@@ -22,7 +22,18 @@ class EmitSeries(SeriesDatabase):
     Supports only 'ep' and 'sequence' mode series.
     """
 
-    schema = {'type': 'boolean'}
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'from_start': {'type': 'boolean', 'default': False}
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def ep_identifiers(self, season, episode):
         return ['S%02dE%02d' % (season, episode),
@@ -52,6 +63,8 @@ class EmitSeries(SeriesDatabase):
     def on_task_input(self, task, config):
         if not config:
             return
+        if isinstance(config, bool):
+            config = {}
         if not task.is_rerun:
             self.try_next_season = {}
         entries = []
@@ -95,9 +108,13 @@ class EmitSeries(SeriesDatabase):
                     if latest_ep_this_season.downloaded_releases:
                         entries.append(self.search_entry(series, latest.season, latest_ep_this_season.number + 1, task))
             else:
-                log.verbose('Series `%s` has no history. Set begin option, or use --series-begin '
-                            'to set first episode to emit' % series.name)
-                continue
+                if config.get('from_start'):
+                    season = 1 if series.identified_by == 'ep' else 0
+                    entries.append(self.search_entry(series, season, 1, task))
+                else:
+                    log.verbose('Series `%s` has no history. Set begin option, or use --series-begin '
+                                'to set first episode to emit' % series.name)
+                    continue
 
         return entries
 
