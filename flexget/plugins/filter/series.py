@@ -546,7 +546,12 @@ def set_series_begin(series, ep_id):
     elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
         identified_by = 'date'
     else:
-        raise ValueError('`%s` is not a valid episode identifier' % ep_id)
+        # Check if a sequence identifier was passed as a string
+        try:
+            ep_id = int(ep_id)
+            identified_by = 'sequence'
+        except ValueError:
+            raise ValueError('`%s` is not a valid episode identifier' % ep_id)
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
