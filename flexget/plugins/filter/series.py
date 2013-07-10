@@ -666,7 +666,7 @@ class FilterSeriesBase(object):
                 'propers': {'type': ['boolean', 'string'], 'format': 'interval'},
                 # Identified by
                 'identified_by': {
-                    'type': 'string', 'enum': ['ep', 'date', 'sequence', 'id', 'auto'], 'default': 'auto'
+                    'type': 'string', 'enum': ['ep', 'date', 'sequence', 'id', 'auto']
                 },
                 # Strict naming
                 'exact': {'type': 'boolean'},
