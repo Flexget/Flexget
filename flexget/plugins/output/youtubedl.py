@@ -69,12 +69,14 @@ class PluginYoutubeDl(object):
                     'user_agent': {'type': 'string'},
                     'referer': {'type': 'string'},
                     'output_template': {'type': 'string'},
-                    'write': {'type': 'array',
+                    'write': 
+                    {
+                        'type': 'array',
                         'items': {'type': 'string'}
                     },
                     'audio_format': {'type': 'string'},
                     'audio_quality': {'type': 'string'},
-                    'keep_video': {'type': 'boolean' }
+                    'keep_video': {'type': 'boolean'}
                 },
                 'additionalProperties': False
             }
