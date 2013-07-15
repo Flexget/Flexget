@@ -11,8 +11,6 @@ from flexget import validator
 import subprocess
 import sys
 
-from pprint import pprint
-
 log = getLogger('youtubedl')
 
 
@@ -24,7 +22,6 @@ class PluginYoutubeDl(object):
 
       youtubedl:
         quiet: no
-        enabled: yes
         output_template: '%(title)s ____BY____ %(uploader)s.%(ext)s'
         restrict_filenames: yes
         write:
@@ -44,7 +41,6 @@ class PluginYoutubeDl(object):
         username:
         password:
         video_password:
-        enabled: yes
         user_agent: 'Mozilla/5.0 (Windows NT 6.1; rv:22.0) Gecko/20130405 Firefox/22.0'
         referer: http://www.google.com
         output_template: '(%uploader)s - (%title)s - (%id)s.(%ext)s'
@@ -55,51 +51,61 @@ class PluginYoutubeDl(object):
     """
 
     __author__ = 'http://rg3.github.io/youtube-dl/'
-    __version__ = '0.1'
+    __version__ = '0.2'
 
-    DEFAULT_USER_AGENT = 'Mozilla/5.0 (Windows NT 6.1; rv:22.0) Gecko/20130405 Firefox/22.0'
-    DEFAULT_REFERER = 'http://www.google.com'
-    DEFAULT_OUTPUT_TEMPLATE = '%(uploader)s - %(title)s - %(id)s.%(ext)s'
-    DEFAULT_RESTRICT_FILENAMES = False
-    DEFAULT_WRITE = []
-    DEFAULT_QUIET = True
-    DEFAULT_EXTRACT_AUDIO = False
-    DEFAULT_KEEP_VIDEO = False
-    DEFAULT_USERNAME = ''
-    DEFAULT_PASSWORD = ''
-    DEFAULT_VIDEO_PASSWORD = ''
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'quiet': {'type': 'boolean'},
+                    'restrict_filenames': {'type': 'boolean'},
+                    'extract_audio': {'type': 'boolean'},
+                    'keep_video': {'type': 'boolean'},
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'video_password': {'type': 'string'},
+                    'user_agent': {'type': 'string'},
+                    'referer': {'type': 'string'},
+                    'output_template': {'type': 'string'},
+                    'write': {'type': 'array',
+                        'items': {'type': 'string'}
+                    },
+                    'audio_format': {'type': 'string'},
+                    'audio_quality': {'type': 'string'},
+                    'keep_video': {'type': 'boolean' }
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
-    def validator(self):
-        """Return config validator"""
-        root = validator.factory()
-        root.accept('boolean')
-        config = root.accept('dict')
-        #Auth stuff
-        config.accept('text', key='video_password')
-        config.accept('text', key='username')
-        config.accept('text', key='password')
-        #Basics
-        config.accept('boolean', key='enabled')
-        config.accept('text', key='user_agent')
-        config.accept('text', key='referer')
-        config.accept('text', key='output_template')
-        config.accept('boolean', key='restrict_filenames')
-        config.accept('boolean', key='quiet')
-        config.accept('list', key='write').accept('text')
-        #Audio
-        config.accept('boolean', key='extract_audio')
-        config.accept('boolean', key='keep_video')
-        config.accept('text', key='audio_format')
-        config.accept('text', key='audio_quality')
+    def prepare_config(self, config):
+        if isinstance(config, bool) and config:
+            config = {}
+        
+        config.setdefault('user_agent', 'Mozilla/5.0 (Windows NT 6.1; rv:22.0) Gecko/20130405 Firefox/22.0')
+        config.setdefault('referer', 'http://www.google.com')
+        config.setdefault('output_template', '%(uploader)s - %(title)s - %(id)s.%(ext)s')
+        config.setdefault('restrict_filenames', False)
+        config.setdefault('quiet', False)
+        config.setdefault('extract_audio', False)
+        config.setdefault('keep_video', False)
+        config.setdefault('username', '')
+        config.setdefault('password', '')
+        config.setdefault('video_password', '')
+        config.setdefault('write', [])
+        config.setdefault('keep_video', False)
+
         return config
 
     def on_task_output(self, task, config):
-        if not config.get('enabled', True):
-            return
         if not task.accepted:
             return
-        import IPython
-        IPython.embed()
+
+        config = self.prepare_config(config)
+        
         self.download_entries(task, config)        
 
     def download_entries(self, task, config):
@@ -116,25 +122,25 @@ class PluginYoutubeDl(object):
                 raise PluginError('Unknown error: %s' % str(e), log)
 
     def download_entry(self, entry, config):
-        username = config.get('username', self.DEFAULT_USERNAME)
-        password = config.get('password', self.DEFAULT_PASSWORD)
-        video_password = config.get('video_password', self.DEFAULT_VIDEO_PASSWORD)
+        username = config['username']
+        password = config['password']
+        video_password = config['video_password']
         
-        user_agent = config.get('user_agent', self.DEFAULT_USER_AGENT)
-        referer = config.get('referer', self.DEFAULT_REFERER)
-        output_template = config.get('output_template', self.DEFAULT_OUTPUT_TEMPLATE)
-        restrict_filenames = config.get('restrict_filenames', self.DEFAULT_RESTRICT_FILENAMES)
-        quiet = config.get('quiet', self.DEFAULT_QUIET)
-        write = config.get('write', self.DEFAULT_WRITE)
+        user_agent = config['user_agent']
+        referer = config['referer']
+        output_template = config['output_template']
+        restrict_filenames = config['restrict_filenames']
+        quiet = config['quiet']
+        write = config['write']
         
-        extract_audio = config.get('extract_audio', self.DEFAULT_EXTRACT_AUDIO)
-        keep_video = config.get('keep_video', self.DEFAULT_KEEP_VIDEO)
-        audio_format = config.get('audio_format', '')
-        audio_quality = config.get('audio_quality', '')
+        extract_audio = config['extract_audio']
+        keep_video = config['keep_video']
+        audio_format = config['audio_format']
+        audio_quality = config['audio_quality']
 
         path = ''
         if 'set' in entry.task.config:
-            path = entry.task.config['set'].get('path', '')
+            path = entry.task.config['set'].get('path', '') # TODO this might fail in the future, needs a test
 
         # TODO this is ugly
         # we need both username and password, otherwise youtube-dl will ask at STDIN
