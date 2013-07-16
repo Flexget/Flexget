@@ -67,6 +67,8 @@ class MovePlugin(object):
                 log.warning('Cannot move `%s` because location `%s` is not a file ' % (entry['title'], src))
                 continue
 
+            src_filename, src_ext = os.path.splitext(src)
+
             # DST
             filepath, filename = os.path.split(src)
             # get proper value in order of: entry, config, above split
@@ -133,6 +135,12 @@ class MovePlugin(object):
                     else:
                         break
                     count += 1
+
+            # Check dst contains src_ext
+            dst_filename, dst_ext = os.path.splitext(dst)
+            if dst_ext != src_ext:
+                log.verbose('Adding extension `%s` to dst `%s`' % (src_ext, dst))
+                dst += src_ext
 
             # Move stuff
             if task.manager.options.test:

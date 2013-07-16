@@ -421,6 +421,8 @@ class SeriesDatabase(object):
         downloaded = session.query(Episode).join(Episode.releases, Episode.series).\
             filter(Series.id == series.id).\
             filter(Release.downloaded == True)
+        if series.identified_by and series.identified_by != 'auto':
+            downloaded = downloaded.filter(Episode.identified_by == series.identified_by)
         if series.identified_by in ['ep', 'sequence']:
             latest_download = downloaded.order_by(desc(Episode.season), desc(Episode.number)).first()
         elif series.identified_by == 'date':
@@ -544,7 +546,12 @@ def set_series_begin(series, ep_id):
     elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
         identified_by = 'date'
     else:
-        raise ValueError('`%s` is not a valid episode identifier' % ep_id)
+        # Check if a sequence identifier was passed as a string
+        try:
+            ep_id = int(ep_id)
+            identified_by = 'sequence'
+        except ValueError:
+            raise ValueError('`%s` is not a valid episode identifier' % ep_id)
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
@@ -574,8 +581,10 @@ def set_series_begin(series, ep_id):
 def forget_series(name):
     """Remove a whole series `name` from database."""
     session = Session()
-    deleted = session.query(Series).filter(Series.name == name).delete()
-    if deleted:
+    series = session.query(Series).filter(Series.name == name).all()
+    if series:
+        for s in series:
+            session.delete(s)
         session.commit()
         log.debug('Removed series %s from database.', name)
     else:
@@ -659,7 +668,7 @@ class FilterSeriesBase(object):
                 'propers': {'type': ['boolean', 'string'], 'format': 'interval'},
                 # Identified by
                 'identified_by': {
-                    'type': 'string', 'enum': ['ep', 'date', 'sequence', 'id', 'auto'], 'default': 'auto'
+                    'type': 'string', 'enum': ['ep', 'date', 'sequence', 'id', 'auto']
                 },
                 # Strict naming
                 'exact': {'type': 'boolean'},
@@ -771,7 +780,8 @@ class FilterSeriesBase(object):
                     # Combine the config dicts for both instances of the show
                     unique_series[series].update(series_settings)
         # Turn our all_series dict back into a list
-        return [{series: settings} for (series, settings) in unique_series.iteritems()]
+        # sort by reverse alpha, so that in the event of 2 series with common prefix, more specific is parsed first
+        return [{series: unique_series[series]} for series in sorted(unique_series, reverse=True)]
 
     def merge_config(self, task, config):
         """Merges another series config dict in with the current one."""

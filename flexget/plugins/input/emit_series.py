@@ -22,7 +22,18 @@ class EmitSeries(SeriesDatabase):
     Supports only 'ep' and 'sequence' mode series.
     """
 
-    schema = {'type': 'boolean'}
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'from_start': {'type': 'boolean', 'default': False}
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def ep_identifiers(self, season, episode):
         return ['S%02dE%02d' % (season, episode),
@@ -46,17 +57,24 @@ class EmitSeries(SeriesDatabase):
                       series_id=series_id,
                       series_id_type=series.identified_by)
         if rerun:
-            entry.on_complete(self.on_search_complete, task=task)
+            entry.on_complete(self.on_search_complete, task=task, identified_by=series.identified_by)
         return entry
 
     def on_task_input(self, task, config):
         if not config:
             return
+        if isinstance(config, bool):
+            config = {}
         if not task.is_rerun:
             self.try_next_season = {}
         entries = []
         for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
             series = seriestask.series
+            if not series:
+                # TODO: How can this happen?
+                log.debug('Found SeriesTask item without series specified. Cleaning up.')
+                task.session.delete(seriestask)
+                continue
             if series.identified_by not in ['ep', 'sequence']:
                 log.verbose('Can only emit ep or sequence based series. `%s` is identified_by %s' %
                             (series.name, series.identified_by or 'auto'))
@@ -90,18 +108,25 @@ class EmitSeries(SeriesDatabase):
                     if latest_ep_this_season.downloaded_releases:
                         entries.append(self.search_entry(series, latest.season, latest_ep_this_season.number + 1, task))
             else:
-                log.verbose('Series `%s` has no history. Set begin option, or use --series-begin '
-                            'to set first episode to emit' % series.name)
-                continue
+                if config.get('from_start'):
+                    season = 1 if series.identified_by == 'ep' else 0
+                    entries.append(self.search_entry(series, season, 1, task))
+                else:
+                    log.verbose('Series `%s` has no history. Set begin option, or use --series-begin '
+                                'to set first episode to emit' % series.name)
+                    continue
 
         return entries
 
-    def on_search_complete(self, entry, task=None, **kwargs):
+    def on_search_complete(self, entry, task=None, identified_by=None, **kwargs):
         if entry.accepted:
             # We accepted a result from this search, rerun the task to look for next ep
             self.try_next_season.pop(entry['series_name'], None)
             task.rerun()
         else:
+            if identified_by != 'ep':
+                # Do not try next season if this is not an 'ep' show
+                return
             if entry['series_name'] not in self.try_next_season:
                 self.try_next_season[entry['series_name']] = True
                 task.rerun()

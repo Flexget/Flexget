@@ -177,12 +177,12 @@ class Discover(object):
                 # If we just got a date, add a time so we can compare it to now()
                 est_date = datetime.datetime.combine(est_date, datetime.time())
             if datetime.datetime.now() >= est_date:
-                log.verbose('%s has been released at %s' % (entry['title'], est_date))
+                log.debug('%s has been released at %s' % (entry['title'], est_date))
                 result.append(entry)
             else:
                 entry.reject('has not been released')
                 entry.complete()
-                log.verbose("%s hasn't been released yet (Expected:%s)" % (entry['title'], est_date))
+                log.debug("%s hasn't been released yet (Expected: %s)" % (entry['title'], est_date))
         return result
 
     def interval_total_seconds(self, interval):
@@ -203,6 +203,7 @@ class Discover(object):
         if task.manager.options.discover_now:
             log.info('Ignoring interval because of --discover-now')
         result = []
+        interval_count = 0
         for entry in entries:
             de = task.session.query(DiscoverEntry).\
                 filter(DiscoverEntry.title == entry['title']).\
@@ -222,14 +223,16 @@ class Discover(object):
                           de.last_execution, config['interval'], next_time)
                 if datetime.datetime.now() < next_time:
                     log.debug('interval not met')
-                    log.verbose('Discover interval %s not met for %s. Use --discover-now to override.' %
-                                (config['interval'], entry['title']))
+                    interval_count += 1
                     entry.reject('discover interval not met')
                     entry.complete()
                     continue
                 de.last_execution = datetime.datetime.now()
             log.debug('interval passed')
             result.append(entry)
+        if interval_count:
+            log.verbose('Discover interval of %s not met for %s entries. Use --discover-now to override.' %
+                        (config['interval'], interval_count))
         return result
 
     def on_task_input(self, task, config):
