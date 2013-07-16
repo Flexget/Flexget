@@ -31,6 +31,7 @@ class InputPlex(object):
     'strip_year'        Remove year from title, ex: Show Name (2012) 01x01 => Show Name 01x01
     'original_filename' Use filename stored in PMS instead of transformed name. lowercase_title and strip_year
                         will be ignored.
+    'unwatched_only'    Request only unwatched media from PMS.
 
     Default paramaters:
       server           : localhost
@@ -39,6 +40,7 @@ class InputPlex(object):
       lowercase_title  : no
       strip_year       : yes
       original_filename: no
+      unwatched_only   : no
 
     Example:
 
@@ -61,6 +63,7 @@ class InputPlex(object):
         config.accept('boolean', key='lowercase_title')
         config.accept('boolean', key='strip_year')
         config.accept('boolean', key='original_filename')
+        config.accept('boolean', key='unwatched_only')
         return config
 
     def prepare_config(self, config):
@@ -72,11 +75,18 @@ class InputPlex(object):
         config.setdefault('lowercase_title', False)
         config.setdefault('strip_year', True)
         config.setdefault('original_filename', False)
+        config.setdefault('unwatched_only', False)
         return config
 
     def on_task_input(self, task, config):
         config = self.prepare_config(config)
         accesstoken = ""
+        urlconfig = {}
+        urlappend = "?"
+        if (config['unwatched_only'] and config['section'] != 'recentlyViewedShows' 
+            and config['section'] != 'all'):
+                urlconfig['unwatched'] = '1'
+            
         plexserver = config['server']  
         if gethostbyname(config['server']) != config['server']:
             config['server'] = gethostbyname(config['server'])
@@ -105,14 +115,16 @@ class InputPlex(object):
             for node in dom.getElementsByTagName('Server'):
                 if node.getAttribute('address') == config['server']:
                     accesstoken = node.getAttribute('accessToken') 
-                    log.debug("Got accesstoken: %s" % plextoken)
-                    accesstoken = "?X-Plex-Token=%s" % accesstoken
+                    log.debug("Got accesstoken: %s" % accesstoken)
+                    urlconfig['X-Plex-Token'] = accesstoken
             if accesstoken == "":
                 raise PluginError('Could not retrieve accesstoken for %s.' % config['server'])
+        for key in urlconfig:
+            urlappend += '%s=%s&' % (key, urlconfig[key])
         if not isinstance(config['section'], int):
             try:
                 r = requests.get("http://%s:%d/library/sections/%s" % 
-                    (config['server'], config['port'], accesstoken))
+                    (config['server'], config['port'], urlappend))
             except requests.RequestException as e:
                 raise PluginError('Error retrieving source: %s' % e)
             dom = parseString(r.text.encode("utf-8"))
@@ -121,9 +133,11 @@ class InputPlex(object):
                     config['section'] = int(node.getAttribute('key'))
         if not isinstance(config['section'], int):
             raise PluginError('Could not find section \'%s\'' % config['section'])
+        log.debug("Fetching http://%s:%d/library/sections/%s/%s%s" %
+            (config['server'], config['port'], config['section'], config['selection'], urlappend))
         try:
             r = requests.get("http://%s:%d/library/sections/%s/%s%s" % 
-                (config['server'], config['port'], config['section'], config['selection'], accesstoken))
+                (config['server'], config['port'], config['section'], config['selection'], urlappend))
         except requests.RequestException as e:
             raise PluginError('Error retrieving source: %s' % e)
         dom = parseString(r.text.encode("utf-8"))
@@ -142,10 +156,10 @@ class InputPlex(object):
                 e = Entry()
                 e['title'] = title
                 e['url'] = "NULL"
-                e['plexserver'] = plexserver
-                e['plexport'] = config['port']
-                e['plexsection'] = config['section']
-                e['plexsectionname'] = plexsectionname
+                e['plex_server'] = plexserver
+                e['plex_port'] = config['port']
+                e['plex_section'] = config['section']
+                e['plex_section_name'] = plexsectionname
                 entries.append(e)
         elif dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') == "episode":
             for node in dom.getElementsByTagName('Video'):
@@ -181,7 +195,7 @@ class InputPlex(object):
                             if config['lowercase_title']:
                                 title = title.lower()
                             e['title'] = filenamemap % (title, season, episode, resolution, vcodec, acodec, container) 
-                        e['url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, accesstoken)
+                        e['url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, urlappend)
                         e['plex_server'] = plexserver
                         e['plex_server_ip'] = config['server']
                         e['plex_port'] = config['port']
