@@ -219,8 +219,10 @@ def series_begin(manager):
     session = Session()
     series = session.query(Series).filter(Series.name == series_name).first()
     if not series:
-        console('Unknown series `%s`' % series_name)
-        return
+        console('Series not yet in database, adding `%s`' % series_name)
+        series = Series()
+        series.name = series_name
+        session.add(series)
     try:
         set_series_begin(series, ep_id)
     except ValueError as e:

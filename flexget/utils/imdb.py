@@ -263,7 +263,9 @@ class ImdbParser(object):
             log.warning('Unable to get infodiv class for %s - plugin needs update?' % url)
 
         # get name
-        tag_name = soup.find('h1').find('span', attrs={'itemprop': 'name'})
+        tag_name = soup.find('h1')
+        if tag_name:
+            tag_name = tag_name.find('span', attrs={'itemprop': 'name'})
         if tag_name:
             self.name = tag_name.text
             log.debug('Detected name: %s' % self.name)
@@ -274,7 +276,7 @@ class ImdbParser(object):
         if tag_original_title_i:
             span = tag_original_title_i.parent
             tag_original_title_i.decompose()
-            self.original_name = span.text.strip()
+            self.original_name = span.text.strip().strip('"')
             log.debug('Detected original name: %s' % self.original_name)
         else:
             # if title is already in original language, it doesn't have the tag

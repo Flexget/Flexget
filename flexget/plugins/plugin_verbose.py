@@ -25,7 +25,7 @@ class Verbose(object):
     def verbose_details(self, entry, task=None, act=None, reason=None, **kwargs):
         msg = "%s: `%s` by %s plugin" % (act.upper(), entry['title'], task.current_plugin)
         if reason:
-            msg += 'because %s' % reason[0].lower() + reason[1:]
+            msg += ' because %s' % reason[0].lower() + reason[1:]
 
         task_log.verbose(msg)
 

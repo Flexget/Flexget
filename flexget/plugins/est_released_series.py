@@ -31,8 +31,8 @@ class EstimatesReleasedSeries(object):
                 if entry.get('series_id_type') == 'sequence':
                     # Tvrage has absolute numbered shows under season 1
                     season = 1
-                log.verbose("Querying release estimation for %s S%02dE%02d ..." %
-                            (entry['series_name'], season, entry['series_episode']))
+                log.debug("Querying release estimation for %s S%02dE%02d ..." %
+                          (entry['series_name'], season, entry['series_episode']))
                 try:
                     series_info = lookup_series(name=entry['series_name'])
                 except LookupError as e:

@@ -1,9 +1,11 @@
-import tvrage.api  # See https://github.com/ckreutzer/python-tvrage for more details, it's pretty classic.
+from __future__ import unicode_literals, division, absolute_import
 import logging
 import datetime
+from socket import timeout
 
-from sqlalchemy import Column, Integer, DateTime, String, ForeignKey, select, update
+from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, select, update
 from sqlalchemy.orm import relation
+import tvrage.api
 
 from flexget.event import event
 from flexget.utils.database import with_session
@@ -40,10 +42,22 @@ def upgrade(ver, session):
     return ver
 
 
+class TVRageLookup(Base):
+    __tablename__ = 'tvrage_lookup'
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode, index=True)
+    series_id = Column(Integer, ForeignKey('tvrage_series.id'), nullable=False)
+    series = relation('TVRageSeries', uselist=False, cascade='all, delete')
+
+    def __init__(self, name, series):
+        self.name = name.lower()
+        self.series = series
+
+
 class TVRageSeries(Base):
     __tablename__ = 'tvrage_series'
     id = Column(Integer, primary_key=True)
-    name = Column(String, index=True)
+    name = Column(String)
     episodes = relation('TVRageEpisodes', order_by='TVRageEpisodes.season, TVRageEpisodes.episode',
                         cascade='all, delete, delete-orphan')
     showid = Column(String)
@@ -58,18 +72,23 @@ class TVRageSeries(Base):
     last_update = Column(DateTime)  # last time we updated the db for the show
 
     def __init__(self, series):
-        self.name = series.name.lower()
+        self.update(series)
+
+    def update(self, series):
+        self.name = series.name
         self.showid = series.showid
         self.link = series.link
         self.classification = series.classification
-        self.genres = filter(None, series.genres)  # Sometimes tvdb has a None in the genres list
+        self.genres = filter(None, series.genres)  # Sometimes tvrage has a None in the genres list
         self.country = series.country
         self.started = series.started
         self.ended = series.ended
         self.seasons = series.seasons
         self.last_update = datetime.datetime.now()
 
-        for i in range(1, series.seasons+1):
+        # Clear old eps before repopulating
+        del self.episodes[:]
+        for i in range(1, series.seasons + 1):
             season = series.season(i)
             for j in season.keys():
                 episode = TVRageEpisodes(season.episode(j))
@@ -101,6 +120,9 @@ class TVRageEpisodes(Base):
     title = Column(String)
 
     def __init__(self, ep):
+        self.update(ep)
+
+    def update(self, ep):
         self.episode = ep.number
         self.season = ep.season
         self.prodnum = ep.prodnumber
@@ -128,22 +150,33 @@ class TVRageEpisodes(Base):
 
 @with_session
 def lookup_series(name=None, session=None):
-    # TODO : Maybe find a better way to find a match from a name, so far series are named in lowercase
-    res = session.query(TVRageSeries).filter(TVRageSeries.name == name.lower()).first()
+    series = None
+    res = session.query(TVRageLookup).filter(TVRageLookup.name == name.lower()).first()
 
-    if res is not None:
+    if res:
+        series = res.series
         # if too old result, clean the db and refresh it
         interval = parse_timedelta(update_interval)
-        if datetime.datetime.now() > res.last_update+interval:
-            log.info('Refreshing tvrage info for %s' % name)
-            session.delete(res)
+        if datetime.datetime.now() > series.last_update + interval:
+            log.debug('Refreshing tvrage info for %s', name)
         else:
-            return res
-    log.info('Fetching tvrage info for %s' % name)
+            return series
+    log.debug('Fetching tvrage info for %s' % name)
     try:
-        fetched = tvrage.api.Show(name)
+        fetched = tvrage.api.Show(name.encode('utf-8'))
     except tvrage.exceptions.ShowNotFound:
         raise LookupError('Could not find show %s' % name)
-    series = TVRageSeries(fetched)
-    session.add(series)
+    except (timeout, AttributeError):
+        # AttributeError is due to a bug in tvrage package trying to access URLError.code
+        raise LookupError('Timed out while connecting to tvrage')
+    if not series:
+        series = session.query(TVRageSeries).filter(TVRageSeries.showid == fetched.showid).first()
+    if not series:
+        series = TVRageSeries(fetched)
+        session.add(series)
+        session.add(TVRageLookup(unicode(fetched.name), series))
+    else:
+        series.update(fetched)
+    if name.lower() != fetched.name.lower():
+        session.add(TVRageLookup(name, series))
     return series

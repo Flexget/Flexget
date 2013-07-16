@@ -76,7 +76,7 @@ class NewTorrents:
         """Parses torrent download url from search results"""
         name = normalize_unicode(name)
         if not url:
-            url = 'http://www.newtorrents.info/search/%s' % urllib.quote(name.encode('utf-8'), safe=':/~?=&%')
+            url = 'http://www.newtorrents.info/search/%s' % urllib.quote(name.encode('utf-8'), safe=b':/~?=&%')
 
         log.debug('search url: %s' % url)
 
