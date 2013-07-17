@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals, division, absolute_import
-from urllib import urlencode, quote
-from urllib2 import urlopen, URLError, HTTPError
 from logging import getLogger
-from flexget.utils import json
 from flexget.plugin import register_plugin, PluginError
-from flexget import validator
 
 import subprocess
 import sys
@@ -51,7 +47,7 @@ class PluginYoutubeDl(object):
     """
 
     __author__ = 'http://rg3.github.io/youtube-dl/'
-    __version__ = '0.2'
+    __version__ = '0.3'
 
     schema = {
         'oneOf': [
@@ -76,7 +72,7 @@ class PluginYoutubeDl(object):
                     },
                     'audio_format': {'type': 'string'},
                     'audio_quality': {'type': 'string'},
-                    'keep_video': {'type': 'boolean'}
+                    'allow_background': {'type': 'boolean'}
                 },
                 'additionalProperties': False
             }
@@ -99,7 +95,8 @@ class PluginYoutubeDl(object):
         config.setdefault('video_password', '')
         config.setdefault('write', [])
         config.setdefault('keep_video', False)
-
+        config.setdefault('allow_background', False)
+   
         return config
 
     def on_task_output(self, task, config):
@@ -107,7 +104,6 @@ class PluginYoutubeDl(object):
             return
 
         config = self.prepare_config(config)
-        
         self.download_entries(task, config)        
 
     def download_entries(self, task, config):
@@ -116,78 +112,63 @@ class PluginYoutubeDl(object):
         for entry in task.accepted:
             try:
                 self.download_entry(entry, config)
-            except URLError:
-                raise PluginError('Invalid URL', log)
             except PluginError:
                 raise
             except Exception as e:
                 raise PluginError('Unknown error: %s' % str(e), log)
 
     def download_entry(self, entry, config):
-        username = config['username']
-        password = config['password']
-        video_password = config['video_password']
-        
-        user_agent = config['user_agent']
-        referer = config['referer']
-        output_template = config['output_template']
-        restrict_filenames = config['restrict_filenames']
-        quiet = config['quiet']
-        write = config['write']
-        
-        extract_audio = config['extract_audio']
-        keep_video = config['keep_video']
-        audio_format = config['audio_format']
-        audio_quality = config['audio_quality']
+        if 'path' in entry.task.config['set']:
+            config['path'] = entry.task.config['set'].get('path', '') # TODO this might fail in the future
+        else:
+            config['path'] = ''
 
-        path = ''
-        if 'set' in entry.task.config:
-            path = entry.task.config['set'].get('path', '') # TODO this might fail in the future, needs a test
+        # TODO this whole thing is ugly, maybe something like "for (index, item) in enumerate(config)"?
+        auth = '--video-password "%s"' % (config['video_password']) if (config['video_password']) else ''
 
-        # TODO this is ugly
         # we need both username and password, otherwise youtube-dl will ask at STDIN
         # also the defaults are empty strings, so we can't just add it all together
-        auth1 = '--video-password "%s"' % (video_password) if (video_password) else ''
-        auth2 = '--username "%s" --password "%s"' % (username, password) if (username and password) else ''
+        username = config['username']
+        password = config['password']
+        auth += '--username "%s" --password "%s"' % (username, password) if (username and password) else ''
 
-        general = '--user-agent "%(user_agent)s" --referer "%(referer)s" -o "%(path)s%(output_template)s"' % locals()
+        general = '--user-agent "%(user_agent)s" --referer "%(referer)s" -o "%(path)s%(output_template)s"' % config
 
-        bools1 = '--restrict-filenames' if (restrict_filenames) else ''
-        bools2 = '--quiet' if (quiet) else ''
-        bools3 = '--extract-audio' if (extract_audio) else ''
-        bools4 = '--keep-video' if (keep_video) else ''
+        bools = '--restrict-filenames' if (config['restrict_filenames']) else ''
+        bools += '--quiet' if (config['quiet']) else ''
+        bools += '--extract-audio' if (config['extract_audio']) else ''
+        bools += '--keep-video' if (config['keep_video']) else ''
         
-        if(extract_audio):
-            audio1 = '--audio-format "%s"' % (audio_format) if (audio_format) else ''
-            audio2 = '--audio-quality "%s"' % (audio_quality) if (audio_quality) else ''
+        if(config['extract_audio']):
+            audio = '--audio-format "%s"' % (config['audio_format']) if (config['audio_format']) else ''
+            audio += '--audio-quality "%s"' % (config['audio_quality']) if (config['audio_quality']) else ''
 
-        extras = ' --write-' + ' --write-'.join(write) if write else ''
+        extras = ' --write-' + ' --write-'.join(config['write']) if config['write'] else ''
 
         url = '"%s"' % (entry['url'])
 
-        args = ' '.join([auth1, auth2, general, bools1, bools2, bools3, bools4, audio1, audio2, extras, url])
-        
-        cmd = 'youtube-dl %s' % (args)
+        cmd = ' '.join(['youtube-dl', auth, general, bools, audio, extras, url])
                 
         if entry.task.manager.options.test:
-            log.info('Would start youtubedl with "%s"' % cmd)
+            log.info('Would start youtubedl with "%s"', cmd)
             return
         
-        log.debug('Starting Youtube-Dl with "%s"' % cmd)
+        log.debug('Starting Youtube-Dl with "%s"', cmd)
 
-        # 'borrowed' from exec plugin
-        p = subprocess.Popen(cmd.encode(sys.getfilesystemencoding()), 
+        # from exec plugin
+        proc = subprocess.Popen(cmd.encode(sys.getfilesystemencoding()), 
                              shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
                              stderr=subprocess.STDOUT, close_fds=False)
         
-        # TODO allow background
-        (r, w) = (p.stdout, p.stdin)
-        response = r.read()
-        r.close()
-        w.close()
-        if response:
-            log.info('YoutubeDl Stdout: %s' % response)
-        return p.wait()
+        if not config['allow_background']:
+            (read, write) = (proc.stdout, proc.stdin)
+            response = read.read()
+            read.close()
+            write.close()
+            if response:
+                log.info('YoutubeDl Stdout: %s', response)
+
+        return proc.wait()
         
 
 register_plugin(PluginYoutubeDl, 'youtubedl', api_ver=2)
