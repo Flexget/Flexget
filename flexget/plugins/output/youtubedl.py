@@ -47,7 +47,7 @@ class PluginYoutubeDl(object):
     """
 
     __author__ = 'http://rg3.github.io/youtube-dl/'
-    __version__ = '0.3'
+    __version__ = '0.4'
 
     schema = {
         'oneOf': [
@@ -130,18 +130,18 @@ class PluginYoutubeDl(object):
         # also the defaults are empty strings, so we can't just add it all together
         username = config['username']
         password = config['password']
-        auth += '--username "%s" --password "%s"' % (username, password) if (username and password) else ''
+        auth += ' --username "%s" --password "%s"' % (username, password) if (username and password) else ''
 
-        general = '--user-agent "%(user_agent)s" --referer "%(referer)s" -o "%(path)s%(output_template)s"' % config
+        general = ' --user-agent "%(user_agent)s" --referer "%(referer)s" -o "%(path)s%(output_template)s"' % config
 
-        bools = '--restrict-filenames' if (config['restrict_filenames']) else ''
-        bools += '--quiet' if (config['quiet']) else ''
-        bools += '--extract-audio' if (config['extract_audio']) else ''
-        bools += '--keep-video' if (config['keep_video']) else ''
+        bools = ' --restrict-filenames' if (config['restrict_filenames']) else ''
+        bools += ' --quiet' if (config['quiet']) else ''
+        bools += ' --extract-audio' if (config['extract_audio']) else ''
+        bools += ' --keep-video' if (config['keep_video']) else ''
         
         if(config['extract_audio']):
-            audio = '--audio-format "%s"' % (config['audio_format']) if (config['audio_format']) else ''
-            audio += '--audio-quality "%s"' % (config['audio_quality']) if (config['audio_quality']) else ''
+            audio = ' --audio-format "%s"' % (config['audio_format']) if (config['audio_format']) else ''
+            audio += ' --audio-quality "%s"' % (config['audio_quality']) if (config['audio_quality']) else ''
 
         extras = ' --write-' + ' --write-'.join(config['write']) if config['write'] else ''
 
