@@ -133,15 +133,17 @@ class UrlRewriteTorrentleech(object):
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
 
                 # use tr object for size
-                size = tr.find("td", text=re.compile('([\.\d]+) ([GMK])B')).contents[0]
-                size = re.search('([\.\d]+) ([GMK])B', size)
+                size = tr.find("td", text=re.compile('([\.\d]+) ([GMK]?)B')).contents[0]
+                size = re.search('([\.\d]+) ([GMK]?)B', size)
                 if size:
                     if size.group(2) == 'G':
                         entry['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)
                     elif size.group(2) == 'M':
                         entry['content_size'] = int(float(size.group(1)) * 1000 ** 2 / 1024 ** 2)
-                    else:
+                    elif size.group(2) == 'K':
                         entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
+                    else:
+                        entry['content_size'] = int(float(size.group(1)) / 1024 ** 2)
                 entries.add(entry)
 
         return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
