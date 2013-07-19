@@ -58,7 +58,8 @@ class PluginDownload(object):
                 'properties': {
                     'path': {'type': 'string', 'format': 'path'},
                     'fail_html': {'type': 'boolean', 'default': True},
-                    'overwrite': {'type': 'boolean', 'default': False}
+                    'overwrite': {'type': 'boolean', 'default': False},
+                    'temp': {'type': 'string', 'format': 'path'}
                 },
                 'additionalProperties': False
             },
@@ -76,6 +77,7 @@ class PluginDownload(object):
         if not config.get('path'):
             config['require_path'] = True
         config.setdefault('fail_html', True)
+        config.setdefault('temp', '')
         return config
 
     def on_task_download(self, task, config):
@@ -245,8 +247,13 @@ class PluginDownload(object):
             return
 
         # download and write data into a temp file
-        # generate temp file using stdlib
-        tmp_path = os.path.join(task.manager.config_base, 'temp')
+        # generate temp file using stdlib based on user's config setting
+        temp = task.config['download'].get('temp', False)
+        if temp:
+            tmp_path = temp
+        else:
+            tmp_path = os.path.join(task.manager.config_base, 'temp')
+
         if not os.path.isdir(tmp_path):
             log.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
