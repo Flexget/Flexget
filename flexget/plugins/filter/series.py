@@ -25,7 +25,7 @@ from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, DependencyError, priority,
                             PluginError)
 
-SCHEMA_VER = 10
+SCHEMA_VER = 11
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -135,6 +135,13 @@ def upgrade(ver, session):
     if ver == 9:
         table_add_column('series', 'begin_episode_id', Integer, session)
         ver = 10
+    if ver == 10:
+        # Due to bad db cleanups there may be invalid entries in series_tasks table
+        series_tasks = table_schema('series_tasks', session)
+        series_table = table_schema('series', session)
+        log.verbose('Repairing series_tasks table data')
+        session.execute(delete(series_tasks, ~series_tasks.c.series_id.in_(select([series_table.c.id]))))
+        ver = 11
 
     return ver
 
