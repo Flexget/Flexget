@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relation, backref
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
 
@@ -148,11 +148,11 @@ def db_cleanup(session):
     if result:
         log.verbose('Removed %d undownloaded episode releases.', result)
     # Clean up episodes without releases
-    result = session.query(Episode).filter(~Episode.releases.any()).delete(False)
+    result = session.query(Episode).filter(~Episode.releases.any()).filter(~Episode.begins_series.any()).delete(False)
     if result:
         log.verbose('Removed %d episodes without releases.', result)
-    # Clean up series without episodes
-    result = session.query(Series).filter(~Series.episodes.any()).delete(False)
+    # Clean up series without episodes that aren't in any tasks
+    result = session.query(Series).filter(~Series.episodes.any()).filter(~Series.in_tasks.any()).delete(False)
     if result:
         log.verbose('Removed %d series without episodes.', result)
 
@@ -204,10 +204,10 @@ class Series(Base):
     identified_by = Column(String)
     begin_episode_id = Column(Integer, ForeignKey('series_episodes.id', name='begin_episode_id', use_alter=True))
     begin = relation('Episode', uselist=False, primaryjoin="Series.begin_episode_id == Episode.id",
-                     foreign_keys=[begin_episode_id], post_update=True)
+                     foreign_keys=[begin_episode_id], post_update=True, backref='begins_series')
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan',
                         primaryjoin='Series.id == Episode.series_id')
-    in_tasks = relation('SeriesTask', backref='series', cascade='all, delete, delete-orphan')
+    in_tasks = relation('SeriesTask', backref=backref('series', uselist=False), cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
     def name_getter(self):
