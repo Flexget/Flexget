@@ -58,7 +58,8 @@ class PluginDownload(object):
                 'properties': {
                     'path': {'type': 'string', 'format': 'path'},
                     'fail_html': {'type': 'boolean', 'default': True},
-                    'overwrite': {'type': 'boolean', 'default': False}
+                    'overwrite': {'type': 'boolean', 'default': False},
+                    'temp': {'type': 'string', 'format': 'path'}
                 },
                 'additionalProperties': False
             },
@@ -76,6 +77,7 @@ class PluginDownload(object):
         if not config.get('path'):
             config['require_path'] = True
         config.setdefault('fail_html', True)
+        config.setdefault('temp', '')
         return config
 
     def on_task_download(self, task, config):
