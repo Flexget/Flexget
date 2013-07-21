@@ -659,6 +659,8 @@ class Manager(object):
             fire_event('manager.db_cleanup', session)
             session.commit()
             session.close()
+            # Just in case some plugin was overzealous in its cleaning, mark the config changed
+            self.config_changed()
             self.persist['last_cleanup'] = datetime.now()
         else:
             log.debug('Not running db cleanup, last run %s' % self.persist.get('last_cleanup'))
