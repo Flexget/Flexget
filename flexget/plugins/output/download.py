@@ -77,14 +77,18 @@ class PluginDownload(object):
         if not config.get('path'):
             config['require_path'] = True
         config.setdefault('fail_html', True)
-        config.setdefault('temp', '')
         return config
 
     def on_task_download(self, task, config):
         config = self.process_config(config)
-        self.get_temp_files(task, require_path=config.get('require_path', False), fail_html=config['fail_html'])
 
-    def get_temp_file(self, task, entry, require_path=False, handle_magnets=False, fail_html=True):
+        # set temporary download path based on user's config setting or use fallback
+        tmp = config.get('temp', os.path.join(task.manager.config_base, 'temp'))
+        
+        self.get_temp_files(task, require_path=config.get('require_path', False), fail_html=config['fail_html'],
+                            tmp_path=tmp)
+
+    def get_temp_file(self, task, entry, require_path=False, handle_magnets=False, fail_html=True, tmp_path='/tmp'):
         """
         Download entry content and store in temporary folder.
         Fails entry with a reason if there was problem.
@@ -96,6 +100,8 @@ class PluginDownload(object):
           otherwise warning is printed.
         :param fail_html:
           fail entries which url respond with html content
+        :param tmp_path:
+          path to use for temporary files while downloading
         """
         if entry.get('urls'):
             urls = entry.get('urls')
@@ -117,7 +123,7 @@ class PluginDownload(object):
                 # Don't fail here, there might be a magnet later in the list of urls
                 log.debug('Skipping url %s because there is no path for download' % url)
                 continue
-            error = self.process_entry(task, entry, url)
+            error = self.process_entry(task, entry, url, tmp_path)
 
             # disallow html content
             html_mimes = ['html', 'text/html']
@@ -149,7 +155,7 @@ class PluginDownload(object):
         with open(filename, 'w') as outfile:
             outfile.write(page)
 
-    def get_temp_files(self, task, require_path=False, handle_magnets=False, fail_html=True):
+    def get_temp_files(self, task, require_path=False, handle_magnets=False, fail_html=True, tmp_path='/tmp'):
         """Download all task content and store in temporary folder.
 
         :param bool require_path:
@@ -159,19 +165,22 @@ class PluginDownload(object):
           otherwise warning is printed.
         :param fail_html:
           fail entries which url respond with html content
+        :param tmp_path:
+          path to use for temporary files while downloading
         """
         for entry in task.accepted:
-            self.get_temp_file(task, entry, require_path, handle_magnets, fail_html)
+            self.get_temp_file(task, entry, require_path, handle_magnets, fail_html, tmp_path)
 
     # TODO: a bit silly method, should be get rid of now with simplier exceptions ?
-    def process_entry(self, task, entry, url):
+    def process_entry(self, task, entry, url, tmp_path):
         """
         Processes `entry` by using `url`. Does not use entry['url'].
-        Does not fail the `entry` if there is a network issue, instead just log and return a string error.
+        Does not fail the `entry` if there is a network issue, instead just logs and returns a string error.
 
         :param task: Task
         :param entry: Entry
         :param url: Url to try download
+        :param tmp_path: Path to store temporary files
         :return: String error, if failed.
         """
         try:
@@ -180,7 +189,7 @@ class PluginDownload(object):
             else:
                 if not task.manager.unit_test:
                     log.info('Downloading: %s' % entry['title'])
-                self.download_entry(task, entry, url)
+                self.download_entry(task, entry, url, tmp_path)
         except RequestException as e:
             # TODO: Improve this error message?
             log.warning('RequestException %s' % e)
@@ -209,7 +218,7 @@ class PluginDownload(object):
             log.debug(msg, exc_info=True)
             return msg
 
-    def download_entry(self, task, entry, url):
+    def download_entry(self, task, entry, url, tmp_path):
         """Downloads `entry` by using `url`.
 
         :raises: Several types of exceptions ...
@@ -233,7 +242,8 @@ class PluginDownload(object):
         # get content
         auth = None
         if 'basic_auth_password' in entry and 'basic_auth_username' in entry:
-            log.debug('Basic auth enabled. User: %s Password: %s' % (entry['basic_auth_username'], entry['basic_auth_password']))
+            log.debug('Basic auth enabled. User: %s Password: %s'
+                      % (entry['basic_auth_username'], entry['basic_auth_password']))
             auth = (entry['basic_auth_username'], entry['basic_auth_password'])
 
         response = task.requests.get(url, auth=auth, raise_status=False)
@@ -246,24 +256,33 @@ class PluginDownload(object):
             response.raise_for_status()
             return
 
-        # download and write data into a temp file
-        # generate temp file using stdlib based on user's config setting
-        tmp_path = os.path.join(task.manager.config_base, 'temp')
-        if isinstance(task.config['download'], dict):
-            tmp_path = task.config['download'].get('temp', tmp_path)
-            
+        # expand ~ in temp path
+        #TODO jinja?
+        try:
+            tmp_path = os.path.expanduser(tmp_path)
+        except RenderError as e:
+            entry.fail('Could not set temp path. Error during string replacement: %s' % e)
+            return
+
+        # Clean illegal characters from temp path name
+        tmp_path = pathscrub(tmp_path)
+
+        # check for write-access
         if not os.access(tmp_path, os.W_OK):
             raise PluginError('Not allowed to write to temp directory `%s`' % tmp_path)
 
+        # create if missing
         if not os.path.isdir(tmp_path):
             log.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
+
+        # download and write data into a temp file
         tmp_dir = tempfile.mkdtemp(dir=tmp_path)
         fname = hashlib.md5(url).hexdigest()
         datafile = os.path.join(tmp_dir, fname)
         outfile = open(datafile, 'wb')
         try:
-            for chunk in response.iter_content(chunk_size=150*1024, decode_unicode=False):
+            for chunk in response.iter_content(chunk_size=150 * 1024, decode_unicode=False):
                 outfile.write(chunk)
         except:
             # don't leave futile files behind
@@ -402,9 +421,7 @@ class PluginDownload(object):
 
             # check that temp file is present
             if not os.path.exists(entry['file']):
-                tmp_path = os.path.join(task.manager.config_base, 'temp')
                 log.debug('entry: %s' % entry)
-                log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
                 raise PluginWarning('Downloaded temp file `%s` doesn\'t exist!?' % entry['file'])
 
             # if we still don't have a filename, try making one from title (last resort)
