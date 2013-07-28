@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase
 from nose.plugins.attrib import attr
+import tempfile
+import sys
 
 # TODO more checks: fail_html, etc.
 class TestDownload(FlexGetBase):
@@ -12,7 +14,7 @@ class TestDownload(FlexGetBase):
             accept_all: yes
             download:
               path: ~/
-              temp: /tmp
+              temp: """ + tempfile.gettempdir() + """
           just_path:
             mock:
               - {title: 'entry 2', url: 'http://www.speedtest.qsc.de/10kB.qsc'}
@@ -75,8 +77,11 @@ class TestDownloadTemp(FlexGetBase):
     
     def test_wrong_permission(self):
         """Download plugin: Temp directory has wrong permissions"""
-        self.execute_task('temp_wrong_permission', True)
-        assert self.task._abort_reason == 'Not allowed to write to temp directory `/root`'
+        if sys.platform.startswith('win'):
+            assert True, 'Windows - Skipping test' #TODO: Windows doesn't have a guaranteed 'private' directory afaik
+        else:
+            self.execute_task('temp_wrong_permission', True)
+            assert self.task._abort_reason == 'Not allowed to write to temp directory `/root`'
 
     def test_temp_non_existent(self):
         """Download plugin: Temp directory does not exist"""
