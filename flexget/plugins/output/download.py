@@ -88,7 +88,8 @@ class PluginDownload(object):
         self.get_temp_files(task, require_path=config.get('require_path', False), fail_html=config['fail_html'],
                             tmp_path=tmp)
 
-    def get_temp_file(self, task, entry, require_path=False, handle_magnets=False, fail_html=True, tmp_path='/tmp'):
+    def get_temp_file(self, task, entry, require_path=False, handle_magnets=False, fail_html=True,
+                      tmp_path=tempfile.gettempdir()):
         """
         Download entry content and store in temporary folder.
         Fails entry with a reason if there was problem.
@@ -155,7 +156,8 @@ class PluginDownload(object):
         with open(filename, 'w') as outfile:
             outfile.write(page)
 
-    def get_temp_files(self, task, require_path=False, handle_magnets=False, fail_html=True, tmp_path='/tmp'):
+    def get_temp_files(self, task, require_path=False, handle_magnets=False, fail_html=True,
+                       tmp_path=tempfile.gettempdir()):
         """Download all task content and store in temporary folder.
 
         :param bool require_path:
@@ -267,14 +269,14 @@ class PluginDownload(object):
         # Clean illegal characters from temp path name
         tmp_path = pathscrub(tmp_path)
 
-        # check for write-access
-        if not os.access(tmp_path, os.W_OK):
-            raise PluginError('Not allowed to write to temp directory `%s`' % tmp_path)
-
         # create if missing
         if not os.path.isdir(tmp_path):
             log.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
+        
+        # check for write-access
+        if not os.access(tmp_path, os.W_OK):
+            raise PluginError('Not allowed to write to temp directory `%s`' % tmp_path)
 
         # download and write data into a temp file
         tmp_dir = tempfile.mkdtemp(dir=tmp_path)
