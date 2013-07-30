@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 from string import capwords
-from flexget.event import event
+from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
+from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, DependencyError
 from flexget.utils.tools import console
@@ -33,9 +34,16 @@ class SeriesReport(SeriesDatabase):
         session = Session()
 
         name = unicode(name.lower())
-        series = session.query(Series).filter(Series.name == name).first()
-        if not series:
-            console('Unknown series `%s`' % name)
+        try:
+            series = session.query(Series).filter(Series._name_normalized.contains(name)).one()
+        except MultipleResultsFound:
+            console('ERROR: Multiple series match to `%s`.' % name)
+            series = session.query(Series).filter(Series._name_normalized.contains(name)).all()
+            for s in series:
+                print ' - %s' % s.name
+            return
+        except NoResultFound:
+            console('ERROR: Unknown series `%s`' % name)
             return
 
         console(' %-63s%-15s' % ('Identifier, Title', 'Quality'))
