@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 import urllib
+import urllib2
 import feedparser
 
 from flexget.plugin import register_plugin, PluginWarning
@@ -47,11 +48,17 @@ class UrlRewriteTorrentz(object):
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
             url = 'http://torrentz.eu/%s?q=%s' % (feed, urllib.quote(query.encode('utf-8')))
             log.debug('requesting: %s' % url)
-            rss = feedparser.parse(url)
+            try:
+                opened = urllib2.urlopen(url)
+            except urllib2.URLError, err:
+                raise PluginWarning('Error requesting URL: %s' % err)
+            rss = feedparser.parse(opened)
 
             status = rss.get('status', False)
             if status != 200:
-                raise PluginWarning('Search result not 200 (OK), received %s' % status)
+                raise PluginWarning(
+                    'Search result not 200 (OK), received %s %s' %
+                    (status, opened.msg))
 
             ex = rss.get('bozo_exception', False)
             if ex:
