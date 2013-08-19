@@ -162,18 +162,16 @@ class SeriesReport(SeriesDatabase):
             last_dl = data.get('latest', {})
             behind = last_dl.get('behind', 0)
 
-            # hide or not
+            # Mark new eps
             if last_dl:
                 if last_dl['first_seen'] > datetime.now() - timedelta(days=2):
                     new_ep = '>'
-                # don't hide if the series is behind too much
-                if last_dl['first_seen'] < datetime.now() - timedelta(days=30 * 7) and behind <= 3:
+            # Determine whether to hide series. Never hide explicitly configured series.
+            if not data.get('in_tasks'):
+                if behind <= 3 and (last_dl and last_dl['first_seen'] < datetime.now() - timedelta(days=30 * 7)):
+                    # Hide series that are have not been seen recently, and are not behind too many eps
                     hidden += 1
                     continue
-            elif not data.get('in_tasks'):
-                # no recorded downloads
-                hidden += 1
-                continue
 
             status = last_dl.get('status', 'N/A')
             age = last_dl.get('age', 'N/A')
