@@ -9,8 +9,8 @@ from flexget.plugin import register_plugin, register_parser_option, DependencyEr
 from flexget.utils.tools import console
 
 try:
-    from flexget.plugins.filter.series import (SeriesDatabase, Series, Episode, Release, SeriesTask,
-                                               forget_series, forget_series_episode, set_series_begin)
+    from flexget.plugins.filter.series import (SeriesDatabase, Series, Episode, Release, SeriesTask, forget_series,
+                                               forget_series_episode, set_series_begin, normalize_series_name)
 except ImportError:
     raise DependencyError(issued_by='cli_series', missing='series', message='Series commandline interface not loaded')
 
@@ -33,18 +33,19 @@ class SeriesReport(SeriesDatabase):
         from flexget.manager import Session
         session = Session()
 
-        name = unicode(name.lower())
-        try:
-            series = session.query(Series).filter(Series._name_normalized.contains(name)).one()
-        except MultipleResultsFound:
-            console('ERROR: Multiple series match to `%s`.' % name)
-            series = session.query(Series).filter(Series._name_normalized.contains(name)).all()
-            for s in series:
-                print ' - %s' % s.name
-            return
-        except NoResultFound:
+        name = normalize_series_name(name)
+        matches = session.query(Series).filter(Series._name_normalized.contains(name)).order_by(Series.name).all()
+        if not matches:
             console('ERROR: Unknown series `%s`' % name)
             return
+        # Pick the best matching series
+        series = matches[0]
+        console('Showing results for `%s`.' % series.name)
+        if len(matches) > 1:
+            console('WARNING: Multiple series match to `%s`.' % name)
+            console('Be more specific to see the results of other matches:')
+            for s in matches[1:]:
+                console(' - %s' % s.name)
 
         console(' %-63s%-15s' % ('Identifier, Title', 'Quality'))
         console('-' * 79)
