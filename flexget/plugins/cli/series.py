@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 from string import capwords
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+from sqlalchemy import func
 
 from flexget.event import event
 from flexget.manager import Session
@@ -34,7 +34,9 @@ class SeriesReport(SeriesDatabase):
         session = Session()
 
         name = normalize_series_name(name)
-        matches = session.query(Series).filter(Series._name_normalized.contains(name)).order_by(Series.name).all()
+        # Sort by length of name, so that partial matches always show shortest matching title
+        matches = (session.query(Series).filter(Series._name_normalized.contains(name)).
+                   order_by(func.char_length(Series.name)).all())
         if not matches:
             console('ERROR: Unknown series `%s`' % name)
             return
