@@ -91,36 +91,36 @@ class UrlRewriteSerienjunkies(object):
     		raise UrlRewritingError('Unable to find episode language')
     	
     	# filter language
-    	found_lang = 'no'
+    	found_lang = False
     	if language == 'de':
     		if re.search('german|deutsch', episode_lang, flags = re.IGNORECASE):
-    			found_lang = 'yes'
+    			found_lang = True
     	elif language == 'en':
     		if re.search('english|englisch', episode_lang, flags = re.IGNORECASE):
-    			found_lang = 'yes'
+    			found_lang = True
 	elif language == 'both':
 		if re.search('english|englisch', episode_lang, flags = re.IGNORECASE) and re.search('german|deutsch', episode_lang, flags = re.IGNORECASE):
-			found_lang = 'yes'
+			found_lang = True
     			
-    	if found_lang == 'no':
+    	if not found_lang:
     		entry.reject('Language does not match')
+    		    		
+		# find download links
+		links = episode.find_all('a')
+		if not links:
+			raise UrlRewritingError('Unable to find download links')
 
-        # find download links
-        links = episode.find_all('a')
-        if not links:
-            raise UrlRewritingError('Unable to find download links')
-
-        for link in links:
-            if not link.has_attr('href'):
-                continue
-
-            url = link['href']
-            pattern = 'http:\/\/download\.serienjunkies\.org.*%s_.*\.html' % hoster
-
-            if re.match(pattern, url):
-                return url
-            else:
-                log.debug('Hoster does not match')
-                continue
+		for link in links:
+			if not link.has_attr('href'):
+				continue
+				
+			url = link['href']
+			pattern = 'http:\/\/download\.serienjunkies\.org.*%s_.*\.html' % hoster
+			
+			if re.match(pattern, url):
+				return url
+			else:
+				log.debug('Hoster does not match')
+				continue
             
 register_plugin(UrlRewriteSerienjunkies, 'serienjunkies', groups=['urlrewriter'])
