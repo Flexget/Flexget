@@ -9,11 +9,28 @@ from flexget import validator
 
 log = logging.getLogger('serienjunkies')
 
-#configuration
-hoster = 'ul'
+LANGUAGE = ['de', 'en', 'both']
+HOSTER = ['ul', 'cz', 'so']
 
 class UrlRewriteSerienjunkies(object):
-    """Serienjunkies urlrewriter."""
+    """
+    Serienjunkies urlrewriter
+    Version 1.0.0
+    
+    Language setting works like a whitelist, the selected is needed,
+    but others are still possible.
+    
+    Configuration
+    language: [de|en|both] default "en"
+    hoster: [ul|cz|so] default "ul"
+    """
+    
+    def validator(self):
+		root = validator.factory()
+		advanced = root.accept('dict')
+		advanced.accept('choice', key='language').accept_choices(LANGUAGE)
+		advanced.accept('choice', key='hoster').accept_choices(HOSTER)
+		return root
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
@@ -29,31 +46,66 @@ class UrlRewriteSerienjunkies(object):
         series_url = entry['url']
         download_title = entry['title']
         search_title = re.sub('\[.*\] ', '', download_title)
-        download_url = self.parse_download(series_url, search_title)
+        self.config = task.config.get('serienjunkies')
+        download_url = self.parse_download(series_url, search_title, self.config, entry)
         log.debug('TV Show URL: %s' % series_url)
         log.debug('Episode: %s' % search_title)
         log.debug('Download URL: %s' % download_url)
         entry['url'] = download_url
 
     @internet(log)
-    def parse_download(self, series_url, search_title):
+    def parse_download(self, series_url, search_title, config, entry):
         page = requests.get(series_url).content
         try:
             soup = get_soup(page)
         except Exception, e:
             raise UrlRewritingError(e)
+        
+        if config is None:
+        	hoster = 'ul'
+        	language = 'en'
+        else:
+        	if 'hoster' in config:
+        		hoster = config['hoster']
+    		else:
+        		hoster = 'ul'
+        	
+        	if 'language' in config:
+        		language = config['language']
+        	else:
+        		language = 'en'        	
 
-        #find matching download
+        # find matching download
         episode_title = soup.find('strong', text=search_title)
         if not episode_title:
             raise UrlRewritingError('Unable to find episode')
 
-        #find download container
+        # find download container
         episode = episode_title.parent
         if not episode:
             raise UrlRewritingError('Unable to find episode container')
+        
+        # find episode language
+    	episode_lang = episode.find_previous('strong', text=re.compile('Sprache')).next_sibling
+    	if not episode_lang:
+    		raise UrlRewritingError('Unable to find episode language')
+    	
+    	# filter language
+    	found_lang = 'no'
+    	if language == 'de':
+    		if re.search('german|deutsch', episode_lang, flags = re.IGNORECASE):
+    			found_lang = 'yes'
+    	elif language == 'en':
+    		if re.search('english|englisch', episode_lang, flags = re.IGNORECASE):
+    			found_lang = 'yes'
+		elif language == 'both':
+			if re.search('english|englisch', episode_lang, flags = re.IGNORECASE) and re.search('german|deutsch', episode_lang, flags = re.IGNORECASE):
+				found_lang = 'yes'
+    			
+    	if found_lang == 'no':
+    		entry.reject('Language does not match')
 
-        #find download links
+        # find download links
         links = episode.find_all('a')
         if not links:
             raise UrlRewritingError('Unable to find download links')
@@ -70,5 +122,5 @@ class UrlRewriteSerienjunkies(object):
             else:
                 log.debug('Hoster does not match')
                 continue
-
+            
 register_plugin(UrlRewriteSerienjunkies, 'serienjunkies', groups=['urlrewriter'])
