@@ -98,9 +98,9 @@ class UrlRewriteSerienjunkies(object):
     	elif language == 'en':
     		if re.search('english|englisch', episode_lang, flags = re.IGNORECASE):
     			found_lang = 'yes'
-		elif language == 'both':
-			if re.search('english|englisch', episode_lang, flags = re.IGNORECASE) and re.search('german|deutsch', episode_lang, flags = re.IGNORECASE):
-				found_lang = 'yes'
+	elif language == 'both':
+		if re.search('english|englisch', episode_lang, flags = re.IGNORECASE) and re.search('german|deutsch', episode_lang, flags = re.IGNORECASE):
+			found_lang = 'yes'
     			
     	if found_lang == 'no':
     		entry.reject('Language does not match')
