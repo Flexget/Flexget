@@ -13,6 +13,7 @@ LANGUAGE = ['de', 'en', 'both']
 HOSTER = ['ul', 'cz', 'so']
 
 class UrlRewriteSerienjunkies(object):
+
     """
     Serienjunkies urlrewriter
     Version 1.0.0
@@ -26,11 +27,11 @@ class UrlRewriteSerienjunkies(object):
     """
     
     def validator(self):
-		root = validator.factory()
-		advanced = root.accept('dict')
-		advanced.accept('choice', key='language').accept_choices(LANGUAGE)
-		advanced.accept('choice', key='hoster').accept_choices(HOSTER)
-		return root
+    	root = validator.factory()
+    	advanced = root.accept('dict')
+    	advanced.accept('choice', key='language').accept_choices(LANGUAGE)
+    	advanced.accept('choice', key='hoster').accept_choices(HOSTER)
+    	return root
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
@@ -98,9 +99,9 @@ class UrlRewriteSerienjunkies(object):
     	elif language == 'en':
     		if re.search('english|englisch', episode_lang, flags = re.IGNORECASE):
     			found_lang = 'yes'
-		elif language == 'both':
-			if re.search('english|englisch', episode_lang, flags = re.IGNORECASE) and re.search('german|deutsch', episode_lang, flags = re.IGNORECASE):
-				found_lang = 'yes'
+    	elif language == 'both':
+    		if re.search('english|englisch', episode_lang, flags = re.IGNORECASE) and re.search('german|deutsch', episode_lang, flags = re.IGNORECASE):
+    			found_lang = 'yes'
     			
     	if found_lang == 'no':
     		entry.reject('Language does not match')
