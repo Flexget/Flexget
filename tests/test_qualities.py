@@ -20,6 +20,7 @@ class TestQualityParser(object):
     def test_qualities(self):
         items = [('Test.File 1080p.web-dl', '1080p webdl'),
                  ('Test.File.web-dl.1080p', '1080p webdl'),
+                 ('Test.File.WebHD.720p', '720p webdl'),
                  ('Test.File.720p.bluray', '720p bluray'),
                  ('Test.File.1080p.bluray', '1080p bluray'),
                  ('Test.File.1080p.cam', '1080p cam'),
