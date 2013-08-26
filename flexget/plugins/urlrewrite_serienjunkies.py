@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
 
-from plugin_urlrewriting import UrlRewritingError
+from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.plugin import internet, register_plugin
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
