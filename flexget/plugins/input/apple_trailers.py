@@ -22,7 +22,7 @@ class AppleTrailers(InputRSS):
 
         apple_trailers: 480p
 
-        Choice of quality is one of: ipod, '320', '480', 640w, 480p, 720p, 1080p
+        Choice of quality is one of: 480p, 720p
     """
 
     rss_url = 'http://trailers.apple.com/trailers/home/rss/newtrailers.rss'
