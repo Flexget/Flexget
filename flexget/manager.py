@@ -113,7 +113,7 @@ class Manager(object):
         self.tasks = {}
 
         self.initialize()
-        
+
         # check if stdout is not connected to terminal (cron run)
         #if not os.isatty(sys.stdout.fileno()):
         #    log.warning('It appears you\'re running from CRON')
@@ -221,20 +221,27 @@ class Manager(object):
         log.info('Tried to read from: %s' % ', '.join(possible))
         raise IOError('Failed to find configuration file %s' % self.options.config)
 
-    def load_config(self, config):
+    def load_config(self, config_path):
         """
         .. warning::
 
            Calls sys.exit(1) if configuration file could not be loaded.
            This is something we probably want to change.
 
-        :param string config: Path to configuration file
+        :param string config_path: Path to configuration file
         """
+        with open(config_path, 'rb') as file:
+            config = file.read()
+        try:
+            config = config.decode('utf-8')
+        except UnicodeDecodeError:
+            log.critical('Config file must be UTF-8 encoded.')
+            sys.exit(1)
         if not self.options.quiet:
             # pre-check only when running without --cron
             self.pre_check_config(config)
         try:
-            self.config = yaml.safe_load(file(config)) or {}
+            self.config = yaml.safe_load(config) or {}
         except Exception as e:
             msg = str(e).replace('\n', ' ')
             msg = ' '.join(msg.split())
@@ -278,8 +285,8 @@ class Manager(object):
             sys.exit(1)
 
         # config loaded successfully
-        self.config_name = os.path.splitext(os.path.basename(config))[0]
-        self.config_base = os.path.normpath(os.path.dirname(config))
+        self.config_name = os.path.splitext(os.path.basename(config_path))[0]
+        self.config_base = os.path.normpath(os.path.dirname(config_path))
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         log.debug('config_name: %s' % self.config_name)
         log.debug('config_base: %s' % self.config_base)
@@ -298,7 +305,7 @@ class Manager(object):
         for task in self.tasks.values():
             task.config_changed()
 
-    def pre_check_config(self, fn):
+    def pre_check_config(self, config):
         """Checks configuration file for common mistakes that are easily detectable"""
 
         def get_indentation(line):
@@ -310,7 +317,6 @@ class Manager(object):
         def isodd(n):
             return bool(n % 2)
 
-        file = codecs.open(fn, encoding='utf-8')
         line_num = 0
         duplicates = {}
         # flags
@@ -320,7 +326,7 @@ class Manager(object):
         prev_scalar = True
         list_open = False  # multiline list with [
 
-        for line in file:
+        for line in config.splitlines():
             if '# warnings off' in line.strip().lower():
                 log.debug('config pre-check warnings off')
                 break
@@ -406,7 +412,6 @@ class Manager(object):
                 # as duplicates are not always wrong in a list. see #697
                 duplicates[indentation] = {}
 
-        file.close()
         log.debug('Pre-checked %s configuration lines' % line_num)
 
     def validate_config(self):
