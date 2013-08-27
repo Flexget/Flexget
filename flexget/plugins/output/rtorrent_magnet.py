@@ -1,10 +1,9 @@
+from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 import os
-import sys
 
 from flexget import plugin
-from flexget import validator
 
 log = logging.getLogger('rtorrent_magnet')
 pat = re.compile('xt=urn:btih:([^&/]+)')
@@ -14,7 +13,7 @@ class PluginRtorrentMagnet(object):
     """
     Process Magnet URI's into rtorrent compatible torrent files
 
-    Magnet URI's will look somethign like this:
+    Magnet URI's will look something like this:
 
     magnet:?xt=urn:btih:190F1ABAED7AE7252735A811149753AA83E34309&dn=URL+Escaped+Torrent+Name
 
@@ -30,28 +29,21 @@ class PluginRtorrentMagnet(object):
       rtorrent_magnet: ~/torrents/
     """
 
-    def write_torrent_file(self, task, entry):
-        path = os.path.join(
-            entry['path'],
-            'meta-%s.torrent' % entry['title'].encode(sys.getfilesystemencoding(), 'replace')
-        )
+    schema = {'type': 'string', 'format': 'path'}
+
+    def write_torrent_file(self, task, entry, path):
+        path = os.path.join(path, 'meta-%s.torrent' % entry['title'])
         path = os.path.expanduser(path)
-        log.info('Writing rTorrent Magnet File: %s', path)
 
         if task.manager.options.test:
-            log.info('Would write: d10:magnet-uri%d:%se' % (entry['url'].__len__(), entry['url']))
+            log.info('Would write: %s' % path)
         else:
+            log.info('Writing rTorrent Magnet File: %s', path)
             with open(path, 'w') as f:
-                f.write('d10:magnet-uri%d:%se' % (entry['url'].__len__(), entry['url']))
-            f.closed
-
+                f.write('d10:magnet-uri%d:%se' % (len(entry['url']), entry['url']))
         entry['output'] = path
 
-    def validator(self):
-        root = validator.factory()
-        root.accept('path', allow_replacement=True)
-        return root
-
+    # Run after download plugin to only pick up entries it did not already handle
     @plugin.priority(0)
     def on_task_output(self, task, config):
 
@@ -60,22 +52,11 @@ class PluginRtorrentMagnet(object):
                 log.debug('Ignoring, %s already has an output file: %s' % (entry['title'], entry['output']))
                 continue
 
-            urls = entry.get('urls', [entry['url']])
-
-            for url in urls:
+            for url in entry.get('urls', [entry['url']]):
                 if url.startswith('magnet:'):
                     log.debug('Magnet URI detected for url %s (%s)' % (url, entry['title']))
-
-                    m = pat.search(url)
-                    if m:
-                        entry['url'] = url
-                        entry['path'] = entry.get('path', config)
-                        entry['hash'] = m.groups()[0]
-
-                        log.debug('Magnet Hash Detected: %s' % entry['hash'])
-
-                        self.write_torrent_file(task, entry)
-
+                    if pat.search(url):
+                        self.write_torrent_file(task, entry, entry.get('path', config))
                         break
                     else:
                         log.warning('Unrecognized Magnet URI Format: %s', url)
