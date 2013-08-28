@@ -55,8 +55,9 @@ class TransmissionBase(object):
         config.setdefault('host', 'localhost')
         config.setdefault('port', 9091)
         if 'netrc' in config:
+            netrc_path = os.path.expanduser(config['netrc'])
             try:
-                config['username'], _, config['password'] = netrc(config['netrc']).authenticators(config['host'])
+                config['username'], _, config['password'] = netrc(netrc_path).authenticators(config['host'])
             except IOError as e:
                 log.error('netrc: unable to open: %s' % e.filename)
             except NetrcParseError as e:
