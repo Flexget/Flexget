@@ -70,14 +70,8 @@ class FilterContentFilter(object):
                     entry.reject('does not have any of the required filetypes', remember=True)
                     return True
             if config.get('require_all'):
-                matches = 0
-                for file in files:
-                    for mask in config['require_all']:
-                        if fnmatch(file, mask):
-                            matches += 1
-
-                # if all masks didn't match, reject the entry
-                if matches != len(config['require_all']):
+                # Make sure each mask matches at least one of the contained files
+                if not all(any(fnmatch(file, mask) for file in files) for mask in config['require_all']):
                     log.info('Entry %s does not have all of the required filetypes, rejecting' % entry['title'])
                     entry.reject('does not have all of the required filetypes', remember=True)
                     return True
