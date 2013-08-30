@@ -67,9 +67,14 @@ class ImdbList(object):
             # try to automatically figure out user_id from watchlist redirect url
             if not 'user_id' in config:
                 log.verbose('Getting user_id ...')
-                response = sess.get('http://www.imdb.com/list/watchlist')
-                log.debug('redirected to %s' % response.url)
-                user_id = response.url.split('/')[-2]
+                try:
+                    response = sess.get('http://www.imdb.com/list/watchlist')
+                except requests.RequestException as e:
+                    log.error('Error retrieving user ID from imdb: %s' % e.message)
+                    user_id = ''
+                else:
+                    log.debug('redirected to %s' % response.url)
+                    user_id = response.url.split('/')[-2]
                 if re.match(USER_ID_RE, user_id):
                     config['user_id'] = user_id
                 else:

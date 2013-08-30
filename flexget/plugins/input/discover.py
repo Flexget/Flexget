@@ -145,8 +145,8 @@ class Discover(object):
                         e.on_complete(self.entry_complete, query=entry, search_results=search_results)
                     result.extend(search_results)
 
-                except (PluginError, PluginWarning):
-                    log.debug('No results from %s' % plugin_name)
+                except (PluginError, PluginWarning), err:
+                    log.debug('No results from %s: %s' % (plugin_name, err))
                     entry.complete()
 
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))

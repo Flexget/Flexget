@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relation, backref
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
 
@@ -25,7 +25,7 @@ from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, DependencyError, priority,
                             PluginError)
 
-SCHEMA_VER = 10
+SCHEMA_VER = 11
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -135,6 +135,13 @@ def upgrade(ver, session):
     if ver == 9:
         table_add_column('series', 'begin_episode_id', Integer, session)
         ver = 10
+    if ver == 10:
+        # Due to bad db cleanups there may be invalid entries in series_tasks table
+        series_tasks = table_schema('series_tasks', session)
+        series_table = table_schema('series', session)
+        log.verbose('Repairing series_tasks table data')
+        session.execute(delete(series_tasks, ~series_tasks.c.series_id.in_(select([series_table.c.id]))))
+        ver = 11
 
     return ver
 
@@ -148,11 +155,11 @@ def db_cleanup(session):
     if result:
         log.verbose('Removed %d undownloaded episode releases.', result)
     # Clean up episodes without releases
-    result = session.query(Episode).filter(~Episode.releases.any()).delete(False)
+    result = session.query(Episode).filter(~Episode.releases.any()).filter(~Episode.begins_series.any()).delete(False)
     if result:
         log.verbose('Removed %d episodes without releases.', result)
-    # Clean up series without episodes
-    result = session.query(Series).filter(~Series.episodes.any()).delete(False)
+    # Clean up series without episodes that aren't in any tasks
+    result = session.query(Series).filter(~Series.episodes.any()).filter(~Series.in_tasks.any()).delete(False)
     if result:
         log.verbose('Removed %d series without episodes.', result)
 
@@ -204,10 +211,10 @@ class Series(Base):
     identified_by = Column(String)
     begin_episode_id = Column(Integer, ForeignKey('series_episodes.id', name='begin_episode_id', use_alter=True))
     begin = relation('Episode', uselist=False, primaryjoin="Series.begin_episode_id == Episode.id",
-                     foreign_keys=[begin_episode_id], post_update=True)
+                     foreign_keys=[begin_episode_id], post_update=True, backref='begins_series')
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan',
                         primaryjoin='Series.id == Episode.series_id')
-    in_tasks = relation('SeriesTask', backref='series', cascade='all, delete, delete-orphan')
+    in_tasks = relation('SeriesTask', backref=backref('series', uselist=False), cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
     def name_getter(self):

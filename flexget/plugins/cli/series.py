@@ -1,15 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 from string import capwords
-from flexget.event import event
+from sqlalchemy import func
 
+from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import register_plugin, register_parser_option, DependencyError
 from flexget.utils.tools import console
 
 try:
-    from flexget.plugins.filter.series import (SeriesDatabase, Series, Episode, Release, SeriesTask,
-                                               forget_series, forget_series_episode, set_series_begin)
+    from flexget.plugins.filter.series import (SeriesDatabase, Series, Episode, Release, SeriesTask, forget_series,
+                                               forget_series_episode, set_series_begin, normalize_series_name)
 except ImportError:
     raise DependencyError(issued_by='cli_series', missing='series', message='Series commandline interface not loaded')
 
@@ -32,11 +33,21 @@ class SeriesReport(SeriesDatabase):
         from flexget.manager import Session
         session = Session()
 
-        name = unicode(name.lower())
-        series = session.query(Series).filter(Series.name == name).first()
-        if not series:
-            console('Unknown series `%s`' % name)
+        name = normalize_series_name(name)
+        # Sort by length of name, so that partial matches always show shortest matching title
+        matches = (session.query(Series).filter(Series._name_normalized.contains(name)).
+                   order_by(func.char_length(Series.name)).all())
+        if not matches:
+            console('ERROR: Unknown series `%s`' % name)
             return
+        # Pick the best matching series
+        series = matches[0]
+        console('Showing results for `%s`.' % series.name)
+        if len(matches) > 1:
+            console('WARNING: Multiple series match to `%s`.' % name)
+            console('Be more specific to see the results of other matches:')
+            for s in matches[1:]:
+                console(' - %s' % s.name)
 
         console(' %-63s%-15s' % ('Identifier, Title', 'Quality'))
         console('-' * 79)
@@ -151,18 +162,16 @@ class SeriesReport(SeriesDatabase):
             last_dl = data.get('latest', {})
             behind = last_dl.get('behind', 0)
 
-            # hide or not
+            # Mark new eps
             if last_dl:
                 if last_dl['first_seen'] > datetime.now() - timedelta(days=2):
                     new_ep = '>'
-                # don't hide if the series is behind too much
-                if last_dl['first_seen'] < datetime.now() - timedelta(days=30 * 7) and behind <= 3:
+            # Determine whether to hide series. Never hide explicitly configured series.
+            if not data.get('in_tasks'):
+                if behind <= 3 and (last_dl and last_dl['first_seen'] < datetime.now() - timedelta(days=30 * 7)):
+                    # Hide series that are have not been seen recently, and are not behind too many eps
                     hidden += 1
                     continue
-            elif not data.get('in_tasks'):
-                # no recorded downloads
-                hidden += 1
-                continue
 
             status = last_dl.get('status', 'N/A')
             age = last_dl.get('age', 'N/A')
