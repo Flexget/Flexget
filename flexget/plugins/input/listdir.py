@@ -34,7 +34,10 @@ class Listdir(object):
             path = os.path.expanduser(path)
             for name in os.listdir(unicode(path)):
                 e = Entry()
-                e['title'] = os.path.splitext(name)[0]
+		if not os.path.isdir("%s/%s" % (path, name)):
+                    e['title'] = os.path.splitext(name)[0]
+		else:
+		    e['title'] = name
                 filepath = os.path.join(path, name)
                 # Windows paths need an extra / preceded to them
                 if not filepath.startswith('/'):
