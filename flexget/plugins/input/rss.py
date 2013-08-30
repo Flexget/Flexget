@@ -304,7 +304,7 @@ class InputRSS(object):
         last_entry_id = ''
         if not all_entries:
             # Test to make sure entries are in descending order
-            if rss.entries and rss.entries[0].get('published_parsed'):
+            if rss.entries and rss.entries[0].get('published_parsed') and rss.entries[-1].get('published_parsed'):
                 if rss.entries[0]['published_parsed'] < rss.entries[-1]['published_parsed']:
                     # Sort them if they are not
                     rss.entries.sort(key=lambda x: x['published_parsed'], reverse=True)

@@ -36,6 +36,24 @@ class TestContentFilter(FlexGetBase):
             content_filter:
               require: '*.avi'
 
+          test_require_all1:
+            mock:
+              - {title: 'test', file: 'test_require_all.torrent'}
+            accept_all: yes
+            content_filter:
+              require_all:
+                - 'ubu*'
+                - '*.iso'
+
+          test_require_all2:
+            mock:
+              - {title: 'test', file: 'test_require_all.torrent'}
+            accept_all: yes
+            content_filter:
+              require_all:
+                - '*.iso'
+                - '*.avi'
+
           test_strict:
             mock:
               - {title: 'test'}
@@ -54,31 +72,39 @@ class TestContentFilter(FlexGetBase):
 
     @with_filecopy('test.torrent', 'test_reject1.torrent')
     def test_reject1(self):
-        """Content Filter: torrent with min size"""
         self.execute_task('test_reject1')
         assert self.task.find_entry('rejected', title='test'), \
             'should have rejected, contains *.iso'
 
     @with_filecopy('test.torrent', 'test_reject2.torrent')
     def test_reject2(self):
-        """Content Filter: torrent with max size"""
         self.execute_task('test_reject2')
         assert self.task.find_entry('accepted', title='test'), \
             'should have accepted, doesn\t contain *.avi'
 
     @with_filecopy('test.torrent', 'test_require1.torrent')
     def test_require1(self):
-        """Content Filter: torrent with min size"""
         self.execute_task('test_require1')
         assert self.task.find_entry('accepted', title='test'), \
             'should have accepted, contains *.iso'
 
     @with_filecopy('test.torrent', 'test_require2.torrent')
     def test_require2(self):
-        """Content Filter: torrent with max size"""
         self.execute_task('test_require2')
         assert self.task.find_entry('rejected', title='test'), \
             'should have rejected, doesn\t contain *.avi'
+
+    @with_filecopy('test.torrent', 'test_require_all.torrent')
+    def test_require_all1(self):
+        self.execute_task('test_require_all1')
+        assert self.task.find_entry('accepted', title='test'), \
+            'should have accepted, both masks are satisfied'
+
+    @with_filecopy('test.torrent', 'test_require_all.torrent')
+    def test_require_all2(self):
+        self.execute_task('test_require_all2')
+        assert self.task.find_entry('rejected', title='test'), \
+            'should have rejected, one mask isn\'t satisfied'
 
     @with_filecopy('test.torrent', 'test_strict.torrent')
     def test_strict(self):

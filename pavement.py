@@ -79,7 +79,8 @@ setup(
 
 options(
     minilib=Bunch(
-        extra_files=['virtual', 'svn']
+        # 'version' is included as workaround to https://github.com/paver/paver/issues/112, TODO: remove
+        extra_files=['virtual', 'svn', 'version']
     ),
     virtualenv=Bunch(
         paver_command_line='develop',

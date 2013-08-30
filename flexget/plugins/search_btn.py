@@ -50,8 +50,8 @@ class SearchBTN(object):
                         continue
                     entry = Entry()
                     entry['title'] = item['ReleaseName']
+                    entry['title'] += ' '.join(['', item['Resolution'], item['Source'], item['Codec']])
                     entry['url'] = item['DownloadURL']
-                    entry['description'] = ' '.join([item['Resolution'], item['Source'], item['Codec']])
                     entry['torrent_seeds'] = int(item['Seeders'])
                     entry['torrent_leeches'] = int(item['Leechers'])
                     entry['torrent_info_hash'] = item['InfoHash']

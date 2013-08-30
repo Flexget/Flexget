@@ -20,7 +20,7 @@ class TraktList(object):
       username: <value>
       api_key: <value>
       strip_dates: <yes|no>
-      movies: <all|loved|hated|collection|watchlist>
+      movies: <all|loved|hated|collection|watchlist|watched>
       series: <all|loved|hated|collection|watchlist|watched>
       custom: <value>
 
@@ -33,7 +33,7 @@ class TraktList(object):
             'username': {'type': 'string'},
             'api_key': {'type': 'string'},
             'password': {'type': 'string'},
-            'movies': {'enum': ['all', 'loved', 'hated', 'collection', 'watchlist']},
+            'movies': {'enum': ['all', 'loved', 'hated', 'collection', 'watched', 'watchlist']},
             'series': {'enum': ['all', 'loved', 'hated', 'collection', 'watched', 'watchlist']},
             'custom': {'type': 'string'},
             'strip_dates': {'type': 'boolean', 'default': False}

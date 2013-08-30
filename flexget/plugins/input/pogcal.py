@@ -21,11 +21,13 @@ class InputPogDesign(object):
                 'Late Show [Letterman]': 'David Letterman'}
 
     def on_task_input(self, task, config):
+        session = requests.Session()
+        data = {'username': config['username'], 'password': config['password'], 'sub_login': 'Account Login'}
         try:
-            r = requests.post('http://www.pogdesign.co.uk/cat/', data={'username': config['username'], 'password': config['password'], 'sub_login': 'Account Login'}, allow_redirects=True)
+            r = session.post('http://www.pogdesign.co.uk/cat/', data=data)
             if 'U / P Invalid' in r.text:
                 raise plugin.PluginError('Invalid username/password for pogdesign.')
-            page = requests.get('http://www.pogdesign.co.uk/cat/showselect.php', cookies=r.cookies)
+            page = session.get('http://www.pogdesign.co.uk/cat/showselect.php')
         except requests.RequestException as e:
             raise plugin.PluginError('Error retrieving source: %s' % e)
         soup = BeautifulSoup(page.text)

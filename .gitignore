@@ -20,3 +20,7 @@ build/
 *.sqlite
 *.yml
 paver-minilib.zip
+man/
+distribute-*.tar.gz
+
+.DS_Store

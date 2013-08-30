@@ -51,7 +51,7 @@ class OutputNotifyOsd(object):
         """
         from gi.repository import Notify
 
-        if not task.accepted:
+        if not config or not task.accepted:
             return
 
         config = self.prepare_config(config)
