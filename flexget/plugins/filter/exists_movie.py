@@ -74,7 +74,7 @@ class FilterExistsMovie(object):
             #logging.getLogger('imdb_lookup').setLevel(logging.WARNING)
 
             # scan through
-            for root, dirs, files in os.walk(path):
+            for root, dirs, files in os.walk(path, followlinks=True):
                 # convert filelists into utf-8 to avoid unicode problems
                 dirs = [x.decode('utf-8', 'ignore') for x in dirs]
                 # files = [x.decode('utf-8', 'ignore') for x in files]

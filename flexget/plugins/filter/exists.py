@@ -40,7 +40,7 @@ class FilterExists(object):
             if not os.path.exists(path):
                 raise PluginWarning('Path %s does not exist' % path, log)
             # scan through
-            for root, dirs, files in os.walk(path):
+            for root, dirs, files in os.walk(path, followlinks=True):
                 # convert filelists into utf-8 to avoid unicode problems
                 dirs = [x.decode('utf-8', 'ignore') for x in dirs]
                 files = [x.decode('utf-8', 'ignore') for x in files]
