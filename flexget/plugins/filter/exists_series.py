@@ -28,8 +28,7 @@ class FilterExistsSeries(object):
                 'type': 'object',
                 'properties': {
                     'path': one_or_more({'type': 'string', 'format': 'path'}),
-                    'allow_different_qualities': {'enum': ['better', True, False], 'default': False},
-		    'dirs_only':  {'type': 'boolean', 'default': False}
+                    'allow_different_qualities': {'enum': ['better', True, False], 'default': False}
                 },
                 'required': ['path'],
                 'additionalProperties': False
@@ -70,12 +69,6 @@ class FilterExistsSeries(object):
             log.warning('No accepted entries have series information. exists_series cannot filter them')
             return
 
-        if not config.get('dirs_only'):
-	    scantypes = "files + dirs"
-            log.debug('Scanning for files and directories')
-	else:
-	    scantypes = "dirs"
-            log.debug('Scanning for directories only since dirs_only is set to True')
         for path in paths:
             log.verbose('Scanning %s', path)
             # crashes on some paths with unicode
@@ -83,7 +76,7 @@ class FilterExistsSeries(object):
             if not os.path.exists(path):
                 raise PluginWarning('Path %s does not exist' % path, log)
             # scan through
-            for root, dirs, files in os.walk(path, followlinks=True):
+            for root, dirs, files in os.walk(path):
                 # convert filelists into utf-8 to avoid unicode problems
                 dirs = [x.decode('utf-8', 'ignore') for x in dirs]
                 files = [x.decode('utf-8', 'ignore') for x in files]
@@ -91,7 +84,7 @@ class FilterExistsSeries(object):
                 for series in accepted_series:
                     # make new parser from parser in entry
                     disk_parser = copy.copy(accepted_series[series][0]['series_parser'])
-                    for name in scantypes:
+                    for name in files + dirs:
                         # run parser on filename data
                         disk_parser.data = name
                         try:
