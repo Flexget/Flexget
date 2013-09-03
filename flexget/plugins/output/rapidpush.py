@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from flexget.utils import json
 from flexget.plugin import register_plugin, priority
 from flexget.utils.template import RenderError
@@ -9,6 +10,7 @@ log = logging.getLogger('rapidpush')
 __version__ = 0.4
 headers = {'User-Agent': "FlexGet RapidPush plugin/%s" % str(__version__)}
 url = 'https://rapidpush.net/api'
+
 
 class OutputRapidPush(object):
     """
@@ -20,7 +22,8 @@ class OutputRapidPush(object):
         [title: title, default New release]
         [group: device group, default no group]
         [message: the message, default {{title}}]
-        [channel: the broadcast notification channel, if provided it will be send to the channel subscribers instead of your devices, default no channel]
+        [channel: the broadcast notification channel, if provided it will be send to the channel subscribers instead of
+            your devices, default no channel]
         [priority: 0 - 6 (6 = highest), default 2 (normal)]
         [notify_accepted: boolean true or false, default true]
         [notify_rejected: boolean true or false, default false]
@@ -113,8 +116,6 @@ class OutputRapidPush(object):
                 except RenderError as e:
                     log.error('Error setting RapidPush category: %s' % e)
 
-            
-
                 group = entry.get('group', config['group'])
                 try:
                     group = entry.render(group)
@@ -134,20 +135,19 @@ class OutputRapidPush(object):
                 try:
                     channel = entry.render(channel)
                 except RenderError as e:
-                    log.error('Error setting RapidPush channel: %s' % e)  
+                    log.error('Error setting RapidPush channel: %s' % e)
 
                 # Send the broadcast request
                 data_string = json.dumps({
                     'title': title,
                     'message': message,
                     'channel': channel})
-                data = {'apikey': apikey, 'command': 'broadcast', 'data': data_string}  
+                data = {'apikey': apikey, 'command': 'broadcast', 'data': data_string}
 
-            
             response = task.requests.post(url, headers=headers, data=data, raise_status=False)
 
             json_data = response.json()
-            if json_data.has_key('code'):
+            if 'code' in json_data:
                 if json_data['code'] == 200:
                     log.debug("RapidPush message sent")
                 else:
