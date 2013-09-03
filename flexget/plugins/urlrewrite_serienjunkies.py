@@ -64,19 +64,9 @@ class UrlRewriteSerienjunkies(object):
         except Exception, e:
             raise UrlRewritingError(e)
 
-        if config is None:
-            hoster = 'ul'
-            language = 'en'
-        else:
-            if 'hoster' in config:
-                hoster = config['hoster']
-            else:
-                hoster = 'ul'
-
-            if 'language' in config:
-                language = config['language']
-            else:
-                language = 'en'
+        config = config or {}
+        config.setdefault('hoster', 'ul')
+        config.setdefault('language', 'en')
 
         # find matching download
         episode_title = soup.find('strong', text=search_title)
@@ -94,19 +84,12 @@ class UrlRewriteSerienjunkies(object):
             raise UrlRewritingError('Unable to find episode language')
 
         # filter language
-        found_lang = 'no'
-        if language == 'de':
-            if re.search('german|deutsch', episode_lang, flags = re.IGNORECASE):
-                found_lang = 'yes'
-        elif language == 'en':
-            if re.search('english|englisch', episode_lang, flags = re.IGNORECASE):
-                found_lang = 'yes'
-        elif language == 'both':
-            if re.search('english|englisch', episode_lang, flags = re.IGNORECASE) and re.search('german|deutsch', episode_lang, flags = re.IGNORECASE):
-                found_lang = 'yes'
-
-        if found_lang == 'no':
-            entry.reject('Language does not match')
+        if config['language'] in ['de', 'both']:
+            if not re.search('german|deutsch', episode_lang, flags=re.IGNORECASE):
+                entry.reject('Language does not match')
+        if config['language'] in ['en', 'both']:
+            if not re.search('englisc?h', episode_lang, flags=re.IGNORECASE):
+                entry.reject('Language does not match')
 
         # find download links
         links = episode.find_all('a')
@@ -118,7 +101,7 @@ class UrlRewriteSerienjunkies(object):
                 continue
 
             url = link['href']
-            pattern = 'http:\/\/download\.serienjunkies\.org.*%s_.*\.html' % hoster
+            pattern = 'http:\/\/download\.serienjunkies\.org.*%s_.*\.html' % config['hoster']
 
             if re.match(pattern, url):
                 return url
