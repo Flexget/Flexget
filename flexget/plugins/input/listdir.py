@@ -34,16 +34,16 @@ class Listdir(object):
             path = os.path.expanduser(path)
             for name in os.listdir(unicode(path)):
                 e = Entry()
-		if not os.path.isdir("%s/%s" % (path, name)):
-                    e['title'] = os.path.splitext(name)[0]
-		else:
-		    e['title'] = name
                 filepath = os.path.join(path, name)
+                if os.path.isfile(filepath):
+                    e['title'] = os.path.splitext(name)[0]
+                else:
+                    e['title'] = name
+                e['location'] = filepath
                 # Windows paths need an extra / preceded to them
                 if not filepath.startswith('/'):
                     filepath = '/' + filepath
                 e['url'] = 'file://%s' % filepath
-                e['location'] = os.path.join(path, name)
                 e['filename'] = name
                 entries.append(e)
         return entries
