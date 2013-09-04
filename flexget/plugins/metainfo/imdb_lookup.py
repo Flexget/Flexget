@@ -375,7 +375,8 @@ class ImdbLookup(object):
                 log.verbose('Searching from imdb `%s`' % entry['title'])
 
                 search = ImdbSearch()
-                search_result = search.smart_match(entry.get('movie_name', entry['title']))
+                search_name = entry.get('movie_name', entry['title'], eval_lazy=False)
+                search_result = search.smart_match(search_name)
                 if search_result:
                     entry['imdb_url'] = search_result['url']
                     # store url for this movie, so we don't have to search on
