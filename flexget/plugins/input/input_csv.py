@@ -40,9 +40,13 @@ class InputCSV(object):
         'type': 'object',
         'properties': {
             'url': {'type': 'string', 'format': 'url'},
-            'values': {'type': 'object', 'additionalProperties': {'type': 'integer'}}
+            'values': {
+                'type': 'object',
+                'additionalProperties': {'type': 'integer'},
+                'required': ['title', 'url']
+            }
         },
-        'required': ['values'],
+        'required': ['url', 'values'],
         'additionalProperties': False
     }
 
