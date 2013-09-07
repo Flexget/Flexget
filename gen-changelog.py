@@ -17,14 +17,16 @@ if len(sys.argv) > 1:
         print 'Output dir doesn\'t exist: %s' % sys.argv[1]
         sys.exit(1)
     out_path = sys.argv[1]
+
 # 1.0.3280 was last revision on svn
-git_log_output = subprocess.check_output(['git', 'log', '--pretty=%n---%n.%d%n%ci%n%h%n%s%n%-b%n---%n', '--topo-order', 'refs/tags/1.0.3280..HEAD'])
+git_log_output = subprocess.check_output(['git', 'log', '--pretty=%n---%n.%d%n%ci%n%h%n%s%n%-b%n---%n',
+                                          '--topo-order', '--decorate=full','refs/tags/1.0.3280..HEAD'])
 git_log_iter = ifilter(None, git_log_output.decode('utf-8').splitlines())
 
 with codecs.open(out_path, 'w', encoding='utf-8') as out_file:
     for line in git_log_iter:
         assert line == '---'
-        tag = re.search('tag: ([\d.]+)', next(git_log_iter))
+        tag = re.search('refs/tags/([\d.]+)', next(git_log_iter))
         date = dateutil.parser.parse(next(git_log_iter))
         commit_hash = next(git_log_iter)
         body = list(iter(git_log_iter.next, '---'))
