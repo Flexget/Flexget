@@ -54,10 +54,6 @@ class OutputProwl(object):
         config = self.prepare_config(config)
         for entry in task.accepted:
 
-            if task.manager.options.test:
-                log.info("Would send prowl message about: %s", entry['title'])
-                continue
-
             # get the parameters
             apikey = entry.get('apikey', config['apikey'])
             application = entry.get('application', config['application'])
@@ -81,6 +77,12 @@ class OutputProwl(object):
             url = 'https://prowl.weks.net/publicapi/add'
             data = {'priority': priority, 'application': application, 'apikey': apikey,
                     'event': event, 'description': description}
+
+            if task.manager.options.test:
+                log.info('Would send prowl message about: %s', entry['title'])
+                log.verbose('options: %s' % data)
+                continue
+
             try:
                 response = task.requests.post(url, headers=headers, data=data, raise_status=False)
             except RequestException as e:
