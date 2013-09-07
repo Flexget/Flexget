@@ -80,7 +80,7 @@ class OutputProwl(object):
 
             if task.manager.options.test:
                 log.info('Would send prowl message about: %s', entry['title'])
-                log.verbose('options: %s' % data)
+                log.debug('options: %s' % data)
                 continue
 
             try:
