@@ -41,6 +41,12 @@ class TestSeriesPremiere(FlexGetBase):
               - {title: 'foo bar s01e00 hdtv'}
               - {title: 'foo bar s01e01 hdtv'}
             series_premiere: yes
+          test_no_teasers:
+            mock:
+              - {title: 'foo bar s01e00 hdtv'}
+              - {title: 'foo bar s01e01 hdtv'}
+            series_premiere:
+              allow_teasers: no
           test_multi_episode:
             mock:
               - {title: 'foo bar s01e01e02 hdtv'}
@@ -80,6 +86,11 @@ class TestSeriesPremiere(FlexGetBase):
     def test_pilot_and_premiere(self):
         self.execute_task('test_pilot_and_premiere')
         assert len(self.task.accepted) == 2, 'should have accepted pilot and premiere'
+
+    def test_no_teasers(self):
+        self.execute_task('test_no_teasers')
+        assert len(self.task.accepted) == 1, 'should have accepted only premiere'
+        assert not self.task.find_entry('accepted', title='foo bar s01e00 hdtv')
 
     def test_multi_episode(self):
         self.execute_task('test_multi_episode')

@@ -30,7 +30,8 @@ class FilterSeriesPremiere(FilterSeriesBase):
     @property
     def schema(self):
         settings = self.settings_schema
-        settings['properties']['allow_seasonless'] = {"type": "boolean"}
+        settings['properties']['allow_seasonless'] = {'type': 'boolean'}
+        settings['properties']['allow_teasers'] = {'type': 'boolean'}
         return {'anyOf': [{'type': 'boolean'}, settings]}
 
     # Run after series and metainfo series plugins
@@ -42,8 +43,11 @@ class FilterSeriesPremiere(FilterSeriesBase):
         # Generate the group settings for series plugin
         group_settings = {}
         allow_seasonless = False
+        desired_eps = [0, 1]
         if isinstance(config, dict):
             allow_seasonless = config.pop('allow_seasonless', False)
+            if not config.pop('allow_teasers', True):
+                desired_eps = [1]
             group_settings = config
         group_settings['identified_by'] = 'ep'
         # Generate a list of unique series that have premieres
@@ -53,7 +57,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
         guessed_series = {}
         for entry in task.entries:
             if guess_entry(entry, allow_seasonless=allow_seasonless):
-                if entry['series_season'] == 1 and entry['series_episode'] in (0, 1):
+                if entry['series_season'] == 1 and entry['series_episode'] in desired_eps:
                     normalized_name = normalize_series_name(entry['series_name'])
                     db_series = task.session.query(Series).filter(Series.name == normalized_name).first()
                     if db_series and db_series.in_tasks:
@@ -64,7 +68,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
             for series in guessed_series.itervalues():
                 if entry.get('series_name') == series and not (
                         entry.get('series_season') == 1
-                        and entry.get('series_episode') in (0, 1)):
+                        and entry.get('series_episode') in desired_eps):
                     entry.reject('Non premiere episode in a premiere series')
         # Combine settings and series into series plugin config format
         allseries = {'settings': {'series_premiere': group_settings}, 'series_premiere': guessed_series.values()}
