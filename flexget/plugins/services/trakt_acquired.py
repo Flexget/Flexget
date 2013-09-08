@@ -1,10 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import hashlib
-import urllib2
+
+from requests import RequestException
+
 from flexget.plugin import register_plugin
 from flexget.utils import json
-from flexget.utils.tools import urlopener
 
 log = logging.getLogger('trakt_acquired')
 
@@ -80,25 +81,24 @@ class TraktAcquired(object):
             # Add username and password to the dict to submit
             item.update({'username': config['username'], 'password': config['password']})
             try:
-                self.post_json_to_trakt(post_url, item)
-            except (urllib2.HTTPError, urllib2.URLError) as e:
-                if hasattr(e, 'code'):
-                    if e.code == 404:
-                        # Remove some info from posted json and print the rest to aid debugging
-                        for key in ['username', 'password', 'episodes']:
-                            item.pop(key, None)
-                        log.warning('%s not found on trakt: %s' % (config['type'].capitalize(), item))
-                        continue
-                    elif e.code == 401:
-                        log.error('Error authenticating with trakt. Check your username/password/api_key')
-                        continue
+                result = task.requests.post(post_url, data=json.dumps(item), raise_status=False)
+            except RequestException as e:
                 log.error('Error submitting data to trakt.tv: %s' % e)
                 continue
 
-    def post_json_to_trakt(self, url, data):
-        """Dumps data as json and POSTs it to the specified url."""
-        req = urllib2.Request(url, json.dumps(data), {'content-type': 'application/json'})
-        return urlopener(req, log)
+            if result.status_code == 404:
+                # Remove some info from posted json and print the rest to aid debugging
+                for key in ['username', 'password', 'episodes']:
+                    item.pop(key, None)
+                log.warning('%s not found on trakt: %s' % (config['type'].capitalize(), item))
+                continue
+            elif result.status_code == 401:
+                log.error('Error authenticating with trakt. Check your username/password/api_key')
+                log.debug(result.text)
+                continue
+            elif result.status_code != 200:
+                log.error('Error submitting data to trakt.tv: %s' % result.text)
+                continue
 
 
 register_plugin(TraktAcquired, 'trakt_acquired', api_ver=2)
