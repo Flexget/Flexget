@@ -38,7 +38,7 @@ with codecs.open(out_path, 'w', encoding='utf-8') as out_file:
         if tag:
             ver = tag.group(1)
             ua_link = ''
-            result = ua_soup.find('h3', text=re.compile(' %s ' % re.escape(ver)))
+            result = ua_soup.find('h3', text=re.compile(' %s$' % re.escape(ver)))
             if result:
                 ua_link = '^[wiki:UpgradeActions#%s upgrade actions]^ ' % result['id']
             out_file.write('\n=== %s (%s) %s===\n\n' % (ver, date.strftime('%Y.%m.%d'), ua_link))
