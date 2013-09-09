@@ -535,8 +535,10 @@ class Manager(object):
         # construct task list
         tasks = self.config.get('tasks', {}).keys()
         for name in tasks:
-            # Make sure numeric task names are turned into strings. #1763
-            name = unicode(name)
+            # Make sure numeric task names are turned into strings. #1763, #1961
+            if not isinstance(name, basestring):
+                self.config['tasks'][unicode(name)] = self.config['tasks'].pop(name)
+                name = unicode(name)
             # create task
             task = Task(self, name, self.config['tasks'][name])
             # if task name is prefixed with _ it's disabled
