@@ -8,10 +8,9 @@ import re
 import subprocess
 import sys
 
+from bs4 import BeautifulSoup
 import dateutil.parser
 import requests
-
-from flexget.utils.soup import get_soup
 
 out_path = 'ChangeLog'
 if len(sys.argv) > 1:
@@ -22,7 +21,7 @@ if len(sys.argv) > 1:
     out_path = sys.argv[1]
 
 ua_response = requests.get('http://flexget.com/wiki/UpgradeActions')
-ua_soup = get_soup(ua_response.text)
+ua_soup = BeautifulSoup(ua_response.text, 'html5lib')
 
 # 1.0.3280 was last revision on svn
 git_log_output = subprocess.check_output(['git', 'log', '--pretty=%n---%n.%d%n%ci%n%h%n%s%n%-b%n---%n',
