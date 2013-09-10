@@ -84,7 +84,7 @@ class PluginDownload(object):
 
         # set temporary download path based on user's config setting or use fallback
         tmp = config.get('temp', os.path.join(task.manager.config_base, 'temp'))
-        
+
         self.get_temp_files(task, require_path=config.get('require_path', False), fail_html=config['fail_html'],
                             tmp_path=tmp)
 
@@ -238,7 +238,7 @@ class PluginDownload(object):
             except:
                 log.warning('Unable to URL-encode URL for `%s`' % entry['title'])
         if not isinstance(url, unicode):
-            url = urllib.quote(url, safe=b':/~?=&%')
+            url = urllib.quote(url, safe=b':/~?=&%;')
         log.debug('Downloading url \'%s\'' % url)
 
         # get content
@@ -273,7 +273,7 @@ class PluginDownload(object):
         if not os.path.isdir(tmp_path):
             log.debug('creating tmp_path %s' % tmp_path)
             os.mkdir(tmp_path)
-        
+
         # check for write-access
         if not os.access(tmp_path, os.W_OK):
             raise PluginError('Not allowed to write to temp directory `%s`' % tmp_path)
