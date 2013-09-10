@@ -34,12 +34,6 @@ class InputPublicHD(object):
         'additionalProperties': False
     }
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('url')
-        return root
-
     @cached('publichd')
     @internet(log)
     def on_task_input(self, task, config):
