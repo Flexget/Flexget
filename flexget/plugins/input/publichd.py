@@ -1,25 +1,38 @@
-import urlparse
+from __future__ import unicode_literals, division, absolute_import
+
 import logging
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
-from flexget.utils.tools import urlopener
+from flexget.utils import requests
 from werkzeug.urls import url_quote
+import re
 
 log = logging.getLogger('publichd')
 
 
 class InputPublicHD(object):
     """
-        Parses torrents from hdts.ru
-
+        Parses torrents from publichd.se
 
         Configuration expects the URL of a search result:
         
-        publichd: https://publichd.eu/index.php?page=torrents&category=14
+        publichd: https://publichd.se/index.php?page=torrents&category=14
         
     """
+
+    schema = {
+        'type': ['string', 'object'],
+        # Simple form, just url
+        'anyOf': [{'format': 'url'}],
+        # Advanced form, with options (no options implemented yet)
+        'properties': {
+            'url': {'type': 'string', 'format': 'url'},
+        },
+        'required': ['url'],
+        'additionalProperties': False
+    }
 
     def validator(self):
         from flexget import validator
@@ -32,46 +45,38 @@ class InputPublicHD(object):
     def on_task_input(self, task, config):
         if isinstance(config, basestring):
             config = {'url': config}
-        log.debug('InputPlugin publichd requesting url %s' % config['url'])
-        page = urlopener(config['url'], log)
-        soup = get_soup(page)
-        log.debug('Detected encoding %s' % soup.originalEncoding)
+        soup = get_soup(task.requests.get(config['url']).content)
 
-        return self.create_entries(soup, config['url'])
+        return self.create_entries(soup)
 
-    def create_entries(self, soup, baseurl):
+    @cached('publichd')
+    @internet(log)
+    def search(self, entry, config=None):
+        if isinstance(config, basestring):
+            config = {'url': config}
+        url = '%s&search=%s' % (config['url'], url_quote(entry['title'], 'utf8'))
+        soup = get_soup(requests.get(url).content)
+
+        return self.create_entries(soup)
+
+    def create_entries(self, soup):
 
         table = soup.find('table', id='torrbg')
 
         queue = []
         for tr in table.find_all('tr')[1:]:
-            title = None
-            url = None
-            for link in tr.find_all('a'):
-                href = link['href']
-                if href.startswith('index.php?page=torrent-details'):
-                    title = link.string
-                    log.debug('Found title "%s"', title)
-                elif href.startswith('magnet:'):
-                    #url = urlparse.urljoin(baseurl, href)
-                    url = href
-                    log.debug('Found url "%s"', url)
-            if title and url:
-                entry = Entry(title = title, url = url)
-                queue.append(entry)
+            title_link = tr.find('a', href=re.compile(r'^index\.php\?page=torrent-details'))
+            url_link = tr.find('a', href=re.compile(r'^magnet:'))
+            if title_link is None or url_link is None:
+                continue
+
+            title = title_link.string
+            url = url_link['href']
+            log.debug('Found title "%s"', title)
+            log.debug('Found url "%s"', url)
+            entry = Entry(title=title, url=url)
+            queue.append(entry)
 
         return queue
-    
-    @internet(log)
-    def search(self, entry, config=None):
-        if isinstance(config, basestring):
-            config = {'url': config}
-        config['url'] = '%s&search=%s' % (config['url'], url_quote(entry['title'], 'utf8'))
-        log.debug('InputPlugin publichd requesting url %s' % config['url'])
-        page = urlopener(config['url'], log)
-        soup = get_soup(page)
-        log.debug('Detected encoding %s' % soup.originalEncoding)
 
-        return self.create_entries(soup, config['url'])
-    
 register_plugin(InputPublicHD, 'publichd', api_ver=2, groups=['search'])
