@@ -503,7 +503,7 @@ class SeriesParser(TitleParser):
                 end_episode = None
                 if len(matches) == 3 and matches[2]:
                     end_episode = int(matches[2])
-                    if end_episode <= episode or end_episode > episode + 8:
+                    if end_episode <= episode or end_episode > episode + 12:
                         # end episode cannot be before start episode
                         # Assume large ranges are not episode packs, ticket #1271 TODO: is this the best way?
                         end_episode = None
