@@ -1,6 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import os
+import yaml
+
 from flexget.plugin import priority, register_plugin, PluginError
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger('include')
 
@@ -16,13 +20,7 @@ class PluginInclude(object):
     File content must be valid for a task configuration
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('text') # TODO: file
-        bundle = root.accept('list')
-        bundle.accept('text')
-        return root
+    schema = one_or_more({'type': 'string', 'format': 'file'})
 
     def get_config(self, task):
         config = task.config.get('include', None)
@@ -32,14 +30,14 @@ class PluginInclude(object):
         return config
 
     @priority(254)
-    def on_process_start(self, task):
-        if not 'include' in task.config:
+    def on_process_start(self, task, config):
+        if not config:
             return
 
-        import yaml
-        import os
-
-        files = self.get_config(task)
+        if isinstance(config, basestring):
+            files = [config]
+        else:
+            files = config
 
         for name in files:
             name = os.path.expanduser(name)
@@ -54,4 +52,4 @@ class PluginInclude(object):
             except MergeException:
                 raise PluginError('Failed to merge include file to task %s, incompatible datatypes' % (task.name))
 
-register_plugin(PluginInclude, 'include', builtin=True)
+register_plugin(PluginInclude, 'include', api_ver=2, builtin=True)
