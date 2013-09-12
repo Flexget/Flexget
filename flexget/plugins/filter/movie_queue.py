@@ -141,10 +141,11 @@ def parse_what(what, lookup=True, session=None):
 
     result = {'title': None, 'imdb_id': None, 'tmdb_id': None}
     result['imdb_id'] = extract_id(what)
-    if not result['imdb_id'] and what.startswith('tmdb_id='):
-        result['tmdb_id'] = what[8:]
-    else:
-        result['title'] = what
+    if not result['imdb_id']:
+        if what.startswith('tmdb_id='):
+            result['tmdb_id'] = what[8:]
+        else:
+            result['title'] = what
 
     if not lookup:
         # If not doing an online lookup we can return here

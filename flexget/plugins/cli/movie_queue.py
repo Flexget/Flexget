@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from argparse import ArgumentError, Action
+
 from sqlalchemy.exc import OperationalError
+
 from flexget.utils import qualities
 from flexget.utils.tools import console, str_to_boolean
 from flexget.plugin import DependencyError, register_plugin, register_parser_option
@@ -48,9 +50,8 @@ class MovieQueueManager(object):
 
         if options['action'] == 'del':
             try:
-                what = parse_what(options['what'])
-                title = queue_del(title=what.get('title'), imdb_id=what.get('imdb_id'),
-                                  tmdb_id=what.get('tmdb_id'))
+                what = parse_what(options['what'], lookup=False)
+                title = queue_del(**what)
             except QueueError as e:
                 console('ERROR: %s' % e.message)
             else:
@@ -59,9 +60,8 @@ class MovieQueueManager(object):
 
         if options['action'] == 'forget':
             try:
-                what = parse_what(options['what'])
-                title = queue_forget(title=what.get('title'), imdb_id=what.get('imdb_id'),
-                                     tmdb_id=what.get('tmdb_id'))
+                what = parse_what(options['what'], lookup=False)
+                title = queue_forget(**what)
             except QueueError as e:
                 console('ERROR: %s' % e.message)
             else:
