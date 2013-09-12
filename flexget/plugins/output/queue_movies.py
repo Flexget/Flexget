@@ -58,7 +58,9 @@ class QueueMovies(object):
             if force is not None:
                 kwargs['force'] = force
             # Provide movie title if it is already available, to avoid movie_queue doing a lookup
-            kwargs['title'] = entry.get('imdb_name') or entry.get('tmdb_name') or entry.get('movie_name')
+            kwargs['title'] = (entry.get('imdb_name', eval_lazy=False) or
+                               entry.get('tmdb_name', eval_lazy=False) or
+                               entry.get('movie_name', eval_lazy=False))
             log.debug('queueing kwargs: %s' % kwargs)
             try:
                 queue_add(**kwargs)
