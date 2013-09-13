@@ -218,9 +218,11 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None):
     """
     log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s' % (title, imdb_id, tmdb_id))
     query = session.query(QueuedMovie)
-    if imdb_id or tmdb_id:
-        query = query.filter(or_(QueuedMovie.imdb_id == imdb_id, QueuedMovie.tmdb_id == tmdb_id))
-    if title:
+    if imdb_id:
+        query = query.filter(QueuedMovie.imdb_id == imdb_id)
+    elif tmdb_id:
+        query = query.filter(QueuedMovie.tmdb_id == tmdb_id)
+    elif title:
         query = query.filter(QueuedMovie.title == title)
     try:
         item = query.one()
@@ -245,9 +247,11 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None):
     """
     log.debug('queue_forget - title=%s, imdb_id=%s, tmdb_id=%s' % (title, imdb_id, tmdb_id))
     query = session.query(QueuedMovie)
-    if imdb_id or tmdb_id:
-        query = query.filter(or_(QueuedMovie.imdb_id == imdb_id, QueuedMovie.tmdb_id == tmdb_id))
-    if title:
+    if imdb_id:
+        query = query.filter(QueuedMovie.imdb_id == imdb_id)
+    elif tmdb_id:
+        query = query.filter(QueuedMovie.tmdb_id == tmdb_id)
+    elif title:
         query = query.filter(QueuedMovie.title == title)
     try:
         item = query.one()
