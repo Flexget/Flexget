@@ -20,7 +20,8 @@ class PluginInclude(object):
     File content must be valid for a task configuration
     """
 
-    schema = one_or_more({'type': 'string', 'format': 'file'})
+    # TODO: validate files exist, but relative paths should be relative to config dir
+    schema = one_or_more({'type': 'string'})
 
     def get_config(self, task):
         config = task.config.get('include', None)
@@ -44,6 +45,8 @@ class PluginInclude(object):
             if not os.path.isabs(name):
                 name = os.path.join(task.manager.config_base, name)
             include = yaml.load(file(name))
+            if not isinstance(include, dict):
+                raise PluginError('Include file format is invalid: %s' % name)
             log.debug('Merging %s into task %s' % (name, task.name))
             # merge
             from flexget.utils.tools import MergeException, merge_dict_from_to

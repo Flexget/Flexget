@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from collections import defaultdict
-from copy import deepcopy
 import os
 import re
 import urlparse
@@ -8,7 +7,6 @@ import urlparse
 import jsonschema
 
 from flexget.utils import qualities, template
-from flexget.utils.tools import merge_dict_from_to
 
 schema_paths = {}
 
