@@ -23,22 +23,14 @@ class PluginInclude(object):
     # TODO: validate files exist, but relative paths should be relative to config dir
     schema = one_or_more({'type': 'string'})
 
-    def get_config(self, task):
-        config = task.config.get('include', None)
-        #if only a single path is passed turn it into a 1 element list
-        if isinstance(config, basestring):
-            config = [config]
-        return config
-
     @priority(254)
     def on_process_start(self, task, config):
         if not config:
             return
 
+        files = config
         if isinstance(config, basestring):
             files = [config]
-        else:
-            files = config
 
         for name in files:
             name = os.path.expanduser(name)
