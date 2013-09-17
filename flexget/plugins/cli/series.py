@@ -22,6 +22,8 @@ class SeriesReport(SeriesDatabase):
     def do_cli(self, options):
         if options.series_action == 'list':
             self.display_summary()
+        elif options.series_action == 'show':
+            self.display_details(options.series_name)
 
     def on_process_start(self, task):
         if task.manager.options.series:
