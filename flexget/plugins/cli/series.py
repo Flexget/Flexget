@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 from string import capwords
 from sqlalchemy import func
 
-from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import register_plugin, register_parser_option, DependencyError
+from flexget.options import add_subparser
+from flexget.plugin import register_plugin, DependencyError
 from flexget.utils.tools import console
 
 try:
@@ -18,6 +18,10 @@ except ImportError:
 
 class SeriesReport(SeriesDatabase):
     """Produces --series report"""
+
+    def do_cli(self, options):
+        if options.series_action == 'list':
+            self.display_summary()
 
     def on_process_start(self, task):
         if task.manager.options.series:
@@ -220,7 +224,7 @@ class SeriesForget(object):
             task.manager.config_changed()
 
 
-@event('manager.startup')
+# TODO: CLI
 def series_begin(manager):
     if not manager.options.series_begin:
         return
@@ -244,10 +248,12 @@ def series_begin(manager):
         session.close()
 
 
+parser = add_subparser('series', ['cli_series', 'do_cli'], help='view and manipulate the series plugin database')
+
 series_parser = argparse.ArgumentParser(add_help=False)
 series_parser.add_argument('series_name', help='the name of the series', metavar='<series name>')
-parser = argparse.ArgumentParser('flexget series', description='view and manipulate the series plugin database')
-subparsers = parser.add_subparsers(title='commands', metavar='<command>')
+
+subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='series_action')
 list_parser = subparsers.add_parser('list', help='list a summary of the different series being tracked')
 list_parser.add_argument('type', nargs='?', choices=['all', 'configured', 'premieres'], default='configured',
                          help='only list a subset of shows (default: %(default)s)')
@@ -264,11 +270,13 @@ forget_parser = subparsers.add_parser('forget', parents=[series_parser],
                                       help='removes episodes or whole series from the series database')
 forget_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
 
-register_plugin(SeriesReport, 'cli_series', builtin=True)
-register_plugin(SeriesForget, '--series-forget', builtin=True)
 
-register_parser_option('--series-begin', nargs=2, metavar=('NAME', 'EP_ID'),
-                       help='Mark the first desired episode of a series. Episodes before this will not be grabbed')
-register_parser_option('--series', nargs='?', const=True, help='Display series summary.')
-register_parser_option('--series-forget', nargs='1-2', metavar=('NAME', 'EP_ID'),
-                       help='Remove complete series or single episode from database: <NAME> [EPISODE]')
+
+register_plugin(SeriesReport, 'cli_series', builtin=True)
+#register_plugin(SeriesForget, '--series-forget', builtin=True)
+
+#register_parser_option('--series-begin', nargs=2, metavar=('NAME', 'EP_ID'),
+#                       help='Mark the first desired episode of a series. Episodes before this will not be grabbed')
+#register_parser_option('--series', nargs='?', const=True, help='Display series summary.')
+#register_parser_option('--series-forget', nargs='1-2', metavar=('NAME', 'EP_ID'),
+#                       help='Remove complete series or single episode from database: <NAME> [EPISODE]')
