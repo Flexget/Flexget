@@ -676,15 +676,16 @@ class Manager(object):
             self.process_end(tasks=run_tasks)
             fire_event('manager.execute.completed', self)
 
-    def db_cleanup(self):
-        """ Perform database cleanup if cleanup interval has been met.
+    def db_cleanup(self, force=False):
         """
-        # TODO: CLI
-        return
-        expired = self.persist.get('last_cleanup', datetime.now()) < datetime.now() - DB_CLEANUP_INTERVAL
-        if self.options.db_cleanup or not self.persist.get('last_cleanup') or expired and \
-                any([t.enabled for t in self.tasks.values()]):
-            if not self.options.db_cleanup and not self.options.quiet:
+        Perform database cleanup if cleanup interval has been met.
+
+        :param bool force: Run the cleanup no matter whether the interval has been met.
+
+        """
+        expired = self.persist.get('last_cleanup', datetime(1900, 1, 1)) < datetime.now() - DB_CLEANUP_INTERVAL
+        if force or expired and any([t.enabled for t in self.tasks.values()]):
+            if not (force or self.options.quiet):
                 log.verbose('Not running database cleanup on manual run. It will be run on next --cron run.')
                 return
             log.info('Running database cleanup.')

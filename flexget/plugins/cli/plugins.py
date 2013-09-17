@@ -7,7 +7,7 @@ from flexget.plugin import plugins
 log = logging.getLogger('plugins')
 
 
-def plugins_summary(options):
+def plugins_summary(manager, options):
     print '-' * 79
     print '%-20s%-30s%s' % ('Name', 'Roles (priority)', 'Info')
     print '-' * 79
@@ -16,7 +16,7 @@ def plugins_summary(options):
     for name in sorted(plugins):
         plugin = plugins[name]
         # do not include test classes, unless in debug mode
-        if plugin.get('debug_plugin', False) and not manager.options.debug:
+        if plugin.get('debug_plugin', False) and not options.debug:
             continue
         flags = []
         if plugin.instance.__doc__:

@@ -147,7 +147,7 @@ class InputBacklog(object):
         return entries
 
 
-def clear_backlog(options):
+def clear_backlog(manager, options):
     session = Session()
     num = session.query(BacklogEntry).delete()
     session.close()

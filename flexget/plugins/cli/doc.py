@@ -33,7 +33,7 @@ def trim(docstring):
     return '\n'.join(trimmed)
 
 
-def print_doc(options):
+def print_doc(manager, options):
     plugin_name = options.doc
     plugin = plugins.get(plugin_name, None)
     if plugin:

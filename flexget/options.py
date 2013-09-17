@@ -55,6 +55,7 @@ class CoreArgumentParser(ArgParser):
         ArgParser.__init__(self, **kwargs)
 
     def error(self, message):
+        """Overridden error handler to print help message"""
         sys.stderr.write('error: %s\n' % message)
         self.print_help()
         sys.exit(2)
@@ -74,14 +75,9 @@ class CoreArgumentParser(ArgParser):
 
     def parse_args(self, args=None, namespace=None):
         if args is None:
+            # Decode all arguments to unicode before parsing
             args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
-        args = super(CoreArgumentParser, self).parse_args(args, namespace)
-        if args.debug_trace:
-            args.debug = True
-            args.loglevel = 'trace'
-        elif args.debug:
-            args.loglevel = 'debug'
-        return args
+        return super(CoreArgumentParser, self).parse_args(args, namespace)
 
     def _debug_tb_callback(self, *dummy):
         import cgitb
@@ -97,31 +93,40 @@ core_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
 core_parser.add_argument('--logfile', default='flexget.log',
                   help='Specify a custom logfile name/location. '
                        'Default is flexget.log in the config directory.')
-core_parser.add_argument('--debug', action='store_true', dest='debug',
-                  help=SUPPRESS)
-core_parser.add_argument('--debug-trace', action='store_true', dest='debug_trace',
-                  help=SUPPRESS)
-core_parser.add_argument('--loglevel', default='verbose',
-                  choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
-                  help=SUPPRESS)
-core_parser.add_argument('--debug-sql', action='store_true', default=False,
-                  help=SUPPRESS)
-core_parser.add_argument('-c', dest='config', default='config.yml',
-                  help='Specify configuration file. Default is config.yml')
-core_parser.add_argument('--experimental', action='store_true', default=False,
-                  help=SUPPRESS)
-core_parser.add_argument('--del-db', action='store_true', dest='del_db', default=False,
-                  help=SUPPRESS)
-core_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
-core_parser.add_argument('--test', action='store_true', dest='test', default=0,
-                  help='Verbose what would happen on normal execution.')
-core_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0,
-                  help=SUPPRESS)
+
+
+class DebugAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, True)
+        namespace.log_level = 'debug'
+
+
+class DebugTraceAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, True)
+        namespace.debug = True
+        namespace.log_level = 'trace'
+
 
 class CronAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, True)
         namespace.loglevel = 'info'
+
+core_parser.add_argument('--debug', action=DebugAction, nargs=0, help=SUPPRESS)
+core_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, help=SUPPRESS)
+core_parser.add_argument('--loglevel', default='verbose',
+                  choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
+                  help=SUPPRESS)
+core_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
+core_parser.add_argument('-c', dest='config', default='config.yml',
+                  help='Specify configuration file. Default is config.yml')
+core_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
+core_parser.add_argument('--del-db', action='store_true', dest='del_db', default=False, help=SUPPRESS)
+core_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
+core_parser.add_argument('--test', action='store_true', dest='test', default=0,
+                  help='Verbose what would happen on normal execution.')
+core_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0, help=SUPPRESS)
 
 # TODO: rename dest to cron, since this does more than just quiet
 core_parser.add_argument('--cron', action=CronAction, dest='quiet', default=False, nargs=0,
@@ -132,38 +137,27 @@ core_parser.add_argument('-q', '--quiet', action=CronAction, dest='quiet', defau
 
 core_subparsers = core_parser.add_subparsers(title='Commands', metavar='<command>', dest='subcommand')
 
-class ExecArgumentParser(ArgParser):
-    """Contains all the options that should only be used when running without a ui"""
+exec_parser = core_subparsers.add_parser('exec', help='execute tasks now')
 
-    def __init__(self, **kwargs):
-        super(ExecArgumentParser, self).__init__(add_help=False, **kwargs)
 
-        self.add_argument('--check', action='store_true', dest='validate', default=0,
-                          help='Validate configuration file and print errors.')
-        self.add_argument('--learn', action='store_true', dest='learn', default=0,
-                          help='Matches are not downloaded but will be skipped in the future.')
-        self.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
-                          help='Disable caches. Works only in plugins that have explicit support.')
+class ResetAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, True)
+        namespace.del_db = True
+        namespace.learn = True
 
-        class ResetAction(Action):
-            def __call__(self, parser, namespace, values, option_string=None):
-                setattr(namespace, self.dest, True)
-                namespace.del_db = True
-                namespace.learn = True
+exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
+                  help='Validate configuration file and print errors.')
+exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
+                  help='Matches are not downloaded but will be skipped in the future.')
+exec_parser.add_argument('--reset', action=ResetAction, nargs=0,
+                  help='DANGEROUS. Obliterates the database and runs with learn '
+                       'in order to to regain useful state.')
 
-        self.add_argument('--reset', action=ResetAction, nargs=0,
-                          help='DANGEROUS. Obliterates the database and runs with learn '
-                               'in order to to regain useful state.')
-        self.add_argument('--db-cleanup', action='store_true', dest='db_cleanup', default=False,
-                          help='Forces the database cleanup event to run right now.')
-
-        # Plugins should respect this flag and retry where appropriate
-        self.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
-
-        self.add_argument('--validate', action='store_true', dest='validate', default=False,
-                          help=SUPPRESS)
-
-exec_parser = core_subparsers.add_parser('exec', parents=[ExecArgumentParser()], help='execute tasks now')
+# Plugins should respect these flags where appropriate
+exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
+exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
+                  help='Disable caches. Works only in plugins that have explicit support.')
 
 
 def add_subparser(name, func, **kwargs):

@@ -42,7 +42,7 @@ def main():
         # TODO: CLI Fix this hacky crap
         if isinstance(options.func, list):
             options.func = getattr(plugin.get_plugin_by_name(options.func[0]).instance, options.func[1])
-        options.func(options)
+        options.func(manager, options)
     elif options.subcommand == 'exec':
         if options.profile:
             try:

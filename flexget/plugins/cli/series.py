@@ -6,7 +6,7 @@ from sqlalchemy import func
 
 from flexget.manager import Session
 from flexget.options import add_subparser
-from flexget.plugin import register_plugin, DependencyError
+from flexget.plugin import register_plugin, DependencyError, get_plugin_by_name
 from flexget.utils.tools import console
 
 try:
@@ -16,23 +16,18 @@ except ImportError:
     raise DependencyError(issued_by='cli_series', missing='series', message='Series commandline interface not loaded')
 
 
-class SeriesReport(SeriesDatabase):
+class CLISeries(SeriesDatabase):
     """Produces --series report"""
 
-    def do_cli(self, options):
+    def do_cli(self, manager, options):
         if options.series_action == 'list':
-            self.display_summary()
+            self.display_summary(options)
         elif options.series_action == 'show':
             self.display_details(options.series_name)
-
-    def on_process_start(self, task):
-        if task.manager.options.series:
-            task.manager.disable_tasks()
-
-            if isinstance(task.manager.options.series, bool):
-                self.display_summary()
-            else:
-                self.display_details(task.manager.options.series)
+        elif options.series_action == 'forget':
+            self.forget(manager, options)
+        elif options.series_action == 'begin':
+            self.begin(manager, options)
 
     def display_details(self, name):
         """Display detailed series information, ie. --series NAME"""
@@ -150,12 +145,13 @@ class SeriesReport(SeriesDatabase):
             status += ', '
         return status.rstrip(', ') if status else None
 
-    def display_summary(self, discontinued=False):
+    def display_summary(self, options):
         """
-        Display series summary. ie --series
-        :param discontinued: Whether to display active or discontinued series
+        Display series summary.
+        :param options: argparse options from the CLI
         """
 
+        # TODO: CLI implement the extra filtering options: within, type
         formatting = ' %-30s %-10s %-10s %-20s'
         console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
         console('-' * 79)
@@ -196,65 +192,60 @@ class SeriesReport(SeriesDatabase):
                 ('| %i series unseen past 6 months hidden' % hidden if hidden else ''))
         console(' Use --series NAME to get detailed information')
 
+    def forget(self, manager, options):
+        name = options.series_name
 
-class SeriesForget(object):
-    """Provides --series-forget"""
+        if options.episode_id:
+            # remove by id
+            identifier = options.episode_id.upper()
+            try:
+                forget_series_episode(name, identifier)
+                console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
+            except ValueError as e:
+                console(e.message)
+        else:
+            # remove whole series
+            try:
+                forget_series(name)
+                console('Removed series `%s` from database.' % name.capitalize())
+            except ValueError as e:
+                console(e.message)
 
-    def on_process_start(self, task):
-        if task.manager.options.series_forget:
-            task.manager.disable_tasks()
+        manager.config_changed()
 
-            name = unicode(task.manager.options.series_forget[0])
-
-            if len(task.manager.options.series_forget) > 1:
-                # remove by id
-                identifier = task.manager.options.series_forget[1].upper()
-                if identifier and name:
-                    try:
-                        forget_series_episode(name, identifier)
-                        console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
-                    except ValueError as e:
-                        console(e.message)
-            else:
-                # remove whole series
-                try:
-                    forget_series(name)
-                    console('Removed series `%s` from database.' % name.capitalize())
-                except ValueError as e:
-                    console(e.message)
-
-            task.manager.config_changed()
-
-
-# TODO: CLI
-def series_begin(manager):
-    if not manager.options.series_begin:
-        return
-    manager.disable_tasks()
-    series_name, ep_id = manager.options.series_begin
-    session = Session()
-    series = session.query(Series).filter(Series.name == series_name).first()
-    if not series:
-        console('Series not yet in database, adding `%s`' % series_name)
-        series = Series()
-        series.name = series_name
-        session.add(series)
-    try:
-        set_series_begin(series, ep_id)
-    except ValueError as e:
-        console(e)
-    else:
-        console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
-        session.commit()
-    finally:
-        session.close()
+    def begin(self, manager, options):
+        series_name = options.series_name
+        ep_id = options.episode_id
+        session = Session()
+        series = session.query(Series).filter(Series.name == series_name).first()
+        if not series:
+            console('Series not yet in database, adding `%s`' % series_name)
+            series = Series()
+            series.name = series_name
+            session.add(series)
+        try:
+            set_series_begin(series, ep_id)
+        except ValueError as e:
+            console(e)
+        else:
+            console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
+            session.commit()
+        finally:
+            session.close()
+        manager.config_changed()
 
 
-parser = add_subparser('series', ['cli_series', 'do_cli'], help='view and manipulate the series plugin database')
+register_plugin(CLISeries, 'cli_series')
 
+# Register the subcommand
+instance = get_plugin_by_name('cli_series').instance
+parser = add_subparser('series', instance.do_cli, help='view and manipulate the series plugin database')
+
+# Parent parser for subcommands that need a series name
 series_parser = argparse.ArgumentParser(add_help=False)
 series_parser.add_argument('series_name', help='the name of the series', metavar='<series name>')
 
+# Set up our subparsers
 subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='series_action')
 list_parser = subparsers.add_parser('list', help='list a summary of the different series being tracked')
 list_parser.add_argument('type', nargs='?', choices=['all', 'configured', 'premieres'], default='configured',
@@ -274,11 +265,3 @@ forget_parser.add_argument('episode_id', nargs='?', default=None, help='episode 
 
 
 
-register_plugin(SeriesReport, 'cli_series', builtin=True)
-#register_plugin(SeriesForget, '--series-forget', builtin=True)
-
-#register_parser_option('--series-begin', nargs=2, metavar=('NAME', 'EP_ID'),
-#                       help='Mark the first desired episode of a series. Episodes before this will not be grabbed')
-#register_parser_option('--series', nargs='?', const=True, help='Display series summary.')
-#register_parser_option('--series-forget', nargs='1-2', metavar=('NAME', 'EP_ID'),
-#                       help='Remove complete series or single episode from database: <NAME> [EPISODE]')

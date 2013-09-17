@@ -7,7 +7,7 @@ from flexget.utils.tools import console
 log = logging.getLogger('reset_plugin')
 
 
-def reset_plugin(options):
+def reset_plugin(manager, options):
     plugin = options.reset_plugin
     if not plugin:
         console('%-20s Ver Tables' % 'Name')
