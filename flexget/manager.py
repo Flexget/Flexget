@@ -679,6 +679,8 @@ class Manager(object):
     def db_cleanup(self):
         """ Perform database cleanup if cleanup interval has been met.
         """
+        # TODO: CLI
+        return
         expired = self.persist.get('last_cleanup', datetime.now()) < datetime.now() - DB_CLEANUP_INTERVAL
         if self.options.db_cleanup or not self.persist.get('last_cleanup') or expired and \
                 any([t.enabled for t in self.tasks.values()]):

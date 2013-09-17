@@ -108,8 +108,24 @@ core_parser.add_argument('--experimental', action='store_true', default=False,
 core_parser.add_argument('--del-db', action='store_true', dest='del_db', default=False,
                   help=SUPPRESS)
 core_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
+core_parser.add_argument('--test', action='store_true', dest='test', default=0,
+                  help='Verbose what would happen on normal execution.')
+core_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0,
+                  help=SUPPRESS)
 
-core_subparsers = core_parser.add_subparsers(title='Commands', metavar='<command>')
+class CronAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, True)
+        namespace.loglevel = 'info'
+
+# TODO: rename dest to cron, since this does more than just quiet
+core_parser.add_argument('--cron', action=CronAction, dest='quiet', default=False, nargs=0,
+                  help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
+# provides backward compatibility to --cron and -d
+core_parser.add_argument('-q', '--quiet', action=CronAction, dest='quiet', default=False, nargs=0,
+                  help=SUPPRESS)
+
+core_subparsers = core_parser.add_subparsers(title='Commands', metavar='<command>', dest='subcommand')
 
 class ExecArgumentParser(ArgParser):
     """Contains all the options that should only be used when running without a ui"""
@@ -117,22 +133,22 @@ class ExecArgumentParser(ArgParser):
     def __init__(self, **kwargs):
         super(ExecArgumentParser, self).__init__(add_help=False, **kwargs)
 
-        self.add_argument('--log-start', action='store_true', dest='log_start', default=0,
-                          help=SUPPRESS)
-        self.add_argument('--test', action='store_true', dest='test', default=0,
-                          help='Verbose what would happen on normal execution.')
         self.add_argument('--check', action='store_true', dest='validate', default=0,
                           help='Validate configuration file and print errors.')
         self.add_argument('--learn', action='store_true', dest='learn', default=0,
                           help='Matches are not downloaded but will be skipped in the future.')
         self.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
                           help='Disable caches. Works only in plugins that have explicit support.')
-        self.add_argument('--reset', action='store_true', dest='reset', default=0,
+
+        class ResetAction(Action):
+            def __call__(self, parser, namespace, values, option_string=None):
+                setattr(namespace, self.dest, True)
+                namespace.del_db = True
+                namespace.learn = True
+
+        self.add_argument('--reset', action=ResetAction, nargs=0,
                           help='DANGEROUS. Obliterates the database and runs with learn '
                                'in order to to regain useful state.')
-        # TODO: rename dest to cron, since this does more than just quiet
-        self.add_argument('--cron', action='store_true', dest='quiet', default=False,
-                          help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
         self.add_argument('--db-cleanup', action='store_true', dest='db_cleanup', default=False,
                           help='Forces the database cleanup event to run right now.')
 
@@ -142,24 +158,14 @@ class ExecArgumentParser(ArgParser):
         self.add_argument('--validate', action='store_true', dest='validate', default=False,
                           help=SUPPRESS)
 
-        self.add_argument('--migrate', action='store', dest='migrate', default=None,
-                          help=SUPPRESS)
-
-        # provides backward compatibility to --cron and -d
-        self.add_argument('-q', '--quiet', action='store_true', dest='quiet', default=False,
-                          help=SUPPRESS)
-
-    def parse_args(self, args=None, namespace=None):
-        args = super(ExecArgumentParser, self).parse_args(args, namespace)
-
-        # reset and migrate should be executed with learn
-        if args.reset or args.migrate:
-            args.learn = True
-
-        # Lower the log level when executed with --cron
-        if args.quiet:
-            args.loglevel = 'info'
-
-        return args
-
 exec_parser = core_subparsers.add_parser('exec', parents=[ExecArgumentParser()], help='execute tasks now')
+
+
+def add_subparser(name, func, **kwargs):
+    subparser = core_subparsers.add_parser(name, **kwargs)
+    subparser.set_defaults(func=func)
+    return subparser
+
+
+def get_subparser(name):
+    core_subparsers.choices.get(name)

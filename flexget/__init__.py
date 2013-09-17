@@ -38,12 +38,18 @@ def main():
         log_file = os.path.join(manager.config_base, log_file)
     logger.start(log_file, log_level)
 
-    if options.profile:
-        try:
-            import cProfile as profile
-        except ImportError:
-            import profile
-        profile.runctx('manager.execute()', globals(), locals(), os.path.join(manager.config_base, 'flexget.profile'))
-    else:
-        manager.execute()
+    if getattr(options, 'func', False):
+        # TODO: Fix this hacky crap
+        if isinstance(options.func, list):
+            options.func = getattr(plugin.get_plugin_by_name(options.func[0]).instance, options.func[1])
+        options.func(options)
+    elif options.subcommand == 'exec':
+        if options.profile:
+            try:
+                import cProfile as profile
+            except ImportError:
+                import profile
+            profile.runctx('manager.execute()', globals(), locals(), os.path.join(manager.config_base, 'flexget.profile'))
+        else:
+            manager.execute()
     manager.shutdown()
