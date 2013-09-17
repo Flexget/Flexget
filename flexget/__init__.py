@@ -39,7 +39,7 @@ def main():
     logger.start(log_file, log_level)
 
     if getattr(options, 'func', False):
-        # TODO: Fix this hacky crap
+        # TODO: CLI Fix this hacky crap
         if isinstance(options.func, list):
             options.func = getattr(plugin.get_plugin_by_name(options.func[0]).instance, options.func[1])
         options.func(options)
