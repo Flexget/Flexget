@@ -54,6 +54,11 @@ class CoreArgumentParser(ArgParser):
 
         ArgParser.__init__(self, **kwargs)
 
+    def error(self, message):
+        sys.stderr.write('error: %s\n' % message)
+        self.print_help()
+        sys.exit(2)
+
     def add_argument(self, *args, **kwargs):
         if isinstance(kwargs.get('nargs'), basestring) and '-' in kwargs['nargs']:
             # Handle a custom range of arguments
