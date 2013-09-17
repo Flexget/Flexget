@@ -103,6 +103,7 @@ class Manager(object):
         self.options = options
         self.config_base = None
         self.config_name = None
+        self.config_path = None
         self.db_filename = None
         self.engine = None
         self.lockfile = None
@@ -142,14 +143,14 @@ class Manager(object):
         """Separated from __init__ so that unit tests can modify options before loading config."""
         self.setup_yaml()
         self.find_config()
-        self.acquire_lock()
+        #self.acquire_lock()
         self.init_sqlalchemy()
-        errors = self.validate_config()
-        if errors:
-            for error in errors:
-                log.critical("[%s] %s", error.json_pointer, error.message)
-            return
-        self.create_tasks()
+        #errors = self.validate_config()
+        #if errors:
+        #    for error in errors:
+        #        log.critical("[%s] %s", error.json_pointer, error.message)
+        #    return
+        #self.create_tasks()
 
     def setup_yaml(self):
         """ Set up the yaml loader to return unicode objects for strings by default
@@ -216,12 +217,16 @@ class Manager(object):
             config = os.path.join(path, self.options.config)
             if os.path.exists(config):
                 log.debug('Found config: %s' % config)
-                self.load_config(config)
+
+                self.config_path = config
+                self.config_name = os.path.splitext(os.path.basename(config))[0]
+                self.config_base = os.path.normpath(os.path.dirname(config))
+                self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config)
                 return
         log.info('Tried to read from: %s' % ', '.join(possible))
         raise IOError('Failed to find configuration file %s' % self.options.config)
 
-    def load_config(self, config_path):
+    def load_config(self):#, config_path):
         """
         .. warning::
 
@@ -230,7 +235,7 @@ class Manager(object):
 
         :param string config_path: Path to configuration file
         """
-        with open(config_path, 'rb') as file:
+        with open(self.config_path, 'rb') as file:
             config = file.read()
         try:
             config = config.decode('utf-8')
@@ -285,9 +290,9 @@ class Manager(object):
             sys.exit(1)
 
         # config loaded successfully
-        self.config_name = os.path.splitext(os.path.basename(config_path))[0]
-        self.config_base = os.path.normpath(os.path.dirname(config_path))
-        self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
+        #self.config_name = os.path.splitext(os.path.basename(config_path))[0]
+        #self.config_base = os.path.normpath(os.path.dirname(config_path))
+        #self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         log.debug('config_name: %s' % self.config_name)
         log.debug('config_base: %s' % self.config_base)
 
@@ -468,7 +473,7 @@ class Manager(object):
         # create all tables, doesn't do anything to existing tables
         from sqlalchemy.exc import OperationalError
         try:
-            if self.options.reset or self.options.del_db:
+            if self.options.del_db:
                 log.verbose('Deleting everything from database ...')
                 Base.metadata.drop_all(bind=self.engine)
             Base.metadata.create_all(bind=self.engine)
@@ -509,7 +514,17 @@ class Manager(object):
         f = file(self.lockfile, 'w')
         f.write('PID: %s\n' % os.getpid())
         f.close()
+
+        class ContextManager(object):
+            def __enter__(s):
+                return
+
+            def __exit__(s, exc_type, exc_val, exc_tb):
+                self.release_lock()
+
         atexit.register(self.release_lock)
+
+        return ContextManager()
 
     def release_lock(self):
         if self.options.log_start:
@@ -604,53 +619,62 @@ class Manager(object):
         :param list entries: Optional list of entries to pass into task(s).
             This will also cause task to disable input phase.
         """
-        # Make a list of Task instances to execute
-        if tasks is None:
-            # Default to all tasks if none are specified
-            run_tasks = self.tasks.values()
-        else:
-            # Turn the list of task names or instances into a list of instances
-            run_tasks = []
-            for task in tasks:
-                if isinstance(task, basestring):
-                    if task in self.tasks:
-                        run_tasks.append(self.tasks[task])
+        with self.acquire_lock():
+            self.load_config()
+            errors = self.validate_config()
+            if errors:
+                for error in errors:
+                    log.critical("[%s] %s", error.json_pointer, error.message)
+                return
+            self.create_tasks()
+
+            # Make a list of Task instances to execute
+            if tasks is None:
+                # Default to all tasks if none are specified
+                run_tasks = self.tasks.values()
+            else:
+                # Turn the list of task names or instances into a list of instances
+                run_tasks = []
+                for task in tasks:
+                    if isinstance(task, basestring):
+                        if task in self.tasks:
+                            run_tasks.append(self.tasks[task])
+                        else:
+                            log.error('Task `%s` does not exist.' % task)
                     else:
-                        log.error('Task `%s` does not exist.' % task)
-                else:
-                    run_tasks.append(task)
+                        run_tasks.append(task)
 
-        if not run_tasks:
-            log.warning('There are no tasks to execute, please add some tasks')
-            return
-
-        disable_phases = disable_phases or []
-        # when learning, skip few phases
-        if self.options.learn:
-            log.info('Disabling download and output phases because of %s' %
-                     ('--reset' if self.options.reset else '--learn'))
-            disable_phases.extend(['download', 'output'])
-
-        fire_event('manager.execute.started', self)
-        self.process_start(tasks=run_tasks)
-
-        for task in sorted(run_tasks):
-            if not task.enabled or task._abort:
-                continue
-            try:
-                task.execute(disable_phases=disable_phases, entries=entries)
-            except Exception as e:
-                task.enabled = False
-                log.exception('Task %s: %s' % (task.name, e))
-            except KeyboardInterrupt:
-                # show real stack trace in debug mode
-                if self.options.debug:
-                    raise
-                print '**** Keyboard Interrupt ****'
+            if not run_tasks:
+                log.warning('There are no tasks to execute, please add some tasks')
                 return
 
-        self.process_end(tasks=run_tasks)
-        fire_event('manager.execute.completed', self)
+            disable_phases = disable_phases or []
+            # when learning, skip few phases
+            if self.options.learn:
+                log.info('Disabling download and output phases because of %s' %
+                         ('--reset' if self.options.reset else '--learn'))
+                disable_phases.extend(['download', 'output'])
+
+            fire_event('manager.execute.started', self)
+            self.process_start(tasks=run_tasks)
+
+            for task in sorted(run_tasks):
+                if not task.enabled or task._abort:
+                    continue
+                try:
+                    task.execute(disable_phases=disable_phases, entries=entries)
+                except Exception as e:
+                    task.enabled = False
+                    log.exception('Task %s: %s' % (task.name, e))
+                except KeyboardInterrupt:
+                    # show real stack trace in debug mode
+                    if self.options.debug:
+                        raise
+                    print '**** Keyboard Interrupt ****'
+                    return
+
+            self.process_end(tasks=run_tasks)
+            fire_event('manager.execute.completed', self)
 
     def db_cleanup(self):
         """ Perform database cleanup if cleanup interval has been met.
