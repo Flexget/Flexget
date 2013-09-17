@@ -147,7 +147,7 @@ class InputBacklog(object):
         return entries
 
 
-@event('manager.startup')
+# TODO: CLI
 def clear_backlog(manager):
     if not manager.options.clear_backlog:
         return

@@ -7,7 +7,7 @@ from flexget.event import event
 log = logging.getLogger('plugins')
 
 
-@event('manager.startup')
+# TODO: CLI
 def plugins_summary(manager):
     if manager.options.plugins:
         manager.disable_tasks()
