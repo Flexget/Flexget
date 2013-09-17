@@ -23,6 +23,7 @@ class VersionAction(_VersionAction):
     Also attempts to get more information from git describe if on git checkout.
     """
     def __call__(self, parser, namespace, values, option_string=None):
+        self.version = flexget.__version__
         # Print the version number
         console('%s' % self.version)
         if self.version == '{git}':
@@ -43,7 +44,7 @@ class VersionAction(_VersionAction):
         parser.exit()
 
 
-class ArgumentParser(ArgParser):
+class CoreArgumentParser(ArgParser):
     """Contains all the options that both the core and webui should have"""
 
     def __init__(self, **kwargs):
@@ -52,32 +53,6 @@ class ArgumentParser(ArgParser):
             self._debug_tb_callback()
 
         ArgParser.__init__(self, **kwargs)
-
-        self.add_argument('-V', '--version', action=VersionAction, version=flexget.__version__,
-                          help='Print FlexGet version and exit.')
-        # This option is already handled above.
-        self.add_argument('--bugreport', action='store_true', dest='debug_tb',
-                          help='Use this option to create a detailed bug report, '
-                               'note that the output might contain PRIVATE data, so edit that out')
-        self.add_argument('--logfile', default='flexget.log',
-                          help='Specify a custom logfile name/location. '
-                               'Default is flexget.log in the config directory.')
-        self.add_argument('--debug', action='store_true', dest='debug',
-                          help=SUPPRESS)
-        self.add_argument('--debug-trace', action='store_true', dest='debug_trace',
-                          help=SUPPRESS)
-        self.add_argument('--loglevel', default='verbose',
-                          choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
-                          help=SUPPRESS)
-        self.add_argument('--debug-sql', action='store_true', default=False,
-                          help=SUPPRESS)
-        self.add_argument('-c', dest='config', default='config.yml',
-                          help='Specify configuration file. Default is config.yml')
-        self.add_argument('--experimental', action='store_true', default=False,
-                          help=SUPPRESS)
-        self.add_argument('--del-db', action='store_true', dest='del_db', default=False,
-                          help=SUPPRESS)
-        self.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
 
     def add_argument(self, *args, **kwargs):
         if isinstance(kwargs.get('nargs'), basestring) and '-' in kwargs['nargs']:
@@ -90,12 +65,12 @@ class ArgumentParser(ArgParser):
                 kwargs['nargs'] = '*'
             else:
                 kwargs['nargs'] = '+'
-        super(ArgumentParser, self).add_argument(*args, **kwargs)
+        super(CoreArgumentParser, self).add_argument(*args, **kwargs)
 
     def parse_args(self, args=None, namespace=None):
         if args is None:
             args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
-        args = super(ArgumentParser, self).parse_args(args, namespace)
+        args = super(CoreArgumentParser, self).parse_args(args, namespace)
         if args.debug_trace:
             args.debug = True
             args.loglevel = 'trace'
@@ -107,14 +82,40 @@ class ArgumentParser(ArgParser):
         import cgitb
         cgitb.enable(format="text")
 
+core_parser = CoreArgumentParser()
 
-class CoreArgumentParser(ArgumentParser):
+core_parser.add_argument('-V', '--version', action=VersionAction, help='Print FlexGet version and exit.')
+# This option is already handled above.
+core_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
+                  help='Use this option to create a detailed bug report, '
+                       'note that the output might contain PRIVATE data, so edit that out')
+core_parser.add_argument('--logfile', default='flexget.log',
+                  help='Specify a custom logfile name/location. '
+                       'Default is flexget.log in the config directory.')
+core_parser.add_argument('--debug', action='store_true', dest='debug',
+                  help=SUPPRESS)
+core_parser.add_argument('--debug-trace', action='store_true', dest='debug_trace',
+                  help=SUPPRESS)
+core_parser.add_argument('--loglevel', default='verbose',
+                  choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
+                  help=SUPPRESS)
+core_parser.add_argument('--debug-sql', action='store_true', default=False,
+                  help=SUPPRESS)
+core_parser.add_argument('-c', dest='config', default='config.yml',
+                  help='Specify configuration file. Default is config.yml')
+core_parser.add_argument('--experimental', action='store_true', default=False,
+                  help=SUPPRESS)
+core_parser.add_argument('--del-db', action='store_true', dest='del_db', default=False,
+                  help=SUPPRESS)
+core_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
+
+core_subparsers = core_parser.add_subparsers(title='Commands', metavar='<command>')
+
+class ExecArgumentParser(ArgParser):
     """Contains all the options that should only be used when running without a ui"""
 
-    def __init__(self, unit_test=False, **kwargs):
-        ArgumentParser.__init__(self, **kwargs)
-
-        self._unit_test = unit_test
+    def __init__(self, **kwargs):
+        super(ExecArgumentParser, self).__init__(add_help=False, **kwargs)
 
         self.add_argument('--log-start', action='store_true', dest='log_start', default=0,
                           help=SUPPRESS)
@@ -149,13 +150,10 @@ class CoreArgumentParser(ArgumentParser):
                           help=SUPPRESS)
 
     def parse_args(self, args=None, namespace=None):
-        args = super(CoreArgumentParser, self).parse_args(args or self._unit_test and ['--reset'] or None, namespace)
-
-        if args.test and (args.learn or args.reset):
-            self.error('--test and %s are mutually exclusive' % ('--learn' if args.learn else '--reset'))
+        args = super(ExecArgumentParser, self).parse_args(args, namespace)
 
         # reset and migrate should be executed with learn
-        if (args.reset and not self._unit_test) or args.migrate:
+        if args.reset or args.migrate:
             args.learn = True
 
         # Lower the log level when executed with --cron
@@ -163,3 +161,5 @@ class CoreArgumentParser(ArgumentParser):
             args.loglevel = 'info'
 
         return args
+
+exec_parser = core_subparsers.add_parser('exec', parents=[ExecArgumentParser()], help='execute tasks now')

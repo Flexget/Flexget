@@ -6,7 +6,7 @@ import sys
 import flexget.logger
 from flexget.manager import Manager
 from flexget.plugin import load_plugins
-from flexget.options import CoreArgumentParser
+from flexget.options import core_parser, exec_parser
 from flexget.task import Task
 from tests import util
 import yaml
@@ -36,10 +36,9 @@ def setup_once():
     if not plugins_loaded:
         flexget.logger.initialize(True)
         setup_logging_level()
-        parser = CoreArgumentParser(True)
-        load_plugins(parser)
+        load_plugins(exec_parser)
         # store options for MockManager
-        test_arguments = parser.parse_args()
+        test_arguments = core_parser.parse_args(['--del-db', 'exec'])
         plugins_loaded = True
 
 

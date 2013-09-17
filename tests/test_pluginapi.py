@@ -5,7 +5,8 @@ import glob
 from nose.tools import raises
 
 from tests import FlexGetBase
-from flexget import plugin, plugins, CoreArgumentParser
+from flexget import plugin, plugins
+from flexget.options import ExecArgumentParser
 
 
 class TestPluginApi(object):
@@ -18,15 +19,15 @@ class TestPluginApi(object):
         plugin.get_plugin_by_name('nonexisting_plugin')
 
     def test_no_dupes(self):
-        from flexget.options import CoreArgumentParser
-        plugin.load_plugins(CoreArgumentParser())
+        from flexget.options import ExecArgumentParser
+        plugin.load_plugins(ExecArgumentParser())
 
         assert plugin.PluginInfo.dupe_counter == 0, "Duplicate plugin names, see log"
 
     def test_load(self):
-        from flexget.options import CoreArgumentParser
+        from flexget.options import ExecArgumentParser
 
-        plugin.load_plugins(CoreArgumentParser())
+        plugin.load_plugins(ExecArgumentParser())
         plugin_path = os.path.dirname(plugins.__file__)
         plugin_modules = set(os.path.basename(i)
             for k in ("/*.py", "/*/*.py")
@@ -63,7 +64,7 @@ class TestExternalPluginLoading(FlexGetBase):
 
     def setup(self):
         os.environ['FLEXGET_PLUGIN_PATH'] = os.path.join(self.base_path, 'external_plugins')
-        plugin.load_plugins(CoreArgumentParser())
+        plugin.load_plugins(ExecArgumentParser())
         super(TestExternalPluginLoading, self).setup()
 
     def teardown(self):

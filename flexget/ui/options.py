@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 from argparse import SUPPRESS
-from flexget.options import ArgumentParser, CoreArgumentParser
+from flexget.options import ArgumentParser, ExecArgumentParser
 
 
 class UIArgumentParser(ArgumentParser):
@@ -49,11 +49,11 @@ class UIArgumentParser(ArgumentParser):
         return super(UIArgumentParser, self).parse_args(args, namespace)
 
 
-class StoreErrorArgumentParser(CoreArgumentParser):
+class StoreErrorArgumentParser(ExecArgumentParser):
     """Parses options from a string instead of cli, doesn't exit on parser errors, stores them in error_msg attribute"""
 
     def __init__(self, baseparser):
-        """Duplicates options of a CoreArgumentParser for use mid-run"""
+        """Duplicates options of a ExecArgumentParser for use mid-run"""
         super(StoreErrorArgumentParser, self).__init__(parents=[baseparser], conflict_handler='resolve')
         # Remove the options inappropriate to change mid-run
         # TODO: argparse doesn't seem to have a remove_argument method

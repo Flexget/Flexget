@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+import argparse
 from datetime import datetime, timedelta
 from string import capwords
 from sqlalchemy import func
@@ -243,7 +244,27 @@ def series_begin(manager):
         session.close()
 
 
-register_plugin(SeriesReport, '--series', builtin=True)
+series_parser = argparse.ArgumentParser(add_help=False)
+series_parser.add_argument('series_name', help='the name of the series', metavar='<series name>')
+parser = argparse.ArgumentParser('flexget series', description='view and manipulate the series plugin database')
+subparsers = parser.add_subparsers(title='commands', metavar='<command>')
+list_parser = subparsers.add_parser('list', help='list a summary of the different series being tracked')
+list_parser.add_argument('type', nargs='?', choices=['all', 'configured', 'premieres'], default='configured',
+                         help='only list a subset of shows (default: %(default)s)')
+list_parser.add_argument('--within', type=int, metavar='DAYS',
+                         help='only show series seen within the last %(metavar)s days')
+show_parser = subparsers.add_parser('show', parents=[series_parser],
+                                    help='show the releases FlexGet has seen for a given series ')
+begin_parser = subparsers.add_parser('begin', parents=[series_parser],
+                                     help='set the episode to start getting a series from')
+begin_parser.add_argument('episode_id', metavar='<episode ID>',
+                          help='episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
+                               'depending on how the series is numbered)')
+forget_parser = subparsers.add_parser('forget', parents=[series_parser],
+                                      help='removes episodes or whole series from the series database')
+forget_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
+
+register_plugin(SeriesReport, 'cli_series', builtin=True)
 register_plugin(SeriesForget, '--series-forget', builtin=True)
 
 register_parser_option('--series-begin', nargs=2, metavar=('NAME', 'EP_ID'),

@@ -5,7 +5,7 @@ import os
 import sys
 import logging
 from flexget import logger
-from flexget.options import CoreArgumentParser
+from flexget.options import core_parser, exec_parser
 from flexget import plugin
 from flexget.manager import Manager
 
@@ -19,10 +19,9 @@ def main():
 
     logger.initialize()
 
-    parser = CoreArgumentParser()
-    plugin.load_plugins(parser)
+    plugin.load_plugins(exec_parser)
 
-    options = parser.parse_args()
+    options = core_parser.parse_args()
 
     try:
         manager = Manager(options)
