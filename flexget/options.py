@@ -44,8 +44,27 @@ class VersionAction(_VersionAction):
         parser.exit()
 
 
+class DebugAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, True)
+        namespace.log_level = 'debug'
+
+
+class DebugTraceAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, True)
+        namespace.debug = True
+        namespace.log_level = 'trace'
+
+
+class CronAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, True)
+        namespace.loglevel = 'info'
+
+
 class CoreArgumentParser(ArgParser):
-    """Contains all the options that both the core and webui should have"""
+    """Overrides some default ArgumentParser behavior"""
 
     def __init__(self, **kwargs):
         # Do this early, so even option processing stuff is caught
@@ -83,57 +102,38 @@ class CoreArgumentParser(ArgParser):
         import cgitb
         cgitb.enable(format="text")
 
+
 core_parser = CoreArgumentParser()
 
 core_parser.add_argument('-V', '--version', action=VersionAction, help='Print FlexGet version and exit.')
+core_parser.add_argument('--test', action='store_true', dest='test', default=0,
+                         help='Verbose what would happen on normal execution.')
+core_parser.add_argument('-c', dest='config', default='config.yml',
+                         help='Specify configuration file. Default is config.yml')
+core_parser.add_argument('--logfile', default='flexget.log',
+                         help='Specify a custom logfile name/location. '
+                              'Default is flexget.log in the config directory.')
+# TODO: rename dest to cron, since this does more than just quiet
+core_parser.add_argument('--cron', action=CronAction, dest='quiet', default=False, nargs=0,
+                         help='Use when scheduling FlexGet with cron or other scheduler. Allows background '
+                              'maintenance to run. Disables stdout and stderr output. Reduces logging level.')
 # This option is already handled above.
 core_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
-                  help='Use this option to create a detailed bug report, '
-                       'note that the output might contain PRIVATE data, so edit that out')
-core_parser.add_argument('--logfile', default='flexget.log',
-                  help='Specify a custom logfile name/location. '
-                       'Default is flexget.log in the config directory.')
-
-
-class DebugAction(Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, True)
-        namespace.log_level = 'debug'
-
-
-class DebugTraceAction(Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, True)
-        namespace.debug = True
-        namespace.log_level = 'trace'
-
-
-class CronAction(Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, True)
-        namespace.loglevel = 'info'
-
+                         help='Use this option to create a detailed bug report, '
+                              'note that the output might contain PRIVATE data, so edit that out')
+# provides backward compatibility to --cron and -d
+core_parser.add_argument('-q', '--quiet', action=CronAction, dest='quiet', default=False, nargs=0,
+                         help=SUPPRESS)
 core_parser.add_argument('--debug', action=DebugAction, nargs=0, help=SUPPRESS)
 core_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, help=SUPPRESS)
 core_parser.add_argument('--loglevel', default='verbose',
-                  choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
-                  help=SUPPRESS)
+                         choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
+                         help=SUPPRESS)
 core_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
-core_parser.add_argument('-c', dest='config', default='config.yml',
-                  help='Specify configuration file. Default is config.yml')
 core_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
 core_parser.add_argument('--del-db', action='store_true', dest='del_db', default=False, help=SUPPRESS)
 core_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
-core_parser.add_argument('--test', action='store_true', dest='test', default=0,
-                  help='Verbose what would happen on normal execution.')
 core_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0, help=SUPPRESS)
-
-# TODO: rename dest to cron, since this does more than just quiet
-core_parser.add_argument('--cron', action=CronAction, dest='quiet', default=False, nargs=0,
-                  help='Disables stdout and stderr output, log file used. Reduces logging level slightly.')
-# provides backward compatibility to --cron and -d
-core_parser.add_argument('-q', '--quiet', action=CronAction, dest='quiet', default=False, nargs=0,
-                  help=SUPPRESS)
 
 core_subparsers = core_parser.add_subparsers(title='Commands', metavar='<command>', dest='subcommand')
 
@@ -143,7 +143,6 @@ exec_parser.add_argument('--check', action='store_true', dest='validate', defaul
                   help='Validate configuration file and print errors.')
 exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
                   help='Matches are not downloaded but will be skipped in the future.')
-
 # Plugins should respect these flags where appropriate
 exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
 exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
