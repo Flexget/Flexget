@@ -4,7 +4,6 @@ import os
 import sys
 import shutil
 import logging
-from utils.tools import pid_exists
 import yaml
 from datetime import datetime, timedelta
 
@@ -13,8 +12,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.pool import SingletonThreadPool
 
-from flexget.event import fire_event
 from flexget import config_schema
+from flexget.event import fire_event
+from flexget.utils.tools import pid_exists
 
 log = logging.getLogger('manager')
 
