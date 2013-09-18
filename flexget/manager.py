@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
+from contextlib import contextmanager
 import os
 import sys
 import shutil
 import logging
+from utils.tools import pid_exists
 import yaml
-import codecs
-import atexit
 from datetime import datetime, timedelta
 
 import sqlalchemy
@@ -221,7 +221,7 @@ class Manager(object):
                 self.config_path = config
                 self.config_name = os.path.splitext(os.path.basename(config))[0]
                 self.config_base = os.path.normpath(os.path.dirname(config))
-                self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config)
+                self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
                 return
         log.info('Tried to read from: %s' % ', '.join(possible))
         raise IOError('Failed to find configuration file %s' % self.options.config)
@@ -489,42 +489,40 @@ class Manager(object):
     def check_lock(self):
         """Checks if there is already a lock, returns True if there is."""
         if os.path.exists(self.lockfile):
-            # check the lock age
-            lock_time = datetime.fromtimestamp(os.path.getmtime(self.lockfile))
-            if (datetime.now() - lock_time).seconds > 36000:
-                log.warning('Lock file over 10 hour in age, ignoring it ...')
-            else:
-                return True
+            with open(self.lockfile) as f:
+                pid = f.read()
+            pid = int(pid.lstrip('PID: '))
+
+            if not pid_exists(pid):
+                log.info('PID %s no longer exists, ignoring lock file.' % pid)
+                return False
+
+            return True
         return False
 
+    @contextmanager
     def acquire_lock(self):
-        if self.options.log_start:
-            log.info('FlexGet started (PID: %s)' % os.getpid())
+        try:
+            if self.options.log_start:
+                log.info('FlexGet started (PID: %s)' % os.getpid())
 
-        # Exit if there is an existing lock.
-        if self.check_lock():
-            if not self.options.quiet:
-                f = file(self.lockfile)
-                pid = f.read()
-                f.close()
-                print >> sys.stderr, 'Another process (%s) is running, will exit.' % pid.strip()
-                print >> sys.stderr, 'If you\'re sure there is no other instance running, delete %s' % self.lockfile
-            sys.exit(1)
+            # Exit if there is an existing lock.
+            if self.check_lock():
+                if not self.options.quiet:
+                    with open(self.lockfile) as f:
+                        pid = f.read()
+                    print >> sys.stderr, 'Another process (%s) is running, will exit.' % pid.strip()
+                    print >> sys.stderr, 'If you\'re sure there is no other instance running, delete %s' % self.lockfile
+                sys.exit(1)
 
-        f = file(self.lockfile, 'w')
-        f.write('PID: %s\n' % os.getpid())
-        f.close()
-
-        class ContextManager(object):
-            def __enter__(s):
-                return
-
-            def __exit__(s, exc_type, exc_val, exc_tb):
-                self.release_lock()
-
-        atexit.register(self.release_lock)
-
-        return ContextManager()
+            f = file(self.lockfile, 'w')
+            f.write('PID: %s\n' % os.getpid())
+            f.close()
+            yield
+        except Exception:
+            raise
+        finally:
+            self.release_lock()
 
     def release_lock(self):
         if self.options.log_start:

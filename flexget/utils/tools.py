@@ -3,6 +3,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import urllib2
 import httplib
+import os
 import socket
 import time
 import re
@@ -375,3 +376,37 @@ def multiply_timedelta(interval, number):
     # Python 2.6 doesn't have total seconds
     total_seconds = interval.seconds + interval.days * 24 * 3600
     return timedelta(seconds=total_seconds*number)
+
+if os.name == 'posix':
+    def pid_exists(pid):
+        """Check whether pid exists in the current process table."""
+        import errno
+        if pid < 0:
+            return False
+        try:
+            os.kill(pid, 0)
+        except OSError as e:
+            return e.errno == errno.EPERM
+        else:
+            return True
+else:
+    def pid_exists(pid):
+        import ctypes
+        import ctypes.wintypes
+        kernel32 = ctypes.windll.kernel32
+        PROCESS_QUERY_INFORMATION = 0x0400
+        STILL_ACTIVE = 259
+
+        handle = kernel32.OpenProcess(PROCESS_QUERY_INFORMATION, 0, pid)
+        if handle == 0:
+            return False
+
+        # If the process exited recently, a pid may still exist for the handle.
+        # So, check if we can get the exit code.
+        exit_code = ctypes.wintypes.DWORD()
+        is_running = kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)) == 0
+        kernel32.CloseHandle(handle)
+
+        # See if we couldn't get the exit code or the exit code indicates that the
+        # process is still running.
+        return is_running or exit_code.value == STILL_ACTIVE
