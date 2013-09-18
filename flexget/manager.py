@@ -649,8 +649,7 @@ class Manager(object):
             disable_phases = disable_phases or []
             # when learning, skip few phases
             if self.options.learn:
-                log.info('Disabling download and output phases because of %s' %
-                         ('--reset' if self.options.reset else '--learn'))
+                log.info('Disabling download and output phases because of --learn')
                 disable_phases.extend(['download', 'output'])
 
             fire_event('manager.execute.started', self)

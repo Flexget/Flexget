@@ -139,20 +139,10 @@ core_subparsers = core_parser.add_subparsers(title='Commands', metavar='<command
 
 exec_parser = core_subparsers.add_parser('exec', help='execute tasks now')
 
-
-class ResetAction(Action):
-    def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, True)
-        namespace.del_db = True
-        namespace.learn = True
-
 exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
                   help='Validate configuration file and print errors.')
 exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
                   help='Matches are not downloaded but will be skipped in the future.')
-exec_parser.add_argument('--reset', action=ResetAction, nargs=0,
-                  help='DANGEROUS. Obliterates the database and runs with learn '
-                       'in order to to regain useful state.')
 
 # Plugins should respect these flags where appropriate
 exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
