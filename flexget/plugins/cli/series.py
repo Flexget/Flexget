@@ -17,7 +17,7 @@ except ImportError:
 
 
 class CLISeries(SeriesDatabase):
-    """Produces --series report"""
+    """Handle CLI 'series' subcommand"""
 
     def do_cli(self, manager, options):
         if options.series_action == 'list':
@@ -190,7 +190,7 @@ class CLISeries(SeriesDatabase):
         console('-' * 79)
         console(' > = new episode ' +
                 ('| %i series unseen past 6 months hidden' % hidden if hidden else ''))
-        console(' Use --series NAME to get detailed information')
+        console(' Use `flexget series show NAME` to get detailed information')
 
     def forget(self, manager, options):
         name = options.series_name

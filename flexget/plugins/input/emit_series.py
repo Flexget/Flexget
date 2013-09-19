@@ -112,7 +112,7 @@ class EmitSeries(SeriesDatabase):
                     season = 1 if series.identified_by == 'ep' else 0
                     entries.append(self.search_entry(series, season, 1, task))
                 else:
-                    log.verbose('Series `%s` has no history. Set begin option, or use --series-begin '
+                    log.verbose('Series `%s` has no history. Set begin option, or use CLI `series begin` subcommand '
                                 'to set first episode to emit' % series.name)
                     continue
 
