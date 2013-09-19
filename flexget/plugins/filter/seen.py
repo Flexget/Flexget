@@ -11,14 +11,18 @@ forget (string)
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime, timedelta
-from sqlalchemy import Column, Integer, String, DateTime, Unicode, Boolean, asc, or_, select, update, Index
+
+from sqlalchemy import Column, Integer, DateTime, Unicode, Boolean, or_, select, update, Index
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
+
+from flexget.options import add_subparser
 from flexget.manager import Session
 from flexget.event import event
-from flexget.plugin import register_plugin, priority, register_parser_option
+from flexget.plugin import register_plugin, priority
 from flexget import db_schema
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
+from flexget.utils.tools import console
 from flexget.utils.imdb import is_imdb_url, extract_id
 
 log = logging.getLogger('seen')
@@ -125,164 +129,6 @@ def forget(value):
     finally:
         session.commit()
         session.close()
-
-
-class MigrateSeen(object):
-
-    def migrate2(self):
-        session = Session()
-
-        try:
-            from progressbar import ProgressBar, Percentage, Bar, ETA
-        except:
-            print 'Critical: progressbar library not found, try running `bin/easy_install progressbar` ?'
-            return
-
-        class Seen(Base):
-
-            __tablename__ = 'seen'
-
-            id = Column(Integer, primary_key=True)
-            field = Column(String)
-            value = Column(String, index=True)
-            task = Column('feed', String)
-            added = Column(DateTime)
-
-            def __init__(self, field, value, task):
-                self.field = field
-                self.value = value
-                self.task = task
-                self.added = datetime.now()
-
-            def __str__(self):
-                return '<Seen(%s=%s)>' % (self.field, self.value)
-
-        print ''
-
-        # REPAIR / REMOVE DUPLICATES
-        index = 0
-        removed = 0
-        total = session.query(Seen).count() + 1
-
-        widgets = ['Repairing - ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
-        bar = ProgressBar(widgets=widgets, maxval=total).start()
-
-        for seen in session.query(Seen).all():
-            index += 1
-            if index % 10 == 0:
-                bar.update(index)
-            amount = 0
-            for dupe in session.query(Seen).filter(Seen.value == seen.value):
-                amount += 1
-                if amount > 1:
-                    removed += 1
-                    session.delete(dupe)
-        bar.finish()
-
-        # MIGRATE
-        total = session.query(Seen).count() + 1
-        widgets = ['Upgrading - ', ETA(), ' ', Percentage(), ' ', Bar(left='[', right=']')]
-        bar = ProgressBar(widgets=widgets, maxval=total).start()
-
-        index = 0
-        for seen in session.query(Seen).all():
-            index += 1
-            if not index % 10:
-                bar.update(index)
-            se = SeenEntry(u'N/A', seen.task, u'migrated')
-            se.added = seen.added
-            se.fields.append(SeenField(seen.field, seen.value))
-            session.add(se)
-        bar.finish()
-
-        session.execute('drop table seen;')
-        session.commit()
-
-    def on_process_start(self, task):
-        # migrate seen to seen_entry
-        session = Session()
-        from flexget.utils.sqlalchemy_utils import table_exists
-        if table_exists('seen', session):
-            self.migrate2()
-        session.close()
-
-
-class SeenSearch(object):
-
-    def on_process_start(self, task):
-        if not task.manager.options.seen_search:
-            return
-
-        task.manager.disable_tasks()
-
-        session = Session()
-        shown = []
-        for field in session.query(SeenField).\
-            filter(SeenField.value.like(unicode('%' + task.manager.options.seen_search + '%'))).\
-                order_by(asc(SeenField.added)).all():
-
-            se = session.query(SeenEntry).filter(SeenEntry.id == field.seen_entry_id).first()
-            if not se:
-                print 'ERROR: <SeenEntry(id=%s)> missing' % field.seen_entry_id
-                continue
-
-            # don't show duplicates
-            if se.id in shown:
-                continue
-            shown.append(se.id)
-
-            print 'ID: %s Name: %s Task: %s Added: %s' % (se.id, se.title, se.task, se.added.strftime('%c'))
-            for sf in se.fields:
-                print ' %s: %s' % (sf.field, sf.value)
-            print ''
-
-        if not shown:
-            print 'No results'
-
-        session.close()
-
-
-class SeenForget(object):
-
-    def on_process_start(self, task):
-        if not task.manager.options.forget:
-            return
-
-        task.manager.disable_tasks()
-
-        forget_name = task.manager.options.forget
-        if is_imdb_url(forget_name):
-            imdb_id = extract_id(forget_name)
-            if imdb_id:
-                forget_name = imdb_id
-
-        count, fcount = forget(forget_name)
-        log.info('Removed %s titles (%s fields)' % (count, fcount))
-        task.manager.config_changed()
-
-
-class SeenCmd(object):
-
-    def on_process_start(self, task):
-        if not task.manager.options.seen:
-            return
-
-        task.manager.disable_tasks()
-
-        seen_name = task.manager.options.seen
-        if is_imdb_url(seen_name):
-            imdb_id = extract_id(seen_name)
-            if imdb_id:
-                seen_name = imdb_id
-
-        session = Session()
-        se = SeenEntry(u'--seen', unicode(task.name))
-        sf = SeenField(u'--seen', seen_name)
-        se.fields.append(sf)
-        session.add(se)
-        session.commit()
-
-        log.info('Added %s as seen. This will affect all tasks.' % seen_name)
 
 
 class FilterSeen(object):
@@ -398,15 +244,69 @@ def db_cleanup(session):
         log.verbose('Removed %d seen fields older than 1 year.' % result)
 
 
-register_plugin(FilterSeen, 'seen', builtin=True, api_ver=2)
-register_plugin(SeenSearch, '--seen-search', builtin=True)
-register_plugin(SeenCmd, '--seen', builtin=True)
-register_plugin(SeenForget, '--forget', builtin=True)
-register_plugin(MigrateSeen, 'migrate_seen', builtin=True)
+def do_cli(manager, options):
+    if options.seen_action == 'forget':
+        seen_forget(manager, options)
+    elif options.seen_action == 'add':
+        seen_add(options)
+    elif options.seen_action == 'search':
+        seen_search(options)
 
-register_parser_option('--forget', action='store', dest='forget', default=False,
-                       metavar='TASK|VALUE', help='Forget task (completely) or given title or url.')
-register_parser_option('--seen', action='store', dest='seen', default=False,
-                       metavar='VALUE', help='Add title or url to what has been seen in tasks.')
-register_parser_option('--seen-search', action='store', dest='seen_search', default=False,
-                       metavar='VALUE', help='Search given text from seen database.')
+
+def seen_forget(manager, options):
+    forget_name = options.forget_value
+    if is_imdb_url(forget_name):
+        imdb_id = extract_id(forget_name)
+        if imdb_id:
+            forget_name = imdb_id
+
+    count, fcount = forget(forget_name)
+    console('Removed %s titles (%s fields)' % (count, fcount))
+    manager.config_changed()
+
+
+def seen_add(options):
+    seen_name = options.add_value
+    if is_imdb_url(seen_name):
+        imdb_id = extract_id(seen_name)
+        if imdb_id:
+            seen_name = imdb_id
+
+    session = Session()
+    se = SeenEntry(seen_name, 'cli_seen')
+    sf = SeenField('cli_seen', seen_name)
+    se.fields.append(sf)
+    session.add(se)
+    session.commit()
+    console('Added %s as seen. This will affect all tasks.' % seen_name)
+
+
+def seen_search(options):
+    session = Session()
+    search_term = '%' + options.search_term + '%'
+    seen_entries = (session.query(SeenEntry).join(SeenField).
+                    filter(SeenField.value.like(search_term)).order_by(SeenField.added).all())
+
+    for se in seen_entries:
+        console('ID: %s Name: %s Task: %s Added: %s' % (se.id, se.title, se.task, se.added.strftime('%c')))
+        for sf in se.fields:
+            console(' %s: %s' % (sf.field, sf.value))
+        console('')
+
+    if not seen_entries:
+        console('No results')
+
+    session.close()
+
+
+register_plugin(FilterSeen, 'seen', builtin=True, api_ver=2)
+
+parser = add_subparser('seen', do_cli, help='view or forget entries remembered by the seen plugin')
+subparsers = parser.add_subparsers(dest='seen_action', metavar='<action>')
+forget_parser = subparsers.add_parser('forget', help='forget entry or entire task from seen plugin database')
+forget_parser.add_argument('forget_value', metavar='<value>',
+                           help='title or url of entry to forget, or name of task to forget')
+add_parser = subparsers.add_parser('add', help='add a title or url to the seen database')
+add_parser.add_argument('add_value', metavar='<value>', help='the title or url to add')
+search_parser = subparsers.add_parser('search', help='search text from the seen database')
+search_parser.add_argument('search_term', metavar='<search term>')
