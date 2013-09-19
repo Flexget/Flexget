@@ -226,7 +226,7 @@ class Manager(object):
         log.info('Tried to read from: %s' % ', '.join(possible))
         raise IOError('Failed to find configuration file %s' % self.options.config)
 
-    def load_config(self):#, config_path):
+    def load_config(self):
         """
         .. warning::
 
@@ -290,9 +290,6 @@ class Manager(object):
             sys.exit(1)
 
         # config loaded successfully
-        #self.config_name = os.path.splitext(os.path.basename(config_path))[0]
-        #self.config_base = os.path.normpath(os.path.dirname(config_path))
-        #self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         log.debug('config_name: %s' % self.config_name)
         log.debug('config_base: %s' % self.config_base)
 

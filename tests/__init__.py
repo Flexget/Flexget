@@ -3,14 +3,16 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import sys
+import yaml
+import logging
+from contextlib import contextmanager
+
 import flexget.logger
 from flexget.manager import Manager
 from flexget.plugin import load_plugins
 from flexget.options import core_parser, exec_parser
 from flexget.task import Task
 from tests import util
-import yaml
-import logging
 
 log = logging.getLogger('tests')
 
@@ -67,9 +69,13 @@ class MockManager(Manager):
             print 'Invalid configuration'
             raise
 
-    # no lock files with unit testing
-    def acquire_lock(self):
+    def load_config(self):
         pass
+
+    # no lock files with unit testing
+    @contextmanager
+    def acquire_lock(self):
+        yield
 
     def release_lock(self):
         pass
