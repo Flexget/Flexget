@@ -160,4 +160,4 @@ def db_cleanup(session):
 
 register_plugin(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
 register_parser_option('--forget-rejected', action='store_true', dest='forget_rejected',
-                       help='Forget all previous rejections so entries can be processed again.')
+                       help='Forget all stored rejections so entries can be processed again.')
