@@ -492,16 +492,17 @@ class Manager(object):
             with open(self.lockfile) as f:
                 pid = f.read()
             pid = int(pid.lstrip('PID: '))
-
+            if pid == os.getpid():
+                return False
             if not pid_exists(pid):
                 log.info('PID %s no longer exists, ignoring lock file.' % pid)
                 return False
-
             return True
         return False
 
     @contextmanager
     def acquire_lock(self):
+        acquired = False
         try:
             if self.options.log_start:
                 log.info('FlexGet started (PID: %s)' % os.getpid())
@@ -518,11 +519,11 @@ class Manager(object):
             f = file(self.lockfile, 'w')
             f.write('PID: %s\n' % os.getpid())
             f.close()
+            acquired = True
             yield
-        except Exception:
-            raise
         finally:
-            self.release_lock()
+            if acquired:
+                self.release_lock()
 
     def release_lock(self):
         if self.options.log_start:

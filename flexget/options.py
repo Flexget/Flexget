@@ -63,7 +63,7 @@ class CronAction(Action):
         namespace.loglevel = 'info'
 
 
-class CoreArgumentParser(ArgParser):
+class ArgumentParser(ArgParser):
     """Overrides some default ArgumentParser behavior"""
 
     def __init__(self, **kwargs):
@@ -90,50 +90,52 @@ class CoreArgumentParser(ArgParser):
                 kwargs['nargs'] = '*'
             else:
                 kwargs['nargs'] = '+'
-        super(CoreArgumentParser, self).add_argument(*args, **kwargs)
+        super(ArgumentParser, self).add_argument(*args, **kwargs)
 
     def parse_args(self, args=None, namespace=None):
         if args is None:
             # Decode all arguments to unicode before parsing
             args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
-        return super(CoreArgumentParser, self).parse_args(args, namespace)
+        return super(ArgumentParser, self).parse_args(args, namespace)
 
     def _debug_tb_callback(self, *dummy):
         import cgitb
         cgitb.enable(format="text")
 
 
-core_parser = CoreArgumentParser()
+manager_parser = ArgumentParser(add_help=False)
 
-core_parser.add_argument('-V', '--version', action=VersionAction, help='Print FlexGet version and exit.')
-core_parser.add_argument('--test', action='store_true', dest='test', default=0,
+manager_parser.add_argument('-V', '--version', action=VersionAction, help='Print FlexGet version and exit.')
+manager_parser.add_argument('--test', action='store_true', dest='test', default=0,
                          help='Verbose what would happen on normal execution.')
-core_parser.add_argument('-c', dest='config', default='config.yml',
+manager_parser.add_argument('-c', dest='config', default='config.yml',
                          help='Specify configuration file. Default is config.yml')
-core_parser.add_argument('--logfile', default='flexget.log',
+manager_parser.add_argument('--logfile', default='flexget.log',
                          help='Specify a custom logfile name/location. '
                               'Default is flexget.log in the config directory.')
 # TODO: rename dest to cron, since this does more than just quiet
-core_parser.add_argument('--cron', action=CronAction, dest='quiet', default=False, nargs=0,
+manager_parser.add_argument('--cron', action=CronAction, dest='quiet', default=False, nargs=0,
                          help='Use when scheduling FlexGet with cron or other scheduler. Allows background '
                               'maintenance to run. Disables stdout and stderr output. Reduces logging level.')
 # This option is already handled above.
-core_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
+manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
                          help='Use this option to create a detailed bug report, '
                               'note that the output might contain PRIVATE data, so edit that out')
 # provides backward compatibility to --cron and -d
-core_parser.add_argument('-q', '--quiet', action=CronAction, dest='quiet', default=False, nargs=0,
+manager_parser.add_argument('-q', '--quiet', action=CronAction, dest='quiet', default=False, nargs=0,
                          help=SUPPRESS)
-core_parser.add_argument('--debug', action=DebugAction, nargs=0, help=SUPPRESS)
-core_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, help=SUPPRESS)
-core_parser.add_argument('--loglevel', default='verbose',
+manager_parser.add_argument('--debug', action=DebugAction, nargs=0, help=SUPPRESS)
+manager_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, help=SUPPRESS)
+manager_parser.add_argument('--loglevel', default='verbose',
                          choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
                          help=SUPPRESS)
-core_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
-core_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
-core_parser.add_argument('--del-db', action='store_true', dest='del_db', default=False, help=SUPPRESS)
-core_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
-core_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0, help=SUPPRESS)
+manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
+manager_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
+manager_parser.add_argument('--del-db', action='store_true', dest='del_db', default=False, help=SUPPRESS)
+manager_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
+manager_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0, help=SUPPRESS)
+
+core_parser = ArgumentParser(parents=[manager_parser])
 
 core_subparsers = core_parser.add_subparsers(title='Commands', metavar='<command>', dest='subcommand')
 

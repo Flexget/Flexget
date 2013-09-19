@@ -1,9 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from Queue import Empty
+
 from flask import render_template, request, flash
 from flask import Module, escape, jsonify
-from flexget.ui.webui import register_plugin, manager, executor
+
+from flexget.options import exec_parser as _exec_parser
+from flexget.ui.options import StoreErrorArgumentParser
+from flexget.ui.webui import register_plugin, executor
 from flexget.ui.executor import BufferQueue
 
 execute = Module(__name__, url_prefix='/execute')
@@ -11,18 +15,19 @@ execute = Module(__name__, url_prefix='/execute')
 log = logging.getLogger('ui.execute')
 
 bufferqueue = BufferQueue()
-
+exec_parser = StoreErrorArgumentParser(parents=[_exec_parser])
 
 @execute.route('/', methods=['POST', 'GET'])
 def index():
-    context = {'progress': manager.parser.get_help().split('\n')}
+    context = {'progress': exec_parser.format_help().split('\n')}
     if request.method == 'POST':
-        parser = manager.parser.parse_args(request.form.get('options', ''))
-        if manager.parser.error_msg:
-            flash(escape(manager.parser.error_msg), 'error')
+        try:
+            options = exec_parser.parse_args(request.form.get('options', ''))
+        except ValueError as e:
+            flash(escape(e.message), 'error')
             context['options'] = request.form['options']
         else:
-            executor.execute(parsed_options=parser, output=bufferqueue)
+            executor.execute(options=options, output=bufferqueue)
             context['execute_progress'] = True
             context['progress'] = progress(as_list=True)
 

@@ -12,10 +12,6 @@ log = logging.getLogger('ui.manager')
 
 class UIManager(Manager):
 
-    def __init__(self, options, coreparser):
-        Manager.__init__(self, options)
-        self.parser = StoreErrorArgumentParser(coreparser)
-
     def find_config(self):
         """If no config file is found by the webui, a blank one is created."""
         try:
@@ -37,39 +33,6 @@ class UIManager(Manager):
             newconfig.write(yaml.dump({'presets': {}, 'tasks': {}}))
             newconfig.close()
             self.load_config(config_filename)
-
-    def execute(self, *args, **kwargs):
-        # Update task instances to match config
-        self.update_tasks()
-        Manager.execute(self, *args, **kwargs)
-
-    def update_tasks(self):
-        """Updates instances of all configured tasks from config"""
-        from flexget.task import Task
-
-        if not isinstance(self.config['tasks'], dict):
-            log.critical('Tasks is in wrong datatype, please read configuration guides')
-            return
-
-        # construct task list
-        for name in self.config.get('tasks', {}):
-            if not isinstance(self.config['tasks'][name], dict):
-                continue
-            if name in self.tasks:
-                # This task already has an instance, update it
-                self.tasks[name].config = deepcopy(self.config['tasks'][name])
-                if not name.startswith('_'):
-                    self.tasks[name].enabled = True
-            else:
-                # Create task
-                task = Task(self, name, deepcopy(self.config['tasks'][name]))
-                # If task name is prefixed with _ it's disabled
-                if name.startswith('_'):
-                    task.enabled = False
-                self.tasks[name] = task
-        # Delete any task instances that are no longer in the config
-        for name in [n for n in self.tasks if n not in self.config['tasks']]:
-            del self.tasks[name]
 
     def check_lock(self):
         if self.options.autoreload:
