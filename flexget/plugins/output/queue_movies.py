@@ -20,7 +20,6 @@ class QueueMovies(object):
         root.accept('boolean')
         opts = root.accept('dict')
         opts.accept('quality_requirements', key='quality')
-        opts.accept('boolean', key='force')
         return root
 
     def on_task_output(self, task, config):
@@ -54,9 +53,6 @@ class QueueMovies(object):
                 quality = qualities.Requirements(config.get('quality', 'any'))
 
             kwargs['quality'] = quality
-            force = entry.get('force', config.get('force'))
-            if force is not None:
-                kwargs['force'] = force
             # Provide movie title if it is already available, to avoid movie_queue doing a lookup
             kwargs['title'] = (entry.get('imdb_name', eval_lazy=False) or
                                entry.get('tmdb_name', eval_lazy=False) or

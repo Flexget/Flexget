@@ -33,7 +33,7 @@ def migrate_imdb_queue(manager):
             old_table = table_schema('imdb_queue', session)
             for row in session.execute(old_table.select()):
                 try:
-                    queue_add(imdb_id=row['imdb_id'], quality=row['quality'], force=row['immortal'], session=session)
+                    queue_add(imdb_id=row['imdb_id'], quality=row['quality'], session=session)
                 except QueueError as e:
                     log.error('Unable to migrate %s from imdb_queue to movie_queue' % row['title'])
             old_table.drop()
@@ -165,7 +165,7 @@ def parse_what(what, lookup=True, session=None):
 
 # API functions to edit queue
 @with_session
-def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, force=True, session=None):
+def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None):
     """
     Add an item to the queue with the specified quality requirements.
 
@@ -175,7 +175,6 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, force=True, 
     :param imdb_id: IMDB id for the movie. (optional)
     :param tmdb_id: TMDB id for the movie. (optional)
     :param quality: A QualityRequirements object defining acceptable qualities.
-    :param force: If this is true, accepted movie will be marked as immortal.
     :param session: Optional session to use for database updates
     """
 
@@ -193,10 +192,10 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, force=True, 
                                                  and_(QueuedMovie.tmdb_id != None, QueuedMovie.tmdb_id == tmdb_id))). \
         first()
     if not item:
-        item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality.text, immortal=force)
+        item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality.text)
         session.add(item)
-        log.info('Adding %s to movie queue with quality=%s and force=%s.' % (title, quality, force))
-        return {'title': title, 'imdb_id': imdb_id, 'tmdb_id': tmdb_id, 'quality': quality, 'force': force}
+        log.info('Adding %s to movie queue with quality=%s.' % (title, quality))
+        return {'title': title, 'imdb_id': imdb_id, 'tmdb_id': tmdb_id, 'quality': quality}
     else:
         if item.downloaded:
             raise QueueError('ERROR: %s has already been queued and downloaded' % title)

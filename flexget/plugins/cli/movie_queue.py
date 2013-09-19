@@ -84,10 +84,10 @@ def queue_list(options):
     """List movie queue"""
     items = queue_get(downloaded=(options.type == 'downloaded'))
     console('-' * 79)
-    console('%-10s %-7s %-37s %-15s %s' % ('IMDB id', 'TMDB id', 'Title', 'Quality', 'Force'))
+    console('%-10s %-7s %-37s %s' % ('IMDB id', 'TMDB id', 'Title', 'Quality'))
     console('-' * 79)
     for item in items:
-        console('%-10s %-7s %-37s %-15s %s' % (item.imdb_id, item.tmdb_id, item.title, item.quality, item.immortal))
+        console('%-10s %-7s %-37s %s' % (item.imdb_id, item.tmdb_id, item.title, item.quality))
     if not items:
         console('No results')
     console('-' * 79)
