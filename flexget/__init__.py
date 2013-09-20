@@ -5,7 +5,7 @@ import os
 import sys
 import logging
 from flexget import logger
-from flexget.options import core_parser, exec_parser
+from flexget.options import core_parser
 from flexget import plugin
 from flexget.manager import Manager
 from flexget.event import fire_event
@@ -20,7 +20,7 @@ def main():
 
     logger.initialize()
 
-    plugin.load_plugins(exec_parser)
+    plugin.load_plugins(core_parser.get_subparser('exec'))
 
     options = core_parser.parse_args()
 

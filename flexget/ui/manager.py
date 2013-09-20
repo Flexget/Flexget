@@ -3,9 +3,7 @@ import os
 import sys
 import logging
 import yaml
-from copy import deepcopy
 from flexget.manager import Manager
-from flexget.ui.options import StoreErrorArgumentParser
 
 log = logging.getLogger('ui.manager')
 

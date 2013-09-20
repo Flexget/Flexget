@@ -5,8 +5,8 @@ from Queue import Empty
 from flask import render_template, request, flash
 from flask import Module, escape, jsonify
 
-from flexget.options import exec_parser as _exec_parser
-from flexget.ui.options import StoreErrorArgumentParser
+from flexget.options import core_parser
+from flexget.ui.options import RaiseErrorArgumentParser
 from flexget.ui.webui import register_plugin, executor
 from flexget.ui.executor import BufferQueue
 
@@ -15,7 +15,7 @@ execute = Module(__name__, url_prefix='/execute')
 log = logging.getLogger('ui.execute')
 
 bufferqueue = BufferQueue()
-exec_parser = StoreErrorArgumentParser(parents=[_exec_parser])
+exec_parser = RaiseErrorArgumentParser(parents=[core_parser.get_subparser('exec')])
 
 @execute.route('/', methods=['POST', 'GET'])
 def index():

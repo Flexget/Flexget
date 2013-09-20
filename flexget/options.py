@@ -92,7 +92,7 @@ class ArgumentParser(ArgParser):
                 kwargs['nargs'] = '*'
             else:
                 kwargs['nargs'] = '+'
-        super(ArgumentParser, self).add_argument(*args, **kwargs)
+        return super(ArgumentParser, self).add_argument(*args, **kwargs)
 
     def parse_args(self, args=None, namespace=None):
         if args is None:
@@ -101,9 +101,8 @@ class ArgumentParser(ArgParser):
         return super(ArgumentParser, self).parse_args(args, namespace)
 
     def add_subparsers(self, **kwargs):
-        result = super(ArgumentParser, self).add_subparsers(**kwargs)
-        self.subparsers = result
-        return result
+        self.subparsers = super(ArgumentParser, self).add_subparsers(**kwargs)
+        return self.subparsers
 
     def add_subparser(self, name, **kwargs):
         if not self.subparsers:
@@ -113,7 +112,7 @@ class ArgumentParser(ArgParser):
     def get_subparser(self, name, default=None):
         if not self.subparsers:
             raise TypeError('This parser does not have subparsers')
-        return self.subparsers.choices.get(name, default=default)
+        return self.subparsers.choices.get(name, default)
 
     def _debug_tb_callback(self, *dummy):
         import cgitb
@@ -122,7 +121,6 @@ class ArgumentParser(ArgParser):
 
 # This will hold just the arguments directly for Manager. Webui needs this clean, to build its parser.
 manager_parser = ArgumentParser(add_help=False)
-
 manager_parser.add_argument('-V', '--version', action=VersionAction, help='Print FlexGet version and exit.')
 manager_parser.add_argument('--test', action='store_true', dest='test', default=0,
                          help='Verbose what would happen on normal execution.')
@@ -156,25 +154,22 @@ manager_parser.add_argument('--log-start', action='store_true', dest='log_start'
 
 # This is the main parser, it will contain the manager options as well as all the subcommands and plugin arguments
 core_parser = ArgumentParser(parents=[manager_parser])
-
-core_subparsers = core_parser.add_subparsers(title='Commands', metavar='<command>', dest='subcommand')
+core_parser.add_subparsers(title='Commands', metavar='<command>', dest='subcommand')
 
 
 # The parser for the exec subcommand
-exec_parser = core_subparsers.add_parser('exec', help='execute tasks now')
-
-exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
+_exec_parser = core_parser.add_subparser('exec', help='execute tasks now')
+_exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
                   help='Validate configuration file and print errors.')
-exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
+_exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
                   help='Matches are not downloaded but will be skipped in the future.')
 # Plugins should respect these flags where appropriate
-exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
-exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
+_exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
+_exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
                   help='Disable caches. Works only in plugins that have explicit support.')
 
 
-# TODO: CLI get rid of this and handle subcommands with events
+# TODO: CLI get rid of this and have plugins register for events directly
 def add_subparser(name, func, **kwargs):
-    subparser = core_subparsers.add_parser(name, **kwargs)
     event('manager.subcommand.%s' % name)(func)
-    return subparser
+    return core_parser.add_subparser(name, **kwargs)

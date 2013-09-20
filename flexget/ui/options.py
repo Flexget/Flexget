@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 from argparse import SUPPRESS
-from flexget.options import ArgumentParser, manager_parser, exec_parser
+from flexget.options import ArgumentParser, manager_parser
 
 
 webui_parser = ArgumentParser(parents=[manager_parser])
@@ -25,24 +25,21 @@ webui_group.add_argument('--password', action='store', dest='password',
 webui_group.add_argument('--autoreload', action='store_true', dest='autoreload', default=False,
                 help=SUPPRESS)
 
-#webui_parser._defaults.update(exec_parser._defaults)
 
-
-class StoreErrorArgumentParser(ArgumentParser):
-    """Parses options from a string instead of cli, doesn't exit on parser errors, stores them in error_msg attribute"""
+class RaiseErrorArgumentParser(ArgumentParser):
+    """Parses options from a string instead of cli, doesn't exit on parser errors, raises a ValueError instead"""
 
     def __init__(self, **kwargs):
-        """Duplicates options of a parser for use mid-run"""
         kwargs.setdefault('add_help', False)
         kwargs.setdefault('usage', SUPPRESS)
-        super(StoreErrorArgumentParser, self).__init__(**kwargs)
+        super(RaiseErrorArgumentParser, self).__init__(**kwargs)
 
     def parse_args(self, args, namespace=None):
         # If args is a string, split it into an args list
         if isinstance(args, basestring):
             import shlex
             args = shlex.split(args)
-        return super(StoreErrorArgumentParser, self).parse_args(args)
+        return super(RaiseErrorArgumentParser, self).parse_args(args)
 
     def error(self, msg):
         raise ValueError(msg)
