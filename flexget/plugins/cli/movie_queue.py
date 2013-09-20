@@ -3,10 +3,11 @@ from argparse import ArgumentParser
 
 from sqlalchemy.exc import OperationalError
 
-from flexget.options import add_subparser
+from flexget.event import event
+from flexget.options import core_parser
 from flexget.utils import qualities
-from flexget.utils.tools import console, str_to_boolean
-from flexget.plugin import DependencyError, register_plugin, register_parser_option
+from flexget.utils.tools import console
+from flexget.plugin import DependencyError
 
 try:
     from flexget.plugins.filter.movie_queue import QueueError, queue_add, queue_del, queue_get, queue_forget, parse_what
@@ -14,6 +15,7 @@ except ImportError:
     raise DependencyError(issued_by='cli_movie_queue', missing='movie_queue')
 
 
+@event('manager.subcommand.movie-queue')
 def do_cli(manager, options):
     """Handle movie-queue subcommand"""
 
@@ -110,7 +112,7 @@ what_parser = ArgumentParser(add_help=False)
 what_parser.add_argument('movie_name', metavar='<movie>',
                          help='the movie (can be movie title, imdb id, or in the form `tmdb_id=XXXX`')
 # Register subcommand
-parser = add_subparser('movie-queue', do_cli, help='view and manage the movie queue')
+parser = core_parser.add_subparser('movie-queue', help='view and manage the movie queue')
 # Set up our subparsers
 subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='queue_action')
 list_parser = subparsers.add_parser('list', help='list movies from the queue')

@@ -5,6 +5,7 @@ from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRES
 import flexget
 from flexget.utils.tools import console
 from flexget.utils import requests
+from flexget.event import event
 
 
 def required_length(nmin, nmax):
@@ -72,6 +73,7 @@ class ArgumentParser(ArgParser):
             self._debug_tb_callback()
 
         ArgParser.__init__(self, **kwargs)
+        self.subparsers = None
 
     def error(self, message):
         """Overridden error handler to print help message"""
@@ -97,6 +99,21 @@ class ArgumentParser(ArgParser):
             # Decode all arguments to unicode before parsing
             args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
         return super(ArgumentParser, self).parse_args(args, namespace)
+
+    def add_subparsers(self, **kwargs):
+        result = super(ArgumentParser, self).add_subparsers(**kwargs)
+        self.subparsers = result
+        return result
+
+    def add_subparser(self, name, **kwargs):
+        if not self.subparsers:
+            raise TypeError('This parser does not have subparsers')
+        return self.subparsers.add_parser(name, **kwargs)
+
+    def get_subparser(self, name, default=None):
+        if not self.subparsers:
+            raise TypeError('This parser does not have subparsers')
+        return self.subparsers.choices.get(name, default=default)
 
     def _debug_tb_callback(self, *dummy):
         import cgitb
@@ -151,11 +168,8 @@ exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', defa
                   help='Disable caches. Works only in plugins that have explicit support.')
 
 
+# TODO: CLI get rid of this and handle subcommands with events
 def add_subparser(name, func, **kwargs):
     subparser = core_subparsers.add_parser(name, **kwargs)
-    subparser.set_defaults(func=func)
+    event('manager.subcommand.%s' % name)(func)
     return subparser
-
-
-def get_subparser(name):
-    core_subparsers.choices.get(name)

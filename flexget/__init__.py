@@ -8,6 +8,7 @@ from flexget import logger
 from flexget.options import core_parser, exec_parser
 from flexget import plugin
 from flexget.manager import Manager
+from flexget.event import fire_event
 
 __version__ = '{git}'
 
@@ -27,6 +28,7 @@ def main():
         manager = Manager(options)
     except IOError as e:
         # failed to load config, TODO: why should it be handled here? So sys.exit isn't called in webui?
+        # note: this may not be needed here anymore, config is no longer read on manager init
         log.critical(e)
         logger.flush_logging_to_console()
         sys.exit(1)
@@ -38,9 +40,8 @@ def main():
         log_file = os.path.join(manager.config_base, log_file)
     logger.start(log_file, log_level)
 
-    if getattr(options, 'func', False):
-        options.func(manager, options)
-    elif options.subcommand == 'exec':
+    # TODO: exec subcommand is hard coded, this should probably be changed
+    if options.subcommand == 'exec':
         if options.profile:
             try:
                 import cProfile as profile
@@ -49,4 +50,6 @@ def main():
             profile.runctx('manager.execute()', globals(), locals(), os.path.join(manager.config_base, 'flexget.profile'))
         else:
             manager.execute()
+    else:
+        fire_event('manager.subcommand.%s' % options.subcommand, manager, options)
     manager.shutdown()
