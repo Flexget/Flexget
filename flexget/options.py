@@ -120,6 +120,7 @@ class ArgumentParser(ArgParser):
         cgitb.enable(format="text")
 
 
+# This will hold just the arguments directly for Manager. Webui needs this clean, to build its parser.
 manager_parser = ArgumentParser(add_help=False)
 
 manager_parser.add_argument('-V', '--version', action=VersionAction, help='Print FlexGet version and exit.')
@@ -152,10 +153,14 @@ manager_parser.add_argument('--del-db', action='store_true', dest='del_db', defa
 manager_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0, help=SUPPRESS)
 
+
+# This is the main parser, it will contain the manager options as well as all the subcommands and plugin arguments
 core_parser = ArgumentParser(parents=[manager_parser])
 
 core_subparsers = core_parser.add_subparsers(title='Commands', metavar='<command>', dest='subcommand')
 
+
+# The parser for the exec subcommand
 exec_parser = core_subparsers.add_parser('exec', help='execute tasks now')
 
 exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
