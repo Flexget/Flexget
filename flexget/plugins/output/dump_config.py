@@ -1,7 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from argparse import SUPPRESS
-from flexget.plugin import register_plugin, register_parser_option, priority
+
+from flexget.event import event
+from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('dump_config')
 
@@ -23,8 +26,14 @@ class OutputDumpConfig(object):
             print task.config
             task.abort(silent=True)
 
+
 register_plugin(OutputDumpConfig, 'dump_config', debug=True, builtin=True)
-register_parser_option('--dump-config', action='store_true', dest='dump_config', default=False,
-                       help='Display the config of each feed after preset merging/config generation occurs.')
-register_parser_option('--dump-config-python', action='store_true', dest='dump_config_python', default=False,
-                       help=SUPPRESS)
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    exec_parser = core_parser.get_subparser('exec')
+    exec_parser.add_argument('--dump-config', action='store_true', dest='dump_config', default=False,
+                             help='display the config of each feed after preset merging/config generation occurs')
+    exec_parser.add_argument('--dump-config-python', action='store_true', dest='dump_config_python', default=False,
+                             help=SUPPRESS)

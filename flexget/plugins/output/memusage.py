@@ -1,14 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
-from flexget.plugin import DependencyError
+import logging
+
+from flexget.event import event
+from flexget.plugin import DependencyError, register_plugin
 
 try:
     from guppy import hpy
 except ImportError:
     # this will leave the plugin unloaded
     raise DependencyError(issued_by='memusage', missing='ext lib `guppy`', silent=True)
-
-from flexget.plugin import register_plugin, register_parser_option
-import logging
 
 log = logging.getLogger('mem_usage')
 
@@ -33,7 +33,7 @@ def update()
 
 
 class OutputMemUsage(object):
-    """ Output memory usage statistics with heapy """
+    """Output memory usage statistics with heapy"""
 
     def __init__(self):
         self.heapy = None
@@ -62,5 +62,9 @@ class OutputMemUsage(object):
 
 
 register_plugin(OutputMemUsage, 'mem_usage', builtin=True)
-register_parser_option('--mem-usage', action='store_true', dest='mem_usage', default=False,
-    help='Display memory usage debug information')
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--mem-usage', action='store_true', dest='mem_usage', default=False,
+                                                   help='display memory usage debug information')

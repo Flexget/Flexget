@@ -22,8 +22,7 @@ from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_ta
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property
 from flexget.manager import Session
-from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, DependencyError, priority,
-                            PluginError)
+from flexget.plugin import register_plugin, get_plugin_by_name, DependencyError, priority, PluginError
 
 SCHEMA_VER = 11
 
@@ -1412,7 +1411,12 @@ class SeriesDBManager(FilterSeriesBase):
 register_plugin(FilterSeries, 'series')
 # This is a builtin so that it can update the database for tasks that may have had series plugin removed
 register_plugin(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
-register_parser_option('--stop-waiting', action='store', dest='stop_waiting', default='',
-                       metavar='NAME', help='Stop timeframe for a given series.')
-register_parser_option('--disable-advancement', action='store_true', dest='disable_advancement', default=False,
-                       help='Disable episode advancement for this run.')
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    exec_parser = core_parser.get_subparser('exec')
+    exec_parser.add_argument('--stop-waiting', action='store', dest='stop_waiting', default='',
+                             metavar='NAME', help='stop timeframe for a given series')
+    exec_parser.add_argument('--disable-advancement', action='store_true', dest='disable_advancement', default=False,
+                             help='disable episode advancement for this run')

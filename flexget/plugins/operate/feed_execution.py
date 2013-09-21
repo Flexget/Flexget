@@ -1,23 +1,25 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
 import fnmatch
-from flexget.plugin import register_plugin, register_parser_option, PluginError
+import logging
+
+from flexget.event import event
+from flexget.plugin import register_plugin, PluginError
 
 log = logging.getLogger('task_control')
 
 
 class OnlyTask(object):
     """
-        Implements --task option to only run specified task(s)
+    Implements --task option to only run specified task(s)
 
-        Example:
-        flexget --task taska
+    Example:
+    flexget --task taska
 
-        Multiple tasks:
-        flexget --task taska,taskb
+    Multiple tasks:
+    flexget --task taska,taskb
 
-        Patterns:
-        flexget --task 'tv*'
+    Patterns:
+    flexget --task 'tv*'
     """
 
     def on_process_start(self, task):
@@ -63,8 +65,13 @@ class ManualTask(object):
             log.debug('Disabling task %s' % task.name)
             task.enabled = False
 
+
 register_plugin(OnlyTask, '--task', builtin=True)
 register_plugin(ManualTask, 'manual')
-register_parser_option('--task', action='store', dest='onlytask', default=None, metavar='TASK[,...]',
-                       help='Run only specified task(s), optionally using glob patterns ("tv-*").'
-                            ' Matching is case-insensitive.')
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--task', dest='onlytask', default=None, metavar='TASK[,...]',
+                                                   help='run only specified task(s), optionally using glob patterns '
+                                                        '("tv-*"). Matching is case-insensitive')

@@ -1,8 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.utils.log import log_once
-from flexget.plugin import register_plugin, register_parser_option, priority
+
+from flexget.event import event
+from flexget.plugin import register_plugin, priority
 from flexget.task import log as task_log
+from flexget.utils.log import log_once
 
 log = logging.getLogger('verbose')
 
@@ -44,8 +46,14 @@ class Verbose(object):
                 log_once('Undecided entries have not been accepted or rejected. If you expected these to reach output,'
                          ' you must set up filter plugin(s) to accept them.', logger=log)
 
+
 register_plugin(Verbose, 'verbose', builtin=True, api_ver=2)
-register_parser_option('-v', '--verbose', action='store_true', dest='verbose', default=False,
-                       help='Verbose undecided entries.')
-register_parser_option('-s', '--silent', action='store_true', dest='silent', default=False,
-                       help='Don\'t verbose any actions (accept, reject, fail).')
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    exec_parser = core_parser.get_subparser('exec')
+    exec_parser.add_argument('-v', '--verbose', action='store_true', dest='verbose', default=False,
+                             help='verbose undecided entries')
+    exec_parser.add_argument('-s', '--silent', action='store_true', dest='silent', default=False,
+                             help='don\'t verbose any actions (accept, reject, fail)')

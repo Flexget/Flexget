@@ -19,13 +19,13 @@ class TestPluginApi(object):
         plugin.get_plugin_by_name('nonexisting_plugin')
 
     def test_no_dupes(self):
-        plugin.load_plugins(ArgumentParser())
+        plugin.load_plugins()
 
         assert plugin.PluginInfo.dupe_counter == 0, "Duplicate plugin names, see log"
 
     def test_load(self):
 
-        plugin.load_plugins(ArgumentParser())
+        plugin.load_plugins()
         plugin_path = os.path.dirname(plugins.__file__)
         plugin_modules = set(os.path.basename(i)
             for k in ("/*.py", "/*/*.py")
@@ -62,7 +62,7 @@ class TestExternalPluginLoading(FlexGetBase):
 
     def setup(self):
         os.environ['FLEXGET_PLUGIN_PATH'] = os.path.join(self.base_path, 'external_plugins')
-        plugin.load_plugins(ArgumentParser())
+        plugin.load_plugins()
         super(TestExternalPluginLoading, self).setup()
 
     def teardown(self):

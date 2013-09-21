@@ -3,8 +3,10 @@ import string
 import random
 import logging
 import yaml
+
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, register_parser_option, priority
+from flexget.event import event
+from flexget.plugin import register_plugin, priority
 from flexget.utils.tools import str_to_boolean
 
 log = logging.getLogger('inject')
@@ -84,5 +86,10 @@ class InputInject(object):
 
 
 register_plugin(InputInject, '--inject', debug=True, builtin=True)
-register_parser_option('--inject', nargs='+', metavar=('TITLE', 'URL'),
-                       help='Injects entry to all executed tasks: <TITLE> [URL] [ACCEPT] [FORCE]')
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--inject', nargs='1-4', metavar=('TITLE', 'URL'),
+                                                   help='injects entry to all executed tasks: '
+                                                        '<TITLE> [URL] [ACCEPT] [FORCE]')

@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, register_parser_option
+
+from flexget.event import event
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('try_regexp')
 
@@ -57,6 +59,11 @@ class PluginTryRegexp:
             print '%s of %s entries matched' % (count, len(task.entries))
         print 'Bye!'
 
+
 register_plugin(PluginTryRegexp, '--try-regexp', builtin=True)
-register_parser_option('--try-regexp', action='store_true', dest='try_regexp', default=False,
-                       help='Try regular expressions interactively.')
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--try-regexp', action='store_true', dest='try_regexp',
+                                                   default=False, help='try regular expressions interactively')

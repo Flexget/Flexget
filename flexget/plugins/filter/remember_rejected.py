@@ -1,11 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime, timedelta
+
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, and_, Index
 from sqlalchemy.orm import relation
+
 from flexget import db_schema
 from flexget.event import event
-from flexget.plugin import register_plugin, register_parser_option, priority
+from flexget.plugin import register_plugin, priority
 from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column
 from flexget.utils.tools import parse_timedelta
 
@@ -159,5 +161,9 @@ def db_cleanup(session):
 
 
 register_plugin(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
-register_parser_option('--forget-rejected', action='store_true', dest='forget_rejected',
-                       help='Forget all stored rejections so entries can be processed again.')
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--forget-rejected', action='store_true', dest='forget_rejected',
+                                                   help='forget stored rejections so entries can be processed again')

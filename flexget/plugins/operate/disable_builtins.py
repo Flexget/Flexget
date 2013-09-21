@@ -18,7 +18,8 @@ class PluginDisableBuiltins(object):
         # cannot trust that on_task_start would have been executed
         self.disabled = []
 
-    # TODO: schemas are registered to a uri at plugin load, the list of builtins will not be complete at that time
+    # TODO: Shit, how was this ever working? If this plugin is loaded before any builtin plugins, they are not allowed
+    # in the schema.
     schema = {
         'oneOf': [
             {'type': 'boolean'},

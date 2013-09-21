@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
 import datetime
-from flexget.plugin import register_plugin, register_parser_option, priority
+import logging
+
+from flexget.event import event
+from flexget.plugin import register_plugin, priority
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('interval')
@@ -48,6 +50,11 @@ class PluginInterval(object):
         log.debug('interval passed')
         task.simple_persistence['last_time'] = datetime.datetime.now()
 
+
 register_plugin(PluginInterval, 'interval', api_ver=2)
-register_parser_option('--now', action='store_true', dest='interval_ignore', default=False,
-                       help='Ignore interval(s)')
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--now', action='store_true', dest='interval_ignore', default=False,
+                                                   help='Ignore interval(s)')

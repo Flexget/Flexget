@@ -12,7 +12,7 @@ from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 from flexget import db_schema
 from flexget.event import event
 from flexget.entry import Entry
-from flexget.plugin import priority, register_parser_option, register_plugin
+from flexget.plugin import priority, register_plugin
 from flexget.utils.sqlalchemy_utils import table_schema, get_index_by_name
 from flexget.utils.tools import console, strip_html
 from flexget.manager import Session
@@ -616,11 +616,17 @@ Usage for --archive ACTION args, these are subjected to change in near future.
         options['action'] = action
         options['args'] = [unicode(arg) for arg in values[1:]]
 
+
 register_plugin(Archive, 'archive', api_ver=2)
 register_plugin(ArchiveInject, 'archive_inject', api_ver=2, builtin=True)
 register_plugin(UrlrewriteArchive, 'flexget_archive', groups=['search'])
 register_plugin(ArchiveCli, '--archive-cli', builtin=True, api_ver=2)
-register_parser_option('--archive', nargs='*', action=ArchiveCLIAction,
-                       metavar=('ACTION', 'ARGS'),
-                       help='Access [search|inject|tag-source|consolidate] functionalities. '
-                            'Without any args display help about those.')
+
+
+# TODO: CLI split this into an 'archive' subcommand, and an --archive-inject exec argument
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--archive', nargs='*', action=ArchiveCLIAction,
+                                                   metavar=('ACTION', 'ARGS'),
+                                                   help='Access [search|inject|tag-source|consolidate] '
+                                                        'functionalities. Without any args display help about those.')

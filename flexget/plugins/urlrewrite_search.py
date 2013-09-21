@@ -2,16 +2,15 @@ from __future__ import unicode_literals, division, absolute_import
 from difflib import SequenceMatcher
 import logging
 
-from flexget.plugin import get_plugins_by_group, PluginWarning, PluginError, \
-    register_parser_option, register_plugin, priority
+from flexget.event import event
+from flexget.plugin import get_plugins_by_group, PluginWarning, PluginError, register_plugin, priority
 
 log = logging.getLogger('urlrewrite_search')
 
 
 class SearchPlugins(object):
-
     """
-        Implements --search-plugins
+    Implements --search-plugins
     """
 
     def on_process_start(self, task):
@@ -105,7 +104,12 @@ class PluginSearch(object):
                 entry['immortal'] = False
                 entry.reject('search failed')
 
+
 register_plugin(PluginSearch, 'urlrewrite_search', api_ver=2)
 register_plugin(SearchPlugins, '--search-plugins', builtin=True)
-register_parser_option('--search-plugins', action='store_true', dest='search_plugins', default=False,
-                       help='List supported search plugins.')
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--search-plugins', action='store_true', dest='search_plugins',
+                                                   default=False, help='list supported search plugins')

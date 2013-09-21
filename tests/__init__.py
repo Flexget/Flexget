@@ -8,9 +8,10 @@ import logging
 from contextlib import contextmanager
 
 import flexget.logger
+from flexget.event import fire_event
 from flexget.manager import Manager
 from flexget.plugin import load_plugins
-from flexget.options import core_parser
+from flexget.options import CoreArgumentParser
 from flexget.task import Task
 from tests import util
 
@@ -38,9 +39,9 @@ def setup_once():
     if not plugins_loaded:
         flexget.logger.initialize(True)
         setup_logging_level()
-        load_plugins(core_parser.get_subparser('exec'))
+        load_plugins()
         # store options for MockManager
-        test_arguments = core_parser.parse_args(['--del-db', 'exec'])
+        test_arguments = CoreArgumentParser().parse_args(['--del-db', 'exec'])
         plugins_loaded = True
 
 
@@ -91,7 +92,6 @@ class FlexGetBase(object):
     # (ending with "os.sep"), and any occurrence of "__tmp__" in __yaml__ or
     # a @with_filecopy destination is also replaced with it.
 
-    # TODO: there's probably flaw in this as this is shared across FlexGetBases ?
     __tmp__ = False
 
     def __init__(self):

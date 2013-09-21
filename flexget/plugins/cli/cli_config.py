@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, register_parser_option
+
+from flexget.event import event
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('cli_config')
 
@@ -66,6 +68,11 @@ class CliConfig(object):
             task.config = self.replace_item(task.config)
             log.debug(task.config)
 
+
 register_plugin(CliConfig, 'cli_config', builtin=True)
-register_parser_option('--cli-config', action='store', dest='cli_config', default=False,
-                       metavar='PARAMS', help='Configuration parameters trough commandline.')
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--cli-config', action='store', dest='cli_config', default=False,
+                                                   metavar='PARAMS', help='configuration parameters trough commandline')

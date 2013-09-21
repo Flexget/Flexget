@@ -5,7 +5,7 @@ from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRES
 import flexget
 from flexget.utils.tools import console
 from flexget.utils import requests
-from flexget.event import event
+from flexget.event import fire_event
 
 
 def required_length(nmin, nmax):
@@ -101,6 +101,7 @@ class ArgumentParser(ArgParser):
         return super(ArgumentParser, self).parse_args(args, namespace)
 
     def add_subparsers(self, **kwargs):
+        kwargs.setdefault('parser_class', ArgumentParser)
         self.subparsers = super(ArgumentParser, self).add_subparsers(**kwargs)
         return self.subparsers
 
@@ -152,18 +153,28 @@ manager_parser.add_argument('--profile', action='store_true', default=False, hel
 manager_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0, help=SUPPRESS)
 
 
-# This is the main parser, it will contain the manager options as well as all the subcommands and plugin arguments
-core_parser = ArgumentParser(parents=[manager_parser])
-core_parser.add_subparsers(title='Commands', metavar='<command>', dest='subcommand')
+class CoreArgumentParser(ArgumentParser):
+    """The core argument parser, contains the manager arguments, subcommands, and plugin arguments"""
+    def __init__(self, **kwargs):
+        kwargs.setdefault('parents', [manager_parser])
+        super(CoreArgumentParser, self).__init__(**kwargs)
+        self.add_subparsers(title='Commands', metavar='<command>', dest='subcommand')
 
+        # The parser for the exec subcommand
+        _exec_parser = self.add_subparser('exec', help='execute tasks now')
+        _exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
+                          help='Validate configuration file and print errors.')
+        _exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
+                          help='Matches are not downloaded but will be skipped in the future.')
+        # Plugins should respect these flags where appropriate
+        _exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
+        _exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
+                          help='Disable caches. Works only in plugins that have explicit support.')
 
-# The parser for the exec subcommand
-_exec_parser = core_parser.add_subparser('exec', help='execute tasks now')
-_exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
-                  help='Validate configuration file and print errors.')
-_exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
-                  help='Matches are not downloaded but will be skipped in the future.')
-# Plugins should respect these flags where appropriate
-_exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
-_exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
-                  help='Disable caches. Works only in plugins that have explicit support.')
+        # Add all plugin options to the parser
+        fire_event('register_parser_arguments', self)
+
+    def add_subparsers(self, **kwargs):
+        # The subparsers should not be CoreArgumentParsers
+        kwargs.setdefault('parser_class', ArgumentParser)
+        return super(CoreArgumentParser, self).add_subparsers(**kwargs)

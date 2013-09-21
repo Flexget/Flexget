@@ -143,14 +143,7 @@ class Manager(object):
         """Separated from __init__ so that unit tests can modify options before loading config."""
         self.setup_yaml()
         self.find_config()
-        #self.acquire_lock()
         self.init_sqlalchemy()
-        #errors = self.validate_config()
-        #if errors:
-        #    for error in errors:
-        #        log.critical("[%s] %s", error.json_pointer, error.message)
-        #    return
-        #self.create_tasks()
 
     def setup_yaml(self):
         """ Set up the yaml loader to return unicode objects for strings by default

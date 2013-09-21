@@ -7,7 +7,6 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import Executable, ClauseElement, _literal_as_text
 from flexget import manager
-from flexget.plugin import register_parser_option
 from flexget.event import event
 
 log = logging.getLogger('explain_sql')
@@ -55,5 +54,7 @@ def deregister_sql_explain(man):
         manager.Session = sessionmaker()
 
 
-register_parser_option('--explain-sql', action='store_true', dest='explain_sql', default=False,
-                       help=SUPPRESS)
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--explain-sql', action='store_true', dest='explain_sql',
+                                                   default=False, help=SUPPRESS)

@@ -16,7 +16,6 @@ from sqlalchemy import Column, Integer, DateTime, Unicode, Boolean, or_, select,
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
-from flexget.options import add_subparser
 from flexget.manager import Session
 from flexget.event import event
 from flexget.plugin import register_plugin, priority
@@ -301,6 +300,7 @@ def seen_search(options):
 
 
 register_plugin(FilterSeen, 'seen', builtin=True, api_ver=2)
+
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):

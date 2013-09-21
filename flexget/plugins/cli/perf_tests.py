@@ -1,8 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from argparse import SUPPRESS
-from flexget.manager import Session
-from flexget.plugin import register_plugin, register_parser_option
 import logging
+
+from argparse import SUPPRESS
+
+from flexget.event import event
+from flexget.manager import Session
+from flexget.plugin import register_plugin
 
 log = logging.getLogger('perftests')
 
@@ -73,5 +76,9 @@ class PerfTests(object):
 
 
 register_plugin(PerfTests, 'perftests', api_ver=2, debug=True, builtin=True)
-register_parser_option('--perf-test', action='store', dest='perf_test', default='',
-                       help=SUPPRESS)
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--perf-test', action='store', dest='perf_test', default='',
+                                                   help=SUPPRESS)

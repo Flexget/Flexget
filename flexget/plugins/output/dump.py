@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, register_parser_option, priority
+
+from flexget.event import event
+from flexget.plugin import register_plugin,  priority
 from flexget.utils.tools import console
 
 log = logging.getLogger('dump')
@@ -60,11 +62,9 @@ class OutputDump(object):
     schema = {'type': 'boolean'}
 
     @priority(0)
-    def on_task_output(self, task):
-        if 'dump' not in task.config and not task.manager.options.dump_entries:
+    def on_task_output(self, task, config):
+        if not config and not task.manager.options.dump_entries:
             return
-        #from flexget.utils.tools import sanitize
-        #import yaml
 
         eval_lazy = task.manager.options.dump_entries == 'eval'
         trace = task.manager.options.dump_entries == 'trace'
@@ -79,7 +79,13 @@ class OutputDump(object):
             console('-- Rejected: ---------------------------')
             dump(task.rejected, task.manager.options.debug, eval_lazy, trace)
 
-register_plugin(OutputDump, 'dump', builtin=True)
-register_parser_option('--dump', nargs='?', choices=['eval', 'trace'], const=True, dest='dump_entries',
-                       help='Display all entries in task with details. '
-                            'Arg `--dump eval` will evaluate all lazy fields.')
+
+register_plugin(OutputDump, 'dump', builtin=True, api_ver=2)
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--dump', nargs='?', choices=['eval', 'trace'], dest='dump_entries',
+                                                   const=True, help='display all entries in task with fields they '
+                                                                    'contain, use `--dump eval` to evaluate all lazy '
+                                                                    'fields')

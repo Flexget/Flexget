@@ -2,8 +2,10 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import re
 import logging
+
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, register_parser_option, PluginError
+from flexget.event import event
+from flexget.plugin import register_plugin, PluginError
 from flexget.utils.cached_input import cached
 
 log = logging.getLogger('tail')
@@ -160,7 +162,12 @@ class InputTail(object):
                             used = {}
         return entries
 
+
 register_plugin(InputTail, 'tail', api_ver=2)
 register_plugin(ResetTail, '--tail-reset', builtin=True)
-register_parser_option('--tail-reset', action='store', dest='tail_reset', default=False, metavar='FILE',
-    help='Reset tail position for a file.')
+
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--tail-reset', action='store', dest='tail_reset', default=False,
+                                                   metavar='FILE', help='reset tail position for a file')

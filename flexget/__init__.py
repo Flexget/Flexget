@@ -5,7 +5,7 @@ import os
 import sys
 import logging
 from flexget import logger
-from flexget.options import core_parser
+from flexget.options import CoreArgumentParser
 from flexget import plugin
 from flexget.manager import Manager
 from flexget.event import fire_event
@@ -20,10 +20,9 @@ def main():
 
     logger.initialize()
 
-    plugin.load_plugins(core_parser.get_subparser('exec'))
-    fire_event('register_parser_arguments', core_parser)
+    plugin.load_plugins()
 
-    options = core_parser.parse_args()
+    options = CoreArgumentParser().parse_args()
 
     try:
         manager = Manager(options)
@@ -41,7 +40,7 @@ def main():
         log_file = os.path.join(manager.config_base, log_file)
     logger.start(log_file, log_level)
 
-    # TODO: exec subcommand is hard coded, this should probably be changed
+    # TODO: CLI handle this some method like manager.do_subcommand(name, options)
     if options.subcommand == 'exec':
         if options.profile:
             try:

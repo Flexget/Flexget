@@ -8,6 +8,7 @@ import re
 import logging
 import time
 import pkgutil
+import warnings
 from itertools import ifilter
 
 from requests import RequestException
@@ -177,21 +178,9 @@ plugins = {}
 # Loading done?
 plugins_loaded = False
 
-_parser = None
 _loaded_plugins = {}
 _plugin_options = []
 _new_phase_queue = {}
-
-
-# TODO: CLI get rid of this in favor of register_parser_arguments event
-def register_parser_option(*args, **kwargs):
-    """Adds a parser option to the global parser."""
-    if _parser is None:
-        import warnings
-        warnings.warn('register_parser_option called before it can be')
-        return
-    _parser.add_argument(*args, **kwargs)
-    _plugin_options.append((args, kwargs))
 
 
 def register_task_phase(name, before=None, after=None):
@@ -421,25 +410,15 @@ def _load_plugins_from_dirs(dirs):
                       'point (before, after). Plugin is not working properly.' % (args[0], phase))
 
 
-def load_plugins(parser):
+def load_plugins():
     """Load plugins from the standard plugin paths."""
-    global plugins_loaded, _parser
-
-    if plugins_loaded:
-        if parser is not None:
-            for args, kwargs in _plugin_options:
-                parser.add_argument(*args, **kwargs)
+    global plugins_loaded
 
     # suppress DeprecationWarning's
-    import warnings
     warnings.simplefilter('ignore', DeprecationWarning)
 
     start_time = time.time()
-    _parser = parser
-    try:
-        _load_plugins_from_dirs(get_standard_plugins_path())
-    finally:
-        _parser = None
+    _load_plugins_from_dirs(get_standard_plugins_path())
     took = time.time() - start_time
     plugins_loaded = True
     log.debug('Plugins took %.2f seconds to load' % took)

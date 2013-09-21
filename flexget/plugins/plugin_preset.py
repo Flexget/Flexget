@@ -2,8 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import validator
+from flexget.event import event
 from flexget.manager import register_config_key
-from flexget.plugin import priority, register_plugin, PluginError, register_parser_option
+from flexget.plugin import priority, register_plugin, PluginError
 from flexget.utils.tools import MergeException, merge_dict_from_to
 
 log = logging.getLogger('preset')
@@ -152,5 +153,8 @@ register_config_key('presets', root_config_schema)
 register_plugin(PluginPreset, 'preset', builtin=True, api_ver=2)
 register_plugin(DisablePlugin, 'disable_plugin', api_ver=2)
 
-register_parser_option('--preset', action='store', dest='preset', default=False,
-                       metavar='NAME', help='Execute tasks with given preset.')
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.get_subparser('exec').add_argument('--preset', action='store', dest='preset', default=False,
+                                                   metavar='NAME', help='execute tasks with given preset')
