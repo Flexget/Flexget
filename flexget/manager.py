@@ -150,18 +150,25 @@ class Manager(object):
         self.init_sqlalchemy()
 
     def run_subcommand(self, name, options):
-        # Let plugins handle the subcommand
-        fire_event('manager.subcommand.%s' % name, self, options)
-        # exec is the only built-in subcommand, handle it here
-        if options.subcommand == 'exec':
-            if options.profile:
-                try:
-                    import cProfile as profile
-                except ImportError:
-                    import profile
-                profile.runctx('self.execute()', globals(), locals(), os.path.join(self.config_base, 'flexget.profile'))
-            else:
-                self.execute()
+        def do_subcommand():
+            # Let plugins handle the subcommand
+            fire_event('manager.subcommand.%s' % name, self, options)
+            # exec is the only built-in subcommand, handle it here
+            if options.subcommand == 'exec':
+                if options.profile:
+                    try:
+                        import cProfile as profile
+                    except ImportError:
+                        import profile
+                    profile.runctx('self.execute()', globals(), locals(), os.path.join(self.config_base, 'flexget.profile'))
+                else:
+                    self.execute()
+
+        if getattr(options, 'lock_required', False):
+            with self.acquire_lock():
+                do_subcommand()
+        else:
+            do_subcommand()
 
     def setup_yaml(self):
         """Sets up the yaml loader to return unicode objects for strings by default"""
@@ -625,61 +632,60 @@ class Manager(object):
         :param list entries: Optional list of entries to pass into task(s).
             This will also cause task to disable input phase.
         """
-        with self.acquire_lock():
-            self.load_config()
-            errors = self.validate_config()
-            if errors:
-                for error in errors:
-                    log.critical("[%s] %s", error.json_pointer, error.message)
-                return
-            self.create_tasks()
+        self.load_config()
+        errors = self.validate_config()
+        if errors:
+            for error in errors:
+                log.critical("[%s] %s", error.json_pointer, error.message)
+            return
+        self.create_tasks()
 
-            # Make a list of Task instances to execute
-            if tasks is None:
-                # Default to all tasks if none are specified
-                run_tasks = self.tasks.values()
-            else:
-                # Turn the list of task names or instances into a list of instances
-                run_tasks = []
-                for task in tasks:
-                    if isinstance(task, basestring):
-                        if task in self.tasks:
-                            run_tasks.append(self.tasks[task])
-                        else:
-                            log.error('Task `%s` does not exist.' % task)
+        # Make a list of Task instances to execute
+        if tasks is None:
+            # Default to all tasks if none are specified
+            run_tasks = self.tasks.values()
+        else:
+            # Turn the list of task names or instances into a list of instances
+            run_tasks = []
+            for task in tasks:
+                if isinstance(task, basestring):
+                    if task in self.tasks:
+                        run_tasks.append(self.tasks[task])
                     else:
-                        run_tasks.append(task)
+                        log.error('Task `%s` does not exist.' % task)
+                else:
+                    run_tasks.append(task)
 
-            if not run_tasks:
-                log.warning('There are no tasks to execute, please add some tasks')
+        if not run_tasks:
+            log.warning('There are no tasks to execute, please add some tasks')
+            return
+
+        disable_phases = disable_phases or []
+        # when learning, skip few phases
+        if self.options.learn:
+            log.info('Disabling download and output phases because of --learn')
+            disable_phases.extend(['download', 'output'])
+
+        fire_event('manager.execute.started', self)
+        self.process_start(tasks=run_tasks)
+
+        for task in sorted(run_tasks):
+            if not task.enabled or task._abort:
+                continue
+            try:
+                task.execute(disable_phases=disable_phases, entries=entries)
+            except Exception as e:
+                task.enabled = False
+                log.exception('Task %s: %s' % (task.name, e))
+            except KeyboardInterrupt:
+                # show real stack trace in debug mode
+                if self.options.debug:
+                    raise
+                print '**** Keyboard Interrupt ****'
                 return
 
-            disable_phases = disable_phases or []
-            # when learning, skip few phases
-            if self.options.learn:
-                log.info('Disabling download and output phases because of --learn')
-                disable_phases.extend(['download', 'output'])
-
-            fire_event('manager.execute.started', self)
-            self.process_start(tasks=run_tasks)
-
-            for task in sorted(run_tasks):
-                if not task.enabled or task._abort:
-                    continue
-                try:
-                    task.execute(disable_phases=disable_phases, entries=entries)
-                except Exception as e:
-                    task.enabled = False
-                    log.exception('Task %s: %s' % (task.name, e))
-                except KeyboardInterrupt:
-                    # show real stack trace in debug mode
-                    if self.options.debug:
-                        raise
-                    print '**** Keyboard Interrupt ****'
-                    return
-
-            self.process_end(tasks=run_tasks)
-            fire_event('manager.execute.completed', self)
+        self.process_end(tasks=run_tasks)
+        fire_event('manager.execute.completed', self)
 
     def db_cleanup(self, force=False):
         """

@@ -105,10 +105,19 @@ class ArgumentParser(ArgParser):
         self.subparsers = super(ArgumentParser, self).add_subparsers(**kwargs)
         return self.subparsers
 
-    def add_subparser(self, name, **kwargs):
+    def add_subparser(self, name, lock_required=False, **kwargs):
+        """
+        Adds a parser for a new subcommand and returns it.
+
+        :param name: Name of the subcommand
+        :param require_lock: Whether this subcommand should require a database lock
+        """
         if not self.subparsers:
             raise TypeError('This parser does not have subparsers')
-        return self.subparsers.add_parser(name, **kwargs)
+        result = self.subparsers.add_parser(name, **kwargs)
+        if lock_required:
+            result.set_defaults(lock_required=True)
+        return result
 
     def get_subparser(self, name, default=None):
         if not self.subparsers:
@@ -165,7 +174,8 @@ class CoreArgumentParser(ArgumentParser):
         self.add_subparsers(title='Commands', metavar='<command>', dest='subcommand')
 
         # The parser for the exec subcommand
-        exec_parser = self.add_subparser('exec', help='execute tasks now')
+        exec_parser = self.add_subparser('exec', lock_required=True, help='execute tasks now')
+        exec_parser.set_defaults(lock_required=True)
         exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
                                  help='Validate configuration file and print errors.')
         exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
