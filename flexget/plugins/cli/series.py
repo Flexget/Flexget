@@ -241,7 +241,11 @@ register_plugin(CLISeries, 'cli_series')
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
     # TODO: CLI this is a hacky way of registering the plugin instance method, maybe refactor to not use a class
-    event('manager.subcommand.series')(get_plugin_by_name('cli_series').instance.do_cli)
+    try:
+        event('manager.subcommand.series')(get_plugin_by_name('cli_series').instance.do_cli)
+    except ValueError:
+        # If this event is called more than once registering the same function for the same event will fail
+        pass
     # Register the subcommand
     parser = core_parser.add_subparser('series', help='view and manipulate the series plugin database')
 

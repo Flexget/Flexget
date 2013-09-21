@@ -37,3 +37,10 @@ class UIManager(Manager):
             log.info('autoreload enabled, not checking for lock file')
             return False
         return Manager.check_lock(self)
+
+    def write_lock(self, pid=None):
+        if not pid:
+            pid = os.getpid()
+        with open(self.lockfile, 'w') as f:
+            f.write('PID: %s\n' % pid)
+            f.write('Port: %s\n' % self.options.port)

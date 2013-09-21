@@ -7,6 +7,7 @@ import logging
 import yaml
 from datetime import datetime, timedelta
 
+import requests
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -14,7 +15,7 @@ from sqlalchemy.pool import SingletonThreadPool
 
 from flexget import config_schema
 from flexget.event import fire_event
-from flexget.utils.tools import pid_exists
+from flexget.utils.tools import pid_exists, console
 
 log = logging.getLogger('manager')
 
@@ -165,8 +166,12 @@ class Manager(object):
                     self.execute()
 
         if getattr(options, 'lock_required', False):
-            with self.acquire_lock():
-                do_subcommand()
+            port = self.check_webui_port()
+            if port and name == 'exec':
+                self.remote_execute(port)
+            else:
+                with self.acquire_lock():
+                    do_subcommand()
         else:
             do_subcommand()
 
@@ -500,18 +505,35 @@ class Manager(object):
                                      (e.message, self.config_base)
             raise Exception(e.message)
 
-    def check_lock(self):
-        """Checks if there is already a lock, returns True if there is."""
+    def _read_lock(self):
+        """
+        Checks if there is already a lock on the database, returns truthy if there is.
+        If the lock is held by the webui, returns the port number it is running on.
+        """
         if os.path.exists(self.lockfile):
             with open(self.lockfile) as f:
-                pid = f.read()
-            pid = int(pid.lstrip('PID: '))
+                lines = filter(None, f.readlines())
+            pid = int(lines[0].lstrip('PID: '))
+            port = True
+            if len(lines) > 1:
+                port = int(lines[1].lstrip('Port: '))
             if pid == os.getpid():
                 return False
             if not pid_exists(pid):
                 log.info('PID %s no longer exists, ignoring lock file.' % pid)
                 return False
-            return True
+            return port
+        return False
+
+    def check_lock(self):
+        """Returns True if there is a lock on the database."""
+        return bool(self._read_lock())
+
+    def check_webui_port(self):
+        """If the webui has a lock on the database, return the port number."""
+        port = self._read_lock()
+        if not isinstance(port, bool):
+            return port
         return False
 
     @contextmanager
@@ -530,14 +552,16 @@ class Manager(object):
                     print >> sys.stderr, 'If you\'re sure there is no other instance running, delete %s' % self.lockfile
                 sys.exit(1)
 
-            f = file(self.lockfile, 'w')
-            f.write('PID: %s\n' % os.getpid())
-            f.close()
+            self.write_lock()
             acquired = True
             yield
         finally:
             if acquired:
                 self.release_lock()
+
+    def write_lock(self):
+        with open(self.lockfile, 'w') as f:
+            f.write('PID: %s\n' % os.getpid())
 
     def release_lock(self):
         if self.options.log_start:
@@ -620,6 +644,18 @@ class Manager(object):
                 task._process_end()
             except Exception as e:
                 log.exception('Task %s process_end: %s' % (task.name, e))
+
+    def remote_execute(self, port, **kwargs):
+        log.info('Sending this execution to the webui running on port %s' % port)
+        url = 'http://localhost:%s/api/' % port
+        r = requests.post(url + 'execute', params=kwargs)
+        if r.status_code != 200:
+            log.error('Error queueing remote execution: %s' % r.json().get('error', 'unknown'))
+            return
+
+        console('Displaying log from remote execution...')
+        for line in r.iter_lines(chunk_size=1):
+            console(line)
 
     @useExecLogging
     def execute(self, tasks=None, disable_phases=None, entries=None):

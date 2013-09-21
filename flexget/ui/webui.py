@@ -14,12 +14,15 @@ import os
 import urllib
 import threading
 import sys
+
 from flask import Flask, redirect, url_for, abort, request, send_from_directory
 from sqlalchemy.orm import scoped_session
 from sqlalchemy.orm.session import sessionmaker
+
 from flexget.event import fire_event
 from flexget.plugin import DependencyError
 from flexget.ui.executor import ExecThread
+from flexget.ui.api import api
 
 log = logging.getLogger('webui')
 
@@ -153,11 +156,7 @@ def start(mg):
         newpid = daemonize()
         # Write new pid to lock file
         log.debug('Writing new pid %d to lock file %s' % (newpid, manager.lockfile))
-        lockfile = file(manager.lockfile, 'w')
-        try:
-            lockfile.write('%d\n' % newpid)
-        finally:
-            lockfile.close()
+        manager.write_lock(pid=newpid)
 
     # Start the executor thread
     global executor
@@ -173,6 +172,8 @@ def start(mg):
     from flexget.manager import Base
     Base.metadata.create_all(bind=manager.engine)
 
+    fire_event('webui.register_api_endpoints', api)
+    app.register_blueprint(api)
     fire_event('webui.start')
 
     # Start Flask

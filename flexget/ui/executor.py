@@ -7,6 +7,7 @@ import threading
 from Queue import Queue
 
 from flexget.logger import FlexGetFormatter
+from flexget.options import CoreArgumentParser
 
 log = logging.getLogger('ui.executor')
 
@@ -33,12 +34,16 @@ class ExecThread(threading.Thread):
             kwargs = self.queue.get() or {}
             opts = kwargs.pop('options', None)
             output = kwargs.pop('output', None)
+            # make copy of original options and apply options from opts
+            old_opts = copy(manager.options)
+            # Start with the exec defaults, to make sure all exec subcommand options are defined
+            new_opts = CoreArgumentParser().get_subparser('exec').parse_args().__dict__
+            new_opts.update(old_opts.__dict__)
             if opts:
-                # make copy of original options and apply options from opts
-                old_opts = copy(manager.options)
                 if isinstance(opts, Namespace):
                     opts = opts.__dict__
-                manager.options.__dict__.update(opts)
+                new_opts.update(opts)
+            manager.options.__dict__.update(new_opts)
             if output:
                 old_stdout = sys.stdout
                 old_stderr = sys.stderr
@@ -54,8 +59,7 @@ class ExecThread(threading.Thread):
                 # Inform queue we are done processing this item.
                 self.queue.task_done()
                 # Restore manager's previous options and stdout
-                if opts:
-                    manager.options = old_opts
+                manager.options = old_opts
                 if output:
                     # Write EOF to the output, so that a listener knows when the output is over
                     output.write('EOF')

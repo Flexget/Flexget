@@ -57,6 +57,9 @@ def enable_authentication():
 
 
 def check_authenticated():
+    # TODO: Is this a big security hole? Maybe figure out a better way to authenticate for local IPC
+    if request.remote_addr == '127.0.0.1':
+        return
     auth = request.authorization
     if not auth or not check_auth(auth.username, auth.password):
         return authenticate()

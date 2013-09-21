@@ -5,7 +5,6 @@ import os
 import sys
 import logging
 from flexget import logger
-from flexget.options import core_parser
 from flexget.ui.options import webui_parser
 from flexget.ui.manager import UIManager
 import flexget.ui.webui
@@ -20,7 +19,7 @@ def main():
     logger.initialize()
 
     # The core plugins need the exec parser to add their options to
-    plugin.load_plugins(core_parser.get_subparser('exec'))
+    plugin.load_plugins()
 
     # Use the ui options parser to parse the cli
     options = webui_parser.parse_args()
