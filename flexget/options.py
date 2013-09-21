@@ -149,12 +149,16 @@ manager_parser.add_argument('--loglevel', default='verbose',
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--del-db', action='store_true', dest='del_db', default=False, help=SUPPRESS)
-manager_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0, help=SUPPRESS)
 
 
 class CoreArgumentParser(ArgumentParser):
-    """The core argument parser, contains the manager arguments, subcommands, and plugin arguments"""
+    """
+    The core argument parser, contains the manager arguments, subcommands, and plugin arguments.
+
+    Warning: Should be instantiated only after plugins have been loaded.
+
+    """
     def __init__(self, **kwargs):
         kwargs.setdefault('parents', [manager_parser])
         super(CoreArgumentParser, self).__init__(**kwargs)
@@ -166,6 +170,7 @@ class CoreArgumentParser(ArgumentParser):
                           help='Validate configuration file and print errors.')
         _exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
                           help='Matches are not downloaded but will be skipped in the future.')
+        _exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         # Plugins should respect these flags where appropriate
         _exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
         _exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,

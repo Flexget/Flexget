@@ -39,17 +39,5 @@ def main():
     if not os.path.isabs(log_file):
         log_file = os.path.join(manager.config_base, log_file)
     logger.start(log_file, log_level)
-
-    # TODO: CLI handle this some method like manager.do_subcommand(name, options)
-    if options.subcommand == 'exec':
-        if options.profile:
-            try:
-                import cProfile as profile
-            except ImportError:
-                import profile
-            profile.runctx('manager.execute()', globals(), locals(), os.path.join(manager.config_base, 'flexget.profile'))
-        else:
-            manager.execute()
-    else:
-        fire_event('manager.subcommand.%s' % options.subcommand, manager, options)
+    manager.run_subcommand(options.subcommand, options)
     manager.shutdown()

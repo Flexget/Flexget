@@ -76,6 +76,10 @@ class Manager(object):
 
       Upgrade plugin database schemas etc
 
+    * manager.subcommand.<subcommand name>
+
+      When a subcommand is called from the CLI
+
     * manager.execute.started
 
       When execute is about the be started, this happens before any task phases occur
@@ -145,9 +149,22 @@ class Manager(object):
         self.find_config()
         self.init_sqlalchemy()
 
+    def run_subcommand(self, name, options):
+        # Let plugins handle the subcommand
+        fire_event('manager.subcommand.%s' % name, self, options)
+        # exec is the only built-in subcommand, handle it here
+        if options.subcommand == 'exec':
+            if options.profile:
+                try:
+                    import cProfile as profile
+                except ImportError:
+                    import profile
+                profile.runctx('self.execute()', globals(), locals(), os.path.join(self.config_base, 'flexget.profile'))
+            else:
+                self.execute()
+
     def setup_yaml(self):
-        """ Set up the yaml loader to return unicode objects for strings by default
-        """
+        """Sets up the yaml loader to return unicode objects for strings by default"""
 
         def construct_yaml_str(self, node):
             # Override the default string handling function
