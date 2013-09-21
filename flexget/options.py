@@ -156,7 +156,7 @@ class CoreArgumentParser(ArgumentParser):
     """
     The core argument parser, contains the manager arguments, subcommands, and plugin arguments.
 
-    Warning: Should be instantiated only after plugins have been loaded.
+    Warning: Only gets plugin arguments if instantiated after plugins have been loaded.
 
     """
     def __init__(self, **kwargs):
@@ -165,16 +165,16 @@ class CoreArgumentParser(ArgumentParser):
         self.add_subparsers(title='Commands', metavar='<command>', dest='subcommand')
 
         # The parser for the exec subcommand
-        _exec_parser = self.add_subparser('exec', help='execute tasks now')
-        _exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
-                          help='Validate configuration file and print errors.')
-        _exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
-                          help='Matches are not downloaded but will be skipped in the future.')
-        _exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
+        exec_parser = self.add_subparser('exec', help='execute tasks now')
+        exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
+                                 help='Validate configuration file and print errors.')
+        exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
+                                 help='Matches are not downloaded but will be skipped in the future.')
+        exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         # Plugins should respect these flags where appropriate
-        _exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
-        _exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
-                          help='Disable caches. Works only in plugins that have explicit support.')
+        exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
+        exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
+                                 help='Disable caches. Works only in plugins that have explicit support.')
 
         # Add all plugin options to the parser
         fire_event('register_parser_arguments', self)
