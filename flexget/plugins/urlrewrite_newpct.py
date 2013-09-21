@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-import urllib2
 import logging
+import os
 import re
+import urllib2
+from urlparse import urlparse
 
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.plugin import register_plugin, internet
@@ -36,10 +38,11 @@ class UrlRewriteNewPCT(object):
             soup = get_soup(page)
         except Exception, e:
             raise UrlRewritingError(e)
-        down_link = soup.find('a', attrs={'href': re.compile("descargar/torrent/")})
-        if not down_link:
-            raise UrlRewritingError('Unable to locate download link from url %s' % url)
-        return down_link.get('href')
-
+        torrent_id_prog = re.compile("'torrentID': '(\d+)'")
+        torrent_ids = soup.findAll(text=torrent_id_prog)
+        if len(torrent_ids) == 0:
+            raise UrlRewritingError('Unable to locate torret ID from url %s' % url)
+        torrent_id = torrent_id_prog.search(torrent_ids[0]).group(1)
+        return 'http://www.pctorrent.com/descargar/index.php?link=descargar/torrent/%s/dummy.html' % torrent_id
 
 register_plugin(UrlRewriteNewPCT, 'newpct', groups=['urlrewriter'])
