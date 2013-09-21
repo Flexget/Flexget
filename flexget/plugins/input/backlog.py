@@ -147,17 +147,4 @@ class InputBacklog(object):
         return entries
 
 
-@event('manager.subcommands.clear-backlog')
-def clear_backlog(manager, options):
-    session = Session()
-    num = session.query(BacklogEntry).delete()
-    session.close()
-    console('%s entries cleared from backlog.' % num)
-
-
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.add_subparser('clear-backlog', help='remove all items from the backlog')
-
-
 register_plugin(InputBacklog, 'backlog', builtin=True, api_ver=2)
