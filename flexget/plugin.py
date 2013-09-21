@@ -183,6 +183,7 @@ _plugin_options = []
 _new_phase_queue = {}
 
 
+# TODO: CLI get rid of this in favor of register_parser_arguments event
 def register_parser_option(*args, **kwargs):
     """Adds a parser option to the global parser."""
     if _parser is None:

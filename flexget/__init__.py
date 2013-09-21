@@ -21,6 +21,7 @@ def main():
     logger.initialize()
 
     plugin.load_plugins(core_parser.get_subparser('exec'))
+    fire_event('register_parser_arguments', core_parser)
 
     options = core_parser.parse_args()
 

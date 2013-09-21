@@ -4,10 +4,10 @@ from datetime import datetime
 
 from sqlalchemy import Column, String, Integer, DateTime, Unicode, desc
 
+from flexget.event import event
 from flexget.manager import Base, Session
 from flexget.plugin import register_plugin
 from flexget.utils.tools import console
-from flexget.options import add_subparser
 
 log = logging.getLogger('history')
 
@@ -54,6 +54,7 @@ class PluginHistory(object):
             task.session.add(item)
 
 
+@event('manager.subcommand.history')
 def do_cli(manager, options):
     session = Session()
     console('-- History: ' + '-' * 67)
@@ -74,8 +75,12 @@ def do_cli(manager, options):
     session.close()
 
 
-parser = add_subparser('history', do_cli, help='view the history of entries that FlexGet has accepted')
-parser.add_argument('--limit', action='store', type=int, metavar='NUM', default=50, help='limit to %(metavar)s results')
-parser.add_argument('--search', action='store', metavar='TERM', help='limit to results that contain %(metavar)s')
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    parser = core_parser.add_subparser('history', help='view the history of entries that FlexGet has accepted')
+    parser.add_argument('--limit', action='store', type=int, metavar='NUM', default=50,
+                        help='limit to %(metavar)s results')
+    parser.add_argument('--search', action='store', metavar='TERM', help='limit to results that contain %(metavar)s')
+
 
 register_plugin(PluginHistory, 'history', builtin=True, api_ver=2)

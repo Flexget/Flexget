@@ -1,12 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget.options import add_subparser
+from flexget.event import event
 from flexget.plugin import plugins
 
 log = logging.getLogger('plugins')
 
 
+@event('manager.subcommand.plugins')
 def plugins_summary(manager, options):
     print '-' * 79
     print '%-20s%-30s%s' % ('Name', 'Roles (priority)', 'Info')
@@ -31,4 +32,7 @@ def plugins_summary(manager, options):
 
     print '-' * 79
 
-parser = add_subparser('plugins', plugins_summary, help='print registered plugin summaries')
+
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    core_parser.add_subparser('plugins', help='print registered plugin summaries')

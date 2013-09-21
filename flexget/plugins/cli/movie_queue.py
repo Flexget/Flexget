@@ -4,7 +4,6 @@ from argparse import ArgumentParser
 from sqlalchemy.exc import OperationalError
 
 from flexget.event import event
-from flexget.options import core_parser
 from flexget.utils import qualities
 from flexget.utils.tools import console
 from flexget.plugin import DependencyError
@@ -107,20 +106,22 @@ def clear():
         console('No results')
     console('-' * 79)
 
-# Common option to bu used in multiple subparsers
-what_parser = ArgumentParser(add_help=False)
-what_parser.add_argument('movie_name', metavar='<movie>',
-                         help='the movie (can be movie title, imdb id, or in the form `tmdb_id=XXXX`')
-# Register subcommand
-parser = core_parser.add_subparser('movie-queue', help='view and manage the movie queue')
-# Set up our subparsers
-subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='queue_action')
-list_parser = subparsers.add_parser('list', help='list movies from the queue')
-list_parser.add_argument('type', nargs='?', choices=['waiting', 'downloaded'], default='waiting',
-                         help='choose to show waiting or already downloaded movies')
-add_parser = subparsers.add_parser('add', parents=[what_parser], help='add a movie to the queue')
-add_parser.add_argument('quality', metavar='<quality>', default='ANY', nargs='?',
-                        help='the quality requirements for getting this movie (default: %(default)s)')
-del_parser = subparsers.add_parser('del', parents=[what_parser], help='remove a movie from the queue')
-forget_parser = subparsers.add_parser('forget', parents=[what_parser], help='remove the downloaded flag from a movie')
-clear_parser = subparsers.add_parser('clear', help='remove all un-downloaded movies from the queue')
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    # Common option to be used in multiple subparsers
+    what_parser = ArgumentParser(add_help=False)
+    what_parser.add_argument('movie_name', metavar='<movie>',
+                             help='the movie (can be movie title, imdb id, or in the form `tmdb_id=XXXX`')
+    # Register subcommand
+    parser = core_parser.add_subparser('movie-queue', help='view and manage the movie queue')
+    # Set up our subparsers
+    subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='queue_action')
+    list_parser = subparsers.add_parser('list', help='list movies from the queue')
+    list_parser.add_argument('type', nargs='?', choices=['waiting', 'downloaded'], default='waiting',
+                             help='choose to show waiting or already downloaded movies')
+    add_parser = subparsers.add_parser('add', parents=[what_parser], help='add a movie to the queue')
+    add_parser.add_argument('quality', metavar='<quality>', default='ANY', nargs='?',
+                            help='the quality requirements for getting this movie (default: %(default)s)')
+    subparsers.add_parser('del', parents=[what_parser], help='remove a movie from the queue')
+    subparsers.add_parser('forget', parents=[what_parser], help='remove the downloaded flag from a movie')
+    subparsers.add_parser('clear', help='remove all un-downloaded movies from the queue')

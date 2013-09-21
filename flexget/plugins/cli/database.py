@@ -1,11 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from flexget.manager import Base, Session
-from flexget.options import add_subparser
 from flexget.db_schema import reset_schema, plugin_schemas
+from flexget.event import event
+from flexget.manager import Base, Session
 from flexget.utils.tools import console
 
 
+@event('manager.subcommand.database')
 def do_cli(manager, options):
     with manager.acquire_lock():
         if options.db_action == 'cleanup':
@@ -63,14 +64,15 @@ def reset_plugin(options):
         except ValueError as e:
             console('Unable to reset %s: %s' % (plugin, e.message))
 
-
-parser = add_subparser('database', do_cli, help='utilities to manage the FlexGet database')
-subparsers = parser.add_subparsers(title='Actions', metavar='<action>', dest='db_action')
-subparsers.add_parser('cleanup', help='make all plugins clean un-needed data from the database')
-subparsers.add_parser('vacuum', help='running vacuum can increase performance and decrease database size')
-reset_parser = subparsers.add_parser('reset', add_help=False, help='reset the entire database (DANGEROUS!)')
-reset_parser.add_argument('--sure', action='store_true', required=True,
-                          help='you must use this flag to indicate you REALLY want to do this')
-reset_plugin_parser = subparsers.add_parser('reset-plugin', help='reset the database for a specific plugin')
-reset_plugin_parser.add_argument('reset_plugin', metavar='<plugin>', nargs='?',
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    parser = core_parser.add_subparser('database', help='utilities to manage the FlexGet database')
+    subparsers = parser.add_subparsers(title='Actions', metavar='<action>', dest='db_action')
+    subparsers.add_parser('cleanup', help='make all plugins clean un-needed data from the database')
+    subparsers.add_parser('vacuum', help='running vacuum can increase performance and decrease database size')
+    reset_parser = subparsers.add_parser('reset', add_help=False, help='reset the entire database (DANGEROUS!)')
+    reset_parser.add_argument('--sure', action='store_true', required=True,
+                              help='you must use this flag to indicate you REALLY want to do this')
+    reset_plugin_parser = subparsers.add_parser('reset-plugin', help='reset the database for a specific plugin')
+    reset_plugin_parser.add_argument('reset_plugin', metavar='<plugin>', nargs='?',
                                  help='name of plugin to reset (if omitted, known plugins will be listed)')

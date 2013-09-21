@@ -244,6 +244,7 @@ def db_cleanup(session):
         log.verbose('Removed %d seen fields older than 1 year.' % result)
 
 
+@event('manager.subcommand.seen')
 def do_cli(manager, options):
     if options.seen_action == 'forget':
         seen_forget(manager, options)
@@ -301,12 +302,14 @@ def seen_search(options):
 
 register_plugin(FilterSeen, 'seen', builtin=True, api_ver=2)
 
-parser = add_subparser('seen', do_cli, help='view or forget entries remembered by the seen plugin')
-subparsers = parser.add_subparsers(dest='seen_action', metavar='<action>')
-forget_parser = subparsers.add_parser('forget', help='forget entry or entire task from seen plugin database')
-forget_parser.add_argument('forget_value', metavar='<value>',
-                           help='title or url of entry to forget, or name of task to forget')
-add_parser = subparsers.add_parser('add', help='add a title or url to the seen database')
-add_parser.add_argument('add_value', metavar='<value>', help='the title or url to add')
-search_parser = subparsers.add_parser('search', help='search text from the seen database')
-search_parser.add_argument('search_term', metavar='<search term>')
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    parser = core_parser.add_subparser('seen', help='view or forget entries remembered by the seen plugin')
+    subparsers = parser.add_subparsers(dest='seen_action', metavar='<action>')
+    forget_parser = subparsers.add_parser('forget', help='forget entry or entire task from seen plugin database')
+    forget_parser.add_argument('forget_value', metavar='<value>',
+                               help='title or url of entry to forget, or name of task to forget')
+    add_parser = subparsers.add_parser('add', help='add a title or url to the seen database')
+    add_parser.add_argument('add_value', metavar='<value>', help='the title or url to add')
+    search_parser = subparsers.add_parser('search', help='search text from the seen database')
+    search_parser.add_argument('search_term', metavar='<search term>')

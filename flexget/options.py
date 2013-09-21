@@ -167,9 +167,3 @@ _exec_parser.add_argument('--learn', action='store_true', dest='learn', default=
 _exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
 _exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
                   help='Disable caches. Works only in plugins that have explicit support.')
-
-
-# TODO: CLI get rid of this and have plugins register for events directly
-def add_subparser(name, func, **kwargs):
-    event('manager.subcommand.%s' % name)(func)
-    return core_parser.add_subparser(name, **kwargs)

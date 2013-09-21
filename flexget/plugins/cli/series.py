@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 from string import capwords
 from sqlalchemy import func
 
+from flexget.event import event
 from flexget.manager import Session
-from flexget.options import add_subparser
 from flexget.plugin import register_plugin, DependencyError, get_plugin_by_name
 from flexget.utils.tools import console
 
@@ -237,31 +237,35 @@ class CLISeries(SeriesDatabase):
 
 register_plugin(CLISeries, 'cli_series')
 
-# Register the subcommand
-instance = get_plugin_by_name('cli_series').instance
-parser = add_subparser('series', instance.do_cli, help='view and manipulate the series plugin database')
 
-# Parent parser for subcommands that need a series name
-series_parser = argparse.ArgumentParser(add_help=False)
-series_parser.add_argument('series_name', help='the name of the series', metavar='<series name>')
+@event('register_parser_arguments')
+def register_parser_arguments(core_parser):
+    # TODO: CLI this is a hacky way of registering the plugin instance method, maybe refactor to not use a class
+    event('manager.subcommand.series')(get_plugin_by_name('cli_series').instance.do_cli)
+    # Register the subcommand
+    parser = core_parser.add_subparser('series', help='view and manipulate the series plugin database')
 
-# Set up our subparsers
-subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='series_action')
-list_parser = subparsers.add_parser('list', help='list a summary of the different series being tracked')
-list_parser.add_argument('type', nargs='?', choices=['all', 'configured', 'premieres'], default='configured',
-                         help='only list a subset of shows (default: %(default)s)')
-list_parser.add_argument('--within', type=int, metavar='DAYS',
-                         help='only show series seen within the last %(metavar)s days')
-show_parser = subparsers.add_parser('show', parents=[series_parser],
-                                    help='show the releases FlexGet has seen for a given series ')
-begin_parser = subparsers.add_parser('begin', parents=[series_parser],
-                                     help='set the episode to start getting a series from')
-begin_parser.add_argument('episode_id', metavar='<episode ID>',
-                          help='episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
-                               'depending on how the series is numbered)')
-forget_parser = subparsers.add_parser('forget', parents=[series_parser],
-                                      help='removes episodes or whole series from the series database')
-forget_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
+    # Parent parser for subcommands that need a series name
+    series_parser = argparse.ArgumentParser(add_help=False)
+    series_parser.add_argument('series_name', help='the name of the series', metavar='<series name>')
+
+    # Set up our subparsers
+    subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='series_action')
+    list_parser = subparsers.add_parser('list', help='list a summary of the different series being tracked')
+    list_parser.add_argument('type', nargs='?', choices=['all', 'configured', 'premieres'], default='configured',
+                             help='only list a subset of shows (default: %(default)s)')
+    list_parser.add_argument('--within', type=int, metavar='DAYS',
+                             help='only show series seen within the last %(metavar)s days')
+    show_parser = subparsers.add_parser('show', parents=[series_parser],
+                                        help='show the releases FlexGet has seen for a given series ')
+    begin_parser = subparsers.add_parser('begin', parents=[series_parser],
+                                         help='set the episode to start getting a series from')
+    begin_parser.add_argument('episode_id', metavar='<episode ID>',
+                              help='episode ID to start getting the series from (e.g. S02E01, 2013-12-11, or 9, '
+                                   'depending on how the series is numbered)')
+    forget_parser = subparsers.add_parser('forget', parents=[series_parser],
+                                          help='removes episodes or whole series from the series database')
+    forget_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
 
 
 
