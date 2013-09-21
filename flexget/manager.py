@@ -15,6 +15,7 @@ from sqlalchemy.pool import SingletonThreadPool
 
 from flexget import config_schema
 from flexget.event import fire_event
+from flexget.utils import json
 from flexget.utils.tools import pid_exists, console
 
 log = logging.getLogger('manager')
@@ -168,7 +169,7 @@ class Manager(object):
         if getattr(options, 'lock_required', False):
             port = self.check_webui_port()
             if port and name == 'exec':
-                self.remote_execute(port)
+                self.remote_execute(port, options)
             else:
                 with self.acquire_lock():
                     do_subcommand()
@@ -645,10 +646,12 @@ class Manager(object):
             except Exception as e:
                 log.exception('Task %s process_end: %s' % (task.name, e))
 
-    def remote_execute(self, port, **kwargs):
+    def remote_execute(self, port, options=None, **kwargs):
         log.info('Sending this execution to the webui running on port %s' % port)
         url = 'http://localhost:%s/api/' % port
-        r = requests.post(url + 'execute', params=kwargs)
+        if options:
+            kwargs['options'] = options.__dict__
+        r = requests.post(url + 'execute', data=json.dumps(kwargs), headers={'Content-type': 'application/json'})
         if r.status_code != 200:
             log.error('Error queueing remote execution: %s' % r.json().get('error', 'unknown'))
             return
