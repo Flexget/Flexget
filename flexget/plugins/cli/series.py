@@ -95,39 +95,6 @@ class CLISeries(SeriesDatabase):
         console(' See option `identified_by` for more information.')
         session.close()
 
-    def get_series_summary(self):
-        """
-        :return: Dictionary where key is series name and value is dictionary of summary details.
-        """
-        result = {}
-        session = Session()
-        try:
-            seriestasks = session.query(SeriesTask).all()
-            if seriestasks:
-                all_series = set(st.series for st in seriestasks)
-            else:
-                all_series = session.query(Series).all()
-            for series in all_series:
-                name = series.name
-                # capitalize if user hasn't, better look and sorting ...
-                if name.islower():
-                    name = capwords(name)
-                result[name] = {'identified_by': series.identified_by}
-                result[name]['in_tasks'] = [task.name for task in series.in_tasks]
-                episode = self.get_latest_download(series)
-                if episode:
-                    latest = {'first_seen': episode.first_seen,
-                              'episode_instance': episode,
-                              'episode_id': episode.identifier,
-                              'age': episode.age,
-                              'status': self.get_latest_status(episode),
-                              'behind': self.new_eps_after(episode)}
-
-                    result[name]['latest'] = latest
-        finally:
-            session.close()
-        return result
-
     def get_latest_status(self, episode):
         """
         :param episode: Instance of Episode
@@ -150,47 +117,53 @@ class CLISeries(SeriesDatabase):
         Display series summary.
         :param options: argparse options from the CLI
         """
-
-        # TODO: CLI implement the extra filtering options: within, type
         formatting = ' %-30s %-10s %-10s %-20s'
         console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
         console('-' * 79)
 
-        hidden = 0
-        for series_name, data in sorted((self.get_series_summary()).iteritems()):
-            new_ep = ' '
-            if len(series_name) > 30:
-                series_name = series_name[:27] + '...'
+        session = Session()
+        try:
+            query = (session.query(Series).outerjoin(Series.episodes).outerjoin(Episode.releases).
+                     outerjoin(Series.in_tasks).group_by(Series.id))
+            if options.type == 'configured':
+                query = query.having(func.count(SeriesTask.id) >= 1)
+            elif options.type == 'premieres':
+                query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2).
+                         having(func.count(SeriesTask.id) < 1)).filter(Release.downloaded == True)
+            if options.within:
+                query = query.having(func.max(Episode.first_seen) > datetime.now() - timedelta(days=options.within))
+            for series in query.order_by(Series.name).yield_per(10):
+                series_name = series.name
+                if len(series_name) > 30:
+                    series_name = series_name[:27] + '...'
 
-            last_dl = data.get('latest', {})
-            behind = last_dl.get('behind', 0)
+                new_ep = ' '
+                behind = 0
+                status = 'N/A'
+                age = 'N/A'
+                episode_id = 'N/A'
+                latest = self.get_latest_download(series)
+                if latest:
+                    if latest.first_seen > datetime.now() - timedelta(days=2):
+                        new_ep = '>'
+                    behind = self.new_eps_after(latest)
+                    status = self.get_latest_status(latest)
+                    age = latest.age
+                    episode_id = latest.identifier
 
-            # Mark new eps
-            if last_dl:
-                if last_dl['first_seen'] > datetime.now() - timedelta(days=2):
-                    new_ep = '>'
-            # Determine whether to hide series. Never hide explicitly configured series.
-            if not data.get('in_tasks'):
-                if behind <= 3 and (last_dl and last_dl['first_seen'] < datetime.now() - timedelta(days=30 * 7)):
-                    # Hide series that are have not been seen recently, and are not behind too many eps
-                    hidden += 1
-                    continue
+                if behind:
+                    episode_id += ' +%s' % behind
 
-            status = last_dl.get('status', 'N/A')
-            age = last_dl.get('age', 'N/A')
-            episode_id = last_dl.get('episode_id', 'N/A')
-            if behind:
-                episode_id += ' +%s' % last_dl['behind']
+                console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
+                if behind >= 3:
+                    console(' ! Latest download is %d episodes behind, this may require '
+                            'manual intervention' % behind)
 
-            console(new_ep + formatting[1:] % (series_name, episode_id, age if age else '', status))
-            if behind >= 3:
-                console(' ! Latest download is %d episodes behind, this may require '
-                        'manual intervention' % behind)
-
-        console('-' * 79)
-        console(' > = new episode ' +
-                ('| %i series unseen past 6 months hidden' % hidden if hidden else ''))
-        console(' Use `flexget series show NAME` to get detailed information')
+            console('-' * 79)
+            console(' > = new episode ')
+            console(' Use `flexget series show NAME` to get detailed information')
+        finally:
+            session.close()
 
     def forget(self, manager, options):
         name = options.series_name
