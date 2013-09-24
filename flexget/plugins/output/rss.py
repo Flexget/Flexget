@@ -203,7 +203,7 @@ class OutputRSS(object):
         if not rss2gen:
             return
         # don't generate rss when learning
-        if task.manager.options.learn:
+        if task.manager.options.execute.learn:
             return
 
         config = self.get_config(task)

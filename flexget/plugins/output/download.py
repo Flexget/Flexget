@@ -394,8 +394,8 @@ class PluginDownload(object):
                 raise PluginError('Invalid `path` in entry `%s`' % entry['title'])
 
             # override path from command line parameter
-            if task.manager.options.dl_path:
-                path = task.manager.options.dl_path
+            if task.manager.options.execute.dl_path:
+                path = task.manager.options.execute.dl_path
 
             # expand variables in path
             try:
@@ -510,6 +510,6 @@ register_plugin(PluginDownload, 'download', api_ver=2)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--dl-path', dest='dl_path', default=False, metavar='PATH',
+    core_parser.get_subparser('execute').add_argument('--dl-path', dest='dl_path', default=False, metavar='PATH',
                                                    help='override path for download plugin, applies to all executed '
                                                         'tasks')

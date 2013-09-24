@@ -41,7 +41,7 @@ class OutputMemUsage(object):
     schema = {'type': 'boolean'}
 
     def on_process_start(self, task):
-        if not task.manager.options.mem_usage:
+        if not task.manager.options.execute.mem_usage:
             return
         # start only once
         if self.heapy:
@@ -49,7 +49,7 @@ class OutputMemUsage(object):
         self.heapy = hpy()
 
     def on_process_end(self, task):
-        if not task.manager.options.mem_usage:
+        if not task.manager.options.execute.mem_usage:
             return
         # prevents running this multiple times ...
         if not self.heapy:
@@ -66,5 +66,5 @@ register_plugin(OutputMemUsage, 'mem_usage', builtin=True)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--mem-usage', action='store_true', dest='mem_usage', default=False,
+    core_parser.get_subparser('execute').add_argument('--mem-usage', action='store_true', dest='mem_usage', default=False,
                                                    help='display memory usage debug information')

@@ -37,7 +37,7 @@ class ExecThread(threading.Thread):
             # make copy of original options and apply options from opts
             old_opts = copy(manager.options)
             # Start with the exec defaults, to make sure all exec subcommand options are defined
-            new_opts = CoreArgumentParser().get_subparser('exec').parse_args().__dict__
+            new_opts = CoreArgumentParser().get_subparser('execute').parse_args().__dict__
             new_opts.update(old_opts.__dict__)
             if opts:
                 if isinstance(opts, Namespace):

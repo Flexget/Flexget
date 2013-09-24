@@ -68,5 +68,5 @@ def startup(manager, options):
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--debug-perf', action='store_true', dest='debug_perf',
+    core_parser.get_subparser('execute').add_argument('--debug-perf', action='store_true', dest='debug_perf',
                                                    default=False, help=SUPPRESS)

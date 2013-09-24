@@ -139,7 +139,6 @@ class Manager(object):
         if manager.db_upgraded:
             fire_event('manager.db_upgraded', self)
         fire_event('manager.startup', self)
-        self.db_cleanup()
 
     def __del__(self):
         global manager
@@ -156,7 +155,7 @@ class Manager(object):
             # Let plugins handle the subcommand
             fire_event('manager.subcommand.%s' % name, self, options)
             # exec is the only built-in subcommand, handle it here
-            if options.subcommand == 'exec':
+            if name == 'execute':
                 if options.profile:
                     try:
                         import cProfile as profile
@@ -166,6 +165,8 @@ class Manager(object):
                 else:
                     self.execute()
 
+        # TODO: CLI Fill default options and update them with passed in ones?
+        setattr(self.options, name, options)
         if getattr(options, 'lock_required', False):
             port = self.check_webui_port()
             if port and name == 'exec':
@@ -265,7 +266,8 @@ class Manager(object):
         except UnicodeDecodeError:
             log.critical('Config file must be UTF-8 encoded.')
             sys.exit(1)
-        if not self.options.quiet:
+        # This could cause an issue if we move loading the config outside of running 'execute'
+        if not self.options.execute.cron:
             # pre-check only when running without --cron
             self.pre_check_config(config)
         try:
@@ -541,16 +543,12 @@ class Manager(object):
     def acquire_lock(self):
         acquired = False
         try:
-            if self.options.log_start:
-                log.info('FlexGet started (PID: %s)' % os.getpid())
-
             # Exit if there is an existing lock.
             if self.check_lock():
-                if not self.options.quiet:
-                    with open(self.lockfile) as f:
-                        pid = f.read()
-                    print >> sys.stderr, 'Another process (%s) is running, will exit.' % pid.strip()
-                    print >> sys.stderr, 'If you\'re sure there is no other instance running, delete %s' % self.lockfile
+                with open(self.lockfile) as f:
+                    pid = f.read()
+                print >> sys.stderr, 'Another process (%s) is running, will exit.' % pid.strip()
+                print >> sys.stderr, 'If you\'re sure there is no other instance running, delete %s' % self.lockfile
                 sys.exit(1)
 
             self.write_lock()
@@ -565,8 +563,6 @@ class Manager(object):
             f.write('PID: %s\n' % os.getpid())
 
     def release_lock(self):
-        if self.options.log_start:
-            log.info('FlexGet stopped (PID: %s)' % os.getpid())
         if os.path.exists(self.lockfile):
             os.remove(self.lockfile)
             log.debug('Removed %s' % self.lockfile)
@@ -671,6 +667,9 @@ class Manager(object):
         :param list entries: Optional list of entries to pass into task(s).
             This will also cause task to disable input phase.
         """
+        if self.options.execute.log_start:
+            log.info('FlexGet started (PID: %s)' % os.getpid())
+        self.db_cleanup()
         self.load_config()
         errors = self.validate_config()
         if errors:
@@ -701,7 +700,7 @@ class Manager(object):
 
         disable_phases = disable_phases or []
         # when learning, skip few phases
-        if self.options.learn:
+        if self.options.execute.learn:
             log.info('Disabling download and output phases because of --learn')
             disable_phases.extend(['download', 'output'])
 
@@ -725,6 +724,8 @@ class Manager(object):
 
         self.process_end(tasks=run_tasks)
         fire_event('manager.execute.completed', self)
+        if self.options.execute.log_start:
+            log.info('FlexGet stopped (PID: %s)' % os.getpid())
 
     def db_cleanup(self, force=False):
         """
@@ -735,7 +736,7 @@ class Manager(object):
         """
         expired = self.persist.get('last_cleanup', datetime(1900, 1, 1)) < datetime.now() - DB_CLEANUP_INTERVAL
         if force or expired and any([t.enabled for t in self.tasks.values()]):
-            if not (force or self.options.quiet):
+            if not (force or self.options.execute.cron):
                 log.verbose('Not running database cleanup on manual run. It will be run on next --cron run.')
                 return
             log.info('Running database cleanup.')

@@ -1,11 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
 import sys
-from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, _VersionAction
+from collections import OrderedDict
+from functools import wraps
+
+import argparse
+from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, _VersionAction, Namespace, _SubParsersAction
 
 import flexget
 from flexget.utils.tools import console
 from flexget.utils import requests
 from flexget.event import fire_event
+
+
+_UNSET = object
 
 
 def required_length(nmin, nmax):
@@ -67,13 +74,27 @@ class CronAction(Action):
 class ArgumentParser(ArgParser):
     """Overrides some default ArgumentParser behavior"""
 
-    def __init__(self, **kwargs):
+    def __init__(self, separate_namespace=None, **kwargs):
+        """
+        :param str separate_namespace: If this is set, all options will be nested under an attribute called this
+        """
         # Do this early, so even option processing stuff is caught
         if '--bugreport' in sys.argv:
             self._debug_tb_callback()
 
         ArgParser.__init__(self, **kwargs)
         self.subparsers = None
+        self.separate_namespace = separate_namespace
+
+    def _get_values(self, action, arg_strings):
+        if action.nargs == argparse.PARSER and self.subparsers:
+            subcommand = arg_strings[0]
+            if not subcommand in self.subparsers.choices:
+                results = [x for x in self.subparsers.choices if x.startswith(subcommand)]
+                if len(results) == 1:
+                    arg_strings[0] = results[0]
+        return super(ArgumentParser, self)._get_values(action, arg_strings)
+
 
     def error(self, message):
         """Overridden error handler to print help message"""
@@ -94,15 +115,21 @@ class ArgumentParser(ArgParser):
                 kwargs['nargs'] = '+'
         return super(ArgumentParser, self).add_argument(*args, **kwargs)
 
-    def parse_args(self, args=None, namespace=None):
+    def parse_known_args(self, args=None, namespace=None):
         if args is None:
             # Decode all arguments to unicode before parsing
             args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
-        return super(ArgumentParser, self).parse_args(args, namespace)
+        if self.separate_namespace:
+            new_namespace = Namespace()
+            setattr(namespace, self.separate_namespace, new_namespace)
+            namespace = new_namespace
+        _namespace, args = super(ArgumentParser, self).parse_known_args(args, namespace)
+        return _namespace, args
 
-    def add_subparsers(self, **kwargs):
+    def add_subparsers(self, separate_namespace=False, **kwargs):
         kwargs.setdefault('parser_class', ArgumentParser)
         self.subparsers = super(ArgumentParser, self).add_subparsers(**kwargs)
+        self.subparsers.separate_namespace = separate_namespace
         return self.subparsers
 
     def add_subparser(self, name, lock_required=False, **kwargs):
@@ -114,15 +141,23 @@ class ArgumentParser(ArgParser):
         """
         if not self.subparsers:
             raise TypeError('This parser does not have subparsers')
+        if self.subparsers.separate_namespace:
+            kwargs.setdefault('separate_namespace', name)
         result = self.subparsers.add_parser(name, **kwargs)
         if lock_required:
             result.set_defaults(lock_required=True)
         return result
 
-    def get_subparser(self, name, default=None):
+    def get_subparser(self, name, default=_UNSET):
         if not self.subparsers:
             raise TypeError('This parser does not have subparsers')
-        return self.subparsers.choices.get(name, default)
+        p = self.subparsers.choices.get(name, default)
+        if p is _UNSET:
+            raise ArgumentError('%s is not an existing subparser name' % name)
+        return p
+
+    def get_defaults(self):
+        return self.parse_args([])
 
     def _debug_tb_callback(self, *dummy):
         import cgitb
@@ -133,32 +168,26 @@ class ArgumentParser(ArgParser):
 manager_parser = ArgumentParser(add_help=False)
 manager_parser.add_argument('-V', '--version', action=VersionAction, help='Print FlexGet version and exit.')
 manager_parser.add_argument('--test', action='store_true', dest='test', default=0,
-                         help='Verbose what would happen on normal execution.')
+                            help='Verbose what would happen on normal execution.')
 manager_parser.add_argument('-c', dest='config', default='config.yml',
-                         help='Specify configuration file. Default is config.yml')
+                            help='Specify configuration file. Default is config.yml')
 manager_parser.add_argument('--logfile', default='flexget.log',
-                         help='Specify a custom logfile name/location. '
-                              'Default is flexget.log in the config directory.')
-# TODO: rename dest to cron, since this does more than just quiet
-manager_parser.add_argument('--cron', action=CronAction, dest='quiet', default=False, nargs=0,
-                         help='Use when scheduling FlexGet with cron or other scheduler. Allows background '
-                              'maintenance to run. Disables stdout and stderr output. Reduces logging level.')
+                            help='Specify a custom logfile name/location. '
+                                 'Default is flexget.log in the config directory.')
 # This option is already handled above.
 manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
-                         help='Use this option to create a detailed bug report, '
+                            help='Use this option to create a detailed bug report, '
                               'note that the output might contain PRIVATE data, so edit that out')
 # provides backward compatibility to --cron and -d
 manager_parser.add_argument('-q', '--quiet', action=CronAction, dest='quiet', default=False, nargs=0,
-                         help=SUPPRESS)
+                            help=SUPPRESS)
 manager_parser.add_argument('--debug', action=DebugAction, nargs=0, help=SUPPRESS)
 manager_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, help=SUPPRESS)
-manager_parser.add_argument('--loglevel', default='verbose',
-                         choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'],
-                         help=SUPPRESS)
+manager_parser.add_argument('--loglevel', default='verbose', help=SUPPRESS,
+                            choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--del-db', action='store_true', dest='del_db', default=False, help=SUPPRESS)
-manager_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0, help=SUPPRESS)
 
 
 class CoreArgumentParser(ArgumentParser):
@@ -171,16 +200,22 @@ class CoreArgumentParser(ArgumentParser):
     def __init__(self, **kwargs):
         kwargs.setdefault('parents', [manager_parser])
         super(CoreArgumentParser, self).__init__(**kwargs)
-        self.add_subparsers(title='Commands', metavar='<command>', dest='subcommand')
+        self.add_subparsers(title='Commands', metavar='<command>', dest='subcommand', separate_namespace=True)
 
         # The parser for the exec subcommand
-        exec_parser = self.add_subparser('exec', lock_required=True, help='execute tasks now')
+        exec_parser = self.add_subparser('execute', lock_required=True, help='execute tasks now')
         exec_parser.set_defaults(lock_required=True)
         exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
                                  help='Validate configuration file and print errors.')
         exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
                                  help='Matches are not downloaded but will be skipped in the future.')
+        exec_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
+                                 help='Use when scheduling FlexGet with cron or other scheduler. Allows background '
+                                      'maintenance to run. Disables stdout and stderr output. Reduces logging level.')
+        exec_parser.add_argument('--loglevel', dest='exec_loglevel', help=SUPPRESS,
+                                 choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
+        exec_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0, help=SUPPRESS)
         # Plugins should respect these flags where appropriate
         exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
         exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,

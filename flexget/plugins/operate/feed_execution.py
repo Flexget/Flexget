@@ -24,11 +24,11 @@ class OnlyTask(object):
 
     def on_process_start(self, task):
         # If --task hasn't been specified don't do anything
-        if not task.manager.options.onlytask:
+        if not task.manager.options.execute.onlytask:
             return
 
         # Make a list of the specified tasks to run, and those available
-        onlytasks = task.manager.options.onlytask.split(',')
+        onlytasks = task.manager.options.execute.onlytask.split(',')
 
         # Make sure the specified tasks exist
         enabled_tasks = [f.name.lower() for f in task.manager.tasks.itervalues() if f.enabled]
@@ -61,7 +61,7 @@ class ManualTask(object):
         if not task.config['manual']:
             return
         # If --task hasn't been specified disable this plugin
-        if not task.manager.options.onlytask:
+        if not task.manager.options.execute.onlytask:
             log.debug('Disabling task %s' % task.name)
             task.enabled = False
 
@@ -72,6 +72,6 @@ register_plugin(ManualTask, 'manual')
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--task', dest='onlytask', default=None, metavar='TASK[,...]',
+    core_parser.get_subparser('execute').add_argument('--task', dest='onlytask', default=None, metavar='TASK[,...]',
                                                    help='run only specified task(s), optionally using glob patterns '
                                                         '("tv-*"). Matching is case-insensitive')

@@ -62,10 +62,10 @@ class InputInject(object):
 
     @priority(255)
     def on_task_input(self, task):
-        if not task.manager.options.inject:
+        if not task.manager.options.execute.inject:
             return
 
-        options = self.parse_arguments(task.manager.options.inject)
+        options = self.parse_arguments(task.manager.options.execute.inject)
 
         # disable other inputs
         log.info('Disabling the rest of the input phase.')
@@ -90,6 +90,6 @@ register_plugin(InputInject, '--inject', debug=True, builtin=True)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--inject', nargs='1-4', metavar=('TITLE', 'URL'),
+    core_parser.get_subparser('execute').add_argument('--inject', nargs='1-4', metavar=('TITLE', 'URL'),
                                                    help='injects entry to all executed tasks: '
                                                         '<TITLE> [URL] [ACCEPT] [FORCE]')

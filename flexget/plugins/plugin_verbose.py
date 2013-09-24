@@ -17,7 +17,7 @@ class Verbose(object):
 
     @priority(-255)
     def on_task_input(self, task, config):
-        if task.manager.options.silent:
+        if task.manager.options.execute.silent:
             return
         for entry in task.all_entries:
             entry.on_accept(self.verbose_details, task=task, act='accepted', reason='')
@@ -32,10 +32,10 @@ class Verbose(object):
         task_log.verbose(msg)
 
     def on_task_exit(self, task, config):
-        if task.manager.options.silent:
+        if task.manager.options.execute.silent:
             return
         # verbose undecided entries
-        if task.manager.options.verbose:
+        if task.manager.options.execute.verbose:
             undecided = False
             for entry in task.entries:
                 if entry in task.accepted:
@@ -52,7 +52,7 @@ register_plugin(Verbose, 'verbose', builtin=True, api_ver=2)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    exec_parser = core_parser.get_subparser('exec')
+    exec_parser = core_parser.get_subparser('execute')
     exec_parser.add_argument('-v', '--verbose', action='store_true', dest='verbose', default=False,
                              help='verbose undecided entries')
     exec_parser.add_argument('-s', '--silent', action='store_true', dest='silent', default=False,

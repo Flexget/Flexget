@@ -38,7 +38,7 @@ class ExplainQuery(Query):
 
 @event('manager.execute.started')
 def register_sql_explain(man):
-    if man.options.explain_sql:
+    if man.options.execute.explain_sql:
         maininit = manager.Session.__init__
 
         def init(*args, **kwargs):
@@ -50,11 +50,11 @@ def register_sql_explain(man):
 
 @event('manager.execute.completed')
 def deregister_sql_explain(man):
-    if man.options.explain_sql:
+    if man.options.execute.explain_sql:
         manager.Session = sessionmaker()
 
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--explain-sql', action='store_true', dest='explain_sql',
+    core_parser.get_subparser('execute').add_argument('--explain-sql', action='store_true', dest='explain_sql',
                                                    default=False, help=SUPPRESS)

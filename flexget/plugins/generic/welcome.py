@@ -18,7 +18,7 @@ class WelcomePlugin(object):
         self.persistence = SimplePersistence(plugin='welcome')
 
     def on_process_start(self, task, entries):
-        if self.executed or not task.manager.options.quiet:
+        if self.executed or not task.manager.options.execute.cron:
             return
         count = self.persistence.setdefault('count', 5)
         if not count:

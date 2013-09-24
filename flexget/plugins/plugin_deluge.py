@@ -381,7 +381,7 @@ class OutputDeluge(DelugePlugin):
         """Add torrents to deluge at exit."""
         config = self.prepare_config(config)
         # don't add when learning
-        if task.manager.options.learn:
+        if task.manager.options.execute.learn:
             return
         if not config['enabled'] or not (task.accepted or task.manager.options.test):
             return

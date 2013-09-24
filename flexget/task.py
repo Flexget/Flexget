@@ -443,7 +443,7 @@ class Task(object):
             return
         if errors and self.manager.unit_test:  # todo: bad practice
             raise Exception('configuration errors')
-        if self.manager.options.validate:
+        if self.manager.options.execute.validate:
             if not errors:
                 log.info('Task \'%s\' passed' % self.name)
             self.enabled = False
@@ -519,7 +519,7 @@ class Task(object):
 
     def _process_end(self):
         """Execute terminate phase for this task"""
-        if self.manager.options.validate:
+        if self.manager.options.execute.validate:
             log.debug('No process_end phase with --check')
             return
         self.__run_task_phase('process_end')

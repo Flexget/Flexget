@@ -26,7 +26,7 @@ class PluginTryRegexp:
         return (False, None)
 
     def on_task_filter(self, task):
-        if not task.manager.options.try_regexp:
+        if not task.manager.options.execute.try_regexp:
             return
         if self.abort:
             return
@@ -65,5 +65,5 @@ register_plugin(PluginTryRegexp, '--try-regexp', builtin=True)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--try-regexp', action='store_true', dest='try_regexp',
+    core_parser.get_subparser('execute').add_argument('--try-regexp', action='store_true', dest='try_regexp',
                                                    default=False, help='try regular expressions interactively')

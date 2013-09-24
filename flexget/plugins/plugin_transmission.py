@@ -228,7 +228,7 @@ class PluginTransmission(TransmissionBase):
         from transmissionrpc import TransmissionError
         config = self.prepare_config(config)
         # don't add when learning
-        if task.manager.options.learn:
+        if task.manager.options.execute.learn:
             return
         if not config['enabled']:
             return

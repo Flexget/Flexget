@@ -13,7 +13,7 @@ log = logging.getLogger('perftests')
 class PerfTests(object):
 
     def on_process_start(self, task, config):
-        test_name = task.manager.options.perf_test
+        test_name = task.manager.options.execute.perf_test
         if test_name:
             task.manager.disable_tasks()
         else:
@@ -80,5 +80,5 @@ register_plugin(PerfTests, 'perftests', api_ver=2, debug=True, builtin=True)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--perf-test', action='store', dest='perf_test', default='',
+    core_parser.get_subparser('execute').add_argument('--perf-test', action='store', dest='perf_test', default='',
                                                    help=SUPPRESS)

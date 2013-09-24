@@ -95,8 +95,8 @@ class PluginPreset(object):
         log.trace('presets: %s' % config)
 
         # implements --preset NAME
-        if task.manager.options.preset:
-            if task.manager.options.preset not in config:
+        if task.manager.options.execute.preset:
+            if task.manager.options.execute.preset not in config:
                 task.enabled = False
                 return
 
@@ -156,5 +156,5 @@ register_plugin(DisablePlugin, 'disable_plugin', api_ver=2)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--preset', action='store', dest='preset', default=False,
+    core_parser.get_subparser('execute').add_argument('--preset', action='store', dest='preset', default=False,
                                                    metavar='NAME', help='execute tasks with given preset')

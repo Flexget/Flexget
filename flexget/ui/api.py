@@ -9,7 +9,7 @@ API_VERSION = 1
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
-exec_parser = RaiseErrorArgumentParser(parents=[CoreArgumentParser().get_subparser('exec')])
+exec_parser = RaiseErrorArgumentParser(parents=[CoreArgumentParser().get_subparser('execute')])
 
 
 # TODO: These endpoints should probably return a header which points to a json schema describing the return data

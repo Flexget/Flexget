@@ -191,7 +191,7 @@ class InputRSS(object):
         # set etag and last modified headers if config has not changed since
         # last run and if caching wasn't disabled with --no-cache argument.
         all_entries = (config['all_entries'] or task.config_modified or
-                       task.manager.options.nocache or task.manager.options.retry)
+                       task.manager.options.execute.nocache or task.manager.options.execute.retry)
         headers = {}
         if not all_entries:
             etag = task.simple_persistence.get('%s_etag' % url_hash, None)

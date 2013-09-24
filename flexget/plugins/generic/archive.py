@@ -239,10 +239,10 @@ class ArchiveInject(object):
 
     @priority(512)
     def on_process_start(self, task, config):
-        if not task.manager.options.archive_inject:
+        if not task.manager.options.execute.archive_inject:
             return
 
-        ids = filter(lambda x: isinstance(x, int), task.manager.options.archive_inject)
+        ids = filter(lambda x: isinstance(x, int), task.manager.options.execute.archive_inject)
 
         # get the entries to be injected, does it only once
         if ArchiveInject._inject_entries is None:
@@ -292,7 +292,7 @@ class ArchiveInject(object):
         log.info('Disabling all other inputs in the task.')
         task.disable_phase('input')
 
-        immortal = 'yes' in task.manager.options.archive_inject
+        immortal = 'yes' in task.manager.options.execute.archive_inject
         for inject_entry in self._inject_entries[task.name]:
             log.info('Injecting from archive `%s`' % inject_entry.title)
             entry = Entry(inject_entry.title, inject_entry.url)
@@ -536,7 +536,7 @@ def register_parser_arguments(core_parser):
         except ValueError:
             raise ArgumentTypeError('parameters must be an integer ID or the word `yes`')
 
-    core_parser.get_subparser('exec').add_argument('--archive-inject', nargs='+', metavar='ID', type=int_or_yes,
+    core_parser.get_subparser('execute').add_argument('--archive-inject', nargs='+', metavar='ID', type=int_or_yes,
                                                    help='inject as accepted from archive by IDs. '
                                                         'if `yes` is given immortal flag will be used')
 

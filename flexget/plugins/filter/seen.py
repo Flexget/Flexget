@@ -182,7 +182,7 @@ class FilterSeen(object):
                 if found:
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], found.value))
                     se = task.session.query(SeenEntry).filter(SeenEntry.id == found.seen_entry_id).one()
-                    entry.reject('Entry with %s `%s` is already marked seen in the task %s at %s' % 
+                    entry.reject('Entry with %s `%s` is already marked seen in the task %s at %s' %
                                  (found.field, found.value, se.task, se.added.strftime('%Y-%m-%d %H:%M')),
                                 remember=remember_rejected)
 
@@ -199,7 +199,7 @@ class FilterSeen(object):
         for entry in task.accepted:
             self.learn(task, entry, fields=fields, local=config == 'local')
             # verbose if in learning mode
-            if task.manager.options.learn:
+            if task.manager.options.execute.learn:
                 log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
 
     def learn(self, task, entry, fields=None, reason=None, local=False):

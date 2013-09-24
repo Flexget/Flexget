@@ -63,11 +63,11 @@ class OutputDump(object):
 
     @priority(0)
     def on_task_output(self, task, config):
-        if not config and not task.manager.options.dump_entries:
+        if not config and not task.manager.options.execute.dump_entries:
             return
 
-        eval_lazy = task.manager.options.dump_entries == 'eval'
-        trace = task.manager.options.dump_entries == 'trace'
+        eval_lazy = task.manager.options.execute.dump_entries == 'eval'
+        trace = task.manager.options.execute.dump_entries == 'trace'
         undecided = [entry for entry in task.all_entries if entry.undecided]
         if undecided:
             console('-- Undecided: --------------------------')
@@ -85,7 +85,7 @@ register_plugin(OutputDump, 'dump', builtin=True, api_ver=2)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--dump', nargs='?', choices=['eval', 'trace'], dest='dump_entries',
+    core_parser.get_subparser('execute').add_argument('--dump', nargs='?', choices=['eval', 'trace'], dest='dump_entries',
                                                    const=True, help='display all entries in task with fields they '
                                                                     'contain, use `--dump eval` to evaluate all lazy '
                                                                     'fields')

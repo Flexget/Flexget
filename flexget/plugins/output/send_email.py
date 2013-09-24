@@ -252,7 +252,7 @@ class OutputEmail(object):
             return
 
         # don't send mail when learning
-        if task.manager.options.learn:
+        if task.manager.options.execute.learn:
             return
 
         # generate email content

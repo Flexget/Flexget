@@ -15,7 +15,7 @@ execute = Module(__name__, url_prefix='/execute')
 log = logging.getLogger('ui.execute')
 
 bufferqueue = BufferQueue()
-exec_parser = RaiseErrorArgumentParser(parents=[CoreArgumentParser().get_subparser('exec')])
+exec_parser = RaiseErrorArgumentParser(parents=[CoreArgumentParser().get_subparser('execute')])
 
 @execute.route('/', methods=['POST', 'GET'])
 def index():

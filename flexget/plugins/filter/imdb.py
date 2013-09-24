@@ -188,7 +188,7 @@ class FilterImdb(object):
                 if task.manager.options.debug:
                     log.debug(msg)
                 else:
-                    if task.manager.options.quiet:
+                    if task.manager.options.execute.cron:
                         log_once(msg, log)
                     else:
                         log.info(msg)

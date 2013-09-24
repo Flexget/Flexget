@@ -87,12 +87,8 @@ class FilterRememberRejected(object):
         """Purge remembered entries if the config has changed."""
         # See if the task has changed since last run
         old_task = task.session.query(RememberTask).filter(RememberTask.name == task.name).first()
-        if not task.is_rerun and old_task and (task.config_modified or task.manager.options.forget_rejected):
-            if task.manager.options.forget_rejected:
-                log.info('Forgetting previous rejections.')
-                task.config_changed()
-            else:
-                log.debug('Task config has changed since last run, purging remembered entries.')
+        if not task.is_rerun and old_task and task.config_modified:
+            log.debug('Task config has changed since last run, purging remembered entries.')
             task.session.delete(old_task)
             old_task = None
         if not old_task:
@@ -161,9 +157,3 @@ def db_cleanup(session):
 
 
 register_plugin(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
-
-
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--forget-rejected', action='store_true', dest='forget_rejected',
-                                                   help='forget stored rejections so entries can be processed again')

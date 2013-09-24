@@ -36,7 +36,7 @@ class FilterLimitNew(object):
 
     @priority(-255)
     def on_task_filter(self, task, config):
-        if task.manager.options.learn:
+        if task.manager.options.execute.learn:
             log.info('Plugin limit_new is disabled with --learn / --reset')
             return
 

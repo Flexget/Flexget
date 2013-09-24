@@ -15,7 +15,7 @@ class ResetTail(object):
     """Adds --tail-reset"""
 
     def on_process_start(self, task):
-        if not task.manager.options.tail_reset:
+        if not task.manager.options.execute.tail_reset:
             return
 
         task.manager.disable_tasks()
@@ -25,9 +25,9 @@ class ResetTail(object):
 
         session = Session()
         try:
-            poses = session.query(SimpleKeyValue).filter(SimpleKeyValue.key == task.manager.options.tail_reset).all()
+            poses = session.query(SimpleKeyValue).filter(SimpleKeyValue.key == task.manager.options.execute.tail_reset).all()
             if not poses:
-                print 'No position stored for file %s' % task.manager.options.tail_reset
+                print 'No position stored for file %s' % task.manager.options.execute.tail_reset
                 print 'Note that file must give in same format as in config, ie. ~/logs/log can not be given as /home/user/logs/log'
             for pos in poses:
                 if pos.value == 0:
@@ -169,5 +169,5 @@ register_plugin(ResetTail, '--tail-reset', builtin=True)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--tail-reset', action='store', dest='tail_reset', default=False,
+    core_parser.get_subparser('execute').add_argument('--tail-reset', action='store', dest='tail_reset', default=False,
                                                    metavar='FILE', help='reset tail position for a file')

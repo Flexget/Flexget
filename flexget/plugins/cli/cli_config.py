@@ -49,7 +49,7 @@ class CliConfig(object):
 
     def parse_replaces(self, task):
         """Parses commandline string into internal dict"""
-        arg = task.manager.options.cli_config
+        arg = task.manager.options.execute.cli_config
         if not arg:
             return False  # nothing to process
         if self.replaces:
@@ -74,5 +74,5 @@ register_plugin(CliConfig, 'cli_config', builtin=True)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--cli-config', action='store', dest='cli_config', default=False,
+    core_parser.get_subparser('execute').add_argument('--cli-config', action='store', dest='cli_config', default=False,
                                                    metavar='PARAMS', help='configuration parameters trough commandline')

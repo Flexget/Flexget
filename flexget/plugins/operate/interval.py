@@ -29,13 +29,13 @@ class PluginInterval(object):
         # Allow reruns
         if task.is_rerun:
             return
-        if task.manager.options.learn:
+        if task.manager.options.execute.learn:
             log.info('Ignoring task %s interval for --learn' % task.name)
             return
         last_time = task.simple_persistence.get('last_time')
         if not last_time:
             log.info('No previous run recorded, running now')
-        elif task.manager.options.interval_ignore:
+        elif task.manager.options.execute.interval_ignore:
             log.info('Ignoring interval because of --now')
         else:
             log.debug('last_time: %r' % last_time)
@@ -56,5 +56,5 @@ register_plugin(PluginInterval, 'interval', api_ver=2)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--now', action='store_true', dest='interval_ignore', default=False,
+    core_parser.get_subparser('execute').add_argument('--now', action='store_true', dest='interval_ignore', default=False,
                                                    help='Ignore interval(s)')

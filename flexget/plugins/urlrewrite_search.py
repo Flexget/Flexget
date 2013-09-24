@@ -14,10 +14,10 @@ class SearchPlugins(object):
     """
 
     def on_process_start(self, task):
-        if task.manager.options.search_plugins:
+        if task.manager.options.execute.search_plugins:
             task.manager.disable_tasks()
             header = '-- Supported search plugins: '
-            header = header + '-' * (79 - len(header))
+            header += '-' * (79 - len(header))
             print header
             for plugin in get_plugins_by_group('search'):
                 print ' %s' % plugin.name
@@ -111,5 +111,5 @@ register_plugin(SearchPlugins, '--search-plugins', builtin=True)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    core_parser.get_subparser('exec').add_argument('--search-plugins', action='store_true', dest='search_plugins',
+    core_parser.get_subparser('execute').add_argument('--search-plugins', action='store_true', dest='search_plugins',
                                                    default=False, help='list supported search plugins')

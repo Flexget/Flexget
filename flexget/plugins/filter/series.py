@@ -1122,7 +1122,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
             # episode advancement. used only with season and sequence based series
             if ep.identified_by in ['ep', 'sequence']:
-                if task.manager.options.disable_advancement:
+                if task.manager.options.execute.disable_advancement:
                     log.debug('episode advancement disabled')
                 else:
                     log.debug('-' * 20 + ' episode advancement -->')
@@ -1294,7 +1294,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         expires = first_seen + timeframe
         log.debug('timeframe: %s, first_seen: %s, expires: %s', timeframe, first_seen, expires)
 
-        stop = task.manager.options.stop_waiting.lower() == episode.series.name.lower()
+        stop = task.manager.options.execute.stop_waiting.lower() == episode.series.name.lower()
         if expires <= datetime.now() or stop:
             # Expire timeframe, accept anything
             log.info('Timeframe expired, releasing quality restriction.')
@@ -1415,7 +1415,7 @@ register_plugin(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    exec_parser = core_parser.get_subparser('exec')
+    exec_parser = core_parser.get_subparser('execute')
     exec_parser.add_argument('--stop-waiting', action='store', dest='stop_waiting', default='',
                              metavar='NAME', help='stop timeframe for a given series')
     exec_parser.add_argument('--disable-advancement', action='store_true', dest='disable_advancement', default=False,

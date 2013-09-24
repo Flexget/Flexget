@@ -22,7 +22,7 @@ class CronEnvPlugin(object):
             return
 
         encoding = sys.getfilesystemencoding()
-        if task.manager.options.quiet:
+        if task.manager.options.execute.cron:
             if 'terminal_encoding' in self.persistence:
                 terminal_encoding = self.persistence['terminal_encoding']
                 if terminal_encoding != encoding:

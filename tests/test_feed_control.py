@@ -69,12 +69,12 @@ class TestManualOnlytask(FlexGetBase):
 
     def test_manual_with_onlytask(self):
         # Pretend we have been run with --task test2
-        self.manager.options.onlytask = 'test2'
+        self.manager.options.execute.onlytask = 'test2'
         # --task plugin uses manager.tasks, so we must create it for this test.
         self.manager.create_tasks()
         self.execute_task('test2')
         # Revert manager settings back to default
-        self.manager.options.onlytask = None
+        self.manager.options.execute.onlytask = None
         self.manager.tasks = {}
         assert self.task.find_entry(title='download'), \
                 'Manual tasks failed to download on manual run'

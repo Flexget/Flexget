@@ -16,13 +16,13 @@ class OutputDumpConfig(object):
 
     @priority(-255)
     def on_task_start(self, task):
-        if task.manager.options.dump_config:
+        if task.manager.options.execute.dump_config:
             import yaml
             print '--- config from task: %s' % task.name
             print yaml.safe_dump(task.config)
             print '---'
             task.abort(silent=True)
-        if task.manager.options.dump_config_python:
+        if task.manager.options.execute.dump_config_python:
             print task.config
             task.abort(silent=True)
 
@@ -32,7 +32,7 @@ register_plugin(OutputDumpConfig, 'dump_config', debug=True, builtin=True)
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    exec_parser = core_parser.get_subparser('exec')
+    exec_parser = core_parser.get_subparser('execute')
     exec_parser.add_argument('--dump-config', action='store_true', dest='dump_config', default=False,
                              help='display the config of each feed after preset merging/config generation occurs')
     exec_parser.add_argument('--dump-config-python', action='store_true', dest='dump_config_python', default=False,
