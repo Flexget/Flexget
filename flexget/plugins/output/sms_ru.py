@@ -78,7 +78,7 @@ class OutputSMSru(object):
                 message = "accepted %s" % entry["title"]
 
             # Check for test mode
-            if task.manager.options.test:
+            if task.manager.options.execute.test:
                 log.info("Test mode. Processing for %s" % phonenumber)
                 log.info("Message: %s" % message)
 
@@ -88,7 +88,7 @@ class OutputSMSru(object):
                            'token': token_response.text,
                            'to': phonenumber,
                            'text': message}
-            if task.manager.options.test:
+            if task.manager.options.execute.test:
                 send_params.update({'test': 1})
 
             # Make the request

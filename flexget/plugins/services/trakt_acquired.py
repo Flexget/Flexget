@@ -68,7 +68,7 @@ class TraktAcquired(object):
             log.debug('Nothing to submit to trakt.')
             return
 
-        if task.manager.options.test:
+        if task.manager.options.execute.test:
             log.info('Not submitting to trakt.tv because of test mode.')
             return
 

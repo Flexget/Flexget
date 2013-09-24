@@ -288,7 +288,7 @@ class InputRSS(object):
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
                     # html pages (login pages) are received
                     self.process_invalid_content(task, content, config['url'])
-                    if task.manager.options.debug:
+                    if task.manager.options.execute.debug:
                         log.exception(ex)
                     raise PluginError('Received invalid RSS content from task %s (%s)' % (task.name, config['url']))
                 elif isinstance(ex, httplib.BadStatusLine) or isinstance(ex, IOError):

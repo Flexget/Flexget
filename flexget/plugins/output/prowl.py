@@ -78,7 +78,7 @@ class OutputProwl(object):
             data = {'priority': priority, 'application': application, 'apikey': apikey,
                     'event': event, 'description': description}
 
-            if task.manager.options.test:
+            if task.manager.options.execute.test:
                 log.info('Would send prowl message about: %s', entry['title'])
                 log.debug('options: %s' % data)
                 continue

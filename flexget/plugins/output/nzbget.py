@@ -35,7 +35,7 @@ class OutputNzbget(object):
         server = ServerProxy(params["url"])
 
         for entry in task.accepted:
-            if task.manager.options.test:
+            if task.manager.options.execute.test:
                 log.info('Would add into nzbget: %s' % entry['title'])
                 continue
 

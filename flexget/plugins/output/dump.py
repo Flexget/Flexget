@@ -71,13 +71,13 @@ class OutputDump(object):
         undecided = [entry for entry in task.all_entries if entry.undecided]
         if undecided:
             console('-- Undecided: --------------------------')
-            dump(undecided, task.manager.options.debug, eval_lazy, trace)
+            dump(undecided, task.manager.options.execute.debug, eval_lazy, trace)
         if task.accepted:
             console('-- Accepted: ---------------------------')
-            dump(task.accepted, task.manager.options.debug, eval_lazy, trace)
+            dump(task.accepted, task.manager.options.execute.debug, eval_lazy, trace)
         if task.rejected:
             console('-- Rejected: ---------------------------')
-            dump(task.rejected, task.manager.options.debug, eval_lazy, trace)
+            dump(task.rejected, task.manager.options.execute.debug, eval_lazy, trace)
 
 
 register_plugin(OutputDump, 'dump', builtin=True, api_ver=2)

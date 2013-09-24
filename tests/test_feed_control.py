@@ -19,7 +19,7 @@ class TestOnlytask(FlexGetBase):
 
     def test_manual_with_onlytask(self):
         # Pretend we have been run with --task test
-        self.manager.options.onlytask = 'test'
+        self.manager.options.execute.onlytask = 'test'
         # --task plugin uses manager.tasks, so we must create it for this test.
         self.manager.create_tasks()
         # This task should run normally, as we specified it as onlytask
@@ -31,7 +31,7 @@ class TestOnlytask(FlexGetBase):
         assert not self.task.find_entry(title='nodownload'), \
                 'task should not have been executed'
         # Revert manager settings back to default
-        self.manager.options.onlytask = None
+        self.manager.options.execute.onlytask = None
         self.manager.tasks = {}
 
 

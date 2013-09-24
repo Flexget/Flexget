@@ -203,7 +203,7 @@ class FilterTvdb(object):
             if reasons and not force_accept:
                 msg = 'Skipping %s because of rule(s) %s' % \
                     (entry.get('series_name_thetvdb', None) or entry['title'], ', '.join(reasons))
-                if task.manager.options.debug:
+                if task.manager.options.execute.debug:
                     log.debug(msg)
                 else:
                     log_once(msg, log)

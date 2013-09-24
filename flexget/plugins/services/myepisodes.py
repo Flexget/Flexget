@@ -201,7 +201,7 @@ class MyEpisodes(object):
         season = entry['series_season']
         episode = entry['series_episode']
 
-        if task.manager.options.test:
+        if task.manager.options.execute.test:
             log.info('Would mark %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
         else:
             baseurl2 = urllib2.Request(

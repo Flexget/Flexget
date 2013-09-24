@@ -1,10 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import sys
-from collections import OrderedDict
-from functools import wraps
 
 import argparse
-from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, _VersionAction, Namespace, _SubParsersAction
+from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, _VersionAction, Namespace
 
 import flexget
 from flexget.utils.tools import console
@@ -71,12 +69,30 @@ class CronAction(Action):
         namespace.loglevel = 'info'
 
 
+class ScopedNamespace(Namespace):
+    def __init__(self, **kwargs):
+        super(ScopedNamespace, self).__init__(**kwargs)
+        self.__parent__ = None
+
+    def __getattr__(self, key):
+        if self.__parent__:
+            return getattr(self.__parent__, key)
+        raise AttributeError("'%s' object has no attribute '%s'" % (self.__class__.__name__, key))
+
+    def __setattr__(self, key, value):
+        # Let child namespaces keep track of us
+        if key != '__parent__' and isinstance(value, ScopedNamespace):
+            value.__parent__ = self
+        object.__setattr__(self, key, value)
+
+
 class ArgumentParser(ArgParser):
     """Overrides some default ArgumentParser behavior"""
 
-    def __init__(self, separate_namespace=None, **kwargs):
+    def __init__(self, nested_namespace_name=None, **kwargs):
         """
-        :param str separate_namespace: If this is set, all options will be nested under an attribute called this
+        :param nested_namespace_name: When used as a subparser, options from this parser will be stored nested under
+            this attribute name in the root parser's namespace
         """
         # Do this early, so even option processing stuff is caught
         if '--bugreport' in sys.argv:
@@ -84,17 +100,7 @@ class ArgumentParser(ArgParser):
 
         ArgParser.__init__(self, **kwargs)
         self.subparsers = None
-        self.separate_namespace = separate_namespace
-
-    def _get_values(self, action, arg_strings):
-        if action.nargs == argparse.PARSER and self.subparsers:
-            subcommand = arg_strings[0]
-            if not subcommand in self.subparsers.choices:
-                results = [x for x in self.subparsers.choices if x.startswith(subcommand)]
-                if len(results) == 1:
-                    arg_strings[0] = results[0]
-        return super(ArgumentParser, self)._get_values(action, arg_strings)
-
+        self.nested_namespace_name = nested_namespace_name
 
     def error(self, message):
         """Overridden error handler to print help message"""
@@ -119,17 +125,19 @@ class ArgumentParser(ArgParser):
         if args is None:
             # Decode all arguments to unicode before parsing
             args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
-        if self.separate_namespace:
-            new_namespace = Namespace()
-            setattr(namespace, self.separate_namespace, new_namespace)
-            namespace = new_namespace
-        _namespace, args = super(ArgumentParser, self).parse_known_args(args, namespace)
-        return _namespace, args
+        _nested_namespace = namespace or ScopedNamespace()
+        if self.nested_namespace_name and namespace:
+            _nested_namespace = ScopedNamespace()
+            setattr(namespace, self.nested_namespace_name, _nested_namespace)
+        _namespace, args = super(ArgumentParser, self).parse_known_args(args, _nested_namespace)
+        # Still return the passed in namespace if there was one
+        return namespace or _namespace, args
 
-    def add_subparsers(self, separate_namespace=False, **kwargs):
+    def add_subparsers(self, scoped_namespaces=False, **kwargs):
+        # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
         kwargs.setdefault('parser_class', ArgumentParser)
         self.subparsers = super(ArgumentParser, self).add_subparsers(**kwargs)
-        self.subparsers.separate_namespace = separate_namespace
+        self.subparsers.scoped_namespaces = scoped_namespaces
         return self.subparsers
 
     def add_subparser(self, name, lock_required=False, **kwargs):
@@ -141,8 +149,8 @@ class ArgumentParser(ArgParser):
         """
         if not self.subparsers:
             raise TypeError('This parser does not have subparsers')
-        if self.subparsers.separate_namespace:
-            kwargs.setdefault('separate_namespace', name)
+        if self.subparsers.scoped_namespaces:
+            kwargs.setdefault('nested_namespace_name', name)
         result = self.subparsers.add_parser(name, **kwargs)
         if lock_required:
             result.set_defaults(lock_required=True)
@@ -153,8 +161,18 @@ class ArgumentParser(ArgParser):
             raise TypeError('This parser does not have subparsers')
         p = self.subparsers.choices.get(name, default)
         if p is _UNSET:
-            raise ArgumentError('%s is not an existing subparser name' % name)
+            raise ValueError('%s is not an existing subparser name' % name)
         return p
+
+    def _get_values(self, action, arg_strings):
+        """Complete the full name for partial subcommands"""
+        if action.nargs == argparse.PARSER and self.subparsers:
+            subcommand = arg_strings[0]
+            if subcommand not in self.subparsers.choices:
+                matches = [x for x in self.subparsers.choices if x.startswith(subcommand)]
+                if len(matches) == 1:
+                    arg_strings[0] = matches[0]
+        return super(ArgumentParser, self)._get_values(action, arg_strings)
 
     def get_defaults(self):
         return self.parse_args([])
@@ -200,7 +218,7 @@ class CoreArgumentParser(ArgumentParser):
     def __init__(self, **kwargs):
         kwargs.setdefault('parents', [manager_parser])
         super(CoreArgumentParser, self).__init__(**kwargs)
-        self.add_subparsers(title='Commands', metavar='<command>', dest='subcommand', separate_namespace=True)
+        self.add_subparsers(title='Commands', metavar='<command>', dest='subcommand', scoped_namespaces=True)
 
         # The parser for the exec subcommand
         exec_parser = self.add_subparser('execute', lock_required=True, help='execute tasks now')

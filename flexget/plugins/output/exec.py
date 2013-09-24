@@ -129,7 +129,7 @@ class PluginExec(object):
                     continue
 
                 log.debug('phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd))
-                if task.manager.options.test:
+                if task.manager.options.execute.test:
                     log.info('Would execute: %s' % cmd)
                 else:
                     # Make sure the command can be encoded into appropriate encoding, don't actually encode yet,
@@ -154,7 +154,7 @@ class PluginExec(object):
                 log.error('Error rendering `%s`: %s' % (cmd, e))
             else:
                 log.debug('phase cmd: %s' % cmd)
-                if task.manager.options.test:
+                if task.manager.options.execute.test:
                     log.info('Would execute: %s' % cmd)
                 else:
                     self.execute_cmd(cmd, allow_background, config['encoding'])

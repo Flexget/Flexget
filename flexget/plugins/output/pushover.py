@@ -118,7 +118,7 @@ class OutputPushover(object):
                     data["sound"] = sound
     
                 # Check for test mode
-                if task.manager.options.test:
+                if task.manager.options.execute.test:
                     log.info("Test mode.  Pushover notification would be:")
                     if device:
                         log.info("    Device: %s" % device)

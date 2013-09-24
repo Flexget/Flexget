@@ -187,7 +187,7 @@ class PluginDownload(object):
         :return: String error, if failed.
         """
         try:
-            if task.manager.options.test:
+            if task.manager.options.execute.test:
                 log.info('Would download: %s' % entry['title'])
             else:
                 if not task.manager.unit_test:
@@ -383,7 +383,7 @@ class PluginDownload(object):
             PluginError if operation fails
         """
 
-        if 'file' not in entry and not task.manager.options.test:
+        if 'file' not in entry and not task.manager.options.execute.test:
             log.debug('file missing, entry: %s' % entry)
             raise PluginError('Entry `%s` has no temp file associated with' % entry['title'])
 
@@ -408,7 +408,7 @@ class PluginDownload(object):
             path = pathscrub(path)
 
             # If we are in test mode, report and return
-            if task.manager.options.test:
+            if task.manager.options.execute.test:
                 log.info('Would write `%s` to `%s`' % (entry['title'], path))
                 # Set a fake location, so the exec plugin can do string replacement during --test #1015
                 entry['output'] = os.path.join(path, 'TEST_MODE_NO_OUTPUT')

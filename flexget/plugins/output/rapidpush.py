@@ -85,7 +85,7 @@ class OutputRapidPush(object):
     # Process the given events.
     def process_notifications(self, task, entries, config):
         for entry in entries:
-            if task.manager.options.test:
+            if task.manager.options.execute.test:
                 log.info("Would send RapidPush notification about: %s", entry['title'])
                 continue
 

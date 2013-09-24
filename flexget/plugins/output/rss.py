@@ -258,7 +258,7 @@ class OutputRSS(object):
                              items=rss_items)
 
         # don't run with --test
-        if task.manager.options.test:
+        if task.manager.options.execute.test:
             log.info('Would write rss file with %d entries.', len(rss_items))
             return
 

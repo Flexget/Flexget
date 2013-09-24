@@ -35,7 +35,7 @@ class PluginRtorrentMagnet(object):
         path = os.path.join(path, 'meta-%s.torrent' % entry['title'])
         path = os.path.expanduser(path)
 
-        if task.manager.options.test:
+        if task.manager.options.execute.test:
             log.info('Would write: %s' % path)
         else:
             log.info('Writing rTorrent Magnet File: %s', path)
