@@ -14,7 +14,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.pool import SingletonThreadPool
 
 from flexget import config_schema
-from flexget.event import fire_event
+from flexget.event import fire_event, event
+from flexget.options import CoreArgumentParser
 from flexget.utils import json
 from flexget.utils.tools import pid_exists, console
 
@@ -163,7 +164,7 @@ class Manager(object):
                         import profile
                     profile.runctx('self.execute()', globals(), locals(), os.path.join(self.config_base, 'flexget.profile'))
                 else:
-                    self.execute()
+                    self.execute(options=options)
 
         # TODO: CLI Fill default options and update them with passed in ones?
         setattr(self.options, name, options)
@@ -656,17 +657,22 @@ class Manager(object):
         for line in r.iter_lines(chunk_size=1):
             console(line)
 
+    @event('manager.subcommands.execute')
     @useExecLogging
-    def execute(self, tasks=None, disable_phases=None, entries=None):
+    def execute(self, options=None):
         """
         Iterate trough tasks and run them. If --learn is used download and output
         phases are disabled.
 
-        :param list tasks: Optional list of task names to run, all tasks otherwise.
-        :param list disable_phases: Optional list of phases to disabled
-        :param list entries: Optional list of entries to pass into task(s).
-            This will also cause task to disable input phase.
+        :param options: argparse.Namespace with execute options, or a dict containing a subset of those options
         """
+        defaults = CoreArgumentParser().get_subparser('execute').get_defaults()
+        if not options:
+            options = defaults
+        elif isinstance(options, dict):
+            defaults.__dict__.update(options)
+            options = defaults
+        self.options.execute = options
         if self.options.execute.log_start:
             log.info('FlexGet started (PID: %s)' % os.getpid())
         self.db_cleanup()
@@ -679,13 +685,13 @@ class Manager(object):
         self.create_tasks()
 
         # Make a list of Task instances to execute
-        if tasks is None:
+        if options.tasks is None:
             # Default to all tasks if none are specified
             run_tasks = self.tasks.values()
         else:
             # Turn the list of task names or instances into a list of instances
             run_tasks = []
-            for task in tasks:
+            for task in options.tasks:
                 if isinstance(task, basestring):
                     if task in self.tasks:
                         run_tasks.append(self.tasks[task])
@@ -698,7 +704,7 @@ class Manager(object):
             log.warning('There are no tasks to execute, please add some tasks')
             return
 
-        disable_phases = disable_phases or []
+        disable_phases = options.disable_phases or []
         # when learning, skip few phases
         if self.options.execute.learn:
             log.info('Disabling download and output phases because of --learn')
@@ -711,7 +717,8 @@ class Manager(object):
             if not task.enabled or task._abort:
                 continue
             try:
-                task.execute(disable_phases=disable_phases, entries=entries)
+                # TODO: CLI fix disable_phases, entries
+                task.execute(disable_phases=disable_phases, entries=options.inject)
             except Exception as e:
                 task.enabled = False
                 log.exception('Task %s: %s' % (task.name, e))

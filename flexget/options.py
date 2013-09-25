@@ -1,12 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
+import random
+import string
 import sys
 
-import argparse
-from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, _VersionAction, Namespace
+from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, _VersionAction, Namespace, PARSER
 
 import flexget
 from flexget.utils.tools import console
 from flexget.utils import requests
+from flexget.entry import Entry
 from flexget.event import fire_event
 
 
@@ -67,6 +69,24 @@ class CronAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, True)
         namespace.loglevel = 'info'
+
+
+# This makes the old --inject form forwards compatible
+class InjectAction(Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        new_value = getattr(namespace, self.dest, None) or []
+        kwargs = {'title': values.pop(0)}
+        if values:
+            kwargs['url'] = values.pop(0)
+        else:
+            kwargs['url'] = 'http://localhost/inject/%s' % ''.join(random.sample(string.letters + string.digits, 30))
+        if 'force' in [v.lower() for v in values]:
+            kwargs['immortal'] = True
+        entry = Entry(**kwargs)
+        if 'accept' in [v.lower() for v in values]:
+            entry.accept(reason='accepted by --inject')
+        new_value.append(entry)
+        setattr(namespace, self.dest, new_value)
 
 
 class ScopedNamespace(Namespace):
@@ -166,7 +186,7 @@ class ArgumentParser(ArgParser):
 
     def _get_values(self, action, arg_strings):
         """Complete the full name for partial subcommands"""
-        if action.nargs == argparse.PARSER and self.subparsers:
+        if action.nargs == PARSER and self.subparsers:
             subcommand = arg_strings[0]
             if subcommand not in self.subparsers.choices:
                 matches = [x for x in self.subparsers.choices if x.startswith(subcommand)]
@@ -234,6 +254,10 @@ class CoreArgumentParser(ArgumentParser):
                                  choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         exec_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0, help=SUPPRESS)
+        exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
+        exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
+        # TODO: CLI Should we just fold --task into the core?
+        exec_parser.add_argument('--tasks', nargs='*', default=None, help=SUPPRESS)
         # Plugins should respect these flags where appropriate
         exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
         exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
