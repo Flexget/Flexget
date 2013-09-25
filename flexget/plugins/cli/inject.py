@@ -35,7 +35,9 @@ def key_equals_value(text):
 def register_parser_arguments(core_parser):
     exec_parser = core_parser.get_subparser('execute')
     inject_parser = core_parser.add_subparser('inject', add_help=False, parents=[exec_parser],
-                                              help='inject an entry from command line into tasks')
+                                              help='inject an entry from command line into tasks',
+                                              usage='%(prog)s title [url] [--accept] [--force] '
+                                                    '[--fields NAME=VALUE [NAME=VALUE...]] [<execute arguments>]')
     inject_group = inject_parser.add_argument_group('inject arguments')
     inject_group.add_argument('title', help='title of the entry to inject')
     inject_group.add_argument('url', nargs='?', help='url of the entry to inject')
