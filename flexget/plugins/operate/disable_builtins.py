@@ -19,13 +19,15 @@ class PluginDisableBuiltins(object):
         self.disabled = []
 
     # TODO: Shit, how was this ever working? If this plugin is loaded before any builtin plugins, they are not allowed
-    # in the schema.
-    schema = {
-        'oneOf': [
-            {'type': 'boolean'},
-            {'type': 'array', 'items': {'type': 'string', 'enum': [p.name for p in all_builtins()]}}
-        ]
-    }
+    # in the schema. We need to change plugin loading to not access the schema until all plugins are loaded.
+    @property
+    def schema(self):
+        return {
+            'oneOf': [
+                {'type': 'boolean'},
+                {'type': 'array', 'items': {'type': 'string', 'enum': [p.name for p in all_builtins()]}}
+            ]
+        }
 
     def debug(self):
         log.debug('Builtin plugins: %s' % ', '.join(plugin.name for plugin in all_builtins()))
