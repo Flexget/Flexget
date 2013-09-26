@@ -22,15 +22,14 @@ options = environment.options
 install_requires = ['FeedParser>=5.1.3', 'SQLAlchemy >=0.7, <0.7.99', 'PyYAML', 'BeautifulSoup>=3.2, <3.3',
                     # There is a bug in beautifulsoup 4.2.0 that breaks imdb parsing, see http://flexget.com/ticket/2091
                     'beautifulsoup4>=4.1, !=4.2.0, <4.3', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar',
-                    'jinja2', 'flask', 'cherrypy', 'requests>=1.0, <1.99', 'python-dateutil!=2.0', 'jsonschema>=2.0',
-                    'python-tvrage']
+                    'jinja2', 'requests>=1.0, <1.99', 'python-dateutil!=2.0', 'jsonschema>=2.0', 'python-tvrage']
 if sys.version_info < (2, 7):
     # argparse is part of the standard library in python 2.7+
     install_requires.append('argparse')
 
 entry_points = {
     'console_scripts': ['flexget = flexget:main'],
-    'gui_scripts': ['flexget-webui = flexget.ui:main']}
+    'gui_scripts': ['flexget-webui = flexget.ui:main [webui]']}
 
 # Provide an alternate exe on windows which does not cause a pop-up when scheduled
 if sys.platform.startswith('win'):
@@ -61,6 +60,7 @@ setup(
         'memusage': ['guppy'],
         'NZB': ['pynzb'],
         'TaskTray': ['pywin32'],
+        'webui': ['flask', 'cherrypy']
     },
     entry_points=entry_points,
     classifiers=[
