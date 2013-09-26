@@ -7,12 +7,14 @@ WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 
 
 
 # TODO: make tests for this, the defaults probably don't work quite right at the moment
-schema = {
+schedule_schema = {
+    'type': 'object',
     'properties': {
         'every': {'type': 'number', 'default': 1},
         'unit': {'type': 'string', 'enum': UNITS + [u.rstrip('s') for u in UNITS], 'default': 'hours'},
         'on': {'type': 'string', 'enum': WEEKDAYS},
         'at': {'type': 'string'}},
+    'additionalProperties': False,
     'dependencies': {
         'on': {
             'properties': {
@@ -26,6 +28,14 @@ schema = {
                 'unit': {
                     'enum': ['day', 'days', 'week', 'weeks'],
                     'default': 'days'}}}}}
+
+
+main_schema = {
+    'properties': {
+        'tasks': {'type': 'object', 'additionalProperties': schedule_schema},
+        'default': schedule_schema
+    }
+}
 
 
 class Job(object):
