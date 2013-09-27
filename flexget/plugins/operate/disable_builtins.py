@@ -18,8 +18,6 @@ class PluginDisableBuiltins(object):
         # cannot trust that on_task_start would have been executed
         self.disabled = []
 
-    # TODO: Shit, how was this ever working? If this plugin is loaded before any builtin plugins, they are not allowed
-    # in the schema. We need to change plugin loading to not access the schema until all plugins are loaded.
     @property
     def schema(self):
         return {

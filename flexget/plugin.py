@@ -201,11 +201,6 @@ def register_task_phase(name, before=None, after=None):
             task_phases.insert(task_phases.index(after) + 1, phase_name)
         if after is None:
             task_phases.insert(task_phases.index(before), phase_name)
-
-        # create possibly newly available phase handlers
-        for loaded_plugin in plugins:
-            plugins[loaded_plugin].build_phase_handlers()
-
         return True
 
     # if can't add yet (dependencies) queue addition
@@ -266,12 +261,21 @@ class PluginInfo(dict):
         self.category = category
         self.phase_handlers = {}
 
-        # Create plugin instance
         self.plugin_class = plugin_class
+
+        # Create plugin instance
         self.instance = self.plugin_class()
         self.instance.plugin_info = self  # give plugin easy access to its own info
         self.instance.log = logging.getLogger(getattr(self.instance, "LOGGER_NAME", None) or self.name)
 
+        if self.name in plugins:
+            PluginInfo.dupe_counter += 1
+            log.critical('Error while registering plugin %s. %s' %
+                         (self.name, ('A plugin with the name %s is already registered' % self.name)))
+        else:
+            plugins[self.name] = self
+
+    def initialize(self):
         if hasattr(self.instance, 'schema'):
             self.schema = self.instance.schema
         elif hasattr(self.instance, 'validator'):
@@ -285,13 +289,7 @@ class PluginInfo(dict):
             self.schema['id'] = location
             config_schema.register_schema(location, self.schema)
 
-        if self.name in plugins:
-            PluginInfo.dupe_counter += 1
-            log.critical('Error while registering plugin %s. %s' %
-                         (self.name, ('A plugin with the name %s is already registered' % self.name)))
-        else:
-            self.build_phase_handlers()
-            plugins[self.name] = self
+        self.build_phase_handlers()
 
     def reset_phase_handlers(self):
         """Temporary utility method"""
@@ -415,7 +413,11 @@ def load_plugins():
     warnings.simplefilter('ignore', DeprecationWarning)
 
     start_time = time.time()
+    # Import all the plugins
     _load_plugins_from_dirs(get_standard_plugins_path())
+    # After they have all been imported, instantiate them
+    for plugin in plugins.values():
+        plugin.initialize()
     took = time.time() - start_time
     plugins_loaded = True
     log.debug('Plugins took %.2f seconds to load' % took)
