@@ -123,7 +123,6 @@ class Manager(object):
 
         self.initialize()
         self.scheduler = Scheduler(self)
-        self.scheduler.start()
 
         # cannot be imported at module level because of circular references
         from flexget.utils.simple_persistence import SimplePersistence
@@ -148,32 +147,34 @@ class Manager(object):
         self.find_config()
         self.init_sqlalchemy()
 
-    def run_subcommand(self, name, options):
-        def do_subcommand():
-            # Let plugins handle the subcommand
-            fire_event('manager.subcommand.%s' % name, self, options)
-            # exec is the only built-in subcommand, handle it here
-            if name == 'execute':
-                if options.profile:
+    def handle_cli(self):
+        subcommand = self.options.cli_subcommand
+        options = getattr(self.options, subcommand)
+        if subcommand == 'execute':
+            port = self.check_webui_port()
+            if port:
+                self.remote_execute(port, options)
+                self.shutdown()
+                return
+            with self.acquire_lock():
+                self.scheduler.start()
+                self.scheduler.execute(options)
+                self.shutdown()
+                # TODO: Figure out how to profile with scheduler
+                """if options.profile:
                     try:
                         import cProfile as profile
                     except ImportError:
                         import profile
-                    profile.runctx('self.execute()', globals(), locals(), os.path.join(self.config_base, 'flexget.profile'))
-                else:
-                    self.execute(options=options)
-
-        # TODO: CLI Fill default options and update them with passed in ones?
-        setattr(self.options, name, options)
-        if getattr(options, 'lock_required', False):
-            port = self.check_webui_port()
-            if port and name == 'exec':
-                self.remote_execute(port, options)
-            else:
-                with self.acquire_lock():
-                    do_subcommand()
+                    profile.runctx('self.execute()', globals(), locals(),
+                                   os.path.join(self.config_base, 'flexget.profile'))"""
         else:
-            do_subcommand()
+            # TODO: CLI don't use an event to run the subcommands
+            if getattr(options, 'lock_required', False):
+                with self.acquire_lock():
+                    fire_event('manager.subcommand.%s' % subcommand, self, options)
+            else:
+                fire_event('manager.subcommand.%s' % subcommand, self, options)
 
     def setup_yaml(self):
         """Sets up the yaml loader to return unicode objects for strings by default"""
@@ -653,10 +654,6 @@ class Manager(object):
         console('Displaying log from remote execution...')
         for line in r.iter_lines(chunk_size=1):
             console(line)
-
-    @event('manager.subcommands.execute')
-    def execute(self, options=None):
-        self.scheduler.execute(options)
 
     @useExecLogging
     def _execute(self, options=None):

@@ -12,7 +12,7 @@ from flexget.entry import Entry
 from flexget.event import fire_event
 
 
-_UNSET = object
+_UNSET = object()
 
 
 def required_length(nmin, nmax):
@@ -238,7 +238,7 @@ class CoreArgumentParser(ArgumentParser):
     def __init__(self, **kwargs):
         kwargs.setdefault('parents', [manager_parser])
         super(CoreArgumentParser, self).__init__(**kwargs)
-        self.add_subparsers(title='Commands', metavar='<command>', dest='subcommand', scoped_namespaces=True)
+        self.add_subparsers(title='Commands', metavar='<command>', dest='cli_subcommand', scoped_namespaces=True)
 
         # The parser for the exec subcommand
         exec_parser = self.add_subparser('execute', lock_required=True, help='execute tasks now')

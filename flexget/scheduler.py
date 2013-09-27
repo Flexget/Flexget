@@ -54,15 +54,12 @@ class Scheduler(threading.Thread):
         self.run_queue.put(job)
 
     def run(self):
-        from itertools import count
-        a = count()
         while True:
             # Add pending jobs to the run queue
             for job in self.periodic_jobs:
                 if job.should_run:
                     # Make sure it is not added to the queue again until it is done running
                     job.running = True
-                    print 'put?'
                     self.run_queue.put(job)
             # Grab the first job from the run queue and do it
             try:

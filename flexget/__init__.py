@@ -24,14 +24,7 @@ def main():
 
     options = CoreArgumentParser().parse_args()
 
-    try:
-        manager = Manager(options)
-    except IOError as e:
-        # failed to load config, TODO: why should it be handled here? So sys.exit isn't called in webui?
-        # note: this may not be needed here anymore, config is no longer read on manager init
-        log.critical(e)
-        logger.flush_logging_to_console()
-        sys.exit(1)
+    manager = Manager(options)
 
     log_level = logging.getLevelName(options.loglevel.upper())
     log_file = os.path.expanduser(manager.options.logfile)
@@ -39,5 +32,4 @@ def main():
     if not os.path.isabs(log_file):
         log_file = os.path.join(manager.config_base, log_file)
     logger.start(log_file, log_level)
-    manager.run_subcommand(options.subcommand, getattr(options, options.subcommand))
-    manager.shutdown()
+    manager.handle_cli()
