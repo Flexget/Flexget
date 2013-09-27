@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from collections import defaultdict
+from datetime import datetime
 import os
 import re
 import urlparse
@@ -7,6 +8,7 @@ import urlparse
 import jsonschema
 
 from flexget.utils import qualities, template
+from flexget.utils.tools import parse_timedelta
 
 schema_paths = {}
 
@@ -84,6 +86,25 @@ format_checker = jsonschema.FormatChecker(('email',))
 format_checker.checks('quality', raises=ValueError)(qualities.get)
 format_checker.checks('quality_requirements', raises=ValueError)(qualities.Requirements)
 
+@format_checker.checks('time', raises=ValueError)
+def parse_time(time_string):
+    """Parse a time string from the config into a :class:`datetime.time` object."""
+    formats = ['%I:%M %p', '%H:%M', '%H:%M:%S']
+    for f in formats:
+        try:
+            return datetime.strptime(time_string, f).time()
+        except ValueError:
+            continue
+    raise ValueError('invalid time `%s`' % time_string)
+
+@format_checker.checks('interval', raises=ValueError)
+def parse_interval(interval_string):
+    """Takes an interval string from the config and turns it into a :class:`datetime.timedelta` object."""
+    regexp = r'^\d+ (second|minute|hour|day|week)s?$'
+    if not re.match(regexp, interval_string):
+        raise ValueError("should be in format 'x (seconds|minutes|hours|days|weeks)'")
+    return parse_timedelta(interval_string)
+
 @format_checker.checks('regex', raises=ValueError)
 def is_regex(instance):
     try:
@@ -115,13 +136,6 @@ def is_url(instance):
     regexp = ('(' + '|'.join(['ftp', 'http', 'https', 'file', 'udp']) +
               '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
     return re.match(regexp, instance)
-
-@format_checker.checks('interval', raises=ValueError)
-def is_interval(instance):
-    regexp = r'^\d+ (second|minute|hour|day|week)s?$'
-    if not re.match(regexp, instance):
-        raise ValueError("should be in format 'x (seconds|minutes|hours|days|weeks)'")
-    return True
 
 
 def get_error_message(error):

@@ -1,6 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
-import functools
+import logging
+import Queue
+import threading
+
+log = logging.getLogger('scheduler')
 
 UNITS = ['seconds', 'minutes', 'hours', 'days', 'weeks']
 WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
@@ -11,22 +15,22 @@ schedule_schema = {
     'type': 'object',
     'properties': {
         'every': {'type': 'number', 'default': 1},
-        'unit': {'type': 'string', 'enum': UNITS + [u.rstrip('s') for u in UNITS], 'default': 'hours'},
-        'on': {'type': 'string', 'enum': WEEKDAYS},
-        'at': {'type': 'string'}},
+        'unit': {'type': 'string', 'enum': UNITS, 'default': 'hours'},
+        'on_day': {'type': 'string', 'enum': WEEKDAYS},
+        'at_time': {'type': 'string', 'format': 'time'}},
     'additionalProperties': False,
     'dependencies': {
-        'on': {
+        'on_day': {
             'properties': {
                 'amount': {'type': 'integer'},
                 'unit': {
-                    'enum': ['week', 'weeks'],
+                    'enum': ['weeks'],
                     'default': 'weeks'}}},
-        'at': {
+        'at_time': {
             'properties': {
                 'amount': {'type': 'integer'},
                 'unit': {
-                    'enum': ['day', 'days', 'week', 'weeks'],
+                    'enum': ['days', 'weeks'],
                     'default': 'days'}}}}}
 
 
@@ -38,15 +42,114 @@ main_schema = {
 }
 
 
+class Scheduler(threading.Thread):
+    def __init__(self, manager):
+        super(Scheduler, self).__init__()
+        self.run_queue = Queue.PriorityQueue()
+        self.manager = manager
+        self.periodic_jobs = []
+
+    def execute(self, options=None):
+        job = ImmediateJob(options)
+        self.run_queue.put(job)
+
+    def run(self):
+        from itertools import count
+        a = count()
+        while True:
+            # Add pending jobs to the run queue
+            for job in self.periodic_jobs:
+                if job.should_run:
+                    # Make sure it is not added to the queue again until it is done running
+                    job.running = True
+                    print 'put?'
+                    self.run_queue.put(job)
+            # Grab the first job from the run queue and do it
+            try:
+                job = self.run_queue.get(timeout=0.5)
+            except Queue.Empty:
+                continue
+            job.start()
+            try:
+                if job.execute_options is SHUTDOWN:
+                    # shutdown job, exit the main loop
+                    break
+                self.manager._execute(job.execute_options)
+            finally:
+                self.run_queue.task_done()
+                job.done()
+        remaining_jobs = self.run_queue.qsize()
+        if remaining_jobs:
+            log.warning('Scheduler shut down with %s jobs remaining in the queue to run.' % remaining_jobs)
+        log.debug('scheduler shut down')
+
+    def shutdown(self, finish_queue=True):
+        """
+        Ends the thread. If a job is running, waits for it to finish first.
+
+        :param bool finish_queue: If this is True, shutdown will wait until all queued tasks have finished.
+        """
+        job = ShutdownJob()
+        job.priority = 10 if finish_queue else -1
+        self.run_queue.put(job)
+
+
 class Job(object):
-    def __init__(self, config=None):
-        self.job_func = None
+    """A job for the scheduler to execute."""
+    #: Used to determine which job to run first when multiple jobs are waiting.
+    priority = None
+    #: A datetime object when the job was scheduled to run. Jobs are sorted by this value when priority is the same.
+    run_time = None
+    #: An :class:`argparse.Namespace` or ``dict`` containing options for this job's execution.
+    execute_options = None
+
+    def start(self):
+        """Called when the job is run."""
+        pass
+
+    def done(self):
+        """Called when the job has finished running."""
+        pass
+
+    def __lt__(self, other):
+        return (self.priority, self.run_time) < (other.priority, other.run_time)
+
+
+SHUTDOWN = object()
+
+class ShutdownJob(Job):
+    priority = -1
+    execute_options = SHUTDOWN
+
+
+class ImmediateJob(Job):
+    priority = 1
+
+    def __init__(self, options=None):
+        self.execute_options = options
+        self.run_time = datetime.now()
+
+
+class PeriodicJob(Job):
+    priority = 5
+
+    def __init__(self):
+        self.running = False
+        self.execute_options = None
         self.unit = None
         self.amount = None
         self.on_day = None
-        self._at_time = None
+        self.at_time = None
         self.last_run = None
-        self.next_run = None
+        self.run_time = None
+
+    def start(self):
+        self.running = True
+        self.last_run = datetime.now()
+
+    def done(self):
+        self.schedule_next_run()
+        self.running = False
 
     def _validate(self):
         """Makes sure schedule is valid."""
@@ -64,34 +167,12 @@ class Job(object):
             raise ValueError('amount must be an integer when on_day or at_time are used')
 
     @property
-    def at_time(self):
-        return self._at_time
-
-    @at_time.setter
-    def at_time(self, value):
-        """Allow setting the time with a 12 or 24 hour formatted time string."""
-        if isinstance(value, basestring):
-            # Try parsing with AM/PM first, then 24 hour time
-            try:
-                self._at_time = datetime.strptime(value, '%I:%M %p')
-            except ValueError:
-                try:
-                    self._at_time = datetime.strptime(value, '%H:%M')
-                except ValueError:
-                    raise ValueError('invalid time `%s`' % value)
-        else:
-            self._at_time = value
-
-    def set_func(self, func, *args, **kwargs):
-        self.job_func = functools.partial(func, *args, **kwargs)
-
-    @property
     def should_run(self):
-        return datetime.datetime.now() >= self.next_run
+        return not self.running and self.run_time and datetime.datetime.now() >= self.run_time
 
     @property
     def period(self):
-        return datetime.timedelta(**{self.unit: self.amount})
+        return timedelta(**{self.unit: self.amount})
 
     def schedule_next_run(self):
         last_run = self.last_run
@@ -102,11 +183,11 @@ class Job(object):
             days_ahead = self.on_day - last_run.weekday()
             if days_ahead <= 0:  # Target day already happened this week
                 days_ahead += 7
-            self.next_run = last_run + datetime.timedelta(days=days_ahead, weeks=self.amount-1)
+            self.run_time = last_run + timedelta(days=days_ahead, weeks=self.amount-1)
         else:
-            self.next_run = last_run + self.period
+            self.run_time = last_run + self.period
         if self.at_time:
-            self.next_run = self.next_run.replace(hour=self.at_time.hour, minute=self.at_time.minute,
+            self.run_time = self.run_time.replace(hour=self.at_time.hour, minute=self.at_time.minute,
                                                   second=self.at_time.second)
 
     # TODO: Probably remove this, and go with the yaml form defined by above schema

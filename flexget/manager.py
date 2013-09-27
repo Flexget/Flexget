@@ -16,6 +16,7 @@ from sqlalchemy.pool import SingletonThreadPool
 from flexget import config_schema
 from flexget.event import fire_event, event
 from flexget.options import CoreArgumentParser
+from flexget.scheduler import Scheduler
 from flexget.utils import json
 from flexget.utils.tools import pid_exists, console
 
@@ -121,12 +122,8 @@ class Manager(object):
         self.tasks = {}
 
         self.initialize()
-
-        # check if stdout is not connected to terminal (cron run)
-        #if not os.isatty(sys.stdout.fileno()):
-        #    log.warning('It appears you\'re running from CRON')
-        #else:
-        #    log.warning('It appears you\'re running from terminal')
+        self.scheduler = Scheduler(self)
+        self.scheduler.start()
 
         # cannot be imported at module level because of circular references
         from flexget.utils.simple_persistence import SimplePersistence
@@ -658,8 +655,11 @@ class Manager(object):
             console(line)
 
     @event('manager.subcommands.execute')
-    @useExecLogging
     def execute(self, options=None):
+        self.scheduler.execute(options)
+
+    @useExecLogging
+    def _execute(self, options=None):
         """
         Iterate trough tasks and run them. If --learn is used download and output
         phases are disabled.
@@ -760,6 +760,9 @@ class Manager(object):
     def shutdown(self):
         """ Application is being exited
         """
+        # Wait for scheduler to finish
+        self.scheduler.shutdown()
+        self.scheduler.join()
         fire_event('manager.shutdown', self)
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutting down')
