@@ -74,7 +74,27 @@ def process_config(config, schema, set_defaults=True):
     return errors
 
 
+def parse_time(time_string):
+    """Parse a time string from the config into a :class:`datetime.time` object."""
+    formats = ['%I:%M %p', '%H:%M', '%H:%M:%S']
+    for f in formats:
+        try:
+            return datetime.strptime(time_string, f).time()
+        except ValueError:
+            continue
+    raise ValueError('invalid time `%s`' % time_string)
+
+
+def parse_interval(interval_string):
+    """Takes an interval string from the config and turns it into a :class:`datetime.timedelta` object."""
+    regexp = r'^\d+ (second|minute|hour|day|week)s?$'
+    if not re.match(regexp, interval_string):
+        raise ValueError("should be in format 'x (seconds|minutes|hours|days|weeks)'")
+    return parse_timedelta(interval_string)
+
+
 ## Public API end here, the rest should not be used outside this module
+
 
 class RefResolver(jsonschema.RefResolver):
     def __init__(self, *args, **kwargs):
@@ -87,23 +107,13 @@ format_checker.checks('quality', raises=ValueError)(qualities.get)
 format_checker.checks('quality_requirements', raises=ValueError)(qualities.Requirements)
 
 @format_checker.checks('time', raises=ValueError)
-def parse_time(time_string):
-    """Parse a time string from the config into a :class:`datetime.time` object."""
-    formats = ['%I:%M %p', '%H:%M', '%H:%M:%S']
-    for f in formats:
-        try:
-            return datetime.strptime(time_string, f).time()
-        except ValueError:
-            continue
-    raise ValueError('invalid time `%s`' % time_string)
+def is_time(time_string):
+    return parse_time(time_string)
 
 @format_checker.checks('interval', raises=ValueError)
-def parse_interval(interval_string):
-    """Takes an interval string from the config and turns it into a :class:`datetime.timedelta` object."""
-    regexp = r'^\d+ (second|minute|hour|day|week)s?$'
-    if not re.match(regexp, interval_string):
-        raise ValueError("should be in format 'x (seconds|minutes|hours|days|weeks)'")
-    return parse_timedelta(interval_string)
+def is_interval(interval_string):
+    # A zero length timedelta counts as false, if parse_interval doesn't return an error, make sure to return truthy
+    return parse_interval(interval_string) or True
 
 @format_checker.checks('regex', raises=ValueError)
 def is_regex(instance):

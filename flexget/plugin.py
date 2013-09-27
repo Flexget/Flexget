@@ -164,11 +164,8 @@ task_phases = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'ou
 # map phase names to method names
 phase_methods = {
     # task
-    'abort': 'on_task_abort',  # special; not a task phase that gets called normally
-
-    # lifecycle
-    'process_start': 'on_process_start',
-    'process_end': 'on_process_end',
+    'prepare': 'on_task_prepare', # special; called before config validation
+    'abort': 'on_task_abort'  # special; not a task phase that gets called normally
 }
 phase_methods.update((_phase, 'on_task_' + _phase) for _phase in task_phases)  # DRY
 

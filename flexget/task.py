@@ -10,6 +10,7 @@ from sqlalchemy import Column, Unicode, String, Integer
 from flexget import config_schema
 from flexget import db_schema
 from flexget.manager import Session, register_config_key
+from flexget.options import CoreArgumentParser
 from flexget.plugin import (get_plugins_by_phase, task_phases, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins, plugin_schemas)
 from flexget.utils.simple_persistence import SimpleTaskPersistence
@@ -161,7 +162,7 @@ class Task(object):
         # not to be reset
         self._rerun_count = 0
 
-        # This should not be used until after process_start, when it is evaluated
+        # This should not be used until after prepare phase, when it is evaluated
         self.config_modified = None
 
         # use reset to init variables when creating
@@ -291,7 +292,7 @@ class Task(object):
 
         :param string phase: Name of the phase
         """
-        if phase not in task_phases + ['abort', 'process_start', 'process_end']:
+        if phase not in task_phases + ['prepare', 'abort']:
             raise Exception('%s is not a valid task phase' % phase)
         # warn if no inputs, filters or outputs in the task
         if phase in ['input', 'filter', 'output']:
@@ -333,14 +334,6 @@ class Task(object):
             # Make sure we abort if any plugin sets our abort flag
             if self._abort and phase != 'abort':
                 return
-
-    def _run_entry_phase(self, phase, entry, **kwargs):
-        # TODO: entry events are not very elegant, refactor into real (new) events or something ...
-        if phase not in ['accept', 'reject', 'fail']:
-            raise Exception('Not a valid entry phase')
-        phase_plugins = self.plugins(phase)
-        for plugin in phase_plugins:
-            self.__run_plugin(plugin, phase, (self, entry), kwargs)
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
         """
@@ -415,27 +408,37 @@ class Task(object):
             session.close()
 
     @useTaskLogging
-    def execute(self, disable_phases=None, entries=None):
+    def execute(self, options=None):
         """Executes the task.
 
         :param list disable_phases: Disable given phases names during execution
         :param list entries: Entries to be used in execution instead
             of using the input. Disables input phase.
         """
-
         log.debug('executing %s' % self.name)
+
+        defaults = CoreArgumentParser().get_subparser('execute').get_defaults()
+        if not options:
+            options = defaults
+        elif isinstance(options, dict):
+            defaults.__dict__.update(options)
+            options = defaults
+        self.options = options
+
+        self._reset()
+        # This phase runs before config validation
+        self.__run_task_phase('prepare')
 
         # Store original config state to be restored if a rerun is needed
         config_backup = copy.deepcopy(self.config)
 
-        self._reset()
         # Handle keyword args
-        if disable_phases:
-            map(self.disable_phase, disable_phases)
-        if entries:
+        if options.disable_phases:
+            map(self.disable_phase, options.disable_phases)
+        if options.inject:
             # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')
-            self.all_entries.extend(entries)
+            self.all_entries.extend(options.inject)
 
         # validate configuration
         errors = self.validate()
@@ -443,7 +446,7 @@ class Task(object):
             return
         if errors and self.manager.unit_test:  # todo: bad practice
             raise Exception('configuration errors')
-        if self.manager.options.execute.validate:
+        if options.validate:
             if not errors:
                 log.info('Task \'%s\' passed' % self.name)
             self.enabled = False
@@ -507,22 +510,11 @@ class Task(object):
                 self._rerun_count += 1
                 # Restore config to original state before running again
                 self.config = config_backup
-                self.execute(disable_phases=disable_phases, entries=entries)
+                self.execute(options)
 
         # Clean up entries after the task has executed to reduce ram usage, #1652
         if not self.manager.unit_test:
             self.all_entries[:] = [entry for entry in self.all_entries if entry.accepted]
-
-    def _process_start(self):
-        """Execute process_start phase"""
-        self.__run_task_phase('process_start')
-
-    def _process_end(self):
-        """Execute terminate phase for this task"""
-        if self.manager.options.execute.validate:
-            log.debug('No process_end phase with --check')
-            return
-        self.__run_task_phase('process_end')
 
     def validate(self):
         """Called during task execution. Validates config, prints errors and aborts task if invalid."""
@@ -551,5 +543,3 @@ task_config_schema = {
 }
 
 register_config_key('tasks', task_config_schema, required=True)
-# Backwards compatibility with feeds key
-register_config_key('feeds', task_config_schema)

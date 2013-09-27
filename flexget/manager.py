@@ -14,7 +14,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.pool import SingletonThreadPool
 
 from flexget import config_schema
-from flexget.event import fire_event, event
+from flexget.event import fire_event
 from flexget.options import CoreArgumentParser
 from flexget.scheduler import Scheduler
 from flexget.utils import json
@@ -48,24 +48,6 @@ def register_config_key(key, schema, required=False):
         _root_config_schema.setdefault('required', []).append(key)
 
 
-def useExecLogging(func):
-    """
-    Decorator for setting task name to log messages.
-    """
-
-    def wrapper(self, *args, **kw):
-        # Set the task name in the logger
-        from flexget import logger
-        import time
-        logger.set_execution(str(time.time()))
-        try:
-            return func(self, *args, **kw)
-        finally:
-            logger.set_execution('')
-
-    return wrapper
-
-
 class Manager(object):
 
     """Manager class for FlexGet
@@ -87,7 +69,6 @@ class Manager(object):
     * manager.execute.started
 
       When execute is about the be started, this happens before any task phases occur
-      including on_process_start
 
     * manager.execute.completed
 
@@ -157,8 +138,12 @@ class Manager(object):
                 self.shutdown()
                 return
             with self.acquire_lock():
+                # TODO: Determine when tasks should actually be created, and how to keep them updated
+                self.load_config()
+                self.create_tasks()
                 self.scheduler.start()
-                self.scheduler.execute(options)
+                for task in self.tasks:
+                    self.scheduler.execute(task, options)
                 self.shutdown()
                 # TODO: Figure out how to profile with scheduler
                 """if options.profile:
@@ -512,7 +497,7 @@ class Manager(object):
         Checks if there is already a lock on the database, returns truthy if there is.
         If the lock is held by the webui, returns the port number it is running on.
         """
-        if os.path.exists(self.lockfile):
+        if self.lockfile and os.path.exists(self.lockfile):
             with open(self.lockfile) as f:
                 lines = filter(None, f.readlines())
             pid = int(lines[0].lstrip('PID: '))
@@ -573,13 +558,6 @@ class Manager(object):
         from flexget.task import Task
         # Clear tasks dict
         self.tasks = {}
-
-        # Backwards compatibility with feeds key
-        if 'feeds' in self.config:
-            log.warning('`feeds` key has been deprecated and replaced by `tasks`. Please update your config.')
-            if 'tasks' in self.config:
-                log.error('You have defined both `feeds` and `tasks`. Stop that.')
-            self.config['tasks'] = self.config.pop('feeds')
         # construct task list
         tasks = self.config.get('tasks', {}).keys()
         for name in tasks:
@@ -604,43 +582,6 @@ class Manager(object):
         for task in self.tasks.itervalues():
             task.enabled = True
 
-    def process_start(self, tasks=None):
-        """Execute process_start for tasks.
-
-        :param list tasks: Optional list of :class:`~flexget.task.Task` instances, defaults to all.
-        """
-        if tasks is None:
-            tasks = self.tasks.values()
-
-        for task in tasks:
-            if not task.enabled:
-                continue
-            try:
-                log.trace('calling process_start on a task %s' % task.name)
-                task._process_start()
-            except Exception as e:
-                task.enabled = False
-                log.exception('Task %s process_start: %s' % (task.name, e))
-
-    def process_end(self, tasks=None):
-        """Execute process_end for all tasks.
-
-        :param list tasks: Optional list of :class:`~flexget.task.Task` instances, defaults to all.
-        """
-        if tasks is None:
-            tasks = self.tasks.values()
-
-        for task in tasks:
-            if not task.enabled:
-                continue
-            if task._abort:
-                continue
-            try:
-                log.trace('calling process_end on a task %s' % task.name)
-                task._process_end()
-            except Exception as e:
-                log.exception('Task %s process_end: %s' % (task.name, e))
-
     def remote_execute(self, port, options=None, **kwargs):
         log.info('Sending this execution to the webui running on port %s' % port)
         url = 'http://localhost:%s/api/' % port
@@ -655,8 +596,8 @@ class Manager(object):
         for line in r.iter_lines(chunk_size=1):
             console(line)
 
-    @useExecLogging
-    def _execute(self, options=None):
+    # TODO: remove
+    def __execute(self, options=None):
         """
         Iterate trough tasks and run them. If --learn is used download and output
         phases are disabled.
@@ -708,14 +649,13 @@ class Manager(object):
             disable_phases.extend(['download', 'output'])
 
         fire_event('manager.execute.started', self)
-        self.process_start(tasks=run_tasks)
 
         for task in sorted(run_tasks):
             if not task.enabled or task._abort:
                 continue
             try:
                 # TODO: CLI fix disable_phases, entries
-                task.execute(disable_phases=disable_phases, entries=options.inject)
+                task.execute(options)
             except Exception as e:
                 task.enabled = False
                 log.exception('Task %s: %s' % (task.name, e))
@@ -726,7 +666,6 @@ class Manager(object):
                 print '**** Keyboard Interrupt ****'
                 return
 
-        self.process_end(tasks=run_tasks)
         fire_event('manager.execute.completed', self)
         if self.options.execute.log_start:
             log.info('FlexGet stopped (PID: %s)' % os.getpid())
@@ -758,8 +697,9 @@ class Manager(object):
         """ Application is being exited
         """
         # Wait for scheduler to finish
-        self.scheduler.shutdown()
-        self.scheduler.join()
+        if self.scheduler.is_alive():
+            self.scheduler.shutdown()
+            self.scheduler.join()
         fire_event('manager.shutdown', self)
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutting down')
