@@ -1,10 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
-import time
-import os
 import base64
+import glob
+import logging
+import os
 import re
 import sys
+import time
 
 from flexget.event import event
 from flexget.entry import Entry
@@ -14,16 +15,29 @@ from flexget.utils.pathscrub import pathscrub
 
 log = logging.getLogger('deluge')
 
+
+def add_deluge_windows_install_dir_to_sys_path():
 # Deluge does not install to python system on Windows, add the install directory to sys.path if it is found
-if sys.platform.startswith('win') and os.environ.get('ProgramFiles'):
+    if not (sys.platform.startswith('win') or os.environ.get('ProgramFiles')):
+        return
     deluge_dir = os.path.join(os.environ['ProgramFiles'], 'Deluge')
     log.debug('Looking for deluge install in %s' % deluge_dir)
-    if os.path.isdir(deluge_dir):
-        log.debug('Found deluge install in %s adding to sys.path' % deluge_dir)
-        sys.path.append(deluge_dir)
-        for item in os.listdir(deluge_dir):
-            if item.endswith(('.egg', '.zip')):
-                sys.path.append(os.path.join(deluge_dir, item))
+    if not os.path.isdir(deluge_dir):
+        return
+    deluge_egg = glob.glob(os.path.join(deluge_dir, 'deluge-*-py2.?.egg'))
+    if not deluge_egg:
+        return
+    minor_version = int(re.search(r'py2\.(\d).egg', deluge_egg[0]).group(1))
+    if minor_version != sys.version_info[1]:
+        log.verbose('Cannot use deluge from install directory because its python version doesn\'t match.')
+        return
+    log.debug('Found deluge install in %s adding to sys.path' % deluge_dir)
+    sys.path.append(deluge_dir)
+    for item in os.listdir(deluge_dir):
+        if item.endswith(('.egg', '.zip')):
+            sys.path.append(os.path.join(deluge_dir, item))
+
+add_deluge_windows_install_dir_to_sys_path()
 
 try:
     from twisted.python import log as twisted_log
