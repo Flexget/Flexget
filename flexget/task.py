@@ -166,6 +166,7 @@ class Task(object):
         # this will be ceated when the prepare method is called
         self.config = None
         self.manager = manager
+        # Make a copy of options so that changes to this task don't affect other tasks with same starting options
         self.options = copy.copy(options)
 
         # simple persistence
@@ -570,6 +571,20 @@ class Task(object):
         # Don't validate commented out plugins
         schema['patternProperties'] = {'^_': {}}
         return config_schema.process_config(config, schema)
+
+    def __copy__(self):
+        new = type(self)(self.manager, self.name, self.config, self.options)
+        # We already made a copy of options, keep a reference to it
+        new_options = new.options
+        # Update all the variables of new instance to match our own
+        new.__dict__.update(self.__dict__)
+        # Some mutable objects need to be copies
+        new.options = new_options
+        new.raw_config = copy.deepcopy(self.raw_config)
+        new.config = copy.deepcopy(self.config)
+        return new
+
+    copy = __copy__
 
 
 task_config_schema = {

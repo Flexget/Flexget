@@ -54,7 +54,8 @@ class Scheduler(threading.Thread):
         self.periodic_jobs = []
 
     def execute(self, task):
-        job = ImmediateJob(task)
+        # Create a copy of task, so that changes to instance in manager thread do not affect scheduler thread
+        job = ImmediateJob(task.copy())
         self.run_queue.put(job)
 
     def run(self):
