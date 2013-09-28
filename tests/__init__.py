@@ -130,7 +130,7 @@ class FlexGetBase(object):
         if hasattr(self, 'task'):
             if hasattr(self, 'session'):
                 self.task.session.close() # pylint: disable-msg=E0203
-        self.task = Task(self.manager, name, config)
+        self.task = Task(self.manager, name, config, self.manager.options.execute)
         self.task.execute()
         if not abort_ok:
             assert not self.task.aborted, 'Task should not have aborted.'

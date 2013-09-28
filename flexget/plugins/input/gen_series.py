@@ -33,7 +33,7 @@ class GenSeries(object):
         container = validator.factory('any')
         return container
 
-    def on_process_start(self, task, config):
+    def on_task_prepare(self, task, config):
         log.info('Generating test data ...')
         series = []
         for num in range(config['series']):

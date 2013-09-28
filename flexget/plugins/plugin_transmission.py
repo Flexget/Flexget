@@ -88,7 +88,7 @@ class TransmissionBase(object):
         return cli
 
     @save_opener
-    def on_process_start(self, task, config):
+    def on_task_prepare(self, task, config):
         try:
             import transmissionrpc
             from transmissionrpc import TransmissionError

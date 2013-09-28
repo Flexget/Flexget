@@ -24,7 +24,7 @@ class PluginInclude(object):
     schema = one_or_more({'type': 'string'})
 
     @priority(254)
-    def on_process_start(self, task, config):
+    def on_task_prepare(self, task, config):
         if not config:
             return
 

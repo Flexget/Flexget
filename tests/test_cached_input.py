@@ -36,8 +36,7 @@ class TestInputCache(FlexGetBase):
     def test_memory_cache(self):
         """Test memory input caching"""
         # Don't use execute_task in this test as it runs process_start (which clears the cache) before each task
-        self.manager.create_tasks()
-        self.manager.process_start()
+        self.manager.refresh_tasks()
         task = self.manager.tasks['test_memory']
         task.execute()
         assert task.entries, 'should have created entries at the start'
@@ -48,7 +47,6 @@ class TestInputCache(FlexGetBase):
         task = self.manager.tasks['test_memory']
         task.execute()
         assert task.entries, 'should have created entries from the cache'
-        self.manager.process_end()
 
     def test_db_cache(self):
         """Test db input caching"""

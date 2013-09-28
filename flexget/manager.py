@@ -62,17 +62,9 @@ class Manager(object):
 
       Upgrade plugin database schemas etc
 
-    * manager.subcommand.<subcommand name>
+    * manager.startup
 
-      When a subcommand is called from the CLI
-
-    * manager.execute.started
-
-      When execute is about the be started, this happens before any task phases occur
-
-    * manager.execute.completed
-
-      After manager has executed all Tasks
+      Occurs after manager has been started and initialized
 
     * manager.shutdown
 
@@ -140,19 +132,19 @@ class Manager(object):
             with self.acquire_lock():
                 # TODO: Determine when tasks should actually be created, and how to keep them updated
                 self.load_config()
-                self.create_tasks()
+                self.refresh_tasks()
                 self.scheduler.start()
-                for task in self.tasks:
-                    self.scheduler.execute(task, options)
+                for task in self.tasks.values():
+                    self.scheduler.execute(task)
                 self.shutdown()
                 # TODO: Figure out how to profile with scheduler
-                """if options.profile:
-                    try:
-                        import cProfile as profile
-                    except ImportError:
-                        import profile
-                    profile.runctx('self.execute()', globals(), locals(),
-                                   os.path.join(self.config_base, 'flexget.profile'))"""
+                #if options.profile:
+                #    try:
+                #        import cProfile as profile
+                #    except ImportError:
+                #        import profile
+                #    profile.runctx('self.execute()', globals(), locals(),
+                #                   os.path.join(self.config_base, 'flexget.profile'))
         else:
             # TODO: CLI don't use an event to run the subcommands
             if getattr(options, 'lock_required', False):
@@ -553,11 +545,10 @@ class Manager(object):
         else:
             log.debug('Lockfile %s not found' % self.lockfile)
 
-    def create_tasks(self):
+    def refresh_tasks(self):
         """Creates instances of all configured tasks"""
         from flexget.task import Task
-        # Clear tasks dict
-        self.tasks = {}
+        tasks_to_update = self.tasks.keys()
         # construct task list
         tasks = self.config.get('tasks', {}).keys()
         for name in tasks:
@@ -566,11 +557,17 @@ class Manager(object):
                 self.config['tasks'][unicode(name)] = self.config['tasks'].pop(name)
                 name = unicode(name)
             # create task
-            task = Task(self, name, self.config['tasks'][name])
+            if name in tasks_to_update:
+                self.tasks[name].raw_config = self.config['tasks'][name]
+                tasks_to_update.remove(name)
+            else:
+                self.tasks[name] = Task(self, name, self.config['tasks'][name], self.options.execute)
             # if task name is prefixed with _ it's disabled
             if name.startswith('_'):
-                task.enabled = False
-            self.tasks[name] = task
+                self.tasks[name].enabled = False
+        # Remove tasks that are no longer in config
+        for name in tasks_to_update:
+            del self.tasks[name]
 
     def disable_tasks(self):
         """Disables all tasks."""
@@ -620,7 +617,7 @@ class Manager(object):
             for error in errors:
                 log.critical("[%s] %s", error.json_pointer, error.message)
             return
-        self.create_tasks()
+        self.refresh_tasks()
 
         # Make a list of Task instances to execute
         if options.tasks is None:
@@ -693,12 +690,12 @@ class Manager(object):
         else:
             log.debug('Not running db cleanup, last run %s' % self.persist.get('last_cleanup'))
 
-    def shutdown(self):
+    def shutdown(self, finish_queue=True):
         """ Application is being exited
         """
         # Wait for scheduler to finish
         if self.scheduler.is_alive():
-            self.scheduler.shutdown()
+            self.scheduler.shutdown(finish_queue=finish_queue)
             self.scheduler.join()
         fire_event('manager.shutdown', self)
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled

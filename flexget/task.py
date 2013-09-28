@@ -10,7 +10,6 @@ from sqlalchemy import Column, Unicode, String, Integer
 from flexget import config_schema
 from flexget import db_schema
 from flexget.manager import Session, register_config_key
-from flexget.options import CoreArgumentParser
 from flexget.plugin import (get_plugins_by_phase, task_phases, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins, plugin_schemas)
 from flexget.utils.simple_persistence import SimpleTaskPersistence
@@ -116,6 +115,15 @@ class EntryContainer(list):
         return '<EntryContainer(%s)>' % list.__repr__(self)
 
 
+class TaskAbort(Exception):
+    def __init__(self, reason, silent=False):
+        self.reason = reason
+        self.silent = silent
+
+    def __repr__(self):
+        return 'TaskAbort(reason=%s, silent=%s)' % (self.reason, self.silent)
+
+
 class Task(object):
 
     """
@@ -146,15 +154,19 @@ class Task(object):
 
     max_reruns = 5
 
-    def __init__(self, manager, name, config):
+    def __init__(self, manager, name, config, options):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
         :param dict config: Task configuration.
         """
         self.name = unicode(name)
-        self.config = config
+        # raw_config should remain the untouched input config
+        self._raw_config = config
+        # this will be ceated when the prepare method is called
+        self.config = None
         self.manager = manager
+        self.options = options
 
         # simple persistence
         self.simple_persistence = SimpleTaskPersistence(self)
@@ -177,13 +189,23 @@ class Task(object):
     undecided = property(lambda self: self.all_entries.undecided)
 
     @property
+    def raw_config(self):
+        return self._raw_config
+
+    @raw_config.setter
+    def raw_config(self, value):
+        # Automatically reset config when raw_config is updated, prepare method must be called again
+        self._raw_config = value
+        self.config = None
+
+    @property
     def is_rerun(self):
         return self._rerun_count
 
     def _reset(self):
         """Reset task state"""
         log.debug('resetting %s' % self.name)
-        self.enabled = True
+        self.enabled = not self.name.startswith('_')
         self.session = None
         self.priority = 65535
 
@@ -194,7 +216,8 @@ class Task(object):
 
         self.disabled_phases = []
 
-        # TODO: task.abort() should be done by using exception? not a flag that has to be checked everywhere
+        # TODO: Some of these can probably be removed. I think we just use them as a way for the plugins to get the
+        # abort reason from an on_task_abort handler
         self._abort = False
         self._abort_reason = None
         self._silent_abort = False
@@ -209,7 +232,11 @@ class Task(object):
         return cmp(self.priority, other.priority)
 
     def __str__(self):
-        return '<Task(name=%s,aborted=%s)>' % (self.name, str(self.aborted))
+        return '<Task(name=%s,aborted=%s)>' % (self.name, self.aborted)
+
+    @property
+    def prepared(self):
+        return self.config is not None
 
     @property
     def aborted(self):
@@ -218,6 +245,39 @@ class Task(object):
     @property
     def abort_reason(self):
         return self._abort_reason
+
+    def prepare(self):
+        """
+        Resets the config and runs the prepare phase plugins on it, then validates the config.
+
+        :returns: True if the task has been prepared and is ready to run
+
+        """
+        self._reset()
+        self.config = copy.deepcopy(self.raw_config)
+        # This phase runs before config validation
+        try:
+            self.__run_task_phase('prepare')
+        except TaskAbort as e:
+            self.enabled = False
+            self.config = None
+            log.error('Task aborted while being prepared: %s' % e.reason)
+            return False
+        # validate configuration
+        errors = self.validate()
+        if errors and self.manager.unit_test:  # todo: bad practice
+            raise Exception('configuration errors')
+        if self.options.validate:
+            if not errors:
+                log.info('Task \'%s\' passed' % self.name)
+            self.enabled = False
+            return False
+        if errors:
+            self.enabled = False
+            self.config = None
+            return False
+        # If one of the prepare handlers disabled us, we aren't prepared
+        return self.enabled
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
@@ -235,19 +295,8 @@ class Task(object):
             self.disabled_phases.append(phase)
 
     def abort(self, reason='Unknown', **kwargs):
-        """Abort this task execution, no more plugins will be executed after the current one exists."""
-        if self._abort:
-            return
-        self._abort_reason = reason
-        if not kwargs.get('silent', False):
-            log.info('Aborting task (plugin: %s)' % self.current_plugin)
-            self._silent_abort = False
-        else:
-            log.debug('Aborting task (plugin: %s)' % self.current_plugin)
-            self._silent_abort = True
-        # Run the abort phase before we set the _abort flag
-        self._abort = True
-        self.__run_task_phase('abort')
+        """Abort this task execution, no more plugins will be executed except the abort handling ones."""
+        raise TaskAbort(reason, silent=kwargs.get('silent', False))
 
     def find_entry(self, category='entries', **values):
         """
@@ -356,6 +405,11 @@ class Task(object):
         # call the plugin
         try:
             return method(*args, **kwargs)
+        except TaskAbort as e:
+            self._abort = True
+            self._abort_reason = e.reason
+            self._silent_abort = e.silent
+            raise
         except PluginWarning as warn:
             # check if this warning should be logged only once (may keep repeating)
             if warn.kwargs.get('log_once', False):
@@ -408,49 +462,29 @@ class Task(object):
             session.close()
 
     @useTaskLogging
-    def execute(self, options=None):
+    def execute(self):
         """Executes the task.
 
         :param list disable_phases: Disable given phases names during execution
         :param list entries: Entries to be used in execution instead
             of using the input. Disables input phase.
         """
+        if not self.enabled:
+            log.debug('Not running disabled task %s' % self.name)
         log.debug('executing %s' % self.name)
-
-        defaults = CoreArgumentParser().get_subparser('execute').get_defaults()
-        if not options:
-            options = defaults
-        elif isinstance(options, dict):
-            defaults.__dict__.update(options)
-            options = defaults
-        self.options = options
-
+        if not self.prepared:
+            if not self.prepare():
+                log.debug('task %s failed to prepare, not running' % self.name)
+                return
         self._reset()
-        # This phase runs before config validation
-        self.__run_task_phase('prepare')
-
-        # Store original config state to be restored if a rerun is needed
-        config_backup = copy.deepcopy(self.config)
 
         # Handle keyword args
-        if options.disable_phases:
-            map(self.disable_phase, options.disable_phases)
-        if options.inject:
+        if self.options.disable_phases:
+            map(self.disable_phase, self.options.disable_phases)
+        if self.options.inject:
             # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')
-            self.all_entries.extend(options.inject)
-
-        # validate configuration
-        errors = self.validate()
-        if self._abort:  # todo: bad practice
-            return
-        if errors and self.manager.unit_test:  # todo: bad practice
-            raise Exception('configuration errors')
-        if options.validate:
-            if not errors:
-                log.info('Task \'%s\' passed' % self.name)
-            self.enabled = False
-            return
+            self.all_entries.extend(self.options.inject)
 
         log.debug('starting session')
         self.session = Session()
@@ -473,26 +507,32 @@ class Task(object):
 
         try:
             # run phases
-            for phase in task_phases:
-                if phase in self.disabled_phases:
-                    # log keywords not executed
-                    for plugin in self.plugins(phase):
-                        if plugin.name in self.config:
-                            log.info('Plugin %s is not executed because %s phase is disabled (e.g. --test)' %
-                                     (plugin.name, phase))
-                    continue
+            try:
+                for phase in task_phases:
+                    if phase in self.disabled_phases:
+                        # log keywords not executed
+                        for plugin in self.plugins(phase):
+                            if plugin.name in self.config:
+                                log.info('Plugin %s is not executed because %s phase is disabled (e.g. --test)' %
+                                         (plugin.name, phase))
+                        continue
 
-                # run all plugins with this phase
-                self.__run_task_phase(phase)
-
-                # if abort flag has been set task should be aborted now
-                # since this calls return rerun will not be done
-                if self._abort:
-                    return
+                    # run all plugins with this phase
+                    self.__run_task_phase(phase)
+            except TaskAbort as e:
+                if not e.silent:
+                    log.warning('Aborting task (plugin: %s)' % self.current_plugin)
+                else:
+                    log.debug('Aborting task (plugin: %s)' % self.current_plugin)
+                try:
+                    self.__run_task_phase('abort')
+                except TaskAbort:
+                    log.exception('abort handlers aborted!')
+                return
 
             for entry in self.all_entries:
                 entry.complete()
-            log.debug('committing session, abort=%s' % self._abort)
+            log.debug('committing session')
             self.session.commit()
             fire_event('task.execute.completed', self)
         finally:
@@ -508,25 +548,20 @@ class Task(object):
             else:
                 log.info('Rerunning the task in case better resolution can be achieved.')
                 self._rerun_count += 1
-                # Restore config to original state before running again
-                self.config = config_backup
-                self.execute(options)
+                self.execute()
 
         # Clean up entries after the task has executed to reduce ram usage, #1652
         if not self.manager.unit_test:
             self.all_entries[:] = [entry for entry in self.all_entries if entry.accepted]
 
     def validate(self):
-        """Called during task execution. Validates config, prints errors and aborts task if invalid."""
+        """Validates config, logs errors and returns a list of errors."""
         errors = self.validate_config(self.config)
-        # log errors and abort
         if errors:
-            log.critical('Task \'%s\' has configuration errors:' % self.name)
+            log.critical('Task `%s` has configuration errors:' % self.name)
             msgs = ["[%s] %s" % (e.json_pointer, e.message) for e in errors]
             for msg in msgs:
                 log.error(msg)
-            # task has errors, abort it
-            self.abort('\n'.join(msgs))
         return errors
 
     @staticmethod

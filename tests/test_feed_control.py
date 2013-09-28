@@ -21,7 +21,7 @@ class TestOnlytask(FlexGetBase):
         # Pretend we have been run with --task test
         self.manager.options.execute.onlytask = 'test'
         # --task plugin uses manager.tasks, so we must create it for this test.
-        self.manager.create_tasks()
+        self.manager.refresh_tasks()
         # This task should run normally, as we specified it as onlytask
         self.execute_task('test')
         assert self.task.find_entry(title='download'), \
@@ -71,7 +71,7 @@ class TestManualOnlytask(FlexGetBase):
         # Pretend we have been run with --task test2
         self.manager.options.execute.onlytask = 'test2'
         # --task plugin uses manager.tasks, so we must create it for this test.
-        self.manager.create_tasks()
+        self.manager.refresh_tasks()
         self.execute_task('test2')
         # Revert manager settings back to default
         self.manager.options.execute.onlytask = None

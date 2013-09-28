@@ -4,8 +4,32 @@ import logging
 
 from flexget.event import event
 from flexget.plugin import register_plugin, PluginError
+from flexget.utils.tools import console
 
 log = logging.getLogger('task_control')
+
+
+@event('manager.startup')
+def validate_cli_opts(manager):
+    if manager.options.cli_subcommand != 'execute' or not manager.options.execute.onlytask:
+        return
+    # Make a list of the specified tasks to run, and those available
+    onlytasks = manager.options.execute.onlytask.split(',')
+
+    # Make sure the specified tasks exist
+    task_names = manager.config['tasks'].keys()
+    for onlytask in onlytasks:
+        if onlytask.lower() not in task_names:
+            if any(i in onlytask for i in '*?['):
+                # Try globbing
+                if not any(fnmatch.fnmatchcase(f.lower(), onlytask.lower()) for f in task_names):
+                    console('No match for task pattern \'%s\'' % onlytask)
+                    manager.shutdown(finish_queue=False)
+                    return
+            else:
+                console('Could not find task \'%s\'' % onlytask)
+            manager.shutdown(finish_queue=False)
+
 
 
 class OnlyTask(object):
@@ -22,30 +46,16 @@ class OnlyTask(object):
     flexget --task 'tv*'
     """
 
-    def on_process_start(self, task):
+    def on_task_prepare(self, task):
         # If --task hasn't been specified don't do anything
         if not task.manager.options.execute.onlytask:
             return
 
         # Make a list of the specified tasks to run, and those available
-        onlytasks = task.manager.options.execute.onlytask.split(',')
-
-        # Make sure the specified tasks exist
-        enabled_tasks = [f.name.lower() for f in task.manager.tasks.itervalues() if f.enabled]
-        for onlytask in onlytasks:
-            if any(i in onlytask for i in '*?['):
-                # Try globbing
-                if not any(fnmatch.fnmatchcase(f.lower(), onlytask.lower()) for f in enabled_tasks):
-                    task.manager.disable_tasks()
-                    raise PluginError('No match for task pattern \'%s\'' % onlytask, log)
-            elif onlytask.lower() not in enabled_tasks:
-                # If any of the tasks do not exist, exit with an error
-                task.manager.disable_tasks()
-                raise PluginError('Could not find task \'%s\'' % onlytask, log)
+        onlytasks = [t.lower() for t in task.manager.options.execute.onlytask.split(',')]
 
         # If current task is not among the specified tasks, disable it
-        if not any(task.name.lower() == f.lower() or fnmatch.fnmatchcase(task.name.lower(), f.lower())
-                for f in onlytasks):
+        if not (task.name.lower() in onlytasks or any(fnmatch.fnmatchcase(task.name.lower(), f) for f in onlytasks)):
             task.enabled = False
 
 

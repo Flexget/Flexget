@@ -134,7 +134,7 @@ class DelugePlugin(object):
         config.setdefault('user', '')
         config.setdefault('pass', '')
 
-    def on_process_start(self, task, config):
+    def on_task_prepare(self, task, config):
         """Raise a DependencyError if our dependencies aren't available"""
         # This is overridden by OutputDeluge to add deluge 1.1 support
         try:
@@ -343,7 +343,7 @@ class OutputDeluge(DelugePlugin):
                         'addpaused': 'add_paused', 'compact': 'compact_allocation'}
 
     @priority(120)
-    def on_process_start(self, task, config):
+    def on_task_prepare(self, task, config):
         """
         Detect what version of deluge is loaded.
         """
@@ -356,7 +356,7 @@ class OutputDeluge(DelugePlugin):
                 log.debug('1.1 API found')
             except ImportError:
                 log.debug('Looking for deluge 1.2 API')
-                DelugePlugin.on_process_start(self, task, config)
+                DelugePlugin.on_task_prepare(self, task, config)
                 logger('Using deluge 1.2 api')
                 self.deluge12 = True
             else:

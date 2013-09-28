@@ -63,7 +63,7 @@ class CliConfig(object):
             self.replaces[key.strip()] = value.strip()
         return True
 
-    def on_process_start(self, task):
+    def on_task_prepare(self, task):
         if self.parse_replaces(task):
             task.config = self.replace_item(task.config)
             log.debug(task.config)

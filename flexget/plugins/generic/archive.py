@@ -224,6 +224,7 @@ class Archive(object):
             self.on_task_exit(task, config)
 
 
+# TODO: CLI make this a subcommand
 class ArchiveInject(object):
     """
     Provides functionality to inject items from archive into tasks

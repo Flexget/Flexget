@@ -49,8 +49,8 @@ class Scheduler(threading.Thread):
         self.manager = manager
         self.periodic_jobs = []
 
-    def execute(self, task, options=None):
-        job = ImmediateJob(task, options)
+    def execute(self, task):
+        job = ImmediateJob(task)
         self.run_queue.put(job)
 
     def run(self):
@@ -68,13 +68,10 @@ class Scheduler(threading.Thread):
                 continue
             job.start()
             try:
-                if job.execute_options is SHUTDOWN:
+                if job.task is SHUTDOWN:
                     # shutdown job, exit the main loop
                     break
-                # Create a task and run it
-                from flexget.task import Task
-                task = Task(self.manager, job.task, self.manager.config['tasks'][job.task])
-                task.execute(job.execute_options)
+                job.task.execute()
             finally:
                 self.run_queue.task_done()
                 job.done()
@@ -100,9 +97,7 @@ class Job(object):
     priority = None
     #: A datetime object when the job was scheduled to run. Jobs are sorted by this value when priority is the same.
     run_time = None
-    #: An :class:`argparse.Namespace` or ``dict`` containing options for this job's execution.
-    execute_options = None
-    #: The name of the task this job executes
+    #: The :class:`Task` this job executes
     task = None
 
     def start(self):
@@ -121,22 +116,22 @@ SHUTDOWN = object()
 
 class ShutdownJob(Job):
     priority = -1
-    execute_options = SHUTDOWN
+    task = SHUTDOWN
 
 
 class ImmediateJob(Job):
     priority = 1
 
-    def __init__(self, task, options=None):
+    def __init__(self, task):
         self.task = task
-        self.execute_options = options
         self.run_time = datetime.now()
 
 
 class PeriodicJob(Job):
     priority = 5
 
-    def __init__(self):
+    def __init__(self, task):
+        self.task = task
         self.running = False
         self.execute_options = None
         self.unit = None

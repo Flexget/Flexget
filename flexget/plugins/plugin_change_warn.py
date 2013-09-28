@@ -21,7 +21,7 @@ class ChangeWarn(object):
         self.warned = False
         self.executed = False
 
-    def on_process_start(self, task):
+    def on_task_prepare(self, task):
         # Run only once
         if self.executed:
             return

@@ -44,7 +44,7 @@ class PluginPreset(object):
         return config
 
     @priority(255)
-    def on_process_start(self, task, config):
+    def on_task_prepare(self, task, config):
         if config is False: # handles 'preset: no' form to turn off preset on this task
             return
         config = self.prepare_config(config)

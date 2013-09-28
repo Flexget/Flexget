@@ -164,7 +164,7 @@ def start(mg):
     executor.start()
 
     # Initialize manager
-    manager.create_tasks()
+    manager.refresh_tasks()
     load_ui_plugins()
 
     # quick hack: since ui plugins may add tables to SQLAlchemy too and they're not initialized because create

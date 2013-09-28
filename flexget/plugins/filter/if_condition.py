@@ -44,7 +44,7 @@ class FilterIf(object):
     def __init__(self):
         self.task_phases = {}
 
-    def on_process_start(self, task, config):
+    def on_task_prepare(self, task, config):
         """Divide the config into parts based on which phase they need to run on."""
         phase_dict = self.task_phases[task.name] = defaultdict(lambda: [])
         for item in config:
@@ -55,8 +55,8 @@ class FilterIf(object):
                 for plugin_name, plugin_config in action.iteritems():
                     plugin = get_plugin_by_name(plugin_name)
                     for phase in plugin.phase_handlers:
-                        if phase == 'process_start':
-                            # If plugin has a process_start handler, run it now unconditionally
+                        if phase == 'prepare':
+                            # If plugin has a prepare handler, run it now unconditionally
                             try:
                                 plugin.phase_handlers[phase](task, plugin_config)
                             except TypeError:
@@ -112,7 +112,7 @@ class FilterIf(object):
                             entry_actions[action](entry, 'Matched requirement: %s' % requirement)
                     else:
                         # Other plugins were specified to run on this entry
-                        fake_task = Task(task.manager, task.name, task.config)
+                        fake_task = Task(task.manager, task.name, task.config, task.options)
                         fake_task.session = task.session
                         # This entry still belongs to our feed, accept/reject etc. will carry through.
                         fake_task.all_entries[:] = passed_entries

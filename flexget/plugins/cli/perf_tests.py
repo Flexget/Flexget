@@ -10,6 +10,7 @@ from flexget.plugin import register_plugin
 log = logging.getLogger('perftests')
 
 
+# TODO: CLI make this a subcommand
 class PerfTests(object):
 
     def on_process_start(self, task, config):
