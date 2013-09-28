@@ -224,91 +224,6 @@ class Archive(object):
             self.on_task_exit(task, config)
 
 
-# TODO: CLI make this a subcommand
-class ArchiveInject(object):
-    """
-    Provides functionality to inject items from archive into tasks
-    """
-
-    # ArchiveEntries to be injected
-    _inject_entries = None
-
-    @event('manager.execute.started')
-    def reset(*args, **kwargs):
-        log.debug('reset ArchiveInject state')
-        ArchiveInject._inject_entries = None
-
-    @priority(512)
-    def on_process_start(self, task, config):
-        if not task.manager.options.execute.archive_inject:
-            return
-
-        ids = filter(lambda x: isinstance(x, int), task.manager.options.execute.archive_inject)
-
-        # get the entries to be injected, does it only once
-        if ArchiveInject._inject_entries is None:
-            log.debug('Finding inject content')
-            ArchiveInject._inject_entries = defaultdict(list)
-            session = Session()
-            try:
-                for id in ids:
-                    archive_entry = session.query(ArchiveEntry).get(id)
-
-                    # not found
-                    if not archive_entry:
-                        log.critical('There\'s no archived item with ID `%s`' % id)
-                        continue
-
-                    # find if there is no longer any task within sources
-                    for source in archive_entry.sources:
-                        if source.name in task.manager.tasks:
-                            break
-                    else:
-                        log.error('None of sources (%s) exists anymore, cannot inject `%s` from archive!' %
-                                  (', '.join([s.name for s in archive_entry.sources]), archive_entry.title))
-                        continue
-
-                    # update list of tasks to be injected
-                    for source in archive_entry.sources:
-                        self._inject_entries[source.name].append(archive_entry)
-            finally:
-                session.close()
-
-        # if this task is not going to be injected into, abort it
-        if task.name not in ArchiveInject._inject_entries:
-            log.debug('Not going to inject to %s, aborting & disabling' % task.name)
-            task.enabled = False
-            task.abort('Not injecting to this task', silent=True)
-        else:
-            log.debug('Injecting to %s, leaving it enabled' % task.name)
-
-    @priority(255)
-    def on_task_input(self, task, config):
-        if not (self._inject_entries and task.name in self._inject_entries):
-            return
-
-        entries = []
-
-        # disable other inputs
-        log.info('Disabling all other inputs in the task.')
-        task.disable_phase('input')
-
-        immortal = 'yes' in task.manager.options.execute.archive_inject
-        for inject_entry in self._inject_entries[task.name]:
-            log.info('Injecting from archive `%s`' % inject_entry.title)
-            entry = Entry(inject_entry.title, inject_entry.url)
-            if inject_entry.description:
-                entry['description'] = inject_entry.description
-            if immortal:
-                log.debug('Injecting as immortal')
-                entry['immortal'] = True
-            entry['accepted_by'] = '--archive-inject'
-            entry.accept('injected')
-            entries.append(entry)
-
-        return entries
-
-
 class UrlrewriteArchive(object):
     """
     Provides capability to rewrite urls from archive or make searches with discover.
@@ -510,6 +425,53 @@ def cli_search(options):
         session.close()
 
 
+def cli_inject(manager, options):
+    log.debug('Finding inject content')
+    inject_entries = defaultdict(list)
+    session = Session()
+    try:
+        for id in options.ids:
+            archive_entry = session.query(ArchiveEntry).get(id)
+
+            # not found
+            if not archive_entry:
+                log.critical('There\'s no archived item with ID `%s`' % id)
+                continue
+
+            # find if there is no longer any task within sources
+            if not any(source.name in manager.tasks for source in archive_entry.sources):
+                log.error('None of sources (%s) exists anymore, cannot inject `%s` from archive!' %
+                          (', '.join([s.name for s in archive_entry.sources]), archive_entry.title))
+                continue
+
+            # update list of tasks to be injected
+            for source in archive_entry.sources:
+                inject_entries[source.name].append(archive_entry)
+    finally:
+        session.close()
+
+    for task_name in inject_entries:
+        task = manager.tasks[task_name]
+        task.options.inject = []
+        for inject_entry in inject_entries[task_name]:
+            log.info('Injecting from archive `%s`' % inject_entry.title)
+            entry = Entry(inject_entry.title, inject_entry.url)
+            if inject_entry.description:
+                entry['description'] = inject_entry.description
+            if options.immortal:
+                log.debug('Injecting as immortal')
+                entry['immortal'] = True
+            entry['accepted_by'] = 'archive inject'
+            entry.accept('injected')
+            task.options.inject.append(entry)
+
+        manager.scheduler.execute(task)
+
+    with manager.acquire_lock():
+        manager.scheduler.start()
+        manager.shutdown()
+
+
 @event('manager.subcommand.archive')
 def do_cli(manager, options):
     action = options.archive_action
@@ -520,27 +482,16 @@ def do_cli(manager, options):
         consolidate()
     elif action == 'search':
         cli_search(options)
+    elif action == 'inject':
+        cli_inject(manager, options)
 
 
 register_plugin(Archive, 'archive', api_ver=2)
-register_plugin(ArchiveInject, 'archive_inject', api_ver=2, builtin=True)
 register_plugin(UrlrewriteArchive, 'flexget_archive', groups=['search'])
 
 
 @event('register_parser_arguments')
 def register_parser_arguments(core_parser):
-    def int_or_yes(string):
-        if string.lower() in ('true', 'y', 'yes', 'immortal'):
-            return 'yes'
-        try:
-            return int(string)
-        except ValueError:
-            raise ArgumentTypeError('parameters must be an integer ID or the word `yes`')
-
-    core_parser.get_subparser('execute').add_argument('--archive-inject', nargs='+', metavar='ID', type=int_or_yes,
-                                                   help='inject as accepted from archive by IDs. '
-                                                        'if `yes` is given immortal flag will be used')
-
     archive_parser = core_parser.add_subparser('archive', help='search and manipulate the archive database')
     archive_parser.add_subparsers(title='Actions', metavar='<action>', dest='archive_action')
     # Default usage shows the positional arguments after the optional ones, override usage to fix it
@@ -549,6 +500,10 @@ def register_parser_arguments(core_parser):
     search_parser.add_argument('keywords', metavar='<keyword>', nargs='+', help='keyword(s) to search for')
     search_parser.add_argument('--tags', metavar='TAG', nargs='+', default=[], help='tag(s) to search within')
     search_parser.add_argument('--sources', metavar='SOURCE', nargs='+', default=[], help='source(s) to search within')
+    inject_parser = archive_parser.add_subparser('inject', help='inject entries from the archive back into tasks')
+    inject_parser.add_argument('ids', nargs='+', type=int, metavar='ID', help='archive ID of an item to inject')
+    inject_parser.add_argument('--immortal', action='store_true', help='injected entries will not be able to be '
+                                                                      'rejected by any plugins')
     tag_parser = archive_parser.add_subparser('tag-source', help='tag all archived entries within a given source')
     tag_parser.add_argument('source', metavar='<source>', help='the source whose entries you would like to tag')
     tag_parser.add_argument('tags', nargs='+', metavar='<tag>',

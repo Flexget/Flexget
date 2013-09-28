@@ -1,7 +1,7 @@
 from flask import request, jsonify, Blueprint, Response
 
 import flexget
-from flexget.options import CoreArgumentParser
+from flexget.options import get_parser
 from flexget.ui.options import RaiseErrorArgumentParser
 from flexget.ui.executor import BufferQueue
 
@@ -9,7 +9,7 @@ API_VERSION = 1
 
 api = Blueprint('api', __name__, url_prefix='/api')
 
-exec_parser = RaiseErrorArgumentParser(parents=[CoreArgumentParser().get_subparser('execute')])
+exec_parser = RaiseErrorArgumentParser(parents=[get_parser('execute')])
 
 
 # TODO: These endpoints should probably return a header which points to a json schema describing the return data

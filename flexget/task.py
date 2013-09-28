@@ -166,7 +166,7 @@ class Task(object):
         # this will be ceated when the prepare method is called
         self.config = None
         self.manager = manager
-        self.options = options
+        self.options = copy.copy(options)
 
         # simple persistence
         self.simple_persistence = SimpleTaskPersistence(self)
@@ -471,6 +471,7 @@ class Task(object):
         """
         if not self.enabled:
             log.debug('Not running disabled task %s' % self.name)
+        self.manager.db_cleanup()
         log.debug('executing %s' % self.name)
         if not self.prepared:
             if not self.prepare():

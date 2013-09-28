@@ -5,7 +5,7 @@ import os
 import sys
 import logging
 from flexget import logger
-from flexget.options import CoreArgumentParser
+from flexget.options import get_parser
 from flexget import plugin
 from flexget.manager import Manager
 from flexget.event import fire_event
@@ -22,7 +22,7 @@ def main():
 
     plugin.load_plugins()
 
-    options = CoreArgumentParser().parse_args()
+    options = get_parser().parse_args()
 
     manager = Manager(options)
 

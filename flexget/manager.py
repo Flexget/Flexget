@@ -119,6 +119,7 @@ class Manager(object):
         self.setup_yaml()
         self.find_config()
         self.init_sqlalchemy()
+        self.load_config()
 
     def handle_cli(self):
         subcommand = self.options.cli_subcommand
@@ -130,9 +131,6 @@ class Manager(object):
                 self.shutdown()
                 return
             with self.acquire_lock():
-                # TODO: Determine when tasks should actually be created, and how to keep them updated
-                self.load_config()
-                self.refresh_tasks()
                 self.scheduler.start()
                 for task in self.tasks.values():
                     self.scheduler.execute(task)
@@ -293,6 +291,9 @@ class Manager(object):
         # config loaded successfully
         log.debug('config_name: %s' % self.config_name)
         log.debug('config_base: %s' % self.config_base)
+
+        # After config load refresh task instances
+        self.refresh_tasks()
 
     def save_config(self):
         """Dumps current config to yaml config file"""
@@ -610,7 +611,6 @@ class Manager(object):
         self.options.execute = options
         if self.options.execute.log_start:
             log.info('FlexGet started (PID: %s)' % os.getpid())
-        self.db_cleanup()
         self.load_config()
         errors = self.validate_config()
         if errors:

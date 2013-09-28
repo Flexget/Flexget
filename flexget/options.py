@@ -14,6 +14,24 @@ from flexget.event import fire_event
 
 _UNSET = object()
 
+core_parser = None
+
+
+def get_parser(subparser=None):
+    global core_parser
+    if not core_parser:
+        core_parser = CoreArgumentParser()
+    if subparser:
+        return core_parser.get_subparser(subparser)
+    return core_parser
+
+
+def get_defaults(subparser=None):
+    options = get_parser().parse_args([subparser or 'execute'])
+    if subparser:
+        return getattr(options, subparser)
+    return options
+
 
 def required_length(nmin, nmax):
     """Generates a custom Action to validate an arbitrary range of arguments."""
@@ -270,3 +288,10 @@ class CoreArgumentParser(ArgumentParser):
         # The subparsers should not be CoreArgumentParsers
         kwargs.setdefault('parser_class', ArgumentParser)
         return super(CoreArgumentParser, self).add_subparsers(**kwargs)
+
+    def parse_args(self, args=None, namespace=None):
+        result = super(CoreArgumentParser, self).parse_args(args=args, namespace=namespace)
+        # Make sure we always have execute parser settings even when other subcommands called
+        if not hasattr(result, 'execute'):
+            result.execute = get_defaults('execute')
+        return result
