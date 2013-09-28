@@ -14,7 +14,7 @@ log = logging.getLogger('perftests')
 class PerfTests(object):
 
     def on_process_start(self, task, config):
-        test_name = task.manager.options.execute.perf_test
+        test_name = task.options.perf_test
         if test_name:
             task.manager.disable_tasks()
         else:

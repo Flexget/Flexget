@@ -42,7 +42,7 @@ class OutputNotifyMyAndroid(object):
     def on_task_output(self, task, config):
         for entry in task.accepted:
 
-            if task.manager.options.execute.test:
+            if task.options.test:
                 log.info("Would send notifymyandroid message about: %s", entry['title'])
                 continue
 

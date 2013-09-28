@@ -349,7 +349,7 @@ class OutputDeluge(DelugePlugin):
         """
 
         if self.deluge12 is None:
-            logger = log.info if task.manager.options.execute.test else log.debug
+            logger = log.info if task.options.test else log.debug
             try:
                 log.debug('Looking for deluge 1.1 API')
                 from deluge.ui.client import sclient
@@ -395,9 +395,9 @@ class OutputDeluge(DelugePlugin):
         """Add torrents to deluge at exit."""
         config = self.prepare_config(config)
         # don't add when learning
-        if task.manager.options.execute.learn:
+        if task.options.learn:
             return
-        if not config['enabled'] or not (task.accepted or task.manager.options.execute.test):
+        if not config['enabled'] or not (task.accepted or task.options.test):
             return
 
         add_to_deluge = self.connect if self.deluge12 else self.add_to_deluge11
@@ -422,7 +422,7 @@ class OutputDeluge(DelugePlugin):
                 before = sclient.get_session_state()
             except Exception, (errno, msg):
                 raise PluginError('Could not communicate with deluge core. %s' % msg, log)
-            if task.manager.options.execute.test:
+            if task.options.test:
                 return
             opts = {}
             path = entry.get('path', config['path'])
@@ -500,7 +500,7 @@ class OutputDeluge(DelugePlugin):
         if not result:
             log.debug('on_connect_success returned a failed result. BUG?')
 
-        if task.manager.options.execute.test:
+        if task.options.test:
             log.debug('Test connection to deluge daemon successful.')
             client.disconnect()
             return

@@ -61,7 +61,7 @@ class OutputSabnzbd(object):
 
     def on_task_output(self, task, config):
         for entry in task.accepted:
-            if task.manager.options.execute.test:
+            if task.options.test:
                 log.info('Would add into sabnzbd: %s' % entry['title'])
                 continue
 
@@ -84,7 +84,7 @@ class OutputSabnzbd(object):
                 log.critical('Failed to use sabnzbd. Requested %s' % request_url)
                 log.critical('Result was: %s' % e)
                 entry.fail('sabnzbd unreachable')
-                if task.manager.options.execute.debug:
+                if task.options.debug:
                     log.exception(e)
                 continue
 

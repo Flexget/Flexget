@@ -16,13 +16,13 @@ class OutputDumpConfig(object):
 
     @priority(-255)
     def on_task_start(self, task):
-        if task.manager.options.execute.dump_config:
+        if task.options.dump_config:
             import yaml
             print '--- config from task: %s' % task.name
             print yaml.safe_dump(task.config)
             print '---'
             task.abort(silent=True)
-        if task.manager.options.execute.dump_config_python:
+        if task.options.dump_config_python:
             print task.config
             task.abort(silent=True)
 

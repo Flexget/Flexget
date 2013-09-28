@@ -191,7 +191,7 @@ class InputRSS(object):
         # set etag and last modified headers if config has not changed since
         # last run and if caching wasn't disabled with --no-cache argument.
         all_entries = (config['all_entries'] or task.config_modified or
-                       task.manager.options.execute.nocache or task.manager.options.execute.retry)
+                       task.options.nocache or task.options.retry)
         headers = {}
         if not all_entries:
             etag = task.simple_persistence.get('%s_etag' % url_hash, None)
@@ -288,7 +288,7 @@ class InputRSS(object):
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
                     # html pages (login pages) are received
                     self.process_invalid_content(task, content, config['url'])
-                    if task.manager.options.execute.debug:
+                    if task.options.debug:
                         log.exception(ex)
                     raise PluginError('Received invalid RSS content from task %s (%s)' % (task.name, config['url']))
                 elif isinstance(ex, httplib.BadStatusLine) or isinstance(ex, IOError):

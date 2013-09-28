@@ -128,7 +128,7 @@ class PluginPyLoad(object):
                     if name != "BasePlugin":
                         urls.extend(purls)
 
-            if task.manager.options.execute.test:
+            if task.options.test:
                 log.info('Would add `%s` to pyload' % urls)
                 continue
 

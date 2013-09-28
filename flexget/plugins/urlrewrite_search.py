@@ -14,7 +14,7 @@ class SearchPlugins(object):
     """
 
     def on_process_start(self, task):
-        if task.manager.options.execute.search_plugins:
+        if task.options.search_plugins:
             task.manager.disable_tasks()
             header = '-- Supported search plugins: '
             header += '-' * (79 - len(header))

@@ -106,12 +106,12 @@ class MovePlugin(object):
                 continue
 
             if not os.path.exists(dst_path):
-                if task.manager.options.execute.test:
+                if task.options.test:
                     log.info('Would create `%s`' % dst_path)
                 else:
                     log.info('Creating destination directory `%s`' % dst_path)
                     os.makedirs(dst_path)
-            if not os.path.isdir(dst_path) and not task.manager.options.execute.test:
+            if not os.path.isdir(dst_path) and not task.options.test:
                 log.warning('Cannot move `%s` because destination `%s` is not a directory' % (entry['title'], dst_path))
                 continue
 
@@ -143,7 +143,7 @@ class MovePlugin(object):
                 dst += src_ext
 
             # Move stuff
-            if task.manager.options.execute.test:
+            if task.options.test:
                 log.info('Would move `%s` to `%s`' % (src, dst))
             else:
                 log.info('Moving `%s` to `%s`' % (src, dst))
@@ -155,7 +155,7 @@ class MovePlugin(object):
                     size = get_directory_size(base_path) / 1024 / 1024
                     log.debug('base_path: %s size: %s' % (base_path, size))
                     if size <= config['clean_source']:
-                        if task.manager.options.execute.test:
+                        if task.options.test:
                             log.info('Would delete %s and everything under it' % base_path)
                         else:
                             log.info('Deleting `%s`' % base_path)

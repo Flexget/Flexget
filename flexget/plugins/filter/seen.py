@@ -199,7 +199,7 @@ class FilterSeen(object):
         for entry in task.accepted:
             self.learn(task, entry, fields=fields, local=config == 'local')
             # verbose if in learning mode
-            if task.manager.options.execute.learn:
+            if task.options.learn:
                 log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
 
     def learn(self, task, entry, fields=None, reason=None, local=False):

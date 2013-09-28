@@ -1122,7 +1122,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
             # episode advancement. used only with season and sequence based series
             if ep.identified_by in ['ep', 'sequence']:
-                if task.manager.options.execute.disable_advancement:
+                if task.options.disable_advancement:
                     log.debug('episode advancement disabled')
                 else:
                     log.debug('-' * 20 + ' episode advancement -->')
@@ -1294,7 +1294,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         expires = first_seen + timeframe
         log.debug('timeframe: %s, first_seen: %s, expires: %s', timeframe, first_seen, expires)
 
-        stop = task.manager.options.execute.stop_waiting.lower() == episode.series.name.lower()
+        stop = task.options.stop_waiting.lower() == episode.series.name.lower()
         if expires <= datetime.now() or stop:
             # Expire timeframe, accept anything
             log.info('Timeframe expired, releasing quality restriction.')

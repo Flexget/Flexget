@@ -102,7 +102,7 @@ class TransmissionBase(object):
     def on_task_start(self, task, config):
         config = self.prepare_config(config)
         if config['enabled']:
-            if task.manager.options.execute.test:
+            if task.options.test:
                 log.info('Trying to connect to transmission...')
                 self.client = self.create_rpc_client(config)
                 if self.client:
@@ -228,7 +228,7 @@ class PluginTransmission(TransmissionBase):
         from transmissionrpc import TransmissionError
         config = self.prepare_config(config)
         # don't add when learning
-        if task.manager.options.execute.learn:
+        if task.options.learn:
             return
         if not config['enabled']:
             return
@@ -303,7 +303,7 @@ class PluginTransmission(TransmissionBase):
         """Adds accepted entries to transmission """
         from transmissionrpc import TransmissionError
         for entry in task.accepted:
-            if task.manager.options.execute.test:
+            if task.options.test:
                 log.info('Would add %s to transmission' % entry['url'])
                 continue
             options = self._make_torrent_options_dict(config, entry)

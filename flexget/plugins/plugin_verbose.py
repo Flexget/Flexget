@@ -17,7 +17,7 @@ class Verbose(object):
 
     @priority(-255)
     def on_task_input(self, task, config):
-        if task.manager.options.execute.silent:
+        if task.options.silent:
             return
         for entry in task.all_entries:
             entry.on_accept(self.verbose_details, task=task, act='accepted', reason='')
@@ -32,10 +32,10 @@ class Verbose(object):
         task_log.verbose(msg)
 
     def on_task_exit(self, task, config):
-        if task.manager.options.execute.silent:
+        if task.options.silent:
             return
         # verbose undecided entries
-        if task.manager.options.execute.verbose:
+        if task.options.verbose:
             undecided = False
             for entry in task.entries:
                 if entry in task.accepted:

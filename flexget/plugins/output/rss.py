@@ -203,7 +203,7 @@ class OutputRSS(object):
         if not rss2gen:
             return
         # don't generate rss when learning
-        if task.manager.options.execute.learn:
+        if task.options.learn:
             return
 
         config = self.get_config(task)
@@ -258,7 +258,7 @@ class OutputRSS(object):
                              items=rss_items)
 
         # don't run with --test
-        if task.manager.options.execute.test:
+        if task.options.test:
             log.info('Would write rss file with %d entries.', len(rss_items))
             return
 

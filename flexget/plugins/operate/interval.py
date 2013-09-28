@@ -33,7 +33,7 @@ class PluginInterval(object):
         last_time = task.simple_persistence.get('last_time')
         if not last_time:
             log.info('No previous run recorded, running now')
-        elif task.manager.options.execute.interval_ignore:
+        elif task.options.interval_ignore:
             log.info('Ignoring interval because of --now')
         else:
             log.debug('last_time: %r' % last_time)

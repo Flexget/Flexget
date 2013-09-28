@@ -48,11 +48,11 @@ class OnlyTask(object):
 
     def on_task_prepare(self, task):
         # If --task hasn't been specified don't do anything
-        if not task.manager.options.execute.onlytask:
+        if not task.options.onlytask:
             return
 
         # Make a list of the specified tasks to run, and those available
-        onlytasks = [t.lower() for t in task.manager.options.execute.onlytask.split(',')]
+        onlytasks = [t.lower() for t in task.options.onlytask.split(',')]
 
         # If current task is not among the specified tasks, disable it
         if not (task.name.lower() in onlytasks or any(fnmatch.fnmatchcase(task.name.lower(), f) for f in onlytasks)):
@@ -71,7 +71,7 @@ class ManualTask(object):
         if not task.config['manual']:
             return
         # If --task hasn't been specified disable this plugin
-        if not task.manager.options.execute.onlytask:
+        if not task.options.onlytask:
             log.debug('Disabling task %s' % task.name)
             task.enabled = False
 

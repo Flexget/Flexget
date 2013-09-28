@@ -26,7 +26,7 @@ class PluginTryRegexp:
         return (False, None)
 
     def on_task_filter(self, task):
-        if not task.manager.options.execute.try_regexp:
+        if not task.options.try_regexp:
             return
         if self.abort:
             return

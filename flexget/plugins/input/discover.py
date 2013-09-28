@@ -199,7 +199,7 @@ class Discover(object):
         """
         config.setdefault('interval', '5 hour')
         interval = parse_timedelta(config['interval'])
-        if task.manager.options.execute.discover_now:
+        if task.options.discover_now:
             log.info('Ignoring interval because of --discover-now')
         result = []
         interval_count = 0
@@ -212,7 +212,7 @@ class Discover(object):
                 log.debug('%s -> No previous run recorded' % entry['title'])
                 de = DiscoverEntry(entry['title'], task.name)
                 task.session.add(de)
-            if task.manager.options.execute.discover_now or not de.last_execution:
+            if task.options.discover_now or not de.last_execution:
                 # First time we execute (and on --discover-now) we randomize time to avoid clumping
                 delta = multiply_timedelta(interval, random.random())
                 de.last_execution = datetime.datetime.now() - delta

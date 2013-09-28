@@ -41,7 +41,7 @@ class OutputMemUsage(object):
     schema = {'type': 'boolean'}
 
     def on_process_start(self, task):
-        if not task.manager.options.execute.mem_usage:
+        if not task.options.mem_usage:
             return
         # start only once
         if self.heapy:
@@ -49,7 +49,7 @@ class OutputMemUsage(object):
         self.heapy = hpy()
 
     def on_process_end(self, task):
-        if not task.manager.options.execute.mem_usage:
+        if not task.options.mem_usage:
             return
         # prevents running this multiple times ...
         if not self.heapy:

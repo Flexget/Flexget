@@ -186,10 +186,10 @@ class FilterRottenTomatoes(object):
             if reasons and not force_accept:
                 msg = 'Didn\'t accept `%s` because of rule(s) %s' % \
                     (entry.get('rt_name', None) or entry['title'], ', '.join(reasons))
-                if task.manager.options.execute.debug:
+                if task.options.debug:
                     log.debug(msg)
                 else:
-                    if task.manager.options.execute.cron:
+                    if task.options.cron:
                         log_once(msg, log)
                     else:
                         log.info(msg)

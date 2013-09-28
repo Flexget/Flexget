@@ -95,8 +95,8 @@ class PluginPreset(object):
         log.trace('presets: %s' % config)
 
         # implements --preset NAME
-        if task.manager.options.execute.preset:
-            if task.manager.options.execute.preset not in config:
+        if task.options.preset:
+            if task.options.preset not in config:
                 task.enabled = False
                 return
 

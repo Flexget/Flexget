@@ -91,7 +91,7 @@ class FilterContentFilter(object):
 
     @priority(150)
     def on_task_modify(self, task):
-        if task.manager.options.execute.test or task.manager.options.execute.learn:
+        if task.options.test or task.options.learn:
             log.info('Plugin is partially disabled with --test and --learn because content filename information may not be available')
             #return
 

@@ -36,7 +36,7 @@ class PogcalAcquired(object):
     }
 
     def on_task_exit(self, task, config):
-        if not task.accepted and not task.manager.options.execute.test:
+        if not task.accepted and not task.options.test:
             return
         try:
             result = session.post('http://www.pogdesign.co.uk/cat/',
@@ -49,7 +49,7 @@ class PogcalAcquired(object):
         if 'logout' not in result.text:
             log.error('Username/password for pogdesign calendar appear to be incorrect.')
             return
-        elif task.manager.options.execute.test:
+        elif task.options.test:
             log.verbose('Successfully logged in to pogdesign calendar.')
         for entry in task.accepted:
             if not entry.get('series_name') or not entry.get('series_id_type') == 'ep':
@@ -58,7 +58,7 @@ class PogcalAcquired(object):
             if not show_id:
                 log.debug('Could not find pogdesign calendar id for `%s`' % entry['series_name'])
                 continue
-            if task.manager.options.execute.test:
+            if task.options.test:
                 log.verbose('Would mark %s %s in pogdesign calenadar.' % (entry['series_name'], entry['series_id']))
                 continue
             else:
