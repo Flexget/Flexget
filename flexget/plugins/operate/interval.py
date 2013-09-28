@@ -2,9 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 import datetime
 import logging
 
+from flexget.config_schema import parse_interval
 from flexget.event import event
 from flexget.plugin import register_plugin, priority
-from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('interval')
 
@@ -20,16 +20,14 @@ class PluginInterval(object):
         interval: 7 days
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('interval')
+    schema = {'type': 'string', 'format': 'interval'}
 
     @priority(255)
     def on_task_start(self, task, config):
         # Allow reruns
         if task.is_rerun:
             return
-        if task.manager.options.execute.learn:
+        if task.options.learn:
             log.info('Ignoring task %s interval for --learn' % task.name)
             return
         last_time = task.simple_persistence.get('last_time')
@@ -40,7 +38,7 @@ class PluginInterval(object):
         else:
             log.debug('last_time: %r' % last_time)
             log.debug('interval: %s' % config)
-            next_time = last_time + parse_timedelta(config)
+            next_time = last_time + parse_interval(config)
             log.debug('next_time: %r' % next_time)
             if datetime.datetime.now() < next_time:
                 log.debug('interval not met')

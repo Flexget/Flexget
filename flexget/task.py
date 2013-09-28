@@ -10,7 +10,7 @@ from sqlalchemy import Column, Unicode, String, Integer
 from flexget import config_schema
 from flexget import db_schema
 from flexget.manager import Session, register_config_key
-from flexget.plugin import (get_plugins_by_phase, task_phases, PluginWarning, PluginError,
+from flexget.plugin import (get_plugins_by_phase, task_phases, phase_methods, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins, plugin_schemas)
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 from flexget.event import fire_event
@@ -259,7 +259,6 @@ class Task(object):
         try:
             self.__run_task_phase('prepare')
         except TaskAbort as e:
-            self.enabled = False
             self.config = None
             log.error('Task aborted while being prepared: %s' % e.reason)
             return False
@@ -341,7 +340,7 @@ class Task(object):
 
         :param string phase: Name of the phase
         """
-        if phase not in task_phases + ['prepare', 'abort']:
+        if phase not in phase_methods:
             raise Exception('%s is not a valid task phase' % phase)
         # warn if no inputs, filters or outputs in the task
         if phase in ['input', 'filter', 'output']:
