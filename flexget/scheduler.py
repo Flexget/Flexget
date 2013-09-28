@@ -4,6 +4,8 @@ import logging
 import Queue
 import threading
 
+from flexget.config_schema import register_config_key
+
 log = logging.getLogger('scheduler')
 
 UNITS = ['seconds', 'minutes', 'hours', 'days', 'weeks']
@@ -11,7 +13,7 @@ WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 
 
 
 # TODO: make tests for this, the defaults probably don't work quite right at the moment
-schedule_schema = {
+yaml_config = {
     'type': 'object',
     'properties': {
         'every': {'type': 'number', 'default': 1},
@@ -33,11 +35,13 @@ schedule_schema = {
                     'enum': ['days', 'weeks'],
                     'default': 'days'}}}}}
 
+# TODO: make a 'schedule' format keyword for this?
+text_config = {'type': 'string', 'pattern': '^every '}
 
 main_schema = {
     'properties': {
-        'tasks': {'type': 'object', 'additionalProperties': schedule_schema},
-        'default': schedule_schema
+        'tasks': {'type': 'object', 'additionalProperties': {'oneOf': [text_config, yaml_config]}},
+        'default': {'oneOf': [text_config, yaml_config]}
     }
 }
 
@@ -197,28 +201,34 @@ class PeriodicJob(Job):
             if next(word_iter, '') != 'every':
                 raise ValueError('schedule string must start with `every`')
             word = next(word_iter, '')
-            try:
-                self.amount = float(word)
-                word = next(word_iter, '')
-            except ValueError:
+            if word in WEEKDAYS:
+                self.unit = 'weeks'
                 self.amount = 1
-            if word + 's' in UNITS:
-                word += 's'
-            if word not in UNITS:
-                raise ValueError('`%s` is not a valid unit' % word)
-            self.unit = word
-            word = next(word_iter)
-            if word == 'on':
-                if self.unit != 'weeks':
-                    raise ValueError('`on` may only be specified when the unit is weeks')
-                if int(self.amount) != self.amount:
-                    raise ValueError('week quantity must be an integer when `at` is specified')
-                word = next(word_iter, '')
-                try:
-                    self.on_day = datetime.strptime(word, '%A').weekday()
-                except ValueError:
-                    raise ValueError('`%s` is not a valid weekday' % word)
+                self.on_day = word
                 word = next(word_iter)
+            else:
+                try:
+                    self.amount = float(word)
+                    word = next(word_iter, '')
+                except ValueError:
+                    self.amount = 1
+                if word + 's' in UNITS:
+                    word += 's'
+                if word not in UNITS:
+                    raise ValueError('`%s` is not a valid unit' % word)
+                self.unit = word
+                word = next(word_iter)
+                if word == 'on':
+                    if self.unit != 'weeks':
+                        raise ValueError('`on` may only be specified when the unit is weeks')
+                    if int(self.amount) != self.amount:
+                        raise ValueError('week quantity must be an integer when `at` is specified')
+                    word = next(word_iter, '')
+                    try:
+                        self.on_day = datetime.strptime(word, '%A').weekday()
+                    except ValueError:
+                        raise ValueError('`%s` is not a valid weekday' % word)
+                    word = next(word_iter)
             if word == 'at':
                 if self.unit not in ['days', 'weeks']:
                     raise ValueError('can only specify `at` when unit is days or weeks')
@@ -247,3 +257,5 @@ class PeriodicJob(Job):
             raise ValueError('must specify at least unit and interval')
         return result
 
+
+register_config_key('schedules', main_schema)

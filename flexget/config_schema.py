@@ -13,6 +13,7 @@ from flexget.utils.tools import parse_timedelta
 schema_paths = {}
 
 
+# TODO: Rethink how config key and schema registration work
 def register_schema(path, schema):
     """
     Register `schema` to be available at `path` for $refs
@@ -21,6 +22,27 @@ def register_schema(path, schema):
     :param schema: The schema, or function which returns the schema
     """
     schema_paths[path] = schema
+
+
+# Validator that handles root structure of config.
+_root_config_schema = {'type': 'object', 'additionalProperties': False}
+# TODO: Is /schema/root this the best place for this?
+register_schema('/schema/root', _root_config_schema)
+
+
+def register_config_key(key, schema, required=False):
+    """ Registers a valid root level key for the config.
+
+    :param string key:
+      Name of the root level key being registered.
+    :param dict schema:
+      Schema for the key.
+    :param bool required:
+      Specify whether this is a mandatory key.
+    """
+    _root_config_schema.setdefault('properties', {})[key] = schema
+    if required:
+        _root_config_schema.setdefault('required', []).append(key)
 
 
 def one_or_more(schema):

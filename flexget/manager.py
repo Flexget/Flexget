@@ -27,26 +27,6 @@ Session = sessionmaker()
 manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
-# Validator that handles root structure of config.
-_root_config_schema = {'type': 'object', 'additionalProperties': False}
-# TODO: Is /schema/root this the best place for this?
-config_schema.register_schema('/schema/root', _root_config_schema)
-
-
-def register_config_key(key, schema, required=False):
-    """ Registers a valid root level key for the config.
-
-    :param string key:
-      Name of the root level key being registered.
-    :param dict schema:
-      Schema for the key.
-    :param bool required:
-      Specify whether this is a mandatory key.
-    """
-    _root_config_schema.setdefault('properties', {})[key] = schema
-    if required:
-        _root_config_schema.setdefault('required', []).append(key)
-
 
 class Manager(object):
 

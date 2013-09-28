@@ -7,9 +7,11 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from smtplib import SMTPException
 from email.utils import formatdate
+
+from flexget import manager
+from flexget.config_schema import register_config_key
 from flexget.utils.tools import MergeException, merge_dict_from_to
 from flexget.plugin import PluginError, register_plugin
-from flexget import manager
 from flexget.event import event
 from flexget.utils.template import render_from_task, get_template, RenderError
 from flexget import validator
@@ -299,4 +301,4 @@ class OutputEmail(object):
             log.debug('Email error:', exc_info=True)
 
 register_plugin(OutputEmail, 'email', api_ver=2)
-manager.register_config_key('email', options_validator().schema())
+register_config_key('email', options_validator().schema())

@@ -3,7 +3,7 @@ import logging
 
 from flexget import validator
 from flexget.event import event
-from flexget.manager import register_config_key
+from flexget.config_schema import register_config_key
 from flexget.plugin import priority, register_plugin, PluginError
 from flexget.utils.tools import MergeException, merge_dict_from_to
 

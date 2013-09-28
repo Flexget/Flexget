@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+import copy
 import random
 import string
 import sys
@@ -122,6 +123,17 @@ class ScopedNamespace(Namespace):
         if key != '__parent__' and isinstance(value, ScopedNamespace):
             value.__parent__ = self
         object.__setattr__(self, key, value)
+
+    def __copy__(self):
+        new = self.__class__()
+        new.__dict__.update(self.__dict__)
+        # Make copies of any nested namespaces
+        for key, value in self.__dict__.iteritems():
+            if key == '__parent__':
+                continue
+            if isinstance(value, ScopedNamespace):
+                setattr(new, key, copy.copy(value))
+        return new
 
 
 class ArgumentParser(ArgParser):

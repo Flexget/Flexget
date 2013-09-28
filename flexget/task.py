@@ -9,7 +9,7 @@ from sqlalchemy import Column, Unicode, String, Integer
 
 from flexget import config_schema
 from flexget import db_schema
-from flexget.manager import Session, register_config_key
+from flexget.manager import Session
 from flexget.plugin import (get_plugins_by_phase, task_phases, phase_methods, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins, plugin_schemas)
 from flexget.utils.simple_persistence import SimpleTaskPersistence
@@ -577,4 +577,4 @@ task_config_schema = {
     'additionalProperties': {'type': 'object'}
 }
 
-register_config_key('tasks', task_config_schema, required=True)
+config_schema.register_config_key('tasks', task_config_schema, required=True)
