@@ -52,9 +52,12 @@ class Scheduler(threading.Thread):
 
     def __init__(self, manager):
         super(Scheduler, self).__init__()
+        self.daemon = True
         self.run_queue = Queue.PriorityQueue()
         self.manager = manager
         self.periodic_jobs = []
+        self._shutdown_now = False
+        self._shutdown_when_finished = False
 
     def execute(self, task):
         """Add a task to the scheduler to be run immediately."""
@@ -98,18 +101,19 @@ class Scheduler(threading.Thread):
                     self.run_queue.put(job)
 
     def run(self):
-        while True:
+        self._shutdown_now = False
+        self._shutdown_when_finished = False
+        while not self._shutdown_now:
             self.queue_pending_jobs()
             # Grab the first job from the run queue and do it
             try:
                 job = self.run_queue.get(timeout=0.5)
             except Queue.Empty:
+                if self._shutdown_when_finished:
+                    self._shutdown_now = True
                 continue
             job.start()
             try:
-                if job.task is SHUTDOWN:
-                    # shutdown job, exit the main loop
-                    break
                 job.task.execute()
             finally:
                 self.run_queue.task_done()
@@ -125,9 +129,10 @@ class Scheduler(threading.Thread):
 
         :param bool finish_queue: If this is True, shutdown will wait until all queued tasks have finished.
         """
-        job = ShutdownJob()
-        job.priority = 10 if finish_queue else -1
-        self.run_queue.put(job)
+        if finish_queue:
+            self._shutdown_when_finished = True
+        else:
+            self._shutdown_now = True
 
 
 class Job(object):
@@ -149,13 +154,6 @@ class Job(object):
 
     def __lt__(self, other):
         return (self.priority, self.run_time) < (other.priority, other.run_time)
-
-
-SHUTDOWN = object()
-
-class ShutdownJob(Job):
-    priority = -1
-    task = SHUTDOWN
 
 
 class ImmediateJob(Job):
@@ -208,7 +206,8 @@ class PeriodicJob(Job):
             else:
                 invalid_keys = [k for k in schedule if k not in self._schedule_attrs]
                 if invalid_keys:
-                    raise ValueError('the following are not valid keys in a schedule dictionary: %s' % ', '.join(invalid_keys))
+                    raise ValueError('the following are not valid keys in a schedule dictionary: %s' %
+                                     ', '.join(invalid_keys))
                 for key in self._schedule_attrs:
                     setattr(self, key, schedule.get(key))
             self._validate()

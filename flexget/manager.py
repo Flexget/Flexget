@@ -142,6 +142,7 @@ class Manager(object):
                     for task in unscheduled_tasks:
                         self.scheduler.add_scheduled_task(self.tasks[task], schedule=default_schedule)
                 self.scheduler.start()
+                self.scheduler.join()
         else:
             # TODO: CLI don't use an event to run the subcommands
             if getattr(options, 'lock_required', False):
