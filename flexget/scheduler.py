@@ -47,6 +47,9 @@ main_schema = {
 
 
 class Scheduler(threading.Thread):
+    # We use a regular list for periodic jobs, so you must hold this lock while using it
+    periodic_jobs_lock = threading.Lock()
+
     def __init__(self, manager):
         super(Scheduler, self).__init__()
         self.run_queue = Queue.PriorityQueue()
@@ -54,18 +57,49 @@ class Scheduler(threading.Thread):
         self.periodic_jobs = []
 
     def execute(self, task):
+        """Add a task to the scheduler to be run immediately."""
         # Create a copy of task, so that changes to instance in manager thread do not affect scheduler thread
         job = ImmediateJob(task.copy())
         self.run_queue.put(job)
 
-    def run(self):
-        while True:
-            # Add pending jobs to the run queue
+    def add_scheduled_task(self, task, schedule):
+        """Add a task to the scheduler to be run periodically on `schedule`."""
+        job = PeriodicJob(task.copy(), schedule)
+        with self.periodic_jobs_lock:
+            self.periodic_jobs.append(job)
+
+    def update_scheduled_task(self, task, schedule=None):
+        with self.periodic_jobs_lock:
+            for job in self.periodic_jobs:
+                if job.task == task:
+                    job.task = task.copy()
+                    if schedule:
+                        job.schedule = schedule
+                    break
+            else:
+                raise ValueError('task %s was not found among scheduled tasks' % task)
+
+    def remove_scheduled_task(self, task):
+        with self.periodic_jobs_lock:
+            for job in self.periodic_jobs:
+                if job.task == task:
+                    break
+            else:
+                raise ValueError('task %s was not found among scheduled tasks' % task)
+            self.periodic_jobs.remove(job)
+
+    def queue_pending_jobs(self):
+        # Add pending jobs to the run queue
+        with self.periodic_jobs_lock:
             for job in self.periodic_jobs:
                 if job.should_run:
                     # Make sure it is not added to the queue again until it is done running
                     job.running = True
                     self.run_queue.put(job)
+
+    def run(self):
+        while True:
+            self.queue_pending_jobs()
             # Grab the first job from the run queue and do it
             try:
                 job = self.run_queue.get(timeout=0.5)
@@ -134,8 +168,9 @@ class ImmediateJob(Job):
 
 class PeriodicJob(Job):
     priority = 5
+    _schedule_attrs = ['unit', 'amount', 'on_day', 'at_time']
 
-    def __init__(self, task):
+    def __init__(self, task, schedule):
         self.task = task
         self.running = False
         self.execute_options = None
@@ -145,6 +180,33 @@ class PeriodicJob(Job):
         self.at_time = None
         self.last_run = None
         self.run_time = None
+        self.schedule = schedule
+
+    @property
+    def schedule(self):
+        schedule = {}
+        for key in self._schedule_attrs:
+            schedule[key] = getattr(self, key)
+        return schedule
+
+    @schedule.setter
+    def schedule(self, schedule):
+        # Don't apply bad updates
+        old_schedule = self.schedule
+        try:
+            if isinstance(schedule, basestring):
+                self._parse_schedule_text(schedule)
+            else:
+                invalid_keys = [k for k in schedule if k not in self._schedule_attrs]
+                if invalid_keys:
+                    raise ValueError('the following are not valid keys in a schedule dictionary: %s' % ', '.join(invalid_keys))
+                for key in self._schedule_attrs:
+                    setattr(self, key, schedule.get(key))
+            self._validate()
+        except:
+            self.schedule = old_schedule
+            raise
+        self.schedule_next_run()
 
     def start(self):
         self.running = True
@@ -171,7 +233,7 @@ class PeriodicJob(Job):
 
     @property
     def should_run(self):
-        return not self.running and self.run_time and datetime.datetime.now() >= self.run_time
+        return not self.running and self.run_time and datetime.now() >= self.run_time
 
     @property
     def period(self):
@@ -195,7 +257,7 @@ class PeriodicJob(Job):
 
     # TODO: Probably remove this, and go with the yaml form defined by above schema
     # format: every NUM UNIT [on WEEKDAY] [at TIME]
-    def parse_schedule_text(self, text):
+    def _parse_schedule_text(self, text):
         result = {}
         word_iter = iter(text.lower().split(' '))
         try:
@@ -254,8 +316,6 @@ class PeriodicJob(Job):
                 pass
         except StopIteration:
             pass
-        if not result.get('unit') or not result.get('amount'):
-            raise ValueError('must specify at least unit and interval')
         return result
 
 

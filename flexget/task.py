@@ -572,6 +572,11 @@ class Task(object):
         schema['patternProperties'] = {'^_': {}}
         return config_schema.process_config(config, schema)
 
+    def __eq__(self, other):
+        if hasattr(other, 'name'):
+            return self.name == other.name
+        return NotImplemented
+
     def __copy__(self):
         new = type(self)(self.manager, self.name, self.config, self.options)
         # We already made a copy of options, keep a reference to it

@@ -270,7 +270,7 @@ class CoreArgumentParser(ArgumentParser):
         super(CoreArgumentParser, self).__init__(**kwargs)
         self.add_subparsers(title='Commands', metavar='<command>', dest='cli_subcommand', scoped_namespaces=True)
 
-        # The parser for the exec subcommand
+        # The parser for the execute subcommand
         exec_parser = self.add_subparser('execute', lock_required=True, help='execute tasks now')
         exec_parser.set_defaults(lock_required=True)
         exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
@@ -292,6 +292,11 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
         exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
                                  help='Disable caches. Works only in plugins that have explicit support.')
+
+        # The parser for the daemon subcommand
+        daemon_parser = self.add_subparser('daemon', lock_required=True,
+                                           help='Run continuously, executing tasks according to schedules defined in '
+                                                'config.')
 
         # Add all plugin options to the parser
         fire_event('register_parser_arguments', self)

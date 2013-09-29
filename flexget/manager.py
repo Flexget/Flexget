@@ -123,6 +123,25 @@ class Manager(object):
                 #        import profile
                 #    profile.runctx('self.execute()', globals(), locals(),
                 #                   os.path.join(self.config_base, 'flexget.profile'))
+        elif subcommand == 'daemon':
+            if not self.config.get('schedules'):
+                console('No schedules are defined in the config.')
+                self.shutdown()
+                return
+            with self.acquire_lock():
+                unscheduled_tasks = self.tasks.keys()
+                for task, schedule in self.config['schedules'].get('tasks', {}).iteritems():
+                    if task not in unscheduled_tasks:
+                        console('task `%s` is not defined' % task)
+                        self.shutdown()
+                        return
+                    self.scheduler.add_scheduled_task(self.tasks[task], schedule=schedule)
+                    unscheduled_tasks.remove(task)
+                default_schedule = self.config['schedules'].get('default')
+                if default_schedule:
+                    for task in unscheduled_tasks:
+                        self.scheduler.add_scheduled_task(self.tasks[task], schedule=default_schedule)
+                self.scheduler.start()
         else:
             # TODO: CLI don't use an event to run the subcommands
             if getattr(options, 'lock_required', False):
