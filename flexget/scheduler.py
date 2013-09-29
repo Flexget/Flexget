@@ -191,8 +191,17 @@ class PeriodicJob(Job):
 
     @schedule.setter
     def schedule(self, schedule):
+        if not schedule:
+            for attr in self._schedule_attrs:
+                setattr(self, attr, None)
+            return
         # Don't apply bad updates
         old_schedule = self.schedule
+        try:
+            self._validate()
+        except ValueError:
+            # We can't restore an invalid schedule
+            old_schedule = None
         try:
             if isinstance(schedule, basestring):
                 self._parse_schedule_text(schedule)
@@ -228,7 +237,7 @@ class PeriodicJob(Job):
             raise ValueError('unit must be weeks when on_day is used')
         if self.at_time and self.unit not in ['days', 'weeks']:
             raise ValueError('unit must be days or weeks when at_time is used')
-        if self.on_day or self.at_time and int(self.amount) != self.amount:
+        if (self.on_day or self.at_time) and int(self.amount) != self.amount:
             raise ValueError('amount must be an integer when on_day or at_time are used')
 
     @property
@@ -245,7 +254,7 @@ class PeriodicJob(Job):
             # Pretend we ran one period ago
             last_run = datetime.now() - self.period
         if self.on_day:
-            days_ahead = self.on_day - last_run.weekday()
+            days_ahead = WEEKDAYS.index(self.on_day) - last_run.weekday()
             if days_ahead <= 0:  # Target day already happened this week
                 days_ahead += 7
             self.run_time = last_run + timedelta(days=days_ahead, weeks=self.amount-1)
