@@ -97,7 +97,7 @@ class MyEpisodes(object):
 
         cookiejar = cookielib.CookieJar()
         opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar))
-        baseurl = urllib2.Request('http://myepisodes.com/login.php?')
+        baseurl = urllib2.Request('http://www.myepisodes.com/login.php?')
         loginparams = urllib.urlencode({'username': username,
                                         'password': password,
                                         'action': 'Login'})
@@ -156,7 +156,7 @@ class MyEpisodes(object):
                 log.warning('Unable to lookup series `%s` from tvdb, using raw name.' % series_name)
                 query_name = series_name
 
-        baseurl = urllib2.Request('http://myepisodes.com/search.php?')
+        baseurl = urllib2.Request('http://www.myepisodes.com/search.php?')
         params = urllib.urlencode({'tvshow': query_name, 'action': 'Search myepisodes.com'})
         try:
             con = opener.open(baseurl, params)
@@ -205,7 +205,7 @@ class MyEpisodes(object):
             log.info('Would mark %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
         else:
             baseurl2 = urllib2.Request(
-                'http://myepisodes.com/myshows.php?action=Update&showid=%s&season=%s&episode=%s&seen=0' %
+                'http://www.myepisodes.com/myshows.php?action=Update&showid=%s&season=%s&episode=%s&seen=0' %
                 (myepisodes_id, season, episode))
             opener.open(baseurl2)
             log.info('Marked %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
