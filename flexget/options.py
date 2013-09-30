@@ -22,6 +22,8 @@ def get_parser(subparser=None):
     global core_parser
     if not core_parser:
         core_parser = CoreArgumentParser()
+        # Add all plugin options to the parser
+        fire_event('register_parser_arguments')
     if subparser:
         return core_parser.get_subparser(subparser)
     return core_parser
@@ -31,6 +33,12 @@ def get_defaults(subparser=None):
     if subparser:
         return getattr(get_parser().parse_args([subparser]), subparser)
     return get_parser().parse_args([])
+
+
+def register_command(command, callback, lock_required=False, **kwargs):
+    subparser = get_parser().add_subparser(command, lock_required=lock_required, **kwargs)
+    subparser.set_defaults(cli_command_callback=callback)
+    return subparser
 
 
 def required_length(nmin, nmax):
@@ -274,7 +282,7 @@ class CoreArgumentParser(ArgumentParser):
     def __init__(self, **kwargs):
         kwargs.setdefault('parents', [manager_parser])
         super(CoreArgumentParser, self).__init__(**kwargs)
-        self.add_subparsers(title='Commands', metavar='<command>', dest='cli_subcommand', scoped_namespaces=True)
+        self.add_subparsers(title='Commands', metavar='<command>', dest='cli_command', scoped_namespaces=True)
 
         # The parser for the execute subcommand
         exec_parser = self.add_subparser('execute', lock_required=True, help='execute tasks now')
@@ -303,9 +311,6 @@ class CoreArgumentParser(ArgumentParser):
         daemon_parser = self.add_subparser('daemon', lock_required=True,
                                            help='Run continuously, executing tasks according to schedules defined in '
                                                 'config.')
-
-        # Add all plugin options to the parser
-        fire_event('register_parser_arguments', self)
 
     def add_subparsers(self, **kwargs):
         # The subparsers should not be CoreArgumentParsers

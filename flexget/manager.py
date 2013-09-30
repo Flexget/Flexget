@@ -111,9 +111,9 @@ class Manager(object):
         return self.config.get('tasks', {}).keys()
 
     def handle_cli(self):
-        subcommand = self.options.cli_subcommand
-        options = getattr(self.options, subcommand)
-        if subcommand == 'execute':
+        command = self.options.cli_command
+        options = getattr(self.options, command)
+        if command == 'execute':
             port = self.check_webui_port()
             if port:
                 self.remote_execute(port, options)
@@ -132,7 +132,7 @@ class Manager(object):
                 #        import profile
                 #    profile.runctx('self.execute()', globals(), locals(),
                 #                   os.path.join(self.config_base, 'flexget.profile'))
-        elif subcommand == 'daemon':
+        elif command == 'daemon':
             if not self.config.get('schedules'):
                 console('No schedules are defined in the config.')
                 self.shutdown()
@@ -153,12 +153,12 @@ class Manager(object):
                 self.scheduler.start()
                 self.scheduler.join()
         else:
-            # TODO: CLI don't use an event to run the subcommands
+            # TODO: CLI don't use an event to run the commands
             if getattr(options, 'lock_required', False):
                 with self.acquire_lock():
-                    fire_event('manager.subcommand.%s' % subcommand, self, options)
+                    fire_event('manager.subcommand.%s' % command, self, options)
             else:
-                fire_event('manager.subcommand.%s' % subcommand, self, options)
+                fire_event('manager.subcommand.%s' % command, self, options)
 
     def setup_yaml(self):
         """Sets up the yaml loader to return unicode objects for strings by default"""
