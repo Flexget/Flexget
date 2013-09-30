@@ -18,27 +18,6 @@ from flexget import validator
 
 log = logging.getLogger('email')
 
-# A dict which stores the email content from each task when plugin is configured globally
-task_content = {}
-
-
-def options_validator():
-    email = validator.factory('dict')
-    email.accept('boolean', key='active')
-    email.accept('text', key='to', required=True)
-    email.accept('list', key='to', required=True).accept('text')
-    email.accept('text', key='from', required=True)
-    email.accept('text', key='smtp_host')
-    email.accept('integer', key='smtp_port')
-    email.accept('boolean', key='smtp_login')
-    email.accept('text', key='smtp_username')
-    email.accept('text', key='smtp_password')
-    email.accept('boolean', key='smtp_tls')
-    email.accept('boolean', key='smtp_ssl')
-    email.accept('text', key='template')
-    email.accept('text', key='subject')
-    return email
-
 
 def prepare_config(config):
     config.setdefault('active', True)
@@ -53,49 +32,6 @@ def prepare_config(config):
     if not isinstance(config['to'], list):
         config['to'] = [config['to']]
     return config
-
-
-@event('manager.execute.started')
-def setup(manager):
-    if not 'email' in manager.config:
-        return
-    config = prepare_config(manager.config['email'])
-    config['global'] = True
-    global task_content
-    task_content = {}
-    for task in manager.tasks.itervalues():
-        task.config.setdefault('email', {})
-        try:
-            merge_dict_from_to(config, task.config['email'])
-        except MergeException as exc:
-            raise PluginError('Failed to merge email config to task %s due to %s' % (task.name, exc))
-        task.config.setdefault('email', config)
-
-
-@event('manager.execute.completed')
-def global_send(manager):
-    if not 'email' in manager.config:
-        return
-    if all(not task.enabled for task in manager.tasks.itervalues()):
-        # If all the tasks are disabled, don't do anything.
-        return
-    config = prepare_config(manager.config['email'])
-    content = ''
-    for task, text in task_content.iteritems():
-        content += '_' * 30 + ' Task: %s ' % task + '_' * 30 + '\n'
-
-        content += text + '\n'
-    if not content:
-        log.verbose('No tasks generated any email notifications. Not sending.')
-        return
-    if config.get('subject'):
-        # If subject is specified, use it from the config
-        subject = config['subject']
-    elif config['template'].startswith('failed'):
-        subject = '[FlexGet] Failures on task(s): %s' % ', '.join(task_content)
-    else:
-        subject = '[FlexGet] Notifications for task(s): %s' % ', '.join(task_content)
-    send_email(subject, content, config)
 
 
 def send_email(subject, content, config):
@@ -193,26 +129,6 @@ class OutputEmail(object):
         smtp_password: my_smtp_password
         smtp_tls: true
 
-    Config multi-task example::
-
-      global:
-        email:
-          from: xxx@xxx.xxx
-          to: xxx@xxx.xxx
-          smtp_host: smtp.host.com
-
-      tasks:
-        task1:
-          rss: http://xxx
-        task2:
-          rss: http://yyy
-          email:
-            active: False
-        task3:
-          rss: http://zzz
-          email:
-            to: zzz@zzz.zzz
-
     GMAIL example::
 
       from: from@gmail.com
@@ -238,9 +154,21 @@ class OutputEmail(object):
     """
 
     def validator(self):
-        v = options_validator()
-        v.accept('boolean', key='global')
-        return v
+        email = validator.factory('dict')
+        email.accept('boolean', key='active')
+        email.accept('text', key='to', required=True)
+        email.accept('list', key='to', required=True).accept('text')
+        email.accept('text', key='from', required=True)
+        email.accept('text', key='smtp_host')
+        email.accept('integer', key='smtp_port')
+        email.accept('boolean', key='smtp_login')
+        email.accept('text', key='smtp_username')
+        email.accept('text', key='smtp_password')
+        email.accept('boolean', key='smtp_tls')
+        email.accept('boolean', key='smtp_ssl')
+        email.accept('text', key='template')
+        email.accept('text', key='subject')
+        return email
 
     def on_task_output(self, task, config):
         """Count the email as an output"""
@@ -283,12 +211,7 @@ class OutputEmail(object):
             log.verbose('No content generated from template, not sending email.')
             return
 
-        if config.get('global'):
-            # Email plugin was configured at root, save the email output
-            log.debug('Saving email content for task %s' % task.name)
-            task_content[task.name] = content
-        else:
-            send_email(subject, content, config)
+        send_email(subject, content, config)
 
     # Also send the email on abort
     def on_task_abort(self, task, config):
@@ -301,4 +224,3 @@ class OutputEmail(object):
             log.debug('Email error:', exc_info=True)
 
 register_plugin(OutputEmail, 'email', api_ver=2)
-register_config_key('email', options_validator().schema())
