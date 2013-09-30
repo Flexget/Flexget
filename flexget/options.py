@@ -294,7 +294,6 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--loglevel', dest='exec_loglevel', help=SUPPRESS,
                                  choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
-        exec_parser.add_argument('--log-start', action='store_true', dest='log_start', default=0, help=SUPPRESS)
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
         exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
         # TODO: CLI Should we just fold --task into the core?
