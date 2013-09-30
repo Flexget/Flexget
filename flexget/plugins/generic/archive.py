@@ -451,8 +451,7 @@ def cli_inject(manager, options):
         session.close()
 
     for task_name in inject_entries:
-        task = manager.tasks[task_name]
-        task.options.inject = []
+        entries = []
         for inject_entry in inject_entries[task_name]:
             log.info('Injecting from archive `%s`' % inject_entry.title)
             entry = Entry(inject_entry.title, inject_entry.url)
@@ -463,9 +462,9 @@ def cli_inject(manager, options):
                 entry['immortal'] = True
             entry['accepted_by'] = 'archive inject'
             entry.accept('injected')
-            task.options.inject.append(entry)
+            entries.append(entry)
 
-        manager.scheduler.execute(task)
+        manager.scheduler.execute(task_name, options={'inject': entries})
 
     with manager.acquire_lock():
         manager.scheduler.start()

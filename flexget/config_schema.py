@@ -74,13 +74,16 @@ def resolve_ref(uri):
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 
 
-def process_config(config, schema, set_defaults=True):
+def process_config(config, schema=None, set_defaults=True):
     """
     Validates the config, and sets defaults within it if `set_defaults` is set.
+    If schema is not given, uses the root config schema.
 
     :returns: A list with :class:`jsonschema.ValidationError`s if any
 
     """
+    if schema is None:
+        schema = _root_config_schema
     resolver = RefResolver.from_schema(schema)
     validator = SchemaValidator(schema, resolver=resolver, format_checker=format_checker)
     if set_defaults:

@@ -2,26 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 from difflib import SequenceMatcher
 import logging
 
-from flexget.event import event
 from flexget.plugin import get_plugins_by_group, PluginWarning, PluginError, register_plugin, priority
 
 log = logging.getLogger('urlrewrite_search')
-
-
-class SearchPlugins(object):
-    """
-    Implements --search-plugins
-    """
-
-    def on_process_start(self, task):
-        if task.options.search_plugins:
-            task.manager.disable_tasks()
-            header = '-- Supported search plugins: '
-            header += '-' * (79 - len(header))
-            print header
-            for plugin in get_plugins_by_group('search'):
-                print ' %s' % plugin.name
-            print '-' * 79
 
 
 class PluginSearch(object):
@@ -106,10 +89,3 @@ class PluginSearch(object):
 
 
 register_plugin(PluginSearch, 'urlrewrite_search', api_ver=2)
-register_plugin(SearchPlugins, '--search-plugins', builtin=True)
-
-
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.get_subparser('execute').add_argument('--search-plugins', action='store_true', dest='search_plugins',
-                                                   default=False, help='list supported search plugins')

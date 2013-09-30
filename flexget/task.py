@@ -1,21 +1,21 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
 import copy
-import hashlib
 from functools import wraps
+import hashlib
 import itertools
+import logging
 
 from sqlalchemy import Column, Unicode, String, Integer
 
 from flexget import config_schema
 from flexget import db_schema
+from flexget.entry import EntryUnicodeError
+from flexget.event import fire_event
 from flexget.manager import Session
 from flexget.plugin import (get_plugins_by_phase, task_phases, phase_methods, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins, plugin_schemas)
+from flexget.utils import requests
 from flexget.utils.simple_persistence import SimpleTaskPersistence
-from flexget.event import fire_event
-from flexget.entry import EntryUnicodeError
-import flexget.utils.requests as requests
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
@@ -32,6 +32,18 @@ class TaskConfigHash(Base):
 
     def __repr__(self):
         return '<TaskConfigHash(task=%s,hash=%s)>' % (self.task, self.hash)
+
+
+def config_changed(task):
+    """Forces config_modified flag to come out true on next run. Used when the db changes, and all
+    entries need to be reprocessed."""
+    log.debug('Marking config as changed.')
+    session = Session()
+    task_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == task).first()
+    if task_hash:
+        task_hash.hash = ''
+    session.commit()
+    session.close()
 
 
 def useTaskLogging(func):
@@ -154,20 +166,27 @@ class Task(object):
 
     max_reruns = 5
 
-    def __init__(self, manager, name, config, options):
+    def __init__(self, manager, name, config=None, options=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
         :param dict config: Task configuration.
         """
         self.name = unicode(name)
+        self.manager = manager
         # raw_config should remain the untouched input config
+        if config is None:
+            config = manager.config['tasks'].get('name', {})
         self._raw_config = config
         # this will be ceated when the prepare method is called
         self.config = None
-        self.manager = manager
-        # Make a copy of options so that changes to this task don't affect other tasks with same starting options
-        self.options = copy.copy(options)
+        if options is None:
+            options = copy.copy(self.manager.options.execute)
+        elif isinstance(options, dict):
+            options_namespace = copy.copy(self.manager.execute)
+            options_namespace.__dict__.update(options)
+            options = options_namespace
+        self.options = options
 
         # simple persistence
         self.simple_persistence = SimpleTaskPersistence(self)
@@ -448,18 +467,11 @@ class Task(object):
                      self.current_plugin)
 
     def config_changed(self):
-        """Forces config_modified flag to come out true on next run. Used when the db changes, and all
-        entries need to be reprocessed."""
-        log.debug('Marking config as changed.')
-        session = self.session or Session()
-        task_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
-        if task_hash:
-            task_hash.hash = ''
+        """
+        Sets config_modified flag to True for the remainder of this run.
+        Used when the db changes, and all entries need to be reprocessed.
+        """
         self.config_modified = True
-        # If we created our own session, commit and close it.
-        if not self.session:
-            session.commit()
-            session.close()
 
     @useTaskLogging
     def execute(self):
@@ -579,12 +591,10 @@ class Task(object):
 
     def __copy__(self):
         new = type(self)(self.manager, self.name, self.config, self.options)
-        # We already made a copy of options, keep a reference to it
-        new_options = new.options
         # Update all the variables of new instance to match our own
         new.__dict__.update(self.__dict__)
         # Some mutable objects need to be copies
-        new.options = new_options
+        new.options = copy.copy(self.options)
         new.raw_config = copy.deepcopy(self.raw_config)
         new.config = copy.deepcopy(self.config)
         return new

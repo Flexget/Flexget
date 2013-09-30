@@ -72,10 +72,9 @@ class Manager(object):
         self.db_upgraded = False
 
         self.config = {}
-        self.tasks = {}
 
-        self.initialize()
         self.scheduler = Scheduler(self)
+        self.initialize()
 
         # cannot be imported at module level because of circular references
         from flexget.utils.simple_persistence import SimplePersistence
@@ -100,6 +99,16 @@ class Manager(object):
         self.find_config()
         self.init_sqlalchemy()
         self.load_config()
+        errors = self.validate_config()
+        if errors:
+            for error in errors:
+                log.critical("[%s] %s", error.json_pointer, error.message)
+            self.shutdown(finish_queue=False)
+
+    @property
+    def tasks(self):
+        """A list of tasks in the config"""
+        return self.config.get('tasks', {}).keys()
 
     def handle_cli(self):
         subcommand = self.options.cli_subcommand
@@ -112,8 +121,8 @@ class Manager(object):
                 return
             with self.acquire_lock():
                 self.scheduler.start()
-                for task in self.tasks.values():
-                    self.scheduler.execute(task)
+                for name in self.tasks:
+                    self.scheduler.execute(name)
                 self.shutdown()
                 # TODO: Figure out how to profile with scheduler
                 #if options.profile:
@@ -129,18 +138,18 @@ class Manager(object):
                 self.shutdown()
                 return
             with self.acquire_lock():
-                unscheduled_tasks = self.tasks.keys()
+                unscheduled_tasks = self.tasks
                 for task, schedule in self.config['schedules'].get('tasks', {}).iteritems():
                     if task not in unscheduled_tasks:
                         console('task `%s` is not defined' % task)
                         self.shutdown()
                         return
-                    self.scheduler.add_scheduled_task(self.tasks[task], schedule=schedule)
+                    self.scheduler.add_scheduled_task(task, schedule=schedule)
                     unscheduled_tasks.remove(task)
                 default_schedule = self.config['schedules'].get('default')
                 if default_schedule:
                     for task in unscheduled_tasks:
-                        self.scheduler.add_scheduled_task(self.tasks[task], schedule=default_schedule)
+                        self.scheduler.add_scheduled_task(task, schedule=default_schedule)
                 self.scheduler.start()
                 self.scheduler.join()
         else:
@@ -292,9 +301,6 @@ class Manager(object):
         log.debug('config_name: %s' % self.config_name)
         log.debug('config_base: %s' % self.config_base)
 
-        # After config load refresh task instances
-        self.refresh_tasks()
-
     def save_config(self):
         """Dumps current config to yaml config file"""
         config_file = file(os.path.join(self.config_base, self.config_name) + '.yml', 'w')
@@ -306,8 +312,9 @@ class Manager(object):
     def config_changed(self):
         """Makes sure that all tasks will have the config_modified flag come out true on the next run.
         Useful when changing the db and all tasks need to be completely reprocessed."""
-        for task in self.tasks.values():
-            task.config_changed()
+        from flexget.task import config_changed
+        for task in self.tasks:
+            config_changed(task)
 
     def pre_check_config(self, config):
         """Checks configuration file for common mistakes that are easily detectable"""
@@ -425,7 +432,7 @@ class Manager(object):
         :returns: A list of `ValidationError`s
 
         """
-        return config_schema.process_config(self.config, _root_config_schema)
+        return config_schema.process_config(self.config)
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
@@ -546,40 +553,6 @@ class Manager(object):
         else:
             log.debug('Lockfile %s not found' % self.lockfile)
 
-    def refresh_tasks(self):
-        """Creates instances of all configured tasks"""
-        from flexget.task import Task
-        tasks_to_update = self.tasks.keys()
-        # construct task list
-        tasks = self.config.get('tasks', {}).keys()
-        for name in tasks:
-            # Make sure numeric task names are turned into strings. #1763, #1961
-            if not isinstance(name, basestring):
-                self.config['tasks'][unicode(name)] = self.config['tasks'].pop(name)
-                name = unicode(name)
-            # create task
-            if name in tasks_to_update:
-                self.tasks[name].raw_config = self.config['tasks'][name]
-                tasks_to_update.remove(name)
-            else:
-                self.tasks[name] = Task(self, name, self.config['tasks'][name], self.options.execute)
-            # if task name is prefixed with _ it's disabled
-            if name.startswith('_'):
-                self.tasks[name].enabled = False
-        # Remove tasks that are no longer in config
-        for name in tasks_to_update:
-            del self.tasks[name]
-
-    def disable_tasks(self):
-        """Disables all tasks."""
-        for task in self.tasks.itervalues():
-            task.enabled = False
-
-    def enable_tasks(self):
-        """Enables all tasks."""
-        for task in self.tasks.itervalues():
-            task.enabled = True
-
     def remote_execute(self, port, options=None, **kwargs):
         log.info('Sending this execution to the webui running on port %s' % port)
         url = 'http://localhost:%s/api/' % port
@@ -651,7 +624,6 @@ class Manager(object):
             if not task.enabled or task._abort:
                 continue
             try:
-                # TODO: CLI fix disable_phases, entries
                 task.execute(options)
             except Exception as e:
                 task.enabled = False
@@ -675,7 +647,7 @@ class Manager(object):
 
         """
         expired = self.persist.get('last_cleanup', datetime(1900, 1, 1)) < datetime.now() - DB_CLEANUP_INTERVAL
-        if force or expired and any([t.enabled for t in self.tasks.values()]):
+        if force or expired:
             if not (force or self.options.execute.cron):
                 log.verbose('Not running database cleanup on manual run. It will be run on next --cron run.')
                 return
@@ -694,8 +666,8 @@ class Manager(object):
         """ Application is being exited
         """
         # Wait for scheduler to finish
+        self.scheduler.shutdown(finish_queue=finish_queue)
         if self.scheduler.is_alive():
-            self.scheduler.shutdown(finish_queue=finish_queue)
             self.scheduler.join()
         fire_event('manager.shutdown', self)
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled

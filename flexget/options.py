@@ -28,10 +28,9 @@ def get_parser(subparser=None):
 
 
 def get_defaults(subparser=None):
-    options = get_parser().parse_args([subparser or 'execute'])
     if subparser:
-        return getattr(options, subparser)
-    return options
+        return getattr(get_parser().parse_args([subparser]), subparser)
+    return get_parser().parse_args([])
 
 
 def required_length(nmin, nmax):
@@ -114,15 +113,25 @@ class ScopedNamespace(Namespace):
         self.__parent__ = None
 
     def __getattr__(self, key):
+        if '.' in key:
+            scope, key = key.split('.', 1)
+            return getattr(getattr(self, scope), key)
+
         if self.__parent__:
             return getattr(self.__parent__, key)
-        raise AttributeError("'%s' object has no attribute '%s'" % (self.__class__.__name__, key))
+        raise AttributeError("'%s' object has no attribute '%s'" % (type(self).__name__, key))
 
     def __setattr__(self, key, value):
+        if '.' in key:
+            scope, key = key.split('.', 1)
+            if not hasattr(self, scope):
+                setattr(self, scope, type(self)())
+            sub_ns = getattr(self, scope, None)
+            return object.__setattr__(sub_ns, key, value)
         # Let child namespaces keep track of us
         if key != '__parent__' and isinstance(value, ScopedNamespace):
             value.__parent__ = self
-        object.__setattr__(self, key, value)
+        return object.__setattr__(self, key, value)
 
     def __copy__(self):
         new = self.__class__()
@@ -148,9 +157,9 @@ class ArgumentParser(ArgParser):
         if '--bugreport' in sys.argv:
             self._debug_tb_callback()
 
-        ArgParser.__init__(self, **kwargs)
         self.subparsers = None
         self.nested_namespace_name = nested_namespace_name
+        ArgParser.__init__(self, **kwargs)
 
     def error(self, message):
         """Overridden error handler to print help message"""
@@ -169,19 +178,16 @@ class ArgumentParser(ArgParser):
                 kwargs['nargs'] = '*'
             else:
                 kwargs['nargs'] = '+'
-        return super(ArgumentParser, self).add_argument(*args, **kwargs)
+        result = super(ArgumentParser, self).add_argument(*args, **kwargs)
+        if self.nested_namespace_name:
+            result.dest = self.nested_namespace_name + '.' + result.dest
+        return result
 
     def parse_known_args(self, args=None, namespace=None):
         if args is None:
             # Decode all arguments to unicode before parsing
             args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
-        _nested_namespace = namespace or ScopedNamespace()
-        if self.nested_namespace_name and namespace:
-            _nested_namespace = ScopedNamespace()
-            setattr(namespace, self.nested_namespace_name, _nested_namespace)
-        _namespace, args = super(ArgumentParser, self).parse_known_args(args, _nested_namespace)
-        # Still return the passed in namespace if there was one
-        return namespace or _namespace, args
+        return super(ArgumentParser, self).parse_known_args(args, namespace or ScopedNamespace())
 
     def add_subparsers(self, scoped_namespaces=False, **kwargs):
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser

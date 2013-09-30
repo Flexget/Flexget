@@ -16,7 +16,7 @@ WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 
 yaml_config = {
     'type': 'object',
     'properties': {
-        'every': {'type': 'number', 'default': 1},
+        'amount': {'type': 'number', 'default': 1},
         'unit': {'type': 'string', 'enum': UNITS, 'default': 'hours'},
         'on_day': {'type': 'string', 'enum': WEEKDAYS},
         'at_time': {'type': 'string', 'format': 'time'}},
@@ -59,37 +59,21 @@ class Scheduler(threading.Thread):
         self._shutdown_now = False
         self._shutdown_when_finished = False
 
-    def execute(self, task):
+    def execute(self, task, options=None):
         """Add a task to the scheduler to be run immediately."""
         # Create a copy of task, so that changes to instance in manager thread do not affect scheduler thread
-        job = ImmediateJob(task.copy())
+        job = ImmediateJob(task, options=options)
         self.run_queue.put(job)
 
     def add_scheduled_task(self, task, schedule):
         """Add a task to the scheduler to be run periodically on `schedule`."""
-        job = PeriodicJob(task.copy(), schedule)
+        job = PeriodicJob(task, schedule)
         with self.periodic_jobs_lock:
             self.periodic_jobs.append(job)
 
-    def update_scheduled_task(self, task, schedule=None):
+    def clear_scheduled_tasks(self):
         with self.periodic_jobs_lock:
-            for job in self.periodic_jobs:
-                if job.task == task:
-                    job.task = task.copy()
-                    if schedule:
-                        job.schedule = schedule
-                    break
-            else:
-                raise ValueError('task %s was not found among scheduled tasks' % task)
-
-    def remove_scheduled_task(self, task):
-        with self.periodic_jobs_lock:
-            for job in self.periodic_jobs:
-                if job.task == task:
-                    break
-            else:
-                raise ValueError('task %s was not found among scheduled tasks' % task)
-            self.periodic_jobs.remove(job)
+            self.periodic_jobs = []
 
     def queue_pending_jobs(self):
         # Add pending jobs to the run queue
@@ -101,8 +85,7 @@ class Scheduler(threading.Thread):
                     self.run_queue.put(job)
 
     def run(self):
-        self._shutdown_now = False
-        self._shutdown_when_finished = False
+        from flexget.task import Task
         while not self._shutdown_now:
             self.queue_pending_jobs()
             # Grab the first job from the run queue and do it
@@ -114,7 +97,7 @@ class Scheduler(threading.Thread):
                 continue
             job.start()
             try:
-                job.task.execute()
+                Task(self.manager, job.task, options=job.options).execute()
             finally:
                 self.run_queue.task_done()
                 job.done()
@@ -141,8 +124,10 @@ class Job(object):
     priority = None
     #: A datetime object when the job was scheduled to run. Jobs are sorted by this value when priority is the same.
     run_time = None
-    #: The :class:`Task` this job executes
+    #: The name of the task to execute
     task = None
+    #: Options to run the task with
+    options = None
 
     def start(self):
         """Called when the job is run."""
@@ -159,8 +144,9 @@ class Job(object):
 class ImmediateJob(Job):
     priority = 1
 
-    def __init__(self, task):
+    def __init__(self, task, options=None):
         self.task = task
+        self.options = options
         self.run_time = datetime.now()
 
 
@@ -168,8 +154,9 @@ class PeriodicJob(Job):
     priority = 5
     _schedule_attrs = ['unit', 'amount', 'on_day', 'at_time']
 
-    def __init__(self, task, schedule):
+    def __init__(self, task, schedule, options=None):
         self.task = task
+        self.options = options
         self.running = False
         self.execute_options = None
         self.unit = None
