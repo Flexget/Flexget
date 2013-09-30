@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime
 from sqlalchemy.schema import Index, MetaData
 
-from flexget import db_schema
+from flexget import db_schema, options
 from flexget.event import event
 from flexget.plugin import register_plugin, priority, DependencyError, get_plugin_by_name
 from flexget.manager import Session
@@ -183,7 +183,6 @@ class PluginFailed(object):
                 task.rerun()
 
 
-@event('manager.subcommand.failed')
 def do_cli(manager, options):
     if options.failed_action == 'list':
         list_failed()
@@ -218,9 +217,9 @@ def clear_failed(manager):
 
 register_plugin(PluginFailed, 'retry_failed', builtin=True, api_ver=2)
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    parser = core_parser.add_subparser('failed', help='list or clear remembered failures')
+@event('options.register')
+def register_parser_arguments():
+    parser = options.register_command('failed', do_cli, help='list or clear remembered failures')
     subparsers = parser.add_subparsers(dest='failed_action', metavar='<action>')
     subparsers.add_parser('list', help='list all the entries that have had failures')
     subparsers.add_parser('clear', help='clear all failures from database, so they can be retried')

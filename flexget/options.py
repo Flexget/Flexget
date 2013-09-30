@@ -18,14 +18,14 @@ _UNSET = object()
 core_parser = None
 
 
-def get_parser(subparser=None):
+def get_parser(command=None):
     global core_parser
     if not core_parser:
         core_parser = CoreArgumentParser()
         # Add all plugin options to the parser
-        fire_event('register_parser_arguments')
-    if subparser:
-        return core_parser.get_subparser(subparser)
+        fire_event('options.register')
+    if command:
+        return core_parser.get_subparser(command)
     return core_parser
 
 
@@ -36,8 +36,8 @@ def get_defaults(subparser=None):
 
 
 def register_command(command, callback, lock_required=False, **kwargs):
-    subparser = get_parser().add_subparser(command, lock_required=lock_required, **kwargs)
-    subparser.set_defaults(cli_command_callback=callback)
+    subparser = get_parser().add_subparser(command, **kwargs)
+    subparser.set_defaults(cli_command_callback=callback, lock_required=lock_required)
     return subparser
 
 
@@ -204,7 +204,7 @@ class ArgumentParser(ArgParser):
         self.subparsers.scoped_namespaces = scoped_namespaces
         return self.subparsers
 
-    def add_subparser(self, name, lock_required=False, **kwargs):
+    def add_subparser(self, name, **kwargs):
         """
         Adds a parser for a new subcommand and returns it.
 
@@ -216,8 +216,8 @@ class ArgumentParser(ArgParser):
         if self.subparsers.scoped_namespaces:
             kwargs.setdefault('nested_namespace_name', name)
         result = self.subparsers.add_parser(name, **kwargs)
-        if lock_required:
-            result.set_defaults(lock_required=True)
+        if self.subparsers.scoped_namespaces:
+            result.set_defaults(**{name: ScopedNamespace()})
         return result
 
     def get_subparser(self, name, default=_UNSET):
@@ -259,10 +259,7 @@ manager_parser.add_argument('--logfile', default='flexget.log',
 # This option is already handled above.
 manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
                             help='Use this option to create a detailed bug report, '
-                              'note that the output might contain PRIVATE data, so edit that out')
-# provides backward compatibility to --cron and -d
-manager_parser.add_argument('-q', '--quiet', action=CronAction, dest='quiet', default=False, nargs=0,
-                            help=SUPPRESS)
+                                 'note that the output might contain PRIVATE data, so edit that out')
 manager_parser.add_argument('--debug', action=DebugAction, nargs=0, help=SUPPRESS)
 manager_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, help=SUPPRESS)
 manager_parser.add_argument('--loglevel', default='verbose', help=SUPPRESS,
@@ -274,7 +271,7 @@ manager_parser.add_argument('--del-db', action='store_true', dest='del_db', defa
 
 class CoreArgumentParser(ArgumentParser):
     """
-    The core argument parser, contains the manager arguments, subcommands, and plugin arguments.
+    The core argument parser, contains the manager arguments, command parsers, and plugin arguments.
 
     Warning: Only gets plugin arguments if instantiated after plugins have been loaded.
 
@@ -284,8 +281,8 @@ class CoreArgumentParser(ArgumentParser):
         super(CoreArgumentParser, self).__init__(**kwargs)
         self.add_subparsers(title='Commands', metavar='<command>', dest='cli_command', scoped_namespaces=True)
 
-        # The parser for the execute subcommand
-        exec_parser = self.add_subparser('execute', lock_required=True, help='execute tasks now')
+        # The parser for the execute command
+        exec_parser = self.add_subparser('execute', help='execute tasks now')
         exec_parser.set_defaults(lock_required=True)
         exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
                                  help='Validate configuration file and print errors.')
@@ -307,10 +304,9 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
                                  help='Disable caches. Works only in plugins that have explicit support.')
 
-        # The parser for the daemon subcommand
-        daemon_parser = self.add_subparser('daemon', lock_required=True,
-                                           help='Run continuously, executing tasks according to schedules defined in '
-                                                'config.')
+        # The parser for the daemon command
+        daemon_parser = self.add_subparser('daemon', help='Run continuously, executing tasks according to schedules '
+                                                          'defined in config.')
 
     def add_subparsers(self, **kwargs):
         # The subparsers should not be CoreArgumentParsers
@@ -319,7 +315,7 @@ class CoreArgumentParser(ArgumentParser):
 
     def parse_args(self, args=None, namespace=None):
         result = super(CoreArgumentParser, self).parse_args(args=args, namespace=namespace)
-        # Make sure we always have execute parser settings even when other subcommands called
+        # Make sure we always have execute parser settings even when other commands called
         if not hasattr(result, 'execute'):
             result.execute = get_defaults('execute')
         return result

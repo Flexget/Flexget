@@ -13,16 +13,16 @@ import logging
 from datetime import datetime, timedelta
 
 from sqlalchemy import Column, Integer, DateTime, Unicode, Boolean, or_, select, update, Index
-from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
+from sqlalchemy.schema import ForeignKey
 
-from flexget.manager import Session
+from flexget import db_schema, options
 from flexget.event import event
+from flexget.manager import Session
 from flexget.plugin import register_plugin, priority
-from flexget import db_schema
+from flexget.utils.imdb import is_imdb_url, extract_id
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 from flexget.utils.tools import console
-from flexget.utils.imdb import is_imdb_url, extract_id
 
 log = logging.getLogger('seen')
 Base = db_schema.versioned_base('seen', 4)
@@ -243,7 +243,6 @@ def db_cleanup(session):
         log.verbose('Removed %d seen fields older than 1 year.' % result)
 
 
-@event('manager.subcommand.seen')
 def do_cli(manager, options):
     if options.seen_action == 'forget':
         seen_forget(manager, options)
@@ -302,9 +301,9 @@ def seen_search(options):
 register_plugin(FilterSeen, 'seen', builtin=True, api_ver=2)
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    parser = core_parser.add_subparser('seen', help='view or forget entries remembered by the seen plugin')
+@event('options.register')
+def register_parser_arguments():
+    parser = options.register_command('seen', do_cli, help='view or forget entries remembered by the seen plugin')
     subparsers = parser.add_subparsers(dest='seen_action', metavar='<action>')
     forget_parser = subparsers.add_parser('forget', help='forget entry or entire task from seen plugin database')
     forget_parser.add_argument('forget_value', metavar='<value>',

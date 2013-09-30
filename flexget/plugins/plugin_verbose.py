@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from flexget import options
 from flexget.event import event
 from flexget.plugin import register_plugin, priority
 from flexget.task import log as task_log
@@ -50,9 +51,9 @@ class Verbose(object):
 register_plugin(Verbose, 'verbose', builtin=True, api_ver=2)
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    exec_parser = core_parser.get_subparser('execute')
+@event('options.register')
+def register_parser_arguments():
+    exec_parser = options.get_parser('execute')
     exec_parser.add_argument('-v', '--verbose', action='store_true', dest='verbose', default=False,
                              help='verbose undecided entries')
     exec_parser.add_argument('-s', '--silent', action='store_true', dest='silent', default=False,

@@ -11,7 +11,7 @@ from sqlalchemy.orm import relation, backref
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
 
-from flexget import db_schema
+from flexget import db_schema, options
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils import qualities
@@ -1413,9 +1413,9 @@ register_plugin(FilterSeries, 'series')
 register_plugin(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    exec_parser = core_parser.get_subparser('execute')
+@event('options.register')
+def register_parser_arguments():
+    exec_parser = options.get_parser('execute')
     exec_parser.add_argument('--stop-waiting', action='store', dest='stop_waiting', default='',
                              metavar='NAME', help='stop timeframe for a given series')
     exec_parser.add_argument('--disable-advancement', action='store_true', dest='disable_advancement', default=False,

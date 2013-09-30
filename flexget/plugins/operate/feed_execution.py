@@ -2,8 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 import fnmatch
 import logging
 
+from flexget import options
 from flexget.event import event
-from flexget.plugin import register_plugin, PluginError
+from flexget.plugin import register_plugin
 from flexget.utils.tools import console
 
 log = logging.getLogger('task_control')
@@ -11,7 +12,7 @@ log = logging.getLogger('task_control')
 
 @event('manager.startup')
 def validate_cli_opts(manager):
-    if manager.options.cli_subcommand != 'execute' or not manager.options.execute.onlytask:
+    if manager.options.cli_command != 'execute' or not manager.options.execute.onlytask:
         return
     # Make a list of the specified tasks to run, and those available
     onlytasks = manager.options.execute.onlytask.split(',')
@@ -80,8 +81,8 @@ register_plugin(OnlyTask, '--task', builtin=True)
 register_plugin(ManualTask, 'manual')
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.get_subparser('execute').add_argument('--task', dest='onlytask', default=None, metavar='TASK[,...]',
-                                                   help='run only specified task(s), optionally using glob patterns '
-                                                        '("tv-*"). Matching is case-insensitive')
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--task', dest='onlytask', default=None, metavar='TASK[,...]',
+                                               help='run only specified task(s), optionally using glob patterns '
+                                                    '("tv-*"). Matching is case-insensitive')

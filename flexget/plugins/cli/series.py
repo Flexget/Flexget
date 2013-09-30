@@ -1,9 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import argparse
 from datetime import datetime, timedelta
-from string import capwords
 from sqlalchemy import func
 
+from flexget import options
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import register_plugin, DependencyError, get_plugin_by_name
@@ -17,7 +17,7 @@ except ImportError:
 
 
 class CLISeries(SeriesDatabase):
-    """Handle CLI 'series' subcommand"""
+    """Handle CLI 'series' command"""
 
     def do_cli(self, manager, options):
         if options.series_action == 'list':
@@ -211,16 +211,11 @@ class CLISeries(SeriesDatabase):
 register_plugin(CLISeries, 'cli_series')
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    # TODO: CLI this is a hacky way of registering the plugin instance method, maybe refactor to not use a class
-    try:
-        event('manager.subcommand.series')(get_plugin_by_name('cli_series').instance.do_cli)
-    except ValueError:
-        # If this event is called more than once registering the same function for the same event will fail
-        pass
-    # Register the subcommand
-    parser = core_parser.add_subparser('series', help='view and manipulate the series plugin database')
+@event('options.register')
+def register_parser_arguments():
+    # Register the command
+    callback = get_plugin_by_name('cli_series').instance.do_cli
+    parser = options.register_command('series', callback, help='view and manipulate the series plugin database')
 
     # Parent parser for subcommands that need a series name
     series_parser = argparse.ArgumentParser(add_help=False)

@@ -4,6 +4,7 @@ from datetime import datetime
 
 from sqlalchemy import Column, String, Integer, DateTime, Unicode, desc
 
+from flexget import options
 from flexget.event import event
 from flexget.manager import Base, Session
 from flexget.plugin import register_plugin
@@ -54,7 +55,6 @@ class PluginHistory(object):
             task.session.add(item)
 
 
-@event('manager.subcommand.history')
 def do_cli(manager, options):
     session = Session()
     console('-- History: ' + '-' * 67)
@@ -75,9 +75,9 @@ def do_cli(manager, options):
     session.close()
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    parser = core_parser.add_subparser('history', help='view the history of entries that FlexGet has accepted')
+@event('options.register')
+def register_parser_arguments():
+    parser = options.register_command('history', do_cli, help='view the history of entries that FlexGet has accepted')
     parser.add_argument('--limit', action='store', type=int, metavar='NUM', default=50,
                         help='limit to %(metavar)s results')
     parser.add_argument('--search', action='store', metavar='TERM', help='limit to results that contain %(metavar)s')

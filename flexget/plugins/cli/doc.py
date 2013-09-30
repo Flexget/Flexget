@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import sys
 
+from flexget import options
 from flexget.event import event
 from flexget.plugin import plugins
 
@@ -35,7 +36,6 @@ def trim(docstring):
     return '\n'.join(trimmed)
 
 
-@event('manager.subcommand.doc')
 def print_doc(manager, options):
     plugin_name = options.doc
     plugin = plugins.get(plugin_name, None)
@@ -50,7 +50,7 @@ def print_doc(manager, options):
         print 'Could not find plugin %s' % plugin_name
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    parser = core_parser.add_subparser('doc', help='display plugin documentation')
+@event('options.register')
+def register_parser_arguments():
+    parser = options.register_command('doc', print_doc, help='display plugin documentation')
     parser.add_argument('doc', metavar='<plugin name>', help='name of plugin to show docs for')

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from flexget import options
 from flexget.event import event
 from flexget.plugin import register_plugin,  priority
 from flexget.utils.tools import console
@@ -83,9 +84,8 @@ class OutputDump(object):
 register_plugin(OutputDump, 'dump', builtin=True, api_ver=2)
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.get_subparser('execute').add_argument('--dump', nargs='?', choices=['eval', 'trace'], dest='dump_entries',
-                                                   const=True, help='display all entries in task with fields they '
-                                                                    'contain, use `--dump eval` to evaluate all lazy '
-                                                                    'fields')
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--dump', nargs='?', choices=['eval', 'trace'], dest='dump_entries',
+                                               const=True, help='display all entries in task with fields they contain, '
+                                                                'use `--dump eval` to evaluate all lazy fields')

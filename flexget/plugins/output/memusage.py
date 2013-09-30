@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from flexget import options
 from flexget.event import event
 from flexget.plugin import DependencyError, register_plugin
 
@@ -64,7 +65,7 @@ class OutputMemUsage(object):
 register_plugin(OutputMemUsage, 'mem_usage', builtin=True)
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.get_subparser('execute').add_argument('--mem-usage', action='store_true', dest='mem_usage', default=False,
-                                                   help='display memory usage debug information')
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--mem-usage', action='store_true', dest='mem_usage', default=False,
+                                               help='display memory usage debug information')

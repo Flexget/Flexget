@@ -13,6 +13,7 @@ from httplib import BadStatusLine
 
 from requests import RequestException
 
+from flexget import options
 from flexget.event import event
 from flexget.plugin import register_plugin, PluginWarning, PluginError
 from flexget.utils.tools import decode_html
@@ -508,8 +509,7 @@ class PluginDownload(object):
 register_plugin(PluginDownload, 'download', api_ver=2)
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.get_subparser('execute').add_argument('--dl-path', dest='dl_path', default=False, metavar='PATH',
-                                                   help='override path for download plugin, applies to all executed '
-                                                        'tasks')
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--dl-path', dest='dl_path', default=False, metavar='PATH',
+                                               help='override path for download plugin, applies to all executed tasks')

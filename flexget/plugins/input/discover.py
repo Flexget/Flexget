@@ -5,6 +5,7 @@ import random
 
 from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 
+from flexget import options
 from flexget.event import event
 from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, PluginWarning
 from flexget import db_schema
@@ -251,7 +252,7 @@ class Discover(object):
 register_plugin(Discover, 'discover', api_ver=2)
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.get_subparser('execute').add_argument('--discover-now', action='store_true', dest='discover_now',
-                                                   default=False, help='immediately try to discover everything')
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--discover-now', action='store_true', dest='discover_now',
+                                               default=False, help='immediately try to discover everything')

@@ -3,6 +3,7 @@ import logging
 
 from argparse import SUPPRESS
 
+from flexget import options
 from flexget.event import event
 
 log = logging.getLogger('performance')
@@ -66,7 +67,7 @@ def startup(manager, options):
                         log.info('%-15s took %0.2f sec (%s queries)' % (keyword, took, queries))
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.get_subparser('execute').add_argument('--debug-perf', action='store_true', dest='debug_perf',
-                                                   default=False, help=SUPPRESS)
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--debug-perf', action='store_true', dest='debug_perf', default=False,
+                                               help=SUPPRESS)

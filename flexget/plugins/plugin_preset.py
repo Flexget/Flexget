@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget import validator
+from flexget import options, validator
 from flexget.event import event
 from flexget.config_schema import register_config_key
 from flexget.plugin import priority, register_plugin, PluginError
@@ -154,7 +154,7 @@ register_plugin(PluginPreset, 'preset', builtin=True, api_ver=2)
 register_plugin(DisablePlugin, 'disable_plugin', api_ver=2)
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.get_subparser('execute').add_argument('--preset', action='store', dest='preset', default=False,
-                                                   metavar='NAME', help='execute tasks with given preset')
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--preset', action='store', dest='preset', default=False, metavar='NAME',
+                                               help='execute tasks with given preset')

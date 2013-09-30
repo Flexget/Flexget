@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import datetime
 import logging
 
+from flexget import options
 from flexget.config_schema import parse_interval
 from flexget.event import event
 from flexget.plugin import register_plugin, priority
@@ -52,7 +53,7 @@ class PluginInterval(object):
 register_plugin(PluginInterval, 'interval', api_ver=2)
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.get_subparser('execute').add_argument('--now', action='store_true', dest='interval_ignore', default=False,
-                                                   help='Ignore interval(s)')
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--now', action='store_true', dest='interval_ignore', default=False,
+                                               help='Ignore interval(s)')

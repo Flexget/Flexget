@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from flexget import options
 from flexget.event import event
 from flexget.plugin import get_plugins
 
@@ -32,8 +33,8 @@ def plugins_summary(manager, options):
     print '-' * 79
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    plugins_subparser = core_parser.add_subparser('plugins', help='print registered plugin summaries')
+@event('options.register')
+def register_parser_arguments():
+    plugins_subparser = options.register_command('plugins', plugins_summary, help='print registered plugin summaries')
     plugins_subparser.add_argument('--group', help='show plugins belonging to this group')
     plugins_subparser.add_argument('--phase', help='show plugins that act on this phase')

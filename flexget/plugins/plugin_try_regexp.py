@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from flexget import options
 from flexget.event import event
 from flexget.plugin import register_plugin
 
@@ -63,7 +64,7 @@ class PluginTryRegexp:
 register_plugin(PluginTryRegexp, '--try-regexp', builtin=True)
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.get_subparser('execute').add_argument('--try-regexp', action='store_true', dest='try_regexp',
-                                                   default=False, help='try regular expressions interactively')
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--try-regexp', action='store_true', dest='try_regexp', default=False,
+                                               help='try regular expressions interactively')

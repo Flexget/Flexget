@@ -4,6 +4,7 @@ import string
 import random
 import yaml
 
+from flexget import options
 from flexget.entry import Entry
 from flexget.event import event
 
@@ -31,13 +32,13 @@ def key_equals_value(text):
 
 
 # Run after other plugins, so we can get all exec subcommand options
-@event('register_parser_arguments', priority=0)
-def register_parser_arguments(core_parser):
-    exec_parser = core_parser.get_subparser('execute')
-    inject_parser = core_parser.add_subparser('inject', add_help=False, parents=[exec_parser],
-                                              help='inject an entry from command line into tasks',
-                                              usage='%(prog)s title [url] [--accept] [--force] '
-                                                    '[--fields NAME=VALUE [NAME=VALUE...]] [<execute arguments>]')
+@event('options.register', priority=0)
+def register_parser_arguments():
+    exec_parser = options.get_parser('execute')
+    inject_parser = options.register_command('inject', do_cli, add_help=False, parents=[exec_parser],
+                                             help='inject an entry from command line into tasks',
+                                             usage='%(prog)s title [url] [--accept] [--force] '
+                                                   '[--fields NAME=VALUE [NAME=VALUE...]] [<execute arguments>]')
     inject_group = inject_parser.add_argument_group('inject arguments')
     inject_group.add_argument('title', help='title of the entry to inject')
     inject_group.add_argument('url', nargs='?', help='url of the entry to inject')

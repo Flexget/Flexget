@@ -113,6 +113,7 @@ class Manager(object):
     def handle_cli(self):
         command = self.options.cli_command
         options = getattr(self.options, command)
+        # First check for built-in commands
         if command == 'execute':
             port = self.check_webui_port()
             if port:
@@ -152,13 +153,13 @@ class Manager(object):
                         self.scheduler.add_scheduled_task(task, schedule=default_schedule)
                 self.scheduler.start()
                 self.scheduler.join()
+        # Otherwise dispatch the command to the callback function
         else:
-            # TODO: CLI don't use an event to run the commands
-            if getattr(options, 'lock_required', False):
+            if options.lock_required:
                 with self.acquire_lock():
-                    fire_event('manager.subcommand.%s' % command, self, options)
+                    options.cli_command_callback(self, options)
             else:
-                fire_event('manager.subcommand.%s' % command, self, options)
+                options.cli_command_callback(self, options)
 
     def setup_yaml(self):
         """Sets up the yaml loader to return unicode objects for strings by default"""

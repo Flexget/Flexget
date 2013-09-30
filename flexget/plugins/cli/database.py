@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 
+from flexget import options
 from flexget.db_schema import reset_schema, plugin_schemas
 from flexget.event import event
 from flexget.manager import Base, Session
 from flexget.utils.tools import console
 
 
-@event('manager.subcommand.database')
 def do_cli(manager, options):
     if options.db_action == 'cleanup':
         cleanup(manager)
@@ -63,9 +63,11 @@ def reset_plugin(options):
         except ValueError as e:
             console('Unable to reset %s: %s' % (plugin, e.message))
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    parser = core_parser.add_subparser('database', lock_required=True, help='utilities to manage the FlexGet database')
+
+@event('options.register')
+def register_parser_arguments():
+    parser = options.register_command('database', do_cli, lock_required=True,
+                                      help='utilities to manage the FlexGet database')
     subparsers = parser.add_subparsers(title='Actions', metavar='<action>', dest='db_action')
     subparsers.add_parser('cleanup', help='make all plugins clean un-needed data from the database')
     subparsers.add_parser('vacuum', help='running vacuum can increase performance and decrease database size')

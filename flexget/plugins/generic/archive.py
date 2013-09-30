@@ -3,17 +3,16 @@ from collections import defaultdict
 import logging
 import re
 from datetime import datetime
-from argparse import ArgumentTypeError
 
 from sqlalchemy.orm import relationship
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import Table, ForeignKey
 from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 
-from flexget import db_schema
+from flexget import db_schema, options
 from flexget.event import event
 from flexget.entry import Entry
-from flexget.plugin import priority, register_plugin
+from flexget.plugin import register_plugin
 from flexget.utils.sqlalchemy_utils import table_schema, get_index_by_name
 from flexget.utils.tools import console, strip_html
 from flexget.manager import Session
@@ -471,7 +470,6 @@ def cli_inject(manager, options):
         manager.shutdown()
 
 
-@event('manager.subcommand.archive')
 def do_cli(manager, options):
     action = options.archive_action
 
@@ -489,9 +487,9 @@ register_plugin(Archive, 'archive', api_ver=2)
 register_plugin(UrlrewriteArchive, 'flexget_archive', groups=['search'])
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    archive_parser = core_parser.add_subparser('archive', help='search and manipulate the archive database')
+@event('options.register')
+def register_parser_arguments():
+    archive_parser = options.register_command('archive', do_cli, help='search and manipulate the archive database')
     archive_parser.add_subparsers(title='Actions', metavar='<action>', dest='archive_action')
     # Default usage shows the positional arguments after the optional ones, override usage to fix it
     search_parser = archive_parser.add_subparser('search', help='search from the archive',

@@ -3,11 +3,11 @@ import os
 import re
 import logging
 
+from flexget import options
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import register_plugin, PluginError
 from flexget.utils.cached_input import cached
-from flexget.utils.tools import console
 
 log = logging.getLogger('tail')
 
@@ -145,7 +145,7 @@ class InputTail(object):
 register_plugin(InputTail, 'tail', api_ver=2)
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    core_parser.get_subparser('execute').add_argument('--tail-reset', action='store', dest='tail_reset', default=False,
-                                                      metavar='FILE|TASK', help='reset tail position for a file')
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--tail-reset', action='store', dest='tail_reset', default=False,
+                                               metavar='FILE|TASK', help='reset tail position for a file')

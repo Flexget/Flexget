@@ -3,6 +3,7 @@ import logging
 
 from argparse import SUPPRESS
 
+from flexget import options
 from flexget.event import event
 from flexget.plugin import register_plugin, priority
 
@@ -30,9 +31,9 @@ class OutputDumpConfig(object):
 register_plugin(OutputDumpConfig, 'dump_config', debug=True, builtin=True)
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    exec_parser = core_parser.get_subparser('execute')
+@event('options.register')
+def register_parser_arguments():
+    exec_parser = options.get_parser('execute')
     exec_parser.add_argument('--dump-config', action='store_true', dest='dump_config', default=False,
                              help='display the config of each feed after preset merging/config generation occurs')
     exec_parser.add_argument('--dump-config-python', action='store_true', dest='dump_config_python', default=False,

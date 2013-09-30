@@ -15,7 +15,7 @@ log = logging.getLogger('welcome')
 @event('manager.startup')
 def welcome_message(manager):
     # Only run for cli cron executions
-    if manager.options.cli_subcommand != 'execute' or not manager.options.execute.cron:
+    if manager.options.cli_command != 'execute' or not manager.options.execute.cron:
         return
     persistence = SimplePersistence(plugin='welcome')
     count = persistence.setdefault('count', 5)

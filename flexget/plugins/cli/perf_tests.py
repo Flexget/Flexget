@@ -1,11 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from argparse import SUPPRESS
-
+from flexget import options
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import register_plugin
 from flexget.utils.tools import console
 
 log = logging.getLogger('perftests')
@@ -13,8 +11,7 @@ log = logging.getLogger('perftests')
 TESTS = ['imdb_query']
 
 
-@event('manager.subcommand.perf-test')
-def on_process_start(manager, options):
+def cli_perf_test(manager, options):
     if options.test_name not in TESTS:
         console('Unknown performance test %s' % options.test_name)
         return
@@ -74,7 +71,7 @@ def imdb_query(session):
     log.debug('Took %.2f seconds to query %i movies' % (took, len(imdb_urls)))
 
 
-@event('register_parser_arguments')
-def register_parser_arguments(core_parser):
-    perf_parser = core_parser.add_subparser('perf-test')
+@event('options.register')
+def register_parser_arguments():
+    perf_parser = options.register_command('perf-test', cli_perf_test)
     perf_parser.add_argument('test_name', metavar='<test name>', choices=TESTS)
