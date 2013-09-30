@@ -165,7 +165,7 @@ def db_cleanup(session):
 
 @event('manager.startup')
 def repair(manager):
-    """Perform database repairing and upgrading at startup."""
+    # Perform database repairing and upgrading at startup.
     if not manager.persist.get('series_repaired', False):
         session = Session()
         # For some reason at least I have some releases in database which don't belong to any episode.
@@ -174,6 +174,16 @@ def repair(manager):
             session.delete(release)
         session.commit()
         manager.persist['series_repaired'] = True
+    # Unmark series from tasks which have been deleted.
+    # TODO: Maybe this should run on a manager.config_changed event?
+    session = Session()
+    try:
+        deleted = (session.query(SeriesTask).filter(not_(SeriesTask.name.in_(manager.tasks))).
+                   delete(synchronize_session=False))
+        if deleted:
+            session.commit()
+    finally:
+        session.close()
 
 
 TRANSLATE_MAP = {ord(u'&'): u' and '}
@@ -797,19 +807,6 @@ class FilterSeriesBase(object):
         merging_series = self.prepare_config(config)
         task.config['series'] = self.combine_series_lists(merging_series, native_series, log_once=True)
         return task.config['series']
-
-
-@event('manager.execute.started')
-def remove_old_tasks(manager):
-    """Unmark series from tasks which have been deleted"""
-    session = Session()
-    try:
-        deleted = (session.query(SeriesTask).filter(not_(SeriesTask.name.in_(manager.config['tasks']))).
-                   delete(synchronize_session=False))
-        if deleted:
-            session.commit()
-    finally:
-        session.close()
 
 
 class FilterSeries(SeriesDatabase, FilterSeriesBase):
