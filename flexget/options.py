@@ -29,9 +29,9 @@ def get_parser(command=None):
     return core_parser
 
 
-def get_defaults(subparser=None):
-    if subparser:
-        return getattr(get_parser().parse_args([subparser]), subparser)
+def get_defaults(command=None):
+    if command:
+        return getattr(get_parser(command).parse_args([]), command)
     return get_parser().parse_args([])
 
 
@@ -284,8 +284,6 @@ class CoreArgumentParser(ArgumentParser):
         # The parser for the execute command
         exec_parser = self.add_subparser('execute', help='execute tasks now')
         exec_parser.set_defaults(lock_required=True)
-        exec_parser.add_argument('--check', action='store_true', dest='validate', default=0,
-                                 help='Validate configuration file and print errors.')
         exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
                                  help='Matches are not downloaded but will be skipped in the future.')
         exec_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
@@ -306,6 +304,8 @@ class CoreArgumentParser(ArgumentParser):
         # The parser for the daemon command
         daemon_parser = self.add_subparser('daemon', help='Run continuously, executing tasks according to schedules '
                                                           'defined in config.')
+        # TODO: 1.2 Make this work
+        daemon_parser.set_defaults(loglevel='info')
 
     def add_subparsers(self, **kwargs):
         # The subparsers should not be CoreArgumentParsers
@@ -315,6 +315,9 @@ class CoreArgumentParser(ArgumentParser):
     def parse_args(self, args=None, namespace=None):
         result = super(CoreArgumentParser, self).parse_args(args=args, namespace=namespace)
         # Make sure we always have execute parser settings even when other commands called
-        if not hasattr(result, 'execute'):
-            result.execute = get_defaults('execute')
+        if not result.cli_command == 'execute':
+            exec_options = get_defaults('execute')
+            if hasattr(result, 'execute'):
+                exec_options.__dict__.update(result.execute.__dict__)
+            result.execute = exec_options
         return result
