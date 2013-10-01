@@ -361,7 +361,8 @@ class ImdbLookup(object):
                 result = session.query(SearchResult).\
                     filter(SearchResult.title == entry['title']).first()
                 if result:
-                    if result.fails and not manager.options.retry:
+                    # TODO: 1.2 this should really be checking task.options.retry
+                    if result.fails and not manager.options.execute.retry:
                         # this movie cannot be found, not worth trying again ...
                         log.debug('%s will fail lookup' % entry['title'])
                         raise PluginError('Title `%s` lookup fails' % entry['title'])

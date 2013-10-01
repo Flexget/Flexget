@@ -67,7 +67,7 @@ class ManualTask(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    def on_process_start(self, task):
+    def on_task_prepare(self, task):
         # Make sure we need to run
         if not task.config['manual']:
             return
