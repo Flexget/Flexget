@@ -304,6 +304,7 @@ class CoreArgumentParser(ArgumentParser):
         # The parser for the daemon command
         daemon_parser = self.add_subparser('daemon', help='Run continuously, executing tasks according to schedules '
                                                           'defined in config.')
+        daemon_parser.add_argument('--ipc-port', type=int, default=29709, help='port which will be used for IPC')
         # TODO: 1.2 Make this work
         daemon_parser.set_defaults(loglevel='info')
 

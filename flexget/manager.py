@@ -15,7 +15,7 @@ from sqlalchemy.pool import SingletonThreadPool
 
 from flexget import config_schema
 from flexget.event import fire_event
-from flexget.options import CoreArgumentParser
+from flexget.ipc import IPCServer, remote_execute
 from flexget.scheduler import Scheduler
 from flexget.utils import json
 from flexget.utils.tools import pid_exists, console
@@ -74,6 +74,7 @@ class Manager(object):
         self.config = {}
 
         self.scheduler = Scheduler(self)
+        self.ipc_server = None
         self.initialize()
 
         # cannot be imported at module level because of circular references
@@ -110,14 +111,15 @@ class Manager(object):
         """A list of tasks in the config"""
         return self.config.get('tasks', {}).keys()
 
-    def handle_cli(self):
+    def run_cli_command(self):
         command = self.options.cli_command
         options = getattr(self.options, command)
         # First check for built-in commands
         if command == 'execute':
-            port = self.check_webui_port()
+            port = self.check_ipc_port()
             if port:
-                self.remote_execute(port, options)
+                for task in self.tasks:
+                    remote_execute(port, task, options)
                 self.shutdown()
                 return
             with self.acquire_lock():
@@ -138,7 +140,9 @@ class Manager(object):
                 console('No schedules are defined in the config.')
                 self.shutdown()
                 return
+            self.ipc_server = IPCServer(self, options.ipc_port)
             with self.acquire_lock():
+                self.ipc_server.start()
                 unscheduled_tasks = self.tasks
                 for task, schedule in self.config['schedules'].get('tasks', {}).iteritems():
                     if task not in unscheduled_tasks:
@@ -517,12 +521,12 @@ class Manager(object):
         """Returns True if there is a lock on the database."""
         return bool(self._read_lock())
 
-    def check_webui_port(self):
-        """If the webui has a lock on the database, return the port number."""
+    def check_ipc_port(self):
+        """If a daemon has a lock on the database, return the port number for IPC."""
         port = self._read_lock()
         if not isinstance(port, bool):
             return port
-        return False
+        return None
 
     @contextmanager
     def acquire_lock(self):
@@ -546,6 +550,8 @@ class Manager(object):
     def write_lock(self):
         with open(self.lockfile, 'w') as f:
             f.write('PID: %s\n' % os.getpid())
+            if self.ipc_server:
+                f.write('Port: %s\n' % self.ipc_server.port)
 
     def release_lock(self):
         if os.path.exists(self.lockfile):
