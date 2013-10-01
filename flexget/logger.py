@@ -17,8 +17,7 @@ class FlexGetLogger(logging.Logger):
     local = threading.local()
 
     def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None):
-        extra = {'task': getattr(FlexGetLogger.local, 'task', u''),
-                 'execution': getattr(FlexGetLogger.local, 'execution', '')}
+        extra = {'task': getattr(FlexGetLogger.local, 'task', '')}
         return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
 
     def trace(self, msg, *args, **kwargs):
@@ -28,9 +27,6 @@ class FlexGetLogger(logging.Logger):
     def verbose(self, msg, *args, **kwargs):
         """Log at VERBOSE level (displayed when FlexGet is run interactively.)"""
         self.log(VERBOSE, msg, *args, **kwargs)
-
-    # backwards compatibility
-    debugall = trace
 
 
 class FlexGetFormatter(logging.Formatter):

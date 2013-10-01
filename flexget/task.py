@@ -176,14 +176,14 @@ class Task(object):
         self.manager = manager
         # raw_config should remain the untouched input config
         if config is None:
-            config = manager.config['tasks'].get('name', {})
+            config = manager.config['tasks'].get(name, {})
         self._raw_config = config
-        # this will be ceated when the prepare method is called
+        # this will be created when the prepare method is called
         self.config = None
         if options is None:
             options = copy.copy(self.manager.options.execute)
         elif isinstance(options, dict):
-            options_namespace = copy.copy(self.manager.execute)
+            options_namespace = copy.copy(self.manager.options.execute)
             options_namespace.__dict__.update(options)
             options = options_namespace
         self.options = options
@@ -281,19 +281,6 @@ class Task(object):
         except TaskAbort as e:
             self.config = None
             log.error('Task aborted while being prepared: %s' % e.reason)
-            return False
-        # validate configuration
-        errors = self.validate()
-        if errors and self.manager.unit_test:  # todo: bad practice
-            raise Exception('configuration errors')
-        if self.options.validate:
-            if not errors:
-                log.info('Task \'%s\' passed' % self.name)
-            self.enabled = False
-            return False
-        if errors:
-            self.enabled = False
-            self.config = None
             return False
         # If one of the prepare handlers disabled us, we aren't prepared
         return self.enabled
@@ -483,12 +470,23 @@ class Task(object):
         """
         if not self.enabled:
             log.debug('Not running disabled task %s' % self.name)
-        self.manager.db_cleanup()
+        if self.options.cron:
+            self.manager.db_cleanup()
         log.debug('executing %s' % self.name)
         if not self.prepared:
             if not self.prepare():
                 log.debug('task %s failed to prepare, not running' % self.name)
                 return
+
+        # validate configuration
+        errors = self.validate()
+        if errors and self.manager.unit_test:  # todo: bad practice
+            raise Exception('configuration errors')
+        if errors:
+            self.enabled = False
+            self.config = None
+            return False
+
         self._reset()
 
         # Handle keyword args

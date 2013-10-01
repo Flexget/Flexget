@@ -155,6 +155,9 @@ class PeriodicJob(Job):
     _schedule_attrs = ['unit', 'amount', 'on_day', 'at_time']
 
     def __init__(self, task, schedule, options=None):
+        # Periodic jobs default to running with --cron
+        if options is None:
+            options = {'cron': True}
         self.task = task
         self.options = options
         self.running = False

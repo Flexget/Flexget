@@ -577,9 +577,6 @@ class Manager(object):
         """
         expired = self.persist.get('last_cleanup', datetime(1900, 1, 1)) < datetime.now() - DB_CLEANUP_INTERVAL
         if force or expired:
-            if not (force or self.options.execute.cron):
-                log.verbose('Not running database cleanup on manual run. It will be run on next --cron run.')
-                return
             log.info('Running database cleanup.')
             session = Session()
             fire_event('manager.db_cleanup', session)

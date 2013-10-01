@@ -94,7 +94,7 @@ def process_config(config, schema=None, set_defaults=True):
         validator.VALIDATORS['properties'] = jsonschema.Draft4Validator.VALIDATORS['properties']
     # Customize the error messages
     for e in errors:
-        e.message = get_error_message(e)
+        set_error_message(e)
         e.json_pointer = '/' + '/'.join(map(unicode, e.path))
     return errors
 
@@ -173,16 +173,12 @@ def is_url(instance):
     return re.match(regexp, instance)
 
 
-def get_error_message(error):
+def set_error_message(error):
     """
      Create user facing error message from a :class:`jsonschema.ValidationError` `error`
 
     """
-
-    custom_error = error.schema.get('error_%s' % error.validator, error.schema.get('error'))
-    if custom_error:
-        return template.render(custom_error, error.__dict__)
-
+    # First, replace default error messages with our custom ones
     if error.validator == 'type':
         if isinstance(error.validator_value, basestring):
             valid_types = [error.validator_value]
@@ -198,25 +194,27 @@ def get_error_message(error):
         if isinstance(error.instance, list):
             return 'Got a list, expected: %s' % valid_types
         return 'Got `%s`, expected: %s' % (error.instance, valid_types)
-
-    if error.validator == 'format':
+    elif error.validator == 'format':
         if error.cause:
-            return unicode(error.cause)
-
-    if error.validator == 'enum':
-        return 'Must be one of the following: %s' % ', '.join(map(unicode, error.validator_value))
-
-    if error.validator == 'additionalProperties':
+            error.message = unicode(error.cause)
+    elif error.validator == 'enum':
+        error.message = 'Must be one of the following: %s' % ', '.join(map(unicode, error.validator_value))
+    elif error.validator == 'additionalProperties':
         if error.validator_value is False:
             extras = set(jsonschema._utils.find_additional_properties(error.instance, error.schema))
             if len(extras) == 1:
-                return 'The key `%s` is not valid here.' % extras.pop()
+                error.message = 'The key `%s` is not valid here.' % extras.pop()
             else:
-                return 'The keys %s are not valid here.' % ', '.join('`%s`' % e for e in extras)
+                error.message = 'The keys %s are not valid here.' % ', '.join('`%s`' % e for e in extras)
+    else:
+        # Remove u'' string representation from jsonschema error messages
+        error.message = re.sub('u\'(.*?)\'', '`\\1`', error.message)
 
-    # Remove u'' string representation from jsonschema error messages
-    message = re.sub('u\'(.*?)\'', '`\\1`', error.message)
-    return message
+    # Then update with any custom error message supplied from the schema
+    custom_error = error.schema.get('error_%s' % error.validator, error.schema.get('error'))
+    if custom_error:
+        error.message = template.render(custom_error, error.__dict__)
+
 
 
 def select_child_errors(validator, errors):

@@ -456,7 +456,8 @@ def plugin_schemas(**kwargs):
     """Create a dict schema that matches plugins specified by `kwargs`"""
     return {'type': 'object',
             'properties': dict((p.name, {'$ref': p.schema['id']}) for p in get_plugins(**kwargs)),
-            'additionalProperties': False}
+            'additionalProperties': False,
+            'error_additionalProperties': '{{message}} Only known plugin names are valid keys.'}
 
 
 config_schema.register_schema('/schema/plugins', plugin_schemas)
