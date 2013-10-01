@@ -2,7 +2,6 @@
 
 from __future__ import unicode_literals, division, absolute_import
 import os
-import sys
 import logging
 from flexget import logger
 from flexget.options import get_parser

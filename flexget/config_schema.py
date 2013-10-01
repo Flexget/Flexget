@@ -190,10 +190,10 @@ def set_error_message(error):
         # Make valid_types into an english list, with commas and 'or'
         valid_types = ', '.join(valid_types[:-2] + ['']) + ' or '.join(valid_types[-2:])
         if isinstance(error.instance, dict):
-            return 'Got a dict, expected: %s' % valid_types
+            error.message = 'Got a dict, expected: %s' % valid_types
         if isinstance(error.instance, list):
-            return 'Got a list, expected: %s' % valid_types
-        return 'Got `%s`, expected: %s' % (error.instance, valid_types)
+            error.message = 'Got a list, expected: %s' % valid_types
+        error.message = 'Got `%s`, expected: %s' % (error.instance, valid_types)
     elif error.validator == 'format':
         if error.cause:
             error.message = unicode(error.cause)
@@ -214,7 +214,6 @@ def set_error_message(error):
     custom_error = error.schema.get('error_%s' % error.validator, error.schema.get('error'))
     if custom_error:
         error.message = template.render(custom_error, error.__dict__)
-
 
 
 def select_child_errors(validator, errors):

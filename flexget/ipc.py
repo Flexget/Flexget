@@ -21,8 +21,7 @@ def remote_execute(port, task, options):
             options = options.__dict__
             options.pop('__parent__', None)
         s.sendall(json.dumps({'task': task, 'options': options}) + '\n')
-        f = s.makefile()
-        for line in f:
+        for line in s.makefile():
             console(line.rstrip())
     except socket.error as e:
         log.error('Socket error while sending execution to daemon: %s' % e)
