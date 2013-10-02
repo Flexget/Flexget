@@ -4,6 +4,7 @@ import re
 import os
 
 from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('rtorrent_magnet')
 pat = re.compile('xt=urn:btih:([^&/]+)')
@@ -61,4 +62,7 @@ class PluginRtorrentMagnet(object):
                     else:
                         log.warning('Unrecognized Magnet URI Format: %s', url)
 
-plugin.register_plugin(PluginRtorrentMagnet, 'rtorrent_magnet', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginRtorrentMagnet, 'rtorrent_magnet', api_ver=2)

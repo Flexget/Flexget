@@ -3,10 +3,12 @@ from flexget.utils.log import log_once
 
 __author__ = 'paranoidi'
 
-import sys
-from flexget.utils.simple_persistence import SimplePersistence
-from flexget.plugin import register_plugin
 import logging
+import sys
+
+from flexget import plugin
+from flexget.event import event
+from flexget.utils.simple_persistence import SimplePersistence
 
 log = logging.getLogger('cron_env')
 
@@ -42,5 +44,7 @@ class CronEnvPlugin(object):
         self.executed = True
 
 
-if not sys.platform.startswith('win'):
-    register_plugin(CronEnvPlugin, 'cron_env', api_ver=2, builtin=True)
+@event('plugin.register')
+def register_plugin():
+    if not sys.platform.startswith('win'):
+        plugin.register(CronEnvPlugin, 'cron_env', api_ver=2, builtin=True)
