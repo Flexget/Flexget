@@ -17,7 +17,7 @@ class FilterRottenTomatoes(object):
         min_critics_score: <num>
         min_audience_score: <num>
         min_average_score: <num>
-        min_critic_rating: <rotten, fresh, or certified fresh>
+        min_critics_rating: <rotten, fresh, or certified fresh>
         min_audience_rating: <upright or spilled>
         min_year: <num>
         max_year: <num>
