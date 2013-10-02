@@ -10,9 +10,10 @@ from datetime import datetime
 import feedparser
 from requests import RequestException
 
+from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, internet, PluginError
+from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.tools import decode_html
 from flexget.utils.pathscrub import pathscrub
@@ -179,7 +180,7 @@ class InputRSS(object):
             log.trace('filename `%s` from enclosure', entry['filename'])
 
     @cached('rss')
-    @internet(log)
+    @plugin.internet(log)
     def on_task_input(self, task, config):
         config = self.build_config(config)
 
@@ -217,7 +218,7 @@ class InputRSS(object):
                 response = task.requests.get(config['url'], timeout=60, headers=headers, raise_status=False, auth=auth)
                 content = response.content
             except RequestException as e:
-                raise PluginError('Unable to download the RSS for task %s (%s): %s' %
+                raise plugin.PluginError('Unable to download the RSS for task %s (%s): %s' %
                                   (task.name, config['url'], e))
             if config.get('ascii'):
                 # convert content to ascii (cleanup), can also help with parsing problems on malformed feeds
@@ -231,14 +232,14 @@ class InputRSS(object):
                 task.no_entries_ok = True
                 return []
             elif status == 401:
-                raise PluginError('Authentication needed for task %s (%s): %s' %
-                                  (task.name, config['url'], response.headers['www-authenticate']), log)
+                raise plugin.PluginError('Authentication needed for task %s (%s): %s' %
+                                         (task.name, config['url'], response.headers['www-authenticate']), log)
             elif status == 404:
-                raise PluginError('RSS Feed %s (%s) not found' % (task.name, config['url']), log)
+                raise plugin.PluginError('RSS Feed %s (%s) not found' % (task.name, config['url']), log)
             elif status == 500:
-                raise PluginError('Internal server exception on task %s (%s)' % (task.name, config['url']), log)
+                raise plugin.PluginError('Internal server exception on task %s (%s)' % (task.name, config['url']), log)
             elif status != 200:
-                raise PluginError('HTTP error %s received from %s' % (status, config['url']), log)
+                raise plugin.PluginError('HTTP error %s received from %s' % (status, config['url']), log)
 
             # update etag and last modified
             if not config['all_entries']:
@@ -264,7 +265,7 @@ class InputRSS(object):
         try:
             rss = feedparser.parse(content)
         except LookupError as e:
-            raise PluginError('Unable to parse the RSS (from %s): %s' % (config['url'], e))
+            raise plugin.PluginError('Unable to parse the RSS (from %s): %s' % (config['url'], e))
 
         # check for bozo
         ex = rss.get('bozo_exception', False)
@@ -283,20 +284,20 @@ class InputRSS(object):
                     # see: ticket 88
                     log.debug('ignoring feedparser.CharacterEncodingOverride')
                 elif isinstance(ex, UnicodeEncodeError):
-                    raise PluginError('Feed has UnicodeEncodeError while parsing...')
+                    raise plugin.PluginError('Feed has UnicodeEncodeError while parsing...')
                 elif isinstance(ex, (xml.sax._exceptions.SAXParseException, xml.sax._exceptions.SAXException)):
                     # save invalid data for review, this is a bit ugly but users seem to really confused when
                     # html pages (login pages) are received
                     self.process_invalid_content(task, content, config['url'])
                     if task.options.debug:
                         log.exception(ex)
-                    raise PluginError('Received invalid RSS content from task %s (%s)' % (task.name, config['url']))
+                    raise plugin.PluginError('Received invalid RSS content from task %s (%s)' % (task.name, config['url']))
                 elif isinstance(ex, httplib.BadStatusLine) or isinstance(ex, IOError):
                     raise ex  # let the @internet decorator handle
                 else:
                     # all other bozo errors
                     self.process_invalid_content(task, content, config['url'])
-                    raise PluginError('Unhandled bozo_exception. Type: %s (task: %s)' %
+                    raise plugin.PluginError('Unhandled bozo_exception. Type: %s (task: %s)' %
                                       (ex.__class__.__name__, task.name), log)
 
         log.debug('encoding %s', rss.encoding)
@@ -447,4 +448,7 @@ class InputRSS(object):
 
         return entries
 
-register_plugin(InputRSS, 'rss', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputRSS, 'rss', api_ver=2)

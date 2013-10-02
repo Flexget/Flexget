@@ -9,10 +9,9 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.schema import Table, ForeignKey
 from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 
-from flexget import db_schema, options
+from flexget import db_schema, options, plugin
 from flexget.event import event
 from flexget.entry import Entry
-from flexget.plugin import register_plugin
 from flexget.utils.sqlalchemy_utils import table_schema, get_index_by_name
 from flexget.utils.tools import console, strip_html
 from flexget.manager import Session
@@ -483,8 +482,10 @@ def do_cli(manager, options):
         cli_inject(manager, options)
 
 
-register_plugin(Archive, 'archive', api_ver=2)
-register_plugin(UrlrewriteArchive, 'flexget_archive', groups=['search'])
+@event('plugin.register')
+def register_plugin():
+    plugin.register(Archive, 'archive', api_ver=2)
+    plugin.register(UrlrewriteArchive, 'flexget_archive', groups=['search'])
 
 
 @event('options.register')

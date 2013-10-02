@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('accept_all')
 
@@ -21,4 +23,6 @@ class FilterAcceptAll(object):
             for entry in task.entries:
                 entry.accept()
 
-register_plugin(FilterAcceptAll, 'accept_all', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterAcceptAll, 'accept_all', api_ver=2)

@@ -11,9 +11,10 @@ from sqlalchemy.orm import relation, backref
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
 
-from flexget import db_schema, options
+from flexget import db_schema, options, plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
+from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.log import log_once
 from flexget.utils.titles import SeriesParser, ParseWarning, ID_TYPES
@@ -21,8 +22,6 @@ from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_ta
                                             create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property
-from flexget.manager import Session
-from flexget.plugin import register_plugin, get_plugin_by_name, DependencyError, priority, PluginError
 
 SCHEMA_VER = 11
 
@@ -852,8 +851,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
     def on_process_start(self, task):
         try:
-            self.backlog = get_plugin_by_name('backlog').instance
-        except DependencyError:
+            self.backlog = plugin.get_plugin_by_name('backlog').instance
+        except plugin.DependencyError:
             log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
 
     def auto_exact(self, config):
@@ -875,7 +874,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                         series_config['exact'] = True
 
     # Run after metainfo_quality and before metainfo_series
-    @priority(125)
+    @plugin.priority(125)
     def on_task_metainfo(self, task):
         config = self.prepare_config(task.config.get('series', {}))
         self.auto_exact(config)
@@ -931,7 +930,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
                 # accept info from set: and place into the entry
                 if 'set' in series_config:
-                    set = get_plugin_by_name('set')
+                    set = plugin.get_plugin_by_name('set')
                     set.instance.modify(entry, series_config.get('set'))
 
             # If we didn't find any episodes for this series, continue
@@ -1370,7 +1369,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 class SeriesDBManager(FilterSeriesBase):
     """Update in the database with series info from the config"""
 
-    @priority(0)
+    @plugin.priority(0)
     def on_task_start(self, task, config):
         if not task.config_modified:
             return
@@ -1401,13 +1400,14 @@ class SeriesDBManager(FilterSeriesBase):
                 try:
                     set_series_begin(db_series, series_config['begin'])
                 except ValueError as e:
-                    raise PluginError(e)
+                    raise plugin.PluginError(e)
 
 
-# Register plugin
-register_plugin(FilterSeries, 'series')
-# This is a builtin so that it can update the database for tasks that may have had series plugin removed
-register_plugin(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterSeries, 'series')
+    # This is a builtin so that it can update the database for tasks that may have had series plugin removed
+    plugin.register(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
 
 
 @event('options.register')

@@ -3,10 +3,9 @@ import os
 import re
 import logging
 
-from flexget import options
+from flexget import options, plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugin import register_plugin, PluginError
 from flexget.utils.cached_input import cached
 
 log = logging.getLogger('tail')
@@ -99,7 +98,7 @@ class InputTail(object):
                     try:
                         line = line.decode(encoding)
                     except UnicodeError:
-                        raise PluginError('Failed to decode file using %s. Check encoding.' % encoding)
+                        raise plugin.PluginError('Failed to decode file using %s. Check encoding.' % encoding)
 
                 if not line:
                     task.simple_persistence[filename] = file.tell()
@@ -142,7 +141,9 @@ class InputTail(object):
         return entries
 
 
-register_plugin(InputTail, 'tail', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputTail, 'tail', api_ver=2)
 
 
 @event('options.register')

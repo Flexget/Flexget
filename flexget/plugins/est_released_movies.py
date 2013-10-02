@@ -2,7 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime
 import logging
 
-from flexget.plugin import register_plugin
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('est_movies')
 
@@ -19,4 +20,6 @@ class EstimatesReleasedMovies(object):
             log.debug('Unable to check release for %s, tmdb_release field is not defined' %
                       entry['title'])
 
-register_plugin(EstimatesReleasedMovies, 'est_released_movies', groups=['estimate_release'])
+@event('plugin.register')
+def register_plugin():
+    plugin.register(EstimatesReleasedMovies, 'est_released_movies', groups=['estimate_release'])

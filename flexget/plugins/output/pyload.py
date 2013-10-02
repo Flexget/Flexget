@@ -4,9 +4,10 @@ from __future__ import unicode_literals, division, absolute_import
 from urllib import urlencode, quote
 from urllib2 import urlopen, URLError, HTTPError
 from logging import getLogger
+
+from flexget import plugin, validator
+from flexget.event import event
 from flexget.utils import json
-from flexget.plugin import register_plugin, PluginError
-from flexget import validator
 
 log = getLogger('pyload')
 
@@ -89,11 +90,11 @@ class PluginPyLoad(object):
         try:
             self.check_login(task, config)
         except URLError:
-            raise PluginError('pyLoad not reachable', log)
-        except PluginError:
+            raise plugin.PluginError('pyLoad not reachable', log)
+        except plugin.PluginError:
             raise
         except Exception as e:
-            raise PluginError('Unknown error: %s' % str(e), log)
+            raise plugin.PluginError('Unknown error: %s' % str(e), log)
 
         api = config.get('api', self.DEFAULT_API)
         hoster = config.get('hoster', self.DEFAULT_HOSTER)
@@ -169,7 +170,7 @@ class PluginPyLoad(object):
             result = query_api(url, "login", post)
             response = json.loads(result.read())
             if not response:
-                raise PluginError('Login failed', log)
+                raise plugin.PluginError('Login failed', log)
             self.session = response.replace('"', '')
         else:
             try:
@@ -179,7 +180,7 @@ class PluginPyLoad(object):
                     self.session = None
                     return self.check_login(task, config)
                 else:
-                    raise PluginError('HTTP Error %s' % e, log)
+                    raise plugin.PluginError('HTTP Error %s' % e, log)
 
 
 def query_api(url, method, post=None):
@@ -187,7 +188,10 @@ def query_api(url, method, post=None):
         return urlopen(url.rstrip("/") + "/" + method.strip("/"), urlencode(post) if post else None)
     except HTTPError as e:
         if e.code == 500:
-            raise PluginError('Internal API Error', log)
+            raise plugin.PluginError('Internal API Error', log)
         raise
 
-register_plugin(PluginPyLoad, 'pyload', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginPyLoad, 'pyload', api_ver=2)

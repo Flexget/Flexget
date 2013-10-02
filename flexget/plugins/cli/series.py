@@ -3,17 +3,17 @@ import argparse
 from datetime import datetime, timedelta
 from sqlalchemy import func
 
-from flexget import options
+from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import register_plugin, DependencyError, get_plugin_by_name
 from flexget.utils.tools import console
 
 try:
     from flexget.plugins.filter.series import (SeriesDatabase, Series, Episode, Release, SeriesTask, forget_series,
                                                forget_series_episode, set_series_begin, normalize_series_name)
 except ImportError:
-    raise DependencyError(issued_by='cli_series', missing='series', message='Series commandline interface not loaded')
+    raise plugin.DependencyError(issued_by='cli_series', missing='series',
+                                 message='Series commandline interface not loaded')
 
 
 class CLISeries(SeriesDatabase):
@@ -208,13 +208,10 @@ class CLISeries(SeriesDatabase):
         manager.config_changed()
 
 
-register_plugin(CLISeries, 'cli_series')
-
-
 @event('options.register')
 def register_parser_arguments():
     # Register the command
-    callback = get_plugin_by_name('cli_series').instance.do_cli
+    callback = plugin.get_plugin_by_name('cli_series').instance.do_cli
     parser = options.register_command('series', callback, help='view and manipulate the series plugin database')
 
     # Parent parser for subcommands that need a series name

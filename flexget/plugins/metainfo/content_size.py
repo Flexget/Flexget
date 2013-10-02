@@ -3,7 +3,9 @@ import logging
 import re
 import math
 import os.path
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('metanfo_csize')
 
@@ -65,4 +67,6 @@ class MetainfoContentSize(object):
             log.debug('Found content size information from %s entries' % count)
 
 
-register_plugin(MetainfoContentSize, 'metainfo_content_size', builtin=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(MetainfoContentSize, 'metainfo_content_size', builtin=True)

@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from sys import maxint
-from flexget.plugin import register_plugin, priority
+
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.log import log_once
 
 log = logging.getLogger('content_size')
@@ -35,13 +37,13 @@ class FilterContentSize(object):
                 entry.reject('maximum size %s MB, got %s MB' % (config['max'], size), remember=remember)
                 return True
 
-    @priority(130)
+    @plugin.priority(130)
     def on_task_filter(self, task, config):
         # Do processing on filter phase in case input plugin provided the size
         for entry in task.entries:
             self.process_entry(task, entry, config, remember=False)
 
-    @priority(150)
+    @plugin.priority(150)
     def on_task_modify(self, task, config):
         if task.options.test or task.options.learn:
             log.info('Plugin is partially disabled with --test and --learn because size information may not be available')
@@ -65,4 +67,6 @@ class FilterContentSize(object):
             task.rerun()
 
 
-register_plugin(FilterContentSize, 'content_size', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterContentSize, 'content_size', api_ver=2)

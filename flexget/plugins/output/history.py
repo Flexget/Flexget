@@ -4,10 +4,9 @@ from datetime import datetime
 
 from sqlalchemy import Column, String, Integer, DateTime, Unicode, desc
 
-from flexget import options
+from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Base, Session
-from flexget.plugin import register_plugin
 from flexget.utils.tools import console
 
 log = logging.getLogger('history')
@@ -83,4 +82,6 @@ def register_parser_arguments():
     parser.add_argument('--search', action='store', metavar='TERM', help='limit to results that contain %(metavar)s')
 
 
-register_plugin(PluginHistory, 'history', builtin=True, api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginHistory, 'history', builtin=True, api_ver=2)

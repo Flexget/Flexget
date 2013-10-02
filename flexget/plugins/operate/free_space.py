@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
-from flexget.plugin import register_plugin, priority
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('free_space')
 
@@ -41,7 +43,7 @@ class PluginFreeSpace(object):
             config['path'] = task.manager.config_base
         return config
 
-    @priority(255)
+    @plugin.priority(255)
     def on_task_download(self, task):
         config = self.get_config(task)
         # Only bother aborting if there were accepted entries this run.
@@ -52,4 +54,6 @@ class PluginFreeSpace(object):
                 task.abort('Less than %d MB of free space in %s' % (config['space'], config['path']))
 
 
-register_plugin(PluginFreeSpace, 'free_space')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginFreeSpace, 'free_space')

@@ -5,9 +5,8 @@ from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, and_, Index
 from sqlalchemy.orm import relation
 
-from flexget import db_schema
+from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.plugin import register_plugin, priority
 from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column
 from flexget.utils.tools import parse_timedelta
 
@@ -82,7 +81,7 @@ class FilterRememberRejected(object):
         entry.reject('message', remember=True)
     """
 
-    @priority(0)
+    @plugin.priority(0)
     def on_task_start(self, task, config):
         """Purge remembered entries if the config has changed."""
         # See if the task has changed since last run
@@ -103,12 +102,12 @@ class FilterRememberRejected(object):
                 task.config_changed()
         task.session.commit()
 
-    @priority(-255)
+    @plugin.priority(-255)
     def on_task_input(self, task, config):
         for entry in task.all_entries:
             entry.on_reject(self.on_entry_reject, task=task)
 
-    @priority(255)
+    @plugin.priority(255)
     def on_task_filter(self, task, config):
         """Reject any remembered entries from previous runs"""
         (task_id,) = task.session.query(RememberTask.id).filter(RememberTask.name == task.name).first()
@@ -156,4 +155,6 @@ def db_cleanup(session):
         log.verbose('Removed %d entries from remember rejected table.' % result)
 
 
-register_plugin(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)

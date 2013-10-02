@@ -2,9 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import fnmatch
 import logging
 
-from flexget import options
+from flexget import options, plugin
 from flexget.event import event
-from flexget.plugin import register_plugin
 from flexget.utils.tools import console
 
 log = logging.getLogger('task_control')
@@ -77,8 +76,10 @@ class ManualTask(object):
             task.enabled = False
 
 
-register_plugin(OnlyTask, '--task', builtin=True)
-register_plugin(ManualTask, 'manual')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OnlyTask, '--task', builtin=True)
+    plugin.register(ManualTask, 'manual')
 
 
 @event('options.register')

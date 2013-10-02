@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, priority
+
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.log import log_once
 
 log = logging.getLogger('rt')
@@ -82,10 +84,10 @@ class FilterRottenTomatoes(object):
         return rt
 
     # Run later to avoid unnecessary lookups
-    @priority(115)
+    @plugin.priority(115)
     def on_task_filter(self, task, config):
 
-        lookup = get_plugin_by_name('rottentomatoes_lookup').instance.lookup
+        lookup = plugin.get_plugin_by_name('rottentomatoes_lookup').instance.lookup
 
         # since the plugin does not reject anything, no sense going trough accepted
         for entry in task.undecided:
@@ -94,7 +96,7 @@ class FilterRottenTomatoes(object):
 
             try:
                 lookup(entry)
-            except PluginError as e:
+            except plugin.PluginError as e:
                 # logs skip message once through log_once (info) and then only when ran from cmd line (w/o --cron)
                 msg = 'Skipping %s because of an error: %s' % (entry['title'], e.value)
                 if not log_once(msg, logger=log):
@@ -197,4 +199,7 @@ class FilterRottenTomatoes(object):
                 log.debug('Accepting %s' % (entry['title']))
                 entry.accept()
 
-register_plugin(FilterRottenTomatoes, 'rottentomatoes', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterRottenTomatoes, 'rottentomatoes', api_ver=2)

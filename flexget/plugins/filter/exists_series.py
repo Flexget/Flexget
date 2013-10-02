@@ -3,8 +3,9 @@ import copy
 import os
 import logging
 
+from flexget import plugin
+from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.plugin import register_plugin, priority, PluginWarning
 from flexget.utils.log import log_once
 from flexget.utils.template import RenderError
 from flexget.utils.titles import ParseWarning
@@ -46,7 +47,7 @@ class FilterExistsSeries(object):
             config['path'] = [config['path']]
         return config
 
-    @priority(-1)
+    @plugin.priority(-1)
     def on_task_filter(self, task):
         if not task.accepted:
             log.debug('Scanning not needed')
@@ -74,7 +75,7 @@ class FilterExistsSeries(object):
             # crashes on some paths with unicode
             path = str(os.path.expanduser(path))
             if not os.path.exists(path):
-                raise PluginWarning('Path %s does not exist' % path, log)
+                raise plugin.PluginWarning('Path %s does not exist' % path, log)
             # scan through
             for root, dirs, files in os.walk(path, followlinks=True):
                 # convert filelists into utf-8 to avoid unicode problems
@@ -119,4 +120,6 @@ class FilterExistsSeries(object):
                                     log.trace('new one is better proper, allowing')
                                     continue
 
-register_plugin(FilterExistsSeries, 'exists_series', groups=['exists'])
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterExistsSeries, 'exists_series', groups=['exists'])

@@ -2,7 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import sys
 import os
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('change')
 found_deprecated = False
@@ -66,7 +68,11 @@ class ChangeWarn(object):
             task.manager.shutdown(finish_queue=False)
             task.abort('Deprecated config.')
 
-register_plugin(ChangeWarn, 'change_warn', builtin=True)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(ChangeWarn, 'change_warn', builtin=True)
+
 
 # check that no old plugins are in pre-compiled form (pyc)
 try:

@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, priority
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('priv_torrents')
 
@@ -27,9 +29,9 @@ class FilterPrivateTorrents(object):
 
     schema = {'type': 'boolean'}
 
-    @priority(127)
-    def on_task_modify(self, task):
-        private_torrents = task.config['private_torrents']
+    @plugin.priority(127)
+    def on_task_modify(self, task, config):
+        private_torrents = config
 
         for entry in task.accepted:
             if not 'torrent' in entry:
@@ -42,4 +44,7 @@ class FilterPrivateTorrents(object):
             elif private_torrents and not private:
                 entry.reject('public torrent', remember=True)
 
-register_plugin(FilterPrivateTorrents, 'private_torrents')
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterPrivateTorrents, 'private_torrents', api_ver=2)

@@ -3,8 +3,9 @@ import logging
 import os
 import yaml
 
-from flexget.plugin import priority, register_plugin, PluginError
+from flexget import plugin
 from flexget.config_schema import one_or_more
+from flexget.event import event
 
 log = logging.getLogger('include')
 
@@ -23,7 +24,7 @@ class PluginInclude(object):
     # TODO: validate files exist, but relative paths should be relative to config dir
     schema = one_or_more({'type': 'string'})
 
-    @priority(254)
+    @plugin.priority(254)
     def on_task_prepare(self, task, config):
         if not config:
             return
@@ -38,13 +39,15 @@ class PluginInclude(object):
                 name = os.path.join(task.manager.config_base, name)
             include = yaml.load(file(name))
             if not isinstance(include, dict):
-                raise PluginError('Include file format is invalid: %s' % name)
+                raise plugin.PluginError('Include file format is invalid: %s' % name)
             log.debug('Merging %s into task %s' % (name, task.name))
             # merge
             from flexget.utils.tools import MergeException, merge_dict_from_to
             try:
                 merge_dict_from_to(include, task.config)
             except MergeException:
-                raise PluginError('Failed to merge include file to task %s, incompatible datatypes' % (task.name))
+                raise plugin.PluginError('Failed to merge include file to task %s, incompatible datatypes' % task.name)
 
-register_plugin(PluginInclude, 'include', api_ver=2, builtin=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginInclude, 'include', api_ver=2, builtin=True)

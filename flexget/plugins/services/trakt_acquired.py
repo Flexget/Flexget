@@ -4,7 +4,8 @@ import hashlib
 
 from requests import RequestException
 
-from flexget.plugin import register_plugin
+from flexget import plugin
+from flexget.event import event
 from flexget.utils import json
 
 log = logging.getLogger('trakt_acquired')
@@ -101,4 +102,6 @@ class TraktAcquired(object):
                 continue
 
 
-register_plugin(TraktAcquired, 'trakt_acquired', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(TraktAcquired, 'trakt_acquired', api_ver=2)

@@ -3,8 +3,9 @@ import logging
 
 from sqlalchemy import desc
 
+from flexget import plugin
+from flexget.event import event
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, DependencyError
 
 log = logging.getLogger('emit_series')
 
@@ -12,7 +13,7 @@ try:
     from flexget.plugins.filter.series import SeriesTask, SeriesDatabase, Episode, Release
 except ImportError as e:
     log.error(e.message)
-    raise DependencyError(issued_by='emit_series', missing='series')
+    raise plugin.DependencyError(issued_by='emit_series', missing='series')
 
 
 class EmitSeries(SeriesDatabase):
@@ -135,4 +136,6 @@ class EmitSeries(SeriesDatabase):
                 self.try_next_season[entry['series_name']] = False
 
 
-register_plugin(EmitSeries, 'emit_series', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(EmitSeries, 'emit_series', api_ver=2)

@@ -6,9 +6,10 @@ import datetime
 from copy import copy
 from collections import defaultdict
 
+from flexget import plugin
+from flexget.event import event
 from flexget.task import Task
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, plugins as all_plugins, get_plugin_by_name, phase_methods
 
 log = logging.getLogger('if')
 
@@ -53,7 +54,7 @@ class FilterIf(object):
                 phase_dict['filter'].append(item)
             else:
                 for plugin_name, plugin_config in action.iteritems():
-                    plugin = get_plugin_by_name(plugin_name)
+                    plugin = plugin.get_plugin_by_name(plugin_name)
                     for phase in plugin.phase_handlers:
                         if phase == 'prepare':
                             # If plugin has a prepare handler, run it now unconditionally
@@ -88,7 +89,7 @@ class FilterIf(object):
 
     def __getattr__(self, item):
         """Provides handlers for all phases."""
-        for phase, method in phase_methods.iteritems():
+        for phase, method in plugin.phase_methods.iteritems():
             if item == method and phase not in ['accept', 'reject', 'fail', 'input']:
                 break
         else:
@@ -119,7 +120,7 @@ class FilterIf(object):
 
                         try:
                             for plugin_name, plugin_config in action.iteritems():
-                                plugin = get_plugin_by_name(plugin_name)
+                                plugin = plugin.get_plugin_by_name(plugin_name)
                                 method = plugin.phase_handlers[phase]
                                 method(fake_task, plugin_config)
                         except Exception:
@@ -129,4 +130,6 @@ class FilterIf(object):
         return handle_phase
 
 
-register_plugin(FilterIf, 'if', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterIf, 'if', api_ver=2)

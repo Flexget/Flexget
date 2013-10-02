@@ -1,8 +1,10 @@
 import logging
 import ftplib
 import os
+
+from flexget import plugin
+from flexget.event import event
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, PluginError, PluginWarning
 
 log = logging.getLogger('ftp_list')
 
@@ -58,7 +60,7 @@ class InputFtpList(object):
             ftp.connect(connection_config['host'], connection_config['port'])
             ftp.login(connection_config['username'], connection_config['password'])
         except ftplib.all_errors as e:
-            raise PluginError(e)
+            raise plugin.PluginError(e)
 
         log.debug('Connected.')
             
@@ -72,7 +74,7 @@ class InputFtpList(object):
             try:
                 dirs = ftp.nlst(path)
             except ftplib.error_perm, e:
-                raise PluginWarning(str(e))
+                raise plugin.PluginWarning(str(e))
 
             if not dirs:
                 log.info('Directory %s is empty', path)
@@ -84,4 +86,6 @@ class InputFtpList(object):
 
         return entries
 
-register_plugin(InputFtpList, 'ftp_list', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputFtpList, 'ftp_list', api_ver=2)

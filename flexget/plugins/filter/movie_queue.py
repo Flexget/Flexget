@@ -4,19 +4,18 @@ import logging
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget import db_schema
+from flexget import db_schema, plugin
+from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.imdb import extract_id
 from flexget.utils.database import quality_requirement_property, with_session
 from flexget.utils.sqlalchemy_utils import table_exists, table_schema
-from flexget.plugin import DependencyError, get_plugin_by_name, register_plugin
-from flexget.event import event
 
 try:
     from flexget.plugins.filter import queue_base
 except ImportError:
-    raise DependencyError(issued_by='movie_queue', missing='queue_base',
+    raise plugin.DependencyError(issued_by='movie_queue', missing='queue_base',
                           message='movie_queue requires the queue_base plugin')
 
 log = logging.getLogger('movie_queue')
@@ -81,12 +80,12 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
     def matches(self, task, config, entry):
         # Tell tmdb_lookup to add lazy lookup fields if not already present
         try:
-            get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
-        except DependencyError:
+            plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
+        except plugin.DependencyError:
             log.debug('tmdb_lookup is not available, queue will not work if movie ids are not populated')
         try:
-            get_plugin_by_name('imdb_lookup').instance.register_lazy_fields(entry)
-        except DependencyError:
+            plugin.get_plugin_by_name('imdb_lookup').instance.register_lazy_fields(entry)
+        except plugin.DependencyError:
             log.debug('imdb_lookup is not available, queue will not work if movie ids are not populated')
             # make sure the entry has a movie id field filled
         conditions = []
@@ -137,7 +136,7 @@ def parse_what(what, lookup=True, session=None):
     :return: A dictionary with 'title', 'imdb_id' and 'tmdb_id' keys
     """
 
-    tmdb_lookup = get_plugin_by_name('api_tmdb').instance.lookup
+    tmdb_lookup = plugin.get_plugin_by_name('api_tmdb').instance.lookup
 
     result = {'title': None, 'imdb_id': None, 'tmdb_id': None}
     result['imdb_id'] = extract_id(what)
@@ -297,4 +296,6 @@ def queue_get(session=None, downloaded=False):
         return session.query(QueuedMovie).filter(QueuedMovie.downloaded != None).all()
 
 
-register_plugin(FilterMovieQueue, 'movie_queue', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterMovieQueue, 'movie_queue', api_ver=2)

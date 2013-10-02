@@ -16,10 +16,9 @@ from sqlalchemy import Column, Integer, DateTime, Unicode, Boolean, or_, select,
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
-from flexget import db_schema, options
+from flexget import db_schema, options, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import register_plugin, priority
 from flexget.utils.imdb import is_imdb_url, extract_id
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 from flexget.utils.tools import console
@@ -152,7 +151,7 @@ class FilterSeen(object):
         root.accept('choice').accept_choices(['global', 'local'])
         return root
 
-    @priority(255)
+    @plugin.priority(255)
     def on_task_filter(self, task, config, remember_rejected=False):
         """Filter seen entries"""
         if config is False:
@@ -298,7 +297,9 @@ def seen_search(options):
     session.close()
 
 
-register_plugin(FilterSeen, 'seen', builtin=True, api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterSeen, 'seen', builtin=True, api_ver=2)
 
 
 @event('options.register')

@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from flexget.plugin import register_plugin, priority, get_plugin_by_name
+from flexget import plugin
+from flexget.event import event
 from flexget.plugins.filter.series import FilterSeriesBase, normalize_series_name, Series
 
 
@@ -35,7 +36,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
         return {'anyOf': [{'type': 'boolean'}, settings]}
 
     # Run after series and metainfo series plugins
-    @priority(115)
+    @plugin.priority(115)
     def on_task_metainfo(self, task, config):
         if not config:
             # Don't run when we are disabled
@@ -51,7 +52,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
             group_settings = config
         group_settings['identified_by'] = 'ep'
         # Generate a list of unique series that have premieres
-        metainfo_series = get_plugin_by_name('metainfo_series')
+        metainfo_series = plugin.get_plugin_by_name('metainfo_series')
         guess_entry = metainfo_series.instance.guess_entry
         # Make a set of unique series according to series name normalization rules
         guessed_series = {}
@@ -76,4 +77,6 @@ class FilterSeriesPremiere(FilterSeriesBase):
         self.merge_config(task, allseries)
 
 
-register_plugin(FilterSeriesPremiere, 'series_premiere', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterSeriesPremiere, 'series_premiere', api_ver=2)

@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('extension')
 
@@ -32,4 +34,6 @@ class ModifyExtension(object):
             entry['filename'] = '%s.%s' % (entry.get('filename', entry['title']), ext)
             log.debug('filename is now `%s`' % entry['filename'])
 
-register_plugin(ModifyExtension, 'extension')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(ModifyExtension, 'extension')

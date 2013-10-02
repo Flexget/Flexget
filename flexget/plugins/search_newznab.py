@@ -2,15 +2,13 @@ __author__ = 'deksan'
 
 import logging
 import urllib
-from urlparse import urlparse
 
 import feedparser
 
-from flexget import validator
+from flexget import plugin, validator
 from flexget.entry import Entry
-from flexget.plugin import register_plugin
+from flexget.event import event
 from flexget.plugins.api_tvrage import lookup_series
-from flexget.utils.requests import Session
 
 log = logging.getLogger('newznab')
 
@@ -108,4 +106,7 @@ class Newznab(object):
         url = config['url'] + '&imdbid=' + imdb_id
         return self.fill_entries_for_url(url, config)
 
-register_plugin(Newznab, 'newznab', api_ver=2, groups=['search'])
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(Newznab, 'newznab', api_ver=2, groups=['search'])

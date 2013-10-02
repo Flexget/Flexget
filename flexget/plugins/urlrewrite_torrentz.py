@@ -5,10 +5,10 @@ import urllib
 import urllib2
 import feedparser
 
-from flexget.plugin import register_plugin, PluginWarning
+from flexget import plugin
 from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils.search import torrent_availability, normalize_unicode
-from flexget import validator
 
 log = logging.getLogger('torrentz')
 
@@ -24,10 +24,7 @@ REPUTATIONS = {  # Maps reputation name to feed address
 class UrlRewriteTorrentz(object):
     """Torrentz urlrewriter."""
 
-    def validator(self):
-        root = validator.factory('choice')
-        root.accept_choices(REPUTATIONS)
-        return root
+    schema = {'type': 'string', 'enum': list(REPUTATIONS)}
 
     def url_rewritable(self, task, entry):
         return REGEXP.match(entry['url'])
@@ -51,18 +48,18 @@ class UrlRewriteTorrentz(object):
             try:
                 opened = urllib2.urlopen(url)
             except urllib2.URLError, err:
-                raise PluginWarning('Error requesting URL: %s' % err)
+                raise plugin.PluginWarning('Error requesting URL: %s' % err)
             rss = feedparser.parse(opened)
 
             status = rss.get('status', False)
             if status != 200:
-                raise PluginWarning(
+                raise plugin.PluginWarning(
                     'Search result not 200 (OK), received %s %s' %
                     (status, opened.msg))
 
             ex = rss.get('bozo_exception', False)
             if ex:
-                raise PluginWarning('Got bozo_exception (bad feed)')
+                raise plugin.PluginWarning('Got bozo_exception (bad feed)')
 
             for item in rss.entries:
                 m = re.search(r'Size: ([\d]+) Mb Seeds: ([,\d]+) Peers: ([,\d]+) Hash: ([a-f0-9]+)',
@@ -84,4 +81,7 @@ class UrlRewriteTorrentz(object):
         log.debug('Search got %d results' % len(entries))
         return entries
 
-register_plugin(UrlRewriteTorrentz, 'torrentz', groups=['urlrewriter', 'search'])
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteTorrentz, 'torrentz', groups=['urlrewriter', 'search'])

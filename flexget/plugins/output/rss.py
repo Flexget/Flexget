@@ -7,8 +7,8 @@ import os
 
 from sqlalchemy import Column, Integer, String, DateTime, Unicode
 
-from flexget import db_schema
-from flexget.plugin import register_plugin, PluginWarning
+from flexget import db_schema, plugin
+from flexget.event import event
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
 from flexget.utils.template import render_from_entry, get_template
 
@@ -168,7 +168,7 @@ class OutputRSS(object):
     def on_task_exit(self, task):
         """Store finished / downloaded entries at exit"""
         if not rss2gen:
-            raise PluginWarning('plugin make_rss requires PyRSS2Gen library.')
+            raise plugin.PluginWarning('plugin make_rss requires PyRSS2Gen library.')
         config = self.get_config(task)
 
         # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely usefull)
@@ -278,4 +278,6 @@ class OutputRSS(object):
         self.written[config['file']] = True
 
 
-register_plugin(OutputRSS, 'make_rss')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputRSS, 'make_rss')

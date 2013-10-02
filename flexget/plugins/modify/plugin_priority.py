@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import plugins, register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('p_priority')
 
@@ -32,7 +34,7 @@ class PluginPriority(object):
         for name, priority in task.config.get('plugin_priority', {}).iteritems():
             names.append(name)
             originals = self.priorities.setdefault(name, {})
-            for phase, event in plugins[name].phase_handlers.iteritems():
+            for phase, event in plugin.plugins[name].phase_handlers.iteritems():
                 originals[phase] = event.priority
                 log.debug('stored %s original value %s' % (phase, event.priority))
                 event.priority = priority
@@ -48,10 +50,12 @@ class PluginPriority(object):
             names.append(name)
             originals = self.priorities[name]
             for phase, priority in originals.iteritems():
-                plugins[name].phase_handlers[phase].priority = priority
+                plugin.plugins[name].phase_handlers[phase].priority = priority
         log.debug('Restored priority for: %s' % ', '.join(names))
         self.priorities = {}
 
     on_task_abort = on_task_exit
 
-register_plugin(PluginPriority, 'plugin_priority')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginPriority, 'plugin_priority')

@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, priority, DependencyError, get_plugin_by_name
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('limit_new')
 
@@ -30,11 +32,11 @@ class FilterLimitNew(object):
 
     def on_process_start(self, task, config):
         try:
-            self.backlog = get_plugin_by_name('backlog').instance
-        except DependencyError:
+            self.backlog = plugin.get_plugin_by_name('backlog').instance
+        except plugin.DependencyError:
             log.warning('Unable utilize backlog plugin, entries may slip trough limit_new in some rare cases')
 
-    @priority(-255)
+    @plugin.priority(-255)
     def on_task_filter(self, task, config):
         if task.options.learn:
             log.info('Plugin limit_new is disabled with --learn')
@@ -53,4 +55,6 @@ class FilterLimitNew(object):
         log.debug('Rejected: %s Allowed: %s' % (len(task.accepted[amount:]), len(task.accepted[:amount])))
 
 
-register_plugin(FilterLimitNew, 'limit_new', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterLimitNew, 'limit_new', api_ver=2)

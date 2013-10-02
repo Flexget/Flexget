@@ -3,8 +3,9 @@ import logging
 import random
 import string
 
+from flexget import plugin
+from flexget.event import event
 from flexget.entry import Entry
-from flexget.plugin import register_plugin
 
 log = logging.getLogger('gen_series')
 
@@ -69,4 +70,6 @@ class GenSeries(object):
             task._rerun_count = 0
 
 
-register_plugin(GenSeries, 'gen_series_data', api_ver=2, debug=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(GenSeries, 'gen_series_data', api_ver=2, debug=True)

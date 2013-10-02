@@ -1,9 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget import options
+from flexget import options, plugin
 from flexget.event import event
-from flexget.plugin import register_plugin, priority
 from flexget.task import log as task_log
 from flexget.utils.log import log_once
 
@@ -16,7 +15,7 @@ class Verbose(object):
     Verbose entry accept, reject and failure
     """
 
-    @priority(-255)
+    @plugin.priority(-255)
     def on_task_input(self, task, config):
         if task.options.silent:
             return
@@ -48,7 +47,9 @@ class Verbose(object):
                          ' you must set up filter plugin(s) to accept them.', logger=log)
 
 
-register_plugin(Verbose, 'verbose', builtin=True, api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(Verbose, 'verbose', builtin=True, api_ver=2)
 
 
 @event('options.register')

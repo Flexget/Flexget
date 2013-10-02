@@ -4,8 +4,9 @@ import csv
 
 from requests import RequestException
 
+from flexget import plugin
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, PluginError
+from flexget.event import event
 from flexget.utils.cached_input import cached
 
 log = logging.getLogger('csv')
@@ -56,7 +57,7 @@ class InputCSV(object):
         try:
             r = task.requests.get(config['url'])
         except RequestException as e:
-            raise PluginError('Error fetching `%s`: %s' % (config['url'], e))
+            raise plugin.PluginError('Error fetching `%s`: %s' % (config['url'], e))
         # CSV module needs byte strings, we'll convert back to unicode later
         page = r.text.encode('utf-8').splitlines()
         for row in csv.reader(page):
@@ -68,9 +69,11 @@ class InputCSV(object):
                     # Convert the value back to unicode
                     entry[name] = row[index - 1].decode('utf-8').strip()
                 except IndexError:
-                    raise PluginError('Field `%s` index is out of range' % name)
+                    raise plugin.PluginError('Field `%s` index is out of range' % name)
 
             entries.append(entry)
         return entries
 
-register_plugin(InputCSV, 'csv', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputCSV, 'csv', api_ver=2)

@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget import validator
-from flexget.plugin import get_plugins_by_group, priority, PluginError, register_plugin, register_task_phase, get_plugin_by_name, DependencyError
+
+from flexget import plugin, validator
+from flexget.event import event
 
 log = logging.getLogger('urlrewriter')
 
@@ -36,7 +37,7 @@ class PluginUrlRewriting(object):
     # API method
     def url_rewritable(self, task, entry):
         """Return True if entry is urlrewritable by registered rewriter."""
-        for urlrewriter in get_plugins_by_group('urlrewriter'):
+        for urlrewriter in plugin.get_plugins_by_group('urlrewriter'):
             if urlrewriter.name in self.disabled_rewriters:
                 log.trace('Skipping rewriter %s since it\'s disabled' % urlrewriter.name)
                 continue
@@ -46,7 +47,7 @@ class PluginUrlRewriting(object):
         return False
 
     # API method - why priority though?
-    @priority(255)
+    @plugin.priority(255)
     def url_rewrite(self, task, entry):
         """Rewrites given entry url. Raises UrlRewritingError if failed."""
         tries = 0
@@ -55,7 +56,7 @@ class PluginUrlRewriting(object):
             if tries > 20:
                 raise UrlRewritingError('URL rewriting was left in infinite loop while rewriting url for %s, '
                                         'some rewriter is returning always True' % entry)
-            for urlrewriter in get_plugins_by_group('urlrewriter'):
+            for urlrewriter in plugin.get_plugins_by_group('urlrewriter'):
                 name = urlrewriter.name
                 if name in self.disabled_rewriters:
                     log.trace('Skipping rewriter %s since it\'s disabled' % name)
@@ -70,7 +71,7 @@ class PluginUrlRewriting(object):
                     #count = self.shared_cache.storedefault(entry['url'], 1)
                     #count += 1
                     raise UrlRewritingError('URL rewriting %s failed: %s' % (name, r.value))
-                except PluginError as e:
+                except plugin.PluginError as e:
                     raise UrlRewritingError('URL rewriting %s failed: %s' % (name, e.value))
                 except Exception as e:
                     log.exception(e)
@@ -86,18 +87,18 @@ class DisableUrlRewriter(object):
         return root
 
     def on_task_start(self, task, config):
-        urlrewrite = get_plugin_by_name('urlrewriting')['instance']
+        urlrewrite = plugin.get_plugin_by_name('urlrewriting')['instance']
         for disable in config:
             try:
-                get_plugin_by_name(disable)
-            except DependencyError:
+                plugin.get_plugin_by_name(disable)
+            except plugin.DependencyError:
                 log.critical('Unknown url-rewriter %s' % disable)
                 continue
             log.debug('Disabling url rewriter %s' % disable)
             urlrewrite.disabled_rewriters.append(disable)
 
     def on_task_exit(self, task, config):
-        urlrewrite = get_plugin_by_name('urlrewriting')['instance']
+        urlrewrite = plugin.get_plugin_by_name('urlrewriting')['instance']
         for disable in config:
             log.debug('Enabling url rewriter %s' % disable)
             try:
@@ -108,7 +109,9 @@ class DisableUrlRewriter(object):
     on_task_abort = on_task_exit
 
 
-register_plugin(PluginUrlRewriting, 'urlrewriting', builtin=True, api_ver=2)
-register_plugin(DisableUrlRewriter, 'disable_urlrewriters', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginUrlRewriting, 'urlrewriting', builtin=True, api_ver=2)
+    plugin.register(DisableUrlRewriter, 'disable_urlrewriters', api_ver=2)
 
-register_task_phase('urlrewrite', before='download')
+    plugin.register_task_phase('urlrewrite', before='download')

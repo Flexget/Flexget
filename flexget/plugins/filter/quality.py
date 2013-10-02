@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from flexget import plugin
+from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.plugin import register_plugin, priority
 import flexget.utils.qualities as quals
 
 log = logging.getLogger('quality')
@@ -21,7 +22,7 @@ class FilterQuality(object):
     schema = one_or_more({'type': 'string', 'format': 'quality_requirements'})
 
     # Run before series and imdb plugins, so correct qualities are chosen
-    @priority(175)
+    @plugin.priority(175)
     def on_task_filter(self, task, config):
         if not isinstance(config, list):
             config = [config]
@@ -33,4 +34,6 @@ class FilterQuality(object):
             if not any(req.allows(entry['quality']) for req in reqs):
                 entry.reject('%s does not match quality requirement %s' % (entry['quality'], reqs))
 
-register_plugin(FilterQuality, 'quality', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterQuality, 'quality', api_ver=2)

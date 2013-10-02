@@ -7,9 +7,9 @@ import re
 import sys
 import time
 
-from flexget.event import event
+from flexget import plugin
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, PluginError, priority, get_plugin_by_name, DependencyError
+from flexget.event import event
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
 
@@ -141,12 +141,12 @@ class DelugePlugin(object):
             from deluge.ui.client import client
         except ImportError as e:
             log.debug('Error importing deluge: %s' % e)
-            raise DependencyError('output_deluge', 'deluge',
+            raise plugin.DependencyError('output_deluge', 'deluge',
                                   'Deluge module and it\'s dependencies required. ImportError: %s' % e, log)
         try:
             from twisted.internet import reactor
         except:
-            raise DependencyError('output_deluge', 'twisted.internet', 'Twisted.internet package required', log)
+            raise plugin.DependencyError('output_deluge', 'twisted.internet', 'Twisted.internet package required', log)
         log.debug('Using deluge 1.2 api')
 
     def on_task_abort(self, task, config):
@@ -168,7 +168,7 @@ try:
         def on_connect_fail(self, result):
             """Pauses the reactor, returns PluginError. Gets called when connection to deluge daemon fails."""
             log.debug('Connect to deluge daemon failed, result: %s' % result)
-            reactor.callLater(0, reactor.pause, PluginError('Could not connect to deluge daemon', log))
+            reactor.callLater(0, reactor.pause, plugin.PluginError('Could not connect to deluge daemon', log))
 
         def on_connect_success(self, result, task, config):
             """Gets called when successfully connected to the daemon. Should do the work then call client.disconnect"""
@@ -183,8 +183,8 @@ try:
                 if auth[0]:
                     config['user'], config['pass'] = auth
                 else:
-                    raise PluginError('Unable to get local authentication info for Deluge. '
-                                      'You may need to specify an username and password from your Deluge auth file.')
+                    raise plugin.PluginError('Unable to get local authentication info for Deluge. You may need to '
+                                             'specify an username and password from your Deluge auth file.')
 
             client.set_disconnect_callback(self.on_disconnect)
 
@@ -342,7 +342,7 @@ class OutputDeluge(DelugePlugin):
                         'automanaged': 'auto_managed', 'ratio': 'stop_ratio', 'removeatratio': 'remove_at_ratio',
                         'addpaused': 'add_paused', 'compact': 'compact_allocation'}
 
-    @priority(120)
+    @plugin.priority(120)
     def on_task_prepare(self, task, config):
         """
         Detect what version of deluge is loaded.
@@ -363,7 +363,7 @@ class OutputDeluge(DelugePlugin):
                 logger('Using deluge 1.1 api')
                 self.deluge12 = False
 
-    @priority(120)
+    @plugin.priority(120)
     def on_task_download(self, task, config):
         """
         Call download plugin to generate the temp files we will load into deluge
@@ -375,7 +375,7 @@ class OutputDeluge(DelugePlugin):
             return
         # If the download plugin is not enabled, we need to call it to get our temp .torrent files
         if not 'download' in task.config:
-            download = get_plugin_by_name('download')
+            download = plugin.get_plugin_by_name('download')
             for entry in task.accepted:
                 if not entry.get('deluge_id'):
                     download.instance.get_temp_file(task, entry, handle_magnets=True)
@@ -390,7 +390,7 @@ class OutputDeluge(DelugePlugin):
                     entry.fail('Invalid torrent file')
                     log.error('Torrent file appears invalid for: %s', entry['title'])
 
-    @priority(135)
+    @plugin.priority(135)
     def on_task_output(self, task, config):
         """Add torrents to deluge at exit."""
         config = self.prepare_config(config)
@@ -414,14 +414,14 @@ class OutputDeluge(DelugePlugin):
         try:
             from deluge.ui.client import sclient
         except:
-            raise PluginError('Deluge module required', log)
+            raise plugin.PluginError('Deluge module required', log)
 
         sclient.set_core_uri()
         for entry in task.accepted:
             try:
                 before = sclient.get_session_state()
             except Exception, (errno, msg):
-                raise PluginError('Could not communicate with deluge core. %s' % msg, log)
+                raise plugin.PluginError('Could not communicate with deluge core. %s' % msg, log)
             if task.options.test:
                 return
             opts = {}
@@ -768,7 +768,7 @@ class OutputDeluge(DelugePlugin):
         """Make sure all temp files are cleaned up when task exits"""
         # If download plugin is enabled, it will handle cleanup.
         if not 'download' in task.config:
-            download = get_plugin_by_name('download')
+            download = plugin.get_plugin_by_name('download')
             download.instance.cleanup_temp_files(task)
 
     def on_task_abort(self, task, config):
@@ -777,5 +777,7 @@ class OutputDeluge(DelugePlugin):
         self.on_task_exit(task, config)
 
 
-register_plugin(InputDeluge, 'from_deluge', api_ver=2)
-register_plugin(OutputDeluge, 'deluge', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputDeluge, 'from_deluge', api_ver=2)
+    plugin.register(OutputDeluge, 'deluge', api_ver=2)

@@ -2,8 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import urllib
 
+from flexget import plugin
+from flexget.event import event
 from flexget.task import Task
-from flexget.plugin import register_plugin, get_plugin_by_name
 from flexget.utils.search import normalize_unicode
 
 log = logging.getLogger('search_rss')
@@ -20,7 +21,7 @@ class SearchRSS(object):
         from flexget.manager import manager
         search_strings = [urllib.quote(normalize_unicode(s).encode('utf-8'))
                           for s in entry.get('search_strings', [entry['title']])]
-        rss_plugin = get_plugin_by_name('rss')
+        rss_plugin = plugin.get_plugin_by_name('rss')
         entries = set()
         for search_string in search_strings:
             # Create a fake task to pass to the rss plugin input handler
@@ -34,4 +35,7 @@ class SearchRSS(object):
             entries.update(rss_plugin.phase_handlers['input'](task, config))
         return entries
 
-register_plugin(SearchRSS, 'search_rss', groups=['search'])
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(SearchRSS, 'search_rss', groups=['search'])

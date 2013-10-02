@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
+from flexget import plugin
+from flexget.event import event
 from flexget.plugins.filter.seen import FilterSeen
-from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('seenmovies')
 
@@ -28,7 +30,7 @@ class FilterSeenMovies(FilterSeen):
         return root
 
     # We run last (-255) to make sure we don't reject duplicates before all the other plugins get a chance to reject.
-    @priority(-255)
+    @plugin.priority(-255)
     def on_task_filter(self, task, config):
         # strict method
         if config == 'strict':
@@ -55,4 +57,6 @@ class FilterSeenMovies(FilterSeen):
                 else:
                     tmdb_ids.add(entry['tmdb_id'])
 
-register_plugin(FilterSeenMovies, 'seen_movies', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterSeenMovies, 'seen_movies', api_ver=2)

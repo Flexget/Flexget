@@ -4,7 +4,8 @@ import shutil
 import logging
 import time
 
-from flexget.plugin import register_plugin
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
 
@@ -167,4 +168,6 @@ class MovePlugin(object):
                     log.verbose('Cannot clean_source `%s` because source is a directory' % src)
 
 
-register_plugin(MovePlugin, 'move', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(MovePlugin, 'move', api_ver=2)

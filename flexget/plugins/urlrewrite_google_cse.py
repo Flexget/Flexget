@@ -4,8 +4,9 @@ import urllib2
 import logging
 import urlparse
 
+from flexget import plugin
+from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.plugin import register_plugin, get_plugin_by_name
 from flexget.utils.requests import Session
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import urlopener
@@ -81,7 +82,7 @@ class UrlRewriteGoogle(object):
             # Test if entry with this url would be recognized by some urlrewriter
             log.trace('Checking if %s is known by some rewriter' % href)
             fake_entry = {'title': entry['title'], 'url': href}
-            urlrewriting = get_plugin_by_name('urlrewriting')
+            urlrewriting = plugin.get_plugin_by_name('urlrewriting')
             if urlrewriting['instance'].url_rewritable(task, fake_entry):
                 log.debug('--> rewriting %s (known url pattern)' % href)
                 entry['url'] = href
@@ -90,5 +91,8 @@ class UrlRewriteGoogle(object):
                 log.debug('<-- ignoring %s (unknown url pattern)' % href)
         raise UrlRewritingError('Unable to resolve')
 
-register_plugin(UrlRewriteGoogleCse, 'google_cse', groups=['urlrewriter'], api_ver=2)
-register_plugin(UrlRewriteGoogle, 'google', groups=['urlrewriter'], api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteGoogleCse, 'google_cse', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteGoogle, 'google', groups=['urlrewriter'], api_ver=2)

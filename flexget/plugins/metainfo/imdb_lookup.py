@@ -6,9 +6,9 @@ from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, 
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation, joinedload_all
 
-from flexget import db_schema
+from flexget import db_schema, plugin
+from flexget.event import event
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, internet, PluginError, priority
 from flexget.manager import Session
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
@@ -254,7 +254,7 @@ class ImdbLookup(object):
         from flexget import validator
         return validator.factory('boolean')
 
-    @priority(130)
+    @plugin.priority(130)
     def on_task_metainfo(self, task, config):
         if not config:
             return
@@ -268,7 +268,7 @@ class ImdbLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         try:
             self.lookup(entry)
-        except PluginError as e:
+        except plugin.PluginError as e:
             log_once(e.value.capitalize(), logger=log)
             # Set all of our fields to None if the lookup failed
             entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
@@ -311,7 +311,7 @@ class ImdbLookup(object):
             self.lookup(fake_entry)
             return fake_entry['imdb_id']
 
-    @internet(log)
+    @plugin.internet(log)
     def lookup(self, entry, search_allowed=True):
         """
         Perform imdb lookup for entry.
@@ -330,7 +330,7 @@ class ImdbLookup(object):
         elif entry.get('title', eval_lazy=False):
             log.debug('lookup for %s' % entry['title'])
         else:
-            raise PluginError('looking up IMDB for entry failed, no title, imdb_url or imdb_id passed.')
+            raise plugin.PluginError('looking up IMDB for entry failed, no title, imdb_url or imdb_id passed.')
 
         session = Session()
 
@@ -340,7 +340,7 @@ class ImdbLookup(object):
                 if entry.get(field, eval_lazy=False):
                     value = entry[field]
                     if not isinstance(value, (int, float)):
-                        raise PluginError('Entry field %s should be a number!' % field)
+                        raise plugin.PluginError('Entry field %s should be a number!' % field)
 
             # if imdb_id is included, build the url.
             if entry.get('imdb_id', eval_lazy=False) and not entry.get('imdb_url', eval_lazy=False):
@@ -365,7 +365,7 @@ class ImdbLookup(object):
                     if result.fails and not manager.options.execute.retry:
                         # this movie cannot be found, not worth trying again ...
                         log.debug('%s will fail lookup' % entry['title'])
-                        raise PluginError('Title `%s` lookup fails' % entry['title'])
+                        raise plugin.PluginError('Title `%s` lookup fails' % entry['title'])
                     else:
                         if result.url:
                             log.trace('Setting imdb url for %s from db' % entry['title'])
@@ -391,7 +391,7 @@ class ImdbLookup(object):
                     result = SearchResult(entry['title'])
                     result.fails = True
                     session.add(result)
-                    raise PluginError('Title `%s` lookup failed' % entry['title'])
+                    raise plugin.PluginError('Title `%s` lookup failed' % entry['title'])
 
             # check if this imdb page has been parsed & cached
             movie = session.query(Movie).\
@@ -430,12 +430,12 @@ class ImdbLookup(object):
                     movie = Movie()
                     movie.url = entry['imdb_url']
                     session.add(movie)
-                    raise PluginError('UnicodeDecodeError')
+                    raise plugin.PluginError('UnicodeDecodeError')
                 except ValueError as e:
                     # TODO: might be a little too broad catch, what was this for anyway? ;P
                     if manager.options.debug:
                         log.exception(e)
-                    raise PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
+                    raise plugin.PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
 
             for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'mpaa_rating']:
                 log.trace('movie.%s: %s' % (att, getattr(movie, att)))
@@ -492,4 +492,6 @@ class ImdbLookup(object):
         session.add(movie)
         return movie
 
-register_plugin(ImdbLookup, 'imdb_lookup', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(ImdbLookup, 'imdb_lookup', api_ver=2)

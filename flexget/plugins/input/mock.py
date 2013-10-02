@@ -1,8 +1,10 @@
 """Plugin for mocking task data."""
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
+from flexget import plugin
 from flexget.entry import Entry
-from flexget.plugin import register_plugin
+from flexget.event import event
 
 log = logging.getLogger('mock')
 
@@ -46,4 +48,6 @@ class Mock(object):
         return entries
 
 
-register_plugin(Mock, 'mock', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(Mock, 'mock', api_ver=2)

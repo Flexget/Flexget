@@ -1,9 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget import validator
+from flexget import plugin
 from flexget.entry import Entry
-from flexget.plugin import register_plugin
+from flexget.event import event
 from flexget.utils import requests, json
 from flexget.utils.search import torrent_availability
 
@@ -14,8 +14,7 @@ log = logging.getLogger('search_btn')
 
 
 class SearchBTN(object):
-    def validator(self):
-        return validator.factory('text')
+    schema = {'type': 'string'}
 
     def search(self, entry, config):
         api_key = config
@@ -62,5 +61,6 @@ class SearchBTN(object):
         return results
 
 
-
-register_plugin(SearchBTN, 'btn', groups=['search'], debug=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(SearchBTN, 'btn', groups=['search'], debug=True)

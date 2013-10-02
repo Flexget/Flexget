@@ -5,7 +5,8 @@ from datetime import datetime
 
 from sqlalchemy import Column, Unicode, Integer
 
-from flexget.plugin import register_plugin
+from flexget import plugin
+from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.titles.series import SeriesParser
@@ -40,9 +41,9 @@ class PogcalAcquired(object):
             return
         try:
             result = session.post('http://www.pogdesign.co.uk/cat/',
-                         data={'username': config['username'],
-                               'password': config['password'],
-                               'sub_login': 'Account Login'})
+                                  data={'username': config['username'],
+                                        'password': config['password'],
+                                        'sub_login': 'Account Login'})
         except requests.RequestException as e:
             log.error('Error logging in to pog calendar: %s' % e)
             return
@@ -95,4 +96,6 @@ class PogcalAcquired(object):
         else:
             log.verbose('Could not find pogdesign calendar id for show `%s`' % show_re)
 
-register_plugin(PogcalAcquired, 'pogcal_acquired', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PogcalAcquired, 'pogcal_acquired', api_ver=2)

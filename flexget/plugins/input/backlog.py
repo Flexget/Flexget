@@ -5,14 +5,13 @@ from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime, PickleType, Index
 
-from flexget import db_schema
+from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import register_plugin, priority
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.sqlalchemy_utils import table_schema
-from flexget.utils.tools import parse_timedelta, console
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('backlog')
 Base = db_schema.versioned_base('backlog', 1)
@@ -71,7 +70,7 @@ class InputBacklog(object):
         from flexget import validator
         return validator.factory('interval')
 
-    @priority(-255)
+    @plugin.priority(-255)
     def on_task_input(self, task, config):
         # Get a list of entries to inject
         injections = self.get_injections(task)
@@ -147,4 +146,6 @@ class InputBacklog(object):
         return entries
 
 
-register_plugin(InputBacklog, 'backlog', builtin=True, api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputBacklog, 'backlog', builtin=True, api_ver=2)

@@ -3,7 +3,8 @@ import logging
 
 from requests import RequestException
 
-from flexget.plugin import register_plugin, priority
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.template import RenderError
 
 __version__ = 0.1
@@ -49,7 +50,7 @@ class OutputProwl(object):
         return config
 
     # Run last to make sure other outputs are successful before sending notification
-    @priority(0)
+    @plugin.priority(0)
     def on_task_output(self, task, config):
         config = self.prepare_config(config)
         for entry in task.accepted:
@@ -106,4 +107,7 @@ class OutputProwl(object):
             else:
                 log.error("Unknown error when sending Prowl message")
 
-register_plugin(OutputProwl, 'prowl', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputProwl, 'prowl', api_ver=2)

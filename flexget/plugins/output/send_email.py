@@ -8,10 +8,7 @@ from email.mime.text import MIMEText
 from smtplib import SMTPException
 from email.utils import formatdate
 
-from flexget import manager
-from flexget.config_schema import register_config_key
-from flexget.utils.tools import MergeException, merge_dict_from_to
-from flexget.plugin import PluginError, register_plugin
+from flexget import manager, plugin
 from flexget.event import event
 from flexget.utils.template import render_from_task, get_template, RenderError
 from flexget import validator
@@ -55,7 +52,8 @@ def send_email(subject, content, config):
         try:
             if config['smtp_ssl']:
                 if sys.version_info < (2, 6, 3):
-                    raise PluginError('SSL email support requires python >= 2.6.3 due to python bug #4066, upgrade python or use TLS', log)
+                    raise plugin.PluginError('SSL email support requires python >= 2.6.3 due to python bug #4066, '
+                                             'upgrade python or use TLS', log)
                     # Create a SSL connection to smtp server
                 mailServer = smtplib.SMTP_SSL(config['smtp_host'], config['smtp_port'])
             else:
@@ -223,4 +221,7 @@ class OutputEmail(object):
             # Log the exception to debug, in case something different is going wrong.
             log.debug('Email error:', exc_info=True)
 
-register_plugin(OutputEmail, 'email', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputEmail, 'email', api_ver=2)

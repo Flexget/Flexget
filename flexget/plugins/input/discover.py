@@ -5,9 +5,9 @@ import random
 
 from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 
-from flexget import options
+from flexget import options, plugin
 from flexget.event import event
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, PluginWarning
+from flexget.plugin import get_plugin_by_name, PluginError, PluginWarning
 from flexget import db_schema
 from flexget.utils.tools import parse_timedelta, multiply_timedelta
 
@@ -249,7 +249,9 @@ class Discover(object):
         return self.execute_searches(config, entries)
 
 
-register_plugin(Discover, 'discover', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(Discover, 'discover', api_ver=2)
 
 
 @event('options.register')

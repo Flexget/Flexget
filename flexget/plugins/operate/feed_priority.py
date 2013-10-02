@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('priority')
 
@@ -16,4 +18,6 @@ class TaskPriority(object):
     def on_process_start(self, task, config):
         task.priority = task.config.get('priority', 65535)
 
-register_plugin(TaskPriority, 'priority', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(TaskPriority, 'priority', api_ver=2)

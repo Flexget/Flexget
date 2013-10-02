@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget import validator
+
+from flexget import plugin
+from flexget.event import event
 from flexget.task import Task
-from flexget.plugin import register_plugin
 
 log = logging.getLogger('max_reruns')
 
@@ -13,9 +14,7 @@ class MaxReRuns(object):
     def __init__(self):
         self.default = Task.max_reruns
 
-    def validator(self):
-        root = validator.factory('integer')
-        return root
+    schema = {'type': 'integer'}
 
     def on_process_start(self, task, config):
         self.default = task.max_reruns
@@ -32,4 +31,6 @@ class MaxReRuns(object):
     on_task_abort = on_process_end
 
 
-register_plugin(MaxReRuns, 'max_reruns', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(MaxReRuns, 'max_reruns', api_ver=2)

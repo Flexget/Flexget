@@ -5,9 +5,8 @@ from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime
 from sqlalchemy.schema import Index, MetaData
 
-from flexget import db_schema, options
+from flexget import db_schema, options, plugin
 from flexget.event import event
-from flexget.plugin import register_plugin, priority, DependencyError, get_plugin_by_name
 from flexget.manager import Session
 from flexget.utils.tools import console, parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_add_column
@@ -93,8 +92,8 @@ class PluginFailed(object):
 
     def on_process_start(self, task, config):
         try:
-            self.backlog = get_plugin_by_name('backlog').instance
-        except DependencyError:
+            self.backlog = plugin.get_plugin_by_name('backlog').instance
+        except plugin.DependencyError:
             log.warning('Unable utilize backlog plugin, failed entries may not be retried properly.')
 
     def prepare_config(self, config):
@@ -110,7 +109,7 @@ class PluginFailed(object):
             config['retry_time_multiplier'] = 1
         return config
 
-    @priority(-255)
+    @plugin.priority(-255)
     def on_task_input(self, task, config):
         for entry in task.all_entries:
             entry.on_fail(self.add_failed)
@@ -139,7 +138,7 @@ class PluginFailed(object):
         finally:
             failed.close()
 
-    @priority(255)
+    @plugin.priority(255)
     def on_task_filter(self, task, config):
         if config is False:
             return
@@ -215,7 +214,9 @@ def clear_failed(manager):
         session.close()
 
 
-register_plugin(PluginFailed, 'retry_failed', builtin=True, api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginFailed, 'retry_failed', builtin=True, api_ver=2)
 
 @event('options.register')
 def register_parser_arguments():

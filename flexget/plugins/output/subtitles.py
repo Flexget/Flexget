@@ -5,7 +5,8 @@ import difflib
 import os.path
 import logging
 
-from flexget.plugin import register_plugin
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.tools import urlopener
 
 """
@@ -166,4 +167,7 @@ class Subtitles(object):
 
         s.LogOut(token)
 
-register_plugin(Subtitles, 'subtitles')
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(Subtitles, 'subtitles')

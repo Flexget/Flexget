@@ -1,9 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget import options
+from flexget import options, plugin
 from flexget.event import event
-from flexget.plugin import register_plugin
 
 log = logging.getLogger('cli_config')
 
@@ -69,8 +68,9 @@ class CliConfig(object):
             task.config = self.replace_item(task.config)
             log.debug(task.config)
 
-
-register_plugin(CliConfig, 'cli_config', builtin=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(CliConfig, 'cli_config', builtin=True)
 
 
 @event('options.register')

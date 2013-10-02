@@ -13,9 +13,8 @@ from httplib import BadStatusLine
 
 from requests import RequestException
 
-from flexget import options
+from flexget import options, plugin
 from flexget.event import event
-from flexget.plugin import register_plugin, PluginWarning, PluginError
 from flexget.utils.tools import decode_html
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
@@ -278,7 +277,7 @@ class PluginDownload(object):
 
         # check for write-access
         if not os.access(tmp_path, os.W_OK):
-            raise PluginError('Not allowed to write to temp directory `%s`' % tmp_path)
+            raise plugin.PluginError('Not allowed to write to temp directory `%s`' % tmp_path)
 
         # download and write data into a temp file
         tmp_dir = tempfile.mkdtemp(dir=tmp_path)
@@ -370,7 +369,7 @@ class PluginDownload(object):
         for entry in task.accepted:
             try:
                 self.output(task, entry, config)
-            except PluginWarning as e:
+            except plugin.PluginWarning as e:
                 entry.fail()
                 log.error('Plugin error while writing: %s' % e)
             except Exception as e:
@@ -386,13 +385,13 @@ class PluginDownload(object):
 
         if 'file' not in entry and not task.options.test:
             log.debug('file missing, entry: %s' % entry)
-            raise PluginError('Entry `%s` has no temp file associated with' % entry['title'])
+            raise plugin.PluginError('Entry `%s` has no temp file associated with' % entry['title'])
 
         try:
             # use path from entry if has one, otherwise use from download definition parameter
             path = entry.get('path', config.get('path'))
             if not isinstance(path, basestring):
-                raise PluginError('Invalid `path` in entry `%s`' % entry['title'])
+                raise plugin.PluginError('Invalid `path` in entry `%s`' % entry['title'])
 
             # override path from command line parameter
             if task.options.dl_path:
@@ -421,12 +420,12 @@ class PluginDownload(object):
                 try:
                     os.makedirs(path)
                 except:
-                    raise PluginError('Cannot create path %s' % path, log)
+                    raise plugin.PluginError('Cannot create path %s' % path, log)
 
             # check that temp file is present
             if not os.path.exists(entry['file']):
                 log.debug('entry: %s' % entry)
-                raise PluginWarning('Downloaded temp file `%s` doesn\'t exist!?' % entry['file'])
+                raise plugin.PluginWarning('Downloaded temp file `%s` doesn\'t exist!?' % entry['file'])
 
             # if we still don't have a filename, try making one from title (last resort)
             if not entry.get('filename'):
@@ -474,7 +473,7 @@ class PluginDownload(object):
                     # ignore permission errors, see ticket #555
                     import errno
                     if not os.path.exists(destfile):
-                        raise PluginError('Unable to write %s' % destfile)
+                        raise plugin.PluginError('Unable to write %s' % destfile)
                     if err.errno != errno.EPERM:
                         raise
 
@@ -506,7 +505,9 @@ class PluginDownload(object):
             self.cleanup_temp_file(entry)
 
 
-register_plugin(PluginDownload, 'download', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginDownload, 'download', api_ver=2)
 
 
 @event('options.register')

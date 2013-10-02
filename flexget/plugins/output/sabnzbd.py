@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import urllib
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.tools import urlopener
 
 log = logging.getLogger('sabnzbd')
@@ -93,4 +95,7 @@ class OutputSabnzbd(object):
             else:
                 log.info('Added `%s` to SABnzbd' % (entry['title']))
 
-register_plugin(OutputSabnzbd, 'sabnzbd', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputSabnzbd, 'sabnzbd', api_ver=2)

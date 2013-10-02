@@ -2,10 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 import datetime
 import logging
 
-from flexget import options
+from flexget import options, plugin
 from flexget.config_schema import parse_interval
 from flexget.event import event
-from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('interval')
 
@@ -23,7 +22,7 @@ class PluginInterval(object):
 
     schema = {'type': 'string', 'format': 'interval'}
 
-    @priority(255)
+    @plugin.priority(255)
     def on_task_start(self, task, config):
         # Allow reruns
         if task.is_rerun:
@@ -50,7 +49,9 @@ class PluginInterval(object):
         task.simple_persistence['last_time'] = datetime.datetime.now()
 
 
-register_plugin(PluginInterval, 'interval', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginInterval, 'interval', api_ver=2)
 
 
 @event('options.register')

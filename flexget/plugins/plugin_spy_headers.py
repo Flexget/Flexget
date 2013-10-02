@@ -4,7 +4,8 @@ import urllib2
 import httplib
 import socket
 
-from flexget.plugin import register_plugin
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('spy_headers')
 
@@ -79,9 +80,7 @@ class PluginSpyHeaders(object):
         WARNING: At the moment this modifies requests somehow!
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('any')
+    schema = {}
 
     def log_requests_headers(self, response):
         log.info('Request  : %s' % response.request.url)
@@ -115,4 +114,7 @@ class PluginSpyHeaders(object):
     # remove also on abort
     on_task_abort = on_task_exit
 
-register_plugin(PluginSpyHeaders, 'spy_headers')
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginSpyHeaders, 'spy_headers')

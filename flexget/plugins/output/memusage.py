@@ -1,15 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget import options
+from flexget import options, plugin
 from flexget.event import event
-from flexget.plugin import DependencyError, register_plugin
 
 try:
     from guppy import hpy
 except ImportError:
     # this will leave the plugin unloaded
-    raise DependencyError(issued_by='memusage', missing='ext lib `guppy`', silent=True)
+    raise plugin.DependencyError(issued_by='memusage', missing='ext lib `guppy`', silent=True)
 
 log = logging.getLogger('mem_usage')
 
@@ -41,7 +40,7 @@ class OutputMemUsage(object):
 
     schema = {'type': 'boolean'}
 
-    def on_process_start(self, task):
+    def on_process_start(self, task, config):
         if not task.options.mem_usage:
             return
         # start only once
@@ -49,7 +48,7 @@ class OutputMemUsage(object):
             return
         self.heapy = hpy()
 
-    def on_process_end(self, task):
+    def on_process_end(self, task, config):
         if not task.options.mem_usage:
             return
         # prevents running this multiple times ...
@@ -62,7 +61,9 @@ class OutputMemUsage(object):
         self.heapy = None
 
 
-register_plugin(OutputMemUsage, 'mem_usage', builtin=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputMemUsage, 'mem_usage', builtin=True, api_ver=2)
 
 
 @event('options.register')

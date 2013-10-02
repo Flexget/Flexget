@@ -9,13 +9,13 @@ from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, 
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
-from flexget import db_schema
-from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
-from flexget.utils.titles import MovieParser
+from flexget import db_schema, plugin
+from flexget.event import event
+from flexget.manager import Session
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, year_property, with_session
-from flexget.manager import Session
-from flexget.plugin import register_plugin
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
+from flexget.utils.titles import MovieParser
 
 log = logging.getLogger('api_tmdb')
 Base = db_schema.versioned_base('api_tmdb', 0)
@@ -332,4 +332,6 @@ def get_first_result(tmdb_function, value):
         if isinstance(result, dict) and result.get('id'):
             return result
 
-register_plugin(ApiTmdb, 'api_tmdb')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(ApiTmdb, 'api_tmdb')

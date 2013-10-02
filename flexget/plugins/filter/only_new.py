@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, get_plugin_by_name
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('only_new')
 
@@ -13,7 +15,7 @@ class FilterOnlyNew(object):
     def on_process_start(self, task, config):
         """Make sure the remember_rejected plugin is available"""
         # Raises an error if plugin isn't available
-        get_plugin_by_name('remember_rejected')
+        plugin.get_plugin_by_name('remember_rejected')
 
     def on_task_exit(self, task, config):
         """Reject all entries so remember_rejected will reject them next time"""
@@ -24,4 +26,6 @@ class FilterOnlyNew(object):
             entry.reject('Already processed entry', remember=True)
 
 
-register_plugin(FilterOnlyNew, 'only_new', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterOnlyNew, 'only_new', api_ver=2)

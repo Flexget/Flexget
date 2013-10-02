@@ -3,8 +3,9 @@ import logging
 import posixpath
 from fnmatch import fnmatch
 
+from flexget import plugin
+from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('content_filter')
 
@@ -89,7 +90,7 @@ class FilterContentFilter(object):
                 # TODO: should not add this to entry, this is a filter plugin
                 entry['content_files'] = files
 
-    @priority(150)
+    @plugin.priority(150)
     def on_task_modify(self, task):
         if task.options.test or task.options.learn:
             log.info('Plugin is partially disabled with --test and --learn because content filename information may not be available')
@@ -106,4 +107,6 @@ class FilterContentFilter(object):
                 entry.reject('no content files parsed for entry', remember=True)
                 task.rerun()
 
-register_plugin(FilterContentFilter, 'content_filter')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterContentFilter, 'content_filter')

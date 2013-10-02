@@ -2,7 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 from difflib import SequenceMatcher
 import logging
 
-from flexget.plugin import get_plugins_by_group, PluginWarning, PluginError, register_plugin, priority
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('urlrewrite_search')
 
@@ -28,33 +29,33 @@ class PluginSearch(object):
         from flexget import validator
         search = validator.factory('list')
         names = []
-        for plugin in get_plugins_by_group('search'):
+        for p in plugin.get_plugins_by_group('search'):
             # If the plugin has a validator, get it's validator and make it a
             # child of the search plugins
-            if not hasattr(plugin.instance, 'validator'):
+            if not hasattr(p.instance, 'validator'):
                 # Create choice validator for plugins without validators later
-                names.append(plugin.name)
+                names.append(p.name)
             else:
-                plugin_validator = plugin.instance.validator()
+                plugin_validator = p.instance.validator()
                 if isinstance(plugin_validator, validator.Validator):
-                    search.accept('dict').accept(plugin_validator, key=plugin.name)
+                    search.accept('dict').accept(plugin_validator, key=p.name)
                 else:
                     log.error("plugin %s has a validator method, but does not "
                               "return a validator instance when called with "
-                              "search plugin." % plugin.name)
+                              "search plugin." % p.name)
         search.accept('choice').accept_choices(names)
         return search
 
     # Run before main urlrewriting
-    @priority(130)
+    @plugin.priority(130)
     def on_task_urlrewrite(self, task, config):
         # no searches in unit test mode
         if task.manager.unit_test:
             return
 
         plugins = {}
-        for plugin in get_plugins_by_group('search'):
-            plugins[plugin.name] = plugin.instance
+        for p in plugin.get_plugins_by_group('search'):
+            plugins[p.name] = p.instance
 
         # search accepted
         for entry in task.accepted:
@@ -77,7 +78,7 @@ class PluginSearch(object):
                     else:
                         continue
                     break
-                except (PluginError, PluginWarning) as pw:
+                except (plugin.PluginError, plugin.PluginWarning) as pw:
                     log.verbose('Failed: %s' % pw.value)
                     continue
 
@@ -88,4 +89,6 @@ class PluginSearch(object):
                 entry.reject('search failed')
 
 
-register_plugin(PluginSearch, 'urlrewrite_search', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginSearch, 'urlrewrite_search', api_ver=2)

@@ -2,9 +2,10 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType, Index
-from flexget import db_schema
+
+from flexget import db_schema, plugin
+from flexget.event import event
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, priority, PluginError
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.tools import parse_timedelta
 
@@ -64,9 +65,9 @@ class FilterDelay(object):
         try:
             return parse_timedelta(config)
         except ValueError:
-            raise PluginError('Invalid time format', log)
+            raise plugin.PluginError('Invalid time format', log)
 
-    @priority(-1)
+    @plugin.priority(-1)
     def on_task_input(self, task, config):
         """Captures the current input then replaces it with entries that have passed the delay."""
         if task.entries:
@@ -108,4 +109,6 @@ class FilterDelay(object):
         return delayed_entries
 
 
-register_plugin(FilterDelay, 'delay', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterDelay, 'delay', api_ver=2)

@@ -3,8 +3,10 @@ import urllib
 import urllib2
 import logging
 import re
+
+from flexget import plugin
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, internet
+from flexget.event import event
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import urlopener
 
@@ -18,7 +20,7 @@ class UrlRewriteNewzleech(object):
     """
 
     # Search API
-    @internet(log)
+    @plugin.internet(log)
     def search(self, entry, config=None):
 
         txheaders = {
@@ -79,4 +81,7 @@ class UrlRewriteNewzleech(object):
 
         return nzbs
 
-register_plugin(UrlRewriteNewzleech, 'newzleech', groups=['search'])
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteNewzleech, 'newzleech', groups=['search'])

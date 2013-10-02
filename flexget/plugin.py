@@ -332,7 +332,7 @@ class PluginInfo(dict):
     __repr__ = __str__
 
 
-register_plugin = PluginInfo
+register = PluginInfo
 
 
 def _strip_trailing_sep(path):

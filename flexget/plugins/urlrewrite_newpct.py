@@ -3,8 +3,9 @@ import urllib2
 import logging
 import re
 
+from flexget import plugin
+from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.plugin import register_plugin, internet
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
 
@@ -27,7 +28,7 @@ class UrlRewriteNewPCT(object):
     def url_rewrite(self, task, entry):
         entry['url'] = self.parse_download_page(entry['url'])
 
-    @internet(log)
+    @plugin.internet(log)
     def parse_download_page(self, url):
         txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
         req = urllib2.Request(url, None, txheaders)
@@ -42,4 +43,6 @@ class UrlRewriteNewPCT(object):
         return down_link.get('href')
 
 
-register_plugin(UrlRewriteNewPCT, 'newpct', groups=['urlrewriter'])
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteNewPCT, 'newpct', groups=['urlrewriter'])

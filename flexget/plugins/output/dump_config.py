@@ -3,9 +3,8 @@ import logging
 
 from argparse import SUPPRESS
 
-from flexget import options
+from flexget import options, plugin
 from flexget.event import event
-from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('dump_config')
 
@@ -15,7 +14,7 @@ class OutputDumpConfig(object):
         Dumps task config in STDOUT in yaml at exit or abort event.
     """
 
-    @priority(-255)
+    @plugin.priority(-255)
     def on_task_start(self, task):
         if task.options.dump_config:
             import yaml
@@ -28,7 +27,9 @@ class OutputDumpConfig(object):
             task.abort(silent=True)
 
 
-register_plugin(OutputDumpConfig, 'dump_config', debug=True, builtin=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputDumpConfig, 'dump_config', debug=True, builtin=True)
 
 
 @event('options.register')

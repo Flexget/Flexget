@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget import options, validator
+from flexget import options, plugin
 from flexget.event import event
-from flexget.config_schema import register_config_key
-from flexget.plugin import priority, register_plugin, PluginError
+from flexget.config_schema import register_config_key, one_or_more
 from flexget.utils.tools import MergeException, merge_dict_from_to
 
 log = logging.getLogger('preset')
@@ -43,7 +42,7 @@ class PluginPreset(object):
             config = [config]
         return config
 
-    @priority(255)
+    @plugin.priority(255)
     def on_task_prepare(self, task, config):
         if config is False:  # handles 'preset: no' form to turn off preset on this task
             return
@@ -64,7 +63,7 @@ class PluginPreset(object):
             if preset not in toplevel_presets:
                 if preset == 'global':
                     continue
-                raise PluginError('Unable to find preset %s for task %s' % (preset, task.name), log)
+                raise plugin.PluginError('Unable to find preset %s for task %s' % (preset, task.name), log)
             if toplevel_presets[preset] is None:
                 log.warning('Preset `%s` is empty. Nothing to merge.' % preset)
                 continue
@@ -89,7 +88,7 @@ class PluginPreset(object):
             try:
                 merge_dict_from_to(preset_config, task.config)
             except MergeException as exc:
-                raise PluginError('Failed to merge preset %s to task %s. Error: %s' %
+                raise plugin.PluginError('Failed to merge preset %s to task %s. Error: %s' %
                                   (preset, task.name, exc.value))
 
         log.trace('presets: %s' % config)
@@ -125,14 +124,9 @@ class DisablePlugin(object):
       # Task nzbs uses all other configuration from preset movies but removes the download plugin
     """
 
-    def validator(self):
-        root = validator.factory()
-        root.accept('text')
-        presets = root.accept('list')
-        presets.accept('text')
-        return root
+    schema = one_or_more({'type': 'string'})
 
-    @priority(250)
+    @plugin.priority(250)
     def on_task_start(self, task, config):
         if isinstance(config, basestring):
             config = [config]
@@ -150,8 +144,12 @@ root_config_schema = {
 
 
 register_config_key('presets', root_config_schema)
-register_plugin(PluginPreset, 'preset', builtin=True, api_ver=2)
-register_plugin(DisablePlugin, 'disable_plugin', api_ver=2)
+
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginPreset, 'preset', builtin=True, api_ver=2)
+    plugin.register(DisablePlugin, 'disable_plugin', api_ver=2)
 
 
 @event('options.register')

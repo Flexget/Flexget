@@ -1,9 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget import options
+from flexget import options, plugin
 from flexget.event import event
-from flexget.plugin import register_plugin,  priority
 from flexget.utils.tools import console
 
 log = logging.getLogger('dump')
@@ -62,7 +61,7 @@ class OutputDump(object):
 
     schema = {'type': 'boolean'}
 
-    @priority(0)
+    @plugin.priority(0)
     def on_task_output(self, task, config):
         if not config and not task.options.dump_entries:
             return
@@ -81,7 +80,9 @@ class OutputDump(object):
             dump(task.rejected, task.options.debug, eval_lazy, trace)
 
 
-register_plugin(OutputDump, 'dump', builtin=True, api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputDump, 'dump', builtin=True, api_ver=2)
 
 
 @event('options.register')

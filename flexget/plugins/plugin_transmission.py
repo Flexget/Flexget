@@ -4,9 +4,9 @@ from netrc import netrc, NetrcParseError
 import logging
 import base64
 
-from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError
-from flexget import validator
+from flexget import plugin, validator
 from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
 
@@ -76,15 +76,15 @@ class TransmissionBase(object):
         except TransmissionError as e:
             if isinstance(e.original, HTTPHandlerError):
                 if e.original.code == 111:
-                    raise PluginError("Cannot connect to transmission. Is it running?")
+                    raise plugin.PluginError("Cannot connect to transmission. Is it running?")
                 elif e.original.code == 401:
-                    raise PluginError("Username/password for transmission is incorrect. Cannot connect.")
+                    raise plugin.PluginError("Username/password for transmission is incorrect. Cannot connect.")
                 elif e.original.code == 110:
-                    raise PluginError("Cannot connect to transmission: Connection timed out.")
+                    raise plugin.PluginError("Cannot connect to transmission: Connection timed out.")
                 else:
-                    raise PluginError("Error connecting to transmission: %s" % e.original.message)
+                    raise plugin.PluginError("Error connecting to transmission: %s" % e.original.message)
             else:
-                raise PluginError("Error connecting to transmission: %s" % e.message)
+                raise plugin.PluginError("Error connecting to transmission: %s" % e.message)
         return cli
 
     @save_opener
@@ -94,9 +94,9 @@ class TransmissionBase(object):
             from transmissionrpc import TransmissionError
             from transmissionrpc import HTTPHandlerError
         except:
-            raise PluginError('Transmissionrpc module version 0.6 or higher required.', log)
+            raise plugin.PluginError('Transmissionrpc module version 0.6 or higher required.', log)
         if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 6]:
-            raise PluginError('Transmissionrpc module version 0.6 or higher required, please upgrade', log)
+            raise plugin.PluginError('Transmissionrpc module version 0.6 or higher required, please upgrade', log)
 
     @save_opener
     def on_task_start(self, task, config):
@@ -207,7 +207,7 @@ class PluginTransmission(TransmissionBase):
         config.setdefault('removewhendone', False)
         return config
 
-    @priority(120)
+    @plugin.priority(120)
     def on_task_download(self, task, config):
         """
             Call download plugin to generate the temp files we will load
@@ -219,10 +219,10 @@ class PluginTransmission(TransmissionBase):
         # If the download plugin is not enabled, we need to call it to get
         # our temp .torrent files
         if not 'download' in task.config:
-            download = get_plugin_by_name('download')
+            download = plugin.get_plugin_by_name('download')
             download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
-    @priority(135)
+    @plugin.priority(135)
     @save_opener
     def on_task_output(self, task, config):
         from transmissionrpc import TransmissionError
@@ -240,7 +240,7 @@ class PluginTransmission(TransmissionBase):
             if self.client:
                 log.debug('Successfully connected to transmission.')
             else:
-                raise PluginError("Couldn't connect to transmission.")
+                raise plugin.PluginError("Couldn't connect to transmission.")
         if task.accepted:
             self.add_to_transmission(self.client, task, config)
         if config['removewhendone']:
@@ -362,10 +362,13 @@ class PluginTransmission(TransmissionBase):
         """Make sure all temp files are cleaned up when task exits"""
         # If download plugin is enabled, it will handle cleanup.
         if not 'download' in task.config:
-            download = get_plugin_by_name('download')
+            download = plugin.get_plugin_by_name('download')
             download.instance.cleanup_temp_files(task)
 
     on_task_abort = on_task_exit
 
-register_plugin(PluginTransmission, 'transmission', api_ver=2)
-register_plugin(PluginTransmissionInput, 'from_transmission', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginTransmission, 'transmission', api_ver=2)
+    plugin.register(PluginTransmissionInput, 'from_transmission', api_ver=2)
