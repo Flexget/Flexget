@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 
 from flexget.entry import Entry
-from flexget.plugin import register_plugin
+from flexget import plugin
 import flexget.validator
 from tests import FlexGetBase
 
@@ -16,7 +16,7 @@ class SearchPlugin(object):
     def search(self, entry, comparator=None, config=None):
         return [Entry(entry)]
 
-register_plugin(SearchPlugin, 'test_search', groups=['search'])
+plugin.register(SearchPlugin, 'test_search', groups=['search'])
 
 
 class EstRelease(object):
@@ -25,7 +25,7 @@ class EstRelease(object):
     def estimate(self, entry):
         return entry.get('est_release')
 
-register_plugin(EstRelease, 'test_release', groups=['estimate_release'])
+plugin.register(EstRelease, 'test_release', groups=['estimate_release'])
 
 
 class TestDiscover(FlexGetBase):

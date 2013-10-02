@@ -54,12 +54,12 @@ class FilterIf(object):
                 phase_dict['filter'].append(item)
             else:
                 for plugin_name, plugin_config in action.iteritems():
-                    plugin = plugin.get_plugin_by_name(plugin_name)
-                    for phase in plugin.phase_handlers:
+                    p = plugin.get_plugin_by_name(plugin_name)
+                    for phase in p.phase_handlers:
                         if phase == 'prepare':
                             # If plugin has a prepare handler, run it now unconditionally
                             try:
-                                plugin.phase_handlers[phase](task, plugin_config)
+                                p.phase_handlers[phase](task, plugin_config)
                             except TypeError:
                                 # Print to debug, as validator will show user error message
                                 log.debug('Cannot run api < 2 plugins.')
@@ -120,8 +120,8 @@ class FilterIf(object):
 
                         try:
                             for plugin_name, plugin_config in action.iteritems():
-                                plugin = plugin.get_plugin_by_name(plugin_name)
-                                method = plugin.phase_handlers[phase]
+                                p = plugin.get_plugin_by_name(plugin_name)
+                                method = p.phase_handlers[phase]
                                 method(fake_task, plugin_config)
                         except Exception:
                             raise

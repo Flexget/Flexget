@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 from tests import FlexGetBase, with_filecopy
 from flexget.utils.cached_input import cached
-from flexget.plugin import register_plugin
+from flexget import plugin
 from flexget.entry import Entry
 
 
@@ -18,7 +18,7 @@ class InputPersist(object):
         self.hasrun = True
         return [Entry(title='Test', url='http://test.com')]
 
-register_plugin(InputPersist, 'test_input', api_ver=2)
+plugin.register(InputPersist, 'test_input', api_ver=2)
 
 
 class TestInputCache(FlexGetBase):
@@ -36,7 +36,6 @@ class TestInputCache(FlexGetBase):
     def test_memory_cache(self):
         """Test memory input caching"""
         # Don't use execute_task in this test as it runs process_start (which clears the cache) before each task
-        self.manager.refresh_tasks()
         task = self.manager.tasks['test_memory']
         task.execute()
         assert task.entries, 'should have created entries at the start'
