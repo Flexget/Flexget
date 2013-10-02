@@ -480,12 +480,10 @@ class Task(object):
 
         # validate configuration
         errors = self.validate()
-        if errors and self.manager.unit_test:  # todo: bad practice
-            raise Exception('configuration errors')
         if errors:
             self.enabled = False
             self.config = None
-            return False
+            self.abort('Configuration errors')
 
         self._reset()
 

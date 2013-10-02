@@ -87,7 +87,7 @@ class Scheduler(threading.Thread):
                     self.run_queue.put(job)
 
     def run(self):
-        from flexget.task import Task
+        from flexget.task import Task, TaskAbort
         while not self._shutdown_now:
             self.queue_pending_jobs()
             # Grab the first job from the run queue and do it
@@ -108,6 +108,8 @@ class Scheduler(threading.Thread):
                 logging.getLogger().addHandler(streamhandler)
             try:
                 Task(self.manager, job.task, options=job.options).execute()
+            except TaskAbort as e:
+                log.debug('task %s aborted: %s' % (job.task, e))
             finally:
                 self.run_queue.task_done()
                 if job.output:
