@@ -516,38 +516,41 @@ class Task(object):
         else:
             self.config_modified = False
 
+        # run phases
         try:
-            # run phases
+            for phase in task_phases:
+                if phase in self.disabled_phases:
+                    # log keywords not executed
+                    for plugin in self.plugins(phase):
+                        if plugin.name in self.config:
+                            log.info('Plugin %s is not executed because %s phase is disabled (e.g. --test)' %
+                                     (plugin.name, phase))
+                    continue
+
+                # run all plugins with this phase
+                self.__run_task_phase(phase)
+        except TaskAbort as e:
+            if not e.silent:
+                log.warning('Aborting task (plugin: %s)' % self.current_plugin)
+            else:
+                log.debug('Aborting task (plugin: %s)' % self.current_plugin)
+            # Roll back the session before calling abort handlers
+            self.session.rollback()
             try:
-                for phase in task_phases:
-                    if phase in self.disabled_phases:
-                        # log keywords not executed
-                        for plugin in self.plugins(phase):
-                            if plugin.name in self.config:
-                                log.info('Plugin %s is not executed because %s phase is disabled (e.g. --test)' %
-                                         (plugin.name, phase))
-                        continue
-
-                    # run all plugins with this phase
-                    self.__run_task_phase(phase)
-            except TaskAbort as e:
-                if not e.silent:
-                    log.warning('Aborting task (plugin: %s)' % self.current_plugin)
-                else:
-                    log.debug('Aborting task (plugin: %s)' % self.current_plugin)
-                try:
-                    self.__run_task_phase('abort')
-                except TaskAbort:
-                    log.exception('abort handlers aborted!')
-                return
-
+                self.__run_task_phase('abort')
+                # Commit just the abort handler changes if no exceptions are raised there
+                self.session.commit()
+            except TaskAbort:
+                log.exception('abort handlers aborted!')
+            raise
+        else:
             for entry in self.all_entries:
                 entry.complete()
             log.debug('committing session')
             self.session.commit()
             fire_event('task.execute.completed', self)
         finally:
-            # this will cause database rollback on exception and task.abort
+            # this will cause database rollback on exception
             self.session.close()
 
         # rerun task

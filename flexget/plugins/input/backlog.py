@@ -8,7 +8,6 @@ from sqlalchemy import Column, Integer, String, DateTime, PickleType, Index
 from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.manager import Session
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.utils.tools import parse_timedelta
@@ -99,9 +98,8 @@ class InputBacklog(object):
                 # Not having a snapshot is normal during input phase, don't display a warning
                 log.warning('No input snapshot available for `%s`, using current state' % entry['title'])
             snapshot = entry
-        session = Session()
         expire_time = datetime.now() + parse_timedelta(amount)
-        backlog_entry = session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
+        backlog_entry = task.session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
             filter(BacklogEntry.task == task.name).first()
         if backlog_entry:
             # If there is already a backlog entry for this, update the expiry time if necessary.
@@ -115,8 +113,7 @@ class InputBacklog(object):
             backlog_entry.entry = snapshot
             backlog_entry.task = task.name
             backlog_entry.expire = expire_time
-            session.add(backlog_entry)
-        session.commit()
+            task.session.add(backlog_entry)
 
     def learn_backlog(self, task, amount=''):
         """Learn current entries into backlog. All task inputs must have been executed."""
