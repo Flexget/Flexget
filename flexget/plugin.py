@@ -14,7 +14,7 @@ from itertools import ifilter
 from requests import RequestException
 
 from flexget import config_schema
-from flexget.event import add_event_handler as add_phase_handler
+from flexget.event import add_event_handler as add_phase_handler, fire_event
 from flexget import plugins as plugins_pkg
 
 log = logging.getLogger('plugin')
@@ -415,6 +415,7 @@ def load_plugins():
     start_time = time.time()
     # Import all the plugins
     _load_plugins_from_dirs(get_standard_plugins_path())
+    fire_event('plugin.register')
     # After they have all been imported, instantiate them
     for plugin in plugins.values():
         plugin.initialize()

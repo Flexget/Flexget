@@ -10,13 +10,13 @@ from flexget.entry import Entry
 log = logging.getLogger('emit_series')
 
 try:
-    from flexget.plugins.filter.series import SeriesTask, SeriesDatabase, Episode, Release
+    from flexget.plugins.filter.series import SeriesTask, Episode, Release, get_latest_download
 except ImportError as e:
     log.error(e.message)
     raise plugin.DependencyError(issued_by='emit_series', missing='series')
 
 
-class EmitSeries(SeriesDatabase):
+class EmitSeries(object):
     """
     Emit next episode number from all series configured in this task.
 
@@ -81,7 +81,7 @@ class EmitSeries(SeriesDatabase):
                             (series.name, series.identified_by or 'auto'))
                 continue
 
-            latest = self.get_latest_download(series)
+            latest = get_latest_download(series)
             if series.begin and (not latest or latest < series.begin):
                 entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
             elif latest:

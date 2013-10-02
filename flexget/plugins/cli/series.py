@@ -9,210 +9,212 @@ from flexget.manager import Session
 from flexget.utils.tools import console
 
 try:
-    from flexget.plugins.filter.series import (SeriesDatabase, Series, Episode, Release, SeriesTask, forget_series,
-                                               forget_series_episode, set_series_begin, normalize_series_name)
+    from flexget.plugins.filter.series import (Series, Episode, Release, SeriesTask, forget_series,
+                                               forget_series_episode, set_series_begin, normalize_series_name,
+                                               new_eps_after, get_latest_download)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
 
 
-class CLISeries(SeriesDatabase):
-    """Handle CLI 'series' command"""
+def do_cli(manager, options):
+    if options.series_action == 'list':
+        display_summary(options)
+    elif options.series_action == 'show':
+        display_details(options.series_name)
+    elif options.series_action == 'forget':
+        forget(manager, options)
+    elif options.series_action == 'begin':
+        begin(manager, options)
 
-    def do_cli(self, manager, options):
-        if options.series_action == 'list':
-            self.display_summary(options)
-        elif options.series_action == 'show':
-            self.display_details(options.series_name)
-        elif options.series_action == 'forget':
-            self.forget(manager, options)
-        elif options.series_action == 'begin':
-            self.begin(manager, options)
 
-    def display_details(self, name):
-        """Display detailed series information, ie. --series NAME"""
+def display_summary(options):
+    """
+    Display series summary.
+    :param options: argparse options from the CLI
+    """
+    formatting = ' %-30s %-10s %-10s %-20s'
+    console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
+    console('-' * 79)
 
-        from flexget.manager import Session
-        session = Session()
+    session = Session()
+    try:
+        query = (session.query(Series).outerjoin(Series.episodes).outerjoin(Episode.releases).
+                 outerjoin(Series.in_tasks).group_by(Series.id))
+        if options.type == 'configured':
+            query = query.having(func.count(SeriesTask.id) >= 1)
+        elif options.type == 'premieres':
+            query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2).
+                     having(func.count(SeriesTask.id) < 1)).filter(Release.downloaded == True)
+        if options.within:
+            query = query.having(func.max(Episode.first_seen) > datetime.now() - timedelta(days=options.within))
+        for series in query.order_by(Series.name).yield_per(10):
+            series_name = series.name
+            if len(series_name) > 30:
+                series_name = series_name[:27] + '...'
 
-        name = normalize_series_name(name)
-        # Sort by length of name, so that partial matches always show shortest matching title
-        matches = (session.query(Series).filter(Series._name_normalized.contains(name)).
-                   order_by(func.char_length(Series.name)).all())
-        if not matches:
-            console('ERROR: Unknown series `%s`' % name)
-            return
-        # Pick the best matching series
-        series = matches[0]
-        console('Showing results for `%s`.' % series.name)
-        if len(matches) > 1:
-            console('WARNING: Multiple series match to `%s`.' % name)
-            console('Be more specific to see the results of other matches:')
-            for s in matches[1:]:
-                console(' - %s' % s.name)
+            new_ep = ' '
+            behind = 0
+            status = 'N/A'
+            age = 'N/A'
+            episode_id = 'N/A'
+            latest = get_latest_download(series)
+            if latest:
+                if latest.first_seen > datetime.now() - timedelta(days=2):
+                    new_ep = '>'
+                behind = new_eps_after(latest)
+                status = get_latest_status(latest)
+                age = latest.age
+                episode_id = latest.identifier
 
-        console(' %-63s%-15s' % ('Identifier, Title', 'Quality'))
-        console('-' * 79)
+            if behind:
+                episode_id += ' +%s' % behind
 
-        # Query episodes in sane order instead of iterating from series.episodes
-        episodes = session.query(Episode).filter(Episode.series_id == series.id)
-        if series.identified_by == 'sequence':
-            episodes = episodes.order_by(Episode.number).all()
-        else:
-            episodes = episodes.order_by(Episode.identifier).all()
-
-        for episode in episodes:
-
-            if episode.identifier is None:
-                console(' None <--- Broken!')
-            else:
-                console(' %s (%s) - %s' % (episode.identifier, episode.identified_by or 'N/A', episode.age))
-
-            for release in episode.releases:
-                status = release.quality.name
-                title = release.title
-                if len(title) > 55:
-                    title = title[:55] + '...'
-                if release.proper_count > 0:
-                    status += '-proper'
-                    if release.proper_count > 1:
-                        status += str(release.proper_count)
-                if release.downloaded:
-                    console('  * %-60s%-15s' % (title, status))
-                else:
-                    console('    %-60s%-15s' % (title, status))
+            console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
+            if behind >= 3:
+                console(' ! Latest download is %d episodes behind, this may require '
+                        'manual intervention' % behind)
 
         console('-' * 79)
-        console(' * = downloaded')
-        if not series.identified_by:
-            console('')
-            console(' Series plugin is still learning which episode numbering mode is ')
-            console(' correct for this series (identified_by: auto).')
-            console(' Few duplicate downloads can happen with different numbering schemes')
-            console(' during this time.')
-        else:
-            console(' Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by)
-        console(' See option `identified_by` for more information.')
+        console(' > = new episode ')
+        console(' Use `flexget series show NAME` to get detailed information')
+    finally:
         session.close()
 
-    def get_latest_status(self, episode):
-        """
-        :param episode: Instance of Episode
-        :return: Status string for given episode
-        """
-        status = ''
-        for release in sorted(episode.releases, key=lambda r: r.quality):
-            if not release.downloaded:
-                continue
-            status += release.quality.name
+
+def begin(manager, options):
+    series_name = options.series_name
+    ep_id = options.episode_id
+    session = Session()
+    series = session.query(Series).filter(Series.name == series_name).first()
+    if not series:
+        console('Series not yet in database, adding `%s`' % series_name)
+        series = Series()
+        series.name = series_name
+        session.add(series)
+    try:
+        set_series_begin(series, ep_id)
+    except ValueError as e:
+        console(e)
+    else:
+        console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
+        session.commit()
+    finally:
+        session.close()
+    manager.config_changed()
+
+
+def forget(manager, options):
+    name = options.series_name
+
+    if options.episode_id:
+        # remove by id
+        identifier = options.episode_id.upper()
+        try:
+            forget_series_episode(name, identifier)
+            console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
+        except ValueError as e:
+            console(e.message)
+    else:
+        # remove whole series
+        try:
+            forget_series(name)
+            console('Removed series `%s` from database.' % name.capitalize())
+        except ValueError as e:
+            console(e.message)
+
+    manager.config_changed()
+
+
+def get_latest_status(episode):
+    """
+    :param episode: Instance of Episode
+    :return: Status string for given episode
+    """
+    status = ''
+    for release in sorted(episode.releases, key=lambda r: r.quality):
+        if not release.downloaded:
+            continue
+        status += release.quality.name
+        if release.proper_count > 0:
+            status += '-proper'
+            if release.proper_count > 1:
+                status += str(release.proper_count)
+        status += ', '
+    return status.rstrip(', ') if status else None
+
+
+def display_details(name):
+    """Display detailed series information, ie. series show NAME"""
+
+    from flexget.manager import Session
+    session = Session()
+
+    name = normalize_series_name(name)
+    # Sort by length of name, so that partial matches always show shortest matching title
+    matches = (session.query(Series).filter(Series._name_normalized.contains(name)).
+               order_by(func.char_length(Series.name)).all())
+    if not matches:
+        console('ERROR: Unknown series `%s`' % name)
+        return
+    # Pick the best matching series
+    series = matches[0]
+    console('Showing results for `%s`.' % series.name)
+    if len(matches) > 1:
+        console('WARNING: Multiple series match to `%s`.' % name)
+        console('Be more specific to see the results of other matches:')
+        for s in matches[1:]:
+            console(' - %s' % s.name)
+
+    console(' %-63s%-15s' % ('Identifier, Title', 'Quality'))
+    console('-' * 79)
+
+    # Query episodes in sane order instead of iterating from series.episodes
+    episodes = session.query(Episode).filter(Episode.series_id == series.id)
+    if series.identified_by == 'sequence':
+        episodes = episodes.order_by(Episode.number).all()
+    else:
+        episodes = episodes.order_by(Episode.identifier).all()
+
+    for episode in episodes:
+
+        if episode.identifier is None:
+            console(' None <--- Broken!')
+        else:
+            console(' %s (%s) - %s' % (episode.identifier, episode.identified_by or 'N/A', episode.age))
+
+        for release in episode.releases:
+            status = release.quality.name
+            title = release.title
+            if len(title) > 55:
+                title = title[:55] + '...'
             if release.proper_count > 0:
                 status += '-proper'
                 if release.proper_count > 1:
                     status += str(release.proper_count)
-            status += ', '
-        return status.rstrip(', ') if status else None
+            if release.downloaded:
+                console('  * %-60s%-15s' % (title, status))
+            else:
+                console('    %-60s%-15s' % (title, status))
 
-    def display_summary(self, options):
-        """
-        Display series summary.
-        :param options: argparse options from the CLI
-        """
-        formatting = ' %-30s %-10s %-10s %-20s'
-        console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
-        console('-' * 79)
-
-        session = Session()
-        try:
-            query = (session.query(Series).outerjoin(Series.episodes).outerjoin(Episode.releases).
-                     outerjoin(Series.in_tasks).group_by(Series.id))
-            if options.type == 'configured':
-                query = query.having(func.count(SeriesTask.id) >= 1)
-            elif options.type == 'premieres':
-                query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2).
-                         having(func.count(SeriesTask.id) < 1)).filter(Release.downloaded == True)
-            if options.within:
-                query = query.having(func.max(Episode.first_seen) > datetime.now() - timedelta(days=options.within))
-            for series in query.order_by(Series.name).yield_per(10):
-                series_name = series.name
-                if len(series_name) > 30:
-                    series_name = series_name[:27] + '...'
-
-                new_ep = ' '
-                behind = 0
-                status = 'N/A'
-                age = 'N/A'
-                episode_id = 'N/A'
-                latest = self.get_latest_download(series)
-                if latest:
-                    if latest.first_seen > datetime.now() - timedelta(days=2):
-                        new_ep = '>'
-                    behind = self.new_eps_after(latest)
-                    status = self.get_latest_status(latest)
-                    age = latest.age
-                    episode_id = latest.identifier
-
-                if behind:
-                    episode_id += ' +%s' % behind
-
-                console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
-                if behind >= 3:
-                    console(' ! Latest download is %d episodes behind, this may require '
-                            'manual intervention' % behind)
-
-            console('-' * 79)
-            console(' > = new episode ')
-            console(' Use `flexget series show NAME` to get detailed information')
-        finally:
-            session.close()
-
-    def forget(self, manager, options):
-        name = options.series_name
-
-        if options.episode_id:
-            # remove by id
-            identifier = options.episode_id.upper()
-            try:
-                forget_series_episode(name, identifier)
-                console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
-            except ValueError as e:
-                console(e.message)
-        else:
-            # remove whole series
-            try:
-                forget_series(name)
-                console('Removed series `%s` from database.' % name.capitalize())
-            except ValueError as e:
-                console(e.message)
-
-        manager.config_changed()
-
-    def begin(self, manager, options):
-        series_name = options.series_name
-        ep_id = options.episode_id
-        session = Session()
-        series = session.query(Series).filter(Series.name == series_name).first()
-        if not series:
-            console('Series not yet in database, adding `%s`' % series_name)
-            series = Series()
-            series.name = series_name
-            session.add(series)
-        try:
-            set_series_begin(series, ep_id)
-        except ValueError as e:
-            console(e)
-        else:
-            console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
-            session.commit()
-        finally:
-            session.close()
-        manager.config_changed()
+    console('-' * 79)
+    console(' * = downloaded')
+    if not series.identified_by:
+        console('')
+        console(' Series plugin is still learning which episode numbering mode is ')
+        console(' correct for this series (identified_by: auto).')
+        console(' Few duplicate downloads can happen with different numbering schemes')
+        console(' during this time.')
+    else:
+        console(' Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by)
+    console(' See option `identified_by` for more information.')
+    session.close()
 
 
 @event('options.register')
 def register_parser_arguments():
     # Register the command
-    callback = plugin.get_plugin_by_name('cli_series').instance.do_cli
-    parser = options.register_command('series', callback, help='view and manipulate the series plugin database')
+    parser = options.register_command('series', do_cli, help='view and manipulate the series plugin database')
 
     # Parent parser for subcommands that need a series name
     series_parser = argparse.ArgumentParser(add_help=False)
