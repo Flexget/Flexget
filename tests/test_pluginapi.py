@@ -6,7 +6,7 @@ from nose.tools import raises
 
 from tests import FlexGetBase
 from flexget import plugin, plugins
-from flexget.options import ArgumentParser
+from flexget.event import event
 
 
 class TestPluginApi(object):
@@ -47,10 +47,14 @@ class TestPluginApi(object):
             pass
 
         assert 'test_plugin' not in plugin.plugins
-        plugin.register(TestPlugin)
-        plugin.register(Oneword)
-        plugin.register(TestHTML)
-        # Call load_plugins again to initialize the new plugins we just registered
+
+        @event('plugin.register')
+        def rp():
+            plugin.register(TestPlugin)
+            plugin.register(Oneword)
+            plugin.register(TestHTML)
+
+        # Call load_plugins again to register our new plugins
         plugin.load_plugins()
         assert 'test_plugin' in plugin.plugins
         assert 'oneword' in plugin.plugins
