@@ -262,11 +262,7 @@ class PluginInfo(dict):
         self.phase_handlers = {}
 
         self.plugin_class = plugin_class
-
-        # Create plugin instance
-        self.instance = self.plugin_class()
-        self.instance.plugin_info = self  # give plugin easy access to its own info
-        self.instance.log = logging.getLogger(getattr(self.instance, "LOGGER_NAME", None) or self.name)
+        self.instance = None
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
@@ -276,6 +272,13 @@ class PluginInfo(dict):
             plugins[self.name] = self
 
     def initialize(self):
+        if self.instance is not None:
+            # We already initialized
+            return
+        # Create plugin instance
+        self.instance = self.plugin_class()
+        self.instance.plugin_info = self  # give plugin easy access to its own info
+        self.instance.log = logging.getLogger(getattr(self.instance, "LOGGER_NAME", None) or self.name)
         if hasattr(self.instance, 'schema'):
             self.schema = self.instance.schema
         elif hasattr(self.instance, 'validator'):
