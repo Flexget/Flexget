@@ -74,13 +74,15 @@ def add_event_handler(name, func, priority=128):
     events.append(event)
     return event
 
+def remove_event_handlers(name):
+    """Removes all handlers for given event `name`."""
+    _events.pop(name, None)
 
 def remove_event_handler(name, func):
-    """
-    .. warning:: Not implemented!
-    """
-    # TODO: implement
-    raise NotImplementedError
+    """Remove `func` from the handlers for event `name`."""
+    for e in list(_events.get(name, [])):
+        if e.func is func:
+            _events[name].remove(e)
 
 
 def fire_event(name, *args, **kwargs):
