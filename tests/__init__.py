@@ -11,7 +11,7 @@ import flexget.logger
 from flexget.manager import Manager
 from flexget.plugin import load_plugins
 from flexget.options import get_parser
-from flexget.task import Task
+from flexget.task import Task, TaskAbort
 from tests import util
 
 log = logging.getLogger('tests')
@@ -130,9 +130,11 @@ class FlexGetBase(object):
             if hasattr(self, 'session'):
                 self.task.session.close() # pylint: disable-msg=E0203
         self.task = Task(self.manager, name, config, options)
-        self.task.execute()
-        if not abort_ok:
-            assert not self.task.aborted, 'Task should not have aborted.'
+        try:
+            self.task.execute()
+        except TaskAbort:
+            if not abort_ok:
+                raise
 
     def dump(self):
         """Helper method for debugging"""

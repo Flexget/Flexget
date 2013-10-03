@@ -230,10 +230,6 @@ class Task(object):
         self.session = None
         self.priority = 65535
 
-        # Restore the config from the prepared copy
-        if self.prepared:
-            self.config = copy.deepcopy(self._prepared_config)
-
         self.requests = requests.Session()
 
         # List of all entries in the task
@@ -270,29 +266,26 @@ class Task(object):
         return self._abort_reason
 
     def prepare(self):
-        """
-        Resets the config and runs the prepare phase plugins on it, then validates the config.
-
-        :returns: True if the task has been prepared and is ready to run
-
-        """
-        self._prepared_config = None
+        """Resets the task state, and initializes config by running the task prepare handlers."""
         self._reset()
-        # We don't want the raw_config to be modified, so create a copy before running prepare methods
-        self.config = copy.deepcopy(self.raw_config)
-        # This phase runs before config validation
-        try:
-            self.__run_task_phase('prepare')
-        except TaskAbort as e:
-            self.config = None
-            log.error('Task aborted while being prepared: %s' % e.reason)
-            return False
-        # Store the prepared config so that we can reset the config on reruns
-        self._prepared_config = self.config
-        # A copy of _prepared_config will be put in config on execute
-        self.config = None
-        # If one of the prepare handlers disabled us, we aren't prepared
-        return self.enabled
+        if not self.prepared:
+            # We don't want the raw_config to be modified, so create a copy before running prepare methods
+            self.config = copy.deepcopy(self.raw_config)
+            # This phase runs before config validation
+            try:
+                self.__run_task_phase('prepare')
+            except TaskAbort as e:
+                self.config = None
+                log.debug('Task aborted while being prepared: %s' % e.reason)
+                raise
+            except Exception as e:
+                msg = 'Unhandled exception during task preparation: %s' % e
+                log.exception(msg)
+                self.abort(msg)
+            # Store the prepared config so that we can reset the config on reruns
+            self._prepared_config = self.config
+        # No matter what, we restore config to a copy of the prepared config
+        self.config = copy.deepcopy(self._prepared_config)
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
@@ -309,9 +302,16 @@ class Task(object):
             log.debug('Disabling %s phase' % phase)
             self.disabled_phases.append(phase)
 
-    def abort(self, reason='Unknown', **kwargs):
+    def abort(self, reason='Unknown', silent=False):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
-        raise TaskAbort(reason, silent=kwargs.get('silent', False))
+        self._abort = True
+        self._abort_reason = reason
+        self._silent_abort = silent
+        if not self._silent_abort:
+            log.warning('Aborting task (plugin: %s)' % self.current_plugin)
+        else:
+            log.debug('Aborting task (plugin: %s)' % self.current_plugin)
+        raise TaskAbort(reason, silent=silent)
 
     def find_entry(self, category='entries', **values):
         """
@@ -420,10 +420,7 @@ class Task(object):
         # call the plugin
         try:
             return method(*args, **kwargs)
-        except TaskAbort as e:
-            self._abort = True
-            self._abort_reason = e.reason
-            self._silent_abort = e.silent
+        except TaskAbort:
             raise
         except PluginWarning as warn:
             # check if this warning should be logged only once (may keep repeating)
@@ -450,9 +447,6 @@ class Task(object):
             msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
             log.exception(msg)
             self.abort(msg)
-            # don't handle plugin errors gracefully with unit test
-            if self.manager.unit_test:
-                raise
 
     def rerun(self):
         """Immediately re-run the task after execute has completed,
@@ -481,13 +475,12 @@ class Task(object):
             log.debug('Not running disabled task %s' % self.name)
         if self.options.cron:
             self.manager.db_cleanup()
-        log.debug('executing %s' % self.name)
-        if not self.prepared:
-            if not self.prepare():
-                log.debug('task %s failed to prepare, not running' % self.name)
-                return
 
-        self._reset()
+        log.debug('executing %s' % self.name)
+        self.prepare()
+        if not self.enabled:
+            log.debug('task %s disabled during preparation, not running' % self.name)
+            return
 
         # validate configuration
         errors = self.validate()
@@ -536,11 +529,7 @@ class Task(object):
 
                 # run all plugins with this phase
                 self.__run_task_phase(phase)
-        except TaskAbort as e:
-            if not e.silent:
-                log.warning('Aborting task (plugin: %s)' % self.current_plugin)
-            else:
-                log.debug('Aborting task (plugin: %s)' % self.current_plugin)
+        except TaskAbort:
             # Roll back the session before calling abort handlers
             self.session.rollback()
             try:
