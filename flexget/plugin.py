@@ -415,8 +415,9 @@ def load_plugins():
     start_time = time.time()
     # Import all the plugins
     _load_plugins_from_dirs(get_standard_plugins_path())
+    # Register them
     fire_event('plugin.register')
-    # After they have all been imported, instantiate them
+    # After they have all been registered, instantiate them
     for plugin in plugins.values():
         plugin.initialize()
     took = time.time() - start_time

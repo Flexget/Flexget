@@ -178,7 +178,8 @@ class Task(object):
         if config is None:
             config = manager.config['tasks'].get(name, {})
         self._raw_config = config
-        # this will be created when the prepare method is called
+        # _prepared_config and config will be created when the prepare method is called
+        self._prepared_config = None
         self.config = None
         if options is None:
             options = copy.copy(self.manager.options.execute)
@@ -229,6 +230,10 @@ class Task(object):
         self.session = None
         self.priority = 65535
 
+        # Restore the config from the prepared copy
+        if self.prepared:
+            self.config = copy.deepcopy(self._prepared_config)
+
         self.requests = requests.Session()
 
         # List of all entries in the task
@@ -236,8 +241,6 @@ class Task(object):
 
         self.disabled_phases = []
 
-        # TODO: Some of these can probably be removed. I think we just use them as a way for the plugins to get the
-        # abort reason from an on_task_abort handler
         self._abort = False
         self._abort_reason = None
         self._silent_abort = False
@@ -256,7 +259,7 @@ class Task(object):
 
     @property
     def prepared(self):
-        return self.config is not None
+        return self._prepared_config is not None
 
     @property
     def aborted(self):
@@ -273,7 +276,9 @@ class Task(object):
         :returns: True if the task has been prepared and is ready to run
 
         """
+        self._prepared_config = None
         self._reset()
+        # We don't want the raw_config to be modified, so create a copy before running prepare methods
         self.config = copy.deepcopy(self.raw_config)
         # This phase runs before config validation
         try:
@@ -282,6 +287,10 @@ class Task(object):
             self.config = None
             log.error('Task aborted while being prepared: %s' % e.reason)
             return False
+        # Store the prepared config so that we can reset the config on reruns
+        self._prepared_config = self.config
+        # A copy of _prepared_config will be put in config on execute
+        self.config = None
         # If one of the prepare handlers disabled us, we aren't prepared
         return self.enabled
 
@@ -478,14 +487,14 @@ class Task(object):
                 log.debug('task %s failed to prepare, not running' % self.name)
                 return
 
+        self._reset()
+
         # validate configuration
         errors = self.validate()
         if errors:
             self.enabled = False
             self.config = None
             self.abort('Configuration errors')
-
-        self._reset()
 
         # Handle keyword args
         if self.options.disable_phases:
