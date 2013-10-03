@@ -40,7 +40,7 @@ with open("README.rst") as readme:
 
 setup(
     name='FlexGet',
-    version='1.1',  # our tasks append the .1234 (current build number) to the version number
+    version='1.2',  # our tasks append the .1234 (current build number) to the version number
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) '
                 'from different sources like RSS-feeds, html-pages, various sites and more.',
     long_description=long_description,
