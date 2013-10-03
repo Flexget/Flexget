@@ -34,7 +34,7 @@ class PluginSortBy(object):
             {
                 'type': 'object',
                 'properties': {
-                    'field': {'type': 'text'},
+                    'field': {'type': 'string'},
                     'reverse': {'type': 'boolean'}},
                 'additionalProperties': False
             }

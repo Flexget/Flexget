@@ -31,7 +31,7 @@ class TorrentScrub(object):
     schema = {
         'oneOf': [
             {'type': 'boolean'},
-            {'type': 'string', 'enum': SCRUB_MODES},
+            {'type': 'string', 'enum': list(SCRUB_MODES)},
             {'type': 'array', 'items': {'type': 'string'}}  # list of keys to scrub
         ]
     }
