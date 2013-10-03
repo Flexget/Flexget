@@ -104,11 +104,14 @@ class Manager(object):
         if errors:
             for error in errors:
                 log.critical("[%s] %s", error.json_pointer, error.message)
-            self.shutdown(finish_queue=False)
+            # Make sure the scheduler is never started
+            self.scheduler.shutdown(finish_queue=False)
 
     @property
     def tasks(self):
         """A list of tasks in the config"""
+        if not self.config:
+            return []
         return self.config.get('tasks', {}).keys()
 
     def run_cli_command(self):
