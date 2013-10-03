@@ -31,7 +31,9 @@ class TestPluginApi(object):
             for k in ("/*.py", "/*/*.py")
             for i in glob.glob(plugin_path + k))
         assert len(plugin_modules) >= 10, "Less than 10 plugin modules looks fishy"
-        assert len(plugin.plugins) >= len(plugin_modules) - 1, "Less plugins than plugin modules"
+        # Hmm, this test isn't good, because we have plugin modules that don't register a class (like cli ones)
+        # and one module can load multiple plugins TODO: Maybe consider some replacement
+        # assert len(plugin.plugins) >= len(plugin_modules) - 1, "Less plugins than plugin modules"
 
     def test_register_by_class(self):
 
@@ -45,9 +47,11 @@ class TestPluginApi(object):
             pass
 
         assert 'test_plugin' not in plugin.plugins
-        plugin.register_plugin(TestPlugin)
-        plugin.register_plugin(Oneword)
-        plugin.register_plugin(TestHTML)
+        plugin.register(TestPlugin)
+        plugin.register(Oneword)
+        plugin.register(TestHTML)
+        # Call load_plugins again to initialize the new plugins we just registered
+        plugin.load_plugins()
         assert 'test_plugin' in plugin.plugins
         assert 'oneword' in plugin.plugins
         assert 'test_html' in plugin.plugins
