@@ -17,7 +17,7 @@ from flexget.utils.tools import parse_timedelta
 log = logging.getLogger('api_tvrage')
 
 Base = db_schema.versioned_base('tvrage', 1)
-update_interval = '7 days'
+UPDATE_INTERVAL = '7 days'
 
 
 @event('manager.db_cleanup')
@@ -153,10 +153,13 @@ def lookup_series(name=None, session=None):
     series = None
     res = session.query(TVRageLookup).filter(TVRageLookup.name == name.lower()).first()
 
-    if res:
+    if res and not res.series:
+        # If this result lost its series somehow, remove it
+        session.delete(res)
+    elif res:
         series = res.series
         # if too old result, clean the db and refresh it
-        interval = parse_timedelta(update_interval)
+        interval = parse_timedelta(UPDATE_INTERVAL)
         if datetime.datetime.now() > series.last_update + interval:
             log.debug('Refreshing tvrage info for %s', name)
         else:
