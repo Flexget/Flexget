@@ -22,7 +22,7 @@ def log_query_count(name_point):
 
 @event('manager.execute.started')
 def startup(manager):
-    if manager.execute.options.debug_perf:
+    if manager.options.execute.debug_perf:
         log.info('Enabling plugin and SQLAlchemy performance debugging')
         import time
 

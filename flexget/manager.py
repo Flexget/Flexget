@@ -126,12 +126,12 @@ class Manager(object):
                 self.shutdown()
                 return
             with self.acquire_lock():
-                fire_event('manager.execute.started')
+                fire_event('manager.execute.started', self)
                 self.scheduler.start()
                 for name in self.tasks:
                     self.scheduler.execute(name)
                 self.scheduler.run_queue.join()
-                fire_event('manager.execute.completed')
+                fire_event('manager.execute.completed', self)
                 self.shutdown()
                 # TODO: Figure out how to profile with scheduler
                 #if options.profile:
@@ -149,6 +149,7 @@ class Manager(object):
             self.ipc_server = IPCServer(self, options.ipc_port)
             with self.acquire_lock():
                 self.ipc_server.start()
+                fire_event('manager.daemon.started', self)
                 unscheduled_tasks = self.tasks
                 for task, schedule in self.config['schedules'].get('tasks', {}).iteritems():
                     if task not in unscheduled_tasks:
@@ -163,6 +164,7 @@ class Manager(object):
                         self.scheduler.add_scheduled_task(task, schedule=default_schedule)
                 self.scheduler.start()
                 self.scheduler.join()
+                fire_event('manager.daemon.completed', self)
         # Otherwise dispatch the command to the callback function
         else:
             if options.lock_required:
