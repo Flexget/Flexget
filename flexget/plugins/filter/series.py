@@ -847,11 +847,8 @@ class FilterSeries(FilterSeriesBase):
         }
 
     def __init__(self):
-        self.backlog = None
-
-    def on_process_start(self, task):
         try:
-            self.backlog = plugin.get_plugin_by_name('backlog').instance
+            self.backlog = plugin.get_plugin_by_name('backlog')
         except plugin.DependencyError:
             log.warning('Unable utilize backlog plugin, episodes may slip trough timeframe')
 
@@ -1308,7 +1305,7 @@ class FilterSeries(FilterSeriesBase):
 
             # add best entry to backlog (backlog is able to handle duplicate adds)
             if self.backlog:
-                self.backlog.add_backlog(task, best)
+                self.backlog.instance.add_backlog(task, best)
             return True
 
     def process_qualities(self, config, entries, downloaded):
