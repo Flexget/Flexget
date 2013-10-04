@@ -5,6 +5,7 @@ import cookielib
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.tools import TimedDict
 
 log = logging.getLogger('cookies')
 
@@ -20,6 +21,10 @@ class PluginCookies:
 
       cookies: /path/firefox/profile/something/cookies.sqlite
     """
+
+    # TODO: 1.2 Is this a good way to handle this? How long should the time be?
+    # Keeps loaded cookiejars cached for some time
+    cookiejars = TimedDict(cache_time='5 minutes')
 
     schema = {
         'oneOf': [
@@ -124,9 +129,6 @@ class PluginCookies:
         cookie_jar._really_load(s, '', True, True)
         return cookie_jar
 
-    def on_process_start(self, task, config):
-        self.cookiejars = {}
-
     def on_task_start(self, task, config):
         """Task starting, install cookiejar"""
         import os
@@ -177,9 +179,6 @@ class PluginCookies:
 
     # Task aborted, unhook the cookiejar
     on_task_abort = on_task_exit
-
-    def on_process_end(self, task, config):
-        self.cookiejars = {}
 
 
 @event('plugin.register')
