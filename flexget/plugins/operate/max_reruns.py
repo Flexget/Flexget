@@ -11,24 +11,21 @@ log = logging.getLogger('max_reruns')
 class MaxReRuns(object):
     """Overrides the maximum amount of re-runs allowed by a task."""
 
+    schema = {'type': 'integer'}
+
     def __init__(self):
         self.default = Task.max_reruns
 
-    schema = {'type': 'integer'}
-
-    def on_process_start(self, task, config):
+    def on_task_start(self, task, config):
         self.default = task.max_reruns
-        try:
-            task.max_reruns = int(config)
-        except ValueError:
-            return  # The validator will catch this before the task actually runs
+        task.max_reruns = int(config)
         log.debug('changing max task rerun variable to: %s' % config)
 
-    def on_process_end(self, task, config):
+    def on_task_exit(self, task, config):
         log.debug('restoring max task rerun variable to: %s' % self.default)
         task.max_reruns = self.default
 
-    on_task_abort = on_process_end
+    on_task_abort = on_task_exit
 
 
 @event('plugin.register')

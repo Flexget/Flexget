@@ -451,10 +451,12 @@ class Task(object):
     def rerun(self):
         """Immediately re-run the task after execute has completed,
         task can be re-run up to :attr:`.max_reruns` times."""
-        if not self._rerun:
-            self._rerun = True
-            log.info('Plugin %s has requested task to be ran again after execution has completed.' %
-                     self.current_plugin)
+        log.info('Plugin %s has requested task to be ran again after execution has completed.' % self.current_plugin)
+        if self._rerun_count >= self.max_reruns:
+            self._rerun = False
+            log.info('Task has been re-run %s times already, stopping for now' % self._rerun_count)
+            return
+        self._rerun = True
 
     def config_changed(self):
         """
@@ -526,7 +528,12 @@ class Task(object):
                             log.info('Plugin %s is not executed because %s phase is disabled (e.g. --test)' %
                                      (plugin.name, phase))
                     continue
-
+                if phase == 'start' and self.is_rerun:
+                    log.debug('skipping task_start during rerun')
+                    continue
+                elif phase == 'exit' and self._rerun:
+                    log.debug('not running task_end yet because task will rerun')
+                    continue
                 # run all plugins with this phase
                 self.__run_task_phase(phase)
         except TaskAbort:
@@ -551,18 +558,11 @@ class Task(object):
 
         # rerun task
         if self._rerun:
-            if self._rerun_count >= self.max_reruns:
-                log.info('Task has been rerunning already %s times, stopping for now' % self._rerun_count)
-                # reset the counter for future runs (necessary only with webui)
-                self._rerun_count = 0
-            else:
-                log.info('Rerunning the task in case better resolution can be achieved.')
-                self._rerun_count += 1
-                self.execute()
-
-        # Clean up entries after the task has executed to reduce ram usage, #1652
-        if not self.manager.unit_test:
-            self.all_entries[:] = [entry for entry in self.all_entries if entry.accepted]
+            log.info('Rerunning the task in case better resolution can be achieved.')
+            self._rerun_count += 1
+            # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in instead of
+            # taking another one) after input and just inject the same entries for the rerun
+            self.execute()
 
     def validate(self):
         """Validates config, logs errors and returns a list of errors."""

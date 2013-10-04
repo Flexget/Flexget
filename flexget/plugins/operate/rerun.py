@@ -10,12 +10,13 @@ log = logging.getLogger('rerun')
 class MaxReRuns(object):
     """Force a task to rerun for debugging purposes."""
 
-    schema = {'type': 'boolean'}
+    schema = {'type': ['boolean', 'integer']}
 
     def on_task_start(self, task, config):
-        if config and not task.is_rerun:
-            log.debug('forcing a task rerun')
-            task.rerun()
+        task.max_reruns = int(config)
+
+    def on_task_input(self, task, config):
+        task.rerun()
 
 
 @event('plugin.register')
