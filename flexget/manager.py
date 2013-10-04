@@ -126,9 +126,12 @@ class Manager(object):
                 self.shutdown()
                 return
             with self.acquire_lock():
+                fire_event('manager.execute.started')
                 self.scheduler.start()
                 for name in self.tasks:
                     self.scheduler.execute(name)
+                self.scheduler.run_queue.join()
+                fire_event('manager.execute.completed')
                 self.shutdown()
                 # TODO: Figure out how to profile with scheduler
                 #if options.profile:

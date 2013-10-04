@@ -20,9 +20,9 @@ def log_query_count(name_point):
     log.info('At point named `%s` total of %s queries were ran' % (name_point, query_count))
 
 
-@event('manager.subcommand.exec', priority=255)
-def startup(manager, options):
-    if options.debug_perf:
+@event('manager.execute.started')
+def startup(manager):
+    if manager.execute.options.debug_perf:
         log.info('Enabling plugin and SQLAlchemy performance debugging')
         import time
 
