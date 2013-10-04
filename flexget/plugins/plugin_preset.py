@@ -26,10 +26,27 @@ class PluginPreset(object):
 
     schema = {
         'oneOf': [
-            {'title': 'list of presets','type': 'array', 'items': {'type': 'string'}},
-            {'title': 'single preset', 'type': 'string'},
-            {'title': 'disable presets', 'type': 'boolean', 'enum': [False]}
-        ]
+            {
+                'description': 'Apply multiple templates to this task.',
+                'type': 'array',
+                'items': {'$ref': '#/definitions/preset'}},
+            {
+                'description': 'Apply a single template to this task.',
+                'allOf': [{'$ref': '#/definitions/preset'}]
+            },
+            {
+                'description': 'Disable all templates on this task.',
+                'type': 'boolean',
+                'enum': [False]
+            }
+        ],
+        'definitions': {
+            'preset': {
+                'type': 'string',
+                'description': 'Name of a template which will be applied to this task.',
+                'links': [{'rel': 'template', 'href': '/api/config/templates/{$}'}]  # Dunno what the 'rel' should be
+            }
+        }
     }
 
     def __init__(self):
@@ -47,6 +64,10 @@ class PluginPreset(object):
         if config is False:  # handles 'preset: no' form to turn off preset on this task
             return
         config = self.prepare_config(config)
+        # Config has not been validated on prepare phase, sanity check our data
+        if not isinstance(config, (basestring, list)):
+            # The task validation will provide user with an error message
+            return
 
         # add global in except when disabled with no_global
         if 'no_global' in config:
