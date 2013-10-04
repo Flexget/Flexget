@@ -12,7 +12,7 @@ class FilterOnlyNew(object):
 
     schema = {'type': 'boolean'}
 
-    def on_process_start(self, task, config):
+    def on_task_start(self, task, config):
         """Make sure the remember_rejected plugin is available"""
         # Raises an error if plugin isn't available
         plugin.get_plugin_by_name('remember_rejected')

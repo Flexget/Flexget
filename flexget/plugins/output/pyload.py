@@ -53,9 +53,6 @@ class PluginPyLoad(object):
     DEFAULT_PREFERRED_HOSTER_ONLY = False
     DEFAULT_HANDLE_NO_URL_AS_FAILURE = False
 
-    def __init__(self):
-        self.session = None
-
     def validator(self):
         """Return config validator"""
         root = validator.factory()
@@ -73,9 +70,6 @@ class PluginPyLoad(object):
         advanced.accept('boolean', key='handle_no_url_as_failure')
         return root
 
-    def on_process_start(self, task, config):
-        self.session = None
-
     def on_task_output(self, task, config):
         if not config.get('enabled', True):
             return
@@ -88,7 +82,7 @@ class PluginPyLoad(object):
         """Adds accepted entries"""
 
         try:
-            self.check_login(task, config)
+            session = self.get_session(config)
         except URLError:
             raise plugin.PluginError('pyLoad not reachable', log)
         except plugin.PluginError:
@@ -109,7 +103,7 @@ class PluginPyLoad(object):
 
             log.debug("Parsing url %s" % url)
 
-            result = query_api(api, "parseURLs", {"html": content, "url": url, "session": self.session})
+            result = query_api(api, "parseURLs", {"html": content, "url": url, "session": session})
 
             # parsed { plugins: [urls] }
             parsed = json.loads(result.read())
@@ -148,7 +142,7 @@ class PluginPyLoad(object):
                 post = {'name': "'%s'" % entry['title'].encode("ascii", "ignore"),
                         'links': str(urls),
                         'dest': dest,
-                        'session': self.session}
+                        'session': session}
 
                 pid = query_api(api, "addPackage", post).read()
                 log.debug('added package pid: %s' % pid)
@@ -156,31 +150,21 @@ class PluginPyLoad(object):
                 if folder:
                     # set folder with api
                     data = {'folder': folder}
-                    query_api(api, "setPackageData", {'pid': pid, 'data': data, 'session': self.session})
+                    query_api(api, "setPackageData", {'pid': pid, 'data': data, 'session': session})
 
             except Exception as e:
                 entry.fail(str(e))
 
-    def check_login(self, task, config):
+    def get_session(self, config):
         url = config.get('api', self.DEFAULT_API)
 
-        if not self.session:
-            # Login
-            post = {'username': config['username'], 'password': config['password']}
-            result = query_api(url, "login", post)
-            response = json.loads(result.read())
-            if not response:
-                raise plugin.PluginError('Login failed', log)
-            self.session = response.replace('"', '')
-        else:
-            try:
-                query_api(url, 'getServerVersion', {'session': self.session})
-            except HTTPError as e:
-                if e.code == 403:  # Forbidden
-                    self.session = None
-                    return self.check_login(task, config)
-                else:
-                    raise plugin.PluginError('HTTP Error %s' % e, log)
+        # Login
+        post = {'username': config['username'], 'password': config['password']}
+        result = query_api(url, "login", post)
+        response = json.loads(result.read())
+        if not response:
+            raise plugin.PluginError('Login failed', log)
+        return response.replace('"', '')
 
 
 def query_api(url, method, post=None):

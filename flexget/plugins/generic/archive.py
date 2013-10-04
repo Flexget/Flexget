@@ -152,13 +152,6 @@ class Archive(object):
 
     }
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory()
-        config.accept('boolean')
-        config.accept('list').accept('text')
-        return config
-
     def on_task_exit(self, task, config):
         """Add new entries into archive. We use exit phase in case the task corrects title or url via some plugins."""
 
@@ -216,7 +209,7 @@ class Archive(object):
     def on_task_abort(self, task, config):
         """
         Archive even on task abort, except if the abort has happened before session
-        was started. Eg. in on_process_start
+        was started.
         """
         if task.session is not None:
             self.on_task_exit(task, config)
