@@ -9,9 +9,10 @@ import time
 import re
 import sys
 import locale
+from collections import MutableMapping
 from urlparse import urlparse
 from htmlentitydefs import name2codepoint
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 
 def str_to_boolean(string):
@@ -410,3 +411,34 @@ else:
         # See if we couldn't get the exit code or the exit code indicates that the
         # process is still running.
         return is_running or exit_code.value == STILL_ACTIVE
+
+
+class TimedDict(MutableMapping):
+    """Acts like a normal dict, but keys will only remain in the dictionary for a specified time span."""
+    def __init__(self, cache_time='5 minutes'):
+        self.cache_time = parse_timedelta(cache_time)
+        self._store = dict()
+
+    def __getitem__(self, key):
+        add_time, value = self._store[key]
+        # Prune data and raise KeyError when expired
+        if add_time < datetime.now() - self.cache_time:
+            del self._store[key]
+            raise KeyError(key, 'cache time expired')
+        return value
+
+    def __setitem__(self, key, value):
+        self._store[key] = (datetime.now(), value)
+
+    def __delitem__(self, key):
+        del self._store[key]
+
+    def __iter__(self):
+        # Uses our getitem to skip expired items
+        return (key for key in self._store.keys() if key in self)
+
+    def __len__(self):
+        return len(list(self.__iter__()))
+
+    def __repr__(self):
+        return '%s(%r)' % (self.__class__.__name__, dict(zip(self._store, (v[1] for v in self._store.values()))))
