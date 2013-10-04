@@ -31,6 +31,9 @@ class FilterAllSeries(FilterSeriesBase):
         if not config:
             # Don't run when we are disabled
             return
+        if task.is_rerun:
+            # Since we are running after task start phase, make sure not to merge into the config again on reruns
+            return
         # Generate the group settings for series plugin
         group_settings = {}
         if isinstance(config, dict):
