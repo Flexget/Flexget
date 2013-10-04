@@ -42,11 +42,7 @@ class PluginHeaders(object):
       cookie: uid=<YOUR UID>; pass=<YOUR PASS>
     """
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory('dict')
-        config.accept_valid_keys('text', key_type='text')
-        return config
+    schema = {'type': 'object', 'additionalProperties': {'type': 'string'}}
 
     @plugin.priority(130)
     def on_task_start(self, task, config):

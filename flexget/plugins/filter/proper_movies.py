@@ -56,12 +56,12 @@ class FilterProperMovies(object):
         Value no will disable plugin.
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('root')
-        root.accept('boolean')
-        root.accept('interval')
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {'type': 'string', 'format': 'interval'}
+        ]
+    }
 
     def on_task_filter(self, task, config):
         log.debug('check for enforcing')

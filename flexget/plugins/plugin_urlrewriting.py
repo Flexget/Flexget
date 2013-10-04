@@ -81,10 +81,7 @@ class PluginUrlRewriting(object):
 class DisableUrlRewriter(object):
     """Disable certain urlrewriters."""
 
-    def validator(self):
-        root = validator.factory('list')
-        root.accept('text')
-        return root
+    schema = {'type': 'array', 'items': {'type': 'string'}}
 
     def on_task_start(self, task, config):
         urlrewrite = plugin.get_plugin_by_name('urlrewriting')['instance']
