@@ -9,9 +9,9 @@ from flexget.utils.tools import console
 log = logging.getLogger('task_control')
 
 
-@event('manager.startup')
+@event('manager.execute.started')
 def validate_cli_opts(manager):
-    if manager.options.cli_command != 'execute' or not manager.options.execute.onlytask:
+    if not manager.options.execute.onlytask:
         return
     # Make a list of the specified tasks to run, and those available
     onlytasks = manager.options.execute.onlytask.split(',')
@@ -22,14 +22,13 @@ def validate_cli_opts(manager):
         if onlytask.lower() not in task_names:
             if any(i in onlytask for i in '*?['):
                 # Try globbing
-                if not any(fnmatch.fnmatchcase(f.lower(), onlytask.lower()) for f in task_names):
-                    console('No match for task pattern \'%s\'' % onlytask)
-                    manager.shutdown(finish_queue=False)
-                    return
+                if any(fnmatch.fnmatchcase(f.lower(), onlytask.lower()) for f in task_names):
+                    continue
+                console('No match for task pattern \'%s\'' % onlytask)
             else:
                 console('Could not find task \'%s\'' % onlytask)
-            manager.shutdown(finish_queue=False)
-
+            manager.scheduler.shutdown(finish_queue=False)
+            return
 
 
 class OnlyTask(object):

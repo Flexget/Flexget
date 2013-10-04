@@ -65,7 +65,7 @@ class ChangeWarn(object):
             log.critical('Plugin \'priority\' was renamed to \'plugin_priority\'')
 
         if found_deprecated:
-            task.manager.shutdown(finish_queue=False)
+            task.manager.scheduler.shutdown(finish_queue=False)
             task.abort('Deprecated config.')
 
 
