@@ -84,25 +84,25 @@ class TestDownloadTemp(FlexGetBase):
         """Download plugin: Temp directory has wrong permissions"""
         if sys.platform.startswith('win'):
             raise SkipTest  # TODO: Windows doesn't have a guaranteed 'private' directory afaik
-        with assert_raises(TaskAbort):
-            self.execute_task('temp_wrong_permission', True)
+        self.execute_task('temp_wrong_permission', abort_ok=True)
+        assert self.task.aborted
 
     def test_temp_non_existent(self):
         """Download plugin: Temp directory does not exist"""
-        with assert_raises(TaskAbort):
-            self.execute_task('temp_non_existent')
+        self.execute_task('temp_non_existent', abort_ok=True)
+        assert self.task.aborted
 
     def test_wrong_config_1(self):
         """Download plugin: Temp directory config error [1of3]"""
-        with assert_raises(TaskAbort):
-            self.execute_task('temp_wrong_config_1')
+        self.execute_task('temp_wrong_config_1', abort_ok=True)
+        assert self.task.aborted
 
     def test_wrong_config_2(self):
         """Download plugin: Temp directory config error [2of3]"""
-        with assert_raises(TaskAbort):
-            self.execute_task('temp_wrong_config_2')
+        self.execute_task('temp_wrong_config_2', abort_ok=True)
+        assert self.task.aborted
 
     def test_wrong_config_3(self):
         """Download plugin: Temp directory config error [3of3]"""
-        with assert_raises(TaskAbort):
-            self.execute_task('temp_empty')
+        self.execute_task('temp_empty', abort_ok=True)
+        assert self.task.aborted
