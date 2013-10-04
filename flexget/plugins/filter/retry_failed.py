@@ -88,11 +88,8 @@ class PluginFailed(object):
     }
 
     def __init__(self):
-        self.backlog = None
-
-    def on_process_start(self, task, config):
         try:
-            self.backlog = plugin.get_plugin_by_name('backlog').instance
+            self.backlog = plugin.get_plugin_by_name('backlog')
         except plugin.DependencyError:
             log.warning('Unable utilize backlog plugin, failed entries may not be retried properly.')
 
@@ -173,7 +170,7 @@ class PluginFailed(object):
             else:
                 retry_time = base_retry_time
             if self.backlog:
-                self.backlog.add_backlog(task, entry, amount=retry_time)
+                self.backlog.instance.add_backlog(task, entry, amount=retry_time)
             if retry_time:
                 fail_reason = item.reason if item else entry.get('reason', 'unknown')
                 entry.reject(reason='Waiting before trying failed entry again. (failure reason: %s)' %

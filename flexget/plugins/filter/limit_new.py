@@ -28,11 +28,8 @@ class FilterLimitNew(object):
     }
 
     def __init__(self):
-        self.backlog = None
-
-    def on_process_start(self, task, config):
         try:
-            self.backlog = plugin.get_plugin_by_name('backlog').instance
+            self.backlog = plugin.get_plugin_by_name('backlog')
         except plugin.DependencyError:
             log.warning('Unable utilize backlog plugin, entries may slip trough limit_new in some rare cases')
 
@@ -50,7 +47,7 @@ class FilterLimitNew(object):
                 entry.reject('limit exceeded')
                 # Also save this in backlog so that it can be accepted next time.
                 if self.backlog:
-                    self.backlog.add_backlog(task, entry)
+                    self.backlog.instance.add_backlog(task, entry)
 
         log.debug('Rejected: %s Allowed: %s' % (len(task.accepted[amount:]), len(task.accepted[:amount])))
 
