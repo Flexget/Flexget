@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from datetime import timedelta
 import os
+
 from tests import FlexGetBase, with_filecopy
 from flexget.utils.cached_input import cached
 from flexget import plugin
@@ -35,17 +37,19 @@ class TestInputCache(FlexGetBase):
     @with_filecopy('rss.xml', 'cached.xml')
     def test_memory_cache(self):
         """Test memory input caching"""
-        # Don't use execute_task in this test as it runs process_start (which clears the cache) before each task
-        task = self.manager.tasks['test_memory']
-        task.execute()
-        assert task.entries, 'should have created entries at the start'
+        self.execute_task('test_memory')
+        assert self.task.entries, 'should have created entries at the start'
         os.remove('cached.xml')
         f = open('cached.xml', 'w')
         f.write('')
         f.close()
-        task = self.manager.tasks['test_memory']
-        task.execute()
-        assert task.entries, 'should have created entries from the cache'
+        self.execute_task('test_memory')
+        assert self.task.entries, 'should have created entries from the cache'
+        # Turn the cache time down and run again to make sure the entries are not created again
+        from flexget.utils.cached_input import cached
+        cached.cache.cache_time = timedelta(minutes=0)
+        self.execute_task('test_memory')
+        assert not self.task.entries, 'cache should have been expired'
 
     def test_db_cache(self):
         """Test db input caching"""

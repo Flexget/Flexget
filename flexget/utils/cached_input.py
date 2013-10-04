@@ -7,7 +7,7 @@ from sqlalchemy import Column, Integer, String, DateTime, PickleType, Unicode, F
 from sqlalchemy.orm import relation
 from flexget import db_schema
 from flexget.utils.database import safe_pickle_synonym
-from flexget.utils.tools import parse_timedelta
+from flexget.utils.tools import parse_timedelta, TimedDict
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
@@ -72,7 +72,7 @@ class cached(object):
     .. note:: Configuration assumptions may make this unusable in some (future) inputs
     """
 
-    cache = {}
+    cache = TimedDict(cache_time='1 minute')
 
     def __init__(self, name, persist=None):
         # Cast name to unicode to prevent sqlalchemy warnings when filtering
@@ -174,12 +174,3 @@ class cached(object):
                 return response
 
         return wrapped_func
-
-
-@event('manager.execute.started')
-def clear_cache(manager):
-    """Clears the input cache before execution.
-    This is neccessary for webui or otherwise it will only use cache.
-    """
-    log.debug('clearing cache')
-    cached.cache = {}
