@@ -259,7 +259,7 @@ class Task(object):
 
     @property
     def aborted(self):
-        return self._abort and not self._silent_abort
+        return self._abort
 
     @property
     def abort_reason(self):
