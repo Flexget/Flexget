@@ -3,6 +3,7 @@ import logging
 
 from flexget import options, plugin
 from flexget.event import event
+from flexget.utils.tools import console
 
 try:
     from guppy import hpy
@@ -31,39 +32,25 @@ def update()
     heapy.setref()
 """
 
-
-class OutputMemUsage(object):
-    """Output memory usage statistics with heapy"""
-
-    def __init__(self):
-        self.heapy = None
-
-    schema = {'type': 'boolean'}
-
-    def on_process_start(self, task, config):
-        if not task.options.mem_usage:
-            return
-        # start only once
-        if self.heapy:
-            return
-        self.heapy = hpy()
-
-    def on_process_end(self, task, config):
-        if not task.options.mem_usage:
-            return
-        # prevents running this multiple times ...
-        if not self.heapy:
-            return
-        print 'Calculating memory usage:'
-        print self.heapy.heap()
-        print '-' * 79
-        print self.heapy.heap().get_rp(40)
-        self.heapy = None
+heapy = None
 
 
-@event('plugin.register')
-def register_plugin():
-    plugin.register(OutputMemUsage, 'mem_usage', builtin=True, api_ver=2)
+@event('manager.execute.started')
+def on_exec_started(manager):
+    if not manager.options.execute.mem_usage:
+        return
+    global heapy
+    heapy = hpy()
+
+
+@event('manager.execute.completed')
+def on_exec_stopped(manager):
+    if not manager.options.execute.mem_usage:
+        return
+    console('Calculating memory usage:')
+    console(heapy.heap())
+    console('-' * 79)
+    console(heapy.heap().get_rp(40))
 
 
 @event('options.register')
