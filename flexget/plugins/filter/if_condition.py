@@ -45,7 +45,7 @@ class FilterIf(object):
     def __init__(self):
         self.task_phases = {}
 
-    def on_task_prepare(self, task, config):
+    def on_task_start(self, task, config):
         """Divide the config into parts based on which phase they need to run on."""
         phase_dict = self.task_phases[task.name] = defaultdict(lambda: [])
         for item in config:
@@ -56,7 +56,7 @@ class FilterIf(object):
                 for plugin_name, plugin_config in action.iteritems():
                     p = plugin.get_plugin_by_name(plugin_name)
                     for phase in p.phase_handlers:
-                        if phase == 'prepare':
+                        if phase == 'start':
                             # If plugin has a prepare handler, run it now unconditionally
                             try:
                                 p.phase_handlers[phase](task, plugin_config)
@@ -106,25 +106,24 @@ class FilterIf(object):
             for item in self.task_phases[task.name][phase]:
                 requirement, action = item.items()[0]
                 passed_entries = [e for e in task.entries if self.check_condition(requirement, e)]
-                if passed_entries:
-                    if isinstance(action, basestring):
-                        # Simple entry action (accept, reject or fail) was specified as a string
-                        for entry in passed_entries:
-                            entry_actions[action](entry, 'Matched requirement: %s' % requirement)
-                    else:
-                        # Other plugins were specified to run on this entry
-                        fake_task = Task(task.manager, task.name, task.config, task.options)
-                        fake_task.session = task.session
-                        # This entry still belongs to our feed, accept/reject etc. will carry through.
-                        fake_task.all_entries[:] = passed_entries
+                if isinstance(action, basestring):
+                    # Simple entry action (accept, reject or fail) was specified as a string
+                    for entry in passed_entries:
+                        entry_actions[action](entry, 'Matched requirement: %s' % requirement)
+                else:
+                    # Other plugins were specified to run on this entry
+                    fake_task = Task(task.manager, task.name, task.config, task.options)
+                    fake_task.session = task.session
+                    # This entry still belongs to our feed, accept/reject etc. will carry through.
+                    fake_task.all_entries[:] = passed_entries
 
-                        try:
-                            for plugin_name, plugin_config in action.iteritems():
-                                p = plugin.get_plugin_by_name(plugin_name)
-                                method = p.phase_handlers[phase]
-                                method(fake_task, plugin_config)
-                        except Exception:
-                            raise
+                    try:
+                        for plugin_name, plugin_config in action.iteritems():
+                            p = plugin.get_plugin_by_name(plugin_name)
+                            method = p.phase_handlers[phase]
+                            method(fake_task, plugin_config)
+                    except Exception:
+                        raise
 
         handle_phase.priority = 80
         return handle_phase
