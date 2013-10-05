@@ -100,6 +100,7 @@ class Manager(object):
         self.find_config()
         self.init_sqlalchemy()
         self.load_config()
+        fire_event('manager.config.pre-process', self)
         errors = self.validate_config()
         if errors:
             for error in errors:

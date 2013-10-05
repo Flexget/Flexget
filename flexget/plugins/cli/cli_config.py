@@ -1,79 +1,66 @@
 from __future__ import unicode_literals, division, absolute_import
+import argparse
+import functools
 import logging
 
-from flexget import options, plugin
+from flexget import options
 from flexget.event import event
 
 log = logging.getLogger('cli_config')
 
 
-class CliConfig(object):
+"""
+Allows specifying yml configuration values from commandline parameters.
 
-    """
-    Allows specifying yml configuration values from commandline parameters.
+Yml variables are prefixed with dollar sign ($).
+Commandline parameter must be comma separated list of variable=values.
 
-    Yml variables are prefixed with dollar sign ($).
-    Commandline parameter must be comma separated list of variable=values.
+Configuration example::
 
-    Configuration example::
+  tasks:
+    my task:
+      rss: $url
+      download: $path
 
-      tasks:
-        my task:
-          rss: $url
-          download: $path
+Commandline example::
 
-    Commandline example::
+  --cli-config url=http://some.url/ path=~/downloads
 
-      --cli-config "url=http://some.url/, path=~/downloads"
+"""
 
-    """
 
-    def __init__(self):
-        self.replaces = {}
+def replace_in_item(replaces, item):
+    replace = functools.partial(replace_in_item, replaces)
+    if isinstance(item, basestring):
+        # Do replacement in text objects
+        for key, val in replaces.iteritems():
+            item = item.replace('$%s' % key, val)
+        return item
+    elif isinstance(item, list):
+        # Make a new list with replacements done on each item
+        return map(replace, item)
+    elif isinstance(item, dict):
+        # Make a new dict with replacements done on keys and values
+        return dict(map(replace, kv_pair) for kv_pair in item.iteritems())
+    else:
+        # We don't know how to do replacements on this item, just return it
+        return item
 
-    def replace_item(self, item):
-        if isinstance(item, basestring):
-            # Do replacement in text objects
-            for key, val in self.replaces.iteritems():
-                item = item.replace('$%s' % key, val)
-            return item
-        elif isinstance(item, list):
-            # Make a new list with replacements done on each item
-            return map(self.replace_item, item)
-        elif isinstance(item, dict):
-            # Make a new dict with replacements done on keys and values
-            return dict(map(self.replace_item, kv_pair) for kv_pair in item.iteritems())
-        else:
-            # We don't know how to do replacements on this item, just return it
-            return item
 
-    def parse_replaces(self, task):
-        """Parses commandline string into internal dict"""
-        arg = task.options.cli_config
-        if not arg:
-            return False  # nothing to process
-        if self.replaces:
-            return True  # already parsed
-        for item in arg.split(','):
-            try:
-                key, value = item.split('=', 1)
-            except ValueError:
-                log.critical('Invalid --cli-config, no name for %s' % item)
-                continue
-            self.replaces[key.strip()] = value.strip()
-        return True
+@event('manager.config.pre-process')
+def substitute_cli_variables(manager):
+    if not manager.options.execute.cli_config:
+        return
+    manager.config = replace_in_item(dict(manager.options.execute.cli_config), manager.config)
 
-    def on_task_prepare(self, task):
-        if self.parse_replaces(task):
-            task.config = self.replace_item(task.config)
-            log.debug(task.config)
 
-@event('plugin.register')
-def register_plugin():
-    plugin.register(CliConfig, 'cli_config', builtin=True)
+def key_value_pair(text):
+    if '=' not in text:
+        raise argparse.ArgumentTypeError('arguments must be in VARIABLE=VALUE form')
+    return text.split('=', 1)
 
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--cli-config', action='store', dest='cli_config', default=False,
-                                               metavar='PARAMS', help='configuration parameters trough commandline')
+    options.get_parser('execute').add_argument('--cli-config', nargs='+', type=key_value_pair, metavar='VARIABLE=VALUE',
+                                               help='configuration parameters trough commandline')
