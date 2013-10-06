@@ -155,8 +155,8 @@ def parse_what(what, lookup=True, session=None):
         if result.get('field'):
             search_entry[field] = result[field]
     # Put lazy lookup fields on the search entry
-    get_plugin_by_name('tmdb_lookup').instance.lookup(search_entry)
     get_plugin_by_name('imdb_lookup').instance.register_lazy_fields(search_entry)
+    get_plugin_by_name('tmdb_lookup').instance.lookup(search_entry)
 
     try:
         # Both ids are optional, but if movie_name was populated at least one of them will be there
