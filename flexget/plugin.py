@@ -463,7 +463,8 @@ def plugin_schemas(**kwargs):
     return {'type': 'object',
             'properties': dict((p.name, {'$ref': p.schema['id']}) for p in get_plugins(**kwargs)),
             'additionalProperties': False,
-            'error_additionalProperties': '{{message}} Only known plugin names are valid keys.'}
+            'error_additionalProperties': '{{message}} Only known plugin names are valid keys.',
+            'patternProperties': {'^_': {'title': 'Disabled Plugin'}}}
 
 
 config_schema.register_schema('/schema/plugins', plugin_schemas)
