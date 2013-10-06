@@ -282,29 +282,33 @@ class ImdbParser(object):
             # if title is already in original language, it doesn't have the tag
             log.debug('Unable to get original title for %s - it probably does not exists' % url)
 
-        # detect if movie is eligible for ratings
-        rating_ineligible = soup.find('div', attrs={'class': 'rating-ineligible'})
-        if rating_ineligible:
-            log.debug('movie is not eligible for ratings')
-        else:
-            # get votes
-            tag_votes = soup.find(itemprop='ratingCount')
-            if tag_votes:
-                self.votes = str_to_int(tag_votes.string) or 0
-                log.debug('Detected votes: %s' % self.votes)
+        star_box = soup.find('div', attrs={'class': 'star-box giga-star'})
+        if star_box:
+            # detect if movie is eligible for ratings
+            rating_ineligible = star_box.find('div', attrs={'class': 'rating-ineligible'})
+            if rating_ineligible:
+                log.debug('movie is not eligible for ratings')
             else:
-                log.warning('Unable to get votes for %s - plugin needs update?' % url)
+                # get votes
+                tag_votes = star_box.find(itemprop='ratingCount')
+                if tag_votes:
+                    self.votes = str_to_int(tag_votes.string) or 0
+                    log.debug('Detected votes: %s' % self.votes)
+                else:
+                    log.warning('Unable to get votes for %s - plugin needs update?' % url)
 
-            # get score - find the ratingValue item that contains a numerical value
-            span_score = soup.find(itemprop='ratingValue', text=re.compile('[\d\.]+'))
-            if span_score:
-                try:
-                    self.score = float(span_score.string)
-                except (ValueError, TypeError):
-                    log.debug('tag_score %r is not valid float' % span_score.string)
-                log.debug('Detected score: %s' % self.score)
-            else:
-                log.warning('Unable to get score for %s - plugin needs update?' % url)
+                # get score - find the ratingValue item that contains a numerical value
+                span_score = star_box.find(itemprop='ratingValue', text=re.compile('[\d\.]+'))
+                if span_score:
+                    try:
+                        self.score = float(span_score.string)
+                    except (ValueError, TypeError):
+                        log.debug('tag_score %r is not valid float' % span_score.string)
+                    log.debug('Detected score: %s' % self.score)
+                else:
+                    log.warning('Unable to get score for %s - plugin needs update?' % url)
+        else:
+            log.warning('Unable to find score/vote section for %s - plugin needs update?' % url)
 
         # get genres
         genres = soup.find('div', itemprop='genre')
