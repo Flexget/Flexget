@@ -82,20 +82,20 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
     def matches(self, task, config, entry):
         # Tell tmdb_lookup to add lazy lookup fields if not already present
         try:
-            get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
-        except DependencyError:
-            log.debug('tmdb_lookup is not available, queue will not work if movie ids are not populated')
-        try:
             get_plugin_by_name('imdb_lookup').instance.register_lazy_fields(entry)
         except DependencyError:
             log.debug('imdb_lookup is not available, queue will not work if movie ids are not populated')
+        try:
+            get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
+        except DependencyError:
+            log.debug('tmdb_lookup is not available, queue will not work if movie ids are not populated')
             # make sure the entry has a movie id field filled
         conditions = []
         # Check if a movie id is already populated before incurring a lazy lookup
         for lazy in [False, True]:
             if entry.get('imdb_id', eval_lazy=lazy):
                 conditions.append(QueuedMovie.imdb_id == entry['imdb_id'])
-            if entry.get('tmdb_id', eval_lazy=lazy):
+            if entry.get('tmdb_id', eval_lazy=lazy and not conditions):
                 conditions.append(QueuedMovie.tmdb_id == entry['tmdb_id'])
             if conditions:
                 break
