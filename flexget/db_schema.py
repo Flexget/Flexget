@@ -68,6 +68,13 @@ def set_version(plugin, version):
         session.close()
 
 
+class UpgradeImpossible(Exception):
+    """
+    Exception to be thrown during a db upgrade function which will cause the old tables to be removed and recreated from
+    the new model.
+    """
+
+
 def upgrade(plugin):
     """Used as a decorator to register a schema upgrade function.
 
@@ -105,6 +112,10 @@ def upgrade(plugin):
                     log.critical('A lower schema version was returned (%s) from the %s upgrade function '
                                  'than passed in (%s)' % (new_ver, plugin, ver))
                     manager.shutdown(finish_queue=False)
+            except UpgradeImpossible:
+                log.info('Plugin %s database is not upgradable. Flushing data and regenerating.' % plugin)
+                reset_schema(plugin)
+                session.commit()
             except Exception as e:
                 log.exception('Failed to upgrade database for plugin %s: %s' % (plugin, e))
                 manager.shutdown(finish_queue=False)

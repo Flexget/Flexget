@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import datetime
+import difflib
 from socket import timeout
 
 from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, select, update
@@ -16,7 +17,7 @@ from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('api_tvrage')
 
-Base = db_schema.versioned_base('tvrage', 1)
+Base = db_schema.versioned_base('tvrage', 2)
 UPDATE_INTERVAL = '7 days'
 
 
@@ -39,6 +40,8 @@ def upgrade(ver, session):
                 new_genres = row['genres'].replace(',', '|')
             session.execute(update(series_table, series_table.c.id == row['id'], {'genres': new_genres}))
         ver = 1
+    if ver == 1:
+        raise db_schema.UpgradeImpossible
     return ver
 
 
@@ -46,10 +49,12 @@ class TVRageLookup(Base):
     __tablename__ = 'tvrage_lookup'
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, index=True)
-    series_id = Column(Integer, ForeignKey('tvrage_series.id'), nullable=False)
+    failed_time = Column(DateTime)
+    series_id = Column(Integer, ForeignKey('tvrage_series.id'))
     series = relation('TVRageSeries', uselist=False, cascade='all, delete')
 
-    def __init__(self, name, series):
+    def __init__(self, name, series, **kwargs):
+        super(TVRageLookup, self).__init__(**kwargs)
         self.name = name.lower()
         self.series = series
 
@@ -154,8 +159,10 @@ def lookup_series(name=None, session=None):
     res = session.query(TVRageLookup).filter(TVRageLookup.name == name.lower()).first()
 
     if res and not res.series:
-        # If this result lost its series somehow, remove it
-        session.delete(res)
+        # The lookup failed in the past for this series, retry every week
+        # TODO: 1.2 this should also retry with --retry or whatever flag imdb lookup is using for that
+        if res.failed_time and res.failed_time > datetime.datetime.now() - datetime.timedelta(days=7):
+            raise LookupError('Could not find show %s' % name)
     elif res:
         series = res.series
         # if too old result, clean the db and refresh it
@@ -164,14 +171,29 @@ def lookup_series(name=None, session=None):
             log.debug('Refreshing tvrage info for %s', name)
         else:
             return series
+
+    def store_failed_lookup():
+        if res:
+            res.series = None
+            res.failed_time = datetime.datetime.now()
+        else:
+            session.add(TVRageLookup(name, None, failed_time=datetime.datetime.now()))
+            session.commit()
+
     log.debug('Fetching tvrage info for %s' % name)
     try:
         fetched = tvrage.api.Show(name.encode('utf-8'))
     except tvrage.exceptions.ShowNotFound:
+        store_failed_lookup()
         raise LookupError('Could not find show %s' % name)
     except (timeout, AttributeError):
         # AttributeError is due to a bug in tvrage package trying to access URLError.code
         raise LookupError('Timed out while connecting to tvrage')
+    # Make sure the result is close enough to the search
+    if difflib.SequenceMatcher(a=name, b=fetched.name).ratio() < 0.7:
+        log.debug('Show result `%s` was not a close enough match for `%s`' % (fetched.name, name))
+        store_failed_lookup()
+        raise LookupError('Could not find show %s' % name)
     if not series:
         series = session.query(TVRageSeries).filter(TVRageSeries.showid == fetched.showid).first()
     if not series:
@@ -181,5 +203,8 @@ def lookup_series(name=None, session=None):
     else:
         series.update(fetched)
     if name.lower() != fetched.name.lower():
-        session.add(TVRageLookup(name, series))
+        if res:
+            res.series = series
+        else:
+            session.add(TVRageLookup(name, series))
     return series

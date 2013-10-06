@@ -19,16 +19,8 @@ def upgrade(ver, session):
     if ver is None:
         columns = table_columns('remember_rejected_entry', session)
         if 'uid' in columns:
-            # Drop the old table
-            log.info('Dropping old version of remember_rejected_entry table from db')
-            drop_tables(['remember_rejected_entry'], session)
-            # Create new table from the current model
-            Base.metadata.create_all(bind=session.bind)
-            # We go directly to version 2, as remember_rejected_entries table has just been made from current model
-            # TODO: Fix this somehow. Just avoid dropping tables?
-            ver = 3
-        else:
-            ver = 0
+            raise db_schema.UpgradeImpossible
+        ver = 0
     if ver == 0:
         log.info('Adding reason column to remember_rejected_entry table.')
         table_add_column('remember_rejected_entry', 'reason', String, session)
