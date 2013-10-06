@@ -11,12 +11,10 @@ class TaskPriority(object):
 
     """Set task priorities"""
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('integer')
+    schema = {'type': 'integer'}
 
     def on_process_start(self, task, config):
-        task.priority = task.config.get('priority', 65535)
+        task.priority = config
 
 @event('plugin.register')
 def register_plugin():

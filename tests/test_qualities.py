@@ -77,7 +77,7 @@ class TestQualityParser(object):
 class TestFilterQuality(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             mock:
               - {title: 'Smoke.1280x720'}

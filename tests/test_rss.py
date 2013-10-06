@@ -7,7 +7,7 @@ from nose.plugins.attrib import attr
 class TestInputRSS(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             rss:
               url: rss.xml

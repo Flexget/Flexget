@@ -8,7 +8,7 @@ from tests import FlexGetBase
 class TestThetvdbLookup(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             thetvdb_lookup: yes
             # Access a tvdb field to cause lazy loading to occur

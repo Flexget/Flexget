@@ -47,7 +47,7 @@ def replace_in_item(replaces, item):
         return item
 
 
-@event('manager.config.pre-process')
+@event('manager.pre-process')
 def substitute_cli_variables(manager):
     if not manager.options.execute.cli_config:
         return

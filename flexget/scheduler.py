@@ -6,6 +6,7 @@ import threading
 import sys
 
 from flexget.config_schema import register_config_key
+from flexget.event import event
 from flexget.logger import FlexGetFormatter
 
 log = logging.getLogger('scheduler')
@@ -361,4 +362,6 @@ class BufferQueue(Queue.Queue):
             yield line
 
 
-register_config_key('schedules', main_schema)
+@event('config.register')
+def register_config():
+    register_config_key('schedules', main_schema)

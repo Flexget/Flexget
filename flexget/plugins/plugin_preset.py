@@ -6,20 +6,20 @@ from flexget.event import event
 from flexget.config_schema import register_config_key, one_or_more
 from flexget.utils.tools import MergeException, merge_dict_from_to
 
-log = logging.getLogger('preset')
+log = logging.getLogger('template')
 
 
-class PluginPreset(object):
+class PluginTemplate(object):
     """
-    Use presets.
+    Appyly templates with preconfigured plugins to a task config.
 
     Example::
 
-      preset: movies
+      template: movies
 
-    Example, list of presets::
+    Example, list of templates::
 
-      preset:
+      template:
         - movies
         - imdb
     """
@@ -29,10 +29,10 @@ class PluginPreset(object):
             {
                 'description': 'Apply multiple templates to this task.',
                 'type': 'array',
-                'items': {'$ref': '#/definitions/preset'}},
+                'items': {'$ref': '#/definitions/template'}},
             {
                 'description': 'Apply a single template to this task.',
-                'allOf': [{'$ref': '#/definitions/preset'}]
+                'allOf': [{'$ref': '#/definitions/template'}]
             },
             {
                 'description': 'Disable all templates on this task.',
@@ -41,16 +41,13 @@ class PluginPreset(object):
             }
         ],
         'definitions': {
-            'preset': {
+            'template': {
                 'type': 'string',
                 'description': 'Name of a template which will be applied to this task.',
-                'links': [{'rel': 'template', 'href': '/api/config/templates/{$}'}]  # Dunno what the 'rel' should be
+                'links': [{'rel': 'settings', 'href': '/api/config/templates/{$}'}]
             }
         }
     }
-
-    def __init__(self):
-        self.warned = False
 
     def prepare_config(self, config):
         if config is None or isinstance(config, bool):
@@ -59,15 +56,16 @@ class PluginPreset(object):
             config = [config]
         return config
 
-    @plugin.priority(255)
-    def on_task_prepare(self, task, config):
-        if config is False:  # handles 'preset: no' form to turn off preset on this task
+    @plugin.priority(256)
+    def on_task_start(self, task, config):
+        if config is False:  # handles 'template: no' form to turn off template on this task
             return
+        # implements --template NAME
+        if task.options.template:
+            if task.options.template not in config:
+                task.abort('does not use `%s` template' % task.options.template, silent=True)
+
         config = self.prepare_config(config)
-        # Config has not been validated on prepare phase, sanity check our data
-        if not isinstance(config, (basestring, list)):
-            # The task validation will provide user with an error message
-            return
 
         # add global in except when disabled with no_global
         if 'no_global' in config:
@@ -77,57 +75,51 @@ class PluginPreset(object):
         elif not 'global' in config:
             config.append('global')
 
-        toplevel_presets = task.manager.config.get('presets', {})
+        toplevel_templates = task.manager.config.get('templates', {})
 
-        # apply presets
-        for preset in config:
-            if preset not in toplevel_presets:
-                if preset == 'global':
+        # apply templates
+        for template in config:
+            if template not in toplevel_templates:
+                if template == 'global':
                     continue
-                raise plugin.PluginError('Unable to find preset %s for task %s' % (preset, task.name), log)
-            if toplevel_presets[preset] is None:
-                log.warning('Preset `%s` is empty. Nothing to merge.' % preset)
+                raise plugin.PluginError('Unable to find template %s for task %s' % (template, task.name), log)
+            if toplevel_templates[template] is None:
+                log.warning('Template `%s` is empty. Nothing to merge.' % template)
                 continue
-            log.debug('Merging preset %s into task %s' % (preset, task.name))
+            log.debug('Merging template %s into task %s' % (template, task.name))
 
             # We make a copy here because we need to remove
-            preset_config = toplevel_presets[preset]
-            # When there are presets within presets we remove the preset
+            template_config = toplevel_templates[template]
+            # When there are templates within templates we remove the template
             # key from the config and append it's items to our own
-            if 'preset' in preset_config:
-                nested_presets = self.prepare_config(preset_config['preset'])
-                for nested_preset in nested_presets:
-                    if nested_preset not in config:
-                        config.append(nested_preset)
+            if 'template' in template_config:
+                nested_templates = self.prepare_config(template_config['template'])
+                for nested_template in nested_templates:
+                    if nested_template not in config:
+                        config.append(nested_template)
                     else:
-                        log.warning('Presets contain each other in a loop.')
-                # Replace preset_config with a copy without the preset key, to avoid merging errors
-                preset_config = dict(preset_config)
-                del preset_config['preset']
+                        log.warning('Templates contain each other in a loop.')
+                # Replace template_config with a copy without the template key, to avoid merging errors
+                template_config = dict(template_config)
+                del template_config['template']
 
             # Merge
             try:
-                merge_dict_from_to(preset_config, task.config)
+                merge_dict_from_to(template_config, task.config)
             except MergeException as exc:
-                raise plugin.PluginError('Failed to merge preset %s to task %s. Error: %s' %
-                                  (preset, task.name, exc.value))
+                raise plugin.PluginError('Failed to merge template %s to task %s. Error: %s' %
+                                  (template, task.name, exc.value))
 
-        log.trace('presets: %s' % config)
-
-        # implements --preset NAME
-        if task.options.preset:
-            if task.options.preset not in config:
-                task.enabled = False
-                return
+        log.trace('templates: %s' % config)
 
 
 class DisablePlugin(object):
     """
-    Allows disabling plugins when using presets.
+    Allows disabling plugins when using templates.
 
     Example::
 
-      presets:
+      templates:
         movies:
           download: ~/torrents/movies/
           .
@@ -135,14 +127,14 @@ class DisablePlugin(object):
 
       tasks:
         nzbs:
-          preset: movies
+          template: movies
           disable_plugin:
             - download
           sabnzbd:
             .
             .
 
-      # Task nzbs uses all other configuration from preset movies but removes the download plugin
+      # Task nzbs uses all other configuration from template movies but removes the download plugin
     """
 
     schema = one_or_more({'type': 'string'})
@@ -158,22 +150,23 @@ class DisablePlugin(object):
                 del(task.config[disable])
 
 
-root_config_schema = {
-    'type': 'object',
-    'additionalProperties': {}
-}
-
-
-register_config_key('presets', root_config_schema)
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginPreset, 'preset', builtin=True, api_ver=2)
+    plugin.register(PluginTemplate, 'template', builtin=True, api_ver=2)
     plugin.register(DisablePlugin, 'disable_plugin', api_ver=2)
+
+
+@event('config.register')
+def register_config():
+    root_config_schema = {
+        'type': 'object',
+        'additionalProperties': plugin.plugin_schemas(context='task')
+    }
+    register_config_key('templates', root_config_schema)
 
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--preset', action='store', dest='preset', default=False, metavar='NAME',
-                                               help='execute tasks with given preset')
+    options.get_parser('execute').add_argument('--template', metavar='NAME', help='execute tasks using given template')

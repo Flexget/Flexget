@@ -21,11 +21,11 @@ class PluginInclude(object):
     File content must be valid for a task configuration
     """
 
-    # TODO: validate files exist, but relative paths should be relative to config dir
     schema = one_or_more({'type': 'string'})
 
+    # TODO: 1.2 I think this needs to run on manager.pre-process event, so that config from other file gets validated
     @plugin.priority(254)
-    def on_task_prepare(self, task, config):
+    def on_task_start(self, task, config):
         if not config:
             return
 

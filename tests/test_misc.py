@@ -212,7 +212,7 @@ class TestHtmlUtils(object):
 class TestSetPlugin(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             accept_all: yes
         tasks:

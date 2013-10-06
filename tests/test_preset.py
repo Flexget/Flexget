@@ -4,7 +4,7 @@ from tests import FlexGetBase
 
 class TestPreset(FlexGetBase):
     __yaml__ = """
-        presets:
+        templates:
           global:
             mock:
               - {title: 'global'}
@@ -14,25 +14,25 @@ class TestPreset(FlexGetBase):
           a:
             mock:
               - {title: 'a'}
-            preset: b
+            template: b
           b:
             mock:
               - {title: 'b'}
 
         tasks:
           test1:
-            preset: movies
+            template: movies
 
           test2:
-            preset: no
+            template: no
 
           test3:
-            preset:
+            template:
               - movies
               - no_global
 
           test_nested:
-            preset:
+            template:
               - a
               - no_global
     """
@@ -62,7 +62,7 @@ class TestPreset(FlexGetBase):
 class TestPresetMerge(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           movies:
             seen_movies: strict
             imdb:
@@ -77,7 +77,7 @@ class TestPresetMerge(FlexGetBase):
 
         tasks:
           test:
-            preset: movies
+            template: movies
             imdb:
               min_score: 6.5
               reject_genres:

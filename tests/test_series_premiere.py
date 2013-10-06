@@ -6,7 +6,7 @@ class TestSeriesPremiere(FlexGetBase):
 
     __yaml__ = """
 
-        presets:
+        templates:
           global: # just cleans log a bit ..
             disable_builtins:
               - seen

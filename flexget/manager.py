@@ -60,7 +60,6 @@ class Manager(object):
         """
         global manager
         assert not manager, 'Only one instance of Manager should be created at a time!'
-        manager = self
         self.options = options
         self.config_base = None
         self.config_name = None
@@ -76,6 +75,7 @@ class Manager(object):
         self.scheduler = Scheduler(self)
         self.ipc_server = None
         self.initialize()
+        manager = self  # Make sure we initialize before setting ourselves as the global manager
 
         # cannot be imported at module level because of circular references
         from flexget.utils.simple_persistence import SimplePersistence
@@ -100,13 +100,13 @@ class Manager(object):
         self.find_config()
         self.init_sqlalchemy()
         self.load_config()
-        fire_event('manager.config.pre-process', self)
+        fire_event('manager.pre-process', self)
         errors = self.validate_config()
         if errors:
             for error in errors:
                 log.critical("[%s] %s", error.json_pointer, error.message)
-            # Make sure the scheduler is never started
-            self.scheduler.shutdown(finish_queue=False)
+            self.shutdown(finish_queue=False)
+            sys.exit(1)
 
     @property
     def tasks(self):

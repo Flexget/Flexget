@@ -7,6 +7,7 @@ import urlparse
 
 import jsonschema
 
+from flexget.event import fire_event
 from flexget.utils import qualities, template
 from flexget.utils.tools import parse_timedelta
 
@@ -25,9 +26,7 @@ def register_schema(path, schema):
 
 
 # Validator that handles root structure of config.
-_root_config_schema = {'type': 'object', 'additionalProperties': False}
-# TODO: Is /schema/root this the best place for this?
-register_schema('/schema/root', _root_config_schema)
+_root_config_schema = None
 
 
 def register_config_key(key, schema, required=False):
@@ -40,9 +39,19 @@ def register_config_key(key, schema, required=False):
     :param bool required:
       Specify whether this is a mandatory key.
     """
-    _root_config_schema.setdefault('properties', {})[key] = schema
+    _root_config_schema['properties'][key] = schema
     if required:
         _root_config_schema.setdefault('required', []).append(key)
+
+
+def get_schema():
+    global _root_config_schema
+    if _root_config_schema is None:
+        _root_config_schema = {'type': 'object', 'properties': {}, 'additionalProperties': False}
+        fire_event('config.register')
+        # TODO: Is /schema/root this the best place for this?
+        register_schema('/schema/root', _root_config_schema)
+    return _root_config_schema
 
 
 def one_or_more(schema):
@@ -83,7 +92,7 @@ def process_config(config, schema=None, set_defaults=True):
 
     """
     if schema is None:
-        schema = _root_config_schema
+        schema = get_schema()
     resolver = RefResolver.from_schema(schema)
     validator = SchemaValidator(schema, resolver=resolver, format_checker=format_checker)
     if set_defaults:

@@ -10,7 +10,7 @@ from sqlalchemy import Column, Unicode, String, Integer
 from flexget import config_schema
 from flexget import db_schema
 from flexget.entry import EntryUnicodeError
-from flexget.event import fire_event
+from flexget.event import fire_event, event
 from flexget.manager import Session
 from flexget.plugin import (get_plugins_by_phase, task_phases, phase_methods, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins, plugin_schemas)
@@ -178,8 +178,6 @@ class Task(object):
         if config is None:
             config = manager.config['tasks'].get(name, {})
         self._raw_config = config
-        # _prepared_config and config will be created when the prepare method is called
-        self._prepared_config = None
         self.config = None
         if options is None:
             options = copy.copy(self.manager.options.execute)
@@ -195,7 +193,6 @@ class Task(object):
         # not to be reset
         self._rerun_count = 0
 
-        # This should not be used until after prepare phase, when it is evaluated
         self.config_modified = None
 
         # use reset to init variables when creating
@@ -210,16 +207,6 @@ class Task(object):
     undecided = property(lambda self: self.all_entries.undecided)
 
     @property
-    def raw_config(self):
-        return self._raw_config
-
-    @raw_config.setter
-    def raw_config(self, value):
-        # Automatically reset config when raw_config is updated, prepare method must be called again
-        self._raw_config = value
-        self.config = None
-
-    @property
     def is_rerun(self):
         return self._rerun_count
 
@@ -229,6 +216,7 @@ class Task(object):
         self.enabled = not self.name.startswith('_')
         self.session = None
         self.priority = 65535
+        self.config = copy.deepcopy(self._raw_config)
 
         self.requests = requests.Session()
 
@@ -254,38 +242,12 @@ class Task(object):
         return '<Task(name=%s,aborted=%s)>' % (self.name, self.aborted)
 
     @property
-    def prepared(self):
-        return self._prepared_config is not None
-
-    @property
     def aborted(self):
         return self._abort
 
     @property
     def abort_reason(self):
         return self._abort_reason
-
-    def prepare(self):
-        """Resets the task state, and initializes config by running the task prepare handlers."""
-        self._reset()
-        if not self.prepared:
-            # We don't want the raw_config to be modified, so create a copy before running prepare methods
-            self.config = copy.deepcopy(self.raw_config)
-            # This phase runs before config validation
-            try:
-                self.__run_task_phase('prepare')
-            except TaskAbort as e:
-                self.config = None
-                log.debug('Task aborted while being prepared: %s' % e.reason)
-                raise
-            except Exception as e:
-                msg = 'Unhandled exception during task preparation: %s' % e
-                log.exception(msg)
-                self.abort(msg)
-            # Store the prepared config so that we can reset the config on reruns
-            self._prepared_config = self.config
-        # No matter what, we restore config to a copy of the prepared config
-        self.config = copy.deepcopy(self._prepared_config)
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
@@ -478,18 +440,11 @@ class Task(object):
         if self.options.cron:
             self.manager.db_cleanup()
 
+        self._reset()
         log.debug('executing %s' % self.name)
-        self.prepare()
         if not self.enabled:
             log.debug('task %s disabled during preparation, not running' % self.name)
             return
-
-        # validate configuration
-        errors = self.validate()
-        if errors:
-            self.enabled = False
-            self.config = None
-            self.abort('Configuration errors')
 
         # Handle keyword args
         if self.options.disable_phases:
@@ -564,23 +519,6 @@ class Task(object):
             # taking another one) after input and just inject the same entries for the rerun
             self.execute()
 
-    def validate(self):
-        """Validates config, logs errors and returns a list of errors."""
-        errors = self.validate_config(self.config)
-        if errors:
-            log.critical('Task `%s` has configuration errors:' % self.name)
-            msgs = ["[%s] %s" % (e.json_pointer, e.message) for e in errors]
-            for msg in msgs:
-                log.error(msg)
-        return errors
-
-    @staticmethod
-    def validate_config(config):
-        schema = plugin_schemas(context='task')
-        # Don't validate commented out plugins
-        schema['patternProperties'] = {'^_': {}}
-        return config_schema.process_config(config, schema)
-
     def __eq__(self, other):
         if hasattr(other, 'name'):
             return self.name == other.name
@@ -592,16 +530,17 @@ class Task(object):
         new.__dict__.update(self.__dict__)
         # Some mutable objects need to be copies
         new.options = copy.copy(self.options)
-        new.raw_config = copy.deepcopy(self.raw_config)
         new.config = copy.deepcopy(self.config)
         return new
 
     copy = __copy__
 
 
-task_config_schema = {
-    'type': 'object',
-    'additionalProperties': {'type': 'object'}
-}
+@event('config.register')
+def register_config_key():
+    task_config_schema = {
+        'type': 'object',
+        'additionalProperties': plugin_schemas(context='task')
+    }
 
-config_schema.register_config_key('tasks', task_config_schema, required=True)
+    config_schema.register_config_key('tasks', task_config_schema, required=True)

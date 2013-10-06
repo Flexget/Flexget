@@ -155,7 +155,7 @@ class TestQuality(FlexGetBase):
 class TestDatabase(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             series:
               - some series
@@ -504,7 +504,7 @@ class TestFilterSeriesPriority(FlexGetBase):
 class TestPropers(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             # prevents seen from rejecting on second execution,
             # we want to see that series is able to reject
@@ -752,7 +752,7 @@ class TestDuplicates(FlexGetBase):
 
     __yaml__ = """
 
-        presets:
+        templates:
           global: # just cleans log a bit ..
             disable_builtins:
               - seen
@@ -826,7 +826,7 @@ class TestDuplicates(FlexGetBase):
 class TestQualities(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             disable_builtins: yes
             series:
@@ -966,7 +966,7 @@ class TestQualities(FlexGetBase):
 class TestIdioticNumbering(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             series:
               - FooBar:
@@ -1037,7 +1037,7 @@ class TestNormalization(FlexGetBase):
 class TestMixedNumbering(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             series:
               - FooBar:
@@ -1111,7 +1111,7 @@ class TestExact(FlexGetBase):
 class TestTimeframe(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             series:
               - test:
@@ -1372,21 +1372,21 @@ class TestFromGroup(FlexGetBase):
 class TestWatched(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           eps:
             mock:
               - {title: 'WTest.S02E03.HDTV.XViD-FlexGet'}
               - {title: 'W2Test.S02E03.HDTV.XViD-FlexGet'}
         tasks:
           before_ep_test:
-            preset: eps
+            template: eps
             series:
               - WTest:
                   begin: S02E05
               - W2Test:
                   begin: S03E02
           after_ep_test:
-            preset: eps
+            template: eps
             series:
               - WTest:
                   begin: S02E03
@@ -1459,7 +1459,7 @@ class TestWatched(FlexGetBase):
 class TestSeriesPremiere(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             metainfo_series: yes
             series_premiere: yes
@@ -1620,7 +1620,7 @@ class TestDoubleEps(FlexGetBase):
 
 class TestAutoLockin(FlexGetBase):
     __yaml__ = """
-        presets:
+        templates:
           global:
             series:
             - FooBar
