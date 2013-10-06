@@ -31,11 +31,4 @@ def main():
     if not os.path.isabs(log_file):
         log_file = os.path.join(manager.config_base, log_file)
     logger.start(log_file, log_level)
-    try:
-        manager.run_cli_command()
-    except KeyboardInterrupt:
-        # show real stack trace in debug mode
-        if manager.options.debug:
-            raise
-        print '**** Keyboard Interrupt ****'
-        return
+    manager.run_cli_command()

@@ -4,7 +4,6 @@ import os
 import sys
 import shutil
 import logging
-import time
 import yaml
 from datetime import datetime, timedelta
 
@@ -133,11 +132,13 @@ class Manager(object):
                 for name in self.tasks:
                     self.scheduler.execute(name)
                 self.scheduler.shutdown(finish_queue=True)
-                # Don't join thread as we can't receive ctrl-c then
-                while self.scheduler.is_alive():
-                    time.sleep(0.1)
-                fire_event('manager.execute.completed', self)
-                self.shutdown()
+                try:
+                    self.scheduler.wait()
+                except KeyboardInterrupt:
+                    log.error('Got ctrl-c exiting after this task completes. Press ctrl-c again to abort this task.')
+                else:
+                    fire_event('manager.execute.completed', self)
+                self.shutdown(finish_queue=False)
                 # TODO: Figure out how to profile with scheduler
                 #if options.profile:
                 #    try:
@@ -168,8 +169,11 @@ class Manager(object):
                     for task in unscheduled_tasks:
                         self.scheduler.add_scheduled_task(task, schedule=default_schedule)
                 self.scheduler.start()
-                self.scheduler.join()
-                fire_event('manager.daemon.completed', self)
+                try:
+                    self.scheduler.wait()
+                except KeyboardInterrupt:
+                    fire_event('manager.daemon.completed', self)
+                    self.shutdown(finish_queue=False)
         # Otherwise dispatch the command to the callback function
         else:
             if options.lock_required:
@@ -612,9 +616,14 @@ class Manager(object):
         """
         # Wait for scheduler to finish
         self.scheduler.shutdown(finish_queue=finish_queue)
-        # Don't join thread as we can't receive ctrl-c then
-        while self.scheduler.is_alive():
-            time.sleep(0.1)
+        try:
+            self.scheduler.wait()
+        except KeyboardInterrupt:
+            log.debug('Not waiting for scheduler shutdown due to ctrl-c')
+            # show real stack trace in debug mode
+            if manager.options.debug:
+                raise
+            print '**** Keyboard Interrupt ****'
         fire_event('manager.shutdown', self)
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutting down')

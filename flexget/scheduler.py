@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import logging
 import Queue
 import threading
+import time
 import sys
 
 from flexget.config_schema import register_config_key
@@ -122,6 +123,14 @@ class Scheduler(threading.Thread):
         if remaining_jobs:
             log.warning('Scheduler shut down with %s jobs remaining in the queue to run.' % remaining_jobs)
         log.debug('scheduler shut down')
+
+    def wait(self):
+        """
+        Waits for the thread to exit.
+        Similar to :method:`Thread.join`, except it allows ctrl-c to be caught still.
+        """
+        while self.is_alive():
+            time.sleep(0.1)
 
     def shutdown(self, finish_queue=True):
         """
