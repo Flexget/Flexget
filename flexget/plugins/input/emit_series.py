@@ -88,17 +88,21 @@ class EmitSeries(object):
                 if self.try_next_season.get(series.name):
                     entries.append(self.search_entry(series, latest.season + 1, 1, task))
                 else:
+                    start_at_ep = 1
                     episodes_this_season = (task.session.query(Episode).
                                             filter(Episode.series_id == series.id).
                                             filter(Episode.season == latest.season))
+                    if series.identified_by == 'sequence':
+                        # Don't look for missing too far back with sequence shows
+                        start_at_ep = latest.number - 10
+                        episodes_this_season = episodes_this_season.filter(Episode.number >= start_at_ep)
                     latest_ep_this_season = episodes_this_season.order_by(desc(Episode.number)).first()
                     downloaded_this_season = (episodes_this_season.join(Episode.releases).
                                               filter(Release.downloaded == True).all())
                     # Calculate the episodes we still need to get from this season
                     if series.begin and series.begin.season == latest.season:
-                        eps_to_get = range(series.begin.number, latest_ep_this_season.number + 1)
-                    else:
-                        eps_to_get = range(1, latest_ep_this_season.number + 1)
+                        start_at_ep = max(start_at_ep, series.begin.number)
+                    eps_to_get = range(start_at_ep, latest_ep_this_season.number + 1)
                     for ep in downloaded_this_season:
                         try:
                             eps_to_get.remove(ep.number)
