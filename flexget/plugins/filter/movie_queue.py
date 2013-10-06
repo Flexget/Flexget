@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, u
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import db_schema
+from flexget.entry import Entry
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.imdb import extract_id
@@ -137,8 +138,6 @@ def parse_what(what, lookup=True, session=None):
     :return: A dictionary with 'title', 'imdb_id' and 'tmdb_id' keys
     """
 
-    tmdb_lookup = get_plugin_by_name('api_tmdb').instance.lookup
-
     result = {'title': None, 'imdb_id': None, 'tmdb_id': None}
     result['imdb_id'] = extract_id(what)
     if not result['imdb_id']:
@@ -151,16 +150,20 @@ def parse_what(what, lookup=True, session=None):
         # If not doing an online lookup we can return here
         return result
 
-    try:
-        result['session'] = session
-        movie = tmdb_lookup(**result)
-    except LookupError as e:
-        raise QueueError(e.message)
+    search_entry = Entry(title=result['title'] or '')
+    for field in ['imdb_id', 'tmdb_id']:
+        if result.get('field'):
+            search_entry[field] = result[field]
+    # Put lazy lookup fields on the search entry
+    get_plugin_by_name('tmdb_lookup').instance.lookup(search_entry)
+    get_plugin_by_name('imdb_lookup').instance.register_lazy_fields(search_entry)
 
-    if movie:
-        return {'title': movie.name, 'imdb_id': movie.imdb_id, 'tmdb_id': movie.id}
-    else:
-        raise QueueError('ERROR: Unable to find any such movie from tmdb, use imdb or tmdb id instead.')
+    try:
+        # Both ids are optional, but if movie_name was populated at least one of them will be there
+        return {'title': search_entry['movie_name'], 'imdb_id': search_entry.get('imdb_id'),
+                'tmdb_id': search_entry.get('tmdb_id')}
+    except KeyError as e:
+        raise QueueError(e.message)
 
 
 # API functions to edit queue
