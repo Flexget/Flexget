@@ -3,9 +3,9 @@
 from __future__ import unicode_literals, division, absolute_import
 from urllib import quote
 import requests
-from requests.exceptions import HTTPError
+from requests.exceptions import RequestException
 from logging import getLogger
-from flexget.utils import json
+from flexget.utils import json, requests
 from flexget.plugin import register_plugin, PluginError
 from flexget import validator
 
@@ -112,7 +112,7 @@ class PluginPyLoad(object):
             result = query_api(api, "parseURLs", {"html": content, "url": url, "session": self.session})
 
             # parsed { plugins: [urls] }
-            parsed = json.loads(result.text)
+            parsed = result.json()
 
             urls = []
 
@@ -168,7 +168,7 @@ class PluginPyLoad(object):
             # Login
             post = {'username': config['username'], 'password': config['password']}
             result = query_api(url, "login", post)
-            response = json.loads(result.text)
+            response = result.json()
             if not response:
                 raise PluginError('Login failed', log)
             self.session = response.replace('"', '')
@@ -191,9 +191,9 @@ def query_api(url, method, post=None):
             data=post)
         response.raise_for_status()
         return response
-    except HTTPError as e:
+    except RequestException as e:
         if e.response.status_code == 500:
-            raise PluginError('Internal API Error %s %s %s' % (method, url, post), log)
+            raise PluginError('Internal API Error: <%s> <%s> <%s>' % (method, url, post), log)
         raise
 
 register_plugin(PluginPyLoad, 'pyload', api_ver=2)
