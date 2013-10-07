@@ -2,7 +2,6 @@
 
 from __future__ import unicode_literals, division, absolute_import
 from urllib import quote
-import requests
 from requests.exceptions import RequestException
 from logging import getLogger
 from flexget.utils import json, requests
