@@ -156,15 +156,11 @@ def start(mg):
         newpid = daemonize()
         # Write new pid to lock file
         log.debug('Writing new pid %d to lock file %s' % (newpid, manager.lockfile))
-        manager.write_lock(pid=newpid)
+        manager.write_lock()
 
-    # Start the executor thread
-    global executor
-    executor = ExecThread()
-    executor.start()
+    # Start the scheduler
+    manager.scheduler.start()
 
-    # Initialize manager
-    manager.refresh_tasks()
     load_ui_plugins()
 
     # quick hack: since ui plugins may add tables to SQLAlchemy too and they're not initialized because create
@@ -172,6 +168,7 @@ def start(mg):
     from flexget.manager import Base
     Base.metadata.create_all(bind=manager.engine)
 
+    # TODO: 1.2 consider if this event is the best way
     fire_event('webui.register_api_endpoints', api)
     app.register_blueprint(api)
     fire_event('webui.start')
@@ -218,6 +215,7 @@ def start_server():
 
 def stop_server(*args):
     log.debug('Shutting down server')
+    manager.scheduler.shutdown(finish_queue=False)
     if server:
         server.stop()
 

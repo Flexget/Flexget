@@ -13,7 +13,7 @@ class UIManager(Manager):
     def find_config(self):
         """If no config file is found by the webui, a blank one is created."""
         try:
-            Manager.find_config(self)
+            super(UIManager, self).find_config()
         except IOError:
             # No config file found, create a blank one in the home path
             if sys.platform.startswith('win'):
@@ -30,17 +30,12 @@ class UIManager(Manager):
             # Write empty tasks and presets to the config
             newconfig.write(yaml.dump({'presets': {}, 'tasks': {}}))
             newconfig.close()
-            self.load_config(config_filename)
+            # Call superclass again to find our newly created file
+            super(UIManager, self).find_config()
 
-    def check_lock(self):
+    # TODO: Remove? Don't think we need this anymore.
+    def __check_lock(self):
         if self.options.autoreload:
             log.info('autoreload enabled, not checking for lock file')
             return False
         return Manager.check_lock(self)
-
-    def write_lock(self, pid=None):
-        if not pid:
-            pid = os.getpid()
-        with open(self.lockfile, 'w') as f:
-            f.write('PID: %s\n' % pid)
-            f.write('Port: %s\n' % self.options.port)

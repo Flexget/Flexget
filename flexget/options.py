@@ -305,6 +305,10 @@ class CoreArgumentParser(ArgumentParser):
         daemon_parser.add_argument('--ipc-port', type=int, default=29709, help='port which will be used for IPC')
         daemon_parser.set_defaults(loglevel='info')
 
+        webui_parser = self.add_subparser('webui', help='Run continuously, with a web interface to configure and '
+                                                        'interact with.')
+
+
     def add_subparsers(self, **kwargs):
         # The subparsers should not be CoreArgumentParsers
         kwargs.setdefault('parser_class', ArgumentParser)
