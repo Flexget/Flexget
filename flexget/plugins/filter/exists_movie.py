@@ -6,6 +6,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.titles.movie import MovieParser
+from flexget.utils.tools import TimedDict
 
 log = logging.getLogger('exists_movie')
 
@@ -25,16 +26,13 @@ class FilterExistsMovie(object):
     skip = ['cd1', 'cd2', 'subs', 'sample']
 
     def __init__(self):
-        self.cache = {}
+        self.cache = TimedDict(cache_time='1 hour')
 
     def build_config(self, config):
         # if only a single path is passed turn it into a 1 element list
         if isinstance(config, basestring):
             config = [config]
         return config
-
-    def on_process_start(self, task, config):
-        self.cache = {}
 
     @plugin.priority(-1)
     def on_task_filter(self, task, config):

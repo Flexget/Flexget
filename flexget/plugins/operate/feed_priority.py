@@ -7,6 +7,7 @@ from flexget.event import event
 log = logging.getLogger('priority')
 
 
+# TODO: 1.2 figure out replacement for this
 class TaskPriority(object):
 
     """Set task priorities"""
