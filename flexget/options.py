@@ -262,7 +262,8 @@ manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
                                  'note that the output might contain PRIVATE data, so edit that out')
 manager_parser.add_argument('--debug', action=DebugAction, nargs=0, help=SUPPRESS)
 manager_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, help=SUPPRESS)
-manager_parser.add_argument('--loglevel', default='verbose', help=SUPPRESS,
+# Supress setting  this when not explicitly specified, so that subparsers can set their own defaults
+manager_parser.add_argument('--loglevel', default=SUPPRESS, help=SUPPRESS,
                             choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
@@ -289,8 +290,6 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
                                  help='Use when scheduling FlexGet with cron or other scheduler. Allows background '
                                       'maintenance to run. Disables stdout and stderr output. Reduces logging level.')
-        exec_parser.add_argument('--loglevel', dest='exec_loglevel', help=SUPPRESS,
-                                 choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
         exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
@@ -298,12 +297,12 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
         exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
                                  help='Disable caches. Works only in plugins that have explicit support.')
+        exec_parser.set_defaults(loglevel='verbose')
 
         # The parser for the daemon command
         daemon_parser = self.add_subparser('daemon', help='Run continuously, executing tasks according to schedules '
                                                           'defined in config.')
         daemon_parser.add_argument('--ipc-port', type=int, default=29709, help='port which will be used for IPC')
-        # TODO: 1.2 Make this work
         daemon_parser.set_defaults(loglevel='info')
 
     def add_subparsers(self, **kwargs):
@@ -313,6 +312,9 @@ class CoreArgumentParser(ArgumentParser):
 
     def parse_args(self, args=None, namespace=None):
         result = super(CoreArgumentParser, self).parse_args(args=args, namespace=namespace)
+        # If the default log level was not set, make it verbose
+        if not hasattr(result, 'loglevel'):
+            result.loglevel = 'verbose'
         # Make sure we always have execute parser settings even when other commands called
         if not result.cli_command == 'execute':
             exec_options = get_defaults('execute')
