@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.ui.webui import db_session, app, executor
+from flexget.ui.webui import db_session, app
 from flask import request, render_template, flash, Module
 from flexget.plugin import DependencyError
 
@@ -56,6 +56,7 @@ def count():
 # TODO: Fix this
 @archive.route('/inject/<id>')
 def inject(id):
+    # TODO: Do it like the cli command does
     options = {'archive_inject_id': id, 'archive_inject_immortal': True}
     executor.execute(options=options)
     flash('Queued execution, see log for results', 'info')

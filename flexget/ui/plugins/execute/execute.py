@@ -6,7 +6,7 @@ from flask import render_template, request, flash
 from flask import Module, escape, jsonify
 
 from flexget.options import CoreArgumentParser, RaiseErrorArgumentParser
-from flexget.ui.webui import register_plugin, executor
+from flexget.ui.webui import register_plugin
 from flexget.scheduler import BufferQueue
 
 execute = Module(__name__, url_prefix='/execute')

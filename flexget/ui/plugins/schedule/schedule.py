@@ -6,65 +6,12 @@ import threading
 from sqlalchemy import Column, Integer, Unicode
 from flask import request, render_template, flash, Module, redirect, url_for
 
-from flexget.ui.webui import register_plugin, db_session, manager, executor
+from flexget.ui.webui import register_plugin, db_session, manager
 from flexget.manager import Base
 from flexget.event import event, fire_event
 
 log = logging.getLogger('ui.schedule')
 schedule = Module(__name__)
-
-DEFAULT_INTERVAL = 60
-
-timers = {}
-
-
-class Schedule(Base):
-    __tablename__ = 'schedule'
-
-    id = Column(Integer, primary_key=True)
-    task = Column('feed', Unicode)
-    interval = Column(Integer)
-
-    def __init__(self, task, interval):
-        self.task = task
-        self.interval = interval
-
-
-class RepeatingTimer(threading.Thread):
-    """Call a function every certain number of seconds"""
-
-    def __init__(self, interval, function, args=[], kwargs={}):
-        threading.Thread.__init__(self)
-        self.daemon = True
-        self.interval = interval
-        self.function = function
-        self.args = args
-        self.kwargs = kwargs
-        self.finished = threading.Event()
-        self.waiting = threading.Event()
-
-    def cancel(self):
-        """Stop the repeating"""
-        self.finished.set()
-        self.waiting.set()
-
-    def run(self):
-        last_run = datetime.now()
-        while not self.finished.is_set():
-            self.waiting.clear()
-            wait_delta = (last_run + timedelta(seconds=self.interval) - datetime.now())
-            wait_secs = (wait_delta.seconds + wait_delta.days * 24 * 3600)
-            if wait_secs > 0:
-                log.debug('Waiting %s to execute.' % wait_secs)
-                self.waiting.wait(wait_secs)
-            else:
-                log.debug('We were scheduled to execute %d seconds ago, executing now.' % - wait_secs)
-            if self.waiting.is_set():
-                # If waiting was cancelled do not execute the function
-                continue
-            if not self.finished.is_set():
-                last_run = datetime.now()
-                self.function(*self.args, **self.kwargs)
 
 
 def get_task_interval(task):
@@ -87,15 +34,17 @@ def set_task_interval(task, interval):
 
 @schedule.context_processor
 def get_intervals():
-    schedule_items = db_session.query(Schedule).filter(Schedule.task != u'__DEFAULT__').all()
-    default_interval = db_session.query(Schedule).filter(Schedule.task == u'__DEFAULT__').first()
-    if default_interval:
-        default_interval = default_interval.interval
-    else:
-        default_interval = DEFAULT_INTERVAL
-    return {'default_interval': default_interval,
-            'schedule_items': schedule_items,
-            'tasks': set(manager.tasks) - set(get_scheduled_tasks())}
+    config = manager.config.setdefault('schedules', {})
+    config_tasks = config.setdefault('tasks', {})
+    task_schedules = []
+    for task in set(config_tasks) + set(manager.tasks):
+        task_schedules.append(
+            {'name': task,
+             'enabled': task in config_tasks,
+             'schedule': config_tasks.get(task, ''),
+             'valid': task in manager.tasks})
+    default_schedule = {'enabled': 'default' in config, 'schedule': config.get('default', '')}
+    return {'default_schedule': default_schedule, 'task_schedules': task_schedules}
 
 
 def update_interval(form, task):
