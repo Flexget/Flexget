@@ -29,19 +29,11 @@ def execute():
         except ValueError as e:
             return jsonify(error='invalid options_string specified: %s' % e.message), 400
 
+    # We'll stream the log results as they arrive in the bufferqueue
     kwargs['output'] = BufferQueue()
-    from flexget.ui.webui import executor
-    executor.execute(**kwargs)
+    manager.scheduler.execute(**kwargs)
 
-    def streamer():
-        bufferqueue = kwargs['output']
-        while True:
-            line = bufferqueue.get()
-            if line == 'EOF':
-                break
-            yield line + '\n'
-
-    return Response(streamer(), mimetype='text/plain'), 200
+    return Response(kwargs['output'], mimetype='text/plain'), 200
 
 
 # TODO: return proper schemas in headers, also none of these should allow setting invalid config

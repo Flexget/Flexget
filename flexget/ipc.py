@@ -70,7 +70,7 @@ class IPCServer(threading.Thread):
                     log.info('Executing task `%s` for client at %s.' % (args['task'], addr))
                     self.manager.scheduler.execute(args['task'], options=args['options'], output=bufferqueue)
                     for line in bufferqueue:
-                        conn.sendall(line + '\n')
+                        conn.sendall(line)
             except socket.error as e:
                 log.error('Socket error while communicating with client: %s' % e)
             except Exception as e:

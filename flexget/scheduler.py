@@ -356,17 +356,18 @@ class Tee(object):
 
 
 class BufferQueue(Queue.Queue):
+    """Thread safe way to stream text. Reader should iterate over the buffer."""
     EOF = object()
 
-    def write(self, txt):
-        txt = txt.rstrip('\n')
-        if txt:
-            self.put(txt)
+    def write(self, line):
+        self.put(line)
 
     def close(self):
+        """The writing side should call this to indicate it is done streaming items."""
         self.put(self.EOF)
 
     def __iter__(self):
+        """Iterates over the items written to the queue. Stops when writing side calls `close` method."""
         for line in iter(self.get, self.EOF):
             yield line
 
