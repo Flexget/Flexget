@@ -3,6 +3,7 @@ import logging
 import time
 import os
 import base64
+import pkg_resources
 import re
 import sys
 
@@ -193,7 +194,7 @@ try:
             log.debug('Stopping twisted reactor.')
             reactor.stop()
 
-except ImportError:
+except (ImportError, pkg_resources.DistributionNotFound):
     pass
 
 
