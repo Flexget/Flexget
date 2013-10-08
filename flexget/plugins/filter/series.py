@@ -927,6 +927,8 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
                 entry['series_releases'] = releases
                 series_entries.setdefault(releases[0].episode, []).append(entry)
 
+                # TODO: Unfortunately we are setting these again, even though they were set in metanifo. This is for the
+                # benefit of all_series and series_premiere. Figure a better way.
                 # set custom download path
                 if 'path' in series_config:
                     log.debug('setting %s custom path to %s', entry['title'], series_config.get('path'))
@@ -1027,6 +1029,17 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
 
             log.debug('%s detected as %s, field: %s', entry['title'], parser, parser.field)
             populate_entry_fields(entry, parser)
+
+            # set custom download path
+            if 'path' in config:
+                log.debug('setting %s custom path to %s', entry['title'], config.get('path'))
+                # Just add this to the 'set' dictionary, so that string replacement is done cleanly
+                config.setdefault('set', {}).update(path=config['path'])
+
+            # accept info from set: and place into the entry
+            if 'set' in config:
+                set = get_plugin_by_name('set')
+                set.instance.modify(entry, config.get('set'))
 
     def process_series(self, task, series_entries, config):
         """
