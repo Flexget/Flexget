@@ -4,14 +4,14 @@ from datetime import datetime, timedelta
 import threading
 
 from sqlalchemy import Column, Integer, Unicode
-from flask import request, render_template, flash, Module, redirect, url_for
+from flask import request, render_template, flash, Blueprint, redirect, url_for
 
 from flexget.ui.webui import register_plugin, db_session, manager
 from flexget.manager import Base
 from flexget.event import event, fire_event
 
 log = logging.getLogger('ui.schedule')
-schedule = Module(__name__)
+schedule = Blueprint('schedule', __name__)
 
 
 def get_task_interval(task):
@@ -106,71 +106,6 @@ def get_all_tasks():
 
 def get_scheduled_tasks():
     return [item.task for item in db_session.query(Schedule).all()]
-
-
-def execute(interval):
-    """Adds a run to the executor"""
-
-    # Make a list of tasks that run on this interval
-    schedules = db_session.query(Schedule).filter(Schedule.interval == interval).all()
-    tasks = set([sch.task for sch in schedules])
-    if u'__DEFAULT__' in tasks:
-        tasks.remove(u'__DEFAULT__')
-        # Get a list of all tasks that do not have their own schedule
-        default_tasks = set(manager.tasks) - set(get_scheduled_tasks())
-        tasks.update(default_tasks)
-
-    if not tasks:
-        # No tasks scheduled to run at this interval, stop the timer
-        stop_timer(interval)
-        return
-
-    log.info('Executing tasks: %s' % ", ".join(tasks))
-    fire_event('scheduler.execute')
-    executor.execute(tasks=tasks)
-
-
-def start_timer(interval):
-    # autoreload will fail if there are pending timers
-    if manager.options.webui.autoreload:
-        log.info('Aborting start_timer() because --autoreload is enabled')
-        return
-
-    global timers
-    if not timers.get(interval):
-        log.debug('Starting scheduler (%s minutes)' % interval)
-        timers[interval] = RepeatingTimer(interval * 60, execute, (interval,))
-        timers[interval].start()
-
-
-def stop_timer(interval):
-    global timers
-    if timers.get(interval):
-        timers[interval].cancel()
-        del timers[interval]
-
-
-def stop_empty_timers():
-    """Stops timers that don't have any more tasks using them."""
-    current_intervals = set([i.interval for i in db_session.query(Schedule).all()])
-    for interval in timers.keys():
-        if interval not in current_intervals:
-            stop_timer(interval)
-
-
-@event('webui.start')
-def on_webui_start():
-    # Start timers for all schedules
-    for interval in set([item.interval for item in db_session.query(Schedule).all()]):
-        start_timer(interval)
-
-
-@event('webui.stop')
-def on_webui_stop():
-    log.info('Terminating')
-    # Stop all running timers
-    for interval in timers.keys():
-        stop_timer(interval)
 
 
 register_plugin(schedule, menu='Schedule')

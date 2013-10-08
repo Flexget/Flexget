@@ -31,7 +31,7 @@ entry_points = {'console_scripts': ['flexget = flexget:main']}
 
 # Provide an alternate exe on windows which does not cause a pop-up when scheduled
 if sys.platform.startswith('win'):
-    entry_points['gui_scripts'].append('flexget-headless = flexget:main')
+    entry_points.setdefault('gui_scripts', []).append('flexget-headless = flexget:main')
 
 with open("README.rst") as readme:
     long_description = readme.read()

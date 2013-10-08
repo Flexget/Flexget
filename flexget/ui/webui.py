@@ -95,18 +95,25 @@ def load_ui_plugins():
             raise
 
 
-def register_plugin(plugin, url_prefix=None, menu=None, order=128, home=False):
-    """Registers UI plugin.
-    :plugin: Flask Module instance for the plugin
+def register_plugin(blueprint, menu=None, order=128, home=False):
     """
+    Registers UI plugin.
 
-    log.info('Registering UI plugin %s' % plugin.name)
-    url_prefix = url_prefix or '/' + plugin.name
-    app.register_module(plugin, url_prefix=url_prefix)
+    :plugin: :class:`flask.Blueprint` object for this plugin.
+    """
+    # Set up some defaults if the plugin did not already specify them
+    if blueprint.url_prefix is None:
+        blueprint.url_prefix = '/' + blueprint.name
+    if not blueprint.template_folder and os.path.isdir(os.path.join(blueprint.root_path, 'templates')):
+        blueprint.template_folder = 'templates'
+    if not blueprint.static_folder and os.path.isdir(os.path.join(blueprint.root_path, 'static')):
+        blueprint.static_folder = 'static'
+    log.info('Registering UI plugin %s' % blueprint.name)
+    app.register_blueprint(blueprint)
     if menu:
-        register_menu(url_prefix, menu, order=order)
+        register_menu(blueprint.url_prefix, menu, order=order)
     if home:
-        register_home(plugin.name + '.index')
+        register_home(blueprint.name + '.index')
 
 
 def register_menu(href, caption, order=128):
