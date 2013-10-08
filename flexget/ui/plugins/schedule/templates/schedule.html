@@ -41,9 +41,9 @@
                     <td align="center" style="width: 6em">
                         Default
                     </td><td>
-                        <input name="__DEFAULT___interval" value="{{ default_interval }}" size="10" style="text-align: right;">
+                        <input name="default_interval" value="{{ default_interval }}" size="10" style="text-align: right;">
                     </td><td>
-                        <select name="__DEFAULT___unit">
+                        <select name="default_unit">
                             <option value="minutes" selected>minutes</option>
                             <option value="hours">hours</option>
                             <option value="days">days</option>
@@ -56,9 +56,9 @@
                     <td align="center">
                         {{ item.task }}
                     </td><td>
-                        <input name="{{ item.task }}_interval" value="{{ item.interval }}" size="10" style="text-align: right;">
+                        <input name="task_{{ item.task }}_interval" value="{{ item.interval }}" size="10" style="text-align: right;">
                     </td><td>
-                        <select name="{{ item.task }}_unit">
+                        <select name="task_{{ item.task }}_unit">
                             <option value="minutes" selected>minutes</option>
                             <option value="hours">hours</option>
                             <option value="days">days</option>

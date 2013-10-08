@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import base64
 import glob
 import logging
+import pkg_resources
 import os
 import re
 import sys
@@ -207,7 +208,7 @@ try:
             log.debug('Stopping twisted reactor.')
             reactor.stop()
 
-except ImportError:
+except (ImportError, pkg_resources.DistributionNotFound):
     pass
 
 

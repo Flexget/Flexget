@@ -12,7 +12,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
 import urllib
-import threading
+import socket
 import sys
 
 from flask import Flask, redirect, url_for, abort, request, send_from_directory
@@ -21,7 +21,6 @@ from sqlalchemy.orm.session import sessionmaker
 
 from flexget.event import fire_event
 from flexget.plugin import DependencyError
-from flexget.ui.executor import ExecThread
 from flexget.ui.api import api
 
 log = logging.getLogger('webui')
@@ -30,7 +29,6 @@ app = Flask(__name__)
 manager = None
 db_session = None
 server = None
-executor = None
 
 _home = None
 _menu = []
@@ -148,19 +146,6 @@ def start(mg):
     if db_session is None:
         raise Exception('db_session is None')
 
-    if os.name != 'nt' and manager.options.daemon:
-        if threading.activeCount() != 1:
-            log.critical('There are %r active threads. '
-                         'Daemonizing now may cause strange failures.' % threading.enumerate())
-        log.info('Creating FlexGet Daemon.')
-        newpid = daemonize()
-        # Write new pid to lock file
-        log.debug('Writing new pid %d to lock file %s' % (newpid, manager.lockfile))
-        manager.write_lock()
-
-    # Start the scheduler
-    manager.scheduler.start()
-
     load_ui_plugins()
 
     # quick hack: since ui plugins may add tables to SQLAlchemy too and they're not initialized because create
@@ -178,33 +163,35 @@ def start(mg):
 
     set_exit_handler(stop_server)
 
-    log.info('Starting server on port %s' % manager.options.port)
+    log.info('Starting server on port %s' % manager.options.webui.port)
 
-    if manager.options.autoreload:
+    if manager.options.webui.autoreload:
         # Create and destroy a socket so that any exceptions are raised before
         # we spawn a separate Python interpreter and lose this ability.
-        import socket
         from werkzeug.serving import run_with_reloader
         reloader_interval = 1
         extra_files = None
         test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         test_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        test_socket.bind(('0.0.0.0', manager.options.port))
+        test_socket.bind((manager.options.webui.bind, manager.options.webui.port))
         test_socket.close()
+        log.warning('Not starting scheduler, since autoreload is enabled.')
         run_with_reloader(start_server, extra_files, reloader_interval)
     else:
+        # Start the scheduler
+        manager.scheduler.start()
         start_server()
 
     log.debug('server exited')
     fire_event('webui.stop')
-    manager.shutdown()
+    manager.shutdown(finish_queue=False)
 
 
 def start_server():
     global server
     from cherrypy import wsgiserver
     d = wsgiserver.WSGIPathInfoDispatcher({'/': app})
-    server = wsgiserver.CherryPyWSGIServer(('0.0.0.0', manager.options.port), d)
+    server = wsgiserver.CherryPyWSGIServer((manager.options.webui.bind, manager.options.webui.port), d)
 
     log.debug('server %s' % server)
     try:
@@ -234,46 +221,4 @@ def set_exit_handler(func):
         signal.signal(signal.SIGTERM, func)
 
 
-def daemonize(stdin='/dev/null', stdout='/dev/null', stderr='/dev/null'):
-    """Daemonizes the current process. Returns the new pid"""
-    import atexit
 
-    try:
-        pid = os.fork()
-        if pid > 0:
-            # Don't run the exit handlers on the parent
-            atexit._exithandlers = []
-            # exit first parent
-            sys.exit(0)
-    except OSError as e:
-        sys.stderr.write("fork #1 failed: %d (%s)\n" % (e.errno, e.strerror))
-        sys.exit(1)
-
-    # decouple from parent environment
-    os.chdir('/')
-    os.setsid()
-    os.umask(0)
-
-    # do second fork
-    try:
-        pid = os.fork()
-        if pid > 0:
-            # Don't run the exit handlers on the parent
-            atexit._exithandlers = []
-            # exit from second parent
-            sys.exit(0)
-    except OSError as e:
-        sys.stderr.write("fork #2 failed: %d (%s)\n" % (e.errno, e.strerror))
-        sys.exit(1)
-
-    # redirect standard file descriptors
-    sys.stdout.flush()
-    sys.stderr.flush()
-    si = file(stdin, 'r')
-    so = file(stdout, 'a+')
-    se = file(stderr, 'a+', 0)
-    os.dup2(si.fileno(), sys.stdin.fileno())
-    os.dup2(so.fileno(), sys.stdout.fileno())
-    os.dup2(se.fileno(), sys.stderr.fileno())
-
-    return os.getpid()

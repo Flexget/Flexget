@@ -35,6 +35,7 @@ def do_inject():
     if fields.get('title') and fields.get('url'):
         # Create the entry for injection
         entry = Entry(**fields)
+        # TODO: Fix
         executor.execute(options={'dump_entries': True, 'inject': [entry]})
         flash('Scheduled execution for entry `%s`' % entry['title'], 'success')
     else:

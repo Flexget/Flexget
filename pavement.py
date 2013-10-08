@@ -27,9 +27,7 @@ if sys.version_info < (2, 7):
     # argparse is part of the standard library in python 2.7+
     install_requires.append('argparse')
 
-entry_points = {
-    'console_scripts': ['flexget = flexget:main'],
-    'gui_scripts': ['flexget-webui = flexget.ui:main [webui]']}
+entry_points = {'console_scripts': ['flexget = flexget:main']}
 
 # Provide an alternate exe on windows which does not cause a pop-up when scheduled
 if sys.platform.startswith('win'):

@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from sqlalchemy import Column, Unicode
 from flask import Module, request, Response
+
 from flexget.event import event
 from flexget.ui.webui import register_plugin, app, manager, db_session
 from flexget.manager import Base
@@ -39,7 +41,7 @@ def authenticate():
 
 @event('webui.start')
 def enable_authentication():
-    if manager.options.no_auth:
+    if manager.options.webui.no_auth:
         return
     global credentials
     credentials = db_session.query(AuthCredentials).first()
@@ -47,10 +49,10 @@ def enable_authentication():
         credentials = AuthCredentials('flexget', 'flexget')
         db_session.add(credentials)
 
-    if manager.options.username:
+    if manager.options.webui.username:
         credentials.username = manager.options.username
-    if manager.options.password:
-        credentials.password = manager.options.password
+    if manager.options.webui.password:
+        credentials.password = manager.options.webui.password
     db_session.commit()
 
     app.before_request(check_authenticated)
@@ -58,7 +60,7 @@ def enable_authentication():
 
 def check_authenticated():
     # TODO: Is this a big security hole? Maybe figure out a better way to authenticate for local IPC
-    if request.remote_addr == '127.0.0.1':
+    if manager.options.webui.no_local_auth and request.remote_addr == '127.0.0.1':
         return
     auth = request.authorization
     if not auth or not check_auth(auth.username, auth.password):

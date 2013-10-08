@@ -3,8 +3,8 @@ from flask import request, jsonify, Blueprint, Response
 import flexget
 from flexget.manager import manager
 from flexget.options import get_parser
-from flexget.ui.options import RaiseErrorArgumentParser
-from flexget.ui.executor import BufferQueue
+from flexget.scheduler import BufferQueue
+from flexget.options import RaiseErrorArgumentParser
 
 API_VERSION = 1
 

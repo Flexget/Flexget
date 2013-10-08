@@ -2,8 +2,10 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime, timedelta
 import threading
+
 from sqlalchemy import Column, Integer, Unicode
 from flask import request, render_template, flash, Module, redirect, url_for
+
 from flexget.ui.webui import register_plugin, db_session, manager, executor
 from flexget.manager import Base
 from flexget.event import event, fire_event
@@ -93,7 +95,7 @@ def get_intervals():
         default_interval = DEFAULT_INTERVAL
     return {'default_interval': default_interval,
             'schedule_items': schedule_items,
-            'tasks': set(get_all_tasks()) - set(get_scheduled_tasks())}
+            'tasks': set(manager.tasks) - set(get_scheduled_tasks())}
 
 
 def update_interval(form, task):
@@ -121,8 +123,10 @@ def update_interval(form, task):
 def index():
     global timer
     if request.method == 'POST':
-        for task in get_all_tasks() + [u'__DEFAULT__']:
-            if request.form.get(task + '_interval'):
+        if request.form.get('default_interval'):
+            pass  # TODO: something
+        for task in manager.tasks:
+            if request.form.get('task_%s_interval' % task):
                 update_interval(request.form, task)
 
     return render_template('schedule/schedule.html')
@@ -164,7 +168,7 @@ def execute(interval):
     if u'__DEFAULT__' in tasks:
         tasks.remove(u'__DEFAULT__')
         # Get a list of all tasks that do not have their own schedule
-        default_tasks = set(get_all_tasks()) - set(get_scheduled_tasks())
+        default_tasks = set(manager.tasks) - set(get_scheduled_tasks())
         tasks.update(default_tasks)
 
     if not tasks:
@@ -179,7 +183,7 @@ def execute(interval):
 
 def start_timer(interval):
     # autoreload will fail if there are pending timers
-    if manager.options.autoreload:
+    if manager.options.webui.autoreload:
         log.info('Aborting start_timer() because --autoreload is enabled')
         return
 

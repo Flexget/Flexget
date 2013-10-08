@@ -1,9 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
+import atexit
 from contextlib import contextmanager
 import os
 import sys
 import shutil
 import logging
+import threading
+import pkg_resources
 import yaml
 from datetime import datetime, timedelta
 
@@ -97,7 +100,7 @@ class Manager(object):
     def initialize(self):
         """Separated from __init__ so that unit tests can modify options before loading config."""
         self.setup_yaml()
-        self.find_config()
+        self.find_config(create=(self.options.cli_command == 'webui'))
         self.init_sqlalchemy()
         self.load_config()
         fire_event('manager.pre-process', self)
@@ -174,6 +177,16 @@ class Manager(object):
                 except KeyboardInterrupt:
                     fire_event('manager.daemon.completed', self)
                     self.shutdown(finish_queue=False)
+        elif command == 'webui':
+            try:
+                pkg_resources.require('flexget[webui]')
+            except pkg_resources.DistributionNotFound as e:
+                log.error('Dependency not met. %s' % e)
+                log.error('Webui dependencies not installed. You can use `pip install flexget[webui]` to install them.')
+                self.shutdown()
+            else:
+                from flexget.ui import webui
+                webui.start(self)
         # Otherwise dispatch the command to the callback function
         else:
             if options.lock_required:
@@ -208,18 +221,21 @@ class Manager(object):
         yaml.Dumper.increase_indent = increase_indent_wrapper(yaml.Dumper.increase_indent)
         yaml.SafeDumper.increase_indent = increase_indent_wrapper(yaml.SafeDumper.increase_indent)
 
-    def find_config(self):
-        """Find the configuration file and then call :meth:`.load_config` to load it"""
+    def find_config(self, create=False):
+        """
+        Find the configuration file.
+
+        :param bool create: If a config file is not found, and create is True, one will be created in the home folder
+        """
         startup_path = os.path.dirname(os.path.abspath(sys.path[0]))
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
         current_path = os.getcwd()
         exec_path = sys.path[0]
 
         config_path = os.path.dirname(self.options.config)
-        path_given = config_path != ''
 
         possible = []
-        if path_given:
+        if config_path != '':
             # explicit path given, don't try anything too fancy
             possible.append(self.options.config)
         else:
@@ -229,7 +245,8 @@ class Manager(object):
             possible.append(home_path)
             if sys.platform.startswith('win'):
                 # On windows look in ~/flexget as well, as explorer does not let you create a folder starting with a dot
-                possible.append(os.path.join(os.path.expanduser('~'), 'flexget'))
+                home_path = os.path.join(os.path.expanduser('~'), 'flexget')
+                possible.append(home_path)
             else:
                 # The freedesktop.org standard config location
                 xdg_config = os.environ.get('XDG_CONFIG_HOME', os.path.join(os.path.expanduser('~'), '.config'))
@@ -246,14 +263,22 @@ class Manager(object):
             config = os.path.join(path, self.options.config)
             if os.path.exists(config):
                 log.debug('Found config: %s' % config)
+                break
+        else:
+            if not create:
+                log.info('Tried to read from: %s' % ', '.join(possible))
+                log.critical('Failed to find configuration file %s' % self.options.config)
+                sys.exit(1)
+            config = os.path.join(home_path, self.options.config)
+            log.info('Config file %s not found. Creating new config %s' % (self.options.config, config))
+            with open(config, 'w') as newconfig:
+                # Write empty tasks to the config
+                newconfig.write(yaml.dump({'tasks': {}}))
 
-                self.config_path = config
-                self.config_name = os.path.splitext(os.path.basename(config))[0]
-                self.config_base = os.path.normpath(os.path.dirname(config))
-                self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
-                return
-        log.info('Tried to read from: %s' % ', '.join(possible))
-        raise IOError('Failed to find configuration file %s' % self.options.config)
+        self.config_path = config
+        self.config_name = os.path.splitext(os.path.basename(config))[0]
+        self.config_base = os.path.normpath(os.path.dirname(config))
+        self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
 
     def load_config(self):
         """
@@ -576,6 +601,59 @@ class Manager(object):
             log.debug('Removed %s' % self.lockfile)
         else:
             log.debug('Lockfile %s not found' % self.lockfile)
+
+
+    def daemonize(self):
+        """Daemonizes the current process. Returns the new pid"""
+        if sys.platform.startswith('win'):
+            log.error('Cannot daemonize on windows')
+            return
+        if threading.activeCount() != 1:
+            log.critical('There are %r active threads. '
+                         'Daemonizing now may cause strange failures.' % threading.enumerate())
+
+        log.info('Daemonizing...')
+
+        try:
+            pid = os.fork()
+            if pid > 0:
+                # Don't run the exit handlers on the parent
+                atexit._exithandlers = []
+                # exit first parent
+                sys.exit(0)
+        except OSError as e:
+            sys.stderr.write('fork #1 failed: %d (%s)\n' % (e.errno, e.strerror))
+            sys.exit(1)
+
+        # decouple from parent environment
+        os.chdir('/')
+        os.setsid()
+        os.umask(0)
+
+        # do second fork
+        try:
+            pid = os.fork()
+            if pid > 0:
+                # Don't run the exit handlers on the parent
+                atexit._exithandlers = []
+                # exit from second parent
+                sys.exit(0)
+        except OSError as e:
+            sys.stderr.write('fork #2 failed: %d (%s)\n' % (e.errno, e.strerror))
+            sys.exit(1)
+
+        # redirect standard file descriptors
+        sys.stdout.flush()
+        sys.stderr.flush()
+        si = file('/dev/null', 'r')
+        so = file('/dev/null', 'a+')
+        se = file('/dev/null', 'a+', 0)
+        os.dup2(si.fileno(), sys.stdin.fileno())
+        os.dup2(so.fileno(), sys.stdout.fileno())
+        os.dup2(se.fileno(), sys.stderr.fileno())
+
+        # Our pid has changed, update t
+        manager.write_lock()
 
     def remote_execute(self, port, options=None, **kwargs):
         log.info('Sending this execution to the webui running on port %s' % port)

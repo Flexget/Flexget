@@ -1,10 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import copy
+import pkg_resources
 import random
+import socket
 import string
 import sys
-
-from argparse import ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, _VersionAction, Namespace, PARSER
+from argparse import (ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, PARSER, _VersionAction, Namespace,
+                      ArgumentTypeError)
 
 import flexget
 from flexget.utils.tools import console
@@ -154,7 +156,19 @@ class ScopedNamespace(Namespace):
 
 
 class ArgumentParser(ArgParser):
-    """Overrides some default ArgumentParser behavior"""
+    """
+    Mimics the default :class:`argparse.ArgumentParser` class, with a few distinctions, mostly to ease subparser usage:
+
+    - Adds the `add_subparser` method. After `add_subparsers` has been called, the `add_subparser` method can be used
+      instead of the `add_parser` method of the object returned by the `add_subparsers` call.
+    - If `add_subparser` is called with the `scoped_namespace` kwarg, all subcommand options will be stored in a
+      nested namespace scope based on the command name for this subparser
+    - The `get_subparser` method will get the :class:`ArgumentParser` instance for an existing subparser on this parser
+    - For any arguments defined both in this parser and one of its subparsers, the selected subparser default will
+      override the main one.
+    - Command shortening: If the command for a subparser is abbreviated unambiguously, it will still be accepted.
+    - The add_argument `nargs` keyword argument supports a range of arguments, e.g. `"2-4"
+    """
 
     def __init__(self, nested_namespace_name=None, **kwargs):
         """
@@ -188,6 +202,11 @@ class ArgumentParser(ArgParser):
                 kwargs['nargs'] = '+'
         result = super(ArgumentParser, self).add_argument(*args, **kwargs)
         if self.nested_namespace_name:
+            # If metavar hasn't already been set, set it without the nested scope name
+            if not result.metavar:
+                result.metavar = result.dest
+                if result.option_strings[0].startswith('-'):
+                    result.metavar = result.dest.upper()
             result.dest = self.nested_namespace_name + '.' + result.dest
         return result
 
@@ -195,7 +214,20 @@ class ArgumentParser(ArgParser):
         if args is None:
             # Decode all arguments to unicode before parsing
             args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
-        return super(ArgumentParser, self).parse_known_args(args, namespace or ScopedNamespace())
+        # No need to do anything fancy if we don't have subparsers
+        if not self.subparsers:
+            return super(ArgumentParser, self).parse_known_args(args, namespace or ScopedNamespace())
+        # Remove all of our defaults, and wait until the subparsers have had a chance to set them before setting ours
+        real_defaults, self._defaults = self._defaults, {}
+        for action in self._actions:
+            action.real_default, action.default = action.default, SUPPRESS
+        namespace, _ = super(ArgumentParser, self).parse_known_args(args, namespace or ScopedNamespace())
+        # Restore the defaults
+        self._defaults = real_defaults
+        for action in self._actions:
+            action.default = action.real_default
+        # Ehh, just parse again with subparser defaults already in the namespace instead of rewriting code from argparse
+        return super(ArgumentParser, self).parse_known_args(args, namespace)
 
     def add_subparsers(self, scoped_namespaces=False, **kwargs):
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
@@ -238,6 +270,7 @@ class ArgumentParser(ArgParser):
                     arg_strings[0] = matches[0]
         return super(ArgumentParser, self)._get_values(action, arg_strings)
 
+    # TODO: I'm not sure this is actually good. Perhaps remove it.
     def get_defaults(self):
         return self.parse_args([])
 
@@ -263,11 +296,12 @@ manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
 manager_parser.add_argument('--debug', action=DebugAction, nargs=0, help=SUPPRESS)
 manager_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, help=SUPPRESS)
 # Supress setting  this when not explicitly specified, so that subparsers can set their own defaults
-manager_parser.add_argument('--loglevel', default=SUPPRESS, help=SUPPRESS,
+manager_parser.add_argument('--loglevel', default='verbose', help=SUPPRESS,
                             choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--del-db', action='store_true', dest='del_db', default=False, help=SUPPRESS)
+manager_parser.set_defaults(lock_required=True)
 
 
 class CoreArgumentParser(ArgumentParser):
@@ -284,7 +318,7 @@ class CoreArgumentParser(ArgumentParser):
 
         # The parser for the execute command
         exec_parser = self.add_subparser('execute', help='execute tasks now')
-        exec_parser.set_defaults(lock_required=True)
+        exec_parser.set_defaults(lock_required=True, loglevel='verbose')
         exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
                                  help='Matches are not downloaded but will be skipped in the future.')
         exec_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
@@ -297,17 +331,55 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
         exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
                                  help='Disable caches. Works only in plugins that have explicit support.')
-        exec_parser.set_defaults(loglevel='verbose')
+
+        daemonize_help = SUPPRESS
+        if not sys.platform.startswith('win'):
+            daemonize_help = 'causes process to daemonize after starting'
 
         # The parser for the daemon command
-        daemon_parser = self.add_subparser('daemon', help='Run continuously, executing tasks according to schedules '
-                                                          'defined in config.')
-        daemon_parser.add_argument('--ipc-port', type=int, default=29709, help='port which will be used for IPC')
+        daemon_parser = self.add_subparser('daemon', help='run continuously, executing tasks according to schedules '
+                                                          'defined in config')
         daemon_parser.set_defaults(loglevel='info')
+        daemon_parser.add_argument('--ipc-port', type=int, default=29709, help=SUPPRESS)
+        if not sys.platform.startswith('win'):
+            daemon_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
 
-        webui_parser = self.add_subparser('webui', help='Run continuously, with a web interface to configure and '
-                                                        'interact with.')
+        # The parser for the webui
+        # Hide the webui command if deps aren't available
+        webui_kwargs = {}
+        try:
+            pkg_resources.require('flexget[webui]')
+            webui_kwargs['help'] = 'run continuously, with a web interface to configure and interact with the daemon'
+        except pkg_resources.DistributionNotFound:
+            pass
+        webui_parser = self.add_subparser('webui', **webui_kwargs)
 
+        def ip_type(value):
+            try:
+                socket.inet_aton(value)
+            except socket.error:
+                raise ArgumentTypeError('must be a valid ip address to bind to')
+            return value
+
+        webui_parser.add_argument('--bind', type=ip_type, default='0.0.0.0', metavar='IP',
+                                  help='IP address to bind to when serving the web interface [default: %(default)s]')
+        webui_parser.add_argument('--port', type=int, default=5050,
+                                  help='run FlexGet webui on port [default: %(default)s]')
+        webui_parser.add_argument('--ipc-port', type=int, default=29709, help=SUPPRESS)
+        if not sys.platform.startswith('win'):
+            webui_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
+
+        # TODO: move these to authentication plugin?
+        webui_parser.add_argument('--no-auth', action='store_true',
+                                  help='runs without authentication required (dangerous)')
+        webui_parser.add_argument('--no-local-auth', action='store_true',
+                                  help='runs without any authentication required when accessed from localhost')
+        webui_parser.add_argument('--username', help='username needed to login [default: flexget]')
+        webui_parser.add_argument('--password', help='password needed to login [default: flexget]')
+
+        # enable flask autoreloading (development)
+        webui_parser.add_argument('--autoreload', action='store_true', help=SUPPRESS)
+        webui_parser.set_defaults(loglevel='info')
 
     def add_subparsers(self, **kwargs):
         # The subparsers should not be CoreArgumentParsers
@@ -316,9 +388,6 @@ class CoreArgumentParser(ArgumentParser):
 
     def parse_args(self, args=None, namespace=None):
         result = super(CoreArgumentParser, self).parse_args(args=args, namespace=namespace)
-        # If the default log level was not set, make it verbose
-        if not hasattr(result, 'loglevel'):
-            result.loglevel = 'verbose'
         # Make sure we always have execute parser settings even when other commands called
         if not result.cli_command == 'execute':
             exec_options = get_defaults('execute')
@@ -326,3 +395,22 @@ class CoreArgumentParser(ArgumentParser):
                 exec_options.__dict__.update(result.execute.__dict__)
             result.execute = exec_options
         return result
+
+
+class RaiseErrorArgumentParser(ArgumentParser):
+    """Parses options from a string instead of cli, doesn't exit on parser errors, raises a ValueError instead"""
+
+    def __init__(self, **kwargs):
+        kwargs.setdefault('add_help', False)
+        kwargs.setdefault('usage', SUPPRESS)
+        super(RaiseErrorArgumentParser, self).__init__(**kwargs)
+
+    def parse_args(self, args, namespace=None):
+        # If args is a string, split it into an args list
+        if isinstance(args, basestring):
+            import shlex
+            args = shlex.split(args)
+        return super(RaiseErrorArgumentParser, self).parse_args(args)
+
+    def error(self, msg):
+        raise ValueError(msg)
