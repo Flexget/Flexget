@@ -1,11 +1,11 @@
 from flask import request, jsonify, Blueprint, Response, flash
 
 import flexget
-from flexget.config_schema import resolve_ref, process_config
+from flexget.config_schema import resolve_ref, process_config, get_schema
 from flexget.manager import manager
-from flexget.options import get_parser
+from flexget.options import get_parser, RaiseErrorArgumentParser
+from flexget.plugin import plugin_schemas
 from flexget.scheduler import BufferQueue
-from flexget.options import RaiseErrorArgumentParser
 
 API_VERSION = 1
 
@@ -83,3 +83,31 @@ def config_root_key(root_key):
     response = jsonify(manager.config[root_key])
     response.headers[b'Content-Type'] += '; profile=/schema/config/%s' % root_key
     return response
+
+
+# Serves the appropriate schema for any /api method. Schema for /api/x/y can be found at /schema/api/x/y
+api_schema = Blueprint('api_schema', __name__, url_prefix='/schema/api')
+
+@api_schema.route('/config')
+def cs_root():
+    return get_schema()
+
+
+@api_schema.route('/config/<root_key>')
+def cs_tasks(root_key):
+    root_schema = get_schema()
+    if root_key not in root_schema['properties']:
+        return 'Not found', 404
+    return root_schema['properties'][root_key]
+
+
+@api_schema.route('/config/templates/<name>', defaults={'section': 'templates'})
+@api_schema.route('/config/tasks/<name>', defaults={'section': 'tasks'})
+def cs_plugin_container(section, name):
+    hyper_schema = {
+        'links': [
+            {'rel': 'self', 'href': request.path}
+        ]
+    }
+
+    return plugin_schemas(context='task')

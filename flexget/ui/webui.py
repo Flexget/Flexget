@@ -21,7 +21,7 @@ from sqlalchemy.orm.session import sessionmaker
 
 from flexget.event import fire_event
 from flexget.plugin import DependencyError
-from flexget.ui.api import api
+from flexget.ui.api import api, api_schema
 
 log = logging.getLogger('webui')
 
@@ -163,6 +163,7 @@ def start(mg):
     # TODO: 1.2 consider if this event is the best way
     fire_event('webui.register_api_endpoints', api)
     app.register_blueprint(api)
+    app.register_blueprint(api_schema)
     fire_event('webui.start')
 
     # Start Flask
