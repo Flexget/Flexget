@@ -62,7 +62,7 @@ class PluginTemplate(object):
             return
         # implements --template NAME
         if task.options.template:
-            if task.options.template not in config:
+            if not config or task.options.template not in config:
                 task.abort('does not use `%s` template' % task.options.template, silent=True)
 
         config = self.prepare_config(config)
