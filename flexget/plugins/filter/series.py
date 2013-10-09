@@ -900,7 +900,7 @@ class FilterSeries(SeriesDatabase, FilterSeriesBase):
         config = self.prepare_config(task.config.get('series', {}))
         found_series = {}
         for entry in task.entries:
-            if entry.get('series_name') and entry.get('series_id') and entry.get('series_parser'):
+            if entry.get('series_name') and entry.get('series_id') is not None and entry.get('series_parser'):
                 found_series.setdefault(entry['series_name'], []).append(entry)
 
         for series_item in config:
