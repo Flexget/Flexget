@@ -1,6 +1,7 @@
-from flask import request, jsonify, Blueprint, Response
+from flask import request, jsonify, Blueprint, Response, flash
 
 import flexget
+from flexget.config_schema import resolve_ref, process_config
 from flexget.manager import manager
 from flexget.options import get_parser
 from flexget.scheduler import BufferQueue
@@ -68,3 +69,17 @@ def config_tasks(taskname):
         del manager.config['tasks'][taskname]
         return Response(status=204)
     return jsonify(manager.config['tasks'][taskname]), status_code
+
+@api.route('/config/<root_key>', methods=['GET', 'PUT', 'DELETE'])
+def config_root_key(root_key):
+    if request.method == 'PUT':
+        schema = resolve_ref('/schema/config/%s' % root_key)
+        errors = process_config(request.json, schema, set_defaults=False)
+        if errors:
+            return jsonify({'$errors': errors}), 400
+        manager.config[root_key] = request.json
+    if root_key not in manager.config:
+        return 'Not found', 404
+    response = jsonify(manager.config[root_key])
+    response.headers[b'Content-Type'] += '; profile=/schema/config/%s' % root_key
+    return response

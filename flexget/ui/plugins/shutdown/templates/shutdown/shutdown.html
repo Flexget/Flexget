@@ -24,7 +24,7 @@
                 $.blockUI.defaults.overlayCSS.opacity = .8;
                 $.blockUI.defaults.overlayCSS.cursor = 'default';
                 $.blockUI({ message: 'See you Space Cowboy...'});
-                $('#shutdown').load("{{ url_for('now') }}");
+                $('#shutdown').load("{{ url_for('.now') }}");
             }
         });
     });

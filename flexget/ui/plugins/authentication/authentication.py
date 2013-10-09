@@ -2,14 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from sqlalchemy import Column, Unicode
-from flask import Module, request, Response
+from flask import Blueprint, request, Response
 
 from flexget.event import event
 from flexget.ui.webui import register_plugin, app, manager, db_session
 from flexget.manager import Base
 
 log = logging.getLogger('ui.authentication')
-auth = Module(__name__)
+auth = Blueprint('authentication', __name__)
 credentials = None
 
 

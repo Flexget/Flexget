@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+
+{% block main %}
+<style>
+label>p {color: #000000}
+</style>
+<form action="{{ url_for('.index') }}" method="post" class="simple">
+    <h3>Task schedules:</h3>
+    <ol>
+        {% for ts in task_schedules %}
+        <li>
+            <table><tr>
+            <td><input type="checkbox" name="task_{{ ts.name }}_enabled" {{ "checked" if ts.enabled else "" }}></td>
+            <td><label for="task_{{ ts.name }}_enabled"><p>{{ ts.name }}</p></label></td>
+            <td><input name="task_{{ ts.name }}_schedule" value="{{ ts.schedule }}"style="clear: left"></td>
+            </tr></table>
+        </li>
+        {% endfor %}
+    </ol>
+    <h3>Default schedule:</h3>
+    <p>All tasks not scheduled above will be ran with this schedule.</p>
+    <table>
+
+        <tr>
+        <td><input type="checkbox" name="default_enabled" {{ "checked" if default_schedule.enabled else "" }}>
+        <td><label for="default_enabled"><p>enabled</p></label></td>
+        <td><input name="default_schedule" value="{{ default_schedule.schedule }}"></td>
+        </tr>
+    </table>
+
+</form>
+{% endblock %}

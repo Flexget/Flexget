@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import time
 import logging
 
-from flask import redirect, render_template, Module, request, flash, url_for
+from flask import redirect, render_template, Blueprint, request, flash, url_for
 from sqlalchemy.sql.expression import desc, asc
 
 from flexget.plugin import DependencyError
@@ -15,7 +15,7 @@ except ImportError:
     raise DependencyError(issued_by='ui.series', missing='series')
 
 
-series_module = Module(__name__, url_prefix='/series')
+series_module = Blueprint('series', __name__)
 log = logging.getLogger('ui.series')
 
 
@@ -94,7 +94,7 @@ def forget_episode(rel_id):
             except ValueError as e:
                 flash(e.message, 'error')
 
-        return redirect(url_for('index'))
+        return redirect(url_for('.index'))
 
     return render_template('series/forget.html', **context)
 

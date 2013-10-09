@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from flask import Module, jsonify, request
+from flask import Blueprint, jsonify, request
 from jsonschema import RefResolutionError
 
 from flexget.config_schema import resolve_ref
 from flexget.ui.webui import register_plugin
 
-schema = Module(__name__)
+schema = Blueprint('schema', __name__)
 
 
 @schema.route('/', defaults={'path': ''})

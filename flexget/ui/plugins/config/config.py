@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flask import request, Module, jsonify, json
+from flask import request, Blueprint, jsonify, json
 
 from flexget.ui.webui import manager, register_plugin
 
 
-config = Module(__name__)
+config = Blueprint('config', __name__)
 
 log = logging.getLogger('ui.config')
 

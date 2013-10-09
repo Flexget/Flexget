@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.ui.webui import db_session, app
-from flask import request, render_template, flash, Module
+from flask import request, render_template, flash, Blueprint
 from flexget.plugin import DependencyError
 
 try:
@@ -10,7 +10,7 @@ except ImportError:
     raise DependencyError(issued_by='ui.archive', missing='archive')
 
 log = logging.getLogger('ui.archive')
-archive = Module(__name__)
+archive = Blueprint('archive', __name__)
 
 
 # TODO: refactor this filter to some globally usable place (webui.py?)

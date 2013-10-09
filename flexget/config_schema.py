@@ -42,6 +42,7 @@ def register_config_key(key, schema, required=False):
     _root_config_schema['properties'][key] = schema
     if required:
         _root_config_schema.setdefault('required', []).append(key)
+    register_schema('/schema/config/%s' % key, schema)
 
 
 def get_schema():
@@ -50,7 +51,7 @@ def get_schema():
         _root_config_schema = {'type': 'object', 'properties': {}, 'additionalProperties': False}
         fire_event('config.register')
         # TODO: Is /schema/root this the best place for this?
-        register_schema('/schema/root', _root_config_schema)
+        register_schema('/schema/config', _root_config_schema)
     return _root_config_schema
 
 

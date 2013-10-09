@@ -37,7 +37,7 @@ def get_intervals():
     config = manager.config.setdefault('schedules', {})
     config_tasks = config.setdefault('tasks', {})
     task_schedules = []
-    for task in set(config_tasks) + set(manager.tasks):
+    for task in set(config_tasks) | set(manager.tasks):
         task_schedules.append(
             {'name': task,
              'enabled': task in config_tasks,
@@ -86,7 +86,7 @@ def delete_schedule(task):
     db_session.query(Schedule).filter(Schedule.task == task).delete()
     db_session.commit()
     stop_empty_timers()
-    return redirect(url_for('index'))
+    return redirect(url_for('.index'))
 
 
 @schedule.route('/add/<task>')
@@ -97,7 +97,7 @@ def add_schedule(task):
         db_session.add(schedule)
         db_session.commit()
     start_timer(DEFAULT_INTERVAL)
-    return redirect(url_for('index'))
+    return redirect(url_for('.index'))
 
 
 def get_all_tasks():

@@ -186,7 +186,8 @@ class Manager(object):
                 self.shutdown()
             else:
                 from flexget.ui import webui
-                webui.start(self)
+                with self.acquire_lock():
+                    webui.start(self)
         # Otherwise dispatch the command to the callback function
         else:
             if options.lock_required:

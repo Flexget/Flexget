@@ -2,12 +2,12 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import posixpath
 import urlparse
-from flask import render_template, request, flash, redirect, Module
+from flask import render_template, request, flash, redirect, Blueprint
 from flask.helpers import url_for
 from flexget.ui.webui import register_plugin, manager
 from flexget.entry import Entry
 
-inject = Module(__name__, url_prefix='/inject')
+inject = Blueprint('inject', __name__)
 
 log = logging.getLogger('ui.inject')
 
@@ -42,7 +42,7 @@ def do_inject():
     else:
         flash('Title and URL required for inject.', 'error')
 
-    return redirect(url_for('index'))
+    return redirect(url_for('.index'))
 
 
 register_plugin(inject)
