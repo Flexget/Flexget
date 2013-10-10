@@ -10,8 +10,8 @@ platform_replaces = {
         ['[:*?"<>| ]+', ' '],  # Turn illegal characters into a space
         [r'[\.\s]+([/\\]|$)', r'\1']],  # Dots cannot end file or directory names
     'mac': [
-        ['[: ]+', ' ']],
-    'linux': []}  # No replacements on linux
+        ['[: ]+', ' ']],  # Only colon is illegal here
+    'linux': []}  # No illegal chars
 
 
 def pathscrub(dirty_path, os=None, filename=False):
@@ -28,25 +28,26 @@ def pathscrub(dirty_path, os=None, filename=False):
     if os_mode and not os:
         os = os_mode
 
-    if os:
-        # If os is defined, use replacements for that os
-        replaces = platform_replaces[os]
-    else:
+    if not os:
         # If os is not defined, try to detect appropriate
         drive, path = ntpath.splitdrive(dirty_path)
         if sys.platform.startswith('win') or drive:
-            replaces = platform_replaces['windows']
+            os = 'windows'
         elif sys.platform.startswith('darwin'):
-            replaces = platform_replaces['mac']
+            os = 'mac'
         else:
-            replaces = platform_replaces['linux']
+            os = 'linux'
+    replaces = platform_replaces[os]
 
     # Make sure not to mess with windows drive specifications
     drive, path = ntpath.splitdrive(dirty_path)
 
     if filename:
         path = path.replace('/', ' ').replace('\\', ' ')
-
+    # Remove spaces surrounding path components
+    path = '/'.join(comp.strip() for comp in path.split('/'))
+    if os == 'windows':
+        path = '\\'.join(comp.strip() for comp in path.split('\\'))
     for search, replace in replaces:
         path = re.sub(search, replace, path)
     path = path.strip()
