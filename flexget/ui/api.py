@@ -88,26 +88,43 @@ def config_root_key(root_key):
 # Serves the appropriate schema for any /api method. Schema for /api/x/y can be found at /schema/api/x/y
 api_schema = Blueprint('api_schema', __name__, url_prefix='/schema/api')
 
-@api_schema.route('/config')
+@api_schema.route('/config/')
 def cs_root():
-    return get_schema()
+    root_schema = get_schema()
+    hyper_schema = {'properties': {}, 'links': [{'self': '/api/config/'}]}
+    hs_props = hyper_schema['properties']
+    for key, key_schema in root_schema.get('properties', {}).iteritems():
+        hs_props[key] = {'links': [{'rel': 'self', 'href': key}]}
+        if key not in root_schema.get('required', []):
+            hs_props[key]['links'].append({'rel': 'delete', 'href': '', 'method': 'DELETE'})
 
 
-@api_schema.route('/config/<root_key>')
+# TODO: Move this route to template plugin
+@api_schema.route('/config/templates/', defaults={'section': 'templates'})
+@api_schema.route('/config/tasks/', defaults={'section': 'tasks'})
+def cs_task_container(section):
+    hyper_schema = {'links': [{'rel': 'create',
+                               'href': '',
+                               'method': 'POST',
+                               'schema': {
+                                   'type': 'object',
+                                   'properties': {'name': {'type': 'string'}},
+                                   'required': ['name']}}]}
+
+
+@api_schema.route('/config/<root_key>/')
 def cs_tasks(root_key):
     root_schema = get_schema()
     if root_key not in root_schema['properties']:
         return 'Not found', 404
+    hyper_schema = {'links': [{'rel': 'edit', 'href': 'PUT', }]}
     return root_schema['properties'][root_key]
 
 
+# TODO: Move this route to template plugin
 @api_schema.route('/config/templates/<name>', defaults={'section': 'templates'})
 @api_schema.route('/config/tasks/<name>', defaults={'section': 'tasks'})
 def cs_plugin_container(section, name):
-    hyper_schema = {
-        'links': [
-            {'rel': 'self', 'href': request.path}
-        ]
-    }
+
 
     return plugin_schemas(context='task')
