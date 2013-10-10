@@ -4,13 +4,14 @@ import sys
 import re
 
 os_mode = None  # Can be 'windows', 'mac', 'linux' or None. None will auto-detect os.
-replace_maps = {
-    'windows': {
-        '[:*?"<>| ]+': ' ',  # Turn illegal characters into a space
-        r'\.\s*([/\\]|$)': r'\1'},  # Dots cannot end file or directory names
-    'mac': {
-        '[: ]+': ' '},
-    'linux': {}}  # No replacements on linux
+# Replacement order is important, don't use dicts to store
+platform_replaces = {
+    'windows': [
+        ['[:*?"<>| ]+', ' '],  # Turn illegal characters into a space
+        [r'[\.\s]+([/\\]|$)', r'\1']],  # Dots cannot end file or directory names
+    'mac': [
+        ['[: ]+', ' ']],
+    'linux': []}  # No replacements on linux
 
 
 def pathscrub(dirty_path, os=None, filename=False):
@@ -29,23 +30,26 @@ def pathscrub(dirty_path, os=None, filename=False):
 
     if os:
         # If os is defined, use replacements for that os
-        replace_map = replace_maps[os_mode]
+        replaces = platform_replaces[os]
     else:
         # If os is not defined, try to detect appropriate
         drive, path = ntpath.splitdrive(dirty_path)
         if sys.platform.startswith('win') or drive:
-            replace_map = replace_maps['windows']
+            replaces = platform_replaces['windows']
         elif sys.platform.startswith('darwin'):
-            replace_map = replace_maps['mac']
+            replaces = platform_replaces['mac']
         else:
-            replace_map = replace_maps['linux']
+            replaces = platform_replaces['linux']
 
     # Make sure not to mess with windows drive specifications
     drive, path = ntpath.splitdrive(dirty_path)
-    for search, replace in replace_map.iteritems():
-        path = re.sub(search, replace, path)
 
     if filename:
-        path = path.replace('/', '-').replace('\\', '-')
+        path = path.replace('/', ' ').replace('\\', ' ')
 
-    return drive + path.strip()
+    for search, replace in replaces:
+        path = re.sub(search, replace, path)
+    path = path.strip()
+    if not path:
+        raise ValueError('Nothing was left after stripping invalid characters from path `%s`!' % dirty_path)
+    return drive + path
