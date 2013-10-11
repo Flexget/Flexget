@@ -42,15 +42,13 @@ class IPCServer(threading.Thread):
         self._shutdown = False
 
     def run(self):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        try:
+            s.bind((self.host, self.port))
+        except socket.error as e:
+            log.error('Error binding to socket %s' % e)
+            return
         while not self._shutdown:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            try:
-                s.bind((self.host, self.port))
-            except socket.error as e:
-                log.error('Error binding to socket %s' % e)
-                # Prevent too tight of a loop if we keep failing. TODO: 1.2 something better
-                time.sleep(1)
-                continue
             try:
                 s.settimeout(None)
                 s.listen(1)
@@ -64,7 +62,7 @@ class IPCServer(threading.Thread):
                             log.error('Connection with client ended prematurely.')
                             continue
                         buffer += data
-                        if '\n' in data:
+                        if b'\n' in data:
                             break
                     try:
                         args = json.loads(buffer)
@@ -82,8 +80,6 @@ class IPCServer(threading.Thread):
                 log.error('Socket error while communicating with client: %s' % e)
             except Exception as e:
                 log.exception('Unhandled exception while communicating with client.')
-            finally:
-                s.close()
 
     def shutdown(self):
         self._shutdown = True
