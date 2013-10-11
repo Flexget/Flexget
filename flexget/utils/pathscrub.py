@@ -51,6 +51,7 @@ def pathscrub(dirty_path, os=None, filename=False):
     for search, replace in replaces:
         path = re.sub(search, replace, path)
     path = path.strip()
-    if not path:
+    # If we stripped everything from a filename, complain
+    if filename and dirty_path and not path:
         raise ValueError('Nothing was left after stripping invalid characters from path `%s`!' % dirty_path)
     return drive + path
