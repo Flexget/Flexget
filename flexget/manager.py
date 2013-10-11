@@ -620,7 +620,6 @@ class Manager(object):
         else:
             log.debug('Lockfile %s not found' % self.lockfile)
 
-
     def daemonize(self):
         """Daemonizes the current process. Returns the new pid"""
         if sys.platform.startswith('win'):
@@ -670,20 +669,6 @@ class Manager(object):
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
         log.info('Daemonize complete. New PID: %s' % os.getpid())
-
-    def remote_execute(self, port, options=None, **kwargs):
-        log.info('Sending this execution to the webui running on port %s' % port)
-        url = 'http://localhost:%s/api/' % port
-        if options:
-            kwargs['options'] = options.__dict__
-        r = requests.post(url + 'execute', data=json.dumps(kwargs), headers={'Content-type': 'application/json'})
-        if r.status_code != 200:
-            log.error('Error queueing remote execution: %s' % r.json().get('error', 'unknown'))
-            return
-
-        console('Displaying log from remote execution...')
-        for line in r.iter_lines(chunk_size=1):
-            console(line)
 
     def db_cleanup(self, force=False):
         """
