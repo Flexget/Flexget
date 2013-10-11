@@ -23,7 +23,7 @@ def remote_execute(port, task, options):
             options.pop('__parent__', None)
         s.sendall(json.dumps({'task': task, 'options': options}) + '\n')
         for line in s.makefile():
-            console(line.rstrip())
+            console(line.decode('utf-8').rstrip())
     except socket.error as e:
         log.error('Socket error while sending execution to daemon: %s' % e)
     except Exception as e:
@@ -75,7 +75,7 @@ class IPCServer(threading.Thread):
                     log.info('Executing task `%s` for client at %s.' % (args['task'], addr))
                     self.manager.scheduler.execute(args['task'], options=args['options'], output=bufferqueue)
                     for line in bufferqueue:
-                        conn.sendall(line)
+                        conn.sendall(line.encode('utf-8'))
             except socket.error as e:
                 log.error('Socket error while communicating with client: %s' % e)
             except Exception as e:
