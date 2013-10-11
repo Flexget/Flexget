@@ -13,13 +13,15 @@ class RunTask(object):
         'type': 'object',
         'properties': {
             'task': {'type': 'string'},
-            'when': one_or_more({'type': 'string', 'enum': ['accepted', 'rejected', 'failed', 'no_entries', 'aborted']})
+            'when': one_or_more({'type': 'string',
+                                 'enum': ['accepted', 'rejected', 'failed', 'no_entries', 'aborted', 'always']})
         },
-        'required': ['task', 'when'],
+        'required': ['task'],
         'additionalProperties': False
     }
 
     def on_task_exit(self, task, config):
+        config.setdefault('when', 'always')
         if task.accepted and 'accepted' in config['when']:
             self.run_task(task.manager, config['task'])
         elif task.rejected and 'rejected' in config['when']:
@@ -27,6 +29,8 @@ class RunTask(object):
         elif task.failed and 'rejected' in config['when']:
             self.run_task(task.manager, config['task'])
         elif not task.all_entries and 'no_entries' in config['when']:
+            self.run_task(task.manager, config['task'])
+        elif 'always' in config['when']:
             self.run_task(task.manager, config['task'])
 
     def on_task_abort(self, task, config):
