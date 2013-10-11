@@ -669,6 +669,7 @@ class Manager(object):
         os.dup2(si.fileno(), sys.stdin.fileno())
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
+        log.info('Daemonize complete. New PID: %s' % os.getpid())
 
     def remote_execute(self, port, options=None, **kwargs):
         log.info('Sending this execution to the webui running on port %s' % port)
