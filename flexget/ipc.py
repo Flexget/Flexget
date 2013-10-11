@@ -4,6 +4,7 @@ import contextlib
 import logging
 import socket
 import threading
+import time
 
 from flexget.scheduler import BufferQueue
 from flexget.utils import json
@@ -42,13 +43,19 @@ class IPCServer(threading.Thread):
 
     def run(self):
         while not self._shutdown:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             try:
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.bind((self.host, self.port))
+            except socket.error as e:
+                log.error('Error binding to socket %s' % e)
+                # Prevent too tight of a loop if we keep failing. TODO: 1.2 something better
+                time.sleep(1)
+                continue
+            try:
                 s.settimeout(None)
                 s.listen(1)
                 conn, addr = s.accept()
-                s.settimeout(30)
+                conn.settimeout(60)
                 with contextlib.closing(conn) as conn:
                     buffer = b''
                     while True:
@@ -75,6 +82,8 @@ class IPCServer(threading.Thread):
                 log.error('Socket error while communicating with client: %s' % e)
             except Exception as e:
                 log.exception('Unhandled exception while communicating with client.')
+            finally:
+                s.close()
 
     def shutdown(self):
         self._shutdown = True
