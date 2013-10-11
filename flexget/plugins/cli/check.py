@@ -10,11 +10,8 @@ log = logging.getLogger('check')
 
 def check(manager, options):
     tasks = [Task(manager, name) for name in manager.tasks]
-    for task in tasks:
-        task.prepare()
-        errors = task.validate()
-        if not errors:
-            log.info('Task \'%s\' passed' % task.name)
+    # If we got here, there aren't any errors. :P
+    log.info('Config passed check.')
     manager.shutdown()
 
 
