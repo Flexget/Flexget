@@ -136,11 +136,12 @@ class Manager(object):
                     tasks.update(matches)
                 # Set the option as a list of matching task names so plugins can use it easily
                 options.tasks = list(tasks)
+            tasks = sorted(tasks, key=lambda t: manager.config['tasks'][t].get('priority', 65535))
 
             port = self.check_ipc_port()
             if port:
                 # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
-                for task in sorted(tasks, key=lambda t: manager.config['tasks'][t].get('priority', 65535)):
+                for task in tasks:
                     remote_execute(port, task, options)
                 self.shutdown()
                 return
