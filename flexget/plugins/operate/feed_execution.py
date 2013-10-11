@@ -18,7 +18,7 @@ def validate_cli_opts(manager):
 
     # Make sure the specified tasks exist
     for onlytask in onlytasks:
-        if onlytask.lower() not in manager.tasks:
+        if onlytask.lower() not in [t.lower() for t in manager.tasks]:
             if any(i in onlytask for i in '*?['):
                 # Try globbing
                 if any(fnmatch.fnmatchcase(f.lower(), onlytask.lower()) for f in manager.tasks):
