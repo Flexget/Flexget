@@ -344,8 +344,7 @@ class CoreArgumentParser(ArgumentParser):
                                                           'defined in config')
         daemon_parser.set_defaults(loglevel='info')
         daemon_parser.add_argument('--ipc-port', type=int, default=29709, help=SUPPRESS)
-        if not sys.platform.startswith('win'):
-            daemon_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
+        daemon_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
 
         # The parser for the webui
         # Hide the webui command if deps aren't available
@@ -369,8 +368,7 @@ class CoreArgumentParser(ArgumentParser):
         webui_parser.add_argument('--port', type=int, default=5050,
                                   help='run FlexGet webui on port [default: %(default)s]')
         webui_parser.add_argument('--ipc-port', type=int, default=29709, help=SUPPRESS)
-        if not sys.platform.startswith('win'):
-            webui_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
+        webui_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
 
         # TODO: move these to authentication plugin?
         webui_parser.add_argument('--no-auth', action='store_true',
