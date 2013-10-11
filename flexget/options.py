@@ -319,18 +319,21 @@ class CoreArgumentParser(ArgumentParser):
         # The parser for the execute command
         exec_parser = self.add_subparser('execute', help='execute tasks now')
         exec_parser.set_defaults(lock_required=True, loglevel='verbose')
+        exec_parser.add_argument('--tasks', nargs='+', metavar='TASK',
+                                 help='run only specified task(s), optionally using glob patterns ("tv-*"). '
+                                      'matching is case-insensitive')
         exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
-                                 help='Matches are not downloaded but will be skipped in the future.')
+                                 help='matches are not downloaded but will be skipped in the future')
         exec_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
-                                 help='Use when scheduling FlexGet with cron or other scheduler. Allows background '
-                                      'maintenance to run. Disables stdout and stderr output. Reduces logging level.')
+                                 help='use when scheduling FlexGet with cron or other scheduler: allows background '
+                                      'maintenance to run, disables stdout and stderr output, reduces logging level')
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
         exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
         # Plugins should respect these flags where appropriate
         exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
         exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
-                                 help='Disable caches. Works only in plugins that have explicit support.')
+                                 help='disable caches. works only in plugins that have explicit support')
 
         daemonize_help = SUPPRESS
         if not sys.platform.startswith('win'):

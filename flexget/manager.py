@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import atexit
 from contextlib import contextmanager
+import fnmatch
 import os
 import sys
 import shutil
@@ -123,16 +124,30 @@ class Manager(object):
         options = getattr(self.options, command)
         # First check for built-in commands
         if command == 'execute':
+            tasks = manager.tasks
+            # Handle --tasks
+            if options.tasks:
+                tasks = set()
+                for arg in [t.lower() for t in options.tasks]:
+                    matches = [t for t in manager.tasks if t == arg or fnmatch.fnmatchcase(t.lower(), arg)]
+                    if not matches:
+                        log.error('`%s` does not match any tasks' % arg)
+                        continue
+                    tasks.update(matches)
+                # Set the option as a list of matching task names so plugins can use it easily
+                options.tasks = list(tasks)
+
             port = self.check_ipc_port()
             if port:
-                for task in self.tasks:
+                # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
+                for task in sorted(tasks, key=lambda t: manager.config['tasks'][t].get('priority', 65535)):
                     remote_execute(port, task, options)
                 self.shutdown()
                 return
             with self.acquire_lock():
                 fire_event('manager.execute.started', self)
                 self.scheduler.start()
-                for name in self.tasks:
+                for name in tasks:
                     self.scheduler.execute(name)
                 self.scheduler.shutdown(finish_queue=True)
                 try:
@@ -151,10 +166,9 @@ class Manager(object):
                 #    profile.runctx('self.execute()', globals(), locals(),
                 #                   os.path.join(self.config_base, 'flexget.profile'))
         elif command == 'daemon':
-            if not self.config.get('schedules'):
-                console('No schedules are defined in the config.')
-                self.shutdown()
-                return
+            self.config.setdefault('schedules', {})
+            if options.daemonize:
+                self.daemonize()
             self.ipc_server = IPCServer(self, options.ipc_port)
             with self.acquire_lock():
                 self.ipc_server.start()
@@ -184,10 +198,12 @@ class Manager(object):
                 log.error('Dependency not met. %s' % e)
                 log.error('Webui dependencies not installed. You can use `pip install flexget[webui]` to install them.')
                 self.shutdown()
-            else:
-                from flexget.ui import webui
-                with self.acquire_lock():
-                    webui.start(self)
+                return
+            if options.daemonize:
+                self.daemonize()
+            from flexget.ui import webui
+            with self.acquire_lock():
+                webui.start(self)
         # Otherwise dispatch the command to the callback function
         else:
             if options.lock_required:
@@ -652,9 +668,6 @@ class Manager(object):
         os.dup2(si.fileno(), sys.stdin.fileno())
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
-
-        # Our pid has changed, update t
-        manager.write_lock()
 
     def remote_execute(self, port, options=None, **kwargs):
         log.info('Sending this execution to the webui running on port %s' % port)

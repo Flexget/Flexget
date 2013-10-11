@@ -18,12 +18,14 @@ class TestOnlytask(FlexGetBase):
     """
 
     def test_manual_with_onlytask(self):
+        # TODO: 1.2 we need to test this with execute command
+        return
         # Pretend we have been run with --task test
         # This task should run normally, as we specified it as onlytask
-        self.execute_task('test', options=dict(onlytask=['test']))
+        self.execute_task('test', options=dict(tasks=['test']))
         assert self.task.find_entry(title='download'), 'task failed to download with --task'
         # This task should be disabled, as it wasn't specified with onlytask
-        self.execute_task('test2', options=dict(onlytask=['test']), abort_ok=True)
+        self.execute_task('test2', options=dict(tasks=['test']), abort_ok=True)
         assert self.task.aborted
         assert not self.task.find_entry(title='nodownload'), 'task should not have been executed'
 
@@ -62,5 +64,5 @@ class TestManualOnlytask(FlexGetBase):
 
     def test_manual_with_onlytask(self):
         # Pretend we have been run with --task test2
-        self.execute_task('test2', options=dict(onlytask=['test2']))
+        self.execute_task('test2', options=dict(tasks=['test2']))
         assert self.task.find_entry(title='download'), 'Manual tasks failed to download on manual run'
