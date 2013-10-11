@@ -659,6 +659,7 @@ class Manager(object):
             sys.stderr.write('fork #2 failed: %d (%s)\n' % (e.errno, e.strerror))
             sys.exit(1)
 
+        log.info('Daemonize complete. New PID: %s' % os.getpid())
         # redirect standard file descriptors
         sys.stdout.flush()
         sys.stderr.flush()
@@ -668,7 +669,6 @@ class Manager(object):
         os.dup2(si.fileno(), sys.stdin.fileno())
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
-        log.info('Daemonize complete. New PID: %s' % os.getpid())
 
     def db_cleanup(self, force=False):
         """
