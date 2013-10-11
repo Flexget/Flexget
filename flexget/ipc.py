@@ -14,6 +14,7 @@ log = logging.getLogger('ipc')
 
 
 def remote_execute(port, task, options):
+    log.info('Sending task %s to running daemon for execution.' % task)
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(None)
     try:

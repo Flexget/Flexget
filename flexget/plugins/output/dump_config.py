@@ -36,6 +36,6 @@ def register_plugin():
 def register_parser_arguments():
     exec_parser = options.get_parser('execute')
     exec_parser.add_argument('--dump-config', action='store_true', dest='dump_config', default=False,
-                             help='display the config of each feed after preset merging/config generation occurs')
+                             help='display the config of each feed after template merging/config generation occurs')
     exec_parser.add_argument('--dump-config-python', action='store_true', dest='dump_config_python', default=False,
                              help=SUPPRESS)
