@@ -116,7 +116,7 @@ class cached(object):
                     log.verbose('Restored %s entries from cache' % len(entries))
                 return entries
             else:
-                if self.persist and not task.manager.options.execute.nocache:
+                if self.persist and not task.options.nocache:
                     # Check database cache
                     db_cache = task.session.query(InputCache).filter(InputCache.name == self.name).\
                         filter(InputCache.hash == hash).\
@@ -136,7 +136,7 @@ class cached(object):
                     response = func(*args, **kwargs)
                 except PluginError as e:
                     # If there was an error producing entries, but we have valid entries in the db cache, return those.
-                    if self.persist and not task.manager.options.nocache:
+                    if self.persist and not task.options.nocache:
                         db_cache = task.session.query(InputCache).filter(InputCache.name == self.name).\
                             filter(InputCache.hash == hash).first()
                         if db_cache and db_cache.entries:
