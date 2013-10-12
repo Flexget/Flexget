@@ -21,22 +21,21 @@ class OutputFtp(object):
               use-ssl: False
               use-secure: False
               path: /home/dl/tv
-              skiplist: \.message|\.diz$|Sample 
-    
+              skiplist: \.message|\.diz$|Sample
+
         TODO:
           - validate connection parameters
     """
-
 
     schema = {
         'type': 'object',
         'properties': {
             'use-ssl': {'type': 'boolean', 'default': False},
             'use-secure': {'type': 'boolean', 'default': False},
-            'path': {'type': 'string', 'format': 'path', 'Required':'true'},
-            'skiplist': {'type': "string", 'format':'regexp', 'default': '' }
+            'path': {'type': 'string', 'format': 'path', 'Required': 'true'},
+            'skiplist': {'type': "string", 'format': 'regexp', 'default': ''}
         },
-         'additionalProperties': False
+        'additionalProperties': False
     }
 
     def on_task_download(self, task, config):
@@ -46,13 +45,12 @@ class OutputFtp(object):
             config['path'] = os.path.join(task.manager.config_base, 'temp')
 
         if (skipreg is not None and len(skipreg) == 0):
-            skipreg=None
-        
+            skipreg = None
+
         if config['use-ssl']:
             ftp = ftplib.FTP_TLS()
         else:
             ftp = ftplib.FTP()
-
 
         for entry in task.accepted:
             ftp_url = urlparse(entry.get('url'))
@@ -72,16 +70,16 @@ class OutputFtp(object):
 
             if (config['use-secure']):
                 ftp.prot_p()
-          
+
             try:
                 ftp.cwd(ftp_url.path)
-                self.ftp_walk(ftp, tmp_path, skipreg);
+                self.ftp_walk(ftp, tmp_path, skipreg)
             except ftplib.error_perm as e:
                 if (e.args[0][:3] != '550' or re.search('No such file or directory$', str(e), re.I) is None):
-                    log.error('Failed to find ftp-path: %s' % str(e));
-                else :
+                    log.error('Failed to find ftp-path: %s' % str(e))
+                else:
                     # Path is actually a file
-                    self.ftp_down(ftp, ftp_url.path, tmp_path, skipreg)         
+                    self.ftp_down(ftp, ftp_url.path, tmp_path, skipreg)
             ftp.close()
 
     def ftp_walk(self, ftp, tmp_path, skipreg):
@@ -89,11 +87,11 @@ class OutputFtp(object):
         try:
             dirs = ftp.nlst()
         except ftplib.error_perm as ex:
-            # Path is empty. 
+            # Path is empty.
             return
 
         if (skipreg is not None):
-            dirs = (d for d in dirs if (re.search(skipreg, d, re.I) is None)) 
+            dirs = (d for d in dirs if (re.search(skipreg, d, re.I) is None))
 
         for item in (path for path in dirs if path not in ('.', '..')):
             log.debug('Item: ' + item)
@@ -108,39 +106,38 @@ class OutputFtp(object):
                 # 550 while CWD, meaning it is a file.
                 self.ftp_down(ftp, item, tmp_path)
 
-
     def ftp_down(self, ftp, file_name, tmp_path):
         file_name = os.path.basename(file_name)
         dst_file = os.path.join(tmp_path, file_name)
         src_filesize = 0
         dst_filesize = 0
-        dl_offset = None 
-       
+        dl_offset = None
+
         if not os.path.exists(tmp_path):
             os.makedirs(tmp_path)
 
         try:
-            ftp.voidcmd('TYPE I') # To make sure ftp.size functions correctly
+            ftp.voidcmd('TYPE I')  # To make sure ftp.size functions correctly
             src_filesize = ftp.size(file_name)
 
+            fmode = 'wb'
             if os.path.exists(dst_file):
                 dst_filesize = os.stat(dst_file).st_size
-                if src_filesize == dst_filesize:
-                    log.info('File ' + file_name + ' completed.')
+                if src_filesize <= dst_filesize:
+                    log.info('File ' + file_name + ' already downloaded.')
                     return
+                elif dst_filesize > 20480:
+                    fmode = 'a+b'
+                    dl_offset = dst_filesize - 20480  # Rollback 20kb
 
-            log.info("downloading " + file_name + " in " + tmp_path)
-            
-            fmode='wb'
-            ftp.set_debuglevel(2)
-            if dst_filesize > 20480 and dst_filesize < src_filesize:
-                dl_offset = dst_filesize - 20480 # Rollback 20kb
-                fmode='a+b'
-                log.info('src_filesize %d, dst_filesize: %d, dl_offset: %d' % (src_filesize,dst_filesize,dl_offset))
+            if (dl_offset is not None):
+                log.info("resuming " + file_name + " in " + tmp_path)
+            else:
+                log.info("downloading " + file_name + " in " + tmp_path)
 
             with open(os.path.join(tmp_path, file_name), fmode) as f:
                 if (dl_offset is not None):
-                    f.seek(dl_offset,0)
+                    f.seek(dl_offset, 0)
                     f.truncate()
                 ftp.retrbinary('RETR %s' % file_name, f.write, 8192, dl_offset)
         except ftplib.error_perm, ex:
