@@ -40,21 +40,22 @@ class OutputFtp(object):
 
     def on_task_download(self, task, config):
         skipreg = config.get('skiplist')
-	
-        if config['use-ssl']:
-            ftp = ftplib.FTP_TLS()
-        else:
-            ftp = ftplib.FTP()
 
         for entry in task.accepted:
             ftp_url = urlparse(entry.get('url'))
             path = entry.get('path', config.get('path'))
-            
-	    if (not path):
-                log.info('Skipping download of %s since there is no path for download set.' % ftp_url); 
-		continue
+
+            if (not path):
+                log.info('Skipping download of %s since there is no path for download set.' % ftp_url)
+                entry.fail('no path for download set.')
+                continue
             tmp_path = os.path.join(path, entry.get('title'))
             log.info('download path %s' % tmp_path)
+
+            if config['use-ssl']:
+                ftp = ftplib.FTP_TLS()
+            else:
+                ftp = ftplib.FTP()
 
             try:
                 # ftp.set_debuglevel(2)
@@ -64,6 +65,7 @@ class OutputFtp(object):
                 ftp.set_pasv(True)
             except ftplib.error_perm as ex:
                 log.error('Connection error: %s' % str(ex))
+                entry.fail('failed to connect: %s' % str(ex))
                 continue
 
             if (config['use-secure']):
@@ -75,6 +77,7 @@ class OutputFtp(object):
             except ftplib.error_perm as e:
                 if (e.args[0][:3] != '550' or re.search('No such file or directory$', str(e), re.I) is None):
                     log.error('Failed to find ftp-path: %s' % str(e))
+                    entry.fail('Failed to find ftp-path: %s' % str(e))
                 else:
                     # Path is actually a file
                     self.ftp_down(ftp, ftp_url.path, tmp_path, skipreg)
