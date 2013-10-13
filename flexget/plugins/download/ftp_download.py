@@ -11,12 +11,11 @@ log = logging.getLogger('ftp')
 
 class OutputFtp(object):
     """
-        Ftp Download plugin
+        Downloads file or a entire path from the entry ftp-url. 
 
-        input-url: ftp://<user>:<password>@<host>:<port>/<path to file>
-        Example: ftp://anonymous:anon@my-ftp-server.com:21/torrent-files-dir
+        Example entry url: ftp://anonymous:anon@my-ftp-server.com:21/torrent-files-dir
 
-        config:
+        Example config:
             ftp_download:
               use-ssl: False
               use-secure: False
@@ -25,6 +24,7 @@ class OutputFtp(object):
 
         TODO:
           - validate connection parameters
+          - reconnect should not be performed between two entries using same host.
     """
 
     schema = {
@@ -50,15 +50,15 @@ class OutputFtp(object):
                 entry.fail('no path for download set.')
                 continue
             tmp_path = os.path.join(path, entry.get('title'))
-            log.info('download path %s' % tmp_path)
 
-            if config['use-ssl']:
+            if (config.get('use-ssl')):
                 ftp = ftplib.FTP_TLS()
             else:
                 ftp = ftplib.FTP()
 
             try:
                 # ftp.set_debuglevel(2)
+                log.info('download path %s' % tmp_path)
                 ftp.connect(ftp_url.hostname, ftp_url.port)
                 ftp.login(ftp_url.username, ftp_url.password)
                 ftp.sendcmd('TYPE I')
@@ -68,7 +68,7 @@ class OutputFtp(object):
                 entry.fail('failed to connect: %s' % str(ex))
                 continue
 
-            if (config['use-secure']):
+            if (config.get('use-secure')):
                 ftp.prot_p()
 
             try:
@@ -87,19 +87,17 @@ class OutputFtp(object):
         log.debug("DIR->" + ftp.pwd())
         try:
             dirs = ftp.nlst()
-        except ftplib.error_perm as ex:
+        except ftplib.error_perm:
             # Path is empty.
             return
 
         if (skipreg):
-            dirs = (d for d in dirs if (re.search(skipreg, d, re.I) is None))
+            dirs = (d for d in dirs if (not re.search(skipreg, d, re.I)))
 
         for item in (path for path in dirs if path not in ('.', '..')):
             log.debug('Item: ' + item)
             try:
                 ftp.cwd(item)
-                log.debug('DIRECTORY: %s' % ftp.pwd())
-
                 new_tmp_dir = os.path.join(tmp_path, os.path.basename(item))
                 self.ftp_walk(ftp, new_tmp_dir, skipreg)
                 ftp.cwd('..')
@@ -114,7 +112,7 @@ class OutputFtp(object):
         dst_filesize = 0
         dl_offset = None
 
-        if not os.path.exists(tmp_path):
+        if (not os.path.exists(tmp_path)):
             os.makedirs(tmp_path)
 
         try:
@@ -122,7 +120,7 @@ class OutputFtp(object):
             src_filesize = ftp.size(file_name)
 
             fmode = 'wb'
-            if os.path.exists(dst_file):
+            if (os.path.exists(dst_file)):
                 dst_filesize = os.stat(dst_file).st_size
                 if src_filesize <= dst_filesize:
                     log.info('File ' + file_name + ' already downloaded.')
@@ -131,13 +129,13 @@ class OutputFtp(object):
                     fmode = 'a+b'
                     dl_offset = dst_filesize - 20480  # Rollback 20kb
 
-            if (dl_offset is not None):
+            if (dl_offset):
                 log.info("resuming " + file_name + " in " + tmp_path)
             else:
                 log.info("downloading " + file_name + " in " + tmp_path)
 
             with open(os.path.join(tmp_path, file_name), fmode) as f:
-                if (dl_offset is not None):
+                if (dl_offset):
                     f.seek(dl_offset, 0)
                     f.truncate()
                 ftp.retrbinary('RETR %s' % file_name, f.write, 8192, dl_offset)
