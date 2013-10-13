@@ -27,7 +27,7 @@ def remote_execute(port, task, options):
     except socket.error as e:
         log.error('Socket error while sending execution to daemon: %s' % e)
     except Exception as e:
-        log.exception('Unhandled error while sending execution to daemone.')
+        log.exception('Unhandled error while sending execution to daemon.')
     finally:
         s.close()
 
@@ -40,13 +40,15 @@ class RequestHandler(BaseRequestHandler):
         except ValueError:
             log.error('Error decoding ipc message.')
             return
-        bufferqueue = BufferQueue()
         if self.server.manager.scheduler.run_queue.qsize() > 0:
             self.request.sendall('There is already a task executing. This task will execute next.\n')
         log.info('Executing task `%s` for client at %s.' % (args['task'], self.client_address))
+        bufferqueue = BufferQueue()
         self.server.manager.scheduler.execute(args['task'], options=args['options'], output=bufferqueue)
-        for line in bufferqueue:
-            self.request.sendall(line.encode('utf-8'))
+        # If this is a --cron execution, don't stream back the log
+        if not args['options'].get('cron'):
+            for line in bufferqueue:
+                self.request.sendall(line.encode('utf-8'))
 
 
 class IPCServer(threading.Thread):
