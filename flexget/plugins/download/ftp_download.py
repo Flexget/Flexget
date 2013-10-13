@@ -32,21 +32,15 @@ class OutputFtp(object):
         'properties': {
             'use-ssl': {'type': 'boolean', 'default': False},
             'use-secure': {'type': 'boolean', 'default': False},
-            'path': {'type': 'string', 'format': 'path', 'Required': 'true'},
-            'skiplist': {'type': "string", 'format': 'regexp', 'default': ''}
+            'path': {'type': 'string', 'format': 'path'},
+            'skiplist': {'type': "string", 'format': 'regexp'}
         },
         'additionalProperties': False
     }
 
     def on_task_download(self, task, config):
-        skipreg = config['skiplist']
-
-        if (len(config['path']) == 0):
-            config['path'] = os.path.join(task.manager.config_base, 'temp')
-
-        if (skipreg is not None and len(skipreg) == 0):
-            skipreg = None
-
+        skipreg = config.get('skiplist')
+	
         if config['use-ssl']:
             ftp = ftplib.FTP_TLS()
         else:
@@ -54,10 +48,14 @@ class OutputFtp(object):
 
         for entry in task.accepted:
             ftp_url = urlparse(entry.get('url'))
-
-            title = entry.get('title')
-            tmp_path = os.path.join(config['path'], title)
+            path = entry.get('path', config.get('path'))
+            
+	    if (not path):
+                log.info('Skipping download of %s since there is no path for download set.' % ftp_url); 
+		continue
+            tmp_path = os.path.join(path, entry.get('title'))
             log.info('download path %s' % tmp_path)
+
             try:
                 # ftp.set_debuglevel(2)
                 ftp.connect(ftp_url.hostname, ftp_url.port)
@@ -65,8 +63,8 @@ class OutputFtp(object):
                 ftp.sendcmd('TYPE I')
                 ftp.set_pasv(True)
             except ftplib.error_perm as ex:
-                    log.error('Connection error: %s' % str(ex))
-                    continue
+                log.error('Connection error: %s' % str(ex))
+                continue
 
             if (config['use-secure']):
                 ftp.prot_p()
@@ -90,7 +88,7 @@ class OutputFtp(object):
             # Path is empty.
             return
 
-        if (skipreg is not None):
+        if (skipreg):
             dirs = (d for d in dirs if (re.search(skipreg, d, re.I) is None))
 
         for item in (path for path in dirs if path not in ('.', '..')):
