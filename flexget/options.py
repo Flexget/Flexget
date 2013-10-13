@@ -96,7 +96,9 @@ class DebugTraceAction(Action):
 class CronAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, True)
-        namespace.loglevel = 'info'
+        # Only set loglevel if it has not already explicitly been set
+        if not hasattr(namespace, 'loglevel'):
+            namespace.loglevel = 'info'
 
 
 # This makes the old --inject form forwards compatible
@@ -214,9 +216,6 @@ class ArgumentParser(ArgParser):
         if args is None:
             # Decode all arguments to unicode before parsing
             args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
-        # No need to do anything fancy if we don't have subparsers
-        if not self.subparsers:
-            return super(ArgumentParser, self).parse_known_args(args, namespace or ScopedNamespace())
         # Remove all of our defaults, and wait until the subparsers have had a chance to set them before setting ours
         real_defaults, self._defaults = self._defaults, {}
         for action in self._actions:

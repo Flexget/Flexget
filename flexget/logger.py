@@ -130,10 +130,6 @@ def initialize(unit_test=False):
         logger.setLevel(logging.DEBUG)
     elif '--debug-trace' in sys.argv:
         logger.setLevel(TRACE)
-    elif '--cron' not in sys.argv:
-        logger.setLevel(VERBOSE)
-    else:
-        logger.setLevel(logging.INFO)
 
     # without --cron we log to console
     # this must be done at initialize because otherwise there will be too much delay (user feedback) (see #1113)
