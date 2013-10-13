@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import argparse
-import contextlib
 import logging
 import socket
+from SocketServer import BaseRequestHandler, ThreadingTCPServer
 import threading
-import time
 
 from flexget.scheduler import BufferQueue
 from flexget.utils import json
@@ -33,54 +32,37 @@ def remote_execute(port, task, options):
         s.close()
 
 
+class RequestHandler(BaseRequestHandler):
+    def handle(self):
+        data = self.request.makefile().readline().decode('utf-8')
+        try:
+            args = json.loads(data)
+        except ValueError:
+            log.error('Error decoding ipc message.')
+            return
+        bufferqueue = BufferQueue()
+        if self.server.manager.scheduler.run_queue.qsize() > 0:
+            self.request.sendall('There is already a task executing. This task will execute next.\n')
+        log.info('Executing task `%s` for client at %s.' % (args['task'], self.client_address))
+        self.server.manager.scheduler.execute(args['task'], options=args['options'], output=bufferqueue)
+        for line in bufferqueue:
+            self.request.sendall(line.encode('utf-8'))
+
+
 class IPCServer(threading.Thread):
     def __init__(self, manager, port):
-        super(IPCServer, self).__init__()
+        super(IPCServer, self).__init__(name='ipc_server')
         self.daemon = True
         self.manager = manager
-        self.host = '127.0.0.1'
         self.port = port
-        self._shutdown = False
+        self.server = None
 
     def run(self):
-        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        try:
-            s.bind((self.host, self.port))
-        except socket.error as e:
-            log.error('Error binding to socket %s' % e)
-            return
-        while not self._shutdown:
-            try:
-                s.settimeout(None)
-                s.listen(1)
-                conn, addr = s.accept()
-                conn.settimeout(60)
-                with contextlib.closing(conn) as conn:
-                    buffer = b''
-                    while True:
-                        data = conn.recv(1024)
-                        if not data:
-                            log.error('Connection with client ended prematurely.')
-                            continue
-                        buffer += data
-                        if b'\n' in data:
-                            break
-                    try:
-                        args = json.loads(buffer)
-                    except ValueError:
-                        log.error('Error decoding ipc message.')
-                        continue
-                    bufferqueue = BufferQueue()
-                    if self.manager.scheduler.run_queue.qsize() > 0:
-                        conn.sendall('There is already a task executing. This task will execute next.\n')
-                    log.info('Executing task `%s` for client at %s.' % (args['task'], addr))
-                    self.manager.scheduler.execute(args['task'], options=args['options'], output=bufferqueue)
-                    for line in bufferqueue:
-                        conn.sendall(line.encode('utf-8'))
-            except socket.error as e:
-                log.error('Socket error while communicating with client: %s' % e)
-            except Exception as e:
-                log.exception('Unhandled exception while communicating with client.')
+        # Don't actually bind to the port until start is called
+        self.server = ThreadingTCPServer(('127.0.0.1', self.port), RequestHandler)
+        self.server.daemon_threads = True
+        self.server.manager = self.manager
+        self.server.serve_forever()
 
     def shutdown(self):
-        self._shutdown = True
+        self.server.shutdown()

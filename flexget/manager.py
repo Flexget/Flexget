@@ -77,7 +77,7 @@ class Manager(object):
         self.config = {}
 
         self.scheduler = Scheduler(self)
-        self.ipc_server = None
+        self.ipc_server = IPCServer(self, options.ipc_port)
         self.initialize()
         manager = self  # Make sure we initialize before setting ourselves as the global manager
 
@@ -170,7 +170,6 @@ class Manager(object):
             self.config.setdefault('schedules', {})
             if options.daemonize:
                 self.daemonize()
-            self.ipc_server = IPCServer(self, options.ipc_port)
             with self.acquire_lock():
                 self.ipc_server.start()
                 fire_event('manager.daemon.started', self)

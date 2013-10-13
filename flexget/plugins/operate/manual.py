@@ -20,7 +20,7 @@ class ManualTask(object):
         # If --task hasn't been specified disable this plugin
         if not task.options.tasks or task.name not in task.options.tasks:
             log.debug('Disabling task %s' % task.name)
-            task.abort('manual task not specified in --task', silent=True)
+            task.abort('manual task not specified in --tasks', silent=True)
 
 
 @event('plugin.register')

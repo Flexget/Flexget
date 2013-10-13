@@ -55,7 +55,7 @@ class Scheduler(threading.Thread):
     periodic_jobs_lock = threading.Lock()
 
     def __init__(self, manager):
-        super(Scheduler, self).__init__()
+        super(Scheduler, self).__init__(name='scheduler')
         self.daemon = True
         self.run_queue = Queue.PriorityQueue()
         self.manager = manager
@@ -111,7 +111,7 @@ class Scheduler(threading.Thread):
             try:
                 Task(self.manager, job.task, options=job.options).execute()
             except TaskAbort as e:
-                log.debug('task %s aborted: %s' % (job.task, e))
+                log.debug('task %s aborted: %r' % (job.task, e))
             finally:
                 self.run_queue.task_done()
                 if job.output:

@@ -301,6 +301,7 @@ manager_parser.add_argument('--loglevel', default='verbose', help=SUPPRESS,
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--del-db', action='store_true', dest='del_db', default=False, help=SUPPRESS)
+manager_parser.add_argument('--ipc-port', type=int, default=29709, help=SUPPRESS)
 manager_parser.set_defaults(lock_required=True)
 
 
@@ -343,7 +344,6 @@ class CoreArgumentParser(ArgumentParser):
         daemon_parser = self.add_subparser('daemon', help='run continuously, executing tasks according to schedules '
                                                           'defined in config')
         daemon_parser.set_defaults(loglevel='info')
-        daemon_parser.add_argument('--ipc-port', type=int, default=29709, help=SUPPRESS)
         daemon_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
 
         # The parser for the webui
@@ -367,7 +367,6 @@ class CoreArgumentParser(ArgumentParser):
                                   help='IP address to bind to when serving the web interface [default: %(default)s]')
         webui_parser.add_argument('--port', type=int, default=5050,
                                   help='run FlexGet webui on port [default: %(default)s]')
-        webui_parser.add_argument('--ipc-port', type=int, default=29709, help=SUPPRESS)
         webui_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
 
         # TODO: move these to authentication plugin?
