@@ -59,10 +59,17 @@ class IPCServer(threading.Thread):
 
     def run(self):
         # Don't actually bind to the port until start is called
-        self.server = ThreadingTCPServer(('127.0.0.1', self.port), RequestHandler)
+        try:
+            self.server = ThreadingTCPServer(('127.0.0.1', self.port), RequestHandler)
+        except socket.error as e:
+            log.critical('IPC server unable to bind to port %s' % self.port)
+            log.debug('error', exc_info=True)
+            return
         self.server.daemon_threads = True
         self.server.manager = self.manager
+        self.manager.write_lock(ipc_port=self.port)
         self.server.serve_forever()
 
     def shutdown(self):
-        self.server.shutdown()
+        if self.server:
+            self.server.shutdown()

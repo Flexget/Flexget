@@ -73,6 +73,7 @@ class Manager(object):
         self.lockfile = None
         self.database_uri = None
         self.db_upgraded = False
+        self._has_lock = False
 
         self.config = {}
 
@@ -591,26 +592,31 @@ class Manager(object):
     def acquire_lock(self):
         acquired = False
         try:
-            # Exit if there is an existing lock.
-            if self.check_lock():
-                with open(self.lockfile) as f:
-                    pid = f.read()
-                print >> sys.stderr, 'Another process (%s) is running, will exit.' % pid.strip()
-                print >> sys.stderr, 'If you\'re sure there is no other instance running, delete %s' % self.lockfile
-                sys.exit(1)
+            # Don't do anything if we already have a lock. This means only the outermost call will release the lock file
+            if not self._has_lock:
+                # Exit if there is an existing lock.
+                if self.check_lock():
+                    with open(self.lockfile) as f:
+                        pid = f.read()
+                    print >> sys.stderr, 'Another process (%s) is running, will exit.' % pid.strip()
+                    print >> sys.stderr, 'If you\'re sure there is no other instance running, delete %s' % self.lockfile
+                    sys.exit(1)
 
-            self.write_lock()
-            acquired = True
+                self._has_lock = True
+                self.write_lock()
+                acquired = True
             yield
         finally:
             if acquired:
                 self.release_lock()
+                self._has_lock = False
 
-    def write_lock(self):
+    def write_lock(self, ipc_port=None):
+        assert self._has_lock
         with open(self.lockfile, 'w') as f:
             f.write('PID: %s\n' % os.getpid())
-            if self.ipc_server:
-                f.write('Port: %s\n' % self.ipc_server.port)
+            if ipc_port:
+                f.write('Port: %s\n' % ipc_port)
 
     def release_lock(self):
         if os.path.exists(self.lockfile):
