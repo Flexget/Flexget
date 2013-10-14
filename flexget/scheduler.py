@@ -229,7 +229,7 @@ class Trigger(object):
         else:
             raise ValueError('Schedule interval must provide a unit and amount')
         self.at_time = interval.pop('at_time', None)
-        if not isinstance(self.at_time, dt_time):
+        if self.at_time and not isinstance(self.at_time, dt_time):
             self.at_time = parse_time(self.at_time)
         self.on_day = interval.pop('on_day', None)
         if interval:
