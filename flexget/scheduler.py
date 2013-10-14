@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time as dt_time
 import logging
 import Queue
 import threading
 import time
 import sys
 
-from flexget.config_schema import register_config_key, one_or_more
+from flexget.config_schema import register_config_key, parse_time
 from flexget.event import event
 from flexget.logger import FlexGetFormatter
 
@@ -229,6 +229,8 @@ class Trigger(object):
         else:
             raise ValueError('Schedule interval must provide a unit and amount')
         self.at_time = interval.pop('at_time', None)
+        if not isinstance(self.at_time, dt_time):
+            self.at_time = parse_time(self.at_time)
         self.on_day = interval.pop('on_day', None)
         if interval:
             raise ValueError('the following are not valid keys in a schedule interval dictionary: %s' %

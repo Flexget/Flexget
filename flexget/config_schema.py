@@ -143,12 +143,11 @@ format_checker.checks('quality_requirements', raises=ValueError)(qualities.Requi
 
 @format_checker.checks('time', raises=ValueError)
 def is_time(time_string):
-    return parse_time(time_string)
+    return parse_time(time_string) is not None
 
 @format_checker.checks('interval', raises=ValueError)
 def is_interval(interval_string):
-    # A zero length timedelta counts as false, if parse_interval doesn't return an error, make sure to return truthy
-    return parse_interval(interval_string) or True
+    return parse_interval(interval_string) is not None
 
 @format_checker.checks('regex', raises=ValueError)
 def is_regex(instance):
