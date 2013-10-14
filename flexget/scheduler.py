@@ -24,22 +24,22 @@ yaml_schedule = {
         'hours': {'type': 'number'},
         'days': {'type': 'number'},
         'weeks': {'type': 'number'},
-        'time': {'type': 'string', 'format': 'time'},
-        'day': {'type': 'string', 'enum': WEEKDAYS}
+        'at_time': {'type': 'string', 'format': 'time'},
+        'on_day': {'type': 'string', 'enum': WEEKDAYS}
     },
     # Only allow one unit to be specified
     'oneOf': [{'required': [unit]} for unit in UNITS],
     'error_oneOf': 'Interval must be specified as one of %s' % ', '.join(UNITS),
     'dependencies': {
-        'time': {
+        'at_time': {
             'properties': {'days': {'type': 'integer'}, 'weeks': {'type': 'integer'}},
             'oneOf': [{'required': ['days']}, {'required': ['weeks']}],
-            'error': 'Interval must be an integer number of days or weeks when `time` is specified.',
+            'error': 'Interval must be an integer number of days or weeks when `at_time` is specified.',
         },
-        'day': {
+        'on_day': {
             'properties': {'weeks': {'type': 'integer'}},
             'required': ['weeks'],
-            'error': 'Unit must be an integer number of weeks when `day` is specified.'
+            'error': 'Unit must be an integer number of weeks when `on_day` is specified.'
         }
     },
     'additionalProperties': False
@@ -51,9 +51,9 @@ main_schema = {
     'items': {
         'properties': {
             'tasks': {'type': 'array', 'items': {'type': 'string'}},
-            'schedule': yaml_schedule
+            'interval': yaml_schedule
         },
-        'required': ['tasks', 'schedule'],
+        'required': ['tasks', 'interval'],
         'additionalProperties': False
     }
 }
@@ -77,7 +77,7 @@ class Scheduler(threading.Thread):
         with self.triggers_lock:
             self.triggers = []
             for item in self.manager.config.get('schedules', []):
-                self.triggers.append(Trigger(item['schedule'], item['tasks'], options={'cron': True}))
+                self.triggers.append(Trigger(item['interval'], item['tasks'], options={'cron': True}))
 
     def execute(self, task, options=None, output=None):
         """Add a task to the scheduler to be run immediately."""
@@ -193,45 +193,46 @@ class Job(object):
 
 
 class Trigger(object):
-    def __init__(self, schedule, tasks, options=None):
+    def __init__(self, interval, tasks, options=None):
         self.tasks = tasks
         self.options = options
         self.execute_options = None
         self.unit = None
         self.amount = None
-        self.day = None
-        self.time = None
+        self.on_day = None
+        self.at_time = None
         self.last_run = None
         self.run_at = None
-        self.schedule = schedule
+        self.interval = interval
 
-    # Handles getting and setting schedule in form validated by config
+    # Handles getting and setting interval in form validated by config
     @property
-    def schedule(self):
-        schedule = {self.unit: self.amount}
-        if self.time:
-            schedule['time'] = self.time
-        if self.day:
-            schedule['day'] = self.day
+    def interval(self):
+        interval = {self.unit: self.amount}
+        if self.at_time:
+            interval['at_time'] = self.at_time
+        if self.on_day:
+            interval['on_day'] = self.on_day
+        return interval
 
-    @schedule.setter
-    def schedule(self, schedule):
-        if not schedule:
-            for attr in ['unit', 'amount', 'day', 'time']:
+    @interval.setter
+    def interval(self, interval):
+        if not interval:
+            for attr in ['unit', 'amount', 'on_day', 'at_time']:
                 setattr(self, attr, None)
             return
         for unit in UNITS:
-            self.amount = schedule.pop(unit, None)
+            self.amount = interval.pop(unit, None)
             if self.amount:
                 self.unit = unit
                 break
         else:
-            raise ValueError('Schedule must provide a unit and amount')
-        self.time = schedule.pop('time', None)
-        self.day = schedule.pop('day', None)
-        if schedule:
-            raise ValueError('the following are not valid keys in a schedule dictionary: %s' %
-                                 ', '.join(schedule))
+            raise ValueError('Schedule interval must provide a unit and amount')
+        self.at_time = interval.pop('at_time', None)
+        self.on_day = interval.pop('on_day', None)
+        if interval:
+            raise ValueError('the following are not valid keys in a schedule interval dictionary: %s' %
+                             ', '.join(interval))
         self.schedule_next_run()
 
     def trigger(self):
@@ -252,16 +253,16 @@ class Trigger(object):
         if not last_run:
             # Pretend we ran one period ago
             last_run = datetime.now() - self.period
-        if self.day:
-            days_ahead = WEEKDAYS.index(self.day) - last_run.weekday()
+        if self.on_day:
+            days_ahead = WEEKDAYS.index(self.on_day) - last_run.weekday()
             if days_ahead <= 0:  # Target day already happened this week
                 days_ahead += 7
             self.run_at = last_run + timedelta(days=days_ahead, weeks=self.amount-1)
         else:
             self.run_at = last_run + self.period
-        if self.time:
-            self.run_at = self.run_at.replace(hour=self.time.hour, minute=self.time.minute,
-                                              second=self.time.second)
+        if self.at_time:
+            self.run_at = self.run_at.replace(hour=self.at_time.hour, minute=self.at_time.minute,
+                                              second=self.at_time.second)
 
 
 class Tee(object):
