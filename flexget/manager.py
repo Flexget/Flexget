@@ -168,24 +168,11 @@ class Manager(object):
                 #    profile.runctx('self.execute()', globals(), locals(),
                 #                   os.path.join(self.config_base, 'flexget.profile'))
         elif command == 'daemon':
-            self.config.setdefault('schedules', {})
             if options.daemonize:
                 self.daemonize()
             with self.acquire_lock():
                 self.ipc_server.start()
                 fire_event('manager.daemon.started', self)
-                unscheduled_tasks = self.tasks
-                for task, schedule in self.config['schedules'].get('tasks', {}).iteritems():
-                    if task not in unscheduled_tasks:
-                        console('task `%s` is not defined' % task)
-                        self.shutdown()
-                        return
-                    self.scheduler.add_scheduled_task(task, schedule=schedule)
-                    unscheduled_tasks.remove(task)
-                default_schedule = self.config['schedules'].get('default')
-                if default_schedule:
-                    for task in unscheduled_tasks:
-                        self.scheduler.add_scheduled_task(task, schedule=default_schedule)
                 self.scheduler.start()
                 try:
                     self.scheduler.wait()
