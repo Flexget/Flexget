@@ -10,14 +10,25 @@ from flexget.scheduler import BufferQueue
 API_VERSION = 1
 
 api = Blueprint('api', __name__, url_prefix='/api')
+# Serves the appropriate schema for any /api method. Schema for /api/x/y can be found at /schema/api/x/y
+api_schema = Blueprint('api_schema', __name__, url_prefix='/schema/api')
 
-exec_parser = RaiseErrorArgumentParser(parents=[get_parser('execute')])
+
+@api.after_request
+def attach_schema(response):
+    # TODO: Check if /schema/ourpath exists
+    schema_path = '/schema' + request.path
+    response.headers[b'Content-Type'] += '; profile=%s' % schema_path
+    return response
 
 
 # TODO: These endpoints should probably return a header which points to a json schema describing the return data
 @api.route('/version')
 def version():
     return jsonify(flexget_version=flexget.__version__, api_version=API_VERSION)
+
+
+exec_parser = RaiseErrorArgumentParser(parents=[get_parser('execute')])
 
 
 @api.route('/execute', methods=['GET', 'POST'])
@@ -35,6 +46,65 @@ def execute():
     manager.scheduler.execute(**kwargs)
 
     return Response(kwargs['output'], mimetype='text/plain'), 200
+
+
+task_schema = {
+    'type': 'object',
+    'properties': {
+        'name': {'type': 'string', 'description': 'The name of this task.'},
+        'config': plugin_schemas(context='task')
+    },
+    'required': ['name'],
+    'additionalProperties': False,
+    'links': [
+        {'rel': 'self', 'href': '/api/tasks/{name}/'},
+        {'rel': 'edit', 'method': 'PUT', 'href': '', 'schema': {'$ref': '#'}},
+        {'rel': 'delete', 'method': 'DELETE', 'href': ''}
+    ]
+}
+
+tasks_schema = {
+    'type': 'array',
+    'items': {'$ref': '/schema/api/tasks/task'},
+    'links': [
+        {'rel': 'add', 'method': 'POST', 'href': '/api/tasks/', 'schema': {'$ref': '/schema/api/tasks/task'}}
+    ]
+}
+
+
+@api_schema.route('/tasks/')
+def schema_tasks():
+    return jsonify(tasks_schema)
+
+
+@api.route('/tasks/', methods=['GET', 'POST'])
+def api_tasks():
+    if request.method == 'GET':
+        tasks = []
+        for name in manager.tasks:
+            tasks.append({'name': name, 'config': manager.config['tasks'][name]})
+        return jsonify(tasks)
+    elif request.method == 'POST':
+        # TODO: Validate and add task
+        pass
+
+
+@api_schema.route('/tasks/<task>/')
+def schema_task(task):
+    return jsonify(task_schema)
+
+
+@api.route('/tasks/<task>/', methods=['GET', 'PUT', 'DELETE'])
+def api_task(task):
+    if request.method == 'GET':
+        if not task in manager.tasks:
+            return 'not found', 404
+        return jsonify({'name': task, 'config': manager.config[task]})
+    elif request.method == 'PUT':
+        # TODO: Validate then set
+        pass
+    elif request.method == 'DELETE':
+        manager.config['tasks'].pop(task)
 
 
 # TODO: return proper schemas in headers, also none of these should allow setting invalid config
@@ -85,8 +155,6 @@ def config_root_key(root_key):
     return response
 
 
-# Serves the appropriate schema for any /api method. Schema for /api/x/y can be found at /schema/api/x/y
-api_schema = Blueprint('api_schema', __name__, url_prefix='/schema/api')
 
 @api_schema.route('/config/')
 def cs_root():
