@@ -185,7 +185,7 @@ class ArgumentParser(ArgParser):
         self.nested_namespace_name = nested_namespace_name
         ArgParser.__init__(self, **kwargs)
 
-    def error(self, message):
+    def _error(self, message):
         """Overridden error handler to print help message"""
         sys.stderr.write('error: %s\n' % message)
         self.print_help()
@@ -212,19 +212,51 @@ class ArgumentParser(ArgParser):
             result.dest = self.nested_namespace_name + '.' + result.dest
         return result
 
+    def error(self, message):
+        raise ValueError(message)
+
+    def print_help(self, file=None):
+        self.restore_defaults()
+        super(ArgumentParser, self).print_help(file)
+
+    def parse_args(self, args=None, namespace=None):
+        try:
+            return super(ArgumentParser, self).parse_args(args, namespace)
+        except ValueError as e:
+            sys.stderr.write('error: %s\n' % e.message)
+            self.print_help()
+            sys.exit(2)
+
+    def stash_defaults(self):
+        """Remove all the defaults and store them in a temporary location."""
+        self.real_defaults, self._defaults = self._defaults, {}
+        for action in self._actions:
+            action.real_default, action.default = action.default, SUPPRESS
+
+    def restore_defaults(self):
+        """Restore all stashed defaults."""
+        if hasattr(self, 'real_defaults'):
+            self._defaults = self.real_defaults
+            del self.real_defaults
+        for action in self._actions:
+            if hasattr(action, 'real_default'):
+                action.default = action.real_default
+                del action.real_default
+
     def parse_known_args(self, args=None, namespace=None):
         if args is None:
             # Decode all arguments to unicode before parsing
             args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
         # Remove all of our defaults, and wait until the subparsers have had a chance to set them before setting ours
-        real_defaults, self._defaults = self._defaults, {}
-        for action in self._actions:
-            action.real_default, action.default = action.default, SUPPRESS
-        namespace, _ = super(ArgumentParser, self).parse_known_args(args, namespace or ScopedNamespace())
-        # Restore the defaults
-        self._defaults = real_defaults
-        for action in self._actions:
-            action.default = action.real_default
+        self.stash_defaults()
+        try:
+            namespace, _ = super(ArgumentParser, self).parse_known_args(args, namespace or ScopedNamespace())
+        except ValueError:
+            # If there are any parsing errors, back out and let the error raise when we parse with the defaults restored
+            pass
+        finally:
+            # Restore the defaults
+            self.restore_defaults()
         # Ehh, just parse again with subparser defaults already in the namespace instead of rewriting code from argparse
         return super(ArgumentParser, self).parse_known_args(args, namespace)
 
