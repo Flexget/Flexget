@@ -77,7 +77,7 @@ class Scheduler(threading.Thread):
         with self.triggers_lock:
             self.triggers = []
             for item in self.manager.config.get('schedules', []):
-                self.triggers.append(Trigger(item['schedule'], item['tasks']))
+                self.triggers.append(Trigger(item['schedule'], item['tasks'], options={'cron': True}))
 
     def execute(self, task, options=None, output=None):
         """Add a task to the scheduler to be run immediately."""
@@ -154,7 +154,7 @@ class Scheduler(threading.Thread):
 class Job(object):
     """A job for the scheduler to execute."""
     #: Used to determine which job to run first when multiple jobs are waiting.
-    priority = None
+    priority = 1
     #: A datetime object when the job is scheduled to run. Jobs are sorted by this value when priority is the same.
     run_at = None
     #: The name of the task to execute
@@ -169,6 +169,16 @@ class Job(object):
         self.options = options
         self.output = output
         self.run_at = datetime.now()
+        # Lower priority if cron flag is present in either dict or Namespace form
+        try:
+            cron = self.options.cron
+        except AttributeError:
+            try:
+                cron = self.options.get('cron')
+            except AttributeError:
+                cron = False
+        if cron:
+            self.priority = 5
 
     def start(self):
         """Called when the job is run."""
