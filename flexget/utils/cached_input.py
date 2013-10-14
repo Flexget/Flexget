@@ -72,7 +72,7 @@ class cached(object):
     .. note:: Configuration assumptions may make this unusable in some (future) inputs
     """
 
-    cache = TimedDict(cache_time='1 minute')
+    cache = TimedDict(cache_time='5 minutes')
 
     def __init__(self, name, persist=None):
         # Cast name to unicode to prevent sqlalchemy warnings when filtering
