@@ -202,19 +202,18 @@ class SeriesParser(TitleParser):
         if not self.name_regexps:
             # if we don't have name_regexps, generate one from the name
             self.name_regexps = ReList(self.name_to_re(name) for name in [self.name] + self.alternate_names)
+            # With auto regex generation, the first regex group captures the name
             self.re_from_name = True
         # try all specified regexps on this data
         for name_re in self.name_regexps:
             match = re.search(name_re, self.data)
             if match:
-                if self.re_from_name:
-                    name_start, name_end = match.span(1)
-                else:
-                    name_start, name_end = match.span()
-
+                match_start, match_end = match.span(1 if self.re_from_name else 0)
+                # Always pick the longest matching regex
+                if match_end > name_end:
+                    name_start, name_end = match_start, match_end
                 log.debug('NAME SUCCESS: %s matched to %s', name_re.pattern, self.data)
-                break
-        else:
+        if not name_end:
             # leave this invalid
             log.debug('FAIL: name regexps %s do not match %s',
                       [regexp.pattern for regexp in self.name_regexps], self.data)
