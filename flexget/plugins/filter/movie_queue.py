@@ -152,7 +152,7 @@ def parse_what(what, lookup=True, session=None):
 
     search_entry = Entry(title=result['title'] or '')
     for field in ['imdb_id', 'tmdb_id']:
-        if result.get('field'):
+        if result.get(field):
             search_entry[field] = result[field]
     # Put lazy lookup fields on the search entry
     get_plugin_by_name('imdb_lookup').instance.register_lazy_fields(search_entry)
