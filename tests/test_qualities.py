@@ -70,12 +70,12 @@ class TestQualityParser(object):
                  ('Camera.1080p', '1080p'),
 
                  # Some audio formats
-                 ('Test.File.DTSHDMA', 'dts-hd'),
-                 ('Test.File.DTSHD.MA', 'dts-hd'),
-                 ('Test.File.DTS.HDMA', 'dts-hd'),
-                 ('Test.File.dts.hd.ma', 'dts-hd'),
-                 ('Test.File.DTS.HD', 'dts-hd'),
-                 ('Test.File.DTSHD', 'dts-hd'),
+                 ('Test.File.DTSHDMA', 'dtshd'),
+                 ('Test.File.DTSHD.MA', 'dtshd'),
+                 ('Test.File.DTS.HDMA', 'dtshd'),
+                 ('Test.File.dts.hd.ma', 'dtshd'),
+                 ('Test.File.DTS.HD', 'dtshd'),
+                 ('Test.File.DTSHD', 'dtshd'),
                  ('Test.File.DTS', 'dts'),
                  ('Test.File.truehd', 'truehd')]
 
