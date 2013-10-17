@@ -67,7 +67,17 @@ class TestQualityParser(object):
 
                  # Test qualities as part of words. #1593
                  ('Tsar.File.720p', '720p'),
-                 ('Camera.1080p', '1080p')]
+                 ('Camera.1080p', '1080p'),
+
+                 # Some audio formats
+                 ('Test.File.DTSHDMA', 'dts-hd'),
+                 ('Test.File.DTSHD.MA', 'dts-hd'),
+                 ('Test.File.DTS.HDMA', 'dts-hd'),
+                 ('Test.File.dts.hd.ma', 'dts-hd'),
+                 ('Test.File.DTS.HD', 'dts-hd'),
+                 ('Test.File.DTSHD', 'dts-hd'),
+                 ('Test.File.DTS', 'dts'),
+                 ('Test.File.truehd', 'truehd')]
 
         for item in items:
             quality = Quality(item[0]).name
