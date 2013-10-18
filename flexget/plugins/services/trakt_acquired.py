@@ -19,7 +19,8 @@ class TraktAcquired(object):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'api_key': {'type': 'string'},
-            'type': {'type': 'string', 'enum': ['movies', 'series']}
+            'type': {'type': 'string', 'enum': ['movies', 'series']},
+            'remove_collected': {'type': 'string'}
         },
         'required': ['username', 'password', 'api_key', 'type'],
         'additionalProperties': False
@@ -29,6 +30,22 @@ class TraktAcquired(object):
         """Finds accepted movies and series episodes and submits them to trakt as acquired."""
         # Change password to an SHA1 digest of the password
         config['password'] = hashlib.sha1(config['password']).hexdigest()
+        
+        if 'remove_collected' in config:
+            # Don't edit the config, or it won't pass validation on rerun
+            url_params = config.copy()
+            url_params['data_type'] = 'remove_collected'
+            # Do some translation from visible list name to prepare for use in url
+            list_name = config['remove_collected'].lower()
+            # These characters are just stripped in the url
+            for char in '!@#$%^*()[]{}/=?+\\|-_':
+                list_name = list_name.replace(char, '')
+            # These characters get replaced
+            list_name = list_name.replace('&', 'and')
+            list_name = list_name.replace(' ', '-')
+            url_params['list_type'] = list_name
+            # Map type is per item in custom lists
+        
         found = {}
         for entry in task.accepted:
             if config['type'] == 'series':
@@ -77,6 +94,13 @@ class TraktAcquired(object):
             post_url = 'http://api.trakt.tv/show/episode/library/' + config['api_key']
         else:
             post_url = 'http://api.trakt.tv/movie/library/' + config['api_key']
+            
+        # URL to remove collected entries from trakt list    
+        if config['remove_collected'] :
+            post_url_del = 'http://api.trakt.tv/lists/items/delete/' + config['api_key']
+                
+                
+        # Mark entry as collected on trakt        
         for item in found.itervalues():
             # Add username and password to the dict to submit
             item.update({'username': config['username'], 'password': config['password']})
@@ -98,7 +122,32 @@ class TraktAcquired(object):
                 continue
             elif result.status_code != 200:
                 log.error('Error submitting data to trakt.tv: %s' % result.text)
-                continue
+                continue       
+                
+        # Delete entry from list
+        if 'remove_collected' in config:
+            for item in found.itervalues():
+                # Add username and password to the dict to submit
+                item.update({'username': config['username'], 'password': config['password'], 'slug': url_params['remove_collected']})
+                try:
+                    result = task.requests.post(post_url_del, data=json.dumps(item), raise_status=False)
+                except RequestException as e:
+                    log.error('Error submitting data to trakt.tv: %s' % e)
+                    continue
+    
+                if result.status_code == 404:
+                    # Remove some info from posted json and print the rest to aid debugging
+                    for key in ['username', 'password', 'episodes']:
+                        item.pop(key, None)
+                    log.warning('%s not found on trakt (remove_collected): %s' % (config['type'].capitalize(), item))
+                    continue
+                elif result.status_code == 401:
+                    log.error('Error authenticating with trakt (remove_collected). Check your username/password/api_key')
+                    log.debug(result.text)
+                    continue
+                elif result.status_code != 200:
+                    log.error('Error submitting data to trakt.tv (remove_collected): %s' % result.text)
+                    continue
 
 
 register_plugin(TraktAcquired, 'trakt_acquired', api_ver=2)
