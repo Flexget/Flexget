@@ -41,13 +41,17 @@ def display_summary(options):
     try:
         query = (session.query(Series).outerjoin(Series.episodes).outerjoin(Episode.releases).
                  outerjoin(Series.in_tasks).group_by(Series.id))
-        if options.type == 'configured':
+        if options.configured == 'configured':
             query = query.having(func.count(SeriesTask.id) >= 1)
-        elif options.type == 'premieres':
+        elif options.configured == 'unconfigured':
+            query = query.having(func.count(SeriesTask.id) < 1)
+        if options.premieres:
             query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2).
                      having(func.count(SeriesTask.id) < 1)).filter(Release.downloaded == True)
-        if options.within:
-            query = query.having(func.max(Episode.first_seen) > datetime.now() - timedelta(days=options.within))
+        if options.new:
+            query = query.having(func.max(Episode.first_seen) > datetime.now() - timedelta(days=options.new))
+        if options.stale:
+            query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=options.stale))
         for series in query.order_by(Series.name).yield_per(10):
             series_name = series.name
             if len(series_name) > 30:
@@ -223,10 +227,17 @@ def register_parser_arguments():
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='series_action')
     list_parser = subparsers.add_parser('list', help='list a summary of the different series being tracked')
-    list_parser.add_argument('type', nargs='?', choices=['all', 'configured', 'premieres'], default='configured',
-                             help='only list a subset of shows (default: %(default)s)')
-    list_parser.add_argument('--within', type=int, metavar='DAYS',
-                             help='only show series seen within the last %(metavar)s days')
+    list_parser.add_argument('configured', nargs='?', choices=['configured', 'unconfigured', 'all'],
+                             default='configured',
+                             help='limit list to series that are currently in the config or not (default: %(default)s)')
+    list_parser.add_argument('--premieres', action='store_true',
+                             help='limit list to series which only have episode 1 (and maybe also 2) downloaded')
+    list_parser.add_argument('--new', nargs='?', type=int, metavar='DAYS', const=7,
+                             help='limit list to series with a release seen in last %(const)s days. number of days can '
+                                  'be overridden with %(metavar)s')
+    list_parser.add_argument('--stale', nargs='?', type=int, metavar='DAYS', const=365,
+                             help='limit list to series which have not seen a release in %(const)s days. number of '
+                                  'days can be overridden with %(metavar)s')
     show_parser = subparsers.add_parser('show', parents=[series_parser],
                                         help='show the releases FlexGet has seen for a given series ')
     begin_parser = subparsers.add_parser('begin', parents=[series_parser],
