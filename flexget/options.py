@@ -170,6 +170,7 @@ class ArgumentParser(ArgParser):
       override the main one.
     - Command shortening: If the command for a subparser is abbreviated unambiguously, it will still be accepted.
     - The add_argument `nargs` keyword argument supports a range of arguments, e.g. `"2-4"
+    - If the `raise_errors` keyword argument to `parse_args` is True, a `ValueError` will be raised instead of sys.exit
     """
 
     def __init__(self, nested_namespace_name=None, **kwargs):
@@ -183,6 +184,7 @@ class ArgumentParser(ArgParser):
 
         self.subparsers = None
         self.nested_namespace_name = nested_namespace_name
+        self.raise_errors = None
         ArgParser.__init__(self, **kwargs)
 
     def _error(self, message):
@@ -212,20 +214,9 @@ class ArgumentParser(ArgParser):
             result.dest = self.nested_namespace_name + '.' + result.dest
         return result
 
-    def error(self, message):
-        raise ValueError(message)
-
     def print_help(self, file=None):
         self.restore_defaults()
         super(ArgumentParser, self).print_help(file)
-
-    def parse_args(self, args=None, namespace=None):
-        try:
-            return super(ArgumentParser, self).parse_args(args, namespace)
-        except ValueError as e:
-            sys.stderr.write('error: %s\n' % e.message)
-            self.print_help()
-            sys.exit(2)
 
     def stash_defaults(self):
         """Remove all the defaults and store them in a temporary location."""
@@ -243,6 +234,29 @@ class ArgumentParser(ArgParser):
                 action.default = action.real_default
                 del action.real_default
 
+    def _set_error_mode(self, raise_errors):
+        """Set the error mode for this parser and recursively for its subparsers."""
+        self.raise_errors = raise_errors
+        if self.subparsers:
+            for subparser in self.subparsers.choices.values():
+                subparser._set_error_mode(raise_errors)
+
+    def error(self, msg):
+        raise ValueError(msg)
+
+    def parse_args(self, args=None, namespace=None, raise_errors=None):
+        """
+        :param raise_errors: If this is true, errors will be raised as `ValueError`s instead of calling sys.exit
+        """
+        old_raise_errors = self.raise_errors
+        if raise_errors is not None:
+            self._set_error_mode(raise_errors)
+        try:
+            return super(ArgumentParser, self).parse_args(args, namespace)
+        finally:
+            if raise_errors is not None:
+                self._set_error_mode(old_raise_errors)
+
     def parse_known_args(self, args=None, namespace=None):
         if args is None:
             # Decode all arguments to unicode before parsing
@@ -258,7 +272,14 @@ class ArgumentParser(ArgParser):
             # Restore the defaults
             self.restore_defaults()
         # Ehh, just parse again with subparser defaults already in the namespace instead of rewriting code from argparse
-        return super(ArgumentParser, self).parse_known_args(args, namespace)
+        try:
+            return super(ArgumentParser, self).parse_known_args(args, namespace)
+        except ValueError as e:
+            if self.raise_errors:
+                raise
+            sys.stderr.write('error: %s\n' % e.message)
+            self.print_help()
+            sys.exit(2)
 
     def add_subparsers(self, scoped_namespaces=False, **kwargs):
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
@@ -417,8 +438,8 @@ class CoreArgumentParser(ArgumentParser):
         kwargs.setdefault('parser_class', ArgumentParser)
         return super(CoreArgumentParser, self).add_subparsers(**kwargs)
 
-    def parse_args(self, args=None, namespace=None):
-        result = super(CoreArgumentParser, self).parse_args(args=args, namespace=namespace)
+    def parse_args(self, *args, **kwargs):
+        result = super(CoreArgumentParser, self).parse_args(*args, **kwargs)
         # Make sure we always have execute parser settings even when other commands called
         if not result.cli_command == 'execute':
             exec_options = get_defaults('execute')
@@ -426,22 +447,3 @@ class CoreArgumentParser(ArgumentParser):
                 exec_options.__dict__.update(result.execute.__dict__)
             result.execute = exec_options
         return result
-
-
-class RaiseErrorArgumentParser(ArgumentParser):
-    """Parses options from a string instead of cli, doesn't exit on parser errors, raises a ValueError instead"""
-
-    def __init__(self, **kwargs):
-        kwargs.setdefault('add_help', False)
-        kwargs.setdefault('usage', SUPPRESS)
-        super(RaiseErrorArgumentParser, self).__init__(**kwargs)
-
-    def parse_args(self, args, namespace=None):
-        # If args is a string, split it into an args list
-        if isinstance(args, basestring):
-            import shlex
-            args = shlex.split(args)
-        return super(RaiseErrorArgumentParser, self).parse_args(args)
-
-    def error(self, msg):
-        raise ValueError(msg)
