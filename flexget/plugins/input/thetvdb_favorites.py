@@ -60,11 +60,11 @@ class ThetvdbFavorites(Base):
 
 class InputThetvdbFavorites(object):
     """
-    Creates a list of entries for your series marked as favorites at thetvdb.com for use in import_series.
+    Creates a list of entries for your series marked as favorites at thetvdb.com for use in configure_series.
 
     Example::
 
-      import_series:
+      configure_series:
         from:
           thetvdb_favorites:
             account_id: 23098230

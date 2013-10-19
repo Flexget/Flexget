@@ -123,7 +123,7 @@ class TestThetvdbFavorites(FlexGetBase):
               - {title: 'Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'}
               - {title: 'Lost.S03E02.720p-FlexGet'}
               - {title: 'Penn.and.Teller.Bullshit.S02E02.720p.x264'}
-            import_series:
+            configure_series:
               from:
                 thetvdb_favorites:
                   account_id: 80FB8BD0720CA5EC

@@ -650,7 +650,7 @@ def populate_entry_fields(entry, parser):
 class FilterSeriesBase(object):
     """
     Class that contains helper methods for both filter.series as well as plugins that configure it,
-    such as all_series, series_premiere and import_series.
+    such as all_series, series_premiere and configure_series.
     """
 
     @property

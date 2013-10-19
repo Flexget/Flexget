@@ -8,7 +8,7 @@ from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.plugins.filter.series import FilterSeriesBase
 
-log = logging.getLogger('import_series')
+log = logging.getLogger('configure_series')
 Base = db_schema.versioned_base('import_series', 0)
 
 
@@ -26,7 +26,7 @@ class ImportSeries(FilterSeriesBase):
 
     Configuration::
 
-      import_series:
+      configure_series:
         [settings]:
            # same configuration as series plugin
         from:
@@ -34,7 +34,7 @@ class ImportSeries(FilterSeriesBase):
 
     Example::
 
-      import_series:
+      configure_series:
         settings:
           quality: 720p
         from:
@@ -98,4 +98,4 @@ class ImportSeries(FilterSeriesBase):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ImportSeries, 'import_series', api_ver=2)
+    plugin.register(ImportSeries, 'configure_series', api_ver=2)

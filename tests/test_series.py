@@ -1485,7 +1485,7 @@ class TestImportSeries(FlexGetBase):
     __yaml__ = """
         tasks:
           timeframe_max:
-            import_series:
+            configure_series:
               settings:
                 propers: 12 hours
                 target: 720p
@@ -1500,7 +1500,7 @@ class TestImportSeries(FlexGetBase):
     """
 
     def test_timeframe_max(self):
-        """Tests import_series as well as timeframe with max_quality."""
+        """Tests configure_series as well as timeframe with max_quality."""
         self.execute_task('timeframe_max')
         assert not self.task.accepted, 'Entry shouldnot have been accepted on first run.'
         age_series(minutes=6)
