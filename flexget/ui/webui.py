@@ -46,7 +46,7 @@ def _update_menu(root):
 
 
 @app.route('/')
-def start():
+def start_page():
     """Redirect user to registered home plugin"""
     if not _home:
         abort(404)
@@ -131,12 +131,11 @@ def register_home(route, order=128):
     _home = route
 
 
-@app.after_request
-def shutdown_session(response):
+@app.teardown_appcontext
+def shutdown_session(exception=None):
     """Remove db_session after request"""
     db_session.remove()
     log.debug('db_session removed')
-    return response
 
 
 def start(mg):
@@ -160,8 +159,6 @@ def start(mg):
     from flexget.manager import Base
     Base.metadata.create_all(bind=manager.engine)
 
-    # TODO: 1.2 consider if this event is the best way
-    fire_event('webui.register_api_endpoints', api)
     app.register_blueprint(api)
     app.register_blueprint(api_schema)
     fire_event('webui.start')
