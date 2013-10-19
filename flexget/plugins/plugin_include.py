@@ -4,8 +4,9 @@ import os
 import yaml
 
 from flexget import plugin
-from flexget.config_schema import one_or_more
+from flexget.config_schema import one_or_more, process_config
 from flexget.event import event
+from flexget.utils.tools import MergeException, merge_dict_from_to
 
 log = logging.getLogger('include')
 
@@ -23,7 +24,6 @@ class PluginInclude(object):
 
     schema = one_or_more({'type': 'string'})
 
-    # TODO: 1.2 I think this needs to run on manager.pre-process event, so that config from other file gets validated
     @plugin.priority(254)
     def on_task_start(self, task, config):
         if not config:
@@ -38,11 +38,14 @@ class PluginInclude(object):
             if not os.path.isabs(name):
                 name = os.path.join(task.manager.config_base, name)
             include = yaml.load(file(name))
-            if not isinstance(include, dict):
-                raise plugin.PluginError('Include file format is invalid: %s' % name)
+            errors = process_config(include, plugin.plugin_schemas(context='task'))
+            if errors:
+                log.error('Included file %s has invalid config:' % name)
+                for error in errors:
+                    log.error('[%s] %s', error.json_pointer, error.message)
+                task.abort('Invalid config in included file %s' % name)
             log.debug('Merging %s into task %s' % (name, task.name))
             # merge
-            from flexget.utils.tools import MergeException, merge_dict_from_to
             try:
                 merge_dict_from_to(include, task.config)
             except MergeException:
