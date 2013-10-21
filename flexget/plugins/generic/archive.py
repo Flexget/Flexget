@@ -496,7 +496,8 @@ def register_parser_arguments():
     inject_parser.add_argument('ids', nargs='+', type=int, metavar='ID', help='archive ID of an item to inject')
     inject_parser.add_argument('--immortal', action='store_true', help='injected entries will not be able to be '
                                                                        'rejected by any plugins')
-    inject_parser.add_argument('execute_options', action=ParseExtrasAction, parser=get_parser('execute'))
+    exec_group = inject_parser.add_argument_group('execute arguments')
+    exec_group.add_argument('execute_options', action=ParseExtrasAction, parser=get_parser('execute'))
     tag_parser = archive_parser.add_subparser('tag-source', help='tag all archived entries within a given source')
     tag_parser.add_argument('source', metavar='<source>', help='the source whose entries you would like to tag')
     tag_parser.add_argument('tags', nargs='+', metavar='<tag>',
