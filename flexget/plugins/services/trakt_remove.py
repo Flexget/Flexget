@@ -80,7 +80,6 @@ class TraktRemove(object):
                     # We use an extra container dict so that the found dict is usable in the same way as found series
                     found.setdefault('items', {}).setdefault('items', []).append(movie)
                     log.debug('Marking %s for submission to trakt.tv library.' % entry['title'])
-                    log.verbose('json dump (found) : %s' % json.dumps(found))
 
         if not found:
             log.debug('Nothing to submit to trakt.')
