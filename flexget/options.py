@@ -5,8 +5,8 @@ import random
 import socket
 import string
 import sys
-from argparse import (ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, PARSER, _VersionAction, Namespace,
-                      ArgumentTypeError)
+from argparse import (ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, PARSER, REMAINDER, _VersionAction,
+                      Namespace, ArgumentTypeError)
 
 import flexget
 from flexget.utils.tools import console
@@ -29,12 +29,6 @@ def get_parser(command=None):
     if command:
         return core_parser.get_subparser(command)
     return core_parser
-
-
-def get_defaults(command=None):
-    if command:
-        return getattr(get_parser(command).parse_args([]), command)
-    return get_parser().parse_args([])
 
 
 def register_command(command, callback, lock_required=False, **kwargs):
@@ -119,6 +113,23 @@ class InjectAction(Action):
         setattr(namespace, self.dest, new_value)
 
 
+class ParseExtrasAction(Action):
+    """This action will take extra arguments, and parser them with a different parser."""
+    def __init__(self, option_strings, parser, help=None, metavar=None, dest=None, required=False):
+        if metavar is None:
+            metavar = '<%s arguments>' % parser.prog
+        if help is None:
+            help = 'arguments for the `%s` command are allowed here' % parser.prog
+        self._parser = parser
+        super(ParseExtrasAction, self).__init__(option_strings=option_strings, dest=SUPPRESS, help=help,
+                                                metavar=metavar, nargs=REMAINDER, required=required)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        namespace, extras = self._parser.parse_known_args(values, namespace)
+        if extras:
+            parser.error('unrecognized arguments: %s' % ' '.join(extras))
+
+
 class ScopedNamespace(Namespace):
     def __init__(self, **kwargs):
         super(ScopedNamespace, self).__init__(**kwargs)
@@ -157,6 +168,18 @@ class ScopedNamespace(Namespace):
         return new
 
 
+class ParserError(Exception):
+    def __init__(self, message, parser):
+        self.message = message
+        self.parser = parser
+
+    def __unicode__(self):
+        return self.message
+
+    def __repr__(self):
+        return 'ParserError(%s, %s)' % self.message, self.parser
+
+
 class ArgumentParser(ArgParser):
     """
     Mimics the default :class:`argparse.ArgumentParser` class, with a few distinctions, mostly to ease subparser usage:
@@ -186,12 +209,6 @@ class ArgumentParser(ArgParser):
         self.nested_namespace_name = nested_namespace_name
         self.raise_errors = None
         ArgParser.__init__(self, **kwargs)
-
-    def _error(self, message):
-        """Overridden error handler to print help message"""
-        sys.stderr.write('error: %s\n' % message)
-        self.print_help()
-        sys.exit(2)
 
     def add_argument(self, *args, **kwargs):
         if isinstance(kwargs.get('nargs'), basestring) and '-' in kwargs['nargs']:
@@ -234,52 +251,35 @@ class ArgumentParser(ArgParser):
                 action.default = action.real_default
                 del action.real_default
 
-    def _set_error_mode(self, raise_errors):
-        """Set the error mode for this parser and recursively for its subparsers."""
-        self.raise_errors = raise_errors
-        if self.subparsers:
-            for subparser in self.subparsers.choices.values():
-                subparser._set_error_mode(raise_errors)
-
     def error(self, msg):
-        raise ValueError(msg)
+        raise ParserError(msg, self)
 
-    def parse_args(self, args=None, namespace=None, raise_errors=None):
+    def parse_args(self, args=None, namespace=None, raise_errors=False):
         """
-        :param raise_errors: If this is true, errors will be raised as `ValueError`s instead of calling sys.exit
+        :param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit
         """
-        old_raise_errors = self.raise_errors
-        if raise_errors is not None:
-            self._set_error_mode(raise_errors)
         try:
             return super(ArgumentParser, self).parse_args(args, namespace)
-        finally:
-            if raise_errors is not None:
-                self._set_error_mode(old_raise_errors)
+        except ParserError as e:
+            if raise_errors:
+                raise
+            sys.stderr.write('error: %s\n' % e.message)
+            e.parser.print_help()
+            sys.exit(2)
 
     def parse_known_args(self, args=None, namespace=None):
         if args is None:
             # Decode all arguments to unicode before parsing
             args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
-        # Remove all of our defaults, and wait until the subparsers have had a chance to set them before setting ours
+        # Remove all of our defaults, to give subparsers and custom actions first priority at setting them
         self.stash_defaults()
         try:
             namespace, _ = super(ArgumentParser, self).parse_known_args(args, namespace or ScopedNamespace())
-        except ValueError:
-            # If there are any parsing errors, back out and let the error raise when we parse with the defaults restored
-            pass
         finally:
             # Restore the defaults
             self.restore_defaults()
-        # Ehh, just parse again with subparser defaults already in the namespace instead of rewriting code from argparse
-        try:
-            return super(ArgumentParser, self).parse_known_args(args, namespace)
-        except ValueError as e:
-            if self.raise_errors:
-                raise
-            sys.stderr.write('error: %s\n' % e.message)
-            self.print_help()
-            sys.exit(2)
+        # Parse again with subparser and custom action defaults already in the namespace
+        return super(ArgumentParser, self).parse_known_args(args, namespace)
 
     def add_subparsers(self, scoped_namespaces=False, **kwargs):
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
@@ -322,10 +322,6 @@ class ArgumentParser(ArgParser):
                     arg_strings[0] = matches[0]
         return super(ArgumentParser, self)._get_values(action, arg_strings)
 
-    # TODO: I'm not sure this is actually good. Perhaps remove it.
-    def get_defaults(self):
-        return self.parse_args([])
-
     def _debug_tb_callback(self, *dummy):
         import cgitb
         cgitb.enable(format="text")
@@ -366,6 +362,7 @@ class CoreArgumentParser(ArgumentParser):
     """
     def __init__(self, **kwargs):
         kwargs.setdefault('parents', [manager_parser])
+        kwargs.setdefault('prog', 'flexget')
         super(CoreArgumentParser, self).__init__(**kwargs)
         self.add_subparsers(title='Commands', metavar='<command>', dest='cli_command', scoped_namespaces=True)
 
@@ -442,7 +439,7 @@ class CoreArgumentParser(ArgumentParser):
         result = super(CoreArgumentParser, self).parse_args(*args, **kwargs)
         # Make sure we always have execute parser settings even when other commands called
         if not result.cli_command == 'execute':
-            exec_options = get_defaults('execute')
+            exec_options = get_parser('execute').parse_args([])
             if hasattr(result, 'execute'):
                 exec_options.__dict__.update(result.execute.__dict__)
             result.execute = exec_options

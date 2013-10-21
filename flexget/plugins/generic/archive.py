@@ -12,6 +12,7 @@ from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 from flexget import db_schema, options, plugin
 from flexget.event import event
 from flexget.entry import Entry
+from flexget.options import ParseExtrasAction, get_parser
 from flexget.utils.sqlalchemy_utils import table_schema, get_index_by_name
 from flexget.utils.tools import console, strip_html
 from flexget.manager import Session
@@ -494,7 +495,8 @@ def register_parser_arguments():
     inject_parser = archive_parser.add_subparser('inject', help='inject entries from the archive back into tasks')
     inject_parser.add_argument('ids', nargs='+', type=int, metavar='ID', help='archive ID of an item to inject')
     inject_parser.add_argument('--immortal', action='store_true', help='injected entries will not be able to be '
-                                                                      'rejected by any plugins')
+                                                                       'rejected by any plugins')
+    inject_parser.add_argument('execute_options', action=ParseExtrasAction, parser=get_parser('execute'))
     tag_parser = archive_parser.add_subparser('tag-source', help='tag all archived entries within a given source')
     tag_parser.add_argument('source', metavar='<source>', help='the source whose entries you would like to tag')
     tag_parser.add_argument('tags', nargs='+', metavar='<tag>',
