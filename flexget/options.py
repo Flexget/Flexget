@@ -275,6 +275,8 @@ class ArgumentParser(ArgParser):
         self.stash_defaults()
         try:
             namespace, _ = super(ArgumentParser, self).parse_known_args(args, namespace or ScopedNamespace())
+        except ParserError:
+            pass
         finally:
             # Restore the defaults
             self.restore_defaults()
@@ -439,7 +441,7 @@ class CoreArgumentParser(ArgumentParser):
         result = super(CoreArgumentParser, self).parse_args(*args, **kwargs)
         # Make sure we always have execute parser settings even when other commands called
         if not result.cli_command == 'execute':
-            exec_options = get_parser('execute').parse_args([])
+            exec_options = get_parser('execute').parse_args([]).execute
             if hasattr(result, 'execute'):
                 exec_options.__dict__.update(result.execute.__dict__)
             result.execute = exec_options
