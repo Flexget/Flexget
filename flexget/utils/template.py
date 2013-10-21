@@ -111,7 +111,7 @@ def filter_default(value, default_value=u'', boolean=False):
 filter_d = filter_default
 
 
-@event('manager.pre-process')
+@event('manager.before_config_validate')
 def make_environment(manager):
     """Create our environment and add our custom filters"""
     global environment

@@ -11,7 +11,6 @@ import pkg_resources
 import yaml
 from datetime import datetime, timedelta
 
-import requests
 import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
@@ -21,8 +20,7 @@ from flexget import config_schema
 from flexget.event import fire_event
 from flexget.ipc import IPCServer, remote_execute
 from flexget.scheduler import Scheduler
-from flexget.utils import json
-from flexget.utils.tools import pid_exists, console
+from flexget.utils.tools import pid_exists
 
 log = logging.getLogger('manager')
 
@@ -104,8 +102,9 @@ class Manager(object):
         self.setup_yaml()
         self.find_config(create=(self.options.cli_command == 'webui'))
         self.init_sqlalchemy()
+        fire_event('manager.before_config_load', self)
         self.load_config()
-        fire_event('manager.pre-process', self)
+        fire_event('manager.before_config_validate', self)
         errors = self.validate_config()
         if errors:
             for error in errors:
@@ -301,10 +300,6 @@ class Manager(object):
         except UnicodeDecodeError:
             log.critical('Config file must be UTF-8 encoded.')
             sys.exit(1)
-        # This could cause an issue if we move loading the config outside of running 'execute'
-        if not self.options.execute.cron:
-            # pre-check only when running without --cron
-            self.pre_check_config(config)
         try:
             self.config = yaml.safe_load(config) or {}
         except Exception as e:
