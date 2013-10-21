@@ -18,7 +18,7 @@ from sqlalchemy.pool import SingletonThreadPool
 
 from flexget import config_schema
 from flexget.event import fire_event
-from flexget.ipc import IPCServer, remote_execute
+from flexget.ipc import IPCServer, IPCClient
 from flexget.scheduler import Scheduler
 from flexget.utils.tools import pid_exists
 
@@ -141,8 +141,9 @@ class Manager(object):
 
             port = self.check_ipc_port()
             if port:
+                client = IPCClient(port)
                 for task in tasks:
-                    remote_execute(port, task, options)
+                    client.execute(task, dict(options))
                 self.shutdown()
                 return
             with self.acquire_lock():

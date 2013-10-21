@@ -156,13 +156,14 @@ class ScopedNamespace(Namespace):
             value.__parent__ = self
         return object.__setattr__(self, key, value)
 
+    def __iter__(self):
+        return (i for i in self.__dict__.iteritems() if i[0] != '__parent__')
+
     def __copy__(self):
         new = self.__class__()
         new.__dict__.update(self.__dict__)
         # Make copies of any nested namespaces
-        for key, value in self.__dict__.iteritems():
-            if key == '__parent__':
-                continue
+        for key, value in self:
             if isinstance(value, ScopedNamespace):
                 setattr(new, key, copy.copy(value))
         return new

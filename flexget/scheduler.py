@@ -271,9 +271,15 @@ class Tee(object):
     def __init__(self, *files):
         self.files = files
 
-    def write(self, obj):
-        for f in self.files:
-            f.write(obj)
+    def __getattr__(self, meth):
+        def method_runner(*args, **kwargs):
+            for file in self.files:
+                try:
+                    getattr(file, meth)(*args, **kwargs)
+                except AttributeError:
+                    # We don't really care if all of our 'files' fully support the file api
+                    pass
+        return method_runner
 
 
 class BufferQueue(Queue.Queue):
