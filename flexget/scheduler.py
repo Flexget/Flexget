@@ -80,10 +80,15 @@ class Scheduler(threading.Thread):
                 self.triggers.append(Trigger(item['interval'], item['tasks'], options={'cron': True}))
 
     def execute(self, task, options=None, output=None):
-        """Add a task to the scheduler to be run immediately."""
+        """
+        Add a task to the scheduler to be run immediately.
+
+        :returns: :class:`threading.Event` instance which will be set when the task has finished running
+        """
         # Create a copy of task, so that changes to instance in manager thread do not affect scheduler thread
         job = Job(task, options=options, output=output)
         self.run_queue.put(job)
+        return job.finished_event
 
     def queue_pending_jobs(self):
         # Add pending jobs to the run queue
@@ -106,11 +111,10 @@ class Scheduler(threading.Thread):
                 if self._shutdown_when_finished:
                     self._shutdown_now = True
                 continue
-            job.start()
             if job.output:
                 # Hook up our log and stdout to give back to the requester
                 old_stdout, old_stderr = sys.stdout, sys.stderr
-                sys.stdout, sys.stderr = Tee(job.output, old_stdout), Tee(job.output, old_stderr)
+                sys.stdout, sys.stderr = Tee(job.output, sys.stdout), Tee(job.output, sys.stderr)
                 # TODO: Use a filter to capture only the logging for this execution?
                 streamhandler = logging.StreamHandler(job.output)
                 streamhandler.setFormatter(FlexGetFormatter())
@@ -121,11 +125,12 @@ class Scheduler(threading.Thread):
                 log.debug('task %s aborted: %r' % (job.task, e))
             finally:
                 self.run_queue.task_done()
+                job.finished_event.set()
                 if job.output:
-                    job.output.close()
+                    if isinstance(job.output, BufferQueue):
+                        job.output.close()
                     sys.stdout, sys.stderr = old_stdout, old_stderr
                     logging.getLogger().removeHandler(streamhandler)
-                job.done()
         remaining_jobs = self.run_queue.qsize()
         if remaining_jobs:
             log.warning('Scheduler shut down with %s jobs remaining in the queue to run.' % remaining_jobs)
@@ -169,6 +174,7 @@ class Job(object):
         self.options = options
         self.output = output
         self.run_at = datetime.now()
+        self.finished_event = threading.Event()
         # Lower priority if cron flag is present in either dict or Namespace form
         try:
             cron = self.options.cron
@@ -179,14 +185,6 @@ class Job(object):
                 cron = False
         if cron:
             self.priority = 5
-
-    def start(self):
-        """Called when the job is run."""
-        pass
-
-    def done(self):
-        """Called when the job has finished running."""
-        pass
 
     def __lt__(self, other):
         return (self.priority, self.run_at) < (other.priority, other.run_at)
@@ -268,6 +266,7 @@ class Trigger(object):
 
 
 class Tee(object):
+    """Used so that output to sys.stdout can be grabbed and still displayed."""
     def __init__(self, *files):
         self.files = files
 
