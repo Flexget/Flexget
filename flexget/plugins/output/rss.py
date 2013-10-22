@@ -137,7 +137,7 @@ class OutputRSS(object):
                     'rsslink': {'type': 'string'},
                     'encoding': {'type': 'string'},  # TODO: only valid choices
                     'title': {'type': 'string'},
-                    'description': {'type': 'string'},
+                    'template': {'type': 'string'},
                     'link': {'type': 'array', 'items': {'type': 'string'}}
                 },
                 'required': ['file'],
