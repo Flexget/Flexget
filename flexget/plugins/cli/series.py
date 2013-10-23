@@ -201,13 +201,18 @@ class SeriesForget(object):
 
             if len(task.manager.options.series_forget) > 1:
                 # remove by id
-                identifier = task.manager.options.series_forget[1].upper()
+                identifier = task.manager.options.series_forget[1]
                 if identifier and name:
                     try:
                         forget_series_episode(name, identifier)
                         console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
-                    except ValueError as e:
-                        console(e.message)
+                    except ValueError:
+                        # Try upper casing identifier if we fail at first
+                        try:
+                            forget_series_episode(name, identifier.upper())
+                            console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
+                        except ValueError as e:
+                            console(e.message)
             else:
                 # remove whole series
                 try:
