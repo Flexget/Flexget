@@ -4,6 +4,11 @@ from flexget.plugin import register_plugin, DependencyError
 from flexget.utils import imdb
 
 try:
+    import tmdb3
+except ImportError:
+    raise DependencyError(issued_by='tmdb_lookup', missing='tmdb3', message='https://github.com/wagnerrp/pytmdb3')
+
+try:
     # TODO: Fix this after api_tmdb has module level functions
     from flexget.plugins.api_tmdb import ApiTmdb
     lookup = ApiTmdb.lookup
