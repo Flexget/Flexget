@@ -67,7 +67,6 @@ class TraktRemove(object):
                 # Check entry is a movie
                 if entry.get('imdb_id') or entry.get('tmdb_id'):
                     movie = {}
-                    movie['type'] = 'movie'
                     # We know imdb_id or tmdb_id is filled in, so don't cause any more lazy lookups
                     if entry.get('movie_name', eval_lazy=False):
                         movie['title'] = entry['movie_name']
@@ -78,8 +77,13 @@ class TraktRemove(object):
                     if entry.get('imdb_id', eval_lazy=False):
                         movie['imdb_id'] = entry['imdb_id']
                     # We use an extra container dict so that the found dict is usable in the same way as found series
-                    found.setdefault('items', {}).setdefault('items', []).append(movie)
+                    if url_params['list'] == 'watchlist': 
+                        found.setdefault('movies', {}).setdefault('movies', []).append(movie)
+                    else:          
+                        movie['type'] = 'movie'          
+                        found.setdefault('items', {}).setdefault('items', []).append(movie)
                     log.debug('Marking %s for submission to trakt.tv library.' % entry['title'])
+                    # log.verbose('json dump (found) : %s' % json.dumps(found))
 
         if not found:
             log.debug('Nothing to submit to trakt.')
@@ -90,7 +94,10 @@ class TraktRemove(object):
             return
          
         # URL to remove collected entries from trakt list    
-        post_url = 'http://api.trakt.tv/lists/items/delete/' + config['api_key']
+        if url_params['list'] == 'watchlist':          
+            post_url = 'http://api.trakt.tv/movie/unwatchlist/' + config['api_key']
+        else:
+            post_url = 'http://api.trakt.tv/lists/items/delete/' + config['api_key']
                 
         # Delete entry from list    
         for item in found.itervalues():
@@ -114,7 +121,7 @@ class TraktRemove(object):
                 continue
             elif result.status_code != 200:
                 log.error('Error submitting data to trakt.tv (remove_collected): %s' % result.text)
-                continue                
-
-
+                continue
+            # log.debug(result.text)
+            
 register_plugin(TraktRemove, 'trakt_remove', api_ver=2)
