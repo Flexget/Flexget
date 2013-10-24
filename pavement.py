@@ -23,10 +23,14 @@ install_requires = ['FeedParser>=5.1.3', 'SQLAlchemy >=0.7, <0.7.99', 'PyYAML', 
                     # There is a bug in beautifulsoup 4.2.0 that breaks imdb parsing, see http://flexget.com/ticket/2091
                     'beautifulsoup4>=4.1, !=4.2.0, <4.4', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar',
                     'jinja2', 'flask', 'cherrypy', 'requests>=1.0, <2.99', 'python-dateutil!=2.0', 'jsonschema>=2.0',
-                    'python-tvrage']
+                    'python-tvrage', 'tmdb3']
 if sys.version_info < (2, 7):
     # argparse is part of the standard library in python 2.7+
     install_requires.append('argparse')
+	
+dependency_links = [
+    'https://github.com/wagnerrp/pytmdb3/zipball/master#egg=tmdb3'
+]
 
 entry_points = {
     'console_scripts': ['flexget = flexget:main'],
@@ -51,6 +55,7 @@ setup(
     url='http://flexget.com',
     download_url='http://download.flexget.com',
     install_requires=install_requires,
+	dependency_links=dependency_links,
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget',
         exclude=['FlexGet.egg-info', '*.pyc'],
@@ -376,32 +381,9 @@ def pep8(args):
 
 @task
 def bootstrap():
-    """
-    Current paver bootstrap task ignores the distribute option, do some hackery to fix that.
-    This should not be needed after next release of paver (>1.1.1)
-
-    This also prevents --system-site-packages option from being hard coded into bootstrap.py
-    https://github.com/paver/paver/issues/87
-    """
-    import textwrap
     vopts = options.virtualenv
-    more_text = ""
-    if vopts.get('distribute') is not None:
-        more_text = textwrap.dedent("""
-        def more_adjust_options(orig_adjust_options):
-            def adjust_options(options, args):
-                # Don't let paver overwrite system_site_packages options specified by the user
-                ssp = options.system_site_packages
-                orig_adjust_options(options, args)
-                options.system_site_packages = ssp
-                options.use_distribute = %s
-            return adjust_options
-        adjust_options = more_adjust_options(adjust_options)
-        """ % bool(vopts.get('distribute')))
-
     paver.virtual._create_bootstrap(vopts.get("script_name", "bootstrap.py"),
                                     vopts.get("packages_to_install", []),
                                     vopts.get("paver_command_line", None),
                                     dest_dir=vopts.get("dest_dir", '.'),
-                                    unzip_setuptools=vopts.get("unzip_setuptools", False),
-                                    more_text=more_text)
+                                    unzip_setuptools=vopts.get("unzip_setuptools", False))
