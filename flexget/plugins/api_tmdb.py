@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 import logging
-from urllib2 import URLError, quote
+from urllib2 import URLError
 import os
 import sys
 import posixpath
@@ -16,16 +16,18 @@ from flexget.utils.titles import MovieParser
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, year_property, with_session
 from flexget.manager import Session
-from flexget.plugin import register_plugin
+from flexget.plugin import register_plugin, DependencyError
 
-import tmdb3
-from tmdb3.tmdb_exceptions import TMDBRequestInvalid
+try:
+    import tmdb3
+except ImportError:
+    raise DependencyError(issued_by='api_tmdb', missing='tmdb3', message='TMDB requires https://github.com/wagnerrp/pytmdb3')
 
 log = logging.getLogger('api_tmdb')
 Base = db_schema.versioned_base('api_tmdb', 0)
 
 # This is a FlexGet API key
-tmdb3.tmdb_api.set_key('bdfc018dbdb7c243dc7cb1454ff74b96')
+tmdb3.tmdb_api.set_key('bdfc018dbdb7c243dc7cb1454ff74b95')
 tmdb3.locales.set_locale("en", "us", True);
 tmdb3.set_cache('null')
 
@@ -187,7 +189,7 @@ class ApiTmdb(object):
     @staticmethod
     @with_session
     def lookup(title=None, year=None, tmdb_id=None, imdb_id=None, smart_match=None, only_cached=False, session=None):
-        """Do a lookup from tmdb for the movie matching the passed arguments.
+        """Do a lookup from TMDb for the movie matching the passed arguments.
 
         Any combination of criteria can be passed, the most specific criteria specified will be used.
 
@@ -219,8 +221,8 @@ class ApiTmdb(object):
             if year:
                 search_string = '%s (%s)' % (search_string, year)
         elif not (tmdb_id or imdb_id):
-            raise LookupError('No criteria specified for tmdb lookup')
-        log.debug('Looking up tmdb information for %r' % {'title': title, 'tmdb_id': tmdb_id, 'imdb_id': imdb_id})
+            raise LookupError('No criteria specified for TMDb lookup')
+        log.debug('Looking up TMDb information for %r' % {'title': title, 'tmdb_id': tmdb_id, 'imdb_id': imdb_id})
 
         movie = None
 
@@ -262,7 +264,7 @@ class ApiTmdb(object):
             if only_cached:
                 raise LookupError('Movie %s not found from cache' % id_str())
             # There was no movie found in the cache, do a lookup from tmdb
-            log.debug('Movie %s not found in cache, looking up from tmdb.' % id_str())
+            log.verbose('Searching from TMDb %s' % id_str())
             try:
                 if imdb_id and not tmdb_id:
                     result = tmdb3.Movie.fromIMDB(imdb_id)
@@ -282,7 +284,9 @@ class ApiTmdb(object):
                     else:
                         movie = None
                 elif title:
-                    result = _first_result(tmdb3.tmdb_api.searchMovieWithYear(search_string, adult=True))
+                    result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True, year=year))
+                    if not result and year:
+                        result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True))
                     if result:
                         movie = session.query(TMDBMovie).filter(TMDBMovie.id == result.id).first()
                         if not movie:
@@ -291,8 +295,10 @@ class ApiTmdb(object):
                             session.merge(movie)
                         if title.lower() != movie.name.lower():
                             session.merge(TMDBSearchResult(search=search_string, movie=movie))
-            except tmdb3.TMDBError:
-                raise LookupError('Error looking up movie from TMDb (%s)' % sys.exc_info()[1])
+            except tmdb3.TMDBError as e:
+                raise LookupError('Error looking up movie from TMDb (%s)' % e)
+            if movie:
+                log.verbose("Movie found from TMDb: %s (%s)" % (movie.name, movie.year))
             
         if not movie:
             raise LookupError('No results found from tmdb for %s' % id_str())

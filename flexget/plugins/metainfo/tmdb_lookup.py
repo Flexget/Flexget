@@ -4,11 +4,6 @@ from flexget.plugin import register_plugin, DependencyError
 from flexget.utils import imdb
 
 try:
-    import tmdb3
-except ImportError:
-    raise DependencyError(issued_by='tmdb_lookup', missing='tmdb3', message='https://github.com/wagnerrp/pytmdb3')
-
-try:
     # TODO: Fix this after api_tmdb has module level functions
     from flexget.plugins.api_tmdb import ApiTmdb
     lookup = ApiTmdb.lookup
@@ -61,7 +56,7 @@ class PluginTmdbLookup(object):
                            imdb_id=imdb_id)
             entry.update_using_map(self.field_map, movie)
         except LookupError as e:
-            log.debug(u'Tmdb lookup for %s failed: %s' % (entry['title'], e.message))
+            log.info(u'Tmdb lookup failed for %s (%s)' % (entry['title'], e.message))
             # Set all of our fields to None if the lookup failed
             entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
         return entry[field]
