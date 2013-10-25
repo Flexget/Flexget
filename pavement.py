@@ -28,9 +28,6 @@ if sys.version_info < (2, 7):
     # argparse is part of the standard library in python 2.7+
     install_requires.append('argparse')
 	
-dependency_links = [
-    'https://github.com/wagnerrp/pytmdb3/zipball/master#egg=tmdb3'
-]
 
 entry_points = {
     'console_scripts': ['flexget = flexget:main'],
@@ -55,7 +52,6 @@ setup(
     url='http://flexget.com',
     download_url='http://download.flexget.com',
     install_requires=install_requires,
-	dependency_links=dependency_links,
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget',
         exclude=['FlexGet.egg-info', '*.pyc'],
