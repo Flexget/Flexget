@@ -60,7 +60,7 @@ class TMDBContainer(object):
     def __init__(self, init_object=None):
         if isinstance(init_object, dict):
             self.update_from_dict(init_object)
-        else:
+        elif init_object:
             self.update_from_object(init_object)
 
     def update_from_dict(self, update_dict):
