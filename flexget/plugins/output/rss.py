@@ -46,7 +46,6 @@ class RSSEntry(Base):
     published = Column(DateTime, default=datetime.datetime.utcnow())
 
 
-# TODO: 1.2 figure out what to do with this
 class OutputRSS(object):
     """
     Write RSS containing succeeded (downloaded) entries.
