@@ -16,6 +16,10 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.pool import SingletonThreadPool
 
+# These need to be declared before we start importing from other flexget modules, since they might import them
+Base = declarative_base()
+Session = sessionmaker()
+
 from flexget import config_schema
 from flexget.event import fire_event
 from flexget.ipc import IPCServer, IPCClient
@@ -24,8 +28,6 @@ from flexget.utils.tools import pid_exists
 
 log = logging.getLogger('manager')
 
-Base = declarative_base()
-Session = sessionmaker()
 manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 

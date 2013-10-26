@@ -1,16 +1,22 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta, time as dt_time
+from hashlib import md5
 import logging
 import Queue
 import threading
 import time
 import sys
 
+from sqlalchemy import Column, String, DateTime
+
 from flexget.config_schema import register_config_key, parse_time
+from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.logger import FlexGetFormatter
+from flexget.manager import Session
 
 log = logging.getLogger('scheduler')
+Base = versioned_base('scheduler', 0)
 
 UNITS = ['seconds', 'minutes', 'hours', 'days', 'weeks']
 WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
@@ -57,6 +63,17 @@ main_schema = {
         'additionalProperties': False
     }
 }
+
+
+class DBTrigger(Base):
+    __tablename__ = 'scheduler_triggers'
+
+    uid = Column(String, primary_key=True)  # Hash of all trigger properties, to uniquely identify the trigger
+    last_run = Column(DateTime)
+
+    def __init__(self, uid, last_run=None):
+        self.uid = uid
+        self.last_run = last_run
 
 
 class Scheduler(threading.Thread):
@@ -194,7 +211,6 @@ class Trigger(object):
     def __init__(self, interval, tasks, options=None):
         self.tasks = tasks
         self.options = options
-        self.execute_options = None
         self.unit = None
         self.amount = None
         self.on_day = None
@@ -202,6 +218,17 @@ class Trigger(object):
         self.last_run = None
         self.run_at = None
         self.interval = interval
+        self._get_db_last_run()
+        self.schedule_next_run()
+
+    @property
+    def uid(self):
+        """A unique id which describes this trigger."""
+        # Determine uniqueness based on interval,
+        hash = md5(str(sorted(self.interval)))
+        # and tasks run on that interval.
+        hash.update(','.join(self.tasks).encode('utf-8'))
+        return hash.hexdigest()
 
     # Handles getting and setting interval in form validated by config
     @property
@@ -238,6 +265,7 @@ class Trigger(object):
     def trigger(self):
         """Call when trigger is activated. Records current run time and schedules next run."""
         self.last_run = datetime.now()
+        self._set_db_last_run()
         self.schedule_next_run()
 
     @property
@@ -263,6 +291,25 @@ class Trigger(object):
         if self.at_time:
             self.run_at = self.run_at.replace(hour=self.at_time.hour, minute=self.at_time.minute,
                                               second=self.at_time.second)
+
+    def _get_db_last_run(self):
+        session = Session()
+        db_trigger = session.query(DBTrigger).get(self.uid)
+        if db_trigger:
+            self.last_run = db_trigger.last_run
+            log.debug('loaded last_run from the database')
+
+    def _set_db_last_run(self):
+        session = Session()
+        db_trigger = session.query(DBTrigger).get(self.uid)
+        if not db_trigger:
+            db_trigger = DBTrigger(self.uid)
+            session.add(db_trigger)
+        db_trigger.last_run = self.last_run
+        session.commit()
+        session.close()
+        log.debug('recorded last_run to the database')
+
 
 
 class Tee(object):
