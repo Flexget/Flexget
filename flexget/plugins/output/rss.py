@@ -122,9 +122,6 @@ class OutputRSS(object):
     Default list: imdb_url, input_url, url
     """
 
-    def __init__(self):
-        self.written = {}
-
     schema = {
         'oneOf': [
             {'type': 'string'},  # TODO: path / file
@@ -138,7 +135,7 @@ class OutputRSS(object):
                     'rsslink': {'type': 'string'},
                     'encoding': {'type': 'string'},  # TODO: only valid choices
                     'title': {'type': 'string'},
-                    'description': {'type': 'string'},
+                    'template': {'type': 'string'},
                     'link': {'type': 'array', 'items': {'type': 'string'}}
                 },
                 'required': ['file'],
@@ -172,7 +169,7 @@ class OutputRSS(object):
             raise plugin.PluginWarning('plugin make_rss requires PyRSS2Gen library.')
         config = self.get_config(task)
 
-        # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely usefull)
+        # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely useful)
         if not config['history']:
             log.debug('disabling history')
             for item in task.session.query(RSSEntry).filter(RSSEntry.file == config['file']).all():
@@ -199,24 +196,13 @@ class OutputRSS(object):
             log.debug('Saving %s into rss database' % entry['title'])
             task.session.add(rss)
 
-    def on_process_end(self, task):
-        """Write RSS file at application terminate."""
         if not rss2gen:
             return
         # don't generate rss when learning
         if task.options.learn:
             return
 
-        config = self.get_config(task)
-        if config['file'] in self.written:
-            log.trace('skipping already written file %s' % config['file'])
-            return
-
-        # in terminate phase there is no open session in task, so open new one
-        from flexget.manager import Session
-        session = Session()
-
-        db_items = session.query(RSSEntry).filter(RSSEntry.file == config['file']).\
+        db_items = task.session.query(RSSEntry).filter(RSSEntry.file == config['file']).\
             order_by(RSSEntry.published.desc()).all()
 
         # make items
@@ -246,10 +232,7 @@ class OutputRSS(object):
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
                 # no longer needed
-                session.delete(db_item)
-
-        session.commit()
-        session.close()
+                task.session.delete(db_item)
 
         # make rss
         rss = PyRSS2Gen.RSS2(title='FlexGet',
@@ -276,7 +259,6 @@ class OutputRSS(object):
                 # TODO: plugins cannot raise PluginWarnings in terminate event ..
                 log.critical('Unable to write %s' % fn)
                 return
-        self.written[config['file']] = True
 
 
 @event('plugin.register')
