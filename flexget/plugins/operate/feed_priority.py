@@ -8,14 +8,14 @@ log = logging.getLogger('priority')
 
 
 # TODO: 1.2 figure out replacement for this
+# Currently the manager reads this value directly out of the config when the 'execute' command is run, and this plugin
+# does nothing but make the config key valid.
+# In daemon mode, schedules should be made which run tasks in the proper order instead of using this.
 class TaskPriority(object):
-
     """Set task priorities"""
 
     schema = {'type': 'integer'}
 
-    def on_process_start(self, task, config):
-        task.priority = config
 
 @event('plugin.register')
 def register_plugin():
