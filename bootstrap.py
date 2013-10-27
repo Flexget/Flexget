@@ -916,7 +916,8 @@ def install_sdist(project_name, sdist, py_executable, search_dirs=None):
     found, sdist_path = _find_file(sdist, search_dirs)
     if not found:
         logger.fatal("Cannot find sdist %s" % (sdist,))
-        return
+        # This is a manual edit to the file to make errors more clear until this change is released in new virtualenv
+        sys.exit(100)
 
     tmpdir = tempfile.mkdtemp()
     try:
@@ -1811,7 +1812,6 @@ def create_bootstrap_script(extra_text, python_version=''):
 
 def adjust_options(options, args):
     args[:] = ['.']
-    options.unzip_setuptools = True
 
 
 def after_install(options, home_dir):
