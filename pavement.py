@@ -141,7 +141,7 @@ def clean():
     import glob
 
     for p in ('bin', 'Scripts', 'build', 'dist', 'include', 'lib', 'man',
-              'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
+              'share', 'FlexGet.egg-info', 'paver-minilib.zip'):
         pth = path(p)
         if pth.isdir():
             pth.rmtree()
