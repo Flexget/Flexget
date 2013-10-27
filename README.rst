@@ -14,6 +14,11 @@ directory support or provide interface for external utilities like FlexGet.
 
 .. _FlexGet: http://flexget.com
 
+.. image:: https://api.travis-ci.org/Flexget/Flexget.png?branch=master
+    :target: https://travis-ci.org/Flexget/Flexget
+
+.. image:: https://pypip.in/d/FlexGet/badge.png
+    :target: https://crate.io/packages/FlexGet
 
 Install
 -------
