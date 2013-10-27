@@ -113,12 +113,17 @@ def forget(manager, options):
 
     if options.episode_id:
         # remove by id
-        identifier = options.episode_id.upper()
+        identifier = options.episode_id
         try:
             forget_series_episode(name, identifier)
             console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
-        except ValueError as e:
-            console(e.message)
+        except ValueError:
+            # Try upper casing identifier if we fail at first
+            try:
+                forget_series_episode(name, identifier.upper())
+                console('Removed episode `%s` from series `%s`.' % (identifier, name.capitalize()))
+            except ValueError as e:
+                console(e.message)
     else:
         # remove whole series
         try:

@@ -5,6 +5,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, u
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import db_schema, plugin
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import qualities
@@ -16,7 +17,7 @@ try:
     from flexget.plugins.filter import queue_base
 except ImportError:
     raise plugin.DependencyError(issued_by='movie_queue', missing='queue_base',
-                          message='movie_queue requires the queue_base plugin')
+                                 message='movie_queue requires the queue_base plugin')
 
 log = logging.getLogger('movie_queue')
 Base = db_schema.versioned_base('movie_queue', 2)
@@ -80,20 +81,20 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
     def matches(self, task, config, entry):
         # Tell tmdb_lookup to add lazy lookup fields if not already present
         try:
-            plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
-        except plugin.DependencyError:
-            log.debug('tmdb_lookup is not available, queue will not work if movie ids are not populated')
-        try:
             plugin.get_plugin_by_name('imdb_lookup').instance.register_lazy_fields(entry)
         except plugin.DependencyError:
             log.debug('imdb_lookup is not available, queue will not work if movie ids are not populated')
-            # make sure the entry has a movie id field filled
+        try:
+            plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
+        except plugin.DependencyError:
+            log.debug('tmdb_lookup is not available, queue will not work if movie ids are not populated')
+    
         conditions = []
         # Check if a movie id is already populated before incurring a lazy lookup
         for lazy in [False, True]:
             if entry.get('imdb_id', eval_lazy=lazy):
                 conditions.append(QueuedMovie.imdb_id == entry['imdb_id'])
-            if entry.get('tmdb_id', eval_lazy=lazy):
+            if entry.get('tmdb_id', eval_lazy=lazy and not conditions):
                 conditions.append(QueuedMovie.tmdb_id == entry['tmdb_id'])
             if conditions:
                 break
@@ -150,16 +151,20 @@ def parse_what(what, lookup=True, session=None):
         # If not doing an online lookup we can return here
         return result
 
-    try:
-        result['session'] = session
-        movie = tmdb_lookup(**result)
-    except LookupError as e:
-        raise QueueError(e.message)
+    search_entry = Entry(title=result['title'] or '')
+    for field in ['imdb_id', 'tmdb_id']:
+        if result.get(field):
+            search_entry[field] = result[field]
+    # Put lazy lookup fields on the search entry
+    get_plugin_by_name('imdb_lookup').instance.register_lazy_fields(search_entry)
+    get_plugin_by_name('tmdb_lookup').instance.lookup(search_entry)
 
-    if movie:
-        return {'title': movie.name, 'imdb_id': movie.imdb_id, 'tmdb_id': movie.id}
-    else:
-        raise QueueError('ERROR: Unable to find any such movie from tmdb, use imdb or tmdb id instead.')
+    try:
+        # Both ids are optional, but if movie_name was populated at least one of them will be there
+        return {'title': search_entry['movie_name'], 'imdb_id': search_entry.get('imdb_id'),
+                'tmdb_id': search_entry.get('tmdb_id')}
+    except KeyError as e:
+        raise QueueError(e.message)
 
 
 # API functions to edit queue

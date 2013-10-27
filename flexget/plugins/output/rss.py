@@ -10,7 +10,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Unicode
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
-from flexget.utils.template import render_from_entry, get_template
+from flexget.utils.template import render_from_entry, get_template, RenderError
 
 log = logging.getLogger('make_rss')
 Base = db_schema.versioned_base('make_rss', 0)
@@ -183,11 +183,14 @@ class OutputRSS(object):
                     rss.link = entry[field]
                     break
 
-            # TODO: better exception handling
             try:
-                rss.description = render_from_entry(get_template(config['template'], 'rss'), entry)
-            except:
-                log.error("Error while rendering entry %s, falling back to plain title", entry)
+                template = get_template(config['template'], 'rss')
+            except ValueError as e:
+                raise plugin.PluginError('Invalid template specified: %s' % e)
+            try:
+                rss.description = render_from_entry(template, entry)
+            except RenderError as e:
+                log.error('Error while rendering entry %s, falling back to plain title: %s', (entry, e))
                 rss.description = entry['title'] + ' - (Render Error)'
             rss.file = config['file']
 

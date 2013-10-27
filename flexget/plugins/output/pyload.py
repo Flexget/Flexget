@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals, division, absolute_import
-from urllib import urlencode, quote
-from urllib2 import urlopen, URLError, HTTPError
 from logging import getLogger
+from urllib import quote
+
+from requests.exceptions import RequestException
 
 from flexget import plugin, validator
 from flexget.event import event
-from flexget.utils import json
+from flexget.utils import json, requests
 
 log = getLogger('pyload')
 
@@ -83,7 +84,7 @@ class PluginPyLoad(object):
 
         try:
             session = self.get_session(config)
-        except URLError:
+        except IOError:
             raise plugin.PluginError('pyLoad not reachable', log)
         except plugin.PluginError:
             raise
@@ -106,7 +107,7 @@ class PluginPyLoad(object):
             result = query_api(api, "parseURLs", {"html": content, "url": url, "session": session})
 
             # parsed { plugins: [urls] }
-            parsed = json.loads(result.read())
+            parsed = result.json()
 
             urls = []
 
@@ -144,7 +145,7 @@ class PluginPyLoad(object):
                         'dest': dest,
                         'session': session}
 
-                pid = query_api(api, "addPackage", post).read()
+                pid = query_api(api, "addPackage", post).text
                 log.debug('added package pid: %s' % pid)
 
                 if folder:
@@ -161,7 +162,7 @@ class PluginPyLoad(object):
         # Login
         post = {'username': config['username'], 'password': config['password']}
         result = query_api(url, "login", post)
-        response = json.loads(result.read())
+        response = result.json()
         if not response:
             raise plugin.PluginError('Login failed', log)
         return response.replace('"', '')
@@ -169,10 +170,15 @@ class PluginPyLoad(object):
 
 def query_api(url, method, post=None):
     try:
-        return urlopen(url.rstrip("/") + "/" + method.strip("/"), urlencode(post) if post else None)
-    except HTTPError as e:
-        if e.code == 500:
-            raise plugin.PluginError('Internal API Error', log)
+        response = requests.request(
+            'post' if post is not None else 'get',
+            url.rstrip("/") + "/" + method.strip("/"),
+            data=post)
+        response.raise_for_status()
+        return response
+    except RequestException as e:
+        if e.response.status_code == 500:
+            raise plugin.PluginError('Internal API Error: <%s> <%s> <%s>' % (method, url, post), log)
         raise
 
 

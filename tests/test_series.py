@@ -253,6 +253,7 @@ class TestFilterSeries(FlexGetBase):
             - title: many.names.S01E01
             - title: name.1.S01E02
             - title: name.2.S01E03
+            - title: paren.title.2013.S01E01
             series:
             - The Show:
                 alternate_name: Other Name
@@ -260,6 +261,8 @@ class TestFilterSeries(FlexGetBase):
                 alternate_name:
                 - name 1
                 - name 2
+            - paren title (US):
+                alternate_name: paren title 2013
     """
 
     def test_smoke(self):

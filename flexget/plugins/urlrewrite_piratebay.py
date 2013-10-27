@@ -61,10 +61,10 @@ class UrlRewritePirateBay(object):
         url = entry['url']
         if url.endswith('.torrent'):
             return False
-        url = url.replace('thepiratebay.org', 'thepiratebay.se')
-        if url.startswith('http://thepiratebay.se/'):
+        url = url.replace('thepiratebay.org', 'thepiratebay.sx')
+        if url.startswith('http://thepiratebay.sx/'):
             return True
-        if url.startswith('http://torrents.thepiratebay.se/'):
+        if url.startswith('http://torrents.thepiratebay.sx/'):
             return True
         return False
 
@@ -74,7 +74,7 @@ class UrlRewritePirateBay(object):
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
-        if entry['url'].startswith(('http://thepiratebay.se/search/', 'http://thepiratebay.org/search/')):
+        if entry['url'].startswith(('http://thepiratebay.sx/search/', 'http://thepiratebay.org/search/')):
             # use search
             results = self.search(entry)
             if not results:
@@ -124,14 +124,14 @@ class UrlRewritePirateBay(object):
             # TPB search doesn't like dashes
             query = query.replace('-', ' ')
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = 'http://thepiratebay.se/search/' + urllib.quote(query.encode('utf-8')) + filter_url
+            url = 'http://thepiratebay.sx/search/' + urllib.quote(query.encode('utf-8')) + filter_url
             log.debug('Using %s as piratebay search url' % url)
             page = requests.get(url).content
             soup = get_soup(page)
             for link in soup.find_all('a', attrs={'class': 'detLink'}):
                 entry = Entry()
                 entry['title'] = link.contents[0]
-                entry['url'] = 'http://thepiratebay.se' + link.get('href')
+                entry['url'] = 'http://thepiratebay.sx' + link.get('href')
                 tds = link.parent.parent.parent.find_all('td')
                 entry['torrent_seeds'] = int(tds[-2].contents[0])
                 entry['torrent_leeches'] = int(tds[-1].contents[0])
