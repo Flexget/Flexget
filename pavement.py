@@ -84,9 +84,7 @@ options(
         extra_files=['virtual', 'svn', 'version']
     ),
     virtualenv=Bunch(
-        paver_command_line='develop',
-        unzip_setuptools=True,
-        distribute=True
+        paver_command_line='develop'
     ),
     # sphinxcontrib.paverutils
     sphinx=Bunch(
@@ -143,7 +141,7 @@ def clean():
     import glob
 
     for p in ('bin', 'Scripts', 'build', 'dist', 'include', 'lib', 'man',
-              'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
+              'share', 'FlexGet.egg-info', 'paver-minilib.zip'):
         pth = path(p)
         if pth.isdir():
             pth.rmtree()
@@ -377,9 +375,4 @@ def pep8(args):
 
 @task
 def bootstrap():
-    vopts = options.virtualenv
-    paver.virtual._create_bootstrap(vopts.get("script_name", "bootstrap.py"),
-                                    vopts.get("packages_to_install", []),
-                                    vopts.get("paver_command_line", None),
-                                    dest_dir=vopts.get("dest_dir", '.'),
-                                    unzip_setuptools=vopts.get("unzip_setuptools", False))
+    paver.virtual.bootstrap()
