@@ -90,11 +90,16 @@ class InputHtml(object):
             base_url = config['url']
             entries_count = increment.get('entries_count', 500)
             stop_when_empty = increment.get('stop_when_empty', True)
+            increment_name = increment.get('name', 'i')
             while to is None or current < to:
                 def _increment_replace(match):
-                    expr = match.group(1)                  
-                    eval = safer_eval(expr, {increment.get('name', 'i'): current})
-                    return str(eval)
+                    expr = match.group(1).strip()
+                    if not expr:
+                        return ""
+                    elif expr == increment_name:
+                        return str(current)
+                    else:
+                        return str(safer_eval(expr, {increment_name: current}))
                 url = re.sub(r"{(.*?)}", _increment_replace, base_url)
                 dump_name = None
                 if 'dump' in config:
