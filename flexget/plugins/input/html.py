@@ -7,6 +7,7 @@ import re
 
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginError
+from flexget.plugins.filter.if_condition import safer_eval
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
 
@@ -38,6 +39,14 @@ class InputHtml(object):
         advanced.accept('text', key='title_from')
         regexps = advanced.accept('list', key='links_re')
         regexps.accept('regexp')
+        advanced.accept('boolean', key='increment')
+        increment = advanced.accept('dict', key='increment')
+        increment.accept('integer', key='from')
+        increment.accept('integer', key='to')
+        increment.accept('text', key='name')
+        increment.accept('integer', key='step')
+        increment.accept('boolean', key='stop_when_empty')
+        increment.accept('integer', key='entries_count')
         return root
 
     def build_config(self, config):
@@ -65,25 +74,61 @@ class InputHtml(object):
     def on_task_input(self, task, config):
         config = self.build_config(config)
 
-        log.debug('InputPlugin html requesting url %s' % config['url'])
-
         auth = None
         if config.get('username') and config.get('password'):
             log.debug('Basic auth enabled. User: %s Password: %s' % (config['username'], config['password']))
             auth = (config['username'], config['password'])
-
-        page = task.requests.get(config['url'], auth=auth)
+            
+        increment = config.get('increment')
+        if increment:            
+            entries = None
+            if not isinstance(increment, dict):
+                increment = {}
+            current = increment.get('from', 0)
+            to = increment.get('to')
+            step = increment.get('step', 1)
+            base_url = config['url']
+            entries_count = increment.get('entries_count', 500)
+            stop_when_empty = increment.get('stop_when_empty', True)
+            while to is None or current < to:
+                def _increment_replace(match):
+                    expr = match.group(1)                  
+                    eval = safer_eval(expr, {increment.get('name', 'i'): current})
+                    return str(eval)
+                url = re.sub(r"{(.*?)}", _increment_replace, base_url)
+                dump_name = None
+                if 'dump' in config:
+                    dump_name = config['dump']
+                    if dump_name:
+                        dump_name = re.sub(r"{(.*?)}", _increment_replace, dump_name)
+                new_entries = self._request_url(task, config, url, auth, dump_name)
+                if not entries:
+                    entries = new_entries
+                else:
+                    entries.extend(new_entries)
+                if stop_when_empty and not new_entries:
+                    break
+                if entries_count and len(entries) >= entries_count:
+                    break
+                current = current + step
+            return entries
+        else:
+            return self._request_url(task, config, base_url, auth)
+        
+    def _request_url(self, task, config, url, auth, dump_name = None):
+        log.debug('InputPlugin html requesting url %s' % url)
+        page = task.requests.get(url, auth=auth)
+        log.debug('InputPlugin html response: %s %s' % (page.status_code, page.reason))            
         soup = get_soup(page.text)
 
         # dump received content into a file
-        if 'dump' in config:
-            name = config['dump']
-            log.info('Dumping %s into %s' % (config['url'], name))
+        if dump_name:
+            log.info('Dumping %s into %s' % (url, dump_name))
             data = soup.prettify()
-            with open(name, 'w') as f:
+            with open(dump_name, 'w') as f:
                 f.write(data)
 
-        return self.create_entries(config['url'], soup, config)
+        return self.create_entries(url, soup, config)
 
     def _title_from_link(self, link, log_link):
         title = link.text
