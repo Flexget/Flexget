@@ -1811,7 +1811,6 @@ def create_bootstrap_script(extra_text, python_version=''):
 
 def adjust_options(options, args):
     args[:] = ['.']
-    options.unzip_setuptools = True
 
 
 def after_install(options, home_dir):
