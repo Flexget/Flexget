@@ -4,15 +4,14 @@ import logging
 import urllib
 import zlib
 import re
+from jinja2 import Template
 
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginError
-from flexget.plugins.filter.if_condition import safer_eval
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
 
 log = logging.getLogger('html')
-
 
 class InputHtml(object):
     """
@@ -91,21 +90,20 @@ class InputHtml(object):
             entries_count = increment.get('entries_count', 500)
             stop_when_empty = increment.get('stop_when_empty', True)
             increment_name = increment.get('name', 'i')
+            
+            template_url = Template(base_url)
+            template_dump = None
+            if 'dump' in config:
+                dump_name = config['dump']
+                if dump_name:
+                    template_dump = Template(dump_name)
+            
             while to is None or current < to:
-                def _increment_replace(match):
-                    expr = match.group(1).strip()
-                    if not expr:
-                        return ""
-                    elif expr == increment_name:
-                        return str(current)
-                    else:
-                        return str(safer_eval(expr, {increment_name: current}))
-                url = re.sub(r"{(.*?)}", _increment_replace, base_url)
+                render_ctx = {increment_name: current}
+                url = template_url.render(**render_ctx)
                 dump_name = None
-                if 'dump' in config:
-                    dump_name = config['dump']
-                    if dump_name:
-                        dump_name = re.sub(r"{(.*?)}", _increment_replace, dump_name)
+                if template_dump:
+                    dump_name = template_dump.render(**render_ctx)
                 new_entries = self._request_url(task, config, url, auth, dump_name)
                 if not entries:
                     entries = new_entries
