@@ -1,6 +1,9 @@
 *.pyc
 *.swo
 *.swp
+.settings/
+.project
+.pydevproject
 /.Python
 FlexGet.egg-info/
 bin/
