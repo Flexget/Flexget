@@ -22,5 +22,6 @@ build/
 paver-minilib.zip
 man/
 distribute-*.tar.gz
-
+setuptools-*.tar.gz
+pip-*.tar.gz
 .DS_Store
