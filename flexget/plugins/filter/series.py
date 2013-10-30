@@ -1030,7 +1030,7 @@ class FilterSeries(FilterSeriesBase):
 
             # accept info from set: and place into the entry
             if 'set' in config:
-                set = get_plugin_by_name('set')
+                set = plugin.get_plugin_by_name('set')
                 set.instance.modify(entry, config.get('set'))
 
     def process_series(self, task, series_entries, config):
