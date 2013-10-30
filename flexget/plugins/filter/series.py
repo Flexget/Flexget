@@ -1252,6 +1252,8 @@ class FilterSeries(FilterSeriesBase):
         """Rejects all episodes that are too old or new (advancement), return True when this happens."""
 
         latest = get_latest_download(episode.series)
+        if episode.series.begin and episode.series.begin > latest:
+            latest = episode.series.begin
         log.debug('latest download: %s' % latest)
         log.debug('current: %s' % episode)
 

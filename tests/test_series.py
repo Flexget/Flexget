@@ -1372,7 +1372,7 @@ class TestFromGroup(FlexGetBase):
         assert self.task.find_entry('accepted', title='Test.14.HDTV-Name')
 
 
-class TestWatched(FlexGetBase):
+class TestBegin(FlexGetBase):
 
     __yaml__ = """
         templates:
@@ -1431,6 +1431,22 @@ class TestWatched(FlexGetBase):
                   begin: '2009-05-05'
               - W2Test:
                   begin: '2012-12-31'
+          test_advancement1:
+            mock:
+            - title: WTest.S01E01
+            series:
+            - WTest
+          test_advancement2:
+            mock:
+            - title: WTest.S03E01
+            series:
+            - WTest
+          test_advancement3:
+            mock:
+            - title: WTest.S03E01
+            series:
+            - WTest:
+                begin: S03E01
 
     """
 
@@ -1457,6 +1473,17 @@ class TestWatched(FlexGetBase):
     def test_after_date(self):
         self.execute_task('after_date_test')
         assert len(self.task.accepted) == 2, 'Entries should have been accepted, they are not before the begin episode'
+
+    def test_advancement(self):
+        # Put S01E01 into the database as latest download
+        self.execute_task('test_advancement1')
+        assert self.task.accepted
+        # Just verify regular ep advancement would block S03E01
+        self.execute_task('test_advancement2')
+        assert not self.task.accepted, 'Episode advancement should have blocked'
+        # Make sure ep advancement doesn't block it when we've set begin to that ep
+        self.execute_task('test_advancement3')
+        assert self.task.accepted, 'Episode should have been accepted'
 
 
 class TestSeriesPremiere(FlexGetBase):
