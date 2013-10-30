@@ -247,6 +247,13 @@ class Manager(object):
             possible.append(self.options.config)
         else:
             log.debug('Figuring out config load paths')
+            # for virtualenv / dev sandbox
+            from flexget import __version__ as version
+            if version == '{git}':
+                log.debug('Running git, adding virtualenv / sandbox paths')
+                possible.append(os.path.join(exec_path, '..'))
+                possible.append(current_path)
+                possible.append(exec_path)
             # normal lookup locations
             possible.append(startup_path)
             possible.append(home_path)
@@ -258,13 +265,6 @@ class Manager(object):
                 # The freedesktop.org standard config location
                 xdg_config = os.environ.get('XDG_CONFIG_HOME', os.path.join(os.path.expanduser('~'), '.config'))
                 possible.append(os.path.join(xdg_config, 'flexget'))
-            # for virtualenv / dev sandbox
-            from flexget import __version__ as version
-            if version == '{git}':
-                log.debug('Running git, adding virtualenv / sandbox paths')
-                possible.append(os.path.join(exec_path, '..'))
-                possible.append(current_path)
-                possible.append(exec_path)
 
         for path in possible:
             config = os.path.join(path, self.options.config)
