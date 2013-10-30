@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase
 
 
-class TestPreset(FlexGetBase):
+class TestTemplate(FlexGetBase):
     __yaml__ = """
         templates:
           global:
@@ -59,7 +59,7 @@ class TestPreset(FlexGetBase):
         assert len(self.task.entries) == 2, 'Should only have been 2 entries created'
 
 
-class TestPresetMerge(FlexGetBase):
+class TestTemplateMerge(FlexGetBase):
 
     __yaml__ = """
         templates:
@@ -88,3 +88,20 @@ class TestPresetMerge(FlexGetBase):
         self.execute_task('test')
         assert self.task.config['imdb']['min_score'] == 6.5, 'float merge failed'
         assert 'comedy' in self.task.config['imdb']['reject_genres'], 'list merge failed'
+
+
+class TestTemplateRerun(FlexGetBase):
+    __yaml__ = """
+        templates:
+          a:
+            series:
+            - someseries
+        tasks:
+          test_rerun:
+            template: a
+            rerun: 1
+    """
+
+    def test_rerun(self):
+        self.execute_task('test_rerun')
+        assert len(self.task.config['series']) == 1

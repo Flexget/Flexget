@@ -177,8 +177,8 @@ class Task(object):
         # raw_config should remain the untouched input config
         if config is None:
             config = manager.config['tasks'].get(name, {})
-        self._raw_config = config
-        self.config = None
+        self.config = copy.deepcopy(config)
+        self.prepared_config = None
         if options is None:
             options = copy.copy(self.manager.options.execute)
         elif isinstance(options, dict):
@@ -216,7 +216,6 @@ class Task(object):
         self.enabled = not self.name.startswith('_')
         self.session = None
         self.priority = 65535
-        self.config = copy.deepcopy(self._raw_config)
 
         self.requests = requests.Session()
 
@@ -461,7 +460,11 @@ class Task(object):
         config_hash = hashlib.md5(str(sorted(self.config.items()))).hexdigest()
         last_hash = self.session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
         if self.is_rerun:
-            # Make sure on rerun config is not marked as modified
+            # Restore the config to state right after start phase
+            if self.prepared_config:
+                self.config = copy.deepcopy(self.prepared_config)
+            else:
+                log.error('BUG: No prepared_config on rerun, please report.')
             self.config_modified = False
         elif not last_hash:
             self.config_modified = True
@@ -485,12 +488,14 @@ class Task(object):
                     continue
                 if phase == 'start' and self.is_rerun:
                     log.debug('skipping task_start during rerun')
-                    continue
                 elif phase == 'exit' and self._rerun:
                     log.debug('not running task_end yet because task will rerun')
-                    continue
-                # run all plugins with this phase
-                self.__run_task_phase(phase)
+                else:
+                    # run all plugins with this phase
+                    self.__run_task_phase(phase)
+                    if phase == 'start':
+                        # Store a copy of the config state after start phase to restore for reruns
+                        self.prepared_config = copy.deepcopy(self.config)
         except TaskAbort:
             # Roll back the session before calling abort handlers
             self.session.rollback()
