@@ -94,7 +94,7 @@ class EmitSeries(object):
                                             filter(Episode.season == latest.season))
                     if series.identified_by == 'sequence':
                         # Don't look for missing too far back with sequence shows
-                        start_at_ep = latest.number - 10
+                        start_at_ep = max(latest.number - 10, 1)
                         episodes_this_season = episodes_this_season.filter(Episode.number >= start_at_ep)
                     latest_ep_this_season = episodes_this_season.order_by(desc(Episode.number)).first()
                     downloaded_this_season = (episodes_this_season.join(Episode.releases).
