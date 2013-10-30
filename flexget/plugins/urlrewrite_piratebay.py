@@ -15,7 +15,7 @@ log = logging.getLogger('piratebay')
 TLDS = "com|org|sx|se"
 CUR_TLD = "sx"
 
-URL_MATCH = re.compile("^http://(?:torrent\.)?thepiratebay\.(?:%s)/.*$" % TLDS)
+URL_MATCH = re.compile("^http://(?:torrents\.)?thepiratebay\.(?:%s)/.*$" % TLDS)
 URL_SEARCH = re.compile("^http://thepiratebay\.(?:%s)/search/.*$" % TLDS)
 
 CATEGORIES = {
