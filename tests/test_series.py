@@ -1394,7 +1394,7 @@ class TestBegin(FlexGetBase):
               - WTest:
                   begin: S02E03
               - W2Test:
-                  begin: S01E04
+                  begin: S02E01
           before_seq_test:
             mock:
             - title: WTest.1.HDTV.XViD-FlexGet
