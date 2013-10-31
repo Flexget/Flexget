@@ -367,7 +367,7 @@ class CoreArgumentParser(ArgumentParser):
         kwargs.setdefault('parents', [manager_parser])
         kwargs.setdefault('prog', 'flexget')
         super(CoreArgumentParser, self).__init__(**kwargs)
-        self.add_subparsers(title='Commands', metavar='<command>', dest='cli_command', scoped_namespaces=True)
+        self.add_subparsers(title='commands', metavar='<command>', dest='cli_command', scoped_namespaces=True)
 
         # The parser for the execute command
         exec_parser = self.add_subparser('execute', help='execute tasks now')
@@ -395,8 +395,11 @@ class CoreArgumentParser(ArgumentParser):
         # The parser for the daemon command
         daemon_parser = self.add_subparser('daemon', help='run continuously, executing tasks according to schedules '
                                                           'defined in config')
+        daemon_parser.add_subparsers(title='actions', metavar='<action>', dest='action')
+        start_parser = daemon_parser.add_subparser('start', help='start the daemon')
+        start_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
+        daemon_parser.add_subparser('stop', help='shutdown the running daemon')
         daemon_parser.set_defaults(loglevel='info')
-        daemon_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
 
         # The parser for the webui
         # Hide the webui command if deps aren't available

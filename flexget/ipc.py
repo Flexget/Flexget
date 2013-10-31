@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 import logging
 import sys
 import threading
@@ -37,9 +37,10 @@ class DaemonService(rpyc.Service):
         # TODO: Reload config
         raise NotImplementedError
 
-    def exposed_shutdown(self, finish_queue):
+    def exposed_shutdown(self, finish_queue=False):
+        log.info('Shutdown requested over ipc.')
+        print('Daemon shutdown requested.', file=self._conn.root.get_stdout())
         self.manager.scheduler.shutdown(finish_queue=finish_queue)
-        self._conn.root.console('Daemon shutdown requested.')
 
 
 class ClientService(rpyc.Service):

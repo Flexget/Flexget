@@ -170,6 +170,19 @@ class Manager(object):
                 #    profile.runctx('self.execute()', globals(), locals(),
                 #                   os.path.join(self.config_base, 'flexget.profile'))
         elif command == 'daemon':
+            self.run_daemon(options)
+        elif command == 'webui':
+            self.run_webui(options)
+        # Otherwise dispatch the command to the callback function
+        else:
+            if options.lock_required:
+                with self.acquire_lock():
+                    options.cli_command_callback(self, options)
+            else:
+                options.cli_command_callback(self, options)
+
+    def run_daemon(self, options):
+        if options.action == 'start':
             if options.daemonize:
                 self.daemonize()
             with self.acquire_lock():
@@ -181,26 +194,28 @@ class Manager(object):
                 except KeyboardInterrupt:
                     fire_event('manager.daemon.completed', self)
                     self.shutdown(finish_queue=False)
-        elif command == 'webui':
-            try:
-                pkg_resources.require('flexget[webui]')
-            except pkg_resources.DistributionNotFound as e:
-                log.error('Dependency not met. %s' % e)
-                log.error('Webui dependencies not installed. You can use `pip install flexget[webui]` to install them.')
+        elif options.action == 'stop':
+            port = self.check_ipc_port()
+            if port:
+                client = IPCClient(port)
+                client.shutdown()
                 self.shutdown()
-                return
-            if options.daemonize:
-                self.daemonize()
-            from flexget.ui import webui
-            with self.acquire_lock():
-                webui.start(self)
-        # Otherwise dispatch the command to the callback function
-        else:
-            if options.lock_required:
-                with self.acquire_lock():
-                    options.cli_command_callback(self, options)
             else:
-                options.cli_command_callback(self, options)
+                log.error('There does not appear to be a daemon running.')
+
+    def run_webui(self, options):
+        try:
+            pkg_resources.require('flexget[webui]')
+        except pkg_resources.DistributionNotFound as e:
+            log.error('Dependency not met. %s' % e)
+            log.error('Webui dependencies not installed. You can use `pip install flexget[webui]` to install them.')
+            self.shutdown()
+            return
+        if options.daemonize:
+            self.daemonize()
+        from flexget.ui import webui
+        with self.acquire_lock():
+            webui.start(self)
 
     def setup_yaml(self):
         """Sets up the yaml loader to return unicode objects for strings by default"""
