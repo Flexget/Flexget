@@ -87,7 +87,7 @@ class BetaSeriesList(object):
             user_token = create_token(api_key, username, password)
             for member in members:
                 titles.update(query_series(api_key, user_token, member))
-        except (requests.RequestException, AssertionError), err:
+        except (requests.RequestException, AssertionError) as err:
             log.critical('Failed to get series at BetaSeries.com: %s' % err.message, exc_info=err)
 
         log.verbose("series: " + ", ".join(titles))
