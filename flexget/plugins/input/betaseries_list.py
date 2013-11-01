@@ -63,18 +63,13 @@ class BetaSeriesList(object):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'api_key': {'type': 'string'},
-            'members': {'oneOf': [
-                {
-                    'type': 'null',
-                },
-                {
+            'members': {
                     'type': 'array',
                     'items': {
                         "title": "member name",
                         "type": "string"
                     }
-                }
-            ]},
+            }
         },
         'required': ['username', 'password', 'api_key'],
         'additionalProperties': False
@@ -85,13 +80,7 @@ class BetaSeriesList(object):
         username = config['username']
         password = config['password']
         api_key = config['api_key']
-        try:
-            members = config['members']
-        except KeyError:
-            members = [username]
-
-        if members is None:
-            members = [username]
+        members = config.get('members', [username])
 
         titles = set()
         try:

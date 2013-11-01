@@ -30,15 +30,6 @@ class Test_import_series_betaseries_list(FlexGetBase):
                   password: passwd_foo
                   api_key: api_key_foo
 
-          test_with_empty_members:
-            import_series:
-              from:
-                betaseries_list:
-                  username: user_foo
-                  password: passwd_foo
-                  api_key: api_key_foo
-                  members:
-
           test_with_one_members:
             import_series:
               from:
@@ -83,16 +74,6 @@ class Test_import_series_betaseries_list(FlexGetBase):
         self.query_series_mock.return_value = ["Breaking Bad", "Dexter"]
         # WHEN
         self.execute_task('test_no_members')
-        # THEN
-        assert_series_count_in_db(2)
-        assert_mock_calls([call('api_key_foo', 'user_foo', 'passwd_foo')],  self.create_token_mock)
-        assert_mock_calls([call('api_key_foo', 'token_foo', 'user_foo')], self.query_series_mock)
-
-    def test_with_empty_members(self):
-        # GIVEN
-        self.query_series_mock.return_value = ["Breaking Bad", "Dexter"]
-        # WHEN
-        self.execute_task('test_with_empty_members')
         # THEN
         assert_series_count_in_db(2)
         assert_mock_calls([call('api_key_foo', 'user_foo', 'passwd_foo')],  self.create_token_mock)
