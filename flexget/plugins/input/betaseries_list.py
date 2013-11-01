@@ -21,13 +21,13 @@ class BetaSeriesList(object):
         Configuration examples:
 
         # will get all series followed by the account identified by your_user_name
-        betaseries:
+        betaseries_list:
           username: your_user_name
           password: your_password
           api_key: your_api_key
 
         # will get all series followed by the account identified by some_other_guy
-        betaseries:
+        betaseries_list:
           username: your_user_name
           password: your_password
           api_key: your_api_key
@@ -35,7 +35,7 @@ class BetaSeriesList(object):
             - some_other_guy
 
         # will get all series followed by the accounts identified by guy1 and guy2
-        betaseries:
+        betaseries_list:
           username: your_user_name
           password: your_password
           api_key: your_api_key
