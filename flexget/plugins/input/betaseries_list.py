@@ -104,10 +104,10 @@ def create_token(api_key, login, password):
     login in and request an new API token.
     http://www.betaseries.com/wiki/Documentation#cat-members
 
-    @param api_key: api key requested at http://www.betaseries.com/api
-    @param login:
-    @param password:
-    @return: user token
+    :param string api_key: Api key requested at http://www.betaseries.com/api
+    :param string login: Login name
+    :param string password: Password
+    :return: User token
     """
     r = requests.post(API_URL_PREFIX + 'members/auth', params={
         'login': login,
@@ -128,12 +128,12 @@ def create_token(api_key, login, password):
 
 def query_member_id(api_key, user_token, login_name):
     """
-    get the member id of a member identified by its login name.
+    Get the member id of a member identified by its login name.
 
-    @param api_key: api key requested at http://www.betaseries.com/api
-    @param user_token: obtained with a call to create_token()
-    @param login_name: the login name of the member
-    @return: id of the member identified by its login name or None if not found
+    :param string api_key: Api key requested at http://www.betaseries.com/api
+    :param string user_token: obtained with a call to create_token()
+    :param string login_name: The login name of the member
+    :return: Id of the member identified by its login name or `None` if not found
     """
     r = requests.get(API_URL_PREFIX + 'members/search', params={
         'login': login_name
@@ -159,13 +159,13 @@ def query_member_id(api_key, user_token, login_name):
 
 def query_series(api_key, user_token, member_name=None):
     """
-    get the list of series followed by the authenticated user
+    Get the list of series followed by the authenticated user
 
-    @param api_key: api key requested at http://www.betaseries.com/api
-    @param user_token: obtained with a call to create_token()
-    @param member_name: [optional] a member name to get the list of series from. If None, will query the member for whom
-                    the user_token was for
-    @return: list of serie titles
+    :param string api_key: Api key requested at http://www.betaseries.com/api
+    :param string user_token: Obtained with a call to create_token()
+    :param string member_name: [optional] A member name to get the list of series from. If None, will query the member
+        for whom the user_token was for
+    :return: List of serie titles or empty list
     """
     params = {}
     if member_name:
