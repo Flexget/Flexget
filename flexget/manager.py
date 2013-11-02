@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import atexit
 from contextlib import contextmanager
-import fnmatch
 import os
 import sys
 import shutil

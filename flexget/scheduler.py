@@ -95,7 +95,9 @@ class Scheduler(threading.Thread):
         """Clears current schedules and loads them from the config."""
         with self.triggers_lock:
             self.triggers = []
-            for item in self.manager.config.get('schedules', []):
+            if 'schedules' not in self.manager.config:
+                log.info('No schedules defined in config. Defaulting to run all tasks on a 1 hour interval.')
+            for item in self.manager.config.get('schedules', [{'tasks': ['*'], 'interval': {'hours': 1}}]):
                 tasks = item['tasks']
                 if not isinstance(tasks, list):
                     tasks = [tasks]
