@@ -1,6 +1,5 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
+from __future__ import unicode_literals, division, absolute_import
 import logging
-import sys
 import threading
 
 import rpyc
@@ -11,27 +10,31 @@ from flexget.utils.tools import console
 
 log = logging.getLogger('ipc')
 
-# Allow some attributes from dict and file interface to be called over the wire
-rpyc.core.protocol.DEFAULT_CONFIG['safe_attrs'].update(['items', 'write', 'flush'])
+# Allow some attributes from dict interface to be called over the wire
+rpyc.core.protocol.DEFAULT_CONFIG['safe_attrs'].update(['items'])
 
 
 class DaemonService(rpyc.Service):
     # This will be populated when the server is started
     manager = None
 
-    def exposed_execute(self, task, options=None):
+    def exposed_execute(self, options=None):
         # Dictionaries are pass by reference with rpyc, turn this into a real dict on our side
         if options:
             options = dict(options.items())
         if self.manager.scheduler.run_queue.qsize() > 0:
-            self._conn.root.console('There is already a task executing. This task will execute next.')
-        log.info('Executing task `%s` for client.' % task)
+            self.client_console('There is already a task executing. This task will execute next.')
+        log.info('Executing for client.')
         cron = options and options.get('cron')
-        output = None if cron else self._conn.root.get_stdout()
-        task_finished = self.manager.scheduler.execute(task, options=options, output=output)
-        if not cron:
-            # Wait until task has finished so that log is sent back
-            task_finished.wait()
+        output = None if cron else BufferQueue()
+        tasks_finished = self.manager.scheduler.execute(options=options, output=output)
+        if output:
+            # Send back any output until all tasks have finished
+            while any(not t.is_set() for t in tasks_finished):
+                try:
+                    self.client_console(output.get(True, 0.5).rstrip())
+                except BufferQueue.Empty:
+                    continue
 
     def exposed_reload(self):
         # TODO: Reload config
@@ -39,14 +42,16 @@ class DaemonService(rpyc.Service):
 
     def exposed_shutdown(self, finish_queue=False):
         log.info('Shutdown requested over ipc.')
-        print('Daemon shutdown requested.', file=self._conn.root.get_stdout())
+        self.client_console('Daemon shutdown requested.')
         self.manager.scheduler.shutdown(finish_queue=finish_queue)
+
+    def client_console(self, text):
+        self._conn.root.console(text)
 
 
 class ClientService(rpyc.Service):
-    def exposed_get_stdout(self):
-        """Let the daemon write to our stdout"""
-        return sys.stdout
+    def exposed_console(self, text):
+        console(text)
 
 
 class IPCServer(threading.Thread):

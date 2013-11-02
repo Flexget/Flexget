@@ -126,53 +126,11 @@ class Manager(object):
         options = getattr(self.options, command)
         # First check for built-in commands
         if command == 'execute':
-            tasks = manager.tasks
-            # Handle --tasks
-            if options.tasks:
-                tasks = set()
-                for arg in [t.lower() for t in options.tasks]:
-                    matches = [t for t in manager.tasks if t == arg or fnmatch.fnmatchcase(t.lower(), arg)]
-                    if not matches:
-                        log.error('`%s` does not match any tasks' % arg)
-                        continue
-                    tasks.update(matches)
-                # Set the option as a list of matching task names so plugins can use it easily
-                options.tasks = list(tasks)
-            # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
-            tasks = sorted(tasks, key=lambda t: manager.config['tasks'][t].get('priority', 65535))
-
-            port = self.check_ipc_port()
-            if port:
-                client = IPCClient(port)
-                for task in tasks:
-                    client.execute(task, dict(options))
-                self.shutdown()
-                return
-            with self.acquire_lock():
-                fire_event('manager.execute.started', self)
-                self.scheduler.start()
-                for name in tasks:
-                    self.scheduler.execute(name)
-                self.scheduler.shutdown(finish_queue=True)
-                try:
-                    self.scheduler.wait()
-                except KeyboardInterrupt:
-                    log.error('Got ctrl-c exiting after this task completes. Press ctrl-c again to abort this task.')
-                else:
-                    fire_event('manager.execute.completed', self)
-                self.shutdown(finish_queue=False)
-                # TODO: Figure out how to profile with scheduler
-                #if options.profile:
-                #    try:
-                #        import cProfile as profile
-                #    except ImportError:
-                #        import profile
-                #    profile.runctx('self.execute()', globals(), locals(),
-                #                   os.path.join(self.config_base, 'flexget.profile'))
+            self.execute_command(options)
         elif command == 'daemon':
-            self.run_daemon(options)
+            self.daemon_command(options)
         elif command == 'webui':
-            self.run_webui(options)
+            self.webui_command(options)
         # Otherwise dispatch the command to the callback function
         else:
             if options.lock_required:
@@ -181,7 +139,29 @@ class Manager(object):
             else:
                 options.cli_command_callback(self, options)
 
-    def run_daemon(self, options):
+    def execute_command(self, options):
+        # If a daemon is started, send the execution to the daemon
+        port = self.check_ipc_port()
+        if port:
+            client = IPCClient(port)
+            client.execute(dict(options))
+            self.shutdown()
+            return
+        # Otherwise we run the execution ourselves
+        with self.acquire_lock():
+            fire_event('manager.execute.started', self)
+            self.scheduler.start()
+            self.scheduler.execute(options)
+            self.scheduler.shutdown(finish_queue=True)
+            try:
+                self.scheduler.wait()
+            except KeyboardInterrupt:
+                log.error('Got ctrl-c exiting after this task completes. Press ctrl-c again to abort this task.')
+            else:
+                fire_event('manager.execute.completed', self)
+            self.shutdown(finish_queue=False)
+
+    def daemon_command(self, options):
         if options.action == 'start':
             if options.daemonize:
                 self.daemonize()
@@ -203,7 +183,7 @@ class Manager(object):
             else:
                 log.error('There does not appear to be a daemon running.')
 
-    def run_webui(self, options):
+    def webui_command(self, options):
         try:
             pkg_resources.require('flexget[webui]')
         except pkg_resources.DistributionNotFound as e:

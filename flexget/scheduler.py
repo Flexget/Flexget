@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+import copy
 from datetime import datetime, timedelta, time as dt_time
+import fnmatch
 from hashlib import md5
 import logging
 import Queue
@@ -56,7 +58,7 @@ main_schema = {
     'type': 'array',
     'items': {
         'properties': {
-            'tasks': {'type': 'array', 'items': {'type': 'string'}},
+            'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
             'interval': yaml_schedule
         },
         'required': ['tasks', 'interval'],
@@ -94,26 +96,54 @@ class Scheduler(threading.Thread):
         with self.triggers_lock:
             self.triggers = []
             for item in self.manager.config.get('schedules', []):
-                self.triggers.append(Trigger(item['interval'], item['tasks'], options={'cron': True}))
+                tasks = item['tasks']
+                if not isinstance(tasks, list):
+                    tasks = [tasks]
+                self.triggers.append(Trigger(item['interval'], tasks, options={'cron': True}))
 
-    def execute(self, task, options=None, output=None):
+    def execute(self, options=None, output=None, priority=1):
         """
         Add a task to the scheduler to be run immediately.
 
-        :returns: :class:`threading.Event` instance which will be set when the task has finished running
+        :returns: a list of :class:`threading.Event` instances which will be set when each respective task has finished
+            running
         """
-        # Create a copy of task, so that changes to instance in manager thread do not affect scheduler thread
-        job = Job(task, options=options, output=output)
-        self.run_queue.put(job)
-        return job.finished_event
+        if options is None:
+            options = copy.copy(self.manager.options.execute)
+        elif isinstance(options, dict):
+            options_namespace = copy.copy(self.manager.options.execute)
+            options_namespace.__dict__.update(options)
+            options = options_namespace
+        tasks = self.manager.tasks
+        # Handle --tasks
+        if options.tasks:
+            # Create list of tasks to run, preserving order
+            tasks = []
+            for arg in options.tasks:
+                matches = [t for t in self.manager.tasks if fnmatch.fnmatchcase(t.lower(), arg.lower())]
+                if not matches:
+                    log.error('`%s` does not match any tasks' % arg)
+                    continue
+                tasks.extend(m for m in matches if m not in tasks)
+            # Set the option as a list of matching task names so plugins can use it easily
+            options.tasks = tasks
+        # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
+        tasks = sorted(tasks, key=lambda t: self.manager.config['tasks'][t].get('priority', 65535))
+
+        finished_events = []
+        for task in tasks:
+            job = Job(task, options=options, output=output, priority=priority)
+            self.run_queue.put(job)
+            finished_events.append(job.finished_event)
+        return finished_events
 
     def queue_pending_jobs(self):
         # Add pending jobs to the run queue
         with self.triggers_lock:
             for trigger in self.triggers:
                 if trigger.should_run:
-                    for task in trigger.tasks:
-                        self.run_queue.put(Job(task, trigger.options))
+                    options = dict(trigger.options, tasks=trigger.tasks)
+                    self.execute(options=options, priority=5)
                     trigger.trigger()
 
     def run(self):
@@ -144,8 +174,6 @@ class Scheduler(threading.Thread):
                 self.run_queue.task_done()
                 job.finished_event.set()
                 if job.output:
-                    if isinstance(job.output, BufferQueue):
-                        job.output.close()
                     sys.stdout, sys.stderr = old_stdout, old_stderr
                     logging.getLogger().removeHandler(streamhandler)
         remaining_jobs = self.run_queue.qsize()
@@ -186,10 +214,11 @@ class Job(object):
     #: :class:`BufferQueue` to write the task execution output to. '[[END]]' will be sent to the queue when complete
     output = None
 
-    def __init__(self, task, options=None, output=None):
+    def __init__(self, task, options=None, output=None, priority=1):
         self.task = task
         self.options = options
         self.output = output
+        self.priority = priority
         self.run_at = datetime.now()
         self.finished_event = threading.Event()
         # Lower priority if cron flag is present in either dict or Namespace form
@@ -209,6 +238,11 @@ class Job(object):
 
 class Trigger(object):
     def __init__(self, interval, tasks, options=None):
+        """
+        :param dict interval: An interval dictionary from the config.
+        :param list tasks: List of task specifiers to run. Wildcards are allowed.
+        :param dict options: Dictionary of options that should be applied to this run.
+        """
         self.tasks = tasks
         self.options = options
         self.unit = None
@@ -329,20 +363,12 @@ class Tee(object):
 
 
 class BufferQueue(Queue.Queue):
-    """Thread safe way to stream text. Reader should iterate over the buffer."""
-    EOF = object()
+    """Used in place of a file-like object to capture text and access it safely from another thread."""
+    # Allow access to the Empty error from here
+    Empty = Queue.Empty
 
     def write(self, line):
         self.put(line)
-
-    def close(self):
-        """The writing side should call this to indicate it is done streaming items."""
-        self.put(self.EOF)
-
-    def __iter__(self):
-        """Iterates over the items written to the queue. Stops when writing side calls `close` method."""
-        for line in iter(self.get, self.EOF):
-            yield line
 
 
 @event('config.register')
