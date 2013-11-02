@@ -14,6 +14,7 @@ from flexget.utils.cached_input import cached
 
 log = logging.getLogger('html')
 
+
 class InputHtml(object):
     """
         Parses urls from html page. Usefull on sites which have direct download
@@ -78,9 +79,10 @@ class InputHtml(object):
         if config.get('username') and config.get('password'):
             log.debug('Basic auth enabled. User: %s Password: %s' % (config['username'], config['password']))
             auth = (config['username'], config['password'])
-            
+
         increment = config.get('increment')
-        if increment:            
+        base_url = config['url']
+        if increment:
             entries = None
             if not isinstance(increment, dict):
                 increment = {}
@@ -91,14 +93,14 @@ class InputHtml(object):
             entries_count = increment.get('entries_count', 500)
             stop_when_empty = increment.get('stop_when_empty', True)
             increment_name = increment.get('name', 'i')
-            
+
             template_url = Template(base_url)
             template_dump = None
             if 'dump' in config:
                 dump_name = config['dump']
                 if dump_name:
                     template_dump = Template(dump_name)
-            
+
             while to is None or current < to:
                 render_ctx = {increment_name: current}
                 url = template_url.render(**render_ctx)
@@ -114,15 +116,15 @@ class InputHtml(object):
                     break
                 if entries_count and len(entries) >= entries_count:
                     break
-                current = current + step
+                current += step
             return entries
         else:
             return self._request_url(task, config, base_url, auth)
-        
+
     def _request_url(self, task, config, url, auth, dump_name = None):
         log.debug('InputPlugin html requesting url %s' % url)
         page = task.requests.get(url, auth=auth)
-        log.debug('InputPlugin html response: %s %s' % (page.status_code, page.reason))            
+        log.debug('InputPlugin html response: %s %s' % (page.status_code, page.reason))
         soup = get_soup(page.text)
 
         # dump received content into a file
