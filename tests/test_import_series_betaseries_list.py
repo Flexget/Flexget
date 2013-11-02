@@ -9,6 +9,15 @@ def assert_mock_calls(expected_calls, mock_object):
                                                      (expected_calls, mock_object.mock_calls)
 
 
+def assert_series_count_in_db(expected_count):
+    from flexget.plugins.filter.series import Series
+    from flexget.manager import Session
+    session = Session()
+    actual_series_count = session.query(Series).count()
+    assert expected_count == actual_series_count, "expecting %s series stored in db, got %s instead" % \
+                                                  (expected_count, actual_series_count)
+
+
 class Test_import_series_betaseries_list(FlexGetBase):
 
     __yaml__ = """
@@ -66,6 +75,7 @@ class Test_import_series_betaseries_list(FlexGetBase):
         # WHEN
         self.execute_task('test_no_members')
         # THEN
+        assert_series_count_in_db(2)
         assert_mock_calls([call('api_key_foo', 'user_foo', 'passwd_foo')],  self.create_token_mock)
         assert_mock_calls([call('api_key_foo', 'token_foo', 'user_foo')], self.query_series_mock)
 
@@ -75,6 +85,7 @@ class Test_import_series_betaseries_list(FlexGetBase):
         # WHEN
         self.execute_task('test_with_one_members')
         # THEN
+        assert_series_count_in_db(3)
         assert_mock_calls([call('api_key_foo', 'user_foo', 'passwd_foo')],  self.create_token_mock)
         assert_mock_calls([call('api_key_foo', 'token_foo', 'other_member_1')], self.query_series_mock)
 
@@ -88,6 +99,7 @@ class Test_import_series_betaseries_list(FlexGetBase):
         # WHEN
         self.execute_task('test_with_two_members')
         # THEN
+        assert_series_count_in_db(4)
         assert_mock_calls([call('api_key_foo', 'user_foo', 'passwd_foo')],  self.create_token_mock)
         assert_mock_calls(
             [
