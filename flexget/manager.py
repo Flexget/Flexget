@@ -288,10 +288,9 @@ class Manager(object):
            Calls sys.exit(1) if configuration file could not be loaded.
            This is something we probably want to change.
 
-        :param string config_path: Path to configuration file
         """
-        with open(self.config_path, 'rb') as file:
-            config = file.read()
+        with open(self.config_path, 'rb') as f:
+            config = f.read()
         try:
             config = config.decode('utf-8')
         except UnicodeDecodeError:
@@ -474,7 +473,6 @@ class Manager(object):
         Check all root level keywords are valid.
 
         :returns: A list of `ValidationError`s
-
         """
         return config_schema.process_config(self.config)
 
@@ -659,7 +657,6 @@ class Manager(object):
         Perform database cleanup if cleanup interval has been met.
 
         :param bool force: Run the cleanup no matter whether the interval has been met.
-
         """
         expired = self.persist.get('last_cleanup', datetime(1900, 1, 1)) < datetime.now() - DB_CLEANUP_INTERVAL
         if force or expired:
@@ -675,7 +672,10 @@ class Manager(object):
             log.debug('Not running db cleanup, last run %s' % self.persist.get('last_cleanup'))
 
     def shutdown(self, finish_queue=True):
-        """ Application is being exited
+        """
+        Application is being exited
+
+        :param bool finish_queue: Should scheduler finish the task queue
         """
         # Wait for scheduler to finish
         self.scheduler.shutdown(finish_queue=finish_queue)

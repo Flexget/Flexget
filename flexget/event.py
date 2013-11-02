@@ -74,9 +74,11 @@ def add_event_handler(name, func, priority=128):
     events.append(event)
     return event
 
+
 def remove_event_handlers(name):
     """Removes all handlers for given event `name`."""
     _events.pop(name, None)
+
 
 def remove_event_handler(name, func):
     """Remove `func` from the handlers for event `name`."""

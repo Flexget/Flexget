@@ -112,7 +112,7 @@ class Entry(dict):
         """
         Add a hook for ``action`` to this entry.
 
-        :param action: One of: 'accept', 'reject', 'fail', 'complete'
+        :param string action: One of: 'accept', 'reject', 'fail', 'complete'
         :param func: Function to execute when event occurs
         :param kwargs: Keyword arguments that should be passed to ``func``
         :raises: ValueError when given an invalid ``action``
@@ -298,7 +298,7 @@ class Entry(dict):
     def register_lazy_fields(self, fields, func):
         """Register a list of fields to be lazily loaded by callback func.
 
-        :param fields:
+        :param list fields:
           List of field names that are registered as lazy fields
         :param func:
           Callback function which is called when lazy field needs to be evaluated.
@@ -343,6 +343,8 @@ class Entry(dict):
     def safe_str(self):
         return '%s | %s' % (self['title'], self['url'])
 
+    # TODO: this is too manual, maybe we should somehow check this internally and throw some exception if
+    # application is trying to operate on invalid entry
     def isvalid(self):
         """
         :return: True if entry is valid. Return False if this cannot be used.
@@ -379,7 +381,7 @@ class Entry(dict):
         Populates entry fields from a source object using a dictionary that maps from entry field names to
         attributes (or keys) in the source object.
 
-        :param field_map:
+        :param dict field_map:
           A dictionary mapping entry field names to the attribute in source_item (or keys,
           if source_item is a dict)(nested attributes/dicts are also supported, separated by a dot,)
           or a function that takes source_item as an argument
@@ -397,7 +399,6 @@ class Entry(dict):
             if ignore_none and v is None:
                 continue
             self[field] = v
-
 
     def render(self, template):
         """

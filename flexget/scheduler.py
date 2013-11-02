@@ -107,8 +107,8 @@ class Scheduler(threading.Thread):
         """
         Add a task to the scheduler to be run immediately.
 
-        :returns: a list of :class:`threading.Event` instances which will be set when each respective task has finished
-            running
+        :returns: a list of :class:`threading.Event` instances which will be
+            set when each respective task has finished running
         """
         if options is None:
             options = copy.copy(self.manager.options.execute)
@@ -261,10 +261,10 @@ class Trigger(object):
     def uid(self):
         """A unique id which describes this trigger."""
         # Determine uniqueness based on interval,
-        hash = md5(str(sorted(self.interval)))
+        hashval = md5(str(sorted(self.interval)))
         # and tasks run on that interval.
-        hash.update(','.join(self.tasks).encode('utf-8'))
-        return hash.hexdigest()
+        hashval.update(','.join(self.tasks).encode('utf-8'))
+        return hashval.hexdigest()
 
     # Handles getting and setting interval in form validated by config
     @property
@@ -347,7 +347,6 @@ class Trigger(object):
         log.debug('recorded last_run to the database')
 
 
-
 class Tee(object):
     """Used so that output to sys.stdout can be grabbed and still displayed."""
     def __init__(self, *files):
@@ -355,9 +354,9 @@ class Tee(object):
 
     def __getattr__(self, meth):
         def method_runner(*args, **kwargs):
-            for file in self.files:
+            for f in self.files:
                 try:
-                    getattr(file, meth)(*args, **kwargs)
+                    getattr(f, meth)(*args, **kwargs)
                 except AttributeError:
                     # We don't really care if all of our 'files' fully support the file api
                     pass

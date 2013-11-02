@@ -101,6 +101,7 @@ class PluginError(Exception):
         return self.value
 
 
+# TODO: move to utils or somewhere more appropriate
 class internet(object):
     """@internet decorator for plugin phase methods.
 
@@ -341,10 +342,9 @@ def _strip_trailing_sep(path):
     return path.rstrip("\\/")
 
 
-def get_standard_plugins_path():
+def _get_standard_plugins_path():
     """
     :returns: List of directories where plugins should be tried to load from.
-    :rtype: list
     """
     # Get basic path from environment
     env_path = os.environ.get('FLEXGET_PLUGIN_PATH')
@@ -416,7 +416,7 @@ def load_plugins():
 
     start_time = time.time()
     # Import all the plugins
-    _load_plugins_from_dirs(get_standard_plugins_path())
+    _load_plugins_from_dirs(_get_standard_plugins_path())
     # Register them
     fire_event('plugin.register')
     # Plugins should only be registered once, remove their handlers after
@@ -477,6 +477,7 @@ def get_plugins_by_phase(phase):
 
     Return an iterator over all plugins that hook :phase:
     """
+    warnings.warn('Deprecated API', DeprecationWarning, stacklevel=2)
     if not phase in phase_methods:
         raise Exception('Unknown phase %s' % phase)
     return get_plugins(phase=phase)
@@ -494,6 +495,7 @@ def get_plugins_by_group(group):
 
     Return an iterator over all plugins with in specified group.
     """
+    warnings.warn('Deprecated API', DeprecationWarning, stacklevel=2)
     return get_plugins(group=group)
 
 
