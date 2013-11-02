@@ -3,8 +3,9 @@ from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
 
+from flexget import plugin
+from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.plugin import internet, register_plugin
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
 
@@ -28,7 +29,7 @@ class UrlRewriteTorrent411(object):
         entry['url'] = self.parse_download_page(entry['url'])
         log.debug('%s rewritten to %s' % (old_url, entry['url']))
 
-    @internet(log)
+    @plugin.internet(log)
     def parse_download_page(self, url):
         page = urlopener(url, log)
         log.debug('%s opened', url)
@@ -43,4 +44,7 @@ class UrlRewriteTorrent411(object):
 
         return torrent_url
 
-register_plugin(UrlRewriteTorrent411, 'torrent411', groups=['urlrewriter'])
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteTorrent411, 'torrent411', groups=['urlrewriter'], api_ver=2)

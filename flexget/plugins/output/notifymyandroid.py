@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget.plugin import register_plugin, priority
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('notifymyandroid')
@@ -38,11 +39,11 @@ class OutputNotifyMyAndroid(object):
     }
 
     # Run last to make sure other outputs are successful before sending notification
-    @priority(0)
+    @plugin.priority(0)
     def on_task_output(self, task, config):
         for entry in task.accepted:
 
-            if task.manager.options.test:
+            if task.options.test:
                 log.info("Would send notifymyandroid message about: %s", entry['title'])
                 continue
 
@@ -86,4 +87,7 @@ class OutputNotifyMyAndroid(object):
             else:
                 log.error("Unknown error when sending NotifyMyAndroid message")
 
-register_plugin(OutputNotifyMyAndroid, 'notifymyandroid', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputNotifyMyAndroid, 'notifymyandroid', api_ver=2)

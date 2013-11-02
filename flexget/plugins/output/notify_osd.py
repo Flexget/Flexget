@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget.plugin import register_plugin, priority, DependencyError
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.template import RenderError, render_from_task
 
 log = logging.getLogger('notify_osd')
@@ -37,10 +38,9 @@ class OutputNotifyOsd(object):
             from gi.repository import Notify
         except ImportError as e:
             log.debug('Error importing Notify: %s' % e)
-            raise DependencyError('notify_osd', 'gi.repository',
-                'Notify module required. ImportError: %s' % e)
+            raise plugin.DependencyError('notify_osd', 'gi.repository', 'Notify module required. ImportError: %s' % e)
 
-    @priority(0)
+    @plugin.priority(0)
     def on_task_output(self, task, config):
         """
         Configuration::
@@ -82,4 +82,7 @@ class OutputNotifyOsd(object):
             log.error('Unable to send notification for %s', title)
             return
 
-register_plugin(OutputNotifyOsd, 'notify_osd', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputNotifyOsd, 'notify_osd', api_ver=2)

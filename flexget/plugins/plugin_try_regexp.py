@@ -1,11 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, register_parser_option
+
+from flexget import options, plugin
+from flexget.event import event
 
 log = logging.getLogger('try_regexp')
 
 
-class PluginTryRegexp:
+class PluginTryRegexp(object):
     """
         This plugin allows user to test regexps for a task.
     """
@@ -23,8 +25,8 @@ class PluginTryRegexp:
                 return (True, field)
         return (False, None)
 
-    def on_task_filter(self, task):
-        if not task.manager.options.try_regexp:
+    def on_task_filter(self, task, config):
+        if not task.options.try_regexp:
             return
         if self.abort:
             return
@@ -57,6 +59,13 @@ class PluginTryRegexp:
             print '%s of %s entries matched' % (count, len(task.entries))
         print 'Bye!'
 
-register_plugin(PluginTryRegexp, '--try-regexp', builtin=True)
-register_parser_option('--try-regexp', action='store_true', dest='try_regexp', default=False,
-                       help='Try regular expressions interactively.')
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginTryRegexp, '--try-regexp', builtin=True, api_ver=2)
+
+
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--try-regexp', action='store_true', dest='try_regexp', default=False,
+                                               help='try regular expressions interactively')

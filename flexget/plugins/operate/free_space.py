@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
-from flexget.plugin import register_plugin, priority
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('free_space')
 
@@ -21,19 +23,22 @@ def get_free_space(folder):
 class PluginFreeSpace(object):
     """Aborts a task if an entry is accepted and there is less than a certain amount of space free on a drive."""
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        # Allow just the free space at the root
-        root.accept('number')
-        # Also allow a dict with path and free space
-        advanced = root.accept('dict')
-        advanced.accept('number', key='space', required=True)
-        advanced.accept('path', key='path')
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'number'},
+            {
+                'type': 'object',
+                'properties': {
+                    'space': {'type': 'number'},
+                    'path': {'type': 'string', 'format': 'path'}
+                },
+                'required': ['space'],
+                'additionalProperties': False
+            }
+        ]
+    }
 
-    def get_config(self, task):
-        config = task.config.get('free_space', {})
+    def prepare_config(self, config):
         if isinstance(config, (float, int)):
             config = {'space': config}
         # Use config path if none is specified
@@ -41,9 +46,9 @@ class PluginFreeSpace(object):
             config['path'] = task.manager.config_base
         return config
 
-    @priority(255)
-    def on_task_download(self, task):
-        config = self.get_config(task)
+    @plugin.priority(255)
+    def on_task_download(self, task, config):
+        config = self.prepare_config(config)
         # Only bother aborting if there were accepted entries this run.
         if task.accepted:
             if get_free_space(config['path']) < config['space']:
@@ -52,4 +57,6 @@ class PluginFreeSpace(object):
                 task.abort('Less than %d MB of free space in %s' % (config['space'], config['path']))
 
 
-register_plugin(PluginFreeSpace, 'free_space')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginFreeSpace, 'free_space', api_ver=2)

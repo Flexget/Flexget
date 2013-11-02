@@ -1,13 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
-from flask import redirect, render_template, Module, request, flash, url_for
+import time
+import logging
+
+from flask import redirect, render_template, Blueprint, request, flash, url_for
 from sqlalchemy.sql.expression import desc, asc
 
 from flexget.plugin import DependencyError
 from flexget.ui.webui import register_plugin, db_session, app
-
-import time
-import logging
-
 from flexget.ui.utils import pretty_date
 
 try:
@@ -16,7 +15,7 @@ except ImportError:
     raise DependencyError(issued_by='ui.series', missing='series')
 
 
-series_module = Module(__name__, url_prefix='/series')
+series_module = Blueprint('series', __name__)
 log = logging.getLogger('ui.series')
 
 
@@ -77,13 +76,13 @@ def mark_not_downloaded(rel_id):
 
 @series_module.route('/forget/<int:rel_id>', methods=['POST', 'GET'])
 def forget_episode(rel_id):
-    '''
+    """
     Executes a --series-forget statement for an episode.
     Redirects back to the series index.
-    '''
+    """
     release = db_session.query(Release).get(rel_id)
 
-    context = {'release': release, 'command': '--series-forget "%s" %s' % (
+    context = {'release': release, 'command': 'series forget "%s" %s' % (
         release.episode.series.name, release.episode.identifier)}
 
     if request.method == 'POST':
@@ -95,7 +94,7 @@ def forget_episode(rel_id):
             except ValueError as e:
                 flash(e.message, 'error')
 
-        return redirect(url_for('index'))
+        return redirect(url_for('.index'))
 
     return render_template('series/forget.html', **context)
 

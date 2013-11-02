@@ -5,9 +5,9 @@ import random
 
 from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 
+from flexget import options, plugin
 from flexget.event import event
-from flexget.utils.cached_input import cached
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError, PluginWarning, register_parser_option
+from flexget.plugin import get_plugin_by_name, PluginError, PluginWarning
 from flexget import db_schema
 from flexget.utils.tools import parse_timedelta, multiply_timedelta
 
@@ -200,7 +200,7 @@ class Discover(object):
         """
         config.setdefault('interval', '5 hour')
         interval = parse_timedelta(config['interval'])
-        if task.manager.options.discover_now:
+        if task.options.discover_now:
             log.info('Ignoring interval because of --discover-now')
         result = []
         interval_count = 0
@@ -213,7 +213,7 @@ class Discover(object):
                 log.debug('%s -> No previous run recorded' % entry['title'])
                 de = DiscoverEntry(entry['title'], task.name)
                 task.session.add(de)
-            if task.manager.options.discover_now or not de.last_execution:
+            if task.options.discover_now or not de.last_execution:
                 # First time we execute (and on --discover-now) we randomize time to avoid clumping
                 delta = multiply_timedelta(interval, random.random())
                 de.last_execution = datetime.datetime.now() - delta
@@ -249,6 +249,12 @@ class Discover(object):
         return self.execute_searches(config, entries)
 
 
-register_plugin(Discover, 'discover', api_ver=2)
-register_parser_option('--discover-now', action='store_true', dest='discover_now', default=False,
-                       help='Immediately try to discover everything.')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(Discover, 'discover', api_ver=2)
+
+
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--discover-now', action='store_true', dest='discover_now',
+                                               default=False, help='immediately try to discover everything')

@@ -3,19 +3,20 @@ import logging
 
 from sqlalchemy import desc
 
+from flexget import plugin
+from flexget.event import event
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, DependencyError
 
 log = logging.getLogger('emit_series')
 
 try:
-    from flexget.plugins.filter.series import SeriesTask, SeriesDatabase, Episode, Release
+    from flexget.plugins.filter.series import SeriesTask, Episode, Release, get_latest_download
 except ImportError as e:
     log.error(e.message)
-    raise DependencyError(issued_by='emit_series', missing='series')
+    raise plugin.DependencyError(issued_by='emit_series', missing='series')
 
 
-class EmitSeries(SeriesDatabase):
+class EmitSeries(object):
     """
     Emit next episode number from all series configured in this task.
 
@@ -80,24 +81,28 @@ class EmitSeries(SeriesDatabase):
                             (series.name, series.identified_by or 'auto'))
                 continue
 
-            latest = self.get_latest_download(series)
+            latest = get_latest_download(series)
             if series.begin and (not latest or latest < series.begin):
                 entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
             elif latest:
                 if self.try_next_season.get(series.name):
                     entries.append(self.search_entry(series, latest.season + 1, 1, task))
                 else:
+                    start_at_ep = 1
                     episodes_this_season = (task.session.query(Episode).
                                             filter(Episode.series_id == series.id).
                                             filter(Episode.season == latest.season))
+                    if series.identified_by == 'sequence':
+                        # Don't look for missing too far back with sequence shows
+                        start_at_ep = max(latest.number - 10, 1)
+                        episodes_this_season = episodes_this_season.filter(Episode.number >= start_at_ep)
                     latest_ep_this_season = episodes_this_season.order_by(desc(Episode.number)).first()
                     downloaded_this_season = (episodes_this_season.join(Episode.releases).
                                               filter(Release.downloaded == True).all())
                     # Calculate the episodes we still need to get from this season
                     if series.begin and series.begin.season == latest.season:
-                        eps_to_get = range(series.begin.number, latest_ep_this_season.number + 1)
-                    else:
-                        eps_to_get = range(1, latest_ep_this_season.number + 1)
+                        start_at_ep = max(start_at_ep, series.begin.number)
+                    eps_to_get = range(start_at_ep, latest_ep_this_season.number + 1)
                     for ep in downloaded_this_season:
                         try:
                             eps_to_get.remove(ep.number)
@@ -112,7 +117,7 @@ class EmitSeries(SeriesDatabase):
                     season = 1 if series.identified_by == 'ep' else 0
                     entries.append(self.search_entry(series, season, 1, task))
                 else:
-                    log.verbose('Series `%s` has no history. Set begin option, or use --series-begin '
+                    log.verbose('Series `%s` has no history. Set begin option, or use CLI `series begin` subcommand '
                                 'to set first episode to emit' % series.name)
                     continue
 
@@ -135,4 +140,6 @@ class EmitSeries(SeriesDatabase):
                 self.try_next_season[entry['series_name']] = False
 
 
-register_plugin(EmitSeries, 'emit_series', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(EmitSeries, 'emit_series', api_ver=2)

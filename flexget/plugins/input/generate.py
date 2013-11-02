@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from flexget import plugin
+from flexget.event import event
 from flexget.entry import Entry
 from flexget import validator
-from flexget.plugin import register_plugin
 
 log = logging.getLogger(__name__.rsplit('.')[-1])
 
@@ -26,4 +27,6 @@ class Generate(object):
             task.entries.append(entry)
 
 
-register_plugin(Generate, 'generate', api_ver=2, debug=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(Generate, 'generate', api_ver=2, debug=True)

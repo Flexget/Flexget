@@ -5,7 +5,7 @@ from tests import FlexGetBase
 class TestFilterSeen(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             accept_all: true
 
@@ -51,7 +51,7 @@ class TestFilterSeen(FlexGetBase):
 class TestSeenLocal(FlexGetBase):
 
     __yaml__ = """
-      presets:
+      templates:
         global:
           accept_all: yes
       tasks:

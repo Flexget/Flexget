@@ -5,7 +5,7 @@ from tests import FlexGetBase
 class TestProperMovies(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             seen_movies: strict
             accept_all: yes

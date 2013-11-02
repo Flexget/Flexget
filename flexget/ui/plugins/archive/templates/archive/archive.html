@@ -8,7 +8,7 @@
 <div style="float: right;">
 
     {% if results %}
-    <form action="{{ url_for('index') }}" method="post" class="search">
+    <form action="{{ url_for('.index') }}" method="post" class="search">
         <div>
             <label for="keyword">Search</label>
             <input type="text" id="keyword" name="keyword" value="">
@@ -17,10 +17,10 @@
     </form>
     {% else %}
         <p>There are currently <b id="count">
-            <img src="{{ url_for('.static', filename='img/ajax-loader.gif') }}" style="width: 13px; height: 13px;"/></b> items in the archive
+            <img src="{{ url_for('static', filename='img/ajax-loader.gif') }}" style="width: 13px; height: 13px;"/></b> items in the archive
         </p>
         <script language="JavaScript">
-            $('#count').load("{{ url_for('count') }}");
+            $('#count').load("{{ url_for('.count') }}");
         </script>
     {% endif %}
 
@@ -56,7 +56,7 @@ TODO: how to get this visible since count is now retrieved via ajax call ...
                 <tr class="{{ loop.cycle('odd', 'even') }}">
                     <td>
                         <a href="inject/{{ archive.id }}">
-                            <img src="{{ url_for('.static', filename='img/fatcow-icons/16x16/add.png') }}"/>
+                            <img src="{{ url_for('static', filename='img/fatcow-icons/16x16/add.png') }}"/>
                         </a>
                     </td>
                     <td><a href="{{ archive.url }}">{{ archive.title|wordwrap(width=60) }}</a></td>
@@ -69,7 +69,7 @@ TODO: how to get this visible since count is now retrieved via ajax call ...
     </div>
 {% else %}
     <div>
-    <form action="{{ url_for('index') }}" method="post" class="simple">
+    <form action="{{ url_for('.index') }}" method="post" class="simple">
         <fieldset style="width:26em">
             <legend>Search from the archive</legend>
             <div>

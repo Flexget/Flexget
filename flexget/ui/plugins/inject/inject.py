@@ -2,12 +2,12 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import posixpath
 import urlparse
-from flask import render_template, request, flash, redirect, Module
+from flask import render_template, request, flash, redirect, Blueprint
 from flask.helpers import url_for
-from flexget.ui.webui import register_plugin, executor
+from flexget.ui.webui import register_plugin, manager
 from flexget.entry import Entry
 
-inject = Module(__name__, url_prefix='/inject')
+inject = Blueprint('inject', __name__)
 
 log = logging.getLogger('ui.inject')
 
@@ -35,12 +35,14 @@ def do_inject():
     if fields.get('title') and fields.get('url'):
         # Create the entry for injection
         entry = Entry(**fields)
-        executor.execute(options={'dump_entries': True}, entries=[entry])
+        # TODO: Fix
+        for task in manager.tasks:
+            manager.scheduler.execute(task, options={'dump_entries': True, 'inject': [entry]})
         flash('Scheduled execution for entry `%s`' % entry['title'], 'success')
     else:
         flash('Title and URL required for inject.', 'error')
 
-    return redirect(url_for('index'))
+    return redirect(url_for('.index'))
 
 
 register_plugin(inject)

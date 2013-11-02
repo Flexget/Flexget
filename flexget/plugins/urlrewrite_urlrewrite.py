@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('urlrewrite')
 
@@ -29,19 +31,24 @@ class UrlRewrite(object):
 #    """
 #    )
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        config = root.accept_any_key('dict')
-        config.accept('regexp', key='regexp', required=True)
-        config.accept('text', key='format', required=True)
-        return root
+    schema = {
+        'type': 'object',
+        'additionalProperties': {
+            'type': 'object',
+            'properties': {
+                'regexp': {'type': 'string', 'format': 'regex'},
+                'format': {'type': 'string'}
+            },
+            'required': ['regexp', 'format'],
+            'additionalProperties': False
+        }
+    }
 
-    def on_task_start(self, task):
-        for name, config in task.config.get('urlrewrite', {}).iteritems():
-            match = re.compile(config['regexp'])
-            format = config['format']
-            self.resolves[name] = {'regexp_compiled': match, 'format': format, 'regexp': config['regexp']}
+    def on_task_start(self, task, config):
+        for name, rewrite_config in config.iteritems():
+            match = re.compile(rewrite_config['regexp'])
+            format = rewrite_config['format']
+            self.resolves[name] = {'regexp_compiled': match, 'format': format, 'regexp': rewrite_config['regexp']}
             log.debug('Added rewrite %s' % name)
 
     def url_rewritable(self, task, entry):
@@ -71,4 +78,7 @@ class UrlRewrite(object):
                     raise UrlRewritingError('Regexp %s result should NOT continue to match!' % name)
                 return
 
-register_plugin(UrlRewrite, 'urlrewrite', groups=['urlrewriter'])
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewrite, 'urlrewrite', groups=['urlrewriter'], api_ver=2)

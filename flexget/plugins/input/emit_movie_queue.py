@@ -1,14 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from flexget import plugin
+from flexget.event import event
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, get_plugin_by_name, DependencyError
 from flexget.utils.imdb import make_url as make_imdb_url
 
 try:
     from flexget.plugins.filter.movie_queue import queue_get
 except ImportError:
-    raise DependencyError(issued_by='emit_movie_queue', missing='movie_queue')
+    raise plugin.DependencyError(issued_by='emit_movie_queue', missing='movie_queue')
 
 log = logging.getLogger('emit_movie_queue')
 
@@ -49,7 +50,7 @@ class EmitMovieQueue(object):
             if queue_item.tmdb_id:
                 entry['tmdb_id'] = queue_item.tmdb_id
 
-            get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
+            plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
             # check if title is a imdb url (leftovers from old database?)
             # TODO: maybe this should be fixed at the queue_get ...
             if 'http://' in queue_item.title:
@@ -76,4 +77,6 @@ class EmitMovieQueue(object):
 
         return entries
 
-register_plugin(EmitMovieQueue, 'emit_movie_queue', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(EmitMovieQueue, 'emit_movie_queue', api_ver=2)

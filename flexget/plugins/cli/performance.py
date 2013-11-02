@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from argparse import SUPPRESS
-from flexget.plugin import register_parser_option
+
+from flexget import options
 from flexget.event import event
 
 log = logging.getLogger('performance')
@@ -18,9 +20,9 @@ def log_query_count(name_point):
     log.info('At point named `%s` total of %s queries were ran' % (name_point, query_count))
 
 
-@event('manager.startup')
+@event('manager.execute.started')
 def startup(manager):
-    if manager.options.debug_perf:
+    if manager.options.execute.debug_perf:
         log.info('Enabling plugin and SQLAlchemy performance debugging')
         import time
 
@@ -65,5 +67,7 @@ def startup(manager):
                         log.info('%-15s took %0.2f sec (%s queries)' % (keyword, took, queries))
 
 
-register_parser_option('--debug-perf', action='store_true', dest='debug_perf', default=False,
-                       help=SUPPRESS)
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--debug-perf', action='store_true', dest='debug_perf', default=False,
+                                               help=SUPPRESS)

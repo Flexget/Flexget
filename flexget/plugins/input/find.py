@@ -4,8 +4,9 @@ import os
 import re
 import sys
 
+from flexget import plugin
+from flexget.event import event
 from flexget.entry import Entry
-from flexget.plugin import register_plugin
 from flexget.utils.cached_input import cached
 
 log = logging.getLogger('find')
@@ -93,4 +94,6 @@ class InputFind(object):
                     break
         return entries
 
-register_plugin(InputFind, 'find', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputFind, 'find', api_ver=2)

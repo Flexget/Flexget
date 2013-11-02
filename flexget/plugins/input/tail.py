@@ -2,40 +2,13 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import re
 import logging
+
+from flexget import options, plugin
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, register_parser_option, PluginError
+from flexget.event import event
 from flexget.utils.cached_input import cached
 
 log = logging.getLogger('tail')
-
-
-class ResetTail(object):
-    """Adds --tail-reset"""
-
-    def on_process_start(self, task):
-        if not task.manager.options.tail_reset:
-            return
-
-        task.manager.disable_tasks()
-
-        from flexget.utils.simple_persistence import SimpleKeyValue
-        from flexget.manager import Session
-
-        session = Session()
-        try:
-            poses = session.query(SimpleKeyValue).filter(SimpleKeyValue.key == task.manager.options.tail_reset).all()
-            if not poses:
-                print 'No position stored for file %s' % task.manager.options.tail_reset
-                print 'Note that file must give in same format as in config, ie. ~/logs/log can not be given as /home/user/logs/log'
-            for pos in poses:
-                if pos.value == 0:
-                    print 'Task %s tail position is already zero' % pos.task
-                else:
-                    print 'Task %s tail position (%s) reseted to zero' % (pos.task, pos.value)
-                    pos.value = 0
-            session.commit()
-        finally:
-            session.close()
 
 
 class InputTail(object):
@@ -94,6 +67,13 @@ class InputTail(object):
         encoding = config.get('encoding', None)
         with open(filename, 'r') as file:
             last_pos = task.simple_persistence.setdefault(filename, 0)
+            if task.options.tail_reset == filename or task.options.tail_reset == task.name:
+                if last_pos == 0:
+                    log.info('Task %s tail position is already zero' % task.name)
+                else:
+                    log.info('Task %s tail position (%s) reset to zero' % (task.name, last_pos))
+                    last_pos = 0
+
             if os.path.getsize(filename) < last_pos:
                 log.info('File size is smaller than in previous execution, reseting to beginning of the file')
                 last_pos = 0
@@ -118,7 +98,7 @@ class InputTail(object):
                     try:
                         line = line.decode(encoding)
                     except UnicodeError:
-                        raise PluginError('Failed to decode file using %s. Check encoding.' % encoding)
+                        raise plugin.PluginError('Failed to decode file using %s. Check encoding.' % encoding)
 
                 if not line:
                     task.simple_persistence[filename] = file.tell()
@@ -160,7 +140,13 @@ class InputTail(object):
                             used = {}
         return entries
 
-register_plugin(InputTail, 'tail', api_ver=2)
-register_plugin(ResetTail, '--tail-reset', builtin=True)
-register_parser_option('--tail-reset', action='store', dest='tail_reset', default=False, metavar='FILE',
-    help='Reset tail position for a file.')
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputTail, 'tail', api_ver=2)
+
+
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--tail-reset', action='store', dest='tail_reset', default=False,
+                                               metavar='FILE|TASK', help='reset tail position for a file')

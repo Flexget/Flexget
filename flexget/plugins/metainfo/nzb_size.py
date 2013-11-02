@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, priority, DependencyError
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('nzb_size')
 
@@ -15,8 +17,8 @@ class NzbSize(object):
     Provides entry size information when dealing with nzb files
     """
 
-    @priority(200)
-    def on_task_modify(self, task):
+    @plugin.priority(200)
+    def on_task_modify(self, task, config):
         """
         The downloaded file is accessible in modify phase
         """
@@ -25,7 +27,7 @@ class NzbSize(object):
         except ImportError:
             # TODO: remove builtin status so this won't get repeated on every task execution
             # TODO: this will get loaded even without any need for nzb
-            raise DependencyError(issued_by='nzb_size', missing='lib pynzb')
+            raise plugin.DependencyError(issued_by='nzb_size', missing='lib pynzb')
 
         for entry in task.accepted:
             if entry.get('mime-type', None) in [u'text/nzb', u'application/x-nzb'] or \
@@ -58,4 +60,6 @@ class NzbSize(object):
                 log.trace('%s does not seem to be nzb' % entry['title'])
 
 
-register_plugin(NzbSize, 'nzb_size', builtin=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(NzbSize, 'nzb_size', api_ver=2, builtin=True)

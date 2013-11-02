@@ -2,10 +2,12 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 import time
+
 from requests import RequestException
-from bs4 import NavigableString
+
+from flexget import plugin
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, internet, get_plugin_by_name, PluginError
+from flexget.event import event
 from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
@@ -63,11 +65,11 @@ class RlsLog(object):
         return releases
 
     @cached('rlslog')
-    @internet(log)
+    @plugin.internet(log)
     def on_task_input(self, task, config):
         url = config
         if url.endswith('feed/'):
-            raise PluginError('Invalid URL. Remove trailing feed/ from the url.')
+            raise plugin.PluginError('Invalid URL. Remove trailing feed/ from the url.')
 
         releases = []
         entries = []
@@ -101,4 +103,7 @@ class RlsLog(object):
 
         return entries
 
-register_plugin(RlsLog, 'rlslog', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(RlsLog, 'rlslog', api_ver=2)

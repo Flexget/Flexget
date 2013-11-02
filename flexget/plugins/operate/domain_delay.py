@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget.plugin import register_plugin
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('domain_delay')
 
@@ -23,4 +24,6 @@ class DomainDelay(object):
             task.requests.set_domain_delay(domain, delay)
 
 
-register_plugin(DomainDelay, 'domain_delay', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(DomainDelay, 'domain_delay', api_ver=2)

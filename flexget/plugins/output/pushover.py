@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget.plugin import register_plugin, priority
-from flexget.utils.template import RenderError
+from flexget import plugin
+from flexget.event import event
 from flexget.utils import json
-import time
+from flexget.utils.template import RenderError
 
 log = logging.getLogger("pushover")
 
@@ -63,7 +63,7 @@ class OutputPushover(object):
         return config
 
     # Run last to make sure other outputs are successful before sending notification
-    @priority(0)
+    @plugin.priority(0)
     def on_task_output(self, task, config):
         # get the parameters
         config = self.prepare_config(config)
@@ -118,7 +118,7 @@ class OutputPushover(object):
                     data["sound"] = sound
     
                 # Check for test mode
-                if task.manager.options.test:
+                if task.options.test:
                     log.info("Test mode.  Pushover notification would be:")
                     if device:
                         log.info("    Device: %s" % device)
@@ -154,4 +154,6 @@ class OutputPushover(object):
                     log.error("Unknown error when sending Pushover notification")
 
 
-register_plugin(OutputPushover, "pushover", api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputPushover, "pushover", api_ver=2)

@@ -2,9 +2,11 @@ from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
 import os
+
+from flexget import plugin
 from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.plugin import register_plugin, internet
 
 log = logging.getLogger('regexp_parse')
 
@@ -144,7 +146,7 @@ class RegexpParse(object):
         return entry.isvalid()
 
     @cached('text')
-    @internet(log)
+    @plugin.internet(log)
     def on_task_input(self, task, config):
 
         entries = []
@@ -195,4 +197,6 @@ class RegexpParse(object):
         return entries
 
 
-register_plugin(RegexpParse, 'regexp_parse', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(RegexpParse, 'regexp_parse', api_ver=2)

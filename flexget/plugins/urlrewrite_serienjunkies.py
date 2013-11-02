@@ -2,11 +2,11 @@ from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
 
+from flexget import plugin
+from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.plugin import internet, register_plugin
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
-from flexget import validator
 
 log = logging.getLogger('serienjunkies')
 
@@ -28,12 +28,14 @@ class UrlRewriteSerienjunkies(object):
     hoster: [ul|cz|so] default "ul"
     """
 
-    def validator(self):
-        root = validator.factory()
-        advanced = root.accept('dict')
-        advanced.accept('choice', key='language').accept_choices(LANGUAGE)
-        advanced.accept('choice', key='hoster').accept_choices(HOSTER)
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'language': {'type': 'string', 'enum': LANGUAGE, 'default': 'en'},
+            'hoster': {'type': 'string', 'enum': HOSTER, 'default': 'ul'}
+        },
+        'additionalProperties': False
+    }
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
@@ -56,7 +58,7 @@ class UrlRewriteSerienjunkies(object):
         log.debug('Download URL: %s' % download_url)
         entry['url'] = download_url
 
-    @internet(log)
+    @plugin.internet(log)
     def parse_download(self, series_url, search_title, config, entry):
         page = requests.get(series_url).content
         try:
@@ -109,4 +111,7 @@ class UrlRewriteSerienjunkies(object):
                 log.debug('Hoster does not match')
                 continue
 
-register_plugin(UrlRewriteSerienjunkies, 'serienjunkies', groups=['urlrewriter'])
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteSerienjunkies, 'serienjunkies', groups=['urlrewriter'], api_ver=2)

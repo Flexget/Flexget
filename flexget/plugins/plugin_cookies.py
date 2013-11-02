@@ -2,7 +2,10 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import urllib2
 import cookielib
-from flexget.plugin import PluginWarning, PluginError, register_plugin
+
+from flexget import plugin
+from flexget.event import event
+from flexget.utils.tools import TimedDict
 
 log = logging.getLogger('cookies')
 
@@ -18,6 +21,10 @@ class PluginCookies:
 
       cookies: /path/firefox/profile/something/cookies.sqlite
     """
+
+    # TODO: 1.2 Is this a good way to handle this? How long should the time be?
+    # Keeps loaded cookiejars cached for some time
+    cookiejars = TimedDict(cache_time='5 minutes')
 
     schema = {
         'oneOf': [
@@ -52,19 +59,19 @@ class PluginCookies:
             try:
                 from sqlite3 import dbapi2 as sqlite # try the 2.5+ stdlib
             except ImportError:
-                raise PluginWarning('Unable to use sqlite3 or pysqlite2', log)
+                raise plugin.PluginWarning('Unable to use sqlite3 or pysqlite2', log)
 
         log.debug('connecting: %s' % filename)
         try:
             con = sqlite.connect(filename)
         except:
-            raise PluginError('Unable to open cookies sqlite database')
+            raise plugin.PluginError('Unable to open cookies sqlite database')
 
         cur = con.cursor()
         try:
             cur.execute('select host, path, isSecure, expiry, name, value from moz_cookies')
         except:
-            raise PluginError('%s does not appear to be a valid Firefox 3 cookies file' % filename, log)
+            raise plugin.PluginError('%s does not appear to be a valid Firefox 3 cookies file' % filename, log)
 
         ftstr = ['FALSE', 'TRUE']
 
@@ -122,9 +129,6 @@ class PluginCookies:
         cookie_jar._really_load(s, '', True, True)
         return cookie_jar
 
-    def on_process_start(self, task, config):
-        self.cookiejars = {}
-
     def on_task_start(self, task, config):
         """Task starting, install cookiejar"""
         import os
@@ -145,14 +149,14 @@ class PluginCookies:
                 log.debug('Loading %s cookies' % cookie_type)
                 cj = cookielib.LWPCookieJar()
             else:
-                raise PluginError('Unknown cookie type %s' % cookie_type, log)
+                raise plugin.PluginError('Unknown cookie type %s' % cookie_type, log)
 
             try:
                 cj.load(filename=cookie_file, ignore_expires=True)
                 log.debug('%s cookies loaded' % cookie_type)
             except (cookielib.LoadError, IOError):
                 import sys
-                raise PluginError('Cookies could not be loaded: %s' % sys.exc_info()[1], log)
+                raise plugin.PluginError('Cookies could not be loaded: %s' % sys.exc_info()[1], log)
 
         if cookie_file not in self.cookiejars:
             self.cookiejars[cookie_file] = cj
@@ -176,7 +180,7 @@ class PluginCookies:
     # Task aborted, unhook the cookiejar
     on_task_abort = on_task_exit
 
-    def on_process_end(self, task, config):
-        self.cookiejars = {}
 
-register_plugin(PluginCookies, 'cookies', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginCookies, 'cookies', api_ver=2)

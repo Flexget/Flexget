@@ -8,14 +8,14 @@ from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, DateTime
 
-from flexget import db_schema
-from flexget.plugin import register_plugin, DependencyError, PluginWarning
+from flexget import db_schema, plugin
+from flexget.event import event
 
 try:
     from flexget.plugins.api_tvdb import lookup_series
 except ImportError:
-    raise DependencyError(issued_by='myepisodes', missing='api_tvdb',
-                          message='myepisodes requires the `api_tvdb` plugin')
+    raise plugin.DependencyError(issued_by='myepisodes', missing='api_tvdb',
+                                 message='myepisodes requires the `api_tvdb` plugin')
 
 
 log = logging.getLogger('myepisodes')
@@ -109,13 +109,13 @@ class MyEpisodes(object):
             return
 
         if str(username) not in loginsrc:
-            raise PluginWarning(('Login to myepisodes.com failed, please check '
+            raise plugin.PluginWarning(('Login to myepisodes.com failed, please check '
                                  'your account data or see if the site is down.'), log)
 
         for entry in task.accepted:
             try:
                 self.mark_episode(task, entry, opener)
-            except PluginWarning as w:
+            except plugin.PluginWarning as w:
                 log.warning(str(w))
 
     def lookup_myepisodes_id(self, entry, opener, session):
@@ -190,18 +190,18 @@ class MyEpisodes(object):
         """
 
         if 'series_season' not in entry or 'series_episode' not in entry or 'series_name' not in entry:
-            raise PluginWarning(
+            raise plugin.PluginWarning(
                 'Can\'t mark entry `%s` in myepisodes without series_season, series_episode and series_name fields' %
                 entry['title'], log)
 
         if not self.lookup_myepisodes_id(entry, opener, session=task.session):
-            raise PluginWarning('Couldn\'t get myepisodes id for `%s`' % entry['title'], log)
+            raise plugin.PluginWarning('Couldn\'t get myepisodes id for `%s`' % entry['title'], log)
 
         myepisodes_id = entry['myepisodes_id']
         season = entry['series_season']
         episode = entry['series_episode']
 
-        if task.manager.options.test:
+        if task.options.test:
             log.info('Would mark %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
         else:
             baseurl2 = urllib2.Request(
@@ -211,4 +211,6 @@ class MyEpisodes(object):
             log.info('Marked %s of `%s` as acquired.' % (entry['series_id'], entry['series_name']))
 
 
-register_plugin(MyEpisodes, 'myepisodes', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(MyEpisodes, 'myepisodes', api_ver=2)

@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import mimetypes
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('path_by_ext')
 
@@ -17,21 +19,16 @@ class PluginPathByExt(object):
           nzb: ~/watch/nzb/
     """
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory('dict')
-        config.accept_any_key('any')
-        return config
+    schema = {'type': 'object'}
 
-    def on_task_modify(self, task):
-        self.ext(task, self.set_path)
+    def on_task_modify(self, task, config):
+        self.ext(task, config, self.set_path)
 
     def set_path(self, entry, path):
         log.debug('Setting %s path to %s' % (entry['title'], path))
         entry['path'] = path
 
-    def ext(self, task, callback):
-        config = task.config
+    def ext(self, task, config, callback):
         for entry in task.entries:
             if 'mime-type' in entry:
                 # check if configuration has mimetype that entry has
@@ -50,4 +47,7 @@ class PluginPathByExt(object):
                     if entry['url'].endswith('.' + ext):
                         callback(entry, path)
 
-register_plugin(PluginPathByExt, 'path_by_ext')
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginPathByExt, 'path_by_ext', api_ver=2)

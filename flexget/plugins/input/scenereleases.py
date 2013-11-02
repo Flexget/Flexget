@@ -1,16 +1,19 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.entry import Entry
-from flexget.plugin import register_plugin, get_plugin_by_name, internet
-from flexget.utils.soup import get_soup
-from flexget.utils.cached_input import cached
+
 from bs4 import NavigableString
+
+from flexget import plugin
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.utils.cached_input import cached
+from flexget.utils.soup import get_soup
 from flexget.utils.tools import urlopener
 
 log = logging.getLogger('scenereleases')
 
 
-class InputScenereleases:
+class InputScenereleases(object):
     """
     Uses scenereleases.info category url as input.
 
@@ -64,7 +67,7 @@ class InputScenereleases:
                 temp = {}
                 temp['title'] = release['title']
                 temp['url'] = link_href
-                urlrewriting = get_plugin_by_name('urlrewriting')
+                urlrewriting = plugin.get_plugin_by_name('urlrewriting')
                 if urlrewriting['instance'].url_rewritable(task, temp):
                     release['url'] = link_href
                     log.trace('--> accepting %s (resolvable)' % link_href)
@@ -81,7 +84,7 @@ class InputScenereleases:
         return releases
 
     @cached('scenereleases')
-    @internet(log)
+    @plugin.internet(log)
     def on_task_input(self, task, config):
         releases = self.parse_site(config, task)
         entries = []
@@ -93,7 +96,7 @@ class InputScenereleases:
             def apply_field(d_from, d_to, f):
                 if f in d_from:
                     if d_from[f] is None:
-                        return # None values are not wanted!
+                        return  # None values are not wanted!
                     d_to[f] = d_from[f]
 
             for field in ['title', 'url', 'imdb_url', 'imdb_score', 'imdb_votes']:
@@ -103,4 +106,7 @@ class InputScenereleases:
 
         return entries
 
-register_plugin(InputScenereleases, 'scenereleases', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputScenereleases, 'scenereleases', api_ver=2)

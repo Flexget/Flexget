@@ -1,11 +1,13 @@
 """Input plugin for www.betaseries.com"""
 from __future__ import unicode_literals, division, absolute_import
-from flexget.plugin import register_plugin
-import logging
-from flexget.utils import requests
 from hashlib import md5
-from flexget.utils.cached_input import cached
+import logging
+
+from flexget import plugin
 from flexget.entry import Entry
+from flexget.event import event
+from flexget.utils import requests
+from flexget.utils.cached_input import cached
 
 
 log = logging.getLogger('betaseries_list')
@@ -192,4 +194,6 @@ def query_series(api_key, user_token, member_name=None):
         return []
 
 
-register_plugin(BetaSeriesList, 'betaseries_list', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(BetaSeriesList, 'betaseries_list', api_ver=2)

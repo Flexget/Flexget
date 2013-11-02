@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 from copy import copy
 import logging
-from flexget.plugin import register_plugin, priority, get_plugin_by_name
+
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('set')
@@ -40,11 +42,11 @@ class ModifySet(object):
             log.warning("jinja2 module is not available, set plugin will only work with python string replacement.")
 
     # Filter priority is -255 so we run after all filters are finished
-    @priority(PRIORITY_LAST)
+    @plugin.priority(PRIORITY_LAST)
     def on_task_filter(self, task, config):
         """Adds the set dict to all accepted entries."""
         # TODO: This is ugly, maybe we should only run on accepted entries all the time, or have an option to run on all
-        if get_plugin_by_name('set').phase_handlers['filter'].priority == PRIORITY_LAST:
+        if plugin.get_plugin_by_name('set').phase_handlers['filter'].priority == PRIORITY_LAST:
             # If priority is last only run on accepted entries to prevent unneeded lazy lookups
             log.debug('Set plugin at default priority, only running on accepted entries.')
             entries = task.accepted
@@ -78,4 +80,6 @@ class ModifySet(object):
             log.debug('adding set: info to entry:\'%s\' %s' % (entry['title'], conf))
             entry.update(conf)
 
-register_plugin(ModifySet, 'set', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(ModifySet, 'set', api_ver=2)

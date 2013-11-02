@@ -1,8 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import sys
+
+from flexget import options
 from flexget.event import event
-from flexget.plugin import register_parser_option, plugins
+from flexget.plugin import plugins
+
 
 log = logging.getLogger('doc')
 
@@ -33,21 +36,21 @@ def trim(docstring):
     return '\n'.join(trimmed)
 
 
-@event('manager.startup')
-def print_doc(manager):
-    if manager.options.doc:
-        manager.disable_tasks()
-        plugin_name = manager.options.doc
-        plugin = plugins.get(plugin_name, None)
-        if plugin:
-            if not plugin.instance.__doc__:
-                print 'Plugin %s does not have documentation' % plugin_name
-            else:
-                print ''
-                print trim(plugin.instance.__doc__)
-                print ''
+def print_doc(manager, options):
+    plugin_name = options.doc
+    plugin = plugins.get(plugin_name, None)
+    if plugin:
+        if not plugin.instance.__doc__:
+            print 'Plugin %s does not have documentation' % plugin_name
         else:
-            print 'Could not find plugin %s' % plugin_name
+            print ''
+            print trim(plugin.instance.__doc__)
+            print ''
+    else:
+        print 'Could not find plugin %s' % plugin_name
 
-register_parser_option('--doc', action='store', dest='doc', default=False,
-                       metavar='PLUGIN', help='Display plugin documentation. See also --plugins.')
+
+@event('options.register')
+def register_parser_arguments():
+    parser = options.register_command('doc', print_doc, help='display plugin documentation')
+    parser.add_argument('doc', metavar='<plugin name>', help='name of plugin to show docs for')

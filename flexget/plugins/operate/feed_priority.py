@@ -1,19 +1,22 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('priority')
 
 
+# TODO: 1.2 figure out replacement for this
+# Currently the manager reads this value directly out of the config when the 'execute' command is run, and this plugin
+# does nothing but make the config key valid.
+# In daemon mode, schedules should be made which run tasks in the proper order instead of using this.
 class TaskPriority(object):
-
     """Set task priorities"""
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('integer')
+    schema = {'type': 'integer'}
 
-    def on_process_start(self, task, config):
-        task.priority = task.config.get('priority', 65535)
 
-register_plugin(TaskPriority, 'priority', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(TaskPriority, 'priority', api_ver=2)

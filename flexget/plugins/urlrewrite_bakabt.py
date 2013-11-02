@@ -1,8 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import urllib2
 import logging
+
+from flexget import plugin
+from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.plugin import register_plugin, internet
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
 
@@ -25,7 +27,7 @@ class UrlRewriteBakaBT(object):
     def url_rewrite(self, task, entry):
         entry['url'] = self.parse_download_page(entry['url'])
 
-    @internet(log)
+    @plugin.internet(log)
     def parse_download_page(self, url):
         txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
         req = urllib2.Request(url, None, txheaders)
@@ -40,4 +42,6 @@ class UrlRewriteBakaBT(object):
         torrent_url = 'http://www.bakabt.com' + tag_a.get('href')
         return torrent_url
 
-register_plugin(UrlRewriteBakaBT, 'bakabt', groups=['urlrewriter'])
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteBakaBT, 'bakabt', groups=['urlrewriter'], api_ver=2)

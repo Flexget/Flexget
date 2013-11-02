@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block head %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/movies.css') }}" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="{{ url_for('.static', filename='css/movies.css') }}" type="text/css" media="screen"/>
 
 <script type="text/javascript">
     function show_add_area(){
@@ -42,7 +42,7 @@
     </div>
 
     <div id="add_area" class="add">
-        <form method="post" action="{{ url_for('add_to_queue') }}">
+        <form method="post" action="{{ url_for('.add_to_queue') }}">
             <strong>Add Movie:</strong>
             <input type="text" name="what">
             Quality:
@@ -64,8 +64,8 @@
         {% for movie in movies %}
         <div class="movie drop-shadow curved curved-vt-2">
             <div class="delete">
-                <a href="{{ url_for("del_from_queue", imdb_id=movie.imdb_id) }}">
-                    <img border="0" src="{{ url_for('.static', filename='img/fatcow-icons/16x16/delete.png') }}" alt="Delete"/>
+                <a href="{{ url_for(".del_from_queue", imdb_id=movie.imdb_id) }}">
+                    <img border="0" src="{{ url_for('static', filename='img/fatcow-icons/16x16/delete.png') }}" alt="Delete"/>
                 </a>
             </div>
             <div class="thumb">
@@ -93,8 +93,8 @@
                         {{ movie.title }}</a> ({{ movie.year }})
                     </h3>
                     {#
-                    <a href="{{ url_for("del_from_queue", imdb_id=movie.imdb_id) }}">
-                        <img border="0" src="{{ url_for('.static', filename='img/fatcow-icons/16x16/delete.png') }}" alt="Delete"/>
+                    <a href="{{ url_for(".del_from_queue", imdb_id=movie.imdb_id) }}">
+                        <img border="0" src="{{ url_for('static', filename='img/fatcow-icons/16x16/delete.png') }}" alt="Delete"/>
                     </a>
                     #}
                 </div>
@@ -110,7 +110,7 @@
                         {% if movie.quality == qual %}
                             <li class="active">{{ qual }}</li>
                         {% else %}
-                            <li><a href="{{ url_for('edit_movie_quality', imdb_id=movie.imdb_id, quality=qual) }}">{{ qual }}</a></li>
+                            <li><a href="{{ url_for('.edit_movie_quality', imdb_id=movie.imdb_id, quality=qual) }}">{{ qual }}</a></li>
                         {% endif %}
                     {% endfor %}
                 </ul>

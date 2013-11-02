@@ -1,9 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from bs4 import BeautifulSoup
-from flexget.utils import requests
-from flexget.entry import Entry
+
 from flexget import plugin
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.utils import requests
 
 log = logging.getLogger('pogcal')
 
@@ -49,4 +52,7 @@ class InputPogDesign(object):
                 entries.append(e)
         return entries
 
-plugin.register_plugin(InputPogDesign, 'pogcal', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputPogDesign, 'pogcal', api_ver=2)

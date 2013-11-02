@@ -1,8 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
 import datetime
-from flexget.plugin import register_plugin, register_parser_option, priority
-from flexget.utils.tools import parse_timedelta
+import logging
+
+from flexget import options, plugin
+from flexget.config_schema import parse_interval
+from flexget.event import event
 
 log = logging.getLogger('interval')
 
@@ -18,27 +20,25 @@ class PluginInterval(object):
         interval: 7 days
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('interval')
+    schema = {'type': 'string', 'format': 'interval'}
 
-    @priority(255)
+    @plugin.priority(255)
     def on_task_start(self, task, config):
         # Allow reruns
         if task.is_rerun:
             return
-        if task.manager.options.learn:
+        if task.options.learn:
             log.info('Ignoring task %s interval for --learn' % task.name)
             return
         last_time = task.simple_persistence.get('last_time')
         if not last_time:
             log.info('No previous run recorded, running now')
-        elif task.manager.options.interval_ignore:
+        elif task.options.interval_ignore:
             log.info('Ignoring interval because of --now')
         else:
             log.debug('last_time: %r' % last_time)
             log.debug('interval: %s' % config)
-            next_time = last_time + parse_timedelta(config)
+            next_time = last_time + parse_interval(config)
             log.debug('next_time: %r' % next_time)
             if datetime.datetime.now() < next_time:
                 log.debug('interval not met')
@@ -48,6 +48,13 @@ class PluginInterval(object):
         log.debug('interval passed')
         task.simple_persistence['last_time'] = datetime.datetime.now()
 
-register_plugin(PluginInterval, 'interval', api_ver=2)
-register_parser_option('--now', action='store_true', dest='interval_ignore', default=False,
-                       help='Ignore interval(s)')
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginInterval, 'interval', api_ver=2)
+
+
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--now', action='store_true', dest='interval_ignore', default=False,
+                                               help='Ignore interval(s)')

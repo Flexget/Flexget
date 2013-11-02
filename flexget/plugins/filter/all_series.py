@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from flexget.plugin import register_plugin, priority, get_plugin_by_name
+
+from flexget import plugin
+from flexget.event import event
 from flexget.plugins.filter.series import FilterSeriesBase, normalize_series_name
 
 
@@ -24,10 +26,13 @@ class FilterAllSeries(FilterSeriesBase):
         return {'oneOf': [{'type': 'boolean'}, self.settings_schema]}
 
     # Run after series and metainfo series plugins
-    @priority(115)
+    @plugin.priority(115)
     def on_task_metainfo(self, task, config):
         if not config:
             # Don't run when we are disabled
+            return
+        if task.is_rerun:
+            # Since we are running after task start phase, make sure not to merge into the config again on reruns
             return
         # Generate the group settings for series plugin
         group_settings = {}
@@ -35,7 +40,7 @@ class FilterAllSeries(FilterSeriesBase):
             group_settings = config
         group_settings['identified_by'] = 'ep'
         # Generate a list of unique series that metainfo_series can parse for this task
-        metainfo_series = get_plugin_by_name('metainfo_series')
+        metainfo_series = plugin.get_plugin_by_name('metainfo_series')
         guess_entry = metainfo_series.instance.guess_entry
         guessed_series = {}
         for entry in task.entries:
@@ -47,4 +52,6 @@ class FilterAllSeries(FilterSeriesBase):
         self.merge_config(task, allseries)
 
 
-register_plugin(FilterAllSeries, 'all_series', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterAllSeries, 'all_series', api_ver=2)

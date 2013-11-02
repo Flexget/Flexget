@@ -2,7 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import sys
 import os
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('change')
 found_deprecated = False
@@ -17,34 +19,8 @@ class ChangeWarn(object):
         Contains ugly hacks, better to include all deprecation warnings here during 1.0 BETA phase
     """
 
-    def __init__(self):
-        self.warned = False
-        self.executed = False
-
-    def on_process_start(self, task):
-        # Run only once
-        if self.executed:
-            return
-
-        self.executed = True
-        found_deprecated = False
-        config = task.manager.config
-
-        if 'imdb_queue_input' in task.config:
-            log.critical('imdb_queue_input was renamed to emit_imdb_queue')
-            found_deprecated = True
-
-        if 'emit_imdb_queue' in task.config:
-            log.critical('emit_imdb_queue was renamed to emit_movie_queue, please update your config')
-            found_deprecated = True
-
-        if 'imdb_watchlist' in task.config:
-            log.critical('imdb_watchlist was renamed to more generic imdb_list, please update your config')
-            found_deprecated = True
-
-        if 'transmissionrpc' in task.config:
-            log.critical('transmissionrpc was renamed to transmission')
-            found_deprecated = True
+    def on_task_start(self, task, config):
+        global found_deprecated
 
         if 'torrent_size' in task.config:
             log.critical('Plugin torrent_size is deprecated, use content_size instead')
@@ -54,19 +30,15 @@ class ChangeWarn(object):
             log.critical('Plugin nzb_size is deprecated, use content_size instead')
             found_deprecated = True
 
-        if 'imdb_queue' in task.config:
-            log.critical('Plugin imdb_queue has been replaced by movie_queue, update your config')
-            found_deprecated = True
-
-        # priority (dict) was renamed to plugin_priority
-        if isinstance(task.config.get('priority', None), dict):
-            log.critical('Plugin \'priority\' was renamed to \'plugin_priority\'')
-
         if found_deprecated:
-            task.manager.disable_tasks()
+            task.manager.scheduler.shutdown(finish_queue=False)
             task.abort('Deprecated config.')
 
-register_plugin(ChangeWarn, 'change_warn', builtin=True)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(ChangeWarn, 'change_warn', builtin=True, api_ver=2)
+
 
 # check that no old plugins are in pre-compiled form (pyc)
 try:
@@ -146,16 +118,4 @@ try:
         log.critical('BeautifulSoup is too old, please upgrade it!')
         sys.exit(1)
 except ImportError:
-    try:
-        from bs4 import BeautifulSoup
-        log.critical('-' * 80)
-        log.critical('IMPORTANT:')
-        log.critical('-' * 80)
-        log.critical('BeautifulSoup 4 (beta) is too new, FlexGet requires BeautifulSoup 3.2 !')
-        log.critical('You must downgrade this python library manually.')
-        log.critical('Try `pip install beautifulsoup==3.2.0` for starters (install pip if it''s missing)')
-        log.critical('Help is available via IRC and Trac help tickets if you get truly lost.')
-        log.critical('-' * 80)
-        sys.exit(1)
-    except ImportError:
-        pass # expected, normal state
+    pass

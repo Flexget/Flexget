@@ -8,9 +8,11 @@ from random import randrange
 from httplib import BadStatusLine
 from urllib import quote
 from urllib2 import URLError
+
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.tools import urlopener
 from flexget.utils.bittorrent import bdecode
-from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('torrent_alive')
 
@@ -181,7 +183,7 @@ class TorrentAlive(object):
         config.setdefault('reject_for', '1 hour')
         return config
 
-    @priority(150)
+    @plugin.priority(150)
     def on_task_filter(self, task, config):
         if not config:
             return
@@ -192,7 +194,7 @@ class TorrentAlive(object):
                             (config['min_seeds'], entry['torrent_seeds']))
 
     # Run on output phase so that we let torrent plugin output modified torrent file first
-    @priority(250)
+    @plugin.priority(250)
     def on_task_output(self, task, config):
         if not config:
             return
@@ -246,4 +248,7 @@ class TorrentAlive(object):
                 else:
                     log.debug('Found %i seeds from trackers' % seeds)
 
-register_plugin(TorrentAlive, 'torrent_alive', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(TorrentAlive, 'torrent_alive', api_ver=2)

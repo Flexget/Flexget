@@ -6,8 +6,9 @@ import zlib
 import re
 from jinja2 import Template
 
+from flexget import plugin
+from flexget.event import event
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, internet, PluginError
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
 
@@ -70,7 +71,7 @@ class InputHtml(object):
         return config
 
     @cached('html')
-    @internet(log)
+    @plugin.internet(log)
     def on_task_input(self, task, config):
         config = self.build_config(config)
 
@@ -233,7 +234,7 @@ class InputHtml(object):
                     continue
                 log.debug('title from link: %s' % title)
             else:
-                raise PluginError('Unknown title_from value %s' % title_from)
+                raise plugin.PluginError('Unknown title_from value %s' % title_from)
 
             if not title:
                 log.debug('title could not be determined for %s' % log_link)
@@ -267,4 +268,6 @@ class InputHtml(object):
         return queue
 
 
-register_plugin(InputHtml, 'html', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputHtml, 'html', api_ver=2)

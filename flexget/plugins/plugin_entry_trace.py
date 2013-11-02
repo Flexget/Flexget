@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget.plugin import register_plugin, priority
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('entry_trace')
 
@@ -26,7 +27,7 @@ class EntryOperations(object):
       reason: <given message by plugin>
     """
 
-    @priority(-255)
+    @plugin.priority(-255)
     def on_task_input(self, task, config):
         for entry in task.all_entries:
             entry.on_accept(on_entry_action, act='accepted', task=task)
@@ -34,4 +35,6 @@ class EntryOperations(object):
             entry.on_fail(on_entry_action, act='failed', task=task)
 
 
-register_plugin(EntryOperations, 'entry_operations', builtin=True, api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(EntryOperations, 'entry_operations', builtin=True, api_ver=2)
