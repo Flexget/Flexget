@@ -166,7 +166,7 @@ class Task(object):
 
     max_reruns = 5
 
-    def __init__(self, manager, name, options, config=None):
+    def __init__(self, manager, name, config=None, options=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.

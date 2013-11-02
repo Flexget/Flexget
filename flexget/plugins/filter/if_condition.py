@@ -112,7 +112,7 @@ class FilterIf(object):
                         entry_actions[action](entry, 'Matched requirement: %s' % requirement)
                 else:
                     # Other plugins were specified to run on this entry
-                    fake_task = Task(task.manager, task.name, task.config, task.options)
+                    fake_task = Task(task.manager, task.name, config=task.config, options=task.options)
                     fake_task.session = task.session
                     # This entry still belongs to our feed, accept/reject etc. will carry through.
                     fake_task.all_entries[:] = passed_entries

@@ -25,7 +25,7 @@ class SearchRSS(object):
         entries = set()
         for search_string in search_strings:
             # Create a fake task to pass to the rss plugin input handler
-            task = Task(manager, 'search_rss_task', {})
+            task = Task(manager, 'search_rss_task', config={})
             # Use a copy of the config, so we don't overwrite jinja url when filling in search term
             config = rss_plugin.instance.build_config(config).copy()
             template = environment.from_string(config['url'])
