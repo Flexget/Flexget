@@ -12,5 +12,5 @@ jinja2
 flask
 cherrypy
 requests>=1.0, <1.99
-python-dateutil!=2.0
+python-dateutil!=2.0, !=2.2
 jsonschema>=1.0
