@@ -4,7 +4,6 @@ import logging
 import re
 import datetime
 from copy import copy
-from collections import defaultdict
 
 from flexget import plugin
 from flexget.event import event
@@ -42,30 +41,6 @@ class FilterIf(object):
         }
     }
 
-    def __init__(self):
-        self.task_phases = {}
-
-    def on_task_start(self, task, config):
-        """Divide the config into parts based on which phase they need to run on."""
-        phase_dict = self.task_phases[task.name] = defaultdict(lambda: [])
-        for item in config:
-            action = item.values()[0]
-            if isinstance(action, basestring):
-                phase_dict['filter'].append(item)
-            else:
-                for plugin_name, plugin_config in action.iteritems():
-                    p = plugin.get_plugin_by_name(plugin_name)
-                    for phase in p.phase_handlers:
-                        if phase == 'start':
-                            # If plugin has a prepare handler, run it now unconditionally
-                            try:
-                                p.phase_handlers[phase](task, plugin_config)
-                            except TypeError:
-                                # Print to debug, as validator will show user error message
-                                log.debug('Cannot run api < 2 plugins.')
-                        else:
-                            phase_dict[phase].append(item)
-
     def check_condition(self, condition, entry):
         """Checks if a given `entry` passes `condition`"""
         # Make entry fields and other utilities available in the eval namespace
@@ -96,34 +71,35 @@ class FilterIf(object):
             raise AttributeError(item)
 
         def handle_phase(task, config):
-            if task.name not in self.task_phases:
-                log.debug('No config dict was generated for this task.')
-                return
             entry_actions = {
                 'accept': Entry.accept,
                 'reject': Entry.reject,
                 'fail': Entry.fail}
-            for item in self.task_phases[task.name][phase]:
+            for item in config:
                 requirement, action = item.items()[0]
                 passed_entries = [e for e in task.entries if self.check_condition(requirement, e)]
                 if isinstance(action, basestring):
+                    if not phase == 'filter':
+                        continue
                     # Simple entry action (accept, reject or fail) was specified as a string
                     for entry in passed_entries:
                         entry_actions[action](entry, 'Matched requirement: %s' % requirement)
                 else:
                     # Other plugins were specified to run on this entry
-                    fake_task = Task(task.manager, task.name, config=task.config, options=task.options)
+                    fake_task = Task(task.manager, task.name, config=action, options=task.options)
                     fake_task.session = task.session
                     # This entry still belongs to our feed, accept/reject etc. will carry through.
                     fake_task.all_entries[:] = passed_entries
 
-                    try:
-                        for plugin_name, plugin_config in action.iteritems():
-                            p = plugin.get_plugin_by_name(plugin_name)
-                            method = p.phase_handlers[phase]
-                            method(fake_task, plugin_config)
-                    except Exception:
-                        raise
+                    methods = {}
+                    for plugin_name, plugin_config in action.iteritems():
+                        p = plugin.get_plugin_by_name(plugin_name)
+                        method = p.phase_handlers.get(phase)
+                        if method:
+                            methods[method] = (fake_task, plugin_config)
+                    # Run the methods in priority order
+                    for method in sorted(methods, reverse=True):
+                        method(*methods[method])
 
         handle_phase.priority = 80
         return handle_phase
