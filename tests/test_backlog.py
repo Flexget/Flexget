@@ -10,7 +10,7 @@ class TestBacklog(FlexGetBase):
             mock:
               - {title: 'Test.S01E01.hdtv-FlexGet', description: ''}
             set:
-              description: '%(description)sI'
+              description: '{{description}}I'
               laterfield: 'something'
             # Change the priority of set plugin so it runs on all entries. TODO: Remove, this is an ugly hack.
             plugin_priority:
