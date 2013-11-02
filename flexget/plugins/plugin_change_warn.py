@@ -19,7 +19,7 @@ class ChangeWarn(object):
         Contains ugly hacks, better to include all deprecation warnings here during 1.0 BETA phase
     """
 
-    def on_task_start(self, task):
+    def on_task_start(self, task, config):
         global found_deprecated
 
         if 'torrent_size' in task.config:
@@ -37,7 +37,7 @@ class ChangeWarn(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ChangeWarn, 'change_warn', builtin=True)
+    plugin.register(ChangeWarn, 'change_warn', builtin=True, api_ver=2)
 
 
 # check that no old plugins are in pre-compiled form (pyc)

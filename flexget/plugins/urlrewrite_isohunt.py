@@ -100,4 +100,4 @@ class UrlRewriteIsoHunt(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteIsoHunt, 'isohunt', groups=['urlrewriter', 'search'])
+    plugin.register(UrlRewriteIsoHunt, 'isohunt', groups=['urlrewriter', 'search'], api_ver=2)

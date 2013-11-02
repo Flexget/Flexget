@@ -21,4 +21,4 @@ class UrlRewriteSTMusic(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteSTMusic, 'stmusic', groups=['urlrewriter'])
+    plugin.register(UrlRewriteSTMusic, 'stmusic', groups=['urlrewriter'], api_ver=2)

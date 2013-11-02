@@ -30,13 +30,14 @@ class SearchKAT(object):
       other
     """
 
-    def validator(self):
-        from flexget import validator
-
-        root = validator.factory('dict')
-        root.accept('choice', key='category').accept_choices(['all', 'movies', 'tv', 'music', 'books', 'xxx', 'other'])
-        root.accept('boolean', key='verified')
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'category': {'type': 'string', 'enum': ['all', 'movies', 'tv', 'music', 'books', 'xxx', 'other']},
+            'verified': {'type': 'boolean'}
+        },
+        'additionalProperties': False
+    }
 
     def search(self, entry, config):
         search_strings = [normalize_unicode(s).lower() for s in entry.get('search_strings', [entry['title']])]
@@ -80,4 +81,4 @@ class SearchKAT(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchKAT, 'kat', groups=['search'])
+    plugin.register(SearchKAT, 'kat', groups=['search'], api_ver=2)

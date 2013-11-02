@@ -13,7 +13,7 @@ class TorrentSize(object):
     """
 
     @plugin.priority(200)
-    def on_task_modify(self, task):
+    def on_task_modify(self, task, config):
         for entry in task.entries:
             if 'torrent' in entry:
                 size = entry['torrent'].size / 1024 / 1024
@@ -23,4 +23,4 @@ class TorrentSize(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TorrentSize, 'torrent_size', builtin=True)
+    plugin.register(TorrentSize, 'torrent_size', builtin=True, api_ver=2)

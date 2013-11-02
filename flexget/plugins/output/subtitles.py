@@ -54,18 +54,18 @@ class Subtitles(object):
     Fetch subtitles from opensubtitles.org
     """
 
-    def validator(self):
-        from flexget import validator
-        subs = validator.factory('dict')
-        langs = subs.accept('list', key='languages')
-        langs.accept('text')
-        subs.accept('number', key='min_sub_rating')
-        subs.accept('number', key='match_limit')
-        subs.accept('path', key='output')
-        return subs
+    schema = {
+        'type': 'object',
+        'properties': {
+            'languages': {'type': 'array', 'items': {'type': 'string'}},
+            'min_sub_rating': {'type': 'number'},
+            'match_limit': {'type': 'number'},
+            'output': {'type': 'string', 'format': 'path'}
+        },
+        'additionalProperties': False
+    }
 
-    def get_config(self, task):
-        config = task.config['subtitles']
+    def prepare_config(self, config):
         if not isinstance(config, dict):
             config = {}
         config.setdefault('output', task.manager.config_base)
@@ -75,7 +75,7 @@ class Subtitles(object):
         config['output'] = os.path.expanduser(config['output'])
         return config
 
-    def on_task_download(self, task):
+    def on_task_download(self, task, config):
 
         # filter all entries that have IMDB ID set
         try:
@@ -95,7 +95,7 @@ class Subtitles(object):
         if res['status'] != '200 OK':
             raise Exception("Login to opensubtitles.org XML-RPC interface failed")
 
-        config = self.get_config(task)
+        config = self.prepare_config(config)
 
         token = res['token']
 
@@ -170,4 +170,4 @@ class Subtitles(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Subtitles, 'subtitles')
+    plugin.register(Subtitles, 'subtitles', api_ver=2)

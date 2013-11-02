@@ -21,20 +21,19 @@ class FilterExists(object):
 
     schema = one_or_more({'type': 'string', 'format': 'path'})
 
-    def get_config(self, task):
-        config = task.config.get('exists', None)
+    def prepare_config(self, config):
         # If only a single path is passed turn it into a 1 element list
         if isinstance(config, basestring):
             config = [config]
         return config
 
     @plugin.priority(-1)
-    def on_task_filter(self, task):
+    def on_task_filter(self, task, config):
         if not task.accepted:
             log.debug('No accepted entries, not scanning for existing.')
             return
         log.verbose('Scanning path(s) for existing files.')
-        config = self.get_config(task)
+        config = self.prepare_config(config)
         for path in config:
             # unicode path causes crashes on some paths
             path = str(os.path.expanduser(path))
@@ -53,4 +52,4 @@ class FilterExists(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(FilterExists, 'exists')
+    plugin.register(FilterExists, 'exists', api_ver=2)

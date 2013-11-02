@@ -48,4 +48,4 @@ class UrlRewriteNewPCT(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteNewPCT, 'newpct', groups=['urlrewriter'])
+    plugin.register(UrlRewriteNewPCT, 'newpct', groups=['urlrewriter'], api_ver=2)

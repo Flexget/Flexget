@@ -44,11 +44,11 @@ class UrlRewrite(object):
         }
     }
 
-    def on_task_start(self, task):
-        for name, config in task.config.get('urlrewrite', {}).iteritems():
-            match = re.compile(config['regexp'])
-            format = config['format']
-            self.resolves[name] = {'regexp_compiled': match, 'format': format, 'regexp': config['regexp']}
+    def on_task_start(self, task, config):
+        for name, rewrite_config in config.iteritems():
+            match = re.compile(rewrite_config['regexp'])
+            format = rewrite_config['format']
+            self.resolves[name] = {'regexp_compiled': match, 'format': format, 'regexp': rewrite_config['regexp']}
             log.debug('Added rewrite %s' % name)
 
     def url_rewritable(self, task, entry):
@@ -81,4 +81,4 @@ class UrlRewrite(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewrite, 'urlrewrite', groups=['urlrewriter'])
+    plugin.register(UrlRewrite, 'urlrewrite', groups=['urlrewriter'], api_ver=2)

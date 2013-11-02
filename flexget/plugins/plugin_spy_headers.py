@@ -80,7 +80,7 @@ class PluginSpyHeaders(object):
         WARNING: At the moment this modifies requests somehow!
     """
 
-    schema = {}
+    schema = {'type': 'boolean'}
 
     def log_requests_headers(self, response):
         log.info('Request  : %s' % response.request.url)
@@ -91,7 +91,9 @@ class PluginSpyHeaders(object):
         log.info('--------------------------------------')
         return response
 
-    def on_task_start(self, task):
+    def on_task_start(self, task, config):
+        if not config:
+            return
         # Add our hook to the requests session
         task.requests.hooks['response'].append(self.log_requests_headers)
         # Backwards compatibility for plugins still using urllib
@@ -103,8 +105,10 @@ class PluginSpyHeaders(object):
             opener = urllib2.build_opener(HTTPCaptureHeaderHandler())
             urllib2.install_opener(opener)
 
-    def on_task_exit(self, task):
+    def on_task_exit(self, task, config):
         """Task exiting, remove additions"""
+        if not config:
+            return
         task.requests.hooks['response'].remove(self.log_requests_headers)
         if urllib2._opener:
             log.debug('Removing urllib2 default opener')
@@ -117,4 +121,4 @@ class PluginSpyHeaders(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginSpyHeaders, 'spy_headers')
+    plugin.register(PluginSpyHeaders, 'spy_headers', api_ver=2)

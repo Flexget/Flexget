@@ -20,4 +20,4 @@ class UrlRewriteBtJunkie(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteBtJunkie, 'btjunkie', groups=['urlrewriter'])
+    plugin.register(UrlRewriteBtJunkie, 'btjunkie', groups=['urlrewriter'], api_ver=2)

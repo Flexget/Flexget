@@ -19,19 +19,15 @@ class PluginPriority(object):
           series: 100
     """
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory('dict')
-        config.accept_any_key('integer')
-        return config
+    schema = {'type': 'object', 'additionalProperties': {'type': 'integer'}}
 
     def __init__(self):
         self.priorities = {}
 
-    def on_task_start(self, task):
+    def on_task_start(self, task, config):
         self.priorities = {}
         names = []
-        for name, priority in task.config.get('plugin_priority', {}).iteritems():
+        for name, priority in config.iteritems():
             names.append(name)
             originals = self.priorities.setdefault(name, {})
             for phase, event in plugin.plugins[name].phase_handlers.iteritems():
@@ -41,12 +37,12 @@ class PluginPriority(object):
                 log.debug('set %s new value %s' % (phase, priority))
         log.debug('Changed priority for: %s' % ', '.join(names))
 
-    def on_task_exit(self, task):
+    def on_task_exit(self, task, config):
         if not self.priorities:
             log.debug('nothing changed, aborting restore')
             return
         names = []
-        for name in task.config.get('plugin_priority', {}).keys():
+        for name in config.keys():
             names.append(name)
             originals = self.priorities[name]
             for phase, priority in originals.iteritems():
@@ -58,4 +54,4 @@ class PluginPriority(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginPriority, 'plugin_priority')
+    plugin.register(PluginPriority, 'plugin_priority', api_ver=2)

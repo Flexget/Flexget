@@ -84,4 +84,4 @@ class UrlRewriteTorrentz(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteTorrentz, 'torrentz', groups=['urlrewriter', 'search'])
+    plugin.register(UrlRewriteTorrentz, 'torrentz', groups=['urlrewriter', 'search'], api_ver=2)

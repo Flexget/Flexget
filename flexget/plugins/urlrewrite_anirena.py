@@ -18,4 +18,4 @@ class UrlRewriteAniRena(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteAniRena, 'anirena', groups=['urlrewriter'])
+    plugin.register(UrlRewriteAniRena, 'anirena', groups=['urlrewriter'], api_ver=2)

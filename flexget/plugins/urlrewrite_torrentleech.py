@@ -154,4 +154,4 @@ class UrlRewriteTorrentleech(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteTorrentleech, 'torrentleech', groups=['urlrewriter', 'search'])
+    plugin.register(UrlRewriteTorrentleech, 'torrentleech', groups=['urlrewriter', 'search'], api_ver=2)

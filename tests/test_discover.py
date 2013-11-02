@@ -16,7 +16,7 @@ class SearchPlugin(object):
     def search(self, entry, comparator=None, config=None):
         return [Entry(entry)]
 
-plugin.register(SearchPlugin, 'test_search', groups=['search'])
+plugin.register(SearchPlugin, 'test_search', groups=['search'], api_ver=2)
 
 
 class EstRelease(object):
@@ -25,7 +25,7 @@ class EstRelease(object):
     def estimate(self, entry):
         return entry.get('est_release')
 
-plugin.register(EstRelease, 'test_release', groups=['estimate_release'])
+plugin.register(EstRelease, 'test_release', groups=['estimate_release'], api_ver=2)
 
 
 class TestDiscover(FlexGetBase):

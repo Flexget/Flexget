@@ -15,7 +15,7 @@ class OutputDumpConfig(object):
     """
 
     @plugin.priority(-255)
-    def on_task_start(self, task):
+    def on_task_start(self, task, config):
         if task.options.dump_config:
             import yaml
             print '--- config from task: %s' % task.name
@@ -29,7 +29,7 @@ class OutputDumpConfig(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OutputDumpConfig, 'dump_config', debug=True, builtin=True)
+    plugin.register(OutputDumpConfig, 'dump_config', debug=True, builtin=True, api_ver=2)
 
 
 @event('options.register')

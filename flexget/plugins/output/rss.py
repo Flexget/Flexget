@@ -143,12 +143,11 @@ class OutputRSS(object):
         ]
     }
 
-    def on_task_output(self, task):
+    def on_task_output(self, task, config):
         # makes this plugin count as output (stops warnings about missing outputs)
         pass
 
-    def get_config(self, task):
-        config = task.config['make_rss']
+    def prepare_config(self, config):
         if not isinstance(config, dict):
             config = {'file': config}
         config.setdefault('days', 7)
@@ -162,11 +161,11 @@ class OutputRSS(object):
         config['link'].append('url')
         return config
 
-    def on_task_exit(self, task):
+    def on_task_exit(self, task, config):
         """Store finished / downloaded entries at exit"""
         if not rss2gen:
             raise plugin.PluginWarning('plugin make_rss requires PyRSS2Gen library.')
-        config = self.get_config(task)
+        config = self.prepare_config(config)
 
         # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely useful)
         if not config['history']:
@@ -265,4 +264,4 @@ class OutputRSS(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OutputRSS, 'make_rss')
+    plugin.register(OutputRSS, 'make_rss', api_ver=2)

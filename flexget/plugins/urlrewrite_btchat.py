@@ -19,4 +19,4 @@ class UrlRewriteBtChat(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteBtChat, 'btchat', groups=['urlrewriter'])
+    plugin.register(UrlRewriteBtChat, 'btchat', groups=['urlrewriter'], api_ver=2)

@@ -20,7 +20,9 @@ class FilterImdbRequired(object):
     schema = {'type': 'boolean'}
 
     @plugin.priority(32)
-    def on_task_filter(self, task):
+    def on_task_filter(self, task, config):
+        if not config:
+            return
         for entry in task.entries:
             try:
                 plugin.get_plugin_by_name('imdb_lookup').instance.lookup(entry)
@@ -31,4 +33,4 @@ class FilterImdbRequired(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(FilterImdbRequired, 'imdb_required')
+    plugin.register(FilterImdbRequired, 'imdb_required', api_ver=2)

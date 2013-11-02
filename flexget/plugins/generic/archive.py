@@ -479,7 +479,7 @@ def do_cli(manager, options):
 @event('plugin.register')
 def register_plugin():
     plugin.register(Archive, 'archive', api_ver=2)
-    plugin.register(UrlrewriteArchive, 'flexget_archive', groups=['search'])
+    plugin.register(UrlrewriteArchive, 'flexget_archive', groups=['search'], api_ver=2)
 
 
 @event('options.register')

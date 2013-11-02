@@ -16,10 +16,9 @@ class UrlFix(object):
     schema = {'type': 'boolean'}
 
     @plugin.priority(-255)
-    def on_task_input(self, task):
-        if 'urlfix' in task.config:
-            if not task.config['urlfix']:
-                return
+    def on_task_input(self, task, config):
+        if config is False:
+            return
         for entry in task.entries:
             if '&amp;' in entry['url']:
                 log_once('Corrected `%s` url (replaced &amp; with &)' % entry['title'], logger=log)
@@ -28,4 +27,4 @@ class UrlFix(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlFix, 'urlfix', builtin=True)
+    plugin.register(UrlFix, 'urlfix', builtin=True, api_ver=2)

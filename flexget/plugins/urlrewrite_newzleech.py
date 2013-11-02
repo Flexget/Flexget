@@ -84,4 +84,4 @@ class UrlRewriteNewzleech(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteNewzleech, 'newzleech', groups=['search'])
+    plugin.register(UrlRewriteNewzleech, 'newzleech', groups=['search'], api_ver=2)

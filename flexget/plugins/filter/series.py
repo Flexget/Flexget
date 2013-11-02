@@ -872,8 +872,8 @@ class FilterSeries(FilterSeriesBase):
 
     # Run after metainfo_quality and before metainfo_series
     @plugin.priority(125)
-    def on_task_metainfo(self, task):
-        config = self.prepare_config(task.config.get('series', {}))
+    def on_task_metainfo(self, task, config):
+        config = self.prepare_config(config)
         self.auto_exact(config)
         for series_item in config:
             series_name, series_config = series_item.items()[0]
@@ -883,13 +883,13 @@ class FilterSeries(FilterSeriesBase):
             took = time.clock() - start_time
             log.trace('parsing %s took %s', series_name, took)
 
-    def on_task_filter(self, task):
+    def on_task_filter(self, task, config):
         """Filter series"""
         # Parsing was done in metainfo phase, create the dicts to pass to process_series from the task entries
         # key: series episode identifier ie. S01E02
         # value: seriesparser
 
-        config = self.prepare_config(task.config.get('series', {}))
+        config = self.prepare_config(config)
         found_series = {}
         for entry in task.entries:
             if entry.get('series_name') and entry.get('series_id') is not None and entry.get('series_parser'):
@@ -1366,7 +1366,7 @@ class FilterSeries(FilterSeriesBase):
                 still_needed = [req for req in still_needed if not req.allows(quality)]
         return bool(downloaded_qualities)
 
-    def on_task_exit(self, task):
+    def on_task_exit(self, task, config):
         """Learn succeeded episodes"""
         log.debug('on_task_exit')
         for entry in task.accepted:
@@ -1417,7 +1417,7 @@ class SeriesDBManager(FilterSeriesBase):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(FilterSeries, 'series')
+    plugin.register(FilterSeries, 'series', api_ver=2)
     # This is a builtin so that it can update the database for tasks that may have had series plugin removed
     plugin.register(SeriesDBManager, 'series_db', builtin=True, api_ver=2)
 

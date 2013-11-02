@@ -21,4 +21,4 @@ class UrlRewriteRedskunk(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteRedskunk, 'redskunk', groups=['urlrewriter'])
+    plugin.register(UrlRewriteRedskunk, 'redskunk', groups=['urlrewriter'], api_ver=2)

@@ -37,8 +37,7 @@ class FilterExistsSeries(object):
         ]
     }
 
-    def get_config(self, task):
-        config = task.config.get('exists_series', [])
+    def prepare_config(self, config):
         # if config is not a dict, assign value to 'path' key
         if not isinstance(config, dict):
             config = {'path': config}
@@ -48,11 +47,11 @@ class FilterExistsSeries(object):
         return config
 
     @plugin.priority(-1)
-    def on_task_filter(self, task):
+    def on_task_filter(self, task, config):
         if not task.accepted:
             log.debug('Scanning not needed')
             return
-        config = self.get_config(task)
+        config = self.prepare_config(config)
         accepted_series = {}
         paths = set()
         for entry in task.accepted:
@@ -122,4 +121,4 @@ class FilterExistsSeries(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(FilterExistsSeries, 'exists_series', groups=['exists'])
+    plugin.register(FilterExistsSeries, 'exists_series', groups=['exists'], api_ver=2)
