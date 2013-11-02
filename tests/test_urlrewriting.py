@@ -14,8 +14,11 @@ class TestURLRewriters(FlexGetBase):
           test:
             # make test data
             mock:
-              - {title: 'something', url: 'http://thepiratebay.org/tor/8492471/Test.avi'}
-              - {title: 'bar', url: 'http://thepiratebay.org/search/something'}
+              - {title: 'tpb page', url: 'http://thepiratebay.org/tor/8492471/Test.avi'}
+              - {title: 'tbp search', url: 'http://thepiratebay.com/search/something'}
+              - {title: 'tbp torrent', url: 'http://torrents.thepiratebay.se/8492471/Test.torrent'}
+              - {title: 'tbp torrent subdomain', url: 'http://torrents.thepiratebay.se/8492471/Test.avi'}
+              - {title: 'tbp torrent bad subdomain', url: 'http://torrent.thepiratebay.se/8492471/Test.avi'}
               - {title: 'nyaa', url: 'http://www.nyaa.eu/?page=torrentinfo&tid=12345'}
               - {title: 'isohunt search', url: 'http://isohunt.com/torrents/?ihq=Query.Here'}
               - {title: 'isohunt direct', url: 'http://isohunt.com/torrent_details/123456789/Name.Here'}
@@ -32,17 +35,25 @@ class TestURLRewriters(FlexGetBase):
     def test_piratebay(self):
         # test with piratebay entry
         urlrewriter = self.get_urlrewriter('piratebay')
-        entry = self.task.entries[0]
+        entry = self.task.find_entry(title='tpb page')
         assert_true(urlrewriter.url_rewritable(self.task, entry))
+        entry = self.task.find_entry(title='tbp torrent')
+        assert not urlrewriter.url_rewritable(self.task, entry), \
+            'TPB direct torrent link should not be url_rewritable'
+        entry = self.task.find_entry(title='tbp torrent subdomain')
+        assert_true(urlrewriter.url_rewritable(self.task, entry))
+        entry = self.task.find_entry(title='tbp torrent bad subdomain')
+        assert not urlrewriter.url_rewritable(self.task, entry), \
+            'TPB link with invalid subdomain should not be url_rewritable'
 
     def test_piratebay_search(self):
         # test with piratebay entry
         urlrewriter = self.get_urlrewriter('piratebay')
-        entry = self.task.entries[1]
+        entry = self.task.find_entry(title='tbp search')
         assert_true(urlrewriter.url_rewritable(self.task, entry))
 
     def test_nyaa_torrents(self):
-        entry = self.task.entries[2]
+        entry = self.task.find_entry(title='nyaa')
         urlrewriter = self.get_urlrewriter('nyaa')
         assert entry['url'] == 'http://www.nyaa.eu/?page=torrentinfo&tid=12345'
         assert_true(urlrewriter.url_rewritable(self.task, entry))

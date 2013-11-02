@@ -915,8 +915,11 @@ def install_sdist(project_name, sdist, py_executable, search_dirs=None):
         search_dirs = file_search_dirs()
     found, sdist_path = _find_file(sdist, search_dirs)
     if not found:
+        # Manual edit of bootstrap.py to make this error clearer.
         logger.fatal("Cannot find sdist %s" % (sdist,))
-        return
+        logger.fatal("Installing virtualenv in the system python, or downloading setuptools/pip packages to the"
+                     "bootstrap.py folder will fix this problem.")
+        sys.exit(100)
 
     tmpdir = tempfile.mkdtemp()
     try:
@@ -1811,7 +1814,6 @@ def create_bootstrap_script(extra_text, python_version=''):
 
 def adjust_options(options, args):
     args[:] = ['.']
-    options.unzip_setuptools = True
 
 
 def after_install(options, home_dir):

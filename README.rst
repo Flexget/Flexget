@@ -14,6 +14,11 @@ directory support or provide interface for external utilities like FlexGet.
 
 .. _FlexGet: http://flexget.com
 
+.. image:: https://api.travis-ci.org/Flexget/Flexget.png?branch=master
+    :target: https://travis-ci.org/Flexget/Flexget
+
+.. image:: https://pypip.in/d/FlexGet/badge.png
+    :target: https://crate.io/packages/FlexGet
 
 Install
 -------
@@ -58,3 +63,9 @@ or ``C:\Documents and Setting\<username>\flexget`` (Windows).
 If you don't want to use virtualenv there's ``flexget_vanilla.py`` file which
 can be used to run FlexGet without bootstrapping, note that you will need to
 install all required dependencies yourself.
+
+
+.. image:: https://d2weczhvl823v0.cloudfront.net/Flexget/flexget/trend.png
+   :alt: Bitdeli badge
+   :target: https://bitdeli.com/free
+
