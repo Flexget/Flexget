@@ -55,17 +55,19 @@ class ClientService(rpyc.Service):
 
 
 class IPCServer(threading.Thread):
-    def __init__(self, manager, port):
+    def __init__(self, manager, port=None):
         super(IPCServer, self).__init__(name='ipc_server')
         self.daemon = True
         self.manager = manager
         self.host = "127.0.0.1"
-        self.port = port
+        self.port = port or 0
         self.server = None
 
     def run(self):
         DaemonService.manager = self.manager
         self.server = ThreadedServer(DaemonService, hostname=self.host, port=self.port)
+        # If we just chose an open port, write save the chosen one
+        self.port = self.server.listener.getsockname()[1]
         self.manager.write_lock(ipc_port=self.port)
         self.server.start()
 
