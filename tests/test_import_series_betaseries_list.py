@@ -1,21 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
-from flexget.plugins.filter.series import Series
 from mock import patch, call
 from tests import FlexGetBase
 import flexget.plugins.input.betaseries_list
-from flexget.manager import Session
 
 
 def assert_mock_calls(expected_calls, mock_object):
     assert expected_calls == mock_object.mock_calls, "expecting calls %r, got %r instead" % \
                                                      (expected_calls, mock_object.mock_calls)
-
-
-def assert_series_count_in_db(expected_count):
-    session = Session()
-    actual_series_count = session.query(Series).count()
-    assert expected_count == actual_series_count, "expecting %s series stored in db, got %s instead" % \
-                                                  (expected_count, actual_series_count)
 
 
 class Test_import_series_betaseries_list(FlexGetBase):
@@ -75,7 +66,6 @@ class Test_import_series_betaseries_list(FlexGetBase):
         # WHEN
         self.execute_task('test_no_members')
         # THEN
-        assert_series_count_in_db(2)
         assert_mock_calls([call('api_key_foo', 'user_foo', 'passwd_foo')],  self.create_token_mock)
         assert_mock_calls([call('api_key_foo', 'token_foo', 'user_foo')], self.query_series_mock)
 
@@ -85,7 +75,6 @@ class Test_import_series_betaseries_list(FlexGetBase):
         # WHEN
         self.execute_task('test_with_one_members')
         # THEN
-        assert_series_count_in_db(3)
         assert_mock_calls([call('api_key_foo', 'user_foo', 'passwd_foo')],  self.create_token_mock)
         assert_mock_calls([call('api_key_foo', 'token_foo', 'other_member_1')], self.query_series_mock)
 
@@ -99,7 +88,6 @@ class Test_import_series_betaseries_list(FlexGetBase):
         # WHEN
         self.execute_task('test_with_two_members')
         # THEN
-        assert_series_count_in_db(4)
         assert_mock_calls([call('api_key_foo', 'user_foo', 'passwd_foo')],  self.create_token_mock)
         assert_mock_calls(
             [
