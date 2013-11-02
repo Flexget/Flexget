@@ -22,7 +22,7 @@ options = environment.options
 install_requires = ['FeedParser>=5.1.3', 'SQLAlchemy >=0.7, <0.7.99', 'PyYAML', 'BeautifulSoup>=3.2, <3.3',
                     # There is a bug in beautifulsoup 4.2.0 that breaks imdb parsing, see http://flexget.com/ticket/2091
                     'beautifulsoup4>=4.1, !=4.2.0, <4.4', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar',
-                    'jinja2', 'flask', 'cherrypy', 'requests>=1.0, <2.99', 'python-dateutil!=2.0, !2.2', 'jsonschema>=2.0',
+                    'jinja2', 'flask', 'cherrypy', 'requests>=1.0, <2.99', 'python-dateutil!=2.0, !=2.2', 'jsonschema>=2.0',
                     'python-tvrage', 'tmdb3']
 if sys.version_info < (2, 7):
     # argparse is part of the standard library in python 2.7+
