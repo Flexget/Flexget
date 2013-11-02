@@ -144,7 +144,11 @@ class Scheduler(threading.Thread):
         with self.triggers_lock:
             for trigger in self.triggers:
                 if trigger.should_run:
-                    options = dict(trigger.options, tasks=trigger.tasks)
+                    options = dict(trigger.options)
+                    # If the user has specified all tasks with '*', don't add tasks option at all, so that manual
+                    # tasks are not executed
+                    if trigger.tasks != ['*']:
+                        options.tasks = trigger.tasks
                     self.execute(options=options, priority=5)
                     trigger.trigger()
 
