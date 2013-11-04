@@ -6,6 +6,7 @@ import re
 import urlparse
 
 import jsonschema
+from jsonschema.compat import str_types
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
@@ -143,14 +144,20 @@ format_checker.checks('quality_requirements', raises=ValueError)(qualities.Requi
 
 @format_checker.checks('time', raises=ValueError)
 def is_time(time_string):
+    if not isinstance(time_string, str_types):
+        return True
     return parse_time(time_string) is not None
 
 @format_checker.checks('interval', raises=ValueError)
 def is_interval(interval_string):
+    if not isinstance(interval_string, str_types):
+        return True
     return parse_interval(interval_string) is not None
 
 @format_checker.checks('regex', raises=ValueError)
 def is_regex(instance):
+    if not isinstance(instance, str_types):
+        return True
     try:
         return re.compile(instance)
     except re.error as e:
@@ -158,12 +165,16 @@ def is_regex(instance):
 
 @format_checker.checks('file', raises=ValueError)
 def is_file(instance):
+    if not isinstance(instance, str_types):
+        return True
     if os.path.isfile(os.path.expanduser(instance)):
         return True
     raise ValueError('`%s` does not exist' % instance)
 
 @format_checker.checks('path', raises=ValueError)
 def is_path(instance):
+    if not isinstance(instance, str_types):
+        return True
     # Only validate the part of the path before the first identifier to be replaced
     pat = re.compile(r'{[{%].*[}%]}')
     result = pat.search(instance)
@@ -177,6 +188,8 @@ def is_path(instance):
 #TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
 @format_checker.checks('url')
 def is_url(instance):
+    if not isinstance(instance, str_types):
+        return True
     regexp = ('(' + '|'.join(['ftp', 'http', 'https', 'file', 'udp']) +
               '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
     return re.match(regexp, instance)
