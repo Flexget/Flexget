@@ -251,6 +251,10 @@ class PluginInfo(dict):
             # By default look at the containing package of the plugin.
             category = plugin_class.__module__.split('.')[-2]
 
+        # Check for unsupported api versions
+        if api_ver < 2:
+            warnings.warn('Api versions <2 are no longer supported. Plugin %s' % name, DeprecationWarning, stacklevel=2)
+
         # Set basic info attributes
         self.api_ver = api_ver
         self.name = name
