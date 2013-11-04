@@ -60,7 +60,7 @@ class TestSeenInfoHash(FlexGetBase):
 class TestModifyTrackers(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             accept_all: yes
         tasks:
@@ -255,7 +255,7 @@ class TestTorrentScrub(FlexGetBase):
 
 class TestTorrentAlive(FlexGetBase):
     __yaml__ = """
-        presets:
+        templates:
           global:
             accept_all: yes
         tasks:

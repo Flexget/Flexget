@@ -34,14 +34,14 @@
                         <a href="/configure/edit/text/{{ category }}/{{ a_name }}">{{ a_name }}</a>
                         <div class="actions">
                             <a href="#" onclick="on_delete('{{ category }}','{{ a_name }}')">
-                            <img border="0" src="{{ url_for('.static', filename='img/fatcow-icons/16x16/delete.png') }}" alt="Delete"/></a>
+                            <img border="0" src="{{ url_for('static', filename='img/fatcow-icons/16x16/delete.png') }}" alt="Delete"/></a>
                         </div>
                     </div>
                 </li>
             {% endfor %}
             <li class="new">
                 <div class="item{% if root == category %}{% if name is undefined %} selected{% endif %}{% endif %}">
-                    <a href="{{ url_for('new_text', root=category) }}">Create new</a>
+                    <a href="{{ url_for('.new_text', root=category) }}">Create new</a>
                 </div>
             </li>
         </ul>

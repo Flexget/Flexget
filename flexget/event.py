@@ -68,19 +68,23 @@ def add_event_handler(name, func, priority=128):
     events = _events.setdefault(name, [])
     for event in events:
         if event.func == func:
-            raise Exception('%s has already been registered as event listener under name %s' % (func.__name__, name))
+            raise ValueError('%s has already been registered as event listener under name %s' % (func.__name__, name))
     log.trace('registered function %s to event %s' % (func.__name__, name))
     event = Event(name, func, priority)
     events.append(event)
     return event
 
 
+def remove_event_handlers(name):
+    """Removes all handlers for given event `name`."""
+    _events.pop(name, None)
+
+
 def remove_event_handler(name, func):
-    """
-    .. warning:: Not implemented!
-    """
-    # TODO: implement
-    raise NotImplementedError
+    """Remove `func` from the handlers for event `name`."""
+    for e in list(_events.get(name, [])):
+        if e.func is func:
+            _events[name].remove(e)
 
 
 def fire_event(name, *args, **kwargs):

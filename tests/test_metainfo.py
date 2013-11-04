@@ -88,7 +88,7 @@ class TestMetainfoQuality(FlexGetBase):
 
 class TestMetainfoSeries(FlexGetBase):
     __yaml__ = """
-        presets:
+        templates:
           global:
             metainfo_series: yes
         tasks:

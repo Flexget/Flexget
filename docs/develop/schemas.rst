@@ -10,6 +10,11 @@ for several things including:
 * Set defaults in the config that user did not provide
 * Generating a form for the webui config editor
 
+You can run the `test_config_schema.py` test in the suite to test the validity
+of your plugin's schema. The error messages it produces may help you fix your
+schema if you are having trouble. Note that this doesn't check the schema
+validates what you want, just that it is a valid json schema.
+
 The following list of keywords is not exhaustive, just a general primer, as
 well as some FlexGet specific notes. The JSON schema spec should be referred to
 for more details, or if a keyword is not covered here. Take not that our

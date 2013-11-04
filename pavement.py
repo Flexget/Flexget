@@ -21,28 +21,25 @@ sys.path.insert(0, '')
 options = environment.options
 install_requires = ['FeedParser>=5.1.3', 'SQLAlchemy >=0.7, <0.7.99', 'PyYAML', 'BeautifulSoup>=3.2, <3.3',
                     # There is a bug in beautifulsoup 4.2.0 that breaks imdb parsing, see http://flexget.com/ticket/2091
-                    'beautifulsoup4>=4.1, !=4.2.0, <4.4', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar',
-                    'jinja2', 'flask', 'cherrypy', 'requests>=1.0, <2.99', 'python-dateutil!=2.0, !=2.2', 'jsonschema>=2.0',
-                    'python-tvrage', 'tmdb3']
+                    'beautifulsoup4>=4.1, !=4.2.0, <4.4', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar', 'rpyc',
+                    'jinja2', 'requests>=1.0, <2.99', 'python-dateutil!=2.0, !=2.2', 'jsonschema>=2.0', 'python-tvrage',
+                    'tmdb3', 'guessit>=0.6.1']
 if sys.version_info < (2, 7):
     # argparse is part of the standard library in python 2.7+
     install_requires.append('argparse')
-	
 
-entry_points = {
-    'console_scripts': ['flexget = flexget:main'],
-    'gui_scripts': ['flexget-webui = flexget.ui:main']}
+entry_points = {'console_scripts': ['flexget = flexget:main']}
 
 # Provide an alternate exe on windows which does not cause a pop-up when scheduled
 if sys.platform.startswith('win'):
-    entry_points['gui_scripts'].append('flexget-headless = flexget:main')
+    entry_points.setdefault('gui_scripts', []).append('flexget-headless = flexget:main')
 
 with open("README.rst") as readme:
     long_description = readme.read()
 
 setup(
     name='FlexGet',
-    version='1.1',  # our tasks append the .1234 (current build number) to the version number
+    version='1.2',  # our tasks append the .1234 (current build number) to the version number
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) '
                 'from different sources like RSS-feeds, html-pages, various sites and more.',
     long_description=long_description,
@@ -62,6 +59,7 @@ setup(
         'memusage': ['guppy'],
         'NZB': ['pynzb'],
         'TaskTray': ['pywin32'],
+        'webui': ['flask>=0.7', 'cherrypy']
     },
     entry_points=entry_points,
     classifiers=[

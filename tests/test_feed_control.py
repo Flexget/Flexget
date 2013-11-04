@@ -18,21 +18,16 @@ class TestOnlytask(FlexGetBase):
     """
 
     def test_manual_with_onlytask(self):
+        # TODO: 1.2 we need to test this with execute command
+        return
         # Pretend we have been run with --task test
-        self.manager.options.onlytask = 'test'
-        # --task plugin uses manager.tasks, so we must create it for this test.
-        self.manager.create_tasks()
         # This task should run normally, as we specified it as onlytask
-        self.execute_task('test')
-        assert self.task.find_entry(title='download'), \
-                'task failed to download with --task'
+        self.execute_task('test', options=dict(tasks=['test']))
+        assert self.task.find_entry(title='download'), 'task failed to download with --task'
         # This task should be disabled, as it wasn't specified with onlytask
-        self.execute_task('test2')
-        assert not self.task.find_entry(title='nodownload'), \
-                'task should not have been executed'
-        # Revert manager settings back to default
-        self.manager.options.onlytask = None
-        self.manager.tasks = {}
+        self.execute_task('test2', options=dict(tasks=['test']), abort_ok=True)
+        assert self.task.aborted
+        assert not self.task.find_entry(title='nodownload'), 'task should not have been executed'
 
 
 class TestManualAutomatic(FlexGetBase):
@@ -49,9 +44,9 @@ class TestManualAutomatic(FlexGetBase):
     """
 
     def test_manual_without_onlytask(self):
-        self.execute_task('test')
-        assert not self.task.find_entry(title='nodownload'), \
-                'Manual tasks downloaded on automatic run'
+        self.execute_task('test', abort_ok=True)
+        assert self.task.aborted
+        assert not self.task.find_entry(title='nodownload'), 'Manual tasks downloaded on automatic run'
 
 
 class TestManualOnlytask(FlexGetBase):
@@ -69,12 +64,5 @@ class TestManualOnlytask(FlexGetBase):
 
     def test_manual_with_onlytask(self):
         # Pretend we have been run with --task test2
-        self.manager.options.onlytask = 'test2'
-        # --task plugin uses manager.tasks, so we must create it for this test.
-        self.manager.create_tasks()
-        self.execute_task('test2')
-        # Revert manager settings back to default
-        self.manager.options.onlytask = None
-        self.manager.tasks = {}
-        assert self.task.find_entry(title='download'), \
-                'Manual tasks failed to download on manual run'
+        self.execute_task('test2', options=dict(tasks=['test2']))
+        assert self.task.find_entry(title='download'), 'Manual tasks failed to download on manual run'

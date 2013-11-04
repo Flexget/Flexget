@@ -4,8 +4,9 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin, validator
-from flexget.utils import bittorrent
+from flexget.event import event
 from flexget.plugins.modify.torrent import TorrentFilename
+from flexget.utils import bittorrent
 
 log = logging.getLogger('torrent_scrub')
 
@@ -27,14 +28,13 @@ class TorrentScrub(object):
     # Keys of rTorrent / ruTorrent session data
     RT_KEYS = ("libtorrent_resume", "log_callback", "err_callback", "rtorrent")
 
-    def validator(self):
-        """ Our configuration model.
-        """
-        root = validator.factory()
-        root.accept("boolean")
-        root.accept("choice").accept_choices(self.SCRUB_MODES, ignore_case=True)
-        root.accept("list").accept("text")  # list of keys to scrub
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {'type': 'string', 'enum': list(SCRUB_MODES)},
+            {'type': 'array', 'items': {'type': 'string'}}  # list of keys to scrub
+        ]
+    }
 
     @plugin.priority(SCRUB_PRIO)
     def on_task_modify(self, task, config):
@@ -104,4 +104,6 @@ class TorrentScrub(object):
                              (infohash, new_infohash, entry['filename']))
 
 
-plugin.register_plugin(TorrentScrub, groups=["torrent"], api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(TorrentScrub, groups=["torrent"], api_ver=2)

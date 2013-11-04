@@ -4,6 +4,7 @@ import os
 
 from flexget import plugin
 from flexget import validator
+from flexget.event import event
 
 log = logging.getLogger('proxy')
 
@@ -13,15 +14,16 @@ PROTOCOLS = ['http', 'https', 'ftp']
 class Proxy(object):
     """Adds a proxy to the requests session."""
 
-    def validator(self):
-        root = validator.factory()
-        # Accept one proxy for everything
-        root.accept('url')
-        # Accept a dict mapping protocol to proxy
-        advanced = root.accept('dict')
-        for prot in PROTOCOLS:
-            advanced.accept('url', key=prot)
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'string', 'format': 'url'},
+            {
+                'type': 'object',
+                'properties': dict((prot, {'type': 'string', 'format': 'url'}) for prot in PROTOCOLS),
+                'additionalProperties': False
+            }
+        ]
+    }
 
     @plugin.priority(255)
     def on_task_start(self, task, config):
@@ -43,4 +45,6 @@ class Proxy(object):
         task.requests.proxies = proxies
 
 
-plugin.register_plugin(Proxy, 'proxy', builtin=True, api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(Proxy, 'proxy', builtin=True, api_ver=2)

@@ -5,7 +5,8 @@ import glob
 from nose.tools import raises
 
 from tests import FlexGetBase
-from flexget import plugin, plugins, CoreArgumentParser
+from flexget import plugin, plugins
+from flexget.event import event
 
 
 class TestPluginApi(object):
@@ -18,21 +19,21 @@ class TestPluginApi(object):
         plugin.get_plugin_by_name('nonexisting_plugin')
 
     def test_no_dupes(self):
-        from flexget.options import CoreArgumentParser
-        plugin.load_plugins(CoreArgumentParser())
+        plugin.load_plugins()
 
         assert plugin.PluginInfo.dupe_counter == 0, "Duplicate plugin names, see log"
 
     def test_load(self):
-        from flexget.options import CoreArgumentParser
 
-        plugin.load_plugins(CoreArgumentParser())
+        plugin.load_plugins()
         plugin_path = os.path.dirname(plugins.__file__)
         plugin_modules = set(os.path.basename(i)
             for k in ("/*.py", "/*/*.py")
             for i in glob.glob(plugin_path + k))
         assert len(plugin_modules) >= 10, "Less than 10 plugin modules looks fishy"
-        assert len(plugin.plugins) >= len(plugin_modules) - 1, "Less plugins than plugin modules"
+        # Hmm, this test isn't good, because we have plugin modules that don't register a class (like cli ones)
+        # and one module can load multiple plugins TODO: Maybe consider some replacement
+        # assert len(plugin.plugins) >= len(plugin_modules) - 1, "Less plugins than plugin modules"
 
     def test_register_by_class(self):
 
@@ -46,9 +47,15 @@ class TestPluginApi(object):
             pass
 
         assert 'test_plugin' not in plugin.plugins
-        plugin.register_plugin(TestPlugin)
-        plugin.register_plugin(Oneword)
-        plugin.register_plugin(TestHTML)
+
+        @event('plugin.register')
+        def rp():
+            plugin.register(TestPlugin, api_ver=2)
+            plugin.register(Oneword, api_ver=2)
+            plugin.register(TestHTML, api_ver=2)
+
+        # Call load_plugins again to register our new plugins
+        plugin.load_plugins()
         assert 'test_plugin' in plugin.plugins
         assert 'oneword' in plugin.plugins
         assert 'test_html' in plugin.plugins
@@ -63,7 +70,7 @@ class TestExternalPluginLoading(FlexGetBase):
 
     def setup(self):
         os.environ['FLEXGET_PLUGIN_PATH'] = os.path.join(self.base_path, 'external_plugins')
-        plugin.load_plugins(CoreArgumentParser())
+        plugin.load_plugins()
         super(TestExternalPluginLoading, self).setup()
 
     def teardown(self):

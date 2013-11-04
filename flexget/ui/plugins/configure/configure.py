@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 from flexget.ui.webui import manager, register_plugin, app
 from flexget.task import Task
-from flask import render_template, request, flash, redirect, Module
+from flask import render_template, request, flash, redirect, Blueprint
 import yaml
 import logging
 from flask.helpers import url_for
 
-configure = Module(__name__, url_prefix='/configure')
+configure = Blueprint('configure', __name__)
 
 log = logging.getLogger('ui.configure')
 
@@ -20,7 +20,7 @@ def index():
 def new_text(root):
     if root not in ['tasks', 'presets']:
         flash('Invalid root.', 'error')
-        return redirect(url_for('index'))
+        return redirect(url_for('.index'))
     config_type = root.rstrip('s')
     context = {'root': root,
                'config_type': config_type}
@@ -33,7 +33,7 @@ def new_text(root):
             flash('%s with name %s already exists' % (config_type.capitalize(), name), 'error')
         else:
             manager.config.setdefault(root, {})[name] = {}
-            return redirect(url_for('edit_text', root=root, name=name))
+            return redirect(url_for('.edit_text', root=root, name=name))
 
     return render_template('configure/new.html', **context)
 
@@ -45,7 +45,7 @@ def delete(root, name):
         del manager.config[root][name]
         manager.save_config()
         flash('Deleted %s.' % name, 'delete')
-    return redirect(url_for('index'))
+    return redirect(url_for('.index'))
 
 
 @configure.route('/edit/text/<root>/<name>', methods=['POST', 'GET'])
@@ -85,7 +85,7 @@ def edit_text(root, name):
                         del manager.config[root][name]
                         manager.save_config()
                         flash('%s %s renamed to %s.' % (config_type.capitalize(), name, new_name), 'success')
-                        return redirect(url_for('edit_text', root=root, name=new_name))
+                        return redirect(url_for('.edit_text', root=root, name=new_name))
                 else:
                     flash('Configuration saved', 'success')
     else:

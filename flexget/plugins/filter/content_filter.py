@@ -3,8 +3,9 @@ import logging
 import posixpath
 from fnmatch import fnmatch
 
+from flexget import plugin
+from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.plugin import register_plugin, priority
 
 log = logging.getLogger('content_filter')
 
@@ -33,15 +34,14 @@ class FilterContentFilter(object):
         'additionalProperties': False
     }
 
-    def get_config(self, task):
-        config = task.config.get('content_filter')
+    def prepare_config(self, config):
         for key in ['require', 'require_all', 'reject']:
             if key in config:
                 if isinstance(config[key], basestring):
                     config[key] = [config[key]]
         return config
 
-    def process_entry(self, task, entry):
+    def process_entry(self, task, entry, config):
         """
         Process an entry and reject it if it doesn't pass filter.
 
@@ -49,7 +49,6 @@ class FilterContentFilter(object):
         :param entry: Entry to process
         :return: True, if entry was rejected.
         """
-        config = self.get_config(task)
         if 'content_files' in entry:
             files = entry['content_files']
             log.debug('%s files: %s' % (entry['title'], files))
@@ -89,21 +88,23 @@ class FilterContentFilter(object):
                 # TODO: should not add this to entry, this is a filter plugin
                 entry['content_files'] = files
 
-    @priority(150)
-    def on_task_modify(self, task):
-        if task.manager.options.test or task.manager.options.learn:
+    @plugin.priority(150)
+    def on_task_modify(self, task, config):
+        if task.options.test or task.options.learn:
             log.info('Plugin is partially disabled with --test and --learn because content filename information may not be available')
             #return
 
-        config = self.get_config(task)
+        config = self.prepare_config(config)
         for entry in task.accepted:
             # TODO: I don't know if we can pares filenames from nzbs, just do torrents for now
             # possibly also do compressed files in the future
             self.parse_torrent_files(entry)
-            if self.process_entry(task, entry):
+            if self.process_entry(task, entry, config):
                 task.rerun()
             elif not 'content_files' in entry and config.get('strict'):
                 entry.reject('no content files parsed for entry', remember=True)
                 task.rerun()
 
-register_plugin(FilterContentFilter, 'content_filter')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterContentFilter, 'content_filter', api_ver=2)

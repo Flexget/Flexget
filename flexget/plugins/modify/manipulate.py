@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
-from flexget.plugin import priority, register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('manipulate')
 
@@ -58,7 +60,7 @@ class Manipulate(object):
                 phase = item_config.get('phase', 'metainfo')
                 self.phase_jobs[phase].append(item)
 
-    @priority(255)
+    @plugin.priority(255)
     def on_task_metainfo(self, task, config):
         if not self.phase_jobs['metainfo']:
             # return if no jobs for this phase
@@ -66,7 +68,7 @@ class Manipulate(object):
         modified = sum(self.process(entry, self.phase_jobs['metainfo']) for entry in task.entries)
         log.verbose('Modified %d entries.' % modified)
 
-    @priority(255)
+    @plugin.priority(255)
     def on_task_filter(self, task, config):
         if not self.phase_jobs['filter']:
             # return if no jobs for this phase
@@ -123,4 +125,6 @@ class Manipulate(object):
                 entry[field] = field_value
         return modified
 
-register_plugin(Manipulate, 'manipulate', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(Manipulate, 'manipulate', api_ver=2)

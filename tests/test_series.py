@@ -155,7 +155,7 @@ class TestQuality(FlexGetBase):
 class TestDatabase(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             series:
               - some series
@@ -507,7 +507,7 @@ class TestFilterSeriesPriority(FlexGetBase):
 class TestPropers(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             # prevents seen from rejecting on second execution,
             # we want to see that series is able to reject
@@ -755,7 +755,7 @@ class TestDuplicates(FlexGetBase):
 
     __yaml__ = """
 
-        presets:
+        templates:
           global: # just cleans log a bit ..
             disable_builtins:
               - seen
@@ -829,7 +829,7 @@ class TestDuplicates(FlexGetBase):
 class TestQualities(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             disable_builtins: yes
             series:
@@ -969,7 +969,7 @@ class TestQualities(FlexGetBase):
 class TestIdioticNumbering(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             series:
               - FooBar:
@@ -1040,7 +1040,7 @@ class TestNormalization(FlexGetBase):
 class TestMixedNumbering(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             series:
               - FooBar:
@@ -1114,7 +1114,7 @@ class TestExact(FlexGetBase):
 class TestTimeframe(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             series:
               - test:
@@ -1372,29 +1372,29 @@ class TestFromGroup(FlexGetBase):
         assert self.task.find_entry('accepted', title='Test.14.HDTV-Name')
 
 
-class TestWatched(FlexGetBase):
+class TestBegin(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           eps:
             mock:
               - {title: 'WTest.S02E03.HDTV.XViD-FlexGet'}
               - {title: 'W2Test.S02E03.HDTV.XViD-FlexGet'}
         tasks:
           before_ep_test:
-            preset: eps
+            template: eps
             series:
               - WTest:
                   begin: S02E05
               - W2Test:
                   begin: S03E02
           after_ep_test:
-            preset: eps
+            template: eps
             series:
               - WTest:
                   begin: S02E03
               - W2Test:
-                  begin: S01E04
+                  begin: S02E01
           before_seq_test:
             mock:
             - title: WTest.1.HDTV.XViD-FlexGet
@@ -1431,6 +1431,22 @@ class TestWatched(FlexGetBase):
                   begin: '2009-05-05'
               - W2Test:
                   begin: '2012-12-31'
+          test_advancement1:
+            mock:
+            - title: WTest.S01E01
+            series:
+            - WTest
+          test_advancement2:
+            mock:
+            - title: WTest.S03E01
+            series:
+            - WTest
+          test_advancement3:
+            mock:
+            - title: WTest.S03E01
+            series:
+            - WTest:
+                begin: S03E01
 
     """
 
@@ -1458,11 +1474,22 @@ class TestWatched(FlexGetBase):
         self.execute_task('after_date_test')
         assert len(self.task.accepted) == 2, 'Entries should have been accepted, they are not before the begin episode'
 
+    def test_advancement(self):
+        # Put S01E01 into the database as latest download
+        self.execute_task('test_advancement1')
+        assert self.task.accepted
+        # Just verify regular ep advancement would block S03E01
+        self.execute_task('test_advancement2')
+        assert not self.task.accepted, 'Episode advancement should have blocked'
+        # Make sure ep advancement doesn't block it when we've set begin to that ep
+        self.execute_task('test_advancement3')
+        assert self.task.accepted, 'Episode should have been accepted'
+
 
 class TestSeriesPremiere(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             metainfo_series: yes
             series_premiere: yes
@@ -1488,7 +1515,7 @@ class TestImportSeries(FlexGetBase):
     __yaml__ = """
         tasks:
           timeframe_max:
-            import_series:
+            configure_series:
               settings:
                 propers: 12 hours
                 target: 720p
@@ -1503,7 +1530,7 @@ class TestImportSeries(FlexGetBase):
     """
 
     def test_timeframe_max(self):
-        """Tests import_series as well as timeframe with max_quality."""
+        """Tests configure_series as well as timeframe with max_quality."""
         self.execute_task('timeframe_max')
         assert not self.task.accepted, 'Entry shouldnot have been accepted on first run.'
         age_series(minutes=6)
@@ -1623,7 +1650,7 @@ class TestDoubleEps(FlexGetBase):
 
 class TestAutoLockin(FlexGetBase):
     __yaml__ = """
-        presets:
+        templates:
           global:
             series:
             - FooBar

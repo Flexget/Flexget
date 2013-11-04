@@ -4,8 +4,9 @@ import urllib
 
 import feedparser
 
+from flexget import plugin
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, PluginWarning
+from flexget.event import event
 from flexget.utils.search import normalize_unicode
 
 log = logging.getLogger('nyaa')
@@ -45,11 +46,11 @@ class UrlRewriteNyaa(object):
 
             status = rss.get('status', False)
             if status != 200:
-                raise PluginWarning('Search result not 200 (OK), received %s' % status)
+                raise plugin.PluginWarning('Search result not 200 (OK), received %s' % status)
 
             ex = rss.get('bozo_exception', False)
             if ex:
-                raise PluginWarning('Got bozo_exception (bad feed)')
+                raise plugin.PluginWarning('Got bozo_exception (bad feed)')
 
             for item in rss.entries:
 
@@ -72,4 +73,7 @@ class UrlRewriteNyaa(object):
     def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('torrentinfo', 'download')
 
-register_plugin(UrlRewriteNyaa, 'nyaa', groups=['search', 'urlrewriter'])
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteNyaa, 'nyaa', groups=['search', 'urlrewriter'], api_ver=2)

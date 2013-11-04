@@ -1,8 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from flask import render_template, Module
+from flask import render_template, Blueprint
 from flexget.ui.webui import register_plugin
 
-home = Module(__name__, url_prefix='/home')
+home = Blueprint('home', __name__)
 
 
 @home.route('/')

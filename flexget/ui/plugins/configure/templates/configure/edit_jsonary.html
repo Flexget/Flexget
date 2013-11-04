@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block head %}
+    <link rel="stylesheet" href="{{ url_for(".static", filename="css/page.index.css") }}" />
+    <link rel="stylesheet" href="{{ url_for(".static", filename="renderers/flexget.jsonary.css") }}" />
+    <link rel="stylesheet" href="{{ url_for(".static", filename="renderers/common.css") }}" />
+{% endblock %}
+{% block main %}
+    <table width=100%>
+        <tr>
+            <td width=80%>
+                <input id="url-bar" value="/config/"/>
+            </td>
+            <td>
+                <input id="go" type="submit" value="Go" />
+            </td>
+        </tr>
+    </table>
+    <div id="main">
+    <script src="{{ url_for('.static', filename='js/jquery.js') }}"></script>
+    <script src="{{ url_for('.static', filename='js/jsonary.js') }}"></script>
+    <script src="{{ url_for('.static', filename='plugins/jsonary.undo.js') }}"></script>
+    <script src="{{ url_for('.static', filename='renderers/flexget.jsonary.js') }}"></script>
+    <script src="{{ url_for('.static', filename='renderers/list-schemas.js') }}"></script>
+    <script src="{{ url_for('.static', filename='renderers/list-links.js') }}"></script>
+    <script src="{{ url_for('.static', filename='js/page.index.js') }}"></script>
+    <script>
+        if (window.location.hash == "#" || window.location.hash == "") {
+            window.location.replace("#" + $('#url-bar').val());
+        } else {
+            var url = window.location.hash.substring(1);
+            $('#url-bar').val(url);
+        }
+        $('#go').click();
+    </script>
+
+{% endblock %}

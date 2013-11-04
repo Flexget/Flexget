@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger("redskunk")
 
@@ -16,4 +18,7 @@ class UrlRewriteRedskunk(object):
         entry['url'] = entry['url'].replace('torrents-details', 'download')
         entry['url'] = entry['url'].replace('&hit=1', '')
 
-register_plugin(UrlRewriteRedskunk, 'redskunk', groups=['urlrewriter'])
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteRedskunk, 'redskunk', groups=['urlrewriter'], api_ver=2)

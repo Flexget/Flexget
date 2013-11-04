@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget import validator
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('rerun')
 
@@ -9,14 +10,15 @@ log = logging.getLogger('rerun')
 class MaxReRuns(object):
     """Force a task to rerun for debugging purposes."""
 
-    def validator(self):
-        root = validator.factory('boolean')
-        return root
+    schema = {'type': ['boolean', 'integer']}
 
     def on_task_start(self, task, config):
-        if config and not task.is_rerun:
-            log.debug('forcing a task rerun')
-            task.rerun()
+        task.max_reruns = int(config)
+
+    def on_task_input(self, task, config):
+        task.rerun()
 
 
-register_plugin(MaxReRuns, 'rerun', api_ver=2, debug=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(MaxReRuns, 'rerun', api_ver=2, debug=True)

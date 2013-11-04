@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget.plugin import priority, register_plugin
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.log import log_once
 
 log = logging.getLogger('urlfix')
@@ -14,15 +15,16 @@ class UrlFix(object):
 
     schema = {'type': 'boolean'}
 
-    @priority(-255)
-    def on_task_input(self, task):
-        if 'urlfix' in task.config:
-            if not task.config['urlfix']:
-                return
+    @plugin.priority(-255)
+    def on_task_input(self, task, config):
+        if config is False:
+            return
         for entry in task.entries:
             if '&amp;' in entry['url']:
                 log_once('Corrected `%s` url (replaced &amp; with &)' % entry['title'], logger=log)
                 entry['url'] = entry['url'].replace('&amp;', '&')
 
 
-register_plugin(UrlFix, 'urlfix', builtin=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlFix, 'urlfix', builtin=True, api_ver=2)

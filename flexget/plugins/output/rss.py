@@ -7,8 +7,8 @@ import os
 
 from sqlalchemy import Column, Integer, String, DateTime, Unicode
 
-from flexget import db_schema
-from flexget.plugin import register_plugin, PluginWarning, PluginError
+from flexget import db_schema, plugin
+from flexget.event import event
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
 from flexget.utils.template import render_from_entry, get_template, RenderError
 
@@ -121,9 +121,6 @@ class OutputRSS(object):
     Default list: imdb_url, input_url, url
     """
 
-    def __init__(self):
-        self.written = {}
-
     schema = {
         'oneOf': [
             {'type': 'string'},  # TODO: path / file
@@ -146,12 +143,11 @@ class OutputRSS(object):
         ]
     }
 
-    def on_task_output(self, task):
+    def on_task_output(self, task, config):
         # makes this plugin count as output (stops warnings about missing outputs)
         pass
 
-    def get_config(self, task):
-        config = task.config['make_rss']
+    def prepare_config(self, config):
         if not isinstance(config, dict):
             config = {'file': config}
         config.setdefault('days', 7)
@@ -165,13 +161,13 @@ class OutputRSS(object):
         config['link'].append('url')
         return config
 
-    def on_task_exit(self, task):
+    def on_task_exit(self, task, config):
         """Store finished / downloaded entries at exit"""
         if not rss2gen:
-            raise PluginWarning('plugin make_rss requires PyRSS2Gen library.')
-        config = self.get_config(task)
+            raise plugin.PluginWarning('plugin make_rss requires PyRSS2Gen library.')
+        config = self.prepare_config(config)
 
-        # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely usefull)
+        # when history is disabled, remove everything from backlog on every run (a bit hackish, rarely useful)
         if not config['history']:
             log.debug('disabling history')
             for item in task.session.query(RSSEntry).filter(RSSEntry.file == config['file']).all():
@@ -189,7 +185,7 @@ class OutputRSS(object):
             try:
                 template = get_template(config['template'], 'rss')
             except ValueError as e:
-                raise PluginError('Invalid template specified: %s' % e)
+                raise plugin.PluginError('Invalid template specified: %s' % e)
             try:
                 rss.description = render_from_entry(template, entry)
             except RenderError as e:
@@ -201,24 +197,13 @@ class OutputRSS(object):
             log.debug('Saving %s into rss database' % entry['title'])
             task.session.add(rss)
 
-    def on_process_end(self, task):
-        """Write RSS file at application terminate."""
         if not rss2gen:
             return
         # don't generate rss when learning
-        if task.manager.options.learn:
+        if task.options.learn:
             return
 
-        config = self.get_config(task)
-        if config['file'] in self.written:
-            log.trace('skipping already written file %s' % config['file'])
-            return
-
-        # in terminate phase there is no open session in task, so open new one
-        from flexget.manager import Session
-        session = Session()
-
-        db_items = session.query(RSSEntry).filter(RSSEntry.file == config['file']).\
+        db_items = task.session.query(RSSEntry).filter(RSSEntry.file == config['file']).\
             order_by(RSSEntry.published.desc()).all()
 
         # make items
@@ -248,10 +233,7 @@ class OutputRSS(object):
                 rss_items.append(PyRSS2Gen.RSSItem(**gen))
             else:
                 # no longer needed
-                session.delete(db_item)
-
-        session.commit()
-        session.close()
+                task.session.delete(db_item)
 
         # make rss
         rss = PyRSS2Gen.RSS2(title='FlexGet',
@@ -261,7 +243,7 @@ class OutputRSS(object):
                              items=rss_items)
 
         # don't run with --test
-        if task.manager.options.test:
+        if task.options.test:
             log.info('Would write rss file with %d entries.', len(rss_items))
             return
 
@@ -278,7 +260,8 @@ class OutputRSS(object):
                 # TODO: plugins cannot raise PluginWarnings in terminate event ..
                 log.critical('Unable to write %s' % fn)
                 return
-        self.written[config['file']] = True
 
 
-register_plugin(OutputRSS, 'make_rss')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputRSS, 'make_rss', api_ver=2)

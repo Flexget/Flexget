@@ -3,14 +3,16 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import sys
+import yaml
+import logging
+from contextlib import contextmanager
+
 import flexget.logger
 from flexget.manager import Manager
 from flexget.plugin import load_plugins
-from flexget.options import CoreArgumentParser
-from flexget.task import Task
+from flexget.options import get_parser
+from flexget.task import Task, TaskAbort
 from tests import util
-import yaml
-import logging
 
 log = logging.getLogger('tests')
 
@@ -36,10 +38,9 @@ def setup_once():
     if not plugins_loaded:
         flexget.logger.initialize(True)
         setup_logging_level()
-        parser = CoreArgumentParser(True)
-        load_plugins(parser)
+        load_plugins()
         # store options for MockManager
-        test_arguments = parser.parse_args()
+        test_arguments = get_parser().parse_args(['--del-db', 'execute'])
         plugins_loaded = True
 
 
@@ -57,7 +58,7 @@ class MockManager(Manager):
         log.debug('database_uri: %s' % self.database_uri)
         super(MockManager, self).initialize()
 
-    def find_config(self):
+    def find_config(self, *args, **kwargs):
         """
         Override configuration loading
         """
@@ -68,9 +69,19 @@ class MockManager(Manager):
             print 'Invalid configuration'
             raise
 
-    # no lock files with unit testing
-    def acquire_lock(self):
+    def load_config(self):
         pass
+
+    def validate_config(self):
+        # We don't actually quit on errors in the unit tests, as the configs get modified after manager start
+        errors = super(MockManager, self).validate_config()
+        for error in errors:
+            log.critical(error)
+
+    # no lock files with unit testing
+    @contextmanager
+    def acquire_lock(self):
+        yield
 
     def release_lock(self):
         pass
@@ -86,7 +97,6 @@ class FlexGetBase(object):
     # (ending with "os.sep"), and any occurrence of "__tmp__" in __yaml__ or
     # a @with_filecopy destination is also replaced with it.
 
-    # TODO: there's probably flaw in this as this is shared across FlexGetBases ?
     __tmp__ = False
 
     def __init__(self):
@@ -118,17 +128,19 @@ class FlexGetBase(object):
                 log.trace('Removing tmpdir %r' % self.__tmp__)
                 shutil.rmtree(self.__tmp__.rstrip(os.sep))
 
-    def execute_task(self, name, abort_ok=False):
+    def execute_task(self, name, abort_ok=False, options=None):
         """Use to execute one test task from config"""
         log.info('********** Running task: %s ********** ' % name)
         config = self.manager.config['tasks'][name]
         if hasattr(self, 'task'):
             if hasattr(self, 'session'):
                 self.task.session.close() # pylint: disable-msg=E0203
-        self.task = Task(self.manager, name, config)
-        self.manager.execute(tasks=[self.task])
-        if not abort_ok:
-            assert not self.task.aborted, 'Task should not have aborted.'
+        self.task = Task(self.manager, name, config=config, options=options)
+        try:
+            self.task.execute()
+        except TaskAbort:
+            if not abort_ok:
+                raise
 
     def dump(self):
         """Helper method for debugging"""

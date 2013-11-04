@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.template import render_from_task, get_template
 
 PLUGIN_NAME = 'make_html'
@@ -39,4 +41,6 @@ class OutputHtml:
         with open(output, 'w') as f:
             f.write(template.encode('utf-8'))
 
-register_plugin(OutputHtml, PLUGIN_NAME, api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputHtml, PLUGIN_NAME, api_ver=2)

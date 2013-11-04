@@ -1,11 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('anirena')
 
 
-class UrlRewriteAniRena:
+class UrlRewriteAniRena(object):
     """AniRena urlrewriter."""
 
     def url_rewritable(self, task, entry):
@@ -14,4 +16,6 @@ class UrlRewriteAniRena:
     def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('details', 'download')
 
-register_plugin(UrlRewriteAniRena, 'anirena', groups=['urlrewriter'])
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteAniRena, 'anirena', groups=['urlrewriter'], api_ver=2)

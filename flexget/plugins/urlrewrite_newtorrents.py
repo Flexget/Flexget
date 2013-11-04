@@ -3,9 +3,11 @@ import urllib
 import urllib2
 import logging
 import re
-from flexget.plugins.plugin_urlrewriting import UrlRewritingError
+
+from flexget import plugin
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, PluginWarning, internet
+from flexget.event import event
+from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import urlopener
 from flexget.utils.search import torrent_availability, normalize_unicode
@@ -55,7 +57,7 @@ class NewTorrents:
             entries.update(self.entries_from_search(search_string))
         return entries
 
-    @internet(log)
+    @plugin.internet(log)
     def url_from_page(self, url):
         """Parses torrent url from newtorrents download page"""
         try:
@@ -71,7 +73,7 @@ class NewTorrents:
         else:
             return f.group(1)
 
-    @internet(log)
+    @plugin.internet(log)
     def entries_from_search(self, name, url=None):
         """Parses torrent download url from search results"""
         name = normalize_unicode(name)
@@ -121,4 +123,7 @@ class NewTorrents:
                 log.debug('search result contains multiple matches, sorted %s by most seeders' % torrents)
             return torrents
 
-register_plugin(NewTorrents, 'newtorrents', groups=['urlrewriter', 'search'])
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(NewTorrents, 'newtorrents', groups=['urlrewriter', 'search'], api_ver=2)

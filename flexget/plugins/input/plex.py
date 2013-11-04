@@ -2,11 +2,13 @@
 from xml.dom.minidom import parse, parseString
 import re
 import logging
-from flexget.utils import requests
-from flexget.plugin import register_plugin, PluginError
-from flexget.entry import Entry
-from socket import gethostbyname
 from os.path import basename
+from socket import gethostbyname
+
+from flexget import plugin
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.utils import requests
 
 log = logging.getLogger('plex')
 
@@ -97,11 +99,11 @@ class InputPlex(object):
                 r = requests.post('https://my.plexapp.com/users/sign_in.xml', 
                     auth=(config['username'], config['password']), headers=header)
             except requests.RequestException as e:
-                raise PluginError('Could not login to my.plexapp.com: %s. Username: %s Password: %s' 
+                raise plugin.PluginError('Could not login to my.plexapp.com: %s. Username: %s Password: %s'
                     % (e, config['username'], config['password']))
             log.debug("Managed to connect to myplex.")
             if 'Invalid email' in r.text:
-                raise PluginError('Could not login to my.plexapp.com: invalid username and/or password!')
+                raise plugin.PluginError('Could not login to my.plexapp.com: invalid username and/or password!')
             log.debug("Managed to login to myplex.")
             dom = parseString(r.text)
             plextoken = dom.getElementsByTagName('authentication-token')[0].firstChild.nodeValue
@@ -109,8 +111,8 @@ class InputPlex(object):
             try:
                 r = requests.get("https://my.plexapp.com/pms/servers?X-Plex-Token=%s" % plextoken)
             except requests.RequestException as e:
-                raise PluginError('Could not get servers from my.plexapp.com using authentication-token: %s.' 
-                    % plextoken)
+                raise plugin.PluginError('Could not get servers from my.plexapp.com using authentication-token: %s.'
+                                         % plextoken)
             dom = parseString(r.text)
             for node in dom.getElementsByTagName('Server'):
                 if node.getAttribute('address') == config['server']:
@@ -118,7 +120,7 @@ class InputPlex(object):
                     log.debug("Got accesstoken: %s" % accesstoken)
                     urlconfig['X-Plex-Token'] = accesstoken
             if accesstoken == "":
-                raise PluginError('Could not retrieve accesstoken for %s.' % config['server'])
+                raise plugin.PluginError('Could not retrieve accesstoken for %s.' % config['server'])
         for key in urlconfig:
             urlappend += '%s=%s&' % (key, urlconfig[key])
         if not isinstance(config['section'], int):
@@ -126,20 +128,20 @@ class InputPlex(object):
                 r = requests.get("http://%s:%d/library/sections/%s" % 
                     (config['server'], config['port'], urlappend))
             except requests.RequestException as e:
-                raise PluginError('Error retrieving source: %s' % e)
+                raise plugin.PluginError('Error retrieving source: %s' % e)
             dom = parseString(r.text.encode("utf-8"))
             for node in dom.getElementsByTagName('Directory'):
                 if node.getAttribute('title') == config['section']:
                     config['section'] = int(node.getAttribute('key'))
         if not isinstance(config['section'], int):
-            raise PluginError('Could not find section \'%s\'' % config['section'])
+            raise plugin.PluginError('Could not find section \'%s\'' % config['section'])
         log.debug("Fetching http://%s:%d/library/sections/%s/%s%s" %
             (config['server'], config['port'], config['section'], config['selection'], urlappend))
         try:
             r = requests.get("http://%s:%d/library/sections/%s/%s%s" % 
                 (config['server'], config['port'], config['section'], config['selection'], urlappend))
         except requests.RequestException as e:
-            raise PluginError('Error retrieving source: %s' % e)
+            raise plugin.PluginError('Error retrieving source: %s' % e)
         dom = parseString(r.text.encode("utf-8"))
         entries = []
         plexsectionname = dom.getElementsByTagName('MediaContainer')[0].getAttribute('title1')
@@ -204,7 +206,10 @@ class InputPlex(object):
                         e['plex_path'] = key
                         entries.append(e)
         else:
-            raise PluginError('Selected section is not a TV section.')
+            raise plugin.PluginError('Selected section is not a TV section.')
         return entries
 
-register_plugin(InputPlex, 'plex', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputPlex, 'plex', api_ver=2)

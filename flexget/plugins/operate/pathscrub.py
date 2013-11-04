@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from flexget import plugin
-from flexget import validator
+from flexget.event import event
 from flexget.utils import pathscrub
 
 
@@ -13,10 +14,7 @@ class PathScrub(object):
       pathscrub: windows
     """
 
-    def validator(self):
-        root = validator.factory('choice')
-        root.accept_choices(['windows', 'linux', 'mac'], ignore_case=True)
-        return root
+    schema = {'type': 'string', 'enum': ['windows', 'linux', 'mac']}
 
     def on_task_start(self, task, config):
         # Change path scrub os mode
@@ -29,4 +27,6 @@ class PathScrub(object):
     on_task_abort = on_task_exit
 
 
-plugin.register_plugin(PathScrub, 'pathscrub', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PathScrub, 'pathscrub', api_ver=2)

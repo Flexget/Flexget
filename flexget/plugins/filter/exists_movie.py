@@ -2,9 +2,11 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
 
+from flexget import plugin
+from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.plugin import register_plugin, priority, PluginError, get_plugin_by_name
 from flexget.utils.titles.movie import MovieParser
+from flexget.utils.tools import TimedDict
 
 log = logging.getLogger('exists_movie')
 
@@ -24,7 +26,7 @@ class FilterExistsMovie(object):
     skip = ['cd1', 'cd2', 'subs', 'sample']
 
     def __init__(self):
-        self.cache = {}
+        self.cache = TimedDict(cache_time='1 hour')
 
     def build_config(self, config):
         # if only a single path is passed turn it into a 1 element list
@@ -32,17 +34,14 @@ class FilterExistsMovie(object):
             config = [config]
         return config
 
-    def on_process_start(self, task, config):
-        self.cache = {}
-
-    @priority(-1)
+    @plugin.priority(-1)
     def on_task_filter(self, task, config):
         if not task.accepted:
             log.debug('nothing accepted, aborting')
             return
 
         config = self.build_config(config)
-        imdb_lookup = get_plugin_by_name('imdb_lookup').instance
+        imdb_lookup = plugin.get_plugin_by_name('imdb_lookup').instance
 
         incompatible_dirs = 0
         incompatible_entries = 0
@@ -98,7 +97,7 @@ class FilterExistsMovie(object):
                         if imdb_id is not None:
                             log.trace('adding: %s' % imdb_id)
                             path_ids.append(imdb_id)
-                    except PluginError as e:
+                    except plugin.PluginError as e:
                         log.trace('%s lookup failed (%s)' % (item, e.value))
                         incompatible_dirs += 1
 
@@ -114,7 +113,7 @@ class FilterExistsMovie(object):
             if not entry.get('imdb_id', eval_lazy=False):
                 try:
                     imdb_lookup.lookup(entry)
-                except PluginError as e:
+                except plugin.PluginError as e:
                     log.trace('entry %s imdb failed (%s)' % (entry['title'], e.value))
                     incompatible_entries += 1
                     continue
@@ -130,4 +129,6 @@ class FilterExistsMovie(object):
 
         log.debug('-- Finished filtering entries -------------------------------')
 
-register_plugin(FilterExistsMovie, 'exists_movie', groups=['exists'], api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterExistsMovie, 'exists_movie', groups=['exists'], api_ver=2)

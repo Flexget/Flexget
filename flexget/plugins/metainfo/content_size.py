@@ -3,7 +3,9 @@ import logging
 import re
 import math
 import os.path
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('metanfo_csize')
 
@@ -18,15 +20,12 @@ class MetainfoContentSize(object):
     Also sets content_size for entries with local files from input_listdir.
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean', 'default': False}
 
-    def on_task_metainfo(self, task):
+    def on_task_metainfo(self, task, config):
         # check if disabled (value set to false)
-        if 'metainfo_content_size' in task.config:
-            if not task.config['metainfo_content_size']:
-                return
+        if config is False:
+            return
 
         count = 0
         for entry in task.entries:
@@ -65,4 +64,6 @@ class MetainfoContentSize(object):
             log.debug('Found content size information from %s entries' % count)
 
 
-register_plugin(MetainfoContentSize, 'metainfo_content_size', builtin=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(MetainfoContentSize, 'metainfo_content_size', builtin=True, api_ver=2)

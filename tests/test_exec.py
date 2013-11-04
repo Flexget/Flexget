@@ -9,7 +9,7 @@ class TestExec(FlexGetBase):
 
     __tmp__ = True
     __yaml__ = """
-        presets:
+        templates:
           global:
             set:
               temp_dir: '__tmp__'

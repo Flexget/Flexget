@@ -5,7 +5,7 @@ from tests import FlexGetBase
 class TestCondition(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             disable_builtins: [seen]
             mock:
@@ -72,7 +72,7 @@ class TestCondition(FlexGetBase):
 class TestQualityCondition(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             disable_builtins: [seen]
             mock:

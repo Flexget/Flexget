@@ -23,7 +23,7 @@ class Test_import_series_betaseries_list(FlexGetBase):
     __yaml__ = """
         tasks:
           test_no_members:
-            import_series:
+            configure_series:
               from:
                 betaseries_list:
                   username: user_foo
@@ -31,7 +31,7 @@ class Test_import_series_betaseries_list(FlexGetBase):
                   api_key: api_key_foo
 
           test_with_one_members:
-            import_series:
+            configure_series:
               from:
                 betaseries_list:
                   username: user_foo
@@ -41,7 +41,7 @@ class Test_import_series_betaseries_list(FlexGetBase):
                     - other_member_1
 
           test_with_two_members:
-            import_series:
+            configure_series:
               from:
                 betaseries_list:
                   username: user_foo

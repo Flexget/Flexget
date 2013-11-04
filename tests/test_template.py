@@ -2,9 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase
 
 
-class TestPreset(FlexGetBase):
+class TestTemplate(FlexGetBase):
     __yaml__ = """
-        presets:
+        templates:
           global:
             mock:
               - {title: 'global'}
@@ -14,25 +14,25 @@ class TestPreset(FlexGetBase):
           a:
             mock:
               - {title: 'a'}
-            preset: b
+            template: b
           b:
             mock:
               - {title: 'b'}
 
         tasks:
           test1:
-            preset: movies
+            template: movies
 
           test2:
-            preset: no
+            template: no
 
           test3:
-            preset:
+            template:
               - movies
               - no_global
 
           test_nested:
-            preset:
+            template:
               - a
               - no_global
     """
@@ -59,10 +59,10 @@ class TestPreset(FlexGetBase):
         assert len(self.task.entries) == 2, 'Should only have been 2 entries created'
 
 
-class TestPresetMerge(FlexGetBase):
+class TestTemplateMerge(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           movies:
             seen_movies: strict
             imdb:
@@ -77,7 +77,7 @@ class TestPresetMerge(FlexGetBase):
 
         tasks:
           test:
-            preset: movies
+            template: movies
             imdb:
               min_score: 6.5
               reject_genres:
@@ -88,3 +88,20 @@ class TestPresetMerge(FlexGetBase):
         self.execute_task('test')
         assert self.task.config['imdb']['min_score'] == 6.5, 'float merge failed'
         assert 'comedy' in self.task.config['imdb']['reject_genres'], 'list merge failed'
+
+
+class TestTemplateRerun(FlexGetBase):
+    __yaml__ = """
+        templates:
+          a:
+            series:
+            - someseries
+        tasks:
+          test_rerun:
+            template: a
+            rerun: 1
+    """
+
+    def test_rerun(self):
+        self.execute_task('test_rerun')
+        assert len(self.task.config['series']) == 1

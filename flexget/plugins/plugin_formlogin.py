@@ -2,7 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
 import urllib2
-from flexget.plugin import PluginError, register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('formlogin')
 
@@ -26,7 +28,7 @@ class FormLogin(object):
         try:
             from mechanize import Browser
         except ImportError:
-            raise PluginError('mechanize required (python module), please install it.', log)
+            raise plugin.PluginError('mechanize required (python module), please install it.', log)
 
         userfield = config.get('userfield', 'username')
         passfield = config.get('passfield', 'password')
@@ -41,7 +43,7 @@ class FormLogin(object):
             br.open(url)
         except Exception as e:
             # TODO: improve error handling
-            raise PluginError('Unable to post login form', log)
+            raise plugin.PluginError('Unable to post login form', log)
 
         #br.set_debug_redirects(True)
         #br.set_debug_responses(True)
@@ -64,7 +66,7 @@ class FormLogin(object):
             with open(filename, 'w') as f:
                 f.write(br.response().get_data())
             log.critical('I have saved the login page content to %s for you to view' % filename)
-            raise PluginError('Unable to find login fields', log)
+            raise plugin.PluginError('Unable to find login fields', log)
 
         br.form = loginform
 
@@ -91,4 +93,6 @@ class FormLogin(object):
     # Task aborted, unhook the cookiejar
     on_task_abort = on_task_exit
 
-register_plugin(FormLogin, 'form', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FormLogin, 'form', api_ver=2)

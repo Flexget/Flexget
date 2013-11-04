@@ -1,11 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('sort_by')
 
 
-class PluginSortBy:
+class PluginSortBy(object):
 
     """
     Sort task entries based on a field
@@ -26,15 +28,18 @@ class PluginSortBy:
         reverse: yes
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('text')
-        complex = root.accept('dict')
-        # TODO: accept a list of fields.
-        complex.accept('text', key='field')
-        complex.accept('boolean', key='reverse')
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'string'},
+            {
+                'type': 'object',
+                'properties': {
+                    'field': {'type': 'string'},
+                    'reverse': {'type': 'boolean'}},
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def on_task_filter(self, task, config):
         if isinstance(config, basestring):
@@ -59,4 +64,7 @@ class PluginSortBy:
         task.entries.sort(cmp_helper, reverse=reverse)
         task.accepted.sort(cmp_helper, reverse=reverse)
 
-register_plugin(PluginSortBy, 'sort_by', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginSortBy, 'sort_by', api_ver=2)

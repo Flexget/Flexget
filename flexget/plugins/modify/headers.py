@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import urllib2
-from flexget.plugin import register_plugin, priority
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('headers')
 
@@ -40,13 +42,9 @@ class PluginHeaders(object):
       cookie: uid=<YOUR UID>; pass=<YOUR PASS>
     """
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory('dict')
-        config.accept_valid_keys('text', key_type='text')
-        return config
+    schema = {'type': 'object', 'additionalProperties': {'type': 'string'}}
 
-    @priority(130)
+    @plugin.priority(130)
     def on_task_start(self, task, config):
         """Task starting"""
         # Set the headers for this task's request session
@@ -72,4 +70,7 @@ class PluginHeaders(object):
 
     on_task_abort = on_task_exit
 
-register_plugin(PluginHeaders, 'headers', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginHeaders, 'headers', api_ver=2)

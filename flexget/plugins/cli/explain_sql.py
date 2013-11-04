@@ -2,12 +2,13 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from time import time
 from argparse import SUPPRESS
+
 from sqlalchemy.orm.query import Query
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import Executable, ClauseElement, _literal_as_text
-from flexget import manager
-from flexget.plugin import register_parser_option
+
+from flexget import manager, options
 from flexget.event import event
 
 log = logging.getLogger('explain_sql')
@@ -39,7 +40,7 @@ class ExplainQuery(Query):
 
 @event('manager.execute.started')
 def register_sql_explain(man):
-    if man.options.explain_sql:
+    if man.options.execute.explain_sql:
         maininit = manager.Session.__init__
 
         def init(*args, **kwargs):
@@ -51,9 +52,11 @@ def register_sql_explain(man):
 
 @event('manager.execute.completed')
 def deregister_sql_explain(man):
-    if man.options.explain_sql:
+    if man.options.execute.explain_sql:
         manager.Session = sessionmaker()
 
 
-register_parser_option('--explain-sql', action='store_true', dest='explain_sql', default=False,
-                       help=SUPPRESS)
+@event('options.register')
+def register_parser_arguments():
+    options.get_parser('execute').add_argument('--explain-sql', action='store_true', dest='explain_sql',
+                                               default=False, help=SUPPRESS)

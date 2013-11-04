@@ -7,11 +7,11 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from smtplib import SMTPException
 from email.utils import formatdate
-from flexget.utils.tools import MergeException, merge_dict_from_to
-from flexget.plugin import PluginError, register_plugin
-from flexget import manager
+
+from flexget import config_schema, manager, plugin
 from flexget.event import event
 from flexget.utils.template import render_from_task, get_template, RenderError
+from flexget.utils.tools import merge_dict_from_to, MergeException
 from flexget import validator
 
 log = logging.getLogger('email')
@@ -61,21 +61,18 @@ def setup(manager):
     config['global'] = True
     global task_content
     task_content = {}
-    for task in manager.tasks.itervalues():
-        task.config.setdefault('email', {})
+    for task_name, task_config in manager.config['tasks'].iteritems():
+        task_config.setdefault('email', {})
         try:
-            merge_dict_from_to(config, task.config['email'])
+            merge_dict_from_to(config, task_config['email'])
         except MergeException as exc:
-            raise PluginError('Failed to merge email config to task %s due to %s' % (task.name, exc))
-        task.config.setdefault('email', config)
+            raise plugin.PluginError('Failed to merge email config to task %s due to %s' % (task_name, exc))
+        task_config.setdefault('email', config)
 
 
 @event('manager.execute.completed')
 def global_send(manager):
     if not 'email' in manager.config:
-        return
-    if all(not task.enabled for task in manager.tasks.itervalues()):
-        # If all the tasks are disabled, don't do anything.
         return
     config = prepare_config(manager.config['email'])
     content = ''
@@ -117,7 +114,8 @@ def send_email(subject, content, config):
         try:
             if config['smtp_ssl']:
                 if sys.version_info < (2, 6, 3):
-                    raise PluginError('SSL email support requires python >= 2.6.3 due to python bug #4066, upgrade python or use TLS', log)
+                    raise plugin.PluginError('SSL email support requires python >= 2.6.3 due to python bug #4066, '
+                                             'upgrade python or use TLS', log)
                     # Create a SSL connection to smtp server
                 mailServer = smtplib.SMTP_SSL(config['smtp_host'], config['smtp_port'])
             else:
@@ -252,7 +250,7 @@ class OutputEmail(object):
             return
 
         # don't send mail when learning
-        if task.manager.options.learn:
+        if task.options.learn:
             return
 
         # generate email content
@@ -298,5 +296,12 @@ class OutputEmail(object):
             # Log the exception to debug, in case something different is going wrong.
             log.debug('Email error:', exc_info=True)
 
-register_plugin(OutputEmail, 'email', api_ver=2)
-manager.register_config_key('email', options_validator().schema())
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputEmail, 'email', api_ver=2)
+
+
+@event('config.register')
+def register_config_key():
+    config_schema.register_config_key('email', options_validator().schema())

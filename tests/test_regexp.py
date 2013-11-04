@@ -5,7 +5,7 @@ from tests import FlexGetBase
 class TestRegexp(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             mock:
               - {title: 'regexp1', 'imdb_score': 5}

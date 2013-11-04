@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget.plugin import register_plugin, get_plugin_by_name, get_phases_by_plugin, phase_methods
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('sequence')
 
@@ -21,8 +22,8 @@ class PluginSequence(object):
     }
 
     def __getattr__(self, item):
-        """Returns a function for all on_task_* and on_process_* events, that runs all the configured plugins."""
-        for phase, method in phase_methods.iteritems():
+        """Returns a function for all on_task_* events, that runs all the configured plugins."""
+        for phase, method in plugin.phase_methods.iteritems():
             if item == method and phase not in ['accept', 'reject', 'fail']:
                 break
         else:
@@ -34,8 +35,8 @@ class PluginSequence(object):
             results = []
             for item in config:
                 for plugin_name, plugin_config in item.iteritems():
-                    if phase in get_phases_by_plugin(plugin_name):
-                        method = get_plugin_by_name(plugin_name).phase_handlers[phase]
+                    if phase in plugin.get_phases_by_plugin(plugin_name):
+                        method = plugin.get_plugin_by_name(plugin_name).phase_handlers[phase]
                         log.debug('Running plugin %s' % plugin_name)
                         result = method(task, plugin_config)
                         if isinstance(result, list):
@@ -45,4 +46,6 @@ class PluginSequence(object):
         return handle_phase
 
 
-register_plugin(PluginSequence, 'sequence', api_ver=2, debug=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginSequence, 'sequence', api_ver=2, debug=True)

@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, PluginError, get_plugin_by_name
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('crossmatch')
 
@@ -43,13 +45,13 @@ class CrossMatch(object):
         # code written so that this can be done easily ...
         for item in config['from']:
             for input_name, input_config in item.iteritems():
-                input = get_plugin_by_name(input_name)
+                input = plugin.get_plugin_by_name(input_name)
                 if input.api_ver == 1:
-                    raise PluginError('Plugin %s does not support API v2' % input_name)
+                    raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
                 method = input.phase_handlers['input']
                 try:
                     result = method(task, input_config)
-                except PluginError as e:
+                except plugin.PluginError as e:
                     log.warning('Error during input plugin %s: %s' % (input_name, e))
                     continue
                 if result:
@@ -99,4 +101,6 @@ class CrossMatch(object):
         return common_fields
 
 
-register_plugin(CrossMatch, 'crossmatch', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(CrossMatch, 'crossmatch', api_ver=2)

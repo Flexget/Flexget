@@ -1,9 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from flask import Module, jsonify
+from flask import Blueprint, jsonify
 from flexget.ui.webui import register_plugin
 from flexget.plugin import plugins, get_plugins, task_phases, plugin_contexts
 
-plugins_module = Module(__name__, url_prefix='/plugins')
+plugins_module = Blueprint('plugins', __name__)
 
 
 def plugin_infos(plugins):

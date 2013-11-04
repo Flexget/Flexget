@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block head %}
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/execute.css') }}" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="{{ url_for('.static', filename='css/execute.css') }}" type="text/css" media="screen"/>
 
     {% if execute_progress %}
     <script type="application/javascript">
@@ -31,7 +31,7 @@
 
 {% block main %}
     <div>
-        <form action="{{ url_for('index') }}" method="post" class="simple" style="float: left">
+        <form action="{{ url_for('.index') }}" method="post" class="simple" style="float: left">
             <fieldset style="width:26em">
                 <legend>Execute FlexGet</legend>
                 <div>
