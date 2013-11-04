@@ -131,47 +131,6 @@ def _xmlcharref_encode(unicode_data, encoding):
     return ''.join(chars)
 
 
-import types
-_valid = [types.DictType, types.IntType, types.NoneType,
-          types.StringType, types.UnicodeType, types.BooleanType,
-          types.ListType, types.LongType, types.FloatType]
-
-
-# TODO: I think this was left as broken ...
-def sanitize(value, logger=None):
-    raise Exception('broken')
-    if isinstance(value, dict):
-        sanitize_dict(value, logger)
-    elif isinstance(value, list):
-        sanitize_list(value, logger)
-    else:
-        raise Exception('Unsupported datatype')
-
-
-# TODO: I think this was left as broken ...
-def sanitize_dict(d, logger=None):
-    """Makes dictionary d contain only yaml.safe_dump compatible elements. On other words, remove all non
-    standard types from dictionary."""
-    for k in d.keys():
-        if isinstance(type(d[k]), list):
-            sanitize_list(d[k])
-        elif isinstance(type(d[k]), dict):
-            sanitize_dict(d[k], logger)
-        elif not type(d[k]) in _valid:
-            if logger:
-                logger.debug('Removed non yaml compatible key %s %s' % (k, type(d[k])))
-            d.pop(k)
-
-
-# TODO: I think this was left as broken ...
-def sanitize_list(content, logger=None):
-    for value in content[:]:
-        if not type(value) in _valid:
-            if logger:
-                logger.debug('Removed non yaml compatible list item %s' % type(value))
-        content.remove(value)
-
-
 def merge_dict_from_to(d1, d2):
     """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
     import copy
