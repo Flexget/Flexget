@@ -22,8 +22,10 @@ class EstimateRelease(object):
         """
 
         log.debug(entry['title'])
-        estimators = [e.instance.estimate for e in plugin.get_plugins_by_group('estimate_release')]
-        for estimator in sorted(estimators, key=lambda e: getattr(e, 'priority', plugin.DEFAULT_PRIORITY), reverse=True):
+        estimators = [e.instance.estimate for e in plugin.get_plugins(group='estimate_release')]
+        for estimator in sorted(
+                estimators, key=lambda e: getattr(e, 'priority', plugin.DEFAULT_PRIORITY), reverse=True
+        ):
             estimate = estimator(entry)
             # return first successful estimation
             if estimate is not None:
