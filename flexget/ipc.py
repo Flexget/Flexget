@@ -93,7 +93,7 @@ class IPCServer(threading.Thread):
     def run(self):
         DaemonService.manager = self.manager
         self.server = ThreadedServer(
-            DaemonService, hostname=self.host, port=self.port, authenticator=self.authenticator
+            DaemonService, hostname=self.host, port=self.port, authenticator=self.authenticator, logger=log
         )
         # If we just chose an open port, write save the chosen one
         self.port = self.server.listener.getsockname()[1]
