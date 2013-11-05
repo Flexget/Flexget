@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import atexit
 from contextlib import contextmanager
+import signal
 import os
 import sys
 import shutil
@@ -165,12 +166,14 @@ class Manager(object):
             if options.daemonize:
                 self.daemonize()
             with self.acquire_lock():
+                signal.signal(signal.SIGTERM, self._handle_sigterm)
                 self.ipc_server.start()
                 fire_event('manager.daemon.started', self)
                 self.scheduler.start()
                 try:
                     self.scheduler.wait()
                 except KeyboardInterrupt:
+                    log.info('Got ctrl-c, shutting down.')
                     fire_event('manager.daemon.completed', self)
                     self.shutdown(finish_queue=False)
         elif options.action == 'stop':
@@ -195,6 +198,10 @@ class Manager(object):
         from flexget.ui import webui
         with self.acquire_lock():
             webui.start(self)
+
+    def _handle_sigterm(self, signum, frame):
+        log.info('Got SIGTERM. Shutting down.')
+        self.shutdown(finish_queue=False)
 
     def setup_yaml(self):
         """Sets up the yaml loader to return unicode objects for strings by default"""
