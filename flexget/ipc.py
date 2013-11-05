@@ -15,6 +15,7 @@ log = logging.getLogger('ipc')
 # Allow some attributes from dict interface to be called over the wire
 rpyc.core.protocol.DEFAULT_CONFIG['safe_attrs'].update(['items'])
 
+IPC_VERSION = 0
 AUTH_ERROR = 'authentication error'
 AUTH_SUCCESS = 'authentication success'
 
@@ -22,6 +23,14 @@ AUTH_SUCCESS = 'authentication success'
 class DaemonService(rpyc.Service):
     # This will be populated when the server is started
     manager = None
+
+    def on_connect(self):
+        """Make sure the client version matches our own."""
+        client_version = self._conn.root.version()
+        if IPC_VERSION != client_version:
+            self.client_console('Incompatible client version. (daemon: %s, client: %s' % (IPC_VERSION, client_version))
+            self._conn.close()
+            return
 
     def exposed_execute(self, options=None):
         # Dictionaries are pass by reference with rpyc, turn this into a real dict on our side
@@ -55,6 +64,9 @@ class DaemonService(rpyc.Service):
 
 
 class ClientService(rpyc.Service):
+    def exposed_version(self):
+        return IPC_VERSION
+
     def exposed_console(self, text):
         console(text)
 
