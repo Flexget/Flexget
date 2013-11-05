@@ -140,9 +140,9 @@ class Manager(object):
 
     def execute_command(self, options):
         # If a daemon is started, send the execution to the daemon
-        port = self.check_ipc_port()
-        if port:
-            client = IPCClient(port)
+        ipc_info = self.check_ipc_info()
+        if ipc_info:
+            client = IPCClient(self)
             client.execute(dict(options))
             self.shutdown()
             return
@@ -174,9 +174,9 @@ class Manager(object):
                     fire_event('manager.daemon.completed', self)
                     self.shutdown(finish_queue=False)
         elif options.action == 'stop':
-            port = self.check_ipc_port()
-            if port:
-                client = IPCClient(port)
+            ipc_info = self.check_ipc_info()
+            if ipc_info:
+                client = IPCClient(ipc_info['port'], ipc_info['secret'])
                 client.shutdown()
                 self.shutdown()
             else:
@@ -536,33 +536,38 @@ class Manager(object):
 
     def _read_lock(self):
         """
-        Checks if there is already a lock on the database, returns truthy if there is.
-        If the lock is held by the webui, returns the port number it is running on.
+        Read the values from the lock file. Returns None if there is no current lock file.
         """
         if self.lockfile and os.path.exists(self.lockfile):
+            result = {}
             with open(self.lockfile) as f:
                 lines = filter(None, f.readlines())
-            pid = int(lines[0].lstrip('PID: '))
-            port = True
-            if len(lines) > 1:
-                port = int(lines[1].lstrip('Port: '))
-            if pid == os.getpid():
-                return False
-            if not pid_exists(pid):
-                log.info('PID %s no longer exists, ignoring lock file.' % pid)
-                return False
-            return port
-        return False
+            for line in lines:
+                key, value = line.split(b':', 1)
+                result[key.strip().lower()] = value.strip()
+            for key in ['pid', 'port']:
+                if key in result:
+                    result[key] = int(result[key])
+            if not pid_exists(result['pid']):
+                return None
+            return result
+        return None
 
     def check_lock(self):
         """Returns True if there is a lock on the database."""
-        return bool(self._read_lock())
+        lock_info = self._read_lock()
+        if not lock_info:
+            return False
+        # Don't count it if we hold the lock
+        if os.getpid() == lock_info['pid']:
+            return False
+        return True
 
-    def check_ipc_port(self):
-        """If a daemon has a lock on the database, return the port number for IPC."""
-        port = self._read_lock()
-        if not isinstance(port, bool):
-            return port
+    def check_ipc_info(self):
+        """If a daemon has a lock on the database, return info to connect to IPC."""
+        lock_info = self._read_lock()
+        if lock_info and 'port' in lock_info:
+            return lock_info
         return None
 
     @contextmanager
@@ -588,12 +593,15 @@ class Manager(object):
                 self.release_lock()
                 self._has_lock = False
 
-    def write_lock(self, ipc_port=None):
+    def write_lock(self, ipc_port=None, ipc_secret=None):
         assert self._has_lock
         with open(self.lockfile, 'w') as f:
-            f.write('PID: %s\n' % os.getpid())
+            f.write(b'PID: %s\n' % os.getpid())
             if ipc_port:
-                f.write('Port: %s\n' % ipc_port)
+                f.write(b'Port: %s\n' % ipc_port)
+            if ipc_secret:
+                a = b'Secret: %s\n' % ipc_secret
+                f.write(a)
 
     def release_lock(self):
         if os.path.exists(self.lockfile):

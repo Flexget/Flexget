@@ -59,16 +59,26 @@ class IPCServer(threading.Thread):
         super(IPCServer, self).__init__(name='ipc_server')
         self.daemon = True
         self.manager = manager
-        self.host = "127.0.0.1"
+        self.host = '127.0.0.1'
         self.port = port or 0
+        # TODO: secret should be random
+        self.secret = 'aoeu'
         self.server = None
+
+    def authenticator(self, sock):
+        secret = sock.makefile().readline()
+        if secret != self.secret:
+            raise rpyc.AuthenticationError('Invalid secret, could not connect to daemon.')
+        return sock, self.secret
 
     def run(self):
         DaemonService.manager = self.manager
-        self.server = ThreadedServer(DaemonService, hostname=self.host, port=self.port)
+        self.server = ThreadedServer(
+            DaemonService, hostname=self.host, port=self.port, authenticator=self.authenticator
+        )
         # If we just chose an open port, write save the chosen one
         self.port = self.server.listener.getsockname()[1]
-        self.manager.write_lock(ipc_port=self.port)
+        self.manager.write_lock(ipc_port=self.port, ipc_secret=self.secret)
         self.server.start()
 
     def shutdown(self):
@@ -76,8 +86,16 @@ class IPCServer(threading.Thread):
 
 
 class IPCClient(object):
-    def __init__(self, port):
-        self.conn = rpyc.connect("127.0.0.1", port, service=ClientService)
+    def __init__(self, manager):
+        self.manager = manager
+        ipc_info = self.manager.check_ipc_info()
+        if not ipc_info:
+            log.error('Cannot connect to daemon, no running daemon detected.')
+            return
+        s = rpyc.SocketStream.connect('127.0.0.1', ipc_info['port'])
+        # Send authentication
+        s.write(ipc_info['secret'] + '\n')
+        self.conn = rpyc.utils.factory.connect_stream(s, service=ClientService)
 
     def close(self):
         self.conn.close()
