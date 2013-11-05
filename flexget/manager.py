@@ -142,7 +142,7 @@ class Manager(object):
         # If a daemon is started, send the execution to the daemon
         ipc_info = self.check_ipc_info()
         if ipc_info:
-            client = IPCClient(self)
+            client = IPCClient(ipc_info['port'], ipc_info['password'])
             client.execute(dict(options))
             self.shutdown()
             return
@@ -176,7 +176,7 @@ class Manager(object):
         elif options.action == 'stop':
             ipc_info = self.check_ipc_info()
             if ipc_info:
-                client = IPCClient(ipc_info['port'], ipc_info['secret'])
+                client = IPCClient(ipc_info['port'], ipc_info['password'])
                 client.shutdown()
                 self.shutdown()
             else:
@@ -545,8 +545,8 @@ class Manager(object):
             for line in lines:
                 key, value = line.split(b':', 1)
                 result[key.strip().lower()] = value.strip()
-            for key in ['pid', 'port']:
-                if key in result:
+            for key in result:
+                if result[key].isdigit():
                     result[key] = int(result[key])
             if not pid_exists(result['pid']):
                 return None
@@ -593,15 +593,13 @@ class Manager(object):
                 self.release_lock()
                 self._has_lock = False
 
-    def write_lock(self, ipc_port=None, ipc_secret=None):
+    def write_lock(self, ipc_info=None):
         assert self._has_lock
         with open(self.lockfile, 'w') as f:
             f.write(b'PID: %s\n' % os.getpid())
-            if ipc_port:
-                f.write(b'Port: %s\n' % ipc_port)
-            if ipc_secret:
-                a = b'Secret: %s\n' % ipc_secret
-                f.write(a)
+            if ipc_info:
+                for key in sorted(ipc_info):
+                    f.write(b'%s: %s\n' % (key, ipc_info[key]))
 
     def release_lock(self):
         if os.path.exists(self.lockfile):

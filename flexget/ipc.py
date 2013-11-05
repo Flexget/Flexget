@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import random
+import string
 import threading
 
 import rpyc
@@ -12,6 +14,9 @@ log = logging.getLogger('ipc')
 
 # Allow some attributes from dict interface to be called over the wire
 rpyc.core.protocol.DEFAULT_CONFIG['safe_attrs'].update(['items'])
+
+AUTH_ERROR = 'authentication error'
+AUTH_SUCCESS = 'authentication success'
 
 
 class DaemonService(rpyc.Service):
@@ -30,7 +35,7 @@ class DaemonService(rpyc.Service):
         tasks_finished = self.manager.scheduler.execute(options=options, output=output)
         if output:
             # Send back any output until all tasks have finished
-            while any(not t.is_set() for t in tasks_finished):
+            while any(not t.is_set() for t in tasks_finished) or output.qsize():
                 try:
                     self.client_console(output.get(True, 0.5).rstrip())
                 except BufferQueue.Empty:
@@ -61,15 +66,17 @@ class IPCServer(threading.Thread):
         self.manager = manager
         self.host = '127.0.0.1'
         self.port = port or 0
-        # TODO: secret should be random
-        self.secret = 'aoeu'
+        self.password = ''.join(random.choice(string.letters + string.digits) for x in range(15))
         self.server = None
 
     def authenticator(self, sock):
-        secret = sock.makefile().readline()
-        if secret != self.secret:
-            raise rpyc.AuthenticationError('Invalid secret, could not connect to daemon.')
-        return sock, self.secret
+        channel = rpyc.Channel(rpyc.SocketStream(sock))
+        password = channel.recv()
+        if password != self.password:
+            channel.send(AUTH_ERROR)
+            raise rpyc.utils.authenticators.AuthenticationError('Invalid password from client.')
+        channel.send(AUTH_SUCCESS)
+        return sock, self.password
 
     def run(self):
         DaemonService.manager = self.manager
@@ -78,7 +85,7 @@ class IPCServer(threading.Thread):
         )
         # If we just chose an open port, write save the chosen one
         self.port = self.server.listener.getsockname()[1]
-        self.manager.write_lock(ipc_port=self.port, ipc_secret=self.secret)
+        self.manager.write_lock(ipc_info={'port': self.port, 'password': self.password})
         self.server.start()
 
     def shutdown(self):
@@ -86,16 +93,14 @@ class IPCServer(threading.Thread):
 
 
 class IPCClient(object):
-    def __init__(self, manager):
-        self.manager = manager
-        ipc_info = self.manager.check_ipc_info()
-        if not ipc_info:
-            log.error('Cannot connect to daemon, no running daemon detected.')
-            return
-        s = rpyc.SocketStream.connect('127.0.0.1', ipc_info['port'])
-        # Send authentication
-        s.write(ipc_info['secret'] + '\n')
-        self.conn = rpyc.utils.factory.connect_stream(s, service=ClientService)
+    def __init__(self, port, password):
+        channel = rpyc.Channel(rpyc.SocketStream.connect('127.0.0.1', port))
+        channel.send(password)
+        response = channel.recv()
+        if response == AUTH_ERROR:
+            # TODO: What to raise here. I guess we create a custom error
+            raise ValueError('Invalid password for daemon')
+        self.conn = rpyc.utils.factory.connect_channel(channel, service=ClientService)
 
     def close(self):
         self.conn.close()
