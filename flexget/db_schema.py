@@ -71,10 +71,13 @@ def set_version(plugin, version):
 def upgrade_required():
     """Returns true if an upgrade of the database is required."""
     session = Session()
-    for old_schema in session.query(PluginSchema).all():
-        if old_schema.plugin in plugin_schemas and old_schema.version < plugin_schemas[old_schema.plugin]['version']:
-            return True
-    return False
+    try:
+        for old_schema in session.query(PluginSchema).all():
+            if old_schema.plugin in plugin_schemas and old_schema.version < plugin_schemas[old_schema.plugin]['version']:
+                return True
+        return False
+    finally:
+        session.close()
 
 
 class UpgradeImpossible(Exception):
