@@ -20,7 +20,7 @@ from sqlalchemy.pool import SingletonThreadPool
 Base = declarative_base()
 Session = sessionmaker()
 
-from flexget import config_schema
+from flexget import config_schema, db_schema
 from flexget.event import fire_event
 from flexget.ipc import IPCServer, IPCClient
 from flexget.scheduler import Scheduler
@@ -90,9 +90,13 @@ class Manager(object):
         log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
         log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
 
-        fire_event('manager.upgrade', self)
-        if manager.db_upgraded:
-            fire_event('manager.db_upgraded', self)
+        if db_schema.upgrade_required():
+            log.info('Database upgrade is required. Attempting now.')
+            with self.acquire_lock():
+                fire_event('manager.upgrade', self)
+                if manager.db_upgraded:
+                    fire_event('manager.db_upgraded', self)
+        # TODO: 1.2 We don't have a lock here, and plugins may write to database on this event
         fire_event('manager.startup', self)
 
     def __del__(self):

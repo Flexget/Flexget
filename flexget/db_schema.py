@@ -68,6 +68,15 @@ def set_version(plugin, version):
         session.close()
 
 
+def upgrade_required():
+    """Returns true if an upgrade of the database is required."""
+    session = Session()
+    for old_schema in session.query(PluginSchema).all():
+        if old_schema.plugin in plugin_schemas and old_schema.version < plugin_schemas[old_schema.plugin]['version']:
+            return True
+    return False
+
+
 class UpgradeImpossible(Exception):
     """
     Exception to be thrown during a db upgrade function which will cause the old tables to be removed and recreated from
