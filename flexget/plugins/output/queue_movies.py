@@ -63,7 +63,9 @@ class QueueMovies(object):
             try:
                 queue_add(**kwargs)
             except QueueError as e:
-                entry.fail('Error adding movie to queue: %s' % e.message)
+                # Ignore already in queue errors
+                if e.errno != 1:
+                    entry.fail('Error adding movie to queue: %s' % e.message)
 
 
 @event('plugin.register')
