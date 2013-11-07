@@ -204,7 +204,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, force=True, 
         if item.downloaded:
             raise QueueError('ERROR: %s has already been queued and downloaded' % title)
         else:
-            raise QueueError('ERROR: %s is already in the queue' % title)
+            raise QueueError('ERROR: %s is already in the queue' % title, errno=1)
 
 
 @with_session
