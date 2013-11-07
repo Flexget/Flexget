@@ -107,10 +107,11 @@ class Discover(object):
 
                     if entry['title'] in entry_titles:
                         log.verbose('Ignored duplicate title `%s`' % entry['title'])    # TODO: should combine?
-                    else:
-                        entries.append(entry)
-                        entry_titles.add(entry['title'])
-                        entry_urls.update(urls)
+                        continue
+
+                    entries.append(entry)
+                    entry_titles.add(entry['title'])
+                    entry_urls.update(urls)
         return entries
 
     def execute_searches(self, config, entries):
@@ -139,10 +140,13 @@ class Discover(object):
                         continue
                     log.debug('Discovered %s entries from %s' % (len(search_results), plugin_name))
                     if config.get('limit'):
-                        search_results  = sorted(search_results, reverse=True,
-                                                 key=lambda x: x.get('search_sort'))[:config['limit']]
+                        search_results = sorted(search_results, reverse=True,
+                                                key=lambda x: x.get('search_sort'))[:config['limit']]
                     for e in search_results:
+                        e['discovered_from'] = entry['title']
+                        e['discovered_with'] = plugin_name
                         e.on_complete(self.entry_complete, query=entry, search_results=search_results)
+
                     result.extend(search_results)
 
                 except (PluginError, PluginWarning), err:
