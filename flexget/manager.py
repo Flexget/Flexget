@@ -40,15 +40,22 @@ class Manager(object):
 
     * manager.startup
 
-      After manager has been initialized. This is when application becomes ready to use
+      After manager has been initialized. This is when application becomes ready to use, however no database lock is
+      present, so the database must not be modified on this event.
+
+    * manager.lock-acquired
+
+      The manager does not always require a lock on startup, if one is requested, this event will run when it has been
+      acquired successfully
+
+    * manager.config-loaded
+
+      When a valid configuration has been (re)loaded, this event is fired
 
     * manager.upgrade
 
-      Upgrade plugin database schemas etc
-
-    * manager.startup
-
-      Occurs after manager has been started and initialized
+      If any plugins have declared a newer schema version than exists in the database, this event will be fired to
+      allow plugins to upgrade their tables
 
     * manager.shutdown
 
@@ -96,7 +103,6 @@ class Manager(object):
                 fire_event('manager.upgrade', self)
                 if manager.db_upgraded:
                     fire_event('manager.db_upgraded', self)
-        # TODO: 1.2 We don't have a lock here, and plugins may write to database on this event
         fire_event('manager.startup', self)
 
     def __del__(self):
@@ -117,6 +123,7 @@ class Manager(object):
                 log.critical("[%s] %s", error.json_pointer, error.message)
             self.shutdown(finish_queue=False)
             sys.exit(1)
+        fire_event('manager.config-loaded', self)
 
     @property
     def tasks(self):
@@ -126,6 +133,7 @@ class Manager(object):
         return self.config.get('tasks', {}).keys()
 
     def run_cli_command(self):
+        # TODO: 1.2 fire the manager.lock-acquired event somewhere
         command = self.options.cli_command
         options = getattr(self.options, command)
         # First check for built-in commands

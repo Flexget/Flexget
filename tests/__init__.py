@@ -63,7 +63,7 @@ class MockManager(Manager):
         Override configuration loading
         """
         try:
-            self.config = yaml.safe_load(self.config_text)
+            self.config = yaml.safe_load(self.config_text) or {}
             self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))
         except Exception:
             print 'Invalid configuration'

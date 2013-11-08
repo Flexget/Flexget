@@ -43,7 +43,7 @@ class PluginSearch(object):
             return
 
         plugins = {}
-        for p in plugin.get_plugins_by_group('search'):
+        for p in plugin.get_plugins(group='search'):
             plugins[p.name] = p.instance
 
         # search accepted
@@ -52,7 +52,7 @@ class PluginSearch(object):
             for name in config:
                 search_config = None
                 if isinstance(name, dict):
-                    # assume the name is the first/only key in the dict.
+                    # the name is the first/only key in the dict.
                     name, search_config = name.items()[0]
                 log.verbose('Searching `%s` from %s' % (entry['title'], name))
                 try:

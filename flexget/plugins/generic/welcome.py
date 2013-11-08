@@ -12,7 +12,7 @@ from flexget.utils.simple_persistence import SimplePersistence
 log = logging.getLogger('welcome')
 
 
-@event('manager.startup')
+@event('manager.lock-acquired')
 def welcome_message(manager):
     # Only run for cli cron executions
     if manager.options.cli_command != 'execute' or not manager.options.execute.cron:

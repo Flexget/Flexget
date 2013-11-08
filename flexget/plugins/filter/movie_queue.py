@@ -23,7 +23,7 @@ log = logging.getLogger('movie_queue')
 Base = db_schema.versioned_base('movie_queue', 2)
 
 
-@event('manager.startup')
+@event('manager.lock-acquired')
 def migrate_imdb_queue(manager):
     """If imdb_queue table is found, migrate the data to movie_queue"""
     session = Session()

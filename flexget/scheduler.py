@@ -78,6 +78,11 @@ class DBTrigger(Base):
         self.last_run = last_run
 
 
+@event('manager.config-loaded')
+def create_triggers(manager):
+    manager.scheduler.load_schedules()
+
+
 class Scheduler(threading.Thread):
     # We use a regular list for periodic jobs, so you must hold this lock while using it
     triggers_lock = threading.Lock()
@@ -154,7 +159,6 @@ class Scheduler(threading.Thread):
 
     def run(self):
         from flexget.task import Task, TaskAbort
-        self.load_schedules()
         while not self._shutdown_now:
             self.queue_pending_jobs()
             # Grab the first job from the run queue and do it
