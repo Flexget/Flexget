@@ -132,9 +132,9 @@ class OutputFtp(object):
 
             if (isTesting):
                 if (dl_offset):
-                    log.info("Resuming " + file_name + " in " + dlpath)
+                    log.info("Would have resumed " + file_name + " in " + dlpath)
                 else:
-                    log.info("Downloading " + file_name + " in " + dlpath)
+                    log.info("Would have downloaded " + file_name + " in " + dlpath)
                 return
 
             if (dl_offset):
