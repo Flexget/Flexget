@@ -25,26 +25,15 @@ class PluginSearch(object):
               points into a search page.
     """
 
-    def validator(self):
-        from flexget import validator
-        search = validator.factory('list')
-        names = []
-        for p in plugin.get_plugins_by_group('search'):
-            # If the plugin has a validator, get it's validator and make it a
-            # child of the search plugins
-            if not hasattr(p.instance, 'validator'):
-                # Create choice validator for plugins without validators later
-                names.append(p.name)
-            else:
-                plugin_validator = p.instance.validator()
-                if isinstance(plugin_validator, validator.Validator):
-                    search.accept('dict').accept(plugin_validator, key=p.name)
-                else:
-                    log.error("plugin %s has a validator method, but does not "
-                              "return a validator instance when called with "
-                              "search plugin." % p.name)
-        search.accept('choice').accept_choices(names)
-        return search
+    schema = {
+        'type': 'array',
+        'items': {
+            'allOf': [
+                {'$ref': '/schema/plugins?group=search'},
+                {'maxProperties': 1, 'minProperties': 1}
+            ]
+        }
+    }
 
     # Run before main urlrewriting
     @plugin.priority(130)
