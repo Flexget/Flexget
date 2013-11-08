@@ -189,7 +189,7 @@ class OutputRSS(object):
             try:
                 rss.description = render_from_entry(template, entry)
             except RenderError as e:
-                log.error('Error while rendering entry %s, falling back to plain title: %s', (entry, e))
+                log.error('Error while rendering entry %s, falling back to plain title: %s' % (entry, e))
                 rss.description = entry['title'] + ' - (Render Error)'
             rss.file = config['file']
 
