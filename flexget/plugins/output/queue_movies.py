@@ -16,13 +16,16 @@ log = logging.getLogger('queue_movies')
 class QueueMovies(object):
     """Adds all accepted entries to your movie queue."""
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('boolean')
-        opts = root.accept('dict')
-        opts.accept('quality_requirements', key='quality')
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {'quality': {'type': 'string', 'format': 'quality_requirements'}},
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def on_task_output(self, task, config):
         if not config:
