@@ -11,7 +11,7 @@ log = logging.getLogger('ftp')
 
 class OutputFtp(object):
     """
-        Downloads file or a entire path from the entry ftp-url. 
+        Downloads file or a entire path from the entry ftp-url.
 
         Example entry url: ftp://anonymous:anon@my-ftp-server.com:21/torrent-files-dir
 
@@ -24,7 +24,7 @@ class OutputFtp(object):
 
         TODO:
           - validate connection parameters
-          - reconnect should not be performed between two entries using same host.
+          - reconnect should'nt be made between two entries using same host.
     """
 
     schema = {
@@ -40,16 +40,17 @@ class OutputFtp(object):
 
     def on_task_download(self, task, config):
         skipreg = config.get('skiplist')
+        isTest = task.manager.options.test
 
         for entry in task.accepted:
             ftp_url = urlparse(entry.get('url'))
             path = entry.get('path', config.get('path'))
 
             if (not path):
-                log.info('Skipping download of %s since there is no path for download set.' % ftp_url)
+                log.info('Skipping download of %s since there is no download path set.' % entry.get('url'))
                 entry.fail('no path for download set.')
                 continue
-            tmp_path = os.path.join(path, entry.get('title'))
+            dlpath = os.path.join(path, entry.get('title'))
 
             if (config.get('use-ssl')):
                 ftp = ftplib.FTP_TLS()
@@ -58,14 +59,14 @@ class OutputFtp(object):
 
             try:
                 # ftp.set_debuglevel(2)
-                log.info('download path %s' % tmp_path)
+                log.debug('Download path %s' % dlpath)
                 ftp.connect(ftp_url.hostname, ftp_url.port)
                 ftp.login(ftp_url.username, ftp_url.password)
                 ftp.sendcmd('TYPE I')
                 ftp.set_pasv(True)
-            except ftplib.error_perm as ex:
-                log.error('Connection error: %s' % str(ex))
-                entry.fail('failed to connect: %s' % str(ex))
+            except ftplib.error_perm as e:
+                log.error('Connection error: %s' % str(e))
+                entry.fail('failed to connect: %s' % str(e))
                 continue
 
             if (config.get('use-secure')):
@@ -73,17 +74,17 @@ class OutputFtp(object):
 
             try:
                 ftp.cwd(ftp_url.path)
-                self.ftp_walk(ftp, tmp_path, skipreg)
+                self.ftp_walk(ftp, dlpath, skipreg, isTest)
             except ftplib.error_perm as e:
                 if (e.args[0][:3] != '550' or re.search('No such file or directory$', str(e), re.I) is None):
                     log.error('Failed to find ftp-path: %s' % str(e))
                     entry.fail('Failed to find ftp-path: %s' % str(e))
                 else:
                     # Path is actually a file
-                    self.ftp_down(ftp, ftp_url.path, tmp_path, skipreg)
+                    self.ftp_down(ftp, ftp_url.path, dlpath, skipreg, isTest)
             ftp.close()
 
-    def ftp_walk(self, ftp, tmp_path, skipreg):
+    def ftp_walk(self, ftp, dlpath, skipreg, isTesting):
         log.debug("DIR->" + ftp.pwd())
         try:
             dirs = ftp.nlst()
@@ -98,22 +99,22 @@ class OutputFtp(object):
             log.debug('Item: ' + item)
             try:
                 ftp.cwd(item)
-                new_tmp_dir = os.path.join(tmp_path, os.path.basename(item))
-                self.ftp_walk(ftp, new_tmp_dir, skipreg)
+                new_tmp_dir = os.path.join(dlpath, os.path.basename(item))
+                self.ftp_walk(ftp, new_tmp_dir, skipreg, isTesting)
                 ftp.cwd('..')
             except ftplib.error_perm:
                 # 550 while CWD, meaning it is a file.
-                self.ftp_down(ftp, item, tmp_path)
+                self.ftp_down(ftp, item, dlpath, isTesting)
 
-    def ftp_down(self, ftp, file_name, tmp_path):
+    def ftp_down(self, ftp, file_name, dlpath, isTesting):
         file_name = os.path.basename(file_name)
-        dst_file = os.path.join(tmp_path, file_name)
+        dst_file = os.path.join(dlpath, file_name)
         src_filesize = 0
         dst_filesize = 0
         dl_offset = None
 
-        if (not os.path.exists(tmp_path)):
-            os.makedirs(tmp_path)
+        if (not os.path.exists(dlpath) and not isTesting):
+            os.makedirs(dlpath)
 
         try:
             ftp.voidcmd('TYPE I')  # To make sure ftp.size functions correctly
@@ -122,26 +123,33 @@ class OutputFtp(object):
             fmode = 'wb'
             if (os.path.exists(dst_file)):
                 dst_filesize = os.stat(dst_file).st_size
-                if src_filesize <= dst_filesize:
+                if (src_filesize <= dst_filesize):
                     log.info('File ' + file_name + ' already downloaded.')
                     return
                 elif dst_filesize > 20480:
                     fmode = 'a+b'
                     dl_offset = dst_filesize - 20480  # Rollback 20kb
 
-            if (dl_offset):
-                log.info("resuming " + file_name + " in " + tmp_path)
-            else:
-                log.info("downloading " + file_name + " in " + tmp_path)
+            if (isTesting):
+                if (dl_offset):
+                    log.info("Resuming " + file_name + " in " + dlpath)
+                else:
+                    log.info("Downloading " + file_name + " in " + dlpath)
+                return
 
-            with open(os.path.join(tmp_path, file_name), fmode) as f:
+            if (dl_offset):
+                log.info("Resuming " + file_name + " in " + dlpath)
+            else:
+                log.info("Downloading " + file_name + " in " + dlpath)
+
+            with open(dst_file, fmode) as f:
                 if (dl_offset):
                     f.seek(dl_offset, 0)
                     f.truncate()
                 ftp.retrbinary('RETR %s' % file_name, f.write, 8192, dl_offset)
-        except ftplib.error_perm, ex:
-            log.error("Unknown error while retr: %s" % str(ex))
-        except Exception, e:
+        except ftplib.error_perm as e:
+            log.error("Unknown error while retr: %s" % str(e))
+        except Exception as e:
             log.exception(e)
 
 register_plugin(OutputFtp, 'ftp_download', api_ver=2)
