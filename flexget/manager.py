@@ -99,7 +99,8 @@ class Manager(object):
 
         if db_schema.upgrade_required():
             log.info('Database upgrade is required. Attempting now.')
-            with self.acquire_lock():
+            # Make sure not to fire the lock-acquired event yet
+            with self.acquire_lock(event=False):
                 fire_event('manager.upgrade', self)
                 if manager.db_upgraded:
                     fire_event('manager.db_upgraded', self)
@@ -133,7 +134,6 @@ class Manager(object):
         return self.config.get('tasks', {}).keys()
 
     def run_cli_command(self):
-        # TODO: 1.2 fire the manager.lock-acquired event somewhere
         command = self.options.cli_command
         options = getattr(self.options, command)
         # First check for built-in commands
@@ -590,7 +590,10 @@ class Manager(object):
         return None
 
     @contextmanager
-    def acquire_lock(self):
+    def acquire_lock(self, event=True):
+        """
+        :param bool event: If True, the 'manager.lock-acquired' event will be fired after a lock is obtained
+        """
         acquired = False
         try:
             # Don't do anything if we already have a lock. This means only the outermost call will release the lock file
@@ -606,6 +609,8 @@ class Manager(object):
                 self._has_lock = True
                 self.write_lock()
                 acquired = True
+                if event:
+                    fire_event('manager.lock-acquired', self)
             yield
         finally:
             if acquired:
