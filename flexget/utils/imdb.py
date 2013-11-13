@@ -3,7 +3,7 @@ import difflib
 import logging
 import re
 
-from BeautifulSoup import Tag
+from bs4.element import Tag
 
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session
