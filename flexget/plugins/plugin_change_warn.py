@@ -132,30 +132,3 @@ try:
 
 except:
     pass
-
-# complain if beautifulsoup is screwed (git users / because of broken build)
-import BeautifulSoup
-if [int(part) for part in BeautifulSoup.__version__.split('.')] < [3, 2]:
-    log.critical('BeautifulSoup is too old, please upgrade it!')
-    sys.exit(1)
-
-# complain if beautifulsoup is screwed (git users / because of broken build)
-try:
-    import BeautifulSoup
-    if [int(part) for part in BeautifulSoup.__version__.split('.')] < [3, 2]:
-        log.critical('BeautifulSoup is too old, please upgrade it!')
-        sys.exit(1)
-except ImportError:
-    try:
-        from bs4 import BeautifulSoup
-        log.critical('-' * 80)
-        log.critical('IMPORTANT:')
-        log.critical('-' * 80)
-        log.critical('BeautifulSoup 4 (beta) is too new, FlexGet requires BeautifulSoup 3.2 !')
-        log.critical('You must downgrade this python library manually.')
-        log.critical('Try `pip install beautifulsoup==3.2.0` for starters (install pip if it''s missing)')
-        log.critical('Help is available via IRC and Trac help tickets if you get truly lost.')
-        log.critical('-' * 80)
-        sys.exit(1)
-    except ImportError:
-        pass # expected, normal state
