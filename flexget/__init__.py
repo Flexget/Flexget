@@ -14,14 +14,14 @@ __version__ = '{git}'
 log = logging.getLogger('main')
 
 
-def main():
+def main(args=None):
     """Main entry point for Command Line Interface"""
 
     logger.initialize()
 
     plugin.load_plugins()
 
-    options = get_parser().parse_args()
+    options = get_parser().parse_args(args)
 
     manager = Manager(options)
 
