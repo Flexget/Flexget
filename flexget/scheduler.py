@@ -93,6 +93,7 @@ class Scheduler(threading.Thread):
         self.run_queue = Queue.PriorityQueue()
         self.manager = manager
         self.triggers = []
+        self.run_schedules = True
         self._shutdown_now = False
         self._shutdown_when_finished = False
 
@@ -157,10 +158,16 @@ class Scheduler(threading.Thread):
                     self.execute(options=options, priority=5)
                     trigger.trigger()
 
+    def start(self, run_schedules=None):
+        if run_schedules is not None:
+            self.run_schedules = run_schedules
+        super(Scheduler, self).start()
+
     def run(self):
         from flexget.task import Task, TaskAbort
         while not self._shutdown_now:
-            self.queue_pending_jobs()
+            if self.run_schedules:
+                self.queue_pending_jobs()
             # Grab the first job from the run queue and do it
             try:
                 job = self.run_queue.get(timeout=0.5)

@@ -227,7 +227,7 @@ class ArgumentParser(ArgParser):
             # If metavar hasn't already been set, set it without the nested scope name
             if not result.metavar:
                 result.metavar = result.dest
-                if result.option_strings[0].startswith('-'):
+                if result.option_strings and result.option_strings[0].startswith('-'):
                     result.metavar = result.dest.upper()
             result.dest = self.nested_namespace_name + '.' + result.dest
         return result

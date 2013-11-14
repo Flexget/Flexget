@@ -162,7 +162,7 @@ class Manager(object):
         # Otherwise we run the execution ourselves
         with self.acquire_lock():
             fire_event('manager.execute.started', self)
-            self.scheduler.start()
+            self.scheduler.start(run_schedules=False)
             self.scheduler.execute(options)
             self.scheduler.shutdown(finish_queue=True)
             try:
