@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+import copy
+import functools
 import logging
 
 from flexget import plugin
@@ -22,24 +24,24 @@ class RunTask(object):
 
     def on_task_exit(self, task, config):
         config.setdefault('when', 'always')
-        if task.accepted and 'accepted' in config['when']:
-            self.run_task(task.manager, config['task'])
-        elif task.rejected and 'rejected' in config['when']:
-            self.run_task(task.manager, config['task'])
-        elif task.failed and 'rejected' in config['when']:
-            self.run_task(task.manager, config['task'])
-        elif not task.all_entries and 'no_entries' in config['when']:
-            self.run_task(task.manager, config['task'])
-        elif 'always' in config['when']:
-            self.run_task(task.manager, config['task'])
+        conditions = [
+            task.accepted and 'accepted' in config['when'],
+            task.rejected and 'rejected' in config['when'],
+            not task.all_entries and 'no_entries' in config['when'],
+            'always' in config['when']
+        ]
+        if any(conditions):
+            self.run_task(task, config['task'])
 
     def on_task_abort(self, task, config):
         if 'aborted' in config:
-            self.run_task(task.manager, config['task'])
+            self.run_task(task, config['task'])
 
-    def run_task(self, manager, task):
-        log.info('Scheduling %s task to run' % task)
-        manager.scheduler.execute(task)
+    def run_task(self, current_task, run_task):
+        log.info('Scheduling %s task to run' % run_task)
+        options = copy.copy(current_task.options)
+        options.tasks = [run_task]
+        current_task.manager.scheduler.execute(options=options)
 
 
 @event('plugin.register')
