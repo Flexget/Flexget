@@ -7,7 +7,6 @@ from flexget import logger
 from flexget.options import get_parser
 from flexget import plugin
 from flexget.manager import Manager
-from flexget.event import fire_event
 
 __version__ = '{git}'
 

@@ -14,25 +14,27 @@ def do_cli(manager, options):
     import socket
 
     class AppServerSvc (win32serviceutil.ServiceFramework):
-        _svc_name_ = "FlexGet"
-        _svc_display_name_ = "FlexGet Daemon"
+        _svc_name_ = 'FlexGet'
+        _svc_display_name_ = 'FlexGet Daemon'
+        _svc_description_ = 'Runs FlexGet tasks according to defined schedules'
 
         def __init__(self, args):
             win32serviceutil.ServiceFramework.__init__(self, args)
             self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
             socket.setdefaulttimeout(60)
+            self.manager = None
 
         def SvcStop(self):
             self.ReportServiceStatus(win32service.SERVICE_STOP_PENDING)
-            win32event.SetEvent(self.hWaitStop)
+            from flexget.manager import manager
+            manager.shutdown(finish_queue=False)
+            self.ReportServiceStatus(win32service.SERVICE_STOPPED)
 
         def SvcDoRun(self):
             servicemanager.LogMsg(servicemanager.EVENTLOG_INFORMATION_TYPE,
                                   servicemanager.PYS_SERVICE_STARTED,
                                   (self._svc_name_, ''))
-            self.main()
 
-        def main(self):
             flexget.main(['daemon'])
 
     argv = options.args
@@ -41,7 +43,7 @@ def do_cli(manager, options):
 
     # Hack sys.argv a bit so that we get a better usage message
     sys.argv[0] = 'flexget service'
-    win32serviceutil.HandleCommandLine(AppServerSvc, argv=['flexget service'] + options.args)
+    win32serviceutil.HandleCommandLine(AppServerSvc, argv=['flexget service'] + argv)
 
 
 @event('options.register')
