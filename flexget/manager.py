@@ -554,11 +554,6 @@ class Manager(object):
         # create all tables, doesn't do anything to existing tables
         from sqlalchemy.exc import OperationalError
         try:
-            if self.options.del_db:
-                log.verbose('Deleting everything from database ...')
-                with self.acquire_lock(event=False):
-                    Base.metadata.drop_all(bind=self.engine)
-
             def before_table_create(event, target, bind, tables=None, **kw):
                 if tables:
                     # We need to acquire a lock if we are creating new tables

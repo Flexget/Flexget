@@ -40,7 +40,7 @@ def setup_once():
         setup_logging_level()
         load_plugins()
         # store options for MockManager
-        test_arguments = get_parser().parse_args(['--del-db', 'execute'])
+        test_arguments = get_parser().parse_args(['execute'])
         plugins_loaded = True
 
 
