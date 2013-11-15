@@ -26,9 +26,11 @@ def cleanup(manager):
 def vacuum():
     console('Running VACUUM on sqlite database, this could take a while.')
     session = Session()
-    session.execute('VACUUM')
-    session.commit()
-    session.close()
+    try:
+        session.execute('VACUUM')
+        session.commit()
+    finally:
+        session.close()
     console('VACUUM complete.')
 
 

@@ -169,11 +169,13 @@ class TMDBPoster(TMDBContainer, Base):
         # If we are detached from a session, update the db
         if not Session.object_session(self):
             session = Session()
-            poster = session.query(TMDBPoster).filter(TMDBPoster.db_id == self.db_id).first()
-            if poster:
-                poster.file = filename
-                session.commit()
-            session.close()
+            try:
+                poster = session.query(TMDBPoster).filter(TMDBPoster.db_id == self.db_id).first()
+                if poster:
+                    poster.file = filename
+                    session.commit()
+            finally:
+                session.close()
         return filename.split(os.sep)
 
 

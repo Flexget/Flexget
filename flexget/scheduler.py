@@ -345,20 +345,25 @@ class Trigger(object):
 
     def _get_db_last_run(self):
         session = Session()
-        db_trigger = session.query(DBTrigger).get(self.uid)
-        if db_trigger:
-            self.last_run = db_trigger.last_run
-            log.debug('loaded last_run from the database')
+        try:
+            db_trigger = session.query(DBTrigger).get(self.uid)
+            if db_trigger:
+                self.last_run = db_trigger.last_run
+                log.debug('loaded last_run from the database')
+        finally:
+            session.close()
 
     def _set_db_last_run(self):
         session = Session()
-        db_trigger = session.query(DBTrigger).get(self.uid)
-        if not db_trigger:
-            db_trigger = DBTrigger(self.uid)
-            session.add(db_trigger)
-        db_trigger.last_run = self.last_run
-        session.commit()
-        session.close()
+        try:
+            db_trigger = session.query(DBTrigger).get(self.uid)
+            if not db_trigger:
+                db_trigger = DBTrigger(self.uid)
+                session.add(db_trigger)
+            db_trigger.last_run = self.last_run
+            session.commit()
+        finally:
+            session.close()
         log.debug('recorded last_run to the database')
 
 

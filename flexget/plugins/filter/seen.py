@@ -281,20 +281,21 @@ def seen_add(options):
 
 def seen_search(options):
     session = Session()
-    search_term = '%' + options.search_term + '%'
-    seen_entries = (session.query(SeenEntry).join(SeenField).
-                    filter(SeenField.value.like(search_term)).order_by(SeenField.added).all())
+    try:
+        search_term = '%' + options.search_term + '%'
+        seen_entries = (session.query(SeenEntry).join(SeenField).
+                        filter(SeenField.value.like(search_term)).order_by(SeenField.added).all())
 
-    for se in seen_entries:
-        console('ID: %s Name: %s Task: %s Added: %s' % (se.id, se.title, se.task, se.added.strftime('%c')))
-        for sf in se.fields:
-            console(' %s: %s' % (sf.field, sf.value))
-        console('')
+        for se in seen_entries:
+            console('ID: %s Name: %s Task: %s Added: %s' % (se.id, se.title, se.task, se.added.strftime('%c')))
+            for sf in se.fields:
+                console(' %s: %s' % (sf.field, sf.value))
+            console('')
 
-    if not seen_entries:
-        console('No results')
-
-    session.close()
+        if not seen_entries:
+            console('No results')
+    finally:
+        session.close()
 
 
 @event('plugin.register')

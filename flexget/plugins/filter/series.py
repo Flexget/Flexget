@@ -608,32 +608,38 @@ def set_series_begin(series, ep_id):
 def forget_series(name):
     """Remove a whole series `name` from database."""
     session = Session()
-    series = session.query(Series).filter(Series.name == name).all()
-    if series:
-        for s in series:
-            session.delete(s)
-        session.commit()
-        log.debug('Removed series %s from database.', name)
-    else:
-        raise ValueError('Unknown series %s' % name)
+    try:
+        series = session.query(Series).filter(Series.name == name).all()
+        if series:
+            for s in series:
+                session.delete(s)
+            session.commit()
+            log.debug('Removed series %s from database.', name)
+        else:
+            raise ValueError('Unknown series %s' % name)
+    finally:
+        session.close()
 
 
 def forget_series_episode(name, identifier):
     """Remove all episodes by `identifier` from series `name` from database."""
     session = Session()
-    series = session.query(Series).filter(Series.name == name).first()
-    if series:
-        episode = session.query(Episode).filter(Episode.identifier == identifier).\
-            filter(Episode.series_id == series.id).first()
-        if episode:
-            series.identified_by = ''  # reset identified_by flag so that it will be recalculated
-            session.delete(episode)
-            session.commit()
-            log.debug('Episode %s from series %s removed from database.', identifier, name)
+    try:
+        series = session.query(Series).filter(Series.name == name).first()
+        if series:
+            episode = session.query(Episode).filter(Episode.identifier == identifier).\
+                filter(Episode.series_id == series.id).first()
+            if episode:
+                series.identified_by = ''  # reset identified_by flag so that it will be recalculated
+                session.delete(episode)
+                session.commit()
+                log.debug('Episode %s from series %s removed from database.', identifier, name)
+            else:
+                raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
         else:
-            raise ValueError('Unknown identifier %s for series %s' % (identifier, name.capitalize()))
-    else:
-        raise ValueError('Unknown series %s' % name)
+            raise ValueError('Unknown series %s' % name)
+    finally:
+        session.close()
 
 
 def populate_entry_fields(entry, parser):

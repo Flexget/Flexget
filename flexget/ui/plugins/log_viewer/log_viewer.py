@@ -34,9 +34,11 @@ class DBLogHandler(logging.Handler):
 
     def emit(self, record):
         session = Session()
-        session.add(LogEntry(record))
-        session.commit()
-        session.close()
+        try:
+            session.add(LogEntry(record))
+            session.commit()
+        finally:
+            session.close()
 
 
 @log_viewer.context_processor

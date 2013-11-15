@@ -59,14 +59,18 @@ class EstimatesReleasedSeries(object):
 
             # If no results from tvrage, estimate a date based on series history
             session = Session()
-            series = session.query(Series).filter(Series.name == entry['series_name']).first()
-            if not series:
-                return
-            episodes = (session.query(Episode).join(Episode.series).
-                        filter(Episode.season != None).
-                        filter(Series.id == series.id).
-                        filter(Episode.season == func.max(Episode.season).select()).
-                        order_by(desc(Episode.number)).limit(2).all())
+            try:
+                series = session.query(Series).filter(Series.name == entry['series_name']).first()
+                if not series:
+                    return
+                episodes = (session.query(Episode).join(Episode.series).
+                            filter(Episode.season != None).
+                            filter(Series.id == series.id).
+                            filter(Episode.season == func.max(Episode.season).select()).
+                            order_by(desc(Episode.number)).limit(2).all())
+            finally:
+                session.close()
+
             if len(episodes) < 2:
                 return
             # If last two eps were not contiguous, don't guess

@@ -56,22 +56,24 @@ class PluginHistory(object):
 
 def do_cli(manager, options):
     session = Session()
-    console('-- History: ' + '-' * 67)
-    query = session.query(History)
-    if options.search:
-        search_term = options.search.replace(' ', '%').replace('.', '%')
-        query = query.filter(History.title.like('%' + search_term + '%'))
-    query = query.order_by(desc(History.time)).limit(options.limit)
-    for item in reversed(query.all()):
-        console(' Task    : %s' % item.task)
-        console(' Title   : %s' % item.title)
-        console(' Url     : %s' % item.url)
-        if item.filename:
-            console(' Stored  : %s' % item.filename)
-        console(' Time    : %s' % item.time.strftime("%c"))
-        console(' Details : %s' % item.details)
-        console('-' * 79)
-    session.close()
+    try:
+        console('-- History: ' + '-' * 67)
+        query = session.query(History)
+        if options.search:
+            search_term = options.search.replace(' ', '%').replace('.', '%')
+            query = query.filter(History.title.like('%' + search_term + '%'))
+        query = query.order_by(desc(History.time)).limit(options.limit)
+        for item in reversed(query.all()):
+            console(' Task    : %s' % item.task)
+            console(' Title   : %s' % item.title)
+            console(' Url     : %s' % item.url)
+            if item.filename:
+                console(' Stored  : %s' % item.filename)
+            console(' Time    : %s' % item.time.strftime("%c"))
+            console(' Details : %s' % item.details)
+            console('-' * 79)
+    finally:
+        session.close()
 
 
 @event('options.register')

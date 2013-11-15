@@ -696,9 +696,11 @@ class Manager(object):
         if force or expired:
             log.info('Running database cleanup.')
             session = Session()
-            fire_event('manager.db_cleanup', session)
-            session.commit()
-            session.close()
+            try:
+                fire_event('manager.db_cleanup', session)
+                session.commit()
+            finally:
+                session.close()
             # Just in case some plugin was overzealous in its cleaning, mark the config changed
             self.config_changed()
             self.persist['last_cleanup'] = datetime.now()

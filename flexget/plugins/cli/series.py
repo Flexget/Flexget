@@ -90,19 +90,20 @@ def begin(manager, options):
     series_name = options.series_name
     ep_id = options.episode_id
     session = Session()
-    series = session.query(Series).filter(Series.name == series_name).first()
-    if not series:
-        console('Series not yet in database, adding `%s`' % series_name)
-        series = Series()
-        series.name = series_name
-        session.add(series)
     try:
-        set_series_begin(series, ep_id)
-    except ValueError as e:
-        console(e)
-    else:
-        console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
-        session.commit()
+        series = session.query(Series).filter(Series.name == series_name).first()
+        if not series:
+            console('Series not yet in database, adding `%s`' % series_name)
+            series = Series()
+            series.name = series_name
+            session.add(series)
+        try:
+            set_series_begin(series, ep_id)
+        except ValueError as e:
+            console(e)
+        else:
+            console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
+            session.commit()
     finally:
         session.close()
     manager.config_changed()

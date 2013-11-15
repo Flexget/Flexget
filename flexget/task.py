@@ -39,11 +39,13 @@ def config_changed(task):
     entries need to be reprocessed."""
     log.debug('Marking config as changed.')
     session = Session()
-    task_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == task).first()
-    if task_hash:
-        task_hash.hash = ''
-    session.commit()
-    session.close()
+    try:
+        task_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == task).first()
+        if task_hash:
+            task_hash.hash = ''
+        session.commit()
+    finally:
+        session.close()
 
 
 def useTaskLogging(func):
