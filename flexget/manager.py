@@ -133,6 +133,10 @@ class Manager(object):
             return []
         return self.config.get('tasks', {}).keys()
 
+    @property
+    def has_lock(self):
+        return self._has_lock
+
     def run_cli_command(self):
         command = self.options.cli_command
         options = getattr(self.options, command)

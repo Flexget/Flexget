@@ -167,14 +167,26 @@ def repair(manager):
     # Perform database repairing and upgrading at startup.
     if not manager.persist.get('series_repaired', False):
         session = Session()
-        # For some reason at least I have some releases in database which don't belong to any episode.
-        for release in session.query(Release).filter(Release.episode == None).all():
-            log.info('Purging orphan release %s from database', release.title)
-            session.delete(release)
-        session.commit()
+        try:
+            # For some reason at least I have some releases in database which don't belong to any episode.
+            for release in session.query(Release).filter(Release.episode == None).all():
+                log.info('Purging orphan release %s from database', release.title)
+                session.delete(release)
+            session.commit()
+        finally:
+            session.close()
         manager.persist['series_repaired'] = True
+
+    # Run clean_series the first time we get a database lock, since we won't have had one the first time the config
+    # got loaded.
+    clean_series(manager)
+
+
+@event('manager.config-loaded')
+def clean_series(manager):
     # Unmark series from tasks which have been deleted.
-    # TODO: Maybe this should run on a manager.config_changed event?
+    if not manager.has_lock:
+        return
     session = Session()
     try:
         deleted = (session.query(SeriesTask).filter(not_(SeriesTask.name.in_(manager.tasks))).
