@@ -6,6 +6,8 @@ from flexget.utils.titles.parser import TitleParser
 from flexget.utils import qualities
 from flexget.utils.tools import str_to_int
 
+from guessit import guess_movie_info
+
 log = logging.getLogger('movieparser')
 
 
@@ -44,6 +46,16 @@ class MovieParser(TitleParser):
         if data is None:
             data = self.data
 
+        # Parse with guessit as a nfo file
+        data = data + ".nfo"
+        log.debug('guessit input: %s', data)
+
+        movie_info = guess_movie_info(data)
+        log.debug('guessit output: %s', data)
+
+        self.year = movie_info.get("year")
+        self.name = movie_info.get("title")
+        
         # Move anything in leading brackets to the end
         data = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', data)
 
@@ -103,19 +115,3 @@ class MovieParser(TitleParser):
         quality = qualities.Quality(data)
         if quality:
             self.quality = quality
-            # remaining string is same as data but quality information removed
-            # find out position where there is first difference, this is earliest
-            # quality bit, anything after that has no relevance to the movie name
-            dp = diff_pos(data, quality.clean_text)
-            if dp is not None:
-                log.debug('quality start: %s', dp)
-                if dp < abs_cut:
-                    log.debug('quality cut is even shorter')
-                    abs_cut = dp
-
-        # make cut
-        data = data[:abs_cut].strip()
-        log.debug('data cut to `%s` - this will be the name', data)
-
-        # save results
-        self.name = data
