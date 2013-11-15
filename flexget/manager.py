@@ -8,6 +8,7 @@ import shutil
 import logging
 import threading
 import pkg_resources
+import traceback
 import yaml
 from datetime import datetime, timedelta
 
@@ -18,7 +19,16 @@ from sqlalchemy.pool import SingletonThreadPool
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 Base = declarative_base()
-Session = sessionmaker()
+_Session = sessionmaker()
+class Session(_Session):
+    def commit(self, *args, **kwargs):
+        if not manager.has_lock:
+            if manager.unit_test:
+                raise Exception('Cannot commit to database without lock.')
+            log.error('BUG: Database writes should not be tried when there is no database lock. Please Report.')
+            traceback.print_stack()
+        else:
+            super(Session, self).commit(*args, **kwargs)
 
 from flexget import config_schema, db_schema
 from flexget.event import fire_event
@@ -86,8 +96,8 @@ class Manager(object):
 
         self.scheduler = Scheduler(self)
         self.ipc_server = IPCServer(self, options.ipc_port)
+        manager = self
         self.initialize()
-        manager = self  # Make sure we initialize before setting ourselves as the global manager
 
         # cannot be imported at module level because of circular references
         from flexget.utils.simple_persistence import SimplePersistence
@@ -546,7 +556,15 @@ class Manager(object):
         try:
             if self.options.del_db:
                 log.verbose('Deleting everything from database ...')
-                Base.metadata.drop_all(bind=self.engine)
+                with self.acquire_lock(event=False):
+                    Base.metadata.drop_all(bind=self.engine)
+
+            def before_table_create(event, target, bind, tables=None, **kw):
+                if tables:
+                    # We need to acquire a lock if we are creating new tables
+                    self.acquire_lock(event=False).__enter__()
+
+            Base.metadata.append_ddl_listener('before-create', before_table_create)
             Base.metadata.create_all(bind=self.engine)
         except OperationalError as e:
             if os.path.exists(self.db_filename):
@@ -606,7 +624,7 @@ class Manager(object):
                 if self.check_lock():
                     with open(self.lockfile) as f:
                         pid = f.read()
-                    print >> sys.stderr, 'Another process (%s) is running, will exit.' % pid.strip()
+                    print >> sys.stderr, 'Another process (%s) is running, will exit.' % pid.split('\n')[0]
                     print >> sys.stderr, 'If you\'re sure there is no other instance running, delete %s' % self.lockfile
                     sys.exit(1)
 
