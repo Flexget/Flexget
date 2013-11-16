@@ -40,7 +40,8 @@ class EmitSeries(SeriesDatabase):
                 '%dx%02d' % (season, episode)]
 
     def sequence_identifiers(self, episode):
-        return ['%d' % episode]
+        return ['%d' % episode,
+                '%02d' % episode]
 
     def search_entry(self, series, season, episode, task, rerun=True):
         if series.identified_by == 'ep':
