@@ -16,6 +16,7 @@ import sqlalchemy
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.pool import SingletonThreadPool
+from sqlalchemy.exc import OperationalError
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 Base = declarative_base()
@@ -70,6 +71,14 @@ class Manager(object):
     * manager.shutdown
 
       When the manager is exiting
+
+    * manager.execute.completed
+
+      If execution in current process was completed
+
+    * manager.daemon.started
+    * manager.daemon.completed
+    * manager.db_cleanup
     """
 
     unit_test = False
@@ -148,6 +157,15 @@ class Manager(object):
         return self._has_lock
 
     def run_cli_command(self):
+        """
+        Starting point when executing from commandline, dispatch execution
+        to correct destination.
+
+        * :meth:`.execute_command`
+        * :meth:`.daemon_command`
+        * :meth:`.webui_command`
+        * CLI plugin callback function
+        """
         command = self.options.cli_command
         options = getattr(self.options, command)
         # First check for built-in commands
@@ -157,8 +175,8 @@ class Manager(object):
             self.daemon_command(options)
         elif command == 'webui':
             self.webui_command(options)
-        # Otherwise dispatch the command to the callback function
         else:
+            # Otherwise dispatch the command to the callback function
             if options.lock_required:
                 with self.acquire_lock():
                     options.cli_command_callback(self, options)
@@ -166,6 +184,16 @@ class Manager(object):
                 options.cli_command_callback(self, options)
 
     def execute_command(self, options):
+        """
+        Send execute command to daemon through IPC or perform execution
+        on current process.
+
+        Fires events:
+
+        * manager.execute.completed
+
+        :param options: argparse options
+        """
         # If a daemon is started, send the execution to the daemon
         ipc_info = self.check_ipc_info()
         if ipc_info:
@@ -188,6 +216,14 @@ class Manager(object):
             self.shutdown(finish_queue=False)
 
     def daemon_command(self, options):
+        """
+        Fires events:
+
+        * manager.daemon.started
+        * manager.daemon.completed
+
+        :param options: argparse options
+        """
         if options.action == 'start':
             if options.daemonize:
                 self.daemonize()
@@ -212,6 +248,9 @@ class Manager(object):
                 log.error('There does not appear to be a daemon running.')
 
     def webui_command(self, options):
+        """
+        :param options: argparse options
+        """
         try:
             pkg_resources.require('flexget[webui]')
         except pkg_resources.DistributionNotFound as e:
@@ -320,7 +359,6 @@ class Manager(object):
 
            Calls sys.exit(1) if configuration file could not be loaded.
            This is something we probably want to change.
-
         """
         with open(self.config_path, 'rb') as f:
             config = f.read()
@@ -552,7 +590,6 @@ class Manager(object):
             sys.exit(1)
         Session.configure(bind=self.engine)
         # create all tables, doesn't do anything to existing tables
-        from sqlalchemy.exc import OperationalError
         try:
             def before_table_create(event, target, bind, tables=None, **kw):
                 if tables:
@@ -702,6 +739,12 @@ class Manager(object):
     def db_cleanup(self, force=False):
         """
         Perform database cleanup if cleanup interval has been met.
+
+        Fires events:
+
+        * manager.db_cleanup
+
+          If interval was met. Gives session to do the cleanup as a parameter.
 
         :param bool force: Run the cleanup no matter whether the interval has been met.
         """

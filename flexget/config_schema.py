@@ -142,17 +142,20 @@ format_checker = jsonschema.FormatChecker(('email',))
 format_checker.checks('quality', raises=ValueError)(qualities.get)
 format_checker.checks('quality_requirements', raises=ValueError)(qualities.Requirements)
 
+
 @format_checker.checks('time', raises=ValueError)
 def is_time(time_string):
     if not isinstance(time_string, str_types):
         return True
     return parse_time(time_string) is not None
 
+
 @format_checker.checks('interval', raises=ValueError)
 def is_interval(interval_string):
     if not isinstance(interval_string, str_types):
         return True
     return parse_interval(interval_string) is not None
+
 
 @format_checker.checks('regex', raises=ValueError)
 def is_regex(instance):
@@ -163,6 +166,7 @@ def is_regex(instance):
     except re.error as e:
         raise ValueError('Error parsing regex: %s' % e)
 
+
 @format_checker.checks('file', raises=ValueError)
 def is_file(instance):
     if not isinstance(instance, str_types):
@@ -170,6 +174,7 @@ def is_file(instance):
     if os.path.isfile(os.path.expanduser(instance)):
         return True
     raise ValueError('`%s` does not exist' % instance)
+
 
 @format_checker.checks('path', raises=ValueError)
 def is_path(instance):
@@ -197,7 +202,7 @@ def is_url(instance):
 
 def set_error_message(error):
     """
-     Create user facing error message from a :class:`jsonschema.ValidationError` `error`
+    Create user facing error message from a :class:`jsonschema.ValidationError` `error`
 
     """
     # First, replace default error messages with our custom ones

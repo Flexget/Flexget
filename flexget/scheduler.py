@@ -257,7 +257,7 @@ class Trigger(object):
     def __init__(self, interval, tasks, options=None):
         """
         :param dict interval: An interval dictionary from the config.
-        :param list tasks: List of task specifiers to run. Wildcards are allowed.
+        :param list tasks: List of task names specified to run. Wildcards are allowed.
         :param dict options: Dictionary of options that should be applied to this run.
         """
         self.tasks = tasks

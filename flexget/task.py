@@ -212,6 +212,7 @@ class Task(object):
     def is_rerun(self):
         return self._rerun_count
 
+    # TODO: can we get rid of this now that Tasks are instantiated on demand?
     def _reset(self):
         """Reset task state"""
         log.debug('resetting %s' % self.name)
@@ -430,11 +431,16 @@ class Task(object):
 
     @useTaskLogging
     def execute(self):
-        """Executes the task.
+        """
+        Executes the the task.
 
-        :param list disable_phases: Disable given phases names during execution
-        :param list entries: Entries to be used in execution instead
-            of using the input. Disables input phase.
+        If :attr:`.enabled` is False task is not executed. Certain :attr:`.options`
+        affect how execution is handled.
+
+        - :attr:`.options.disable_phases` is a list of phases that are not enabled
+          for this execution.
+        - :attr:`.options.inject` is a list of :class:`Entry` instances used instead
+          of running input phase.
         """
         if not self.enabled:
             log.debug('Not running disabled task %s' % self.name)
