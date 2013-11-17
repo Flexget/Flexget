@@ -7,27 +7,25 @@ from urlparse import urlparse
 from flexget import plugin
 from flexget.event import event
 
-
 log = logging.getLogger('ftp')
 
 
 class OutputFtp(object):
     """
-        Ftp Download plugin
+    Ftp Download plugin
 
-        input-url: ftp://<user>:<password>@<host>:<port>/<path to file>
-        Example: ftp://anonymous:anon@my-ftp-server.com:21/torrent-files-dir
+    input-url: ftp://<user>:<password>@<host>:<port>/<path to file>
+    Example: ftp://anonymous:anon@my-ftp-server.com:21/torrent-files-dir
 
-        config:
-            ftp_download:
-              tls: False
-              ftp_tmp_path: /tmp
-    
-        TODO:
-          - Resume downloads
-          - create banlists files
-          - validate connection parameters
+    config:
+        ftp_download:
+          tls: False
+          ftp_tmp_path: /tmp
 
+    TODO:
+      - Resume downloads
+      - create banlists files
+      - validate connection parameters
     """
 
     def validator(self):
@@ -40,7 +38,6 @@ class OutputFtp(object):
     def prepare_config(self, config, task):
         config.setdefault('use-ssl', False)
         config.setdefault('ftp_tmp_path', os.path.join(task.manager.config_base, 'temp'))
-
         return config
 
     def on_task_download(self, task, config):
@@ -48,7 +45,7 @@ class OutputFtp(object):
         for entry in task.accepted:
             ftp_url = urlparse(entry.get('url'))
             title = entry.get('title')
-            
+
             if config['use-ssl']:
                 ftp = ftplib.FTP_TLS()
             else:
@@ -66,7 +63,7 @@ class OutputFtp(object):
             if not os.path.isdir(config['ftp_tmp_path']):
                 log.debug('creating base path: %s' % config['ftp_tmp_path'])
                 os.mkdir(config['ftp_tmp_path'])
-    
+
             tmp_path = os.path.join(config['ftp_tmp_path'], title)
             log.info('temp path %s' % tmp_path)
             if not os.path.isdir(tmp_path):
@@ -80,7 +77,7 @@ class OutputFtp(object):
             except ftplib.error_perm:
                 # File
                 self.ftp_down(ftp, ftp_url.path, tmp_path)
-            
+
     def ftp_walk(self, ftp, tmp_path):
         log.debug("DIR->" + ftp.pwd())
         try:
@@ -89,7 +86,7 @@ class OutputFtp(object):
             log.info("Error %s" % ex)
             return
 
-        if not dirs: 
+        if not dirs:
             return
 
         for item in (path for path in dirs if path not in ('.', '..')):
@@ -103,7 +100,7 @@ class OutputFtp(object):
                 if not os.path.isdir(new_tmp_dir):
                     os.mkdir(new_tmp_dir)
                     log.info('Creating tmp_path %s' % new_tmp_dir)
-        
+
                 self.ftp_walk(ftp, new_tmp_dir)
                 ftp.cwd('..')
             except ftplib.error_perm:
@@ -118,7 +115,7 @@ class OutputFtp(object):
 
         src_filesize = 0
         try:
-            ftp.voidcmd('TYPE I') # para que el ftp.size funcione correctamente
+            ftp.voidcmd('TYPE I')
             src_filesize = ftp.size(file_name)
         except ftplib.error_perm, ex:
             #IS directory! walk
@@ -143,7 +140,8 @@ class OutputFtp(object):
             else:
                 log.info('NoDownload: ' + file_name + ' -> ' + os.path.join(tmp_path, file_name))
         except Exception, e:
-            log.exception(e) 
+            log.exception(e)
+
 
 @event('plugin.register')
 def register_plugin():
