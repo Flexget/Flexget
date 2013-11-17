@@ -200,13 +200,47 @@ class Task(object):
         # use reset to init variables when creating
         self._reset()
 
-    # Make these read-only properties
-    all_entries = property(lambda self: self._all_entries)
-    entries = property(lambda self: self.all_entries.entries)
-    accepted = property(lambda self: self.all_entries.accepted)
-    rejected = property(lambda self: self.all_entries.rejected)
-    failed = property(lambda self: self.all_entries.failed)
-    undecided = property(lambda self: self.all_entries.undecided)
+    @property
+    def undecided(self):
+        """
+        .. deprecated:: Use API v3
+        """
+        return self.all_entries.undecided
+
+    @property
+    def failed(self):
+        """
+        .. deprecated:: Use API v3
+        """
+        return self.all_entries.failed
+
+    @property
+    def rejected(self):
+        """
+        .. deprecated:: Use API v3
+        """
+        return self.all_entries.rejected
+
+    @property
+    def accepted(self):
+        """
+        .. deprecated:: Use API v3
+        """
+        return self.all_entries.accepted
+
+    @property
+    def entries(self):
+        """
+        .. deprecated:: Use API v3
+        """
+        return self.all_entries.entries
+
+    @property
+    def all_entries(self):
+        """
+        .. deprecated:: Use API v3
+        """
+        return self._all_entries
 
     @property
     def is_rerun(self):
