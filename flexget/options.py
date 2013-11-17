@@ -98,7 +98,6 @@ class CronAction(Action):
 # This makes the old --inject form forwards compatible
 class InjectAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
-        new_value = getattr(namespace, self.dest, None) or []
         kwargs = {'title': values.pop(0)}
         if values:
             kwargs['url'] = values.pop(0)
@@ -109,8 +108,7 @@ class InjectAction(Action):
         entry = Entry(**kwargs)
         if 'accept' in [v.lower() for v in values]:
             entry.accept(reason='accepted by --inject')
-        new_value.append(entry)
-        setattr(namespace, self.dest, new_value)
+        setattr(namespace, self.dest, [entry])
 
 
 class ParseExtrasAction(Action):
