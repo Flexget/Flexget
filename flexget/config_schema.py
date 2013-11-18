@@ -82,8 +82,21 @@ class RefResolver(jsonschema.RefResolver):
 
 
 format_checker = jsonschema.FormatChecker(('email',))
-format_checker.checks('quality', raises=ValueError)(qualities.get)
-format_checker.checks('quality_requirements', raises=ValueError)(qualities.Requirements)
+
+
+@format_checker.checks('quality', raises=ValueError)
+def is_quality(instance):
+    if not isinstance(instance, str_types):
+        return True
+    return qualities.get(instance)
+
+
+@format_checker.checks('quality_requirements', raises=ValueError)
+def is_quality_req(instance):
+    if not isinstance(instance, str_types):
+        return True
+    return qualities.Requirements(instance)
+
 
 @format_checker.checks('regex', raises=ValueError)
 def is_regex(instance):
@@ -94,6 +107,7 @@ def is_regex(instance):
     except re.error as e:
         raise ValueError('Error parsing regex: %s' % e)
 
+
 @format_checker.checks('file', raises=ValueError)
 def is_file(instance):
     if not isinstance(instance, str_types):
@@ -101,6 +115,7 @@ def is_file(instance):
     if os.path.isfile(os.path.expanduser(instance)):
         return True
     raise ValueError('`%s` does not exist' % instance)
+
 
 @format_checker.checks('path', raises=ValueError)
 def is_path(instance):
