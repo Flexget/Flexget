@@ -11,7 +11,7 @@ log = logging.getLogger('trakt_remove')
 
 
 class TraktRemove(object):
-    """Marks all accepted TV episodes or movies as acquired in your trakt.tv library."""
+    """Remove all accepted movies from your trakt.tv library."""
 
     schema = {
         'type': 'object',
@@ -19,7 +19,7 @@ class TraktRemove(object):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'api_key': {'type': 'string'},
-            'type': {'type': 'string', 'enum': ['movies', 'series']},
+            'type': {'type': 'string', 'enum': ['movies']},
             'list': {'type': 'string'}
         },
         'required': ['username', 'password', 'api_key', 'type', 'list'],
