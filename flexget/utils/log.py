@@ -15,7 +15,7 @@ Base = db_schema.versioned_base('log_once', 0)
 
 
 @db_schema.upgrade('log_once')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         log.info('Adding index to md5sum column of log_once table.')
         table = table_schema('log_once', session)

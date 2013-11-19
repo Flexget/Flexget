@@ -23,7 +23,7 @@ Base = db_schema.versioned_base('simple_persistence', 2)
 
 
 @db_schema.upgrade('simple_persistence')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         # Upgrade to version 0 was a failed attempt at cleaning bad entries from our table, better attempt in ver 1
         ver = 0

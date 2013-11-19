@@ -32,7 +32,7 @@ tmdb3.locales.set_locale("en", "us", True);
 tmdb3.set_cache('null')
 
 @db_schema.upgrade('api_tmdb')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         log.info('Adding columns to tmdb cache table, marking current cache as expired.')
         table_add_column('tmdb_movies', 'runtime', Integer, session)

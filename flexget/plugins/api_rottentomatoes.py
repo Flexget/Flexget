@@ -31,7 +31,7 @@ MIN_DIFF = 0.01
 
 
 @db_schema.upgrade('api_rottentomatoes')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is 0:
         table_names = ['rottentomatoes_actors', 'rottentomatoes_alternate_ids',
                        'rottentomatoes_directors', 'rottentomatoes_genres', 'rottentomatoes_links',

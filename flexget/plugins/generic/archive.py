@@ -109,7 +109,7 @@ def get_tag(name, session):
 
 
 @db_schema.upgrade('archive')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         # get rid of old index
         aet = table_schema('archive_entry', session)

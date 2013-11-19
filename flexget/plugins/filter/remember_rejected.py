@@ -14,7 +14,7 @@ Base = db_schema.versioned_base('remember_rejected', 3)
 
 
 @db_schema.upgrade('remember_rejected')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         columns = table_columns('remember_rejected_entry', session)
         if 'uid' in columns:

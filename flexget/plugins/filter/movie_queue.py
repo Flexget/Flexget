@@ -44,7 +44,7 @@ def migrate_imdb_queue(manager):
 
 
 @db_schema.upgrade('movie_queue')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver == 0:
         # Translate old qualities into new quality requirements
         movie_table = table_schema('movie_queue', session)

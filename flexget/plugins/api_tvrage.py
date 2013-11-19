@@ -29,7 +29,7 @@ def db_cleanup(session):
 
 
 @db_schema.upgrade('tvrage')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver == 0:
         series_table = table_schema('tvrage_series', session)
         for row in session.execute(select([series_table.c.id, series_table.c.genres])):

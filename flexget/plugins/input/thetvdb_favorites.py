@@ -24,7 +24,7 @@ Base = db_schema.versioned_base('thetvdb_favorites', 0)
 
 
 @db_schema.upgrade('thetvdb_favorites')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         columns = table_columns('thetvdb_favorites', session)
         if not 'series_ids' in columns:

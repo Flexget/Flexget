@@ -32,7 +32,7 @@ Base = db_schema.versioned_base('series', SCHEMA_VER)
 
 
 @db_schema.upgrade('series')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         if table_exists('episode_qualities', session):
             log.info('Series database format is too old to upgrade, dropping and recreating tables.')
