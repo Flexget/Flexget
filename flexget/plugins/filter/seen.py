@@ -26,7 +26,7 @@ Base = db_schema.versioned_base('seen', 4)
 
 
 @db_schema.upgrade('seen')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         log.info('Converting seen imdb_url to imdb_id for seen movies.')
         field_table = table_schema('seen_field', session)

@@ -36,7 +36,7 @@ persist = SimplePersistence('api_tvdb')
 
 
 @db_schema.upgrade('api_tvdb')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         if 'last_updated' in persist:
             del persist['last_updated']

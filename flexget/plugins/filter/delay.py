@@ -31,7 +31,7 @@ Index('delay_feed_title', DelayedEntry.task, DelayedEntry.title)
 
 
 @db_schema.upgrade('delay')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         log.info('Fixing delay table from erroneous data ...')
         # TODO: Using the DelayedEntry object here is no good.

@@ -8,13 +8,14 @@ from datetime import datetime, timedelta
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
 from sqlalchemy.orm import relation, backref
+from sqlalchemy.types import TypeDecorator, VARCHAR
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
 
 from flexget import db_schema
 from flexget.config_schema import one_or_more
 from flexget.event import event
-from flexget.utils import qualities
+from flexget.utils import qualities, json
 from flexget.utils.log import log_once
 from flexget.utils.titles import SeriesParser, ParseWarning, ID_TYPES
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
@@ -25,14 +26,14 @@ from flexget.manager import Session
 from flexget.plugin import (register_plugin, register_parser_option, get_plugin_by_name, DependencyError, priority,
                             PluginError)
 
-SCHEMA_VER = 11
+SCHEMA_VER = 12
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
 
 
 @db_schema.upgrade('series')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         if table_exists('episode_qualities', session):
             log.info('Series database format is too old to upgrade, dropping and recreating tables.')
@@ -142,6 +143,10 @@ def upgrade(ver, session):
         log.verbose('Repairing series_tasks table data')
         session.execute(delete(series_tasks, ~series_tasks.c.series_id.in_(select([series_table.c.id]))))
         ver = 11
+    if ver == 11:
+        table_add_column('series_tasks', 'config', String, session)
+        manager.config_changed()
+        ver = 12
 
     return ver
 
@@ -351,15 +356,31 @@ class Release(Base):
         return unicode(self).encode('ascii', 'replace')
 
 
+class JSONConfig(TypeDecorator):
+    impl = VARCHAR
+
+    def process_bind_param(self, value, dialect):
+        if value is not None:
+            value = json.dumps(value)
+        return value
+
+    def process_result_value(self, value, dialect):
+        if value is not None:
+            value = json.loads(value)
+        return value
+
+
 class SeriesTask(Base):
     __tablename__ = 'series_tasks'
 
     id = Column(Integer, primary_key=True)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
     name = Column(Unicode, index=True)
+    config = Column(JSONConfig)
 
-    def __init__(self, name):
+    def __init__(self, name, config):
         self.name = name
+        self.config = config
 
 
 class SeriesDatabase(object):
@@ -1410,7 +1431,7 @@ class SeriesDBManager(FilterSeriesBase):
                 db_series.name = series_name
                 task.session.add(db_series)
                 log.debug('-> added %s' % db_series)
-            db_series.in_tasks.append(SeriesTask(task.name))
+            db_series.in_tasks.append(SeriesTask(task.name, series_config))
             if series_config.get('identified_by', 'auto') != 'auto':
                 db_series.identified_by = series_config['identified_by']
             # Set the begin episode

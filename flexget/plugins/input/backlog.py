@@ -19,7 +19,7 @@ Base = db_schema.versioned_base('backlog', 1)
 
 
 @db_schema.upgrade('backlog')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         # Make sure there is no data we can't load in the backlog table
         backlog_table = table_schema('backlog', session)

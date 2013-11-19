@@ -13,7 +13,7 @@ Base = db_schema.versioned_base('queue', 2)
 
 
 @db_schema.upgrade('queue')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if False:  # ver == 0: disable this, since we don't have a remove column function
         table_add_column('queue', 'last_emit', DateTime, session)
         ver = 1

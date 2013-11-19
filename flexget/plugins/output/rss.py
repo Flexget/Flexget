@@ -23,7 +23,7 @@ except:
 
 
 @db_schema.upgrade('make_rss')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         columns = table_columns('make_rss', session)
         if not 'rsslink' in columns:

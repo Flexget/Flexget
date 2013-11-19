@@ -176,7 +176,7 @@ log = logging.getLogger('imdb_lookup')
 
 
 @db_schema.upgrade('imdb_lookup')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         columns = table_columns('imdb_movies', session)
         if not 'photo' in columns:

@@ -16,7 +16,7 @@ Base = db_schema.versioned_base('failed', SCHEMA_VER)
 
 
 @db_schema.upgrade('failed')
-def upgrade(ver, session):
+def upgrade(ver, session, manager):
     if ver is None:
         # add count column
         table_add_column('failed', 'count', Integer, session, default=1)
