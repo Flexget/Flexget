@@ -43,7 +43,8 @@ class EmitSeries(SeriesDatabase):
         return ['%d' % episode,
                 '%02d' % episode]
 
-    def search_entry(self, series, season, episode, task, rerun=True):
+    def search_entry(self, series, season, episode, config, task, rerun=True):
+        names = [series.name] + config.get('alternate_name', [])
         if series.identified_by == 'ep':
             search_strings = ['%s %s' % (series.name, id) for id in self.ep_identifiers(season, episode)]
             series_id = 'S%02dE%02d' % (season, episode)
@@ -81,12 +82,13 @@ class EmitSeries(SeriesDatabase):
                             (series.name, series.identified_by or 'auto'))
                 continue
 
+            series_config = seriestask.config
             latest = self.get_latest_download(series)
             if series.begin and (not latest or latest < series.begin):
-                entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
+                entries.append(self.search_entry(series, series.begin.season, series.begin.number, series_config, task))
             elif latest:
                 if self.try_next_season.get(series.name):
-                    entries.append(self.search_entry(series, latest.season + 1, 1, task))
+                    entries.append(self.search_entry(series, latest.season + 1, 1, series_config, task))
                 else:
                     episodes_this_season = (task.session.query(Episode).
                                             filter(Episode.series_id == series.id).
@@ -104,14 +106,16 @@ class EmitSeries(SeriesDatabase):
                             eps_to_get.remove(ep.number)
                         except ValueError:
                             pass
-                    entries.extend(self.search_entry(series, latest.season, x, task, rerun=False) for x in eps_to_get)
+                    entries.extend(self.search_entry(series, latest.season, x, series_config, task, rerun=False)
+                                   for x in eps_to_get)
                     # If we have already downloaded the latest known episode, try the next episode
                     if latest_ep_this_season.downloaded_releases:
-                        entries.append(self.search_entry(series, latest.season, latest_ep_this_season.number + 1, task))
+                        entries.append(self.search_entry(series, latest.season,
+                                       latest_ep_this_season.number + 1, series_config, task))
             else:
                 if config.get('from_start'):
                     season = 1 if series.identified_by == 'ep' else 0
-                    entries.append(self.search_entry(series, season, 1, task))
+                    entries.append(self.search_entry(series, season, 1, series_config, task))
                 else:
                     log.verbose('Series `%s` has no history. Set begin option, or use --series-begin '
                                 'to set first episode to emit' % series.name)
