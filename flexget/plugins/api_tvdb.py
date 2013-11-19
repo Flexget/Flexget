@@ -250,12 +250,12 @@ def find_series_id(name):
         return int(firstmatch.find("seriesid").text)
     # If there is no exact match, sort by airing date and pick the latest
     # TODO: Is there a better way to do this? Maybe weight name similarity and air date
-    try:
-        series_list = [(s.find("FirstAired").text, s.find("seriesid").text) for s in xmldata.findall('Series') if s.find("FirstAired").text]
-    except AttributeError:
-        # a hacky way to handle cases where the show doesn't have a FirstAired date listed
-        series_list = None
-
+    series_list = []
+    for s in xmldata.findall('Series'):
+        fa = s.find("FirstAired")
+        if fa is not None and fa.text:
+            series_list.append((fa.text, s.find("seriesid").text))
+   
     if series_list:
         series_list.sort(key=lambda s: s[0], reverse=True)
         return int(series_list[0][1])
