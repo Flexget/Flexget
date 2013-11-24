@@ -2,26 +2,42 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.plugin import register_plugin, priority
 
+import flexget.utils.qualities as qualities
+
 log = logging.getLogger('assumequality')
 
 
 class AssumeQuality(object):
     """
-    Applies a specified quality to entries that don't have a quality set.
+    Applies specified quality components to entries that don't have them set.
 
     Example:
-    assumequality: 720p
+    assumequality: 1080p webdl 10bit truehd
     """
 
     schema = {'type': 'string', 'format': 'quality'}
 
     @priority(127)  #run after metainfo_quality@128
     def on_task_metainfo(self, task, quality):
+        quality = qualities.get(quality)    #turn incoming quality into Quality object
+        log.debug("Assuming quality: %s", quality)
         for entry in task.entries:
-            if not entry.get('quality'):
-                log.info("Assuming quality for %s is %s", entry['title'],quality)
-                entry['quality'] = quality
-                entry['assumedquality'] = True
-                continue
+            newquality = qualities.Quality()
+            log.verbose("%s", entry['title'])
+            log.debug("Current qualities: %s", entry.get('quality'))
+            for component in entry.get('quality').components:
+                qualitycomponent = getattr(quality, component.type)
+                log.debug("\t%s: %s vs %s", component.type, component.name, qualitycomponent.name)
+                if component.name != "unknown":
+                    log.debug("\t%s: keeping %s", component.type, component.name)
+                    setattr(newquality, component.type, component)
+                elif qualitycomponent.name != "unknown":
+                    log.debug("\t%s: assuming %s", component.type, qualitycomponent.name)
+                    setattr(newquality, component.type, qualitycomponent)
+                    entry['assumedquality'] = True
+                elif component.name == "unknown" and qualitycomponent.name == "unknown":
+                    log.debug("\t%s: got nothing", component.type)
+            entry['quality'] = newquality
+            log.verbose("New quality: %s", entry.get('quality'))
 
 register_plugin(AssumeQuality, 'assumequality', api_ver=2)
