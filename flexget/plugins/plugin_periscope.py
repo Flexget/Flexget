@@ -2,34 +2,17 @@ import logging
 import os
 import periscope
 import tempfile
-import urllib
 
 from flexget.plugin import register_plugin
 
 log = logging.getLogger('subtitles')
 psc = periscope.Periscope(tempfile.gettempdir())
 
-# should this stuff be in config?
-EXTSUB = ['.srt']
-
-# to avoid A LOT of info/warnings/errors coming from periscope:
-logging.getLogger("periscope").setLevel(logging.CRITICAL)
-
 
 class PluginPeriscope(object):
     """
     Search and download subtitles using Periscope by Patrick Dessalle 
     (http://code.google.com/p/periscope/).
-    It process only accepted entries referred to local files, and it can be 
-    instructed to ignore (not overwrite) video already associated with subtitles.
-    
-    Example::
-    
-      periscope:
-        languages:
-          - it
-          - en
-        overwrite: no
     
     Example (complete task)::
 
@@ -50,24 +33,31 @@ class PluginPeriscope(object):
         'type': 'object',
         'properties': {
             'languages': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
-            'overwrite': {'type': 'boolean', 'default': False}
+            'overwrite': {'type': 'boolean', 'default': False},
+            'subexts': {'type': 'array', 'items': {'type': 'string'}, 'default': ['srt', 'stp', 'sub', 'stl', 'ssa']},
         },
         'additionalProperties': False
     }
     
     def subbed(self, filename):
-        for ext in EXTSUB:
+        for ext in self.exts:
             if os.path.exists(os.path.splitext(filename)[0] + ext):
                 return True
         return False
     
     def on_task_output(self, task, config):
+        """
+        Configuration::
+            periscope:
+                languages: List of languages in order of preference (at least one is required).
+                overwrite: If yes it will try to download even for videos that are already subbed. Default: no.
+                subexts: List of subtitles file extensions to check (only useful with overwrite=no). Default: srt, stp, sub, stl, ssa.
+        """
         if not task.accepted:
             log.debug('nothing accepted, aborting')
             return
-        langs = []
-        for u in config['languages']:
-            langs.append(u.encode('utf8'))  # unicode warnings in periscope
+        langs = [s.encode('utf8') for s in config['languages']]  # unicode warnings in periscope
+        self.exts = ['.'+s for s in config['subexts']]
         for entry in task.accepted:
             if not 'location' in entry:
                 entry.reject('is not a local file')
