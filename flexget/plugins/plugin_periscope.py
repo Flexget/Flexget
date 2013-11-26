@@ -8,6 +8,9 @@ from flexget.plugin import register_plugin
 log = logging.getLogger('subtitles')
 psc = periscope.Periscope(tempfile.gettempdir())
 
+# to avoid A LOT of info/warnings/errors coming from periscope:
+logging.getLogger("periscope").setLevel(logging.CRITICAL)
+
 
 class PluginPeriscope(object):
     """
@@ -33,6 +36,7 @@ class PluginPeriscope(object):
         'type': 'object',
         'properties': {
             'languages': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
+            'alternatives': {'type': 'array', 'items': {'type': 'string'}},
             'overwrite': {'type': 'boolean', 'default': False},
             'subexts': {'type': 'array', 'items': {'type': 'string'}, 'default': ['srt', 'stp', 'sub', 'stl', 'ssa']},
         },
@@ -50,6 +54,7 @@ class PluginPeriscope(object):
         Configuration::
             periscope:
                 languages: List of languages in order of preference (at least one is required).
+                alternatives: List of second-choice languages; subs will be downloaded but entries rejected.
                 overwrite: If yes it will try to download even for videos that are already subbed. Default: no.
                 subexts: List of subtitles file extensions to check (only useful with overwrite=no). Default: srt, stp, sub, stl, ssa.
         """
@@ -57,7 +62,11 @@ class PluginPeriscope(object):
             log.debug('nothing accepted, aborting')
             return
         langs = [s.encode('utf8') for s in config['languages']]  # unicode warnings in periscope
-        self.exts = ['.'+s for s in config['subexts']]
+        alts = []
+        if 'alternatives' in config:
+            alts = [s.encode('utf8') for s in config['alternatives']]
+        if not config['overwrite']:
+            self.exts = ['.'+s for s in config['subexts']]
         for entry in task.accepted:
             if not 'location' in entry:
                 entry.reject('is not a local file')
@@ -70,8 +79,10 @@ class PluginPeriscope(object):
                 entry.reject('cannot overwrite existing subs')
             elif psc.downloadSubtitle(entry['location'].encode("utf8"), langs):
                 log.info('Subtitles found for %s' % entry['location'])
+            elif alts and psc.downloadSubtitle(entry['location'].encode("utf8"), alts):
+                entry.reject('subtitles found for a second-choice language.')
             else:
-                entry.reject('cannot find subtitles for now.')
+                entry.reject('cannot find any subtitles for now.')
 
 
 register_plugin(PluginPeriscope, 'periscope', api_ver=2)
