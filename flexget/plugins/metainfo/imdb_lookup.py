@@ -6,6 +6,8 @@ from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, 
 from sqlalchemy.schema import ForeignKey, Index
 from sqlalchemy.orm import relation, joinedload_all
 
+import logging
+
 from flexget import db_schema
 from flexget.entry import Entry
 from flexget.plugin import register_plugin, internet, PluginError, priority
@@ -364,7 +366,7 @@ class ImdbLookup(object):
                     if result.fails and not manager.options.retry:
                         # this movie cannot be found, not worth trying again ...
                         log.debug('%s will fail lookup' % entry['title'])
-                        raise PluginError('Title `%s` lookup fails' % entry['title'])
+                        raise PluginError('IMDB lookup failed for %s' % entry['title'])
                     else:
                         if result.url:
                             log.trace('Setting imdb url for %s from db' % entry['title'])
@@ -385,7 +387,7 @@ class ImdbLookup(object):
                     session.add(result)
                     log.verbose('Found %s' % (entry['imdb_url']))
                 else:
-                    log_once('Imdb lookup failed for %s' % entry['title'], log)
+                    log_once('IMDB lookup failed for %s' % entry['title'], log, logging.WARN)
                     # store FAIL for this title
                     result = SearchResult(entry['title'])
                     result.fails = True
@@ -449,7 +451,7 @@ class ImdbLookup(object):
         """
         Get Movie object by parsing imdb page and save movie into the database.
 
-        :param imdb_url: Imdb url
+        :param imdb_url: IMDB url
         :param session: Session to be used
         :return: Newly added Movie
         """
