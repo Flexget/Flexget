@@ -56,6 +56,14 @@ class OutputFtp(object):
         ftp.cwd(current_path)
         
         return ftp
+    
+    def check_connection(self, ftp, config, ftp_url, current_path):
+        try:
+            ftp.voidcmd("NOOP")
+        except:
+            ftp = self.ftp_connect(config, ftp_url, current_path)
+        return ftp
+        
 
     def on_task_download(self, task, config):
         config = self.prepare_config(config, task)
@@ -65,7 +73,7 @@ class OutputFtp(object):
             current_path = os.path.dirname(ftp_url.path)
             try:
                 ftp = self.ftp_connect(config, ftp_url, current_path)
-            except ftplib.error_perm:
+            except:
                 log.error('Connection error')
                 return
 
@@ -77,6 +85,7 @@ class OutputFtp(object):
             
             try:
                 # Directory
+                self.check_connection(ftp, config, ftp_url, current_path)
                 ftp.cwd(file_name)
                 self.ftp_walk(ftp, os.path.join(config['ftp_tmp_path'],file_name),config,ftp_url,ftp_url.path)
             except ftplib.error_perm:
@@ -89,6 +98,7 @@ class OutputFtp(object):
         log.info("DIR->" + ftp.pwd())
         log.info("FTP tmp_path : " + tmp_path)
         try:
+            self.check_connection(ftp, config, ftp_url, current_path)
             dirs = ftp.nlst(ftp.pwd())
         except ftplib.error_perm as ex:
             log.info("Error %s" % ex)
@@ -100,6 +110,7 @@ class OutputFtp(object):
         for file_name in (path for path in dirs if path not in ('.', '..')):
             log.info('Filename: ' + file_name)
             try:
+                self.check_connection(ftp, config, ftp_url, current_path)
                 ftp.cwd(file_name)
                 if not os.path.isdir(tmp_path):
                     os.mkdir(tmp_path)
@@ -107,6 +118,7 @@ class OutputFtp(object):
                 tmp_path = os.path.join(tmp_path, os.path.basename(file_name))
                 current_path = os.path.join(current_path,os.path.basename(file_name))
                 ftp = self.ftp_walk(ftp, tmp_path, config, ftp_url, current_path)
+                self.check_connection(ftp, config, ftp_url, current_path)
                 ftp.cwd('..')
             except ftplib.error_perm:
                 ftp = self.ftp_down(ftp, os.path.basename(file_name), tmp_path, config, ftp_url, current_path)
@@ -118,7 +130,8 @@ class OutputFtp(object):
         if not os.path.exists(tmp_path):
             os.makedirs(tmp_path)
         
-        local_file = open(os.path.join(tmp_path, file_name), 'a+b')    
+        local_file = open(os.path.join(tmp_path, file_name), 'a+b')
+        self.check_connection(ftp, config, ftp_url, current_path)
         file_size = ftp.size(file_name)
         
         max_attempts = 5
@@ -128,12 +141,13 @@ class OutputFtp(object):
         while file_size != local_file.tell():
             try:
                 if local_file.tell() != 0:
+                    self.check_connection(ftp, config, ftp_url, current_path)
                     ftp.retrbinary('RETR %s' % file_name, local_file.write, local_file.tell())
                 else:
+                    self.check_connection(ftp, config, ftp_url, current_path)
                     ftp.retrbinary('RETR %s' % file_name, local_file.write)
             except Exception as error:
                 if max_attempts != 0:
-                    ftp = self.ftp_connect(config, ftp_url, current_path)
                     log.info("Retrying download after error %s" % error);
                 else:
                     log.error("Too many errors downloading %s. Aborting." % file_name)
@@ -144,13 +158,13 @@ class OutputFtp(object):
             # There was an error, we delete the temp file
             try:
                 os.remove(os.path.join(tmp_path, file_name))
-            except OSError as e:
-                local_file.close()
+            except:
                 pass
         else :
             local_file.close()
             if config['delete_origin']:
                 log.info("Remotely deleting %s" % file_name)
+                self.check_connection(ftp, config, ftp_url, current_path)
                 ftp.delete(file_name)
                 
         return ftp
