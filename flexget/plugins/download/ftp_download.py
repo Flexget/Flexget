@@ -74,8 +74,8 @@ class OutputFtp(object):
             try:
                 ftp = self.ftp_connect(config, ftp_url, current_path)
             except:
-                log.error('Connection error')
-                return
+                entry.failed("Unable to connect to server")
+                break
 
             if not os.path.isdir(config['ftp_tmp_path']):
                 log.debug('creating base path: %s' % config['ftp_tmp_path'])
@@ -108,7 +108,7 @@ class OutputFtp(object):
             return ftp
 
         for file_name in (path for path in dirs if path not in ('.', '..')):
-            log.info('Filename: ' + file_name)
+            file_name = os.path.basename(file_name)
             try:
                 self.check_connection(ftp, config, ftp_url, current_path)
                 ftp.cwd(file_name)
@@ -132,13 +132,17 @@ class OutputFtp(object):
         
         local_file = open(os.path.join(tmp_path, file_name), 'a+b')
         self.check_connection(ftp, config, ftp_url, current_path)
-        file_size = ftp.size(file_name)
+        try:
+            ftp.sendcmd("TYPE I")
+            file_size = ftp.size(file_name)
+        except Exception as e:
+            file_size = 1;
         
         max_attempts = 5
         
         log.debug("Starting download of %s into %s" % (file_name,tmp_path))
         
-        while file_size != local_file.tell():
+        while file_size > local_file.tell():
             try:
                 if local_file.tell() != 0:
                     self.check_connection(ftp, config, ftp_url, current_path)
