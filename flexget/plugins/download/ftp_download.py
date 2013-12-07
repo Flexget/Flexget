@@ -90,7 +90,8 @@ class OutputFtp(object):
                 self.ftp_walk(ftp, os.path.join(config['ftp_tmp_path'],file_name),config,ftp_url,ftp_url.path)
                 self.check_connection(ftp, config, ftp_url, current_path)
                 ftp.cwd('..')
-                ftp.rmd(file_name)
+                if config['delete_origin']:
+                    ftp.rmd(file_name)
             except ftplib.error_perm:
                 # File
                 self.ftp_down(ftp, file_name, config['ftp_tmp_path'],config,ftp_url,current_path)
@@ -125,7 +126,8 @@ class OutputFtp(object):
                                     os.path.join(current_path,os.path.basename(file_name)))
                 self.check_connection(ftp, config, ftp_url, current_path)
                 ftp.cwd('..')
-                ftp.rmd(os.path.basename(file_name))
+                if config['delete_origin']:
+                    ftp.rmd(os.path.basename(file_name))
             except ftplib.error_perm:
                 ftp = self.ftp_down(ftp, os.path.basename(file_name), tmp_path, config, ftp_url, current_path)
         self.check_connection(ftp, config, ftp_url, current_path)
