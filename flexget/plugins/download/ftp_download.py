@@ -99,8 +99,8 @@ class OutputFtp(object):
             ftp.close()
             
     def ftp_walk(self, ftp, tmp_path, config,ftp_url,current_path):
-        log.info("DIR->" + ftp.pwd())
-        log.info("FTP tmp_path : " + tmp_path)
+        log.debug("DIR->" + ftp.pwd())
+        log.debug("FTP tmp_path : " + tmp_path)
         try:
             self.check_connection(ftp, config, ftp_url, current_path)
             dirs = ftp.nlst(ftp.pwd())
@@ -118,7 +118,7 @@ class OutputFtp(object):
                 ftp.cwd(file_name)
                 if not os.path.isdir(tmp_path):
                     os.mkdir(tmp_path)
-                    log.info("Directory %s created" % tmp_path)
+                    log.debug("Directory %s created" % tmp_path)
                 ftp = self.ftp_walk(ftp, 
                                     os.path.join(tmp_path,os.path.basename(file_name)), 
                                     config, 
@@ -134,7 +134,7 @@ class OutputFtp(object):
         return ftp
 
     def ftp_down(self, ftp, file_name, tmp_path, config, ftp_url, current_path):
-        log.info("Downloading %s into %s" % (file_name, tmp_path))
+        log.debug("Downloading %s into %s" % (file_name, tmp_path))
 
         if not os.path.exists(tmp_path):
             os.makedirs(tmp_path)
@@ -149,7 +149,7 @@ class OutputFtp(object):
         
         max_attempts = 5
         
-        log.debug("Starting download of %s into %s" % (file_name,tmp_path))
+        log.info("Starting download of %s into %s" % (file_name,tmp_path))
         
         while file_size > local_file.tell():
             try:
@@ -161,7 +161,7 @@ class OutputFtp(object):
                     ftp.retrbinary('RETR %s' % file_name, local_file.write)
             except Exception as error:
                 if max_attempts != 0:
-                    log.info("Retrying download after error %s" % error);
+                    log.debug("Retrying download after error %s" % error);
                 else:
                     log.error("Too many errors downloading %s. Aborting." % file_name)
                     break
@@ -176,7 +176,6 @@ class OutputFtp(object):
         else :
             local_file.close()
             if config['delete_origin']:
-                log.info("Remotely deleting %s" % file_name)
                 self.check_connection(ftp, config, ftp_url, current_path)
                 ftp.delete(file_name)
                 
