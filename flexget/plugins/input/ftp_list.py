@@ -75,11 +75,12 @@ class InputFtpList(object):
                 raise PluginWarning(str(e))
 
             if not dirs:
-                log.info('Directory %s is empty', path)
+                log.verbose('Directory %s is empty', path)
 
             for p in dirs:
                 url = baseurl + p
                 title = os.path.basename(p)
+                log.info('Accepting entry %s ' % title)
                 entries.append(Entry(title, url))
 
         return entries
