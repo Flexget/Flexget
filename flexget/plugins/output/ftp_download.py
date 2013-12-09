@@ -27,6 +27,16 @@ class OutputFtp(object):
           - validate connection parameters
 
     """
+    
+    schema = {
+        'type': 'object',
+        'properties': {
+            'use-ssl': {'type': 'boolean', 'default': False},
+            'path': {'type': 'string', 'format': 'path'},
+            'delete_origin': {'type': 'boolean', 'default' : False}
+        },
+        'additionalProperties': False
+    }
 
     def validator(self):
         from flexget import validator
