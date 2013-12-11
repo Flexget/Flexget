@@ -326,7 +326,12 @@ class PluginDownload(object):
         else:
             log.info('Content-disposition disabled for %s' % entry['title'])
         self.filename_ext_from_mime(entry)
-        # TODO: LAST resort, try to scrap url for filename?
+
+        if not entry.get('filename'):
+            filename = os.path.basename(url)
+            log.debug('No filename - setting from url: %s' % filename)
+            entry['filename'] = filename
+        log.debug('Finishing download_entry() with filename %s' % entry.get('filename'))
 
     def filename_from_headers(self, entry, response):
         """Checks entry filename if it's found from content-disposition"""
