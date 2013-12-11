@@ -22,4 +22,4 @@ def check(manager, options):
 
 @event('options.register')
 def register_options():
-    options.register_command('check', check, lock_required=False, help='validate configuration file and print errors')
+    options.register_command('check', check, help='validate configuration file and print errors')

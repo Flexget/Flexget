@@ -8,14 +8,15 @@ from flexget.utils.tools import console
 
 
 def do_cli(manager, options):
-    if options.db_action == 'cleanup':
-        cleanup(manager)
-    elif options.db_action == 'vacuum':
-        vacuum()
-    elif options.db_action == 'reset':
-        reset(manager)
-    elif options.db_action == 'reset-plugin':
-        reset_plugin(options)
+    with manager.acquire_lock():
+        if options.db_action == 'cleanup':
+            cleanup(manager)
+        elif options.db_action == 'vacuum':
+            vacuum()
+        elif options.db_action == 'reset':
+            reset(manager)
+        elif options.db_action == 'reset-plugin':
+            reset_plugin(options)
 
 
 def cleanup(manager):
@@ -68,8 +69,7 @@ def reset_plugin(options):
 
 @event('options.register')
 def register_parser_arguments():
-    parser = options.register_command('database', do_cli, lock_required=True,
-                                      help='utilities to manage the FlexGet database')
+    parser = options.register_command('database', do_cli, help='utilities to manage the FlexGet database')
     subparsers = parser.add_subparsers(title='Actions', metavar='<action>', dest='db_action')
     subparsers.add_parser('cleanup', help='make all plugins clean un-needed data from the database')
     subparsers.add_parser('vacuum', help='running vacuum can increase performance and decrease database size')

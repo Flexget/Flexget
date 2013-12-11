@@ -31,9 +31,18 @@ def get_parser(command=None):
     return core_parser
 
 
-def register_command(command, callback, lock_required=False, **kwargs):
+def register_command(command, callback, **kwargs):
+    """
+    Register a callback function to be executed when flexget is launched with the given `command`.
+
+    :param command: The command being defined.
+    :param callback: Callback function executed when this command is invoked from the CLI. Should take manager instance
+        and parsed argparse namespace as parameters.
+    :param kwargs: Other keyword arguments will be passed to the :class:`arparse.ArgumentParser` constructor
+    :returns: An :class:`argparse.ArgumentParser` instance ready to be configured with the options for this command.
+    """
     subparser = get_parser().add_subparser(command, **kwargs)
-    subparser.set_defaults(cli_command_callback=callback, lock_required=lock_required)
+    subparser.set_defaults(cli_command_callback=callback)
     return subparser
 
 
@@ -350,7 +359,6 @@ manager_parser.add_argument('--loglevel', default='verbose', help=SUPPRESS,
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--ipc-port', type=int, help=SUPPRESS)
-manager_parser.set_defaults(lock_required=True)
 
 
 class CoreArgumentParser(ArgumentParser):
@@ -368,7 +376,6 @@ class CoreArgumentParser(ArgumentParser):
 
         # The parser for the execute command
         exec_parser = self.add_subparser('execute', help='execute tasks now')
-        exec_parser.set_defaults(lock_required=True, loglevel='verbose')
         exec_parser.add_argument('--tasks', nargs='+', metavar='TASK',
                                  help='run only specified task(s), optionally using glob patterns ("tv-*"). '
                                       'matching is case-insensitive')

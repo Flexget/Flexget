@@ -177,11 +177,7 @@ class Manager(object):
             self.webui_command(options)
         else:
             # Otherwise dispatch the command to the callback function
-            if options.lock_required:
-                with self.acquire_lock():
-                    options.cli_command_callback(self, options)
-            else:
-                options.cli_command_callback(self, options)
+            options.cli_command_callback(self, options)
 
     def execute_command(self, options):
         """
