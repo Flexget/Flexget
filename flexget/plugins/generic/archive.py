@@ -459,7 +459,7 @@ def cli_inject(manager, options):
         manager.scheduler.execute(options={'inject': entries, 'tasks': [task_name]})
 
     with manager.acquire_lock():
-        manager.scheduler.start()
+        manager.scheduler.start(run_schedules=False)
         manager.shutdown()
 
 
