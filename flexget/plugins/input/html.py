@@ -121,15 +121,15 @@ class InputHtml(object):
         else:
             return self._request_url(task, config, base_url, auth)
 
-    def _request_url(self, task, config, url, auth, dump_name = None):
-        log.debug('InputPlugin html requesting url %s' % url)
+    def _request_url(self, task, config, url, auth, dump_name=None):
+        log.verbose('Requesting: %s' % url)
         page = task.requests.get(url, auth=auth)
-        log.debug('InputPlugin html response: %s %s' % (page.status_code, page.reason))
+        log.verbose('Response: %s (%s)' % (page.status_code, page.reason))
         soup = get_soup(page.text)
 
         # dump received content into a file
         if dump_name:
-            log.info('Dumping %s into %s' % (url, dump_name))
+            log.verbose('Dumping: %s' % dump_name)
             data = soup.prettify()
             with open(dump_name, 'w') as f:
                 f.write(data)
@@ -237,7 +237,7 @@ class InputHtml(object):
                 raise plugin.PluginError('Unknown title_from value %s' % title_from)
 
             if not title:
-                log.debug('title could not be determined for %s' % log_link)
+                log.warning('title could not be determined for link %s' % log_link)
                 continue
 
             # strip unicode white spaces

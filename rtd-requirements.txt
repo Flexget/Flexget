@@ -2,7 +2,6 @@ paver
 FeedParser>=5.1.3
 SQLAlchemy >=0.7, <0.7.99
 PyYAML
-BeautifulSoup>=3.2, <3.3
 beautifulsoup4>=4.1, !=4.2.0, <4.4
 html5lib>=0.11
 PyRSS2Gen

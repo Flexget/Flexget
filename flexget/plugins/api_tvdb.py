@@ -6,7 +6,7 @@ import posixpath
 from datetime import datetime, timedelta
 import random
 
-from BeautifulSoup import BeautifulStoneSoup
+import xml.etree.ElementTree as ElementTree
 
 from sqlalchemy import Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
@@ -63,10 +63,10 @@ def get_mirror(type='xml'):
             pass
         # If there were problems getting the mirror list we'll just fall back to the main site.
         if page:
-            data = BeautifulStoneSoup(page, convertEntities=BeautifulStoneSoup.HTML_ENTITIES)
-            for mirror in data.findAll('mirror'):
-                type_mask = int(mirror.typemask.string)
-                mirrorpath = mirror.mirrorpath.string
+            data = ElementTree.fromstring(page)
+            for mirror in data.findall('Mirror'):
+                type_mask = int(mirror.find("typemask").text)
+                mirrorpath = mirror.find("mirrorpath").text
                 for t in [(1, 'xml'), (2, 'banner'), (4, 'zip')]:
                     if type_mask & t[0]:
                         _mirrors.setdefault(t[1], set()).add(mirrorpath)
@@ -82,23 +82,26 @@ def get_mirror(type='xml'):
 class TVDBContainer(object):
     """Base class for TVDb objects"""
 
-    def __init__(self, init_bss=None):
-        if init_bss:
-            self.update_from_bss(init_bss)
+    def __init__(self, init_xml=None):
+        if init_xml is not None:
+            self.update_from_xml(init_xml)
 
-    def update_from_bss(self, update_bss):
+    def update_from_xml(self, update_xml):
         """Populates any simple (string or number) attributes from a dict"""
-        for col in self.__table__.columns:
-            tag = update_bss.find(col.name)
-            if tag and tag.string:
-                if isinstance(col.type, Integer):
-                    value = int(tag.string)
-                elif isinstance(col.type, Float):
-                    value = float(tag.string)
-                else:
-                    # BeautifulSoup used to take care of the html entities... but seems to have stopped.
-                    value = decode_html(tag.string)
-                setattr(self, col.name, value)
+        for node in update_xml:
+            if not node.text or not node.tag:
+                continue
+
+            # Have to iterate to get around the inability to do a case-insensitive find
+            for col in self.__table__.columns:
+                if node.tag.lower() == col.name.lower():
+                    if isinstance(col.type, Integer):
+                        value = int(node.text)
+                    elif isinstance(col.type, Float):
+                        value = float(node.text)
+                    else:
+                        value = decode_html(node.text)
+                    setattr(self, col.name, value)
         self.expired = False
 
 
@@ -139,9 +142,9 @@ class TVDBSeries(TVDBContainer, Base):
             data = requests.get(url).content
         except RequestException as e:
             raise LookupError('Request failed %s' % url)
-        result = BeautifulStoneSoup(data, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).find('series')
-        if result:
-            self.update_from_bss(result)
+        result = ElementTree.fromstring(data).find('Series')
+        if result is not None:
+            self.update_from_xml(result)
         else:
             raise LookupError('Could not retrieve information from thetvdb')
 
@@ -210,9 +213,9 @@ class TVDBEpisode(TVDBContainer, Base):
             data = requests.get(url).content
         except RequestException as e:
             raise LookupError('Request failed %s' % url)
-        result = BeautifulStoneSoup(data, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).find('episode')
-        if result:
-            self.update_from_bss(result)
+        result = ElementTree.fromstring(data).find('Episode')
+        if result is not None:
+            self.update_from_xml(result)
         else:
             raise LookupError('Could not retrieve information from thetvdb')
 
@@ -238,18 +241,23 @@ def find_series_id(name):
         page = requests.get(url).content
     except RequestException as e:
         raise LookupError("Unable to get search results for %s: %s" % (name, e))
-    xmldata = BeautifulStoneSoup(page, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).data
-    if not xmldata:
+    xmldata = ElementTree.fromstring(page)
+    if xmldata is None:
         log.error("Didn't get a return from tvdb on the series search for %s" % name)
         return
     # See if there is an exact match
     # TODO: Check if there are multiple exact matches
-    firstmatch = xmldata.find('series')
-    if firstmatch and firstmatch.seriesname.string.lower() == name.lower():
-        return int(firstmatch.seriesid.string)
+    firstmatch = xmldata.find('Series')
+    if firstmatch is not None and firstmatch.find("SeriesName").text.lower() == name.lower():
+        return int(firstmatch.find("seriesid").text)
     # If there is no exact match, sort by airing date and pick the latest
     # TODO: Is there a better way to do this? Maybe weight name similarity and air date
-    series_list = [(s.firstaired.string, s.seriesid.string) for s in xmldata.findAll('series', recursive=False) if s.firstaired]
+    series_list = []
+    for s in xmldata.findall('Series'):
+        fa = s.find("FirstAired")
+        if fa is not None and fa.text:
+            series_list.append((fa.text, s.find("seriesid").text))
+   
     if series_list:
         series_list.sort(key=lambda s: s[0], reverse=True)
         return int(series_list[0][1])
@@ -364,17 +372,17 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
         log.debug('Episode %s not found in cache, looking up from tvdb.' % ep_description)
         try:
             raw_data = requests.get(url).content
-            data = BeautifulStoneSoup(raw_data, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).data
-            if data:
-                error = data.find('error')
-                if error:
+            data = ElementTree.fromstring(raw_data)
+            if data is not None:
+                error = data.find('Error') # TODO: lowercase????
+                if error is not None:
                     raise LookupError('Error lookuing up episode from TVDb (%s)' % error.string)
-                ep_data = data.find('episode')
-                if ep_data:
+                ep_data = data.find('Episode')
+                if ep_data is not None:
                     # Check if this episode id is already in our db
-                    episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == ep_data.id.string).first()
-                    if episode:
-                        episode.update_from_bss(ep_data)
+                    episode = session.query(TVDBEpisode).filter(TVDBEpisode.id == ep_data.find("id").text).first()
+                    if episode is not None:
+                        episode.update_from_xml(ep_data)
                     else:
                         episode = TVDBEpisode(ep_data)
                     series.episodes.append(episode)
@@ -425,13 +433,13 @@ def mark_expired(session=None):
         content = requests.get(server + api_key + '/updates/updates_%s.xml' % get_update).content
         if not isinstance(content, basestring):
             raise Exception('expected string, got %s' % type(content))
-        updates = BeautifulStoneSoup(content, convertEntities=BeautifulStoneSoup.HTML_ENTITIES).data
+        updates = ElementTree.fromstring(content)
     except RequestException as e:
         log.error('Could not get update information from tvdb: %s' % e)
         return
 
     if updates:
-        new_server = int(updates['time'])
+        new_server = int(updates.attrib['time'])
 
         if new_server < last_server:
             #nothing changed on the server, ignoring
@@ -442,11 +450,11 @@ def mark_expired(session=None):
         expired_series = []
         expired_episodes = []
 
-        for series in updates.findAll('series', recursive=False):
-            expired_series.append(int(series.id.string))
+        for series in updates.findall('Series'):
+            expired_series.append(int(series.find("id").text))
 
-        for episode in updates.findAll('episode', recursive=False):
-            expired_series.append(int(episode.id.string))
+        for episode in updates.findall('Episode'):
+            expired_series.append(int(episode.find("id").text))
 
         def chunked(seq):
             """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""

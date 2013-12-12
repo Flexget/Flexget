@@ -139,8 +139,21 @@ class RefResolver(jsonschema.RefResolver):
 
 
 format_checker = jsonschema.FormatChecker(('email',))
-format_checker.checks('quality', raises=ValueError)(qualities.get)
-format_checker.checks('quality_requirements', raises=ValueError)(qualities.Requirements)
+
+
+@format_checker.checks('quality', raises=ValueError)
+def is_quality(instance):
+    if not isinstance(instance, str_types):
+        return True
+    return qualities.get(instance)
+
+
+@format_checker.checks('quality_requirements', raises=ValueError)
+def is_quality_req(instance):
+    if not isinstance(instance, str_types):
+        return True
+    return qualities.Requirements(instance)
+
 
 
 @format_checker.checks('time', raises=ValueError)

@@ -4,6 +4,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import imdb
+from flexget.utils.log import log_once
 
 try:
     # TODO: Fix this after api_tmdb has module level functions
@@ -57,8 +58,8 @@ class PluginTmdbLookup(object):
                            tmdb_id=entry.get('tmdb_id', eval_lazy=False),
                            imdb_id=imdb_id)
             entry.update_using_map(self.field_map, movie)
-        except LookupError as e:
-            log.info(u'Tmdb lookup failed for %s (%s)' % (entry['title'], e.message))
+        except LookupError:
+            log_once('TMDB lookup failed for %s' % entry['title'], log, logging.WARN)
             # Set all of our fields to None if the lookup failed
             entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
         return entry[field]

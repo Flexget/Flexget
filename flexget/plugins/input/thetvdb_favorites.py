@@ -4,7 +4,7 @@ import urllib2
 import re
 from datetime import datetime, timedelta
 
-from BeautifulSoup import BeautifulStoneSoup
+from xml.etree import ElementTree
 from sqlalchemy import Column, Integer, Unicode, DateTime, String
 
 from flexget import db_schema, plugin
@@ -90,11 +90,11 @@ class InputThetvdbFavorites(object):
             try:
                 url = 'http://thetvdb.com/api/User_Favorites.php?accountid=%s' % account_id
                 log.debug('requesting %s' % url)
-                data = BeautifulStoneSoup(urlopener(url, log))
+                data = ElementTree.fromstring(urlopener(url, log).read())
                 favorite_ids = []
-                for i in data.favorites.findAll('series', recursive=False):
-                    if i.string:
-                        favorite_ids.append(i.string)
+                for i in data.findall('Series'):
+                    if i.text:
+                        favorite_ids.append(i.text)
             except (urllib2.URLError, IOError, AttributeError):
                 import traceback
                 # If there are errors getting the favorites or parsing the xml, fall back on cache

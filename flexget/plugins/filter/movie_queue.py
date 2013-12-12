@@ -10,6 +10,7 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.imdb import extract_id
+from flexget.utils.log import log_once
 from flexget.utils.database import quality_requirement_property, with_session
 from flexget.utils.sqlalchemy_utils import table_exists, table_schema
 
@@ -99,7 +100,7 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
             if conditions:
                 break
         if not conditions:
-            log.verbose('IMDB and TMDB lookups failed for %s.' % entry['title'])
+            log_once('IMDB and TMDB lookups failed for %s.' % entry['title'], log, logging.WARN)
             return
 
         quality = entry.get('quality', qualities.Quality())
