@@ -151,13 +151,26 @@ class PluginTransmissionInput(TransmissionBase):
                 for attr in ['comment', 'downloadDir', 'isFinished', 'isPrivate']:
                         entry['transmission_' + attr] = getattr(torrent, attr)
                 entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
+                
+                # location of the completed file; for multiple files torrents 
+                # it'll refers to the biggest included file (if its size is at 
+                # least the 90% of the total)
+                if torrentCompleted and torrent.status() == 'stopped':
+                    best = None
+                    for tf in torrent.files().iteritems():
+                        if tf[1]['selected'] and tf[1]['completed'] == tf[1]['size'] and \
+                            (not best or tf[1]['size'] > best[1]):
+                            best = (tf[1]['name'], tf[1]['size'])
+                    if best and (100*float(best[0])/float(torrent.fileStats['bytesCompleted'])) > 90:
+                        entry['location'] = os.path.join(torrent.downloadDir, best[0])
+                
                 entries.append(entry)
         return entries
 
     def _torrent_completed(self, torrent):
         result = True
         for tf in torrent.files().iteritems():
-            result &= (tf[1]['completed'] == tf[1]['size'])
+            result &= (not tf[1]['selected'] or tf[1]['completed'] == tf[1]['size'])
         return result
 
 
