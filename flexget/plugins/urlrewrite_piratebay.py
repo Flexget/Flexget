@@ -12,8 +12,8 @@ from flexget import validator
 
 log = logging.getLogger('piratebay')
 
-CUR_TLD = "ac"
-TLDS = "com|org|sx|se|%s" % CUR_TLD
+CUR_TLD = "pe"
+TLDS = "com|org|sx|se|ac|%s" % CUR_TLD
 
 URL_MATCH = re.compile("^http://(?:torrents\.)?thepiratebay\.(?:%s)/.*$" % TLDS)
 URL_SEARCH = re.compile("^http://thepiratebay\.(?:%s)/search/.*$" % TLDS)
