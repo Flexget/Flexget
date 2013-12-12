@@ -1,10 +1,10 @@
 import logging
 import os
 import ftplib
-import datetime
 from urlparse import urlparse
-from flexget.entry import Entry
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('ftp')
 
@@ -33,24 +33,15 @@ class OutputFtp(object):
         'properties': {
             'use-ssl': {'type': 'boolean', 'default': False},
             'path': {'type': 'string', 'format': 'path'},
-            'delete_origin': {'type': 'boolean', 'default' : False}
+            'delete_origin': {'type': 'boolean', 'default': False}
         },
         'additionalProperties': False
     }
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('boolean', key='use-ssl')
-        root.accept('path', key='ftp_tmp_path')
-        root.accept('boolean', key='delete_origin')
-        return root
 
     def prepare_config(self, config, task):
         config.setdefault('use-ssl', False)
         config.setdefault('delete_origin', False)
         config.setdefault('ftp_tmp_path', os.path.join(task.manager.config_base, 'temp'))
-
         return config
     
     def ftp_connect(self, config, ftp_url, current_path):
@@ -73,13 +64,11 @@ class OutputFtp(object):
         except:
             ftp = self.ftp_connect(config, ftp_url, current_path)
         return ftp
-        
 
     def on_task_download(self, task, config):
         config = self.prepare_config(config, task)
         for entry in task.accepted:
             ftp_url = urlparse(entry.get('url'))
-            title = entry.get('title')
             current_path = os.path.dirname(ftp_url.path)
             try:
                 ftp = self.ftp_connect(config, ftp_url, current_path)
@@ -155,7 +144,7 @@ class OutputFtp(object):
             ftp.sendcmd("TYPE I")
             file_size = ftp.size(file_name)
         except Exception as e:
-            file_size = 1;
+            file_size = 1
         
         max_attempts = 5
         
@@ -176,7 +165,6 @@ class OutputFtp(object):
                     log.error("Too many errors downloading %s. Aborting." % file_name)
                     break
         
-        
         local_file.close()
         if config['delete_origin']:
             self.check_connection(ftp, config, ftp_url, current_path)
@@ -184,4 +172,7 @@ class OutputFtp(object):
                 
         return ftp
 
-register_plugin(OutputFtp, 'ftp_download', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputFtp, 'ftp_download', api_ver=2)
