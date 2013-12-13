@@ -155,14 +155,16 @@ class PluginTransmissionInput(TransmissionBase):
                 # location of the completed file; for multiple files torrents 
                 # it'll refers to the biggest included file (if its size is at 
                 # least the 90% of the total)
-                if torrentCompleted and torrent.status() == 'stopped':
+                if torrentCompleted and torrent.status == 'stopped':
                     best = None
+                    tots = 0
                     for tf in torrent.files().iteritems():
+                        tots += tf[1]['size']
                         if tf[1]['selected'] and tf[1]['completed'] == tf[1]['size'] and \
                             (not best or tf[1]['size'] > best[1]):
                             best = (tf[1]['name'], tf[1]['size'])
-                    if best and (100*float(best[0])/float(torrent.fileStats['bytesCompleted'])) > 90:
-                        entry['location'] = os.path.join(torrent.downloadDir, best[0])
+                    if tots and best and (100*float(best[1])/float(tots)) > 90:
+                        entry['location'] = '%s/%s' % (torrent.downloadDir, best[0])
                 
                 entries.append(entry)
         return entries
