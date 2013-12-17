@@ -4,7 +4,7 @@ from flexget.plugin import register_plugin, priority
 
 import flexget.utils.qualities as qualities
 
-log = logging.getLogger('assumequality')
+log = logging.getLogger('assume_quality')
 
 
 class AssumeQuality(object):
@@ -12,7 +12,7 @@ class AssumeQuality(object):
     Applies specified quality components to entries that don't have them set.
 
     Example:
-    assumequality: 1080p webdl 10bit truehd
+    assume_quality: 1080p webdl 10bit truehd
     """
 
     schema = {'type': 'string', 'format': 'quality'}
@@ -34,10 +34,10 @@ class AssumeQuality(object):
                 elif qualitycomponent.name != "unknown":
                     log.debug("\t%s: assuming %s", component.type, qualitycomponent.name)
                     setattr(newquality, component.type, qualitycomponent)
-                    entry['assumedquality'] = True
+                    entry['assumed_quality'] = True
                 elif component.name == "unknown" and qualitycomponent.name == "unknown":
                     log.debug("\t%s: got nothing", component.type)
             entry['quality'] = newquality
             log.verbose("New quality: %s", entry.get('quality'))
 
-register_plugin(AssumeQuality, 'assumequality', api_ver=2)
+register_plugin(AssumeQuality, 'assume_quality', api_ver=2)
