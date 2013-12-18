@@ -56,32 +56,23 @@ class AssumeQuality(object):
         if isinstance(config, basestring): config = {'everything': config}
         assume = namedtuple('assume', ['target', 'quality'])
         self.assumptions = []
-        defaultassumption = {}
         for target, quality in config.items():
             log.verbose('New assumption: %s is %s' % (target, quality))
-            #How to handle duplicates? PluginError _after_ testing?
-            if target.lower() == 'everything':  #'everything' seems to be as good a default flag as any.
-                try: quality = qualities.get(quality)
-                except:
-                    log.error('%s is not a valid quality. Forgetting assumption.' % quality)
-                    continue
-                defaultassumption = assume('everything',quality)
-            else:
+            #'everything' seems to be as good a default flag as any. Unless there's an real requirement which matches *
+            target = target.lower()
+            if target != 'everything':
                 try: target = qualities.Requirements(target)
                 except:
                     log.error('%s is not a valid quality. Forgetting assumption.' % target)
                     continue
-                try: quality = qualities.get(quality)
-                except:
-                    log.error('%s is not a valid quality. Forgetting assumption.' % quality)
-                    continue
-                self.assumptions.append(assume(target,quality))
-                #self.precision(target)
-        self.assumptions.append(defaultassumption)
+            try: quality = qualities.get(quality)
+            except:
+                log.error('%s is not a valid quality. Forgetting assumption.' % quality)
+                continue
+            self.assumptions.append(assume(target,quality))
         self.assumptions.sort(key=lambda assumption: self.precision(assumption.target), reverse=True)
-        log.debug(self.assumptions)
         for assumption in self.assumptions:
-            log.debug('- %s - %s' % (assumption.target, self.precision(assumption.target)))
+            log.debug('Target %s - Priority %s' % (assumption.target, self.precision(assumption.target)))
 
     @priority(127)  #run after metainfo_quality@128
     def on_task_metainfo(self, task, config):
