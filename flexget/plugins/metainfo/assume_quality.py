@@ -50,7 +50,7 @@ class AssumeQuality(object):
         if isinstance(config, basestring): config = {'everything': config}
         self.assumptions = {}
         defaultassumption = {}
-        for target, quality in config.items(): #they seem to get processed in a consistent, but random, order
+        for target, quality in config.items():
             log.verbose('New assumption: %s is %s' % (target, quality))
             if target != 'everything':   #'everything' seems to be as good a default flag as any.
                 try: target = qualities.Requirements(target)
@@ -73,13 +73,11 @@ class AssumeQuality(object):
             log.info('Assuming %s is %s' % (target, quality))
 
     @priority(127)  #run after metainfo_quality@128
-    def on_task_metainfo(self, task, quality):
-        if not isinstance(quality, basestring): raise PluginError('WE AINT READY FOR THIS')
-        quality = qualities.get(quality)    #turn incoming quality into Quality object
-        log.debug('Assuming quality: %s', quality)
+    def on_task_metainfo(self, task, config):
         for entry in task.entries:
-            # for target, quality in assumptions
-            # if target.allows(entry['quality']) or target == everything: assume(entry,quality)
-            self.assume(entry, quality)
+            for target, quality in self.assumptions.items():
+                # if target.allows(entry['quality']) or target == everything: assume(entry,quality)
+                if target == 'everything':
+                    self.assume(entry, quality)
 
 register_plugin(AssumeQuality, 'assume_quality', api_ver=2)
