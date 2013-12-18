@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
 from flexget.plugin import register_plugin, priority, PluginError
 from collections import namedtuple
+import logging
 import flexget.utils.qualities as qualities
 
 log = logging.getLogger('assume_quality')
@@ -11,11 +11,15 @@ class AssumeQuality(object):
     """
     Applies specified quality components to entries that don't have them set.
 
-    Example:
+    Examples:
     assume_quality: 1080p webdl 10bit truehd
+
+    assume_quality:
+      hdtv: 720p
+      720p hdtv: 10bit
+      everything: 720p
     """
 
-#    schema = {'type': 'string', 'format': 'quality'}
     schema = {
         'oneOf': [
             {'title':'simple config', 'type': 'string', 'format': 'quality'},
@@ -58,18 +62,14 @@ class AssumeQuality(object):
         self.assumptions = []
         for target, quality in config.items():
             log.verbose('New assumption: %s is %s' % (target, quality))
-            #'everything' seems to be as good a default flag as any. Unless there's an real requirement which matches *
+            #'everything' seems to be as good a default flag as any.
             target = target.lower()
             if target != 'everything':
                 try: target = qualities.Requirements(target)
-                except:
-                    log.error('%s is not a valid quality. Forgetting assumption.' % target)
-                    continue
+                except: raise PluginError('%s is not a valid quality. Forgetting assumption.' % target)
             try: quality = qualities.get(quality)
-            except:
-                log.error('%s is not a valid quality. Forgetting assumption.' % quality)
-                continue
-            self.assumptions.append(assume(target,quality))
+            except: raise PluginError('%s is not a valid quality. Forgetting assumption.' % quality)
+            self.assumptions.append(assume(target, quality))
         self.assumptions.sort(key=lambda assumption: self.precision(assumption.target), reverse=True)
         for assumption in self.assumptions:
             log.debug('Target %s - Priority %s' % (assumption.target, self.precision(assumption.target)))
@@ -79,11 +79,9 @@ class AssumeQuality(object):
         for entry in task.entries:
             log.verbose('%s' % entry.get('title'))
             for assumption in self.assumptions:
-                # if target.allows(entry['quality']) or target == everything: assume(entry,quality)
                 log.debug('Trying %s - %s' % (assumption.target, assumption.quality))
                 if assumption.target == 'everything' or assumption.target.allows(entry.get('quality')):
                     log.debug('Match: %s' % assumption.target)
-                    #How to handle priority? Perhaps list better option.
                     self.assume(entry, assumption.quality)
             log.verbose('New quality: %s', entry.get('quality'))
 
