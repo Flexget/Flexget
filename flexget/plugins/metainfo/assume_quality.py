@@ -9,7 +9,7 @@ log = logging.getLogger('assume_quality')
 
 class AssumeQuality(object):
     """
-    Applies specified quality components to entries that don't have them set.
+    Applies quality components to entries that match specified quality requirements.
 
     Examples:
     assume_quality: 1080p webdl 10bit truehd
@@ -17,7 +17,7 @@ class AssumeQuality(object):
     assume_quality:
       hdtv: 720p
       720p hdtv: 10bit
-      everything: 720p
+      everything: 720p h264
     """
 
     schema = {
@@ -33,9 +33,13 @@ class AssumeQuality(object):
 
     def precision(self, qualityreq):
         p = 0
-        if qualityreq == 'everything': return -1
+        if qualityreq == 'everything': return -1000
         for component in qualityreq.components:
-            if component.acceptable: p += 1
+            if component.acceptable: p += 2
+            if component.none_of: p -= 2
+            if component.min: p += 1
+            if component.max: p += 1
+            #Still a long way from perfect, but probably good enough.
         return p
 
     def assume(self, entry, quality):
