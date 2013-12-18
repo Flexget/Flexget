@@ -12,8 +12,8 @@ class AssumeQuality(object):
     Applies quality components to entries that match specified quality requirements.
     When a quality is applied, any components which are unknown in the entry are filled from the applied quality.
     Quality requirements are tested in order of increasing precision (ie "720p h264" is more precise than "1080p"
-    so gets tested first), and applied as matches are found. A pseudo-requirement "everything" is also supported,
-    which will match all qualities. Using the simple configuration is the same as specifying an "everything" rule.
+    so gets tested first), and applied as matches are found. Using the simple configuration is the same as specifying
+    an "any" rule.
 
     Examples::
     assume_quality: 1080p webdl 10bit truehd
@@ -21,7 +21,8 @@ class AssumeQuality(object):
     assume_quality:
       hdtv: 720p
       720p hdtv: 10bit
-      everything: 720p h264
+      '!ac3 !mp3': flac
+      any: 720p h264
     """
 
     schema = {
@@ -37,12 +38,11 @@ class AssumeQuality(object):
 
     def precision(self, qualityreq):
         p = 0
-        if qualityreq == 'everything': return -1000
         for component in qualityreq.components:
-            if component.acceptable: p += 2
-            if component.none_of: p -= 2
-            if component.min: p += 1
-            if component.max: p += 1
+            if component.acceptable: p += 8
+            if component.min: p += 4
+            if component.max: p += 4
+            if component.none_of: p += len(component.none_of)
             #Still a long way from perfect, but probably good enough.
         return p
 
@@ -65,16 +65,13 @@ class AssumeQuality(object):
         log.debug('Quality updated: %s', entry.get('quality'))
 
     def on_task_start(self, task, config):
-        if isinstance(config, basestring): config = {'everything': config}
+        if isinstance(config, basestring): config = {'any': config}
         assume = namedtuple('assume', ['target', 'quality'])
         self.assumptions = []
         for target, quality in config.items():
             log.verbose('New assumption: %s is %s' % (target, quality))
-            #'everything' seems to be as good a default flag as any.
-            target = target.lower()
-            if target != 'everything':
-                try: target = qualities.Requirements(target)
-                except: raise PluginError('%s is not a valid quality. Forgetting assumption.' % target)
+            try: target = qualities.Requirements(target)
+            except: raise PluginError('%s is not a valid quality. Forgetting assumption.' % target)
             try: quality = qualities.get(quality)
             except: raise PluginError('%s is not a valid quality. Forgetting assumption.' % quality)
             self.assumptions.append(assume(target, quality))
@@ -88,7 +85,7 @@ class AssumeQuality(object):
             log.verbose('%s' % entry.get('title'))
             for assumption in self.assumptions:
                 log.debug('Trying %s - %s' % (assumption.target, assumption.quality))
-                if assumption.target == 'everything' or assumption.target.allows(entry.get('quality')):
+                if assumption.target.allows(entry.get('quality')):
                     log.debug('Match: %s' % assumption.target)
                     self.assume(entry, assumption.quality)
             log.verbose('New quality: %s', entry.get('quality'))
