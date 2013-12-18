@@ -29,7 +29,6 @@ class AssumeQuality(object):
 
     def assume(self, entry, quality):
         newquality = qualities.Quality()
-        log.verbose('%s', entry['title'])
         log.debug('Current qualities: %s', entry.get('quality'))
         for component in entry.get('quality').components:
             qualitycomponent = getattr(quality, component.type)
@@ -44,7 +43,7 @@ class AssumeQuality(object):
             elif component.name == 'unknown' and qualitycomponent.name == 'unknown':
                 log.debug('\t%s: got nothing', component.type)
         entry['quality'] = newquality
-        log.verbose('New quality: %s', entry.get('quality'))
+        log.debug('Quality updated: %s', entry.get('quality'))
 
     def on_task_start(self, task, config):
         if isinstance(config, basestring): config = {'everything': config}
@@ -76,9 +75,14 @@ class AssumeQuality(object):
     @priority(127)  #run after metainfo_quality@128
     def on_task_metainfo(self, task, config):
         for entry in task.entries:
+            log.verbose('%s' % entry.get('title'))
             for target, quality in self.assumptions.items():
                 # if target.allows(entry['quality']) or target == everything: assume(entry,quality)
-                if target == 'everything':
+                log.debug('Trying %s - %s' % (target, quality))
+                if target == 'everything' or target.allows(entry.get('quality')):
+                    log.debug('Match: %s' % target)
+                    #How to handle priority? Perhaps list better option.
                     self.assume(entry, quality)
+            log.verbose('New quality: %s', entry.get('quality'))
 
 register_plugin(AssumeQuality, 'assume_quality', api_ver=2)
