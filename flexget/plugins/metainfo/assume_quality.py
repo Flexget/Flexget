@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.plugin import register_plugin, priority, PluginError
-
+from collections import namedtuple
 import flexget.utils.qualities as qualities
 
 log = logging.getLogger('assume_quality')
@@ -27,6 +27,13 @@ class AssumeQuality(object):
         ]
     }
 
+    def precision(self, qualityreq):
+        p = 0
+        if qualityreq == 'everything': return -1
+        for component in qualityreq.components:
+            if component.acceptable: p += 1
+        return p
+
     def assume(self, entry, quality):
         newquality = qualities.Quality()
         log.debug('Current qualities: %s', entry.get('quality'))
@@ -47,7 +54,8 @@ class AssumeQuality(object):
 
     def on_task_start(self, task, config):
         if isinstance(config, basestring): config = {'everything': config}
-        self.assumptions = {}
+        assume = namedtuple('assume', ['target', 'quality'])
+        self.assumptions = []
         defaultassumption = {}
         for target, quality in config.items():
             log.verbose('New assumption: %s is %s' % (target, quality))
@@ -57,7 +65,7 @@ class AssumeQuality(object):
                 except:
                     log.error('%s is not a valid quality. Forgetting assumption.' % quality)
                     continue
-                defaultassumption['everything'] = quality
+                defaultassumption = assume('everything',quality)
             else:
                 try: target = qualities.Requirements(target)
                 except:
@@ -67,10 +75,13 @@ class AssumeQuality(object):
                 except:
                     log.error('%s is not a valid quality. Forgetting assumption.' % quality)
                     continue
-                self.assumptions[target] = quality
-        self.assumptions.update(defaultassumption)
-        for target, quality in self.assumptions.items():
-            log.info('Assuming %s is %s' % (target, quality))
+                self.assumptions.append(assume(target,quality))
+                #self.precision(target)
+        self.assumptions.append(defaultassumption)
+        self.assumptions.sort(key=lambda assumption: self.precision(assumption.target), reverse=True)
+        log.debug(self.assumptions)
+        for assumption in self.assumptions:
+            log.debug('- %s - %s' % (assumption.target, self.precision(assumption.target)))
 
     @priority(127)  #run after metainfo_quality@128
     def on_task_metainfo(self, task, config):
