@@ -78,13 +78,13 @@ class AssumeQuality(object):
     def on_task_metainfo(self, task, config):
         for entry in task.entries:
             log.verbose('%s' % entry.get('title'))
-            for target, quality in self.assumptions.items():
+            for assumption in self.assumptions:
                 # if target.allows(entry['quality']) or target == everything: assume(entry,quality)
-                log.debug('Trying %s - %s' % (target, quality))
-                if target == 'everything' or target.allows(entry.get('quality')):
-                    log.debug('Match: %s' % target)
+                log.debug('Trying %s - %s' % (assumption.target, assumption.quality))
+                if assumption.target == 'everything' or assumption.target.allows(entry.get('quality')):
+                    log.debug('Match: %s' % assumption.target)
                     #How to handle priority? Perhaps list better option.
-                    self.assume(entry, quality)
+                    self.assume(entry, assumption.quality)
             log.verbose('New quality: %s', entry.get('quality'))
 
 register_plugin(AssumeQuality, 'assume_quality', api_ver=2)
