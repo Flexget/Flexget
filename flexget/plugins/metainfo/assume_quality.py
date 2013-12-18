@@ -52,7 +52,14 @@ class AssumeQuality(object):
         defaultassumption = {}
         for target, quality in config.items():
             log.verbose('New assumption: %s is %s' % (target, quality))
-            if target != 'everything':   #'everything' seems to be as good a default flag as any.
+            #How to handle duplicates? PluginError _after_ testing?
+            if target.lower() == 'everything':  #'everything' seems to be as good a default flag as any.
+                try: quality = qualities.get(quality)
+                except:
+                    log.error('%s is not a valid quality. Forgetting assumption.' % quality)
+                    continue
+                defaultassumption['everything'] = quality
+            else:
                 try: target = qualities.Requirements(target)
                 except:
                     log.error('%s is not a valid quality. Forgetting assumption.' % target)
@@ -62,12 +69,6 @@ class AssumeQuality(object):
                     log.error('%s is not a valid quality. Forgetting assumption.' % quality)
                     continue
                 self.assumptions[target] = quality
-            else:
-                try: quality = qualities.get(quality)
-                except:
-                    log.error('%s is not a valid quality. Forgetting assumption.' % quality)
-                    continue
-                defaultassumption[target] = quality
         self.assumptions.update(defaultassumption)
         for target, quality in self.assumptions.items():
             log.info('Assuming %s is %s' % (target, quality))
