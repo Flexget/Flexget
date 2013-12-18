@@ -10,8 +10,12 @@ log = logging.getLogger('assume_quality')
 class AssumeQuality(object):
     """
     Applies quality components to entries that match specified quality requirements.
+    When a quality is applied, any components which are unknown in the entry are filled from the applied quality.
+    Quality requirements are tested in order of increasing precision (ie "720p h264" is more precise than "1080p"
+    so gets tested first), and applied as matches are found. A pseudo-requirement "everything" is also supported,
+    which will match all qualities. Using the simple configuration is the same as specifying an "everything" rule.
 
-    Examples:
+    Examples::
     assume_quality: 1080p webdl 10bit truehd
 
     assume_quality:
