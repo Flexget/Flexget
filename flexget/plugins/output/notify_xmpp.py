@@ -1,49 +1,34 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import sleekxmpp
 
-from flexget.plugin import register_plugin
+from flexget.plugin import register_plugin, DependencyError
 from flexget.utils.template import RenderError, render_from_task
 
 log = logging.getLogger('notify_xmpp')
 
 
-class SendMsgBot(sleekxmpp.ClientXMPP):
+try:
+    import sleekxmpp
+    
+    class SendMsgBot(sleekxmpp.ClientXMPP):
+    
+        def __init__(self, jid, password, recipient, message):
+            sleekxmpp.ClientXMPP.__init__(self, jid, password)
+            self.recipient = recipient
+            self.msg = message
+            self.add_event_handler("session_start", self.start, threaded=True)
+            self.register_plugin('xep_0030') # Service Discovery
+            self.register_plugin('xep_0199') # XMPP Ping
+    
+        def start(self, event):
+            self.send_presence()
+            self.get_roster()
+            self.send_message(mto=self.recipient, mbody=self.msg, mtype='chat')
+            self.disconnect(wait=True)
 
-    def __init__(self, jid, password, recipient, message):
-        sleekxmpp.ClientXMPP.__init__(self, jid, password)
-        # The message we wish to send, and the JID that
-        # will receive it.
-        self.recipient = recipient
-        self.msg = message
-        # The session_start event will be triggered when
-        # the bot establishes its connection with the server
-        # and the XML streams are ready for use. We want to
-        # listen for this event so that we we can initialize
-        # our roster.
-        self.add_event_handler("session_start", self.start, threaded=True)
-
-    def start(self, event):
-        """
-        Process the session_start event.
-
-        Typical actions for the session_start event are
-        requesting the roster and broadcasting an initial
-        presence stanza.
-
-        Arguments:
-            event -- An empty dictionary. The session_start
-                     event does not provide any additional
-                     data.
-        """
-        self.send_presence()
-        self.get_roster()
-        self.send_message(mto=self.recipient,
-                          mbody=self.msg,
-                          mtype='chat')
-        # Using wait=True ensures that the send queue will be
-        # emptied before ending the session.
-        self.disconnect(wait=True)
+except ImportError:
+    # If sleekxmpp is not found, errors will be shown later
+    pass
         
 class OutputNotifyXmpp(object):
     
@@ -61,6 +46,14 @@ class OutputNotifyXmpp(object):
     }
     
     __version__ = '0.1'
+
+    def on_task_start(self, task, config):
+        try:
+            import sleekxmpp
+        except ImportError as e:
+            log.debug('Error importing SleekXMPP: %s' % e)
+            raise DependencyError('notify_xmpp', 'sleekxmpp', 
+                                  'SleekXMPP module required. ImportError: %s' % e)
     
     def on_task_output(self, task, config):
         """
@@ -90,8 +83,6 @@ class OutputNotifyXmpp(object):
         logging.getLogger('sleekxmpp').setLevel(logging.CRITICAL)
         
         xmpp = SendMsgBot(config['sender'], config['password'], config['recipient'], text)
-        xmpp.register_plugin('xep_0030') # Service Discovery
-        xmpp.register_plugin('xep_0199') # XMPP Ping
         if xmpp.connect():
             xmpp.process(block=True)
 
