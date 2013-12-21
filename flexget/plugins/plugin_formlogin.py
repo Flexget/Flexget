@@ -2,20 +2,20 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
 import urllib2
-import mechanize
+from  mechanize import BaseHandler
 from flexget.plugin import PluginError, register_plugin
-from BeautifulSoup import BeautifulSoup
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('formlogin')
 
-class SanitizeHandler(mechanize.BaseHandler):
+class SanitizeHandler(BaseHandler):
     def http_response(self, request, response):
         if not hasattr(response, "seek"):
             response = mechanize.response_seek_wrapper(response)
         #if    HTML   used   get   it though  a    robust  Parser    like  BeautifulSoup 
 
         if response.info().dict.has_key('content-type') and ('html' in response.info().dict['content-type']):
-            soup = BeautifulSoup(response.get_data())
+            soup = get_soup(response.get_data())
             response.set_data(soup.prettify())
         return response
 
