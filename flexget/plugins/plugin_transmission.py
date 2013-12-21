@@ -164,7 +164,8 @@ class PluginTransmissionInput(TransmissionBase):
                             (not best or tf[1]['size'] > best[1]):
                             best = (tf[1]['name'], tf[1]['size'])
                     if tots and best and (100*float(best[1])/float(tots)) > 90:
-                        entry['location'] = '%s/%s' % (torrent.downloadDir, best[0])
+                        entry['location'] = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
+                        log.info('assigned location field: %s' % entry['location'])  # debug
                 
                 entries.append(entry)
         return entries
