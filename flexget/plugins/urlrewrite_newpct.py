@@ -3,14 +3,17 @@ import logging
 import os
 import re
 import urllib2
-from urlparse import urlparse
 
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.plugin import register_plugin, internet
-from flexget.utils.tools import urlopener
+from flexget.utils.requests import Session
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('newpct')
+
+requests = Session()
+requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'})
+requests.set_domain_delay('imdb.com', '2 seconds')
 
 
 class UrlRewriteNewPCT(object):
@@ -31,17 +34,15 @@ class UrlRewriteNewPCT(object):
 
     @internet(log)
     def parse_download_page(self, url):
-        txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
-        req = urllib2.Request(url, None, txheaders)
-        page = urlopener(req, log)
+        page = requests.get(url)
         try:
-            soup = get_soup(page)
+            soup = get_soup(page.text)
         except Exception, e:
             raise UrlRewritingError(e)
         torrent_id_prog = re.compile("'torrentID': '(\d+)'")
         torrent_ids = soup.findAll(text=torrent_id_prog)
         if len(torrent_ids) == 0:
-            raise UrlRewritingError('Unable to locate torret ID from url %s' % url)
+            raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
         torrent_id = torrent_id_prog.search(torrent_ids[0]).group(1)
         return 'http://www.pctorrent.com/descargar/index.php?link=descargar/torrent/%s/dummy.html' % torrent_id
 
