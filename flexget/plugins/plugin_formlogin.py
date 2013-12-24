@@ -2,10 +2,22 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
 import urllib2
+from  mechanize import BaseHandler
 from flexget.plugin import PluginError, register_plugin
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('formlogin')
 
+class SanitizeHandler(BaseHandler):
+    def http_response(self, request, response):
+        if not hasattr(response, "seek"):
+            response = mechanize.response_seek_wrapper(response)
+        #if    HTML   used   get   it though  a    robust  Parser    like  BeautifulSoup 
+
+        if response.info().dict.has_key('content-type') and ('html' in response.info().dict['content-type']):
+            soup = get_soup(response.get_data())
+            response.set_data(soup.prettify())
+        return response
 
 class FormLogin(object):
     """
@@ -36,6 +48,7 @@ class FormLogin(object):
         password = config['password']
 
         br = Browser()
+        br.add_handler(SanitizeHandler())
         br.set_handle_robots(False)
         try:
             br.open(url)
