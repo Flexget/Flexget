@@ -33,6 +33,7 @@ class PluginSubliminal(object):
         'properties': {
             'languages': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
             'alternatives': {'type': 'array', 'items': {'type': 'string'}},
+            'exact_match': {'type': 'boolean', 'default': True},
         },
         'additionalProperties': False
     }
@@ -70,22 +71,26 @@ class PluginSubliminal(object):
         logging.getLogger("enzyme").setLevel(logging.WARNING)
         langs = set([Language(s) for s in config['languages']])
         alts = set([Language(s) for s in config.get('alternatives', [])])
+        def getsubs(vd, ln):
+            return subliminal.download_best_subtitles([vd], ln, min_score=vd.scores['hash']) \
+                    if config['exact_match'] else subliminal.download_best_subtitles([vd], ln)
         for entry in task.accepted:
             if not 'location' in entry:
                 entry.reject('is not a local file')
-                continue
-            if '$RECYCLE.BIN' in entry['location']:  # happens in connected network shares
+            elif '$RECYCLE.BIN' in entry['location']:  # happens in connected network shares
                 entry.reject("is in Windows recycle-bin")
             elif not os.path.exists(entry['location']):
                 entry.reject('file not found')
             else:
-                v = subliminal.scan_video(entry['location'])
-                if langs & v.subtitle_languages:
+                try:
+                    video = subliminal.scan_video(entry['location'])
+                except Exception as err:
+                    entry.fail('subliminal scan error: %s' % err.message)
+                if langs & video.subtitle_languages:
                     continue
-                if len(subliminal.download_best_subtitles([v], langs)) > 0:
+                if len(getsubs(video, langs)) > 0:
                     log.info('Subtitles found for %s' % entry['location'])
-                elif alts and (alts - v.subtitle_languages) and \
-                    len(subliminal.download_best_subtitles([v], alts)) > 0:
+                elif alts and (alts - video.subtitle_languages) and len(getsubs(video, alts)) > 0:
                     entry.reject('subtitles found for a second-choice language.')
                 else:
                     entry.reject('cannot find any subtitles for now.')
