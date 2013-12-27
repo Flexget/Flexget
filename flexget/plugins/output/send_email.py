@@ -107,7 +107,7 @@ def send_email(subject, content, config):
     message['Subject'] = subject
     message['Date'] = formatdate(localtime=True)
     content_type = 'html' if '<html>' in content else 'plain'
-    message.attach(MIMEText(transform(content.encode('utf-8')), content_type, _charset='utf-8'))
+    message.attach(MIMEText(transform(content).encode('utf-8'), content_type, _charset='utf-8'))
 
     # send email message
     if manager.manager.options.test:
