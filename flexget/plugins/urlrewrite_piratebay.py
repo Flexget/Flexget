@@ -13,8 +13,8 @@ from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('piratebay')
 
-CUR_TLD = "pe"
-TLDS = "com|org|sx|se|ac|%s" % CUR_TLD
+CUR_TLD = "se"
+TLDS = "com|org|sx|se|ac|pe|gy|%s" % CUR_TLD
 
 URL_MATCH = re.compile("^http://(?:torrents\.)?thepiratebay\.(?:%s)/.*$" % TLDS)
 URL_SEARCH = re.compile("^http://thepiratebay\.(?:%s)/search/.*$" % TLDS)
