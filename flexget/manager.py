@@ -119,6 +119,7 @@ class Manager(object):
         if db_schema.upgrade_required():
             log.info('Database upgrade is required. Attempting now.')
             # Make sure not to fire the lock-acquired event yet
+            # TODO: Detect if any database upgrading is needed and acquire the lock only in one place
             with self.acquire_lock(event=False):
                 fire_event('manager.upgrade', self)
                 if manager.db_upgraded:
@@ -590,6 +591,7 @@ class Manager(object):
             def before_table_create(event, target, bind, tables=None, **kw):
                 if tables:
                     # We need to acquire a lock if we are creating new tables
+                    # TODO: Detect if any database upgrading is needed and acquire the lock only in one place
                     self.acquire_lock(event=False).__enter__()
 
             Base.metadata.append_ddl_listener('before-create', before_table_create)
