@@ -2,14 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 import re
 import urllib
 import logging
-from flexget.plugins.plugin_urlrewriting import UrlRewritingError
+
+from flexget import plugin
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, internet, PluginWarning
+from flexget.event import event
+from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
-from flexget import validator
-from flexget.utils.tools import urlopener
 
 log = logging.getLogger('torrentleech')
 
@@ -41,17 +41,21 @@ class UrlRewriteTorrentleech(object):
           DVDR, HD, BDRip, Boxsets, Documentaries
     """
 
-    def validator(self):
-        root = validator.factory()
-        advanced = root.accept('dict')
-        advanced.accept('text', key='rss_key', required=True)
-        advanced.accept('text', key='username', required=True)
-        advanced.accept('text', key='password', required=True)
-        advanced.accept('choice', key='category').accept_choices(CATEGORIES)
-        advanced.accept('integer', key='category')
-        # advanced.accept('text', key='cookie', required=True)
-        # advanced.accept('boolean', key='sort_reverse')
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'rss_key': {'type': 'string'},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'category': {
+                'oneOf': [
+                    {'type': 'string', 'enum': list(CATEGORIES)}
+                ]
+            }
+        },
+        'required': ['rss_key', 'username', 'password'],
+        'additionalProperties': False
+    }
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
@@ -76,7 +80,7 @@ class UrlRewriteTorrentleech(object):
             # TODO: Search doesn't enforce close match to title, be more picky
             entry['url'] = results[0]['url']
 
-    @internet(log)
+    @plugin.internet(log)
     def search(self, entry, config=None):
         """
         Search for name from torrentleech.
@@ -148,4 +152,6 @@ class UrlRewriteTorrentleech(object):
 
         return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
 
-register_plugin(UrlRewriteTorrentleech, 'torrentleech', groups=['urlrewriter', 'search'])
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteTorrentleech, 'torrentleech', groups=['urlrewriter', 'search'], api_ver=2)

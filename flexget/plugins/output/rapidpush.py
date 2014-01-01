@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from flexget import plugin
+from flexget.event import event
 from flexget.utils import json
-from flexget.plugin import register_plugin, priority
 from flexget.utils.template import RenderError
 
 log = logging.getLogger('rapidpush')
@@ -64,7 +65,7 @@ class OutputRapidPush(object):
         return config
 
     # Run last to make sure other outputs are successful before sending notification
-    @priority(0)
+    @plugin.priority(0)
     def on_task_output(self, task, config):
         # get the parameters
         config = self.prepare_config(config)
@@ -85,7 +86,7 @@ class OutputRapidPush(object):
     # Process the given events.
     def process_notifications(self, task, entries, config):
         for entry in entries:
-            if task.manager.options.test:
+            if task.options.test:
                 log.info("Would send RapidPush notification about: %s", entry['title'])
                 continue
 
@@ -159,4 +160,7 @@ class OutputRapidPush(object):
                     else:
                         log.error(item + ": " + json_data[item]['desc'] + " (" + str(json_data[item]['code']) + ")")
 
-register_plugin(OutputRapidPush, 'rapidpush', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputRapidPush, 'rapidpush', api_ver=2)

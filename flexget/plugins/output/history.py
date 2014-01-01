@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
-from argparse import SUPPRESS
 
 from sqlalchemy import Column, String, Integer, DateTime, Unicode, desc
 
+from flexget import options, plugin
+from flexget.event import event
 from flexget.manager import Base, Session
-from flexget.plugin import register_parser_option, register_plugin, PluginError
 from flexget.utils.tools import console
 
 log = logging.getLogger('history')
@@ -32,32 +32,9 @@ class History(Base):
 
 
 class PluginHistory(object):
-    """
-    Provides --history
-    """
+    """Records all accepted entries for later lookup"""
 
     schema = {'type': 'boolean'}
-
-    def on_process_start(self, task, config):
-        if task.manager.options.history:
-            try:
-                count = int(task.manager.options.history)
-            except ValueError:
-                task.manager.disable_tasks()
-                raise PluginError('Invalid --history value')
-            task.manager.disable_tasks()
-            session = Session()
-            console('-- History: ' + '-' * 67)
-            for item in reversed(session.query(History).order_by(desc(History.id)).limit(count).all()):
-                console(' Task    : %s' % item.task)
-                console(' Title   : %s' % item.title)
-                console(' Url     : %s' % item.url)
-                if item.filename:
-                    console(' Stored  : %s' % item.filename)
-                console(' Time    : %s' % item.time.strftime("%c"))
-                console(' Details : %s' % item.details)
-                console('-' * 79)
-            session.close()
 
     def on_task_exit(self, task, config):
         """Add accepted entries to history"""
@@ -77,8 +54,36 @@ class PluginHistory(object):
             task.session.add(item)
 
 
-register_plugin(PluginHistory, 'history', builtin=True, api_ver=2)
-register_parser_option('--history', action='store', nargs='?', dest='history', const=50,
-                       help='List latest accepted entries. Default: 50')
-register_parser_option('--downloads', action='store_true', dest='history', default=False,
-                       help=SUPPRESS)
+def do_cli(manager, options):
+    session = Session()
+    try:
+        console('-- History: ' + '-' * 67)
+        query = session.query(History)
+        if options.search:
+            search_term = options.search.replace(' ', '%').replace('.', '%')
+            query = query.filter(History.title.like('%' + search_term + '%'))
+        query = query.order_by(desc(History.time)).limit(options.limit)
+        for item in reversed(query.all()):
+            console(' Task    : %s' % item.task)
+            console(' Title   : %s' % item.title)
+            console(' Url     : %s' % item.url)
+            if item.filename:
+                console(' Stored  : %s' % item.filename)
+            console(' Time    : %s' % item.time.strftime("%c"))
+            console(' Details : %s' % item.details)
+            console('-' * 79)
+    finally:
+        session.close()
+
+
+@event('options.register')
+def register_parser_arguments():
+    parser = options.register_command('history', do_cli, help='view the history of entries that FlexGet has accepted')
+    parser.add_argument('--limit', action='store', type=int, metavar='NUM', default=50,
+                        help='limit to %(metavar)s results')
+    parser.add_argument('--search', action='store', metavar='TERM', help='limit to results that contain %(metavar)s')
+
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginHistory, 'history', builtin=True, api_ver=2)

@@ -171,8 +171,10 @@ class TVDBSeries(TVDBContainer, Base):
         # If we are detached from a session, update the db
         if not Session.object_session(self):
             session = Session()
-            session.query(TVDBSeries).filter(TVDBSeries.id == self.id).update(values={'poster_file': filename})
-            session.close()
+            try:
+                session.query(TVDBSeries).filter(TVDBSeries.id == self.id).update(values={'poster_file': filename})
+            finally:
+                session.close()
         return filename
 
     def __repr__(self):
@@ -255,7 +257,7 @@ def find_series_id(name):
         fa = s.find("FirstAired")
         if fa is not None and fa.text:
             series_list.append((fa.text, s.find("seriesid").text))
-   
+
     if series_list:
         series_list.sort(key=lambda s: s[0], reverse=True)
         return int(series_list[0][1])
@@ -374,7 +376,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
             if data is not None:
                 error = data.find('Error') # TODO: lowercase????
                 if error is not None:
-                    raise LookupError('Error lookuing up episode from TVDb (%s)' % error.string)
+                    raise LookupError('Error looking up episode from TVDb (%s)' % error.text)
                 ep_data = data.find('Episode')
                 if ep_data is not None:
                     # Check if this episode id is already in our db

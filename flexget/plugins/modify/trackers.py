@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
-from flexget.plugin import priority, register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('modify_torrents')
 
@@ -19,13 +21,9 @@ class AddTrackers(object):
         This will add all tracker URL uri://tracker_address:port/.
     """
 
-    def validator(self):
-        from flexget import validator
-        trackers = validator.factory('list')
-        trackers.accept('url', protocols=['udp', 'http'])
-        return trackers
+    schema = {'type': 'array', 'items': {'type': 'string', 'format': 'url'}}
 
-    @priority(127)
+    @plugin.priority(127)
     def on_task_modify(self, task, config):
         for entry in task.entries:
             if 'torrent' in entry:
@@ -50,13 +48,9 @@ class RemoveTrackers(object):
         This will remove all trackers that contain text moviex in their url.
     """
 
-    def validator(self):
-        from flexget import validator
-        trackers = validator.factory('list')
-        trackers.accept('regexp')
-        return trackers
+    schema = {'type': 'array', 'items': {'type': 'string', 'format': 'regex'}}
 
-    @priority(127)
+    @plugin.priority(127)
     def on_task_modify(self, task, config):
         for entry in task.entries:
             if 'torrent' in entry:
@@ -77,30 +71,31 @@ class RemoveTrackers(object):
 class ModifyTrackers(object):
 
     """
-        Modify tracker URL to torrent files.
+    Modify tracker URL to torrent files.
 
-        Configuration example:
+    Configuration example::
 
         modify_trackers:
-          - SearchAndReplace1
+          - SearchAndReplace:
               from: string_to_search
               to: string_to_replace
 
     """
 
-    def validator(self):
-        from flexget import validator
-        trackers = validator.factory()
-        bundle = trackers.accept('list').accept('dict')
-        # prevent invalid indentation level
-        bundle.reject_keys(['from', 'to'],
-                           'Option \'$key\' has invalid indentation level. It needs 2 more spaces.')
-        edit = bundle.accept_any_key('dict')
-        edit.accept('text', key='from', required=True)
-        edit.accept('text', key='to', required=True)
-        return trackers
+    schema = {
+        'type': 'array',
+        'items': {
+            'type': 'object',
+            'additionalProperties': {
+                'type': 'object',
+                'properties': {'from': {'type': 'string'}, 'to': {'type': 'string'}},
+                'additionalProperties': False
+            },
+            'maxProperties': 1
+        }
+    }
 
-    @priority(127)
+    @plugin.priority(127)
     def on_task_modify(self, task, config):
         for entry in task.entries:
             if 'torrent' in entry:
@@ -116,6 +111,8 @@ class ModifyTrackers(object):
                                 log.info('Modify %s in %s' % (tracker, trackernew))
 
 
-register_plugin(AddTrackers, 'add_trackers', api_ver=2)
-register_plugin(RemoveTrackers, 'remove_trackers', api_ver=2)
-register_plugin(ModifyTrackers, 'modify_trackers', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(AddTrackers, 'add_trackers', api_ver=2)
+    plugin.register(RemoveTrackers, 'remove_trackers', api_ver=2)
+    plugin.register(ModifyTrackers, 'modify_trackers', api_ver=2)

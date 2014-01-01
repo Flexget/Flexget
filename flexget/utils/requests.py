@@ -6,7 +6,7 @@ from datetime import timedelta, datetime
 from urlparse import urlparse
 import requests
 # Allow some request objects to be imported from here instead of requests
-from requests import RequestException
+from requests import RequestException, HTTPError
 from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('requests')

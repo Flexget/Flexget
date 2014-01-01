@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import jsonschema
-import mock
 
 from flexget import config_schema
 from tests import FlexGetBase

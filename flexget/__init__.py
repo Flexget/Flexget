@@ -2,10 +2,9 @@
 
 from __future__ import unicode_literals, division, absolute_import
 import os
-import sys
 import logging
 from flexget import logger
-from flexget.options import CoreArgumentParser
+from flexget.options import get_parser
 from flexget import plugin
 from flexget.manager import Manager
 
@@ -14,23 +13,16 @@ __version__ = '{git}'
 log = logging.getLogger('main')
 
 
-def main():
+def main(args=None):
     """Main entry point for Command Line Interface"""
 
     logger.initialize()
 
-    parser = CoreArgumentParser()
-    plugin.load_plugins(parser)
+    plugin.load_plugins()
 
-    options = parser.parse_args()
+    options = get_parser().parse_args(args)
 
-    try:
-        manager = Manager(options)
-    except IOError as e:
-        # failed to load config, TODO: why should it be handled here? So sys.exit isn't called in webui?
-        log.critical(e)
-        logger.flush_logging_to_console()
-        sys.exit(1)
+    manager = Manager(options)
 
     log_level = logging.getLevelName(options.loglevel.upper())
     log_file = os.path.expanduser(manager.options.logfile)
@@ -38,13 +30,4 @@ def main():
     if not os.path.isabs(log_file):
         log_file = os.path.join(manager.config_base, log_file)
     logger.start(log_file, log_level)
-
-    if options.profile:
-        try:
-            import cProfile as profile
-        except ImportError:
-            import profile
-        profile.runctx('manager.execute()', globals(), locals(), os.path.join(manager.config_base, 'flexget.profile'))
-    else:
-        manager.execute()
-    manager.shutdown()
+    manager.run_cli_command()

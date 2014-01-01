@@ -4,7 +4,8 @@ import hashlib
 
 from requests import RequestException
 
-from flexget.plugin import register_plugin
+from flexget import plugin
+from flexget.event import event
 from flexget.utils import json
 
 log = logging.getLogger('trakt_remove')
@@ -123,5 +124,8 @@ class TraktRemove(object):
                 log.error('Error submitting data to trakt.tv (remove_collected): %s' % result.text)
                 continue
             # log.debug(result.text)
-            
-register_plugin(TraktRemove, 'trakt_remove', api_ver=2)
+
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(TraktRemove, 'trakt_remove', api_ver=2)

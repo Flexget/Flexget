@@ -1,10 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime, timedelta
+
 from sqlalchemy import Column, Integer, String, Unicode, DateTime
 from sqlalchemy.schema import Index, MetaData
-from flexget import db_schema
-from flexget.plugin import register_plugin, register_parser_option, priority, DependencyError, get_plugin_by_name
+
+from flexget import db_schema, options, plugin
+from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.tools import console, parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_add_column
@@ -59,37 +61,55 @@ Index('failed_title_url', columns.title, columns.url, columns.count)
 
 
 class PluginFailed(object):
-    """Provides tracking for failures and related commandline utilities."""
+    """
+    Records entry failures and stores them for trying again after a certain interval.
+    Rejects them after they have failed too many times.
 
-    def on_process_start(self, task, config):
-        if task.manager.options.failed:
-            task.manager.disable_tasks()
-            self.print_failed()
-            return
-        if task.manager.options.clear_failed:
-            task.manager.disable_tasks()
-            if self.clear_failed():
-                task.manager.config_changed()
-            return
+    """
 
-    @priority(-255)
+    schema = {
+        "oneOf": [
+            # Allow retry_failed: no form to turn off plugin altogether
+            {"type": "boolean"},
+            {
+                "type": "object",
+                "properties": {
+                    "retry_time": {"type": "string", "format": "interval", "default": "1 hour"},
+                    "max_retries": {"type": "integer", "minimum": 0, "default": 3},
+                    "retry_time_multiplier": {
+                        # Allow turning off the retry multiplier with 'no' as well as 1
+                        "oneOf": [{"type": "number", "minimum": 0}, {"type": "boolean"}],
+                        "default": 1.5
+                    }
+                },
+                "additionalProperties": False
+            }
+        ]
+    }
+
+    def __init__(self):
+        try:
+            self.backlog = plugin.get_plugin_by_name('backlog')
+        except plugin.DependencyError:
+            log.warning('Unable utilize backlog plugin, failed entries may not be retried properly.')
+
+    def prepare_config(self, config):
+        if not isinstance(config, dict):
+            config = {}
+        config.setdefault('retry_time', '1 hour')
+        config.setdefault('max_retries', 3)
+        if config.get('retry_time_multiplier', True) is True:
+            # If multiplier is not specified, or is specified as True, use the default
+            config['retry_time_multiplier'] = 1.5
+        else:
+            # If multiplier is False, turn it off
+            config['retry_time_multiplier'] = 1
+        return config
+
+    @plugin.priority(-255)
     def on_task_input(self, task, config):
         for entry in task.all_entries:
             entry.on_fail(self.add_failed)
-
-    def print_failed(self):
-        """Parameter --failed"""
-
-        failed = Session()
-        try:
-            results = failed.query(FailedEntry).all()
-            if not results:
-                console('No failed entries recorded')
-            for entry in results:
-                console('%16s - %s - %s times - %s' %
-                        (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title, entry.count, entry.reason))
-        finally:
-            failed.close()
 
     def add_failed(self, entry, reason=None, **kwargs):
         """Adds entry to internal failed list, displayed with --failed"""
@@ -115,69 +135,7 @@ class PluginFailed(object):
         finally:
             failed.close()
 
-    def clear_failed(self):
-        """
-        Clears list of failed entries
-
-        :return: The number of entries cleared.
-        """
-        session = Session()
-        try:
-            results = session.query(FailedEntry).delete()
-            console('Cleared %i items.' % results)
-            session.commit()
-            return results
-        finally:
-            session.close()
-
-
-class FilterRetryFailed(object):
-    """Stores failed entries for trying again after a certain interval,
-    rejects them after they have failed too many times."""
-
-    def __init__(self):
-        self.backlog = None
-
-    schema = {
-        "oneOf": [
-            # Allow retry_failed: no form to turn off plugin altogether
-            {"type": "boolean"},
-            {
-                "type": "object",
-                "properties": {
-                    "retry_time": {"type": "string", "format": "interval", "default": "1 hour"},
-                    "max_retries": {"type": "integer", "minimum": 0, "default": 3},
-                    "retry_time_multiplier": {
-                        # Allow turning off the retry multiplier with 'no' as well as 1
-                        "oneOf": [{"type": "number", "minimum": 0}, {"type": "boolean"}],
-                        "default": 1.5
-                    }
-                },
-                "additionalProperties": False
-            }
-        ]
-    }
-
-    def prepare_config(self, config):
-        if not isinstance(config, dict):
-            config = {}
-        config.setdefault('retry_time', '1 hour')
-        config.setdefault('max_retries', 3)
-        if config.get('retry_time_multiplier', True) is True:
-            # If multiplier is not specified, or is specified as True, use the default
-            config['retry_time_multiplier'] = 1.5
-        else:
-            # If multiplier is False, turn it off
-            config['retry_time_multiplier'] = 1
-        return config
-
-    def on_process_start(self, task, config):
-        try:
-            self.backlog = get_plugin_by_name('backlog').instance
-        except DependencyError:
-            log.warning('Unable utilize backlog plugin, failed entries may not be retried properly.')
-
-    @priority(255)
+    @plugin.priority(255)
     def on_task_filter(self, task, config):
         if config is False:
             return
@@ -212,7 +170,7 @@ class FilterRetryFailed(object):
             else:
                 retry_time = base_retry_time
             if self.backlog:
-                self.backlog.add_backlog(task, entry, amount=retry_time)
+                self.backlog.instance.add_backlog(task, entry, amount=retry_time)
             if retry_time:
                 fail_reason = item.reason if item else entry.get('reason', 'unknown')
                 entry.reject(reason='Waiting before trying failed entry again. (failure reason: %s)' %
@@ -220,9 +178,46 @@ class FilterRetryFailed(object):
                 # Cause a task rerun, to look for alternate releases
                 task.rerun()
 
-register_plugin(PluginFailed, '--failed', builtin=True, api_ver=2)
-register_plugin(FilterRetryFailed, 'retry_failed', builtin=True, api_ver=2)
-register_parser_option('--failed', action='store_true', dest='failed', default=0,
-                       help='List recently failed entries.')
-register_parser_option('--clear', action='store_true', dest='clear_failed', default=0,
-                       help='Clear recently failed list.')
+
+def do_cli(manager, options):
+    if options.failed_action == 'list':
+        list_failed()
+    elif options.failed_action == 'clear':
+        clear_failed(manager)
+
+
+def list_failed():
+    session = Session()
+    try:
+        results = session.query(FailedEntry).all()
+        if not results:
+            console('No failed entries recorded')
+        for entry in results:
+            console('%16s - %s - %s times - %s' %
+                    (entry.tof.strftime('%Y-%m-%d %H:%M'), entry.title, entry.count, entry.reason))
+    finally:
+        session.close()
+
+
+def clear_failed(manager):
+    session = Session()
+    try:
+        results = session.query(FailedEntry).delete()
+        console('Cleared %i items.' % results)
+        session.commit()
+        if results:
+            manager.config_changed()
+    finally:
+        session.close()
+
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginFailed, 'retry_failed', builtin=True, api_ver=2)
+
+@event('options.register')
+def register_parser_arguments():
+    parser = options.register_command('failed', do_cli, help='list or clear remembered failures')
+    subparsers = parser.add_subparsers(dest='failed_action', metavar='<action>')
+    subparsers.add_parser('list', help='list all the entries that have had failures')
+    subparsers.add_parser('clear', help='clear all failures from database, so they can be retried')

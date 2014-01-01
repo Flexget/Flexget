@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, task_phases
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('disable_phases')
 
@@ -16,10 +18,13 @@ class PluginDisablePhases(object):
       - download
     """
 
-    # TODO: schemas are registered to a uri at plugin load, the list of phases may not be complete at that time
-    schema = {'type': 'array', 'items': {'type': 'string', 'enum': task_phases}}
+    @property
+    def schema(self):
+        return {'type': 'array', 'items': {'type': 'string', 'enum': plugin.task_phases}}
 
     def on_task_start(self, task, config):
         map(task.disable_phase, config)
 
-register_plugin(PluginDisablePhases, 'disable_phases', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginDisablePhases, 'disable_phases', api_ver=2)

@@ -3,7 +3,8 @@ import logging
 import re
 import random
 
-from flexget.plugin import register_plugin, priority
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('torrent_cache')
 
@@ -14,7 +15,7 @@ MIRRORS = ['http://torrage.com/torrent/',
 class TorrentCache(object):
     """Adds urls to torrent cache sites to the urls list."""
 
-    @priority(120)
+    @plugin.priority(120)
     def on_task_urlrewrite(self, task, config):
         for entry in task.accepted:
             info_hash = None
@@ -34,4 +35,6 @@ class TorrentCache(object):
                 entry['urls'].extend(urls)
 
 
-register_plugin(TorrentCache, 'torrent_cache', api_ver=2, builtin=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(TorrentCache, 'torrent_cache', api_ver=2, builtin=True)

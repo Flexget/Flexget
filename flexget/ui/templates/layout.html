@@ -5,13 +5,13 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <title>FlexGet</title>
 
-    <link rel="stylesheet" href="{{ url_for('.static', filename='css/menu.css') }}" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="{{ url_for('.static', filename='css/layout.css') }}" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="{{ url_for('.static', filename='css/forms.css') }}" type="text/css" media="screen"/>
-    <link rel="stylesheet" href="{{ url_for('.static', filename='css/ui-lightness/jquery-ui-1.8.6.custom.css') }}" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/forms.css') }}" type="text/css" media="screen"/>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/ui-lightness/jquery-ui-1.8.6.custom.css') }}" type="text/css" media="screen"/>
 
     {# keep scripts after css to avoid flash of unstyled layout #}
-    <script type="text/javascript" src="{{ url_for('.static', filename='js/jquery-1.4.3.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-1.4.3.min.js') }}"></script>
     
     {% block head %}
         {# UI plugin templates can insert content here #}
@@ -79,10 +79,10 @@
 </div>
 
 {# javascripts should be positioned at the bottom of the html since they block other requests #}
-<script type="text/javascript" src="{{ url_for('.static', filename='js/flexget.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('.static', filename='js/jquery.blockUI.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('.static', filename='js/jquery.tools.min.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('.static', filename='js/jquery-ui-1.8.6.custom.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/flexget.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.blockUI.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.tools.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-ui-1.8.6.custom.min.js') }}"></script>
 
 </body>
 </html>

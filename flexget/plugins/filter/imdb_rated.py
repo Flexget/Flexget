@@ -1,11 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
-from flexget.plugin import register_plugin, PluginWarning, PluginError, get_plugin_by_name
-from bs4 import BeautifulSoup
-from flexget.manager import Base
-from sqlalchemy import Column, Integer, Float, String, DateTime
-import re
 import datetime
+import logging
+import re
+
+from bs4 import BeautifulSoup
+from sqlalchemy import Column, Integer, Float, String, DateTime
+
+from flexget import plugin
+from flexget.event import event
+from flexget.manager import Base
 from flexget.utils.tools import urlopener
 
 log = logging.getLogger('imdb_rated')
@@ -103,10 +106,9 @@ class FilterImdbRated(object):
         if count > 0:
             log.info('Added %s new movies' % count)
 
-    def on_task_filter(self, task):
-        raise PluginWarning('This plugin no longer works with the imdb, replacement will be implemented soon')
+    def on_task_filter(self, task, config):
+        raise plugin.PluginWarning('This plugin no longer works with the imdb, replacement will be implemented soon')
 
-        config = task.config['imdb_rated']
         if isinstance(config, basestring):
             config = {'url': task.config['imdb_rated']}
 
@@ -138,4 +140,6 @@ class FilterImdbRated(object):
                     entry.reject('imdb rated')
 
 
-register_plugin(FilterImdbRated, 'imdb_rated')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterImdbRated, 'imdb_rated', api_ver=2)

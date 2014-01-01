@@ -3,9 +3,10 @@ import urllib
 import logging
 import re
 
+from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
-from flexget.plugin import register_plugin, priority, get_plugin_by_name
+from flexget.event import event
 
 log = logging.getLogger('regexp')
 
@@ -130,7 +131,7 @@ class FilterRegexp(object):
                 out_config.setdefault(operation, []).append({regexp: opts})
         return out_config
 
-    @priority(172)
+    @plugin.priority(172)
     def on_task_filter(self, task, config):
         # TODO: what if accept and accept_excluding configured? Should raise error ...
         config = self.prepare_config(config)
@@ -217,7 +218,7 @@ class FilterRegexp(object):
                     if opts.get('set'):
                         # invoke set plugin with given configuration
                         log.debug('adding set: info to entry:"%s" %s' % (entry['title'], opts['set']))
-                        set = get_plugin_by_name('set')
+                        set = plugin.get_plugin_by_name('set')
                         set.instance.modify(entry, opts['set'])
                     method(entry, matchtext)
                     # We had a match so break out of the regexp loop.
@@ -228,4 +229,6 @@ class FilterRegexp(object):
                 rest.append(entry)
         return rest
 
-register_plugin(FilterRegexp, 'regexp', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterRegexp, 'regexp', api_ver=2)

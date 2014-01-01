@@ -4,8 +4,9 @@ import logging
 
 from sqlalchemy import desc, func
 
+from flexget import plugin
+from flexget.event import event
 from flexget.manager import Session
-from flexget.plugin import register_plugin, priority, DependencyError
 from flexget.utils.tools import multiply_timedelta
 try:
     from flexget.plugins.api_tvrage import lookup_series
@@ -15,14 +16,14 @@ except ImportError as e:
 try:
     from flexget.plugins.filter.series import Series, Episode
 except ImportError:
-    raise DependencyError(issued_by='est_released_series', missing='series plugin', silent=True)
+    raise plugin.DependencyError(issued_by='est_released_series', missing='series plugin', silent=True)
 
 log = logging.getLogger('est_series')
 
 
 class EstimatesReleasedSeries(object):
 
-    @priority(0)  # Run only if better online lookups fail
+    @plugin.priority(0)  # Run only if better online lookups fail
     def estimate(self, entry):
         if all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
             # Try to get airdate from tvrage first
@@ -58,14 +59,18 @@ class EstimatesReleasedSeries(object):
 
             # If no results from tvrage, estimate a date based on series history
             session = Session()
-            series = session.query(Series).filter(Series.name == entry['series_name']).first()
-            if not series:
-                return
-            episodes = (session.query(Episode).join(Episode.series).
-                        filter(Episode.season != None).
-                        filter(Series.id == series.id).
-                        filter(Episode.season == func.max(Episode.season).select()).
-                        order_by(desc(Episode.number)).limit(2).all())
+            try:
+                series = session.query(Series).filter(Series.name == entry['series_name']).first()
+                if not series:
+                    return
+                episodes = (session.query(Episode).join(Episode.series).
+                            filter(Episode.season != None).
+                            filter(Series.id == series.id).
+                            filter(Episode.season == func.max(Episode.season).select()).
+                            order_by(desc(Episode.number)).limit(2).all())
+            finally:
+                session.close()
+
             if len(episodes) < 2:
                 return
             # If last two eps were not contiguous, don't guess
@@ -85,4 +90,6 @@ class EstimatesReleasedSeries(object):
             return episodes[0].first_seen + multiply_timedelta(last_diff, 0.9)
 
 
-register_plugin(EstimatesReleasedSeries, 'est_released_series', groups=['estimate_release'], api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(EstimatesReleasedSeries, 'est_released_series', groups=['estimate_release'], api_ver=2)

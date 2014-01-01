@@ -1,5 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
+
+from flexget import plugin
+from flexget.event import event
 from tests import FlexGetBase
+
+
+class AbortPlugin(object):
+    def on_task_output(self, task, config):
+        task.abort('abort plugin')
+
+
+@event('plugin.register')
+def register():
+    plugin.register(AbortPlugin, 'abort', debug=True, api_ver=2)
 
 
 class TestAbort(FlexGetBase):
@@ -11,7 +24,7 @@ class TestAbort(FlexGetBase):
             disable_builtins: yes
 
             # causes abort
-            nzb_size: 10
+            abort: yes
 
             # another event hookup with this plugin
             headers:

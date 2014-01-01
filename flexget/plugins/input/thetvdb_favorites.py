@@ -3,21 +3,23 @@ import logging
 import urllib2
 import re
 from datetime import datetime, timedelta
-import xml.etree.ElementTree as ElementTree
+
+from xml.etree import ElementTree
 from sqlalchemy import Column, Integer, Unicode, DateTime, String
-from flexget import db_schema
-from flexget.plugin import register_plugin, internet, DependencyError
-from flexget.utils.tools import urlopener
+
+from flexget import db_schema, plugin
+from flexget.entry import Entry
+from flexget.event import event
+from flexget.utils.cached_input import cached
 from flexget.utils.database import pipe_list_synonym, with_session
 from flexget.utils.sqlalchemy_utils import drop_tables, table_columns
-from flexget.utils.cached_input import cached
-from flexget.entry import Entry
+from flexget.utils.tools import urlopener
 
 try:
     from flexget.plugins.api_tvdb import lookup_series
 except ImportError:
-    raise DependencyError(issued_by='thetvdb_favorites', missing='api_tvdb',
-                          message='thetvdb_lookup requires the `api_tvdb` plugin')
+    raise plugin.DependencyError(issued_by='thetvdb_favorites', missing='api_tvdb',
+                                 message='thetvdb_lookup requires the `api_tvdb` plugin')
 
 log = logging.getLogger('thetvdb_favorites')
 Base = db_schema.versioned_base('thetvdb_favorites', 0)
@@ -58,11 +60,11 @@ class ThetvdbFavorites(Base):
 
 class InputThetvdbFavorites(object):
     """
-    Creates a list of entries for your series marked as favorites at thetvdb.com for use in import_series.
+    Creates a list of entries for your series marked as favorites at thetvdb.com for use in configure_series.
 
     Example::
 
-      import_series:
+      configure_series:
         from:
           thetvdb_favorites:
             account_id: 23098230
@@ -76,7 +78,7 @@ class InputThetvdbFavorites(object):
         return root
 
     @cached('thetvdb_favorites')
-    @internet(log)
+    @plugin.internet(log)
     @with_session
     def on_task_input(self, task, config, session=None):
         account_id = str(config['account_id'])
@@ -127,4 +129,6 @@ class InputThetvdbFavorites(object):
                 entries.append(Entry(series_name, '', tvdb_id=series.id))
         return entries
 
-register_plugin(InputThetvdbFavorites, 'thetvdb_favorites', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(InputThetvdbFavorites, 'thetvdb_favorites', api_ver=2)

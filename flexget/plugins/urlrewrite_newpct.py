@@ -4,9 +4,11 @@ import os
 import re
 import urllib2
 
+from flexget import plugin
+from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.plugin import register_plugin, internet
 from flexget.utils.requests import Session
+from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('newpct')
@@ -32,7 +34,7 @@ class UrlRewriteNewPCT(object):
     def url_rewrite(self, task, entry):
         entry['url'] = self.parse_download_page(entry['url'])
 
-    @internet(log)
+    @plugin.internet(log)
     def parse_download_page(self, url):
         page = requests.get(url)
         try:
@@ -46,4 +48,6 @@ class UrlRewriteNewPCT(object):
         torrent_id = torrent_id_prog.search(torrent_ids[0]).group(1)
         return 'http://www.pctorrent.com/descargar/index.php?link=descargar/torrent/%s/dummy.html' % torrent_id
 
-register_plugin(UrlRewriteNewPCT, 'newpct', groups=['urlrewriter'])
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteNewPCT, 'newpct', groups=['urlrewriter'], api_ver=2)

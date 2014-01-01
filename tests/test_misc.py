@@ -212,7 +212,7 @@ class TestHtmlUtils(object):
 class TestSetPlugin(FlexGetBase):
 
     __yaml__ = """
-        presets:
+        templates:
           global:
             accept_all: yes
         tasks:
@@ -222,12 +222,6 @@ class TestSetPlugin(FlexGetBase):
             set:
               thefield: TheValue
               otherfield: 3.0
-          test_string_replacement:
-            mock:
-              - {title: 'Entry 1', series_name: 'Value'}
-              - {title: 'Entry 2'}
-            set:
-              field: 'The%(series_name)s'
           test_jinja:
             mock:
               - {title: 'Entry 1', series_name: 'Value'}
@@ -243,13 +237,6 @@ class TestSetPlugin(FlexGetBase):
         entry = self.task.find_entry('entries', title='Entry 1')
         assert entry['thefield'] == 'TheValue'
         assert entry['otherfield'] == 3.0
-
-    def test_string_replacement(self):
-        self.execute_task('test_string_replacement')
-        assert self.task.find_entry('entries', title='Entry 1')['field'] == 'TheValue'
-        # The string repalcement should fail, an error will be shown, and the field will get a blank value.
-        assert 'field' not in self.task.find_entry('entries', title='Entry 2'),\
-                '`field` should not have been created when string replacement fails'
 
     def test_jinja(self):
         self.execute_task('test_jinja')

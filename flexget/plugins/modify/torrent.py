@@ -2,7 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
 
-from flexget.plugin import register_plugin, priority
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.bittorrent import Torrent, is_torrent_file
 
 log = logging.getLogger('modif_torrent')
@@ -15,8 +16,8 @@ class TorrentFilename(object):
     """
     TORRENT_PRIO = 255
 
-    @priority(TORRENT_PRIO)
-    def on_task_modify(self, task):
+    @plugin.priority(TORRENT_PRIO)
+    def on_task_modify(self, task, config):
         # Only scan through accepted entries, as the file must have been downloaded in order to parse anything
         for entry in task.accepted:
             # skip if entry does not have file assigned
@@ -68,8 +69,8 @@ class TorrentFilename(object):
             except Exception as e:
                 log.exception(e)
 
-    @priority(TORRENT_PRIO)
-    def on_task_output(self, task):
+    @plugin.priority(TORRENT_PRIO)
+    def on_task_output(self, task, config):
         for entry in task.entries:
             if 'torrent' in entry:
                 if entry['torrent'].modified:
@@ -108,4 +109,6 @@ class TorrentFilename(object):
         del(entry['file'])
 
 
-register_plugin(TorrentFilename, 'torrent', builtin=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(TorrentFilename, 'torrent', builtin=True, api_ver=2)

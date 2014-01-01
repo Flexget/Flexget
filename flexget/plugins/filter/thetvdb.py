@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, priority, get_plugin_by_name, PluginError
+
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.log import log_once
 
 log = logging.getLogger('thetvdb')
@@ -125,18 +127,17 @@ class FilterTvdb(object):
                     return True
         return False
 
-    @priority(126)
-    def on_task_filter(self, task):
-        config = task.config['thetvdb']
+    @plugin.priority(126)
+    def on_task_filter(self, task, config):
 
-        lookup = get_plugin_by_name('thetvdb_lookup').instance.lookup
+        lookup = plugin.get_plugin_by_name('thetvdb_lookup').instance.lookup
 
         for entry in task.entries:
             force_accept = False
 
             try:
                 lookup(task, entry)
-            except PluginError as e:
+            except plugin.PluginError as e:
                 log.error('Skipping %s because of an error: %s' % (entry['title'], e.value))
                 continue
 
@@ -203,7 +204,7 @@ class FilterTvdb(object):
             if reasons and not force_accept:
                 msg = 'Skipping %s because of rule(s) %s' % \
                     (entry.get('series_name_thetvdb', None) or entry['title'], ', '.join(reasons))
-                if task.manager.options.debug:
+                if task.options.debug:
                     log.debug(msg)
                 else:
                     log_once(msg, log)
@@ -211,4 +212,7 @@ class FilterTvdb(object):
                 log.debug('Accepting %s' % (entry))
                 entry.accept()
 
-register_plugin(FilterTvdb, 'thetvdb')
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterTvdb, 'thetvdb', api_ver=2)

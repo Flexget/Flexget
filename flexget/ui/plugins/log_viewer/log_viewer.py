@@ -1,13 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
-from flask import render_template, Module, jsonify, request
+from flask import render_template, Blueprint, jsonify, request
 from sqlalchemy import Column, DateTime, Integer, Unicode, String, asc, desc, or_, and_
 from flexget.ui.webui import register_plugin, db_session
 from flexget.manager import Base, Session
 from flexget.event import event
 
-log_viewer = Module(__name__)
+log_viewer = Blueprint('log_viewier', __name__, url_prefix='/log')
 
 
 class LogEntry(Base):
@@ -34,9 +34,11 @@ class DBLogHandler(logging.Handler):
 
     def emit(self, record):
         session = Session()
-        session.add(LogEntry(record))
-        session.commit()
-        session.close()
+        try:
+            session.add(LogEntry(record))
+            session.commit()
+        finally:
+            session.close()
 
 
 @log_viewer.context_processor
@@ -105,4 +107,4 @@ def initialize():
     handler = DBLogHandler()
     logger.addHandler(handler)
 
-register_plugin(log_viewer, url_prefix='/log', menu='Log', order=256)
+register_plugin(log_viewer, menu='Log', order=256)

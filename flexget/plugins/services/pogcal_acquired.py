@@ -5,7 +5,8 @@ from datetime import datetime
 
 from sqlalchemy import Column, Unicode, Integer
 
-from flexget.plugin import register_plugin
+from flexget import plugin
+from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.titles.series import SeriesParser
@@ -36,20 +37,20 @@ class PogcalAcquired(object):
     }
 
     def on_task_exit(self, task, config):
-        if not task.accepted and not task.manager.options.test:
+        if not task.accepted and not task.options.test:
             return
         try:
             result = session.post('http://www.pogdesign.co.uk/cat/',
-                         data={'username': config['username'],
-                               'password': config['password'],
-                               'sub_login': 'Account Login'})
+                                  data={'username': config['username'],
+                                        'password': config['password'],
+                                        'sub_login': 'Account Login'})
         except requests.RequestException as e:
             log.error('Error logging in to pog calendar: %s' % e)
             return
         if 'logout' not in result.text:
             log.error('Username/password for pogdesign calendar appear to be incorrect.')
             return
-        elif task.manager.options.test:
+        elif task.options.test:
             log.verbose('Successfully logged in to pogdesign calendar.')
         for entry in task.accepted:
             if not entry.get('series_name') or not entry.get('series_id_type') == 'ep':
@@ -58,7 +59,7 @@ class PogcalAcquired(object):
             if not show_id:
                 log.debug('Could not find pogdesign calendar id for `%s`' % entry['series_name'])
                 continue
-            if task.manager.options.test:
+            if task.options.test:
                 log.verbose('Would mark %s %s in pogdesign calenadar.' % (entry['series_name'], entry['series_id']))
                 continue
             else:
@@ -95,4 +96,6 @@ class PogcalAcquired(object):
         else:
             log.verbose('Could not find pogdesign calendar id for show `%s`' % show_re)
 
-register_plugin(PogcalAcquired, 'pogcal_acquired', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PogcalAcquired, 'pogcal_acquired', api_ver=2)

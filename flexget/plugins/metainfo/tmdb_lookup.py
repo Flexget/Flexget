@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, DependencyError
+
+from flexget import plugin
+from flexget.event import event
 from flexget.utils import imdb
 from flexget.utils.log import log_once
 
@@ -9,7 +11,7 @@ try:
     from flexget.plugins.api_tmdb import ApiTmdb
     lookup = ApiTmdb.lookup
 except ImportError:
-    raise DependencyError(issued_by='tmdb_lookup', missing='api_tmdb')
+    raise plugin.DependencyError(issued_by='tmdb_lookup', missing='api_tmdb')
 
 log = logging.getLogger('tmdb_lookup')
 
@@ -77,4 +79,7 @@ class PluginTmdbLookup(object):
         for entry in task.entries:
             self.lookup(entry)
 
-register_plugin(PluginTmdbLookup, 'tmdb_lookup', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginTmdbLookup, 'tmdb_lookup', api_ver=2)

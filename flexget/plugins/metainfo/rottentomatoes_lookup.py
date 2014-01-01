@@ -1,12 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, DependencyError, PluginError
+
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.log import log_once
 
 try:
     from flexget.plugins.api_rottentomatoes import lookup_movie
 except ImportError:
-    raise DependencyError(issued_by='rottentomatoes_lookup', missing='api_rottentomatoes',
+    raise plugin.DependencyError(issued_by='rottentomatoes_lookup', missing='api_rottentomatoes',
                           message='rottentomatoes_lookup requires the `api_rottentomatoes` plugin')
 
 log = logging.getLogger('rottentomatoes_lookup')
@@ -74,7 +76,7 @@ class PluginRottenTomatoesLookup(object):
         """
         try:
             self.lookup(entry)
-        except PluginError as e:
+        except plugin.PluginError as e:
             log_once(e.value.capitalize(), logger=log)
             # Set all of our fields to None if the lookup failed
             entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
@@ -100,4 +102,6 @@ class PluginRottenTomatoesLookup(object):
         for entry in task.entries:
             entry.register_lazy_fields(self.field_map, self.lazy_loader)
 
-register_plugin(PluginRottenTomatoesLookup, 'rottentomatoes_lookup', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginRottenTomatoesLookup, 'rottentomatoes_lookup', api_ver=2)

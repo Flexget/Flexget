@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('metainfo_imdb_url')
 
@@ -11,11 +13,9 @@ class MetainfoImdbUrl(object):
         Scan entry information for imdb url.
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
-    def on_task_metainfo(self, task):
+    def on_task_metainfo(self, task, config):
         # check if disabled (value set to false)
         if 'scan_imdb' in task.config:
             if not task.config['scan_imdb']:
@@ -39,4 +39,6 @@ class MetainfoImdbUrl(object):
             entry['imdb_url'] = url
             log.debug('Found imdb url in description %s' % url)
 
-register_plugin(MetainfoImdbUrl, 'scan_imdb', builtin=True)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(MetainfoImdbUrl, 'scan_imdb', builtin=True, api_ver=2)

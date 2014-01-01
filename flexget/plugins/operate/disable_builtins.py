@@ -1,14 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from flexget import plugin
-from flexget.plugin import priority, register_plugin, plugins
+from flexget.event import event
 
 log = logging.getLogger('builtins')
 
 
 def all_builtins():
     """Helper function to return an iterator over all builtin plugins."""
-    return (plugin for plugin in plugins.itervalues() if plugin.builtin)
+    return (plugin for plugin in plugin.plugins.itervalues() if plugin.builtin)
 
 
 class PluginDisableBuiltins(object):
@@ -18,18 +19,19 @@ class PluginDisableBuiltins(object):
         # cannot trust that on_task_start would have been executed
         self.disabled = []
 
-    # TODO: schemas are registered to a uri at plugin load, the list of builtins will not be complete at that time
-    schema = {
-        'oneOf': [
-            {'type': 'boolean'},
-            {'type': 'array', 'items': {'type': 'string', 'enum': [p.name for p in all_builtins()]}}
-        ]
-    }
+    @property
+    def schema(self):
+        return {
+            'oneOf': [
+                {'type': 'boolean'},
+                {'type': 'array', 'items': {'type': 'string', 'enum': [p.name for p in all_builtins()]}}
+            ]
+        }
 
     def debug(self):
         log.debug('Builtin plugins: %s' % ', '.join(plugin.name for plugin in all_builtins()))
 
-    @priority(255)
+    @plugin.priority(255)
     def on_task_start(self, task, config):
         self.disabled = []
         if not config:
@@ -41,7 +43,7 @@ class PluginDisableBuiltins(object):
                 self.disabled.append(plugin.name)
         log.debug('Disabled builtin plugin(s): %s' % ', '.join(self.disabled))
 
-    @priority(-255)
+    @plugin.priority(-255)
     def on_task_exit(self, task, config):
         if not self.disabled:
             return
@@ -53,4 +55,6 @@ class PluginDisableBuiltins(object):
 
     on_task_abort = on_task_exit
 
-register_plugin(PluginDisableBuiltins, 'disable_builtins', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginDisableBuiltins, 'disable_builtins', api_ver=2)

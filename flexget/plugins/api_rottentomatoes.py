@@ -15,7 +15,7 @@ from flexget.manager import Session
 from flexget.utils import json
 from flexget.utils.titles import MovieParser
 from flexget.utils.tools import urlopener
-from flexget.utils.database import text_date_synonym
+from flexget.utils.database import text_date_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('api_rottentomatoes')
@@ -236,6 +236,7 @@ class RottenTomatoesSearchResult(Base):
 
 
 @internet(log)
+@with_session
 def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None,
                  only_cached=False, session=None):
     """
@@ -271,9 +272,6 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None
 
     def id_str():
         return '<title=%s,year=%s,rottentomatoes_id=%s>' % (title, year, rottentomatoes_id)
-
-    if not session:
-        session = Session()
 
     log.debug('Looking up rotten tomatoes information for %s' % id_str())
 

@@ -3,7 +3,8 @@ import logging
 from string import capwords
 import re
 
-from flexget.plugin import priority, register_plugin
+from flexget import plugin
+from flexget.event import event
 from flexget.plugins.filter.series import populate_entry_fields
 from flexget.utils.titles import SeriesParser
 from flexget.utils.titles.parser import ParseWarning
@@ -16,15 +17,13 @@ class MetainfoSeries(object):
     Check if entry appears to be a series, and populate series info if so.
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     # Run after series plugin so we don't try to re-parse it's entries
-    @priority(120)
-    def on_task_metainfo(self, task):
+    @plugin.priority(120)
+    def on_task_metainfo(self, task, config):
         # Don't run if we are disabled
-        if not task.config.get('metainfo_series', True):
+        if config is False:
             return
         for entry in task.entries:
             # If series plugin already parsed this, don't touch it.
@@ -90,4 +89,7 @@ class MetainfoSeries(object):
             if parser.valid:
                 return parser
 
-register_plugin(MetainfoSeries, 'metainfo_series')
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(MetainfoSeries, 'metainfo_series', api_ver=2)

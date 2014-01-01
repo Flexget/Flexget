@@ -239,7 +239,7 @@ def create_icon():
         # View FlexGet in default web browser
         from flexget.ui.webui import manager
         import webbrowser
-        webbrowser.open('http://127.0.0.1:%d' % manager.options.port)
+        webbrowser.open('http://127.0.0.1:%d' % manager.options.webui.port)
 
     menu_options = (('View FlexGet', None, view), )
 

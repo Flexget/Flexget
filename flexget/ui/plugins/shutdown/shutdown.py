@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 from flexget.ui.webui import register_plugin, stop_server
-from flask import render_template, Module
+from flask import render_template, Blueprint
 
 import logging
 
-shutdown = Module(__name__, url_prefix='/shutdown')
+shutdown = Blueprint('shutdown', __name__)
 
 log = logging.getLogger('shutdown')
 

@@ -1,12 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin, DependencyError, priority
+
+from flexget import plugin
+from flexget.event import event
 
 try:
     from flexget.plugins.api_tvdb import lookup_series, lookup_episode, get_mirror
 except ImportError:
-    raise DependencyError(issued_by='thetvdb_lookup', missing='api_tvdb',
-                          message='thetvdb_lookup requires the `api_tvdb` plugin')
+    raise plugin.DependencyError(issued_by='thetvdb_lookup', missing='api_tvdb',
+                                 message='thetvdb_lookup requires the `api_tvdb` plugin')
 
 log = logging.getLogger('thetvdb_lookup')
 
@@ -135,7 +137,7 @@ class PluginThetvdbLookup(object):
         return entry[field]
 
     # Run after series and metainfo series
-    @priority(110)
+    @plugin.priority(110)
     def on_task_metainfo(self, task, config):
         if not config:
             return
@@ -151,4 +153,6 @@ class PluginThetvdbLookup(object):
                 # TODO: lookup for 'seq' and 'date' type series
 
 
-register_plugin(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginThetvdbLookup, 'thetvdb_lookup', api_ver=2)

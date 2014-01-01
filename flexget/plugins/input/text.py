@@ -3,9 +3,10 @@ from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
 
+from flexget import plugin
 from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.plugin import register_plugin, internet, PluginError
 
 log = logging.getLogger('text')
 
@@ -55,7 +56,7 @@ class Text(object):
             entry[k] = v % entry
 
     @cached('text')
-    @internet(log)
+    @plugin.internet(log)
     def on_task_input(self, task, config):
         url = config['url']
         if '://' in url:
@@ -95,7 +96,7 @@ class Text(object):
                         entry[field] = match.group(1)
                     except IndexError:
                         log.error('regex for field `%s` must contain a capture group' % field)
-                        raise PluginError('Your text plugin config contains errors, please correct them.')
+                        raise plugin.PluginError('Your text plugin config contains errors, please correct them.')
                     used[field] = True
                     log.debug('found field: %s value: %s' % (field, entry[field]))
 
@@ -114,4 +115,6 @@ class Text(object):
         return entries
 
 
-register_plugin(Text, 'text', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(Text, 'text', api_ver=2)

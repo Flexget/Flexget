@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from flexget import plugin
-from flexget import validator
+from flexget.event import event
 
 
 class Magnets(object):
@@ -22,4 +23,7 @@ class Magnets(object):
                 else:
                     entry.reject('Magnet urls not allowed.', remember=True)
 
-plugin.register_plugin(Magnets, 'magnets', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(Magnets, 'magnets', api_ver=2)

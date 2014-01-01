@@ -68,6 +68,25 @@ def set_version(plugin, version):
         session.close()
 
 
+def upgrade_required():
+    """Returns true if an upgrade of the database is required."""
+    session = Session()
+    try:
+        for old_schema in session.query(PluginSchema).all():
+            if old_schema.plugin in plugin_schemas and old_schema.version < plugin_schemas[old_schema.plugin]['version']:
+                return True
+        return False
+    finally:
+        session.close()
+
+
+class UpgradeImpossible(Exception):
+    """
+    Exception to be thrown during a db upgrade function which will cause the old tables to be removed and recreated from
+    the new model.
+    """
+
+
 def upgrade(plugin):
     """Used as a decorator to register a schema upgrade function.
 
@@ -104,10 +123,14 @@ def upgrade(plugin):
                 elif new_ver < ver:
                     log.critical('A lower schema version was returned (%s) from the %s upgrade function '
                                  'than passed in (%s)' % (new_ver, plugin, ver))
-                    manager.disable_tasks()
+                    manager.shutdown(finish_queue=False)
+            except UpgradeImpossible:
+                log.info('Plugin %s database is not upgradable. Flushing data and regenerating.' % plugin)
+                reset_schema(plugin)
+                session.commit()
             except Exception as e:
                 log.exception('Failed to upgrade database for plugin %s: %s' % (plugin, e))
-                manager.disable_tasks()
+                manager.shutdown(finish_queue=False)
             finally:
                 session.close()
 
@@ -181,12 +204,15 @@ def versioned_base(plugin, version):
 
 def after_table_create(event, target, bind, tables=None, **kw):
     """Sets the schema version to most recent for a plugin when it's tables are freshly created."""
+    from flexget.manager import manager
     if tables:
-        tables = [table.name for table in tables]
-        for plugin, info in plugin_schemas.iteritems():
-            # Only set the version if all tables for a given plugin are being created
-            if all(table in tables for table in info['tables']):
-                set_version(plugin, info['version'])
+        # TODO: Detect if any database upgrading is needed and acquire the lock only in one place
+        with manager.acquire_lock(event=False):
+            tables = [table.name for table in tables]
+            for plugin, info in plugin_schemas.iteritems():
+                # Only set the version if all tables for a given plugin are being created
+                if all(table in tables for table in info['tables']):
+                    set_version(plugin, info['version'])
 
 # Register a listener to call our method after tables are created
 Base.metadata.append_ddl_listener('after-create', after_table_create)

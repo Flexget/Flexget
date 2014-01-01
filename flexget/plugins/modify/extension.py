@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('extension')
 
@@ -15,15 +17,10 @@ class ModifyExtension(object):
         extension: nzb
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('text')
-        root.accept('number')
-        return root
+    schema = {'type': ['string', 'number']}
 
-    def on_task_modify(self, task):
-        ext = task.config.get('extension')
+    def on_task_modify(self, task, config):
+        ext = unicode(config)
         if ext.startswith('.'):
             ext = ext[1:]
 
@@ -32,4 +29,6 @@ class ModifyExtension(object):
             entry['filename'] = '%s.%s' % (entry.get('filename', entry['title']), ext)
             log.debug('filename is now `%s`' % entry['filename'])
 
-register_plugin(ModifyExtension, 'extension')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(ModifyExtension, 'extension', api_ver=2)

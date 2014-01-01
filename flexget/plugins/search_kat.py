@@ -1,10 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import urllib
+
 import feedparser
+
+from flexget import plugin
 from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils.search import torrent_availability, normalize_unicode
-from flexget.plugin import PluginWarning, register_plugin
 
 log = logging.getLogger('kat')
 
@@ -27,13 +30,14 @@ class SearchKAT(object):
       other
     """
 
-    def validator(self):
-        from flexget import validator
-
-        root = validator.factory('dict')
-        root.accept('choice', key='category').accept_choices(['all', 'movies', 'tv', 'music', 'books', 'xxx', 'other'])
-        root.accept('boolean', key='verified')
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'category': {'type': 'string', 'enum': ['all', 'movies', 'tv', 'music', 'books', 'xxx', 'other']},
+            'verified': {'type': 'boolean'}
+        },
+        'additionalProperties': False
+    }
 
     def search(self, entry, config):
         search_strings = [normalize_unicode(s).lower() for s in entry.get('search_strings', [entry['title']])]
@@ -50,11 +54,11 @@ class SearchKAT(object):
 
             status = rss.get('status', False)
             if status != 200:
-                raise PluginWarning('Search result not 200 (OK), received %s' % status)
+                raise plugin.PluginWarning('Search result not 200 (OK), received %s' % status)
 
             ex = rss.get('bozo_exception', False)
             if ex:
-                raise PluginWarning('Got bozo_exception (bad feed)')
+                raise plugin.PluginWarning('Got bozo_exception (bad feed)')
 
             for item in rss.entries:
                 entry = Entry()
@@ -74,4 +78,7 @@ class SearchKAT(object):
 
         return entries
 
-register_plugin(SearchKAT, 'kat', groups=['search'])
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(SearchKAT, 'kat', groups=['search'], api_ver=2)

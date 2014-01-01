@@ -1,5 +1,7 @@
 import logging
-from flexget.plugin import get_plugins_by_group, register_plugin, DEFAULT_PRIORITY
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('est_released')
 
@@ -20,11 +22,15 @@ class EstimateRelease(object):
         """
 
         log.debug(entry['title'])
-        estimators = [e.instance.estimate for e in get_plugins_by_group('estimate_release')]
-        for estimator in sorted(estimators, key=lambda e: getattr(e, 'priority', DEFAULT_PRIORITY), reverse=True):
+        estimators = [e.instance.estimate for e in plugin.get_plugins(group='estimate_release')]
+        for estimator in sorted(
+                estimators, key=lambda e: getattr(e, 'priority', plugin.DEFAULT_PRIORITY), reverse=True
+        ):
             estimate = estimator(entry)
             # return first successful estimation
             if estimate is not None:
                 return estimate
 
-register_plugin(EstimateRelease, 'estimate_release', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(EstimateRelease, 'estimate_release', api_ver=2)

@@ -1,12 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
+from flexget import plugin
+from flexget.event import event
 from flexget.utils import qualities
-from flexget.plugin import register_plugin, get_plugin_by_name, DependencyError
 
 try:
     from flexget.plugins.filter.movie_queue import queue_add, QueueError
 except ImportError:
-    raise DependencyError(issued_by='queue_movies', missing='movie_queue')
+    raise plugin.DependencyError(issued_by='queue_movies', missing='movie_queue')
 
 log = logging.getLogger('queue_movies')
 
@@ -14,14 +16,16 @@ log = logging.getLogger('queue_movies')
 class QueueMovies(object):
     """Adds all accepted entries to your movie queue."""
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('boolean')
-        opts = root.accept('dict')
-        opts.accept('quality_requirements', key='quality')
-        opts.accept('boolean', key='force')
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {'quality': {'type': 'string', 'format': 'quality_requirements'}},
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def on_task_output(self, task, config):
         if not config:
@@ -31,8 +35,8 @@ class QueueMovies(object):
         for entry in task.accepted:
             # Tell tmdb_lookup to add lazy lookup fields if not already present
             try:
-                get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
-            except DependencyError:
+                plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
+            except plugin.DependencyError:
                 log.debug('tmdb_lookup is not available, queue will not work if movie ids are not populated')
             # Find one or both movie id's for this entry. See if an id is already populated before incurring lazy lookup
             kwargs = {}
@@ -54,9 +58,6 @@ class QueueMovies(object):
                 quality = qualities.Requirements(config.get('quality', 'any'))
 
             kwargs['quality'] = quality
-            force = entry.get('force', config.get('force'))
-            if force is not None:
-                kwargs['force'] = force
             # Provide movie title if it is already available, to avoid movie_queue doing a lookup
             kwargs['title'] = (entry.get('imdb_name', eval_lazy=False) or
                                entry.get('tmdb_name', eval_lazy=False) or
@@ -70,4 +71,6 @@ class QueueMovies(object):
                     entry.fail('Error adding movie to queue: %s' % e.message)
 
 
-register_plugin(QueueMovies, 'queue_movies', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(QueueMovies, 'queue_movies', api_ver=2)

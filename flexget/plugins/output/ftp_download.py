@@ -1,10 +1,10 @@
 import logging
 import os
 import ftplib
-import datetime
 from urlparse import urlparse
-from flexget.entry import Entry
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('ftp')
 
@@ -20,14 +20,14 @@ class OutputFtp(object):
             ftp_download:
               tls: False
               ftp_tmp_path: /tmp
-    
+
         TODO:
           - Resume downloads
           - create banlists files
           - validate connection parameters
 
     """
-    
+
     schema = {
         'type': 'object',
         'properties': {
@@ -38,21 +38,12 @@ class OutputFtp(object):
         'additionalProperties': False
     }
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('boolean', key='use-ssl')
-        root.accept('path', key='ftp_tmp_path')
-        root.accept('boolean', key='delete_origin')
-        return root
-
     def prepare_config(self, config, task):
         config.setdefault('use-ssl', False)
         config.setdefault('delete_origin', False)
         config.setdefault('ftp_tmp_path', os.path.join(task.manager.config_base, 'temp'))
-
         return config
-    
+
     def ftp_connect(self, config, ftp_url, current_path):
         if config['use-ssl']:
             ftp = ftplib.FTP_TLS()
@@ -64,22 +55,20 @@ class OutputFtp(object):
         ftp.sendcmd('TYPE I')
         ftp.set_pasv(True)
         ftp.cwd(current_path)
-        
+
         return ftp
-    
+
     def check_connection(self, ftp, config, ftp_url, current_path):
         try:
             ftp.voidcmd("NOOP")
         except:
             ftp = self.ftp_connect(config, ftp_url, current_path)
         return ftp
-        
 
     def on_task_download(self, task, config):
         config = self.prepare_config(config, task)
         for entry in task.accepted:
             ftp_url = urlparse(entry.get('url'))
-            title = entry.get('title')
             current_path = os.path.dirname(ftp_url.path)
             try:
                 ftp = self.ftp_connect(config, ftp_url, current_path)
@@ -90,9 +79,9 @@ class OutputFtp(object):
             if not os.path.isdir(config['ftp_tmp_path']):
                 log.debug('creating base path: %s' % config['ftp_tmp_path'])
                 os.mkdir(config['ftp_tmp_path'])
-    
+
             file_name = os.path.basename(ftp_url.path)
-            
+
             try:
                 # Directory
                 ftp = self.check_connection(ftp, config, ftp_url, current_path)
@@ -105,9 +94,9 @@ class OutputFtp(object):
             except ftplib.error_perm:
                 # File
                 self.ftp_down(ftp, file_name, config['ftp_tmp_path'], config, ftp_url, current_path)
-                
+
             ftp.close()
-            
+
     def ftp_walk(self, ftp, tmp_path, config, ftp_url, current_path):
         log.debug("DIR->" + ftp.pwd())
         log.debug("FTP tmp_path : " + tmp_path)
@@ -118,7 +107,7 @@ class OutputFtp(object):
             log.info("Error %s" % ex)
             return ftp
 
-        if not dirs: 
+        if not dirs:
             return ftp
 
         for file_name in (path for path in dirs if path not in ('.', '..')):
@@ -148,19 +137,19 @@ class OutputFtp(object):
 
         if not os.path.exists(tmp_path):
             os.makedirs(tmp_path)
-        
+
         local_file = open(os.path.join(tmp_path, file_name), 'a+b')
         ftp = self.check_connection(ftp, config, ftp_url, current_path)
         try:
             ftp.sendcmd("TYPE I")
             file_size = ftp.size(file_name)
         except Exception as e:
-            file_size = 1;
-        
+            file_size = 1
+
         max_attempts = 5
-        
+
         log.info("Starting download of %s into %s" % (file_name, tmp_path))
-        
+
         while file_size > local_file.tell():
             try:
                 if local_file.tell() != 0:
@@ -175,13 +164,15 @@ class OutputFtp(object):
                 else:
                     log.error("Too many errors downloading %s. Aborting." % file_name)
                     break
-        
-        
+
         local_file.close()
         if config['delete_origin']:
             ftp = self.check_connection(ftp, config, ftp_url, current_path)
             ftp.delete(file_name)
-                
+
         return ftp
 
-register_plugin(OutputFtp, 'ftp_download', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputFtp, 'ftp_download', api_ver=2)

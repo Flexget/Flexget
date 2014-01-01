@@ -3,14 +3,16 @@
 from __future__ import unicode_literals, division, absolute_import
 import urllib2
 import httplib
+import os
 import socket
 import time
 import re
 import sys
 import locale
+from collections import MutableMapping
 from urlparse import urlparse
 from htmlentitydefs import name2codepoint
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 
 def str_to_boolean(string):
@@ -127,47 +129,6 @@ def _xmlcharref_encode(unicode_data, encoding):
         except UnicodeError:
             chars.append('&#%i;' % ord(char))
     return ''.join(chars)
-
-
-import types
-_valid = [types.DictType, types.IntType, types.NoneType,
-          types.StringType, types.UnicodeType, types.BooleanType,
-          types.ListType, types.LongType, types.FloatType]
-
-
-# TODO: I think this was left as broken ...
-def sanitize(value, logger=None):
-    raise Exception('broken')
-    if isinstance(value, dict):
-        sanitize_dict(value, logger)
-    elif isinstance(value, list):
-        sanitize_list(value, logger)
-    else:
-        raise Exception('Unsupported datatype')
-
-
-# TODO: I think this was left as broken ...
-def sanitize_dict(d, logger=None):
-    """Makes dictionary d contain only yaml.safe_dump compatible elements. On other words, remove all non
-    standard types from dictionary."""
-    for k in d.keys():
-        if isinstance(type(d[k]), list):
-            sanitize_list(d[k])
-        elif isinstance(type(d[k]), dict):
-            sanitize_dict(d[k], logger)
-        elif not type(d[k]) in _valid:
-            if logger:
-                logger.debug('Removed non yaml compatible key %s %s' % (k, type(d[k])))
-            d.pop(k)
-
-
-# TODO: I think this was left as broken ...
-def sanitize_list(content, logger=None):
-    for value in content[:]:
-        if not type(value) in _valid:
-            if logger:
-                logger.debug('Removed non yaml compatible list item %s' % type(value))
-        content.remove(value)
 
 
 def merge_dict_from_to(d1, d2):
@@ -375,3 +336,68 @@ def multiply_timedelta(interval, number):
     # Python 2.6 doesn't have total seconds
     total_seconds = interval.seconds + interval.days * 24 * 3600
     return timedelta(seconds=total_seconds*number)
+
+if os.name == 'posix':
+    def pid_exists(pid):
+        """Check whether pid exists in the current process table."""
+        import errno
+        if pid < 0:
+            return False
+        try:
+            os.kill(pid, 0)
+        except OSError as e:
+            return e.errno == errno.EPERM
+        else:
+            return True
+else:
+    def pid_exists(pid):
+        import ctypes
+        import ctypes.wintypes
+        kernel32 = ctypes.windll.kernel32
+        PROCESS_QUERY_INFORMATION = 0x0400
+        STILL_ACTIVE = 259
+
+        handle = kernel32.OpenProcess(PROCESS_QUERY_INFORMATION, 0, pid)
+        if handle == 0:
+            return False
+
+        # If the process exited recently, a pid may still exist for the handle.
+        # So, check if we can get the exit code.
+        exit_code = ctypes.wintypes.DWORD()
+        is_running = kernel32.GetExitCodeProcess(handle, ctypes.byref(exit_code)) == 0
+        kernel32.CloseHandle(handle)
+
+        # See if we couldn't get the exit code or the exit code indicates that the
+        # process is still running.
+        return is_running or exit_code.value == STILL_ACTIVE
+
+
+class TimedDict(MutableMapping):
+    """Acts like a normal dict, but keys will only remain in the dictionary for a specified time span."""
+    def __init__(self, cache_time='5 minutes'):
+        self.cache_time = parse_timedelta(cache_time)
+        self._store = dict()
+
+    def __getitem__(self, key):
+        add_time, value = self._store[key]
+        # Prune data and raise KeyError when expired
+        if add_time < datetime.now() - self.cache_time:
+            del self._store[key]
+            raise KeyError(key, 'cache time expired')
+        return value
+
+    def __setitem__(self, key, value):
+        self._store[key] = (datetime.now(), value)
+
+    def __delitem__(self, key):
+        del self._store[key]
+
+    def __iter__(self):
+        # Uses our getitem to skip expired items
+        return (key for key in self._store.keys() if key in self)
+
+    def __len__(self):
+        return len(list(self.__iter__()))
+
+    def __repr__(self):
+        return '%s(%r)' % (self.__class__.__name__, dict(zip(self._store, (v[1] for v in self._store.values()))))

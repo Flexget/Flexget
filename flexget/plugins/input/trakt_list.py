@@ -2,11 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 import hashlib
 import logging
 import re
+
 from requests import RequestException
+
+from flexget import plugin
+from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils import json
 from flexget.utils.cached_input import cached
-from flexget.plugin import register_plugin, PluginError
-from flexget.entry import Entry
 
 log = logging.getLogger('trakt_list')
 
@@ -69,7 +72,7 @@ class TraktList(object):
         # Don't edit the config, or it won't pass validation on rerun
         url_params = config.copy()
         if 'movies' in config and 'series' in config:
-            raise PluginError('Cannot use both series list and movies list in the same task.')
+            raise plugin.PluginError('Cannot use both series list and movies list in the same task.')
         if 'movies' in config:
             url_params['data_type'] = 'movies'
             url_params['list_type'] = config['movies']
@@ -91,7 +94,7 @@ class TraktList(object):
             url_params['list_type'] = list_name
             # Map type is per item in custom lists
         else:
-            raise PluginError('Must define movie or series lists to retrieve from trakt.')
+            raise plugin.PluginError('Must define movie or series lists to retrieve from trakt.')
 
         url = 'http://api.trakt.tv/user/'
         auth = None
@@ -113,30 +116,30 @@ class TraktList(object):
         try:
             result = task.requests.post(url, data=json.dumps(auth))
         except RequestException as e:
-            raise PluginError('Could not retrieve list from trakt (%s)' % e.message)
+            raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e.message)
         try:
             data = result.json()
         except ValueError:
             log.debug('Could not decode json from response: %s', data.text)
-            raise PluginError('Error getting list from trakt.')
+            raise plugin.PluginError('Error getting list from trakt.')
 
         def check_auth():
             if task.requests.post(
                     'http://api.trakt.tv/account/test/' + config['api_key'],
                     data=json.dumps(auth), raise_status=False
             ).status_code != 200:
-                raise PluginError('Authentication to trakt failed.')
+                raise plugin.PluginError('Authentication to trakt failed.')
 
         if 'error' in data:
             check_auth()
-            raise PluginError('Error getting trakt list: %s' % data['error'])
+            raise plugin.PluginError('Error getting trakt list: %s' % data['error'])
         if not data:
             check_auth()
             log.warning('No data returned from trakt.')
             return
         if url_params['data_type'] == 'custom':
             if not isinstance(data['items'], list):
-                raise PluginError('Faulty custom items in response: %s' % data['items'])
+                raise plugin.PluginError('Faulty custom items in response: %s' % data['items'])
             data = data['items']
         for item in data:
             if url_params['data_type'] == 'custom':
@@ -157,4 +160,6 @@ class TraktList(object):
         return entries
 
 
-register_plugin(TraktList, 'trakt_list', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(TraktList, 'trakt_list', api_ver=2)

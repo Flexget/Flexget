@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from flexget.plugin import register_plugin, priority, get_plugin_by_name
+from flexget import plugin
+from flexget.event import event
 from flexget.plugins.filter.series import FilterSeriesBase, normalize_series_name, Series
 
 
@@ -35,10 +36,12 @@ class FilterSeriesPremiere(FilterSeriesBase):
         return {'anyOf': [{'type': 'boolean'}, settings]}
 
     # Run after series and metainfo series plugins
-    @priority(115)
+    @plugin.priority(115)
     def on_task_metainfo(self, task, config):
         if not config:
             # Don't run when we are disabled
+            return
+        if task.is_rerun:
             return
         # Generate the group settings for series plugin
         group_settings = {}
@@ -51,7 +54,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
             group_settings = config
         group_settings['identified_by'] = 'ep'
         # Generate a list of unique series that have premieres
-        metainfo_series = get_plugin_by_name('metainfo_series')
+        metainfo_series = plugin.get_plugin_by_name('metainfo_series')
         guess_entry = metainfo_series.instance.guess_entry
         # Make a set of unique series according to series name normalization rules
         guessed_series = {}
@@ -70,10 +73,14 @@ class FilterSeriesPremiere(FilterSeriesBase):
                         entry.get('series_season') == 1
                         and entry.get('series_episode') in desired_eps):
                     entry.reject('Non premiere episode in a premiere series')
-        # Combine settings and series into series plugin config format
-        allseries = {'settings': {'series_premiere': group_settings}, 'series_premiere': guessed_series.values()}
-        # Merge the our config in to the main series config
-        self.merge_config(task, allseries)
+        # Since we are running after task start phase, make sure not to merge into the config multiple times on reruns
+        if not task.is_rerun:
+            # Combine settings and series into series plugin config format
+            allseries = {'settings': {'series_premiere': group_settings}, 'series_premiere': guessed_series.values()}
+            # Merge the our config in to the main series config
+            self.merge_config(task, allseries)
 
 
-register_plugin(FilterSeriesPremiere, 'series_premiere', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(FilterSeriesPremiere, 'series_premiere', api_ver=2)

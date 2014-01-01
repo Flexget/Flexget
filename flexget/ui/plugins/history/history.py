@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from sqlalchemy import desc
 from flexget.ui.webui import register_plugin, db_session
-from flask import render_template, Module
+from flask import render_template, Blueprint
 from flexget.plugin import DependencyError
 
 try:
@@ -11,7 +11,7 @@ except ImportError:
     raise DependencyError(issued_by='ui.history', missing='history')
 
 log = logging.getLogger('ui.history')
-history = Module(__name__)
+history = Blueprint('history', __name__)
 
 
 @history.route('/')

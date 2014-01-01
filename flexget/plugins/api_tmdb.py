@@ -10,18 +10,19 @@ from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, 
 from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 
-from flexget import db_schema
-from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
-from flexget.utils.titles import MovieParser
+from flexget import db_schema, plugin
+from flexget.event import event
+from flexget.manager import Session
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, year_property, with_session
-from flexget.manager import Session
-from flexget.plugin import register_plugin, DependencyError
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
+from flexget.utils.titles import MovieParser
 
 try:
     import tmdb3
 except ImportError:
-    raise DependencyError(issued_by='api_tmdb', missing='tmdb3', message='TMDB requires https://github.com/wagnerrp/pytmdb3')
+    raise plugin.DependencyError(issued_by='api_tmdb', missing='tmdb3',
+                                 message='TMDB requires https://github.com/wagnerrp/pytmdb3')
 
 log = logging.getLogger('api_tmdb')
 Base = db_schema.versioned_base('api_tmdb', 0)
@@ -30,6 +31,7 @@ Base = db_schema.versioned_base('api_tmdb', 0)
 tmdb3.tmdb_api.set_key('bdfc018dbdb7c243dc7cb1454ff74b95')
 tmdb3.locales.set_locale("en", "us", True);
 tmdb3.set_cache('null')
+
 
 @db_schema.upgrade('api_tmdb')
 def upgrade(ver, session):
@@ -74,6 +76,7 @@ class TMDBContainer(object):
         for col in self.__table__.columns:
             if hasattr(update_object, col.name) and isinstance(getattr(update_object, col.name), (basestring, int, float)):
                 setattr(self, col.name, getattr(update_object, col.name))
+
 
 class TMDBMovie(TMDBContainer, Base):
     __tablename__ = 'tmdb_movies'
@@ -124,6 +127,7 @@ class TMDBMovie(TMDBContainer, Base):
             self.trailer = update_object.apple_trailers[0].source
         self.released = update_object.releasedate
 
+
 class TMDBGenre(TMDBContainer, Base):
 
     __tablename__ = 'tmdb_genres'
@@ -165,11 +169,13 @@ class TMDBPoster(TMDBContainer, Base):
         # If we are detached from a session, update the db
         if not Session.object_session(self):
             session = Session()
-            poster = session.query(TMDBPoster).filter(TMDBPoster.db_id == self.db_id).first()
-            if poster:
-                poster.file = filename
-                session.commit()
-            session.close()
+            try:
+                poster = session.query(TMDBPoster).filter(TMDBPoster.db_id == self.db_id).first()
+                if poster:
+                    poster.file = filename
+                    session.commit()
+            finally:
+                session.close()
         return filename.split(os.sep)
 
 
@@ -348,4 +354,6 @@ def _first_result(results):
         return results[0]
 
 
-register_plugin(ApiTmdb, 'api_tmdb')
+@event('plugin.register')
+def register_plugin():
+    plugin.register(ApiTmdb, 'api_tmdb', api_ver=2)

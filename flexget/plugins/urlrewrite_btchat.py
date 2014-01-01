@@ -1,11 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.plugin import register_plugin
+
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger("btchat")
 
 
-class UrlRewriteBtChat:
+class UrlRewriteBtChat(object):
     """BtChat urlrewriter."""
 
     def url_rewritable(self, task, entry):
@@ -14,4 +16,7 @@ class UrlRewriteBtChat:
     def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('download.php', 'download1.php')
 
-register_plugin(UrlRewriteBtChat, 'btchat', groups=['urlrewriter'])
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(UrlRewriteBtChat, 'btchat', groups=['urlrewriter'], api_ver=2)

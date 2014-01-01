@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import time
 import logging
 import posixpath
-from flask import render_template, Module, request, redirect, flash, send_file
+from flask import render_template, Blueprint, request, redirect, flash, send_file
 from flask.helpers import url_for
 from flexget.plugin import DependencyError, get_plugin_by_name
 from flexget.ui.webui import register_plugin, app, manager
@@ -14,7 +14,7 @@ except ImportError:
     raise DependencyError(issued_by='ui.movies', missing='movie_queue')
 
 
-movies_module = Module(__name__, url_prefix='/movies')
+movies_module = Blueprint('movies', __name__)
 log = logging.getLogger('ui.movies')
 
 
@@ -55,7 +55,7 @@ def index():
             if poster.size == 'thumb':
                 thumb = poster.get_file(only_cached=True)
                 if thumb:
-                    item.thumb = url_for('.userstatic', filename=posixpath.join(*thumb))
+                    item.thumb = url_for('userstatic', filename=posixpath.join(*thumb))
                 break
 
         item.title = movie.name
@@ -79,7 +79,7 @@ def add_to_queue():
         flash(e.message, 'error')
     else:
         flash('%s successfully added to queue.' % title, 'success')
-    return redirect(url_for('index'))
+    return redirect(url_for('.index'))
 
 
 @movies_module.route('/del')
@@ -91,7 +91,7 @@ def del_from_queue():
         flash(e.message, 'error')
     else:
         flash('%s removed from queue.' % title, 'delete')
-    return redirect(url_for('index'))
+    return redirect(url_for('.index'))
 
 
 @movies_module.route('/edit')
@@ -105,7 +105,7 @@ def edit_movie_quality():
     else:
         # TODO: Display movie name instead of id
         flash('%s quality changed to %s' % (imdb_id, quality), 'success')
-    return redirect(url_for('index'))
+    return redirect(url_for('.index'))
 
 
 @movies_module.route('/cover/<imdb_id>')

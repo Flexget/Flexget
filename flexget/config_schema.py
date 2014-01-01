@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from collections import defaultdict
+from datetime import datetime
 import os
 import re
 import urlparse
@@ -7,11 +8,14 @@ import urlparse
 import jsonschema
 from jsonschema.compat import str_types
 
+from flexget.event import fire_event
 from flexget.utils import qualities, template
+from flexget.utils.tools import parse_timedelta
 
 schema_paths = {}
 
 
+# TODO: Rethink how config key and schema registration work
 def register_schema(path, schema):
     """
     Register `schema` to be available at `path` for $refs
@@ -20,6 +24,36 @@ def register_schema(path, schema):
     :param schema: The schema, or function which returns the schema
     """
     schema_paths[path] = schema
+
+
+# Validator that handles root structure of config.
+_root_config_schema = None
+
+
+def register_config_key(key, schema, required=False):
+    """ Registers a valid root level key for the config.
+
+    :param string key:
+      Name of the root level key being registered.
+    :param dict schema:
+      Schema for the key.
+    :param bool required:
+      Specify whether this is a mandatory key.
+    """
+    _root_config_schema['properties'][key] = schema
+    if required:
+        _root_config_schema.setdefault('required', []).append(key)
+    register_schema('/schema/config/%s' % key, schema)
+
+
+def get_schema():
+    global _root_config_schema
+    if _root_config_schema is None:
+        _root_config_schema = {'type': 'object', 'properties': {}, 'additionalProperties': False}
+        fire_event('config.register')
+        # TODO: Is /schema/root this the best place for this?
+        register_schema('/schema/config', _root_config_schema)
+    return _root_config_schema
 
 
 def one_or_more(schema):
@@ -51,13 +85,16 @@ def resolve_ref(uri):
     raise jsonschema.RefResolutionError("%s could not be resolved" % uri)
 
 
-def process_config(config, schema, set_defaults=True):
+def process_config(config, schema=None, set_defaults=True):
     """
     Validates the config, and sets defaults within it if `set_defaults` is set.
+    If schema is not given, uses the root config schema.
 
     :returns: A list with :class:`jsonschema.ValidationError`s if any
 
     """
+    if schema is None:
+        schema = get_schema()
     resolver = RefResolver.from_schema(schema)
     validator = SchemaValidator(schema, resolver=resolver, format_checker=format_checker)
     if set_defaults:
@@ -68,12 +105,32 @@ def process_config(config, schema, set_defaults=True):
         validator.VALIDATORS['properties'] = jsonschema.Draft4Validator.VALIDATORS['properties']
     # Customize the error messages
     for e in errors:
-        e.message = get_error_message(e)
+        set_error_message(e)
         e.json_pointer = '/' + '/'.join(map(unicode, e.path))
     return errors
 
 
+def parse_time(time_string):
+    """Parse a time string from the config into a :class:`datetime.time` object."""
+    formats = ['%I:%M %p', '%H:%M', '%H:%M:%S']
+    for f in formats:
+        try:
+            return datetime.strptime(time_string, f).time()
+        except ValueError:
+            continue
+    raise ValueError('invalid time `%s`' % time_string)
+
+
+def parse_interval(interval_string):
+    """Takes an interval string from the config and turns it into a :class:`datetime.timedelta` object."""
+    regexp = r'^\d+ (second|minute|hour|day|week)s?$'
+    if not re.match(regexp, interval_string):
+        raise ValueError("should be in format 'x (seconds|minutes|hours|days|weeks)'")
+    return parse_timedelta(interval_string)
+
+
 ## Public API end here, the rest should not be used outside this module
+
 
 class RefResolver(jsonschema.RefResolver):
     def __init__(self, *args, **kwargs):
@@ -96,6 +153,21 @@ def is_quality_req(instance):
     if not isinstance(instance, str_types):
         return True
     return qualities.Requirements(instance)
+
+
+
+@format_checker.checks('time', raises=ValueError)
+def is_time(time_string):
+    if not isinstance(time_string, str_types):
+        return True
+    return parse_time(time_string) is not None
+
+
+@format_checker.checks('interval', raises=ValueError)
+def is_interval(interval_string):
+    if not isinstance(interval_string, str_types):
+        return True
+    return parse_interval(interval_string) is not None
 
 
 @format_checker.checks('regex', raises=ValueError)
@@ -140,26 +212,13 @@ def is_url(instance):
               '):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?')
     return re.match(regexp, instance)
 
-@format_checker.checks('interval', raises=ValueError)
-def is_interval(instance):
-    if not isinstance(instance, str_types):
-        return True
-    regexp = r'^\d+ (second|minute|hour|day|week)s?$'
-    if not re.match(regexp, instance):
-        raise ValueError("should be in format 'x (seconds|minutes|hours|days|weeks)'")
-    return True
 
-
-def get_error_message(error):
+def set_error_message(error):
     """
-     Create user facing error message from a :class:`jsonschema.ValidationError` `error`
+    Create user facing error message from a :class:`jsonschema.ValidationError` `error`
 
     """
-
-    custom_error = error.schema.get('error_%s' % error.validator, error.schema.get('error'))
-    if custom_error:
-        return template.render(custom_error, error.__dict__)
-
+    # First, replace default error messages with our custom ones
     if error.validator == 'type':
         if isinstance(error.validator_value, basestring):
             valid_types = [error.validator_value]
@@ -171,29 +230,30 @@ def get_error_message(error):
         # Make valid_types into an english list, with commas and 'or'
         valid_types = ', '.join(valid_types[:-2] + ['']) + ' or '.join(valid_types[-2:])
         if isinstance(error.instance, dict):
-            return 'Got a dict, expected: %s' % valid_types
+            error.message = 'Got a dict, expected: %s' % valid_types
         if isinstance(error.instance, list):
-            return 'Got a list, expected: %s' % valid_types
-        return 'Got `%s`, expected: %s' % (error.instance, valid_types)
-
-    if error.validator == 'format':
+            error.message = 'Got a list, expected: %s' % valid_types
+        error.message = 'Got `%s`, expected: %s' % (error.instance, valid_types)
+    elif error.validator == 'format':
         if error.cause:
-            return unicode(error.cause)
-
-    if error.validator == 'enum':
-        return 'Must be one of the following: %s' % ', '.join(map(unicode, error.validator_value))
-
-    if error.validator == 'additionalProperties':
+            error.message = unicode(error.cause)
+    elif error.validator == 'enum':
+        error.message = 'Must be one of the following: %s' % ', '.join(map(unicode, error.validator_value))
+    elif error.validator == 'additionalProperties':
         if error.validator_value is False:
             extras = set(jsonschema._utils.find_additional_properties(error.instance, error.schema))
             if len(extras) == 1:
-                return 'The key `%s` is not valid here.' % extras.pop()
+                error.message = 'The key `%s` is not valid here.' % extras.pop()
             else:
-                return 'The keys %s are not valid here.' % ', '.join('`%s`' % e for e in extras)
+                error.message = 'The keys %s are not valid here.' % ', '.join('`%s`' % e for e in extras)
+    else:
+        # Remove u'' string representation from jsonschema error messages
+        error.message = re.sub('u\'(.*?)\'', '`\\1`', error.message)
 
-    # Remove u'' string representation from jsonschema error messages
-    message = re.sub('u\'(.*?)\'', '`\\1`', error.message)
-    return message
+    # Then update with any custom error message supplied from the schema
+    custom_error = error.schema.get('error_%s' % error.validator, error.schema.get('error'))
+    if custom_error:
+        error.message = template.render(custom_error, error.__dict__)
 
 
 def select_child_errors(validator, errors):

@@ -4,11 +4,11 @@ import logging
 
 from sqlalchemy import Column, Integer, Unicode
 
-from flexget import db_schema
-from flexget.plugin import register_plugin, get_plugin_by_name, PluginError
+from flexget import db_schema, plugin
+from flexget.event import event
 from flexget.plugins.filter.series import FilterSeriesBase
 
-log = logging.getLogger('import_series')
+log = logging.getLogger('configure_series')
 Base = db_schema.versioned_base('import_series', 0)
 
 
@@ -26,7 +26,7 @@ class ImportSeries(FilterSeriesBase):
 
     Configuration::
 
-      import_series:
+      configure_series:
         [settings]:
            # same configuration as series plugin
         from:
@@ -34,7 +34,7 @@ class ImportSeries(FilterSeriesBase):
 
     Example::
 
-      import_series:
+      configure_series:
         settings:
           quality: 720p
         from:
@@ -57,9 +57,9 @@ class ImportSeries(FilterSeriesBase):
 
         series = {}
         for input_name, input_config in config.get('from', {}).iteritems():
-            input = get_plugin_by_name(input_name)
+            input = plugin.get_plugin_by_name(input_name)
             if input.api_ver == 1:
-                raise PluginError('Plugin %s does not support API v2' % input_name)
+                raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
 
             method = input.phase_handlers['input']
             result = method(task, input_config)
@@ -96,4 +96,6 @@ class ImportSeries(FilterSeriesBase):
         self.merge_config(task, series_config)
 
 
-register_plugin(ImportSeries, 'import_series', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(ImportSeries, 'configure_series', api_ver=2)

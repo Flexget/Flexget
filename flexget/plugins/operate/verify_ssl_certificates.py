@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
 from flexget import plugin, validator
+from flexget.event import event
 
 log = logging.getLogger('verify_ssl')
 
@@ -21,4 +23,7 @@ class VerifySSLCertificates(object):
         if config is False:
             task.requests.verify = False
 
-plugin.register_plugin(VerifySSLCertificates, 'verify_ssl_certificates', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(VerifySSLCertificates, 'verify_ssl_certificates', api_ver=2)

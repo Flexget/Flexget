@@ -2,7 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import hashlib
 
-from flexget.plugin import register_plugin, priority
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.template import RenderError
 
 __version__ = 0.1
@@ -47,7 +48,7 @@ class OutputSMSru(object):
         return config
 
     # Run last to make sure other outputs are successful before sending notification
-    @priority(0)
+    @plugin.priority(0)
     def on_task_output(self, task, config):
         # Get the parameters
         config = self.prepare_config(config)
@@ -78,7 +79,7 @@ class OutputSMSru(object):
                 message = "accepted %s" % entry["title"]
 
             # Check for test mode
-            if task.manager.options.test:
+            if task.options.test:
                 log.info("Test mode. Processing for %s" % phonenumber)
                 log.info("Message: %s" % message)
 
@@ -88,7 +89,7 @@ class OutputSMSru(object):
                            'token': token_response.text,
                            'to': phonenumber,
                            'text': message}
-            if task.manager.options.test:
+            if task.options.test:
                 send_params.update({'test': 1})
 
             # Make the request
@@ -103,4 +104,7 @@ class OutputSMSru(object):
             else:
                 log.error("SMS was not sent. Server response was %s" % response.text)
 
-register_plugin(OutputSMSru, "sms_ru", api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputSMSru, "sms_ru", api_ver=2)

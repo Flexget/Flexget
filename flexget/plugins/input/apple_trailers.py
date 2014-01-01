@@ -1,17 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import urlparse
-import re
 
+from flexget import plugin
 from flexget.entry import Entry
-from flexget.plugin import priority, register_plugin, get_plugin_by_name, DependencyError
+from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 try:
     from flexget.plugins.input.rss import InputRSS
 except ImportError:
-    raise DependencyError(issued_by='apple_trailers', missing='rss')
+    raise plugin.DependencyError(issued_by='apple_trailers', missing='rss')
 
 log = logging.getLogger('apple_trailers')
 
@@ -31,15 +31,15 @@ class AppleTrailers(InputRSS):
     schema = {'enum': qualities}
 
     # Run before headers plugin
-    @priority(135)
+    @plugin.priority(135)
     def on_task_start(self, task, config):
         # TODO: Resolve user-agent in a way that doesn't involve modifying the task config.
         # make sure we have dependencies available, will throw DependencyError if not
-        get_plugin_by_name('headers')
+        plugin.get_plugin_by_name('headers')
         # configure them
         task.config['headers'] = {'User-Agent': 'QuickTime/7.6.6'}
 
-    @priority(127)
+    @plugin.priority(127)
     @cached('apple_trailers')
     def on_task_input(self, task, config):
         # use rss plugin
@@ -96,4 +96,6 @@ class AppleTrailers(InputRSS):
 
         return result
 
-register_plugin(AppleTrailers, 'apple_trailers', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(AppleTrailers, 'apple_trailers', api_ver=2)
