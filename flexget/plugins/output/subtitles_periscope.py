@@ -61,18 +61,14 @@ class PluginPeriscope(object):
                 overwrite: If yes it will try to download even for videos that are already subbed. Default: no.
                 subexts: List of subtitles file extensions to check (only useful with overwrite=no). Default: srt, stp, sub, stl, ssa.
         """
-        import periscope
-        psc = periscope.Periscope(tempfile.gettempdir())
-        # to avoid A LOT of info/warnings/errors coming from periscope:
-        logging.getLogger("periscope").setLevel(logging.CRITICAL)
-        
         if not task.accepted:
             log.debug('nothing accepted, aborting')
             return
-        langs = [s.encode('utf8') for s in config['languages']]  # unicode warnings in periscope
-        alts = []
-        if 'alternatives' in config:
-            alts = [s.encode('utf8') for s in config['alternatives']]
+        import periscope
+        psc = periscope.Periscope(tempfile.gettempdir())
+        logging.getLogger("periscope").setLevel(logging.CRITICAL)  # LOT of messages otherwise
+        langs = [s.encode('utf8') for s in config['languages']]  # avoid unicode warnings
+        alts = [s.encode('utf8') for s in config.get('alternatives', [])]
         if not config['overwrite']:
             self.exts = ['.'+s for s in config['subexts']]
         for entry in task.accepted:
