@@ -72,8 +72,12 @@ class PluginSubliminal(object):
         langs = set([Language(s) for s in config['languages']])
         alts = set([Language(s) for s in config.get('alternatives', [])])
         def getsubs(vd, ln):
-            return subliminal.download_best_subtitles([vd], ln, min_score=vd.scores['hash']) \
-                    if config['exact_match'] else subliminal.download_best_subtitles([vd], ln)
+            try:
+                return subliminal.download_best_subtitles([vd], ln, min_score=vd.scores['hash']) \
+                        if config['exact_match'] else subliminal.download_best_subtitles([vd], ln)
+            except Exception as err:
+                log.error('Subliminal error: %s' % err.message)
+                return []
         for entry in task.accepted:
             if not 'location' in entry:
                 entry.reject('is not a local file')
