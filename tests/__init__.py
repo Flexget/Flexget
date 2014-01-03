@@ -83,7 +83,6 @@ class MockManager(Manager):
     def acquire_lock(self, **kwargs):
         self._has_lock = True
         yield
-        self._has_lock = False
 
     def release_lock(self):
         pass
