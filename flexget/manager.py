@@ -37,8 +37,7 @@ DB_CLEANUP_INTERVAL = timedelta(days=7)
 @sqlalchemy.event.listens_for(Session, 'before_commit')
 def before_commit(session):
     if not manager.has_lock and session.dirty:
-        log.error('BUG: Database writes should not be tried when there is no database lock. Please Report.')
-        traceback.print_stack()
+        log.debug('BUG?: Database writes should not be tried when there is no database lock.')
 
 
 class Manager(object):
