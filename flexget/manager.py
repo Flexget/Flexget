@@ -8,7 +8,6 @@ import shutil
 import logging
 import threading
 import pkg_resources
-import traceback
 import yaml
 from datetime import datetime, timedelta
 
