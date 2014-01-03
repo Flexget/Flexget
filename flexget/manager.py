@@ -20,16 +20,7 @@ from sqlalchemy.exc import OperationalError
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 Base = declarative_base()
-_Session = sessionmaker()
-class Session(_Session):
-    def commit(self, *args, **kwargs):
-        if not manager.has_lock:
-            if manager.unit_test:
-                raise Exception('Cannot commit to database without lock.')
-            log.error('BUG: Database writes should not be tried when there is no database lock. Please Report.')
-            traceback.print_stack()
-        else:
-            super(Session, self).commit(*args, **kwargs)
+Session = sessionmaker()
 
 from flexget import config_schema, db_schema
 from flexget.event import fire_event
@@ -41,6 +32,13 @@ log = logging.getLogger('manager')
 
 manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
+
+
+@sqlalchemy.event.listens_for(Session, 'before_commit')
+def before_commit(session):
+    if not manager.has_lock and session.dirty:
+        log.error('BUG: Database writes should not be tried when there is no database lock. Please Report.')
+        traceback.print_stack()
 
 
 class Manager(object):
