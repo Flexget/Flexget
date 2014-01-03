@@ -60,7 +60,7 @@ class FilterIf(object):
             missing_field = e.message.split('\'')[1]
             log.debug('%s does not contain the field %s' % (entry['title'], missing_field))
         except Exception as e:
-            log.error('Error occurred in if statement: %r' % e)
+            log.error('Error occured while evaluating statement `%s`. (%s)' % (condition, e))
 
     def __getattr__(self, item):
         """Provides handlers for all phases."""
