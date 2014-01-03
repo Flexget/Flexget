@@ -110,7 +110,7 @@ class TestDownload(FlexGetBase):
           test:
             mock:
               - title: README
-                url: http://svn.flexget.com/trunk/bootstrap.py
+                url: https://github.com/Flexget/Flexget/raw/master/README.rst
                 filename: flexget_test_data
             accept_all: true
             download:
