@@ -4,6 +4,7 @@ import logging
 import mimetypes
 import os
 import shutil
+import socket
 import sys
 import tempfile
 import urllib
@@ -287,13 +288,16 @@ class PluginDownload(object):
         try:
             for chunk in response.iter_content(chunk_size=150 * 1024, decode_unicode=False):
                 outfile.write(chunk)
-        except:
+        except Exception as e:
             # don't leave futile files behind
             # outfile has to be closed before we can delete it on Windows
             outfile.close()
             log.debug('Download interrupted, removing datafile')
             os.remove(datafile)
-            raise
+            if isinstance(e, socket.timeout):
+                log.error('Timeout while downloading file')
+            else:
+                raise
         else:
             outfile.close()
             # Do a sanity check on downloaded file
