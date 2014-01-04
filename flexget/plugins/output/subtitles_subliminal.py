@@ -26,6 +26,7 @@ class PluginSubliminal(object):
             - ita
           alternatives:
             - eng
+          exact_match: no
     """
     
     schema = {
@@ -58,6 +59,7 @@ class PluginSubliminal(object):
             subliminal:
                 languages: List of languages (3-letter ISO-639-3 code) in order of preference. At least one is required.
                 alternatives: List of second-choice languages; subs will be downloaded but entries rejected.
+                exact_match: Use file hash only to search for subs, otherwise Subliminal will try to guess by filename.
         """
         if not task.accepted:
             log.debug('nothing accepted, aborting')
@@ -67,37 +69,32 @@ class PluginSubliminal(object):
         subliminal.cache_region.configure('dogpile.cache.dbm', 
             arguments={'filename': os.path.join(tempfile.gettempdir(), 'cachefile.dbm'), 
                        'lock_factory': subliminal.MutexLock})
-        logging.getLogger("subliminal").setLevel(logging.WARNING)
+        logging.getLogger("subliminal").setLevel(logging.CRITICAL)
         logging.getLogger("enzyme").setLevel(logging.WARNING)
         langs = set([Language(s) for s in config['languages']])
         alts = set([Language(s) for s in config.get('alternatives', [])])
-        def getsubs(vd, ln):
-            try:
-                return subliminal.download_best_subtitles([vd], ln, min_score=vd.scores['hash']) \
-                        if config['exact_match'] else subliminal.download_best_subtitles([vd], ln)
-            except Exception as err:
-                log.error('Subliminal error: %s' % err.message)
-                return []
         for entry in task.accepted:
             if not 'location' in entry:
                 entry.reject('is not a local file')
-            elif '$RECYCLE.BIN' in entry['location']:  # happens in connected network shares
-                entry.reject("is in Windows recycle-bin")
             elif not os.path.exists(entry['location']):
                 entry.reject('file not found')
-            else:
+            elif not '$RECYCLE.BIN' in entry['location']:  # ignore deleted files in Windows shares
                 try:
                     video = subliminal.scan_video(entry['location'])
+                    msc = video.scores['hash'] if config['exact_match'] else 0
+                    if langs & video.subtitle_languages:
+                        continue  # subs for preferred lang(s) already exists
+                    elif subliminal.download_best_subtitles([video], langs, min_score=msc):
+                        log.info('Subtitles found for %s' % entry['location'])
+                    elif alts and (alts - video.subtitle_languages) and \
+                        subliminal.download_best_subtitles([video], alts, min_score=msc):
+                        entry.reject('subtitles found for a second-choice language.')
+                    else:
+                        entry.reject('cannot find any subtitles for now.')
                 except Exception as err:
-                    entry.fail('subliminal scan error: %s' % err.message)
-                if langs & video.subtitle_languages:
-                    continue
-                if len(getsubs(video, langs)) > 0:
-                    log.info('Subtitles found for %s' % entry['location'])
-                elif alts and (alts - video.subtitle_languages) and len(getsubs(video, alts)) > 0:
-                    entry.reject('subtitles found for a second-choice language.')
-                else:
-                    entry.reject('cannot find any subtitles for now.')
+                    # don't want to abort the entire task for errors in a  
+                    # single video file or for occasional network timeouts
+                    entry.fail(err.message)
 
 
 register_plugin(PluginSubliminal, 'subliminal', api_ver=2)

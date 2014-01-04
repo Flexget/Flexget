@@ -24,7 +24,9 @@ class PluginPeriscope(object):
         periscope:
           languages:
             - it
+          alternatives:
             - en
+          overwrite: yes
     """
     
     schema = {
@@ -74,19 +76,24 @@ class PluginPeriscope(object):
         for entry in task.accepted:
             if not 'location' in entry:
                 entry.reject('is not a local file')
-                continue
-            if '$RECYCLE.BIN' in entry['location']:  # happens in connected network shares
-                entry.reject("is in Windows recycle-bin")
             elif not os.path.exists(entry['location']):
-                entry.reject('file not found')  # periscope works on hashes
+                entry.reject('file not found')
+            elif '$RECYCLE.BIN' in entry['location']:
+                continue  # ignore deleted files in Windows shares
             elif not config['overwrite'] and self.subbed(entry['location']):
                 entry.reject('cannot overwrite existing subs')
-            elif psc.downloadSubtitle(entry['location'].encode("utf8"), langs):
-                log.info('Subtitles found for %s' % entry['location'])
-            elif alts and psc.downloadSubtitle(entry['location'].encode("utf8"), alts):
-                entry.reject('subtitles found for a second-choice language.')
             else:
-                entry.reject('cannot find any subtitles for now.')
-
+                try:
+                    if psc.downloadSubtitle(entry['location'].encode("utf8"), langs):
+                        log.info('Subtitles found for %s' % entry['location'])
+                    elif alts and psc.downloadSubtitle(entry['location'].encode("utf8"), alts):
+                        entry.reject('subtitles found for a second-choice language.')
+                    else:
+                        entry.reject('cannot find any subtitles for now.')
+                except Exception as err:
+                    # don't want to abort the entire task for errors in a  
+                    # single video file or for occasional network timeouts
+                    entry.fail(err.message)
+    
 
 register_plugin(PluginPeriscope, 'periscope', api_ver=2)
