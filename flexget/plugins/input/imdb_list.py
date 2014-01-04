@@ -56,7 +56,19 @@ class ImdbList(object):
                 if tag:
                     params['49e6c'] = tag['value']
                 else:
-                    log.warning('Unable to find required info for imdb login, maybe their login method has changed.')
+                    # looks like a BeautifulSoup bug:
+                    #   https://bugs.launchpad.net/beautifulsoup/+bug/1237763
+                    try:
+                        bdiv = soup.find('div', attrs={'id': 'root'})
+                        bdiv = [c for c in bdiv.children if c.name != None and c.name == 'div' and c.attrs['id'] == 'pagecontent'][0]
+                        bdiv = [c for c in bdiv.children if c.name != None and c.name == 'div' and c.attrs['id'] == 'content-2-wide'][0]
+                        bdiv = [c for c in bdiv.children if c.name != None and c.name == 'div' and c.attrs['id'] == 'imdb-expand'][0]
+                        bdiv = [c for c in bdiv.children if c.name != None and c.name == 'div' and c.attrs['id'] == 'imdb-login'][0]
+                        tag = bdiv.find('form').find('input')
+                        params['49e6c'] = tag['value']
+                    except:
+                        log.warning('Unable to find required info for imdb login, maybe their login method has changed.')
+                
                 # Now we do the actual login with appropriate parameters
                 r = sess.post('https://secure.imdb.com/register-imdb/login', data=params, raise_status=False)
             except requests.RequestException as e:
