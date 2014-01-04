@@ -3,7 +3,7 @@ TDD in practice
 
 Simple example how to create a plugin with TDD principles.
 
-.. WARNING:: Ironically, this is untested example :)
+.. WARNING:: Ironically, this is an untested example :)
 
 Create test
 -----------
