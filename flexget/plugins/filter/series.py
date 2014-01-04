@@ -1384,7 +1384,8 @@ class FilterSeries(FilterSeriesBase):
                 still_needed = [req for req in still_needed if not req.allows(quality)]
         return bool(downloaded_qualities)
 
-    def on_task_exit(self, task, config):
+    @plugin.priority(255)
+    def on_task_output(self, task, config):
         """Learn succeeded episodes"""
         log.debug('on_task_exit')
         for entry in task.accepted:
