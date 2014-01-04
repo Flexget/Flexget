@@ -20,7 +20,9 @@ def do_cli(manager, options):
         entry['immortal'] = True
     if options.accept:
         entry.accept(reason='accepted by CLI inject')
-    manager.execute_command({'inject': [entry]})
+    exec_options = dict(options.execute)
+    exec_options['inject'] = [entry]
+    manager.execute_command(exec_options)
 
 
 def key_equals_value(text):
