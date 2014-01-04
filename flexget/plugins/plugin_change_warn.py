@@ -104,18 +104,3 @@ try:
 
 except:
     pass
-
-# complain if beautifulsoup is screwed (git users / because of broken build)
-import BeautifulSoup
-if [int(part) for part in BeautifulSoup.__version__.split('.')] < [3, 2]:
-    log.critical('BeautifulSoup is too old, please upgrade it!')
-    sys.exit(1)
-
-# complain if beautifulsoup is screwed (git users / because of broken build)
-try:
-    import BeautifulSoup
-    if [int(part) for part in BeautifulSoup.__version__.split('.')] < [3, 2]:
-        log.critical('BeautifulSoup is too old, please upgrade it!')
-        sys.exit(1)
-except ImportError:
-    pass
