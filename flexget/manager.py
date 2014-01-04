@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 import atexit
 from contextlib import contextmanager
 import signal
@@ -366,38 +366,38 @@ class Manager(object):
             msg = str(e).replace('\n', ' ')
             msg = ' '.join(msg.split())
             log.critical(msg)
-            print ''
-            print '-' * 79
-            print ' Malformed configuration file (check messages above). Common reasons:'
-            print '-' * 79
-            print ''
-            print ' o Indentation error'
-            print ' o Missing : from end of the line'
-            print ' o Non ASCII characters (use UTF8)'
-            print ' o If text contains any of :[]{}% characters it must be single-quoted ' \
-                  '(eg. value{1} should be \'value{1}\')\n'
+            print('')
+            print('-' * 79)
+            print(' Malformed configuration file (check messages above). Common reasons:')
+            print('-' * 79)
+            print('')
+            print(' o Indentation error')
+            print(' o Missing : from end of the line')
+            print(' o Non ASCII characters (use UTF8)')
+            print(' o If text contains any of :[]{}% characters it must be single-quoted ' \
+                  '(eg. value{1} should be \'value{1}\')\n')
 
             # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
             # At least: ReaderError, YmlScannerError (or something like that)
             if hasattr(e, 'problem') and hasattr(e, 'context_mark') and hasattr(e, 'problem_mark'):
                 lines = 0
                 if e.problem is not None:
-                    print ' Reason: %s\n' % e.problem
+                    print(' Reason: %s\n' % e.problem)
                     if e.problem == 'mapping values are not allowed here':
-                        print ' ----> MOST LIKELY REASON: Missing : from end of the line!'
-                        print ''
+                        print(' ----> MOST LIKELY REASON: Missing : from end of the line!')
+                        print('')
                 if e.context_mark is not None:
-                    print ' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column)
+                    print(' Check configuration near line %s, column %s' % (e.context_mark.line, e.context_mark.column))
                     lines += 1
                 if e.problem_mark is not None:
-                    print ' Check configuration near line %s, column %s' % (e.problem_mark.line, e.problem_mark.column)
+                    print(' Check configuration near line %s, column %s' % (e.problem_mark.line, e.problem_mark.column))
                     lines += 1
                 if lines:
-                    print ''
+                    print('')
                 if lines == 1:
-                    print ' Fault is almost always in this or previous line\n'
+                    print(' Fault is almost always in this or previous line\n')
                 if lines == 2:
-                    print ' Fault is almost always in one of these lines or previous ones\n'
+                    print(' Fault is almost always in one of these lines or previous ones\n')
 
             # When --debug escalate to full stacktrace
             if self.options.debug:
@@ -544,7 +544,7 @@ class Manager(object):
         """Initialize SQLAlchemy"""
         try:
             if [int(part) for part in sqlalchemy.__version__.split('.')] < [0, 7, 0]:
-                print >> sys.stderr, 'FATAL: SQLAlchemy 0.7.0 or newer required. Please upgrade your SQLAlchemy.'
+                print('FATAL: SQLAlchemy 0.7.0 or newer required. Please upgrade your SQLAlchemy.', file=sys.stderr)
                 sys.exit(1)
         except ValueError as e:
             log.critical('Failed to check SQLAlchemy version, you may need to upgrade it')
@@ -575,11 +575,11 @@ class Manager(object):
                                                    poolclass=SingletonThreadPool,
                                                    )  # assert_unicode=True
         except ImportError:
-            print >> sys.stderr, ('FATAL: Unable to use SQLite. Are you running Python 2.5 - 2.7 ?\n'
-                                  'Python should normally have SQLite support built in.\n'
-                                  'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
-                                  'You can try installing `pysqlite`. If you have compiled python yourself, '
-                                  'recompile it with SQLite support.')
+            print('FATAL: Unable to use SQLite. Are you running Python 2.5 - 2.7 ?\n'
+                  'Python should normally have SQLite support built in.\n'
+                  'If you\'re running correct version of Python then it is not equipped with SQLite.\n'
+                  'You can try installing `pysqlite`. If you have compiled python yourself, '
+                  'recompile it with SQLite support.', file=sys.stderr)
             sys.exit(1)
         Session.configure(bind=self.engine)
         # create all tables, doesn't do anything to existing tables
@@ -594,11 +594,11 @@ class Manager(object):
             Base.metadata.create_all(bind=self.engine)
         except OperationalError as e:
             if os.path.exists(self.db_filename):
-                print >> sys.stderr, '%s - make sure you have write permissions to file %s' % \
-                                     (e.message, self.db_filename)
+                print('%s - make sure you have write permissions to file %s' %
+                      (e.message, self.db_filename), file=sys.stderr)
             else:
-                print >> sys.stderr, '%s - make sure you have write permissions to directory %s' % \
-                                     (e.message, self.config_base)
+                print('%s - make sure you have write permissions to directory %s' %
+                      (e.message, self.config_base), file=sys.stderr)
             raise Exception(e.message)
 
     def _read_lock(self):
@@ -608,7 +608,7 @@ class Manager(object):
         if self.lockfile and os.path.exists(self.lockfile):
             result = {}
             with open(self.lockfile) as f:
-                lines = filter(None, f.readlines())
+                lines = [l for l in f.readlines() if l]
             for line in lines:
                 key, value = line.split(b':', 1)
                 result[key.strip().lower()] = value.strip()
@@ -650,8 +650,9 @@ class Manager(object):
                 if self.check_lock():
                     with open(self.lockfile) as f:
                         pid = f.read()
-                    print >> sys.stderr, 'Another process (%s) is running, will exit.' % pid.split('\n')[0]
-                    print >> sys.stderr, 'If you\'re sure there is no other instance running, delete %s' % self.lockfile
+                    print('Another process (%s) is running, will exit.' % pid.split('\n')[0], file=sys.stderr)
+                    print('If you\'re sure there is no other instance running, delete %s' % self.lockfile,
+                          file=sys.stderr)
                     sys.exit(1)
 
                 self._has_lock = True
@@ -772,7 +773,7 @@ class Manager(object):
             # show real stack trace in debug mode
             if manager.options.debug:
                 raise
-            print '**** Keyboard Interrupt ****'
+            print('**** Keyboard Interrupt ****')
         fire_event('manager.shutdown', self)
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutting down')

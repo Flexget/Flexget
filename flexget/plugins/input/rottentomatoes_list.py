@@ -54,7 +54,7 @@ class RottenTomatoesList(object):
                 results = lists(list_type=l_type, list_name=l_name)
                 if results:
                     for movie in results['movies']:
-                        if filter(lambda entry: movie['title'] == entry.get('title'), entries):
+                        if [entry for entry in entries if movie['title'] == entry.get('title')]:
                             continue
                         imdb_id = movie.get('alternate_ids', {}).get('imdb')
                         if imdb_id:

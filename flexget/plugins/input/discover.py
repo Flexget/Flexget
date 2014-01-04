@@ -149,7 +149,7 @@ class Discover(object):
 
                     result.extend(search_results)
 
-                except (PluginError, PluginWarning), err:
+                except (PluginError, PluginWarning) as err:
                     log.debug('No results from %s: %s' % (plugin_name, err))
                     entry.complete()
 

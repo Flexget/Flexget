@@ -63,7 +63,7 @@ class UrlRewriteSerienjunkies(object):
         page = requests.get(series_url).content
         try:
             soup = get_soup(page)
-        except Exception, e:
+        except Exception as e:
             raise UrlRewritingError(e)
 
         config = config or {}

@@ -73,7 +73,7 @@ class InputFtpList(object):
 
             try:
                 dirs = ftp.nlst(path)
-            except ftplib.error_perm, e:
+            except ftplib.error_perm as e:
                 raise plugin.PluginWarning(str(e))
 
             if not dirs:

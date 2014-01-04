@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 import logging
 
 from argparse import SUPPRESS
@@ -18,12 +18,12 @@ class OutputDumpConfig(object):
     def on_task_start(self, task, config):
         if task.options.dump_config:
             import yaml
-            print '--- config from task: %s' % task.name
-            print yaml.safe_dump(task.config)
-            print '---'
+            print('--- config from task: %s' % task.name)
+            print(yaml.safe_dump(task.config))
+            print('---')
             task.abort(silent=True)
         if task.options.dump_config_python:
-            print task.config
+            print(task.config)
             task.abort(silent=True)
 
 

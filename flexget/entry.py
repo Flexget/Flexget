@@ -393,7 +393,7 @@ class Entry(dict):
         func = dict.get if isinstance(source_item, dict) else getattr
         for field, value in field_map.iteritems():
             if isinstance(value, basestring):
-                v = reduce(func, value.split('.'), source_item)
+                v = functools.reduce(func, value.split('.'), source_item)
             else:
                 v = value(source_item)
             if ignore_none and v is None:

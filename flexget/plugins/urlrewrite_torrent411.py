@@ -36,7 +36,7 @@ class UrlRewriteTorrent411(object):
         try:
             soup = get_soup(page)
             torrent_url = 'http://www.t411.me' + soup.find(text='Télécharger').findParent().get('href')
-        except Exception, e:
+        except Exception as e:
             raise UrlRewritingError(e)
 
         if not torrent_url:

@@ -15,7 +15,7 @@ class Magnets(object):
             return
         for entry in task.accepted:
             if 'urls' in entry:
-                entry['urls'] = filter(lambda url: not url.startswith('magnet:'), entry['urls'])
+                entry['urls'] = [url for url in entry['urls'] if not url.startswith('magnet:')]
 
             if entry['url'].startswith('magnet:'):
                 if entry.get('urls'):

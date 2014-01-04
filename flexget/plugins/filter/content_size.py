@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from sys import maxint
+from sys import maxsize
 
 from flexget import plugin
 from flexget.event import event
@@ -32,7 +32,7 @@ class FilterContentSize(object):
                 log_once('Entry `%s` too small, rejecting' % entry['title'], log)
                 entry.reject('minimum size %s MB, got %s MB' % (config['min'], size), remember=remember)
                 return True
-            if size > config.get('max', maxint):
+            if size > config.get('max', maxsize):
                 log_once('Entry `%s` too big, rejecting' % entry['title'], log)
                 entry.reject('maximum size %s MB, got %s MB' % (config['max'], size), remember=remember)
                 return True
@@ -46,7 +46,8 @@ class FilterContentSize(object):
     @plugin.priority(150)
     def on_task_modify(self, task, config):
         if task.options.test or task.options.learn:
-            log.info('Plugin is partially disabled with --test and --learn because size information may not be available')
+            log.info('Plugin is partially disabled with --test and --learn because size information may not be '
+                     'available')
             return
 
         num_rejected = len(task.rejected)

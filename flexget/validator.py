@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 import re
 
 from flexget.config_schema import process_config
@@ -589,7 +589,7 @@ if __name__ == '__main__':
 
     import json
 
-    print json.dumps(schema, sort_keys=True, indent=4)
+    print(json.dumps(schema, sort_keys=True, indent=4))
 
     """
     root = factory()

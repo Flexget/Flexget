@@ -1,6 +1,6 @@
 """Contains miscellaneous helpers"""
 
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 import urllib2
 import httplib
 import os
@@ -308,9 +308,9 @@ else:
 def console(text):
     """Print to console safely."""
     if isinstance(text, str):
-        print text
+        print(text)
         return
-    print unicode(text).encode(io_encoding, 'replace')
+    print(unicode(text).encode(io_encoding, 'replace'))
 
 
 def parse_timedelta(value):

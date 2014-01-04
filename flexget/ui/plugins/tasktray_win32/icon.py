@@ -4,7 +4,7 @@
 # Notes      : Based on (i.e. ripped off from) Mark Hammond's
 #              win32gui_taskbar.py and win32gui_menu.py demos from PyWin32
 
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 import os
 from flexget.event import event
 from flexget.plugin import DependencyError
@@ -99,7 +99,7 @@ class SysTrayIcon(object):
                                self._add_ids_to_menu_options(option_action),
                                self._next_action_id))
             else:
-                print 'Unknown item', option_text, option_icon, option_action
+                print('Unknown item', option_text, option_icon, option_action)
             self._next_action_id += 1
         return result
 
@@ -115,7 +115,7 @@ class SysTrayIcon(object):
                                        0,
                                        icon_flags)
         else:
-            print "Can't find icon file - using default."
+            print("Can't find icon file - using default.")
             hicon = win32gui.LoadIcon(0, win32con.IDI_APPLICATION)
 
         if self.notify_id:

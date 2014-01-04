@@ -1,3 +1,6 @@
+from __future__ import division
+
+
 def pretty_date(time=False):
     """
     Get a datetime object or a int() Epoch timestamp and return a

@@ -84,7 +84,7 @@ class TVRageSeries(Base):
         self.showid = series.showid
         self.link = series.link
         self.classification = series.classification
-        self.genres = filter(None, series.genres)  # Sometimes tvrage has a None in the genres list
+        self.genres = [g for g in series.genres if g]  # Sometimes tvrage has a None in the genres list
         self.country = series.country
         self.started = series.started
         self.ended = series.ended

@@ -79,7 +79,7 @@ class Subtitles(object):
 
         # filter all entries that have IMDB ID set
         try:
-            entries = filter(lambda x: x['imdb_url'] is not None, task.accepted)
+            entries = [e for e in task.accepted if e['imdb_url'] is not None]
         except KeyError:
             # No imdb urls on this task, skip it
             # TODO: should do lookup via imdb_lookup plugin?
@@ -126,15 +126,16 @@ class Subtitles(object):
                 continue
 
             # filter bad subs
-            subtitles = filter(lambda x: x['SubBad'] == '0', subtitles)
+            subtitles = [x for x in subtitles if x['SubBad'] == '0']
             # some quality required (0.0 == not reviewed)
-            subtitles = filter(lambda x: float(x['SubRating']) >= min_sub_rating or float(x['SubRating']) == 0.0, subtitles)
+            subtitles = [x for x in subtitles if
+                         float(x['SubRating']) >= min_sub_rating or float(x['SubRating']) == 0.0]
 
             filtered_subs = []
 
             # find the best rated subs for each language
             for language in languages:
-                langsubs = filter(lambda x: x['SubLanguageID'] == language, subtitles)
+                langsubs = [x for x in subtitles if x['SubLanguageID'] == language]
 
                 # did we find any subs for this language?
                 if langsubs:
@@ -145,7 +146,7 @@ class Subtitles(object):
                         return s.ratio() > match_limit
 
                     # filter only those that have matching release names
-                    langsubs = filter(lambda x: seqmatch(x['MovieReleaseName']), subtitles)
+                    langsubs = [x for x in subtitles if seqmatch(x['MovieReleaseName'])]
 
                     if langsubs:
                         # find the best one by SubRating

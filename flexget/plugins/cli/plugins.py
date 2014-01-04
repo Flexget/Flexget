@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 import logging
 
 from flexget import options
@@ -10,9 +10,9 @@ log = logging.getLogger('plugins')
 
 @event('manager.subcommand.plugins')
 def plugins_summary(manager, options):
-    print '-' * 79
-    print '%-20s%-30s%s' % ('Name', 'Roles (priority)', 'Info')
-    print '-' * 79
+    print('-' * 79)
+    print('%-20s%-30s%s' % ('Name', 'Roles (priority)', 'Info'))
+    print('-' * 79)
 
     # print the list
     for plugin in sorted(get_plugins(phase=options.phase, group=options.group)):
@@ -28,9 +28,9 @@ def plugins_summary(manager, options):
             flags.append('debug')
         handlers = plugin.phase_handlers
         roles = ', '.join('%s(%s)' % (phase, handlers[phase].priority) for phase in handlers)
-        print '%-20s%-30s%s' % (plugin.name, roles, ', '.join(flags))
+        print('%-20s%-30s%s' % (plugin.name, roles, ', '.join(flags)))
 
-    print '-' * 79
+    print('-' * 79)
 
 
 @event('options.register')

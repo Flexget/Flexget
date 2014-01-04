@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 import logging
 import sys
 
@@ -17,14 +17,14 @@ def trim(docstring):
     # and split into a list of lines:
     lines = docstring.expandtabs().splitlines()
     # Determine minimum indentation (first line doesn't count):
-    indent = sys.maxint
+    indent = sys.maxsize
     for line in lines[1:]:
         stripped = line.lstrip()
         if stripped:
             indent = min(indent, len(line) - len(stripped))
     # Remove indentation (first line is special):
     trimmed = [lines[0].strip()]
-    if indent < sys.maxint:
+    if indent < sys.maxsize:
         for line in lines[1:]:
             trimmed.append(line[indent:].rstrip())
     # Strip off trailing and leading blank lines:
@@ -41,13 +41,13 @@ def print_doc(manager, options):
     plugin = plugins.get(plugin_name, None)
     if plugin:
         if not plugin.instance.__doc__:
-            print 'Plugin %s does not have documentation' % plugin_name
+            print('Plugin %s does not have documentation' % plugin_name)
         else:
-            print ''
-            print trim(plugin.instance.__doc__)
-            print ''
+            print('')
+            print(trim(plugin.instance.__doc__))
+            print('')
     else:
-        print 'Could not find plugin %s' % plugin_name
+        print('Could not find plugin %s' % plugin_name)
 
 
 @event('options.register')

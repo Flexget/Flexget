@@ -1,14 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import os
 import re
-import urllib2
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.utils.requests import Session
-from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('newpct')
@@ -39,7 +36,7 @@ class UrlRewriteNewPCT(object):
         page = requests.get(url)
         try:
             soup = get_soup(page.text)
-        except Exception, e:
+        except Exception as e:
             raise UrlRewritingError(e)
         torrent_id_prog = re.compile("'torrentID': '(\d+)'")
         torrent_ids = soup.findAll(text=torrent_id_prog)

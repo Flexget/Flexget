@@ -421,7 +421,8 @@ class OutputDeluge(DelugePlugin):
         for entry in task.accepted:
             try:
                 before = sclient.get_session_state()
-            except Exception, (errno, msg):
+            except Exception as e:
+                (errno, msg) = e.args
                 raise plugin.PluginError('Could not communicate with deluge core. %s' % msg, log)
             if task.options.test:
                 return

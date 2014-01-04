@@ -74,7 +74,7 @@ class OutputSMSru(object):
             # Attempt to render the message field
             try:
                 message = entry.render(message)
-            except RenderError, e:
+            except RenderError as e:
                 log.debug("Problem rendering 'message': %s" % e)
                 message = "accepted %s" % entry["title"]
 

@@ -47,7 +47,7 @@ class UrlRewriteTorrentz(object):
             log.debug('requesting: %s' % url)
             try:
                 opened = urllib2.urlopen(url)
-            except urllib2.URLError, err:
+            except urllib2.URLError as err:
                 raise plugin.PluginWarning('Error requesting URL: %s' % err)
             rss = feedparser.parse(opened)
 
