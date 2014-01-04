@@ -782,7 +782,8 @@ class Manager(object):
         if self.options.test:
             if not 'test' in self.db_filename:
                 raise Exception('trying to delete non test database?')
-            os.remove(self.db_filename)
-            log.info('Removed test database')
+            if self._has_lock:
+                os.remove(self.db_filename)
+                log.info('Removed test database')
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutdown completed')
