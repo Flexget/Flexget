@@ -50,7 +50,9 @@ class ImdbList(object):
                 # First get the login page so we can get the hidden input value
                 soup = get_soup(sess.get('https://secure.imdb.com/register-imdb/login').content)
 
-                tag = soup.find('input', attrs={'name': '49e6c'})
+                # Fix for bs4 bug. see #2313 and github#118
+                auxsoup = soup.find('div', id='nb20').next_sibling.next_sibling
+                tag = auxsoup.find('input', attrs={'name': '49e6c'})
                 if tag:
                     params['49e6c'] = tag['value']
                 else:
