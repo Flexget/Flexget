@@ -403,6 +403,7 @@ class CoreArgumentParser(ArgumentParser):
         start_parser = daemon_parser.add_subparser('start', help='start the daemon')
         start_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
         daemon_parser.add_subparser('stop', help='shutdown the running daemon')
+        daemon_parser.add_subparser('status', help='check if a daemon is running')
         daemon_parser.set_defaults(loglevel='info')
 
         # The parser for the webui

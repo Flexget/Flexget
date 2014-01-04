@@ -239,6 +239,12 @@ class Manager(object):
                 self.shutdown()
             else:
                 log.error('There does not appear to be a daemon running.')
+        elif options.action == 'status':
+            ipc_info = self.check_ipc_info()
+            if ipc_info:
+                log.info('Daemon running. (PID: %s)' % ipc_info['pid'])
+            else:
+                log.info('No daemon appears to be running for this config.')
 
     def webui_command(self, options):
         """
