@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from flexget.plugin import register_plugin, priority, PluginError
 from collections import namedtuple
 import logging
 import flexget.utils.qualities as qualities
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('assume_quality')
 
@@ -71,15 +72,15 @@ class AssumeQuality(object):
         for target, quality in config.items():
             log.verbose('New assumption: %s is %s' % (target, quality))
             try: target = qualities.Requirements(target)
-            except: raise PluginError('%s is not a valid quality. Forgetting assumption.' % target)
+            except: raise plugin.PluginError('%s is not a valid quality. Forgetting assumption.' % target)
             try: quality = qualities.get(quality)
-            except: raise PluginError('%s is not a valid quality. Forgetting assumption.' % quality)
+            except: raise plugin.PluginError('%s is not a valid quality. Forgetting assumption.' % quality)
             self.assumptions.append(assume(target, quality))
         self.assumptions.sort(key=lambda assumption: self.precision(assumption.target), reverse=True)
         for assumption in self.assumptions:
             log.debug('Target %s - Priority %s' % (assumption.target, self.precision(assumption.target)))
 
-    @priority(127)  #run after metainfo_quality@128
+    @plugin.priority(127)  #run after metainfo_quality@128
     def on_task_metainfo(self, task, config):
         for entry in task.entries:
             log.verbose('%s' % entry.get('title'))
@@ -90,4 +91,6 @@ class AssumeQuality(object):
                     self.assume(entry, assumption.quality)
             log.verbose('New quality: %s', entry.get('quality'))
 
-register_plugin(AssumeQuality, 'assume_quality', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(AssumeQuality, 'assume_quality', api_ver=2)
