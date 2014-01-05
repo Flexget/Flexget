@@ -148,7 +148,8 @@ class PluginFailed(object):
             if item:
                 entry.reject('Has already failed %s times in the past' % item.count)
 
-    def on_task_exit(self, task, config):
+    @plugin.priority(-255)
+    def on_task_output(self, task, config):
         if config is False:
             return
         config = self.prepare_config(config)

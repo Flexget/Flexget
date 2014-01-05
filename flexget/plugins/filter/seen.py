@@ -185,7 +185,8 @@ class FilterSeen(object):
                                  (found.field, found.value, se.task, se.added.strftime('%Y-%m-%d %H:%M')),
                                 remember=remember_rejected)
 
-    def on_task_exit(self, task, config):
+    @plugin.priority(-255)
+    def on_task_output(self, task, config):
         """Remember succeeded entries"""
         if config is False:
             log.debug('disabled')

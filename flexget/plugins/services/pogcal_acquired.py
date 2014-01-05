@@ -36,7 +36,8 @@ class PogcalAcquired(object):
         'additionalProperties': False
     }
 
-    def on_task_exit(self, task, config):
+    @plugin.priority(-255)
+    def on_task_output(self, task, config):
         if not task.accepted and not task.options.test:
             return
         try:

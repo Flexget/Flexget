@@ -27,7 +27,8 @@ class TraktRemove(object):
         'additionalProperties': False
     }
 
-    def on_task_exit(self, task, config):
+    @plugin.priority(-255)
+    def on_task_output(self, task, config):
         """Finds accepted movies and series episodes and submits them to trakt as acquired."""
         # Change password to an SHA1 digest of the password
         config['password'] = hashlib.sha1(config['password']).hexdigest()
