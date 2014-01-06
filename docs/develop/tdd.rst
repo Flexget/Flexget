@@ -3,7 +3,7 @@ TDD in practice
 
 Simple example how to create a plugin with TDD principles.
 
-.. WARNING:: Ironically, this is untested example :)
+.. WARNING:: Ironically, this is an untested example :)
 
 Create test
 -----------
@@ -45,13 +45,17 @@ Within this file we will add our plugin.
 .. testcode::
 
    from __future__ import unicode_literals, division, absolute_import
-   from flexget.plugin import register_plugin
+
+   from flexget import plugin
+   from flexget.event import event
 
 
    class Hello(object):
        pass
 
-   register_plugin(Hello, 'hello', api_ver=2)
+   @event('plugin.register')
+   def register_plugin():
+       plugin.register(Hello, 'hello', api_ver=2)
 
 After this the unit tests should pass again. Try running them.
 
@@ -96,7 +100,9 @@ Continue by implementing the test case.
 .. testcode::
 
    from __future__ import unicode_literals, division, absolute_import
-   from flexget.plugin import register_plugin
+
+   from flexget import plugin
+   from flexget.event import event
 
 
    class Hello(object):
@@ -104,7 +110,9 @@ Continue by implementing the test case.
            for entry in task.entries:
                entry['hello'] = True
 
-   register_plugin(Hello, 'hello', api_ver=2)
+   @event('plugin.register')
+   def register_plugin():
+       plugin.register(Hello, 'hello', api_ver=2)
 
 
 Summary

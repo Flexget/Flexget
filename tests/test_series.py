@@ -1696,3 +1696,22 @@ class TestAutoLockin(FlexGetBase):
         assert len(self.task.accepted) == 4, 'All specials should have been accepted'
         self.execute_task('try_reg')
         assert len(self.task.accepted) == 2, 'Specials should not have caused episode type lock-in'
+
+
+class TestReruns(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          one_accept:
+            mock:
+            - title: the show s01e01
+            - title: the show s01e01 different
+            series:
+            - the show
+            rerun: 2
+            mock_output: yes
+    """
+
+    def test_one_accept(self):
+        self.execute_task('one_accept')
+        assert len(self.task.mock_output) == 1, \
+            'should have accepted once!: %s' % ', '.join(e['title'] for e in self.task.mock_output)

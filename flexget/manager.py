@@ -239,6 +239,12 @@ class Manager(object):
                 self.shutdown()
             else:
                 log.error('There does not appear to be a daemon running.')
+        elif options.action == 'status':
+            ipc_info = self.check_ipc_info()
+            if ipc_info:
+                log.info('Daemon running. (PID: %s)' % ipc_info['pid'])
+            else:
+                log.info('No daemon appears to be running for this config.')
 
     def webui_command(self, options):
         """
@@ -782,7 +788,8 @@ class Manager(object):
         if self.options.test:
             if not 'test' in self.db_filename:
                 raise Exception('trying to delete non test database?')
-            os.remove(self.db_filename)
-            log.info('Removed test database')
+            if self._has_lock:
+                os.remove(self.db_filename)
+                log.info('Removed test database')
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutdown completed')

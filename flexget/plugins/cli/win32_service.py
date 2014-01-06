@@ -48,7 +48,10 @@ def do_cli(manager, options):
 
 @event('options.register')
 def register_parser_arguments():
-    parser = options.register_command('service', do_cli, help='view and manipulate the series plugin database',
+    if not sys.platform.startswith('win'):
+        return
+    # Still not fully working. Hidden for now.
+    parser = options.register_command('service', do_cli,  #help='set up or control a windows service for the daemon',
                                       add_help=False)
     parser.add_argument('--help', '-h', action='store_true')
     parser.add_argument('args', nargs=argparse.REMAINDER)

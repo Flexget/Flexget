@@ -36,7 +36,8 @@ class PluginHistory(object):
 
     schema = {'type': 'boolean'}
 
-    def on_task_exit(self, task, config):
+    @plugin.priority(-255)
+    def on_task_output(self, task, config):
         """Add accepted entries to history"""
         if config is False:
             return  # Explicitly disabled with configuration

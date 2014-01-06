@@ -1384,9 +1384,11 @@ class FilterSeries(FilterSeriesBase):
                 still_needed = [req for req in still_needed if not req.allows(quality)]
         return bool(downloaded_qualities)
 
-    def on_task_exit(self, task, config):
+    # Run last, to make sure output plugins haven't failed the entry
+    @plugin.priority(-255)
+    def on_task_output(self, task, config):
         """Learn succeeded episodes"""
-        log.debug('on_task_exit')
+        log.debug('on_task_output')
         for entry in task.accepted:
             if 'series_releases' in entry:
                 for release in entry['series_releases']:

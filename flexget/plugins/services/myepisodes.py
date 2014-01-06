@@ -86,7 +86,8 @@ class MyEpisodes(object):
         'additionalProperties': False
     }
 
-    def on_task_exit(self, task, config):
+    @plugin.priority(-255)
+    def on_task_output(self, task, config):
         """Mark all accepted episodes as acquired on MyEpisodes"""
         if not task.accepted:
             # Nothing accepted, don't do anything
