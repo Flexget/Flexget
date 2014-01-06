@@ -4,7 +4,7 @@ Miscellaneous SQLAlchemy helpers.
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from sqlalchemy import ColumnDefault, Sequence, Index
-from sqlalchemy.types import AbstractType
+from sqlalchemy.types import TypeEngine
 from sqlalchemy.schema import Table, MetaData
 from sqlalchemy.exc import NoSuchTableError, OperationalError
 
@@ -72,7 +72,7 @@ def table_add_column(table, name, col_type, session, default=None):
         # If the column already exists, we don't have to do anything.
         return
     # Add the column to the table
-    if not isinstance(col_type, AbstractType):
+    if not isinstance(col_type, TypeEngine):
         # If we got a type class instead of an instance of one, instantiate it
         col_type = col_type()
     type_string = session.bind.engine.dialect.type_compiler.process(col_type)

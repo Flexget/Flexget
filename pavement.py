@@ -19,7 +19,8 @@ except ImportError:
 sys.path.insert(0, '')
 
 options = environment.options
-install_requires = ['FeedParser>=5.1.3', 'SQLAlchemy >=0.7, <0.7.99', 'PyYAML',
+# There is a bug in sqlalchemy 0.9.0, see gh#127
+install_requires = ['FeedParser>=5.1.3', 'SQLAlchemy >=0.7, !=0.9.0, <0.9.99', 'PyYAML',
                     # There is a bug in beautifulsoup 4.2.0 that breaks imdb parsing, see http://flexget.com/ticket/2091
                     'beautifulsoup4>=4.1, !=4.2.0, <4.4', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar', 'rpyc',
                     'jinja2', 'requests>=1.0, <2.99', 'python-dateutil!=2.0, !=2.2', 'jsonschema>=2.0', 'python-tvrage',
