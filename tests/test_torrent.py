@@ -30,7 +30,7 @@ class TestInfoHash(FlexGetBase):
             'InfoHash does not match (got %s)' % info_hash
 
     def test_magnet_infohash(self):
-        """Tests metainfo/magnet_info_hash plugin"""
+        """Tests metainfo/magnet_btih plugin"""
         self.execute_task('test_magnet')
         assert self.task.all_entries[0]['torrent_info_hash'] == '2A8959BED2BE495BB0E3EA96F497D873D5FAED05'
         assert self.task.all_entries[1]['torrent_info_hash'] == '2B3959BED2BE445BB0E3EA96F497D873D5FAED05'
