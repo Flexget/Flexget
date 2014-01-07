@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from flexget.plugin import register_plugin, DependencyError
+from flexget import plugin
+from flexget.event import event
 from flexget.utils.template import RenderError, render_from_task
 
 log = logging.getLogger('notify_xmpp')
@@ -52,8 +53,8 @@ class OutputNotifyXmpp(object):
             import sleekxmpp
         except ImportError as e:
             log.debug('Error importing SleekXMPP: %s' % e)
-            raise DependencyError('notify_xmpp', 'sleekxmpp', 
-                                  'SleekXMPP module required. ImportError: %s' % e)
+            raise plugin.DependencyError('notify_xmpp', 'sleekxmpp', 
+                'SleekXMPP module required. ImportError: %s' % e)
     
     def on_task_output(self, task, config):
         """
@@ -87,4 +88,6 @@ class OutputNotifyXmpp(object):
             xmpp.process(block=True)
 
 
-register_plugin(OutputNotifyXmpp, 'notify_xmpp', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(OutputNotifyXmpp, 'notify_xmpp', api_ver=2)
