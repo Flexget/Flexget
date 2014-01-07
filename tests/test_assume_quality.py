@@ -91,7 +91,9 @@ class TestAssumeQuality(FlexGetBase):
         assert entry.get('quality') == qualities.Quality('720p h264 flac')
 
     def test_invalid_target(self):
-        with assert_raises(TaskAbort): self.execute_task('test_invalid_target')
+        #with assert_raises(TaskAbort): self.execute_task('test_invalid_target')  #Requires Python 2.7
+        assert_raises(TaskAbort, self.execute_task, 'test_invalid_target')
 
     def test_invalid_quality(self):
-        with assert_raises(TaskAbort): self.execute_task('test_invalid_quality')
+        #with assert_raises(TaskAbort): self.execute_task('test_invalid_quality')  #Requires Python 2.7
+        assert_raises(TaskAbort, self.execute_task, 'test_invalid_quality')
