@@ -328,7 +328,7 @@ class PluginDownload(object):
             log.info('Content-disposition disabled for %s' % entry['title'])
         self.filename_ext_from_mime(entry)
 
-        if not 'filename' in entry:
+        if not entry.get('filename'):
             filename = os.path.basename(url)
             log.debug('No filename - setting from url: %s' % filename)
             entry['filename'] = filename
@@ -440,7 +440,7 @@ class PluginDownload(object):
                 raise plugin.PluginWarning('Downloaded temp file `%s` doesn\'t exist!?' % entry['file'])
 
             # if we still don't have a filename, try making one from title (last resort)
-            if not 'filename' in entry:
+            if not entry.get('filename'):
                 entry['filename'] = entry['title']
                 log.debug('set filename from title %s' % entry['filename'])
                 if not 'mime-type' in entry:
