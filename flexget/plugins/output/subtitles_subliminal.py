@@ -2,7 +2,8 @@ import logging
 import os
 import tempfile
 
-from flexget.plugin import register_plugin, DependencyError
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('subtitles')
 
@@ -44,13 +45,13 @@ class PluginSubliminal(object):
             import babelfish
         except ImportError as e:
             log.debug('Error importing Babelfish: %s' % e)
-            raise DependencyError('subliminal', 'babelfish', 
+            raise plugin.DependencyError('subliminal', 'babelfish', 
                                   'Babelfish module required. ImportError: %s' % e)
         try:
             import subliminal
         except ImportError as e:
             log.debug('Error importing Subliminal: %s' % e)
-            raise DependencyError('subliminal', 'subliminal', 
+            raise plugin.DependencyError('subliminal', 'subliminal', 
                                   'Subliminal module required. ImportError: %s' % e)
     
     def on_task_output(self, task, config):
@@ -97,4 +98,6 @@ class PluginSubliminal(object):
                     entry.fail(err.message)
 
 
-register_plugin(PluginSubliminal, 'subliminal', api_ver=2)
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginSubliminal, 'subliminal', api_ver=2)

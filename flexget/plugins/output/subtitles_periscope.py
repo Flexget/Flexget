@@ -2,7 +2,8 @@ import logging
 import os
 import tempfile
 
-from flexget.plugin import register_plugin, DependencyError
+from flexget import plugin
+from flexget.event import event
 
 log = logging.getLogger('subtitles')
 
@@ -45,7 +46,7 @@ class PluginPeriscope(object):
             import periscope
         except ImportError as e:
             log.debug('Error importing Periscope: %s' % e)
-            raise DependencyError('periscope', 'periscope', 
+            raise plugin.DependencyError('periscope', 'periscope', 
                                   'Periscope module required. ImportError: %s' % e)
     
     def subbed(self, filename):
@@ -94,6 +95,8 @@ class PluginPeriscope(object):
                     # don't want to abort the entire task for errors in a  
                     # single video file or for occasional network timeouts
                     entry.fail(err.message)
-    
 
-register_plugin(PluginPeriscope, 'periscope', api_ver=2)
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(PluginPeriscope, 'periscope', api_ver=2)
