@@ -24,7 +24,28 @@ REPUTATIONS = {  # Maps reputation name to feed address
 class UrlRewriteTorrentz(object):
     """Torrentz urlrewriter."""
 
-    schema = {'type': 'string', 'enum': list(REPUTATIONS)}
+    schema = {
+        'oneOf' : [
+            {
+                'title': 'specify options',
+                'type': 'object',
+                'properties': {
+                    'reputation': {'enum': list(REPUTATIONS), 'default': 'good'},
+                    'extra_terms': {'type': 'string'}
+                },
+                'additionalProperties': False
+            },
+            {'title': 'specify reputation', 'enum': list(REPUTATIONS), 'default': 'good'}
+        ]
+    }
+
+    def process_config(self, config):
+        """Return plugin configuration in advonced form"""
+        if isinstance(config, basestring):
+            config = {'reputation': config}
+        if config.get('extra_terms'):
+            config['extra_terms'] = ' '+config['extra_terms']
+        return config
 
     def url_rewritable(self, task, entry):
         return REGEXP.match(entry['url'])
@@ -35,13 +56,11 @@ class UrlRewriteTorrentz(object):
         entry['torrent_info_hash'] = thash
 
     def search(self, entry, config=None):
-        if config:
-            feed = REPUTATIONS[config]
-        else:
-            feed = REPUTATIONS['good']
+        config = self.process_config(config)
+        feed = REPUTATIONS[config['reputation']]
         entries = set()
         for search_string in entry.get('search_string', [entry['title']]):
-            query = normalize_unicode(search_string)
+            query = normalize_unicode(search_string+config.get('extra_terms', ''))
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
             url = 'http://torrentz.eu/%s?q=%s' % (feed, urllib.quote(query.encode('utf-8')))
             log.debug('requesting: %s' % url)
