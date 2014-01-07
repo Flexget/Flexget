@@ -310,9 +310,10 @@ class PluginDownload(object):
             entry['file'] = datafile
             log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
 
-        if response.headers.get('content-type'):
-            entry['mime-type'] = parse_header(response.headers.get('content-type'))[0]
-        else: entry['mime-type'] = "unknown/unknown"
+        if 'content-type' in response.headers:
+            entry['mime-type'] = parse_header(response.headers['content-type'])[0]
+        else:
+            entry['mime-type'] = "unknown/unknown"
 
         content_encoding = response.headers.get('content-encoding', '')
         decompress = 'gzip' in content_encoding or 'deflate' in content_encoding
@@ -327,7 +328,7 @@ class PluginDownload(object):
             log.info('Content-disposition disabled for %s' % entry['title'])
         self.filename_ext_from_mime(entry)
 
-        if not entry.get('filename'):
+        if not 'filename' in entry:
             filename = os.path.basename(url)
             log.debug('No filename - setting from url: %s' % filename)
             entry['filename'] = filename
@@ -439,7 +440,7 @@ class PluginDownload(object):
                 raise plugin.PluginWarning('Downloaded temp file `%s` doesn\'t exist!?' % entry['file'])
 
             # if we still don't have a filename, try making one from title (last resort)
-            if not entry.get('filename'):
+            if not 'filename' in entry:
                 entry['filename'] = entry['title']
                 log.debug('set filename from title %s' % entry['filename'])
                 if not 'mime-type' in entry:
