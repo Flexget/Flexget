@@ -438,7 +438,7 @@ def mark_expired(session=None):
         log.error('Could not get update information from tvdb: %s' % e)
         return
 
-    if updates:
+    if updates is not None:
         new_server = int(updates.attrib['time'])
 
         if new_server < last_server:
