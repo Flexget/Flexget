@@ -17,6 +17,7 @@ class Generate(object):
 
     def on_task_input(self, task, config):
         amount = config or 0  # hackily makes sure it's an int value
+        entries = []
         for i in range(amount):
             entry = Entry()
             import string
@@ -24,7 +25,8 @@ class Generate(object):
             entry['url'] = 'http://localhost/generate/%s/%s' % (i, ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)]))
             entry['title'] = ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
             entry['description'] = ''.join([random.choice(string.letters + string.digits) for x in range(1, 1000)])
-            task.entries.append(entry)
+            entries.append(entry)
+        return entries
 
 
 @event('plugin.register')
