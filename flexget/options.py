@@ -344,18 +344,18 @@ manager_parser.add_argument('--test', action='store_true', dest='test', default=
                             help='Verbose what would happen on normal execution.')
 manager_parser.add_argument('-c', dest='config', default='config.yml',
                             help='Specify configuration file. Default is config.yml')
-manager_parser.add_argument('--logfile', default='flexget.log',
+manager_parser.add_argument('--logfile', '-l', default='flexget.log',
                             help='Specify a custom logfile name/location. '
                                  'Default is flexget.log in the config directory.')
+manager_parser.add_argument('--loglevel', '-L', metavar='LEVEL',
+                            default='verbose', help='Set the verbosity of the logger.',
+                            choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
 # This option is already handled above.
 manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
                             help='Use this option to create a detailed bug report, '
                                  'note that the output might contain PRIVATE data, so edit that out')
 manager_parser.add_argument('--debug', action=DebugAction, nargs=0, help=SUPPRESS)
 manager_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, help=SUPPRESS)
-# Supress setting  this when not explicitly specified, so that subparsers can set their own defaults
-manager_parser.add_argument('--loglevel', default='verbose', help=SUPPRESS,
-                            choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--ipc-port', type=int, help=SUPPRESS)
