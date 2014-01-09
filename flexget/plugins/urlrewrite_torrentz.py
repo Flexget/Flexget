@@ -40,7 +40,7 @@ class UrlRewriteTorrentz(object):
     }
 
     def process_config(self, config):
-        """Return plugin configuration in advonced form"""
+        """Return plugin configuration in advanced form"""
         if isinstance(config, basestring):
             config = {'reputation': config}
         if config.get('extra_terms'):
