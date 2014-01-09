@@ -105,7 +105,7 @@ class PluginRottenTomatoesLookup(object):
         if not config:
             return
 
-        if config.lower() != 'yes':
+        if isinstance(config, basestring):
             self.key = config.lower()
         else:
             self.key = None
