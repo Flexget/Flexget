@@ -48,7 +48,7 @@ class TransmissionBase(object):
         advanced.accept('text', key='username')
         advanced.accept('text', key='password')
         advanced.accept('boolean', key='enabled')
-        advanced.accept('interval', key='remove_after')
+        advanced.accept('interval', key='removedoneafter')
         return advanced
 
     def prepare_config(self, config):
@@ -91,10 +91,10 @@ class TransmissionBase(object):
         return cli
 
     def torrent_completed(self, torrent):
-        result = True
         for tf in torrent.files().iteritems():
-            result &= (not tf[1]['selected'] or tf[1]['completed'] == tf[1]['size'])
-        return result
+            if tf[1]['selected'] and (tf[1]['completed'] < tf[1]['size']):
+                return False
+        return True
 
     @save_opener
     def on_process_start(self, task, config):
@@ -120,32 +120,30 @@ class TransmissionBase(object):
                     log.error('It looks like there was a problem connecting to transmission.')
 
     def on_task_exit(self, task, config):
-        if not (config['enabled'] and ('remove_after' in config)):
-            return
-        
-        if not self.client:
-            self.client = self.create_rpc_client(config)
-        '''
-        # Hack/Workaround for http://flexget.com/ticket/2002
-        # TODO: Proper fix
-        if 'username' in config and 'password' in config:
-            self.client.http_handler.set_authentication(self.client.url, config['username'], config['password'])
-        '''
-        log.debug('remove interval: %s' % config['remove_after'])
-        try:
-            expire_time = datetime.now() - parse_timedelta(config['remove_after'])
-        except ValueError:
-            raise plugin.PluginError('Invalid time format', log)
-        remove_ids = []
-        for torrent in self.client.info().values():
-            log.debug('Torrent "%s": status: "%s" date done: %.s' %
-                      (torrent.name, torrent.status, torrent.date_done))
-            if torrent.status == 'stopped' and torrent.date_done <= expire_time and \
-                self.torrent_completed(torrent):
-                log.info('Removing finished torrent `%s` from transmission' % torrent.name)
-                remove_ids.append(torrent.id)
-        if remove_ids:
-            self.client.remove(remove_ids)
+        if config['enabled'] and ('removedoneafter' in config):
+            if not self.client:
+                self.client = self.create_rpc_client(config)
+            '''
+            (do we need this?)
+            # Hack/Workaround for http://flexget.com/ticket/2002
+            if 'username' in config and 'password' in config:
+                self.client.http_handler.set_authentication(self.client.url, config['username'], config['password'])
+            '''
+            log.debug('remove interval: %s' % config['removedoneafter'])
+            try:
+                ival = parse_timedelta(config['removedoneafter'])
+            except ValueError:
+                raise plugin.PluginError('Invalid time format', log)
+            remove_ids = []
+            for torrent in self.client.info().values():
+                log.debug('Torrent "%s": status: "%s" date done: %.s' %
+                          (torrent.name, torrent.status, torrent.date_done))
+                if torrent.status == 'stopped' and self.torrent_completed(torrent) and \
+                    (torrent.date_done + ival) <= datetime.now():
+                    log.info('Removing finished torrent `%s` from transmission' % torrent.name)
+                    remove_ids.append(torrent.id)
+            if remove_ids:
+                self.client.remove(remove_ids)
 
 
 class PluginTransmissionInput(TransmissionBase):
