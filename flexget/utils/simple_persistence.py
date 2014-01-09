@@ -8,10 +8,13 @@ can replace underlying mechanism in single point (and provide transparent switch
 """
 
 from __future__ import unicode_literals, division, absolute_import
-import logging
+from contextlib import contextmanager
 from datetime import datetime
+import logging
 import pickle
+
 from sqlalchemy import Column, Integer, String, DateTime, PickleType, select, Index
+
 from UserDict import DictMixin
 from flexget import db_schema
 from flexget.manager import Session
@@ -74,53 +77,58 @@ class SimplePersistence(DictMixin):
     def __init__(self, plugin, session=None):
         self.taskname = None
         self.plugin = plugin
-        self.session = session
+        self._session = session
+
+    @contextmanager
+    def session_manager(self):
+        """Context manager which creates commits and closes a Session if this instance does not have its own."""
+        session = self._session or Session()
+        try:
+            yield session
+            if not self._session:
+                session.commit()
+        except Exception:
+            raise
+        finally:
+            if not self._session:
+                session.close()
 
     def __setitem__(self, key, value):
-        session = self.session or Session()
-        skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
-            filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
-        if skv:
-            # update existing
-            log.debug('updating key %s value %s' % (key, repr(value)))
-            skv.value = value
-        else:
-            # add new key
-            skv = SimpleKeyValue(self.taskname, self.plugin, key, value)
-            log.debug('adding key %s value %s' % (key, repr(value)))
-            session.add(skv)
-        if not self.session:
-            # If we created a temporary session for this call, make sure we commit
-            session.commit()
-            session.close()
+        with self.session_manager() as session:
+            skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
+                filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
+            if skv:
+                # update existing
+                log.debug('updating key %s value %s' % (key, repr(value)))
+                skv.value = value
+            else:
+                # add new key
+                skv = SimpleKeyValue(self.taskname, self.plugin, key, value)
+                log.debug('adding key %s value %s' % (key, repr(value)))
+                session.add(skv)
 
     def __getitem__(self, key):
-        session = self.session or Session()
-        skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
-            filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
-        if not self.session:
-            session.close()
-        if not skv:
-            raise KeyError('%s is not contained in the simple_persistence table.' % key)
-        else:
-            return skv.value
+        with self.session_manager() as session:
+            skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
+                filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
+            if not skv:
+                raise KeyError('%s is not contained in the simple_persistence table.' % key)
+            else:
+                return skv.value
 
     def __delitem__(self, key):
-        session = self.session or Session()
-        session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
-            filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).delete()
-        if not self.session:
-            session.commit()
-            session.close()
+        with self.session_manager() as session:
+            session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
+                filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).delete()
 
     def keys(self):
-        session = self.session or Session()
-        query = session.query(SimpleKeyValue.key).filter(SimpleKeyValue.task == self.taskname).\
-            filter(SimpleKeyValue.plugin == self.plugin).all()
-        if query:
-            return [item.key for item in query]
-        else:
-            return []
+        with self.session_manager() as session:
+            query = session.query(SimpleKeyValue.key).filter(SimpleKeyValue.task == self.taskname).\
+                filter(SimpleKeyValue.plugin == self.plugin).all()
+            if query:
+                return [item.key for item in query]
+            else:
+                return []
 
 
 class SimpleTaskPersistence(SimplePersistence):
@@ -137,5 +145,5 @@ class SimpleTaskPersistence(SimplePersistence):
         return self.task.name
 
     @property
-    def session(self):
+    def _session(self):
         return self.task.session
