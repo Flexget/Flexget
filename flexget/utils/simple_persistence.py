@@ -8,6 +8,7 @@ can replace underlying mechanism in single point (and provide transparent switch
 """
 
 from __future__ import unicode_literals, division, absolute_import
+from collections import MutableMapping
 from contextlib import contextmanager
 from datetime import datetime
 import logging
@@ -15,7 +16,6 @@ import pickle
 
 from sqlalchemy import Column, Integer, String, DateTime, PickleType, select, Index
 
-from UserDict import DictMixin
 from flexget import db_schema
 from flexget.manager import Session
 from flexget.utils.database import safe_pickle_synonym
@@ -72,7 +72,7 @@ class SimpleKeyValue(Base):
 Index('ix_simple_persistence_feed_plugin_key', SimpleKeyValue.task, SimpleKeyValue.plugin, SimpleKeyValue.key)
 
 
-class SimplePersistence(DictMixin):
+class SimplePersistence(MutableMapping):
 
     def __init__(self, plugin, session=None):
         self.taskname = None
@@ -121,7 +121,7 @@ class SimplePersistence(DictMixin):
             session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
                 filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).delete()
 
-    def keys(self):
+    def __iter__(self):
         with self.session_manager() as session:
             query = session.query(SimpleKeyValue.key).filter(SimpleKeyValue.task == self.taskname).\
                 filter(SimpleKeyValue.plugin == self.plugin).all()
@@ -129,6 +129,11 @@ class SimplePersistence(DictMixin):
                 return [item.key for item in query]
             else:
                 return []
+
+    def __len__(self):
+        with self.session_manager() as session:
+            return session.query(SimpleKeyValue.key).filter(SimpleKeyValue.task == self.taskname).\
+                filter(SimpleKeyValue.plugin == self.plugin).count()
 
 
 class SimpleTaskPersistence(SimplePersistence):
