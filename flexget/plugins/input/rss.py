@@ -378,8 +378,7 @@ class InputRSS(object):
                     ea['rss_pubdate'] = datetime(*entry.published_parsed[:6])
                 # store basic auth info
                 if 'username' in config and 'password' in config:
-                    ea['basic_auth_username'] = config['username']
-                    ea['basic_auth_password'] = config['password']
+                    ea['download_auth'] = (config['username'], config['password'])
                 entries.append(ea)
 
             # create from enclosures if present

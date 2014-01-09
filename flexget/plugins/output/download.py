@@ -237,7 +237,7 @@ class PluginDownload(object):
             log.debug('URL for `%s` could not be encoded in latin1' % entry['title'])
             try:
                 url = url.encode('utf-8')
-            except:
+            except Exception:
                 log.warning('Unable to URL-encode URL for `%s`' % entry['title'])
         if not isinstance(url, unicode):
             url = urllib.quote(url, safe=b':/~?=&%;')
@@ -245,10 +245,9 @@ class PluginDownload(object):
 
         # get content
         auth = None
-        if 'basic_auth_password' in entry and 'basic_auth_username' in entry:
-            log.debug('Basic auth enabled. User: %s Password: %s'
-                      % (entry['basic_auth_username'], entry['basic_auth_password']))
-            auth = (entry['basic_auth_username'], entry['basic_auth_password'])
+        if 'download_auth' in entry:
+            auth = entry['download_auth']
+            log.debug('Custom auth enabled for %s download: %s' % (entry['title'], entry['download_auth']))
 
         response = task.requests.get(url, auth=auth, raise_status=False)
         if response.status_code != 200:
