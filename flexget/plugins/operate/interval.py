@@ -24,9 +24,6 @@ class PluginInterval(object):
 
     @plugin.priority(255)
     def on_task_start(self, task, config):
-        # Allow reruns
-        if task.is_rerun:
-            return
         if task.options.learn:
             log.info('Ignoring task %s interval for --learn' % task.name)
             return
@@ -41,7 +38,6 @@ class PluginInterval(object):
             next_time = last_time + parse_interval(config)
             log.debug('next_time: %r' % next_time)
             if datetime.datetime.now() < next_time:
-                log.debug('interval not met')
                 log.verbose('Interval %s not met on task %s. Use --now to override.' % (config, task.name))
                 task.abort('Interval not met', silent=True)
                 return
@@ -57,4 +53,4 @@ def register_plugin():
 @event('options.register')
 def register_parser_arguments():
     options.get_parser('execute').add_argument('--now', action='store_true', dest='interval_ignore', default=False,
-                                               help='Ignore interval(s)')
+                                               help='run task(s) even if the interval plugin would normally prevent it')
