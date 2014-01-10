@@ -238,7 +238,7 @@ class RottenTomatoesSearchResult(Base):
 @internet(log)
 @with_session
 def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None,
-                 only_cached=False, session=None):
+                 only_cached=False, session=None, api_key=None):
     """
     Do a lookup from Rotten Tomatoes for the movie matching the passed arguments.
     Any combination of criteria can be passed, the most specific criteria specified will be used.
@@ -249,6 +249,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None
     :param smart_match: attempt to clean and parse title and year from a string
     :param only_cached: if this is specified, an online lookup will not occur if the movie is not in the cache
     :param session: optionally specify a session to use, if specified, returned Movie will be live in that session
+    :param api_key: optionaly specify an API key to use
     :returns: The Movie object populated with data from Rotten Tomatoes
     :raises: PluginError if a match cannot be found or there are other problems with the lookup
 
@@ -298,8 +299,8 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None
         if movie.expired and not only_cached:
             log.debug('Cache has expired for %s, attempting to refresh from Rotten Tomatoes.' % id_str())
             try:
-                result = movies_info(movie.id)
-                movie = _set_movie_details(movie, session, result)
+                result = movies_info(movie.id, api_key)
+                movie = _set_movie_details(movie, session, result, api_key)
                 session.merge(movie)
             except URLError:
                 log.error('Error refreshing movie details from Rotten Tomatoes, cached info being used.')
@@ -312,16 +313,16 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None
         log.debug('Movie %s not found in cache, looking up from rotten tomatoes.' % id_str())
         try:
             if not movie and rottentomatoes_id:
-                result = movies_info(rottentomatoes_id)
+                result = movies_info(rottentomatoes_id, api_key)
                 if result:
                     movie = RottenTomatoesMovie()
-                    movie = _set_movie_details(movie, session, result)
+                    movie = _set_movie_details(movie, session, result, api_key)
                     session.add(movie)
 
             if not movie and title:
                 # TODO: Extract to method
                 log.verbose('Searching from rt `%s`' % search_string)
-                results = movies_search(search_string)
+                results = movies_search(search_string, api_key=api_key)
                 if results:
                     results = results.get('movies')
                     if results:
@@ -374,7 +375,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None
                                     log.debug('remain: %s (match: %s) %s' % (r['title'], r['match'], r['id']))
                                 raise PluginError('min_diff')
 
-                        result = movies_info(results[0].get('id'))
+                        result = movies_info(results[0].get('id'), api_key)
 
                         if not result:
                             result = results[0]
@@ -384,7 +385,7 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None
 
                         if not movie:
                             movie = RottenTomatoesMovie()
-                            movie = _set_movie_details(movie, session, result)
+                            movie = _set_movie_details(movie, session, result, api_key)
                             session.add(movie)
                             session.commit()
 
@@ -406,19 +407,20 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None
 
 
 # TODO: get rid of or heavily refactor
-def _set_movie_details(movie, session, movie_data=None):
+def _set_movie_details(movie, session, movie_data=None, api_key=None):
     """
     Populate ``movie`` object from given data
 
     :param movie: movie object to update
     :param session: session to use, returned Movie will be live in that session
+    :param api_key: optionally specify an API key to use
     :param movie_data: data to copy into the :movie:
     """
 
     if not movie_data:
         if not movie.id:
             raise PluginError('Cannot get rotten tomatoes details without rotten tomatoes id')
-        movie_data = movies_info(movie.id)
+        movie_data = movies_info(movie.id, api_key)
     if movie_data:
         if movie.id:
             log.debug("Updating movie info (actually just deleting the old info and adding the new)")
@@ -474,20 +476,25 @@ def _set_movie_details(movie, session, movie_data=None):
     return movie
 
 
-def movies_info(id):
-    url = '%s/%s/movies/%s.json?apikey=%s' % (SERVER, API_VER, id, API_KEY)
+def movies_info(id, api_key=None):
+    if not api_key:
+        api_key = API_KEY
+    url = '%s/%s/movies/%s.json?apikey=%s' % (SERVER, API_VER, id, api_key)
     result = get_json(url)
     if isinstance(result, dict) and result.get('id'):
         return result
 
 
-def lists(list_type, list_name, limit=20, page_limit=20, page=None):
+def lists(list_type, list_name, limit=20, page_limit=20, page=None, api_key=None):
     if isinstance(list_type, basestring):
         list_type = list_type.replace(' ', '_').encode('utf-8')
     if isinstance(list_name, basestring):
         list_name = list_name.replace(' ', '_').encode('utf-8')
 
-    url = '%s/%s/lists/%s/%s.json?apikey=%s' % (SERVER, API_VER, list_type, list_name, API_KEY)
+    if not api_key:
+        api_key = API_KEY
+
+    url = '%s/%s/lists/%s/%s.json?apikey=%s' % (SERVER, API_VER, list_type, list_name, api_key)
     if limit:
         url += '&limit=%i' % limit
     if page_limit:
@@ -500,11 +507,14 @@ def lists(list_type, list_name, limit=20, page_limit=20, page=None):
         return results
 
 
-def movies_search(q, page_limit=None, page=None):
+def movies_search(q, page_limit=None, page=None, api_key=None):
     if isinstance(q, basestring):
         q = q.replace(' ', '+').encode('utf-8')
 
-    url = '%s/%s/movies.json?q=%s&apikey=%s' % (SERVER, API_VER, q, API_KEY)
+    if not api_key:
+        api_key = API_KEY
+
+    url = '%s/%s/movies.json?q=%s&apikey=%s' % (SERVER, API_VER, q, api_key)
     if page_limit:
         url += '&page_limit=%i' % page_limit
     if page:

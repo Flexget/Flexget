@@ -6,7 +6,7 @@ from flexget.event import event
 from flexget.utils.log import log_once
 
 try:
-    from flexget.plugins.api_rottentomatoes import lookup_movie
+    from flexget.plugins.api_rottentomatoes import lookup_movie, API_KEY
 except ImportError:
     raise plugin.DependencyError(issued_by='rottentomatoes_lookup', missing='api_rottentomatoes',
                           message='rottentomatoes_lookup requires the `api_rottentomatoes` plugin')
@@ -64,7 +64,7 @@ class PluginRottenTomatoesLookup(object):
 
     def validator(self):
         from flexget import validator
-        return validator.factory('boolean')
+        return validator.factory('any')
 
     def lazy_loader(self, entry, field):
         """Does the lookup for this entry and populates the entry fields.
@@ -75,30 +75,41 @@ class PluginRottenTomatoesLookup(object):
 
         """
         try:
-            self.lookup(entry)
+            self.lookup(entry, key=self.key)
         except plugin.PluginError as e:
             log_once(e.value.capitalize(), logger=log)
             # Set all of our fields to None if the lookup failed
             entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
         return entry[field]
 
-    def lookup(self, entry, search_allowed=True):
+    def lookup(self, entry, search_allowed=True, key=None):
         """
         Perform Rotten Tomatoes lookup for entry.
 
         :param entry: Entry instance
         :param search_allowed: Allow fallback to search
+        :param key: optionally specify an API key to use
         :raises PluginError: Failure reason
         """
+        if not key:
+            key = API_KEY
         movie = lookup_movie(smart_match=entry['title'],
                              rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
-                             only_cached=(not search_allowed))
+                             only_cached=(not search_allowed),
+                             api_key=key
+                             )
         log.debug(u'Got movie: %s' % movie)
         entry.update_using_map(self.field_map, movie)
 
     def on_task_metainfo(self, task, config):
         if not config:
             return
+
+        if isinstance(config, basestring):
+            self.key = config.lower()
+        else:
+            self.key = None
+
         for entry in task.entries:
             entry.register_lazy_fields(self.field_map, self.lazy_loader)
 
