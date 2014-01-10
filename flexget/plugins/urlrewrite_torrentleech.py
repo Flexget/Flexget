@@ -4,6 +4,7 @@ import urllib
 import logging
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
@@ -55,14 +56,11 @@ class UrlRewriteTorrentleech(object):
             'rss_key': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'category': {'oneOf': [
-                {'type': 'integer'},
-                {'enum': list(CATEGORIES)},
-                {'type': 'array', 'items': {'oneOf': [
+            'category': one_or_more({
+                'oneOf': [
                     {'type': 'integer'},
-                    {'enum': list(CATEGORIES)}
-                ]}}
-            ]},
+                    {'type': 'string', 'enum': list(CATEGORIES)},
+            ]}),
         },
         'required': ['rss_key', 'username', 'password'],
         'additionalProperties': False
@@ -108,15 +106,12 @@ class UrlRewriteTorrentleech(object):
         # sort = SORT.get(config.get('sort_by', 'seeds'))
         # if config.get('sort_reverse'):
             # sort += 1
-        if isinstance(config.get('category'), int):
-            categories = [config['category']]
-        elif isinstance(config.get('category'), list):
-            if isinstance(config['category'][0], int):
-                categories = config['category']
-            else:
-                categories = map(CATEGORIES.get, config['category'])
-        else:
-            category = CATEGORIES.get(config.get('category', 'all'))
+        categories = config.get('category', 'all')
+        # Make sure categories is a list
+        if not isinstance(categories, list):
+            categories = [categories]
+        # If there are any text categories, turn them into their id number
+        categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
         filter_url = '/categories/%s' % ','.join(str(c) for c in categories)
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
