@@ -15,6 +15,8 @@ log = logging.getLogger('torrentleech')
 
 CATEGORIES = {
     'all': 0,
+
+    # Movies
     'Cam': 8,
     'TS': 9,
     'R5': 10,
@@ -22,8 +24,13 @@ CATEGORIES = {
     'DVDR': 12,
     'HD': 13,
     'BDRip': 14,
-    'Boxsets': 15,
-    'Documentaries': 29
+    'Movie Boxsets': 15,
+    'Documentaries': 29,
+
+    #TV
+    'Episodes': 26,
+    'TV Boxsets': 27,
+    'Episodes HD': 32
 }
 
 
@@ -37,8 +44,9 @@ class UrlRewriteTorrentleech(object):
           password: xxxxxxxx  (required)
           category: HD
 
-          Category is any of: all, Cam, TS, R5, DVDRip,
-          DVDR, HD, BDRip, Boxsets, Documentaries
+          Category is any combination of: all, Cam, TS, R5,
+          DVDRip, DVDR, HD, BDRip, Movie Boxsets, Documentaries,
+          Episodes, TV BoxSets, Episodes HD
     """
 
     schema = {
@@ -47,11 +55,14 @@ class UrlRewriteTorrentleech(object):
             'rss_key': {'type': 'string'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'category': {
-                'oneOf': [
-                    {'type': 'string', 'enum': list(CATEGORIES)}
-                ]
-            }
+            'category': {'oneOf': [
+                {'type': 'integer'},
+                {'enum': list(CATEGORIES)},
+                {'type': 'array', 'items': {'oneOf': [
+                    {'type': 'integer'},
+                    {'enum': list(CATEGORIES)}
+                ]}}
+            ]},
         },
         'required': ['rss_key', 'username', 'password'],
         'additionalProperties': False
@@ -98,10 +109,15 @@ class UrlRewriteTorrentleech(object):
         # if config.get('sort_reverse'):
             # sort += 1
         if isinstance(config.get('category'), int):
-            category = config['category']
+            categories = [config['category']]
+        elif isinstance(config.get('category'), list):
+            if isinstance(config['category'][0], int):
+                categories = config['category']
+            else:
+                categories = map(CATEGORIES.get, config['category'])
         else:
             category = CATEGORIES.get(config.get('category', 'all'))
-        filter_url = '/categories/%d' % category
+        filter_url = '/categories/%s' % ','.join(str(c) for c in categories)
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
