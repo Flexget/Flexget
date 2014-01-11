@@ -57,7 +57,6 @@ class InputPlex(object):
       original_filename: no
       unwatched_only   : no
       fetch            : file
-      validate         : no
 
     Example:
 
@@ -219,7 +218,6 @@ class InputPlex(object):
                         e = Entry()
                         duration = part.getAttribute('duration')
                         if config['original_filename']:
-#                            e['title'] = basename(part.getAttribute('file'))
                             filename, fileext = os.path.splitext(basename(part.getAttribute('file')))
                             if config['fetch'] != 'file':
                                 e['title'] = "%s.jpg" % filename
