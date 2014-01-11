@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
+from datetime import datetime
 from netrc import netrc, NetrcParseError
 import logging
 import base64
@@ -9,6 +10,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('transmission')
 
@@ -87,6 +89,12 @@ class TransmissionBase(object):
                 raise plugin.PluginError("Error connecting to transmission: %s" % e.message)
         return cli
 
+    def torrent_completed(self, torrent):
+        for tf in torrent.files().iteritems():
+            if tf[1]['selected'] and (tf[1]['completed'] < tf[1]['size']):
+                return False
+        return True
+
     @save_opener
     def on_task_start(self, task, config):
         try:
@@ -97,9 +105,6 @@ class TransmissionBase(object):
             raise plugin.PluginError('Transmissionrpc module version 0.6 or higher required.', log)
         if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 6]:
             raise plugin.PluginError('Transmissionrpc module version 0.6 or higher required, please upgrade', log)
-
-    @save_opener
-    def on_task_start(self, task, config):
         config = self.prepare_config(config)
         if config['enabled']:
             if task.options.test:
@@ -142,7 +147,7 @@ class PluginTransmissionInput(TransmissionBase):
             self.client.http_handler.set_authentication(self.client.url, config['username'], config['password'])
 
         for torrent in self.client.info().values():
-            torrentCompleted = self._torrent_completed(torrent)
+            torrentCompleted = self.torrent_completed(torrent)
             if not config['onlycomplete'] or torrentCompleted:
                 entry = Entry(title=torrent.name,
                               url='file://%s' % torrent.torrentFile,
@@ -170,12 +175,6 @@ class PluginTransmissionInput(TransmissionBase):
                 entries.append(entry)
         return entries
 
-    def _torrent_completed(self, torrent):
-        result = True
-        for tf in torrent.files().iteritems():
-            result &= (not tf[1]['selected'] or tf[1]['completed'] == tf[1]['size'])
-        return result
-
 
 class PluginTransmission(TransmissionBase):
     """
@@ -190,7 +189,6 @@ class PluginTransmission(TransmissionBase):
         username: myusername
         password: mypassword
         path: the download location
-        removewhendone: yes
 
     Default values for the config elements::
 
@@ -198,7 +196,6 @@ class PluginTransmission(TransmissionBase):
         host: localhost
         port: 9091
         enabled: yes
-        removewhendone: no
     """
 
     def validator(self):
@@ -215,13 +212,7 @@ class PluginTransmission(TransmissionBase):
         advanced.accept('number', key='maxupspeed')
         advanced.accept('number', key='maxdownspeed')
         advanced.accept('number', key='ratio')
-        advanced.accept('boolean', key='removewhendone')
         return root
-
-    def prepare_config(self, config):
-        config = TransmissionBase.prepare_config(self, config)
-        config.setdefault('removewhendone', False)
-        return config
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
@@ -249,7 +240,7 @@ class PluginTransmission(TransmissionBase):
         if not config['enabled']:
             return
         # Do not run if there is nothing to do
-        if not task.accepted and not config['removewhendone']:
+        if not task.accepted:
             return
         if self.client is None:
             self.client = self.create_rpc_client(config)
@@ -259,11 +250,6 @@ class PluginTransmission(TransmissionBase):
                 raise plugin.PluginError("Couldn't connect to transmission.")
         if task.accepted:
             self.add_to_transmission(self.client, task, config)
-        if config['removewhendone']:
-            try:
-                self.remove_finished(self.client)
-            except TransmissionError as e:
-                log.error('Error while attempting to remove completed torrents from transmission: %s' % e)
 
     def _make_torrent_options_dict(self, config, entry):
 
@@ -359,21 +345,6 @@ class PluginTransmission(TransmissionBase):
                 log.error(msg)
                 entry.fail(msg)
 
-    def remove_finished(self, cli):
-        # Get a list of active transfers
-        transfers = cli.info(arguments=['id', 'hashString', 'name', 'status', 'uploadRatio', 'seedRatioLimit'])
-        remove_ids = []
-        # Go through the list of active transfers and add finished transfers to remove_ids.
-        for transfer in transfers.itervalues():
-            log.debug('Transfer "%s": status: "%s" upload ratio: %.2f seed ratio: %.2f' %
-                      (transfer.name, transfer.status, transfer.uploadRatio, transfer.seedRatioLimit))
-            if transfer.status == 'stopped' and transfer.uploadRatio >= transfer.seedRatioLimit:
-                log.info('Removing finished torrent `%s` from transmission' % transfer.name)
-                remove_ids.append(transfer.id)
-        # Remove finished transfers
-        if remove_ids:
-            cli.remove(remove_ids)
-
     def on_task_exit(self, task, config):
         """Make sure all temp files are cleaned up when task exits"""
         # If download plugin is enabled, it will handle cleanup.
@@ -384,7 +355,79 @@ class PluginTransmission(TransmissionBase):
     on_task_abort = on_task_exit
 
 
+class PluginTransmissionClean(TransmissionBase):
+    """
+    Remove downloaded torrents from transmission.
+    
+    Example::
+
+      clean_transmission:
+        host: localhost
+        port: 9091
+        netrc: /home/flexget/.tmnetrc
+        username: myusername
+        password: mypassword
+        olderthan: 2 hours
+        uploaded: 0.5
+    
+    Parameters olderthan and uploaded are evaluated in OR: in the above example
+    a completed torrent (=fully downloaded) will be removed from Transmission 
+    if its download process ended more than 2 hours ago OR when it's upload 
+    ratio is 50% or more.
+    
+    Default values for the config elements::
+
+      clean_transmission:
+        host: localhost
+        port: 9091
+        enabled: yes
+        olderthan: 0 seconds
+        uploaded: 0
+    """
+
+    def validator(self):
+        """Return config validator"""
+        root = validator.factory()
+        root.accept('boolean')
+        advanced = root.accept('dict')
+        self._validator(advanced)
+        advanced.accept('interval', key='olderthan')
+        advanced.accept('number', key='uploaded')
+        return root
+
+    def prepare_config(self, config):
+        config = TransmissionBase.prepare_config(self, config)
+        config.setdefault('olderthan', '0 seconds')
+        config.setdefault('uploaded', 0)
+        if 'uploaded' in config and config['uploaded'] < 0:
+            raise plugin.PluginError('Invalid value', log)
+        return config
+
+    def on_task_exit(self, task, config):
+        if not config['enabled']:
+            return
+        if not self.client:
+            self.client = self.create_rpc_client(config)
+        log.debug('remove interval: %s' % config['olderthan'])
+        try:
+            nold = parse_timedelta(config['olderthan'])
+        except ValueError:
+            raise plugin.PluginError('Invalid time format', log)
+        nupl = config['uploaded']
+        remove_ids = []
+        for torrent in self.client.info().values():
+            log.debug('Torrent "%s": status: "%s" - ratio: %s - date done: %s' %
+                      (torrent.name, torrent.status, torrent.ratio, torrent.date_done))
+            if self.torrent_completed(torrent) and \
+                ((torrent.date_done + nold) <= datetime.now() or (nupl > 0 and torrent.ratio >= nupl)):
+                log.info('Removing completed torrent `%s` from transmission' % torrent.name)
+                remove_ids.append(torrent.id)
+        if remove_ids:
+            self.client.remove(remove_ids)
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginTransmission, 'transmission', api_ver=2)
     plugin.register(PluginTransmissionInput, 'from_transmission', api_ver=2)
+    plugin.register(PluginTransmissionClean, 'clean_transmission', api_ver=2)
