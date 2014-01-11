@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
+from datetime import datetime
 from netrc import netrc, NetrcParseError
 import logging
 import base64
@@ -9,6 +10,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('transmission')
 
@@ -46,6 +48,7 @@ class TransmissionBase(object):
         advanced.accept('text', key='username')
         advanced.accept('text', key='password')
         advanced.accept('boolean', key='enabled')
+        advanced.accept('interval', key='removedoneafter')
         return advanced
 
     def prepare_config(self, config):
@@ -87,8 +90,14 @@ class TransmissionBase(object):
                 raise plugin.PluginError("Error connecting to transmission: %s" % e.message)
         return cli
 
+    def torrent_completed(self, torrent):
+        for tf in torrent.files().iteritems():
+            if tf[1]['selected'] and (tf[1]['completed'] < tf[1]['size']):
+                return False
+        return True
+
     @save_opener
-    def on_task_start(self, task, config):
+    def on_process_start(self, task, config):
         try:
             import transmissionrpc
             from transmissionrpc import TransmissionError
@@ -109,6 +118,32 @@ class TransmissionBase(object):
                     log.info('Successfully connected to transmission.')
                 else:
                     log.error('It looks like there was a problem connecting to transmission.')
+
+    def on_task_exit(self, task, config):
+        if config['enabled'] and ('removedoneafter' in config):
+            if not self.client:
+                self.client = self.create_rpc_client(config)
+            '''
+            (do we need this?)
+            # Hack/Workaround for http://flexget.com/ticket/2002
+            if 'username' in config and 'password' in config:
+                self.client.http_handler.set_authentication(self.client.url, config['username'], config['password'])
+            '''
+            log.debug('remove interval: %s' % config['removedoneafter'])
+            try:
+                ival = parse_timedelta(config['removedoneafter'])
+            except ValueError:
+                raise plugin.PluginError('Invalid time format', log)
+            remove_ids = []
+            for torrent in self.client.info().values():
+                log.debug('Torrent "%s": status: "%s" date done: %.s' %
+                          (torrent.name, torrent.status, torrent.date_done))
+                if torrent.status == 'stopped' and self.torrent_completed(torrent) and \
+                    (torrent.date_done + ival) <= datetime.now():
+                    log.info('Removing finished torrent `%s` from transmission' % torrent.name)
+                    remove_ids.append(torrent.id)
+            if remove_ids:
+                self.client.remove(remove_ids)
 
 
 class PluginTransmissionInput(TransmissionBase):
@@ -142,7 +177,7 @@ class PluginTransmissionInput(TransmissionBase):
             self.client.http_handler.set_authentication(self.client.url, config['username'], config['password'])
 
         for torrent in self.client.info().values():
-            torrentCompleted = self._torrent_completed(torrent)
+            torrentCompleted = self.torrent_completed(torrent)
             if not config['onlycomplete'] or torrentCompleted:
                 entry = Entry(title=torrent.name,
                               url='file://%s' % torrent.torrentFile,
@@ -169,12 +204,6 @@ class PluginTransmissionInput(TransmissionBase):
                 
                 entries.append(entry)
         return entries
-
-    def _torrent_completed(self, torrent):
-        result = True
-        for tf in torrent.files().iteritems():
-            result &= (not tf[1]['selected'] or tf[1]['completed'] == tf[1]['size'])
-        return result
 
 
 class PluginTransmission(TransmissionBase):
@@ -375,6 +404,7 @@ class PluginTransmission(TransmissionBase):
             cli.remove(remove_ids)
 
     def on_task_exit(self, task, config):
+        TransmissionBase.on_task_exit(self, task, config)
         """Make sure all temp files are cleaned up when task exits"""
         # If download plugin is enabled, it will handle cleanup.
         if not 'download' in task.config:
