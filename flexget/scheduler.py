@@ -109,10 +109,17 @@ class Scheduler(threading.Thread):
                     tasks = [tasks]
                 self.triggers.append(Trigger(item['interval'], tasks, options={'cron': True}))
 
-    def execute(self, options=None, output=None, priority=1):
+    def execute(self, options=None, output=None, priority=1, trigger_id=None):
         """
         Add a task to the scheduler to be run immediately.
 
+        :param options: Either an :class:`argparse.Namespace` instance, or a dict, containing options for execution
+        :param output: If a file-like object is specified here, log messages and stdout from the execution will be
+            written to it.
+        :param priority: If there are other executions waiting to be run, they will be run in priority order,
+            lowest first.
+        :param trigger_id: If a trigger_id is specified, it will be attached to the :class:`Job` instance added to the
+            run queue. Used to check that triggers are not fired faster than they can be executed.
         :returns: a list of :class:`threading.Event` instances which will be
             set when each respective task has finished running
         """
@@ -140,7 +147,7 @@ class Scheduler(threading.Thread):
 
         finished_events = []
         for task in tasks:
-            job = Job(task, options=options, output=output, priority=priority)
+            job = Job(task, options=options, output=output, priority=priority, trigger_id=trigger_id)
             self.run_queue.put(job)
             finished_events.append(job.finished_event)
         return finished_events
@@ -150,12 +157,17 @@ class Scheduler(threading.Thread):
         with self.triggers_lock:
             for trigger in self.triggers:
                 if trigger.should_run:
+                    with self.run_queue.mutex:
+                        if any(j.trigger_id == trigger.uid for j in self.run_queue.queue):
+                            log.error('Not firing schedule %r. Tasks from last run have still not finished.' % trigger)
+                            log.error('You may need to increase the interval for this schedule.')
+                            continue
                     options = dict(trigger.options)
                     # If the user has specified all tasks with '*', don't add tasks option at all, so that manual
                     # tasks are not executed
                     if trigger.tasks != ['*']:
                         options['tasks'] = trigger.tasks
-                    self.execute(options=options, priority=5)
+                    self.execute(options=options, priority=5, trigger_id=trigger.uid)
                     trigger.trigger()
 
     def start(self, run_schedules=None):
@@ -231,13 +243,15 @@ class Job(object):
     #: :class:`BufferQueue` to write the task execution output to. '[[END]]' will be sent to the queue when complete
     output = None
 
-    def __init__(self, task, options=None, output=None, priority=1):
+    def __init__(self, task, options=None, output=None, priority=1, trigger_id=None):
         self.task = task
         self.options = options
         self.output = output
         self.priority = priority
         self.run_at = datetime.now()
         self.finished_event = threading.Event()
+        # Used to make sure a certain trigger doesn't add jobs faster than they can run
+        self.trigger_id = trigger_id
         # Lower priority if cron flag is present in either dict or Namespace form
         try:
             cron = self.options.cron
@@ -365,6 +379,9 @@ class Trigger(object):
         finally:
             session.close()
         log.debug('recorded last_run to the database')
+
+    def __repr__(self):
+        return 'Trigger(tasks=%r, amount=%r, unit=%r)' % (self.tasks, self.amount, self.unit)
 
 
 class Tee(object):
