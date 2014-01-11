@@ -2,15 +2,10 @@
 from xml.dom.minidom import parse, parseString
 import re
 import logging
-<<<<<<< HEAD
-from os.path import basename
-from socket import gethostbyname
-=======
 import os
 from os.path import basename
 from socket import gethostbyname
 from string import find
->>>>>>> planeturban
 
 from flexget import plugin
 from flexget.entry import Entry
