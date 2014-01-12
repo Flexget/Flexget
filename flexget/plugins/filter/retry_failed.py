@@ -3,13 +3,13 @@ import logging
 from datetime import datetime, timedelta
 
 from sqlalchemy import Column, Integer, String, Unicode, DateTime
-from sqlalchemy.schema import Index, MetaData
+from sqlalchemy.schema import Index
 
 from flexget import db_schema, options, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.tools import console, parse_timedelta
-from flexget.utils.sqlalchemy_utils import table_add_column
+from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 SCHEMA_VER = 2
 
@@ -26,8 +26,7 @@ def upgrade(ver, session):
     if ver == 0:
         # define an index
         log.info('Adding database index ...')
-        meta = MetaData(bind=session.connection(), reflect=True)
-        failed = meta.tables['failed']
+        failed = table_schema('failed', session)
         Index('failed_title_url', failed.c.title, failed.c.url, failed.c.count).create()
         ver = 1
     if ver == 1:
