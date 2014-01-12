@@ -1,8 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-import subprocess
+from collections import Mapping
 import logging
+import subprocess
 import sys
-from UserDict import UserDict
+
 
 from flexget import plugin
 from flexget.event import event
@@ -11,11 +12,20 @@ from flexget.utils.template import render_from_entry, render_from_task, RenderEr
 log = logging.getLogger('exec')
 
 
-class EscapingDict(UserDict):
+class EscapingDict(Mapping):
     """Helper class, same as a dict, but returns all string value with quotes escaped."""
 
+    def __init__(self, mapping):
+        self._data = mapping
+
+    def __len__(self):
+        return len(self._data)
+
+    def __iter__(self):
+        return iter(self._data)
+
     def __getitem__(self, key):
-        value = self.data[key]
+        value = self._data[key]
         if isinstance(value, basestring):
             # TODO: May need to be different depending on OS
             value = value.replace('"', '\\"')
