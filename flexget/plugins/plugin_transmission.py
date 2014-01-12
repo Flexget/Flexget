@@ -170,7 +170,7 @@ class PluginTransmissionInput(TransmissionBase):
                             best = (tf[1]['name'], tf[1]['size'])
                     if tots and best and (100*float(best[1])/float(tots)) > 90:
                         entry['location'] = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
-                        log.info('assigned location field: %s' % entry['location'])  # debug
+                        log.debug('"%s" location field set to %s' % (entry['title'], entry['location']))
                 
                 entries.append(entry)
         return entries
@@ -410,10 +410,10 @@ class PluginTransmissionClean(TransmissionBase):
             self.client = self.create_rpc_client(config)
         log.debug('remove interval: %s' % config['olderthan'])
         try:
-            nold = parse_timedelta(config['olderthan'])
+            nold = parse_timedelta(config.get('olderthan', '0 seconds'))
         except ValueError:
             raise plugin.PluginError('Invalid time format', log)
-        nupl = config['uploaded']
+        nupl = config.get('uploaded', 0)
         remove_ids = []
         for torrent in self.client.info().values():
             log.debug('Torrent "%s": status: "%s" - ratio: %s - date done: %s' %
