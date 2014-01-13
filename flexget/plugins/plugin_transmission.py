@@ -357,32 +357,28 @@ class PluginTransmission(TransmissionBase):
 
 class PluginTransmissionClean(TransmissionBase):
     """
-    Remove downloaded torrents from transmission.
+    Remove completed torrents from Transmission.
     
-    Example::
-
-      clean_transmission:
-        host: localhost
-        port: 9091
-        netrc: /home/flexget/.tmnetrc
-        username: myusername
-        password: mypassword
-        olderthan: 2 hours
-        uploaded: 0.5
-    
-    Parameters olderthan and uploaded are evaluated in OR: in the above example
-    a completed torrent (=fully downloaded) will be removed from Transmission 
-    if its download process ended more than 2 hours ago OR when it's upload 
-    ratio is 50% or more.
+    Examples::
+      
+      clean_transmission: yes  # ignore both time and ratio
+      
+      clean_transmission:      # matches time only
+        finished_for: 2 hours
+      
+      clean_transmission:      # matches ratio only
+        min_ratio: 0.5
+      
+      clean_transmission:      # matches time OR ratio
+        finished_for: 2 hours
+        min_ratio: 0.5
     
     Default values for the config elements::
-
+    
       clean_transmission:
         host: localhost
         port: 9091
         enabled: yes
-        olderthan: 0 seconds
-        uploaded: 0
     """
 
     def validator(self):
@@ -391,36 +387,26 @@ class PluginTransmissionClean(TransmissionBase):
         root.accept('boolean')
         advanced = root.accept('dict')
         self._validator(advanced)
-        advanced.accept('interval', key='olderthan')
-        advanced.accept('number', key='uploaded')
+        advanced.accept('number', key='min_ratio')
+        advanced.accept('interval', key='finished_for')
         return root
-
-    def prepare_config(self, config):
-        config = TransmissionBase.prepare_config(self, config)
-        config.setdefault('olderthan', '0 seconds')
-        config.setdefault('uploaded', 0)
-        if 'uploaded' in config and config['uploaded'] < 0:
-            raise plugin.PluginError('Invalid value', log)
-        return config
 
     def on_task_exit(self, task, config):
         if not config['enabled']:
             return
         if not self.client:
             self.client = self.create_rpc_client(config)
-        log.debug('remove interval: %s' % config['olderthan'])
-        try:
-            nold = parse_timedelta(config.get('olderthan', '0 seconds'))
-        except ValueError:
-            raise plugin.PluginError('Invalid time format', log)
-        nupl = config.get('uploaded', 0)
+        nrat = float(config['min_ratio']) if 'min_ratio' in config else None
+        nfor = parse_timedelta(config['finished_for']) if 'finished_for' in config else None
         remove_ids = []
         for torrent in self.client.info().values():
             log.debug('Torrent "%s": status: "%s" - ratio: %s - date done: %s' %
                       (torrent.name, torrent.status, torrent.ratio, torrent.date_done))
             if self.torrent_completed(torrent) and \
-                ((torrent.date_done + nold) <= datetime.now() or (nupl > 0 and torrent.ratio >= nupl)):
-                log.info('Removing completed torrent `%s` from transmission' % torrent.name)
+                ((nrat is None and nfor is None) or \
+                 (nrat and (nrat <= torrent.ratio)) or \
+                 (nfor and ((torrent.date_done + nfor) <= datetime.now()))):
+                log.info('Removing finished torrent `%s` from transmission' % torrent.name)
                 remove_ids.append(torrent.id)
         if remove_ids:
             self.client.remove(remove_ids)
