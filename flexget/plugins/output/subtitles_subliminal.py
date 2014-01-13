@@ -66,10 +66,14 @@ class PluginSubliminal(object):
             log.debug('nothing accepted, aborting')
             return
         from babelfish import Language
+        from dogpile.cache.exception import RegionAlreadyConfigured
         import subliminal
-        subliminal.cache_region.configure('dogpile.cache.dbm', 
-            arguments={'filename': os.path.join(tempfile.gettempdir(), 'cachefile.dbm'), 
-                       'lock_factory': subliminal.MutexLock})
+        try:
+            subliminal.cache_region.configure('dogpile.cache.dbm', 
+                arguments={'filename': os.path.join(tempfile.gettempdir(), 'cachefile.dbm'), 
+                           'lock_factory': subliminal.MutexLock})
+        except RegionAlreadyConfigured:
+            pass
         logging.getLogger("subliminal").setLevel(logging.CRITICAL)
         logging.getLogger("enzyme").setLevel(logging.WARNING)
         langs = set([Language(s) for s in config['languages']])
@@ -95,6 +99,7 @@ class PluginSubliminal(object):
                 except Exception as err:
                     # don't want to abort the entire task for errors in a  
                     # single video file or for occasional network timeouts
+                    log.debug(err.message)
                     entry.fail(err.message)
 
 
