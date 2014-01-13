@@ -397,5 +397,4 @@ class FFMPEGEncoder(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(FFMPEGEncoder, 'ffmpeg_encoder', api_ver=2)         
-register_plugin(FFMPEGEncoder, "ffmpeg_encoder", api_ver=2)
+    plugin.register(FFMPEGEncoder, 'ffmpeg_encoder', api_ver=2)
