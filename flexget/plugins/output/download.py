@@ -11,6 +11,7 @@ import urllib
 import urllib2
 from cgi import parse_header
 from httplib import BadStatusLine
+from itertools import izip_longest
 
 from requests import RequestException
 
@@ -106,11 +107,18 @@ class PluginDownload(object):
         :param tmp_path:
           path to use for temporary files while downloading
         """
+        if entry.get('download_all') and (not entry.get('urls') or len(entry.get('urls'))<=1):
+            entry['download_all'] = False
         if entry.get('urls'):
             urls = entry.get('urls')
         else:
             urls = [entry['url']]
         errors = []
+        if entry.get('download_all'):
+            log.debug('Downloading all links')
+            if not entry.get('filenames'): entry['filenames'] = []
+            if not entry.get('files'): entry['files'] = []
+            if not entry.get('outputs'): entry['outputs'] = []
         for url in urls:
             if url.startswith('magnet:'):
                 if handle_magnets:
@@ -137,8 +145,15 @@ class PluginDownload(object):
             if not error:
                 # Set the main url, so we know where this file actually came from
                 log.debug('Successfully retrieved %s from %s' % (entry['title'], url))
-                entry['url'] = url
-                break
+                if entry.get('download_all'):
+                    #log.debug('Downloading all links')
+                    #entry['url'] = "multiple urls"
+                    #entry['url'] = url
+                    #continue
+                    pass
+                else:
+                    entry['url'] = url
+                    break
             else:
                 errors.append(error)
         else:
@@ -146,6 +161,10 @@ class PluginDownload(object):
             if require_path and 'path' not in entry:
                 log.error('%s can\'t be downloaded, no path specified for entry' % entry['title'])
                 entry.fail('no path specified for entry')
+            elif entry.get('download_all'):
+                #for single-url entries, getting here is bad. for download_all entries, getting here simply means
+                #we've gone right through 'urls', so no problem
+                pass
             else:
                 entry.fail(", ".join(errors))
 
@@ -306,8 +325,13 @@ class PluginDownload(object):
                 return
             # store temp filename into entry so other plugins may read and modify content
             # temp file is moved into final destination at self.output
-            entry['file'] = datafile
-            log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
+            log.debug("download_all is currently: " + str(entry.get('download_all')))
+            if not entry.get('download_all'):
+                entry['file'] = datafile
+                log.debug('%s field file set to: %s' % (entry['title'], entry['file']))
+            else:
+                entry['files'].append(datafile)
+                log.debug('%s: added file %s' % (entry['title'], datafile))
 
         if 'content-type' in response.headers:
             entry['mime-type'] = parse_header(response.headers['content-type'])[0]
@@ -325,13 +349,22 @@ class PluginDownload(object):
             self.filename_from_headers(entry, response)
         else:
             log.info('Content-disposition disabled for %s' % entry['title'])
-        self.filename_ext_from_mime(entry)
+        if not entry.get('download_all'): self.filename_ext_from_mime(entry)
 
         if not entry.get('filename'):
-            filename = os.path.basename(url)
+            if not entry.get('download_all'): filename = os.path.basename(url)
+            else: filename = os.path.basename(entry.get('url'))
             log.debug('No filename - setting from url: %s' % filename)
             entry['filename'] = filename
-        log.debug('Finishing download_entry() with filename %s' % entry.get('filename'))
+            log.debug('Finishing download_entry() with filename %s' % entry.get('filename'))
+            #if not entry.get('download_all'):
+            #    entry['filename'] = filename
+            #    log.debug('Finishing download_entry() with filename %s' % entry.get('filename'))
+            #else:
+            #    index = entry.get('urls').index(url)
+            #    if not len(entry.get('filenames')) > index:
+            #        entry['filenames'].append(filename)
+                    #log.debug('Finishing download_entry() with filename %s' % entry.get('filenames')[-1])
 
     def filename_from_headers(self, entry, response):
         """Checks entry filename if it's found from content-disposition"""
@@ -394,7 +427,7 @@ class PluginDownload(object):
             PluginError if operation fails
         """
 
-        if 'file' not in entry and not task.options.test:
+        if 'file' not in entry and 'files' not in entry and not task.manager.options.test:
             log.debug('file missing, entry: %s' % entry)
             raise plugin.PluginError('Entry `%s` has no temp file associated with' % entry['title'])
 
@@ -415,6 +448,8 @@ class PluginDownload(object):
                 entry.fail('Could not set path. Error during string replacement: %s' % e)
                 return
 
+            if entry.get('download_all'):
+                path = os.path.join(path, entry.get('filename'))
             # Clean illegal characters from path name
             path = pathscrub(path)
 
@@ -433,63 +468,73 @@ class PluginDownload(object):
                 except:
                     raise plugin.PluginError('Cannot create path %s' % path, log)
 
-            # check that temp file is present
-            if not os.path.exists(entry['file']):
-                log.debug('entry: %s' % entry)
-                raise plugin.PluginWarning('Downloaded temp file `%s` doesn\'t exist!?' % entry['file'])
+            if not entry.get('files'): entry['files'] = [entry.get('file')]
+            if not entry.get('filenames'): entry['filenames'] = [entry.get('filename')]
+            if not entry.get('urls'): entry['urls'] = [entry.get('url')]
+            for file, filename, url in izip_longest(entry['files'], entry['filenames'], entry['urls']):
 
-            # if we still don't have a filename, try making one from title (last resort)
-            if not entry.get('filename'):
-                entry['filename'] = entry['title']
-                log.debug('set filename from title %s' % entry['filename'])
-                if not 'mime-type' in entry:
-                    log.warning('Unable to figure proper filename for %s. Using title.' % entry['title'])
-                else:
-                    guess = mimetypes.guess_extension(entry['mime-type'])
-                    if not guess:
-                        log.warning('Unable to guess extension with mime-type %s' % guess)
+                # check that temp file is present
+                if not os.path.exists(file):
+                    log.debug('entry: %s' % entry)
+                    raise plugin.PluginWarning('Downloaded temp file `%s` doesn\'t exist!?' % file)
+
+                # if we still don't have a filename, try making one from title (last resort)
+                if not filename:
+                    filename = entry['title']
+                    log.debug('set filename from title %s' % filename)
+                    if not entry.get('download_all'): entry['filename'] = filename
+                    else: filename = os.path.basename(url)
+                    if not 'mime-type' in entry or 'download_all' in entry:
+                        log.warning('Unable to figure proper filename for %s. Using title.' % entry['title'])
                     else:
-                        self.filename_ext_from_mime(entry)
+                        guess = mimetypes.guess_extension(entry['mime-type'])
+                        if not guess:
+                            log.warning('Unable to guess extension with mime-type %s' % guess)
+                        else:
+                            self.filename_ext_from_mime(entry)
 
-            name = entry.get('filename', entry['title'])
-            # Remove illegal characters from filename #325, #353
-            name = pathscrub(name)
-            # Remove directory separators from filename #208
-            name = name.replace('/', ' ')
-            if sys.platform.startswith('win'):
-                name = name.replace('\\', ' ')
-            # remove duplicate spaces
-            name = ' '.join(name.split())
-            # combine to full path + filename
-            destfile = os.path.join(path, name)
-            log.debug('destfile: %s' % destfile)
+                name = filename if filename else entry.get('title')
+                # Remove illegal characters from filename #325, #353
+                name = pathscrub(name)
+                # Remove directory separators from filename #208
+                name = name.replace('/', ' ')
+                if sys.platform.startswith('win'):
+                    name = name.replace('\\', ' ')
+                # remove duplicate spaces
+                name = ' '.join(name.split())
+                # combine to full path + filename
+                destfile = os.path.join(path, name)
+                log.debug('destfile: %s' % destfile)
 
-            if os.path.exists(destfile):
-                import filecmp
-                if filecmp.cmp(entry['file'], destfile):
-                    log.debug("Identical destination file '%s' already exists", destfile)
-                elif config.get('overwrite'):
-                    log.debug("Overwriting already existing file %s" % destfile)
+                if os.path.exists(destfile):
+                    import filecmp
+                    if filecmp.cmp(file, destfile):
+                        log.debug("Identical destination file '%s' already exists", destfile)
+                    elif config.get('overwrite'):
+                        log.debug("Overwriting already existing file %s" % destfile)
+                    else:
+                        log.info('File `%s` already exists and is not identical, download failed.' % destfile)
+                        entry.fail('File `%s` already exists and is not identical.' % destfile)
+                        return
                 else:
-                    log.info('File `%s` already exists and is not identical, download failed.' % destfile)
-                    entry.fail('File `%s` already exists and is not identical.' % destfile)
-                    return
-            else:
-                # move temp file
-                log.debug('moving %s to %s' % (entry['file'], destfile))
+                    # move temp file
+                    log.debug('moving %s to %s' % (file, destfile))
 
-                try:
-                    shutil.move(entry['file'], destfile)
-                except OSError as err:
-                    # ignore permission errors, see ticket #555
-                    import errno
-                    if not os.path.exists(destfile):
-                        raise plugin.PluginError('Unable to write %s' % destfile)
-                    if err.errno != errno.EPERM:
-                        raise
+                    try:
+                        shutil.move(file, destfile)
+                    except OSError as err:
+                        # ignore permission errors, see ticket #555
+                        import errno
+                        if not os.path.exists(destfile):
+                            raise plugin.PluginError('Unable to write %s' % destfile)
+                        if err.errno != errno.EPERM:
+                            raise
 
-            # store final destination as output key
-            entry['output'] = destfile
+                # store final destination as output key
+                if not entry.get('download_all'): entry['output'] = destfile
+                else:
+                    entry['output'] = path
+                    entry['outputs'].append(destfile)
 
         finally:
             self.cleanup_temp_file(entry)
@@ -509,6 +554,15 @@ class PluginDownload(object):
                 os.remove(entry['file'])
             shutil.rmtree(os.path.dirname(entry['file']))
             del(entry['file'])
+        if 'files' in entry:
+            if len(entry.get('files')) > 1:
+                for file in entry.get('files'):
+                    log.debug('file: ' + file)
+                    if os.path.exists(file):
+                        log.debug('removing temp file %s from %s' % (file, entry['title']))
+                        os.remove(file)
+                    shutil.rmtree(os.path.dirname(file))
+            del(entry['files'])
 
     def cleanup_temp_files(self, task):
         """Checks all entries for leftover temp files and deletes them."""
