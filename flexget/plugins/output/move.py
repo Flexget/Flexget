@@ -38,7 +38,7 @@ class MovePlugin(object):
                     'unpack_safety': {'type': 'boolean'},
                     'allow_dir': {'type': 'boolean'},
                     'clean_source': {'type': 'number'},
-                    #'move_with': {'type': 'array', 'items': {'type': 'string'}}  # TODO
+                    'move_with': {'type': 'array', 'items': {'type': 'string'}}
                 },
                 'additionalProperties': False
             }
@@ -142,13 +142,35 @@ class MovePlugin(object):
             if dst_ext != src_ext:
                 log.verbose('Adding extension `%s` to dst `%s`' % (src_ext, dst))
                 dst += src_ext
-
+            
+            # Collect wanted namesakes
+            ns_src = []
+            ns_dst = []
+            if 'move_with' in config and os.path.isfile(src):
+                for ext in config['move_with']:
+                    if not ext.startswith('.'):
+                        ext = '.' + ext
+                    if os.path.exists(src_filename + ext):
+                        ns_src.append(src_filename + ext)
+                        ns_dst.append(dst_filename + ext)
+            
             # Move stuff
             if task.options.test:
                 log.info('Would move `%s` to `%s`' % (src, dst))
+                # Collected namesakes
+                for i in range(len(ns_src)):
+                    log.info('Would also move `%s` to `%s`' % (ns_src[i], ns_dst[i]))
             else:
                 log.info('Moving `%s` to `%s`' % (src, dst))
                 shutil.move(src, dst)
+                # Collected namesakes
+                for i in range(len(ns_src)):
+                    try:
+                        log.info('Moving `%s` to `%s`' % (ns_src[i], ns_dst[i]))
+                        shutil.move(ns_src[i], ns_dst[i])
+                    except Exception as err:
+                        log.error(err.message)
+            
             entry['output'] = dst
             if 'clean_source' in config:
                 if not os.path.isdir(src):
