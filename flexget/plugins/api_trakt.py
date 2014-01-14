@@ -16,8 +16,6 @@ from difflib import SequenceMatcher as match
 from flexget import db_schema as schema
 from flexget.utils.database import with_session
 
-
-
 api_key = '6c228565a45a302e49fb7d2dab066c9ab948b7be/'
 search_show = 'http://api.trakt.tv/search/shows.json/'
 episode_summary = 'http://api.trakt.tv/show/episode/summary.json/'
@@ -38,8 +36,9 @@ class TraktContainer(object):
                 setattr(self, col.name, update_dict[col.name])
 
 genres_table = Table('trakt_series_genres', Base.metadata,
-    Column('tvdb_id', Integer, ForeignKey('trakt_series.tvdb_id')),
-    Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
+                     Column('tvdb_id', Integer, ForeignKey('trakt_series.tvdb_id')),
+                     Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
+
 
 class TraktGenre(TraktContainer, Base):
 
@@ -49,8 +48,9 @@ class TraktGenre(TraktContainer, Base):
     name = Column(String, nullable=True)
 
 actors_table = Table('trakt_series_actors', Base.metadata,
-    Column('tvdb_id', Integer, ForeignKey('trakt_series.tvdb_id')),
-    Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
+                     Column('tvdb_id', Integer, ForeignKey('trakt_series.tvdb_id')),
+                     Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
+
 
 class TraktActors(TraktContainer, Base):
 
@@ -58,6 +58,7 @@ class TraktActors(TraktContainer, Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
+
 
 class TraktEpisode(TraktContainer, Base):
     __tablename__ = "trakt_episodes"
@@ -86,7 +87,7 @@ class TraktSeries(TraktContainer, Base):
     year = Column(Integer)
     genre = relation('TraktGenre', secondary=genres_table, backref='series')
     network = Column(Unicode, nullable=True)
-    certification = Column(Unicode) # TV-14 is unicode?
+    certification = Column(Unicode)
     country = Column(Unicode)
     overview = Column(Unicode)
     first_aired = Column(Integer)
@@ -102,13 +103,13 @@ class TraktSeries(TraktContainer, Base):
     fanart = Column(String)
     banner = Column(String)
     status = Column(String)
-    url = Column(Unicode) # url is unicode?
+    url = Column(Unicode)
     episodes = relation('TraktEpisode', backref='series', cascade='all, delete, delete-orphan')
     actors = relation('TraktActors', secondary=actors_table, backref='series')
- #### still need to finish ####
+
     def update(self, session):
         tvdb_id = self.tvdb_id
-        url = ('%s%s%s' % (show_summary,api_key,tvdb_id))
+        url = ('%s%s%s' % (show_summary, api_key, tvdb_id))
         try:
             data = requests.get(url).json()
         except requests.RequestException as e:
@@ -125,7 +126,7 @@ class TraktSeries(TraktContainer, Base):
                         genres['name'] = genre
                         db_genre = TraktGenre(genres)
                     if db_genre not in self.genre:
-                         self.genre.append(db_genre)
+                        self.genre.append(db_genre)
             if data['people']['actors']:
                 series_actors = data['people']['actors']
                 for i in series_actors:
@@ -140,10 +141,9 @@ class TraktSeries(TraktContainer, Base):
             else:
                 raise LookupError('Could not update information to database for Trakt on ')
 
-
-
     def __repr__(self):
         return '<Traktv Name=%s, TVDB_ID=%s>' % (self.title, self.tvdb_id)
+
 
 class TraktSearchResult(Base):
 
@@ -155,10 +155,10 @@ class TraktSearchResult(Base):
     series = relation(TraktSeries, backref='search_strings')
 
 
-def get_series_id(title) :
+def get_series_id(title):
     norm_series_name = normalize_series_name(title)
     series_name = urllib.quote_plus(norm_series_name)
-    url = search_show + api_key +series_name
+    url = search_show + api_key + series_name
     series = None
     try:
         data = requests.get(url)
@@ -166,10 +166,10 @@ def get_series_id(title) :
         log.warning('Request failed %s' % url)
         return
     if data:
-      try:
-          data = data.json()
-      except ValueError:
-          log.debug('Error Parsing Traktv Json for %s' % title)
+        try:
+            data = data.json()
+        except ValueError:
+            log.debug('Error Parsing Traktv Json for %s' % title)
     if data:
         if 'status' in data:
             log.debug('Returned Status %s' % data['status'])
@@ -179,7 +179,8 @@ def get_series_id(title) :
                     series = item['tvdb_id']
             if not series:
                 for item in data:
-                    title_match = match(lambda  x:x in "\t", normalize_series_name(item['title']), norm_series_name).ratio()
+                    title_match = match(lambda x: x in "\t",
+                                        normalize_series_name(item['title']), norm_series_name).ratio()
                     if not series and title_match > .9:
                         log.debug('Warning: Using lazy matching because title was not found exactly for %s' % title)
                         series = item['tvdb_id']
@@ -189,6 +190,7 @@ def get_series_id(title) :
         log.debug('Trakt.tv Returns only EXACT Name Matching: %s' % title)
         return series
 
+
 class ApiTrakt(object):
 
     @staticmethod
@@ -197,6 +199,7 @@ class ApiTrakt(object):
         if not title and not tvdb_id:
             raise LookupError('No criteria specified for Trakt.tv Lookup')
         series = None
+
         def id_str():
             return '<name=%s, tvdb_id=%s>' % (title, tvdb_id)
         if tvdb_id:
@@ -205,7 +208,8 @@ class ApiTrakt(object):
             series_filter = session.query(TraktSeries).filter(func.lower(TraktSeries.title) == title.lower())
             series = series_filter.first()
             if not series:
-                found = session.query(TraktSearchResult).filter(func.lower(TraktSearchResult.search) == title.lower()).first()
+                found = session.query(TraktSearchResult).filter(func.lower(TraktSearchResult.search) ==
+                                                                title.lower()).first()
                 if found and found.series:
                     series = found.series
         if not series:
@@ -251,11 +255,12 @@ class ApiTrakt(object):
             raise LookupError('Could not identify series')
         if series.tvdb_id:
             ep_description = '%s.S%sE%s' % (series.title, seasonnum, episodenum)
-            episode = session.query(TraktEpisode).filter(TraktEpisode.series_id == series.tvdb_id).filter(TraktEpisode.season == seasonnum).filter(TraktEpisode.number == episodenum).first()
+            episode = session.query(TraktEpisode).filter(TraktEpisode.series_id == series.tvdb_id).\
+                filter(TraktEpisode.season == seasonnum).filter(TraktEpisode.number == episodenum).first()
             url = episode_summary + api_key + '%s/%s/%s' % (series.tvdb_id, seasonnum, episodenum)
         elif title:
             title = normalize_series_name(title)
-            title = re.sub(' ','-', title)
+            title = re.sub(' ', '-', title)
             ep_description = '%s.S%sE%s' % (series.title, seasonnum, episodenum)
             episode = session.query(TraktEpisode).filter(title == series.title).\
                 filter(TraktEpisode.season == seasonnum).\
@@ -292,6 +297,7 @@ class ApiTrakt(object):
             return episode
         else:
             raise LookupError('No results found for (%s)' % episode)
+
 
 @event('plugin.register')
 def register_plugin():
