@@ -5,7 +5,7 @@
   {% if tvdb_ep_guest_stars is defined %}<p><strong>Guest Starring:</strong> {{ tvdb_ep_guest_stars|join(', ') }}</p>{% endif %}
   {% if tvdb_ep_overview is defined %}<p><strong>Overview:</strong> {{tvdb_ep_overview|d('')}}</p>{% endif %}
 
-  {% if trakt_series_banner_url is defined %}<p><img src="{{trakt_series_url}}" /></p>{% endif %}
+  {% if trakt_series_banner_url is defined %}<p><img src="{{trakt_series_banner_url}}" /></p>{% endif %}
   <p>{% if trakt_series_name is defined %}{{trakt_series_name}}{% else %}{{series_name}}{% endif %} {{series_id}} {{trakt_ep_name|d('')}}</p>
   {% if trakt_series_actors is defined %}<p><strong>Cast:</strong> {{trakt_series_actors|join(', ')}}</p>{% endif %}
   {% if trakt_ep_overview is defined %}<p><strong>Overview:</strong> {{trakt_ep_overview|d('')}}</p>{% endif %}
