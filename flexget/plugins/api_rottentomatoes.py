@@ -12,9 +12,8 @@ from sqlalchemy.orm import relation
 from flexget import db_schema
 from flexget.plugin import internet, PluginError
 from flexget.manager import Session
-from flexget.utils import json
+from flexget.utils import requests
 from flexget.utils.titles import MovieParser
-from flexget.utils.tools import urlopener
 from flexget.utils.database import text_date_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
@@ -528,12 +527,11 @@ def movies_search(q, page_limit=None, page=None, api_key=None):
 def get_json(url):
     try:
         log.debug('fetching json at %s' % url)
-        data = urlopener(url, log)
+        data = requests.get(url)
+        result = data.json()
     except URLError as e:
         log.warning('Request failed %s' % url)
         return
-    try:
-        result = json.load(data)
     except ValueError:
         log.warning('Rotten Tomatoes returned invalid json at: %s' % url)
         return
