@@ -158,8 +158,8 @@ class MovePlugin(object):
             if task.options.test:
                 log.info('Would move `%s` to `%s`' % (src, dst))
                 # Collected namesakes
-                for i in range(len(ns_src)):
-                    log.info('Would also move `%s` to `%s`' % (ns_src[i], ns_dst[i]))
+                for nss, nsd in zip(ns_src, ns_dst):
+                    log.info('Would also move `%s` to `%s`' % (nss, nsd))
             else:
                 log.info('Moving `%s` to `%s`' % (src, dst))
                 shutil.move(src, dst)
