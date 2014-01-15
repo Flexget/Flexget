@@ -366,13 +366,17 @@ class UrlValidator(TextValidator):
 class ListValidator(Validator):
     name = 'list'
 
+    def __init__(self, *args, **kwargs):
+        self.minItems = kwargs.pop('minItems', 0)
+        Validator.__init__(self, *args, **kwargs)
+
     def accept(self, value, **kwargs):
         v = self.get_validator(value, **kwargs)
         self.valid.append(v)
         return v
 
     def _schema(self):
-        return {'type': 'array', 'items': any_schema([v.schema() for v in self.valid])}
+        return {'type': 'array', 'minItems': self.minItems, 'items': any_schema([v.schema() for v in self.valid])}
 
 
 class DictValidator(Validator):

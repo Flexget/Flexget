@@ -37,7 +37,7 @@ class InputFind(object):
         from flexget import validator
         root = validator.factory('dict')
         root.accept('path', key='path', required=True)
-        root.accept('list', key='path').accept('path')
+        root.accept('list', key='path', minItems=1).accept('path')
         root.accept('text', key='mask')
         root.accept('regexp', key='regexp')
         root.accept('boolean', key='recursive')
