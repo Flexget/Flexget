@@ -1,21 +1,20 @@
 # coding=utf-8
 from __future__ import unicode_literals, division, absolute_import
-
 import json
 import logging
-import re
-
+import itertools
+from time import sleep
 from datetime import datetime, timedelta
 
+from sqlalchemy import Column, Unicode, Integer, DateTime
+from sqlalchemy.types import TypeDecorator, VARCHAR
+
+import re
 from flexget import plugin
 from flexget.event import event
 from flexget.db_schema import versioned_base
 from flexget.plugin import PluginError
 from flexget.manager import Session
-
-from sqlalchemy import Column, Unicode, Integer, DateTime
-from sqlalchemy.types import TypeDecorator, VARCHAR
-
 from requests import post
 from requests.auth import AuthBase
 from requests.cookies import cookiejar_from_dict
@@ -66,17 +65,22 @@ class RutrackerAuth(AuthBase):
        if you pass cookies (CookieJar) to constructor then authentication will be bypassed and cookies will be just set
     """
 
+    def try_authenticate(self, payload):
+        for _ in itertools.repeat(None, 5):
+            auth_response = post("http://login.rutracker.org/forum/login.php", data=payload,
+                                 cookies=cookiejar_from_dict({'spylog_test': '1'}))
+            if auth_response.cookies and len(auth_response.cookies) > 0:
+                return auth_response
+            else:
+                sleep(3)
+        raise PluginError('unable to obtain cookies from rutracker')
+
     def __init__(self, login, password, cookies=None, db_session=None):
         if cookies is None:
             log.debug('rutracker cookie not found. Requesting new one')
             payload_ = {'login_username': login,
                         'login_password': password, 'login': 'Вход'}
-            auth_response = post(
-                "http://login.rutracker.org/forum/login.php", data=payload_, follow_redirects=True,
-                cookies=cookiejar_from_dict({'spylog_test': '1'}))
-            if len(auth_response.cookies) == 0 or auth_response.cookies is None:
-                log.fatal('unable to obtain cookies from rutracker')
-                raise PluginError('unable to obtain cookies from rutracker')
+            auth_response = self.try_authenticate(payload_)
             self.cookies_ = auth_response.cookies
             if db_session:
                 db_session.add(
