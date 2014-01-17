@@ -43,9 +43,10 @@ class SearchKAT(object):
         search_strings = [normalize_unicode(s).lower() for s in entry.get('search_strings', [entry['title']])]
         entries = set()
         for search_string in search_strings:
+            search_string_url_fragment = search_string
             if config.get('verified'):
-                search_string += ' verified:1'
-            url = 'http://kickass.to/search/%s/?rss=1' % urllib.quote(search_string.encode('utf-8'))
+                search_string_url_fragment += ' verified:1'
+            url = 'http://kickass.to/search/%s/?rss=1' % urllib.quote(search_string_url_fragment.encode('utf-8'))
             if config.get('category', 'all') != 'all':
                 url += '&category=%s' % config['category']
 
@@ -53,7 +54,11 @@ class SearchKAT(object):
             rss = feedparser.parse(url)
 
             status = rss.get('status', False)
-            if status != 200:
+            if status == 404:
+                # Kat returns status code 404 when no results found for some reason...
+                log.debug('No results found for search query: %s' % search_string)
+                continue
+            elif status != 200:
                 raise plugin.PluginWarning('Search result not 200 (OK), received %s' % status)
 
             ex = rss.get('bozo_exception', False)
