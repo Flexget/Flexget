@@ -79,6 +79,13 @@ def filter_parsedate(val):
     """Attempts to parse a date according to the rules in RFC 2822"""
     return datetime.fromtimestamp(mktime(parsedate(val)))
 
+def filter_date_suffix(date):
+    day = int(date[-2:])
+    if 4 <= day <= 20 or 24 <= day <= 30:
+        suffix = "th"
+    else:
+        suffix = ["st", "nd", "rd"][day % 10 - 1]
+    return date + suffix
 
 def filter_format_number(val, places=None, grouping=True):
     """Formats a number according to the user's locale."""
@@ -99,6 +106,13 @@ def filter_pad(val, width, fillchar='0'):
     """Pads a number or string with fillchar to the specified width."""
     return unicode(val).rjust(width, fillchar)
 
+def filter_to_date(date_time_val):
+    if not isinstance(date_time_val, (datetime, date, time)):
+        return date_time_val
+    return date_time_val.date()
+    
+def now():
+    return datetime.now()
 
 # Override the built-in Jinja default filter due to Jinja bug
 # https://github.com/mitsuhiko/jinja2/pull/138
@@ -111,7 +125,7 @@ def filter_default(value, default_value=u'', boolean=False):
 filter_d = filter_default
 
 
-@event('manager.before_config_validate')
+@event('manager.startup')
 def make_environment(manager):
     """Create our environment and add our custom filters"""
     global environment
@@ -122,6 +136,8 @@ def make_environment(manager):
     for name, filt in globals().items():
         if name.startswith('filter_'):
             environment.filters[name.split('_', 1)[1]] = filt
+        elif name == 'now':
+            environment.globals['now'] = now
 
 
 # TODO: list_templates function
@@ -195,6 +211,17 @@ def render_from_entry(template_string, entry):
             log.debug('Error during rendering: %s' % error)
             raise error
 
+    # Only try string replacement if jinja didn't do anything
+    if result == template_string:
+        try:
+            result = template_string % entry
+        except KeyError as e:
+            raise RenderError('Does not contain the field `%s` for string replacement.' % e)
+        except ValueError as e:
+            raise RenderError('Invalid string replacement template: %s (%s)' % (template_string, e))
+        except TypeError as e:
+            raise RenderError('Error during string replacement: %s' % e.message)
+
     return result
 
 
@@ -214,3 +241,5 @@ def render_from_task(template, task):
         raise RenderError('(%s) %s' % (type(e).__name__, e))
 
     return result
+
+
