@@ -1,19 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
+from difflib import SequenceMatcher
+import logging
+import re
+import urllib
 
 import requests
-import logging
+from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, func
+from sqlalchemy.orm import relation
+from sqlalchemy.schema import ForeignKey
+
+from flexget import db_schema as schema
 from flexget import plugin
 from flexget.event import event
-import urllib
-import re
 from flexget.plugins.filter.series import normalize_series_name
-from datetime import datetime, timedelta
-from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
-from sqlalchemy.schema import ForeignKey
-from sqlalchemy.orm import relation
-from timeit import timeit, Timer
-from difflib import SequenceMatcher as match
-from flexget import db_schema as schema
 from flexget.utils.database import with_session
 
 api_key = '6c228565a45a302e49fb7d2dab066c9ab948b7be/'
@@ -61,7 +60,7 @@ class TraktActors(TraktContainer, Base):
 
 
 class TraktEpisode(TraktContainer, Base):
-    __tablename__ = "trakt_episodes"
+    __tablename__ = 'trakt_episodes'
 
     tvdb_id = Column(Integer, primary_key=True, autoincrement=False)
     episode_name = Column(Unicode)
@@ -78,7 +77,7 @@ class TraktEpisode(TraktContainer, Base):
 
 
 class TraktSeries(TraktContainer, Base):
-    __tablename__ = "trakt_series"
+    __tablename__ = 'trakt_series'
 
     tvdb_id = Column(Integer, primary_key=True, autoincrement=False)
     tvrage_id = Column(Unicode)
@@ -179,8 +178,8 @@ def get_series_id(title):
                     series = item['tvdb_id']
             if not series:
                 for item in data:
-                    title_match = match(lambda x: x in "\t",
-                                        normalize_series_name(item['title']), norm_series_name).ratio()
+                    title_match = SequenceMatcher(lambda x: x in '\t',
+                                                  normalize_series_name(item['title']), norm_series_name).ratio()
                     if not series and title_match > .9:
                         log.debug('Warning: Using lazy matching because title was not found exactly for %s' % title)
                         series = item['tvdb_id']
