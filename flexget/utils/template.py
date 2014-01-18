@@ -125,7 +125,7 @@ def filter_default(value, default_value=u'', boolean=False):
 filter_d = filter_default
 
 
-@event('manager.startup')
+@event('manager.before_config_validate')
 def make_environment(manager):
     """Create our environment and add our custom filters"""
     global environment
@@ -241,5 +241,3 @@ def render_from_task(template, task):
         raise RenderError('(%s) %s' % (type(e).__name__, e))
 
     return result
-
-
