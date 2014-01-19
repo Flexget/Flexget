@@ -189,6 +189,11 @@ def lookup_series(name=None, session=None):
     except (timeout, AttributeError):
         # AttributeError is due to a bug in tvrage package trying to access URLError.code
         raise LookupError('Timed out while connecting to tvrage')
+    except TypeError:
+        # TODO: There should be option to pass tvrage id directly from within series plugin via "set:" (like tvdb_id)
+        # and search directly for tvrage id. This is problematic, because 3rd party TVRage API does not support this.
+        raise LookupError('Returned invalid data for "%s". This is often caused when TVRage is missing episode info'
+                          % name)
     # Make sure the result is close enough to the search
     if difflib.SequenceMatcher(a=name, b=fetched.name).ratio() < 0.7:
         log.debug('Show result `%s` was not a close enough match for `%s`' % (fetched.name, name))
