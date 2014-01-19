@@ -69,6 +69,9 @@ class SearchPublicHD(object):
         """
 
         categories = config.get('category', 'all')
+        # Ensure categories a list
+        if not isinstance(categories, list):
+            categories = [categories]
         # Convert named category to its respective category id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
         category_url_fragment = '&category=%s' % urllib.quote(';'.join(str(c) for c in categories))
@@ -93,7 +96,9 @@ class SearchPublicHD(object):
                 # Expand the selection to whole row
                 result = result.findPrevious('tr')
                 download_url = result.find('a', href=re.compile('\.torrent$'))['href']
-                entry['url'] = download_url
+                torrent_hash = re.search(r'/([0-9a-fA-F]{5,40})/', download_url).group(1)
+
+                entry['url'] = 'http://publichd.se/download.php?id=%s' % torrent_hash
 
                 seeds, leeches = result.findAll('td', text=re.compile('^\d+$'))
                 entry['torrent_seeds'] = int(seeds.text)
