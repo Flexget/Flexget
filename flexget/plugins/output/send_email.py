@@ -238,12 +238,8 @@ class OutputEmail(object):
         v.accept('boolean', key='global')
         return v
 
+    @plugin.priority(0)
     def on_task_output(self, task, config):
-        """Count the email as an output"""
-
-    def on_task_exit(self, task, config):
-        """Send email at exit."""
-
         config = prepare_config(config)
 
         if not config['active']:
