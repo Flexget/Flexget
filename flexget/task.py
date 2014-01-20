@@ -449,10 +449,10 @@ class Task(object):
     def rerun(self):
         """Immediately re-run the task after execute has completed,
         task can be re-run up to :attr:`.max_reruns` times."""
-        log.info('Plugin %s has requested task to be ran again after execution has completed.' % self.current_plugin)
+        log.debug('Plugin %s has requested task to be ran again after execution has completed.' % self.current_plugin)
         if self._rerun_count >= self.max_reruns:
             self._rerun = False
-            log.info('Task has been re-run %s times already, stopping for now' % self._rerun_count)
+            log.verbose('Task has been re-run %s times already, stopping for now' % self._rerun_count)
             return
         self._rerun = True
 
@@ -560,7 +560,7 @@ class Task(object):
 
         # rerun task
         if self._rerun:
-            log.info('Rerunning the task in case better resolution can be achieved.')
+            log.verbose('Rerunning the task in case better resolution can be achieved.')
             self._rerun_count += 1
             # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in instead of
             # taking another one) after input and just inject the same entries for the rerun
