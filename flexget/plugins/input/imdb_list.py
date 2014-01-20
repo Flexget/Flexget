@@ -7,7 +7,7 @@ from cgi import parse_header
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import requests
-from flexget.utils.imdb import make_url
+from flexget.utils.imdb import make_url, extract_id
 from flexget.utils.cached_input import cached
 from flexget.utils.tools import decode_html
 from flexget.entry import Entry
@@ -106,12 +106,7 @@ class ImdbList(object):
         entries = []
         for entry in rss.entries:
             try:
-                # Quick hack to retrieve the IMDB ID from the URL
-                # TODO: Find out if the returned URL always has a trailing slash.
-                # TODO: If not, perform a check and ensure imdb_id is populated correctly.
-                imdb_id = entry.link.split('/')[-2]
-
-                entries.append(Entry(title=entry.title, url=entry.link, imdb_id=imdb_id, imdb_name=entry.title))
+                entries.append(Entry(title=entry.title, url=entry.link, imdb_id=extract_id(entry.link), imdb_name=entry.title))
             except IndexError:
                 log.critical('IndexError! Unable to handle RSS entry: %s' % entry)
         return entries
