@@ -1,5 +1,5 @@
 """Plugin for plex media server (www.plexapp.com)."""
-from xml.dom.minidom import parse, parseString
+from xml.dom.minidom import parseString
 import re
 import logging
 import os
@@ -21,26 +21,28 @@ class InputPlex(object):
 
     'section'           Required parameter, numerical (/library/sections/<num>) or section name.
     'selection'         Can be set to different keys:
-        - all
-        - unwatched
-        - recentlyAdded
-        - recentlyViewed
-        - recentlyViewedShows
+        - all                   : Default
+        - unwatched             :
+        - recentlyAdded         :
+        - recentlyViewed        :
+        - recentlyViewedShows   : Series only.
       'all' and 'recentlyViewedShows' will only produce a list of show names while the other three will produce 
       filename and download url.
     'username'          Myplex (http://my.plexapp.com) username, used to connect to shared PMS'.
     'password'          Myplex (http://my.plexapp.com) password, used to connect to shared PMS'. 
     'server'            Host/IP of PMS to connect to. 
     'lowercase_title'   Convert filename (title) to lower case.
-    'strip_year'        Remove year from title, ex: Show Name (2012) 01x01 => Show Name 01x01
+    'strip_year'        Remove year from title, ex: Show Name (2012) 01x01 => Show Name 01x01.
+                        Movies will have year added to their filename unless this is set.
     'original_filename' Use filename stored in PMS instead of transformed name. lowercase_title and strip_year
                         will be ignored.
     'unwatched_only'    Request only unwatched media from PMS.
     'fetch'             What to download, can be set to the following values:
-        - file          The file itself.
-        - episode_thumb Thumbnail for the episode
-        - season_cover  Season cover thumbnail.
-        - series_art    Series art as configured in PMS
+        - file          The file itself, default.
+        - art           Series or movie art as configured in PMS
+        - cover         Series cover for series, movie cover for movies.
+        - thumb         Episode thumbnail, series only.
+        - season_cover  Season cover, series only. If used in movies, movie cover will be set.
 
 
     Default paramaters:
@@ -61,6 +63,7 @@ class InputPlex(object):
         selection: recentlyAdded
         fetch: series_art
     """
+
 
     def validator(self):
         from flexget import validator
@@ -97,25 +100,24 @@ class InputPlex(object):
         accesstoken = ""
         urlconfig = {}
         urlappend = "?"
-        if (config['unwatched_only'] and config['section'] != 'recentlyViewedShows' and 
-            config['section'] != 'all'):
-                urlconfig['unwatched'] = '1'
-            
-        plexserver = config['server']  
+        entries = []
+        if config['unwatched_only'] and config['section'] != 'recentlyViewedShows' and config['section'] != 'all':
+            urlconfig['unwatched'] = '1'
+        plexserver = config['server']
         if gethostbyname(config['server']) != config['server']:
             config['server'] = gethostbyname(config['server'])
         if config['username'] and config['password'] and config['server'] != '127.0.0.1':
-            header = {'X-Plex-Client-Identifier': 'flexget'} 
+            header = {'X-Plex-Client-Identifier': 'flexget'}
             log.debug("Trying to to connect to myplex.")
             try:
-                r = requests.post('https://my.plexapp.com/users/sign_in.xml', 
-                    auth=(config['username'], config['password']), headers=header)
+                r = requests.post('https://my.plexapp.com/users/sign_in.xml',
+                                  auth=(config['username'], config['password']), headers=header)
             except requests.RequestException as e:
                 raise plugin.PluginError('Could not login to my.plexapp.com: %s. Username: %s Password: %s'
-                    % (e, config['username'], config['password']))
+                                         % (e, config['username'], config['password']))
             log.debug("Connected to myplex.")
             if 'Invalid email' in r.text:
-                raise plugin.PluginError('Could not login to my.plexapp.com: invalid username and/or password!')
+                raise plugin.PluginError("Could not login to my.plexapp.com: invalid username and/or password!")
             log.debug("Managed to login to myplex.")
             dom = parseString(r.text)
             plextoken = dom.getElementsByTagName('authentication-token')[0].firstChild.nodeValue
@@ -123,12 +125,12 @@ class InputPlex(object):
             try:
                 r = requests.get("https://my.plexapp.com/pms/servers?X-Plex-Token=%s" % plextoken)
             except requests.RequestException as e:
-                raise plugin.PluginError('Could not get servers from my.plexapp.com using authentication-token: %s.'
-                                         % plextoken)
+                raise plugin.PluginError("Could not get servers from my.plexapp.com using "
+                                         "authentication-token: %s. (%s)" % (plextoken, e))
             dom = parseString(r.text)
             for node in dom.getElementsByTagName('Server'):
                 if node.getAttribute('address') == config['server']:
-                    accesstoken = node.getAttribute('accessToken') 
+                    accesstoken = node.getAttribute('accessToken')
                     log.debug("Got accesstoken: %s" % accesstoken)
                     urlconfig['X-Plex-Token'] = accesstoken
             if accesstoken == "":
@@ -137,8 +139,8 @@ class InputPlex(object):
             urlappend += '%s=%s&' % (key, urlconfig[key])
         if not isinstance(config['section'], int):
             try:
-                r = requests.get("http://%s:%d/library/sections/%s" % 
-                    (config['server'], config['port'], urlappend))
+                r = requests.get("http://%s:%d/library/sections/%s" %
+                                 (config['server'], config['port'], urlappend))
             except requests.RequestException as e:
                 raise plugin.PluginError('Error retrieving source: %s' % e)
             dom = parseString(r.text.encode("utf-8"))
@@ -148,26 +150,26 @@ class InputPlex(object):
         if not isinstance(config['section'], int):
             raise plugin.PluginError('Could not find section \'%s\'' % config['section'])
         log.debug("Fetching http://%s:%d/library/sections/%s/%s%s" %
-            (config['server'], config['port'], config['section'], config['selection'], urlappend))
+                  (config['server'], config['port'], config['section'], config['selection'], urlappend))
         try:
-            r = requests.get("http://%s:%d/library/sections/%s/%s%s" % 
-                (config['server'], config['port'], config['section'], config['selection'], urlappend))
+            r = requests.get("http://%s:%d/library/sections/%s/%s%s" %
+                             (config['server'], config['port'], config['section'], config['selection'], urlappend))
         except requests.RequestException as e:
             raise plugin.PluginError('Error retrieving source: %s' % e)
         dom = parseString(r.text.encode("utf-8"))
-        entries = []
         plexsectionname = dom.getElementsByTagName('MediaContainer')[0].getAttribute('title1')
+        log.debug("Plex section name %s" % plexsectionname)
         if dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') == "show":
             for node in dom.getElementsByTagName('Directory'):
+                e = Entry()
                 title = node.getAttribute('title')
                 if config['strip_year']:
                     title = re.sub(r'^(.*)\(\d+\)$', r'\1', title)
                 title = re.sub(r'[\(\)]', r'', title)
-                title = re.sub(r'\&', r'And', title)
+                title = re.sub(r'&', r'And', title)
                 title = re.sub(r'[^A-Za-z0-9- ]', r'', title)
                 if config['lowercase_title']:
                     title = title.lower()
-                e = Entry()
                 e['title'] = title
                 e['url'] = "NULL"
                 e['plex_server'] = plexserver
@@ -177,28 +179,29 @@ class InputPlex(object):
                 entries.append(e)
         elif dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') == "episode":
             for node in dom.getElementsByTagName('Video'):
+                e = Entry()
                 title = node.getAttribute('grandparentTitle')
                 season = int(node.getAttribute('parentIndex'))
-                episodethumb = "http://%s:%d%s%s" % (config['server'], config['port'], 
-                    node.getAttribute('thumb'), urlappend)
-                seriesart = "http://%s:%d%s%s" % (config['server'], config['port'], 
-                    node.getAttribute('art'), urlappend)
-                seasoncover = "http://%s:%d%s%s" % (config['server'], config['port'], 
-                    node.getAttribute('parentThumb'), urlappend)
-                seriescover = "http://%s:%d%s%s" % (config['server'], config['port'], 
-                    node.getAttribute('grandparentThumb'), urlappend)
+                episodethumb = "http://%s:%d%s%s" % (config['server'], config['port'],
+                                                     node.getAttribute('thumb'), urlappend)
+                seriesart = "http://%s:%d%s%s" % (config['server'], config['port'],
+                                                  node.getAttribute('art'), urlappend)
+                seasoncover = "http://%s:%d%s%s" % (config['server'], config['port'],
+                                                    node.getAttribute('parentThumb'), urlappend)
+                seriescover = "http://%s:%d%s%s" % (config['server'], config['port'],
+                                                    node.getAttribute('grandparentThumb'), urlappend)
                 episodetitle = node.getAttribute('title')
                 episodesummary = node.getAttribute('summary')
                 if node.getAttribute('parentIndex') == node.getAttribute('year'):
-                    season = node.getAttribute('originallyAvailableAt') 
+                    season = node.getAttribute('originallyAvailableAt')
                     filenamemap = "%s_%s%s_%s_%s_%s.%s"
                     episode = ""
                 elif node.getAttribute('index'):
                     episode = int(node.getAttribute('index'))
                     filenamemap = "%s_%02dx%02d_%s_%s_%s.%s"
                 else:
-                    log.debug("Could not get episode number for '%s' (Hint, ratingKey: %s)" 
-                        % (title, node.getAttribute('ratingKey')))
+                    log.debug("Could not get episode number for '%s' (Hint, ratingKey: %s)"
+                              % (title, node.getAttribute('ratingKey')))
                     break
                 for media in node.getElementsByTagName('Media'):
                     vcodec = media.getAttribute('videoCodec')
@@ -210,8 +213,77 @@ class InputPlex(object):
                     resolution = media.getAttribute('videoResolution') + "p"
                     for part in media.getElementsByTagName('Part'):
                         key = part.getAttribute('key')
-                        e = Entry()
                         duration = part.getAttribute('duration')
+                        if config['original_filename']:
+                            filename, fileext = os.path.splitext(basename(part.getAttribute('file')))
+                            if config['fetch'] != 'file':
+                                filename += ".jpg"
+                            else:
+                                filename = "%s.%s" % (filename, fileext)
+                        else:
+                            title = re.sub(r'[\(\)]', r'', title)
+                            title = re.sub(r'&', r'And', title).strip()
+                            title = re.sub(r'[^A-Za-z0-9- _]', r'', title)
+                            if config['strip_year']:
+                                title = re.sub(r'^(.*)\(\d+\)$', r'\1', title)
+                            if config['lowercase_title']:
+                                title = title.lower()
+                            filename = filenamemap % (title.replace(" ", "."), season, episode, resolution, vcodec,
+                                                      acodec, container)
+                        e['title'] = filename
+                        e['filename'] = filename
+                        e['plex_url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, urlappend)
+                        e['url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, urlappend)
+                        e['plex_server'] = plexserver
+                        e['plex_server_ip'] = config['server']
+                        e['plex_port'] = config['port']
+                        e['plex_section'] = config['section']
+                        e['plex_section_name'] = plexsectionname
+                        e['plex_path'] = key
+                        e['plex_duration'] = duration
+                        e['plex_thumb'] = episodethumb
+                        e['plex_art'] = seriesart
+                        e['plex_cover'] = seriescover
+                        e['plex_season_cover'] = seasoncover
+                        e['plex_title'] = episodetitle
+                        e['plex_summary'] = episodesummary
+                        if config['fetch'] == "file" or not config['fetch']:
+                            e['url'] = e['plex_url']
+                        elif config['fetch'] == "thumb":
+                            e['url'] = e['plex_thumb']
+                        elif config['fetch'] == "art":
+                            e['url'] = e['plex_art']
+                        elif config['fetch'] == "cover":
+                            e['url'] = e['plex_cover']
+                        elif config['fetch'] == "season_cover":
+                            e['url'] = e['plex_season_cover']
+                        log.debug("Setting url to %s since %s was selected." % (e['url'], config['fetch']))
+                        if find(e['url'], '/library/') == -1:
+                            log.debug('Seems like the chosen item could not be found in the PMS.')
+                            break
+                        entries.append(e)
+        elif dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup') == "movie":
+            if config['fetch'] == "thumb":
+                raise plugin.pluginError('There are no thumbnails for movies.')
+            for node in dom.getElementsByTagName('Video'):
+                e = Entry()
+                title = node.getAttribute('title')
+                log.debug("found %s" % title)
+                art = node.getAttribute('art')
+                thumb = node.getAttribute('thumb')
+                duration = node.getAttribute('duration')
+                year = node.getAttribute('year')
+                summary = node.getAttribute('summary')
+                for media in node.getElementsByTagName('Media'):
+                    vcodec = media.getAttribute('videoCodec')
+                    acodec = media.getAttribute('audioCodec')
+                    resolution = media.getAttribute('videoResolution') + 'p'
+                    for part in media.getElementsByTagName('Part'):
+                        key = part.getAttribute('key')
+                        if config['fetch'] == "file" or not config['fetch']:
+                            container = media.getAttribute('container')
+                        else:
+                            container = "jpg"
                         if config['original_filename']:
                             filename, fileext = os.path.splitext(basename(part.getAttribute('file')))
                             if config['fetch'] != 'file':
@@ -219,14 +291,16 @@ class InputPlex(object):
                             else:
                                 e['title'] = "%s.%s" % (filename, fileext)
                         else:
+                            title = re.sub(r'&', r'And', title).strip()
+                            title = re.sub(r'[^A-Za-z0-9- _]', r'', title).replace(" ", ".")
                             if config['strip_year']:
-                                title = re.sub(r'^(.*)\(\d+\)$', r'\1', title)
-                            title = re.sub(r'[\(\)]', r'', title)
-                            title = re.sub(r'\&', r'And', title).strip()
-                            title = re.sub(r'[^A-Za-z0-9- ]', r'', title).replace(" ", ".")
+                                filenamemap = "%s_%s_%s_%s.%s"
+                                e['title'] = filenamemap % (title, resolution, vcodec, acodec, container)
+                            else:
+                                filenamemap = "%s_%d_%s_%s_%s.%s"
+                                e['title'] = filenamemap % (title, year, resolution, vcodec, acodec, container)
                             if config['lowercase_title']:
                                 title = title.lower()
-                            e['title'] = filenamemap % (title, season, episode, resolution, vcodec, acodec, container) 
                         e['filename'] = e['title']
                         e['plex_url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, urlappend)
                         e['url'] = "http://%s:%d%s%s" % (config['server'], config['port'], key, urlappend)
@@ -237,26 +311,23 @@ class InputPlex(object):
                         e['plex_section_name'] = plexsectionname
                         e['plex_path'] = key
                         e['plex_duration'] = duration
-                        e['plex_episode_thumb'] = episodethumb
-                        e['plex_series_art'] = seriesart
-                        e['plex_season_cover'] = seasoncover
-                        e['plex_episode_title'] = episodetitle
-                        e['plex_episode_summary'] = episodesummary
+                        e['plex_episode_thumb'] = ''
+                        e['plex_art'] = art
+                        e['plex_cover'] = thumb
+                        e['plex_summary'] = summary
+                        e['plex_title'] = title
                         if config['fetch'] == "file" or not config['fetch']:
                             e['url'] = e['plex_url']
-                        elif config['fetch'] == "episode_thumb":
-                            e['url'] = e['plex_episode_thumb']
-                        elif config['fetch'] == "series_art":
-                            e['url'] = e['plex_series_art']
-                        elif config['fetch'] == "season_cover":
-                            e['url'] = e['plex_season_cover']
-                        log.debug("Setting url to %s since %s was selected." % (e['url'], config['fetch']))
+                        elif config['fetch'] == "cover" or config['fetch'] == "season_cover":
+                            e['url'] = e['plex_cover']
+                        elif config['fetch'] == "art":
+                            e['url'] = e['plex_art']
                         if find(e['url'], '/library/') == -1:
-                            log.debug('Seems like the chosen item could not be found in the PMS. Oh, well. NEXT!')
+                            log.debug('Seems like the chosen item could not be found in PMS, missing art?')
                             break
                         entries.append(e)
         else:
-            raise plugin.PluginError('Selected section is not a TV section.')
+            raise plugin.PluginError('Selected section is neither TV nor movie section.')
         return entries
 
 
