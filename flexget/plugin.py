@@ -160,7 +160,7 @@ plugin_contexts = ['task', 'root']
 
 # task phases, in order of their execution; note that this can be extended by
 # registering new phases at runtime
-task_phases = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'exit']
+task_phases = ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'learn', 'exit']
 
 # map phase names to method names
 phase_methods = {

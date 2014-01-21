@@ -17,8 +17,7 @@ class FilterOnlyNew(object):
         # Raises an error if plugin isn't available
         plugin.get_plugin_by_name('remember_rejected')
 
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
+    def on_task_learn(self, task, config):
         """Reject all entries so remember_rejected will reject them next time"""
         if not config or not task.entries:
             return
