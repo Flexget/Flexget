@@ -68,8 +68,7 @@ class FilterQueueBase(object):
                 # Keep track of entries we accepted, so they can be marked as downloaded on task_exit if successful
                 self.accepted_entries[item.id] = entry
 
-    @priority(-255)
-    def on_task_output(self, task, config):
+    def on_task_learn(self, task, config):
         if config is False:
             return
 
