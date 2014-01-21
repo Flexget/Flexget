@@ -392,7 +392,8 @@ class PluginTransmissionClean(TransmissionBase):
         return root
 
     def on_task_exit(self, task, config):
-        if not config['enabled']:
+        config = self.prepare_config(config)
+        if not config['enabled'] or task.options.learn:
             return
         if not self.client:
             self.client = self.create_rpc_client(config)

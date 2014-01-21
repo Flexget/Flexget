@@ -488,6 +488,10 @@ class Task(object):
             return
 
         # Handle keyword args
+        if self.options.learn:
+            log.info('Disabling download and output phases because of --learn')
+            self.disable_phase('download')
+            self.disable_phase('output')
         if self.options.disable_phases:
             map(self.disable_phase, self.options.disable_phases)
         if self.options.inject:

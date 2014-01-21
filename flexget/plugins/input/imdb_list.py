@@ -1,13 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import csv
+import feedparser
 import re
 from cgi import parse_header
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import requests
-from flexget.utils.imdb import make_url
+from flexget.utils.imdb import make_url, extract_id
 from flexget.utils.cached_input import cached
 from flexget.utils.tools import decode_html
 from flexget.entry import Entry
@@ -88,32 +88,27 @@ class ImdbList(object):
 
         log.verbose('Retrieving list %s ...' % config['list'])
 
-        # Get the imdb list in csv format
+        # Get the imdb list in RSS format
         try:
-            url = 'http://www.imdb.com/list/export'
-            params = {'list_id': config['list'], 'author_id': config['user_id']}
+            if config['list'] in ['watchlist', 'ratings', 'checkins']:
+                url = 'http://rss.imdb.com/user/%s/%s' % (config['user_id'], config['list'])
+            else:
+                url = 'http://rss.imdb.com/list/%s' % config['list']
             log.debug('Requesting %s' % url)
-            opener = sess.get(url, params=params)
-            mime_type = parse_header(opener.headers['content-type'])[0]
-            log.debug('mime_type: %s' % mime_type)
-            if mime_type != 'text/csv':
-                raise plugin.PluginError('Didn\'t get CSV export as response. Probably specified list `%s` '
-                                         'does not exist.' % config['list'])
-            csv_rows = csv.reader(opener.iter_lines())
+            try:
+                rss = feedparser.parse(url)
+            except LookupError as e:
+                raise plugin.PluginError('Failed to parse RSS feed for list `%s` correctly: %s' % (config['list'], e))
         except requests.RequestException as e:
             raise plugin.PluginError('Unable to get imdb list: %s' % e.message)
 
         # Create an Entry for each movie in the list
         entries = []
-        for row in csv_rows:
-            if not row or row[0] == 'position':
-                # Don't use blank rows or the headings row
-                continue
+        for entry in rss.entries:
             try:
-                title = decode_html(row[5]).decode('utf-8')
-                entries.append(Entry(title=title, url=make_url(row[1]), imdb_id=row[1], imdb_name=title))
+                entries.append(Entry(title=entry.title, url=entry.link, imdb_id=extract_id(entry.link), imdb_name=entry.title))
             except IndexError:
-                log.critical('IndexError! Unable to handle row: %s' % row)
+                log.critical('IndexError! Unable to handle RSS entry: %s' % entry)
         return entries
 
 

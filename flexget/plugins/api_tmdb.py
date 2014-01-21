@@ -315,7 +315,7 @@ class ApiTmdb(object):
             return movie
 
     @staticmethod
-    def get_movie_details(movie, session, result = None):
+    def get_movie_details(movie, session, result=None):
         """Populate details for this :movie: from TMDb"""
 
         if not result and not movie.id:
@@ -325,7 +325,11 @@ class ApiTmdb(object):
                 result = tmdb3.Movie(movie.id)
             except tmdb3.TMDBError:
                 raise LookupError('No results for tmdb_id: %s (%s)' % (movie.id, sys.exc_info()[1]))
-            movie.update_from_object(result)
+            try:
+                movie.update_from_object(result)
+            except tmdb3.TMDBRequestInvalid as e:
+                log.debug('Error updating tmdb info: %s' % e)
+                raise LookupError('Error getting tmdb info')
         posters = result.posters
         if posters:
             # Add any posters we don't already have

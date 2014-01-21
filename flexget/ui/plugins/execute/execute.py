@@ -5,8 +5,8 @@ from Queue import Empty
 from flask import render_template, request, flash
 from flask import Blueprint, escape, jsonify
 
-from flexget.options import CoreArgumentParser, RaiseErrorArgumentParser
-from flexget.ui.webui import register_plugin
+from flexget.options import get_parser
+from flexget.ui.webui import register_plugin, manager
 from flexget.scheduler import BufferQueue
 
 execute = Blueprint('execute', __name__)
@@ -14,19 +14,19 @@ execute = Blueprint('execute', __name__)
 log = logging.getLogger('ui.execute')
 
 bufferqueue = BufferQueue()
-exec_parser = RaiseErrorArgumentParser(parents=[CoreArgumentParser().get_subparser('execute')])
+exec_parser = get_parser('execute')
 
 @execute.route('/', methods=['POST', 'GET'])
 def index():
     context = {'progress': exec_parser.format_help().split('\n')}
     if request.method == 'POST':
         try:
-            options = exec_parser.parse_args(request.form.get('options', ''))
+            options = exec_parser.parse_args(request.form.get('options', ''), raise_errors=True)
         except ValueError as e:
             flash(escape(e.message), 'error')
             context['options'] = request.form['options']
         else:
-            executor.execute(options=options, output=bufferqueue)
+            manager.scheduler.execute(options=options.execute, output=bufferqueue)
             context['execute_progress'] = True
             context['progress'] = progress(as_list=True)
 

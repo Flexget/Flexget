@@ -12,7 +12,7 @@ from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('torrentz')
 
-REGEXP = re.compile(r'http://torrentz\.eu/(?P<hash>[a-f0-9]{40})')
+REGEXP = re.compile(r'http://torrentz\.(eu|me)/(?P<hash>[a-f0-9]{40})')
 REPUTATIONS = {  # Maps reputation name to feed address
     'any': 'feed_any',
     'low': 'feed_low',
@@ -51,7 +51,7 @@ class UrlRewriteTorrentz(object):
         return REGEXP.match(entry['url'])
 
     def url_rewrite(self, task, entry):
-        thash = REGEXP.match(entry['url']).group(1)
+        thash = REGEXP.match(entry['url']).group(2)
         entry['url'] = 'https://torcache.net/torrent/%s.torrent' % thash.upper()
         entry['torrent_info_hash'] = thash
 
@@ -67,7 +67,12 @@ class UrlRewriteTorrentz(object):
             try:
                 opened = urllib2.urlopen(url)
             except urllib2.URLError as err:
-                raise plugin.PluginWarning('Error requesting URL: %s' % err)
+                url = 'http://torrentz.me/%s?q=%s' % (feed, urllib.quote(query.encode('utf-8')))
+                log.warning('torrentz.eu failed, trying torrentz.me. Error: %s' % err)
+                try:
+                    opened = urllib2.urlopen(url)
+                except urllib2.URLError as err:
+                    raise plugin.PluginWarning('Error requesting URL: %s' % err)
             rss = feedparser.parse(opened)
 
             status = rss.get('status', False)
