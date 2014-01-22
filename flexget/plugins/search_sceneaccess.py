@@ -1,24 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import urllib
 import re
 
-from sqlalchemy import Column, Unicode, Integer, PickleType, DateTime
-from requests.utils import dict_from_cookiejar, cookiejar_from_dict
-from datetime import datetime, timedelta
+from urllib import quote
 
 from flexget import plugin
 from flexget import validator
-from flexget.db_schema import versioned_base
-from flexget.manager import Session
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.plugins.common_authentication import Authentication
 
-log = logging.getLogger('sceneaccess')
-Base = versioned_base('cookies_sceneaccess', 0)
+log = logging.getLogger('search_sceneaccess')
 
 CATEGORIES = {
     'browse':
@@ -86,58 +80,6 @@ CATEGORIES = {
 
 URL = 'https://sceneaccess.eu/'
 
-
-class SceneAccessDatabase(Base):
-    __tablename__ = 'cookies_sceneaccess'
-    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    username = Column(Unicode, index=True)
-    cookiejar = Column(PickleType)
-    expires = Column(DateTime)
-
-
-class SceneAccessAuth(object):
-    def __init__(self, username, password):
-        self.session = requests.Session()
-        self.url = URL
-        self.username = username
-        self.password = password
-        self.db_session = Session()
-
-        self.force_login = False
-
-    def Authenticate(self):
-        db = self.db_session.query(SceneAccessDatabase).filter(
-            SceneAccessDatabase.username == self.username).first()
-
-        if db:
-            if db.expires < datetime.now() or self.force_login is True:
-                log.debug('Cookies expired...')
-                self.db_session.delete(db)
-                self.db_session.commit()
-                self._login()
-            else:
-                log.debug('Cookies loaded from database')
-                cookiejar = cookiejar_from_dict(db.cookiejar)
-                self.session.add_cookiejar(cookiejar)
-        else:
-            self._login()
-
-        return self.session
-
-    def _login(self):
-        params = {'password': self.password,
-                  'username': self.username,
-                  'submit': 'come on in'
-        }
-        _url = self.url + 'login'
-        log.debug('Logging in...')
-        self.session.post(_url, data=params)
-        cookiejar = dict_from_cookiejar(self.session.cookies)
-        self.db_session.add(SceneAccessDatabase(
-            username=self.username, cookiejar=cookiejar, expires=datetime.now() + timedelta(days=7)
-        ))
-        self.db_session.commit()
-
 class SceneAccessSearch(object):
     """ Scene Access Search plugin
 
@@ -172,17 +114,17 @@ class SceneAccessSearch(object):
         # Scope as in pages like `browse`, `mp3/0day`, `foreign`, etc.
         # Will only accept categories from `browse` which will it default to, unless user specifies other scopes
         # via dict
-        root.accept('choice', key='category').accept_choices(CATEGORIES['browse'], ignore_case=True)
+        root.accept('choice', key='category').accept_choices(CATEGORIES['browse'])
         categories = root.accept('dict', key='category')
 
         category_list = root.accept('list', key='category')
-        category_list.accept('choice').accept_choices(CATEGORIES['browse'], ignore_case=True)
+        category_list.accept('choice').accept_choices(CATEGORIES['browse'])
 
         for category in CATEGORIES:
-            categories.accept('choice', key=category).accept_choices(CATEGORIES[category], ignore_case=True)
+            categories.accept('choice', key=category).accept_choices(CATEGORIES[category])
             categories.accept('boolean', key=category)
             category_list = categories.accept('list', key=category)
-            category_list.accept('choice', key=category).accept_choices(CATEGORIES[category], ignore_case=True)
+            category_list.accept('choice', key=category).accept_choices(CATEGORIES[category])
         return root
 
     def processCategories(self, config):
@@ -232,8 +174,18 @@ class SceneAccessSearch(object):
             Search for entries on SceneAccess
         """
 
-        SCC = SceneAccessAuth(config['username'], config['password'])
-        session = SCC.Authenticate()
+        post_params = {'username': config['username'],
+                       'password': config['password'],
+                       'submit': 'come on in'}
+
+        scc = Authentication(
+            username=config['username'], post_params=post_params, post_url=URL + 'login')
+        session = scc.Authenticate()
+
+        if scc.cookies_age > 3600:  # Check every hour if cookies are working (logged in), force login if they're not
+            if config['username'] not in session.get(URL + 'browse'):
+                scc.force_login = True
+                session = scc.Authenticate()
 
         BASE_URLS = list()
         entries = set()
@@ -242,7 +194,7 @@ class SceneAccessSearch(object):
 
         for search_string in entry.get('search_strings', [entry['title']]):
             search_string_normalized = normalize_unicode(search_string)
-            search_string_url_fragment = '&search=' + urllib.quote(search_string_normalized.encode('utf8'))
+            search_string_url_fragment = '&search=' + quote(search_string_normalized.encode('utf8'))
 
             for url in BASE_URLS:
                 url += search_string_url_fragment
@@ -276,7 +228,6 @@ class SceneAccessSearch(object):
                     entries.add(entry)
 
         return entries
-
 
 @event('plugin.register')
 def register_plugin():
