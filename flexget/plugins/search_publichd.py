@@ -109,13 +109,13 @@ class SearchPublicHD(object):
 
                 if size:
                     if size.group(2) == 'GB':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 ** 3 / 1024 ** 2)
+                        entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 ** 3 / 1024 ** 2)
                     elif size.group(2) == 'MB':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 ** 2 / 1024 ** 2)
+                        entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 ** 2 / 1024 ** 2)
                     elif size.group(2) == 'KB':
-                        entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
+                        entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 / 1024 ** 2)
                     else:
-                        entry['content_size'] = int(float(size.group(1)) / 1024 ** 2)
+                        entry['content_size'] = int(float(size.group(1).replace(',', '')) / 1024 ** 2)
 
                 entries.add(entry)
 
