@@ -192,6 +192,15 @@ class InputPlex(object):
                                                     node.getAttribute('grandparentThumb'), urlappend)
                 episodetitle = node.getAttribute('title')
                 episodesummary = node.getAttribute('summary')
+                count = node.getAttribute('viewCount')
+                offset = node.getAttribute('viewOffset')
+                if count:
+                    status='seen'
+                elif offset:
+                    status = 'inprogress'
+                else:
+                    status = 'unwatched'
+
                 if node.getAttribute('parentIndex') == node.getAttribute('year'):
                     season = node.getAttribute('originallyAvailableAt')
                     filenamemap = "%s_%s%s_%s_%s_%s.%s"
@@ -247,6 +256,7 @@ class InputPlex(object):
                         e['plex_season_cover'] = seasoncover
                         e['plex_title'] = episodetitle
                         e['plex_summary'] = episodesummary
+                        e['plex_status'] = status
                         if config['fetch'] == "file" or not config['fetch']:
                             e['url'] = e['plex_url']
                         elif config['fetch'] == "thumb":
@@ -274,6 +284,14 @@ class InputPlex(object):
                 duration = node.getAttribute('duration')
                 year = node.getAttribute('year')
                 summary = node.getAttribute('summary')
+                count = node.getAttribute('viewCount')
+                offset = node.getAttribute('viewOffset')
+                if count:
+                    status='seen'
+                elif offset:
+                    status = 'inprogress'
+                else:
+                    status = 'unwatched'
                 for media in node.getElementsByTagName('Media'):
                     vcodec = media.getAttribute('videoCodec')
                     acodec = media.getAttribute('audioCodec')
@@ -316,6 +334,7 @@ class InputPlex(object):
                         e['plex_cover'] = thumb
                         e['plex_summary'] = summary
                         e['plex_title'] = title
+                        e['plex_status'] = status
                         if config['fetch'] == "file" or not config['fetch']:
                             e['url'] = e['plex_url']
                         elif config['fetch'] == "cover" or config['fetch'] == "season_cover":
