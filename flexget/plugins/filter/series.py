@@ -1386,7 +1386,7 @@ class FilterSeries(FilterSeriesBase):
 
     def on_task_learn(self, task, config):
         """Learn succeeded episodes"""
-        log.debug('on_task_output')
+        log.debug('on_task_learn')
         for entry in task.accepted:
             if 'series_releases' in entry:
                 for release in entry['series_releases']:
