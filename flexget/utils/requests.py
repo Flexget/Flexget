@@ -135,7 +135,7 @@ class Session(requests.Session):
 
         try:
             result = requests.Session.request(self, method, url, *args, **kwargs)
-        except requests.Timeout:
+        except (requests.Timeout, requests.ConnectionError):
             # Mark this site in known unresponsive list
             set_unresponsive(url)
             raise
