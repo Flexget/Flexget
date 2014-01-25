@@ -161,8 +161,11 @@ class MovePlugin(object):
                 for nss, nsd in zip(ns_src, ns_dst):
                     log.info('Would also move `%s` to `%s`' % (nss, nsd))
             else:
-                log.info('Moving `%s` to `%s`' % (src, dst))
-                shutil.move(src, dst)
+                try:
+                    log.info('Moving `%s` to `%s`' % (src, dst))
+                    shutil.move(src, dst)
+                except Exception as err:
+                    log.error(err.message)
                 # Collected namesakes
                 for nss, nsd in zip(ns_src, ns_dst):
                     try:
