@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import time
 import logging
 import difflib
+import random
 from datetime import datetime, timedelta
 from urllib2 import URLError
 
@@ -22,8 +23,8 @@ session = requests.Session()
 # There is a 5 call per second rate limit per api key with multiple users on the same api key, this can be problematic
 session.set_domain_delay('api.rottentomatoes.com', '0.4 seconds')
 
-# This is developer Atlanta800's API key
-API_KEY = 'rh8chjzp8vu6gnpwj88736uv'
+# This is developer Atlanta800's API key, and gazpachoking's API key
+API_KEY = random.choice(['rh8chjzp8vu6gnpwj88736uv', 'vwf2rgr2wtrndbtq73aupjez'])
 API_VER = 'v1.0'
 SERVER = 'http://api.rottentomatoes.com/api/public'
 
