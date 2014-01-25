@@ -62,9 +62,10 @@ class PluginRottenTomatoesLookup(object):
         'movie_name': 'title',
         'movie_year': 'year'}
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('any')
+    schema = {'oneOf': [
+        {'type': 'boolean'},
+        {'type': 'string', 'description': 'provide a custom api key'}
+    ]}
 
     def lazy_loader(self, entry, field):
         """Does the lookup for this entry and populates the entry fields.
