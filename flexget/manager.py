@@ -299,23 +299,20 @@ class Manager(object):
 
         :param bool create: If a config file is not found, and create is True, one will be created in the home folder
         """
-        #removal of startup_path
+        config = None
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
-        current_path = os.getcwd()
-        config_path = os.path.dirname(self.options.config)
 
         possible = []
-        if config_path != '':
-            # explicit path given, don't try anything too fancy
-            possible.append(self.options.config)
+        if os.path.isabs(self.options.config):
+            # explicit path given, don't try anything
+            config = self.options.config
+            possible = [config]
         else:
             log.debug('Figuring out config load paths')
+            possible.append(os.getcwd())
             # for virtualenv / dev sandbox
-            from flexget import __version__ as version
-            #add current working direcotry first to appease Gazpachoking
-            possible.append(current_path)
             if hasattr(sys, 'real_prefix'):
-                log.debug('Running git, adding virtualenv / sandbox paths')
+                log.debug('Adding virtualenv path')
                 possible.append(sys.prefix)
             # normal lookup locations
             possible.append(home_path)
@@ -328,12 +325,13 @@ class Manager(object):
                 xdg_config = os.environ.get('XDG_CONFIG_HOME', os.path.join(os.path.expanduser('~'), '.config'))
                 possible.append(os.path.join(xdg_config, 'flexget'))
 
-        for path in possible:
-            config = os.path.join(path, self.options.config)
-            if os.path.exists(config):
-                log.debug('Found config: %s' % config)
-                break
-        else:
+            for path in possible:
+                config = os.path.join(path, self.options.config)
+                if os.path.exists(config):
+                    log.debug('Found config: %s' % config)
+                    break
+
+        if not (config and os.path.exists(config)):
             if not create:
                 log.info('Tried to read from: %s' % ', '.join(possible))
                 log.critical('Failed to find configuration file %s' % self.options.config)
@@ -344,6 +342,7 @@ class Manager(object):
                 # Write empty tasks to the config
                 newconfig.write(yaml.dump({'tasks': {}}))
 
+        log.debug('Config file %s selected')
         self.config_path = config
         self.config_name = os.path.splitext(os.path.basename(config))[0]
         self.config_base = os.path.normpath(os.path.dirname(config))
