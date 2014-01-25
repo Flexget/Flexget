@@ -301,11 +301,12 @@ class Manager(object):
         """
         config = None
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
+        options_config = os.path.expanduser(self.options.config)
 
         possible = []
-        if os.path.isabs(self.options.config):
+        if os.path.isabs(options_config):
             # explicit path given, don't try anything
-            config = self.options.config
+            config = options_config
             possible = [config]
         else:
             log.debug('Figuring out config load paths')
@@ -334,10 +335,10 @@ class Manager(object):
         if not (config and os.path.exists(config)):
             if not create:
                 log.info('Tried to read from: %s' % ', '.join(possible))
-                log.critical('Failed to find configuration file %s' % self.options.config)
+                log.critical('Failed to find configuration file %s' % options_config)
                 sys.exit(1)
-            config = os.path.join(home_path, self.options.config)
-            log.info('Config file %s not found. Creating new config %s' % (self.options.config, config))
+            config = os.path.join(home_path, options_config)
+            log.info('Config file %s not found. Creating new config %s' % (options_config, config))
             with open(config, 'w') as newconfig:
                 # Write empty tasks to the config
                 newconfig.write(yaml.dump({'tasks': {}}))
