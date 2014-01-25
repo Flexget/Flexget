@@ -325,7 +325,7 @@ def parse_timedelta(value):
     # Make sure unit name is plural.
     if not unit.endswith('s'):
         unit += 's'
-    params = {unit: int(amount)}
+    params = {unit: float(amount)}
     try:
         return timedelta(**params)
     except TypeError:
