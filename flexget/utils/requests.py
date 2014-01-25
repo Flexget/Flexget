@@ -7,17 +7,17 @@ from urlparse import urlparse
 import requests
 # Allow some request objects to be imported from here instead of requests
 from requests import RequestException, HTTPError
-from flexget.utils.tools import parse_timedelta
+from flexget.utils.tools import parse_timedelta, TimedDict
 
 log = logging.getLogger('requests')
 
 # Don't emit info level urllib3 log messages or below
 logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
 
-# Remembers sites that have timed out
-unresponsive_hosts = {}
 # Time to wait before trying an unresponsive site again
 WAIT_TIME = timedelta(seconds=60)
+# Remembers sites that have timed out
+unresponsive_hosts = TimedDict(WAIT_TIME)
 
 
 def is_unresponsive(url):
@@ -29,9 +29,7 @@ def is_unresponsive(url):
     :rtype: bool
     """
     host = urlparse(url).hostname
-    if host in unresponsive_hosts and unresponsive_hosts[host] + WAIT_TIME < datetime.now():
-        return True
-    return False
+    return host in unresponsive_hosts
 
 
 def set_unresponsive(url):
@@ -41,7 +39,10 @@ def set_unresponsive(url):
     :param url: The url that timed out
     """
     host = urlparse(url).hostname
-    unresponsive_hosts[host] = datetime.now()
+    if host in unresponsive_hosts:
+        # If somehow this is called again before previous timer clears, don't refresh
+        return
+    unresponsive_hosts[host] = True
 
 
 def _wrap_urlopen(url, timeout=None):
@@ -110,7 +111,7 @@ class Session(requests.Session):
 
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
-            raise requests.Timeout('Requests to this site are known to timeout.')
+            raise requests.Timeout('Requests to this site have timed out recently. Waiting before trying again.')
 
         # Check if we need to add a delay before request to this site
         for domain, domain_dict in self.domain_delay.iteritems():
