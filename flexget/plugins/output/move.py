@@ -161,8 +161,12 @@ class MovePlugin(object):
                 for nss, nsd in zip(ns_src, ns_dst):
                     log.info('Would also move `%s` to `%s`' % (nss, nsd))
             else:
-                log.info('Moving `%s` to `%s`' % (src, dst))
-                shutil.move(src, dst)
+                try:
+                    shutil.move(src, dst)
+                except IOError as e:
+                    entry.fail('IOError: %s' % (e))
+                    log.debug('Unable to move %s to %s' % (src, dst))
+                    continue
                 # Collected namesakes
                 for nss, nsd in zip(ns_src, ns_dst):
                     try:
@@ -170,7 +174,7 @@ class MovePlugin(object):
                         shutil.move(nss, nsd)
                     except Exception as err:
                         log.error(err.message)
-            
+
             entry['output'] = dst
             if 'clean_source' in config:
                 if not os.path.isdir(src):
