@@ -30,3 +30,5 @@ pip-*.tar.gz
 .DS_Store
 /lib64
 *.noseids
+.coverage
+tests/cover/
