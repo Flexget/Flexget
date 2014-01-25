@@ -69,28 +69,28 @@ class PluginPeriscope(object):
             return
         import periscope
         psc = periscope.Periscope(tempfile.gettempdir())
-        logging.getLogger("periscope").setLevel(logging.CRITICAL)  # LOT of messages otherwise
+        logging.getLogger('periscope').setLevel(logging.CRITICAL)  # LOT of messages otherwise
         langs = [s.encode('utf8') for s in config['languages']]  # avoid unicode warnings
         alts = [s.encode('utf8') for s in config.get('alternatives', [])]
         if not config['overwrite']:
             self.exts = ['.'+s for s in config['subexts']]
         for entry in task.accepted:
             if not 'location' in entry:
-                entry.reject('is not a local file')
+                log.warning('Cannot act on entries that do not represent a local file.')
             elif not os.path.exists(entry['location']):
-                entry.reject('file not found')
+                entry.fail('file not found: %s' % entry['location'])
             elif '$RECYCLE.BIN' in entry['location']:
                 continue  # ignore deleted files in Windows shares
             elif not config['overwrite'] and self.subbed(entry['location']):
-                entry.reject('cannot overwrite existing subs')
+                log.warning('cannot overwrite existing subs for %s' % entry['location'])
             else:
                 try:
                     if psc.downloadSubtitle(entry['location'].encode("utf8"), langs):
                         log.info('Subtitles found for %s' % entry['location'])
-                    elif alts and psc.downloadSubtitle(entry['location'].encode("utf8"), alts):
-                        entry.reject('subtitles found for a second-choice language.')
+                    elif alts and psc.downloadSubtitle(entry['location'].encode('utf8'), alts):
+                        entry.fail('subtitles found for a second-choice language.')
                     else:
-                        entry.reject('cannot find any subtitles for now.')
+                        entry.fail('cannot find any subtitles for now.')
                 except Exception as err:
                     # don't want to abort the entire task for errors in a  
                     # single video file or for occasional network timeouts
