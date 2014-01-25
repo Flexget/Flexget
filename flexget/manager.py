@@ -345,7 +345,7 @@ class Manager(object):
                 # Write empty tasks to the config
                 newconfig.write(yaml.dump({'tasks': {}}))
 
-        log.debug('Config file %s selected')
+        log.debug('Config file %s selected' % config)
         self.config_path = config
         self.config_name = os.path.splitext(os.path.basename(config))[0]
         self.config_base = os.path.normpath(os.path.dirname(config))
