@@ -312,11 +312,12 @@ class Manager(object):
             log.debug('Figuring out config load paths')
             # for virtualenv / dev sandbox
             from flexget import __version__ as version
+            #add current working direcotry first to appease Gazpachoking
+            possible.append(current_path)
             if hasattr(sys, 'real_prefix'):
                 log.debug('Running git, adding virtualenv / sandbox paths')
                 possible.append(sys.prefix)
             # normal lookup locations
-            possible.append(current_path)
             possible.append(home_path)
             if sys.platform.startswith('win'):
                 # On windows look in ~/flexget as well, as explorer does not let you create a folder starting with a dot
