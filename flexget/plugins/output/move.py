@@ -163,8 +163,8 @@ class MovePlugin(object):
             else:
                 try:
                     shutil.move(src, dst)
-                except IOError, e:
-                    entry.fail('IOError: %s%s' % (e.message, e.errno))
+                except IOError as e:
+                    entry.fail('IOError: %s' % (e))
                     log.debug('Unable to move %s to %s' % (src, dst))
                     continue
                 # Collected namesakes
