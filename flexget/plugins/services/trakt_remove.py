@@ -39,7 +39,7 @@ class TraktRemove(object):
         # Do some translation from visible list name to prepare for use in url
         list_name = config['list'].lower()
         # These characters are just stripped in the url
-        for char in '!@#$%^*()[]{}/=?+\\|-_':
+        for char in '!@#$%^*()[]{}/=?+\\|_':
             list_name = list_name.replace(char, '')
         # These characters get replaced
         list_name = list_name.replace('&', 'and')
@@ -104,7 +104,8 @@ class TraktRemove(object):
         # Delete entry from list    
         for item in found.itervalues():
             # Add username, password and list (slug) to the dict to submit
-            item.update({'username': config['username'], 'password': config['password'], 'slug': url_params['list']})
+            item.update({'username': config['username'], 'password': config['password'],
+                         'slug': url_params['list_type']})
             try:
                 result = task.requests.post(post_url, data=json.dumps(item), raise_status=False)
             except RequestException as e:
