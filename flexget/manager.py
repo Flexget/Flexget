@@ -299,11 +299,9 @@ class Manager(object):
 
         :param bool create: If a config file is not found, and create is True, one will be created in the home folder
         """
-        startup_path = os.path.dirname(os.path.abspath(sys.path[0]))
+        #removal of startup_path
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
         current_path = os.getcwd()
-        exec_path = sys.path[0]
-
         config_path = os.path.dirname(self.options.config)
 
         possible = []
@@ -314,13 +312,12 @@ class Manager(object):
             log.debug('Figuring out config load paths')
             # for virtualenv / dev sandbox
             from flexget import __version__ as version
-            if version == '{git}':
+            #add current working direcotry first to appease Gazpachoking
+            possible.append(current_path)
+            if hasattr(sys, 'real_prefix'):
                 log.debug('Running git, adding virtualenv / sandbox paths')
-                possible.append(os.path.join(exec_path, '..'))
-                possible.append(current_path)
-                possible.append(exec_path)
+                possible.append(sys.prefix)
             # normal lookup locations
-            possible.append(startup_path)
             possible.append(home_path)
             if sys.platform.startswith('win'):
                 # On windows look in ~/flexget as well, as explorer does not let you create a folder starting with a dot
