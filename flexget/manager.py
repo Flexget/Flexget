@@ -327,10 +327,12 @@ class Manager(object):
                 possible.append(os.path.join(xdg_config, 'flexget'))
 
             for path in possible:
-                config = os.path.join(path, self.options.config)
+                config = os.path.join(path, options_config)
                 if os.path.exists(config):
                     log.debug('Found config: %s' % config)
                     break
+            else:
+                config = None
 
         if not (config and os.path.exists(config)):
             if not create:
