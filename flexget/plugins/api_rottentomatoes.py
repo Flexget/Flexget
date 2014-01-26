@@ -23,8 +23,8 @@ session = requests.Session()
 # There is a 5 call per second rate limit per api key with multiple users on the same api key, this can be problematic
 session.set_domain_delay('api.rottentomatoes.com', '0.4 seconds')
 
-# These are developer Atlanta800's, gazpachoking's, and crawln's API keys
-API_KEY = random.choice(['rh8chjzp8vu6gnpwj88736uv', 'vwf2rgr2wtrndbtq73aupjez', 'pgwxnj3x27ymaav3b73h6v2m'])
+# This is developer Atlanta800's API key
+API_KEY = 'vwf2rgr2wtrndbtq73aupjez'
 API_VER = 'v1.0'
 SERVER = 'http://api.rottentomatoes.com/api/public'
 
