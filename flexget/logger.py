@@ -106,7 +106,6 @@ def initialize(unit_test=False):
         return
 
     warnings.simplefilter('once')
-    logging.captureWarnings(True)
     logging.addLevelName(TRACE, 'TRACE')
     logging.addLevelName(VERBOSE, 'VERBOSE')
     _logging_configured = True
