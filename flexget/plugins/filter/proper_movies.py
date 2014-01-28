@@ -144,8 +144,7 @@ class FilterProperMovies(object):
                 fire_event('forget', entry['imdb_id'])
                 entry.accept('proper version of previously downloaded movie')
 
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
+    def on_task_learn(self, task, config):
         """Add downloaded movies to the database"""
         log.debug('check for learning')
         for entry in task.accepted:

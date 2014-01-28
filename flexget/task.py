@@ -449,7 +449,9 @@ class Task(object):
     def rerun(self):
         """Immediately re-run the task after execute has completed,
         task can be re-run up to :attr:`.max_reruns` times."""
-        log.info('Plugin %s has requested task to be ran again after execution has completed.' % self.current_plugin)
+        msg = 'Plugin %s has requested task to be ran again after execution has completed.' % self.current_plugin
+        # Only print the first request for a rerun to the info log
+        log.debug(msg) if self._rerun else log.info(msg)
         if self._rerun_count >= self.max_reruns:
             self._rerun = False
             log.info('Task has been re-run %s times already, stopping for now' % self._rerun_count)
@@ -488,6 +490,10 @@ class Task(object):
             return
 
         # Handle keyword args
+        if self.options.learn:
+            log.info('Disabling download and output phases because of --learn')
+            self.disable_phase('download')
+            self.disable_phase('output')
         if self.options.disable_phases:
             map(self.disable_phase, self.options.disable_phases)
         if self.options.inject:

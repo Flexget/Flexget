@@ -3,7 +3,7 @@ from flask import request, jsonify, Blueprint, Response, flash
 import flexget
 from flexget.config_schema import resolve_ref, process_config, get_schema
 from flexget.manager import manager
-from flexget.options import get_parser, RaiseErrorArgumentParser
+from flexget.options import get_parser
 from flexget.plugin import plugin_schemas
 from flexget.scheduler import BufferQueue
 
@@ -28,7 +28,7 @@ def version():
     return jsonify(flexget_version=flexget.__version__, api_version=API_VERSION)
 
 
-exec_parser = RaiseErrorArgumentParser(parents=[get_parser('execute')])
+exec_parser = get_parser('execute')
 
 
 @api.route('/execute', methods=['GET', 'POST'])
@@ -37,7 +37,7 @@ def execute():
     options_string = kwargs.pop('options_string', '')
     if options_string:
         try:
-            kwargs['options'] = exec_parser.parse_args(options_string)
+            kwargs['options'] = exec_parser.parse_args(options_string, raise_errors=True).execute
         except ValueError as e:
             return jsonify(error='invalid options_string specified: %s' % e.message), 400
 

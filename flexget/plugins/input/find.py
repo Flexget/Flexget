@@ -5,6 +5,7 @@ import re
 import sys
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.utils.cached_input import cached
@@ -33,15 +34,17 @@ class InputFind(object):
         regexp: .*\.(avi|mkv)$
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('path', key='path', required=True)
-        root.accept('list', key='path').accept('path')
-        root.accept('text', key='mask')
-        root.accept('regexp', key='regexp')
-        root.accept('boolean', key='recursive')
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'path': one_or_more({'type': 'string', 'format': 'path'}),
+            'mask': {'type': 'string'},
+            'regexp': {'type': 'string', 'format': 'regex'},
+            'recursive': {'type': 'boolean'}
+        },
+        'required': ['path'],
+        'additionalProperties': False
+    }
 
     def prepare_config(self, config):
         from fnmatch import translate

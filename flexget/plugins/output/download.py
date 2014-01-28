@@ -494,8 +494,8 @@ class PluginDownload(object):
         finally:
             self.cleanup_temp_file(entry)
 
-    def on_task_exit(self, task, config):
-        """Make sure all temp files are cleaned up when task exits"""
+    def on_task_learn(self, task, config):
+        """Make sure all temp files are cleaned up after output phase"""
         self.cleanup_temp_files(task)
 
     def on_task_abort(self, task, config):

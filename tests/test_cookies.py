@@ -16,5 +16,5 @@ class TestCookies(FlexGetBase):
 
     @attr(online=True)
     def test_cookies(self):
-        self.execute_task('test_cookies')
+        self.execute_task('test_cookies', options={'nocache': True})
         assert self.task.find_entry(title='blah', url='aoeu'), 'Entry should have been created.'

@@ -38,7 +38,7 @@ class MovePlugin(object):
                     'unpack_safety': {'type': 'boolean'},
                     'allow_dir': {'type': 'boolean'},
                     'clean_source': {'type': 'number'},
-                    #'move_with': {'type': 'array', 'items': {'type': 'string'}}  # TODO
+                    'along': {'type': 'array', 'items': {'type': 'string'}}
                 },
                 'additionalProperties': False
             }
@@ -142,13 +142,39 @@ class MovePlugin(object):
             if dst_ext != src_ext:
                 log.verbose('Adding extension `%s` to dst `%s`' % (src_ext, dst))
                 dst += src_ext
-
+            
+            # Collect wanted namesakes
+            ns_src = []
+            ns_dst = []
+            if 'along' in config and os.path.isfile(src):
+                for ext in config['along']:
+                    if not ext.startswith('.'):
+                        ext = '.' + ext
+                    if os.path.exists(src_filename + ext):
+                        ns_src.append(src_filename + ext)
+                        ns_dst.append(dst_filename + ext)
+            
             # Move stuff
             if task.options.test:
                 log.info('Would move `%s` to `%s`' % (src, dst))
+                # Collected namesakes
+                for nss, nsd in zip(ns_src, ns_dst):
+                    log.info('Would also move `%s` to `%s`' % (nss, nsd))
             else:
-                log.info('Moving `%s` to `%s`' % (src, dst))
-                shutil.move(src, dst)
+                try:
+                    shutil.move(src, dst)
+                except IOError as e:
+                    entry.fail('IOError: %s' % (e))
+                    log.debug('Unable to move %s to %s' % (src, dst))
+                    continue
+                # Collected namesakes
+                for nss, nsd in zip(ns_src, ns_dst):
+                    try:
+                        log.info('Moving `%s` to `%s`' % (nss, nsd))
+                        shutil.move(nss, nsd)
+                    except Exception as err:
+                        log.error(err.message)
+
             entry['output'] = dst
             if 'clean_source' in config:
                 if not os.path.isdir(src):

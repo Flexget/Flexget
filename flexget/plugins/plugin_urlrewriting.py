@@ -51,7 +51,7 @@ class PluginUrlRewriting(object):
     def url_rewrite(self, task, entry):
         """Rewrites given entry url. Raises UrlRewritingError if failed."""
         tries = 0
-        while self.url_rewritable(task, entry):
+        while self.url_rewritable(task, entry) and entry.accepted:
             tries += 1
             if tries > 20:
                 raise UrlRewritingError('URL rewriting was left in infinite loop while rewriting url for %s, '

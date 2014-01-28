@@ -12,7 +12,7 @@ class TestRottenTomatoesLookup(FlexGetBase):
               # tests search
               - {title: 'Toy Story'}
               - {title: 'The Matrix'}
-              - {title: 'Star Wars: Episode I - The Phantom Menace (in 3D)'}
+              - {title: 'Star Wars: Episode I - The Phantom Menace (3D)'}
               # tests direct id
               - {title: '[Group] Taken 720p', rt_id: 770680780}
               # tests title + year

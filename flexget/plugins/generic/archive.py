@@ -153,8 +153,8 @@ class Archive(object):
 
     }
 
-    def on_task_exit(self, task, config):
-        """Add new entries into archive. We use exit phase in case the task corrects title or url via some plugins."""
+    def on_task_learn(self, task, config):
+        """Add new entries into archive. We use learn phase in case the task corrects title or url via some plugins."""
 
         if isinstance(config, bool):
             tag_names = []

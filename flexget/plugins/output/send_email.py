@@ -238,12 +238,8 @@ class OutputEmail(object):
         v.accept('boolean', key='global')
         return v
 
+    @plugin.priority(0)
     def on_task_output(self, task, config):
-        """Count the email as an output"""
-
-    def on_task_exit(self, task, config):
-        """Send email at exit."""
-
         config = prepare_config(config)
 
         if not config['active']:
@@ -287,14 +283,7 @@ class OutputEmail(object):
             send_email(subject, content, config)
 
     # Also send the email on abort
-    def on_task_abort(self, task, config):
-        # The config may not be correct if the task is aborting
-        try:
-            self.on_task_exit(task, config)
-        except Exception as e:
-            log.info('Could not send abort email because email config is invalid.')
-            # Log the exception to debug, in case something different is going wrong.
-            log.debug('Email error:', exc_info=True)
+    on_task_abort = on_task_output
 
 
 @event('plugin.register')

@@ -3,6 +3,7 @@ import copy
 from datetime import datetime, timedelta, time as dt_time
 import fnmatch
 from hashlib import md5
+import itertools
 import logging
 import Queue
 import threading
@@ -234,21 +235,21 @@ class Job(object):
     """A job for the scheduler to execute."""
     #: Used to determine which job to run first when multiple jobs are waiting.
     priority = 1
-    #: A datetime object when the job is scheduled to run. Jobs are sorted by this value when priority is the same.
-    run_at = None
     #: The name of the task to execute
     task = None
     #: Options to run the task with
     options = None
     #: :class:`BufferQueue` to write the task execution output to. '[[END]]' will be sent to the queue when complete
     output = None
+    # Used to keep jobs in order, when priority is the same
+    _counter = itertools.count()
 
     def __init__(self, task, options=None, output=None, priority=1, trigger_id=None):
         self.task = task
         self.options = options
         self.output = output
         self.priority = priority
-        self.run_at = datetime.now()
+        self.count = next(self._counter)
         self.finished_event = threading.Event()
         # Used to make sure a certain trigger doesn't add jobs faster than they can run
         self.trigger_id = trigger_id
@@ -264,7 +265,7 @@ class Job(object):
             self.priority = 5
 
     def __lt__(self, other):
-        return (self.priority, self.run_at) < (other.priority, other.run_at)
+        return (self.priority, self.count) < (other.priority, other.count)
 
 
 class Trigger(object):

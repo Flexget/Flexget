@@ -131,7 +131,8 @@ class Discover(object):
             if not callable(getattr(search, 'search')):
                 log.critical('Search plugin %s does not implement search method' % plugin_name)
             for index, entry in enumerate(entries):
-                log.verbose('Searching for `%s` (%i of %i)' % (entry['title'], index + 1, len(entries)))
+                log.verbose('Searching for `%s` with plugin `%s` (%i of %i)' %
+                            (entry['title'], plugin_name, index + 1, len(entries)))
                 try:
                     search_results = search.search(entry, plugin_config)
                     if not search_results:
@@ -191,9 +192,9 @@ class Discover(object):
 
     def interval_total_seconds(self, interval):
         """
-            Because python 2.6 doesn't have total_seconds()
+        Because python 2.6 doesn't have total_seconds()
         """
-        return (interval.seconds + interval.days * 24 * 3600)
+        return interval.seconds + interval.days * 24 * 3600
 
     def interval_expired(self, config, task, entries):
         """

@@ -37,7 +37,7 @@ class InputPogDesign(object):
         entries = []
         for row in soup.find_all('label', {'class': 'label_check'}):
             if row.find(attrs={'checked': 'checked'}):
-                t = row.text
+                t = row.find('strong').text
                 if t.endswith('[The]'):
                     t = 'The ' + t[:-6]
 
@@ -47,7 +47,7 @@ class InputPogDesign(object):
 
                 e = Entry()
                 e['title'] = t
-                url = row.find_next('a', {'class': 'selectsummary'})
+                url = row.find_next('a', {'class': 'slink'})
                 e['url'] = 'http://www.pogdesign.co.uk' + url['href']
                 entries.append(e)
         return entries
