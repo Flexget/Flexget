@@ -24,7 +24,7 @@ session = requests.Session()
 session.set_domain_delay('api.rottentomatoes.com', '0.4 seconds')
 
 # This is developer Atlanta800's API key
-API_KEY = 'vwf2rgr2wtrndbtq73aupjez'
+API_KEY = 'rh8chjzp8vu6gnpwj88736uv'
 API_VER = 'v1.0'
 SERVER = 'http://api.rottentomatoes.com/api/public'
 
