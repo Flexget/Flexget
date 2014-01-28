@@ -71,8 +71,8 @@ class ConfigureSeries(FilterSeriesBase):
                 s = series.setdefault(entry['title'], {})
                 if entry.get('tvdb_id'):
                     s['set'] = {'tvdb_id': entry['tvdb_id']}
-                if entry.get('alternate_name'):
-                    s['alternate_name'] = entry['alternate_name']
+                if entry.get('configure_series_alternate_name'):
+                    s['alternate_name'] = entry['configure_series_alternate_name']
 
         # Set the config_modified flag if the list of shows changed since last time
         new_hash = hashlib.md5(unicode(sorted(series))).hexdigest().decode('ascii')

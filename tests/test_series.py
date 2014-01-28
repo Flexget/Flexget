@@ -1531,7 +1531,7 @@ class TestImportSeries(FlexGetBase):
             configure_series:
               from:
                 mock:
-                  - {title: 'the show', alternate_name: 'le show'}
+                  - {title: 'the show', configure_series_alternate_name: 'le show'}
             mock:
               - title: le show s03e03
     """
