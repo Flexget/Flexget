@@ -1527,6 +1527,13 @@ class TestImportSeries(FlexGetBase):
             mock:
               - title: the show s03e02 1080p bluray
               - title: the show s03e02 hdtv
+          test_import_altnames:
+            configure_series:
+              from:
+                mock:
+                  - {title: 'the show', alternate_name: 'le show'}
+            mock:
+              - title: le show s03e03
     """
 
     def test_timeframe_max(self):
@@ -1538,6 +1545,12 @@ class TestImportSeries(FlexGetBase):
         assert self.task.find_entry('accepted', title='the show s03e02 hdtv'), \
                 'hdtv should have been accepted after timeframe.'
 
+    def test_import_altnames(self):
+        """Tests configure_series with alternate_name."""
+        self.execute_task('test_import_altnames')
+        entry = self.task.find_entry(title='le show s03e03')
+        assert entry.accepted, 'entry matching series alternate name should have been accepted.'
+        assert entry['series_name'] == 'the show', 'entry series should be set to the main name'
 
 class TestIDTypes(FlexGetBase):
 
