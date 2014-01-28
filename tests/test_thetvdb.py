@@ -53,8 +53,8 @@ class TestThetvdbLookup(FlexGetBase):
         entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvdb_ep_name'] == 'Paternity', \
             '%s tvdb_ep_name should be Paternity' % entry['title']
-        assert int(entry['tvdb_runtime']) == 60, \
-            'runtime for %s is %s, should be 60' % (entry['title'], entry['tvdb_runtime'])
+        assert int(entry['tvdb_runtime']) == 45, \
+            'runtime for %s is %s, should be 45' % (entry['title'], entry['tvdb_runtime'])
         assert entry['tvdb_genres'] == ['Comedy', 'Drama']
         assert entry['afield'] == '73255Paternity', 'afield was not set correctly'
         assert self.task.find_entry(tvdb_ep_name='School Reunion'), \
