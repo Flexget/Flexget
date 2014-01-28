@@ -25,13 +25,8 @@ class DaemonService(rpyc.Service):
     # This will be populated when the server is started
     manager = None
 
-    def on_connect(self):
-        """Make sure the client version matches our own."""
-        client_version = self._conn.root.version()
-        if IPC_VERSION != client_version:
-            self.client_console('Incompatible client version. (daemon: %s, client: %s' % (IPC_VERSION, client_version))
-            self._conn.close()
-            return
+    def exposed_version(self):
+        return IPC_VERSION
 
     def exposed_execute(self, options=None):
         # Dictionaries are pass by reference with rpyc, turn this into a real dict on our side
@@ -69,6 +64,13 @@ class DaemonService(rpyc.Service):
 
 
 class ClientService(rpyc.Service):
+    def on_connect(self):
+        """Make sure the client version matches our own."""
+        daemon_version = self._conn.root.version()
+        if IPC_VERSION != daemon_version:
+            self._conn.close()
+            raise ValueError('Daemon is different version than client.')
+
     def exposed_version(self):
         return IPC_VERSION
 

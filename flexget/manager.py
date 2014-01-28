@@ -195,8 +195,12 @@ class Manager(object):
         # If a daemon is started, send the execution to the daemon
         ipc_info = self.check_ipc_info()
         if ipc_info:
-            client = IPCClient(ipc_info['port'], ipc_info['password'])
-            client.execute(dict(options))
+            try:
+                client = IPCClient(ipc_info['port'], ipc_info['password'])
+            except ValueError as e:
+                log.error(e)
+            else:
+                client.execute(dict(options))
             self.shutdown()
             return
         # Otherwise we run the execution ourselves
@@ -245,11 +249,15 @@ class Manager(object):
         elif options.action in ['stop', 'reload']:
             ipc_info = self.check_ipc_info()
             if ipc_info:
-                client = IPCClient(ipc_info['port'], ipc_info['password'])
-                if options.action == 'stop':
-                    client.shutdown()
-                elif options.action == 'reload':
-                    client.reload()
+                try:
+                    client = IPCClient(ipc_info['port'], ipc_info['password'])
+                except ValueError as e:
+                    log.error(e)
+                else:
+                    if options.action == 'stop':
+                        client.shutdown()
+                    elif options.action == 'reload':
+                        client.reload()
                 self.shutdown()
             else:
                 log.error('There does not appear to be a daemon running.')
