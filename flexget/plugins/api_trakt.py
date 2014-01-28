@@ -160,34 +160,31 @@ def get_series_id(title):
     url = search_show + api_key + series_name
     series = None
     try:
-        data = requests.get(url)
+        response = requests.get(url)
     except requests.RequestException:
         log.warning('Request failed %s' % url)
         return
-    if data:
-        try:
-            data = data.json()
-        except ValueError:
-            log.debug('Error Parsing Traktv Json for %s' % title)
-    if data:
-        if 'status' in data:
-            log.debug('Returned Status %s' % data['status'])
-        else:
-            for item in data:
-                if normalize_series_name(item['title']) == norm_series_name:
-                    series = item['tvdb_id']
-            if not series:
-                for item in data:
-                    title_match = SequenceMatcher(lambda x: x in '\t',
-                                                  normalize_series_name(item['title']), norm_series_name).ratio()
-                    if not series and title_match > .9:
-                        log.debug('Warning: Using lazy matching because title was not found exactly for %s' % title)
-                        series = item['tvdb_id']
-    if series:
-        return series
+    try:
+        data = response.json()
+    except ValueError:
+        log.debug('Error Parsing Traktv Json for %s' % title)
+        return
+    if 'status' in data:
+        log.debug('Returned Status %s' % data['status'])
     else:
+        for item in data:
+            if normalize_series_name(item['title']) == norm_series_name:
+                series = item['tvdb_id']
+        if not series:
+            for item in data:
+                title_match = SequenceMatcher(lambda x: x in '\t',
+                                              normalize_series_name(item['title']), norm_series_name).ratio()
+                if not series and title_match > .9:
+                    log.debug('Warning: Using lazy matching because title was not found exactly for %s' % title)
+                    series = item['tvdb_id']
+    if not series:
         log.debug('Trakt.tv Returns only EXACT Name Matching: %s' % title)
-        return series
+    return series
 
 
 class ApiTrakt(object):
