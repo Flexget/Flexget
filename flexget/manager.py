@@ -46,15 +46,9 @@ class Manager(object):
 
     Fires events:
 
-    * manager.startup
+    * manager.initialize
 
-      After manager has been initialized. This is when application becomes ready to use, however no database lock is
-      present, so the database must not be modified on this event.
-
-    * manager.lock_acquired
-
-      The manager does not always require a lock on startup, if one is requested, this event will run when it has been
-      acquired successfully
+      The first time the manager is initialized, before config is loaded
 
     * manager.before_config_load
 
@@ -67,6 +61,16 @@ class Manager(object):
     * manager.config_updated
 
       After a configuration file has been loaded or changed (and validated) this event is fired
+
+    * manager.startup
+
+      After manager has been initialized. This is when application becomes ready to use, however no database lock is
+      present, so the database must not be modified on this event.
+
+    * manager.lock_acquired
+
+      The manager does not always require a lock on startup, if one is requested, this event will run when it has been
+      acquired successfully
 
     * manager.upgrade
 
@@ -140,6 +144,7 @@ class Manager(object):
         self.setup_yaml()
         self.find_config(create=(self.options.cli_command == 'webui'))
         self.init_sqlalchemy()
+        fire_event('manager.initialize', self)
         try:
             self.load_config()
         except ValueError as e:
