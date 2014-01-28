@@ -5,6 +5,7 @@ import os
 import sys
 import yaml
 import logging
+import warnings
 from contextlib import contextmanager
 
 import flexget.logger
@@ -38,6 +39,7 @@ def setup_once():
     if not plugins_loaded:
         flexget.logger.initialize(True)
         setup_logging_level()
+        warnings.simplefilter('error', DeprecationWarning)
         load_plugins()
         # store options for MockManager
         test_arguments = get_parser().parse_args(['execute'])
