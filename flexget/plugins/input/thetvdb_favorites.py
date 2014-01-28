@@ -120,7 +120,7 @@ class InputThetvdbFavorites(object):
             try:
                 series = lookup_series(tvdb_id=series_id)
             except LookupError as e:
-                log.error('Error looking up %s from thetvdb: %s' % (series_id, e.message))
+                log.error('Error looking up %s from thetvdb: %s' % (series_id, e.args[0]))
             else:
                 series_name = series.seriesname
                 if config.get('strip_dates'):

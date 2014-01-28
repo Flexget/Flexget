@@ -57,7 +57,7 @@ class FilterIf(object):
             return passed
         except NameError as e:
             # Extract the name that did not exist
-            missing_field = e.message.split('\'')[1]
+            missing_field = e.args[0].split('\'')[1]
             log.debug('%s does not contain the field %s' % (entry['title'], missing_field))
         except Exception as e:
             log.error('Error occured while evaluating statement `%s`. (%s)' % (condition, e))
