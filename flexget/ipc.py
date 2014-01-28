@@ -16,7 +16,7 @@ log = logging.getLogger('ipc')
 rpyc.core.protocol.DEFAULT_CONFIG['safe_attrs'].update(['items'])
 rpyc.core.protocol.DEFAULT_CONFIG['allow_pickle'] = True
 
-IPC_VERSION = 0
+IPC_VERSION = 1
 AUTH_ERROR = 'authentication error'
 AUTH_SUCCESS = 'authentication success'
 
