@@ -52,8 +52,12 @@ class DaemonService(rpyc.Service):
                     continue
 
     def exposed_reload(self):
-        # TODO: Reload config
-        raise NotImplementedError
+        try:
+            self.manager.load_config()
+        except ValueError as e:
+            self.client_console('Error loading config: %s' % e.args[0])
+        else:
+            self.client_console('Config successfully reloaded from disk.')
 
     def exposed_shutdown(self, finish_queue=False):
         log.info('Shutdown requested over ipc.')

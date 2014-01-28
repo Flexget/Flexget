@@ -236,20 +236,23 @@ class Manager(object):
                     log.info('Got ctrl-c, shutting down.')
                     fire_event('manager.daemon.completed', self)
                     self.shutdown(finish_queue=False)
-        elif options.action == 'stop':
-            ipc_info = self.check_ipc_info()
-            if ipc_info:
-                client = IPCClient(ipc_info['port'], ipc_info['password'])
-                client.shutdown()
-                self.shutdown()
-            else:
-                log.error('There does not appear to be a daemon running.')
         elif options.action == 'status':
             ipc_info = self.check_ipc_info()
             if ipc_info:
                 log.info('Daemon running. (PID: %s)' % ipc_info['pid'])
             else:
                 log.info('No daemon appears to be running for this config.')
+        elif options.action in ['stop', 'reload']:
+            ipc_info = self.check_ipc_info()
+            if ipc_info:
+                client = IPCClient(ipc_info['port'], ipc_info['password'])
+                if options.action == 'stop':
+                    client.shutdown()
+                elif options.action == 'reload':
+                    client.reload()
+                self.shutdown()
+            else:
+                log.error('There does not appear to be a daemon running.')
 
     def webui_command(self, options):
         """
@@ -434,6 +437,7 @@ class Manager(object):
             log.debug('invalid config, rolling back')
             self.config = old_config
             raise ValueError('Config did not pass schema validation')
+        log.debug('New config data loaded.')
         fire_event('manager.config_updated', self)
 
     def save_config(self):
