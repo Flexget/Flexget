@@ -162,7 +162,7 @@ def db_cleanup(session):
         log.verbose('Removed %d series without episodes.', result)
 
 
-@event('manager.lock-acquired')
+@event('manager.lock_acquired')
 def repair(manager):
     # Perform database repairing and upgrading at startup.
     if not manager.persist.get('series_repaired', False):
@@ -182,7 +182,7 @@ def repair(manager):
     clean_series(manager)
 
 
-@event('manager.config-loaded')
+@event('manager.config_updated')
 def clean_series(manager):
     # Unmark series from tasks which have been deleted.
     if not manager.has_lock:
