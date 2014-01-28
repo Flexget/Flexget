@@ -20,7 +20,7 @@ class LastHash(Base):
     hash = Column(Unicode)
 
 
-class ImportSeries(FilterSeriesBase):
+class ConfigureSeries(FilterSeriesBase):
 
     """Generates series configuration from any input (supporting API version 2, soon all)
 
@@ -98,4 +98,4 @@ class ImportSeries(FilterSeriesBase):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ImportSeries, 'configure_series', api_ver=2)
+    plugin.register(ConfigureSeries, 'configure_series', api_ver=2)

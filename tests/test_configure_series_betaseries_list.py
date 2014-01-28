@@ -18,7 +18,7 @@ def assert_series_count_in_db(expected_count):
                                                   (expected_count, actual_series_count)
 
 
-class Test_import_series_betaseries_list(FlexGetBase):
+class Test_configure_series_betaseries_list(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -53,7 +53,7 @@ class Test_import_series_betaseries_list(FlexGetBase):
     """
 
     def setup(self):
-        super(Test_import_series_betaseries_list, self).setup()
+        super(Test_configure_series_betaseries_list, self).setup()
         ## mock create_token
         self.create_token_patcher = patch.object(flexget.plugins.input.betaseries_list, "create_token",
                                                  return_value='token_foo')
@@ -65,7 +65,7 @@ class Test_import_series_betaseries_list(FlexGetBase):
         self.query_series_mock = self.query_series_patcher.start()
 
     def teardown(self):
-        super(Test_import_series_betaseries_list, self).teardown()
+        super(Test_configure_series_betaseries_list, self).teardown()
         self.create_token_patcher.stop()
         self.query_series_patcher.stop()
 
