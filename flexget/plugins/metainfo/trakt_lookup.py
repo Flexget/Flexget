@@ -121,7 +121,7 @@ class PluginTraktLookup(object):
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
                           'tvdb_id': entry.get('tvdb_id', eval_lazy=False)}
             if entry['series_id_type'] == 'ep':
-                lookupargs['seasonnum'] = entry['series_season'] 
+                lookupargs['seasonnum'] = entry['series_season']
                 lookupargs['episodenum'] = entry['series_episode']
             elif entry['series_id_type'] == 'sequence':
                 log.error('Trakt only accepts episode sequences in the format of Season/Episode')
@@ -130,7 +130,7 @@ class PluginTraktLookup(object):
             episode = lookup_episode(**lookupargs)
             entry.update_using_map(self.episode_map, episode)
         except LookupError as e:
-            log.debug('Error looking up trakt episode information for %s: %s' % (entry['title'], e.message))
+            log.debug('Error looking up trakt episode information for %s: %s' % (entry['title'], e.args[0]))
             entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
         return entry[field]
 
