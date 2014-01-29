@@ -89,11 +89,21 @@ class TransmissionBase(object):
                 raise plugin.PluginError("Error connecting to transmission: %s" % e.message)
         return cli
 
-    def torrent_completed(self, torrent):
-        for tf in torrent.files().iteritems():
-            if tf[1]['selected'] and (tf[1]['completed'] < tf[1]['size']):
-                return False
-        return True
+    def torrent_info(self, torrent):
+        done = torrent.totalSize > 0
+        vloc = None
+        best = None
+        for t in torrent.files().iteritems():
+            tf = t[1]
+            if tf['selected']:
+                if tf['size'] <= 0 or tf['completed'] < tf['size']:
+                    done = False
+                    break
+                if not best or tf['size'] > best[1]:
+                    best = (tf['name'], tf['size'])
+        if done and best and (100*float(best[1])/float(torrent.totalSize)) >= 90:
+            vloc = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
+        return done, vloc
 
     @save_opener
     def on_task_start(self, task, config):
@@ -147,31 +157,16 @@ class PluginTransmissionInput(TransmissionBase):
             self.client.http_handler.set_authentication(self.client.url, config['username'], config['password'])
 
         for torrent in self.client.info().values():
-            torrentCompleted = self.torrent_completed(torrent)
-            if not config['onlycomplete'] or torrentCompleted:
+            downloaded, bigfella = self.torrent_info(torrent)
+            if not config['onlycomplete'] or (downloaded and torrent.status == 'stopped'):
                 entry = Entry(title=torrent.name,
                               url='file://%s' % torrent.torrentFile,
                               torrent_info_hash=torrent.hashString,
                               content_size=torrent.totalSize/(1024*1024))
                 for attr in ['comment', 'downloadDir', 'isFinished', 'isPrivate']:
-                        entry['transmission_' + attr] = getattr(torrent, attr)
+                    entry['transmission_' + attr] = getattr(torrent, attr)
                 entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
-                
-                # location of the completed file; for multiple files torrents 
-                # it'll refers to the biggest included file (if its size is at 
-                # least the 90% of the total)
-                if torrentCompleted and torrent.status == 'stopped':
-                    best = None
-                    tots = 0
-                    for tf in torrent.files().iteritems():
-                        tots += tf[1]['size']
-                        if tf[1]['selected'] and tf[1]['completed'] == tf[1]['size'] and \
-                            (not best or tf[1]['size'] > best[1]):
-                            best = (tf[1]['name'], tf[1]['size'])
-                    if tots and best and (100*float(best[1])/float(tots)) > 90:
-                        entry['location'] = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
-                        log.debug('"%s" location field set to %s' % (entry['title'], entry['location']))
-                
+                entry['location'] = bigfella
                 entries.append(entry)
         return entries
 
@@ -401,9 +396,10 @@ class PluginTransmissionClean(TransmissionBase):
         nfor = parse_timedelta(config['finished_for']) if 'finished_for' in config else None
         remove_ids = []
         for torrent in self.client.info().values():
-            log.debug('Torrent "%s": status: "%s" - ratio: %s - date done: %s' %
-                      (torrent.name, torrent.status, torrent.ratio, torrent.date_done))
-            if self.torrent_completed(torrent) and \
+            log.verbose('Torrent "%s": status: "%s" - ratio: %s - date done: %s' % 
+                        (torrent.name, torrent.status, torrent.ratio, torrent.date_done))
+            downloaded, dummy = self.torrent_info(torrent)
+            if downloaded and \
                 ((nrat is None and nfor is None) or \
                  (nrat and (nrat <= torrent.ratio)) or \
                  (nfor and ((torrent.date_done + nfor) <= datetime.now()))):
