@@ -110,7 +110,7 @@ def filter_to_date(date_time_val):
     if not isinstance(date_time_val, (datetime, date, time)):
         return date_time_val
     return date_time_val.date()
-    
+
 def now():
     return datetime.now()
 
@@ -125,7 +125,7 @@ def filter_default(value, default_value=u'', boolean=False):
 filter_d = filter_default
 
 
-@event('manager.before_config_validate')
+@event('manager.initialize')
 def make_environment(manager):
     """Create our environment and add our custom filters"""
     global environment

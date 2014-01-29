@@ -5,6 +5,7 @@ import re
 import sys
 import threading
 import string
+import warnings
 
 # A level more detailed than DEBUG
 TRACE = 5
@@ -104,6 +105,7 @@ def initialize(unit_test=False):
     if _logging_configured:
         return
 
+    warnings.simplefilter('once')
     logging.addLevelName(TRACE, 'TRACE')
     logging.addLevelName(VERBOSE, 'VERBOSE')
     _logging_configured = True

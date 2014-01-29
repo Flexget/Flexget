@@ -33,7 +33,7 @@ class ImdbList(object):
             'password': {'type': 'string'},
             'list': {'type': 'string'}
         },
-        'required': ['list'],
+        'required': ['list', 'username', 'password'],
         'additionalProperties': False
     }
 

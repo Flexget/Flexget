@@ -79,7 +79,7 @@ class DBTrigger(Base):
         self.last_run = last_run
 
 
-@event('manager.config-loaded')
+@event('manager.config_updated')
 def create_triggers(manager):
     manager.scheduler.load_schedules()
 

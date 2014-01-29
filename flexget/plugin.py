@@ -415,9 +415,6 @@ def load_plugins():
     """Load plugins from the standard plugin paths."""
     global plugins_loaded
 
-    # suppress DeprecationWarning's
-    warnings.simplefilter('ignore', DeprecationWarning)
-
     start_time = time.time()
     # Import all the plugins
     _load_plugins_from_dirs(_get_standard_plugins_path())

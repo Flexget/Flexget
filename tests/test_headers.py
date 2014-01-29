@@ -17,5 +17,5 @@ class TestHeaders(FlexGetBase):
 
     @attr(online=True)
     def test_headers(self):
-        self.execute_task('test_headers')
+        self.execute_task('test_headers', options={'nocache': True})
         assert self.task.find_entry(title='blah', url='other'), 'Entry should have been created.'

@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import time
 import logging
 import difflib
+import random
 from datetime import datetime, timedelta
 from urllib2 import URLError
 
@@ -11,7 +12,6 @@ from sqlalchemy.orm import relation
 
 from flexget import db_schema
 from flexget.plugin import internet, PluginError
-from flexget.manager import Session
 from flexget.utils import requests
 from flexget.utils.titles import MovieParser
 from flexget.utils.database import text_date_synonym, with_session
@@ -19,6 +19,9 @@ from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
 log = logging.getLogger('api_rottentomatoes')
 Base = db_schema.versioned_base('api_rottentomatoes', 2)
+session = requests.Session()
+# There is a 5 call per second rate limit per api key with multiple users on the same api key, this can be problematic
+session.set_domain_delay('api.rottentomatoes.com', '0.4 seconds')
 
 # This is developer Atlanta800's API key
 API_KEY = 'rh8chjzp8vu6gnpwj88736uv'
@@ -523,16 +526,14 @@ def movies_search(q, page_limit=None, page=None, api_key=None):
     if isinstance(results, dict) and results.get('total') and len(results.get('movies')):
         return results
 
-
 def get_json(url):
     try:
         log.debug('fetching json at %s' % url)
-        data = requests.get(url)
-        result = data.json()
-    except URLError as e:
-        log.warning('Request failed %s' % url)
+        data = session.get(url)
+        return data.json()
+    except requests.RequestException as e:
+        log.warning('Request failed %s: %s' % (url, e))
         return
     except ValueError:
         log.warning('Rotten Tomatoes returned invalid json at: %s' % url)
         return
-    return result

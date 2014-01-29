@@ -12,7 +12,7 @@ from flexget import db_schema
 from flexget.entry import EntryUnicodeError
 from flexget.event import fire_event, event
 from flexget.manager import Session
-from flexget.plugin import (get_plugins_by_phase, task_phases, phase_methods, PluginWarning, PluginError,
+from flexget.plugin import (get_plugins, task_phases, phase_methods, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins, plugin_schemas)
 from flexget.utils import requests
 from flexget.utils.simple_persistence import SimpleTaskPersistence
@@ -339,7 +339,7 @@ class Task(object):
           An iterator over configured :class:`flexget.plugin.PluginInfo` instances enabled on this task.
         """
         if phase:
-            plugins = sorted(get_plugins_by_phase(phase), key=lambda p: p.phase_handlers[phase], reverse=True)
+            plugins = sorted(get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True)
         else:
             plugins = all_plugins.itervalues()
         return (p for p in plugins if p.name in self.config or p.builtin)

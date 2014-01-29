@@ -105,7 +105,7 @@ class cached(object):
             cache_name = self.name + '_' + hash
             log.debug('cache name: %s (has: %s)' % (cache_name, ', '.join(self.cache.keys())))
 
-            if cache_name in self.cache:
+            if not task.options.nocache and cache_name in self.cache:
                 # return from the cache
                 log.trace('cache hit')
                 entries = []

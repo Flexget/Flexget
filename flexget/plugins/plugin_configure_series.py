@@ -20,7 +20,7 @@ class LastHash(Base):
     hash = Column(Unicode)
 
 
-class ImportSeries(FilterSeriesBase):
+class ConfigureSeries(FilterSeriesBase):
 
     """Generates series configuration from any input (supporting API version 2, soon all)
 
@@ -71,6 +71,8 @@ class ImportSeries(FilterSeriesBase):
                 s = series.setdefault(entry['title'], {})
                 if entry.get('tvdb_id'):
                     s['set'] = {'tvdb_id': entry['tvdb_id']}
+                if entry.get('configure_series_alternate_name'):
+                    s['alternate_name'] = entry['configure_series_alternate_name']
 
         # Set the config_modified flag if the list of shows changed since last time
         new_hash = hashlib.md5(unicode(sorted(series))).hexdigest().decode('ascii')
@@ -98,4 +100,4 @@ class ImportSeries(FilterSeriesBase):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ImportSeries, 'configure_series', api_ver=2)
+    plugin.register(ConfigureSeries, 'configure_series', api_ver=2)
