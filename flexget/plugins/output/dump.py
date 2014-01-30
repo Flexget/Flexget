@@ -63,21 +63,38 @@ class OutputDump(object):
 
     @plugin.priority(0)
     def on_task_output(self, task, config):
-        if not config and not task.options.dump_entries:
+        log.debug(task.options.dump_entries)
+        if not config and task.options.dump_entries is None:
             return
 
-        eval_lazy = task.options.dump_entries == 'eval'
-        trace = task.options.dump_entries == 'trace'
+        eval_lazy = 'eval' in task.options.dump_entries
+        log.debug('eval_lazy = %s' % eval_lazy)
+        trace = 'trace' in task.options.dump_entries
+        log.debug('trace = %s' % trace)
+        states = ['accepted', 'rejected', 'failed', 'undecided']
+        dumpstates = [s for s in states if s in task.options.dump_entries]
+        specificstates = dumpstates
+        if not dumpstates: dumpstates = states
+        log.debug('dumpstates = %s' % dumpstates)
         undecided = [entry for entry in task.all_entries if entry.undecided]
-        if undecided:
-            console('-- Undecided: --------------------------')
-            dump(undecided, task.options.debug, eval_lazy, trace)
-        if task.accepted:
-            console('-- Accepted: ---------------------------')
-            dump(task.accepted, task.options.debug, eval_lazy, trace)
-        if task.rejected:
-            console('-- Rejected: ---------------------------')
-            dump(task.rejected, task.options.debug, eval_lazy, trace)
+        if 'undecided' in dumpstates:
+            if undecided:
+                console('-- Undecided: --------------------------')
+                dump(undecided, task.options.debug, eval_lazy, trace)
+            elif specificstates:
+                console('No undecided entries')
+        if 'accepted' in dumpstates:
+            if task.accepted:
+                console('-- Accepted: ---------------------------')
+                dump(task.accepted, task.options.debug, eval_lazy, trace)
+            elif specificstates:
+                console('No accepted entries')
+        if 'rejected' in dumpstates:
+            if task.rejected:
+                console('-- Rejected: ---------------------------')
+                dump(task.rejected, task.options.debug, eval_lazy, trace)
+            elif specificstates:
+                console('No rejected entries')
 
 
 @event('plugin.register')
@@ -87,6 +104,6 @@ def register_plugin():
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--dump', nargs='?', choices=['eval', 'trace'], dest='dump_entries',
-                                               const=True, help='display all entries in task with fields they contain, '
+    options.get_parser('execute').add_argument('--dump', nargs='*', choices=['eval', 'trace', 'accepted', 'rejected',
+        'undecided'], dest='dump_entries', help='display all entries in task with fields they contain, '
                                                                 'use `--dump eval` to evaluate all lazy fields')
