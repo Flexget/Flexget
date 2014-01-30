@@ -129,6 +129,9 @@ class ConfigureSeries(FilterSeriesBase):
                 if ('configure_series_specials' in entry
                     and isinstance(entry['configure_series_specials'], bool)):
                     s['specials'] = entry['configure_series_specials']
+                if ('configure_series_special_ids' in entry
+                    and isinstance(entry['configure_series_special_ids'], basestring)):
+                    s['special_ids'] = entry['configure_series_special_ids']
                 # Propers (can be boolean, or an interval string)
                 if ('configure_series_propers' in entry
                     and isinstance(entry['configure_series_propers'], basestring)):
