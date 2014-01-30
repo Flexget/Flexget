@@ -2,7 +2,6 @@ language: python
 python:
   - "2.6"
   - "2.7"
-  - "pypy"
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - pip install paver
@@ -14,5 +13,3 @@ notifications:
   webhooks:
     urls:
     - http://n.tkte.ch/h/343/-Sl5O1RgMVaGmIAJDbblXVIc
-    on_success: change
-    on_failure: always
