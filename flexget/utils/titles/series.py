@@ -70,7 +70,7 @@ class SeriesParser(TitleParser):
 
     def __init__(self, name='', alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
                  date_regexps=None, sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None,
-                 allow_seasonless=True, date_dayfirst=None, date_yearfirst=None):
+                 allow_seasonless=True, date_dayfirst=None, date_yearfirst=None, special_ids=None):
         """
         Init SeriesParser.
 
@@ -94,6 +94,7 @@ class SeriesParser(TitleParser):
         :param date_dayfirst: Prefer day first notation of dates when there are multiple possible interpretations.
         :param date_yearfirst: Prefer year first notation of dates when there are multiple possible interpretations.
             This will also populate attribute `group`.
+        :param special_ids: Identifiers which will cause entry to be flagged as a special.
         """
 
         self.name = name
@@ -109,6 +110,7 @@ class SeriesParser(TitleParser):
             listname = mode + '_regexps'
             if locals()[listname]:
                 setattr(self, listname, ReList(locals()[listname] + getattr(SeriesParser, listname)))
+        self.specials = self.specials + [i.lower() for i in (special_ids or [])]
         self.strict_name = strict_name
         self.allow_groups = allow_groups or []
         self.allow_seasonless = allow_seasonless
