@@ -716,7 +716,8 @@ class FilterSeriesBase(object):
                     ]
                 },
                 'from_group': one_or_more({'type': 'string'}),
-                'parse_only': {'type': 'boolean'}
+                'parse_only': {'type': 'boolean'},
+                'special_ids': one_or_more({'type': 'string'})
             },
             'additionalProperties': False
         }
@@ -1005,7 +1006,8 @@ class FilterSeries(FilterSeriesBase):
                       strict_name=config.get('exact', False),
                       allow_groups=get_as_array(config, 'from_group'),
                       date_yearfirst=config.get('date_yearfirst'),
-                      date_dayfirst=config.get('date_dayfirst'))
+                      date_dayfirst=config.get('date_dayfirst'),
+                      special_ids=get_as_array(config, 'special_ids'))
         for id_type in ID_TYPES:
             params[id_type + '_regexps'] = get_as_array(config, id_type + '_regexp')
 
