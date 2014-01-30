@@ -74,11 +74,14 @@ class OutputAria2(object):
             s = xmlrpclib.ServerProxy(baseurl)
             log.info('Connected to daemon at ' + baseurl + '.')
         except xmlrpclib.ProtocolError as err:
-            raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s' % (baseurl, err.errcode, err.errmsg), log)
+            raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
+                                      % (baseurl, err.errcode, err.errmsg), log)
         except xmlrpclib.Fault as err:
-            raise plugin.PluginError('XML-RPC fault: Unable to connect to aria2 daemon at %s: %s' % (baseurl, err.faultString), log)
+            raise plugin.PluginError('XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
+                                      % (baseurl, err.faultString), log)
         except socket.err as err:
-            raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s' % (baseurl, err.strerror), log)
+            raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
+                                      % (baseurl, err.strerror), log)
         except:
             raise plugin.PluginError('Unidentified error during connection to aria2 daemon at %s' % baseurl, log)
 
@@ -227,9 +230,7 @@ class OutputAria2(object):
                             entry['filename'] = curFile
                             curUri = entry.render(config['uri'])
                             if not task.manager.options.test:
-                                r = s.aria2.addUri([curUri], {
-                                        key: entry.render(str(value)) for (key, value) in config['aria_config'].iteritems()
-                                    })
+                                r = s.aria2.addUri([curUri], dict((key, entry.render(str(value))) for (key, value) in config['aria_config'].iteritems()))
                             else:
                                 if config['aria_config']['gid'] == '':
                                     r = '1234567890123456'
