@@ -32,7 +32,7 @@ class MetainfoSubs(object):
                 entry['subtitles'] = lst
                 log.trace('Found subtitles %s for %s' % ('/'.join(lst), entry['title']))
         except Exception as e:
-            log.debug('Error checking local subtitles for %s: %s' % (entry['title'], e.message))
+            log.debug('Error checking local subtitles for %s: %s' % (entry['title'], e))
             entry.unregister_lazy_fields(['subtitles'], self.lazy_subs_check)
         return entry[field]
     
@@ -63,4 +63,4 @@ class MetainfoSubs(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(MetainfoSubs, 'check_subtitles', api_ver=2, builtin=True)
+    plugin.register(MetainfoSubs, 'check_subtitles', api_ver=2)
