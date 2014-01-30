@@ -9,7 +9,7 @@ from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.search import torrent_availability, normalize_unicode, clean_title
 
 log = logging.getLogger('publichd')
 
@@ -80,7 +80,7 @@ class SearchPublicHD(object):
 
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            query = normalize_unicode(search_string)
+            query = normalize_unicode(clean_title(search_string))
             query_url_fragment = '&search=' + urllib.quote(query.encode('utf8'))
 
             # http://publichd.se/index.php?page=torrents&active=0&category=5;15&search=QUERY
