@@ -63,19 +63,15 @@ class OutputDump(object):
 
     @plugin.priority(0)
     def on_task_output(self, task, config):
-        log.debug(task.options.dump_entries)
         if not config and task.options.dump_entries is None:
             return
 
         eval_lazy = 'eval' in task.options.dump_entries
-        log.debug('eval_lazy = %s' % eval_lazy)
         trace = 'trace' in task.options.dump_entries
-        log.debug('trace = %s' % trace)
         states = ['accepted', 'rejected', 'failed', 'undecided']
         dumpstates = [s for s in states if s in task.options.dump_entries]
         specificstates = dumpstates
         if not dumpstates: dumpstates = states
-        log.debug('dumpstates = %s' % dumpstates)
         undecided = [entry for entry in task.all_entries if entry.undecided]
         if 'undecided' in dumpstates:
             if undecided:
@@ -106,4 +102,4 @@ def register_plugin():
 def register_parser_arguments():
     options.get_parser('execute').add_argument('--dump', nargs='*', choices=['eval', 'trace', 'accepted', 'rejected',
         'undecided'], dest='dump_entries', help='display all entries in task with fields they contain, '
-                                                                'use `--dump eval` to evaluate all lazy fields')
+        'use `--dump eval` to evaluate all lazy fields. Specify an entry state/states to only dump matching entries.')
