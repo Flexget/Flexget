@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import timedelta, datetime
 
+from nose.plugins.attrib import attr
+
 from flexget.manager import Session
 from flexget.plugins.filter.movie_queue import queue_add, QueuedMovie
 from tests import FlexGetBase
@@ -17,7 +19,9 @@ class TestEmitMovieQueue(FlexGetBase):
     __yaml__ = """
         tasks:
           test_default:
-            emit_movie_queue: yes
+            emit_movie_queue:
+              # TODO: Currently plugin calls tmdb lookup to get year, movie queue should probably store
+              year: no
         """
 
     def test_default(self):
