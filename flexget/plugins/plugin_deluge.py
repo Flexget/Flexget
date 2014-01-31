@@ -239,7 +239,7 @@ class InputDeluge(DelugePlugin):
         'save_path': 'deluge_path',
         'label': 'deluge_label',
         'total_size': ('content_size', lambda size: size / 1024 / 1024),
-        'files': ('content_files', lambda file_dicts: [os.path.basename(f['path']) for f in file_dicts])}
+        'files': ('content_files', lambda file_dicts: [f['path'] for f in file_dicts])}
 
     def __init__(self):
         self.entries = []
