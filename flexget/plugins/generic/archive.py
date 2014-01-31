@@ -213,7 +213,7 @@ class Archive(object):
         was started.
         """
         if task.session is not None:
-            self.on_task_exit(task, config)
+            self.on_task_learn(task, config)
 
 
 class UrlrewriteArchive(object):

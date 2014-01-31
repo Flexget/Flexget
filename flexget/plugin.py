@@ -270,8 +270,8 @@ class PluginInfo(dict):
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
-            log.critical('Error while registering plugin %s. %s' %
-                         (self.name, ('A plugin with the name %s is already registered' % self.name)))
+            log.critical('Error while registering plugin %s. A plugin with the same name is already registered' %
+                         self.name)
         else:
             plugins[self.name] = self
 
