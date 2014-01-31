@@ -235,7 +235,12 @@ class Manager(object):
             if options.daemonize:
                 self.daemonize()
             with self.acquire_lock():
-                signal.signal(signal.SIGTERM, self._handle_sigterm)
+                try:
+                    signal.signal(signal.SIGTERM, self._handle_sigterm)
+                except ValueError as e:
+                    # If flexget is being called from another script, e.g. windows service helper, and we are not the
+                    # main thread, and this error will occur.
+                    log.debug('Error registering sigterm handler: %s' % e)
                 self.ipc_server.start()
                 fire_event('manager.daemon.started', self)
                 self.scheduler.start()
