@@ -82,7 +82,8 @@ class PluginSpyHeaders(object):
 
     schema = {'type': 'boolean'}
 
-    def log_requests_headers(self, response):
+    @staticmethod
+    def log_requests_headers(response, **kwargs):
         log.info('Request  : %s' % response.request.url)
         log.info('Response : %s (%s)' % (response.status_code, response.reason))
         log.info('-- Headers: --------------------------')
