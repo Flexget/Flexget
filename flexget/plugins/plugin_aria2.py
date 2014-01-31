@@ -8,6 +8,7 @@ import xmlrpclib
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
+from socket import error as socket_error
 
 log = logging.getLogger('aria2')
 
@@ -224,6 +225,9 @@ class OutputAria2(object):
                     except xmlrpclib.ProtocolError as err:
                         raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
                                                   % (baseurl, err.errcode, err.errmsg), log)
+                    except socket_error as (error, msg):
+                        raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
+                                                  % (baseurl, msg), log)
 
                     if newDownload == 1:
                         try:
@@ -240,6 +244,9 @@ class OutputAria2(object):
                             log.verbose('uri: %s' % curUri)
                         except xmlrpclib.Fault as err:
                             raise plugin.PluginError('aria response to add URI request: %s' % err.faultString, log)
+                        except socket_error as (error, msg):
+                            raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
+                                                      % (baseurl, msg), log)
 
 
                 elif config['do'] == 'remove-completed':
@@ -255,6 +262,9 @@ class OutputAria2(object):
                                 except xmlrpclib.Fault as err:
                                     raise plugin.PluginError('aria response to remove request: %s'
                                                               % err.faultString, log)
+                                except socket_error as (error, msg):
+                                    raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
+                                                              % (baseurl, msg), log)
                         else:
                             log.info('Download with gid %s could not be removed because of its status: %s'
                                       % (r['gid'], r['status']))
@@ -264,6 +274,9 @@ class OutputAria2(object):
                                         'possibly previously removed or never added.' % config['aria_config']['gid'])
                         else:
                             raise plugin.PluginError('aria response to status request: %s' % err.faultString, log)
+                    except socket_error as (error, msg):
+                        raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
+                                                  % (baseurl, msg), log)
 
 
 @event('plugin.register')
