@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from datetime import datetime
 import logging
 import os
 import re
@@ -87,6 +88,7 @@ class InputFind(object):
                         continue
                     filepath = os.path.join(item[0], name).decode(fs_encoding)
                     e['location'] = filepath
+                    e['timestamp'] = datetime.fromtimestamp(os.path.getmtime(filepath))
                     # Windows paths need an extra / prepended to them for url
                     if not filepath.startswith('/'):
                         filepath = '/' + filepath
