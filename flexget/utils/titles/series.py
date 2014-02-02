@@ -70,7 +70,8 @@ class SeriesParser(TitleParser):
 
     def __init__(self, name='', alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
                  date_regexps=None, sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None,
-                 allow_seasonless=True, date_dayfirst=None, date_yearfirst=None, special_ids=None):
+                 allow_seasonless=True, date_dayfirst=None, date_yearfirst=None, special_ids=None,
+                 prefer_specials=False):
         """
         Init SeriesParser.
 
@@ -95,6 +96,8 @@ class SeriesParser(TitleParser):
         :param date_yearfirst: Prefer year first notation of dates when there are multiple possible interpretations.
             This will also populate attribute `group`.
         :param special_ids: Identifiers which will cause entry to be flagged as a special.
+        :param boolean prefer_specials: If True, label entry which matches both a series identifier and a special
+            identifier as a special.
         """
 
         self.name = name
@@ -111,6 +114,7 @@ class SeriesParser(TitleParser):
             if locals()[listname]:
                 setattr(self, listname, ReList(locals()[listname] + getattr(SeriesParser, listname)))
         self.specials = self.specials + [i.lower() for i in (special_ids or [])]
+        self.prefer_specials = prefer_specials
         self.strict_name = strict_name
         self.allow_groups = allow_groups or []
         self.allow_seasonless = allow_seasonless
@@ -283,11 +287,10 @@ class SeriesParser(TitleParser):
                 self.id_groups = date_match['match'].groups()
                 self.id_type = 'date'
                 self.valid = True
-                return
+                if not self.special or not self.prefer_specials: return
+            else: log.debug('-> no luck with date_regexps')
 
-        log.debug('-> no luck with date_regexps')
-
-        if self.identified_by in ['ep', 'auto']:
+        if self.identified_by in ['ep', 'auto'] and not self.valid:
             ep_match = self.parse_episode(data_stripped)
             if ep_match:
                 # strict_name
@@ -309,9 +312,9 @@ class SeriesParser(TitleParser):
                     self.episodes = 1
                 self.id_type = 'ep'
                 self.valid = True
-                return
+                if not self.special or not self.prefer_specials: return
 
-            log.debug('-> no luck with ep_regexps')
+            else: log.debug('-> no luck with ep_regexps')
 
             if self.identified_by == 'ep':
                 # we should be getting season, ep !
@@ -332,14 +335,14 @@ class SeriesParser(TitleParser):
                     self.id_type = 'ep'
                     self.valid = True
                     return
-                log.debug('-> no luck with the expect_ep')
+                else: log.debug('-> no luck with the expect_ep')
 
         # Ep mode is done, check for unwanted ids
         if self.parse_unwanted_id(data_stripped):
             return
 
         # Check id regexps
-        if self.identified_by in ['id', 'auto']:
+        if self.identified_by in ['id', 'auto'] and not self.valid:
             for id_re in self.id_regexps:
                 match = re.search(id_re, data_stripped)
                 if match:
@@ -355,11 +358,12 @@ class SeriesParser(TitleParser):
                     self.id_type = 'id'
                     self.valid = True
                     log.debug('found id \'%s\' with regexp \'%s\'', self.id, id_re.pattern)
-                    return
-            log.debug('-> no luck with id_regexps')
+                    if not self.special or not self.prefer_specials: return
+                    else: break
+            else: log.debug('-> no luck with id_regexps')
 
         # Check sequences last as they contain the broadest matches
-        if self.identified_by in ['sequence', 'auto']:
+        if self.identified_by in ['sequence', 'auto'] and not self.valid:
             for sequence_re in self.sequence_regexps:
                 match = re.search(sequence_re, data_stripped)
                 if match:
@@ -381,8 +385,9 @@ class SeriesParser(TitleParser):
                     self.id_type = 'sequence'
                     self.valid = True
                     log.debug('found id \'%s\' with regexp \'%s\'', self.id, sequence_re.pattern)
-                    return
-            log.debug('-> no luck with sequence_regexps')
+                    if not self.special or not self.prefer_specials: return
+                    else: break
+            else: log.debug('-> no luck with sequence_regexps')
 
         # No id found, check if this is a special
         if self.special:
@@ -392,6 +397,7 @@ class SeriesParser(TitleParser):
             self.valid = True
             log.debug('found special, setting id to \'%s\'', self.id)
             return
+        if self.valid: return
 
         msg = 'Title `%s` looks like series `%s` but I cannot find ' % (self.data, self.name)
         if self.identified_by == 'auto':
