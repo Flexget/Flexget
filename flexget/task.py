@@ -441,6 +441,11 @@ class Task(object):
             log.critical(msg)
             log.debug(e.message)
             self.abort(msg)
+        except Warning as e:
+            # If warnings have been elevated to errors
+            msg = 'Warning during plugin %s: %s' % (keyword, e)
+            log.exception(msg)
+            self.abort(msg)
         except Exception as e:
             msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
             log.exception(msg)
