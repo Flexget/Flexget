@@ -130,8 +130,11 @@ class ConfigureSeries(FilterSeriesBase):
                     and isinstance(entry['configure_series_specials'], bool)):
                     s['specials'] = entry['configure_series_specials']
                 if ('configure_series_special_ids' in entry
-                    and isinstance(entry['configure_series_special_ids'], basestring)):
+                    and isinstance(entry['configure_series_special_ids'], (basestring, list))):
                     s['special_ids'] = entry['configure_series_special_ids']
+                if ('configure_series_special_ids' in entry
+                    and isinstance(entry['configure_series_prefer_specials'], bool)):
+                    s['prefer_specials'] = entry['configure_series_prefer_specials']
                 # Propers (can be boolean, or an interval string)
                 if ('configure_series_propers' in entry
                     and isinstance(entry['configure_series_propers'], basestring)):
