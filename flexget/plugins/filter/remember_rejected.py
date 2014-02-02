@@ -150,7 +150,9 @@ def list_rejected():
     try:
         results = session.query(RememberEntry).all()
         if not results:
-            console('No rejected entries recorded')
+            console('No rejected entries recorded by remember_rejected')
+        else:
+            console('Rejections remembered by remember_rejected:')
         for entry in results:
             console('%s from %s by %s because %s' % (entry.title, entry.task.name, entry.rejected_by, entry.reason))
     finally:
