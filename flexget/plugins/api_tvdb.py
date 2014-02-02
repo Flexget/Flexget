@@ -100,7 +100,9 @@ class TVDBContainer(object):
                     elif isinstance(col.type, Float):
                         value = float(node.text)
                     else:
-                        value = decode_html(node.text)
+                        # Make sure we always have unicode strings
+                        value = node.text.decode('utf-8') if isinstance(node.text, str) else node.text
+                        value = decode_html(value)
                     setattr(self, col.name, value)
         self.expired = False
 
