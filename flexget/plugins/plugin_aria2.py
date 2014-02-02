@@ -21,6 +21,77 @@ log = logging.getLogger('aria2')
 
 class OutputAria2(object):
 
+    """
+    aria2 downloader plugin
+    Version 1.0.0
+    
+    Configuration:
+    server:     Where aria2 daemon is running. default 'localhost'
+    port:       Port of that server. default '6800'
+    username:   XML-RPC username set in aria2. default ''
+    password:   XML-RPC password set in aria2. default ''
+    do:         [add-new|remove-completed] What action to take with incoming
+                entries.
+    uri:        URI of file to download. Can include inline Basic Auth para-
+                meters and use jinja2 templating with any fields available
+                in the entry.
+    exclude_samples:
+                [yes|no] Exclude any files that include the word 'sample' in
+                their name. default 'no'
+    exclude_non_content:
+                [yes|no] Exclude any non-content files, as defined by filename
+                extensions not listed in file_exts. (See below.) default 'no'
+    rename_content_files:
+                [yes|no] If set, rename all content files (as defined by
+                extensions listed in file_exts). default 'no'
+    rename_template:
+                If set, and rename_content_files is yes, all content files
+                will be renamed using the value of this field as a template.
+                Will be parsed with jinja2 and can include any fields
+                available in the entry. default ''
+    parse_filename:
+                [yes|no] If yes, filenames will be parsed with either the
+                series parser (if content_is_episodes is set to yes) or the
+                movie parser. default: 'no'
+    content_is_episodes:
+                [yes|no] If yes, files will be parsed by the series plugin
+                parser to attempt to determine series name and series_id. If
+                no, files will be treated as movies. Note this has no effect
+                unless parse_filename is set to yes. default 'no'
+    keep_parent_folders:
+                [yes|no] If yes, any parent folders within the torrent itself
+                will be kept and created within the download directory.
+                For example, if a torrent has this structure:
+                MyTorrent/
+                  MyFile.mkv
+                If this is set to yes, the MyTorrent folder will be created in
+                the download directory. If set to no, the folder will be
+                ignored and the file will be downloaded directly into the
+                download directory. default: 'no'
+    fix_year:   [yes|no] If yes, and the last four characters of the series
+                name are numbers, enclose them in parantheses as they are
+                likely a year. Example: Show Name 1995 S01E01.mkv would become
+                Show Name (1995) S01E01.mkv. default 'yes'
+    file_exts:  [list] File extensions of all files considered to be content
+                files. Used to determine which files to rename or which files
+                to exclude from download, with appropriate options set. (See
+                above.)
+                default: ['.mkv', '.avi', '.mp4', '.wmv', '.asf', '.divx',
+                '.mov', '.mpg', '.rm']
+    aria_config:
+                "Parent folder" for any options to be passed directly to aria.
+                Any command line option listed at
+                http://aria2.sourceforge.net/manual/en/html/aria2c.html#options
+                can be used by removing the two dashes (--) in front of the 
+                command name, and changing key=value to key: value. All
+                options will be treated as jinja2 templates and rendered prior
+                to passing to aria2. default ''
+                Example:
+                aria_config:
+                  dir: "/Volumes/all_my_tv/{{series_name}}"
+                  max-connection-per-server: 4
+    """
+
     schema = {
         'type': 'object',
         'properties': {
@@ -126,10 +197,10 @@ class OutputAria2(object):
                     if len(entry['content_files']) > 99:
                         # sorry not sorry if you have more than 999 files
                         config['aria_config']['gid'] = ''.join([config['aria_config']['gid'][0:-3],
-                                                               strCounter.rjust(3, str('0'))
+                                                               strCounter.rjust(3, str('0'))])
                     else:
                         config['aria_config']['gid'] = ''.join([config['aria_config']['gid'][0:-2],
-                                                               strCounter.rjust(2, str('0'))
+                                                               strCounter.rjust(2, str('0'))])
 
                 if config['exclude_samples'] == True:
                     # remove sample files from download list
