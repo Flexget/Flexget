@@ -348,7 +348,9 @@ manager_parser.add_argument('--logfile', '-l', default='flexget.log',
                             help='Specify a custom logfile name/location. '
                                  'Default is flexget.log in the config directory.')
 manager_parser.add_argument('--loglevel', '-L', metavar='LEVEL',
-                            default='verbose', help='Set the verbosity of the logger.',
+                            default='verbose',
+                            help='Set the verbosity of the logger. Levels: none, info, verbose, debug, trace, warning, '
+                                    'error, critical.',
                             choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
 # This option is already handled above.
 manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
