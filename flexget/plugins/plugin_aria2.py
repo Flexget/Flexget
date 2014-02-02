@@ -18,7 +18,79 @@ log = logging.getLogger('aria2')
 # for RENAME_CONTENT_FILES:
 # to rename TV episodes, content_is_episodes must be set to yes
 
+
 class OutputAria2(object):
+
+    """
+    aria2 downloader plugin
+    Version 1.0.0
+    
+    Configuration:
+    server:     Where aria2 daemon is running. default 'localhost'
+    port:       Port of that server. default '6800'
+    username:   XML-RPC username set in aria2. default ''
+    password:   XML-RPC password set in aria2. default ''
+    do:         [add-new|remove-completed] What action to take with incoming
+                entries.
+    uri:        URI of file to download. Can include inline Basic Auth para-
+                meters and use jinja2 templating with any fields available
+                in the entry.
+    exclude_samples:
+                [yes|no] Exclude any files that include the word 'sample' in
+                their name. default 'no'
+    exclude_non_content:
+                [yes|no] Exclude any non-content files, as defined by filename
+                extensions not listed in file_exts. (See below.) default 'no'
+    rename_content_files:
+                [yes|no] If set, rename all content files (as defined by
+                extensions listed in file_exts). default 'no'
+    rename_template:
+                If set, and rename_content_files is yes, all content files
+                will be renamed using the value of this field as a template.
+                Will be parsed with jinja2 and can include any fields
+                available in the entry. default ''
+    parse_filename:
+                [yes|no] If yes, filenames will be parsed with either the
+                series parser (if content_is_episodes is set to yes) or the
+                movie parser. default: 'no'
+    content_is_episodes:
+                [yes|no] If yes, files will be parsed by the series plugin
+                parser to attempt to determine series name and series_id. If
+                no, files will be treated as movies. Note this has no effect
+                unless parse_filename is set to yes. default 'no'
+    keep_parent_folders:
+                [yes|no] If yes, any parent folders within the torrent itself
+                will be kept and created within the download directory.
+                For example, if a torrent has this structure:
+                MyTorrent/
+                  MyFile.mkv
+                If this is set to yes, the MyTorrent folder will be created in
+                the download directory. If set to no, the folder will be
+                ignored and the file will be downloaded directly into the
+                download directory. default: 'no'
+    fix_year:   [yes|no] If yes, and the last four characters of the series
+                name are numbers, enclose them in parantheses as they are
+                likely a year. Example: Show Name 1995 S01E01.mkv would become
+                Show Name (1995) S01E01.mkv. default 'yes'
+    file_exts:  [list] File extensions of all files considered to be content
+                files. Used to determine which files to rename or which files
+                to exclude from download, with appropriate options set. (See
+                above.)
+                default: ['.mkv', '.avi', '.mp4', '.wmv', '.asf', '.divx',
+                '.mov', '.mpg', '.rm']
+    aria_config:
+                "Parent folder" for any options to be passed directly to aria.
+                Any command line option listed at
+                http://aria2.sourceforge.net/manual/en/html/aria2c.html#options
+                can be used by removing the two dashes (--) in front of the 
+                command name, and changing key=value to key: value. All
+                options will be treated as jinja2 templates and rendered prior
+                to passing to aria2. default ''
+                Example:
+                aria_config:
+                  dir: "/Volumes/all_my_tv/{{series_name}}"
+                  max-connection-per-server: 4
+    """
 
     schema = {
         'type': 'object',
@@ -40,19 +112,21 @@ class OutputAria2(object):
             'file_exts': {
                 'type': 'array',
                 'items': {'type': 'string'},
-                'default': ['.mkv','.avi','.mp4','.wmv','.asf','.divx','.mov','.mpg','.rm']
+                'default': ['.mkv', '.avi', '.mp4', '.wmv', '.asf', '.divx', '.mov', '.mpg', '.rm']
             },
             'aria_config': {
                 'type': 'object',
                 'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
             }
-            
+
         },
         'required': ['do'],
         'additionalProperties': False
     }
 
     def on_task_output(self, task, config):
+        if 'aria_config' not in config:
+            config['aria_config'] = {}
         if 'uri' not in config and config['do'] == 'add-new':
             raise plugin.PluginError('uri (path to folder containing file(s) on server) is required when adding new '
                                      'downloads.', log)
@@ -76,20 +150,21 @@ class OutputAria2(object):
             log.info('Connected to daemon at ' + baseurl + '.')
         except xmlrpclib.ProtocolError as err:
             raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
-                                      % (baseurl, err.errcode, err.errmsg), log)
+                                     % (baseurl, err.errcode, err.errmsg), log)
         except xmlrpclib.Fault as err:
             raise plugin.PluginError('XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
-                                      % (baseurl, err.faultString), log)
-        except socket.err as err:
+                                     % (baseurl, err.faultString), log)
+        except socket_error as (error, msg):
             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
-                                      % (baseurl, err.strerror), log)
+                                     % (baseurl, msg), log)
         except:
             raise plugin.PluginError('Unidentified error during connection to aria2 daemon at %s' % baseurl, log)
 
-
         # loop entries
         for entry in task.accepted:
-            entry['basedir'] = config['aria_config']['dir']
+            entry['basedir'] = ''
+            if 'dir' in config['aria_config']:
+                entry['basedir'] = config['aria_config']['dir']
             if entry['basedir'][-1:] != '/':
                 entry['basedir'] = entry['basedir'] + '/'
             if 'aria_gid' in entry:
@@ -125,9 +200,11 @@ class OutputAria2(object):
                     strCounter = str(counter)
                     if len(entry['content_files']) > 99:
                         # sorry not sorry if you have more than 999 files
-                        config['aria_config']['gid'] = config['aria_config']['gid'][0:-3] + strCounter.rjust(3,str('0'))
+                        config['aria_config']['gid'] = ''.join([config['aria_config']['gid'][0:-3],
+                                                               strCounter.rjust(3, str('0'))])
                     else:
-                        config['aria_config']['gid'] = config['aria_config']['gid'][0:-2] + strCounter.rjust(2,str('0'))
+                        config['aria_config']['gid'] = ''.join([config['aria_config']['gid'][0:-2],
+                                                               strCounter.rjust(2, str('0'))])
 
                 if config['exclude_samples'] == True:
                     # remove sample files from download list
@@ -150,14 +227,15 @@ class OutputAria2(object):
                             # fix it if so desired
                             log.verbose(entry['series_name'])
                             if re.search(r'\d{4}', entry['series_name'][-4:]) is not None and config['fix_year']:
-                                entry['series_name'] = entry['series_name'][0:-4] +'('+ entry['series_name'][-4:] + ')'
+                                entry['series_name'] = ''.join([entry['series_name'][0:-4], '(',
+                                                               entry['series_name'][-4:], ')'])
                                 log.verbose(entry['series_name'])
                             parser.data = curFilename
                             parser.parse
                             log.debug(parser.id_type)
                             if parser.id_type == 'ep':
-                                entry['series_id'] = 'S' + str(parser.season).rjust(2, str('0')) + 'E'
-                                entry['series_id'] += str(parser.episode).rjust(2, str('0'))
+                                entry['series_id'] = ''.join(['S', str(parser.season).rjust(2, str('0')), 'E',
+                                                             str(parser.episode).rjust(2, str('0'))])
                             elif parser.id_type == 'sequence':
                                 entry['series_id'] = parser.episode
                             elif parser.id_type and parser.id:
@@ -181,7 +259,6 @@ class OutputAria2(object):
                             entry['movie_name'] = testname
                         entry['year'] = parser.year
                         entry['movie_year'] = parser.year
-                        
 
                 if config['rename_content_files'] == True:
                     if config['content_is_episodes']:
@@ -201,7 +278,7 @@ class OutputAria2(object):
                             continue
                 else:
                     config['aria_config']['out'] = curFilename
-                                    
+
                 if config['do'] == 'add-new':
                     newDownload = 0
                     try:
@@ -222,20 +299,21 @@ class OutputAria2(object):
                             newDownload = 1
                         else:
                             raise plugin.PluginError('aria response to download status request: %s'
-                                                      % err.faultString, log)
+                                                     % err.faultString, log)
                     except xmlrpclib.ProtocolError as err:
                         raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
-                                                  % (baseurl, err.errcode, err.errmsg), log)
+                                                 % (baseurl, err.errcode, err.errmsg), log)
                     except socket_error as (error, msg):
                         raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
-                                                  % (baseurl, msg), log)
+                                                 % (baseurl, msg), log)
 
                     if newDownload == 1:
                         try:
                             entry['filename'] = curFile
                             curUri = entry.render(config['uri'])
                             if not task.manager.options.test:
-                                r = s.aria2.addUri([curUri], dict((key, entry.render(str(value))) for (key, value) in config['aria_config'].iteritems()))
+                                r = s.aria2.addUri([curUri], dict((key, entry.render(str(value)))
+                                                   for (key, value) in config['aria_config'].iteritems()))
                             else:
                                 if config['aria_config']['gid'] == '':
                                     r = '1234567890123456'
@@ -247,14 +325,13 @@ class OutputAria2(object):
                             raise plugin.PluginError('aria response to add URI request: %s' % err.faultString, log)
                         except socket_error as (error, msg):
                             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
-                                                      % (baseurl, msg), log)
-
+                                                     % (baseurl, msg), log)
 
                 elif config['do'] == 'remove-completed':
                     try:
                         r = s.aria2.tellStatus(config['aria_config']['gid'], ['gid', 'status'])
                         log.info('Status of download with gid %s: %s' % (r['gid'], r['status']))
-                        if r['status'] in ['complete','removed']:
+                        if r['status'] in ['complete', 'removed']:
                             if not task.manager.options.test:
                                 try:
                                     a = s.aria2.removeDownloadResult(r['gid'])
@@ -262,13 +339,13 @@ class OutputAria2(object):
                                         log.info('Download with gid %s removed from memory' % r['gid'])
                                 except xmlrpclib.Fault as err:
                                     raise plugin.PluginError('aria response to remove request: %s'
-                                                              % err.faultString, log)
+                                                             % err.faultString, log)
                                 except socket_error as (error, msg):
                                     raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
-                                                              % (baseurl, msg), log)
+                                                             % (baseurl, msg), log)
                         else:
                             log.info('Download with gid %s could not be removed because of its status: %s'
-                                      % (r['gid'], r['status']))
+                                     % (r['gid'], r['status']))
                     except xmlrpclib.Fault as err:
                         if err.faultString[-12:] == 'is not found':
                             log.warning('Download with gid %s could not be removed because it was not found. It was '
@@ -277,7 +354,7 @@ class OutputAria2(object):
                             raise plugin.PluginError('aria response to status request: %s' % err.faultString, log)
                     except socket_error as (error, msg):
                         raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
-                                                  % (baseurl, msg), log)
+                                                 % (baseurl, msg), log)
 
 
 @event('plugin.register')
