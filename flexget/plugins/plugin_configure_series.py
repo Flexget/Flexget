@@ -132,9 +132,12 @@ class ConfigureSeries(FilterSeriesBase):
                 if ('configure_series_special_ids' in entry
                     and isinstance(entry['configure_series_special_ids'], (basestring, list))):
                     s['special_ids'] = entry['configure_series_special_ids']
-                if ('configure_series_special_ids' in entry
+                if ('configure_series_prefer_specials' in entry
                     and isinstance(entry['configure_series_prefer_specials'], bool)):
                     s['prefer_specials'] = entry['configure_series_prefer_specials']
+                if ('configure_series_assume_special' in entry
+                    and isinstance(entry['configure_series_assume_special'], bool)):
+                    s['assume_special'] = entry['configure_series_assume_special']
                 # Propers (can be boolean, or an interval string)
                 if ('configure_series_propers' in entry
                     and isinstance(entry['configure_series_propers'], basestring)):

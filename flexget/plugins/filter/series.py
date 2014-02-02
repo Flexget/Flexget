@@ -718,7 +718,8 @@ class FilterSeriesBase(object):
                 'from_group': one_or_more({'type': 'string'}),
                 'parse_only': {'type': 'boolean'},
                 'special_ids': one_or_more({'type': 'string'}),
-                'prefer_specials': {'type': 'boolean'}
+                'prefer_specials': {'type': 'boolean'},
+                'assume_special': {'type': 'boolean'}
             },
             'additionalProperties': False
         }
@@ -1009,7 +1010,8 @@ class FilterSeries(FilterSeriesBase):
                       date_yearfirst=config.get('date_yearfirst'),
                       date_dayfirst=config.get('date_dayfirst'),
                       special_ids=get_as_array(config, 'special_ids'),
-                      prefer_specials=config.get('prefer_specials'))
+                      prefer_specials=config.get('prefer_specials'),
+                      assume_special=config.get('assume_special'))
         for id_type in ID_TYPES:
             params[id_type + '_regexps'] = get_as_array(config, id_type + '_regexp')
 
