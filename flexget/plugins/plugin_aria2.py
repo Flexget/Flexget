@@ -18,6 +18,7 @@ log = logging.getLogger('aria2')
 # for RENAME_CONTENT_FILES:
 # to rename TV episodes, content_is_episodes must be set to yes
 
+
 class OutputAria2(object):
 
     schema = {
@@ -40,13 +41,13 @@ class OutputAria2(object):
             'file_exts': {
                 'type': 'array',
                 'items': {'type': 'string'},
-                'default': ['.mkv','.avi','.mp4','.wmv','.asf','.divx','.mov','.mpg','.rm']
+                'default': ['.mkv', '.avi', '.mp4', '.wmv', '.asf', '.divx', '.mov', '.mpg', '.rm']
             },
             'aria_config': {
                 'type': 'object',
                 'additionalProperties': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]}
             }
-            
+
         },
         'required': ['do'],
         'additionalProperties': False
@@ -76,16 +77,15 @@ class OutputAria2(object):
             log.info('Connected to daemon at ' + baseurl + '.')
         except xmlrpclib.ProtocolError as err:
             raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
-                                      % (baseurl, err.errcode, err.errmsg), log)
+                                     % (baseurl, err.errcode, err.errmsg), log)
         except xmlrpclib.Fault as err:
             raise plugin.PluginError('XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
-                                      % (baseurl, err.faultString), log)
-        except socket.err as err:
+                                     % (baseurl, err.faultString), log)
+        except socket_error as (error, msg):
             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
-                                      % (baseurl, err.strerror), log)
+                                     % (baseurl, msg), log)
         except:
             raise plugin.PluginError('Unidentified error during connection to aria2 daemon at %s' % baseurl, log)
-
 
         # loop entries
         for entry in task.accepted:
@@ -125,9 +125,11 @@ class OutputAria2(object):
                     strCounter = str(counter)
                     if len(entry['content_files']) > 99:
                         # sorry not sorry if you have more than 999 files
-                        config['aria_config']['gid'] = config['aria_config']['gid'][0:-3] + strCounter.rjust(3,str('0'))
+                        config['aria_config']['gid'] = ''.join([config['aria_config']['gid'][0:-3],
+                                                               strCounter.rjust(3, str('0'))
                     else:
-                        config['aria_config']['gid'] = config['aria_config']['gid'][0:-2] + strCounter.rjust(2,str('0'))
+                        config['aria_config']['gid'] = ''.join([config['aria_config']['gid'][0:-2],
+                                                               strCounter.rjust(2, str('0'))
 
                 if config['exclude_samples'] == True:
                     # remove sample files from download list
@@ -150,14 +152,15 @@ class OutputAria2(object):
                             # fix it if so desired
                             log.verbose(entry['series_name'])
                             if re.search(r'\d{4}', entry['series_name'][-4:]) is not None and config['fix_year']:
-                                entry['series_name'] = entry['series_name'][0:-4] +'('+ entry['series_name'][-4:] + ')'
+                                entry['series_name'] = ''.join([entry['series_name'][0:-4], '(',
+                                                               entry['series_name'][-4:], ')'])
                                 log.verbose(entry['series_name'])
                             parser.data = curFilename
                             parser.parse
                             log.debug(parser.id_type)
                             if parser.id_type == 'ep':
-                                entry['series_id'] = 'S' + str(parser.season).rjust(2, str('0')) + 'E'
-                                entry['series_id'] += str(parser.episode).rjust(2, str('0'))
+                                entry['series_id'] = ''.join(['S', str(parser.season).rjust(2, str('0')), 'E',
+                                                             str(parser.episode).rjust(2, str('0'))])
                             elif parser.id_type == 'sequence':
                                 entry['series_id'] = parser.episode
                             elif parser.id_type and parser.id:
@@ -181,7 +184,6 @@ class OutputAria2(object):
                             entry['movie_name'] = testname
                         entry['year'] = parser.year
                         entry['movie_year'] = parser.year
-                        
 
                 if config['rename_content_files'] == True:
                     if config['content_is_episodes']:
@@ -201,7 +203,7 @@ class OutputAria2(object):
                             continue
                 else:
                     config['aria_config']['out'] = curFilename
-                                    
+
                 if config['do'] == 'add-new':
                     newDownload = 0
                     try:
@@ -222,20 +224,21 @@ class OutputAria2(object):
                             newDownload = 1
                         else:
                             raise plugin.PluginError('aria response to download status request: %s'
-                                                      % err.faultString, log)
+                                                     % err.faultString, log)
                     except xmlrpclib.ProtocolError as err:
                         raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
-                                                  % (baseurl, err.errcode, err.errmsg), log)
+                                                 % (baseurl, err.errcode, err.errmsg), log)
                     except socket_error as (error, msg):
                         raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
-                                                  % (baseurl, msg), log)
+                                                 % (baseurl, msg), log)
 
                     if newDownload == 1:
                         try:
                             entry['filename'] = curFile
                             curUri = entry.render(config['uri'])
                             if not task.manager.options.test:
-                                r = s.aria2.addUri([curUri], dict((key, entry.render(str(value))) for (key, value) in config['aria_config'].iteritems()))
+                                r = s.aria2.addUri([curUri], dict((key, entry.render(str(value)))
+                                                   for (key, value) in config['aria_config'].iteritems()))
                             else:
                                 if config['aria_config']['gid'] == '':
                                     r = '1234567890123456'
@@ -247,14 +250,13 @@ class OutputAria2(object):
                             raise plugin.PluginError('aria response to add URI request: %s' % err.faultString, log)
                         except socket_error as (error, msg):
                             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
-                                                      % (baseurl, msg), log)
-
+                                                     % (baseurl, msg), log)
 
                 elif config['do'] == 'remove-completed':
                     try:
                         r = s.aria2.tellStatus(config['aria_config']['gid'], ['gid', 'status'])
                         log.info('Status of download with gid %s: %s' % (r['gid'], r['status']))
-                        if r['status'] in ['complete','removed']:
+                        if r['status'] in ['complete', 'removed']:
                             if not task.manager.options.test:
                                 try:
                                     a = s.aria2.removeDownloadResult(r['gid'])
@@ -262,13 +264,13 @@ class OutputAria2(object):
                                         log.info('Download with gid %s removed from memory' % r['gid'])
                                 except xmlrpclib.Fault as err:
                                     raise plugin.PluginError('aria response to remove request: %s'
-                                                              % err.faultString, log)
+                                                             % err.faultString, log)
                                 except socket_error as (error, msg):
                                     raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
-                                                              % (baseurl, msg), log)
+                                                             % (baseurl, msg), log)
                         else:
                             log.info('Download with gid %s could not be removed because of its status: %s'
-                                      % (r['gid'], r['status']))
+                                     % (r['gid'], r['status']))
                     except xmlrpclib.Fault as err:
                         if err.faultString[-12:] == 'is not found':
                             log.warning('Download with gid %s could not be removed because it was not found. It was '
@@ -277,7 +279,7 @@ class OutputAria2(object):
                             raise plugin.PluginError('aria response to status request: %s' % err.faultString, log)
                     except socket_error as (error, msg):
                         raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
-                                                  % (baseurl, msg), log)
+                                                 % (baseurl, msg), log)
 
 
 @event('plugin.register')
