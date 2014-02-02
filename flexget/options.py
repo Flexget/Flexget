@@ -343,14 +343,13 @@ manager_parser.add_argument('-V', '--version', action=VersionAction, help='Print
 manager_parser.add_argument('--test', action='store_true', dest='test', default=0,
                             help='Verbose what would happen on normal execution.')
 manager_parser.add_argument('-c', dest='config', default='config.yml',
-                            help='Specify configuration file. Default is config.yml')
+                            help='Specify configuration file. Default: %(default)s')
 manager_parser.add_argument('--logfile', '-l', default='flexget.log',
                             help='Specify a custom logfile name/location. '
-                                 'Default is flexget.log in the config directory.')
+                                 'Default: %(default)s in the config directory.')
 manager_parser.add_argument('--loglevel', '-L', metavar='LEVEL',
                             default='verbose',
-                            help='Set the verbosity of the logger. Levels: none, info, verbose, debug, trace, warning, '
-                                    'error, critical.',
+                            help='Set the verbosity of the logger. Levels: %(choices)s',
                             choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
 # This option is already handled above.
 manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
@@ -381,7 +380,7 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--tasks', nargs='+', metavar='TASK',
                                  help='run only specified task(s), optionally using glob patterns ("tv-*"). '
                                       'matching is case-insensitive')
-        exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
+        exec_parser.add_argument('--learn', action='store_true', dest='learn', default=False,
                                  help='matches are not downloaded but will be skipped in the future')
         exec_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
                                  help='use when scheduling FlexGet with cron or other scheduler: allows background '
@@ -390,8 +389,8 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
         exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
         # Plugins should respect these flags where appropriate
-        exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
-        exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
+        exec_parser.add_argument('--retry', action='store_true', dest='retry', default=False, help=SUPPRESS)
+        exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=False,
                                  help='disable caches. works only in plugins that have explicit support')
 
         daemonize_help = SUPPRESS
