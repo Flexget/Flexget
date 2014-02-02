@@ -71,7 +71,7 @@ class SeriesParser(TitleParser):
     def __init__(self, name='', alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
                  date_regexps=None, sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None,
                  allow_seasonless=True, date_dayfirst=None, date_yearfirst=None, special_ids=None,
-                 prefer_specials=False):
+                 prefer_specials=False, assume_special=False):
         """
         Init SeriesParser.
 
@@ -115,6 +115,7 @@ class SeriesParser(TitleParser):
                 setattr(self, listname, ReList(locals()[listname] + getattr(SeriesParser, listname)))
         self.specials = self.specials + [i.lower() for i in (special_ids or [])]
         self.prefer_specials = prefer_specials
+        self.assume_special = assume_special
         self.strict_name = strict_name
         self.allow_groups = allow_groups or []
         self.allow_seasonless = allow_seasonless
@@ -390,7 +391,7 @@ class SeriesParser(TitleParser):
             else: log.debug('-> no luck with sequence_regexps')
 
         # No id found, check if this is a special
-        if self.special:
+        if self.special or self.assume_special:
             # Attempt to set id as the title of the special
             self.id = data_stripped or 'special'
             self.id_type = 'special'
