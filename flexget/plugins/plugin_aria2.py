@@ -8,6 +8,8 @@ import xmlrpclib
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
+from flexget.utils.template import RenderError
+from socket import error as socket_error
 
 log = logging.getLogger('aria2')
 
@@ -183,20 +185,20 @@ class OutputAria2(object):
 
                 if config['rename_content_files'] == True:
                     if config['content_is_episodes']:
-                        if config['rename_template'].find('series_name') > -1 and 'series_name' not in entry:
-                            raise plugin.PluginError('Unable to parse series_name and used in rename_template.', log)
-                        elif config['rename_template'].find('series_id') > -1 and 'series_id' not in entry:
-                            raise plugin.PluginError('Unable to parse series id and used in rename_template.', log)
-                        config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
-                        log.verbose(config['aria_config']['out'])
-                    else:
-                        if (('name' not in entry and config['rename_template'].find('name') > -1) or
-                           ('movie_name' not in entry and config['rename_template'].find('movie_name') > -1)):
-                            raise plugin.PluginError('Unable to parse movie name (%s). Try enabling imdb_lookup in this'
-                                                     ' task to assist.' % curFile, log)
-                        else:
+                        try:
                             config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
                             log.verbose(config['aria_config']['out'])
+                        except RenderError as e:
+                            log.error('Could not rename file %s: %s.' % (curFilename, e))
+                            continue
+                    else:
+                        try:
+                            config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
+                            log.verbose(config['aria_config']['out'])
+                        except RenderError as e:
+                            log.error('Could not rename file %s: %s. Try enabling imdb_lookup in this task'
+                                      ' to assist.' % (curFilename, e))
+                            continue
                 else:
                     config['aria_config']['out'] = curFilename
                                     
@@ -224,6 +226,9 @@ class OutputAria2(object):
                     except xmlrpclib.ProtocolError as err:
                         raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
                                                   % (baseurl, err.errcode, err.errmsg), log)
+                    except socket_error as (error, msg):
+                        raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
+                                                  % (baseurl, msg), log)
 
                     if newDownload == 1:
                         try:
@@ -240,6 +245,9 @@ class OutputAria2(object):
                             log.verbose('uri: %s' % curUri)
                         except xmlrpclib.Fault as err:
                             raise plugin.PluginError('aria response to add URI request: %s' % err.faultString, log)
+                        except socket_error as (error, msg):
+                            raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
+                                                      % (baseurl, msg), log)
 
 
                 elif config['do'] == 'remove-completed':
@@ -255,6 +263,9 @@ class OutputAria2(object):
                                 except xmlrpclib.Fault as err:
                                     raise plugin.PluginError('aria response to remove request: %s'
                                                               % err.faultString, log)
+                                except socket_error as (error, msg):
+                                    raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
+                                                              % (baseurl, msg), log)
                         else:
                             log.info('Download with gid %s could not be removed because of its status: %s'
                                       % (r['gid'], r['status']))
@@ -264,6 +275,9 @@ class OutputAria2(object):
                                         'possibly previously removed or never added.' % config['aria_config']['gid'])
                         else:
                             raise plugin.PluginError('aria response to status request: %s' % err.faultString, log)
+                    except socket_error as (error, msg):
+                        raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
+                                                  % (baseurl, msg), log)
 
 
 @event('plugin.register')
