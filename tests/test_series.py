@@ -1737,13 +1737,15 @@ class TestSpecials(FlexGetBase):
             mock:
             - title: the show s03e04 special
             series:
-            - the show
+            - the show:
+                prefer_specials: True
 
           nopreferspecials:
             mock:
             - title: the show s03e05 special
             series:
-            - the show
+            - the show:
+                prefer_specials: False
     """
 
     def test_prefer_specials(self):
