@@ -201,6 +201,7 @@ class Manager(object):
         ipc_info = self.check_ipc_info()
         if ipc_info:
             try:
+                log.info('There is a daemon running for this config. Sending execution to running daemon.')
                 client = IPCClient(ipc_info['port'], ipc_info['password'])
             except ValueError as e:
                 log.error(e)
@@ -502,6 +503,8 @@ class Manager(object):
                 if os.path.exists(self.db_filename):
                     shutil.copy(self.db_filename, db_test_filename)
                 self.db_filename = db_test_filename
+                # Different database, different lock file
+                self.lockfile = os.path.join(self.config_base, '.test-%s-lock' % self.config_name)
                 log.info('Test database created')
 
             # in case running on windows, needs double \\
