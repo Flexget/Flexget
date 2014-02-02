@@ -1728,3 +1728,32 @@ class TestReruns(FlexGetBase):
         self.execute_task('one_accept')
         assert len(self.task.mock_output) == 1, \
             'should have accepted once!: %s' % ', '.join(e['title'] for e in self.task.mock_output)
+
+
+class TestSpecials(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          preferspecials:
+            mock:
+            - title: the show s03e04 special
+            series:
+            - the show
+
+          nopreferspecials:
+            mock:
+            - title: the show s03e05 special
+            series:
+            - the show
+    """
+
+    def test_prefer_specials(self):
+        #Test that an entry matching both ep and special is flagged as a special when prefer_specials is True
+        self.execute_task('preferspecials')
+        entry = self.task.find_entry('accepted', title='the show s03e04 special')
+        assert entry.get('series_id_type') == 'special', 'Entry which should have been flagged a special was not.'
+
+    def test_not_prefer_specials(self):
+        #Test that an entry matching both ep and special is flagged as an ep when prefer_specials is False
+        self.execute_task('nopreferspecials')
+        entry = self.task.find_entry('accepted', title='the show s03e05 special')
+        assert entry.get('series_id_type') != 'special', 'Entry which should not have been flagged a special was.'
