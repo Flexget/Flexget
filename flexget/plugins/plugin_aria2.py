@@ -184,20 +184,20 @@ class OutputAria2(object):
 
                 if config['rename_content_files'] == True:
                     if config['content_is_episodes']:
-                        if config['rename_template'].find('series_name') > -1 and 'series_name' not in entry:
-                            raise plugin.PluginError('Unable to parse series_name and used in rename_template.', log)
-                        elif config['rename_template'].find('series_id') > -1 and 'series_id' not in entry:
-                            raise plugin.PluginError('Unable to parse series id and used in rename_template.', log)
-                        config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
-                        log.verbose(config['aria_config']['out'])
-                    else:
-                        if (('name' not in entry and config['rename_template'].find('name') > -1) or
-                           ('movie_name' not in entry and config['rename_template'].find('movie_name') > -1)):
-                            raise plugin.PluginError('Unable to parse movie name (%s). Try enabling imdb_lookup in this'
-                                                     ' task to assist.' % curFile, log)
-                        else:
+                        try:
                             config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
                             log.verbose(config['aria_config']['out'])
+                        except RenderError as e:
+                            log.error('Could not rename file %s: %s.' % (curFilename, e))
+                            continue
+                    else:
+                        try:
+                            config['aria_config']['out'] = entry.render(config['rename_template']) + fileExt
+                            log.verbose(config['aria_config']['out'])
+                        except RenderError as e:
+                            log.error('Could not rename file %s: %s. Try enabling imdb_lookup in this task'
+                                      ' to assist.' % (curFilename, e))
+                            continue
                 else:
                     config['aria_config']['out'] = curFilename
                                     
