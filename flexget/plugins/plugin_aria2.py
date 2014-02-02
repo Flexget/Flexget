@@ -125,6 +125,8 @@ class OutputAria2(object):
     }
 
     def on_task_output(self, task, config):
+        if 'aria_config' not in config:
+            config['aria_config'] = {}
         if 'uri' not in config and config['do'] == 'add-new':
             raise plugin.PluginError('uri (path to folder containing file(s) on server) is required when adding new '
                                      'downloads.', log)
@@ -160,7 +162,9 @@ class OutputAria2(object):
 
         # loop entries
         for entry in task.accepted:
-            entry['basedir'] = config['aria_config']['dir']
+            entry['basedir'] = ''
+            if 'dir' in config['aria_config']:
+                entry['basedir'] = config['aria_config']['dir']
             if entry['basedir'][-1:] != '/':
                 entry['basedir'] = entry['basedir'] + '/'
             if 'aria_gid' in entry:
