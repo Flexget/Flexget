@@ -8,6 +8,7 @@ import xmlrpclib
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
+from flexget.utils.template import RenderError
 from socket import error as socket_error
 
 log = logging.getLogger('aria2')
