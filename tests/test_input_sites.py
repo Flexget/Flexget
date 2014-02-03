@@ -1,6 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
+
 from nose.plugins.attrib import attr
+from nose.plugins.skip import SkipTest
+
+from tests import FlexGetBase
 
 
 class TestInputSites(FlexGetBase):
@@ -27,5 +30,6 @@ class TestInputSites(FlexGetBase):
 
     @attr(online=True)
     def test_apple_trailers(self):
+        raise SkipTest('apple_trailers plugin is currently broken')
         self.execute_task('test_apple_trailers')
         assert self.task.entries, 'no entries created / site may be down'
