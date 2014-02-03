@@ -13,7 +13,7 @@ class TitleParser(object):
 
     propers = ['proper', 'repack', 'rerip', 'real', 'final']
 
-    specials = ['special']
+    specials = ['special', 'bonus', 'extra', 'omake', 'ova']
 
     editions = ['dc', 'extended', 'uncut', 'remastered', 'unrated', 'theatrical', 'chrono', 'se']
 
