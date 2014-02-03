@@ -98,7 +98,7 @@ class PluginError(Exception):
         return unicode(self).encode('utf-8')
 
     def __unicode__(self):
-        return self.value
+        return unicode(self.value)
 
 
 # TODO: move to utils or somewhere more appropriate
