@@ -88,10 +88,24 @@ class OutputAria2(object):
                 command name, and changing key=value to key: value. All
                 options will be treated as jinja2 templates and rendered prior
                 to passing to aria2. default ''
-                Example:
-                aria_config:
-                  dir: "/Volumes/all_my_tv/{{series_name}}"
-                  max-connection-per-server: 4
+
+    Sample configuration:
+    aria2:
+      server: myserver
+      port: 6802
+      do: add-new
+      exclude_samples: yes
+      exclude_non_content: yes
+      parse_filename: yes
+      content_is_episodes: yes
+      rename_content_files: yes
+      rename_template: '{{series_name}} - {{series_id||lower}}'
+      aria_config:
+        max-connection-per-server: 4
+        max-concurrent-downloads: 4
+        split: 4
+        file-allocation: none
+        dir: "/Volumes/all_my_tv/{{series_name}}"
     """
 
     schema = {
