@@ -9,8 +9,8 @@ class TestInputSites(FlexGetBase):
         tasks:
           test_rlslog:
             rlslog: http://www.rlslog.net/category/movies/dvdrip/
-          test_scenereleases:
-            scenereleases: http://sceper.eu/category/movies/movies-dvd-rip?themedemo=SceneRLSv3
+          test_sceper:
+            sceper: http://sceper.ws/category/movies/movies-dvd-rip
           test_apple_trailers:
               apple_trailers: 480p
     """
@@ -21,8 +21,8 @@ class TestInputSites(FlexGetBase):
         assert self.task.entries, 'no entries created / site may be down'
 
     @attr(online=True)
-    def test_scenereleases(self):
-        self.execute_task('test_scenereleases')
+    def test_sceper(self):
+        self.execute_task('test_sceper')
         assert self.task.entries, 'no entries created / site may be down'
 
     @attr(online=True)
