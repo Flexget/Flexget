@@ -1749,14 +1749,14 @@ class TestSpecials(FlexGetBase):
 
           assumespecial:
             mock:
-            - title: the show OVA
+            - title: the show SOMETHING
             series:
             - the show:
                 assume_special: True
 
           noassumespecial:
             mock:
-            - title: the show OVA
+            - title: the show SOMETHING
             series:
             - the show:
                 assume_special: False
@@ -1777,13 +1777,13 @@ class TestSpecials(FlexGetBase):
     def test_assume_special(self):
         #Test that an entry with no ID found gets flagged as a special and accepted if assume_special is True
         self.execute_task('assumespecial')
-        entry = self.task.find_entry(title='the show OVA')
+        entry = self.task.find_entry(title='the show SOMETHING')
         assert entry.get('series_id_type') == 'special', 'Entry which should have been flagged as a special was not.'
         assert entry.accepted, 'Entry which should have been accepted was not.'
 
     def test_not_assume_special(self):
         #Test that an entry with no ID found does not get flagged as a special and accepted if assume_special is False
         self.execute_task('noassumespecial')
-        entry = self.task.find_entry(title='the show OVA')
+        entry = self.task.find_entry(title='the show SOMETHING')
         assert entry.get('series_id_type') != 'special', 'Entry which should not have been flagged as a special was.'
         assert not entry.accepted, 'Entry which should not have been accepted was.'
