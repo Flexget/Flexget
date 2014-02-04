@@ -227,7 +227,7 @@ class UrlrewriteArchive(object):
 
     schema = {'oneOf': [
         {'type': 'boolean'},
-        {'type': 'list', 'items': {'type': 'string'}}
+        {'type': 'array', 'items': {'type': 'string'}}
     ]}
 
     def search(self, entry, config=None):
