@@ -332,9 +332,6 @@ class OutputDeluge(DelugePlugin):
         deluge.accept('text', key='content_filename')
         deluge.accept('boolean', key='main_file_only')
         deluge.accept('boolean', key='enabled')
-        deluge.accept('choice', key='keep_container').accept_choices([True,False,'yes','no','episode','other'])
-        deluge.accept('text', key='container_directory')
-        deluge.accept('boolean', key='rename_main_file_only')
         return root
 
     def prepare_config(self, config):
@@ -345,9 +342,6 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('path', '')
         config.setdefault('movedone', '')
         config.setdefault('label', '')
-        config.setdefault('content_filename', '')
-        config.setdefault('keep_container', True)
-        config.setdefault('container_directory', '')
         return config
 
     def __init__(self):
@@ -591,8 +585,7 @@ class OutputDeluge(DelugePlugin):
                     log.debug('Moving storage for %s to %s' % (entry['title'], move_now_path))
                     main_file_dlist.append(client.core.move_storage([torrent_id], move_now_path))
 
-                if (config.get('content_filename') or opts.get('main_file_only') or not config.get('keep_container') or
-                    config.get('container_directory')):
+                if opts.get('content_filename') or opts.get('main_file_only'):
 
                     def file_exists():
                         # Checks the download path as well as the move completed path for existence of the file
@@ -604,134 +597,30 @@ class OutputDeluge(DelugePlugin):
                         else:
                             return False
 
-                    for f in status['files']:
-                        if f['size'] > (status['total_size'] * 0.9):
-                            season = False
-                            main_fileid = f['index']
+                    for file in status['files']:
+                        # Only rename file if it is > 90% of the content
+                        if file['size'] > (status['total_size'] * 0.9):
+                            if opts.get('content_filename'):
+                                filename = opts['content_filename'] + os.path.splitext(file['path'])[1]
+                                counter = 1
+                                if client.is_localhost():
+                                    while file_exists():
+                                        # Try appending a (#) suffix till a unique filename is found
+                                        filename = ''.join([opts['content_filename'], '(', str(counter), ')',
+                                                            os.path.splitext(file['path'])[1]])
+                                        counter += 1
+                                else:
+                                    log.debug('Cannot ensure content_filename is unique '
+                                              'when adding to a remote deluge daemon.')
+                                log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], filename))
+                                main_file_dlist.append(
+                                    client.core.rename_files(torrent_id, [(file['index'], filename)]))
+                            if opts.get('main_file_only'):
+                                file_priorities = [1 if f['index'] == file['index'] else 0 for f in status['files']]
+                                main_file_dlist.append(
+                                    client.core.set_torrent_file_priorities(torrent_id, file_priorities))
                             break
                     else:
-                        season = True
-                        main_fileid = -1
-                    log.debug('Main fileid: ' + str(main_fileid))
-
-                    metainfo_series = plugin.get_plugin_by_name('metainfo_series')
-                    guess_series = metainfo_series.instance.guess_series
-                    
-                    for file in status['files']:
-                        try:
-                            entry.pop('series_id')
-                            entry.pop('season')
-                            entry.pop('series_name')
-                        except:
-                            pass
-                        removed_container = False
-                        will_break = False
-
-                        if opts.get('main_file_only') and file['index'] == main_fileid:
-                            will_break = True
-                            file_priorities = [1 if f['index'] == file['index'] else 0 for f in status['files']]
-                            main_file_dlist.append(
-                                client.core.set_torrent_file_priorities(torrent_id, file_priorities))
-                        # Rename file if:
-                        # - renaming all files
-                        # - only renaming the main file and this is that file
-                        # - only downloading the main file and this is that file
-                        if ((config.get('content_filename') and (
-                            (not opts.get('main_file_only') and not config.get('rename_main_file_only')) or 
-                            (config.get('rename_main_file_only') and file['index'] == main_fileid))) or
-                            config.get('container_directory') or not config.get('keep_container') or
-                            (config.get('keep_container') == 'no-other' and season) or
-                            (config.get('keep_container') == 'no-episode' and not season)):
-
-                            cur_filename = file['path'].split('/')[-1]
-
-                            if (('series_id' not in entry and (config.get('content_filename').find('series_id') > -1 or
-                                 config.get('content_filename').find('season'))) or
-                                ('series_name' not in entry and
-                                 config.get('content_filename').find('series_name') > -1) or
-                                ('season' not in entry and (config.get('content_filename').find('season') > -1 or
-                                 config.get('container_directory').find('season') > -1))):
-                                if guess_series(cur_filename):
-                                    parser = guess_series(cur_filename)
-                                    entry['series_name'] = parser.name
-                                    parser.data = cur_filename
-                                    parser.parse
-                                    log.debug('ID type: ' + parser.id_type)
-                                    if parser.id_type == 'ep':
-                                        entry['season'] = parser.season
-                                        entry['series_id'] = 'S' + str(parser.season).rjust(2, str('0')) + 'E'
-                                        entry['series_id'] += str(parser.episode).rjust(2, str('0'))
-                                    elif parser.id_type == 'sequence':
-                                        entry['series_id'] = parser.episode
-                                    elif parser.id_type and parser.id:
-                                        entry['series_id'] = parser.id
-
-                            parent_folders = ''
-                            if file['path'].split('/')[0] != cur_filename and (config.get('keep_container') or
-                                (config.get('keep_container') == 'no-other' and not season) or
-                                (config.get('keep_container') == 'no-episode' and season)):
-                                parent_folders = file['path'][0:(file['path'].rfind('/')+1)]
-                                log.debug('Parent folders: ' + parent_folders)
-
-                            if config.get('container_directory'):
-                                if parent_folders:
-                                    # already has a container, strip the first section out
-                                    log.debug('Stripping out: ' + (file['path'].split('/')[0]+'/'))
-                                    parent_folders = parent_folders.replace((file['path'].split('/')[0]+'/'),'',1)
-                                try:
-                                    log.debug('Current structure: ' + parent_folders)
-                                    parent_folders = ''.join([entry.render(config.get('container_directory')), '/',
-                                                             parent_folders])
-                                    log.debug('Rendered parent folder structure: ' + parent_folders)
-                                except RenderError as e:
-                                    log.error('Error setting parent folder(s) for %s: %s' % (entry['title'], e))
-                            elif (not config.get('keep_container') or
-                                 (config.get('keep_container') == 'no-other' and season) or
-                                 (config.get('keep_container') == 'no-episode' and not season)):
-                                 # the only reason for coming into the loop was to remove the container directory
-                                 parent_folders = file['path'][0:(file['path'].rfind('/')+1)]
-                                 parent_folders = parent_folders.replace((file['path'].split('/')[0]+'/'),'',1)
-                                 removed_container = True
-                                 log.debug('Rendered parent_folders: ' + parent_folders)
-
-                            if (config.get('content_filename') and 
-                               (not opts.get('main_file_only') and not config.get('rename_main_file_only')) or 
-                               (config.get('rename_main_file_only') and file['index'] == main_fileid)):
-                                try:
-                                    content_filename = entry.get('content_filename', config.get('content_filename', ''))
-                                    filename = parent_folders + pathscrub(entry.render(content_filename))
-                                    filename += os.path.splitext(file['path'])[1]
-                                    log.debug('Rendered filename: ' + filename)
-                                except RenderError as e:
-                                    log.error('Error setting content_filename for %s: %s' % (entry['title'], e))
-                                    if not will_break:
-                                        # even if couldn't rename this file, unless are only downloading the main
-                                        # file and this is that file, keep looping through files
-                                        continue
-                                    else:
-                                        # only downloading the main file and this is that file
-                                        break
-                            elif config.get('container_directory') or removed_container:
-                                filename = ''.join([parent_folders, cur_filename])
-                                log.debug('Rendered filename: ' + filename)
-
-                            counter = 1
-                            if client.is_localhost():
-                                while file_exists():
-                                    # Try appending a (#) suffix till a unique filename is found
-                                    filename = ''.join([filename[:(filename.rfind('.'))], '(', str(counter), ')',
-                                                        os.path.splitext(file['path'])[1]])
-                                    counter += 1
-                            else:
-                                log.debug('Cannot ensure content_filename is unique '
-                                          'when adding to a remote deluge daemon.')
-                            log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], filename))
-                            main_file_dlist.append(
-                                client.core.rename_files(torrent_id, [(file['index'], filename)]))
-
-                        if will_break:
-                            break
-                    if opts.get('main_file_only') and not will_break:
                         log.warning('No files in %s are > 90%% of content size, no files renamed.' % entry['title'])
 
                 return defer.DeferredList(main_file_dlist)
@@ -849,6 +738,11 @@ class OutputDeluge(DelugePlugin):
                     modify_opts['movedone'] = pathscrub(os.path.expanduser(movedone))
                 except RenderError as e:
                     log.error('Error setting movedone for %s: %s' % (entry['title'], e))
+                try:
+                    content_filename = entry.get('content_filename', config.get('content_filename', ''))
+                    modify_opts['content_filename'] = pathscrub(entry.render(content_filename))
+                except RenderError as e:
+                    log.error('Error setting content_filename for %s: %s' % (entry['title'], e))
 
                 torrent_id = entry.get('deluge_id') or entry.get('torrent_info_hash')
                 torrent_id = torrent_id and torrent_id.lower()
