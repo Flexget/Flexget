@@ -29,14 +29,17 @@ class Newznab(object):
     Category is any of: movie, tvsearch, music, book
     """
 
-    def validator(self):
-        """Return config validator."""
-        root = validator.factory('dict')
-        root.accept('url', key='url', required=False)
-        root.accept('url', key='website', required=False)
-        root.accept('text', key='apikey', required=False)
-        root.accept('choice', key='category', required=True).accept_choices(['movie', 'tvsearch', 'tv', 'music', 'book'])
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book']},
+            'url': {'type': 'string', 'format': 'url'},
+            'website': {'type': 'string', 'format': 'url'},
+            'apikey': {'type': 'string'}
+        },
+        'required': ['category'],
+        'additionalProperties': False
+    }
 
     def build_config(self, config):
         if config['category'] == 'tv':

@@ -45,8 +45,12 @@ def dump(entries, debug=False, eval_lazy=False, trace=False):
             elif value is None:
                 console('%-17s: %s' % (field, value))
             else:
-                if debug:
-                    console('%-17s: [not printable] (%r)' % (field, value))
+                try:
+                    value = str(entry[field])
+                    console('%-17s: %s' % (field, value.replace('\r', '').replace('\n', '')))
+                except Exception:
+                    if debug:
+                        console('%-17s: [not printable] (%r)' % (field, value))
         if trace:
             console('-- Processing trace:')
             for item in entry.traces:
