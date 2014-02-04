@@ -2,34 +2,36 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from bs4 import NavigableString
+from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
+from flexget.utils.imdb import extract_id
 from flexget.utils.soup import get_soup
-from flexget.utils.tools import urlopener
 
-log = logging.getLogger('scenereleases')
+log = logging.getLogger('sceper')
 
 
-class InputScenereleases(object):
+class InputSceper(object):
     """
-    Uses scenereleases.info category url as input.
+    Uses sceper.ws category url as input.
 
     Example::
 
-      scenereleases: http://scenereleases.info/category/movies/movies-dvd-rip
+      sceper: http://sceper.ws/category/movies/movies-dvd-rip
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('url')
+    schema = {'type': 'string', 'format': 'url'}
 
     def parse_site(self, url, task):
         """Parse configured url and return releases array"""
 
-        page = urlopener(url, log)
+        try:
+            page = task.requests.get(url).content
+        except RequestException as e:
+            raise plugin.PluginError('Error getting input page: %e' % e)
         soup = get_soup(page)
 
         releases = []
@@ -61,7 +63,7 @@ class InputScenereleases(object):
                 # handle imdb link
                 if link_name.lower() == 'imdb':
                     log.debug('found imdb link %s' % link_href)
-                    release['imdb_url'] = link_href
+                    release['imdb_id'] = extract_id(link_href)
 
                 # test if entry with this url would be rewritable by known plugins (ie. downloadable)
                 temp = {}
@@ -83,30 +85,13 @@ class InputScenereleases(object):
 
         return releases
 
-    @cached('scenereleases')
+    @cached('sceper')
     @plugin.internet(log)
     def on_task_input(self, task, config):
         releases = self.parse_site(config, task)
-        entries = []
-
-        for release in releases:
-            # construct entry from release
-            entry = Entry()
-
-            def apply_field(d_from, d_to, f):
-                if f in d_from:
-                    if d_from[f] is None:
-                        return  # None values are not wanted!
-                    d_to[f] = d_from[f]
-
-            for field in ['title', 'url', 'imdb_url', 'imdb_score', 'imdb_votes']:
-                apply_field(release, entry, field)
-
-            entries.append(entry)
-
-        return entries
+        return [Entry(release) for release in releases]
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(InputScenereleases, 'scenereleases', api_ver=2)
+    plugin.register(InputSceper, 'sceper', api_ver=2)

@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 import tempfile
 
 from flexget import plugin
@@ -41,18 +42,18 @@ class PluginSubliminal(object):
     }
 
     def on_task_start(self, task, config):
+        if list(sys.version_info) < [2, 7]:
+            raise plugin.DependencyError('subliminal', 'Python 2.7', 'Subliminal plugin requires python 2.7.')
         try:
             import babelfish
         except ImportError as e:
             log.debug('Error importing Babelfish: %s' % e)
-            raise plugin.DependencyError('subliminal', 'babelfish', 
-                                  'Babelfish module required. ImportError: %s' % e)
+            raise plugin.DependencyError('subliminal', 'babelfish', 'Babelfish module required. ImportError: %s' % e)
         try:
             import subliminal
         except ImportError as e:
             log.debug('Error importing Subliminal: %s' % e)
-            raise plugin.DependencyError('subliminal', 'subliminal', 
-                                  'Subliminal module required. ImportError: %s' % e)
+            raise plugin.DependencyError('subliminal', 'subliminal', 'Subliminal module required. ImportError: %s' % e)
     
     def on_task_output(self, task, config):
         """

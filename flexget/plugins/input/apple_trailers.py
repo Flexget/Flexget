@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import urlparse
+import warnings
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -33,6 +34,9 @@ class AppleTrailers(InputRSS):
     # Run before headers plugin
     @plugin.priority(135)
     def on_task_start(self, task, config):
+        # TODO: Fix or remove this plugin entirely
+        raise plugin.PluginError('The apple_trailers plugin is currently broken, and will be removed unless someone '
+                                 'finds a way to fix it.')
         # TODO: Resolve user-agent in a way that doesn't involve modifying the task config.
         # make sure we have dependencies available, will throw DependencyError if not
         plugin.get_plugin_by_name('headers')

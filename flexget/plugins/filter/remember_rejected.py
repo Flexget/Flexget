@@ -5,10 +5,11 @@ from datetime import datetime, timedelta
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, ForeignKey, and_, Index
 from sqlalchemy.orm import relation
 
-from flexget import db_schema, plugin
+from flexget import db_schema, options, plugin
 from flexget.event import event
+from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column
-from flexget.utils.tools import parse_timedelta
+from flexget.utils.tools import console, parse_timedelta
 
 log = logging.getLogger('remember_rej')
 Base = db_schema.versioned_base('remember_rejected', 3)
@@ -138,6 +139,36 @@ class FilterRememberRejected(object):
         # The test stops passing when this is taken out for some reason...
         task.session.flush()
 
+def do_cli(manager, options):
+    if options.rejected_action == 'list':
+        list_rejected()
+    elif options.rejected_action == 'clear':
+        clear_rejected(manager)
+
+def list_rejected():
+    session = Session()
+    try:
+        results = session.query(RememberEntry).all()
+        if not results:
+            console('No rejected entries recorded by remember_rejected')
+        else:
+            console('Rejections remembered by remember_rejected:')
+        for entry in results:
+            console('%s from %s by %s because %s' % (entry.title, entry.task.name, entry.rejected_by, entry.reason))
+    finally:
+        session.close()
+
+
+def clear_rejected(manager):
+    session = Session()
+    try:
+        results = session.query(RememberEntry).delete()
+        console('Cleared %i items.' % results)
+        session.commit()
+        if results:
+            manager.config_changed()
+    finally:
+        session.close()
 
 @event('manager.db_cleanup')
 def db_cleanup(session):
@@ -146,7 +177,13 @@ def db_cleanup(session):
     if result:
         log.verbose('Removed %d entries from remember rejected table.' % result)
 
-
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
+
+@event('options.register')
+def register_parser_arguments():
+    parser = options.register_command('rejected', do_cli, help='list or clear remembered rejections')
+    subparsers = parser.add_subparsers(dest='rejected_action', metavar='<action>')
+    subparsers.add_parser('list', help='list all the entries that have been rejected')
+    subparsers.add_parser('clear', help='clear all rejected entries from database, so they can be retried')

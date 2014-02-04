@@ -6,6 +6,7 @@ from sqlalchemy import Column, Integer, Unicode
 
 from flexget import db_schema, plugin
 from flexget.event import event
+from flexget.config_schema import process_config
 from flexget.plugins.filter.series import FilterSeriesBase
 
 log = logging.getLogger('configure_series')
@@ -73,81 +74,13 @@ class ConfigureSeries(FilterSeriesBase):
                     s['set'] = {'tvdb_id': entry['tvdb_id']}
 
                 # Allow configure_series to set anything available to series
-                if ('configure_series_path' in entry and isinstance(entry['configure_series_path'], basestring)):
-                    s['path'] = entry['configure_series_path']
-                if ('configure_series_set' in entry and isinstance(entry['configure_series_set'], dict)):
-                    s['set'] = entry['configure_series_set']
-                if ('configure_series_alternate_name' in entry
-                    and isinstance(entry['configure_series_alternate_name'], (basestring, list))):
-                    s['alternate_name'] = entry['configure_series_alternate_name']
-                if ('configure_series_from_group' in entry
-                    and isinstance(entry['configure_series_from_group'], (basestring, list))):
-                    s['from_group'] = entry['configure_series_from_group']
-                if ('configure_series_parse_only' in entry
-                    and isinstance(entry['configure_series_parse_only'], bool)):
-                    s['parse_only'] = entry['configure_series_parse_only']
-                # Custom regexp options
-                if ('configure_series_name_regexp' in entry
-                    and isinstance(entry['configure_series_name_regexp'], (basestring, list))):
-                    s['name_regexp'] = entry['configure_series_name_regexp']
-                if ('configure_series_ep_regexp' in entry
-                    and isinstance(entry['configure_series_ep_regexp'], (basestring, list))):
-                    s['ep_regexp'] = entry['configure_series_ep_regexp']
-                if ('configure_series_date_regexp' in entry
-                    and isinstance(entry['configure_series_date_regexp'], (basestring, list))):
-                    s['date_regexp'] = entry['configure_series_date_regexp']
-                if ('configure_series_sequence_regexp' in entry
-                    and isinstance(entry['configure_series_sequence_regexp'], (basestring, list))):
-                    s['sequence_regexp'] = entry['configure_series_sequence_regexp']
-                if ('configure_series_id_regexp' in entry
-                    and isinstance(entry['configure_series_id_regexp'], (basestring, list))):
-                    s['id_regexp'] = entry['configure_series_id_regexp']
-                # Date parsing options
-                if ('configure_series_date_yearfirst' in entry
-                    and isinstance(entry['configure_series_date_yearfirst'], bool)):
-                    s['date_yearfirst'] = entry['configure_series_date_yearfirst']
-                if ('configure_series_date_dayfirst' in entry
-                    and isinstance(entry['configure_series_date_dayfirst'], bool)):
-                    s['date_dayfirst'] = entry['configure_series_date_dayfirst']
-                # Quality options
-                if ('configure_series_quality' in entry
-                    and isinstance(entry['configure_series_quality'], basestring)):
-                    s['quality'] = entry['configure_series_quality']
-                if ('configure_series_qualities' in entry
-                    and isinstance(entry['configure_series_qualities'], list)):
-                    s['qualities'] = entry['configure_series_qualities']
-                if ('configure_series_timeframe' in entry
-                    and isinstance(entry['configure_series_timeframe'], basestring)):
-                    s['timeframe'] = entry['configure_series_timeframe']
-                if ('configure_series_upgrade' in entry
-                    and isinstance(entry['configure_series_upgrade'], bool)):
-                    s['upgrade'] = entry['configure_series_upgrade']
-                if ('configure_series_target' in entry
-                    and isinstance(entry['configure_series_target'], basestring)):
-                    s['target'] = entry['configure_series_target']
-                # Specials
-                if ('configure_series_specials' in entry
-                    and isinstance(entry['configure_series_specials'], bool)):
-                    s['specials'] = entry['configure_series_specials']
-                if ('configure_series_special_ids' in entry
-                    and isinstance(entry['configure_series_special_ids'], basestring)):
-                    s['special_ids'] = entry['configure_series_special_ids']
-                # Propers (can be boolean, or an interval string)
-                if ('configure_series_propers' in entry
-                    and isinstance(entry['configure_series_propers'], basestring)):
-                    s['propers'] = entry['configure_series_propers']
-                # Strict naming
-                if ('configure_series_exact' in entry
-                    and isinstance(entry['configure_series_exact'], bool)):
-                    s['exact'] = entry['configure_series_exact']
-                # Identified by)):
-                if ('configure_series_identified_by' in entry
-                    and isinstance(entry['configure_series_identified_by'], basestring)):
-                    s['identified_by'] = entry['configure_series_identified_by']
-                # Begin takes an ep, sequence or date identifier
-                if ('configure_series_begin' in entry
-                    and isinstance(entry['configure_series_begin'], basestring)):
-                    s['begin'] = entry['configure_series_begin']
+                for key, schema in self.settings_schema['properties'].iteritems():
+                    if 'configure_series_' + key in entry:
+                        errors = process_config(entry['configure_series_' + key], schema, set_defaults=False)
+                        if errors:
+                            log.debug('not setting series option %s for %s. errors: %s' % (key, entry['title'], errors))
+                        else:
+                            s[key] = entry['configure_series_' + key]
 
         # Set the config_modified flag if the list of shows changed since last time
         new_hash = hashlib.md5(unicode(sorted(series))).hexdigest().decode('ascii')

@@ -14,15 +14,18 @@ class FormLogin(object):
     Login on form
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('url', key='url', required=True)
-        root.accept('text', key='username', required=True)
-        root.accept('text', key='password', required=True)
-        root.accept('text', key='userfield')
-        root.accept('text', key='passfield')
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'url': {'type': 'string', 'format': 'url'},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'userfield': {'type': 'string'},
+            'passfield': {'type': 'string'}
+        },
+        'required': ['url', 'username', 'password'],
+        'additionalProperties': False
+    }
 
     def on_task_start(self, task, config):
         try:

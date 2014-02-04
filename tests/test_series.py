@@ -1728,3 +1728,62 @@ class TestReruns(FlexGetBase):
         self.execute_task('one_accept')
         assert len(self.task.mock_output) == 1, \
             'should have accepted once!: %s' % ', '.join(e['title'] for e in self.task.mock_output)
+
+
+class TestSpecials(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          preferspecials:
+            mock:
+            - title: the show s03e04 special
+            series:
+            - the show:
+                prefer_specials: True
+
+          nopreferspecials:
+            mock:
+            - title: the show s03e05 special
+            series:
+            - the show:
+                prefer_specials: False
+
+          assumespecial:
+            mock:
+            - title: the show SOMETHING
+            series:
+            - the show:
+                assume_special: True
+
+          noassumespecial:
+            mock:
+            - title: the show SOMETHING
+            series:
+            - the show:
+                assume_special: False
+    """
+
+    def test_prefer_specials(self):
+        #Test that an entry matching both ep and special is flagged as a special when prefer_specials is True
+        self.execute_task('preferspecials')
+        entry = self.task.find_entry('accepted', title='the show s03e04 special')
+        assert entry.get('series_id_type') == 'special', 'Entry which should have been flagged a special was not.'
+
+    def test_not_prefer_specials(self):
+        #Test that an entry matching both ep and special is flagged as an ep when prefer_specials is False
+        self.execute_task('nopreferspecials')
+        entry = self.task.find_entry('accepted', title='the show s03e05 special')
+        assert entry.get('series_id_type') != 'special', 'Entry which should not have been flagged a special was.'
+
+    def test_assume_special(self):
+        #Test that an entry with no ID found gets flagged as a special and accepted if assume_special is True
+        self.execute_task('assumespecial')
+        entry = self.task.find_entry(title='the show SOMETHING')
+        assert entry.get('series_id_type') == 'special', 'Entry which should have been flagged as a special was not.'
+        assert entry.accepted, 'Entry which should have been accepted was not.'
+
+    def test_not_assume_special(self):
+        #Test that an entry with no ID found does not get flagged as a special and accepted if assume_special is False
+        self.execute_task('noassumespecial')
+        entry = self.task.find_entry(title='the show SOMETHING')
+        assert entry.get('series_id_type') != 'special', 'Entry which should not have been flagged as a special was.'
+        assert not entry.accepted, 'Entry which should not have been accepted was.'

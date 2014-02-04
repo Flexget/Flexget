@@ -39,7 +39,7 @@ def setup_once():
     if not plugins_loaded:
         flexget.logger.initialize(True)
         setup_logging_level()
-        warnings.simplefilter('error', DeprecationWarning)
+        warnings.simplefilter('error')
         load_plugins()
         # store options for MockManager
         test_arguments = get_parser().parse_args(['execute'])

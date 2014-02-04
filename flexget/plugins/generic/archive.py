@@ -225,13 +225,10 @@ class UrlrewriteArchive(object):
                  'url': 'url',
                  'description': 'description'}
 
-    def validator(self):
-        from flexget import validator
-
-        root = validator.factory()
-        root.accept('boolean')
-        root.accept('list').accept('text')
-        return root
+    schema = {'oneOf': [
+        {'type': 'boolean'},
+        {'type': 'array', 'items': {'type': 'string'}}
+    ]}
 
     def search(self, entry, config=None):
         """Search plugin API method"""
