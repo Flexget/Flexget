@@ -10,14 +10,14 @@ log = logging.getLogger('require_field')
 
 class FilterRequireField(object):
     """
-    Rejects entries without imdb url.
+    Rejects entries without defined field.
 
     Example::
 
       require_field: imdb_url
     """
 
-    schema = one_or_more({"type": "string"})
+    schema = one_or_more({'type': 'string'})
 
     @plugin.priority(32)
     def on_task_filter(self, task, config):

@@ -8,6 +8,7 @@ from requests import RequestException
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils.imdb import extract_id
 from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
@@ -52,6 +53,7 @@ class RlsLog(object):
             # find imdb url
             link_imdb = entrybody.find('a', text=re.compile(r'imdb', re.IGNORECASE))
             if link_imdb:
+                release['imdb_id'] = extract_id(link_imdb['href'])
                 release['imdb_url'] = link_imdb['href']
 
             # find google search url

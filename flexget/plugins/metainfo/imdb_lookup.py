@@ -323,10 +323,10 @@ class ImdbLookup(object):
 
         from flexget.manager import manager
 
-        if entry.get('imdb_url', eval_lazy=False):
-            log.debug('No title passed. Lookup for %s' % entry['imdb_url'])
-        elif entry.get('imdb_id', eval_lazy=False):
+        if entry.get('imdb_id', eval_lazy=False):
             log.debug('No title passed. Lookup for %s' % entry['imdb_id'])
+        elif entry.get('imdb_url', eval_lazy=False):
+            log.debug('No title passed. Lookup for %s' % entry['imdb_url'])
         elif entry.get('title', eval_lazy=False):
             log.debug('lookup for %s' % entry['title'])
         else:
