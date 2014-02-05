@@ -16,34 +16,38 @@ log = logging.getLogger('find')
 FS_ENCODING = sys.getfilesystemencoding() or 'utf-8'
 
 
-def to_syspath(path):
+def fsencode(filename):
     """
-    Prepares a path for use with system calls.
+    Prepares a filename for use with system calls.
 
     On Windows, keeps paths as native strings.
     On unixy systems encodes to a bytestring using the filesystem encoding.
     """
-    if sys.platform.startswith('win'):
-        if isinstance(path, str):
-            # Don't try anything fancy, we shouldn't ever have a bytestring windows path
-            return unicode(path)
+    if isinstance(filename, unicode):
+        if sys.platform.startswith('win'):
+            return filename
+        else:
+            # Linuxy systems can have trouble unless we give them a bytestring path
+            return filename.encode(FS_ENCODING)
+    elif isinstance(filename, str):
+        return filename
     else:
-        # Linuxy systems can have trouble unless we give them a bytestring path
-        if isinstance(path, unicode):
-            return path.encode(FS_ENCODING)
-    return path
+        raise TypeError('expected bytes or str, not %s' % type(filename).__name__)
 
 
-def from_syspath(path, replace=False):
+def fsdecode(filename, replace=False):
     """
-    Makes sure a path returned from a system call is converted back to a native string.
+    Makes sure a filename returned from a system call is converted back to a native string.
 
     :param bool replace: If replace is set to True, this function will mangle the path rather than throw an error.
         This can be useful for debug output, but not for accessing the file system any longer.
     """
-    if isinstance(path, str):
-        return path.decode(FS_ENCODING, 'replace' if replace else 'strict')
-    return path
+    if isinstance(filename, str):
+        return filename.decode(FS_ENCODING, 'replace' if replace else 'strict')
+    elif isinstance(filename, unicode):
+        return filename
+    else:
+        raise TypeError('expected bytes or str, not %s' % type(filename).__name__)
 
 
 class InputFind(object):
@@ -100,31 +104,31 @@ class InputFind(object):
         for path in config['path']:
             log.debug('scanning %s' % path)
             # unicode causes problems in here on linux (#989)
-            fs_path = to_syspath(path)
+            fs_path = fsencode(path)
             fs_path = os.path.expanduser(fs_path)
             for fs_item in os.walk(fs_path):
                 # Make sure subfolder is decodable
                 try:
-                    from_syspath(fs_item[0])
+                    fsdecode(fs_item[0])
                 except UnicodeDecodeError as e:
                     log.warning('Directory `%s` in `%s` encoding broken? %s' %
-                                (from_syspath(fs_item[0], replace=True), from_syspath(fs_path, replace=True), e))
+                                (fsdecode(fs_item[0], replace=True), fsdecode(fs_path, replace=True), e))
                     continue
                 for fs_name in fs_item[2]:
                     e = Entry()
                     # Make sure filename is decodable
                     try:
-                        e['title'] = from_syspath(os.path.splitext(fs_name)[0])
+                        e['title'] = fsdecode(os.path.splitext(fs_name)[0])
                     except UnicodeDecodeError as e:
                         log.warning('Filename `%s` in `%s` encoding broken? %s' %
-                                    (from_syspath(fs_name, replace=True), from_syspath(fs_item[0], replace=True), e))
+                                    (fsdecode(fs_name, replace=True), fsdecode(fs_item[0], replace=True), e))
                     # If mask fails continue
-                    if not match(from_syspath(fs_name)):
+                    if not match(fsdecode(fs_name)):
                         continue
                     fs_filepath = os.path.join(fs_item[0], fs_name)
                     e['timestamp'] = datetime.fromtimestamp(os.path.getmtime(fs_filepath))
                     # We are done calling os.path functions, turn filepath back into a native string
-                    filepath = from_syspath(fs_filepath)
+                    filepath = fsdecode(fs_filepath)
                     e['location'] = filepath
                     # Windows paths need an extra / prepended to them for url
                     if not filepath.startswith('/'):
