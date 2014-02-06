@@ -41,6 +41,9 @@ def add_deluge_windows_install_dir_to_sys_path():
 
 add_deluge_windows_install_dir_to_sys_path()
 
+# Some twisted import is throwing a warning see #2434
+warnings.filterwarnings('ignore', message='Not importing directory .*')
+
 try:
     from twisted.python import log as twisted_log
     from twisted.internet.main import installReactor
