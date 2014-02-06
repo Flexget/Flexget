@@ -8,11 +8,8 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
 
-log = logging.getLogger('trakt_add')
-
 
 class TraktSubmit(object):
-    """Add all accepted elements in your trakt.tv watchlist/library/seen or custom list."""
 
     schema = {
         'type': 'object',
@@ -26,32 +23,29 @@ class TraktSubmit(object):
         'additionalProperties': False
     }
     
-    def __init__(self):
-        self.remove = False
-    
     def submit_data(self, task, url, params):
         if task.manager.options.test:
-            log.info('Not submitting to trakt.tv because of test mode.')
+            self.log.info('Not submitting to trakt.tv because of test mode.')
             return
         prm = json.dumps(params)
-        log.debug('Submitting data to trakt.tv (%s): %s' % (url, prm))
+        self.log.debug('Submitting data to trakt.tv (%s): %s' % (url, prm))
         try:
             result = task.requests.post(url, data=prm, raise_status=False)
         except RequestException as e:
-            log.error('Error submitting data to trakt.tv: %s' % e)
+            self.log.error('Error submitting data to trakt.tv: %s' % e)
             return
         if result.status_code == 404:
             # Remove some info from posted json and print the rest to aid debugging
             for key in ['username', 'password', 'episodes']:
                 params.pop(key, None)
-            log.warning('Some movie/show is unknown to trakt.tv: %s' % params)
+            self.log.warning('Some movie/show is unknown to trakt.tv: %s' % params)
         elif result.status_code == 401:
-            log.error('Authentication error: check your trakt.tv username/password/api_key')
-            log.debug(result.text)
+            self.log.error('Authentication error: check your trakt.tv username/password/api_key')
+            self.log.debug(result.text)
         elif result.status_code != 200:
-            log.error('Error submitting data to trakt.tv: %s' % result.text)
+            self.log.error('Error submitting data to trakt.tv: %s' % result.text)
         else:
-            log.info('Data successfully sent to trakt.tv: ' + result.text)
+            self.log.info('Data successfully sent to trakt.tv: ' + result.text)
     
     @plugin.priority(-255)
     def on_task_output(self, task, config):
@@ -96,7 +90,7 @@ class TraktSubmit(object):
                                            {'title': entry['movie_name'], 
                                             'year': entry['movie_year']})
         if not (found['shows'] or found['movies']):
-            log.debug('Nothing to submit to trakt.')
+            self.log.debug('Nothing to submit to trakt.')
             return
         # Make the calls
         if not list_name in ['watchlist', 'seen', 'library']:
@@ -155,14 +149,19 @@ class TraktSubmit(object):
                     self.submit_data(task, post_url, post_params)
 
 
+class TraktAdd(TraktSubmit):
+    """Add all accepted elements in your trakt.tv watchlist/library/seen or custom list."""
+    remove = False
+    log = logging.getLogger('trakt_add')
+
+
 class TraktRemove(TraktSubmit):
     """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
-    
-    def __init__(self):
-        self.remove = True
+    remove = True
+    log = logging.getLogger('trakt_remove')
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TraktSubmit, 'trakt_acquire', api_ver=2)
+    plugin.register(TraktAdd, 'trakt_add', api_ver=2)
     plugin.register(TraktRemove, 'trakt_remove', api_ver=2)
