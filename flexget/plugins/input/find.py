@@ -126,7 +126,10 @@ class InputFind(object):
                     if not match(fsdecode(fs_name)):
                         continue
                     fs_filepath = os.path.join(fs_item[0], fs_name)
-                    e['timestamp'] = datetime.fromtimestamp(os.path.getmtime(fs_filepath))
+                    try:
+                        e['timestamp'] = datetime.fromtimestamp(os.path.getmtime(fs_filepath))
+                    except ValueError as e:
+                        log.debug('Error setting timestamp for %s: %s' % (fsdecode(fs_filepath), e))
                     # We are done calling os.path functions, turn filepath back into a native string
                     filepath = fsdecode(fs_filepath)
                     e['location'] = filepath
