@@ -355,6 +355,8 @@ manager_parser.add_argument('--loglevel', '-L', metavar='LEVEL',
 manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
                             help='Use this option to create a detailed bug report, '
                                  'note that the output might contain PRIVATE data, so edit that out')
+manager_parser.add_argument('--profile', metavar='OUTFILE', nargs='?', const='flexget.profile',
+                            help='Use the python profiler for this run to debug performance issues.')
 manager_parser.add_argument('--debug', action=DebugAction, nargs=0, help=SUPPRESS)
 manager_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, help=SUPPRESS)
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
