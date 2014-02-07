@@ -30,4 +30,12 @@ def main(args=None):
     if not os.path.isabs(log_file):
         log_file = os.path.join(manager.config_base, log_file)
     logger.start(log_file, log_level)
-    manager.run_cli_command()
+    if options.profile:
+        try:
+            import cProfile as profile
+        except ImportError:
+            import profile
+        profile.runctx('manager.run_cli_command()', globals(), locals(),
+                       os.path.join(manager.config_base, options.profile))
+    else:
+        manager.run_cli_command()

@@ -65,7 +65,7 @@ class Subtitles(object):
         'additionalProperties': False
     }
 
-    def prepare_config(self, config):
+    def prepare_config(self, config, task):
         if not isinstance(config, dict):
             config = {}
         config.setdefault('output', task.manager.config_base)
@@ -79,7 +79,7 @@ class Subtitles(object):
 
         # filter all entries that have IMDB ID set
         try:
-            entries = [e for e in task.accepted if e['imdb_url'] is not None]
+            entries = [e for e in task.accepted if e['imdb_id'] is not None]
         except KeyError:
             # No imdb urls on this task, skip it
             # TODO: should do lookup via imdb_lookup plugin?
@@ -95,7 +95,7 @@ class Subtitles(object):
         if res['status'] != '200 OK':
             raise Exception("Login to opensubtitles.org XML-RPC interface failed")
 
-        config = self.prepare_config(config)
+        config = self.prepare_config(config, task)
 
         token = res['token']
 
@@ -106,13 +106,10 @@ class Subtitles(object):
 
         # loop through the entries
         for entry in entries:
-            # dig out the raw imdb id
-            m = re.search("tt(\d+)/$", entry['imdb_url'])
-            if not m:
-                log.debug("no match for %s" % entry['imdb_url'])
+            imdbid = entry.get('imdb_id')
+            if not imdbid:
+                log.debug('no match for %s' % entry['title'])
                 continue
-
-            imdbid = m.group(1)
 
             query = []
             for language in languages:

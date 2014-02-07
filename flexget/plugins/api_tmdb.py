@@ -29,7 +29,9 @@ Base = db_schema.versioned_base('api_tmdb', 0)
 
 # This is a FlexGet API key
 tmdb3.tmdb_api.set_key('bdfc018dbdb7c243dc7cb1454ff74b95')
-tmdb3.locales.set_locale("en", "us", True);
+tmdb3.locales.set_locale("en", "us", True)
+# There is a bug in tmdb3 library, where it uses the system encoding for query parameters, tmdb expects utf-8 #2392
+tmdb3.locales.syslocale.encoding = 'utf-8'
 tmdb3.set_cache('null')
 
 
@@ -70,7 +72,7 @@ class TMDBContainer(object):
         for col in self.__table__.columns:
             if isinstance(update_dict.get(col.name), (basestring, int, float)):
                 setattr(self, col.name, update_dict[col.name])
-    
+
     def update_from_object(self, update_object):
         """Populates any simple (string or number) attributes from object attributes"""
         for col in self.__table__.columns:
@@ -108,7 +110,7 @@ class TMDBMovie(TMDBContainer, Base):
     year = year_property('released')
     posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
     genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
-    
+
     def update_from_object(self, update_object):
         TMDBContainer.update_from_object(self, update_object)
         self.translated = len(update_object.translations) > 0
@@ -305,7 +307,7 @@ class ApiTmdb(object):
                 raise LookupError('Error looking up movie from TMDb (%s)' % e)
             if movie:
                 log.verbose("Movie found from TMDb: %s (%s)" % (movie.name, movie.year))
-            
+
         if not movie:
             raise LookupError('No results found from tmdb for %s' % id_str())
         else:
@@ -352,7 +354,7 @@ class ApiTmdb(object):
                 if db_genre not in movie.genres:
                     movie.genres.append(db_genre)
         movie.updated = datetime.now()
-        
+
 def _first_result(results):
     if results and len(results) >= 1:
         return results[0]

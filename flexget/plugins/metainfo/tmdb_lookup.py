@@ -51,8 +51,8 @@ class PluginTmdbLookup(object):
 
     def lazy_loader(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
-        imdb_id = entry.get('imdb_id', eval_lazy=False) or \
-            imdb.extract_id(entry.get('imdb_url', eval_lazy=False))
+        imdb_id = (entry.get('imdb_id', eval_lazy=False) or
+                   imdb.extract_id(entry.get('imdb_url', eval_lazy=False)))
         try:
             movie = lookup(smart_match=entry['title'],
                            tmdb_id=entry.get('tmdb_id', eval_lazy=False),

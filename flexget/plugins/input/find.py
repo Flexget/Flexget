@@ -12,6 +12,42 @@ from flexget.entry import Entry
 from flexget.utils.cached_input import cached
 
 log = logging.getLogger('find')
+# Default to utf-8 if we get None from getfilesystemencoding()
+FS_ENCODING = sys.getfilesystemencoding() or 'utf-8'
+
+
+def fsencode(filename):
+    """
+    Prepares a filename for use with system calls.
+
+    On Windows, keeps paths as native strings.
+    On unixy systems encodes to a bytestring using the filesystem encoding.
+    """
+    if isinstance(filename, unicode):
+        if sys.platform.startswith('win'):
+            return filename
+        else:
+            # Linuxy systems can have trouble unless we give them a bytestring path
+            return filename.encode(FS_ENCODING)
+    elif isinstance(filename, str):
+        return filename
+    else:
+        raise TypeError('expected bytes or str, not %s' % type(filename).__name__)
+
+
+def fsdecode(filename, replace=False):
+    """
+    Makes sure a filename returned from a system call is converted back to a native string.
+
+    :param bool replace: If replace is set to True, this function will mangle the path rather than throw an error.
+        This can be useful for debug output, but not for accessing the file system any longer.
+    """
+    if isinstance(filename, str):
+        return filename.decode(FS_ENCODING, 'replace' if replace else 'strict')
+    elif isinstance(filename, unicode):
+        return filename
+    else:
+        raise TypeError('expected bytes or str, not %s' % type(filename).__name__)
 
 
 class InputFind(object):
@@ -65,34 +101,42 @@ class InputFind(object):
         self.prepare_config(config)
         entries = []
         match = re.compile(config['regexp'], re.IGNORECASE).match
-        # Default to utf-8 if we get None from getfilesystemencoding()
-        fs_encoding = sys.getfilesystemencoding() or 'utf-8'
         for path in config['path']:
             log.debug('scanning %s' % path)
-            # unicode causes problems in here (#989)
-            path = path.encode(fs_encoding)
-            path = os.path.expanduser(path)
-            for item in os.walk(path):
-                log.debug('item: %s' % str(item))
-                for name in item[2]:
-                    # If mask fails continue
-                    if match(name) is None:
-                        continue
+            # unicode causes problems in here on linux (#989)
+            fs_path = fsencode(path)
+            fs_path = os.path.expanduser(fs_path)
+            for fs_item in os.walk(fs_path):
+                # Make sure subfolder is decodable
+                try:
+                    fsdecode(fs_item[0])
+                except UnicodeDecodeError as e:
+                    log.warning('Directory `%s` in `%s` encoding broken? %s' %
+                                (fsdecode(fs_item[0], replace=True), fsdecode(fs_path, replace=True), e))
+                    continue
+                for fs_name in fs_item[2]:
                     e = Entry()
+                    # Make sure filename is decodable
                     try:
-                        # Convert back to unicode
-                        e['title'] = os.path.splitext(name.decode(fs_encoding))[0]
-                    except UnicodeDecodeError:
-                        log.warning('Filename `%r` in `%s` encoding broken?' %
-                                    (name.decode('utf-8', 'replace'), item[0]))
+                        e['title'] = fsdecode(os.path.splitext(fs_name)[0])
+                    except UnicodeDecodeError as e:
+                        log.warning('Filename `%s` in `%s` encoding broken? %s' %
+                                    (fsdecode(fs_name, replace=True), fsdecode(fs_item[0], replace=True), e))
+                    # If mask fails continue
+                    if not match(fsdecode(fs_name)):
                         continue
-                    filepath = os.path.join(item[0], name).decode(fs_encoding)
+                    fs_filepath = os.path.join(fs_item[0], fs_name)
+                    try:
+                        e['timestamp'] = datetime.fromtimestamp(os.path.getmtime(fs_filepath))
+                    except ValueError as e:
+                        log.debug('Error setting timestamp for %s: %s' % (fsdecode(fs_filepath), e))
+                    # We are done calling os.path functions, turn filepath back into a native string
+                    filepath = fsdecode(fs_filepath)
                     e['location'] = filepath
-                    e['timestamp'] = datetime.fromtimestamp(os.path.getmtime(filepath))
                     # Windows paths need an extra / prepended to them for url
                     if not filepath.startswith('/'):
                         filepath = '/' + filepath
-                    e['url'] = 'file://%s' % (filepath)
+                    e['url'] = 'file://%s' % filepath
                     entries.append(e)
                 # If we are not searching recursively, break after first (base) directory
                 if not config['recursive']:

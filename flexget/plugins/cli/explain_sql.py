@@ -4,7 +4,6 @@ from time import time
 from argparse import SUPPRESS
 
 from sqlalchemy.orm.query import Query
-from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.sql.expression import Executable, ClauseElement, _literal_as_text
 
@@ -41,19 +40,13 @@ class ExplainQuery(Query):
 @event('manager.execute.started')
 def register_sql_explain(man):
     if man.options.execute.explain_sql:
-        maininit = manager.Session.__init__
-
-        def init(*args, **kwargs):
-            kwargs['query_cls'] = ExplainQuery
-            return maininit(*args, **kwargs)
-
-        manager.Session.__init__ = init
+        manager.Session.kw['query_cls'] = ExplainQuery
 
 
 @event('manager.execute.completed')
 def deregister_sql_explain(man):
     if man.options.execute.explain_sql:
-        manager.Session = sessionmaker()
+        manager.Session.kw.pop('query_cls', None)
 
 
 @event('options.register')

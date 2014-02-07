@@ -45,8 +45,8 @@ class EmitMovieQueue(object):
             # make sure the entry has IMDB fields filled
             entry['url'] = ''
             if queue_item.imdb_id:
-                entry['imdb_url'] = make_imdb_url(queue_item.imdb_id)
                 entry['imdb_id'] = queue_item.imdb_id
+                entry['imdb_url'] = make_imdb_url(queue_item.imdb_id)
             if queue_item.tmdb_id:
                 entry['tmdb_id'] = queue_item.tmdb_id
 
