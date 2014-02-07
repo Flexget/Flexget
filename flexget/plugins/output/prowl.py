@@ -75,7 +75,7 @@ class OutputProwl(object):
                 description = entry['title']
                 log.error('Error rendering jinja description: %s' % e)
 
-            url = 'https://prowl.weks.net/publicapi/add'
+            url = 'https://api.prowlapp.com/publicapi/add'
             data = {'priority': priority, 'application': application, 'apikey': apikey,
                     'event': event, 'description': description}
 
@@ -102,6 +102,8 @@ class OutputProwl(object):
                 log.error("Not authorized, the API key given is not valid, and does not correspond to a user.")
             elif request_status == 406:
                 log.error("Not acceptable, your IP address has exceeded the API limit.")
+            elif request_status == 409:
+                log.error("Not approved, the user has yet to approve your retrieve request.")
             elif request_status == 500:
                 log.error("Internal server error, something failed to execute properly on the Prowl side.")
             else:
