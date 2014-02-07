@@ -1,8 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import os
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
+from flexget.plugins.plugin_include import load_plugin_config
 
 log = logging.getLogger('crossmatch')
 
@@ -26,9 +29,10 @@ class CrossMatch(object):
         'properties': {
             'fields': {'type': 'array', 'items': {'type': 'string'}},
             'action': {'enum': ['accept', 'reject']},
-            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}}
+            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
+            'include': {'type': 'array', 'items': one_or_more({'type': 'string'})}
         },
-        'required': ['fields', 'action', 'from'],
+        'required': ['fields', 'action'],
         'additionalProperties': False
     }
 
@@ -36,14 +40,26 @@ class CrossMatch(object):
 
         fields = config['fields']
         action = config['action']
+        inputs = config['from']
 
         match_entries = []
+
+        for name in config['include']:
+            name = os.path.expanduser(name)
+            if not os.path.isabs(name):
+                name = os.path.join(task.manager.config_base, name)
+            include = load_plugin_config(name, 'task')
+            # merge
+            try:
+                inputs.extend([include])
+            except MergeException:
+                raise plugin.PluginError('Failed to merge include file to task %s, incompatible datatypes' % task.name)
 
         # TODO: xxx
         # we probably want to have common "run and combine inputs" function sometime soon .. this code is in
         # few places already (discover, inputs, ...)
         # code written so that this can be done easily ...
-        for item in config['from']:
+        for item in inputs:
             for input_name, input_config in item.iteritems():
                 input = plugin.get_plugin_by_name(input_name)
                 if input.api_ver == 1:
