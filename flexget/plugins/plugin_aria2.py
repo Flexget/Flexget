@@ -2,13 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
 import re
-
 import urlparse
 import xmlrpclib
+
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.utils.template import RenderError
+
 from socket import error as socket_error
 
 log = logging.getLogger('aria2')
@@ -22,7 +23,7 @@ log = logging.getLogger('aria2')
 class OutputAria2(object):
 
     """
-    aria2 downloader plugin
+    aria2 output plugin
     Version 1.0.0
     
     Configuration:
@@ -311,14 +312,14 @@ class OutputAria2(object):
                                         s.aria2.unpause(r['gid'])
                                     log.info('  Unpaused download.')
                                 except xmlrpclib.Fault as err:
-                                    raise plugin.PluginError('aria response to unpause request: %s' % err.faultString, log)
+                                    raise plugin.PluginError('aria2 response to unpause request: %s' % err.faultString, log)
                             else:
                                 log.info('  Therefore, not re-adding.')
                         except xmlrpclib.Fault as err:
                             if err.faultString[-12:] == 'is not found':
                                 new_download = 1
                             else:
-                                raise plugin.PluginError('aria response to download status request: %s'
+                                raise plugin.PluginError('aria2 response to download status request: %s'
                                                          % err.faultString, log)
                         except xmlrpclib.ProtocolError as err:
                             raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
@@ -347,7 +348,7 @@ class OutputAria2(object):
                                     r = config['aria_config']['gid']
                             log.info('%s successfully added to aria2 with gid %s.' % (config['aria_config']['out'], r))
                         except xmlrpclib.Fault as err:
-                            raise plugin.PluginError('aria response to add URI request: %s' % err.faultString, log)
+                            raise plugin.PluginError('aria2 response to add URI request: %s' % err.faultString, log)
                         except socket_error as (error, msg):
                             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                                      % (baseurl, msg), log)
@@ -366,7 +367,7 @@ class OutputAria2(object):
                                     if a == 'OK':
                                         log.info('Download with gid %s removed from memory' % r['gid'])
                                 except xmlrpclib.Fault as err:
-                                    raise plugin.PluginError('aria response to remove request: %s'
+                                    raise plugin.PluginError('aria2 response to remove request: %s'
                                                              % err.faultString, log)
                                 except socket_error as (error, msg):
                                     raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
@@ -379,7 +380,7 @@ class OutputAria2(object):
                             log.warning('Download with gid %s could not be removed because it was not found. It was '
                                         'possibly previously removed or never added.' % config['aria_config']['gid'])
                         else:
-                            raise plugin.PluginError('aria response to status request: %s' % err.faultString, log)
+                            raise plugin.PluginError('aria2 response to status request: %s' % err.faultString, log)
                     except socket_error as (error, msg):
                         raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                                  % (baseurl, msg), log)
