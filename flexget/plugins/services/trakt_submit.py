@@ -22,7 +22,11 @@ class TraktSubmit(object):
         'required': ['username', 'password', 'api_key', 'list'],
         'additionalProperties': False
     }
-    
+
+    # Defined by subclasses
+    remove = None
+    log = None
+
     def submit_data(self, task, url, params):
         if task.manager.options.test:
             self.log.info('Not submitting to trakt.tv because of test mode.')
