@@ -196,7 +196,7 @@ class OutputAria2(object):
                 else:
                     entry['content_files'] = [entry['title']]
             else:
-                if type(entry['content_files']) == 'str':
+                if not isinstance(entry['content_files'], list):
                     entry['content_files'] = [entry['content_files']]
 
             counter = 0
