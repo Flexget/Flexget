@@ -24,9 +24,12 @@ class PluginTraktLookup(object):
     
       trakt_lookup: yes
     
-    Example with authentication:
+    Example for trakt registered user:
     
-      trakt_lookup: 6c228565a45a302e49fb7d2dab066c9ab948b7be
+      trakt_lookup:
+        username: myusername
+        password: mypassword
+        api_key: myapikey
     
     Primarily used for passing trakt information to other plugins.
     Among these is the IMDB url for the series.
@@ -52,7 +55,6 @@ class PluginTraktLookup(object):
     trakt_series_tvrage_id
     trakt_series_status
     trakt_series_overview
-    
     trakt_ep_name
     trakt_ep_season
     trakt_ep_number
@@ -63,7 +65,9 @@ class PluginTraktLookup(object):
     trakt_ep_id
     trakt_ep_tvdb_id
     
-    (wih API key)
+    Using a valid trakt username/password/apikey combination this info are 
+    provided too (otherwise fields are blanked):
+    
     trakt_series_rating
     trakt_series_rating_advanced
     trakt_series_in_watchlist
