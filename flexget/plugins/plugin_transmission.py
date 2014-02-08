@@ -336,8 +336,7 @@ class PluginTransmission(TransmissionBase):
                     torrent = r
                 log.info('"%s" torrent added to transmission' % (entry['title']))
                 if options['change'].keys():
-                    for id in r.keys():
-                        cli.change(id, 30, **options['change'])
+                    cli.change_torrent(id, 30, **options['change'])
             except TransmissionError as e:
                 log.debug('TransmissionError', exc_info=True)
                 log.debug('Failed options dict: %s' % options)
