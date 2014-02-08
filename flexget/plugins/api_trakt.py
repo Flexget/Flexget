@@ -14,12 +14,14 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugins.filter.series import normalize_series_name
 from flexget.utils.database import with_session
+from flexget.utils.sqlalchemy_utils import table_add_column
+from flexget.utils.sqlalchemy_utils import table_columns
 
-api_key = '6c228565a45a302e49fb7d2dab066c9ab948b7be/'
+std_api_key = '6c228565a45a302e49fb7d2dab066c9ab948b7be'
 search_show = 'http://api.trakt.tv/search/shows.json/'
 episode_summary = 'http://api.trakt.tv/show/episode/summary.json/'
 show_summary = 'http://api.trakt.tv/show/summary.json/'
-Base = schema.versioned_base('api_trakt', 2)
+Base = schema.versioned_base('api_trakt', 3)
 log = logging.getLogger('api_trakt')
 
 
@@ -40,7 +42,6 @@ genres_table = Table('trakt_series_genres', Base.metadata,
 
 
 class TraktGenre(TraktContainer, Base):
-
     __tablename__ = 'trakt_genres'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -52,7 +53,6 @@ actors_table = Table('trakt_series_actors', Base.metadata,
 
 
 class TraktActors(TraktContainer, Base):
-
     __tablename__ = 'trakt_actors'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
@@ -72,6 +72,11 @@ class TraktEpisode(TraktContainer, Base):
     first_aired_iso = Column(Unicode)
     first_aired_utc = Column(Integer)
     screen = Column(Unicode)
+    watched = Column(Boolean)
+    rating = Column(String)
+    rating_advanced = Column(Integer)
+    in_watchlist = Column(Boolean)
+    in_collection = Column(Boolean)
 
     series_id = Column(Integer, ForeignKey('trakt_series.tvdb_id'), nullable=False)
 
@@ -105,13 +110,17 @@ class TraktSeries(TraktContainer, Base):
     url = Column(Unicode)
     episodes = relation('TraktEpisode', backref='series', cascade='all, delete, delete-orphan')
     actors = relation('TraktActors', secondary=actors_table, backref='series')
+    rating = Column(String)
+    rating_advanced = Column(Integer)
+    in_watchlist = Column(Boolean)
 
-    def update(self, session):
+    def update(self, session, user_auth):
         tvdb_id = self.tvdb_id
-        url = ('%s%s%s' % (show_summary, api_key, tvdb_id))
+        url = ('%s%s/%s' % (show_summary, user_auth['api_key'], tvdb_id))
         try:
-            data = requests.get(url).json()
-        except requests.RequestException as e:
+            data = requests.get(url, auth=(user_auth.get('username'), 
+                                           user_auth.get('password'))).json()
+        except requests.RequestException:  # as e:
             raise LookupError('Request failed %s' % url)
         if data:
             if data['title']:
@@ -145,7 +154,6 @@ class TraktSeries(TraktContainer, Base):
 
 
 class TraktSearchResult(Base):
-
     __tablename__ = 'trakt_search_results'
 
     id = Column(Integer, primary_key=True)
@@ -157,7 +165,7 @@ class TraktSearchResult(Base):
 def get_series_id(title):
     norm_series_name = normalize_series_name(title)
     series_name = urllib.quote_plus(norm_series_name)
-    url = search_show + api_key + series_name
+    url = search_show + std_api_key + '/' + series_name
     series = None
     try:
         response = requests.get(url)
@@ -187,15 +195,50 @@ def get_series_id(title):
     return series
 
 
+@schema.upgrade('api_trakt')
+def upgrade(ver, session):
+    if ver < 3:
+        columns = table_columns('trakt_series', session)
+        if not 'rating' in columns:
+            log.info('Adding rating column to trakt_series table.')
+            table_add_column('trakt_series', 'rating', String, session)
+        if not 'rating_advanced' in columns:
+            log.info('Adding rating_advanced column to trakt_series table.')
+            table_add_column('trakt_series', 'rating_advanced', Integer, session)
+        if not 'in_watchlist' in columns:
+            log.info('Adding in_watchlist column to trakt_series table.')
+            table_add_column('trakt_series', 'in_watchlist', Boolean, session)
+        columns = table_columns('trakt_episodes', session)
+        if not 'watched' in columns:
+            log.info('Adding watched column to trakt_episodes table.')
+            table_add_column('trakt_episodes', 'watched', Boolean, session)
+        if not 'rating' in columns:
+            log.info('Adding rating column to trakt_episodes table.')
+            table_add_column('trakt_episodes', 'rating', String, session)
+        if not 'rating_advanced' in columns:
+            log.info('Adding rating_advanced column to trakt_episodes table.')
+            table_add_column('trakt_episodes', 'rating_advanced', Integer, session)
+        if not 'in_watchlist' in columns:
+            log.info('Adding in_watchlist column to trakt_episodes table.')
+            table_add_column('trakt_episodes', 'in_watchlist', Boolean, session)
+        if not 'in_collection' in columns:
+            log.info('Adding in_collection column to trakt_episodes table.')
+            table_add_column('trakt_episodes', 'in_collection', Boolean, session)
+        ver = 3
+    return ver
+
+
 class ApiTrakt(object):
 
     @staticmethod
     @with_session
-    def lookup_series(title=None, tvdb_id=None, only_cached=False, session=None):
+    def lookup_series(title=None, tvdb_id=None, only_cached=False, session=None, user_auth=None):
+        if not user_auth or not (user_auth.get('username') and 
+            user_auth.get('password') and user_auth.get('api_key')):
+            user_auth = {'api_key': std_api_key}
         if not title and not tvdb_id:
             raise LookupError('No criteria specified for Trakt.tv Lookup')
         series = None
-
         def id_str():
             return '<name=%s, tvdb_id=%s>' % (title, tvdb_id)
         if tvdb_id:
@@ -215,7 +258,7 @@ class ApiTrakt(object):
             if tvdb_id is not None:
                 series = TraktSeries()
                 series.tvdb_id = tvdb_id
-                series.update(session=session)
+                series.update(session, user_auth)
                 if series.title:
                     session.add(series)
             if tvdb_id is None and title is not None:
@@ -225,14 +268,13 @@ class ApiTrakt(object):
                     if not series and series_lookup:
                         series = TraktSeries()
                         series.tvdb_id = series_lookup
-                        series.update(session=session)
+                        series.update(session, user_auth)
                         if series.title:
                             session.add(series)
                     if title.lower() != series.title.lower():
                         session.add(TraktSearchResult(search=title, series=series))
                 else:
                     raise LookupError('Unknown Series title from Traktv: %s' % id_str())
-
         if not series:
             raise LookupError('No results found from traktv for %s' % id_str())
         if not series.title:
@@ -245,15 +287,18 @@ class ApiTrakt(object):
 
     @staticmethod
     @with_session
-    def lookup_episode(title=None, seasonnum=None, episodenum=None, tvdb_id=None, session=None, only_cached=False):
-        series = ApiTrakt.lookup_series(title=title, tvdb_id=tvdb_id, only_cached=only_cached, session=session)
+    def lookup_episode(title=None, seasonnum=None, episodenum=None, tvdb_id=None, session=None, only_cached=False, user_auth=None):
+        if not user_auth or not (user_auth.get('username') and 
+            user_auth.get('password') and user_auth.get('api_key')):
+            user_auth = {'api_key': std_api_key}
+        series = ApiTrakt.lookup_series(title=title, tvdb_id=tvdb_id, only_cached=only_cached, session=session, user_auth=user_auth)
         if not series:
             raise LookupError('Could not identify series')
         if series.tvdb_id:
             ep_description = '%s.S%sE%s' % (series.title, seasonnum, episodenum)
             episode = session.query(TraktEpisode).filter(TraktEpisode.series_id == series.tvdb_id).\
                 filter(TraktEpisode.season == seasonnum).filter(TraktEpisode.number == episodenum).first()
-            url = episode_summary + api_key + '%s/%s/%s' % (series.tvdb_id, seasonnum, episodenum)
+            url = episode_summary + user_auth['api_key'] + '/%s/%s/%s' % (series.tvdb_id, seasonnum, episodenum)
         elif title:
             title = normalize_series_name(title)
             title = re.sub(' ', '-', title)
@@ -261,14 +306,14 @@ class ApiTrakt(object):
             episode = session.query(TraktEpisode).filter(title == series.title).\
                 filter(TraktEpisode.season == seasonnum).\
                 filter(TraktEpisode.number == episodenum).first()
-            url = episode_summary + api_key + '%s/%s/%s' % (title, seasonnum, episodenum)
+            url = episode_summary + user_auth['api_key'] + '/%s/%s/%s' % (title, seasonnum, episodenum)
         if not episode:
             if only_cached:
                 raise LookupError('Episode %s not found in cache' % ep_description)
-
             log.debug('Episode %s not found in cache, looking up from trakt.' % ep_description)
             try:
-                data = requests.get(url)
+                data = requests.get(url, auth=(user_auth.get('username'), 
+                                               user_auth.get('password')))
             except requests.RequestException:
                 log.debug('Error Retrieving Trakt url: %s' % url)
             try:
