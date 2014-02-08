@@ -21,4 +21,8 @@
   <p><strong>Plot:</strong> {{imdb_plot_outline|d('N/A')}}</p>
 {% else %}
   {{title}}
+  {% if description is defined %}
+
+  {{description}}
+  {% endif %}
 {% endif %}
