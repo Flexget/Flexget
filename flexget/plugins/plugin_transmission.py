@@ -323,16 +323,15 @@ class PluginTransmission(TransmissionBase):
             try:
                 if downloaded:
                     with open(entry['file'], 'rb') as f:
-                        filedump = base64.encodestring(f.read())
-                    r = cli.add(filedump, 30, **options['add'])
+                        filedump = base64.b64encode(f.read()).encode('utf-8')
+                    r = cli.add_torrent(filedump, 30, **options['add'])
                 else:
-                    r = cli.add_uri(entry['url'], timeout=30, **options['add'])
+                    r = cli.add_torrent(entry['url'], timeout=30, **options['add'])
                 if r:
-                    torrent = r.values()[0]
+                    torrent = r
                 log.info('"%s" torrent added to transmission' % (entry['title']))
                 if options['change'].keys():
-                    for id in r.keys():
-                        cli.change(id, 30, **options['change'])
+                    cli.change_torrent(id, 30, **options['change'])
             except TransmissionError as e:
                 log.debug('TransmissionError', exc_info=True)
                 log.debug('Failed options dict: %s' % options)
