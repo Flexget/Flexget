@@ -394,7 +394,7 @@ class ImdbLookup(object):
                     raise plugin.PluginError('Title `%s` lookup failed' % entry['title'])
 
             # check if this imdb page has been parsed & cached
-            movie = session.query(Movie).filter(Movie.url == entry['imdb_url']).options(joinedload('*')).first()
+            movie = session.query(Movie).filter(Movie.url == entry['imdb_url']).first()
 
             # determine whether or not movie details needs to be parsed
             req_parse = False
