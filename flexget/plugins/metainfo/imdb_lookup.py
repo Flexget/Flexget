@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, delete
 from sqlalchemy.schema import ForeignKey, Index
-from sqlalchemy.orm import relation, joinedload_all
+from sqlalchemy.orm import relation, joinedload
 
 from flexget import db_schema, plugin
 from flexget.event import event
@@ -394,12 +394,7 @@ class ImdbLookup(object):
                     raise plugin.PluginError('Title `%s` lookup failed' % entry['title'])
 
             # check if this imdb page has been parsed & cached
-            movie = session.query(Movie).\
-                options(joinedload_all(Movie.genres),
-                    joinedload_all(Movie.languages),
-                    joinedload_all(Movie.actors),
-                    joinedload_all(Movie.directors)).\
-                filter(Movie.url == entry['imdb_url']).first()
+            movie = session.query(Movie).filter(Movie.url == entry['imdb_url']).options(joinedload('*')).first()
 
             # determine whether or not movie details needs to be parsed
             req_parse = False
