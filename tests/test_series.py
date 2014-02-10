@@ -1619,7 +1619,7 @@ class TestInvalidSeries(FlexGetBase):
     def test_blank_series(self):
         """Make sure a blank series doesn't crash."""
         self.execute_task('blank')
-        assert not self.task._abort, 'Task should not have aborted'
+        assert not self.task.aborted, 'Task should not have aborted'
 
 
 class TestDoubleEps(FlexGetBase):
