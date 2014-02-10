@@ -269,7 +269,7 @@ class ImdbLookup(object):
         try:
             self.lookup(entry)
         except plugin.PluginError as e:
-            log_once(e.value.capitalize(), logger=log)
+            log_once(unicode(e.value).capitalize(), logger=log)
             # Set all of our fields to None if the lookup failed
             entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
         return entry[field]
