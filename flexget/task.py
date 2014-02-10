@@ -261,9 +261,10 @@ class Task(object):
 
         self.disabled_phases = []
 
-        self._abort = False
-        self._abort_reason = None
-        self._silent_abort = False
+        # These are just to query what happened in task. Call task.abort to set.
+        self.aborted = False
+        self.abort_reason = None
+        self.silent_abort = False
 
         self._rerun = False
 
@@ -276,14 +277,6 @@ class Task(object):
 
     def __str__(self):
         return '<Task(name=%s,aborted=%s)>' % (self.name, self.aborted)
-
-    @property
-    def aborted(self):
-        return self._abort
-
-    @property
-    def abort_reason(self):
-        return self._abort_reason
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
@@ -302,10 +295,10 @@ class Task(object):
 
     def abort(self, reason='Unknown', silent=False):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
-        self._abort = True
-        self._abort_reason = reason
-        self._silent_abort = silent
-        if not self._silent_abort:
+        self.aborted = True
+        self.abort_reason = reason
+        self.silent_abort = silent
+        if not self.silent_abort:
             log.warning('Aborting task (plugin: %s)' % self.current_plugin)
         else:
             log.debug('Aborting task (plugin: %s)' % self.current_plugin)
@@ -392,10 +385,6 @@ class Task(object):
                     self.all_entries.extend(response)
             finally:
                 fire_event('task.execute.after_plugin', self, plugin.name)
-
-            # Make sure we abort if any plugin sets our abort flag
-            if self._abort and phase != 'abort':
-                return
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
         """
@@ -556,8 +545,8 @@ class Task(object):
                 self.__run_task_phase('abort')
                 # Commit just the abort handler changes if no exceptions are raised there
                 self.session.commit()
-            except TaskAbort:
-                log.exception('abort handlers aborted!')
+            except TaskAbort as e:
+                log.exception('abort handlers aborted: %s' % e)
             raise
         else:
             for entry in self.all_entries:
