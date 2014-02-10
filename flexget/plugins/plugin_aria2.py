@@ -2,13 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
 import re
-
 import urlparse
 import xmlrpclib
+
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.utils.template import RenderError
+
 from socket import error as socket_error
 
 log = logging.getLogger('aria2')
@@ -22,7 +23,7 @@ log = logging.getLogger('aria2')
 class OutputAria2(object):
 
     """
-    aria2 downloader plugin
+    aria2 output plugin
     Version 1.0.0
     
     Configuration:
@@ -146,8 +147,11 @@ class OutputAria2(object):
         if 'uri' not in config and config['do'] == 'add-new':
             raise plugin.PluginError('uri (path to folder containing file(s) on server) is required when adding new '
                                      'downloads.', log)
-        if 'dir' not in config['aria_config'] and config['do'] == 'add-new':
-            raise plugin.PluginError('dir (destination directory) is required.', log)
+        if 'dir' not in config['aria_config']:
+            if config['do'] == 'add-new':
+                raise plugin.PluginError('dir (destination directory) is required.', log)
+            else:
+                config['aria_config']['dir'] = ''
         if config['keep_parent_folders'] and config['aria_config']['dir'].find('{{parent_folders}}') == -1:
             raise plugin.PluginError('When using keep_parent_folders, you must specify {{parent_folders}} in the dir '
                                      'option to show where it goes.', log)
@@ -178,11 +182,7 @@ class OutputAria2(object):
 
         # loop entries
         for entry in task.accepted:
-            entry['basedir'] = ''
-            if 'dir' in config['aria_config']:
-                entry['basedir'] = config['aria_config']['dir']
-            if entry['basedir'][-1:] != '/':
-                entry['basedir'] = entry['basedir'] + '/'
+            config['aria_dir'] = config['aria_config']['dir']
             if 'aria_gid' in entry:
                 config['aria_config']['gid'] = entry['aria_gid']
             elif 'torrent_info_hash' in entry:
@@ -201,14 +201,18 @@ class OutputAria2(object):
 
             counter = 0
             for cur_file in entry['content_files']:
+                entry['parent_folders'] = ''
+                # reset the 'dir' or it will only be rendered on the first loop
+                config['aria_config']['dir'] = config['aria_dir']
 
                 cur_filename = cur_file.split('/')[-1]
                 if cur_file.split('/')[0] != cur_filename and config['keep_parent_folders']:
                     lastSlash = cur_file.rfind('/')
-                    curPath = cur_file[:lastSlash]
-                    if curPath[0:1] == '/':
-                        curPath = curPath[1:]
-                    entry['parent_folders'] = entry['basedir'] + curPath
+                    cur_path = cur_file[:lastSlash]
+                    if cur_path[0:1] == '/':
+                        cur_path = cur_path[1:]
+                    entry['parent_folders'] = cur_path
+                    log.debug('parent folders: %s' % entry['parent_folders'])
 
                 file_dot = cur_filename.rfind(".")
                 file_ext = cur_filename[file_dot:]
@@ -262,7 +266,7 @@ class OutputAria2(object):
                     else:
                         from flexget.utils.titles.movie import MovieParser
                         parser = MovieParser()
-                        parser.data = cur_file
+                        parser.data = cur_filename
                         parser.parse()
                         log.info(parser)
                         testname = parser.name
@@ -276,8 +280,12 @@ class OutputAria2(object):
                         else:
                             entry['name'] = testname
                             entry['movie_name'] = testname
-                        entry['year'] = parser.year
-                        entry['movie_year'] = parser.year
+                        if parser.year:
+                            entry['year'] = parser.year
+                            entry['movie_year'] = parser.year
+                        else:
+                            entry['year'] = testyear
+                            entry['movie_year'] = testyear
 
                 if config['rename_content_files']:
                     if config['content_is_episodes']:
@@ -299,6 +307,7 @@ class OutputAria2(object):
                     config['aria_config']['out'] = cur_filename
 
                 if config['do'] == 'add-new':
+                    log.debug('Adding new file')
                     new_download = 0
                     if 'gid' in config['aria_config']:
                         try:
@@ -311,14 +320,14 @@ class OutputAria2(object):
                                         s.aria2.unpause(r['gid'])
                                     log.info('  Unpaused download.')
                                 except xmlrpclib.Fault as err:
-                                    raise plugin.PluginError('aria response to unpause request: %s' % err.faultString, log)
+                                    raise plugin.PluginError('aria2 response to unpause request: %s' % err.faultString, log)
                             else:
                                 log.info('  Therefore, not re-adding.')
                         except xmlrpclib.Fault as err:
                             if err.faultString[-12:] == 'is not found':
                                 new_download = 1
                             else:
-                                raise plugin.PluginError('aria response to download status request: %s'
+                                raise plugin.PluginError('aria2 response to download status request: %s'
                                                          % err.faultString, log)
                         except xmlrpclib.ProtocolError as err:
                             raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
@@ -337,9 +346,12 @@ class OutputAria2(object):
                         except RenderError as e:
                             raise plugin.PluginError('Unable to render uri: %s' % e)
                         try:
+                            for key, value in config['aria_config'].iteritems():
+                                log.trace('rendering %s: %s' % (key, value))
+                                config['aria_config'][key] = entry.render(unicode(value))
+                            log.debug('dir: %s' % config['aria_config']['dir'])
                             if not task.manager.options.test:
-                                r = s.aria2.addUri([cur_uri], dict((key, entry.render(str(value)))
-                                                   for (key, value) in config['aria_config'].iteritems()))
+                                r = s.aria2.addUri([cur_uri], config['aria_config'])
                             else:
                                 if 'gid' not in config['aria_config']:
                                     r = '1234567890123456'
@@ -347,7 +359,7 @@ class OutputAria2(object):
                                     r = config['aria_config']['gid']
                             log.info('%s successfully added to aria2 with gid %s.' % (config['aria_config']['out'], r))
                         except xmlrpclib.Fault as err:
-                            raise plugin.PluginError('aria response to add URI request: %s' % err.faultString, log)
+                            raise plugin.PluginError('aria2 response to add URI request: %s' % err.faultString, log)
                         except socket_error as (error, msg):
                             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                                      % (baseurl, msg), log)
@@ -366,7 +378,7 @@ class OutputAria2(object):
                                     if a == 'OK':
                                         log.info('Download with gid %s removed from memory' % r['gid'])
                                 except xmlrpclib.Fault as err:
-                                    raise plugin.PluginError('aria response to remove request: %s'
+                                    raise plugin.PluginError('aria2 response to remove request: %s'
                                                              % err.faultString, log)
                                 except socket_error as (error, msg):
                                     raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
@@ -379,7 +391,7 @@ class OutputAria2(object):
                             log.warning('Download with gid %s could not be removed because it was not found. It was '
                                         'possibly previously removed or never added.' % config['aria_config']['gid'])
                         else:
-                            raise plugin.PluginError('aria response to status request: %s' % err.faultString, log)
+                            raise plugin.PluginError('aria2 response to status request: %s' % err.faultString, log)
                     except socket_error as (error, msg):
                         raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                                  % (baseurl, msg), log)
