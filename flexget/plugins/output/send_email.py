@@ -282,8 +282,9 @@ class OutputEmail(object):
         else:
             send_email(subject, content, config)
 
-    # Also send the email on abort
-    on_task_abort = on_task_output
+    def on_task_abort(self, task, config):
+        if not task.silent_abort:
+            self.on_task_output(task, config)
 
 
 @event('plugin.register')
