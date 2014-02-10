@@ -109,6 +109,12 @@ def decode_item(next, token):
     elif token == b"s":
         # string: "s" value (virtual tokens)
         data = next()
+        # Strings in torrent file are defined as utf-8 encoded
+        try:
+            data = data.decode('utf-8')
+        except UnicodeDecodeError as e:
+            # The pieces field is a byte string, and should be left as such.
+            pass
     elif token == b"l" or token == b"d":
         # container: "l" (or "d") values "e"
         data = []
@@ -129,8 +135,8 @@ def bdecode(text):
         data = decode_item(src.next, src.next()) # pylint:disable=E1101
         for token in src: # look for more tokens
             raise SyntaxError("trailing junk")
-    except (AttributeError, ValueError, StopIteration):
-        raise SyntaxError("syntax error")
+    except (AttributeError, ValueError, StopIteration) as e:
+        raise SyntaxError("syntax error: %s" % e)
     return data
 
 
