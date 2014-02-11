@@ -12,24 +12,30 @@ except ImportError:
     raise plugin.DependencyError(issued_by='trakt_lookup', missing='api_trakt',
                                  message='trakt_lookup requires the `api_trakt` plugin')
 
-from flexget import plugin
-
 log = logging.getLogger('trakt_lookup')
 
 
 class PluginTraktLookup(object):
-    """Retrieves trakt information for entries. Uses series_name,
+    """
+    Retrieves trakt information for entries. Uses series_name,
     series_season, series_episode from series plugin.
-
+    
     Example:
-
-    trakt_lookup: yes
-
+    
+      trakt_lookup: yes
+    
+    Example for trakt registered user:
+    
+      trakt_lookup:
+        username: myusername
+        password: mypassword
+        api_key: myapikey
+    
     Primarily used for passing trakt information to other plugins.
     Among these is the IMDB url for the series.
-
+    
     This information is provided (via entry):
-    series info:
+    
     trakt_series_name
     trakt_series_runtime
     trakt_series_first_aired_epoch
@@ -49,7 +55,6 @@ class PluginTraktLookup(object):
     trakt_series_tvrage_id
     trakt_series_status
     trakt_series_overview
-
     trakt_ep_name
     trakt_ep_season
     trakt_ep_number
@@ -59,10 +64,38 @@ class PluginTraktLookup(object):
     trakt_ep_image_url
     trakt_ep_id
     trakt_ep_tvdb_id
+    
+    Using a valid trakt username/password/apikey combination this info are 
+    provided too (otherwise fields are blanked):
+    
+    trakt_series_rating
+    trakt_series_rating_advanced
+    trakt_series_in_watchlist
+    trakt_ep_watched
+    trakt_ep_rating
+    trakt_ep_rating_advanced
+    trakt_ep_in_watchlist
+    trakt_ep_in_collection
+    
+    """
 
-  """
-
-  # Series info
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'api_key': {'type': 'string'},
+                },
+                'required': ['username', 'password', 'api_key'],
+                'additionalProperties': False
+            }
+        ]
+    }
+        
+    # Series info
     series_map = {
         'trakt_series_name': 'title',
         'trakt_series_runtime': 'runtime',
@@ -84,9 +117,12 @@ class PluginTraktLookup(object):
         'trakt_series_year': 'year',
         'trakt_series_tvrage_id': 'tvrage_id',
         'trakt_series_status': 'status',
-        'trakt_series_overview': 'overview'}
+        'trakt_series_overview': 'overview',
+        'trakt_series_rating': 'rating',
+        'trakt_series_rating_advanced': 'rating_advanced',
+        'trakt_series_in_watchlist': 'in_watchlist'}
 
-  # Episode info
+    # Episode info
     episode_map = {
         'trakt_ep_name': 'episode_name',
         'trakt_ep_first_aired_epoch': 'first_aired',
@@ -96,20 +132,24 @@ class PluginTraktLookup(object):
         'trakt_season': 'season',
         'trakt_episode': 'number',
         'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep.season, ep.number),
-        'trakt_ep_tvdb_id': 'tvdb_id'}
-
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+        'trakt_ep_tvdb_id': 'tvdb_id',
+        'trakt_ep_watched': 'watched',
+        'trakt_ep_rating': 'rating',
+        'trakt_ep_rating_advanced': 'rating_advanced',
+        'trakt_ep_in_watchlist': 'in_watchlist',
+        'trakt_ep_in_collection': 'in_collection'}
+    
+    user_auth = None
 
     def lazy_series_lookup(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
         try:
             series = lookup_series(entry.get('series_name', eval_lazy=False),
-                                   tvdb_id=entry.get('tvdb_id', eval_lazy=False))
+                                   tvdb_id=entry.get('tvdb_id', eval_lazy=False),
+                                   user_auth=self.user_auth)
             entry.update_using_map(self.series_map, series)
         except LookupError as e:
-            log.debug(e.message)
+            log.debug(e)
             entry.unregister_lazy_fields(self.series_map, self.lazy_series_lookup)
             # Also clear episode fields, since episode lookup cannot succeed without series lookup
             entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
@@ -117,7 +157,6 @@ class PluginTraktLookup(object):
 
     def lazy_episode_lookup(self, entry, field):
         try:
-
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
                           'tvdb_id': entry.get('tvdb_id', eval_lazy=False)}
             if entry['series_id_type'] == 'ep':
@@ -127,6 +166,8 @@ class PluginTraktLookup(object):
                 log.error('Trakt only accepts episode sequences in the format of Season/Episode')
             elif entry['series_id_type'] == 'date':
                 log.error('Trakt only accepts episode sequences in the format of Season/Episode')
+            if self.user_auth:
+                lookupargs['user_auth'] = self.user_auth
             episode = lookup_episode(**lookupargs)
             entry.update_using_map(self.episode_map, episode)
         except LookupError as e:
@@ -137,9 +178,14 @@ class PluginTraktLookup(object):
     # Run after series and metainfo series
     @plugin.priority(110)
     def on_task_metainfo(self, task, config):
-        if not config:
-            return
-
+        if isinstance(config, bool):
+            # configured a boolean false, disable plugin
+            if not config:
+                return
+        else:
+            # user trakt login data
+            self.user_auth = config
+        
         for entry in task.entries:
 
             if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False):
