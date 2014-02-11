@@ -118,8 +118,13 @@ class TMDBMovie(TMDBContainer, Base):
             self.language = update_object.languages[0].code #.code or .name ?
         self.original_name = update_object.originaltitle
         self.name = update_object.title
-        if len(update_object.alternate_titles) > 0:
-            self.alternative_name = update_object.alternate_titles[0].title #maybe we could choose alternate title from movie country only
+        try:
+            if len(update_object.alternate_titles) > 0:
+                # maybe we could choose alternate title from movie country only
+                self.alternative_name = update_object.alternate_titles[0].title
+        except UnicodeEncodeError:
+            # Bug in tmdb3 library, see #2437. Just don't set alternate_name when it fails
+            pass
         self.imdb_id = update_object.imdb
         self.url = update_object.homepage
         self.rating = update_object.userrating
