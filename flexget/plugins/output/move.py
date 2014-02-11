@@ -33,7 +33,7 @@ class MovePlugin(object):
             {
                 'type': 'object',
                 'properties': {
-                    'to': {'type': 'string', 'format': 'path'},
+                    'move_to': {'type': 'string', 'format': 'path'},
                     'filename': {'type': 'string'},
                     'unpack_safety': {'type': 'boolean'},
                     'allow_dir': {'type': 'boolean'},
@@ -73,7 +73,7 @@ class MovePlugin(object):
             # DST
             filepath, filename = os.path.split(src)
             # get proper value in order of: entry, config, above split
-            dst_path = entry.get('path', config.get('to', filepath))
+            dst_path = entry.get('move_to', config.get('move_to', filepath))
             dst_path = os.path.expanduser(dst_path)
 
             if entry.get('filename') and entry['filename'] != filename:
