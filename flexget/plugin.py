@@ -90,6 +90,9 @@ class PluginError(Exception):
 
     def __init__(self, value, logger=log, **kwargs):
         super(PluginError, self).__init__()
+        # Value is expected to be a string
+        if not isinstance(value, basestring):
+            value = unicode(value)
         self.value = value
         self.log = logger
         self.kwargs = kwargs
