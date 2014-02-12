@@ -337,7 +337,10 @@ class Manager(object):
             possible = [config]
         else:
             log.debug('Figuring out config load paths')
-            possible.append(os.getcwdu())
+            try:
+                possible.append(os.getcwdu())
+            except OSError:
+                log.debug('current directory invalid, not searching for config there')
             # for virtualenv / dev sandbox
             if hasattr(sys, 'real_prefix'):
                 log.debug('Adding virtualenv path')
