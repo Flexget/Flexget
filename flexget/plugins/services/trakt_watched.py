@@ -54,6 +54,8 @@ class TraktSeenLookup(object):
     
     log = logging.getLogger('trakt_seen_lookup')
     
+    # Run after thetvdb_lookup
+    @plugin.priority(100)
     def on_task_metainfo(self, task, config):
         # check if explicitly disabled (value set to false)
         if config is False:
