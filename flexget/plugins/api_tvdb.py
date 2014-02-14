@@ -297,7 +297,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
             try:
                 series.update()
             except LookupError as e:
-                log.warning('Error while updating from tvdb (%s), using cached data.' % e.message)
+                log.warning('Error while updating from tvdb (%s), using cached data.' % e.args[0])
         else:
             log.debug('Series %s information restored from cache.' % id_str())
     else:
@@ -364,7 +364,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
             try:
                 episode.update()
             except LookupError as e:
-                log.warning('Error while updating from tvdb (%s), using cached data.' % e.message)
+                log.warning('Error while updating from tvdb (%s), using cached data.' % e.args[0])
         else:
             log.debug('Using episode info for %s from cache.' % ep_description)
     else:
