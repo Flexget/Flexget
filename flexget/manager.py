@@ -240,7 +240,7 @@ class Manager(object):
                     signal.signal(signal.SIGTERM, self._handle_sigterm)
                 except ValueError as e:
                     # If flexget is being called from another script, e.g. windows service helper, and we are not the
-                    # main thread, and this error will occur.
+                    # main thread, this error will occur.
                     log.debug('Error registering sigterm handler: %s' % e)
                 self.ipc_server.start()
                 fire_event('manager.daemon.started', self)
@@ -549,7 +549,7 @@ class Manager(object):
             else:
                 print('%s - make sure you have write permissions to directory %s' %
                       (e.message, self.config_base), file=sys.stderr)
-            raise Exception(e.message)
+            raise
 
     def _read_lock(self):
         """
@@ -565,7 +565,10 @@ class Manager(object):
             for key in result:
                 if result[key].isdigit():
                     result[key] = int(result[key])
-            if not pid_exists(result['pid']):
+            result.setdefault('pid', None)
+            if not result['pid']:
+                log.error('Invalid lock file. Make sure FlexGet is not running, then delete it.')
+            elif not pid_exists(result['pid']):
                 return None
             return result
         return None

@@ -35,6 +35,7 @@ class PluginThetvdbLookup(object):
       tvdb_content_rating
       tvdb_genres
       tvdb_network
+      tvdb_overview
       tvdb_banner_url
       tvdb_fanart_url
       tvdb_poster_url
@@ -65,6 +66,7 @@ class PluginThetvdbLookup(object):
         'tvdb_content_rating': 'contentrating',
         'tvdb_genres': 'genre',
         'tvdb_network': 'network',
+        'tvdb_overview': 'overview',
         'tvdb_banner_url': lambda series: series.banner and get_mirror('banner') + series.banner,
         'tvdb_fanart_url': lambda series: series.fanart and get_mirror('banner') + series.fanart,
         'tvdb_poster_url': lambda series: series.poster and get_mirror('banner') + series.poster,
