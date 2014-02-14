@@ -21,7 +21,7 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
 
-SCHEMA_VER = 2
+SCHEMA_VER = 3
 
 log = logging.getLogger('api_tvdb')
 Base = db_schema.versioned_base('api_tvdb', SCHEMA_VER)
@@ -47,6 +47,9 @@ def upgrade(ver, session):
     if ver == 1:
         table_add_column('tvdb_episodes', 'absolute_number', Integer, session)
         ver = 2
+    if ver == 2:
+        table_add_column('tvdb_series', 'overview', Unicode, session)
+        ver = 3
 
     return ver
 
@@ -123,6 +126,7 @@ class TVDBSeries(TVDBContainer, Base):
     airs_dayofweek = Column(Unicode)
     contentrating = Column(Unicode)
     network = Column(Unicode)
+    overview = Column(Unicode)
     imdb_id = Column(String)
     zap2it_id = Column(String)
     banner = Column(String)
