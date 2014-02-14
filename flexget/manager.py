@@ -565,7 +565,10 @@ class Manager(object):
             for key in result:
                 if result[key].isdigit():
                     result[key] = int(result[key])
-            if not pid_exists(result['pid']):
+            result.setdefault('pid', None)
+            if not result['pid']:
+                log.error('Invalid lock file. Make sure FlexGet is not running, then delete it.')
+            elif not pid_exists(result['pid']):
                 return None
             return result
         return None
