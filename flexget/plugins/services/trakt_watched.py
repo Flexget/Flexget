@@ -9,6 +9,7 @@ from sqlalchemy import Column, Integer, DateTime
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.utils import json
+from flexget.plugins.filter.series import Series, set_series_begin
 
 Base = db_schema.versioned_base('trakt_watched', 0)
 
@@ -96,6 +97,7 @@ class TraktSeenUpdate(object):
           username: myusername
           password: mypassword
           api_key: myapikey
+          update_series_begin: yes
     
     """
 
@@ -104,7 +106,8 @@ class TraktSeenUpdate(object):
         'properties': {
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'api_key': {'type': 'string'}
+            'api_key': {'type': 'string'},
+            'update_series_begin': {'type': 'boolean', 'default': False}
         },
         'required': ['username', 'api_key'],
         'additionalProperties': False
@@ -160,15 +163,15 @@ class TraktSeenUpdate(object):
             self.log.warning('No data returned from trakt.')
             return
         # response is a list with series info as elements
-        for show in data:
-            title = show['show']['title']
-            tvdb_id = show['show']['tvdb_id']
+        for rshow in data:
+            title = rshow['show']['title']
+            tvdb_id = rshow['show']['tvdb_id']
             self.log.debug('Checking watched status for "%s" (TVDB: %s)...' % (title, tvdb_id))
             try:
-                lseas = show['seasons'][-1]['season']
-                lepis = show['seasons'][-1]['aired']
-                if show['progress']['percentage'] < 100:
-                    for seas in reversed(show['seasons']):
+                lseas = rshow['seasons'][-1]['season']
+                lepis = rshow['seasons'][-1]['aired']
+                if rshow['progress']['percentage'] < 100:
+                    for seas in reversed(rshow['seasons']):
                         lepis = seas['aired']
                         for epis in reversed(range(seas['aired'])):
                             if seas['episodes'][str(epis+1)]:
@@ -181,19 +184,31 @@ class TraktSeenUpdate(object):
             except Exception as e:
                 self.log.error('Unexpected item structure, perhaps API is changed?')
                 return
-            series = task.session.query(TraktWatched).filter(TraktWatched.tvdb_id == tvdb_id).first()
-            if not series:
+            wshow = task.session.query(TraktWatched).filter(TraktWatched.tvdb_id == tvdb_id).first()
+            if not wshow:
                 self.log.debug('No data stored for "%s", creating record...' % title)
-                series = TraktWatched()
-                series.tvdb_id = tvdb_id
-                task.session.add(series)
-            elif (series.season == lseas and series.episode == lepis):
+                wshow = TraktWatched()
+                wshow.tvdb_id = tvdb_id
+                task.session.add(wshow)
+            elif (wshow.season == lseas and wshow.episode == lepis):
                 self.log.verbose('Last watched episode for "%s" has not changed.' % title)
                 continue
-            series.season = lseas
-            series.episode = lepis
-            series.last_update = datetime.now()
-            self.log.info('Last watched episode set to S%02dE%02d for "%s"' % (lseas, lepis, title))
+            wshow.season = lseas
+            wshow.episode = lepis
+            wshow.last_update = datetime.now()
+            lepid = 'S%02dE%02d' % (lseas, lepis)
+            self.log.info('Last watched episode set to %s for "%s"' % (lepid, title))
+            if config['update_series_begin']:
+                fshow = task.session.query(Series).filter(Series.name == title).first()
+                if not fshow:
+                    fshow = Series()
+                    fshow.name = title
+                    task.session.add(fshow)
+                try:
+                    set_series_begin(fshow, lepid)
+                except ValueError as e:
+                    self.log.error('An error occurred trying to set the first series episode: ' % e)
+                self.log.info('First series episode set too by update_series_begin request.')
 
 
 @event('plugin.register')
