@@ -112,9 +112,9 @@ class TransmissionBase(object):
             from transmissionrpc import TransmissionError
             from transmissionrpc import HTTPHandlerError
         except:
-            raise plugin.PluginError('Transmissionrpc module version 0.6 or higher required.', log)
-        if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 6]:
-            raise plugin.PluginError('Transmissionrpc module version 0.6 or higher required, please upgrade', log)
+            raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required.', log)
+        if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 11]:
+            raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required, please upgrade', log)
         config = self.prepare_config(config)
         if config['enabled']:
             if task.options.test:
