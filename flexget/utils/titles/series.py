@@ -29,7 +29,7 @@ class SeriesParser(TitleParser):
     :expect_id: expect series to be in id format (id_regexps)
     """
 
-    separators = '[!/+,:;|~ -]'
+    separators = '[/ -]'
     roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
     english_numbers = ['one', 'two', 'three', 'four', 'five', 'six', 'seven',
                        'eight', 'nine', 'ten']
