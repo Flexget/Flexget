@@ -632,3 +632,17 @@ class TestSeriesParser(object):
         assert s.valid
         s.parse('Not The Show S01E01')
         assert not s.valid
+
+    def test_long_season(self):
+        """SeriesParser: long season ID Ticket #2197"""
+        s = self.parse(name='FlexGet', data='FlexGet.US.S2013E14.Title.Here.720p.HDTV.AAC5.1.x264-NOGRP')
+        assert s.season == 2013
+        assert s.episode == 14
+        assert s.quality.name == '720p hdtv h264 aac'
+        assert not s.proper, 'detected proper'
+
+        s = self.parse(name='FlexGet', data='FlexGet.Series.2013.14.of.21.Title.Here.720p.HDTV.AAC5.1.x264-NOGRP')
+        assert s.season == 2013
+        assert s.episode == 14
+        assert s.quality.name == '720p hdtv h264 aac'
+        assert not s.proper, 'detected proper'
