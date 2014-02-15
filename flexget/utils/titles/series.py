@@ -29,7 +29,7 @@ class SeriesParser(TitleParser):
     :expect_id: expect series to be in id format (id_regexps)
     """
 
-    separators = '[!/+,:;|~ x-]'
+    separators = '[!/+,:;|~ -]'
     roman_numeral_re = 'X{0,3}(?:IX|XI{0,4}|VI{0,4}|IV|V|I{1,4})'
     english_numbers = ['one', 'two', 'three', 'four', 'five', 'six', 'seven',
                        'eight', 'nine', 'ten']
@@ -53,12 +53,12 @@ class SeriesParser(TitleParser):
     # Make sure none of these are found embedded within a word or other numbers
     date_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
         '(\d{2,4})%s(\d{1,2})%s(\d{1,2})' % (separators, separators),
-        '(\d{1,2})%s(\d{1,2})%s(\d{2,4})' % (separators, separators)]])
+        '(\d{1,2})%s(\d{1,2})%s(\d{2,4})' % (separators, separators),
+        '(\d{4})x(\d{1,2})%s(\d{1,2})' % separators]])
     sequence_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
         '(\d{1,3})(?:v(?P<version>\d))?',
         '(?:pt|part)\s?(\d+|%s)' % roman_numeral_re]])
-    id_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
-        '(\d{4})x(\d+)\W(\d+)']])
+    id_regexps = ReList([])
     unwanted_id_regexps = ReList([
         'seasons?\s?\d{1,2}'])
     clean_regexps = ReList(['\[.*?\]', '\(.*?\)'])
@@ -289,7 +289,8 @@ class SeriesParser(TitleParser):
                 self.id_type = 'date'
                 self.valid = True
                 if not self.special or not self.prefer_specials: return
-            else: log.debug('-> no luck with date_regexps')
+            else:
+                log.debug('-> no luck with date_regexps')
 
         if self.identified_by in ['ep', 'auto'] and not self.valid:
             ep_match = self.parse_episode(data_stripped)
@@ -361,7 +362,8 @@ class SeriesParser(TitleParser):
                     log.debug('found id \'%s\' with regexp \'%s\'', self.id, id_re.pattern)
                     if not self.special or not self.prefer_specials: return
                     else: break
-            else: log.debug('-> no luck with id_regexps')
+            else:
+                log.debug('-> no luck with id_regexps')
 
         # Check sequences last as they contain the broadest matches
         if self.identified_by in ['sequence', 'auto'] and not self.valid:
@@ -446,7 +448,7 @@ class SeriesParser(TitleParser):
                         yearfirst_opts = [self.date_yearfirst]
                     kwargs_list = ({'dayfirst': d, 'yearfirst': y} for d in dayfirst_opts for y in yearfirst_opts)
                     for kwargs in kwargs_list:
-                        possdate = parsedate(match.group(0), **kwargs)
+                        possdate = parsedate(' '.join(match.groups()), **kwargs)
                         # Don't accept dates farther than a day in the future
                         if possdate > datetime.now() + timedelta(days=1):
                             continue

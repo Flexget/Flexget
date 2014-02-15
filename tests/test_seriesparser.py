@@ -88,14 +88,14 @@ class TestSeriesParser(object):
         s.name = 'Something Interesting'
         s.data = 1
 
-    def test_confusing(self):
+    def test_confusing_date(self):
         """SeriesParser: confusing (invalid) numbering scheme"""
         s = self.parse(name='Something', data='Something.2008x12.13-FlexGet')
         assert not s.episode, 'Should not have episode'
         assert not s.season, 'Should not have season'
-        assert s.id_type == 'id'
+        assert s.id_type == 'date'
         assert s.identifier == '2008-12-13', 'invalid id'
-        assert s.valid, 'should not valid'
+        assert s.valid, 'should be valid'
 
     def test_unwanted(self):
         """SeriesParser: unwanted hits (e.g. complete season)"""
