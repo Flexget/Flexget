@@ -1561,7 +1561,8 @@ class TestIDTypes(FlexGetBase):
               - episode
               - date
               - sequence
-              - stupid id
+              - stupid id:
+                  id_regexp: (\\dcat)
             mock:
               - title: episode S03E04
               - title: episode 3x05
@@ -1569,7 +1570,7 @@ class TestIDTypes(FlexGetBase):
               - title: date 4.5.11
               - title: sequence 003
               - title: sequence 4
-              - title: stupid id 2008x3.5
+              - title: stupid id 3cat
     """
 
     def test_id_types(self):

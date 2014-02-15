@@ -88,14 +88,14 @@ class TestSeriesParser(object):
         s.name = 'Something Interesting'
         s.data = 1
 
-    def test_confusing(self):
+    def test_confusing_date(self):
         """SeriesParser: confusing (invalid) numbering scheme"""
         s = self.parse(name='Something', data='Something.2008x12.13-FlexGet')
         assert not s.episode, 'Should not have episode'
         assert not s.season, 'Should not have season'
-        assert s.id_type == 'id'
+        assert s.id_type == 'date'
         assert s.identifier == '2008-12-13', 'invalid id'
-        assert s.valid, 'should not valid'
+        assert s.valid, 'should be valid'
 
     def test_unwanted(self):
         """SeriesParser: unwanted hits (e.g. complete season)"""
@@ -632,3 +632,17 @@ class TestSeriesParser(object):
         assert s.valid
         s.parse('Not The Show S01E01')
         assert not s.valid
+
+    def test_long_season(self):
+        """SeriesParser: long season ID Ticket #2197"""
+        s = self.parse(name='FlexGet', data='FlexGet.US.S2013E14.Title.Here.720p.HDTV.AAC5.1.x264-NOGRP')
+        assert s.season == 2013
+        assert s.episode == 14
+        assert s.quality.name == '720p hdtv h264 aac'
+        assert not s.proper, 'detected proper'
+
+        s = self.parse(name='FlexGet', data='FlexGet.Series.2013.14.of.21.Title.Here.720p.HDTV.AAC5.1.x264-NOGRP')
+        assert s.season == 2013
+        assert s.episode == 14
+        assert s.quality.name == '720p hdtv h264 aac'
+        assert not s.proper, 'detected proper'
