@@ -1,10 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 import logging
-from urllib2 import URLError
 import os
-import sys
 import posixpath
+import socket
+import sys
+from urllib2 import URLError
 
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
@@ -297,7 +298,10 @@ class ApiTmdb(object):
                     else:
                         movie = None
                 elif title:
-                    result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True, year=year))
+                    try:
+                        result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True, year=year))
+                    except socket.timeout:
+                        raise LookupError('Timeout contacting TMDb')
                     if not result and year:
                         result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True))
                     if result:
