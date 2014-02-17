@@ -60,7 +60,7 @@ class ImdbList(object):
                 # Now we do the actual login with appropriate parameters
                 r = sess.post('https://secure.imdb.com/register-imdb/login', data=params, raise_status=False)
             except requests.RequestException as e:
-                raise plugin.PluginError('Unable to login to imdb: %s' % e.message)
+                raise plugin.PluginError('Unable to login to imdb: %s' % e.args[0])
 
             # IMDb redirects us upon a successful login.
             # removed - doesn't happen always?
@@ -73,7 +73,7 @@ class ImdbList(object):
                 try:
                     response = sess.get('http://www.imdb.com/list/watchlist')
                 except requests.RequestException as e:
-                    log.error('Error retrieving user ID from imdb: %s' % e.message)
+                    log.error('Error retrieving user ID from imdb: %s' % e.args[0])
                     user_id = ''
                 else:
                     log.debug('redirected to %s' % response.url)
@@ -101,7 +101,7 @@ class ImdbList(object):
                                          'does not exist.' % config['list'])
             csv_rows = csv.reader(opener.iter_lines())
         except requests.RequestException as e:
-            raise plugin.PluginError('Unable to get imdb list: %s' % e.message)
+            raise plugin.PluginError('Unable to get imdb list: %s' % e.args[0])
 
         # Create an Entry for each movie in the list
         entries = []
