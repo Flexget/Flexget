@@ -288,7 +288,7 @@ class TestSeriesParser(object):
         """SeriesParser: ignoring season packs"""
         #self.parse_invalid(name='The Foo', data='The.Foo.S04.1080p.FlexGet.5.1')
         self.parse_invalid(name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet')
-        self.parse_invalid(name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet', identified_by='ep')
+        self.parse_invalid(name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet')
         self.parse_invalid(name='Something', data='Something S02 Pack 720p WEB-DL-FlexGet')
         self.parse_invalid(name='Something', data='Something S06 AC3-CRAPL3SS')
         self.parse_invalid(name='Something', data='Something SEASON 1 2010 540p BluRay QEBS AAC ANDROID IPAD MP4 FASM')
@@ -312,8 +312,8 @@ class TestSeriesParser(object):
         """SeriesParser: idiotic 101, 102, 103, .. numbering"""
         s = SeriesParser(name='test', identified_by='ep')
         s.parse('Test.706.720p-FlexGet')
-        assert s.season == 7, 'didn''t pick up season'
-        assert s.episode == 6, 'didn''t pick up episode'
+        assert s.season == 7, 'didn\'t pick up season'
+        assert s.episode == 6, 'didn\'t pick up episode'
 
     def test_idiotic_numbering_with_zero(self):
         """SeriesParser: idiotic 0101, 0102, 0103, .. numbering"""
@@ -391,7 +391,7 @@ class TestSeriesParser(object):
         """SeriesParser: test that qualities are not picked as ep"""
         from flexget.utils import qualities
         for quality in qualities.all_components():
-            s = SeriesParser(name='FooBar', identified_by='ep')
+            s = SeriesParser(name='FooBar')
             s.data = 'FooBar %s XviD-FlexGet' % quality.name
             assert_raises(ParseWarning, s.parse)
 
