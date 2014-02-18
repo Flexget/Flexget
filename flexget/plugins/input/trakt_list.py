@@ -73,6 +73,7 @@ class TraktList(object):
         url_params = config.copy()
         if 'movies' in config and 'series' in config:
             raise plugin.PluginError('Cannot use both series list and movies list in the same task.')
+        chk_seen_eps = False
         if 'movies' in config:
             url_params['data_type'] = 'movies'
             url_params['list_type'] = config['movies']
@@ -81,6 +82,7 @@ class TraktList(object):
             url_params['data_type'] = 'shows'
             url_params['list_type'] = config['series']
             map = self.series_map
+            chk_seen_eps = (url_params['list_type'] == 'watched')
         elif 'custom' in config:
             url_params['data_type'] = 'custom'
             # Do some translation from visible list name to prepare for use in url
@@ -155,6 +157,10 @@ class TraktList(object):
                 if config.get('strip_dates'):
                     # Remove year from end of name if present
                     entry['title'] = re.sub('\s+\(\d{4}\)$', '', entry['title'])
+                if chk_seen_eps:
+                    entry['last_seen_season'] = ls = item['seasons'][0]['season']
+                    entry['last_seen_episode'] = le = item['seasons'][0]['episodes'][-1]
+                    entry['last_seen_ep_id'] = 'S%02dE%02d' % (ls, le)
                 entries.append(entry)
 
         return entries
