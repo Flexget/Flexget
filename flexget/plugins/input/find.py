@@ -120,8 +120,11 @@ class InputFind(object):
                     try:
                         e['title'] = fsdecode(os.path.splitext(fs_name)[0])
                     except UnicodeDecodeError as e:
-                        log.warning('Filename `%s` in `%s` encoding broken? %s' %
-                                    (fsdecode(fs_name, replace=True), fsdecode(fs_item[0], replace=True), e))
+                        log.warning('Filename `%s` in `%s` is not decodable by declared filesystem encoding `%s`. '
+                                    'Either your environment does not declare the correct encoding, or this filename '
+                                    'is incorrectly encoded.' %
+                                    (fsdecode(fs_name, replace=True), fsdecode(fs_item[0], replace=True), FS_ENCODING))
+                        continue
                     # If mask fails continue
                     if not match(fsdecode(fs_name)):
                         continue
