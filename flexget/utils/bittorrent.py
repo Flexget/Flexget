@@ -230,20 +230,16 @@ class Torrent(object):
         # Decode strings
         for item in files:
             for field in ('name', 'path'):
-                # The standard mandates UTF-8, but try other common things
-                for encoding in ('utf-8', self.content.get('encoding', None), 'cp1252'):
-                    if encoding:
-                        try:
-                            item[field] = item[field].decode(encoding)
-                            break
-                        except UnicodeError:
-                            continue
-                else:
-                    # Broken beyond anything reasonable
-                    fallback = unicode(item[field], 'utf-8', 'replace').replace(u'\ufffd', '_')
-                    log.warning("%s=%r field in torrent %r is wrongly encoded, falling back to '%s'" % (
-                        field, item[field], self.content['info']['name'], fallback))
-                    item[field] = fallback
+                # These should already be decoded if they were utf-8, if not we can try some other stuff
+                if not isinstance(item[field], unicode):
+                    try:
+                        item[field] = item[field].decode(self.content.get('encoding', 'cp1252'))
+                    except UnicodeError:
+                        # Broken beyond anything reasonable
+                        fallback = item[field].decode('utf-8', 'replace').replace(u'\ufffd', '_')
+                        log.warning('%s=%r field in torrent %r is wrongly encoded, falling back to `%s`' %
+                                    (field, item[field], self.content['info']['name'], fallback))
+                        item[field] = fallback
 
         return files
 
