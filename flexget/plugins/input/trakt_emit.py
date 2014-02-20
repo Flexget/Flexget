@@ -12,7 +12,7 @@ from flexget.utils import json
 log = logging.getLogger('trakt_emit')
 
 
-class TraktLatest(object):
+class TraktEmit(object):
     """
     Creates an entry for the latest or the next item in your watched or collected 
     episodes in your trakt account.
@@ -134,4 +134,4 @@ class TraktLatest(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TraktLatest, 'trakt_emit', api_ver=2)
+    plugin.register(TraktEmit, 'trakt_emit', api_ver=2)
