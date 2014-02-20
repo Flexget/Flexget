@@ -9,7 +9,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import json
 
-log = logging.getLogger('trakt_latest')
+log = logging.getLogger('trakt_emit')
 
 
 class TraktLatest(object):
@@ -19,7 +19,7 @@ class TraktLatest(object):
 
     Syntax:
 
-    trakt_latest:
+    trakt_emit:
       username: <value>
       api_key: <value>
       sequence: <last|next>
@@ -68,7 +68,7 @@ class TraktLatest(object):
     def on_task_input(self, task, config):
         config['context'] = 'watched' if config['context'] == 'watch' else \
             'collected' if config['context'] == 'collect' else config['context']
-        series = []
+        series = {}
         if config.get('list'):
             url = 'http://api.trakt.tv/user/list.json/%s/%s/%s' % \
                 (config['api_key'], config['username'], config['list'])
@@ -76,14 +76,30 @@ class TraktLatest(object):
             for item in data['items']:
                 if item['type'] in ['show', 'season', 'episode'] and \
                     not item['show']['tvdb_id'] in series:
-                    series.append(item['show']['tvdb_id'])
+                    series[item['show']['tvdb_id']] = item['show']['title']
         url = 'http://api.trakt.tv/user/progress/%s.json/%s/%s' % \
             (config['context'], config['api_key'], config['username'])
         if series:
-            url += '/' + ','.join(series)
+            url += '/' + ','.join(series.keys())
         data = self.get_trakt_data(task, config, url)
         log.verbose('Received %d series records from trakt.tv' % len(data))
         entries = []
+        def add_entry(tvdb_id, name, season, episode, imdb_id=None):
+            tvdb_id = str(tvdb_id) # sometimes it's a number
+            entry = Entry()
+            entry['tvdb_id'] = tvdb_id
+            entry['series_name'] = name
+            entry['series_season'] = season
+            entry['series_episode'] = episode
+            entry['series_id_type'] = 'ep'
+            entry['series_id'] = 'S%02dE%02d' % (season, episode)
+            entry['title'] = entry['series_name'] + ' ' + entry['series_id']
+            entry['url'] = 'http://thetvdb.com/?tab=series&id=' + tvdb_id
+            if imdb_id:
+                entry['imdb_id'] = imdb_id
+            entries.append(entry)
+            log.verbose('Entry added: "%s", %s' % (entry['title'], entry['url']))
+            return entry
         for item in data:
             if item['show']['tvdb_id'] == 0: # (sh)it happens with filtered queries
                 continue
@@ -106,21 +122,16 @@ class TraktLatest(object):
                 eps = item['next_episode']['season']
                 epn = item['next_episode']['number']
             if eps and epn:
-                entry = Entry()
-                entry['tvdb_id'] = item['show']['tvdb_id']
-                entry['imdb_id'] = item['show']['imdb_id']
-                entry['series_name'] = item['show']['title']
-                entry['series_season'] = eps
-                entry['series_episode'] = epn
-                entry['series_id_type'] = 'ep'
-                entry['series_id'] = 'S%02dE%02d' % (eps, epn)
-                entry['title'] = entry['series_name'] + ' ' + entry['series_id']
-                entry['url'] = 'http://thetvdb.com/?tab=series&id=%d' % entry['tvdb_id']
-                log.verbose('Entry added: "%s", %s' % (entry['title'], entry['url']))
-                entries.append(entry)
+                entry = add_entry(item['show']['tvdb_id'], item['show']['title'], 
+                                  eps, epn, item['show']['imdb_id'])
+                if entry['tvdb_id'] in series:
+                    del series[entry['tvdb_id']]
+        if config['sequence'] == 'next':
+            for tvdb_id in series.keys():
+                add_entry(tvdb_id, series[tvdb_id], 1, 1)
         return entries
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TraktLatest, 'trakt_latest', api_ver=2)
+    plugin.register(TraktLatest, 'trakt_emit', api_ver=2)
