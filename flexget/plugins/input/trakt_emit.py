@@ -44,7 +44,7 @@ class TraktEmit(object):
         'additionalProperties': False
     }
     
-    def get_trakt_data(self, task, config, url):
+    def get_trakt_data(self, task, config, url, null_data=None):
         log.debug('Opening %s' % url)
         auth = {'username': config['username'],
                 'password': hashlib.sha1(config['password']).hexdigest()}
@@ -58,8 +58,8 @@ class TraktEmit(object):
                 raise plugin.PluginError('Authentication to trakt failed.')
         if not data:
             check_auth()
-            self.log.warning('No data returned from trakt.')
-            return
+            log.warning('No data returned from trakt.')
+            return null_data
         if 'error' in data:
             check_auth()
             raise plugin.PluginError('Error getting trakt list: %s' % data['error'])
@@ -72,7 +72,10 @@ class TraktEmit(object):
         if config.get('list'):
             url = 'http://api.trakt.tv/user/list.json/%s/%s/%s' % \
                 (config['api_key'], config['username'], config['list'])
-            data = self.get_trakt_data(task, config, url)
+            data = self.get_trakt_data(task, config, url, null_data={})
+            if not data.get('items') or len(data['items']) <= 0:
+                log.warning('The list "%s" is empty.' % config['list'])
+                return
             for item in data['items']:
                 if item['type'] in ['show', 'season', 'episode'] and \
                     not item['show']['tvdb_id'] in series:
@@ -81,8 +84,7 @@ class TraktEmit(object):
             (config['context'], config['api_key'], config['username'])
         if series:
             url += '/' + ','.join(series.keys())
-        data = self.get_trakt_data(task, config, url)
-        log.verbose('Received %d series records from trakt.tv' % len(data))
+        data = self.get_trakt_data(task, config, url, null_data=[])
         entries = []
         def add_entry(tvdb_id, name, season, episode, imdb_id=None):
             tvdb_id = str(tvdb_id) # sometimes it's a number
