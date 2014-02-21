@@ -36,8 +36,8 @@ class TraktEmit(object):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'api_key': {'type': 'string'},
-            'sequence': {'enum': ['last', 'next'], 'default': ['next']},
-            'context': {'enum': ['watch', 'watched', 'collect', 'collected'], 'default': ['watched']},
+            'position': {'enum': ['last', 'next'], 'default': ['next']},
+            'context': {'enum': ['watched', 'collected'], 'default': ['watched']},
             'list': {'type': 'string'}
         },
         'required': ['username', 'password', 'api_key'],
@@ -66,8 +66,6 @@ class TraktEmit(object):
         return data
     
     def on_task_input(self, task, config):
-        config['context'] = 'watched' if config['context'] == 'watch' else \
-            'collected' if config['context'] == 'collect' else config['context']
         series = {}
         if config.get('list'):
             url = 'http://api.trakt.tv/user/list.json/%s/%s/%s' % \
@@ -106,7 +104,7 @@ class TraktEmit(object):
             if item['show']['tvdb_id'] == 0: # (sh)it happens with filtered queries
                 continue
             eps = epn = 0
-            if config['sequence'] == 'last':
+            if config['position'] == 'last':
                 for seas in reversed(item['seasons']):
                     eps = seas['season']
                     epn = seas['aired']
@@ -128,7 +126,7 @@ class TraktEmit(object):
                                   eps, epn, item['show']['imdb_id'])
                 if entry['tvdb_id'] in series:
                     del series[entry['tvdb_id']]
-        if config['sequence'] == 'next':
+        if config['position'] == 'next':
             for tvdb_id in series.keys():
                 add_entry(tvdb_id, series[tvdb_id], 1, 1)
         return entries
