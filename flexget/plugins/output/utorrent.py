@@ -89,14 +89,18 @@ class PluginUtorrent(object):
                               'Adding to default download directory instead.')
                     path = ''
 
+            if task.options.test:
+                log.info('Would add `%s` to utorrent' % entry['title'])
+                continue
+
             # Add torrent
-            data = {"action": "add-url", "s": entry['url'], "token": token, "download_dir": folder, "path": path}
+            data = {'action': 'add-url', 's': entry['url'], 'token': token, 'download_dir': folder, 'path': path}
             result = session.get(url, params=data, auth=auth)
             if 'build' in result.json():
-                log.info("Added `%s` to utorrent" % entry['url'])
-                log.info("in folder %s " % folder + path)
+                log.info('Added `%s` to utorrent' % entry['url'])
+                log.info('in folder %s ' % folder + path)
             else:
-                entry.fail("Fail to add '%s' to utorrent" % entry['url'])
+                entry.fail('Fail to add `%s` to utorrent' % entry['url'])
 
 
 @event('plugin.register')
