@@ -106,4 +106,4 @@ class TraktWatched(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(TraktWatched, 'trakt_watched', api_ver=2)
+    plugin.register(TraktWatched, 'trakt_watched_lookup', api_ver=2)
