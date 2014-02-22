@@ -87,17 +87,14 @@ class TraktWatched(object):
             if not (entry.get('series_name') and entry.get('series_season') and entry.get('series_episode')):
                 continue
             entry['trakt_watched'] = False
-            series = None
-            try:
+            if 'tvdb_id' in entry and entry['tvdb_id'] in index:
                 series = data[index[entry['tvdb_id']]]
-            except:
-                try:
-                    series = data[index[entry['imdb_id']]]
-                except:
-                    try:
-                        series = data[index[entry['series_name']]]
-                    except:
-                        continue
+            elif 'imdb_id' in entry and entry['imdb_id'] in index:
+                series = data[index[entry['imdb_id']]]
+            elif 'series_name' in entry and entry['series_name'] in index:
+                series = data[index[entry['series_name']]]
+            else:
+                continue
             for s in series['seasons']:
                 if s['season'] == entry['series_season']:
                     entry['trakt_watched'] = entry['series_episode'] in s['episodes']
