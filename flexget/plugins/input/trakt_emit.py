@@ -22,7 +22,7 @@ class TraktEmit(object):
     trakt_emit:
       username: <value>
       api_key: <value>
-      sequence: <last|next>
+      position: <last|next>
       context: <collect|collected|watch|watched>
       list: <value>
 
