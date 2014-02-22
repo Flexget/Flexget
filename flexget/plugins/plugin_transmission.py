@@ -156,7 +156,7 @@ class PluginTransmissionInput(TransmissionBase):
         if 'username' in config and 'password' in config:
             self.client.http_handler.set_authentication(self.client.url, config['username'], config['password'])
 
-        for torrent in self.client.info().values():
+        for torrent in self.client.get_torrents():
             downloaded, bigfella = self.torrent_info(torrent)
             if not config['onlycomplete'] or (downloaded and torrent.status == 'stopped'):
                 entry = Entry(title=torrent.name,
@@ -394,7 +394,7 @@ class PluginTransmissionClean(TransmissionBase):
         nrat = float(config['min_ratio']) if 'min_ratio' in config else None
         nfor = parse_timedelta(config['finished_for']) if 'finished_for' in config else None
         remove_ids = []
-        for torrent in self.client.info().values():
+        for torrent in self.client.get_torrents():
             log.verbose('Torrent "%s": status: "%s" - ratio: %s - date done: %s' % 
                         (torrent.name, torrent.status, torrent.ratio, torrent.date_done))
             downloaded, dummy = self.torrent_info(torrent)
@@ -405,7 +405,7 @@ class PluginTransmissionClean(TransmissionBase):
                 log.info('Removing finished torrent `%s` from transmission' % torrent.name)
                 remove_ids.append(torrent.id)
         if remove_ids:
-            self.client.remove(remove_ids)
+            self.client.remove_torrent(remove_ids)
 
 
 @event('plugin.register')
