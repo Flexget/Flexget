@@ -27,7 +27,7 @@ class TraktWatched(object):
           recursive: yes
         metainfo_series: yes
         thetvdb_lookup: yes
-        trakt_watched:
+        trakt_watched_lookup:
           username: xxx
           password: xxx
           api_key: xxx
@@ -65,10 +65,12 @@ class TraktWatched(object):
             data = task.requests.get(url, data=json.dumps(auth)).json()
         except RequestException as e:
             raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
+
         def check_auth():
             if task.requests.post('http://api.trakt.tv/account/test/' + config['api_key'],
-                data=json.dumps(auth), raise_status=False).status_code != 200:
+                                  data=json.dumps(auth), raise_status=False).status_code != 200:
                 raise plugin.PluginError('Authentication to trakt failed.')
+
         if not data:
             check_auth()
             self.log.warning('No data returned from trakt.')
