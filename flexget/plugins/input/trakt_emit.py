@@ -80,70 +80,75 @@ class TraktEmit(object):
         return data
 
     def on_task_input(self, task, config):
-        series = {}
+        listed_series = {}
         if config.get('list'):
-            url = 'http://api.trakt.tv/user/list.json/%s/%s/%s' % \
-                (config['api_key'], config['username'], make_list_slug(config['list']))
+            url = ('http://api.trakt.tv/user/list.json/%s/%s/%s' %
+                   (config['api_key'], config['username'], make_list_slug(config['list'])))
             data = self.get_trakt_data(task, config, url, null_data={})
             if not data.get('items') or len(data['items']) <= 0:
                 log.warning('The list "%s" is empty.' % config['list'])
                 return
             for item in data['items']:
-                if item['type'] in ['show', 'season', 'episode'] and \
-                    not item['show']['tvdb_id'] in series:
-                    series[item['show']['tvdb_id']] = item['show']['title']
-        url = 'http://api.trakt.tv/user/progress/%s.json/%s/%s' % \
-            (config['context'], config['api_key'], config['username'])
-        if series:
-            url += '/' + ','.join(series.keys())
+                if item['type'] == 'show':
+                    tvdb_id = int(item['show']['tvdb_id'])
+                    listed_series[tvdb_id] = item['show']['title']
+        url = ('http://api.trakt.tv/user/progress/%s.json/%s/%s' %
+               (config['context'], config['api_key'], config['username']))
+        if listed_series:
+            url += '/' + ','.join(unicode(s) for s in listed_series)
         data = self.get_trakt_data(task, config, url, null_data=[])
         entries = []
-        def add_entry(tvdb_id, name, season, episode, imdb_id=None):
-            tvdb_id = str(tvdb_id) # sometimes it's a number
-            entry = Entry()
-            entry['tvdb_id'] = tvdb_id
-            entry['series_name'] = name
-            entry['series_season'] = season
-            entry['series_episode'] = episode
-            entry['series_id_type'] = 'ep'
-            entry['series_id'] = 'S%02dE%02d' % (season, episode)
-            entry['title'] = entry['series_name'] + ' ' + entry['series_id']
-            entry['url'] = 'http://thetvdb.com/?tab=series&id=' + tvdb_id
-            if imdb_id:
-                entry['imdb_id'] = imdb_id
-            entries.append(entry)
-            log.verbose('Entry added: "%s", %s' % (entry['title'], entry['url']))
-            return entry
+
         for item in data:
-            if item['show']['tvdb_id'] == 0: # (sh)it happens with filtered queries
+            if item['show']['tvdb_id'] == 0:  # (sh)it happens with filtered queries
                 continue
-            eps = epn = 0
-            if config['position'] == 'last':
-                for seas in reversed(item['seasons']):
-                    eps = seas['season']
-                    epn = seas['aired']
-                    if seas['percentage'] >= 100:
-                        break
-                    elif seas['percentage'] > 0:
-                        for i in reversed(range(seas['aired'])):
-                            if seas['episodes'][str(epn)]:
-                                break
-                            epn -= 1
-                        else:
-                            continue
-                        break
-            elif item.get('next_episode'):
+            eps, epn = None, None
+            if config['position'] == 'next' and item.get('next_episode'):
+                # If the next episode is already in the trakt database, we'll get it here
                 eps = item['next_episode']['season']
                 epn = item['next_episode']['number']
+            else:
+                # If we need last ep, or next_episode was not provided, search for last ep
+                for seas in reversed(item['seasons']):
+                    # Find the first season with collected/watched episodes
+                    if seas['completed'] > 0:
+                        eps = seas['season']
+                        # Pick the highest collected/watched episode
+                        epn = max(int(num) for (num, seen) in seas['episodes'].iteritems() if seen)
+                        # If we are in next episode mode, we have to increment this number
+                        if config['position'] == 'next':
+                            if seas['percentage'] >= 100:
+                                # If there are more episodes to air this season, next_episode handled it above
+                                eps += 1
+                                epn = 1
+                            else:
+                                epn += 1
+                        break
             if eps and epn:
-                entry = add_entry(item['show']['tvdb_id'], item['show']['title'],
-                                  eps, epn, item['show']['imdb_id'])
-                if entry['tvdb_id'] in series:
-                    del series[entry['tvdb_id']]
+                entry = self.make_entry(item['show']['tvdb_id'], item['show']['title'], eps, epn,
+                                        item['show']['imdb_id'])
+                entries.append(entry)
+                if entry['tvdb_id'] in listed_series:
+                    del listed_series[entry['tvdb_id']]
+        # If we were given an explicit list in next mode, fill in any missing series with S01E01 entries
         if config['position'] == 'next':
-            for tvdb_id in series.keys():
-                add_entry(tvdb_id, series[tvdb_id], 1, 1)
+            for tvdb_id in listed_series:
+                entries.append(self.make_entry(tvdb_id, listed_series[tvdb_id], 1, 1))
         return entries
+
+    def make_entry(self, tvdb_id, name, season, episode, imdb_id=None):
+        entry = Entry()
+        entry['tvdb_id'] = int(tvdb_id)
+        entry['series_name'] = name
+        entry['series_season'] = season
+        entry['series_episode'] = episode
+        entry['series_id_type'] = 'ep'
+        entry['series_id'] = 'S%02dE%02d' % (season, episode)
+        entry['title'] = entry['series_name'] + ' ' + entry['series_id']
+        entry['url'] = 'http://thetvdb.com/?tab=series&id=%s' % tvdb_id
+        if imdb_id:
+            entry['imdb_id'] = imdb_id
+        return entry
 
 
 @event('plugin.register')
