@@ -76,7 +76,7 @@ class TraktList(object):
         'title': 'title',
         'url': 'url',
         'imdb_id': 'imdb_id',
-        'tvdb_id': 'tvdb_id',
+        'tvdb_id': lambda x: int(x['tvdb_id']),
         'tvrage_id': 'tvrage_id'}
 
     @cached('trakt_list', persist='2 hours')
