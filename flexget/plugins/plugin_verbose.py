@@ -15,8 +15,9 @@ class Verbose(object):
     Verbose entry accept, reject and failure
     """
 
-    @plugin.priority(-255)
-    def on_task_input(self, task, config):
+    # Run first thing after input phase
+    @plugin.priority(255)
+    def on_task_metainfo(self, task, config):
         if task.options.silent:
             return
         for entry in task.all_entries:
