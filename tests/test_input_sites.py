@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
 from nose.plugins.attrib import attr
-from nose.plugins.skip import SkipTest
 
 from tests import FlexGetBase
 
@@ -18,6 +17,9 @@ class TestInputSites(FlexGetBase):
             apple_trailers:
               quality: 480p
               genres: ['Action and Adventure']
+          test_apple_trailers_simple:
+            apple_trailers: 720p
+
     """
 
     @attr(online=True)
@@ -33,4 +35,9 @@ class TestInputSites(FlexGetBase):
     @attr(online=True)
     def test_apple_trailers(self):
         self.execute_task('test_apple_trailers')
+        assert self.task.entries, 'no entries created / site may be down'
+
+    @attr(online=True)
+    def test_apple_trailers_simple(self):
+        self.execute_task('test_apple_trailers_simple')
         assert self.task.entries, 'no entries created / site may be down'
