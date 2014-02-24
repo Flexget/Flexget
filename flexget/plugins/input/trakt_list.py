@@ -145,11 +145,11 @@ class TraktList(object):
             entry = Entry()
             if url_params['data_type'] == 'custom':
                 if 'rating' in item:
-                    entry['in_collection'] = item['in_collection']
-                    entry['in_watchlist'] = item['in_watchlist']
-                    entry['rating'] = item['rating']
-                    entry['rating_advanced'] = item['rating_advanced']
-                    entry['watched'] = item['watched']
+                    entry['trakt_in_collection'] = item['in_collection']
+                    entry['trakt_in_watchlist'] = item['in_watchlist']
+                    entry['trakt_rating'] = item['rating']
+                    entry['trakt_rating_advanced'] = item['rating_advanced']
+                    entry['trakt_watched'] = item['watched']
                 if item['type'] == 'movie':
                     map = self.movie_map
                     item = item['movie']
