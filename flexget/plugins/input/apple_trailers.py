@@ -63,7 +63,7 @@ class AppleTrailers(InputRSS):
                 },
                 'additionalProperties': False
             },
-            {'title': 'justquality', 'type': 'string', 'format': 'quality_requirements'}
+            {'title': 'justquality', 'type': 'string', 'enum': qualities}
             ]
 
     }
