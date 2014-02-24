@@ -15,7 +15,9 @@ class TestInputSites(FlexGetBase):
           test_sceper:
             sceper: http://sceper.ws/category/movies/movies-dvd-rip
           test_apple_trailers:
-              apple_trailers: 480p
+            apple_trailers:
+              quality: 480p
+              genres: ['Action and Adventure']
     """
 
     @attr(online=True)
@@ -30,6 +32,5 @@ class TestInputSites(FlexGetBase):
 
     @attr(online=True)
     def test_apple_trailers(self):
-        raise SkipTest('apple_trailers plugin is currently broken')
         self.execute_task('test_apple_trailers')
         assert self.task.entries, 'no entries created / site may be down'
