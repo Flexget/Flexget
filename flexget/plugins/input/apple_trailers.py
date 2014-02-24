@@ -1,7 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import urlparse
-import warnings
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -20,7 +18,7 @@ log = logging.getLogger('apple_trailers')
 class AppleTrailers(InputRSS):
     """
         Adds support for Apple.com movie trailers.
-        
+
         Configuration:
         quality: Set the desired resolution - 480p or 720p. default '720p'
         genres:  List of genres used to filter the entries. If set, the
@@ -32,7 +30,12 @@ class AppleTrailers(InputRSS):
         apple_trailers:
           quality: 720p
           genres: ['Action and Adventure']
-        
+
+        Alternatively, a simpler configuration format can be used. This uses
+        the default genre filter, all:
+
+        apple_trailers: 720p
+
         This plugin adds the following fields to the entry:
           movie_name, movie_year, genres, apple_trailers_name, movie_studio
         movie_name: Name of the movie
@@ -47,16 +50,22 @@ class AppleTrailers(InputRSS):
     qualities = ['480p', '720p']
 
     schema = {
-        'type': 'object',
-        'properties': {
-            'quality': {
-                'type': 'string',
-                'enum': qualities,
-                'default': '720p'
+        'oneOf': [
+            {
+                'type': 'object',
+                'properties': {
+                    'quality': {
+                        'type': 'string',
+                        'enum': qualities,
+                        'default': '720p'
+                    },
+                    'genres': {'type': 'array', 'items': {'type': 'string'}}
+                },
+                'additionalProperties': False
             },
-            'genres': {'type': 'array', 'items': {'type': 'string'}}
-        },
-        'additionalProperties': False
+            {'title': 'justquality', 'type': 'string', 'format': 'quality_requirements'}
+            ]
+
     }
 
     # Run before headers plugin
@@ -90,7 +99,7 @@ class AppleTrailers(InputRSS):
                 soup = get_soup(page.text)
             except RequestException as err:
                 log.warning("RequestsException when opening playlist page: %s" % err)
-            
+
             genres = set()
             genre_head = soup.find(name='dt', text='Genre')
             if not genre_head:
@@ -100,12 +109,17 @@ class AppleTrailers(InputRSS):
                     continue
                 genres.add(genre_name.contents[0].string)
                 log.debug('genre found: %s' % genre_name.contents[0].string)
+
+            #Turn simple config into full config
+            if isinstance(config, basestring):
+                config = {'quality': config}
+
             if config.get('genres'):
                 config_genres = set(config.get('genres'))
                 good_genres = set.intersection(config_genres, genres)
                 if not good_genres:
                     continue
-            
+
             film_detail = soup.find(class_='film-detail')
             release_year = ''
             studio = ''
