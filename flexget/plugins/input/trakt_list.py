@@ -14,6 +14,18 @@ from flexget.utils.cached_input import cached
 log = logging.getLogger('trakt_list')
 
 
+def make_list_slug(name):
+    """Return the slug for use in url for given list name."""
+    slug = name.lower()
+    # These characters are just stripped in the url
+    for char in '!@#$%^*()[]{}/=?+\\|-_':
+        slug = slug.replace(char, '')
+    # These characters get replaced
+    slug = slug.replace('&', 'and')
+    slug = slug.replace(' ', '-')
+    return slug
+
+
 class TraktList(object):
     """Creates an entry for each item in your trakt list.
 
@@ -83,15 +95,7 @@ class TraktList(object):
             map = self.series_map
         elif 'custom' in config:
             url_params['data_type'] = 'custom'
-            # Do some translation from visible list name to prepare for use in url
-            list_name = config['custom'].lower()
-            # These characters are just stripped in the url
-            for char in '!@#$%^*()[]{}/=?+\\|-_':
-                list_name = list_name.replace(char, '')
-            # These characters get replaced
-            list_name = list_name.replace('&', 'and')
-            list_name = list_name.replace(' ', '-')
-            url_params['list_type'] = list_name
+            url_params['list_type'] = make_list_slug(config['custom'])
             # Map type is per item in custom lists
         else:
             raise plugin.PluginError('Must define movie or series lists to retrieve from trakt.')
