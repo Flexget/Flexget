@@ -28,6 +28,7 @@ class CreateSeriesConfig(object):
     schema = {
         'type': 'object',
         'properties': {
+            'set_fields': {'type': 'array', 'items': {'enum': ['begin', 'quality', 'specials']}},
             'filename': {'type': 'string'}
         },
         'required': ['filename'],
@@ -41,19 +42,21 @@ class CreateSeriesConfig(object):
             if not entry.get('series_name') or entry['series_name'] in chk:
                 continue
             # root
-            props = {}
-            if entry.get('series_id'):
-                props['begin'] = entry['series_id']
-            if entry.get('quality'):
-                props['quality'] = entry['quality']
+            sroot = {}
+            if 'begin' in config.get('set_fields', []) and entry.get('series_id'):
+                sroot['begin'] = entry['series_id']
+            if 'quality' in config.get('set_fields', []) and entry.get('quality'):
+                sroot['quality'] = entry['quality']
+            if 'specials' in config.get('set_fields', []): 
+                sroot['specials'] = entry['specials']
             # "set" node
-            eset = {}
+            sset = {}
             if entry.get('tvdb_id'):
-                eset['tvdb_id'] = int(entry['tvdb_id'])
+                sset['tvdb_id'] = int(entry['tvdb_id'])
             # path? specials? anything else?
-            props['set'] = eset
+            sroot['set'] = sset
             # done
-            outdata['series'].append({entry['series_name']: props})
+            outdata['series'].append({entry['series_name']: sroot})
             chk.append(entry['series_name'])
         if chk:
             with open(config['filename'], 'w') as outfile:
