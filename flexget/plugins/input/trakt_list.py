@@ -109,7 +109,7 @@ class TraktList(object):
         else:
             url += 'library/%(data_type)s/%(list_type)s.json/%(api_key)s/%(username)s'
         url = url % url_params
-
+        
         if 'password' in config:
             auth = {'username': config['username'],
                     'password': hashlib.sha1(config['password']).hexdigest()}
@@ -146,14 +146,20 @@ class TraktList(object):
                 raise plugin.PluginError('Faulty custom items in response: %s' % data['items'])
             data = data['items']
         for item in data:
+            entry = Entry()
             if url_params['data_type'] == 'custom':
+                if 'rating' in item:
+                    entry['trakt_in_collection'] = item['in_collection']
+                    entry['trakt_in_watchlist'] = item['in_watchlist']
+                    entry['trakt_rating'] = item['rating']
+                    entry['trakt_rating_advanced'] = item['rating_advanced']
+                    entry['trakt_watched'] = item['watched']
                 if item['type'] == 'movie':
                     map = self.movie_map
                     item = item['movie']
                 else:
                     map = self.series_map
                     item = item['show']
-            entry = Entry()
             entry.update_using_map(map, item)
             if entry.isvalid():
                 if config.get('strip_dates'):
