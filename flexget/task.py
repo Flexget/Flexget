@@ -197,8 +197,27 @@ class Task(object):
 
         self.config_modified = None
 
-        # use reset to init variables when creating
-        self._reset()
+        self.enabled = not self.name.startswith('_')
+        self.session = None
+        self.priority = 65535
+
+        self.requests = requests.Session()
+
+        # List of all entries in the task
+        self._all_entries = EntryContainer()
+
+        self.disabled_phases = []
+
+        # These are just to query what happened in task. Call task.abort to set.
+        self.aborted = False
+        self.abort_reason = None
+        self.silent_abort = False
+
+        self._rerun = False
+
+        # current state
+        self.current_phase = None
+        self.current_plugin = None
 
     @property
     def undecided(self):
@@ -245,32 +264,6 @@ class Task(object):
     @property
     def is_rerun(self):
         return self._rerun_count
-
-    # TODO: can we get rid of this now that Tasks are instantiated on demand?
-    def _reset(self):
-        """Reset task state"""
-        log.debug('resetting %s' % self.name)
-        self.enabled = not self.name.startswith('_')
-        self.session = None
-        self.priority = 65535
-
-        self.requests = requests.Session()
-
-        # List of all entries in the task
-        self._all_entries = EntryContainer()
-
-        self.disabled_phases = []
-
-        # These are just to query what happened in task. Call task.abort to set.
-        self.aborted = False
-        self.abort_reason = None
-        self.silent_abort = False
-
-        self._rerun = False
-
-        # current state
-        self.current_phase = None
-        self.current_plugin = None
 
     def __cmp__(self, other):
         return cmp(self.priority, other.priority)
@@ -477,11 +470,10 @@ class Task(object):
         if self.options.cron:
             self.manager.db_cleanup()
 
-        self._reset()
         log.debug('executing %s' % self.name)
-        if not self.enabled:
-            log.debug('task %s disabled during preparation, not running' % self.name)
-            return
+        # Reset a couple things before execution
+        self._all_entries = EntryContainer()
+        self._rerun = False
 
         # Handle keyword args
         if self.options.learn:
@@ -491,7 +483,7 @@ class Task(object):
         if self.options.disable_phases:
             map(self.disable_phase, self.options.disable_phases)
         if self.options.inject:
-            # If entries are passed for this execution (eg. rerun), disable the input phase
+            # If entries are passed for this execution (eg. inject), disable the input phase
             self.disable_phase('input')
             self.all_entries.extend(self.options.inject)
 
@@ -562,8 +554,6 @@ class Task(object):
         if self._rerun:
             log.info('Rerunning the task in case better resolution can be achieved.')
             self._rerun_count += 1
-            # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in instead of
-            # taking another one) after input and just inject the same entries for the rerun
             self.execute()
 
     def __eq__(self, other):
