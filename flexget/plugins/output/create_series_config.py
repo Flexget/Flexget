@@ -13,16 +13,17 @@ class CreateSeriesConfig(object):
     """
     Create a yaml file with series configuration that can be include in the main 
     config. Each entry with a series_name field became a series setup.
-    Other fields / series config mapping:
-    - tvdb_id
-    - quality
-    - series_id (begin)
+    Field tvdb_id, if found, is included as well.
+    Optional fields: series_id can became the begin option (first episode to 
+    download); quality and specials can be used too.
     
     Example::
     
       create_series_config:
+        set_fields:
+          - begin
+          - quality
         filename: 'C:\Whatever\MyTVShows.yml'
-    
     """
     
     schema = {
@@ -47,16 +48,19 @@ class CreateSeriesConfig(object):
                 sroot['begin'] = entry['series_id']
             if 'quality' in config.get('set_fields', []) and entry.get('quality'):
                 sroot['quality'] = entry['quality']
-            if 'specials' in config.get('set_fields', []): 
+            if 'specials' in config.get('set_fields', []) and 'specials' in entry: 
                 sroot['specials'] = entry['specials']
             # "set" node
             sset = {}
             if entry.get('tvdb_id'):
                 sset['tvdb_id'] = int(entry['tvdb_id'])
-            # path? specials? anything else?
-            sroot['set'] = sset
+            if sset:
+                sroot['set'] = sset
             # done
-            outdata['series'].append({entry['series_name']: sroot})
+            if sroot:
+                outdata['series'].append({entry['series_name']: sroot})
+            else:
+                outdata['series'].append(entry['series_name'])
             chk.append(entry['series_name'])
         if chk:
             with open(config['filename'], 'w') as outfile:
