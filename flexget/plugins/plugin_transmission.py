@@ -398,10 +398,12 @@ class PluginTransmissionClean(TransmissionBase):
             log.verbose('Torrent "%s": status: "%s" - ratio: %s - date done: %s' % 
                         (torrent.name, torrent.status, torrent.ratio, torrent.date_done))
             downloaded, dummy = self.torrent_info(torrent)
-            if downloaded and \
-                ((nrat is None and nfor is None) or \
-                 (nrat and (nrat <= torrent.ratio)) or \
-                 (nfor and ((torrent.date_done + nfor) <= datetime.now()))):
+            if (downloaded and ((nrat is None and nfor is None) or
+                                (nrat and (nrat <= torrent.ratio)) or
+                                (nfor and ((torrent.date_done + nfor) <= datetime.now())))):
+                if task.options.test:
+                    log.info('Would remove finished torrent `%s` from transmission' % torrent.name)
+                    continue
                 log.info('Removing finished torrent `%s` from transmission' % torrent.name)
                 remove_ids.append(torrent.id)
         if remove_ids:
