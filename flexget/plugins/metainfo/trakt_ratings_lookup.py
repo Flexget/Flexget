@@ -109,8 +109,8 @@ class TraktWatched(object):
                 elif entry['title'] in movidx:
                     info = movies[movidx[entry['title']]]
             if info:
-                entry['rating'] = info['rating']
-                entry['rating_advanced'] = info['rating_advanced']
+                entry['trakt_rating'] = info['rating']
+                entry['trakt_rating_advanced'] = info['rating_advanced']
 
 
 @event('plugin.register')
