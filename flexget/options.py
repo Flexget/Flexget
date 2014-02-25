@@ -390,6 +390,8 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
         exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
+        exec_parser.add_argument('--disable-builtins', dest='builtins', action='store_false', default=True,
+                                 help=SUPPRESS)
         # Plugins should respect these flags where appropriate
         exec_parser.add_argument('--retry', action='store_true', dest='retry', default=False, help=SUPPRESS)
         exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=False,
