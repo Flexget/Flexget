@@ -58,10 +58,7 @@ class ConfigureSeries(FilterSeriesBase):
 
     def on_task_start(self, task, config):
         subtask = Task(task.manager, task.name + '/configure_series/from',
-                       config=config['from'], options={'builtins': False})
-        # This bit probably needs rethought. Adds accept_all if nothing acts on filter phase.
-        if not list(subtask.plugins('filter')):
-            subtask.config['accept_all'] = True
+                       config=config['from'], options={'builtins': False, 'auto_accept': True})
         subtask.execute()
         result = subtask.accepted
 

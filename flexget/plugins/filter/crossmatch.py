@@ -47,9 +47,9 @@ class CrossMatch(object):
 
         for index, item in enumerate(config['from']):
             subtask = Task(task.manager, '%s/crossmatch/from/%s' % (task.name, index), item,
-                           options={'builtins': False})
+                           options={'builtins': False, 'auto_accept': True})
             subtask.execute()
-            match_entries.extend(subtask.all_entries)
+            match_entries.extend(subtask.accepted)
 
         # perform action on intersecting entries
         for entry in task.entries:
