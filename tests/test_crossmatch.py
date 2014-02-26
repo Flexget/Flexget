@@ -10,8 +10,8 @@ class TestCrossmatch(FlexGetBase):
             - title: entry 2
             crossmatch:
               from:
-                - mock:
-                  - title: entry 2
+                mock:
+                - title: entry 2
               action: reject
               fields: [title]
     """

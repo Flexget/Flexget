@@ -27,7 +27,7 @@ class CrossMatch(object):
         'properties': {
             'fields': {'type': 'array', 'items': {'type': 'string'}},
             'action': {'enum': ['accept', 'reject']},
-            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins'}}
+            'from': {'$ref': '/schema/plugins'}
         },
         'required': ['fields', 'action', 'from'],
         'additionalProperties': False
@@ -38,18 +38,10 @@ class CrossMatch(object):
         fields = config['fields']
         action = config['action']
 
-        match_entries = []
-
-        # TODO: xxx
-        # we probably want to have common "run and combine inputs" function sometime soon .. this code is in
-        # few places already (discover, inputs, ...)
-        # code written so that this can be done easily ...
-
-        for index, item in enumerate(config['from']):
-            subtask = Task(task.manager, '%s/crossmatch/from/%s' % (task.name, index), item, session=task.session,
-                           options={'builtins': False, 'auto_accept': True})
-            subtask.execute()
-            match_entries.extend(subtask.accepted)
+        subtask = Task(task.manager, task.name + '/crossmatch/from', config['from'], session=task.session,
+                       options={'builtins': False, 'auto_accept': True})
+        subtask.execute()
+        match_entries = list(subtask.accepted)
 
         # perform action on intersecting entries
         for entry in task.entries:
