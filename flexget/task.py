@@ -375,6 +375,8 @@ class Task(object):
                     # add entries returned by input to self.all_entries
                     for e in response:
                         e.task = self
+                        if self.options.auto_accept:
+                            e.accept('task auto-accepted')
                     self.all_entries.extend(response)
             finally:
                 fire_event('task.execute.after_plugin', self, plugin.name)
@@ -486,6 +488,9 @@ class Task(object):
             # If entries are passed for this execution (eg. inject), disable the input phase
             self.disable_phase('input')
             self.all_entries.extend(self.options.inject)
+            if self.options.auto_accept:
+                for entry in self.all_entries:
+                    entry.accept('task auto-accepted')
 
         log.debug('starting session')
         self.session = Session()

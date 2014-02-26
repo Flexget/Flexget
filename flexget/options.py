@@ -389,6 +389,7 @@ class CoreArgumentParser(ArgumentParser):
                                       'maintenance to run, disables stdout and stderr output, reduces logging level')
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
+        exec_parser.add_argument('--auto-accept', action='store_true', help=SUPPRESS)
         exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
         exec_parser.add_argument('--disable-builtins', dest='builtins', action='store_false', default=True,
                                  help=SUPPRESS)
