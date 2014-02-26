@@ -38,8 +38,7 @@ class CrossMatch(object):
         fields = config['fields']
         action = config['action']
 
-        subtask = Task(task.manager, task.name + '/crossmatch/from', config['from'], session=task.session,
-                       options={'builtins': False, 'auto_accept': True})
+        subtask = task.make_subtask(name_ext='/crossmatch/from', config=config['from'])
         subtask.execute()
         match_entries = list(subtask.accepted)
 

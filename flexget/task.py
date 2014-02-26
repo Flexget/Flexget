@@ -168,11 +168,14 @@ class Task(object):
 
     max_reruns = 5
 
-    def __init__(self, manager, name, config=None, options=None, session=None):
+    def __init__(self, manager, name, config=None, options=None, session=None, req_sess=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
         :param dict config: Task configuration.
+        :param options: dict or argparse namespace object with task options
+        :param session: If provided, database changes will be done in given sqlalchemy session
+        :param req_sess: If provided, task requests will be sent using given requests session.
         """
         self.name = unicode(name)
         self.manager = manager
@@ -203,7 +206,7 @@ class Task(object):
         self._session_provided = session is not None
         self.priority = 65535
 
-        self.requests = requests.Session()
+        self.requests = req_sess or requests.Session()
 
         # List of all entries in the task
         self._all_entries = EntryContainer()
@@ -220,6 +223,16 @@ class Task(object):
         # current state
         self.current_phase = None
         self.current_plugin = None
+
+    def make_subtask(self, name_ext, config):
+        """
+        Creates a new task initialized appropriately for running as a subtask within this task.
+
+        :param name_ext: This will be appended to the name of the parent task to create subtask name
+        :param dict config: Configuration for the subtask
+        """
+        return type(self)(self.manager, self.name + name_ext, config, session=self.session, req_sess=self.requests,
+                          options=dict(builtins=False, auto_accept=True))
 
     @property
     def undecided(self):

@@ -79,8 +79,7 @@ class Discover(object):
         :param task: Current task
         :return: List of pseudo entries created by task under `what` configuration
         """
-        subtask = Task(task.manager, task.name + '/discover/what', config['what'], session=task.session,
-                       options=dict(builtins=False, auto_accept=True))
+        subtask = task.make_subtask('/discover/what', config['what'])
         subtask.execute()
         return list(subtask.accepted)
 

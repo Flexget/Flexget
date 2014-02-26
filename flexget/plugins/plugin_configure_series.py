@@ -57,8 +57,7 @@ class ConfigureSeries(FilterSeriesBase):
         }
 
     def on_task_start(self, task, config):
-        subtask = Task(task.manager, task.name + '/configure_series/from', config=config['from'],
-                       options={'builtins': False, 'auto_accept': True}, session=task.session)
+        subtask = task.make_subtask('/configure_series/from', config=config['from'])
         subtask.execute()
         result = subtask.accepted
 
