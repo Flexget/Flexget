@@ -35,7 +35,7 @@ class TestDiscover(FlexGetBase):
             discover:
               ignore_estimations: yes
               what:
-              - mock:
+                mock:
                 - title: Foo
                   search_sort: 1
                 - title: Bar
@@ -48,7 +48,7 @@ class TestDiscover(FlexGetBase):
             discover:
               ignore_estimations: yes
               what:
-              - mock:
+                mock:
                 - title: Foo
               from:
               - test_search: yes
@@ -56,7 +56,7 @@ class TestDiscover(FlexGetBase):
             discover:
               interval: 0 seconds
               what:
-              - mock:
+                mock:
                 - title: Foo
               from:
               - test_search: yes
@@ -75,7 +75,7 @@ class TestDiscover(FlexGetBase):
         assert len(self.task.entries) == 1
 
         # Insert a new entry into the search input
-        self.manager.config['tasks']['test_interval']['discover']['what'][0]['mock'].append({'title': 'Bar'})
+        self.manager.config['tasks']['test_interval']['discover']['what']['mock'].append({'title': 'Bar'})
         self.execute_task('test_interval')
         # First entry should be waiting for interval
         assert len(self.task.entries) == 1
@@ -86,7 +86,7 @@ class TestDiscover(FlexGetBase):
         assert len(self.task.entries) == 0
 
     def test_estimates(self):
-        mock_config = self.manager.config['tasks']['test_estimates']['discover']['what'][0]['mock']
+        mock_config = self.manager.config['tasks']['test_estimates']['discover']['what']['mock']
         # It should not be searched before the release date
         mock_config[0]['est_release'] = datetime.now() + timedelta(days=7)
         self.execute_task('test_estimates')
