@@ -60,6 +60,20 @@ class TestDiscover(FlexGetBase):
                 - title: Foo
               from:
               - test_search: yes
+          test_what_full_task:
+            discover:
+              ignore_estimations: yes
+              what:
+                mock:
+                - title: entry 1
+                - title: entry 2
+                regexp:
+                  reject:
+                    - "2"
+                set:
+                  title: "{{title}} modified"
+              from:
+              - test_search: yes
 
     """
 
@@ -95,3 +109,10 @@ class TestDiscover(FlexGetBase):
         mock_config[0]['est_release'] = datetime.now()
         self.execute_task('test_estimates')
         assert len(self.task.entries) == 1
+
+    def test_what_full_task(self):
+        self.execute_task('test_what_full_task')
+        # Rejected entries should have been filtered
+        assert len(self.task.all_entries) == 1
+        # Modifications by set plugin should apply
+        assert self.task.all_entries[0]['title'] == 'entry 1 modified'
