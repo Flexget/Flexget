@@ -46,7 +46,7 @@ class CrossMatch(object):
         # code written so that this can be done easily ...
 
         for index, item in enumerate(config['from']):
-            subtask = Task(task.manager, '%s/crossmatch/from/%s' % (task.name, index), item,
+            subtask = Task(task.manager, '%s/crossmatch/from/%s' % (task.name, index), item, session=task.session,
                            options={'builtins': False, 'auto_accept': True})
             subtask.execute()
             match_entries.extend(subtask.accepted)

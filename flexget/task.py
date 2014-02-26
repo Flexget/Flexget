@@ -168,7 +168,7 @@ class Task(object):
 
     max_reruns = 5
 
-    def __init__(self, manager, name, config=None, options=None):
+    def __init__(self, manager, name, config=None, options=None, session=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
@@ -198,7 +198,9 @@ class Task(object):
         self.config_modified = None
 
         self.enabled = not self.name.startswith('_')
-        self.session = None
+        self.session = session
+        # We keep track of this, since outer scope will be responsible for comitting/closing if provided
+        self._session_provided = session is not None
         self.priority = 65535
 
         self.requests = requests.Session()
@@ -492,8 +494,9 @@ class Task(object):
                 for entry in self.all_entries:
                     entry.accept('task auto-accepted')
 
-        log.debug('starting session')
-        self.session = Session()
+        if not self._session_provided:
+            log.debug('starting session')
+            self.session = Session()
 
         # Save current config hash and set config_modidied flag
         config_hash = hashlib.md5(str(sorted(self.config.items()))).hexdigest()
@@ -548,12 +551,14 @@ class Task(object):
         else:
             for entry in self.all_entries:
                 entry.complete()
-            log.debug('committing session')
-            self.session.commit()
+            if not self._session_provided:
+                log.debug('committing session')
+                self.session.commit()
             fire_event('task.execute.completed', self)
         finally:
             # this will cause database rollback on exception
-            self.session.close()
+            if not self._session_provided:
+                self.session.close()
 
         # rerun task
         if self._rerun:

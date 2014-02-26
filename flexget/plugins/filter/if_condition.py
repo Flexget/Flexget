@@ -88,7 +88,7 @@ class FilterIf(object):
                     phases = list(plugin.task_phases)
                     phases.remove(phase)
                     # Other plugins were specified to run on this entry
-                    fake_task = Task(task.manager, '%s/if/%s' % (task.name, index), config=action,
+                    fake_task = Task(task.manager, '%s/if/%s' % (task.name, index), config=action, session=task.session,
                                      options=dict(builtins=False, inject=passed_entries, disable_phases=phases))
                     fake_task.execute()
 
