@@ -3,6 +3,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+from flexget.task import Task
 
 log = logging.getLogger('crossmatch')
 
@@ -26,7 +27,7 @@ class CrossMatch(object):
         'properties': {
             'fields': {'type': 'array', 'items': {'type': 'string'}},
             'action': {'enum': ['accept', 'reject']},
-            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}}
+            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins'}}
         },
         'required': ['fields', 'action', 'from'],
         'additionalProperties': False
@@ -43,22 +44,12 @@ class CrossMatch(object):
         # we probably want to have common "run and combine inputs" function sometime soon .. this code is in
         # few places already (discover, inputs, ...)
         # code written so that this can be done easily ...
-        for item in config['from']:
-            for input_name, input_config in item.iteritems():
-                input = plugin.get_plugin_by_name(input_name)
-                if input.api_ver == 1:
-                    raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
-                method = input.phase_handlers['input']
-                try:
-                    result = method(task, input_config)
-                except plugin.PluginError as e:
-                    log.warning('Error during input plugin %s: %s' % (input_name, e))
-                    continue
-                if result:
-                    match_entries.extend(result)
-                else:
-                    log.warning('Input %s did not return anything' % input_name)
-                    continue
+
+        for index, item in enumerate(config['from']):
+            subtask = Task(task.manager, '%s/crossmatch/from/%s' % (task.name, index), item,
+                           options={'builtins': False})
+            subtask.execute()
+            match_entries.extend(subtask.all_entries)
 
         # perform action on intersecting entries
         for entry in task.entries:
