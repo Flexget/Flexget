@@ -156,7 +156,7 @@ class AppleTrailers(InputRSS):
                     log.debug('did not find trailer link tag')
                     continue
                 try:
-                    link = trailers_link['href'].replace('r640s', config.get('quality'))
+                    link = trailers_link['href'].replace('r640s', ''.join(['h',config.get('quality')]))
                 except AttributeError:
                     log.debug('could not find download link')
                     continue
