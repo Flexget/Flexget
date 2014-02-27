@@ -224,15 +224,18 @@ class Task(object):
         self.current_phase = None
         self.current_plugin = None
 
-    def make_subtask(self, name_ext, config):
+    def make_subtask(self, name_ext, config, options=None):
         """
         Creates a new task initialized appropriately for running as a subtask within this task.
 
         :param name_ext: This will be appended to the name of the parent task to create subtask name
         :param dict config: Configuration for the subtask
         """
+        opts = {'builtins': False, 'auto_accept': True}
+        if options:
+            opts.update(options)
         return type(self)(self.manager, self.name + name_ext, config, session=self.session, req_sess=self.requests,
-                          options=dict(builtins=False, auto_accept=True))
+                          options=opts)
 
     @property
     def undecided(self):

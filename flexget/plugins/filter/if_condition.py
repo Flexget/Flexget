@@ -88,9 +88,9 @@ class FilterIf(object):
                     phases = list(plugin.task_phases)
                     phases.remove(phase)
                     # Other plugins were specified to run on this entry
-                    fake_task = Task(task.manager, '%s/if/%s' % (task.name, index), config=action, session=task.session,
-                                     req_sess=task.requests,
-                                     options=dict(builtins=False, inject=passed_entries, disable_phases=phases))
+                    fake_task = task.make_subtask('/if/%s' % index, action,
+                                                  options=dict(inject=passed_entries, disable_phases=phases,
+                                                               auto_accept=False))
                     fake_task.execute()
 
         handle_phase.priority = 80
