@@ -60,6 +60,13 @@ class OutputPushbullet(object):
         device = config["device"]
             
         client_headers["Authorization"] = "Basic %s" % base64.b64encode(apikey)
+        data = {"device_iden": device, "type": "note"}
+        
+        if task.options.test:
+            log.info("Test mode.  Pushbullet configuration:")
+            log.info("    API_KEY: %s" % apikey)
+            log.info("    Type: Note")
+            log.info("    Device: %s" % device)
 
         # Loop through the provided entries
         for entry in task.accepted:
@@ -82,16 +89,14 @@ class OutputPushbullet(object):
                 body = entry["title"]
 
             # Build the request
-            data = {"device_iden": device, "type": "note", "title": title, "body": body}
+            data["title"] = title
+            data["body"] = body
 
             # Check for test mode
             if task.options.test:
                 log.info("Test mode.  Pushbullet notification would be:")
                 log.info("    Title: %s" % title)
                 log.info("    Body: %s" % body)
-                log.info("    API_KEY: %s" % apikey)
-                log.info("    Type: Note")
-                log.info("    Device: %s" % device)
                 
                 # Test mode.  Skip remainder.
                 continue
