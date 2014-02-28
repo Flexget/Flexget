@@ -107,7 +107,7 @@ class OutputPushbullet(object):
             if request_status == 200:
                 log.debug("Pushbullet notification sent")
             elif request_status == 500:
-                log.debug("Pushbullet notification failed, Pushbullet API having issues")
+                log.warning("Pushbullet notification failed, Pushbullet API having issues")
                 #TODO: Implement retrying. API requests 5 seconds between retries.
             elif request_status >= 400:
                 error = json.loads(response.content)['error']
