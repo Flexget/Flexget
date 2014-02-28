@@ -21,7 +21,7 @@ class OutputPushbullet(object):
       pushbullet:
         apikey: <API_KEY>
         device: <DEVICE_IDEN>
-        [title: <MESSAGE_TITLE>] (default: "Download started" -- accepts Jinja2)
+        [title: <MESSAGE_TITLE>] (default: "{{task}} - Download started" -- accepts Jinja2)
         [body: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}" -- accepts Jinja2)
 
     Configuration parameters are also supported from entries (eg. through set).
@@ -41,7 +41,7 @@ class OutputPushbullet(object):
             config = {"enabled": config}
 
         # TODO: don't assume it's a download
-        config.setdefault("title", "{{task}}")
+        config.setdefault("title", "{{task}} - Download started")
         # TODO: use template file
         config.setdefault("body", "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} "
                                      "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "
