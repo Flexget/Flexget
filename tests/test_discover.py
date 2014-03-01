@@ -74,6 +74,16 @@ class TestDiscover(FlexGetBase):
                   title: "{{title}} modified"
               from:
               - test_search: yes
+          test_emit_series:
+            discover:
+              what:
+                emit_series:
+                  from_start: yes
+              from:
+              - test_search: yes
+            series:
+            - My Show:
+                identified_by: ep
 
     """
 
@@ -116,3 +126,7 @@ class TestDiscover(FlexGetBase):
         assert len(self.task.all_entries) == 1
         # Modifications by set plugin should apply
         assert self.task.all_entries[0]['title'] == 'entry 1 modified'
+
+    def test_emit_series(self):
+        self.execute_task('test_emit_series')
+        assert self.task.find_entry(title='My Show S01E01')
