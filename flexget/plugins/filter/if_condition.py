@@ -75,7 +75,7 @@ class FilterIf(object):
                 'accept': Entry.accept,
                 'reject': Entry.reject,
                 'fail': Entry.fail}
-            for index, item in enumerate(config):
+            for item in config:
                 requirement, action = item.items()[0]
                 passed_entries = [e for e in task.entries if self.check_condition(requirement, e)]
                 if isinstance(action, basestring):
@@ -85,13 +85,21 @@ class FilterIf(object):
                     for entry in passed_entries:
                         entry_actions[action](entry, 'Matched requirement: %s' % requirement)
                 else:
-                    phases = list(plugin.task_phases)
-                    phases.remove(phase)
                     # Other plugins were specified to run on this entry
-                    fake_task = task.make_subtask('/if/%s' % index, action,
-                                                  options=dict(inject=passed_entries, disable_phases=phases,
-                                                               auto_accept=False))
-                    fake_task.execute()
+                    fake_task = Task(task.manager, task.name, config=action, options=task.options)
+                    fake_task.session = task.session
+                    # This entry still belongs to our feed, accept/reject etc. will carry through.
+                    fake_task.all_entries[:] = passed_entries
+
+                    methods = {}
+                    for plugin_name, plugin_config in action.iteritems():
+                        p = plugin.get_plugin_by_name(plugin_name)
+                        method = p.phase_handlers.get(phase)
+                        if method:
+                            methods[method] = (fake_task, plugin_config)
+                    # Run the methods in priority order
+                    for method in sorted(methods, reverse=True):
+                        method(*methods[method])
 
         handle_phase.priority = 80
         return handle_phase
