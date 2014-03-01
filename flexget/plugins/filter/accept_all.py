@@ -18,6 +18,10 @@ class FilterAcceptAll(object):
 
     schema = {'type': 'boolean'}
 
+    def on_task_start(self, task, config):
+        # Can also be used to turn off the task auto_accept option from the config
+        task.options.auto_accept = config
+
     def on_task_filter(self, task, config):
         if config:
             for entry in task.entries:
