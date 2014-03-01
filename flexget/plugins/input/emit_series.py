@@ -10,7 +10,7 @@ from flexget.entry import Entry
 log = logging.getLogger('emit_series')
 
 try:
-    from flexget.plugins.filter.series import Series, Episode, Release, get_latest_release
+    from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release
 except ImportError as e:
     log.error(e.message)
     raise plugin.DependencyError(issued_by='emit_series', missing='series')
@@ -70,7 +70,14 @@ class EmitSeries(object):
         if not task.is_rerun:
             self.try_next_season = {}
         entries = []
-        for series in task.session.query(Series).all():
+        for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
+            series = seriestask.series
+            if not series:
+                # TODO: How can this happen?
+                log.debug('Found SeriesTask item without series specified. Cleaning up.')
+                task.session.delete(seriestask)
+                continue
+
             if series.identified_by not in ['ep', 'sequence']:
                 log.verbose('Can only emit ep or sequence based series. `%s` is identified_by %s' %
                             (series.name, series.identified_by or 'auto'))
