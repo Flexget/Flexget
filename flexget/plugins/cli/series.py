@@ -11,7 +11,7 @@ from flexget.utils.tools import console
 try:
     from flexget.plugins.filter.series import (Series, Episode, Release, SeriesTask, forget_series,
                                                forget_series_episode, set_series_begin, normalize_series_name,
-                                               new_eps_after, get_latest_download)
+                                               new_eps_after, get_latest_release)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
@@ -62,7 +62,7 @@ def display_summary(options):
             status = 'N/A'
             age = 'N/A'
             episode_id = 'N/A'
-            latest = get_latest_download(series)
+            latest = get_latest_release(series)
             if latest:
                 if latest.first_seen > datetime.now() - timedelta(days=2):
                     new_ep = '>'
