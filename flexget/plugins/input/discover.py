@@ -6,10 +6,9 @@ import random
 from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 
 from flexget import options, plugin
-from flexget import db_schema
 from flexget.event import event
 from flexget.plugin import get_plugin_by_name, PluginError, PluginWarning
-from flexget.task import Task
+from flexget import db_schema
 from flexget.utils.tools import parse_timedelta, multiply_timedelta
 
 log = logging.getLogger('discover')
@@ -51,7 +50,7 @@ class Discover(object):
 
       discover:
         what:
-          emit_series: yes
+          - emit_series: yes
         from:
           - piratebay
         interval: [1 hours|days|weeks]
@@ -61,7 +60,9 @@ class Discover(object):
     schema = {
         'type': 'object',
         'properties': {
-            'what': {'$ref': '/schema/plugins'},
+            'what': {'type': 'array', 'items': {
+                'allOf': [{'$ref': '/schema/plugins?phase=input'}, {'maxProperties': 1, 'minProperties': 1}]
+            }},
             'from': {'type': 'array', 'items': {
                 'allOf': [{'$ref': '/schema/plugins?group=search'}, {'maxProperties': 1, 'minProperties': 1}]
             }},
@@ -77,11 +78,41 @@ class Discover(object):
         """
         :param config: Discover config
         :param task: Current task
-        :return: List of pseudo entries created by task under `what` configuration
+        :return: List of pseudo entries created by inputs under `what` configuration
         """
-        subtask = task.make_subtask('/discover/what', config['what'])
-        subtask.execute()
-        return list(subtask.accepted)
+        entries = []
+        entry_titles = set()
+        entry_urls = set()
+        # run inputs
+        for item in config['what']:
+            for input_name, input_config in item.iteritems():
+                input = get_plugin_by_name(input_name)
+                if input.api_ver == 1:
+                    raise PluginError('Plugin %s does not support API v2' % input_name)
+                method = input.phase_handlers['input']
+                try:
+                    result = method(task, input_config)
+                except PluginError as e:
+                    log.warning('Error during input plugin %s: %s' % (input_name, e))
+                    continue
+                if not result:
+                    log.warning('Input %s did not return anything' % input_name)
+                    continue
+
+                for entry in result:
+                    urls = ([entry['url']] if entry.get('url') else []) + entry.get('urls', [])
+                    if any(url in entry_urls for url in urls):
+                        log.debug('URL for `%s` already in entry list, skipping.' % entry['title'])
+                        continue
+
+                    if entry['title'] in entry_titles:
+                        log.verbose('Ignored duplicate title `%s`' % entry['title'])    # TODO: should combine?
+                        continue
+
+                    entries.append(entry)
+                    entry_titles.add(entry['title'])
+                    entry_urls.update(urls)
+        return entries
 
     def execute_searches(self, config, entries):
         """
