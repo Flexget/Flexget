@@ -126,8 +126,8 @@ class TestDiscover(FlexGetBase):
     def test_emit_series(self):
         self.execute_task('test_emit_series')
         assert self.task.find_entry(title='My Show S01E01')
+
+    def test_emit_series_backfill(self):
         self.execute_task('test_emit_series_backfill')
-        # assert self.task.find_entry(title='My Show 2 S01E01')
         assert self.task.find_entry(title='My Show 2 S01E02')
-        # assert self.task.find_entry(title='My Show 2 S02E01')
         assert self.task.find_entry(title='My Show 2 S02E02')
