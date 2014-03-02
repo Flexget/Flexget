@@ -12,6 +12,8 @@ class TestEmitSeries(FlexGetBase):
               - Test Series 1
               - Test Series 2:
                   quality: 1080p
+              - Test Series 3
+              - Test Series 4
           test_emit_series_backfill:
             emit_series:
               backfill: yes
@@ -26,6 +28,20 @@ class TestEmitSeries(FlexGetBase):
             series:
             - Test Series 2:
                 allow_backfill: yes
+                identified_by: ep
+            rerun: 0
+          test_emit_series_from_start:
+            emit_series: yes
+            series:
+            - Test Series 3:
+                from_start: yes
+                identified_by: ep
+            rerun: 0
+          test_emit_series_begin:
+            emit_series: yes
+            series:
+            - Test Series 4:
+                begin: S03E03
                 identified_by: ep
             rerun: 0
     """
@@ -55,3 +71,16 @@ class TestEmitSeries(FlexGetBase):
         assert self.task.find_entry(title='Test Series 2 S01E01')
         assert self.task.find_entry(title='Test Series 2 S01E02')
         assert self.task.find_entry(title='Test Series 2 S01E03')
+
+    def test_emit_series_from_start(self):
+        self.inject_series('Test Series 3 S01E03')
+        self.execute_task('test_emit_series_from_start')
+        assert self.task.find_entry(title='Test Series 3 S01E01')
+        assert self.task.find_entry(title='Test Series 3 S01E02')
+        assert self.task.find_entry(title='Test Series 3 S01E04')
+        self.execute_task('test_emit_series_from_start')
+        assert self.task.find_entry(title='Test Series 3 S01E05')
+
+    def test_emit_series_begin(self):
+        self.execute_task('test_emit_series_begin')
+        assert self.task.find_entry(title='Test Series 4 S03E03')
