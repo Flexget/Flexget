@@ -72,21 +72,6 @@ class TestDiscover(FlexGetBase):
             - My Show:
                 identified_by: ep
             rerun: 0
-          test_emit_series_backfill:
-            discover:
-              ignore_estimations: yes
-              what:
-              - mock:
-                - title: My Show 2 S02E01
-              - emit_series:
-                  backfill: yes
-              from:
-              - test_search: yes
-            series:
-            - My Show 2:
-                allow_backfill: yes
-                identified_by: ep
-            rerun: 1
 
     """
 
@@ -127,7 +112,32 @@ class TestDiscover(FlexGetBase):
         self.execute_task('test_emit_series')
         assert self.task.find_entry(title='My Show S01E01')
 
+class TestEmitSeriesInDiscover(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          inject_series:
+            series:
+              - My Show 2
+          test_emit_series_backfill:
+            discover:
+              ignore_estimations: yes
+              what:
+              - emit_series:
+                  backfill: yes
+              from:
+              - test_search: yes
+            series:
+            - My Show 2:
+                allow_backfill: yes
+                identified_by: ep
+            rerun: 0
+    """
+
+    def inject_series(self, release_name):
+        self.execute_task('inject_series', options = {'inject': [Entry(title=release_name, url='')]})
+
     def test_emit_series_backfill(self):
+        self.inject_series('My Show 2 S02E01')
         self.execute_task('test_emit_series_backfill')
-        assert self.task.find_entry(title='My Show 2 S01E02')
+        assert self.task.find_entry(title='My Show 2 S01E01')
         assert self.task.find_entry(title='My Show 2 S02E02')
