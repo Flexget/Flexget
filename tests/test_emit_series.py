@@ -14,6 +14,8 @@ class TestEmitSeries(FlexGetBase):
                   quality: 1080p
               - Test Series 3
               - Test Series 4
+              - Test Series 5
+              - Test Series 6
           test_emit_series_backfill:
             emit_series:
               backfill: yes
@@ -44,6 +46,23 @@ class TestEmitSeries(FlexGetBase):
                 begin: S03E03
                 identified_by: ep
             rerun: 0
+          test_emit_series_begin_and_backfill:
+            emit_series:
+              backfill: yes
+            series:
+            - Test Series 5:
+                begin: S02E02
+                allow_backfill: yes
+            rerun: 0
+          test_emit_series_begin_backfill_and_rerun:
+            emit_series:
+              backfill: yes
+            series:
+            - Test Series 6:
+                begin: S02E02
+                allow_backfill: yes
+            mock_output: yes
+            rerun: 1
     """
 
     def inject_series(self, release_name):
@@ -84,3 +103,13 @@ class TestEmitSeries(FlexGetBase):
     def test_emit_series_begin(self):
         self.execute_task('test_emit_series_begin')
         assert self.task.find_entry(title='Test Series 4 S03E03')
+
+    def test_emit_series_begin_and_backfill(self):
+        self.execute_task('test_emit_series_begin_and_backfill')
+        # with backfill and begin, no backfilling should be done
+        assert self.task.find_entry(title='Test Series 5 S02E02')
+
+    def test_emit_series_begin_backfill_and_rerun(self):
+        self.execute_task('test_emit_series_begin_backfill_and_rerun')
+        # with backfill and begin, no backfilling should be done
+        assert len(self.task.mock_output) == 2 # Should have S02E02 and S02E03
