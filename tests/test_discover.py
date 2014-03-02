@@ -86,7 +86,7 @@ class TestDiscover(FlexGetBase):
             - My Show 2:
                 allow_backfill: yes
                 identified_by: ep
-            rerun: 0
+            rerun: 1
 
     """
 
@@ -127,5 +127,7 @@ class TestDiscover(FlexGetBase):
         self.execute_task('test_emit_series')
         assert self.task.find_entry(title='My Show S01E01')
         self.execute_task('test_emit_series_backfill')
-        assert self.task.find_entry(title='My Show 2 S01E01')
-        assert self.task.find_entry(title='My Show 2 S02E01')
+        # assert self.task.find_entry(title='My Show 2 S01E01')
+        assert self.task.find_entry(title='My Show 2 S01E02')
+        # assert self.task.find_entry(title='My Show 2 S02E01')
+        assert self.task.find_entry(title='My Show 2 S02E02')
