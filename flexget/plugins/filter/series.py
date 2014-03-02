@@ -1166,7 +1166,7 @@ class FilterSeries(FilterSeriesBase):
                 else:
                     log.debug('-' * 20 + ' episode advancement -->')
                     # Grace is number of distinct eps in the task for this series + 2
-                    if self.process_episode_advancement(ep, entries, grace=len(series_entries)+2):
+                    if self.process_episode_advancement(ep, entries, grace=len(series_entries)+2, config=config):
                         continue
 
             # quality
@@ -1281,7 +1281,7 @@ class FilterSeries(FilterSeriesBase):
             log.debug('no quality meets requirements')
         return result
 
-    def process_episode_advancement(self, episode, entries, grace):
+    def process_episode_advancement(self, episode, entries, grace, config):
         """Rejects all episodes that are too old or new (advancement), return True when this happens."""
 
         latest = get_latest_release(episode.series)
@@ -1292,8 +1292,8 @@ class FilterSeries(FilterSeriesBase):
 
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
-            if (episode.season < latest.season or
-                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace))):
+            if (not config.get('allow_backfill') and (episode.season < latest.season or
+                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
