@@ -60,6 +60,18 @@ class TestDiscover(FlexGetBase):
                 - title: Foo
               from:
               - test_search: yes
+          test_emit_series:
+            discover:
+              ignore_estimations: yes
+              what:
+              - emit_series:
+                  from_start: yes
+              from:
+              - test_search: yes
+            series:
+            - My Show:
+                identified_by: ep
+            rerun: 0
 
     """
 
@@ -95,3 +107,7 @@ class TestDiscover(FlexGetBase):
         mock_config[0]['est_release'] = datetime.now()
         self.execute_task('test_estimates')
         assert len(self.task.entries) == 1
+
+    def test_emit_series(self):
+        self.execute_task('test_emit_series')
+        assert self.task.find_entry(title='My Show S01E01')
