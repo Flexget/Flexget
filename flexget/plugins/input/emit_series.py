@@ -95,7 +95,7 @@ class EmitSeries(object):
                 if series.begin and (not latest or latest < series.begin):
                     entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
                 elif latest:
-                    if self.try_next_season.get(series.name):
+                    if self.try_next_season.get(series.name) and season == latest_season:
                         entries.append(self.search_entry(series, season + 1, 1, task))
                     else:
                         start_at_ep = 1
