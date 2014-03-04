@@ -136,6 +136,8 @@ class EmitSeries(object):
         return entries
 
     def on_search_complete(self, entry, task=None, identified_by=None, **kwargs):
+        series = task.session.query(Series).filter(Series.name == entry['series_name']).first()
+        latest = get_latest_release(series)
         episode = task.session.query(Episode).join(Episode.series).\
                 filter(Series.name == entry['series_name']).\
                 filter(Episode.season == entry['series_season']).\
@@ -144,7 +146,7 @@ class EmitSeries(object):
         if entry.accepted or (episode and len(episode.releases) > 0):
             self.try_next_season.pop(entry['series_name'], None)
             task.rerun()
-        else:
+        elif latest.season == entry['series_season']:
             if identified_by != 'ep':
                 # Do not try next season if this is not an 'ep' show
                 return
