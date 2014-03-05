@@ -16,6 +16,8 @@ class TestEmitSeries(FlexGetBase):
               - Test Series 4
               - Test Series 5
               - Test Series 6
+              - Test Series 7
+              - Test Series 8
           test_emit_series_backfill:
             emit_series:
               backfill: yes
@@ -63,6 +65,24 @@ class TestEmitSeries(FlexGetBase):
                 allow_backfill: yes
             mock_output: yes
             rerun: 1
+          test_emit_series_backfill_advancement:
+            emit_series:
+              backfill: yes
+            series:
+            - Test Series 7:
+                identified_by: ep
+                allow_backfill: yes
+            regexp:
+              reject:
+              - .
+          test_emit_series_advancement:
+            emit_series: yes
+            series:
+            - Test Series 8:
+                identified_by: ep
+            regexp:
+              reject:
+              - .
     """
 
     def inject_series(self, release_name):
@@ -113,3 +133,18 @@ class TestEmitSeries(FlexGetBase):
         self.execute_task('test_emit_series_begin_backfill_and_rerun')
         # with backfill and begin, no backfilling should be done
         assert len(self.task.mock_output) == 2 # Should have S02E02 and S02E03
+
+    def test_emit_series_backfill_advancement(self):
+        self.inject_series('Test Series 7 S02E01')
+        self.execute_task('test_emit_series_backfill_advancement')
+        assert self.task._rerun_count == 1
+        assert len(self.task.all_entries) == 2
+        assert self.task.find_entry('rejected', title='Test Series 7 S01E01')
+        assert self.task.find_entry('rejected', title='Test Series 7 S03E01')
+
+    def test_emit_series_advancement(self):
+        self.inject_series('Test Series 8 S01E01')
+        self.execute_task('test_emit_series_advancement')
+        assert self.task._rerun_count == 1
+        assert len(self.task.all_entries) == 1
+        assert self.task.find_entry('rejected', title='Test Series 8 S02E01')

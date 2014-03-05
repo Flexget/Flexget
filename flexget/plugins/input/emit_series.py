@@ -84,12 +84,15 @@ class EmitSeries(object):
                 continue
 
             low_season = 0 if series.identified_by == 'ep' else -1
+
             latest_season = get_latest_release(series)
             if latest_season:
                 latest_season = latest_season.season
             else:
                 latest_season = low_season + 1
+
             for season in xrange(latest_season, low_season, -1):
+                log.debug('Adding episodes for %d' % latest_season)
                 check_downloaded = not config.get('backfill')
                 latest = get_latest_release(series, season=season, downloaded=check_downloaded)
                 if series.begin and (not latest or latest < series.begin):
