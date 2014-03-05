@@ -70,29 +70,29 @@ class TraktSubmit(object):
         # Sort out the data
         found = {'shows': {}, 'movies': {}}
         for entry in task.accepted:
-            if entry.get('series_name'):
+            serie = None
+            if entry.get('tvdb_id'):
+                serie = found['shows'].setdefault(entry['tvdb_id'], 
+                                                  {'tvdb_id': entry['tvdb_id']})
+            elif entry.get('series_name'):
                 serie = found['shows'].setdefault(entry['series_name'].lower(), 
-                                                  {'title': entry['series_name']})
-                if not (serie.get('tvdb_id') or serie.get('imdb_id')):
-                    if entry.get('tvdb_id'):
-                        serie['tvdb_id'] = entry['tvdb_id']
-                    elif entry.get('imdb_id'):
-                        serie['imdb_id'] = entry['imdb_id']
-                if entry.get('series_season') and entry.get('series_episode'):
-                    serie.setdefault('episodes', []).append({'season': entry['series_season'], 
-                                                             'episode': entry['series_episode']})
-                else:
-                    serie['whole'] = True
+                                                  {'title': entry['series_name'].lower()})
             elif entry.get('imdb_id'):
-                found['movies'].setdefault(entry['imdb_id'].lower(), 
+                found['movies'].setdefault(entry['imdb_id'], 
                                            {'imdb_id': entry['imdb_id']})
             elif entry.get('tmdb_id'):
-                found['movies'].setdefault(entry['tmdb_id'].lower(), 
+                found['movies'].setdefault(entry['tmdb_id'], 
                                            {'tmdb_id': entry['tmdb_id']})
             elif entry.get('movie_name') and entry.get('movie_year'):
                 found['movies'].setdefault(entry['movie_name'].lower(), 
                                            {'title': entry['movie_name'], 
                                             'year': entry['movie_year']})
+            if serie:
+                if entry.get('series_season') and entry.get('series_episode'):
+                    serie.setdefault('episodes', []).append({'season': entry['series_season'], 
+                                                             'episode': entry['series_episode']})
+                else:
+                    serie['whole'] = True
         if not (found['shows'] or found['movies']):
             self.log.debug('Nothing to submit to trakt.')
             return
@@ -106,8 +106,6 @@ class TraktSubmit(object):
                 data.update(item)
                 post_params['items'].append(data)
             for item in found['shows'].itervalues():
-                if item.get('imdb_id') or item.get('tvdb_id'):
-                    del item['title']
                 if 'whole' in item:
                     data = {'type': 'show'}
                     data.update(item)
