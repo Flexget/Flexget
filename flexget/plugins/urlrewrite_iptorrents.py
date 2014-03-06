@@ -2,9 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 import re
 import urllib
 import logging
-from cookielib import Cookie, CookieJar
-
-
 
 
 from flexget import plugin
@@ -89,26 +86,6 @@ class UrlRewriteIPTorrents(object):
         'additionalProperties': False
     }
 
-    def makeCookie(self, name, value):
-        return Cookie(
-            version=0, 
-            name=name, 
-            value=value,
-            port=None, 
-            port_specified=False,
-            domain="iptorrents.com", 
-            domain_specified=True, 
-            domain_initial_dot=False,
-            path="/", 
-            path_specified=True,
-            secure=False,
-            expires=None,
-            discard=False,
-            comment=None,
-            comment_url=None,
-            rest=None
-        )
-
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
@@ -140,18 +117,7 @@ class UrlRewriteIPTorrents(object):
         """
         rss_key = config['rss_key']
         
-        
-        
 
-        #set the login cookies
-        cj = CookieJar()
-        cj.set_cookie(self.makeCookie('uid', str(config['uid'])))
-        cj.set_cookie(self.makeCookie('pass', config['password']))
-
-        
-
-        
-        
         if not isinstance(config, dict):
             config = {}
         # sort = SORT.get(config.get('sort_by', 'seeds'))
@@ -176,7 +142,7 @@ class UrlRewriteIPTorrents(object):
                    urllib.quote(query.encode('utf-8')) + '&qf=')
 
 
-            page = requests.get(url, cookies=cj).content
+            page = requests.get(url, cookies={'uid': str(config['uid']), 'pass': config['password']}).content
             soup = get_soup(page)
 
             log.debug('searching with url: %s' % url)
