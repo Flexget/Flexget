@@ -3,6 +3,7 @@ import re
 import urllib
 import logging
 
+
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
@@ -123,7 +124,8 @@ class UrlRewriteIPTorrents(object):
             categories = [categories]
 
         # If there are any text categories, turn them into their id number
-        categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
+        categories = [c if isinstance(c, int) else CATEGORIES[c]
+                      for c in categories]
         filter_url = '&'.join(('l' + str(c) + '=') for c in categories)
 
         entries = set()
@@ -131,11 +133,13 @@ class UrlRewriteIPTorrents(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
 
-            # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
+            # urllib.quote will crash if the unicode string has non ascii
+            # characters, so encode in utf-8 beforehand
             url = ('http://iptorrents.com/t?' + filter_url + '&q=' +
                    urllib.quote(query.encode('utf-8')) + '&qf=')
 
-            page = requests.get(url, cookies={'uid': str(config['uid']), 'pass': config['password']}).content
+            page = requests.get(url, cookies={'uid': str(config['uid']),
+                                'pass': config['password']}).content
             soup = get_soup(page)
 
             log.debug('searching with url: %s' % url)
@@ -150,7 +154,9 @@ class UrlRewriteIPTorrents(object):
                     if h1.contents[0] == 'No Torrents Found!':
                         break
 
-                link = tr.find("a", attrs={'href': re.compile('/details\.php\?id=\d+')})
+                link = tr.find("a", attrs={'href':
+                                           re.compile('/details\.php\?id=\d+')
+                                           })
                 log.debug('link phase: %s' % link.contents[0])
 
                 entry = Entry()
@@ -169,7 +175,8 @@ class UrlRewriteIPTorrents(object):
                 leechers = tr.find_all('td', {'class': 'ac t_leechers'})
                 entry['torrent_seeds'] = int(seeders[0].contents[0])
                 entry['torrent_leeches'] = int(leechers[0].contents[0])
-                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
+                                                            entry['torrent_leeches'])
                 size = tr.find("td", text=re.compile('([\.\d]+) ([GMK]?)B')).contents[0]
 
                 size = re.search('([\.\d]+) ([GMK]?)B', size)
@@ -189,4 +196,5 @@ class UrlRewriteIPTorrents(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteIPTorrents, 'iptorrents', groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(UrlRewriteIPTorrents, 'iptorrents',
+                    groups=['urlrewriter', 'search'], api_ver=2)
