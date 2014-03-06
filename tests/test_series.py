@@ -350,6 +350,13 @@ class TestEpisodeAdvancement(FlexGetBase):
             series:
               - backwards
 
+          test_backwards_4:
+            mock:
+              - {title: 'backwards s01e02'}
+            series:
+              - backwards:
+                  allow_backfill: yes
+
           test_forwards_1:
             mock:
               - {title: 'forwards s01e01'}
@@ -433,6 +440,9 @@ class TestEpisodeAdvancement(FlexGetBase):
         self.execute_task('test_backwards_3')
         assert self.task.find_entry('rejected', title='backwards s01e01'), \
             'backwards s01e01 should have been rejected, in previous season'
+        self.execute_task('test_backwards_4')
+        assert self.task.find_entry('accepted', title='backwards s01e02'), \
+            'backwards s01e01 should have been accepted, allow_backfill enabled'
 
     def test_forwards(self):
         """Series plugin: episode advancement (future)"""

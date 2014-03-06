@@ -437,29 +437,37 @@ def auto_identified_by(series):
     return 'auto'
 
 
-def get_latest_download(series):
+def get_latest_release(series, downloaded=True, season=None):
     """
     :param Series series: SQLAlchemy session
+    :param Downloaded: find only downloaded releases
+    :param Season: season to find newest release for
     :return: Instance of Episode or None if not found.
     """
     session = Session.object_session(series)
-    downloaded = session.query(Episode).join(Episode.releases, Episode.series).\
-        filter(Series.id == series.id).\
-        filter(Release.downloaded == True)
-    if series.identified_by and series.identified_by != 'auto':
-        downloaded = downloaded.filter(Episode.identified_by == series.identified_by)
-    if series.identified_by in ['ep', 'sequence']:
-        latest_download = downloaded.order_by(desc(Episode.season), desc(Episode.number)).first()
-    elif series.identified_by == 'date':
-        latest_download = downloaded.order_by(desc(Episode.identifier)).first()
-    else:
-        latest_download = downloaded.order_by(desc(Episode.first_seen)).first()
+    releases = session.query(Episode).join(Episode.releases, Episode.series).filter(Series.id == series.id)
 
-    if not latest_download:
-        log.debug('get_latest_download returning None, no downloaded episodes found for: %s', series.name)
+    if downloaded:
+        releases = releases.filter(Release.downloaded == True)
+
+    if season is not None:
+        releases = releases.filter(Episode.season == season)
+
+    if series.identified_by and series.identified_by != 'auto':
+        releases = releases.filter(Episode.identified_by == series.identified_by)
+
+    if series.identified_by in ['ep', 'sequence']:
+        latest_release = releases.order_by(desc(Episode.season), desc(Episode.number)).first()
+    elif series.identified_by == 'date':
+        latest_release = releases.order_by(desc(Episode.identifier)).first()
+    else:
+        latest_release = releases.order_by(desc(Episode.first_seen)).first()
+
+    if not latest_release:
+        log.debug('get_latest_release returning None, no downloaded episodes found for: %s', series.name)
         return
 
-    return latest_download
+    return latest_release
 
 
 def new_eps_after(since_ep):
@@ -719,7 +727,8 @@ class FilterSeriesBase(object):
                 'parse_only': {'type': 'boolean'},
                 'special_ids': one_or_more({'type': 'string'}),
                 'prefer_specials': {'type': 'boolean'},
-                'assume_special': {'type': 'boolean'}
+                'assume_special': {'type': 'boolean'},
+                'allow_backfill': {'type': 'boolean'}
             },
             'additionalProperties': False
         }
@@ -1157,7 +1166,7 @@ class FilterSeries(FilterSeriesBase):
                 else:
                     log.debug('-' * 20 + ' episode advancement -->')
                     # Grace is number of distinct eps in the task for this series + 2
-                    if self.process_episode_advancement(ep, entries, grace=len(series_entries)+2):
+                    if self.process_episode_advancement(ep, entries, grace=len(series_entries)+2, config=config):
                         continue
 
             # quality
@@ -1272,10 +1281,10 @@ class FilterSeries(FilterSeriesBase):
             log.debug('no quality meets requirements')
         return result
 
-    def process_episode_advancement(self, episode, entries, grace):
+    def process_episode_advancement(self, episode, entries, grace, config):
         """Rejects all episodes that are too old or new (advancement), return True when this happens."""
 
-        latest = get_latest_download(episode.series)
+        latest = get_latest_release(episode.series)
         if episode.series.begin and episode.series.begin > latest:
             latest = episode.series.begin
         log.debug('latest download: %s' % latest)
@@ -1283,8 +1292,8 @@ class FilterSeries(FilterSeriesBase):
 
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
-            if (episode.season < latest.season or
-                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace))):
+            if (not config.get('allow_backfill') and (episode.season < latest.season or
+                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
