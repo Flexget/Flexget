@@ -138,8 +138,7 @@ class TestEmitSeries(FlexGetBase):
         self.inject_series('Test Series 7 S02E01')
         self.execute_task('test_emit_series_backfill_advancement')
         assert self.task._rerun_count == 1
-        assert len(self.task.all_entries) == 2
-        assert self.task.find_entry('rejected', title='Test Series 7 S01E01')
+        assert len(self.task.all_entries) == 1
         assert self.task.find_entry('rejected', title='Test Series 7 S03E01')
 
     def test_emit_series_advancement(self):

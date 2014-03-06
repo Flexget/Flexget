@@ -91,16 +91,16 @@ class EmitSeries(object):
             else:
                 latest_season = low_season + 1
 
-            for season in xrange(latest_season, low_season, -1):
-                log.debug('Adding episodes for %d' % latest_season)
-                check_downloaded = not config.get('backfill')
-                latest = get_latest_release(series, season=season, downloaded=check_downloaded)
-                if series.begin and (not latest or latest < series.begin):
-                    entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
-                elif latest:
-                    if self.try_next_season.get(series.name) and season == latest_season:
-                        entries.append(self.search_entry(series, season + 1, 1, task))
-                    else:
+            if self.try_next_season.get(series.name):
+                entries.append(self.search_entry(series, latest_season + 1, 1, task))
+            else:
+                for season in xrange(latest_season, low_season, -1):
+                    log.debug('Adding episodes for %d' % latest_season)
+                    check_downloaded = not config.get('backfill')
+                    latest = get_latest_release(series, season=season, downloaded=check_downloaded)
+                    if series.begin and (not latest or latest < series.begin):
+                        entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
+                    elif latest:
                         start_at_ep = 1
                         episodes_this_season = (task.session.query(Episode).
                                                 filter(Episode.series_id == series.id).
@@ -125,16 +125,16 @@ class EmitSeries(object):
                         # If we have already downloaded the latest known episode, try the next episode
                         if latest_ep_this_season.releases:
                             entries.append(self.search_entry(series, season, latest_ep_this_season.number + 1, task))
-                else:
-                    if config.get('from_start') or config.get('backfill'):
-                        entries.append(self.search_entry(series, season, 1, task))
                     else:
-                        log.verbose('Series `%s` has no history. Set begin option, or use CLI `series begin` subcommand '
-                                    'to set first episode to emit' % series.name)
-                        continue
+                        if config.get('from_start') or config.get('backfill'):
+                            entries.append(self.search_entry(series, season, 1, task))
+                        else:
+                            log.verbose('Series `%s` has no history. Set begin option, or use CLI `series begin` subcommand '
+                                        'to set first episode to emit' % series.name)
+                            continue
 
-                if not config.get('backfill'):
-                    break
+                    if not config.get('backfill'):
+                        break
 
         return entries
 
