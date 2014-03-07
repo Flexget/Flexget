@@ -129,8 +129,8 @@ class EmitSeries(object):
                         if config.get('from_start') or config.get('backfill'):
                             entries.append(self.search_entry(series, season, 1, task))
                         else:
-                            log.verbose('Series `%s` has no history. Set begin option, or use CLI `series begin` subcommand '
-                                        'to set first episode to emit' % series.name)
+                            log.verbose('Series `%s` has no history. Set begin option, or use CLI `series begin` '
+                                        'subcommand to set first episode to emit' % series.name)
                             continue
 
                     if not config.get('backfill'):
@@ -141,15 +141,15 @@ class EmitSeries(object):
     def on_search_complete(self, entry, task=None, identified_by=None, **kwargs):
         series = task.session.query(Series).filter(Series.name == entry['series_name']).first()
         latest = get_latest_release(series)
-        episode = task.session.query(Episode).join(Episode.series).\
-                filter(Series.name == entry['series_name']).\
-                filter(Episode.season == entry['series_season']).\
-                filter(Episode.number == entry['series_episode']).\
-                first()
+        episode = (task.session.query(Episode).join(Episode.series).
+                   filter(Series.name == entry['series_name']).
+                   filter(Episode.season == entry['series_season']).
+                   filter(Episode.number == entry['series_episode']).
+                   first())
         if entry.accepted or (episode and len(episode.releases) > 0):
             self.try_next_season.pop(entry['series_name'], None)
             task.rerun()
-        elif latest.season == entry['series_season']:
+        elif latest and latest.season == entry['series_season']:
             if identified_by != 'ep':
                 # Do not try next season if this is not an 'ep' show
                 return
