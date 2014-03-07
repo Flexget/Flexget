@@ -218,6 +218,8 @@ def display_details(name):
     else:
         console(' Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by)
     console(' See option `identified_by` for more information.')
+    if series.begin:
+        console(' Begin episode for this series set to `%s`.' % series.begin.identifier)
     session.close()
 
 
