@@ -131,7 +131,7 @@ class EmitSeries(object):
                         else:
                             log.verbose('Series `%s` has no history. Set begin option, or use CLI `series begin` '
                                         'subcommand to set first episode to emit' % series.name)
-                            continue
+                            break
 
                     if not config.get('backfill'):
                         break
