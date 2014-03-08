@@ -136,7 +136,7 @@ class UrlRewriteIPTorrents(object):
             # urllib.quote will crash if the unicode string has non ascii
             # characters, so encode in utf-8 beforehand
             url = ('http://iptorrents.com/t?' + filter_url + '&q=' +
-                   urllib.quote(query.encode('utf-8')) + '&qf=')
+                   urllib.quote_plus(query.encode('utf-8')) + '&qf=')
 
             page = requests.get(url, cookies={'uid': str(config['uid']),
                                 'pass': config['password']}).content
@@ -145,6 +145,8 @@ class UrlRewriteIPTorrents(object):
             log.debug('searching with url: %s' % url)
 
             tb = soup.find('table', {'class': 'torrents'})
+            if not tb:
+                continue
 
             # list all row of torrents table except first because it is titles
             for tr in tb.findAll('tr')[1:]:
