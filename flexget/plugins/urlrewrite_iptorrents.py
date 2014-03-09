@@ -142,6 +142,9 @@ class UrlRewriteIPTorrents(object):
                                 'pass': config['password']}).content
             soup = get_soup(page)
 
+            if soup.find("title").contents[0] == "IPT":
+                raise UrlRewritingError("Page title unexpected: Could it be the login page?...")
+
             log.debug('searching with url: %s' % url)
 
             tb = soup.find('table', {'class': 'torrents'})
