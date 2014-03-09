@@ -20,7 +20,7 @@ class OutputPushbullet(object):
 
       pushbullet:
         apikey: <API_KEY>
-        device: <DEVICE_IDEN>
+        device: <DEVICE_IDEN> (can also be a list of device idens)
         [title: <MESSAGE_TITLE>] (default: "{{task}} - Download started" -- accepts Jinja2)
         [body: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}" -- accepts Jinja2)
 
@@ -32,6 +32,7 @@ class OutputPushbullet(object):
         config = validator.factory("dict")
         config.accept("text", key="apikey", required=True)
         config.accept("text", key="device", required=True)
+        config.accept("list", key="device").accept("text")
         config.accept("text", key="title", required=False)
         config.accept("text", key="body", required=False)
         return config
@@ -55,12 +56,16 @@ class OutputPushbullet(object):
         # get the parameters
         config = self.prepare_config(config)
 
+        # Support for multiple devices 
+        devices = config["device"]
+        if not isinstance(devices, list):
+            devices = [devices]
+ 
         # Set a bunch of local variables from the config
         apikey = config["apikey"]
         device = config["device"]
             
         client_headers["Authorization"] = "Basic %s" % base64.b64encode(apikey)
-        data = {"device_iden": device, "type": "note"}
         
         if task.options.test:
             log.info("Test mode.  Pushbullet configuration:")
@@ -88,37 +93,37 @@ class OutputPushbullet(object):
                 log.warning("Problem rendering 'body': %s" % e)
                 body = entry["title"]
 
-            # Build the request
-            data["title"] = title
-            data["body"] = body
+            for device in devices:
+                # Build the request
+                data = {"device_iden": device, "type": "note", "title": title, "body": body}
 
-            # Check for test mode
-            if task.options.test:
-                log.info("Test mode.  Pushbullet notification would be:")
-                log.info("    Title: %s" % title)
-                log.info("    Body: %s" % body)
-                
-                # Test mode.  Skip remainder.
-                continue
+                # Check for test mode
+                if task.options.test:
+                    log.info("Test mode.  Pushbullet notification would be:")
+                    log.info("    Title: %s" % title)
+                    log.info("    Body: %s" % body)
+                    
+                    # Test mode.  Skip remainder.
+                    continue
 
 
-            # Make the request
-            response = task.requests.post(pushbullet_url, headers=client_headers, data=data, raise_status=False)
+                # Make the request
+                response = task.requests.post(pushbullet_url, headers=client_headers, data=data, raise_status=False)
 
-            # Check if it succeeded
-            request_status = response.status_code
+                # Check if it succeeded
+                request_status = response.status_code
 
-            # error codes and messages from Pushbullet API
-            if request_status == 200:
-                log.debug("Pushbullet notification sent")
-            elif request_status == 500:
-                log.warning("Pushbullet notification failed, Pushbullet API having issues")
-                #TODO: Implement retrying. API requests 5 seconds between retries.
-            elif request_status >= 400:
-                error = json.loads(response.content)['error']
-                log.error("Pushbullet API error: %s" % error['message'])
-            else:
-                log.error("Unknown error when sending Pushbullet notification")
+                # error codes and messages from Pushbullet API
+                if request_status == 200:
+                    log.debug("Pushbullet notification sent")
+                elif request_status == 500:
+                    log.warning("Pushbullet notification failed, Pushbullet API having issues")
+                    #TODO: Implement retrying. API requests 5 seconds between retries.
+                elif request_status >= 400:
+                    error = json.loads(response.content)['error']
+                    log.error("Pushbullet API error: %s" % error['message'])
+                else:
+                    log.error("Unknown error when sending Pushbullet notification")
 
 
 @event('plugin.register')
