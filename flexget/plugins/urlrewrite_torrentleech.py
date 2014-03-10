@@ -8,9 +8,9 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.plugins.common_authentication import Authentication
 
 log = logging.getLogger('torrentleech')
 
@@ -34,6 +34,7 @@ CATEGORIES = {
     'Episodes HD': 32
 }
 
+URL = 'http://torrentleech.org/'
 
 class UrlRewriteTorrentleech(object):
     """
@@ -71,7 +72,7 @@ class UrlRewriteTorrentleech(object):
         url = entry['url']
         if url.endswith('.torrent'):
             return False
-        if url.startswith('http://torrentleech.org/'):
+        if url.startswith(URL):
             return True
         return False
 
@@ -81,7 +82,7 @@ class UrlRewriteTorrentleech(object):
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
-        if entry['url'].startswith('http://torrentleech.org/torrents/browse/index/query/'):
+        if entry['url'].startswith(URL + 'torrents/browse/index/query/'):
             # use search
             results = self.search(entry)
             if not results:
@@ -99,7 +100,13 @@ class UrlRewriteTorrentleech(object):
         # build the form request:
         data = {'username': config['username'], 'password': config['password'], 'remember_me': 'on', 'submit': 'submit'}
         # POST the login form:
-        login = requests.post('http://torrentleech.org/', data=data)
+        tl = Authentication(username=config['username'], post_url=URL, post_params=data)
+        session = tl.Authenticate()
+
+        if tl.cookies_age > 3600:  # Check every hour if cookies are working (logged in), force login if they're not
+            if config['username'] not in session.get(URL + 'browse'):
+                tl.force_login = True
+                session = tl.Authenticate()
 
         if not isinstance(config, dict):
             config = {}
@@ -117,11 +124,11 @@ class UrlRewriteTorrentleech(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = ('http://torrentleech.org/torrents/browse/index/query/' +
+            url = (URL + 'torrents/browse/index/query/' +
                    urllib.quote(query.encode('utf-8')) + filter_url)
             log.debug('Using %s as torrentleech search url' % url)
 
-            page = requests.get(url, cookies=login.cookies).content
+            page = session.get(url).content
             soup = get_soup(page)
 
             for tr in soup.find_all("tr", ["even", "odd"]):
@@ -137,7 +144,7 @@ class UrlRewriteTorrentleech(object):
                 # parse link and split along /download/12345 and /name.torrent
                 download_url = re.search('(/download/\d+)/(.+\.torrent)', torrent_url)
                 # change link to rss and splice in rss_key
-                torrent_url = 'http://torrentleech.org/rss' + download_url.group(1) + '/' + rss_key + '/' + download_url.group(2)
+                torrent_url = URL + 'rss' + download_url.group(1) + '/' + rss_key + '/' + download_url.group(2)
                 log.debug('RSS-ified download link: %s' % torrent_url)
                 entry['url'] = torrent_url
 
