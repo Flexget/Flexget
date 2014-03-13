@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin
-from flexget import validator
+from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
@@ -144,31 +144,32 @@ class InputWhatCD(object):
             # Options, translate the input to output
             return opts[val]
 
-    # TODO: Do this with a schema property instead
-    def validator(self):
-        """Return config validator."""
-        root = validator.factory('dict')
-        root.accept('text', key='username', required=True)
-        root.accept('text', key='password', required=True)
+    def __init__(self):
+        """Set up the schema"""
 
-        root.accept('text', key='artist')
-        root.accept('text', key='album')
-        root.accept('text', key='year')
-        root.accept('list', key='tags')
-
-        root.accept('choice', key='tag_type').accept_choices(self._opts('tag_type'))
-        root.accept('choice', key='encoding').accept_choices(self._opts('encoding'))
-        root.accept('choice', key='format').accept_choices(self._opts('format'))
-        root.accept('choice', key='media').accept_choices(self._opts('media'))
-        root.accept('choice', key='release_type').accept_choices(self._opts('release_type'))
-        root.accept('choice', key='haslog').accept_choices(self._opts('haslog'))
-        root.accept('choice', key='leech_type').accept_choices(self._opts('leech_type'))
-
-        root.accept('boolean', key="hascue")
-        root.accept('boolean', key="scene")
-        root.accept('boolean', key="vanityhouse")
-
-        return root
+        self.schema = {
+            'type': 'object',
+            'properties': {
+                'username': {'type': 'string'},
+                'password': {'type': 'string'},
+                'artist': {'type': 'string'},
+                'album': {'type': 'string'},
+                'year': {'type': 'string'},
+                'tags': one_or_more({'type': 'string'}),
+                'tag_type': {'type': 'string', 'enum': self._opts('tag_type')},
+                'encoding': {'type': 'string', 'enum': self._opts('encoding')},
+                'format': {'type': 'string', 'enum': self._opts('format')},
+                'media': {'type': 'string', 'enum': self._opts('media')},
+                'release_type': {'type': 'string', 'enum': self._opts('release_type')},
+                'haslog': {'type': 'string', 'enum': self._opts('haslog')},
+                'leech_type': {'type': 'string', 'enum': self._opts('leech_type')},
+                'hascue': {'type': 'boolean'},
+                'scene': {'type': 'boolean'},
+                'vanityhouse': {'type': 'boolean'},
+            },
+            'required': ['username', 'password'],
+            'additionalProperties': False
+        }
 
     def _login(self, config):
         """
