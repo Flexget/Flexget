@@ -5,6 +5,7 @@ from flexget import plugin
 from flexget import validator
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.plugin import PluginError
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import Session
 
@@ -183,16 +184,15 @@ class InputWhatCD(object):
 
         r = self.session.post("https://ssl.what.cd/login.php", data=data, headers={"User-Agent": "Flexget-whatcd plugin"}, allow_redirects=False)
         if r.status_code != 302:
-            return False
+            raise PluginError("Failed to log in to What.cd")
 
         accountinfo = self._request("index")
         if not accountinfo:
-            return False
+            raise PluginError("Failed to get auth keys after logging in")
 
         self.authkey = accountinfo["response"]["authkey"]
         self.passkey = accountinfo["response"]["passkey"]
         log.info("Logged in to What.cd")
-        return True
 
     def _request(self, action, **kwargs):
         """
@@ -214,17 +214,15 @@ class InputWhatCD(object):
 
         r = self.session.get(ajaxpage, params=params, allow_redirects=False)
         if r.status_code != 200:
-            return None
+            raise PluginError("Request to What.cd returned a non-200 status code")
 
         try:
             json_response = r.json()
             if json_response['status'] != "success":
-                log.error("What.cd gave a 'failure' response: '{0}'".format(json_response['error']))
-                return None
+                raise PluginError("What.cd gave a 'failure' response: '{0}'".format(json_response['error']))
             return json_response
         except (ValueError, TypeError) as e:
-            log.error("What.cd returned an invalid response")
-            return None
+            raise PluginError("What.cd returned an invalid response")
 
     @cached('whatcd')
     @plugin.internet(log)
@@ -234,15 +232,12 @@ class InputWhatCD(object):
         self.session = Session()
 
         # Login
-        if not self._login(config):
-            log.error("Failed to log in to What.cd")
-            return
+        self._login(config)
 
         # Perform the query
         # TODO: pagination
         results = self._request("browse", **config)
-        if results is not None:
-            log.debug(results)
+        log.debug(results)
 
         # TODO: Parse results into Entry objects
         #FORMAT = https://what.cd/torrents.php?action=download&id={id}&authkey={authkey}&torrent_pass={passkey}
