@@ -34,8 +34,9 @@ class InputWhatCD(object):
     }
 
     # API parameters
-    # None signifies a raw value entry, a dict means a choice
-    # TODO: Lists for choices with no mapping (encoding, format, media)
+    # None means a raw value entry (no validation)
+    # A dict means a choice with a mapping for the API
+    # A list is just a choice with no mapping
     PARAMS = {
         "taglist": None,
         "artistname": None,
@@ -48,37 +49,17 @@ class InputWhatCD(object):
             "any": 0,
             "all": 1,
         },
-        "encoding": {
-            "192" : "192",
-            "APS (VBR)" : "APS (VBR)",
-            "V2 (VBR)": "V2 (VBR)",
-            "V1 (VBR)": "V1 (VBR)",
-            "256": "256",
-            "APX (VBR)": "APX (VBR)",
-            "V0 (VBR)": "V0 (VBR)",
-            "320": "320",
-            "Lossless": "Lossless",
-            "24bit Lossless": "24bit Lossless",
-            "V8 (VBR)": "V8 (VBR)"
-        },
-        "format": {
-            "MP3": "MP3",
-            "FLAC": "FLAC",
-            "AAC": "AAC",
-            "AC3": "AC3",
-            "DTS": "DTS",
-        },
-        "media": {
-            "CD": "CD",
-            "DVD": "DVD",
-            "Vinyl": "Vinyl",
-            "Soundboard": "Soundboard",
-            "SACD": "SACD",
-            "DAT": "DAT",
-            "Cassette": "Cassette",
-            "WEB": "WEB",
-            "Blu-ray": "Blu-ray"
-        },
+        "encoding": [
+            "192", "APS (VBR)", "V2 (VBR)", "V1 (VBR)", "256", "APX (VBR)",
+            "V0 (VBR)", "320", "Lossless", "24bit Lossless", "V8 (VBR)"
+        ],
+        "format": [
+            "MP3", "FLAC", "AAC", "AC3", "DTS"
+        ],
+        "media": [
+            "CD", "DVD", "Vinyl", "Soundboard", "SACD", "DAT", "Cassette",
+            "WEB", "Blu-ray"
+        ],
         "releasetype": {
             "Album": 1,
             "Soundtrack": 3,
@@ -123,10 +104,9 @@ class InputWhatCD(object):
 
     def _opts(self, key):
         """Gets the options for the specified key"""
+        temp = self._key(key)
         try:
-            if key in self.ALIASES:
-                return self.PARAMS[self.ALIASES[key]]
-            return self.PARAMS[key]
+            return self.PARAMS[temp]
         except KeyError:
             return None
 
@@ -139,6 +119,11 @@ class InputWhatCD(object):
         opts = self._opts(key)
         if opts is None:
             # No options, use value passed in
+            return val
+        elif isinstance(opts, list):
+            # List of options, check it's in it
+            if val not in opts:
+                return None
             return val
         else:
             # Options, translate the input to output
