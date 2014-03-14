@@ -26,6 +26,7 @@ class UrlRewriteEztv(object):
 
     def url_rewrite(self, task, entry):
         url = entry['url']
+        page = None
         for (scheme, netloc) in EZTV_MIRRORS:
             try:
                 _, _, path, params, query, fragment = urlparse(url)
@@ -42,14 +43,18 @@ class UrlRewriteEztv(object):
         log.debug('Eztv mirror `%s` chosen', url)
         try:
             soup = get_soup(page)
-            mirrors = soup.find('a', attrs={'class': re.compile(r'download_\d')})
-            if not mirrors:
-                raise UrlRewritingError('Unable to locate download link from url %s'
-                                        % url)
-            entry['urls'] = [m.get('href') for m in mirrors]
-            entry['url'] = mirrors[0].get('href')
+            mirrors = soup.find_all('a', attrs={'class': re.compile(r'download_\d')})
         except Exception as e:
             raise UrlRewritingError(e)
+
+        log.debug('%d torrent mirrors found', len(mirrors))
+
+        if not mirrors:
+            raise UrlRewritingError('Unable to locate download link from url %s' % url)
+
+        entry['urls'] = [m.get('href') for m in mirrors]
+        entry['url'] = mirrors[0].get('href')
+
 
 
 @event('plugin.register')
