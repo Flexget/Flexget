@@ -196,7 +196,10 @@ class InputWhatCD(object):
             if k is not None:
                 params[k] = self._getval(k, v)
 
+        # Params other than the searching ones
         params['action'] = action
+        if 'page' in kwargs:
+            params['page'] = kwargs['page']
 
         r = self.session.get(ajaxpage, params=params, allow_redirects=False)
         if r.status_code != 200:
@@ -228,8 +231,13 @@ class InputWhatCD(object):
         page = 1
         while True:
             result = self._request("browse", page=page, **config)
+            if not result['results']:
+                break
             results.extend(result["results"])
-            if page >= result.get('pages', 1):
+            pages = result['pages']
+            page = result['currentPage']
+            log.info("Got {0} of {1} pages".format(page, pages))
+            if page >= pages:
                 break
             page += 1
 
