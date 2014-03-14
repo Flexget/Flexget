@@ -176,8 +176,8 @@ class InputWhatCD(object):
         if not accountinfo:
             raise PluginError("Failed to get auth keys after logging in")
 
-        self.authkey = accountinfo["response"]["authkey"]
-        self.passkey = accountinfo["response"]["passkey"]
+        self.authkey = accountinfo["authkey"]
+        self.passkey = accountinfo["passkey"]
         log.info("Logged in to What.cd")
 
     def _request(self, action, **kwargs):
@@ -206,7 +206,7 @@ class InputWhatCD(object):
             json_response = r.json()
             if json_response['status'] != "success":
                 raise PluginError("What.cd gave a 'failure' response: '{0}'".format(json_response['error']))
-            return json_response
+            return json_response['response']
         except (ValueError, TypeError) as e:
             raise PluginError("What.cd returned an invalid response")
 
@@ -221,19 +221,38 @@ class InputWhatCD(object):
         self._login(config)
 
         # Perform the query
-        # TODO: pagination
-        results = self._request("browse", **config)
-        log.debug(results)
+        results = []
+        page = 1
+        while True:
+            result = self._request("browse", page=page, **config)
+            results.extend(result["results"])
+            if page >= result.get('pages', 1):
+                break
+            page += 1
 
-        # TODO: Parse results into Entry objects
-        #FORMAT = https://what.cd/torrents.php?action=download&id={id}&authkey={authkey}&torrent_pass={passkey}
+        # Logged in and made a request successfully, it's ok if nothing matches
+        task.no_entries_ok = True
 
-        #entry = Entry()
-        #entry['title'] = "title"
-        #entry['url'] = "url"
-        #entry['content_size'] = 0
+        # Parse the needed information out of the response
+        entries = []
+        for result in results:
+            # Get basic information on the release
+            info = {k: result[k] for k in ('artist', 'groupName', 'groupYear')}
 
-        return []
+            # Releases can have multiple download options
+            for tor in result['torrents']:
+                temp = info.copy()
+                temp.update({k: tor[k] for k in ('media', 'encoding', 'format', 'torrentId')})
+
+                entries.append(Entry(
+                    title = "{artist} - {groupName} - {groupYear} ({media} - {format} - {encoding})-{torrentId}.torrent".format(**temp),
+                    url = "https://what.cd/torrents.php?action=download&id={0}&authkey={1}&torrent_pass={2}".format(temp['torrentId'], self.authkey, self.passkey),
+                    torrent_seeds = tor['seeders'],
+                    torrent_leeches = tor['leechers'],
+                    content_size = int(tor['size'] / 1024**2 * 100) / 100 # Given in bytes
+                ))
+
+        return entries
 
 @event('plugin.register')
 def register_plugin():
