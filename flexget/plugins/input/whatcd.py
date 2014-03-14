@@ -217,6 +217,9 @@ class InputWhatCD(object):
 
         self.session = Session()
 
+        # From the API docs: "Refrain from making more than five (5) requests every ten (10) seconds"
+        self.session.set_domain_delay('ssl.what.cd', '2 seconds')
+
         # Login
         self._login(config)
 
