@@ -118,10 +118,13 @@ class InputWhatCD(object):
 
         opts = self._opts(key)
         if opts is None:
-            # No options, use value passed in
+            if isinstance(val, bool):
+                # Convert to 0/1 instead of True/False
+                return ("0", "1")[val]
+            # Just a string, return it.
             return val
         elif isinstance(opts, list):
-            # List of options, check it's in it
+            # List of options, check it's in the list
             if val not in opts:
                 return None
             return val
@@ -192,9 +195,9 @@ class InputWhatCD(object):
 
         # Filter params and map config values -> api values
         for k, v in kwargs.iteritems():
-            k = self._key(k)
-            if k is not None:
-                params[k] = self._getval(k, v)
+            key = self._key(k)
+            if key is not None:
+                params[key] = self._getval(k, v)
 
         # Params other than the searching ones
         params['action'] = action
