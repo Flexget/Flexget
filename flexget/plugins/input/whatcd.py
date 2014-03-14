@@ -237,12 +237,12 @@ class InputWhatCD(object):
         entries = []
         for result in results:
             # Get basic information on the release
-            info = {k: result[k] for k in ('artist', 'groupName', 'groupYear')}
+            info = dict((k, result[k]) for k in ('artist', 'groupName', 'groupYear'))
 
             # Releases can have multiple download options
             for tor in result['torrents']:
                 temp = info.copy()
-                temp.update({k: tor[k] for k in ('media', 'encoding', 'format', 'torrentId')})
+                temp.update(dict((k, tor[k]) for k in ('media', 'encoding', 'format', 'torrentId')))
 
                 entries.append(Entry(
                     title = "{artist} - {groupName} - {groupYear} ({media} - {format} - {encoding})-{torrentId}.torrent".format(**temp),
