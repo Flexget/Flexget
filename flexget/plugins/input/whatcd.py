@@ -31,6 +31,7 @@ class InputWhatCD(object):
         "release_type": "releasetype",
         "tags": "tag_list",
         "tag_type": "tags_type",
+        "search": "searchstr",
     }
 
     # API parameters
@@ -38,6 +39,7 @@ class InputWhatCD(object):
     # A dict means a choice with a mapping for the API
     # A list is just a choice with no mapping
     PARAMS = {
+        "searchstr": None,
         "taglist": None,
         "artistname": None,
         "groupname": None,
@@ -140,6 +142,7 @@ class InputWhatCD(object):
             'properties': {
                 'username': {'type': 'string'},
                 'password': {'type': 'string'},
+                'search': {'type': 'string'},
                 'artist': {'type': 'string'},
                 'album': {'type': 'string'},
                 'year': {'type': 'string'},
