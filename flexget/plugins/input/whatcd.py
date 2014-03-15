@@ -28,7 +28,7 @@ class InputWhatCD(object):
         "artist": "artistname",
         "album": "groupname",
         "leech_type": "freetorrent",
-        "release_type": "releasetype",
+        "release_type": "releaseType",
         "tags": "tag_list",
         "tag_type": "tags_type",
         "search": "searchstr",
@@ -60,7 +60,7 @@ class InputWhatCD(object):
             "CD", "DVD", "Vinyl", "Soundboard", "SACD", "DAT", "Cassette",
             "WEB", "Blu-ray"
         ],
-        "releasetype": {
+        "releaseType": {
             "Album": 1,
             "Soundtrack": 3,
             "EP": 5,
