@@ -132,15 +132,15 @@ class InputWhatCD(object):
         if opts is None:
             # Just a string, return it.
             return val
-        elif isinstance(opts, list):
+        elif isinstance(opts, dict):
+            # Options, translate the input to output
+            # The str cast converts bools to 'True'/'False' for use as keys
+            return opts[str(val)]
+        else:
             # List of options, check it's in the list
             if val not in opts:
                 return None
             return val
-        else:
-            # Options, translate the input to output
-            # The str cast converts bools to 'True'/'False' for use as keys
-            return opts[str(val)]
 
     def __init__(self):
         """Set up the schema"""
