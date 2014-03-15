@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import twitter
 import re
 
 from flexget import options, plugin
@@ -62,7 +61,15 @@ class TwitterFeed(object):
         'additionalProperties': False
     }
 
+    def on_task_start(self, task, config):
+        try:
+            import twitter
+        except ImportError:
+            raise plugin.PluginError('twitter module required', logger=log)
+
     def on_task_input(self, task, config):
+        import twitter
+
         account = config['account']
         log.debug('Looking at twitter account `%s`', account)
 
@@ -108,6 +115,8 @@ class TwitterFeed(object):
 
     def get_tweets(self, account, number=MAX_TWEETS, since_id=None, max_id=None):
         """Fetch tweets from twitter account `account`."""
+        import twitter
+
         all_tweets = []
         while number > 0:
             try:
