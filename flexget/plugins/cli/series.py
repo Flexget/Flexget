@@ -183,6 +183,8 @@ def display_details(name):
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
     if series.identified_by == 'sequence':
         episodes = episodes.order_by(Episode.number).all()
+    elif series.identified_by == 'ep':
+        episodes = episodes.order_by(Episode.season, Episode.number).all()
     else:
         episodes = episodes.order_by(Episode.identifier).all()
 
