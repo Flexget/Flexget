@@ -140,7 +140,8 @@ class PluginPyLoad(object):
 
             try:
                 dest = 1 if config.get('queue', self.DEFAULT_QUEUE) else 0  # Destination.Queue = 1
-                post = {'name': "'%s'" % entry['title'].encode("ascii", "ignore"),
+                name = entry['pyload_package'] if 'pyload_package' in entry else entry['title']
+                post = {'name': "'%s'" % name.encode("ascii", "ignore"),
                         'links': str(urls),
                         'dest': dest,
                         'session': session}
