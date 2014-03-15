@@ -32,6 +32,7 @@ class InputWhatCD(object):
         "tags": "tag_list",
         "tag_type": "tags_type",
         "search": "searchstr",
+        "log": "haslog",
     }
 
     # API parameters
@@ -44,9 +45,6 @@ class InputWhatCD(object):
         "artistname": None,
         "groupname": None,
         "year": None,
-        "hascue": None,
-        "scene": None,
-        "vanityhouse": None,
         "tags_type": {
             "any": 0,
             "all": 1,
@@ -80,8 +78,8 @@ class InputWhatCD(object):
             "Demo": 23
         },
         "haslog": {
-            "0": 0,
-            "1": 1,
+            "False": 0,
+            "True": 1,
             "100%": 100,
             "<100%": -1
         },
@@ -90,6 +88,18 @@ class InputWhatCD(object):
             "neutral": 2,
             "either": 3,
             "normal": 0,
+        },
+        "hascue": {
+            "False": 0,
+            "True": 1,
+        },
+        "scene": {
+            "False": 0,
+            "True": 1,
+        },
+        "vanityhouse": {
+            "False": 0,
+            "True": 1,
         }
     }
 
@@ -120,9 +130,6 @@ class InputWhatCD(object):
 
         opts = self._opts(key)
         if opts is None:
-            if isinstance(val, bool):
-                # Convert to 0/1 instead of True/False
-                return ("0", "1")[val]
             # Just a string, return it.
             return val
         elif isinstance(opts, list):
@@ -132,7 +139,8 @@ class InputWhatCD(object):
             return val
         else:
             # Options, translate the input to output
-            return opts[val]
+            # The str cast converts bools to 'True'/'False' for use as keys
+            return opts[str(val)]
 
     def __init__(self):
         """Set up the schema"""
@@ -152,7 +160,7 @@ class InputWhatCD(object):
                 'format': {'type': 'string', 'enum': self._opts('format')},
                 'media': {'type': 'string', 'enum': self._opts('media')},
                 'release_type': {'type': 'string', 'enum': self._opts('release_type').keys()},
-                'haslog': {'type': 'string', 'enum': self._opts('haslog').keys()},
+                'log': {"oneOf": [{'type': 'string', 'enum': self._opts('log').keys()}, {'type': 'boolean'}]},
                 'leech_type': {'type': 'string', 'enum': self._opts('leech_type').keys()},
                 'hascue': {'type': 'boolean'},
                 'scene': {'type': 'boolean'},
