@@ -31,7 +31,7 @@ class UrlRewriteEztv(object):
             try:
                 _, _, path, params, query, fragment = urlparse(url)
                 url = urlunparse((scheme, netloc, path, params, query, fragment))
-                page = requests.get(url).content
+                page = task.requests.get(url).content
             except RequestException as e:
                 log.debug('Eztv mirror `%s` seems to be down', url)
                 continue
