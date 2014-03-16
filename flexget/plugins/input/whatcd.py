@@ -51,31 +51,31 @@ class InputWhatCD(object):
         },
         "encoding": [
             "192", "APS (VBR)", "V2 (VBR)", "V1 (VBR)", "256", "APX (VBR)",
-            "V0 (VBR)", "320", "Lossless", "24bit Lossless", "V8 (VBR)"
+            "V0 (VBR)", "320", "lossless", "24bit lossless", "V8 (VBR)"
         ],
         "format": [
             "MP3", "FLAC", "AAC", "AC3", "DTS"
         ],
         "media": [
-            "CD", "DVD", "Vinyl", "Soundboard", "SACD", "DAT", "Cassette",
+            "CD", "DVD", "vinyl", "soundboard", "SACD", "DAT", "cassette",
             "WEB", "Blu-ray"
         ],
         "releaseType": {
-            "Album": 1,
-            "Soundtrack": 3,
+            "album": 1,
+            "soundtrack": 3,
             "EP": 5,
-            "Anthology": 6,
-            "Compilation": 7,
-            "DJ Mix": 8,
-            "Single": 9,
-            "Live Album": 11,
-            "Remix": 13,
-            "Bootleg": 14,
-            "Interview": 15,
-            "Mixtape": 16,
-            "Unknown": 21,
-            "Concert Recording": 22,
-            "Demo": 23
+            "anthology": 6,
+            "compilation": 7,
+            "DJ mix": 8,
+            "single": 9,
+            "live album": 11,
+            "remix": 13,
+            "bootleg": 14,
+            "interview": 15,
+            "mixtape": 16,
+            "unknown": 21,
+            "concert recording": 22,
+            "demo": 23
         },
         "haslog": {
             "False": 0,
