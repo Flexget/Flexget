@@ -53,6 +53,15 @@ class TestAssumeQuality(FlexGetBase):
           test_invalid_quality:
             assume_quality:
               hdtv: rhubarb
+
+          test_with_series:
+            template: no_global
+            mock:
+            - title: my show S01E01
+            assume_quality: 720p
+            series:
+            - my show:
+                quality: 720p
     """
 
     def test_matching(self):
@@ -97,3 +106,7 @@ class TestAssumeQuality(FlexGetBase):
     def test_invalid_quality(self):
         #with assert_raises(TaskAbort): self.execute_task('test_invalid_quality')  #Requires Python 2.7
         assert_raises(TaskAbort, self.execute_task, 'test_invalid_quality')
+
+    def test_with_series(self):
+        self.execute_task('test_with_series')
+        assert self.task.accepted, 'series plugin should have used assumed quality'

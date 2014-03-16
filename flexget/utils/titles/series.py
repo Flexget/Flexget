@@ -132,7 +132,7 @@ class SeriesParser(TitleParser):
         self.id = None
         self.id_type = None
         self.id_groups = None
-        self.quality = qualities.Quality()
+        self.quality = None
         self.proper_count = 0
         self.special = False
         # TODO: group is only produced with allow_groups
@@ -185,7 +185,8 @@ class SeriesParser(TitleParser):
         # Clear the output variables before parsing
         self._reset()
         self.field = field
-        self.quality = quality or qualities.Quality()
+        if quality:
+            self.quality = quality
         if data:
             self.data = data
         if not self.name or not self.data:
@@ -250,10 +251,12 @@ class SeriesParser(TitleParser):
         log.debug('parsing quality ->')
         quality = qualities.Quality(data_stripped)
         if quality:
-            self.quality = quality
             # Remove quality string from data
             log.debug('quality detected, using remaining data `%s`', quality.clean_text)
             data_stripped = quality.clean_text
+        # Don't override passed in quality
+        if not self.quality:
+            self.quality = quality
 
         # Remove unwanted words from data for ep / id parsing
         data_stripped = self.remove_words(data_stripped, self.remove, not_in_word=True)
