@@ -16,11 +16,31 @@ class InputWhatCD(object):
 
     == Usage:
 
+    All parameters except `username` and `password` are optional.
+
     whatcd:
         username:
         password:
 
-        [other optional params]
+        search: (general search filter)
+
+        artist: (artist name)
+        album: (album name)
+        year: (album year)
+
+        encoding: (encoding specifics - 192, 320, lossless, etc.)
+        format: (MP3, FLAC, AAC, etc.)
+        media: (CD, DVD, vinyl, Blu-ray, etc.)
+        release_type: (album, soundtrack, EP, etc.)
+
+        log: (log specification - true, false, '100%', or '<100%')
+        hascue: (has a cue file - true or false)
+        scene: (is a scene release - true or false)
+        vanityhouse: (is a vanity house release - true or false)
+        leech_type: ('freeleech', 'neutral', 'either', or 'normal')
+
+        tags: (a list of tags to match - progressive.rock, new.age, blues, etc.)
+        tag_type: (match 'any' or 'all' of the items in `tags`)
     """
 
     # Aliases for config -> api params
