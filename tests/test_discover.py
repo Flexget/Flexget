@@ -128,7 +128,7 @@ class TestEmitSeriesInDiscover(FlexGetBase):
               - test_search: yes
             series:
             - My Show 2:
-                allow_backfill: yes
+                tracking: backfill
                 identified_by: ep
             rerun: 0
     """

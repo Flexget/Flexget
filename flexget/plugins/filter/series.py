@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+import argparse
 import logging
 import re
 import time
@@ -728,7 +729,7 @@ class FilterSeriesBase(object):
                 'special_ids': one_or_more({'type': 'string'}),
                 'prefer_specials': {'type': 'boolean'},
                 'assume_special': {'type': 'boolean'},
-                'allow_backfill': {'type': 'boolean'}
+                'tracking': {'type': ['boolean', 'string'], 'enum': [True, False, 'backfill']}
             },
             'additionalProperties': False
         }
@@ -1159,14 +1160,15 @@ class FilterSeries(FilterSeriesBase):
             log.debug('continuing w. episodes: %s', [e['title'] for e in entries])
             log.debug('best episode is: %s', best['title'])
 
-            # episode advancement. used only with season and sequence based series
+            # episode tracking. used only with season and sequence based series
             if ep.identified_by in ['ep', 'sequence']:
-                if task.options.disable_advancement:
-                    log.debug('episode advancement disabled')
+                if task.options.disable_tracking or not config.get('tracking', True):
+                    log.debug('episode tracking disabled')
                 else:
-                    log.debug('-' * 20 + ' episode advancement -->')
+                    log.debug('-' * 20 + ' episode tracking -->')
                     # Grace is number of distinct eps in the task for this series + 2
-                    if self.process_episode_advancement(ep, entries, grace=len(series_entries)+2, config=config):
+                    backfill = config.get('tracking') == 'backfill'
+                    if self.process_episode_tracking(ep, entries, grace=len(series_entries)+2, backfill=backfill):
                         continue
 
             # quality
@@ -1281,8 +1283,16 @@ class FilterSeries(FilterSeriesBase):
             log.debug('no quality meets requirements')
         return result
 
-    def process_episode_advancement(self, episode, entries, grace, config):
-        """Rejects all episodes that are too old or new (advancement), return True when this happens."""
+    def process_episode_tracking(self, episode, entries, grace, backfill=False):
+        """
+        Rejects all episodes that are too old or new, return True when this happens.
+
+        :param episode: Episode model
+        :param list entries: List of entries for given episode.
+        :param int grace: Number of episodes before or after latest download that are allowed.
+        :param bool backfill: If this is True, previous episodes will be allowed,
+            but forward advancement will still be restricted.
+        """
 
         latest = get_latest_release(episode.series)
         if episode.series.begin and episode.series.begin > latest:
@@ -1292,7 +1302,7 @@ class FilterSeries(FilterSeriesBase):
 
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
-            if (not config.get('allow_backfill') and (episode.season < latest.season or
+            if (not backfill and (episode.season < latest.season or
                     (episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
@@ -1305,7 +1315,7 @@ class FilterSeries(FilterSeriesBase):
                 log.debug('too new! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the future from latest downloaded episode %s. '
-                                 'See `--disable-advancement` if this should be downloaded.' % latest.identifier)
+                                 'See `--disable-tracking` if this should be downloaded.' % latest.identifier)
                 return True
 
     def process_timeframe(self, task, config, episode, entries):
@@ -1460,5 +1470,8 @@ def register_parser_arguments():
     exec_parser = options.get_parser('execute')
     exec_parser.add_argument('--stop-waiting', action='store', dest='stop_waiting', default='',
                              metavar='NAME', help='stop timeframe for a given series')
-    exec_parser.add_argument('--disable-advancement', action='store_true', dest='disable_advancement', default=False,
+    exec_parser.add_argument('--disable-tracking', action='store_true', default=False,
                              help='disable episode advancement for this run')
+    # Backwards compatibility
+    exec_parser.add_argument('--disable-advancement', action='store_true', dest='disable_tracking',
+                             help=argparse.SUPPRESS)

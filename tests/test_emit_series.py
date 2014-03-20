@@ -23,7 +23,7 @@ class TestEmitSeries(FlexGetBase):
               backfill: yes
             series:
             - Test Series 1:
-                allow_backfill: yes
+                tracking: backfill
                 identified_by: ep
             rerun: 0
           test_emit_series_rejected:
@@ -31,7 +31,7 @@ class TestEmitSeries(FlexGetBase):
               backfill: yes
             series:
             - Test Series 2:
-                allow_backfill: yes
+                tracking: backfill
                 identified_by: ep
             rerun: 0
           test_emit_series_from_start:
@@ -54,7 +54,7 @@ class TestEmitSeries(FlexGetBase):
             series:
             - Test Series 5:
                 begin: S02E02
-                allow_backfill: yes
+                tracking: backfill
             rerun: 0
           test_emit_series_begin_backfill_and_rerun:
             emit_series:
@@ -62,7 +62,7 @@ class TestEmitSeries(FlexGetBase):
             series:
             - Test Series 6:
                 begin: S02E02
-                allow_backfill: yes
+                tracking: backfill
             mock_output: yes
             rerun: 1
           test_emit_series_backfill_advancement:
@@ -71,7 +71,7 @@ class TestEmitSeries(FlexGetBase):
             series:
             - Test Series 7:
                 identified_by: ep
-                allow_backfill: yes
+                tracking: backfill
             regexp:
               reject:
               - .

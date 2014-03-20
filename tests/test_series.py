@@ -350,12 +350,19 @@ class TestEpisodeAdvancement(FlexGetBase):
             series:
               - backwards
 
-          test_backwards_4:
+          test_backwards_okay_1:
             mock:
               - {title: 'backwards s01e02'}
             series:
               - backwards:
-                  allow_backfill: yes
+                  tracking: backfill
+
+          test_backwards_okay_2:
+            mock:
+              - {title: 'backwards s01e03'}
+            series:
+              - backwards:
+                  tracking: no
 
           test_forwards_1:
             mock:
@@ -386,6 +393,13 @@ class TestEpisodeAdvancement(FlexGetBase):
               - {title: 'forwards s05e01'}
             series:
               - forwards
+
+          test_forwards_okay_1:
+            mock:
+              - {title: 'forwards s05e01'}
+            series:
+              - forwards:
+                  tracking: no
 
           test_unordered:
             mock:
@@ -440,9 +454,12 @@ class TestEpisodeAdvancement(FlexGetBase):
         self.execute_task('test_backwards_3')
         assert self.task.find_entry('rejected', title='backwards s01e01'), \
             'backwards s01e01 should have been rejected, in previous season'
-        self.execute_task('test_backwards_4')
+        self.execute_task('test_backwards_okay_1')
         assert self.task.find_entry('accepted', title='backwards s01e02'), \
-            'backwards s01e01 should have been accepted, allow_backfill enabled'
+            'backwards s01e01 should have been accepted, backfill enabled'
+        self.execute_task('test_backwards_okay_2')
+        assert self.task.find_entry('accepted', title='backwards s01e03'), \
+            'backwards s01e01 should have been accepted, tracking off'
 
     def test_forwards(self):
         """Series plugin: episode advancement (future)"""
@@ -457,10 +474,13 @@ class TestEpisodeAdvancement(FlexGetBase):
             'forwards s03e01 should have been accepted'
         self.execute_task('test_forwards_4')
         assert self.task.find_entry('rejected', title='forwards s04e02'),\
-        'forwards s04e02 should have been rejected'
+            'forwards s04e02 should have been rejected'
         self.execute_task('test_forwards_5')
         assert self.task.find_entry('rejected', title='forwards s05e01'), \
             'forwards s05e01 should have been rejected'
+        self.execute_task('test_forwards_okay_1')
+        assert self.task.find_entry('accepted', title='forwards s05e01'), \
+            'forwards s05e01 should have been accepted with tracking turned off'
 
     def test_unordered(self):
         """Series plugin: unordered episode advancement"""
