@@ -47,7 +47,7 @@ class SeriesParser(TitleParser):
         '(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
         'S(\d{1,3})D(\d{1,3})',  # S3D1
         '(\d{1,3})\s?x\s?(all)',  # 1xAll
-        '(?:season(?:s)|s|series)?\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
+        r'(?:season(?:s)|s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
         'seasons\s(\d\s){2,}',
         'disc\s\d'])
     # Make sure none of these are found embedded within a word or other numbers

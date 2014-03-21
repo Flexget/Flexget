@@ -301,6 +301,9 @@ class TestSeriesParser(object):
         self.parse_invalid(name='Something', data='Something_Season_1_Full_Season_2_EP_1-7_HD')
         self.parse_invalid(name='Something', data='Something - Season 10 - FlexGet')
         self.parse_invalid(name='Something', data='Something_ DISC_1_OF_2 MANofKENT INVICTA RG')
+        # Make sure no false positives
+        assert self.parse(name='Something', data='Something S01E03 Full Throttle').valid
+
 
     def test_similar(self):
         s = self.parse(name='Foo Bar', data='Foo.Bar:Doppelganger.S02E04.HDTV.FlexGet', strict_name=True)
