@@ -209,12 +209,10 @@ class InputWhatCD(object):
         }
 
         r = self.session.post("https://ssl.what.cd/login.php", data=data, allow_redirects=False)
-        if r.status_code != 302:
+        if r.status_code != 302 or r.headers.get('location') != "index.php":
             raise PluginError("Failed to log in to What.cd")
 
         accountinfo = self._request("index")
-        if not accountinfo:
-            raise PluginError("Failed to get auth keys after logging in")
 
         self.authkey = accountinfo["authkey"]
         self.passkey = accountinfo["passkey"]
