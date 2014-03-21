@@ -441,39 +441,9 @@ class Manager(object):
         # config loaded successfully
         log.debug('config_name: %s' % self.config_name)
         log.debug('config_base: %s' % self.config_base)
-        
-        # passwords/sensitive stuff replacement
-        secret_file = os.path.splitext(self.config_path)[0] + '.sec.yml'
-        if os.path.exists(secret_file):
-            try:
-                with codecs.open(secret_file, 'rb', 'utf-8') as f:
-                    raw_secrets = f.read()
-                secrets = {'secrets': yaml.safe_load(raw_secrets) or {}}
-            except Exception as e:
-                raise Exception('Invalid secrets file: ' + str(e))
-            self.process_secrets(config, secrets)
-        
+        # (temp placeholder)
         # Install the newly loaded config
         self.update_config(config)
-
-    def process_secrets(self, element, secrets):
-        from flexget.utils.template import environment
-        if isinstance(element, dict):
-            for k in element:
-                val = self.process_secrets(element[k], secrets)
-                if val:
-                    element[k] = val
-        elif isinstance(element, list):
-            for i, v in enumerate(element):
-                val = self.process_secrets(v, secrets)
-                if val:
-                    element[i] = val
-        elif isinstance(element, basestring) and '{{' in element:
-            try:
-                template = environment.from_string(element)
-                return template.render(secrets)
-            except:
-                return None
 
     def update_config(self, config):
         """
