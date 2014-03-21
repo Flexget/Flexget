@@ -49,7 +49,7 @@ class InputWhatCD(object):
         "album": "groupname",
         "leech_type": "freetorrent",
         "release_type": "releaseType",
-        "tags": "tag_list",
+        "tags": "taglist",
         "tag_type": "tags_type",
         "search": "searchstr",
         "log": "haslog",
@@ -150,7 +150,8 @@ class InputWhatCD(object):
 
         opts = self._opts(key)
         if opts is None:
-            # Just a string, return it.
+            if isinstance(val, list):
+                return ",".join(val)
             return val
         elif isinstance(opts, dict):
             # Options, translate the input to output
