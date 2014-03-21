@@ -22,6 +22,10 @@ class InputWhatCD(object):
         username:
         password:
 
+        user_agent: (A custom user-agent for the client to report.
+                     It is NOT A GOOD IDEA to spoof a browser with
+                     this. You are responsible for your account.)
+
         search: (general search filter)
 
         artist: (artist name)
@@ -171,6 +175,7 @@ class InputWhatCD(object):
             'properties': {
                 'username': {'type': 'string'},
                 'password': {'type': 'string'},
+                'user_agent': {'type': 'string'},
                 'search': {'type': 'string'},
                 'artist': {'type': 'string'},
                 'album': {'type': 'string'},
@@ -203,7 +208,7 @@ class InputWhatCD(object):
             'keeplogged': 1,
         }
 
-        r = self.session.post("https://ssl.what.cd/login.php", data=data, headers={"User-Agent": "Flexget-whatcd plugin"}, allow_redirects=False)
+        r = self.session.post("https://ssl.what.cd/login.php", data=data, allow_redirects=False)
         if r.status_code != 302:
             raise PluginError("Failed to log in to What.cd")
 
@@ -254,6 +259,7 @@ class InputWhatCD(object):
         """Search on What.cd"""
 
         self.session = Session()
+        self.session.headers.update({"User-Agent": config.get('user_agent', "Flexget (What.cd plugin)")})
 
         # From the API docs: "Refrain from making more than five (5) requests every ten (10) seconds"
         self.session.set_domain_delay('ssl.what.cd', '2 seconds')
