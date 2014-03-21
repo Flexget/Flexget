@@ -441,7 +441,6 @@ class Manager(object):
         # config loaded successfully
         log.debug('config_name: %s' % self.config_name)
         log.debug('config_base: %s' % self.config_base)
-        # (temp placeholder)
         # Install the newly loaded config
         self.update_config(config)
 
