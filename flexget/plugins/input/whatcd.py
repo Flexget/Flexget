@@ -298,8 +298,10 @@ class InputWhatCD(object):
                 temp.update(dict((k, tor[k]) for k in ('media', 'encoding', 'format', 'torrentId')))
 
                 entries.append(Entry(
-                    title="{artist} - {groupName} - {groupYear} ({media} - {format} - {encoding})-{torrentId}.torrent".format(**temp),
-                    url="https://what.cd/torrents.php?action=download&id={0}&authkey={1}&torrent_pass={2}".format(temp['torrentId'], self.authkey, self.passkey),
+                    title="{artist} - {groupName} - {groupYear} "
+                          "({media} - {format} - {encoding})-{torrentId}.torrent".format(**temp),
+                    url="https://what.cd/torrents.php?action=download&"
+                        "id={0}&authkey={1}&torrent_pass={2}".format(temp['torrentId'], self.authkey, self.passkey),
                     torrent_seeds=tor['seeders'],
                     torrent_leeches=tor['leechers'],
                     # Size is given in bytes, convert it
