@@ -11,6 +11,7 @@ from flexget.utils.requests import Session
 
 log = logging.getLogger('whatcd')
 
+
 class InputWhatCD(object):
     """A plugin that searches what.cd
 
@@ -43,7 +44,7 @@ class InputWhatCD(object):
         vanityhouse: (is a vanity house release - true or false)
         leech_type: ('freeleech', 'neutral', 'either', or 'normal')
 
-        tags: (a list of tags to match - progressive.rock, new.age, blues, etc.)
+        tags: (a list of tags to match - drum.and.bass, new.age, blues, etc.)
         tag_type: (match 'any' or 'all' of the items in `tags`)
     """
 
@@ -186,7 +187,7 @@ class InputWhatCD(object):
                 'format': {'type': 'string', 'enum': self._opts('format')},
                 'media': {'type': 'string', 'enum': self._opts('media')},
                 'release_type': {'type': 'string', 'enum': self._opts('release_type').keys()},
-                'log': {"oneOf": [{'type': 'string', 'enum': self._opts('log').keys()}, {'type': 'boolean'}]},
+                'log': {'oneOf': [{'type': 'string', 'enum': self._opts('log').keys()}, {'type': 'boolean'}]},
                 'leech_type': {'type': 'string', 'enum': self._opts('leech_type').keys()},
                 'hascue': {'type': 'boolean'},
                 'scene': {'type': 'boolean'},
@@ -208,7 +209,8 @@ class InputWhatCD(object):
             'keeplogged': 1,
         }
 
-        r = self.session.post("https://ssl.what.cd/login.php", data=data, allow_redirects=False)
+        r = self.session.post("https://ssl.what.cd/login.php", data=data,
+                              allow_redirects=False)
         if r.status_code != 302 or r.headers.get('location') != "index.php":
             raise PluginError("Failed to log in to What.cd")
 
@@ -241,12 +243,13 @@ class InputWhatCD(object):
 
         r = self.session.get(ajaxpage, params=params, allow_redirects=False)
         if r.status_code != 200:
-            raise PluginError("Request to What.cd returned a non-200 status code")
+            raise PluginError("What.cd returned a non-200 status code")
 
         try:
             json_response = r.json()
             if json_response['status'] != "success":
-                raise PluginError("What.cd gave a 'failure' response: '{0}'".format(json_response['error']))
+                raise PluginError("What.cd gave a 'failure' response: "
+                                  "'{0}'".format(json_response['error']))
             return json_response['response']
         except (ValueError, TypeError) as e:
             raise PluginError("What.cd returned an invalid response")
@@ -295,14 +298,16 @@ class InputWhatCD(object):
                 temp.update(dict((k, tor[k]) for k in ('media', 'encoding', 'format', 'torrentId')))
 
                 entries.append(Entry(
-                    title = "{artist} - {groupName} - {groupYear} ({media} - {format} - {encoding})-{torrentId}.torrent".format(**temp),
-                    url = "https://what.cd/torrents.php?action=download&id={0}&authkey={1}&torrent_pass={2}".format(temp['torrentId'], self.authkey, self.passkey),
-                    torrent_seeds = tor['seeders'],
-                    torrent_leeches = tor['leechers'],
-                    content_size = int(tor['size'] / 1024**2 * 100) / 100 # Given in bytes
+                    title="{artist} - {groupName} - {groupYear} ({media} - {format} - {encoding})-{torrentId}.torrent".format(**temp),
+                    url="https://what.cd/torrents.php?action=download&id={0}&authkey={1}&torrent_pass={2}".format(temp['torrentId'], self.authkey, self.passkey),
+                    torrent_seeds=tor['seeders'],
+                    torrent_leeches=tor['leechers'],
+                    # Size is given in bytes, convert it
+                    content_size=int(tor['size']/(1024**2)*100)/100
                 ))
 
         return entries
+
 
 @event('plugin.register')
 def register_plugin():
