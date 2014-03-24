@@ -50,8 +50,10 @@ class UpcomingEpisodes(object):
         task_series = task.session.query(SeriesTask).\
                       filter(SeriesTask.name == task.name).all()
 
-        names = set([t.series.name for t in task_series])
+        ids = set([t.series_id for t in task_series])
 
+        # Update episode information based on the name
+        names = set([t.series.name for t in task_series])
         for n in names:
             lookup_series(name=n)
 
@@ -63,14 +65,14 @@ class UpcomingEpisodes(object):
             upcoming_eps = task.session.query(TVRageEpisodes).join(TVRageSeries).\
                            join(sq, and_(TVRageSeries.id == sq.c.tvrage_series_id,
                                          sq.c.season == TVRageEpisodes.season)).\
-                           filter(TVRageSeries.name.in_(names)).all()
+                           filter(TVRageSeries.id.in_(ids)).all()
 
         else:
             from_date = self.get_from(config)
             upcoming_eps = task.session.query(TVRageEpisodes).\
                            join(TVRageSeries).\
                            filter(TVRageEpisodes.airdate > from_date).\
-                           filter(TVRageSeries.name.in_(names)).all()
+                           filter(TVRageSeries.id.in_(ids)).all()
 
         entries = []
         for e in upcoming_eps:
