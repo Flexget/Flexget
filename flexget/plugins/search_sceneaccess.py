@@ -35,6 +35,14 @@ CATEGORIES = {
             'DOX': 14,
             'MISC': 21
         },
+    'nonscene':
+        {
+            'Movies/HD-x264': 41,
+            'Movies/SD-x264': 42,
+            'Movies/XviD': 43,
+            'TV/HD': 44,
+            'TV/SD': 45
+        },
     'mp3/0day':
         {
             '0DAY/APPS': 2,
@@ -80,24 +88,24 @@ class SceneAccessSearch(object):
         gravity_multiplier: 200     (optional)
 
     == Categories:
-    +---------------+-----------+--------------+--------------+----------+
-    |    browse     | mp3/0day  |   archive    |   foreign    |   xxx    |
-    +---------------+-----------+--------------+--------------+----------+
-    | APPS/ISO      | 0DAY/APPS | Games/Packs  | Movies/DVD-R | XXX/0DAY |
-    | DOX           | FLAC      | Movies/Packs | Movies/x264  | XXX/x264 |
-    | Games/PC      | MP3       | Music/Packs  | Movies/XviD  | XXX/XviD |
-    | Games/PS3     | MVID      | TV/Packs     | TV/x264      |          |
-    | Games/PSP     |           | XXX/Packs    | TV/XviD      |          |
-    | Games/WII     |           |              |              |          |
-    | Games/XBOX360 |           |              |              |          |
-    | MISC          |           |              |              |          |
-    | Movies/DVD-R  |           |              |              |          |
-    | Movies/x264   |           |              |              |          |
-    | Movies/XviD   |           |              |              |          |
-    | TV/HD-x264    |           |              |              |          |
-    | TV/SD-x264    |           |              |              |          |
-    | TV/XviD       |           |              |              |          |
-    +---------------+-----------+--------------+--------------+----------+
+    +---------------+----------------+-----------+--------------+--------------+----------+
+    |    browse     |    nonscene    | mp3/0day  |   archive    |   foreign    |   xxx    |
+    +---------------+----------------+-----------+--------------+--------------+----------+
+    | APPS/ISO      | Movies/HD-x264 | 0DAY/APPS | Games/Packs  | Movies/DVD-R | XXX/0DAY |
+    | DOX           | Movies/SD-x264 | FLAC      | Movies/Packs | Movies/x264  | XXX/x264 |
+    | Games/PC      | Movies/XviD    | MP3       | Music/Packs  | Movies/XviD  | XXX/XviD |
+    | Games/PS3     | TV/HD          | MVID      | TV/Packs     | TV/x264      |          |
+    | Games/PSP     | TV/SD          |           | XXX/Packs    | TV/XviD      |          |
+    | Games/WII     |                |           |              |              |          |
+    | Games/XBOX360 |                |           |              |              |          |
+    | MISC          |                |           |              |              |          |
+    | Movies/DVD-R  |                |           |              |              |          |
+    | Movies/x264   |                |           |              |              |          |
+    | Movies/XviD   |                |           |              |              |          |
+    | TV/HD-x264    |                |           |              |              |          |
+    | TV/SD-x264    |                |           |              |              |          |
+    | TV/XviD       |                |           |              |              |          |
+    +---------------+----------------+-----------+--------------+--------------+----------+
 
     You can combine the categories almost any way you want, here are some examples:
 
