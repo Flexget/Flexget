@@ -9,7 +9,7 @@ from flexget import options, plugin
 from flexget.plugin import get_plugin_by_name
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugins.api_tvrage import TVRageEpisodes, TVRageSeries, lookup_series
+from flexget.plugins.api_tvrage import TVRageEpisodes, TVRageSeries, lookup_series, TVRageLookup
 from flexget.plugins.filter.series import SeriesTask
 from flexget.utils.tools import parse_timedelta
 
@@ -50,12 +50,17 @@ class UpcomingEpisodes(object):
         task_series = task.session.query(SeriesTask).\
                       filter(SeriesTask.name == task.name).all()
 
-        ids = set([t.series_id for t in task_series])
-
         # Update episode information based on the name
-        names = set([t.series.name for t in task_series])
+        names = set([t.series.name.lower() for t in task_series])
         for n in names:
-            lookup_series(name=n)
+            try:
+                lookup_series(name=n)
+            except LookupError:
+                log.warning('TV shows %s not found, skipping', n)
+
+        # Get tvrage ids of corresponding shows
+        ids = task.session.query(TVRageLookup.series_id).filter(TVRageLookup.name.in_(names)).all()
+        ids = [id for (id, ) in ids if id]
 
         if config == 'season':
             sq = task.session.query(TVRageEpisodes.tvrage_series_id,
