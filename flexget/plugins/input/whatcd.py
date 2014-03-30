@@ -180,7 +180,7 @@ class InputWhatCD(object):
                 'search': {'type': 'string'},
                 'artist': {'type': 'string'},
                 'album': {'type': 'string'},
-                'year': {'oneOf': [{'type': 'string'}, {'type': 'integer'}]},
+                'year': {'type': ['string', 'integer']},
                 'tags': one_or_more({'type': 'string'}),
                 'tag_type': {'type': 'string', 'enum': self._opts('tag_type').keys()},
                 'encoding': {'type': 'string', 'enum': self._opts('encoding')},
