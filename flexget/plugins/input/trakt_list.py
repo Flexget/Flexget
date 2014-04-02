@@ -109,7 +109,7 @@ class TraktList(object):
         else:
             url += 'library/%(data_type)s/%(list_type)s.json/%(api_key)s/%(username)s'
         url = url % url_params
-        
+
         if 'password' in config:
             auth = {'username': config['username'],
                     'password': hashlib.sha1(config['password']).hexdigest()}
@@ -120,7 +120,7 @@ class TraktList(object):
         try:
             result = task.requests.post(url, data=json.dumps(auth))
         except RequestException as e:
-            raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e.message)
+            raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e.args[0])
         try:
             data = result.json()
         except ValueError:
