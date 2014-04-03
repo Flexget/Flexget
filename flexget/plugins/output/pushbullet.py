@@ -116,6 +116,8 @@ class OutputPushbullet(object):
                 # error codes and messages from Pushbullet API
                 if request_status == 200:
                     log.debug("Pushbullet notification sent")
+                    # remove this device from devices list as a fix for duplicate pushes with multi-device setups
+                    devices.remove(device)
                 elif request_status == 500:
                     log.warning("Pushbullet notification failed, Pushbullet API having issues")
                     #TODO: Implement retrying. API requests 5 seconds between retries.
