@@ -47,7 +47,7 @@ class OutputPushbullet(object):
         config.setdefault("body", "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} "
                                      "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "
                                      "{{imdb_year}}{% else %}{{title}}{% endif %}")
-        config.setdefault("device", "Nothing")
+        config.setdefault("device", None)
         return config
 
     # Run last to make sure other outputs are successful before sending notification
@@ -95,7 +95,7 @@ class OutputPushbullet(object):
 
             for device in devices:
                 # Build the request
-                if device == "Nothing":
+                if not device:
                     data = {"type": "note", "title": title, "body": body}
                 else:
                     data = {"device_iden": device, "type": "note", "title": title, "body": body}
