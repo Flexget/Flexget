@@ -100,8 +100,8 @@ class PluginSubliminal(object):
                 except Exception as err:
                     # don't want to abort the entire task for errors in a  
                     # single video file or for occasional network timeouts
-                    log.debug(err.message)
-                    entry.fail(err.message)
+                    log.debug(err.args[0])
+                    entry.fail(err.args[0])
 
 
 @event('plugin.register')
