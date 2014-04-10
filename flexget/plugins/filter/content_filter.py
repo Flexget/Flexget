@@ -29,6 +29,7 @@ class FilterContentFilter(object):
             'require': one_or_more({'type': 'string'}),
             'require_all': one_or_more({'type': 'string'}),
             'reject': one_or_more({'type': 'string'}),
+            'require_mainfile': {'type': 'boolean', 'default': False},
             'strict': {'type': 'boolean', 'default': False}
         },
         'additionalProperties': False
@@ -80,6 +81,15 @@ class FilterContentFilter(object):
                     log.info('Entry %s has banned file %s, rejecting' % (entry['title'], mask))
                     entry.reject('has banned file %s' % mask, remember=True)
                     return True
+            if config.get('require_mainfile') and len(files) > 1:
+                best = None
+                for f in entry['torrent'].get_filelist():
+                    if not best or f['size'] > best:
+                        best = f['size']
+                if (100*float(best)/float(entry['torrent'].size)) < 90:
+                    log.info('Entry %s does not have a main file, rejecting' % (entry['title']))
+                    entry.reject('does not have a main file', remember=True)
+                    return True
 
     def parse_torrent_files(self, entry):
         if 'torrent' in entry:
@@ -96,7 +106,7 @@ class FilterContentFilter(object):
 
         config = self.prepare_config(config)
         for entry in task.accepted:
-            # TODO: I don't know if we can pares filenames from nzbs, just do torrents for now
+            # TODO: I don't know if we can parse filenames from nzbs, just do torrents for now
             # possibly also do compressed files in the future
             self.parse_torrent_files(entry)
             if self.process_entry(task, entry, config):
