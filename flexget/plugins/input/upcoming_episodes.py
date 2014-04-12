@@ -70,6 +70,7 @@ class UpcomingEpisodes(object):
             upcoming_eps = task.session.query(TVRageEpisodes).join(TVRageSeries).\
                            join(sq, and_(TVRageSeries.id == sq.c.tvrage_series_id,
                                          sq.c.season == TVRageEpisodes.season)).\
+                           filter(TVRageEpisodes.airdate != None).\
                            filter(TVRageSeries.id.in_(ids)).all()
 
         else:
