@@ -36,6 +36,7 @@ class MovePlugin(object):
                     'to': {'type': 'string', 'format': 'path'},
                     'filename': {'type': 'string'},
                     'unpack_safety': {'type': 'boolean'},
+                    'copy_instead': {'type': 'boolean'},
                     'allow_dir': {'type': 'boolean'},
                     'clean_source': {'type': 'number'},
                     'along': {'type': 'array', 'items': {'type': 'string'}}
@@ -154,6 +155,13 @@ class MovePlugin(object):
                         ns_src.append(src_filename + ext)
                         ns_dst.append(dst_filename + ext)
             
+            # Should we copy instead of moving? Default: no
+            str_function = 'move'
+            if config.get('copy_instead', entry.get('copy_instead', False)):
+                str_function = 'copy'
+
+            move_or_copy = getattr(shutil, str_function)
+            
             # Move stuff
             if task.options.test:
                 log.info('Would move `%s` to `%s`' % (src, dst))
@@ -162,7 +170,7 @@ class MovePlugin(object):
                     log.info('Would also move `%s` to `%s`' % (nss, nsd))
             else:
                 try:
-                    shutil.move(src, dst)
+                    move_or_copy(src, dst)
                 except IOError as e:
                     entry.fail('IOError: %s' % (e))
                     log.debug('Unable to move %s to %s' % (src, dst))
@@ -171,7 +179,7 @@ class MovePlugin(object):
                 for nss, nsd in zip(ns_src, ns_dst):
                     try:
                         log.info('Moving `%s` to `%s`' % (nss, nsd))
-                        shutil.move(nss, nsd)
+                        move_or_copy(nss, nsd)
                     except Exception as err:
                         log.error(err.message)
 
