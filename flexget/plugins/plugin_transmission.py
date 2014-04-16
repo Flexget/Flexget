@@ -383,6 +383,7 @@ class PluginTransmissionClean(TransmissionBase):
         self._validator(advanced)
         advanced.accept('number', key='min_ratio')
         advanced.accept('interval', key='finished_for')
+        advanced.accept('boolean', key='delete_files')
         return root
 
     def on_task_exit(self, task, config):
@@ -393,6 +394,8 @@ class PluginTransmissionClean(TransmissionBase):
             self.client = self.create_rpc_client(config)
         nrat = float(config['min_ratio']) if 'min_ratio' in config else None
         nfor = parse_timedelta(config['finished_for']) if 'finished_for' in config else None
+        delete_files = bool(config['delete_files']) if 'delete_files' in config else False
+        
         remove_ids = []
         for torrent in self.client.get_torrents():
             log.verbose('Torrent "%s": status: "%s" - ratio: %s - date done: %s' % 
@@ -407,7 +410,7 @@ class PluginTransmissionClean(TransmissionBase):
                 log.info('Removing finished torrent `%s` from transmission' % torrent.name)
                 remove_ids.append(torrent.id)
         if remove_ids:
-            self.client.remove_torrent(remove_ids)
+            self.client.remove_torrent(remove_ids, delete_files)
 
 
 @event('plugin.register')
