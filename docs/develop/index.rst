@@ -63,6 +63,10 @@ activated. If you don't activate it you must run commands explicitly from under
 environment ``bin`` directory or ``scripts`` in windows. E.g. ``flexget`` would
 be ``bin/flexget`` (at project root) in unactivated `virtual environment`_.
 
+How to activate virtualenv under linux::
+
+  source bin/activate
+
 FlexGet project uses `paver`_ to provide development related utilities and tasks.
 Run ``paver --help`` to see what commands are available. Some of these will
 be mentioned later.
