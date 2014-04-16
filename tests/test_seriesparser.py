@@ -33,10 +33,18 @@ if enable_logging:
 
 class TestSeriesParser(object):
 
-    def parse(self, name=None, data=None, **kwargs):
+    def parse(self, name, data, **kwargs):
         s = SeriesParser(name, **kwargs)
         s.parse(data)
         return s
+
+    def parse_invalid(self, name, data, **kwargs):
+        """Makes sure either ParseWarning is raised, or return is invalid."""
+        try:
+            r = self.parse(name, data, **kwargs)
+            assert not r.valid, '{data} should not be valid'.format(data=data)
+        except ParseWarning:
+            pass
 
     def test_proper(self):
         """SeriesParser: proper"""
@@ -88,54 +96,18 @@ class TestSeriesParser(object):
         s.name = 'Something Interesting'
         s.data = 1
 
-    def test_confusing(self):
+    def test_confusing_date(self):
         """SeriesParser: confusing (invalid) numbering scheme"""
         s = self.parse(name='Something', data='Something.2008x12.13-FlexGet')
         assert not s.episode, 'Should not have episode'
         assert not s.season, 'Should not have season'
-        assert s.id_type == 'id'
+        assert s.id_type == 'date'
         assert s.identifier == '2008-12-13', 'invalid id'
-        assert s.valid, 'should not valid'
-
-    def test_unwanted(self):
-        """SeriesParser: unwanted hits (e.g. complete season)"""
-        s = self.parse(name='Something', data='Something.1x0.Complete.Season-FlexGet')
-        assert not s.valid, 'data %s should not be valid' % s.data
-
-        s = self.parse(name='Something', data='Something.1xAll.Season.Complete-FlexGet')
-        assert not s.valid, 'data %s should not be valid' % s.data
-
-        s = self.parse(name='Something', data='Something Seasons 1 & 2 - Complete')
-        assert not s.valid, 'data %s should not be valid' % s.data
-
-        s = self.parse(name='Something', data='Something Seasons 4 Complete')
-        assert not s.valid, 'data %s should not be valid' % s.data
-
-        s = self.parse(name='Something', data='Something Seasons 1 2 3 4')
-        assert not s.valid, 'data %s should not be valid' % s.data
-
-        s = self.parse(name='Something', data='Something S6 E1-4')
-        assert not s.valid, 'data %s should not be valid' % s.data
-
-        s = self.parse(name='Something', data='Something_Season_1_Full_Season_2_EP_1-7_HD')
-        assert not s.valid, 'data %s should not be valid' % s.data
-
-        s = self.parse(name='Something', data='Something - Season 10 - FlexGet')
-        assert not s.valid, 'data %s should not be valid' % s.data
-
-        s = self.parse(name='Something', data='Something_ DISC_1_OF_2 MANofKENT INVICTA RG')
-        assert not s.valid, 'data %s should not be valid' % s.data
-
-    @raises(ParseWarning)
-    def test_invalid(self):
-        s = self.parse(name='Something', data='Something S06 AC3-CRAPL3SS')
-        s = self.parse(name='Something', data='Something SEASON 1 2010 540p BluRay QEBS AAC ANDROID IPAD MP4 FASM',
-                       identified_by='ep')
+        assert s.valid, 'should be valid'
 
     def test_unwanted_disc(self):
         """SeriesParser: unwanted disc releases"""
-        s = self.parse(name='Something', data='Something.S01D2.DVDR-FlexGet')
-        assert not s.valid, 'data %s should not be valid' % s.data
+        self.parse_invalid(name='Something', data='Something.S01D2.DVDR-FlexGet')
 
     def test_season_x_ep(self):
         """SeriesParser: 01x02"""
@@ -314,23 +286,24 @@ class TestSeriesParser(object):
 
     def test_ignore_seasonpacks(self):
         """SeriesParser: ignoring season packs"""
-        """
-        s = SeriesParser(name='The Foo')
-        s.data = 'The.Foo.S04.1080p.FlexGet.5.1'
-        assert_raises(ParseWarning, s.parse)
-        """
+        #self.parse_invalid(name='The Foo', data='The.Foo.S04.1080p.FlexGet.5.1')
+        self.parse_invalid(name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet')
+        self.parse_invalid(name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet')
+        self.parse_invalid(name='Something', data='Something S02 Pack 720p WEB-DL-FlexGet')
+        self.parse_invalid(name='Something', data='Something S06 AC3-CRAPL3SS')
+        self.parse_invalid(name='Something', data='Something SEASON 1 2010 540p BluRay QEBS AAC ANDROID IPAD MP4 FASM')
+        self.parse_invalid(name='Something', data='Something.1x0.Complete.Season-FlexGet')
+        self.parse_invalid(name='Something', data='Something.1xAll.Season.Complete-FlexGet')
+        self.parse_invalid(name='Something', data='Something Seasons 1 & 2 - Complete')
+        self.parse_invalid(name='Something', data='Something Seasons 4 Complete')
+        self.parse_invalid(name='Something', data='Something Seasons 1 2 3 4')
+        self.parse_invalid(name='Something', data='Something S6 E1-4')
+        self.parse_invalid(name='Something', data='Something_Season_1_Full_Season_2_EP_1-7_HD')
+        self.parse_invalid(name='Something', data='Something - Season 10 - FlexGet')
+        self.parse_invalid(name='Something', data='Something_ DISC_1_OF_2 MANofKENT INVICTA RG')
+        # Make sure no false positives
+        assert self.parse(name='Something', data='Something S01E03 Full Throttle').valid
 
-        s = SeriesParser(name='Something')
-        s.data = 'Something S02 Pack 720p WEB-DL-FlexGet'
-        assert_raises(ParseWarning, s.parse)
-
-        s = SeriesParser(name='The Foo')
-        s.data = 'The Foo S05 720p BluRay DTS x264-FlexGet'
-        assert_raises(ParseWarning, s.parse)
-
-        s = SeriesParser(name='The Foo', identified_by='ep')
-        s.data = 'The Foo S05 720p BluRay DTS x264-FlexGet'
-        assert_raises(ParseWarning, s.parse)
 
     def test_similar(self):
         s = self.parse(name='Foo Bar', data='Foo.Bar:Doppelganger.S02E04.HDTV.FlexGet', strict_name=True)
@@ -342,8 +315,8 @@ class TestSeriesParser(object):
         """SeriesParser: idiotic 101, 102, 103, .. numbering"""
         s = SeriesParser(name='test', identified_by='ep')
         s.parse('Test.706.720p-FlexGet')
-        assert s.season == 7, 'didn''t pick up season'
-        assert s.episode == 6, 'didn''t pick up episode'
+        assert s.season == 7, 'didn\'t pick up season'
+        assert s.episode == 6, 'didn\'t pick up episode'
 
     def test_idiotic_numbering_with_zero(self):
         """SeriesParser: idiotic 0101, 0102, 0103, .. numbering"""
@@ -421,7 +394,7 @@ class TestSeriesParser(object):
         """SeriesParser: test that qualities are not picked as ep"""
         from flexget.utils import qualities
         for quality in qualities.all_components():
-            s = SeriesParser(name='FooBar', identified_by='ep')
+            s = SeriesParser(name='FooBar')
             s.data = 'FooBar %s XviD-FlexGet' % quality.name
             assert_raises(ParseWarning, s.parse)
 
@@ -632,3 +605,17 @@ class TestSeriesParser(object):
         assert s.valid
         s.parse('Not The Show S01E01')
         assert not s.valid
+
+    def test_long_season(self):
+        """SeriesParser: long season ID Ticket #2197"""
+        s = self.parse(name='FlexGet', data='FlexGet.US.S2013E14.Title.Here.720p.HDTV.AAC5.1.x264-NOGRP')
+        assert s.season == 2013
+        assert s.episode == 14
+        assert s.quality.name == '720p hdtv h264 aac'
+        assert not s.proper, 'detected proper'
+
+        s = self.parse(name='FlexGet', data='FlexGet.Series.2013.14.of.21.Title.Here.720p.HDTV.AAC5.1.x264-NOGRP')
+        assert s.season == 2013
+        assert s.episode == 14
+        assert s.quality.name == '720p hdtv h264 aac'
+        assert not s.proper, 'detected proper'

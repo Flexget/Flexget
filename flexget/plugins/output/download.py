@@ -147,7 +147,7 @@ class PluginDownload(object):
                 log.error('%s can\'t be downloaded, no path specified for entry' % entry['title'])
                 entry.fail('no path specified for entry')
             else:
-                entry.fail(", ".join(errors))
+                entry.fail(', '.join(errors))
 
     def save_error_page(self, entry, task, page):
         received = os.path.join(task.manager.config_base, 'received', task.name)
@@ -197,7 +197,7 @@ class PluginDownload(object):
         except RequestException as e:
             # TODO: Improve this error message?
             log.warning('RequestException %s' % e)
-            return 'Request Exception'
+            return 'Network error during request: %s' % e
         # TODO: I think these exceptions will not be thrown by requests library.
         except urllib2.HTTPError as e:
             log.warning('HTTPError %s' % e.code)

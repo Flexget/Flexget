@@ -22,8 +22,7 @@ try:
             self.register_plugin('xep_0199') # XMPP Ping
     
         def start(self, event):
-            self.send_presence()
-            self.get_roster()
+            self.send_presence(pto=self.recipient)
             self.send_message(mto=self.recipient, mbody=self.msg, mtype='chat')
             self.disconnect(wait=True)
 

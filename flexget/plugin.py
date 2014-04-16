@@ -90,6 +90,9 @@ class PluginError(Exception):
 
     def __init__(self, value, logger=log, **kwargs):
         super(PluginError, self).__init__()
+        # Value is expected to be a string
+        if not isinstance(value, basestring):
+            value = unicode(value)
         self.value = value
         self.log = logger
         self.kwargs = kwargs
@@ -98,7 +101,7 @@ class PluginError(Exception):
         return unicode(self).encode('utf-8')
 
     def __unicode__(self):
-        return self.value
+        return unicode(self.value)
 
 
 # TODO: move to utils or somewhere more appropriate
@@ -123,21 +126,21 @@ class internet(object):
             try:
                 return func(*args, **kwargs)
             except RequestException as e:
-                log.debug('decorator caught RequestException')
+                log.debug('decorator caught RequestException. handled traceback:', exc_info=True)
                 raise PluginError('RequestException: %s' % e)
             except urllib2.HTTPError as e:
                 raise PluginError('HTTPError %s' % e.code, self.log)
             except urllib2.URLError as e:
-                log.debug('decorator caught urlerror')
+                log.debug('decorator caught urlerror. handled traceback:', exc_info=True)
                 raise PluginError('URLError %s' % e.reason, self.log)
             except BadStatusLine:
-                log.debug('decorator caught badstatusline')
+                log.debug('decorator caught badstatusline. handled traceback:', exc_info=True)
                 raise PluginError('Got BadStatusLine', self.log)
             except ValueError as e:
-                log.debug('decorator caught ValueError')
-                raise PluginError(e.message)
+                log.debug('decorator caught ValueError. handled traceback:', exc_info=True)
+                raise PluginError(e)
             except IOError as e:
-                log.debug('decorator caught ioerror')
+                log.debug('decorator caught ioerror. handled traceback:', exc_info=True)
                 if hasattr(e, 'reason'):
                     raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.log)
                 elif hasattr(e, 'code'):
@@ -270,8 +273,8 @@ class PluginInfo(dict):
 
         if self.name in plugins:
             PluginInfo.dupe_counter += 1
-            log.critical('Error while registering plugin %s. %s' %
-                         (self.name, ('A plugin with the name %s is already registered' % self.name)))
+            log.critical('Error while registering plugin %s. A plugin with the same name is already registered' %
+                         self.name)
         else:
             plugins[self.name] = self
 
@@ -414,9 +417,6 @@ def _load_plugins_from_dirs(dirs):
 def load_plugins():
     """Load plugins from the standard plugin paths."""
     global plugins_loaded
-
-    # suppress DeprecationWarning's
-    warnings.simplefilter('ignore', DeprecationWarning)
 
     start_time = time.time()
     # Import all the plugins

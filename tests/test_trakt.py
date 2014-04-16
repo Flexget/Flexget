@@ -49,8 +49,8 @@ class TestTraktLookup(FlexGetBase):
         entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['trakt_ep_name'] == 'Paternity', \
             '%s trakt_ep_name should be Paternity' % entry['title']
-        assert int(entry['trakt_series_runtime']) == 60, \
-            'runtime for %s is %s, should be 60' % (entry['title'], entry['tvdb_runtime'])
+        assert entry['trakt_series_status'] == 'Ended', \
+            'runtime for %s is %s, should be Ended' % (entry['title'], entry['trakt_series_status'])
         assert entry['afield'] == '73255Paternity', 'afield was not set correctly'
         assert self.task.find_entry(trakt_ep_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'

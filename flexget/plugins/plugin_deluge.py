@@ -7,6 +7,7 @@ import os
 import re
 import sys
 import time
+import warnings
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -39,6 +40,9 @@ def add_deluge_windows_install_dir_to_sys_path():
             sys.path.append(os.path.join(deluge_dir, item))
 
 add_deluge_windows_install_dir_to_sys_path()
+
+# Some twisted import is throwing a warning see #2434
+warnings.filterwarnings('ignore', message='Not importing directory .*')
 
 try:
     from twisted.python import log as twisted_log
@@ -126,14 +130,22 @@ class DelugePlugin(object):
     def validate_connection_info(self, dict_validator):
         dict_validator.accept('text', key='host')
         dict_validator.accept('integer', key='port')
+        dict_validator.accept('text', key='username')
+        dict_validator.accept('text', key='password')
+        # Deprecated
         dict_validator.accept('text', key='user')
         dict_validator.accept('text', key='pass')
 
     def prepare_connection_info(self, config):
         config.setdefault('host', 'localhost')
         config.setdefault('port', 58846)
-        config.setdefault('user', '')
-        config.setdefault('pass', '')
+        if 'user' in config or 'pass' in config:
+            warnings.warn('deluge `user` and `pass` options have been renamed `username` and `password`',
+                          DeprecationWarning)
+            config.setdefault('username', config.get('user', ''))
+            config.setdefault('password', config.get('pass', ''))
+        config.setdefault('username', '')
+        config.setdefault('password', '')
 
     def on_task_start(self, task, config):
         """Raise a DependencyError if our dependencies aren't available"""
@@ -178,11 +190,11 @@ try:
         def connect(self, task, config):
             """Connects to the deluge daemon and runs on_connect_success """
 
-            if config['host'] in ['localhost', '127.0.0.1'] and not config.get('user'):
-                # If an user is not specified, we have to do a lookup for the localclient username/password
+            if config['host'] in ['localhost', '127.0.0.1'] and not config.get('username'):
+                # If an username is not specified, we have to do a lookup for the localclient username/password
                 auth = get_localhost_auth()
                 if auth[0]:
-                    config['user'], config['pass'] = auth
+                    config['username'], config['password'] = auth
                 else:
                     raise plugin.PluginError('Unable to get local authentication info for Deluge. You may need to '
                                              'specify an username and password from your Deluge auth file.')
@@ -192,8 +204,8 @@ try:
             d = client.connect(
                 host=config['host'],
                 port=config['port'],
-                username=config['user'],
-                password=config['pass'])
+                username=config['username'],
+                password=config['password'])
 
             d.addCallback(self.on_connect_success, task, config).addErrback(self.on_connect_fail)
             result = reactor.run()
@@ -230,7 +242,7 @@ class InputDeluge(DelugePlugin):
         'save_path': 'deluge_path',
         'label': 'deluge_label',
         'total_size': ('content_size', lambda size: size / 1024 / 1024),
-        'files': ('content_files', lambda file_dicts: [os.path.basename(f['path']) for f in file_dicts])}
+        'files': ('content_files', lambda file_dicts: [f['path'] for f in file_dicts])}
 
     def __init__(self):
         self.entries = []

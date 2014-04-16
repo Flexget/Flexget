@@ -35,6 +35,7 @@ class PluginThetvdbLookup(object):
       tvdb_content_rating
       tvdb_genres
       tvdb_network
+      tvdb_overview
       tvdb_banner_url
       tvdb_fanart_url
       tvdb_poster_url
@@ -65,6 +66,7 @@ class PluginThetvdbLookup(object):
         'tvdb_content_rating': 'contentrating',
         'tvdb_genres': 'genre',
         'tvdb_network': 'network',
+        'tvdb_overview': 'overview',
         'tvdb_banner_url': lambda series: series.banner and get_mirror('banner') + series.banner,
         'tvdb_fanart_url': lambda series: series.fanart and get_mirror('banner') + series.fanart,
         'tvdb_poster_url': lambda series: series.poster and get_mirror('banner') + series.poster,
@@ -99,7 +101,7 @@ class PluginThetvdbLookup(object):
             series = lookup_series(entry.get('series_name', eval_lazy=False), tvdb_id=entry.get('tvdb_id', eval_lazy=False))
             entry.update_using_map(self.series_map, series)
         except LookupError as e:
-            log.debug('Error looking up tvdb series information for %s: %s' % (entry['title'], e.message))
+            log.debug('Error looking up tvdb series information for %s: %s' % (entry['title'], e.args[0]))
             entry.unregister_lazy_fields(self.series_map, self.lazy_series_lookup)
             # Also clear episode fields, since episode lookup cannot succeed without series lookup
             entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
@@ -131,7 +133,7 @@ class PluginThetvdbLookup(object):
             episode = lookup_episode(**lookupargs)
             entry.update_using_map(self.episode_map, episode)
         except LookupError as e:
-            log.debug('Error looking up tvdb episode information for %s: %s' % (entry['title'], e.message))
+            log.debug('Error looking up tvdb episode information for %s: %s' % (entry['title'], e.args[0]))
             entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
 
         return entry[field]

@@ -13,12 +13,15 @@ log = logging.getLogger('pogcal')
 
 class InputPogDesign(object):
 
-    def validator(self):
-        from flexget import validator
-        config = validator.factory('dict')
-        config.accept('text', key='username', required=True)
-        config.accept('text', key='password', required=True)
-        return config
+    schema = {
+        'type': 'object',
+        'properties': {
+            'username': {'type': 'string'},
+            'password': {'type': 'string'}
+        },
+        'required': ['username', 'password'],
+        'additionalProperties': False
+    }
 
     name_map = {'The Tonight Show [Leno]': 'The Tonight Show With Jay Leno',
                 'Late Show [Letterman]': 'David Letterman'}

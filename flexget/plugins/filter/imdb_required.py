@@ -28,7 +28,7 @@ class FilterImdbRequired(object):
                 plugin.get_plugin_by_name('imdb_lookup').instance.lookup(entry)
             except plugin.PluginError:
                 entry.reject('imdb required')
-            if 'imdb_url' not in entry and 'imdb_id' not in entry:
+            if 'imdb_id' not in entry and 'imdb_url' not in entry:
                 entry.reject('imdb required')
 
 @event('plugin.register')

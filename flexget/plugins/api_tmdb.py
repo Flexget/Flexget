@@ -1,10 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 import logging
-from urllib2 import URLError
 import os
-import sys
 import posixpath
+import socket
+import sys
+from urllib2 import URLError
 
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
@@ -29,7 +30,9 @@ Base = db_schema.versioned_base('api_tmdb', 0)
 
 # This is a FlexGet API key
 tmdb3.tmdb_api.set_key('bdfc018dbdb7c243dc7cb1454ff74b95')
-tmdb3.locales.set_locale("en", "us", True);
+tmdb3.locales.set_locale("en", "us", True)
+# There is a bug in tmdb3 library, where it uses the system encoding for query parameters, tmdb expects utf-8 #2392
+tmdb3.locales.syslocale.encoding = 'utf-8'
 tmdb3.set_cache('null')
 
 
@@ -70,7 +73,7 @@ class TMDBContainer(object):
         for col in self.__table__.columns:
             if isinstance(update_dict.get(col.name), (basestring, int, float)):
                 setattr(self, col.name, update_dict[col.name])
-    
+
     def update_from_object(self, update_object):
         """Populates any simple (string or number) attributes from object attributes"""
         for col in self.__table__.columns:
@@ -108,7 +111,7 @@ class TMDBMovie(TMDBContainer, Base):
     year = year_property('released')
     posters = relation('TMDBPoster', backref='movie', cascade='all, delete, delete-orphan')
     genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
-    
+
     def update_from_object(self, update_object):
         TMDBContainer.update_from_object(self, update_object)
         self.translated = len(update_object.translations) > 0
@@ -116,8 +119,13 @@ class TMDBMovie(TMDBContainer, Base):
             self.language = update_object.languages[0].code #.code or .name ?
         self.original_name = update_object.originaltitle
         self.name = update_object.title
-        if len(update_object.alternate_titles) > 0:
-            self.alternative_name = update_object.alternate_titles[0].title #maybe we could choose alternate title from movie country only
+        try:
+            if len(update_object.alternate_titles) > 0:
+                # maybe we could choose alternate title from movie country only
+                self.alternative_name = update_object.alternate_titles[0].title
+        except UnicodeEncodeError:
+            # Bug in tmdb3 library, see #2437. Just don't set alternate_name when it fails
+            pass
         self.imdb_id = update_object.imdb
         self.url = update_object.homepage
         self.rating = update_object.userrating
@@ -290,7 +298,10 @@ class ApiTmdb(object):
                     else:
                         movie = None
                 elif title:
-                    result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True, year=year))
+                    try:
+                        result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True, year=year))
+                    except socket.timeout:
+                        raise LookupError('Timeout contacting TMDb')
                     if not result and year:
                         result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True))
                     if result:
@@ -305,7 +316,7 @@ class ApiTmdb(object):
                 raise LookupError('Error looking up movie from TMDb (%s)' % e)
             if movie:
                 log.verbose("Movie found from TMDb: %s (%s)" % (movie.name, movie.year))
-            
+
         if not movie:
             raise LookupError('No results found from tmdb for %s' % id_str())
         else:
@@ -352,7 +363,7 @@ class ApiTmdb(object):
                 if db_genre not in movie.genres:
                     movie.genres.append(db_genre)
         movie.updated = datetime.now()
-        
+
 def _first_result(results):
     if results and len(results) >= 1:
         return results[0]

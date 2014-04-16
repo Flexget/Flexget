@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import urlparse
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -20,15 +19,54 @@ class AppleTrailers(InputRSS):
     """
         Adds support for Apple.com movie trailers.
 
-        apple_trailers: 480p
+        Configuration:
+        quality: Set the desired resolution - 480p or 720p. default '720p'
+        genres:  List of genres used to filter the entries. If set, the
+        trailer must match at least one listed genre to be accepted. Genres
+        that can be used: Action and Adventure, Comedy, Documentary, Drama,
+        Family, Fantasy, Foreign, Horror, Musical, Romance, Science Fiction,
+        Thriller. default '' (all)
 
-        Choice of quality is one of: 480p, 720p
+        apple_trailers:
+          quality: 720p
+          genres: ['Action and Adventure']
+
+        Alternatively, a simpler configuration format can be used. This uses
+        the default genre filter, all:
+
+        apple_trailers: 720p
+
+        This plugin adds the following fields to the entry:
+          movie_name, movie_year, genres, apple_trailers_name, movie_studio
+        movie_name: Name of the movie
+        movie_year: Year the movie was/will be released
+        genres: Comma-separated list of genres that apply to the movie
+        apple_trailers_name: Contains the Apple-supplied name of the clip,
+        such as 'Clip 2', 'Trailer', 'Winter Olympic Preview'
+        movie_studio: Name of the studio that makes the movie
     """
 
     rss_url = 'http://trailers.apple.com/trailers/home/rss/newtrailers.rss'
     qualities = ['480p', '720p']
 
-    schema = {'enum': qualities}
+    schema = {
+        'oneOf': [
+            {
+                'type': 'object',
+                'properties': {
+                    'quality': {
+                        'type': 'string',
+                        'enum': qualities,
+                        'default': '720p'
+                    },
+                    'genres': {'type': 'array', 'items': {'type': 'string'}}
+                },
+                'additionalProperties': False
+            },
+            {'title': 'justquality', 'type': 'string', 'enum': qualities}
+            ]
+
+    }
 
     # Run before headers plugin
     @plugin.priority(135)
@@ -37,7 +75,7 @@ class AppleTrailers(InputRSS):
         # make sure we have dependencies available, will throw DependencyError if not
         plugin.get_plugin_by_name('headers')
         # configure them
-        task.config['headers'] = {'User-Agent': 'QuickTime/7.6.6'}
+        task.config['headers'] = {'User-Agent': 'Quicktime/7.7'}
 
     @plugin.priority(127)
     @cached('apple_trailers')
@@ -54,44 +92,83 @@ class AppleTrailers(InputRSS):
             trailers.setdefault(url, []).append(entry['title'])
 
         result = []
-        if config == '720p':
-            url_extension = 'includes/extralarge.html'
-        else:
-            url_extension = 'includes/large.html'
         for url, titles in trailers.iteritems():
-            inc_url = url + url_extension
+            genre_url = url + '#gallery-film-info-details'
             try:
-                page = task.requests.get(inc_url)
+                page = task.requests.get(genre_url)
+                soup = get_soup(page.text)
+            except RequestException as err:
+                log.warning("RequestsException when opening playlist page: %s" % err)
+
+            genres = set()
+            genre_head = soup.find(name='dt', text='Genre')
+            if not genre_head:
+                log.debug('genre(s) not found')
+            for genre_name in genre_head.next_sibling.contents:
+                if genre_name == ' ' or genre_name == ', ':
+                    continue
+                genres.add(genre_name.contents[0].string)
+                log.debug('genre found: %s' % genre_name.contents[0].string)
+
+            #Turn simple config into full config
+            if isinstance(config, basestring):
+                config = {'quality': config}
+
+            if config.get('genres'):
+                config_genres = set(config.get('genres'))
+                good_genres = set.intersection(config_genres, genres)
+                if not good_genres:
+                    continue
+
+            film_detail = soup.find(class_='film-detail')
+            release_year = ''
+            studio = ''
+            if not film_detail:
+                log.debug('film detail not found')
+            else:
+                release_c = film_detail.contents[1].string
+                release_year = release_c[(release_c.find(', 20')+2):(release_c.find(', 20')+6)]
+                log.debug('release year: %s' % release_year)
+                studio_c = film_detail.contents[5].string
+                studio = studio_c[7:]
+                log.debug('studio: %s' % studio)
+
+            # the HTML for the trailer gallery is stored in a "secret" location...let's see how long this lasts
+            # the iPad version has direct links to the video files
+            url = url + 'includes/playlists/ipad.inc'
+            try:
+                page = task.requests.get(url)
+                soup = get_soup(page.text)
             except RequestException as err:
                 log.warning("RequestsException when opening playlist page: %s" % err)
                 continue
 
-            soup = get_soup(page.text)
             for title in titles:
-                trailer = soup.find(text=title.split(' - ')[1])
-                if not trailer:
-                    log.debug('did not find trailer link')
-                    continue
-                trailers_link = trailer.find_parent('a')
-                if not trailers_link:
-                    log.debug('did not find trailer link')
+                log.debug('Searching for trailer title: %s' % title.split(' - ')[1])
+                try:
+                    trailer = soup.find(text=title.split(' - ')[1])
+                except AttributeError:
+                    log.debug('did not find %s listed' % title.split(' - ')[1])
                     continue
                 try:
-                    page = task.requests.get(urlparse.urljoin(url, trailers_link['href']))
-                except RequestException as e:
-                    log.debug('error getting trailers page')
+                    trailers_link = trailer.parent.next_sibling.next_sibling.contents[1].contents[0]
+                except AttributeError:
+                    log.debug('did not find trailer link tag')
                     continue
-                trailer_soup = get_soup(page.text)
-                link = trailer_soup.find('a', attrs={'class': 'movieLink'})
-                if not link:
+                try:
+                    link = trailers_link['href'].replace('r640s', ''.join(['h',config.get('quality')]))
+                except AttributeError:
                     log.debug('could not find download link')
                     continue
-                # Need to add an 'h' in front of the resolution
-                entry_url = link['href']
-                entry_url = entry_url[:entry_url.find(config + '.mov')] + 'h%s.mov' % config
-                entry = Entry(title, entry_url)
+                entry = Entry(title, link)
                 # Populate a couple entry fields for making pretty filenames
                 entry['movie_name'], entry['apple_trailers_name'] = title.split(' - ')
+                if genres:
+                    entry['genres'] = ', '.join(list(genres))
+                if release_year:
+                    entry['movie_year'] = release_year
+                if studio:
+                    entry['movie_studio'] = studio
                 result.append(entry)
 
         return result

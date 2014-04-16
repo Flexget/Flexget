@@ -213,7 +213,7 @@ class Archive(object):
         was started.
         """
         if task.session is not None:
-            self.on_task_exit(task, config)
+            self.on_task_learn(task, config)
 
 
 class UrlrewriteArchive(object):
@@ -225,13 +225,10 @@ class UrlrewriteArchive(object):
                  'url': 'url',
                  'description': 'description'}
 
-    def validator(self):
-        from flexget import validator
-
-        root = validator.factory()
-        root.accept('boolean')
-        root.accept('list').accept('text')
-        return root
+    schema = {'oneOf': [
+        {'type': 'boolean'},
+        {'type': 'array', 'items': {'type': 'string'}}
+    ]}
 
     def search(self, entry, config=None):
         """Search plugin API method"""

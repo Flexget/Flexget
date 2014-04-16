@@ -1,17 +1,23 @@
 import argparse
+import logging
+import os
+import socket
 import sys
 
 import flexget
 from flexget import options
 from flexget.event import event
+from flexget.utils.tools import console
 
-def do_cli(manager, options):
-    import pythoncom
-    import win32serviceutil
-    import win32service
-    import win32event
+log = logging.getLogger('win32_service')
+
+
+try:
     import servicemanager
-    import socket
+    import win32event
+    import win32service
+    import win32serviceutil
+
 
     class AppServerSvc (win32serviceutil.ServiceFramework):
         _svc_name_ = 'FlexGet'
@@ -35,7 +41,22 @@ def do_cli(manager, options):
                                   servicemanager.PYS_SERVICE_STARTED,
                                   (self._svc_name_, ''))
 
-            flexget.main(['daemon'])
+            flexget.main(['daemon', 'start'])
+
+except ImportError:
+    pass
+
+
+def do_cli(manager, options):
+    import win32file
+    import win32serviceutil
+
+    if hasattr(sys, 'real_prefix'):
+        # We are in a virtualenv, there is some special setup
+        if not os.path.exists(os.path.join(sys.prefix, 'python.exe')):
+            console('Creating a hard link to virtualenv python.exe in root of virtualenv')
+            win32file.CreateHardLink(os.path.join(sys.prefix, 'python.exe'),
+                                     os.path.join(sys.prefix, 'Scripts', 'python.exe'))
 
     argv = options.args
     if options.help:

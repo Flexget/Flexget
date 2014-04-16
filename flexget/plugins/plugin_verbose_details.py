@@ -32,6 +32,16 @@ class PluginDetails(object):
             len(task.entries) - len(task.accepted), len(task.failed)))
 
 
+class NoEntriesOk(object):
+    """Allows manually silencing the warning message for tasks that regularly produce no entries."""
+    schema = {'type': 'boolean'}
+
+    # Run after details plugin task_start
+    @plugin.priority(127)
+    def on_task_start(self, task, config):
+        task.no_entries_ok = config
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginDetails, 'details', builtin=True, api_ver=2)
+    plugin.register(NoEntriesOk, 'no_entries_ok', api_ver=2)

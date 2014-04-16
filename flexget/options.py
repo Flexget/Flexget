@@ -343,17 +343,20 @@ manager_parser.add_argument('-V', '--version', action=VersionAction, help='Print
 manager_parser.add_argument('--test', action='store_true', dest='test', default=0,
                             help='Verbose what would happen on normal execution.')
 manager_parser.add_argument('-c', dest='config', default='config.yml',
-                            help='Specify configuration file. Default is config.yml')
+                            help='Specify configuration file. Default: %(default)s')
 manager_parser.add_argument('--logfile', '-l', default='flexget.log',
                             help='Specify a custom logfile name/location. '
-                                 'Default is flexget.log in the config directory.')
+                                 'Default: %(default)s in the config directory.')
 manager_parser.add_argument('--loglevel', '-L', metavar='LEVEL',
-                            default='verbose', help='Set the verbosity of the logger.',
+                            default='verbose',
+                            help='Set the verbosity of the logger. Levels: %(choices)s',
                             choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
 # This option is already handled above.
 manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
                             help='Use this option to create a detailed bug report, '
                                  'note that the output might contain PRIVATE data, so edit that out')
+manager_parser.add_argument('--profile', metavar='OUTFILE', nargs='?', const='flexget.profile',
+                            help='Use the python profiler for this run to debug performance issues.')
 manager_parser.add_argument('--debug', action=DebugAction, nargs=0, help=SUPPRESS)
 manager_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, help=SUPPRESS)
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
@@ -379,7 +382,7 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--tasks', nargs='+', metavar='TASK',
                                  help='run only specified task(s), optionally using glob patterns ("tv-*"). '
                                       'matching is case-insensitive')
-        exec_parser.add_argument('--learn', action='store_true', dest='learn', default=0,
+        exec_parser.add_argument('--learn', action='store_true', dest='learn', default=False,
                                  help='matches are not downloaded but will be skipped in the future')
         exec_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
                                  help='use when scheduling FlexGet with cron or other scheduler: allows background '
@@ -388,8 +391,8 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
         exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
         # Plugins should respect these flags where appropriate
-        exec_parser.add_argument('--retry', action='store_true', dest='retry', default=0, help=SUPPRESS)
-        exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=0,
+        exec_parser.add_argument('--retry', action='store_true', dest='retry', default=False, help=SUPPRESS)
+        exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=False,
                                  help='disable caches. works only in plugins that have explicit support')
 
         daemonize_help = SUPPRESS
@@ -404,6 +407,7 @@ class CoreArgumentParser(ArgumentParser):
         start_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
         daemon_parser.add_subparser('stop', help='shutdown the running daemon')
         daemon_parser.add_subparser('status', help='check if a daemon is running')
+        daemon_parser.add_subparser('reload', help='causes a running daemon to reload the config from disk')
         daemon_parser.set_defaults(loglevel='info')
 
         # The parser for the webui

@@ -6,6 +6,7 @@ from sqlalchemy import Column, Integer, Unicode
 
 from flexget import db_schema, plugin
 from flexget.event import event
+from flexget.config_schema import process_config
 from flexget.plugins.filter.series import FilterSeriesBase
 
 log = logging.getLogger('configure_series')
@@ -20,7 +21,7 @@ class LastHash(Base):
     hash = Column(Unicode)
 
 
-class ImportSeries(FilterSeriesBase):
+class ConfigureSeries(FilterSeriesBase):
 
     """Generates series configuration from any input (supporting API version 2, soon all)
 
@@ -72,6 +73,15 @@ class ImportSeries(FilterSeriesBase):
                 if entry.get('tvdb_id'):
                     s['set'] = {'tvdb_id': entry['tvdb_id']}
 
+                # Allow configure_series to set anything available to series
+                for key, schema in self.settings_schema['properties'].iteritems():
+                    if 'configure_series_' + key in entry:
+                        errors = process_config(entry['configure_series_' + key], schema, set_defaults=False)
+                        if errors:
+                            log.debug('not setting series option %s for %s. errors: %s' % (key, entry['title'], errors))
+                        else:
+                            s[key] = entry['configure_series_' + key]
+
         # Set the config_modified flag if the list of shows changed since last time
         new_hash = hashlib.md5(unicode(sorted(series))).hexdigest().decode('ascii')
         last_hash = task.session.query(LastHash).filter(LastHash.task == task.name).first()
@@ -98,4 +108,4 @@ class ImportSeries(FilterSeriesBase):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ImportSeries, 'configure_series', api_ver=2)
+    plugin.register(ConfigureSeries, 'configure_series', api_ver=2)

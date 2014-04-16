@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import, print_function
 import atexit
+import codecs
 from contextlib import contextmanager
 import signal
 import os
@@ -45,19 +46,31 @@ class Manager(object):
 
     Fires events:
 
+    * manager.initialize
+
+      The first time the manager is initialized, before config is loaded
+
+    * manager.before_config_load
+
+      Before the config file is loaded from disk
+
+    * manager.before_config_validate
+
+      When updating the config, before the validator is run on it
+
+    * manager.config_updated
+
+      After a configuration file has been loaded or changed (and validated) this event is fired
+
     * manager.startup
 
       After manager has been initialized. This is when application becomes ready to use, however no database lock is
       present, so the database must not be modified on this event.
 
-    * manager.lock-acquired
+    * manager.lock_acquired
 
       The manager does not always require a lock on startup, if one is requested, this event will run when it has been
       acquired successfully
-
-    * manager.config-loaded
-
-      When a valid configuration has been (re)loaded, this event is fired
 
     * manager.upgrade
 
@@ -131,16 +144,13 @@ class Manager(object):
         self.setup_yaml()
         self.find_config(create=(self.options.cli_command == 'webui'))
         self.init_sqlalchemy()
-        fire_event('manager.before_config_load', self)
-        self.load_config()
-        fire_event('manager.before_config_validate', self)
-        errors = self.validate_config()
-        if errors:
-            for error in errors:
-                log.critical("[%s] %s", error.json_pointer, error.message)
+        fire_event('manager.initialize', self)
+        try:
+            self.load_config()
+        except ValueError as e:
+            log.critical('Failed to load config file: %s' % e.args[0])
             self.shutdown(finish_queue=False)
             sys.exit(1)
-        fire_event('manager.config-loaded', self)
 
     @property
     def tasks(self):
@@ -190,8 +200,13 @@ class Manager(object):
         # If a daemon is started, send the execution to the daemon
         ipc_info = self.check_ipc_info()
         if ipc_info:
-            client = IPCClient(ipc_info['port'], ipc_info['password'])
-            client.execute(dict(options))
+            try:
+                log.info('There is a daemon running for this config. Sending execution to running daemon.')
+                client = IPCClient(ipc_info['port'], ipc_info['password'])
+            except ValueError as e:
+                log.error(e)
+            else:
+                client.execute(dict(options))
             self.shutdown()
             return
         # Otherwise we run the execution ourselves
@@ -221,7 +236,12 @@ class Manager(object):
             if options.daemonize:
                 self.daemonize()
             with self.acquire_lock():
-                signal.signal(signal.SIGTERM, self._handle_sigterm)
+                try:
+                    signal.signal(signal.SIGTERM, self._handle_sigterm)
+                except ValueError as e:
+                    # If flexget is being called from another script, e.g. windows service helper, and we are not the
+                    # main thread, this error will occur.
+                    log.debug('Error registering sigterm handler: %s' % e)
                 self.ipc_server.start()
                 fire_event('manager.daemon.started', self)
                 self.scheduler.start()
@@ -231,20 +251,27 @@ class Manager(object):
                     log.info('Got ctrl-c, shutting down.')
                     fire_event('manager.daemon.completed', self)
                     self.shutdown(finish_queue=False)
-        elif options.action == 'stop':
-            ipc_info = self.check_ipc_info()
-            if ipc_info:
-                client = IPCClient(ipc_info['port'], ipc_info['password'])
-                client.shutdown()
-                self.shutdown()
-            else:
-                log.error('There does not appear to be a daemon running.')
         elif options.action == 'status':
             ipc_info = self.check_ipc_info()
             if ipc_info:
                 log.info('Daemon running. (PID: %s)' % ipc_info['pid'])
             else:
                 log.info('No daemon appears to be running for this config.')
+        elif options.action in ['stop', 'reload']:
+            ipc_info = self.check_ipc_info()
+            if ipc_info:
+                try:
+                    client = IPCClient(ipc_info['port'], ipc_info['password'])
+                except ValueError as e:
+                    log.error(e)
+                else:
+                    if options.action == 'stop':
+                        client.shutdown()
+                    elif options.action == 'reload':
+                        client.reload()
+                self.shutdown()
+            else:
+                log.error('There does not appear to be a daemon running.')
 
     def webui_command(self, options):
         """
@@ -310,11 +337,14 @@ class Manager(object):
             possible = [config]
         else:
             log.debug('Figuring out config load paths')
-            possible.append(os.getcwd())
+            try:
+                possible.append(os.getcwdu())
+            except OSError:
+                log.debug('current directory invalid, not searching for config there')
             # for virtualenv / dev sandbox
             if hasattr(sys, 'real_prefix'):
                 log.debug('Adding virtualenv path')
-                possible.append(sys.prefix)
+                possible.append(sys.prefix.decode(sys.getfilesystemencoding()))
             # normal lookup locations
             possible.append(home_path)
             if sys.platform.startswith('win'):
@@ -353,20 +383,19 @@ class Manager(object):
 
     def load_config(self):
         """
-        .. warning::
+        Loads the config file from disk, validates and activates it.
 
-           Calls sys.exit(1) if configuration file could not be loaded.
-           This is something we probably want to change.
+        :raises: `ValueError` if there is a problem loading the config file
         """
-        with open(self.config_path, 'rb') as f:
-            config = f.read()
+        fire_event('manager.before_config_load', self)
+        with codecs.open(self.config_path, 'rb', 'utf-8') as f:
+            try:
+                raw_config = f.read()
+            except UnicodeDecodeError:
+                log.critical('Config file must be UTF-8 encoded.')
+                raise ValueError('Config file is not UTF-8 encoded')
         try:
-            config = config.decode('utf-8')
-        except UnicodeDecodeError:
-            log.critical('Config file must be UTF-8 encoded.')
-            sys.exit(1)
-        try:
-            self.config = yaml.safe_load(config) or {}
+            config = yaml.safe_load(raw_config) or {}
         except Exception as e:
             msg = str(e).replace('\n', ' ')
             msg = ' '.join(msg.split())
@@ -407,19 +436,41 @@ class Manager(object):
             # When --debug escalate to full stacktrace
             if self.options.debug:
                 raise
-            sys.exit(1)
+            raise ValueError('Config file is not valid YAML')
 
         # config loaded successfully
         log.debug('config_name: %s' % self.config_name)
         log.debug('config_base: %s' % self.config_base)
+        # Install the newly loaded config
+        self.update_config(config)
+
+    def update_config(self, config):
+        """
+        Provide a new config for the manager to use.
+
+        :raises: `ValueError` and rolls back to previous config if the provided config is not valid.
+        """
+        old_config = self.config
+        self.config = config
+        errors = self.validate_config()
+        if errors:
+            for error in errors:
+                log.critical("[%s] %s", error.json_pointer, error.message)
+            log.debug('invalid config, rolling back')
+            self.config = old_config
+            raise ValueError('Config did not pass schema validation')
+        log.debug('New config data loaded.')
+        fire_event('manager.config_updated', self)
 
     def save_config(self):
         """Dumps current config to yaml config file"""
-        config_file = file(os.path.join(self.config_base, self.config_name) + '.yml', 'w')
-        try:
+        # Back up the user's current config before overwriting
+        backup_path = os.path.join(self.config_base,
+                                   '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')))
+        log.debug('backing up old config to %s before new save' % backup_path)
+        shutil.copy(self.config_path, backup_path)
+        with open(self.config_path, 'w') as config_file:
             config_file.write(yaml.dump(self.config, default_flow_style=False))
-        finally:
-            config_file.close()
 
     def config_changed(self):
         """Makes sure that all tasks will have the config_modified flag come out true on the next run.
@@ -428,121 +479,13 @@ class Manager(object):
         for task in self.tasks:
             config_changed(task)
 
-    def pre_check_config(self, config):
-        """Checks configuration file for common mistakes that are easily detectable"""
-
-        def get_indentation(line):
-            i, n = 0, len(line)
-            while i < n and line[i] == ' ':
-                i += 1
-            return i
-
-        def isodd(n):
-            return bool(n % 2)
-
-        line_num = 0
-        duplicates = {}
-        # flags
-        prev_indentation = 0
-        prev_mapping = False
-        prev_list = True
-        prev_scalar = True
-        list_open = False  # multiline list with [
-
-        for line in config.splitlines():
-            if '# warnings off' in line.strip().lower():
-                log.debug('config pre-check warnings off')
-                break
-            line_num += 1
-            # remove linefeed
-            line = line.rstrip()
-            # empty line
-            if line.strip() == '':
-                continue
-            # comment line
-            if line.strip().startswith('#'):
-                continue
-            indentation = get_indentation(line)
-
-            if prev_scalar:
-                if indentation <= prev_indentation:
-                    prev_scalar = False
-                else:
-                    continue
-
-            cur_list = line.strip().startswith('-')
-
-            # skipping lines as long as multiline compact list is open
-            if list_open:
-                if line.strip().endswith(']'):
-                    list_open = False
-#                    print 'closed list at line %s' % line
-                continue
-            else:
-                list_open = line.strip().endswith(': [') or line.strip().endswith(':[')
-                if list_open:
-#                    print 'list open at line %s' % line
-                    continue
-
-#            print '#%i: %s' % (line_num, line)
-#            print 'indentation: %s, prev_ind: %s, prev_mapping: %s, prev_list: %s, cur_list: %s' % \
-#                  (indentation, prev_indentation, prev_mapping, prev_list, cur_list)
-
-            if ':\t' in line:
-                log.critical('Line %s has TAB character after : character. '
-                             'DO NOT use tab key when editing config!' % line_num)
-            elif '\t' in line:
-                log.warning('Line %s has tabs, use only spaces!' % line_num)
-            if isodd(indentation):
-                log.warning('Config line %s has odd (uneven) indentation' % line_num)
-            if indentation > prev_indentation and not prev_mapping:
-                # line increases indentation, but previous didn't start mapping
-                log.warning('Config line %s is likely missing \':\' at the end' % (line_num - 1))
-            if indentation > prev_indentation + 2 and prev_mapping and not prev_list:
-                # mapping value after non list indented more than 2
-                log.warning('Config line %s is indented too much' % line_num)
-            if indentation <= prev_indentation + (2 * (not cur_list)) and prev_mapping and prev_list:
-                log.warning('Config line %s is not indented enough' % line_num)
-            if prev_mapping and cur_list:
-                # list after opening mapping
-                if indentation < prev_indentation or indentation > prev_indentation + 2 + (2 * prev_list):
-                    log.warning('Config line %s containing list element is indented incorrectly' % line_num)
-            elif prev_mapping and indentation <= prev_indentation:
-                # after opening a map, indentation doesn't increase
-                log.warning('Config line %s is indented incorrectly (previous line ends with \':\')' % line_num)
-
-            # notify if user is trying to set same key multiple times in a task (a common mistake)
-            for level in duplicates.iterkeys():
-                # when indentation goes down, delete everything indented more than that
-                if indentation < level:
-                    duplicates[level] = {}
-            if ':' in line:
-                name = line.split(':', 1)[0].strip()
-                ns = duplicates.setdefault(indentation, {})
-                if name in ns:
-                    log.warning('Trying to set value for `%s` in line %s, but it is already defined in line %s!' %
-                        (name, line_num, ns[name]))
-                ns[name] = line_num
-
-            prev_indentation = indentation
-            # this line is a mapping (ends with :)
-            prev_mapping = line[-1] == ':'
-            prev_scalar = line[-1] in '|>'
-            # this line is a list
-            prev_list = line.strip()[0] == '-'
-            if prev_list:
-                # This line is in a list, so clear the duplicates,
-                # as duplicates are not always wrong in a list. see #697
-                duplicates[indentation] = {}
-
-        log.debug('Pre-checked %s configuration lines' % line_num)
-
     def validate_config(self):
         """
         Check all root level keywords are valid.
 
         :returns: A list of `ValidationError`s
         """
+        fire_event('manager.before_config_validate', self)
         return config_schema.process_config(self.config)
 
     def init_sqlalchemy(self):
@@ -563,6 +506,8 @@ class Manager(object):
                 if os.path.exists(self.db_filename):
                     shutil.copy(self.db_filename, db_test_filename)
                 self.db_filename = db_test_filename
+                # Different database, different lock file
+                self.lockfile = os.path.join(self.config_base, '.test-%s-lock' % self.config_name)
                 log.info('Test database created')
 
             # in case running on windows, needs double \\
@@ -604,7 +549,7 @@ class Manager(object):
             else:
                 print('%s - make sure you have write permissions to directory %s' %
                       (e.message, self.config_base), file=sys.stderr)
-            raise Exception(e.message)
+            raise
 
     def _read_lock(self):
         """
@@ -620,7 +565,10 @@ class Manager(object):
             for key in result:
                 if result[key].isdigit():
                     result[key] = int(result[key])
-            if not pid_exists(result['pid']):
+            result.setdefault('pid', None)
+            if not result['pid']:
+                log.error('Invalid lock file. Make sure FlexGet is not running, then delete it.')
+            elif not pid_exists(result['pid']):
                 return None
             return result
         return None
@@ -645,7 +593,7 @@ class Manager(object):
     @contextmanager
     def acquire_lock(self, event=True):
         """
-        :param bool event: If True, the 'manager.lock-acquired' event will be fired after a lock is obtained
+        :param bool event: If True, the 'manager.lock_acquired' event will be fired after a lock is obtained
         """
         acquired = False
         try:
@@ -664,7 +612,7 @@ class Manager(object):
                 self.write_lock()
                 acquired = True
                 if event:
-                    fire_event('manager.lock-acquired', self)
+                    fire_event('manager.lock_acquired', self)
             yield
         finally:
             if acquired:

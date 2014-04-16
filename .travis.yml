@@ -10,3 +10,8 @@ install:
 script: nosetests --attr !online
 notifications:
   email: false
+  webhooks:
+    urls:
+    - http://n.tkte.ch/h/343/-Sl5O1RgMVaGmIAJDbblXVIc
+    on_success: change
+    on_failure: always

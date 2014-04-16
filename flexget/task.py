@@ -12,7 +12,7 @@ from flexget import db_schema
 from flexget.entry import EntryUnicodeError
 from flexget.event import fire_event, event
 from flexget.manager import Session
-from flexget.plugin import (get_plugins_by_phase, task_phases, phase_methods, PluginWarning, PluginError,
+from flexget.plugin import (get_plugins, task_phases, phase_methods, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins, plugin_schemas)
 from flexget.utils import requests
 from flexget.utils.simple_persistence import SimpleTaskPersistence
@@ -261,9 +261,10 @@ class Task(object):
 
         self.disabled_phases = []
 
-        self._abort = False
-        self._abort_reason = None
-        self._silent_abort = False
+        # These are just to query what happened in task. Call task.abort to set.
+        self.aborted = False
+        self.abort_reason = None
+        self.silent_abort = False
 
         self._rerun = False
 
@@ -276,14 +277,6 @@ class Task(object):
 
     def __str__(self):
         return '<Task(name=%s,aborted=%s)>' % (self.name, self.aborted)
-
-    @property
-    def aborted(self):
-        return self._abort
-
-    @property
-    def abort_reason(self):
-        return self._abort_reason
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
@@ -302,10 +295,10 @@ class Task(object):
 
     def abort(self, reason='Unknown', silent=False):
         """Abort this task execution, no more plugins will be executed except the abort handling ones."""
-        self._abort = True
-        self._abort_reason = reason
-        self._silent_abort = silent
-        if not self._silent_abort:
+        self.aborted = True
+        self.abort_reason = reason
+        self.silent_abort = silent
+        if not self.silent_abort:
             log.warning('Aborting task (plugin: %s)' % self.current_plugin)
         else:
             log.debug('Aborting task (plugin: %s)' % self.current_plugin)
@@ -339,7 +332,7 @@ class Task(object):
           An iterator over configured :class:`flexget.plugin.PluginInfo` instances enabled on this task.
         """
         if phase:
-            plugins = sorted(get_plugins_by_phase(phase), key=lambda p: p.phase_handlers[phase], reverse=True)
+            plugins = sorted(get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True)
         else:
             plugins = all_plugins.itervalues()
         return (p for p in plugins if p.name in self.config or p.builtin)
@@ -393,10 +386,6 @@ class Task(object):
             finally:
                 fire_event('task.execute.after_plugin', self, plugin.name)
 
-            # Make sure we abort if any plugin sets our abort flag
-            if self._abort and phase != 'abort':
-                return
-
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
         """
         Execute given plugins phase method, with supplied args and kwargs.
@@ -440,6 +429,11 @@ class Task(object):
                    (keyword, e.missing))
             log.critical(msg)
             log.debug(e.message)
+            self.abort(msg)
+        except Warning as e:
+            # If warnings have been elevated to errors
+            msg = 'Warning during plugin %s: %s' % (keyword, e)
+            log.exception(msg)
             self.abort(msg)
         except Exception as e:
             msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
@@ -551,8 +545,8 @@ class Task(object):
                 self.__run_task_phase('abort')
                 # Commit just the abort handler changes if no exceptions are raised there
                 self.session.commit()
-            except TaskAbort:
-                log.exception('abort handlers aborted!')
+            except TaskAbort as e:
+                log.exception('abort handlers aborted: %s' % e)
             raise
         else:
             for entry in self.all_entries:

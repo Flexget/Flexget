@@ -109,6 +109,12 @@ def decode_item(next, token):
     elif token == b"s":
         # string: "s" value (virtual tokens)
         data = next()
+        # Strings in torrent file are defined as utf-8 encoded
+        try:
+            data = data.decode('utf-8')
+        except UnicodeDecodeError as e:
+            # The pieces field is a byte string, and should be left as such.
+            pass
     elif token == b"l" or token == b"d":
         # container: "l" (or "d") values "e"
         data = []
@@ -129,8 +135,8 @@ def bdecode(text):
         data = decode_item(src.next, src.next()) # pylint:disable=E1101
         for token in src: # look for more tokens
             raise SyntaxError("trailing junk")
-    except (AttributeError, ValueError, StopIteration):
-        raise SyntaxError("syntax error")
+    except (AttributeError, ValueError, StopIteration) as e:
+        raise SyntaxError("syntax error: %s" % e)
     return data
 
 
@@ -224,20 +230,16 @@ class Torrent(object):
         # Decode strings
         for item in files:
             for field in ('name', 'path'):
-                # The standard mandates UTF-8, but try other common things
-                for encoding in ('utf-8', self.content.get('encoding', None), 'cp1252'):
-                    if encoding:
-                        try:
-                            item[field] = item[field].decode(encoding)
-                            break
-                        except UnicodeError:
-                            continue
-                else:
-                    # Broken beyond anything reasonable
-                    fallback = unicode(item[field], 'utf-8', 'replace').replace(u'\ufffd', '_')
-                    log.warning("%s=%r field in torrent %r is wrongly encoded, falling back to '%s'" % (
-                        field, item[field], self.content['info']['name'], fallback))
-                    item[field] = fallback
+                # These should already be decoded if they were utf-8, if not we can try some other stuff
+                if not isinstance(item[field], unicode):
+                    try:
+                        item[field] = item[field].decode(self.content.get('encoding', 'cp1252'))
+                    except UnicodeError:
+                        # Broken beyond anything reasonable
+                        fallback = item[field].decode('utf-8', 'replace').replace(u'\ufffd', '_')
+                        log.warning('%s=%r field in torrent %r is wrongly encoded, falling back to `%s`' %
+                                    (field, item[field], self.content['info']['name'], fallback))
+                        item[field] = fallback
 
         return files
 

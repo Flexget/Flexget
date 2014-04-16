@@ -16,7 +16,7 @@ log = logging.getLogger('ipc')
 rpyc.core.protocol.DEFAULT_CONFIG['safe_attrs'].update(['items'])
 rpyc.core.protocol.DEFAULT_CONFIG['allow_pickle'] = True
 
-IPC_VERSION = 0
+IPC_VERSION = 1
 AUTH_ERROR = 'authentication error'
 AUTH_SUCCESS = 'authentication success'
 
@@ -25,13 +25,8 @@ class DaemonService(rpyc.Service):
     # This will be populated when the server is started
     manager = None
 
-    def on_connect(self):
-        """Make sure the client version matches our own."""
-        client_version = self._conn.root.version()
-        if IPC_VERSION != client_version:
-            self.client_console('Incompatible client version. (daemon: %s, client: %s' % (IPC_VERSION, client_version))
-            self._conn.close()
-            return
+    def exposed_version(self):
+        return IPC_VERSION
 
     def exposed_execute(self, options=None):
         # Dictionaries are pass by reference with rpyc, turn this into a real dict on our side
@@ -52,8 +47,12 @@ class DaemonService(rpyc.Service):
                     continue
 
     def exposed_reload(self):
-        # TODO: Reload config
-        raise NotImplementedError
+        try:
+            self.manager.load_config()
+        except ValueError as e:
+            self.client_console('Error loading config: %s' % e.args[0])
+        else:
+            self.client_console('Config successfully reloaded from disk.')
 
     def exposed_shutdown(self, finish_queue=False):
         log.info('Shutdown requested over ipc.')
@@ -65,6 +64,13 @@ class DaemonService(rpyc.Service):
 
 
 class ClientService(rpyc.Service):
+    def on_connect(self):
+        """Make sure the client version matches our own."""
+        daemon_version = self._conn.root.version()
+        if IPC_VERSION != daemon_version:
+            self._conn.close()
+            raise ValueError('Daemon is different version than client.')
+
     def exposed_version(self):
         return IPC_VERSION
 
