@@ -173,7 +173,7 @@ class TransformingOps(BaseFileOps):
             return
         
         # Clean invalid characters with pathscrub plugin
-        dst_path = os.path.expanduser(dst_path)
+        dst_path = pathscrub(os.path.expanduser(dst_path))
         dst_name = pathscrub(dst_name, filename=True)
         
         # Join path and filename
