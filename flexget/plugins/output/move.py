@@ -42,38 +42,37 @@ class BaseFileOps(object):
             if not 'location' in entry:
                 self.log.verbose('Cannot handle %s because it does not have the field location.' % entry['title'])
                 continue
-            
-            # check location
             src = entry['location']
             src_isdir = os.path.isdir(src)
             try:
+                # check location
                 if not os.path.exists(src):
-                    raise Exception('does not exists (anymore).')
+                    raise plugin.PluginWarning('location `%s` does not exists (anymore).' % src)
                 if src_isdir:
                     if not config.get('allow_dir'):
-                        raise Exception('is a directory.')
+                        raise plugin.PluginWarning('location `%s`is a directory.' % src)
                 elif not os.path.isfile(src):
-                    raise Exception('is not a file.')
+                    raise plugin.PluginWarning('location `%s`is not a file.' % src)
+                # search for namesakes
+                siblings = []
+                if not src_isdir and 'along' in config:
+                    src_file, src_ext = os.path.splitext(src)
+                    for ext in sexts:
+                        if ext != src_ext.lower() and os.path.exists(src_file + ext):
+                            siblings.append(src_file + ext)
+                # execute action in subclasses
+                self.handle_entry(task, config, entry, siblings)
             except Exception as err:
-                self.log.warning('Cannot handle %s because location `%s` %s' % (entry['title'], src, err))
+                entry.fail(str(err))
                 continue
-            
-            # search for namesakes
-            siblings = []
-            if not src_isdir and 'along' in config:
-                src_file, src_ext = os.path.splitext(src)
-                for ext in sexts:
-                    if ext != src_ext.lower() and os.path.exists(src_file + ext):
-                        siblings.append(src_file + ext)
-            
-            # execute action in subclasses
-            self.handle_entry(task, config, entry, siblings)
     
     def clean_source(self, task, config, entry):
         min_size = entry.get('clean_source', config.get('clean_source', -1))
         if min_size < 0:
-            return
+            return 
         base_path = os.path.split(entry['location'])[0]
+        # everything here happens after a successful execution of the main action: the entry has been moved in a 
+        # different location, or it does not exists anymore. so from here we can just log warnings and move on.
         if not os.path.isdir(base_path):
             self.log.warning('Cannot delete path `%s` because it does not exists (anymore).' % base_path)
             return
@@ -114,7 +113,6 @@ class DeleteFiles(BaseFileOps):
     def handle_entry(self, task, config, entry, siblings):
         src = entry['location']
         src_isdir = os.path.isdir(src)
-        
         if task.options.test:
             if src_isdir:
                 self.log.info('Would delete `%s` and all its content.' % src)
@@ -123,26 +121,20 @@ class DeleteFiles(BaseFileOps):
                 for s in siblings:
                     self.log.info('Would also delete `%s`' % s)
             return
-        
-        try:
-            if src_isdir:
-                shutil.rmtree(src)
-                self.log.info('`%s` and all its content has been deleted.' % src)
-            else:
-                os.remove(src)
-                self.log.info('`%s` has been deleted.' % src)
-        except Exception as err:
-            entry.fail('delete error: %s' % err)
-            return
-        
+        # IO errors will have the entry mark failed in the base class
+        if src_isdir:
+            shutil.rmtree(src)
+            self.log.info('`%s` and all its content has been deleted.' % src)
+        else:
+            os.remove(src)
+            self.log.info('`%s` has been deleted.' % src)
+        # further errors will not have any effect (the entry does not exists anymore)
         for s in siblings:
             try:
                 os.remove(s)
                 self.log.info('`%s` has been deleted as well.' % s)
             except Exception as err:
-                # the target file has been successfully deleted, we cannot mark the entry as failed anymore. 
-                self.log.warning('Unable to delete `%s`: %s' % (s, err))
-        
+                self.log.warning(str(err))
         if not src_isdir:
             self.clean_source(task, config, entry)
 
@@ -164,13 +156,11 @@ class TransformingOps(BaseFileOps):
         try:
             dst_path = entry.render(dst_path)
         except RenderError as err:
-            self.log.warning('Path value replacement `%s` failed for %s: %s' % (dst_path, entry['title'], err))
-            return
+            raise plugin.PluginWarning('Path value replacement `%s` failed: %s' % (dst_path, err.args[0]))
         try:
             dst_name = entry.render(dst_name)
         except RenderError as err:
-            self.log.warning('Filename value replacement `%s` failed for %s: %s' % (dst_name, entry['title'], err))
-            return
+            raise plugin.PluginWarning('Filename value replacement `%s` failed: %s' % (dst_name, err.args[0]))
         
         # Clean invalid characters with pathscrub plugin
         dst_path = pathscrub(os.path.expanduser(dst_path))
@@ -179,8 +169,7 @@ class TransformingOps(BaseFileOps):
         # Join path and filename
         dst = os.path.join(dst_path, dst_name)
         if dst == entry['location']:
-            self.log.warning('Cannot handle %s because source and destination are the same.' % entry['title'])
-            return
+            raise plugin.PluginWarning('source and destination are the same.')
         
         if not os.path.exists(dst_path):
             if task.options.test:
@@ -189,16 +178,14 @@ class TransformingOps(BaseFileOps):
                 self.log.info('Creating destination directory `%s`' % dst_path)
                 os.makedirs(dst_path)
         if not os.path.isdir(dst_path) and not task.options.test:
-            self.log.warning('Cannot handle %s because destination `%s` is not a directory' % (entry['title'], dst_path))
-            return
+            raise plugin.PluginWarning('destination `%s` is not a directory.' % dst_path)
         
         # unpack_safety
         if config.get('unpack_safety', entry.get('unpack_safety', True)):
             count = 0
             while True:
                 if count > 60 * 30:
-                    entry.fail('The task has been waiting unpacking for 30 minutes')
-                    return
+                    raise plugin.PluginWarning('The task has been waiting unpacking for 30 minutes')
                 size = os.path.getsize(src)
                 time.sleep(1)
                 new_size = os.path.getsize(src)
@@ -227,17 +214,15 @@ class TransformingOps(BaseFileOps):
                 d = dst_file + s[len(src_file):]
                 self.log.info('Would also %s `%s` to `%s`' % (funct_name, s, d))
         else:
-            try:
-                if self.move:
-                    shutil.move(src, dst)
-                elif src_isdir:
-                    shutil.copytree(src, dst)
-                else:
-                    shutil.copy(src, dst)
-                self.log.info('`%s` has been %s to `%s`' % (src, funct_done, dst))
-            except Exception as err:
-                entry.fail('%s error: %s' % (funct_name, err))
-                return
+            # IO errors will have the entry mark failed in the base class
+            if self.move:
+                shutil.move(src, dst)
+            elif src_isdir:
+                shutil.copytree(src, dst)
+            else:
+                shutil.copy(src, dst)
+            self.log.info('`%s` has been %s to `%s`' % (src, funct_done, dst))
+            # further errors will not have any effect (the entry has been successfully moved or copied out)
             for s in siblings:
                 # we cannot rely on splitext for extensions here (subtitles may have the language code)
                 d = dst_file + s[len(src_file):]
@@ -248,11 +233,8 @@ class TransformingOps(BaseFileOps):
                         shutil.copy(s, d)
                     self.log.info('`%s` has been %s to `%s` as well.' % (s, funct_done, d))
                 except Exception as err:
-                    # the target file has been successfully handled, we cannot mark the entry as failed anymore.
-                    self.log.warning('Unable to %s `%s` to `%s`: %s' % (funct_name, s, d, err))
-        
+                    self.log.warning(str(err))
         entry['output'] = dst
-        
         if self.move and not src_isdir:
             self.clean_source(task, config, entry)
 
