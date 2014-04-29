@@ -50,9 +50,9 @@ class BaseFileOps(object):
                     raise plugin.PluginWarning('location `%s` does not exists (anymore).' % src)
                 if src_isdir:
                     if not config.get('allow_dir'):
-                        raise plugin.PluginWarning('location `%s`is a directory.' % src)
+                        raise plugin.PluginWarning('location `%s` is a directory.' % src)
                 elif not os.path.isfile(src):
-                    raise plugin.PluginWarning('location `%s`is not a file.' % src)
+                    raise plugin.PluginWarning('location `%s` is not a file.' % src)
                 # search for namesakes
                 siblings = []
                 if not src_isdir and 'along' in config:
