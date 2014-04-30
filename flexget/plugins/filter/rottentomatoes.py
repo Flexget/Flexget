@@ -88,8 +88,7 @@ class FilterRottenTomatoes(object):
     def on_task_filter(self, task, config):
         lookup = plugin.get_plugin_by_name('rottentomatoes_lookup').instance.lookup
 
-        # since the plugin does not reject anything, no sense going trough accepted
-        for entry in task.undecided:
+        for entry in task.entries:
             try:
                 lookup(entry)
             except plugin.PluginError as e:
@@ -145,7 +144,7 @@ class FilterRottenTomatoes(object):
                 rejected = config['reject_genres']
                 for genre in entry.get('rt_genres', []):
                     if genre in rejected:
-                        reject_reasons.append('reject_genres')
+                        reject_reasons.append('reject_genres %s' % genre)
                         break
 
             if 'reject_actors' in config:
@@ -187,15 +186,7 @@ class FilterRottenTomatoes(object):
                     accept_reasons.append('accept_mpaa_ratings %s' % entry.get('rt_mpaa_rating'))
 
             if reject_reasons:
-                msg = 'Didn\'t accept `%s` because of rule(s) %s' % \
-                    (entry.get('rt_name', None) or entry['title'], ', '.join(reject_reasons))
-                if task.options.debug:
-                    log.debug(msg)
-                else:
-                    if task.options.cron:
-                        log_once(msg, log)
-                    else:
-                        log.info(msg)
+                entry.reject(', '.join(reject_reasons))
             elif accept_reasons:
                 entry.accept(', '.join(accept_reasons))
             else:

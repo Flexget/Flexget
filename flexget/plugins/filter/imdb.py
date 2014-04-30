@@ -88,14 +88,9 @@ class FilterImdb(object):
     # Run later to avoid unnecessary lookups
     @plugin.priority(120)
     def on_task_filter(self, task, config):
-
         lookup = plugin.get_plugin_by_name('imdb_lookup').instance.lookup
 
-        # since the plugin does not reject anything, no sense going trough accepted
-        for entry in task.undecided:
-
-            force_accept = False
-
+        for entry in task.entries:
             try:
                 lookup(entry)
             except plugin.PluginError as e:
@@ -109,94 +104,90 @@ class FilterImdb(object):
             #    log.debug('%s = %s (type: %s)' % (key, value, type(value)))
 
             # Check defined conditions, TODO: rewrite into functions?
-            reasons = []
+            reject_reasons = []
+            accept_reasons = []
+            
             if 'min_score' in config:
                 if entry.get('imdb_score', 0) < config['min_score']:
-                    reasons.append('min_score (%s < %s)' % (entry.get('imdb_score'), config['min_score']))
+                    reject_reasons.append('min_score (%s < %s)' % (entry.get('imdb_score'), config['min_score']))
+            
             if 'min_votes' in config:
                 if entry.get('imdb_votes', 0) < config['min_votes']:
-                    reasons.append('min_votes (%s < %s)' % (entry.get('imdb_votes'), config['min_votes']))
+                    reject_reasons.append('min_votes (%s < %s)' % (entry.get('imdb_votes'), config['min_votes']))
+            
             if 'min_year' in config:
                 if entry.get('imdb_year', 0) < config['min_year']:
-                    reasons.append('min_year (%s < %s)' % (entry.get('imdb_year'), config['min_year']))
+                    reject_reasons.append('min_year (%s < %s)' % (entry.get('imdb_year'), config['min_year']))
+            
             if 'max_year' in config:
                 if entry.get('imdb_year', 0) > config['max_year']:
-                    reasons.append('max_year (%s > %s)' % (entry.get('imdb_year'), config['max_year']))
+                    reject_reasons.append('max_year (%s > %s)' % (entry.get('imdb_year'), config['max_year']))
+            
             if 'reject_genres' in config:
                 rejected = config['reject_genres']
                 for genre in entry.get('imdb_genres', []):
                     if genre in rejected:
-                        reasons.append('reject_genres')
+                        reject_reasons.append('reject_genres %s' % genre)
                         break
 
             if 'reject_languages' in config:
                 rejected = config['reject_languages']
                 for language in entry.get('imdb_languages', []):
                     if language in rejected:
-                        reasons.append('reject_languages')
+                        reject_reasons.append('reject_languages %s' % language)
                         break
 
             if 'accept_languages' in config:
                 accepted = config['accept_languages']
-                if entry.get('imdb_languages') and entry['imdb_languages'][0] not in accepted:
-                    # Reject if the first (primary) language is not among acceptable languages
-                    reasons.append('accept_languages')
+                for language in entry.get('imdb_languages', []):
+                    if language in accepted:
+                        accept_reasons.append('reject_languages %s' % language)
+                        break
 
             if 'reject_actors' in config:
                 rejected = config['reject_actors']
                 for actor_id, actor_name in entry.get('imdb_actors', {}).iteritems():
                     if actor_id in rejected or actor_name in rejected:
-                        reasons.append('reject_actors %s' % actor_name or actor_id)
+                        reject_reasons.append('reject_actors %s' % actor_name or actor_id)
                         break
 
-            # Accept if actors contains an accepted actor, but don't reject otherwise
             if 'accept_actors' in config:
                 accepted = config['accept_actors']
                 for actor_id, actor_name in entry.get('imdb_actors', {}).iteritems():
                     if actor_id in accepted or actor_name in accepted:
-                        log.debug('Accepting because of accept_actors %s' % actor_name or actor_id)
-                        force_accept = True
+                        accept_reasons.append('accept_actors %s' % actor_name or actor_id)
                         break
 
             if 'reject_directors' in config:
                 rejected = config['reject_directors']
                 for director_id, director_name in entry.get('imdb_directors', {}).iteritems():
                     if director_id in rejected or director_name in rejected:
-                        reasons.append('reject_directors %s' % director_name or director_id)
+                        reject_reasons.append('reject_directors %s' % director_name or director_id)
                         break
 
-            # Accept if the director is in the accept list, but do not reject if the director is unknown
             if 'accept_directors' in config:
                 accepted = config['accept_directors']
                 for director_id, director_name in entry.get('imdb_directors', {}).iteritems():
                     if director_id in accepted or director_name in accepted:
-                        log.debug('Accepting because of accept_directors %s' % director_name or director_id)
-                        force_accept = True
+                        accept_reasons.append('accept_directors %s' % director_name or director_id)
                         break
 
             if 'reject_mpaa_ratings' in config:
                 rejected = config['reject_mpaa_ratings']
                 if entry.get('imdb_mpaa_rating') in rejected:
-                    reasons.append('reject_mpaa_ratings %s' % entry['imdb_mpaa_rating'])
+                    reject_reasons.append('reject_mpaa_ratings %s' % entry['imdb_mpaa_rating'])
 
             if 'accept_mpaa_ratings' in config:
                 accepted = config['accept_mpaa_ratings']
-                if entry.get('imdb_mpaa_rating') not in accepted:
-                    reasons.append('accept_mpaa_ratings %s' % entry.get('imdb_mpaa_rating'))
+                if entry.get('imdb_mpaa_rating') in accepted:
+                    accept_reasons.append('accept_mpaa_ratings %s' % entry['imdb_mpaa_rating'])
 
-            if reasons and not force_accept:
-                msg = 'Didn\'t accept `%s` because of rule(s) %s' % \
-                    (entry.get('imdb_name', None) or entry['title'], ', '.join(reasons))
-                if task.options.debug:
-                    log.debug(msg)
-                else:
-                    if task.options.cron:
-                        log_once(msg, log)
-                    else:
-                        log.info(msg)
+            if reject_reasons:
+                entry.reject(', '.join(reject_reasons))
+            elif accept_reasons:
+                entry.accept(', '.join(accept_reasons))
             else:
-                log.debug('Accepting %s' % (entry['title']))
-                entry.accept()
+                log.debug('Found no reason to accept or reject %s' % entry['title'])
 
 @event('plugin.register')
 def register_plugin():
