@@ -560,7 +560,11 @@ class Manager(object):
             with open(self.lockfile) as f:
                 lines = [l for l in f.readlines() if l]
             for line in lines:
-                key, value = line.split(b':', 1)
+                try:
+                    key, value = line.split(b':', 1)
+                except ValueError:
+                    log.debug('Invalid line in lock file: %s' % line)
+                    continue
                 result[key.strip().lower()] = value.strip()
             for key in result:
                 if result[key].isdigit():
