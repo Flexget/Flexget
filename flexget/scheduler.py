@@ -136,7 +136,7 @@ class Scheduler(threading.Thread):
             # Create list of tasks to run, preserving order
             tasks = []
             for arg in options.tasks:
-                matches = [t for t in self.manager.tasks if fnmatch.fnmatchcase(t.lower(), arg.lower())]
+                matches = [t for t in self.manager.tasks if fnmatch.fnmatchcase(unicode(t).lower(), arg.lower())]
                 if not matches:
                     log.error('`%s` does not match any tasks' % arg)
                     continue
