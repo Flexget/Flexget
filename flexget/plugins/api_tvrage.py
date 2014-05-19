@@ -7,6 +7,7 @@ from socket import timeout
 from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, select, update, func
 from sqlalchemy.orm import relation
 import tvrage.api
+import tvrage.feeds
 
 from flexget.event import event
 from flexget.utils.database import with_session
@@ -19,6 +20,10 @@ log = logging.getLogger('api_tvrage')
 
 Base = db_schema.versioned_base('tvrage', 2)
 UPDATE_INTERVAL = '7 days'
+
+
+# Monkey patch tvrage library to work around https://github.com/ckreutzer/python-tvrage/pull/8
+tvrage.feeds.BASE_URL = 'http://services.tvrage.com/feeds/%s.php?%s=%s'
 
 
 @event('manager.db_cleanup')
