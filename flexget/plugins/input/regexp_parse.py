@@ -146,7 +146,7 @@ class RegexpParse(object):
                 return False
         return entry.isvalid()
 
-    @cached('text')
+    @cached('regexp_parse')
     @plugin.internet(log)
     def on_task_input(self, task, config):
         url = config['source']
