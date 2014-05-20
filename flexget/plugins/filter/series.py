@@ -486,8 +486,8 @@ def new_eps_after(since_ep):
                       series.name)
             return series_eps.filter(Episode.first_seen > since_ep.first_seen).count()
         return series_eps.filter((Episode.identified_by == 'ep') &
-                                 (((Episode.season == since_ep.season) & Episode.number > since_ep.number) |
-                                  Episode.season > since_ep.season)).count()
+                                 (((Episode.season == since_ep.season) & (Episode.number > since_ep.number)) |
+                                  (Episode.season > since_ep.season))).count()
     elif series.identified_by == 'seq':
         return series_eps.filter(Episode.number > since_ep.number).count()
     elif series.identified_by == 'id':
