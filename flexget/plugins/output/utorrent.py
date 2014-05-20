@@ -86,7 +86,7 @@ class PluginUtorrent(object):
                 else:
                     log.error('path `%s` (or one of its parents)is not added to utorrent webui allowed download '
                               'directories. You must add it there before you can use it from flexget. '
-                              'Adding to default download directory instead.')
+                              'Adding to default download directory instead.' % path)
                     path = ''
 
             if task.options.test:
