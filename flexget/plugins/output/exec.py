@@ -104,7 +104,7 @@ class PluginExec(object):
                              stderr=subprocess.STDOUT, close_fds=False)
         if not allow_background:
             (r, w) = (p.stdout, p.stdin)
-            response = r.read().decode(encoding, errors='replace')
+            response = r.read().decode(encoding, 'replace')
             r.close()
             w.close()
             if response:
