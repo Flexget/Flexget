@@ -199,7 +199,7 @@ class PluginTransmission(TransmissionBase):
         root.accept('boolean')
         advanced = root.accept('dict')
         self._validator(advanced)
-        advanced.accept('path', key='path', allow_replacement=True)
+        advanced.accept('text', key='path')
         advanced.accept('boolean', key='addpaused')
         advanced.accept('boolean', key='honourlimits')
         advanced.accept('integer', key='bandwidthpriority')
