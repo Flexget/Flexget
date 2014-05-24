@@ -5,7 +5,7 @@ import re
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.utils.tools import urlopener
+from flexget.utils import requests
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('divxatope')
@@ -29,7 +29,8 @@ class UrlRewriteDivxATope(object):
     @plugin.internet(log)
     def parse_download_page(self, url):
         try:
-            soup = get_soup(urlopener(url, log), 'html.parser')
+            page = requests.get(url).content
+            soup = get_soup(page, 'html.parser')
             download_link = soup.findAll(href=re.compile('redirect.php'))
             download_href = download_link[0]['href']
             return download_href[download_href.index('url=') + 4:]
