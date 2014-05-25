@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from requests.auth import AuthBase
+
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
@@ -11,6 +13,15 @@ from flexget.utils.search import torrent_availability
 
 session = requests.Session()
 log = logging.getLogger('search_ptn')
+
+
+class PtNAuth(AuthBase):
+    def __init__(self, cookies):
+        self.cookies = cookies
+
+    def __call__(self, r):
+        r.prepare_cookies(self.cookies)
+        return r
 
 
 class SearchPTN(object):
@@ -32,6 +43,7 @@ class SearchPTN(object):
             'ptn_uid': str(config['uid'])
         }
 
+        download_auth = PtNAuth(cookies)
         # Default to searching by title (0=title 3=imdb_id)
         search_by = 0
         if 'imdb_id' in entry:
@@ -69,7 +81,8 @@ class SearchPTN(object):
                 entry['title'] = links[0].text
                 if len(links) > 1:
                     entry['imdb_id'] = extract_id(links[1].get('href'))
-                entry['url'] = columns[2].a.get('href')
+                entry['url'] = 'http://piratethenet.org/' + columns[2].a.get('href')
+                entry['download_auth'] = download_auth
                 entry['torrent_seeds'] = int(columns[8].text)
                 entry['torrent_leeches'] = int(columns[9].text)
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
