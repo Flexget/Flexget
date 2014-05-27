@@ -11,11 +11,10 @@ from flexget.utils.imdb import extract_id
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability
 
-session = requests.Session()
 log = logging.getLogger('search_ptn')
 
 
-class PtNAuth(AuthBase):
+class CookieAuth(AuthBase):
     def __init__(self, cookies):
         self.cookies = cookies
 
@@ -28,22 +27,25 @@ class SearchPTN(object):
     schema = {
         'type': 'object',
         'properties': {
-            'hashv': {'type': 'string'},
-            'pass': {'type': 'string'},
-            'uid': {'type': 'number'}
+            'username': {'type': 'string'},
+            'login_key': {'type': 'string'},
+            'password': {'type': 'string'}
         },
-        'required': ['hashv', 'pass', 'uid'],
+        'required': ['username', 'login_key', 'password'],
         'additionalProperties': False
     }
 
     def search(self, entry, config):
-        cookies = {
-            'ptn_hashv': config['hashv'],
-            'ptn_pass': config['pass'],
-            'ptn_uid': str(config['uid'])
-        }
+        login_sess = requests.Session()
+        login_params = {'username': config['username'],
+                        'password': config['password'],
+                        'loginkey': config['login_key']}
+        try:
+            login_sess.post('https://piratethenet.org/takelogin.php', data=login_params, verify=False)
+        except requests.RequestException as e:
+            log.error('Error while logging in to PtN: %s', e)
 
-        download_auth = PtNAuth(cookies)
+        download_auth = CookieAuth(login_sess.cookies)
         # Default to searching by title (0=title 3=imdb_id)
         search_by = 0
         if 'imdb_id' in entry:
@@ -60,8 +62,7 @@ class SearchPTN(object):
         results = set()
         for search in searches:
             try:
-                r = requests.get('http://piratethenet.org/browse.php',
-                                 params={'search': search, '_by': search_by}, cookies=cookies)
+                r = login_sess.get('http://piratethenet.org/browse.php', params={'search': search, '_by': search_by})
             except requests.RequestException as e:
                 log.error('Error searching ptn: %s' % e)
                 continue
