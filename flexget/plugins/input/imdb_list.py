@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import re
 
 import feedparser
 
@@ -50,9 +51,17 @@ class ImdbList(object):
 
         # Create an Entry for each movie in the list
         entries = []
+        title_re = re.compile(r'(.*) \((\d{4})?.*?\)$')
         for entry in rss.entries:
             try:
-                entries.append(Entry(title=entry.title, url=entry.link, imdb_id=extract_id(entry.link), imdb_name=entry.title))
+                # IMDb puts some extra stuff in the titles, e.g. "Battlestar Galactica (2004 TV Series)"
+                # Strip out everything but the date
+                match = title_re.match(entry.title)
+                title = match.group(1)
+                if match.group(2):
+                    title += ' (%s)' % match.group(2)
+                entries.append(
+                    Entry(title=title, url=entry.link, imdb_id=extract_id(entry.link), imdb_name=match.group(1)))
             except IndexError:
                 log.critical('IndexError! Unable to handle RSS entry: %s' % entry)
         return entries
