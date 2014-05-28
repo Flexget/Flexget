@@ -23,13 +23,36 @@ class CookieAuth(AuthBase):
         return r
 
 
+categories = {
+    '1080p': 'c5',
+    '720p': 'c6',
+    'bdrip': 'c10',
+    'bluray': 'c1',
+    'brrip': 'c11',
+    'dvdr': 'c4',
+    'dvdrip': 'c12',
+    'mp4': 'c16',
+    'ost/flac': 'c17',
+    'ost/mp3': 'c18',
+    'packs': 'c20',
+    'r5/scr': 'c13',
+    'remux': 'c2',
+    'tvrip': 'c15',
+    'webrip': 'c14'
+}
+
+
 class SearchPTN(object):
     schema = {
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
             'login_key': {'type': 'string'},
-            'password': {'type': 'string'}
+            'password': {'type': 'string'},
+            'categories': {
+                'type': 'array',
+                'items': {'type': 'string', 'enum': list(categories)}
+            }
         },
         'required': ['username', 'login_key', 'password'],
         'additionalProperties': False
@@ -59,10 +82,15 @@ class SearchPTN(object):
         else:
             searches = entry.get('search_strings', [entry['title']])
 
+        params = {'_by': search_by}
+        if config.get('categories'):
+            for cat in config['categories']:
+                params[categories[cat]] = 1
         results = set()
         for search in searches:
+            params['search'] = search
             try:
-                r = login_sess.get('http://piratethenet.org/browse.php', params={'search': search, '_by': search_by})
+                r = login_sess.get('http://piratethenet.org/browse.php', params=params)
             except requests.RequestException as e:
                 log.error('Error searching ptn: %s' % e)
                 continue
