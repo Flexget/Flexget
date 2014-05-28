@@ -163,7 +163,7 @@ class SeriesParser(TitleParser):
         if name.endswith(')'):
             p_start = name.rfind('(')
             if p_start != -1:
-                parenthetical = name[p_start + 1:-1]
+                parenthetical = re.escape(name[p_start + 1:-1])
                 name = name[:p_start - 1]
         # Blanks are any non word characters except & and _
         blank = r'(?:[^\w&]|_)'
