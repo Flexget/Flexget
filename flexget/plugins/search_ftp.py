@@ -27,7 +27,6 @@ class SearchFTP(object):
                     {'type': 'array', 'items': {'type': 'string'}},
                 ],
             },
-            'use-ssl': {'type': 'boolean', 'default': False},
             'search-cmd': {'type': 'string', 'default': 'site search'},
             'match-regex': {'type': "string", 'format': 'regexp', 'default': '200- ([^ ]+) \([0-9]+F'},
             'search-append': {'type': 'string'},
