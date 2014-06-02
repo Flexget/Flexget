@@ -21,11 +21,11 @@ class UrlRewriteNewPCT(object):
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        if url.startswith('http://www.newpct.com/download/'):
-            return False
-        if url.startswith('http://www.newpct.com/') or url.startswith('http://newpct.com/'):
-            return True
-        return False
+        rewritable_regex='^http:\/\/(www.)?newpct1?.com\/.*'
+        if re.match(rewritable_regex,url) and not url.startswith('http://www.newpct.com/download/'):
+                return True
+        else:
+                return False
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
