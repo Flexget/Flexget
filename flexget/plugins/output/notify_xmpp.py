@@ -54,10 +54,13 @@ class OutputNotifyXmpp(object):
             log.debug('Error importing SleekXMPP: %s' % e)
             raise plugin.DependencyError('notify_xmpp', 'sleekxmpp', 'SleekXMPP module required. ImportError: %s' % e)
         try:
-            import dnspython
-        except ImportError as e:
-            log.debug('Error importing dnspython: %s' % e)
-            raise plugin.DependencyError('notify_xmpp', 'dnspython', 'dnspython module required. ImportError: %s' % e)
+            import dns
+        except:
+            try:
+                import dnspython
+            except ImportError as e:
+                log.debug('Error importing dnspython: %s' % e)
+                raise plugin.DependencyError('notify_xmpp', 'dnspython', 'dnspython module required. ImportError: %s' % e)
     
     def on_task_output(self, task, config):
         """
