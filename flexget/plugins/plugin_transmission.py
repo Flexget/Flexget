@@ -410,7 +410,7 @@ class PluginTransmissionClean(TransmissionBase):
         self._validator(advanced)
         advanced.accept('number', key='min_ratio')
         advanced.accept('interval', key='finished_for')
-        advanced.accept('boolean', key='transmission_seeds_limits')
+        advanced.accept('boolean', key='transmission_seed_limits')
         advanced.accept('boolean', key='delete_files')
         return root
 
