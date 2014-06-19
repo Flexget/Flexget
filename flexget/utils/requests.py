@@ -85,6 +85,10 @@ class Session(requests.Session):
         # Stores min intervals between requests for certain sites
         self.domain_delay = {}
 
+    def override_headers(self, headers):
+        """Override headers from `headers` for this session"""
+        self.headers.update(headers)
+
     def add_cookiejar(self, cookiejar):
         """
         Merges cookies from `cookiejar` into cookiejar for this session.

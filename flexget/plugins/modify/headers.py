@@ -61,6 +61,9 @@ class PluginHeaders(object):
             opener = urllib2.build_opener(HTTPHeadersProcessor(config))
             urllib2.install_opener(opener)
 
+        # Set the headers for the requests plugin
+        task.requests.override_headers(task.requests.headers)
+
     def on_task_exit(self, task, config):
         """Task exiting, remove additions"""
         if urllib2._opener:
