@@ -71,7 +71,9 @@ class PluginPyLoad(object):
         advanced.accept('list', key='hoster').accept('text')
         advanced.accept('boolean', key='preferred_hoster_only')
         advanced.accept('boolean', key='handle_no_url_as_failure')
+        advanced.accept('boolean', key='enabled')
         return root
+
 
     def on_task_output(self, task, config):
         if not config.get('enabled', True):
