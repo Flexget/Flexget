@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
+import platform
 
 from flexget import plugin
 from flexget.event import event
@@ -44,9 +45,17 @@ class FilterExists(object):
                 # convert filelists into utf-8 to avoid unicode problems
                 dirs = [x.decode('utf-8', 'ignore') for x in dirs]
                 files = [x.decode('utf-8', 'ignore') for x in files]
+                # windows file system is not case sensitive
+                if platform.system() == 'Windows':
+                    dirs = [s.lower() for s in dirs]
+                    files = [s.lower() for s in files]
                 for entry in task.accepted:
-                    name = entry['title']
-                    if name in dirs or name in files:
+                    # priority is: filename, location (filename only), title
+                    name = check = os.path.split(entry.get('filename', 
+                        entry.get('location', entry['title'])))[1]
+                    if platform.system() == 'Windows':
+                        check = check.lower()
+                    if check in dirs or check in files:
                         log.debug('Found %s in %s' % (name, root))
                         entry.reject(os.path.join(root, name))
 
