@@ -566,6 +566,13 @@ class Task(object):
             # taking another one) after input and just inject the same entries for the rerun
             self.execute()
 
+    @staticmethod
+    def validate_config(config):
+        schema = plugin_schemas(context='task')
+        # Don't validate commented out plugins
+        schema['patternProperties'] = {'^_': {}}
+        return config_schema.process_config(config, schema)
+
     def __eq__(self, other):
         if hasattr(other, 'name'):
             return self.name == other.name
