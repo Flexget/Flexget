@@ -200,7 +200,7 @@ class TransformingOps(BaseFileOps):
         dst_file, dst_ext = os.path.splitext(dst)
         
         # Check dst contains src_ext
-        if dst_ext != src_ext:
+        if not src_isdir and dst_ext != src_ext:
             self.log.verbose('Adding extension `%s` to dst `%s`' % (src_ext, dst))
             dst += src_ext
         
