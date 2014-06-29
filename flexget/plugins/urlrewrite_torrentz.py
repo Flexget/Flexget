@@ -2,12 +2,12 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 import urllib
-import urllib2
 import feedparser
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import requests
 from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('torrentz')
@@ -61,25 +61,19 @@ class UrlRewriteTorrentz(object):
         entries = set()
         for search_string in entry.get('search_string', [entry['title']]):
             query = normalize_unicode(search_string+config.get('extra_terms', ''))
-            # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-            url = 'http://torrentz.eu/%s?q=%s' % (feed, urllib.quote(query.encode('utf-8')))
-            log.debug('requesting: %s' % url)
-            try:
-                opened = urllib2.urlopen(url)
-            except urllib2.URLError as err:
-                url = 'http://torrentz.me/%s?q=%s' % (feed, urllib.quote(query.encode('utf-8')))
-                log.warning('torrentz.eu failed, trying torrentz.me. Error: %s' % err)
+            for domain in ['eu', 'me']:
+                # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
+                url = 'http://torrentz.%s/%s?q=%s' % (domain, feed, urllib.quote(query.encode('utf-8')))
+                log.debug('requesting: %s' % url)
                 try:
-                    opened = urllib2.urlopen(url)
-                except urllib2.URLError as err:
-                    raise plugin.PluginWarning('Error requesting URL: %s' % err)
-            rss = feedparser.parse(opened)
+                    r = requests.get(url)
+                    break
+                except requests.RequestException as err:
+                    log.warning('torrentz.%s failed. Error: %s' % (domain, err))
+            else:
+                raise plugin.PluginWarning('Error getting torrentz search results')
 
-            status = rss.get('status', False)
-            if status != 200:
-                raise plugin.PluginWarning(
-                    'Search result not 200 (OK), received %s %s' %
-                    (status, opened.msg))
+            rss = feedparser.parse(r.content)
 
             ex = rss.get('bozo_exception', False)
             if ex:

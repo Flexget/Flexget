@@ -14,12 +14,6 @@ except ImportError:
 log = logging.getLogger('rottentomatoes_lookup')
 
 
-def get_imdb_id(movie):
-    for alt_id in movie.alternate_ids:
-        if alt_id.name == 'imdb':
-            return 'tt' + alt_id.id
-
-
 def get_rt_url(movie):
     for link in movie.links:
         if link.name == 'alternate':
@@ -37,7 +31,6 @@ class PluginRottenTomatoesLookup(object):
     field_map = {
         'rt_name': 'title',
         'rt_id': 'id',
-        'imdb_id': get_imdb_id,
         'rt_year': 'year',
         'rt_genres': lambda movie: [genre.name for genre in movie.genres],
         'rt_mpaa_rating': 'mpaa_rating',
@@ -101,6 +94,12 @@ class PluginRottenTomatoesLookup(object):
                              )
         log.debug(u'Got movie: %s' % movie)
         entry.update_using_map(self.field_map, movie)
+        
+        if not entry.get('imdb_id', eval_lazy=False):
+            for alt_id in movie.alternate_ids:
+                if alt_id.name == 'imdb':
+                    entry['imdb_id'] = 'tt' + alt_id.id
+                    break
 
     def on_task_metainfo(self, task, config):
         if not config:

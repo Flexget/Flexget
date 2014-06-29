@@ -1,10 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta
 import logging
-from urllib2 import URLError
 import os
-import sys
 import posixpath
+import socket
+import sys
+from urllib2 import URLError
 
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
@@ -118,8 +119,13 @@ class TMDBMovie(TMDBContainer, Base):
             self.language = update_object.languages[0].code #.code or .name ?
         self.original_name = update_object.originaltitle
         self.name = update_object.title
-        if len(update_object.alternate_titles) > 0:
-            self.alternative_name = update_object.alternate_titles[0].title #maybe we could choose alternate title from movie country only
+        try:
+            if len(update_object.alternate_titles) > 0:
+                # maybe we could choose alternate title from movie country only
+                self.alternative_name = update_object.alternate_titles[0].title
+        except UnicodeEncodeError:
+            # Bug in tmdb3 library, see #2437. Just don't set alternate_name when it fails
+            pass
         self.imdb_id = update_object.imdb
         self.url = update_object.homepage
         self.rating = update_object.userrating
@@ -292,7 +298,10 @@ class ApiTmdb(object):
                     else:
                         movie = None
                 elif title:
-                    result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True, year=year))
+                    try:
+                        result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True, year=year))
+                    except socket.timeout:
+                        raise LookupError('Timeout contacting TMDb')
                     if not result and year:
                         result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True))
                     if result:

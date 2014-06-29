@@ -21,7 +21,7 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
 
-SCHEMA_VER = 2
+SCHEMA_VER = 3
 
 log = logging.getLogger('api_tvdb')
 Base = db_schema.versioned_base('api_tvdb', SCHEMA_VER)
@@ -47,6 +47,9 @@ def upgrade(ver, session):
     if ver == 1:
         table_add_column('tvdb_episodes', 'absolute_number', Integer, session)
         ver = 2
+    if ver == 2:
+        table_add_column('tvdb_series', 'overview', Unicode, session)
+        ver = 3
 
     return ver
 
@@ -123,6 +126,7 @@ class TVDBSeries(TVDBContainer, Base):
     airs_dayofweek = Column(Unicode)
     contentrating = Column(Unicode)
     network = Column(Unicode)
+    overview = Column(Unicode)
     imdb_id = Column(String)
     zap2it_id = Column(String)
     banner = Column(String)
@@ -297,7 +301,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
             try:
                 series.update()
             except LookupError as e:
-                log.warning('Error while updating from tvdb (%s), using cached data.' % e.message)
+                log.warning('Error while updating from tvdb (%s), using cached data.' % e.args[0])
         else:
             log.debug('Series %s information restored from cache.' % id_str())
     else:
@@ -364,7 +368,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
             try:
                 episode.update()
             except LookupError as e:
-                log.warning('Error while updating from tvdb (%s), using cached data.' % e.message)
+                log.warning('Error while updating from tvdb (%s), using cached data.' % e.args[0])
         else:
             log.debug('Using episode info for %s from cache.' % ep_description)
     else:

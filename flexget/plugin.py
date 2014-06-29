@@ -90,6 +90,9 @@ class PluginError(Exception):
 
     def __init__(self, value, logger=log, **kwargs):
         super(PluginError, self).__init__()
+        # Value is expected to be a string
+        if not isinstance(value, basestring):
+            value = unicode(value)
         self.value = value
         self.log = logger
         self.kwargs = kwargs
@@ -123,21 +126,21 @@ class internet(object):
             try:
                 return func(*args, **kwargs)
             except RequestException as e:
-                log.debug('decorator caught RequestException', exc_info=True)
+                log.debug('decorator caught RequestException. handled traceback:', exc_info=True)
                 raise PluginError('RequestException: %s' % e)
             except urllib2.HTTPError as e:
                 raise PluginError('HTTPError %s' % e.code, self.log)
             except urllib2.URLError as e:
-                log.debug('decorator caught urlerror', exc_info=True)
+                log.debug('decorator caught urlerror. handled traceback:', exc_info=True)
                 raise PluginError('URLError %s' % e.reason, self.log)
             except BadStatusLine:
-                log.debug('decorator caught badstatusline', exc_info=True)
+                log.debug('decorator caught badstatusline. handled traceback:', exc_info=True)
                 raise PluginError('Got BadStatusLine', self.log)
             except ValueError as e:
-                log.debug('decorator caught ValueError', exc_info=True)
+                log.debug('decorator caught ValueError. handled traceback:', exc_info=True)
                 raise PluginError(e)
             except IOError as e:
-                log.debug('decorator caught ioerror', exc_info=True)
+                log.debug('decorator caught ioerror. handled traceback:', exc_info=True)
                 if hasattr(e, 'reason'):
                     raise PluginError('Failed to reach server. Reason: %s' % e.reason, self.log)
                 elif hasattr(e, 'code'):

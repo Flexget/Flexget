@@ -127,15 +127,6 @@ except ImportError:
 class DelugePlugin(object):
     """Base class for deluge plugins, contains settings and methods for connecting to a deluge daemon."""
 
-    def validate_connection_info(self, dict_validator):
-        dict_validator.accept('text', key='host')
-        dict_validator.accept('integer', key='port')
-        dict_validator.accept('text', key='username')
-        dict_validator.accept('text', key='password')
-        # Deprecated
-        dict_validator.accept('text', key='user')
-        dict_validator.accept('text', key='pass')
-
     def prepare_connection_info(self, config):
         config.setdefault('host', 'localhost')
         config.setdefault('port', 58846)
@@ -247,18 +238,33 @@ class InputDeluge(DelugePlugin):
     def __init__(self):
         self.entries = []
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('boolean')
-        advanced = root.accept('dict')
-        advanced.accept('path', key='config_path')
-        self.validate_connection_info(advanced)
-        filter = advanced.accept('dict', key='filter')
-        filter.accept('text', key='label')
-        filter.accept('choice', key='state').accept_choices(
-            ['active', 'downloading', 'seeding', 'queued', 'paused'], ignore_case=True)
-        return root
+    schema = {
+        'anyOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'host': {'type': 'string'},
+                    'port': {'type': 'integer'},
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'config_path': {'type': 'string', 'format': 'path'},
+                    'filter': {
+                        'type': 'object',
+                        'properties': {
+                            'label': {'type': 'string'},
+                            'state': {
+                                'type': 'string',
+                                'enum': ['active', 'downloading', 'seeding', 'queued', 'paused']
+                            }
+                        },
+                        'additionalProperties': False
+                    }
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def prepare_config(self, config):
         if isinstance(config, bool):
@@ -312,30 +318,37 @@ class InputDeluge(DelugePlugin):
 
 class OutputDeluge(DelugePlugin):
     """Add the torrents directly to deluge, supporting custom save paths."""
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('boolean')
-        deluge = root.accept('dict')
-        self.validate_connection_info(deluge)
-        deluge.accept('path', key='path', allow_replacement=True, allow_missing=True)
-        deluge.accept('path', key='movedone', allow_replacement=True, allow_missing=True)
-        deluge.accept('text', key='label')
-        deluge.accept('boolean', key='queuetotop')
-        deluge.accept('boolean', key='automanaged')
-        deluge.accept('number', key='maxupspeed')
-        deluge.accept('number', key='maxdownspeed')
-        deluge.accept('integer', key='maxconnections')
-        deluge.accept('integer', key='maxupslots')
-        deluge.accept('number', key='ratio')
-        deluge.accept('boolean', key='removeatratio')
-        deluge.accept('boolean', key='addpaused')
-        deluge.accept('boolean', key='compact')
-        deluge.accept('text', key='content_filename')
-        deluge.accept('boolean', key='main_file_only')
-        deluge.accept('boolean', key='enabled')
-        return root
+    schema = {
+        'anyOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'host': {'type': 'string'},
+                    'port': {'type': 'integer'},
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'path': {'type': 'string'},
+                    'movedone': {'type': 'string'},
+                    'label': {'type': 'string'},
+                    'queuetotop': {'type': 'boolean'},
+                    'automanaged': {'type': 'boolean'},
+                    'maxupspeed': {'type': 'number'},
+                    'maxdownspeed': {'type': 'number'},
+                    'maxconnections': {'type': 'integer'},
+                    'maxupslots': {'type': 'integer'},
+                    'ratio': {'type': 'number'},
+                    'removeatratio': {'type': 'boolean'},
+                    'addpaused': {'type': 'boolean'},
+                    'compact': {'type': 'boolean'},
+                    'content_filename': {'type': 'string'},
+                    'main_file_only': {'type': 'boolean'},
+                    'enabled': {'type': 'boolean'},
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def prepare_config(self, config):
         if isinstance(config, bool):

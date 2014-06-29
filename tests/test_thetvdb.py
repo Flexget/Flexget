@@ -55,7 +55,7 @@ class TestThetvdbLookup(FlexGetBase):
             '%s tvdb_ep_name should be Paternity' % entry['title']
         assert entry['tvdb_status'] == 'Ended', \
             'runtime for %s is %s, should be Ended' % (entry['title'], entry['tvdb_status'])
-        assert entry['tvdb_genres'] == ['Comedy', 'Drama']
+        assert entry['tvdb_absolute_number'] == 3
         assert entry['afield'] == '73255Paternity', 'afield was not set correctly'
         assert self.task.find_entry(tvdb_ep_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'

@@ -25,6 +25,7 @@ class PluginPyLoad(object):
         username: my_username
         password: my_password
         folder: desired_folder
+        package: desired_package_name (jinja2 supported)
         hoster:
           - YoutubeCom
         parse_url: no
@@ -63,13 +64,16 @@ class PluginPyLoad(object):
         advanced.accept('text', key='username')
         advanced.accept('text', key='password')
         advanced.accept('text', key='folder')
+        advanced.accept('text', key='package')
         advanced.accept('boolean', key='queue')
         advanced.accept('boolean', key='parse_url')
         advanced.accept('boolean', key='multiple_hoster')
         advanced.accept('list', key='hoster').accept('text')
         advanced.accept('boolean', key='preferred_hoster_only')
         advanced.accept('boolean', key='handle_no_url_as_failure')
+        advanced.accept('boolean', key='enabled')
         return root
+
 
     def on_task_output(self, task, config):
         if not config.get('enabled', True):
@@ -140,7 +144,18 @@ class PluginPyLoad(object):
 
             try:
                 dest = 1 if config.get('queue', self.DEFAULT_QUEUE) else 0  # Destination.Queue = 1
-                post = {'name': "'%s'" % entry['title'].encode("ascii", "ignore"),
+
+                # Use the title of the enty, if no naming schema for the package is defined.
+                name = config.get('package', entry['title'])
+
+                # If name has jinja template, render it
+                try:
+                    name = entry.render(name)
+                except RenderError as e:
+                    name = entry['title']
+                    log.error('Error rendering jinja event: %s' % e)
+
+                post = {'name': "'%s'" % name.encode("ascii", "ignore"),
                         'links': str(urls),
                         'dest': dest,
                         'session': session}

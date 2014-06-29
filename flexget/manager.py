@@ -240,7 +240,7 @@ class Manager(object):
                     signal.signal(signal.SIGTERM, self._handle_sigterm)
                 except ValueError as e:
                     # If flexget is being called from another script, e.g. windows service helper, and we are not the
-                    # main thread, and this error will occur.
+                    # main thread, this error will occur.
                     log.debug('Error registering sigterm handler: %s' % e)
                 self.ipc_server.start()
                 fire_event('manager.daemon.started', self)
@@ -337,11 +337,14 @@ class Manager(object):
             possible = [config]
         else:
             log.debug('Figuring out config load paths')
-            possible.append(os.getcwd())
+            try:
+                possible.append(os.getcwdu())
+            except OSError:
+                log.debug('current directory invalid, not searching for config there')
             # for virtualenv / dev sandbox
             if hasattr(sys, 'real_prefix'):
                 log.debug('Adding virtualenv path')
-                possible.append(sys.prefix)
+                possible.append(sys.prefix.decode(sys.getfilesystemencoding()))
             # normal lookup locations
             possible.append(home_path)
             if sys.platform.startswith('win'):
@@ -546,7 +549,7 @@ class Manager(object):
             else:
                 print('%s - make sure you have write permissions to directory %s' %
                       (e.message, self.config_base), file=sys.stderr)
-            raise Exception(e.message)
+            raise
 
     def _read_lock(self):
         """
@@ -557,12 +560,19 @@ class Manager(object):
             with open(self.lockfile) as f:
                 lines = [l for l in f.readlines() if l]
             for line in lines:
-                key, value = line.split(b':', 1)
+                try:
+                    key, value = line.split(b':', 1)
+                except ValueError:
+                    log.debug('Invalid line in lock file: %s' % line)
+                    continue
                 result[key.strip().lower()] = value.strip()
             for key in result:
                 if result[key].isdigit():
                     result[key] = int(result[key])
-            if not pid_exists(result['pid']):
+            result.setdefault('pid', None)
+            if not result['pid']:
+                log.error('Invalid lock file. Make sure FlexGet is not running, then delete it.')
+            elif not pid_exists(result['pid']):
                 return None
             return result
         return None

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+import argparse
 import logging
 import re
 import time
@@ -437,29 +438,37 @@ def auto_identified_by(series):
     return 'auto'
 
 
-def get_latest_download(series):
+def get_latest_release(series, downloaded=True, season=None):
     """
     :param Series series: SQLAlchemy session
+    :param Downloaded: find only downloaded releases
+    :param Season: season to find newest release for
     :return: Instance of Episode or None if not found.
     """
     session = Session.object_session(series)
-    downloaded = session.query(Episode).join(Episode.releases, Episode.series).\
-        filter(Series.id == series.id).\
-        filter(Release.downloaded == True)
-    if series.identified_by and series.identified_by != 'auto':
-        downloaded = downloaded.filter(Episode.identified_by == series.identified_by)
-    if series.identified_by in ['ep', 'sequence']:
-        latest_download = downloaded.order_by(desc(Episode.season), desc(Episode.number)).first()
-    elif series.identified_by == 'date':
-        latest_download = downloaded.order_by(desc(Episode.identifier)).first()
-    else:
-        latest_download = downloaded.order_by(desc(Episode.first_seen)).first()
+    releases = session.query(Episode).join(Episode.releases, Episode.series).filter(Series.id == series.id)
 
-    if not latest_download:
-        log.debug('get_latest_download returning None, no downloaded episodes found for: %s', series.name)
+    if downloaded:
+        releases = releases.filter(Release.downloaded == True)
+
+    if season is not None:
+        releases = releases.filter(Episode.season == season)
+
+    if series.identified_by and series.identified_by != 'auto':
+        releases = releases.filter(Episode.identified_by == series.identified_by)
+
+    if series.identified_by in ['ep', 'sequence']:
+        latest_release = releases.order_by(desc(Episode.season), desc(Episode.number)).first()
+    elif series.identified_by == 'date':
+        latest_release = releases.order_by(desc(Episode.identifier)).first()
+    else:
+        latest_release = releases.order_by(desc(Episode.first_seen)).first()
+
+    if not latest_release:
+        log.debug('get_latest_release returning None, no downloaded episodes found for: %s', series.name)
         return
 
-    return latest_download
+    return latest_release
 
 
 def new_eps_after(since_ep):
@@ -477,8 +486,8 @@ def new_eps_after(since_ep):
                       series.name)
             return series_eps.filter(Episode.first_seen > since_ep.first_seen).count()
         return series_eps.filter((Episode.identified_by == 'ep') &
-                                 (((Episode.season == since_ep.season) & Episode.number > since_ep.number) |
-                                  Episode.season > since_ep.season)).count()
+                                 (((Episode.season == since_ep.season) & (Episode.number > since_ep.number)) |
+                                  (Episode.season > since_ep.season))).count()
     elif series.identified_by == 'seq':
         return series_eps.filter(Episode.number > since_ep.number).count()
     elif series.identified_by == 'id':
@@ -567,7 +576,7 @@ def set_series_begin(series, ep_id):
     session = Session.object_session(series)
     if isinstance(ep_id, int):
         identified_by = 'sequence'
-    elif re.match(r'(?i)^S\d{1,2}E\d{1,2}$', ep_id):
+    elif re.match(r'(?i)^S\d{1,4}E\d{1,2}$', ep_id):
         identified_by = 'ep'
         ep_id = ep_id.upper()
     elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
@@ -719,7 +728,8 @@ class FilterSeriesBase(object):
                 'parse_only': {'type': 'boolean'},
                 'special_ids': one_or_more({'type': 'string'}),
                 'prefer_specials': {'type': 'boolean'},
-                'assume_special': {'type': 'boolean'}
+                'assume_special': {'type': 'boolean'},
+                'tracking': {'type': ['boolean', 'string'], 'enum': [True, False, 'backfill']}
             },
             'additionalProperties': False
         }
@@ -1150,14 +1160,15 @@ class FilterSeries(FilterSeriesBase):
             log.debug('continuing w. episodes: %s', [e['title'] for e in entries])
             log.debug('best episode is: %s', best['title'])
 
-            # episode advancement. used only with season and sequence based series
+            # episode tracking. used only with season and sequence based series
             if ep.identified_by in ['ep', 'sequence']:
-                if task.options.disable_advancement:
-                    log.debug('episode advancement disabled')
+                if task.options.disable_tracking or not config.get('tracking', True):
+                    log.debug('episode tracking disabled')
                 else:
-                    log.debug('-' * 20 + ' episode advancement -->')
+                    log.debug('-' * 20 + ' episode tracking -->')
                     # Grace is number of distinct eps in the task for this series + 2
-                    if self.process_episode_advancement(ep, entries, grace=len(series_entries)+2):
+                    backfill = config.get('tracking') == 'backfill'
+                    if self.process_episode_tracking(ep, entries, grace=len(series_entries)+2, backfill=backfill):
                         continue
 
             # quality
@@ -1272,10 +1283,18 @@ class FilterSeries(FilterSeriesBase):
             log.debug('no quality meets requirements')
         return result
 
-    def process_episode_advancement(self, episode, entries, grace):
-        """Rejects all episodes that are too old or new (advancement), return True when this happens."""
+    def process_episode_tracking(self, episode, entries, grace, backfill=False):
+        """
+        Rejects all episodes that are too old or new, return True when this happens.
 
-        latest = get_latest_download(episode.series)
+        :param episode: Episode model
+        :param list entries: List of entries for given episode.
+        :param int grace: Number of episodes before or after latest download that are allowed.
+        :param bool backfill: If this is True, previous episodes will be allowed,
+            but forward advancement will still be restricted.
+        """
+
+        latest = get_latest_release(episode.series)
         if episode.series.begin and episode.series.begin > latest:
             latest = episode.series.begin
         log.debug('latest download: %s' % latest)
@@ -1283,8 +1302,8 @@ class FilterSeries(FilterSeriesBase):
 
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
-            if (episode.season < latest.season or
-                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace))):
+            if (not backfill and (episode.season < latest.season or
+                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
@@ -1296,7 +1315,7 @@ class FilterSeries(FilterSeriesBase):
                 log.debug('too new! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the future from latest downloaded episode %s. '
-                                 'See `--disable-advancement` if this should be downloaded.' % latest.identifier)
+                                 'See `--disable-tracking` if this should be downloaded.' % latest.identifier)
                 return True
 
     def process_timeframe(self, task, config, episode, entries):
@@ -1451,5 +1470,8 @@ def register_parser_arguments():
     exec_parser = options.get_parser('execute')
     exec_parser.add_argument('--stop-waiting', action='store', dest='stop_waiting', default='',
                              metavar='NAME', help='stop timeframe for a given series')
-    exec_parser.add_argument('--disable-advancement', action='store_true', dest='disable_advancement', default=False,
+    exec_parser.add_argument('--disable-tracking', action='store_true', default=False,
                              help='disable episode advancement for this run')
+    # Backwards compatibility
+    exec_parser.add_argument('--disable-advancement', action='store_true', dest='disable_tracking',
+                             help=argparse.SUPPRESS)
