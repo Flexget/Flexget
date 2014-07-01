@@ -85,7 +85,7 @@ class MovieQueue(queue_base.FilterQueueBase):
             {
                 'type': 'object',
                 'properties': {
-                    'action': { 'type': 'string', 'enum': ['accept', 'add', 'remove']},
+                    'action': {'type': 'string', 'enum': ['accept', 'add', 'remove']},
                     'quality': {'type': 'string', 'format': 'quality_requirements'},
                 },
                 'required': ['action'],
@@ -98,7 +98,7 @@ class MovieQueue(queue_base.FilterQueueBase):
         if not config:
             return
         if not isinstance(config, dict):
-            config = { 'action': config }
+            config = {'action': config}
         #only the accept action is applied in the 'matches' section
         if config.get('action') != 'accept':
             return
@@ -137,7 +137,7 @@ class MovieQueue(queue_base.FilterQueueBase):
         if not config:
             return
         if not isinstance(config, dict):
-            config = { 'action': config }
+            config = {'action': config}
         for entry in task.accepted:
             # Tell tmdb_lookup to add lazy lookup fields if not already present
             try:
