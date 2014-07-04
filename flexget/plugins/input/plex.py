@@ -226,7 +226,7 @@ class InputPlex(object):
             if config['strip_non_alpha']:
                 title = re.sub(r'[\(\)]', r'', title)
                 title = re.sub(r'&', r'And', title)
-                title = re.sub(r'[^A-Za-z0-9- ]', r'', title)
+                title = re.sub(r'[^A-Za-z0-9\- ]', r'', title)
             if config['lowercase_title']:
                 title = title.lower()
             if viewgroup == "show":
