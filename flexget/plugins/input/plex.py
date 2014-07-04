@@ -32,7 +32,7 @@ class InputPlex(object):
     'server'            Host/IP of PMS to connect to. 
     'lowercase_title'   Convert filename (title) to lower case.
     'sanitize_title'    Sanitize filename (title), leaving only latin letters.
-                        Better to turn off in case of non-latin titles.
+                        Better to turn off in case of non-english titles.
     'strip_year'        Remove year from title, ex: Show Name (2012) 01x01 => Show Name 01x01.
                         Movies will have year added to their filename unless this is set.
     'strip_parens'      Remove information in parens from title, ex: Show Name (UK)(2012) 01x01 => Show Name 01x01.
