@@ -31,8 +31,11 @@ class InputPlex(object):
     'password'          Myplex (http://my.plexapp.com) password, used to connect to shared PMS'. 
     'server'            Host/IP of PMS to connect to. 
     'lowercase_title'   Convert filename (title) to lower case.
+    'strip_non_alpha'   Sanitize filename (title), stripping all non-alphanumeric letters.
+                        Better to turn off in case of non-english titles.
     'strip_year'        Remove year from title, ex: Show Name (2012) 01x01 => Show Name 01x01.
                         Movies will have year added to their filename unless this is set.
+    'strip_parens'      Remove information in parens from title, ex: Show Name (UK)(2012) 01x01 => Show Name 01x01.
     'original_filename' Use filename stored in PMS instead of transformed name. lowercase_title and strip_year
                         will be ignored.
     'unwatched_only'    Request only unwatched media from PMS.
@@ -49,7 +52,9 @@ class InputPlex(object):
       port             : 32400
       selection        : all
       lowercase_title  : no
+      strip_non_alpha  : yes
       strip_year       : yes
+      strip_parens     : no
       original_filename: no
       unwatched_only   : no
       fetch            : file
@@ -75,7 +80,9 @@ class InputPlex(object):
         config.accept('text', key='username')
         config.accept('text', key='password')
         config.accept('boolean', key='lowercase_title')
+        config.accept('boolean', key='strip_non_alpha')
         config.accept('boolean', key='strip_year')
+        config.accept('boolean', key='strip_parens')
         config.accept('boolean', key='original_filename')
         config.accept('boolean', key='unwatched_only')
         config.accept('text', key='fetch')
@@ -88,7 +95,9 @@ class InputPlex(object):
         config.setdefault('username', '')
         config.setdefault('password', '')
         config.setdefault('lowercase_title', False)
+        config.setdefault('strip_non_alpha', True)
         config.setdefault('strip_year', True)
+        config.setdefault('strip_parens', False)
         config.setdefault('original_filename', False)
         config.setdefault('unwatched_only', False)
         config.setdefault('fetch', 'file')
@@ -211,9 +220,13 @@ class InputPlex(object):
             title = node.getAttribute(titletag)
             if config['strip_year']:
                 title = re.sub(r'^(.*)\(\d{4}\)(.*)', r'\1\2', title)
-            title = re.sub(r'[\(\)]', r'', title)
-            title = re.sub(r'&', r'And', title)
-            title = re.sub(r'[^A-Za-z0-9- ]', r'', title)
+            if config['strip_parens']:
+                title = re.sub(r'\(.*?\)', r'', title)
+                title = title.strip()
+            if config['strip_non_alpha']:
+                title = re.sub(r'[\(\)]', r'', title)
+                title = re.sub(r'&', r'And', title)
+                title = re.sub(r'[^A-Za-z0-9- \']', r'', title)
             if config['lowercase_title']:
                 title = title.lower()
             if viewgroup == "show":
