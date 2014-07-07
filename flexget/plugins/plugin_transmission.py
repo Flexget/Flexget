@@ -433,11 +433,11 @@ class PluginTransmissionClean(TransmissionBase):
                         (torrent.name, torrent.status, torrent.ratio, torrent.date_done))
             downloaded, dummy = self.torrent_info(torrent)
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
-            if (downloaded and ((nrat is None and nfor is None and transmission_checks is None) or
-                                (transmission_checks and (seed_ratio_ok is None and idle_limit_ok is None) or
-                                                         (seed_ratio_ok is True or idle_limit_ok is True)) or
-                                (nrat and (nrat <= torrent.ratio)) or
-                                (nfor and ((torrent.date_done + nfor) <= datetime.now())))):
+            no_checks = (nrat is None and nfor is None and transmission_checks is None)
+            internal_limits_check = (transmission_checks and (seed_ratio_ok is None and idle_limit_ok is None) or (seed_ratio_ok is True or idle_limit_ok is True))
+            ratio_check =  (nrat and (nrat <= torrent.ratio))
+            time_check =  (nfor and ((torrent.date_done + nfor) <= datetime.now()))
+            if (downloaded and (no_checks or internal_limits_check or ratio_check or time_check)):
                 if task.options.test:
                     log.info('Would remove finished torrent `%s` from transmission' % torrent.name)
                     continue
