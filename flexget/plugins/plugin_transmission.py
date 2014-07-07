@@ -434,8 +434,8 @@ class PluginTransmissionClean(TransmissionBase):
             downloaded, dummy = self.torrent_info(torrent)
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             if (downloaded and ((nrat is None and nfor is None and transmission_checks is None) or
-                                (transmission_checks and (seed_ratio_ok is None and idle_limit_ok is None) or
-                                                         (seed_ratio_ok is True or idle_limit_ok is True)) or
+                                (transmission_checks and ((seed_ratio_ok is None and idle_limit_ok is None) or
+                                                         (seed_ratio_ok is True or idle_limit_ok is True))) or
                                 (nrat and (nrat <= torrent.ratio)) or
                                 (nfor and ((torrent.date_done + nfor) <= datetime.now())))):
                 if task.options.test:
