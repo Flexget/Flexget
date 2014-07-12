@@ -165,7 +165,7 @@ class PluginPyLoad(object):
 
                 if folder:
                     # set folder with api
-                    data = {'folder': folder}
+                    data = json.dumps({'folder': folder})
                     query_api(api, "setPackageData", {'pid': pid, 'data': data, 'session': session})
 
             except Exception as e:
