@@ -164,6 +164,7 @@ class PluginPyLoad(object):
 
                 # Set Folder
                 folder = config.get('folder', self.DEFAULT_FOLDER)
+                folder = entry.get('path', folder)
                 if folder:
                     # If folder has jinja template, render it
                     try:
