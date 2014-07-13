@@ -38,7 +38,7 @@ class UrlRewriteNewPCT(object):
             soup = get_soup(page.text)
         except Exception as e:
             raise UrlRewritingError(e)
-        torrent_id_prog = re.compile("'torrentID': '(\d+)'")
+        torrent_id_prog = re.compile("'(?:torrentID|id)'\s*:\s*'(\d+)'")
         torrent_ids = soup.findAll(text=torrent_id_prog)
         if len(torrent_ids) == 0:
             raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)

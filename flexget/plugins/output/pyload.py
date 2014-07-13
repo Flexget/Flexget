@@ -97,7 +97,6 @@ class PluginPyLoad(object):
 
         api = config.get('api', self.DEFAULT_API)
         hoster = config.get('hoster', self.DEFAULT_HOSTER)
-        folder = config.get('folder', self.DEFAULT_FOLDER)
 
         for entry in task.accepted:
             # bunch of urls now going to check
@@ -145,7 +144,7 @@ class PluginPyLoad(object):
             try:
                 dest = 1 if config.get('queue', self.DEFAULT_QUEUE) else 0  # Destination.Queue = 1
 
-                # Use the title of the enty, if no naming schema for the package is defined.
+                # Use the title of the entry, if no naming schema for the package is defined.
                 name = config.get('package', entry['title'])
 
                 # If name has jinja template, render it
@@ -163,9 +162,18 @@ class PluginPyLoad(object):
                 pid = query_api(api, "addPackage", post).text
                 log.debug('added package pid: %s' % pid)
 
+                # Set Folder
+                folder = config.get('folder', self.DEFAULT_FOLDER)
+                folder = entry.get('path', folder)
                 if folder:
+                    # If folder has jinja template, render it
+                    try:
+                        folder = entry.render(folder)
+                    except RenderError as e:
+                        folder = self.DEFAULT_FOLDER
+                        log.error('Error rendering jinja event: %s' % e)
                     # set folder with api
-                    data = {'folder': folder}
+                    data = json.dumps({'folder': folder})
                     query_api(api, "setPackageData", {'pid': pid, 'data': data, 'session': session})
 
             except Exception as e:
