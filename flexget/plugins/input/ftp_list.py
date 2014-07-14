@@ -70,7 +70,6 @@ class InputFtpList(object):
         except ftplib.error_perm as e:
             utf8Enabled = False
             
-        print utf8Enabled
         ftp.sendcmd('TYPE I')
         ftp.set_pasv(True)
         entries = []
