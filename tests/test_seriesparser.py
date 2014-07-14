@@ -406,6 +406,48 @@ class TestSeriesParser(object):
             s.data = 'FooBar %s XViD-FlexGet' % sound
             assert_raises(ParseWarning, s.parse)
 
+    def test_ep_as_quality(self):
+        """SeriesParser: test that eps are not picked as qualities"""
+        from flexget.utils import qualities
+
+        s = SeriesParser(name='FooBar')
+
+        for quality1 in qualities.all_components():
+            # Attempt to create an episode number out of quality
+            mock_ep1 = filter(unicode.isdigit, quality1.name)
+            if not mock_ep1:
+                continue
+
+            for quality2 in qualities.all_components():
+                mock_ep2 = filter(unicode.isdigit, quality2.name)
+                if not mock_ep2:
+                    continue
+
+                # 720i, 1080i, etc. are failing because
+                # e.g the 720 in 720i can always be taken to mean 720p,
+                # which is a higher priority quality.
+                # Moreover, 1080 as an ep number is always failing because
+                # sequence regexps support at most 3 digits at the moment.
+                # Luckily, all of these cases are discarded by the following,
+                # which also discards the failing cases when episode number
+                # (e.g. 720) is greater or equal than quality number (e.g. 480p).
+                # There's nothing that can be done with those failing cases with the
+                # current
+                # "grab leftmost occurrence of highest quality-like thing" algorithm.
+                if int(mock_ep1) >= int(mock_ep2):
+                    continue
+
+                s.data = 'FooBar - %s %s-FlexGet' % (mock_ep1, quality2.name)
+                s.parse()
+                assert s.episode == int(mock_ep1), "confused episode %s with quality %s" % \
+                                                  (mock_ep1, quality2.name)
+
+                # Also test with reversed relative order of episode and quality
+                s.data = '[%s] FooBar - %s [FlexGet]' % (quality2.name, mock_ep1)
+                s.parse()
+                assert s.episode == int(mock_ep1), "confused episode %s with quality %s" % \
+                                                  (mock_ep1, quality2.name)
+
     def test_name_with_number(self):
         """SeriesParser: test number in a name"""
         s = SeriesParser()
