@@ -88,7 +88,7 @@ class InputFtpList(object):
             for p in dirs:
                 if utf8_enabled:
                   p = p.decode('utf-8')
-                url = os.path.join(baseurl, p)
+                url = urlparse.urljoin(baseurl, p)
                 title = os.path.basename(p)
                 log.info('Accepting entry %s ' % title)
                 entries.append(Entry(title, url))
