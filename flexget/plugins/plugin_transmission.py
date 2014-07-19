@@ -365,7 +365,7 @@ class PluginTransmission(TransmissionBase):
                 if r:
                     torrent = r
                 log.info('"%s" torrent added to transmission' % (entry['title']))
-                totalSize = cli.get_torrent(r.id,['id', 'totalSize']).totalSize
+                totalSize = cli.get_torrent(r.id, ['id', 'totalSize']).totalSize
        
                 if options['change'].keys():
                     cli.change_torrent(r.id, 30, **options['change'])
@@ -376,12 +376,12 @@ class PluginTransmission(TransmissionBase):
 
                     extList = ['.srt', '.sub', '.idx']
                     for f in fl[r.id]:
-                        wouldInclude = False
-                        wouldInclude = fl[r.id][f]['size'] > totalSize * 0.90
+                        would_include = False
+                        would_include = fl[r.id][f]['size'] > totalSize * 0.90
                         if 'include_subs' in options['post'] and options['post']['include_subs'] == True:
-                            if not wouldInclude:
-                                wouldInclude = os.path.splitext(fl[r.id][f]['name'])[1] in extList
-                        fl[r.id][f]['selected'] = wouldInclude
+                            if not would_include:
+                                would_include = os.path.splitext(fl[r.id][f]['name'])[1] in extList
+                        fl[r.id][f]['selected'] = would_include
                     
                     cli.set_files(fl)
                  
