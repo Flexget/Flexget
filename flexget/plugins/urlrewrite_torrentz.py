@@ -59,7 +59,7 @@ class UrlRewriteTorrentz(object):
         config = self.process_config(config)
         feed = REPUTATIONS[config['reputation']]
         entries = set()
-        for search_string in entry.get('search_string', [entry['title']]):
+        for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string+config.get('extra_terms', ''))
             for domain in ['eu', 'me']:
                 # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
