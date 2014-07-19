@@ -231,6 +231,8 @@ class PluginTransmission(TransmissionBase):
         advanced.accept('number', key='maxupspeed')
         advanced.accept('number', key='maxdownspeed')
         advanced.accept('number', key='ratio')
+        advanced.accept('boolean', key='main_file_only')
+        advanced.accept('boolean', key='include_subs')
         return root
 
     @plugin.priority(120)
@@ -275,13 +277,13 @@ class PluginTransmission(TransmissionBase):
         opt_dic = {}
 
         for opt_key in ('path', 'addpaused', 'honourlimits', 'bandwidthpriority',
-                        'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio'):
+                        'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio', 'main_file_only', 'include_subs'):
             if opt_key in entry:
                 opt_dic[opt_key] = entry[opt_key]
             elif opt_key in config:
                 opt_dic[opt_key] = config[opt_key]
 
-        options = {'add': {}, 'change': {}}
+        options = {'add': {}, 'change': {}, 'post': {}}
 
         add = options['add']
         if opt_dic.get('path'):
@@ -290,12 +292,12 @@ class PluginTransmission(TransmissionBase):
                 add['download_dir'] = pathscrub(path).encode('utf-8')
             except RenderError as e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
-        if 'addpaused' in opt_dic:
-            add['paused'] = opt_dic['addpaused']
         if 'bandwidthpriority' in opt_dic:
             add['bandwidthPriority'] = opt_dic['bandwidthpriority']
         if 'maxconnections' in opt_dic:
             add['peer_limit'] = opt_dic['maxconnections']
+        # make sure we add it paused, will modify status after adding
+        add['paused'] = True
 
         change = options['change']
         if 'honourlimits' in opt_dic and not opt_dic['honourlimits']:
@@ -317,6 +319,15 @@ class PluginTransmission(TransmissionBase):
                 change['seedRatioMode'] = 2
             else:
                 change['seedRatioMode'] = 1
+
+        post = options['post']
+        # set to modify paused status after 
+        if 'addpaused' in opt_dic:
+            post['paused'] = opt_dic['addpaused']
+        if 'main_file_only' in opt_dic:
+            post['main_file_only'] = opt_dic['main_file_only']
+        if 'include_subs' in opt_dic:
+            post['include_subs'] = opt_dic['include_subs']
 
         return options
 
@@ -354,8 +365,31 @@ class PluginTransmission(TransmissionBase):
                 if r:
                     torrent = r
                 log.info('"%s" torrent added to transmission' % (entry['title']))
+                totalSize = cli.get_torrent(r.id,['id', 'totalSize']).totalSize
+       
                 if options['change'].keys():
                     cli.change_torrent(r.id, 30, **options['change'])
+
+                if 'main_file_only' in options['post'] and options['post']['main_file_only'] == True:
+                    totalSize = cli.get_torrent(r.id, ['id', 'totalSize']).totalSize
+                    fl = cli.get_files(r.id)
+
+                    extList = ['.srt', '.sub', '.idx']
+                    for f in fl[r.id]:
+                        wouldInclude = False
+                        wouldInclude = fl[r.id][f]['size'] > totalSize * 0.90
+                        if 'include_subs' in options['post'] and options['post']['include_subs'] == True:
+                            if not wouldInclude:
+                                wouldInclude = os.path.splitext(fl[r.id][f]['name'])[1] in extList
+                        fl[r.id][f]['selected'] = wouldInclude
+                    
+                    cli.set_files(fl)
+                 
+                # if addPaused was defined and set to False start the torrent;
+                # prevents downloading data before we set what files we want
+                if 'paused' in options['post'] and options['post']['paused'] == False:
+                    cli.get_torrent(r.id).start()
+
             except TransmissionError as e:
                 log.debug('TransmissionError', exc_info=True)
                 log.debug('Failed options dict: %s' % options)
