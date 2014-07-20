@@ -375,20 +375,26 @@ class PluginTransmission(TransmissionBase):
                     fl = cli.get_files(r.id)
 
                     extList = ['.srt', '.sub', '.idx']
+                    found_main = False
                     for f in fl[r.id]:
                         would_include = False
                         would_include = fl[r.id][f]['size'] > totalSize * 0.90
+                        if would_include == True:
+                            found_main = True
                         if 'include_subs' in options['post'] and options['post']['include_subs'] == True:
                             if not would_include:
                                 would_include = os.path.splitext(fl[r.id][f]['name'])[1] in extList
                         fl[r.id][f]['selected'] = would_include
                     
-                    cli.set_files(fl)
-                 
-                # if addPaused was defined and set to False start the torrent;
+                    # Only modify files to download if we found a file that is 90% of the torrent
+                    if found_main == True:
+                        cli.set_files(fl)
+                
+                # if addpaused was defined and set to False start the torrent;
                 # prevents downloading data before we set what files we want
-                if 'paused' in options['post'] and options['post']['paused'] == False:
-                    cli.get_torrent(r.id).start()
+                if ('paused' in options['post'] and options['post']['paused'] == False or
+                   'paused' not in options['post'] and cli.get_session().start_added_torrents == True):
+                        cli.get_torrent(r.id).start()
 
             except TransmissionError as e:
                 log.debug('TransmissionError', exc_info=True)
