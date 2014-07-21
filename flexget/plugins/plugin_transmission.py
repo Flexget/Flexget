@@ -102,7 +102,7 @@ class TransmissionBase(object):
                     break
                 if not best or tf['size'] > best[1]:
                     best = (tf['name'], tf['size'])
-        if done and best and (100*float(best[1])/float(torrent.totalSize)) >= 90:
+        if done and best and (100 * float(best[1]) / float(torrent.totalSize)) >= 90:
             vloc = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
         return done, vloc
 
@@ -186,7 +186,7 @@ class PluginTransmissionInput(TransmissionBase):
                 entry = Entry(title=torrent.name,
                               url='file://%s' % torrent.torrentFile,
                               torrent_info_hash=torrent.hashString,
-                              content_size=torrent.totalSize/(1024*1024))
+                              content_size=torrent.totalSize / (1024 * 1024))
                 for attr in ['comment', 'downloadDir', 'isFinished', 'isPrivate']:
                     entry['transmission_' + attr] = getattr(torrent, attr)
                 entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
@@ -365,25 +365,23 @@ class PluginTransmission(TransmissionBase):
                 if r:
                     torrent = r
                 log.info('"%s" torrent added to transmission' % (entry['title']))
-                totalSize = cli.get_torrent(r.id, ['id', 'totalSize']).totalSize
+                total_size = cli.get_torrent(r.id, ['id', 'totalSize']).totalSize
        
                 if options['change'].keys():
                     cli.change_torrent(r.id, 30, **options['change'])
 
                 if 'main_file_only' in options['post'] and options['post']['main_file_only'] == True:
-                    totalSize = cli.get_torrent(r.id, ['id', 'totalSize']).totalSize
                     fl = cli.get_files(r.id)
 
-                    extList = ['.srt', '.sub', '.idx']
+                    ext_list = ['.srt', '.sub', '.idx', '.ssa', '.ass']
                     found_main = False
                     for f in fl[r.id]:
-                        would_include = False
-                        would_include = fl[r.id][f]['size'] > totalSize * 0.90
+                        would_include = fl[r.id][f]['size'] > total_size * 0.90
                         if would_include == True:
                             found_main = True
                         if 'include_subs' in options['post'] and options['post']['include_subs'] == True:
                             if not would_include:
-                                would_include = os.path.splitext(fl[r.id][f]['name'])[1] in extList
+                                would_include = os.path.splitext(fl[r.id][f]['name'])[1] in ext_list
                         fl[r.id][f]['selected'] = would_include
                     
                     # Only modify files to download if we found a file that is 90% of the torrent
