@@ -15,10 +15,11 @@ class EstimatesReleasedMovies(object):
             log.verbose('Querying release estimation for %s' % entry['title'])
             return entry['tmdb_released']
         elif 'movie_year' in entry:
-            return datetime(year=entry['movie_year'], month=1, day=1)
-        else:
-            log.debug('Unable to check release for %s, tmdb_release field is not defined' %
-                      entry['title'])
+            try:
+                return datetime(year=entry['movie_year'], month=1, day=1)
+            except ValueError:
+                pass
+        log.debug('Unable to check release for %s, tmdb_release field is not defined' % entry['title'])
 
 @event('plugin.register')
 def register_plugin():

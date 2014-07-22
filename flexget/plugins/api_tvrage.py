@@ -8,6 +8,7 @@ from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, s
 from sqlalchemy.orm import relation
 import tvrage.api
 import tvrage.feeds
+from tvrage.util import TvrageError
 
 from flexget.event import event
 from flexget.utils.database import with_session
@@ -235,6 +236,9 @@ def lookup_series(name=None, session=None):
         # and search directly for tvrage id. This is problematic, because 3rd party TVRage API does not support this.
         raise LookupError('Returned invalid data for "%s". This is often caused when TVRage is missing episode info'
                           % name)
+    except TvrageError as e:
+        raise LookupError('Error while accessing tvrage: %s' % e.msg)
+
     # Make sure the result is close enough to the search
     if difflib.SequenceMatcher(a=name, b=fetched.name).ratio() < 0.7:
         log.debug('Show result `%s` was not a close enough match for `%s`' % (fetched.name, name))
