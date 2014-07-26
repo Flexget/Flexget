@@ -394,6 +394,10 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--retry', action='store_true', dest='retry', default=False, help=SUPPRESS)
         exec_parser.add_argument('--no-cache', action='store_true', dest='nocache', default=False,
                                  help='disable caches. works only in plugins that have explicit support')
+        exec_parser.add_argument('--loglevel', '-L', metavar='LEVEL',
+                                 default=SUPPRESS,
+                                 help='Set the verbosity of the logger for this execution. Levels: %(choices)s',
+                                 choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
 
         daemonize_help = SUPPRESS
         if not sys.platform.startswith('win'):
