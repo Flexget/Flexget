@@ -197,10 +197,12 @@ class Scheduler(threading.Thread):
                 streamhandler.setFormatter(FlexGetFormatter())
                 logging.getLogger().addHandler(streamhandler)
             try:
+                logging.getLogger().setLevel(job.options.loglevel.upper())
                 Task(self.manager, job.task, options=job.options).execute()
             except TaskAbort as e:
                 log.debug('task %s aborted: %r' % (job.task, e))
             finally:
+                logging.getLogger().setLevel(self.manager.options.loglevel.upper())
                 self.run_queue.task_done()
                 job.finished_event.set()
                 if job.output:

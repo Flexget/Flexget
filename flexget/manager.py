@@ -206,7 +206,7 @@ class Manager(object):
             except ValueError as e:
                 log.error(e)
             else:
-                client.execute(dict(options))
+                client.execute(dict(options, loglevel=self.options.loglevel))
             self.shutdown()
             return
         # Otherwise we run the execution ourselves
