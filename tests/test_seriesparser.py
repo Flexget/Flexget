@@ -528,6 +528,19 @@ class TestSeriesParser(object):
         assert (s.identifier == '2010-10-25'), 'failed to parse %s' % s.data
         assert s.id_type == 'date'
 
+        # Text based dates
+        s = self.parse(name='Something', data='Something (18th july 2013)')
+        assert (s.identifier == '2013-07-18'), 'failed to parse %s' % s.data
+        assert s.id_type == 'date'
+
+        s = self.parse(name='Something', data='Something 2 mar 2013)')
+        assert (s.identifier == '2013-03-02'), 'failed to parse %s' % s.data
+        assert s.id_type == 'date'
+
+        s = self.parse(name='Something', data='Something 1st february 1993)')
+        assert (s.identifier == '1993-02-01'), 'failed to parse %s' % s.data
+        assert s.id_type == 'date'
+
     def test_date_options(self):
         # By default we should pick the latest interpretation
         s = self.parse(name='Something', data='Something 01-02-03')

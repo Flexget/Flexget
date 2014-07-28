@@ -46,7 +46,7 @@ class ImdbList(object):
             rss = feedparser.parse(url)
         except LookupError as e:
             raise plugin.PluginError('Failed to parse RSS feed for list `%s` correctly: %s' % (config['list'], e))
-        if rss.status == 404:
+        if rss.get('status') == 404:
             raise plugin.PluginError('Unable to get imdb list. Either list is private or does not exist.')
 
         # Create an Entry for each movie in the list
