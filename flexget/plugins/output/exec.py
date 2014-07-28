@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from collections import Mapping
+from collections import MutableMapping
 import logging
 import subprocess
 
@@ -12,7 +12,7 @@ from flexget.utils.tools import io_encoding
 log = logging.getLogger('exec')
 
 
-class EscapingDict(Mapping):
+class EscapingDict(MutableMapping):
     """Helper class, same as a dict, but returns all string value with quotes escaped."""
 
     def __init__(self, mapping):
@@ -29,8 +29,16 @@ class EscapingDict(Mapping):
         if isinstance(value, basestring):
             # TODO: May need to be different depending on OS
             value = value.replace('"', '\\"')
-            #value = re.escape(value)
         return value
+
+    def __setitem__(self, key, value):
+        self._data[key] = value
+
+    def __delitem__(self, key):
+        del self._data[key]
+
+    def __copy__(self):
+        return EscapingDict(self._data.copy())
 
 
 class PluginExec(object):
