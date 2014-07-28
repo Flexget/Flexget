@@ -1345,7 +1345,7 @@ class FilterSeries(FilterSeriesBase):
         expires = first_seen + timeframe
         log.debug('timeframe: %s, first_seen: %s, expires: %s', timeframe, first_seen, expires)
 
-        stop = task.options.stop_waiting.lower() == episode.series.name.lower()
+        stop = normalize_series_name(task.options.stop_waiting) == episode.series._name_normalized
         if expires <= datetime.now() or stop:
             # Expire timeframe, accept anything
             log.info('Timeframe expired, releasing quality restriction.')
