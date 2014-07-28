@@ -75,7 +75,8 @@ class OutputDump(object):
         states = ['accepted', 'rejected', 'failed', 'undecided']
         dumpstates = [s for s in states if s in task.options.dump_entries]
         specificstates = dumpstates
-        if not dumpstates: dumpstates = states
+        if not dumpstates:
+            dumpstates = states
         undecided = [entry for entry in task.all_entries if entry.undecided]
         if 'undecided' in dumpstates:
             if undecided:
