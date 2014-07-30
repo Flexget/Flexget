@@ -246,8 +246,12 @@ def find_series_id(name):
     try:
         page = requests.get(url).content
     except RequestException as e:
-        raise LookupError("Unable to get search results for %s: %s" % (name, e))
-    xmldata = ElementTree.fromstring(page)
+        raise LookupError('Unable to get search results for %s: %s' % (name, e))
+    try:
+        xmldata = ElementTree.fromstring(page)
+    except ElementTree.ParseError as e:
+        log.debug('error parsing tvdb result: %s' % e)
+        xmldata = None
     if xmldata is None:
         log.error("Didn't get a return from tvdb on the series search for %s" % name)
         return
