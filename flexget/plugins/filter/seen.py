@@ -183,7 +183,7 @@ class FilterSeen(object):
                     se = task.session.query(SeenEntry).filter(SeenEntry.id == found.seen_entry_id).one()
                     entry.reject('Entry with %s `%s` is already marked seen in the task %s at %s' %
                                  (found.field, found.value, se.task, se.added.strftime('%Y-%m-%d %H:%M')),
-                                remember=remember_rejected)
+                                 remember=remember_rejected)
 
     def on_task_learn(self, task, config):
         """Remember succeeded entries"""
