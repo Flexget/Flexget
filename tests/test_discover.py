@@ -141,7 +141,7 @@ class TestEmitSeriesInDiscover(FlexGetBase):
             discover:
               ignore_estimations: yes
               what:
-              - emit_series:
+                emit_series:
                   backfill: yes
               from:
               - test_search: yes
