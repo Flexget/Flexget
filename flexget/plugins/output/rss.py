@@ -43,7 +43,7 @@ class RSSEntry(Base):
     link = Column(String)
     rsslink = Column(String)
     file = Column(Unicode)
-    published = Column(DateTime, default=datetime.datetime.utcnow())
+    published = Column(DateTime, default=datetime.datetime.utcnow)
 
 
 class OutputRSS(object):

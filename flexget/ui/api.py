@@ -22,7 +22,17 @@ def attach_schema(response):
     return response
 
 
-# TODO: These endpoints should probably return a header which points to a json schema describing the return data
+@api_schema.route('/version')
+def version_schema():
+    return jsonify({
+        'type': 'object',
+        'properties': {
+            'flexget_version': {'type': 'string', 'description': 'FlexGet version string'},
+            'api_version': {'type': 'integer', 'description': 'Version of the json api'}
+        }
+    })
+
+
 @api.route('/version')
 def version():
     return jsonify(flexget_version=flexget.__version__, api_version=API_VERSION)
@@ -64,14 +74,20 @@ task_schema = {
 }
 
 tasks_schema = {
-    'type': 'array',
-    'items': {'$ref': '/schema/api/tasks/task'},
-    'links': [
-        {'rel': 'add', 'method': 'POST', 'href': '/api/tasks/', 'schema': {'$ref': '/schema/api/tasks/task'}}
-    ]
+    'type': 'object',
+    'properties': {
+        'tasks': {
+            'type': 'array',
+            'items': {'$ref': '/schema/api/tasks/task'},
+            'links': [
+                {'rel': 'add', 'method': 'POST', 'href': '/api/tasks/', 'schema': {'$ref': '/schema/api/tasks/task'}}
+            ]
+        }
+    }
 }
 
 
+# TODO: Maybe these should be in /config/tasks
 @api_schema.route('/tasks/')
 def schema_tasks():
     return jsonify(tasks_schema)
@@ -83,7 +99,7 @@ def api_tasks():
         tasks = []
         for name in manager.tasks:
             tasks.append({'name': name, 'config': manager.config['tasks'][name]})
-        return jsonify(tasks)
+        return jsonify(tasks=tasks)
     elif request.method == 'POST':
         # TODO: Validate and add task
         pass
@@ -98,32 +114,62 @@ def schema_task(task):
 def api_task(task):
     if request.method == 'GET':
         if not task in manager.tasks:
-            return 'not found', 404
+            return jsonify(error='task {task} not found'.format(task=task)), 404
         return jsonify({'name': task, 'config': manager.config[task]})
     elif request.method == 'PUT':
         # TODO: Validate then set
+        # TODO: Return 204 if name has been changed
         pass
     elif request.method == 'DELETE':
         manager.config['tasks'].pop(task)
 
 
-# TODO: return proper schemas in headers, also none of these should allow setting invalid config
-@api.route('/config', methods=['GET', 'PUT'])
+@api_schema.route('/config/')
+def cs_root():
+    root_schema = get_schema()
+    hyper_schema = root_schema.copy()
+    hyper_schema['links'] = [{'rel': 'self', 'href': '/api/config/'}]
+    hyper_schema['properties'] = root_schema.get('properties', {}).copy()
+    hs_props = hyper_schema['properties']
+    for key, key_schema in root_schema.get('properties', {}).iteritems():
+        hs_props[key] = hs_props[key].copy()
+        hs_props[key]['links'] = [{'rel': 'self', 'href': key}]
+        if key not in root_schema.get('required', []):
+            hs_props[key]['links'].append({'rel': 'delete', 'href': '', 'method': 'DELETE'})
+    return jsonify(hyper_schema)
+
+
+# TODO: none of these should allow setting invalid config
+@api.route('/config/', methods=['GET', 'PUT'])
 def config_root():
     return jsonify(manager.config)
 
 
-@api.route('/config/<section>', methods=['GET', 'PUT', 'DELETE'])
+@api_schema.route('/config/<section>')
+def schema_config_section(section):
+    return jsonify(resolve_ref('/schema/config/%s' % section))
+
+
+@api.route('/config/<section>/', methods=['GET', 'PUT', 'DELETE'])
 def config_section(section):
-    if request.method == 'GET':
-        return jsonify(manager.config[section])
-    elif request.method == 'PUT':
+    if request.method == 'PUT':
+        schema = resolve_ref('/schema/config/%s' % section)
+        errors = process_config(request.json, schema, set_defaults=False)
+        if errors:
+            return jsonify({'$errors': errors}), 400
         manager.config[section] = request.json
-    elif request.method == 'DELETE':
+    if section not in manager.config:
+        return jsonify(error='Not found'), 404
+    if request.method == 'DELETE':
         del manager.config[section]
+        return Response(status=204)
+    response = jsonify(manager.config[section])
+    response.headers[b'Content-Type'] += '; profile=/schema/config/%s' % section
+    return response
 
 
-@api.route('/config/tasks/<taskname>', methods=['GET', 'PUT', 'DELETE'])
+# TODO: Abandon this and move above task handlers into /config?
+@api.route('/config/tasks/<taskname>/', methods=['GET', 'PUT', 'DELETE'])
 def config_tasks(taskname):
     if request.method != 'PUT':
         if taskname not in manager.config['tasks']:
@@ -140,32 +186,6 @@ def config_tasks(taskname):
         return Response(status=204)
     return jsonify(manager.config['tasks'][taskname]), status_code
 
-@api.route('/config/<root_key>', methods=['GET', 'PUT', 'DELETE'])
-def config_root_key(root_key):
-    if request.method == 'PUT':
-        schema = resolve_ref('/schema/config/%s' % root_key)
-        errors = process_config(request.json, schema, set_defaults=False)
-        if errors:
-            return jsonify({'$errors': errors}), 400
-        manager.config[root_key] = request.json
-    if root_key not in manager.config:
-        return 'Not found', 404
-    response = jsonify(manager.config[root_key])
-    response.headers[b'Content-Type'] += '; profile=/schema/config/%s' % root_key
-    return response
-
-
-
-@api_schema.route('/config/')
-def cs_root():
-    root_schema = get_schema()
-    hyper_schema = {'properties': {}, 'links': [{'self': '/api/config/'}]}
-    hs_props = hyper_schema['properties']
-    for key, key_schema in root_schema.get('properties', {}).iteritems():
-        hs_props[key] = {'links': [{'rel': 'self', 'href': key}]}
-        if key not in root_schema.get('required', []):
-            hs_props[key]['links'].append({'rel': 'delete', 'href': '', 'method': 'DELETE'})
-
 
 # TODO: Move this route to template plugin
 @api_schema.route('/config/templates/', defaults={'section': 'templates'})
@@ -180,19 +200,8 @@ def cs_task_container(section):
                                    'required': ['name']}}]}
 
 
-@api_schema.route('/config/<root_key>/')
-def cs_tasks(root_key):
-    root_schema = get_schema()
-    if root_key not in root_schema['properties']:
-        return 'Not found', 404
-    hyper_schema = {'links': [{'rel': 'edit', 'href': 'PUT', }]}
-    return root_schema['properties'][root_key]
-
-
 # TODO: Move this route to template plugin
 @api_schema.route('/config/templates/<name>', defaults={'section': 'templates'})
 @api_schema.route('/config/tasks/<name>', defaults={'section': 'tasks'})
 def cs_plugin_container(section, name):
-
-
     return plugin_schemas(context='task')

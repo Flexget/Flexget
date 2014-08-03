@@ -4,9 +4,11 @@ import datetime
 import difflib
 from socket import timeout
 
-from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, select, update
+from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, select, update, func
 from sqlalchemy.orm import relation
 import tvrage.api
+import tvrage.feeds
+from tvrage.util import TvrageError
 
 from flexget.event import event
 from flexget.utils.database import with_session
@@ -19,6 +21,10 @@ log = logging.getLogger('api_tvrage')
 
 Base = db_schema.versioned_base('tvrage', 2)
 UPDATE_INTERVAL = '7 days'
+
+
+# Monkey patch tvrage library to work around https://github.com/ckreutzer/python-tvrage/pull/8
+tvrage.feeds.BASE_URL = 'http://services.tvrage.com/feeds/%s.php?%s=%s'
 
 
 @event('manager.db_cleanup')
@@ -153,6 +159,31 @@ class TVRageEpisodes(Base):
             filter(TVRageEpisodes.episode == 1).first()
 
 
+def closest_airdate(series_id, session):
+    """Returns the next upcoming show's airdate or last airdate."""
+    sq = session.query(TVRageEpisodes).\
+         filter(TVRageEpisodes.tvrage_series_id == series_id).\
+         filter(TVRageEpisodes.airdate > datetime.datetime.now()).subquery()
+
+    upcoming_episode = session.query(sq).\
+                       filter(sq.c.airdate == func.min(sq.c.airdate).select()).first()
+
+    if upcoming_episode is not None:
+        return upcoming_episode.airdate
+
+    sq = session.query(TVRageEpisodes).\
+         filter(TVRageEpisodes.tvrage_series_id == series_id).\
+         filter(TVRageEpisodes.airdate < datetime.datetime.now()).subquery()
+
+    past_episode = session.query(sq).\
+                   filter(sq.c.airdate == func.max(sq.c.airdate).select()).first()
+
+    if past_episode is not None:
+        return past_episode.airdate
+
+    return datetime.datetime.max
+
+
 @with_session
 def lookup_series(name=None, session=None):
     series = None
@@ -165,9 +196,20 @@ def lookup_series(name=None, session=None):
             raise LookupError('Could not find show %s' % name)
     elif res:
         series = res.series
-        # if too old result, clean the db and refresh it
+
+        airdate = closest_airdate(series.id, session)
+        now = datetime.datetime.now()
         interval = parse_timedelta(UPDATE_INTERVAL)
-        if datetime.datetime.now() > series.last_update + interval:
+
+        # if too old result or no upcoming result, clean the db and refresh it
+        if (series.last_update - datetime.timedelta(days=1)) < airdate < now and \
+           now > series.last_update + datetime.timedelta(hours=4):
+            # no upcoming episode and last check done before one day after last airdate; adding timedelta
+            # because last_update has no time information. Left-hand and statement is here to ensure there is
+            # 4 hours between two tvrage lookups
+            log.debug('No next episode information for %s; refreshing now', name)
+        elif now > series.last_update + interval:
+            # too old result, refreshing
             log.debug('Refreshing tvrage info for %s', name)
         else:
             return series
@@ -194,6 +236,9 @@ def lookup_series(name=None, session=None):
         # and search directly for tvrage id. This is problematic, because 3rd party TVRage API does not support this.
         raise LookupError('Returned invalid data for "%s". This is often caused when TVRage is missing episode info'
                           % name)
+    except TvrageError as e:
+        raise LookupError('Error while accessing tvrage: %s' % e.msg)
+
     # Make sure the result is close enough to the search
     if difflib.SequenceMatcher(a=name, b=fetched.name).ratio() < 0.7:
         log.debug('Show result `%s` was not a close enough match for `%s`' % (fetched.name, name))

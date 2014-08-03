@@ -112,6 +112,9 @@ class FilterRegexp(object):
                 # Parse custom settings for this regexp
                 if not isinstance(opts, dict):
                     opts = {'path': opts}
+                else:
+                    # We don't want to modify original config
+                    opts = opts.copy()
                 # advanced configuration
                 if config.get('from'):
                     opts.setdefault('from', config['from'])
@@ -123,8 +126,7 @@ class FilterRegexp(object):
 
                 # compile `not` option regexps
                 if 'not' in opts:
-                    for idx, not_re in enumerate(opts['not'][:]):
-                        opts['not'][idx] = re.compile(not_re, re.IGNORECASE | re.UNICODE)
+                    opts['not'] = [re.compile(not_re, re.IGNORECASE | re.UNICODE) for not_re in opts['not']]
 
                 # compile regexp and make sure regexp is a string for series like '24'
                 regexp = re.compile(unicode(regexp), re.IGNORECASE | re.UNICODE)

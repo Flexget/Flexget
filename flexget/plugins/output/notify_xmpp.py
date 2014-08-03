@@ -22,8 +22,7 @@ try:
             self.register_plugin('xep_0199') # XMPP Ping
     
         def start(self, event):
-            self.send_presence()
-            self.get_roster()
+            self.send_presence(pto=self.recipient)
             self.send_message(mto=self.recipient, mbody=self.msg, mtype='chat')
             self.disconnect(wait=True)
 
@@ -53,8 +52,15 @@ class OutputNotifyXmpp(object):
             import sleekxmpp
         except ImportError as e:
             log.debug('Error importing SleekXMPP: %s' % e)
-            raise plugin.DependencyError('notify_xmpp', 'sleekxmpp', 
-                'SleekXMPP module required. ImportError: %s' % e)
+            raise plugin.DependencyError('notify_xmpp', 'sleekxmpp', 'SleekXMPP module required. ImportError: %s' % e)
+        try:
+            import dns
+        except:
+            try:
+                import dnspython
+            except ImportError as e:
+                log.debug('Error importing dnspython: %s' % e)
+                raise plugin.DependencyError('notify_xmpp', 'dnspython', 'dnspython module required. ImportError: %s' % e)
     
     def on_task_output(self, task, config):
         """

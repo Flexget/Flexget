@@ -47,14 +47,15 @@ class SeriesParser(TitleParser):
         '(\d{1,3})\s?x\s?(0+)[^1-9]',  # 5x0
         'S(\d{1,3})D(\d{1,3})',  # S3D1
         '(\d{1,3})\s?x\s?(all)',  # 1xAll
-        '(?:season(?:s)|s|series)?\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
+        r'(?:season(?:s)|s|series|\b)\s?\d\s?(?:&\s?\d)?[\s-]*(?:complete|full)',
         'seasons\s(\d\s){2,}',
         'disc\s\d'])
     # Make sure none of these are found embedded within a word or other numbers
     date_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
         '(\d{2,4})%s(\d{1,2})%s(\d{1,2})' % (separators, separators),
         '(\d{1,2})%s(\d{1,2})%s(\d{2,4})' % (separators, separators),
-        '(\d{4})x(\d{1,2})%s(\d{1,2})' % separators]])
+        '(\d{4})x(\d{1,2})%s(\d{1,2})' % separators,
+        '(\d{1,2})(?:st|nd|rd|th)?%s([a-z]{3,10})%s(\d{4})' % (separators, separators)]])
     sequence_regexps = ReList([TitleParser.re_not_in_word(regexp) for regexp in [
         '(\d{1,3})(?:v(?P<version>\d))?',
         '(?:pt|part)\s?(\d+|%s)' % roman_numeral_re]])
@@ -132,7 +133,7 @@ class SeriesParser(TitleParser):
         self.id = None
         self.id_type = None
         self.id_groups = None
-        self.quality = qualities.Quality()
+        self.quality = None
         self.proper_count = 0
         self.special = False
         # TODO: group is only produced with allow_groups
@@ -163,7 +164,7 @@ class SeriesParser(TitleParser):
         if name.endswith(')'):
             p_start = name.rfind('(')
             if p_start != -1:
-                parenthetical = name[p_start + 1:-1]
+                parenthetical = re.escape(name[p_start + 1:-1])
                 name = name[:p_start - 1]
         # Blanks are any non word characters except & and _
         blank = r'(?:[^\w&]|_)'
@@ -185,7 +186,8 @@ class SeriesParser(TitleParser):
         # Clear the output variables before parsing
         self._reset()
         self.field = field
-        self.quality = quality or qualities.Quality()
+        if quality:
+            self.quality = quality
         if data:
             self.data = data
         if not self.name or not self.data:
@@ -250,10 +252,12 @@ class SeriesParser(TitleParser):
         log.debug('parsing quality ->')
         quality = qualities.Quality(data_stripped)
         if quality:
-            self.quality = quality
             # Remove quality string from data
             log.debug('quality detected, using remaining data `%s`', quality.clean_text)
             data_stripped = quality.clean_text
+        # Don't override passed in quality
+        if not self.quality:
+            self.quality = quality
 
         # Remove unwanted words from data for ep / id parsing
         data_stripped = self.remove_words(data_stripped, self.remove, not_in_word=True)

@@ -63,4 +63,4 @@ class SearchBTN(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchBTN, 'btn', groups=['search'], debug=True, api_ver=2)
+    plugin.register(SearchBTN, 'btn', groups=['search'], api_ver=2)

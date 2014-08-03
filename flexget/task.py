@@ -585,6 +585,13 @@ class Task(object):
             self._rerun_count += 1
             self.execute()
 
+    @staticmethod
+    def validate_config(config):
+        schema = plugin_schemas(context='task')
+        # Don't validate commented out plugins
+        schema['patternProperties'] = {'^_': {}}
+        return config_schema.process_config(config, schema)
+
     def __eq__(self, other):
         if hasattr(other, 'name'):
             return self.name == other.name

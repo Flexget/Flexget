@@ -11,7 +11,7 @@ from flexget.utils.tools import console
 try:
     from flexget.plugins.filter.series import (Series, Episode, Release, SeriesTask, forget_series,
                                                forget_series_episode, set_series_begin, normalize_series_name,
-                                               new_eps_after, get_latest_download)
+                                               new_eps_after, get_latest_release)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
@@ -62,7 +62,7 @@ def display_summary(options):
             status = 'N/A'
             age = 'N/A'
             episode_id = 'N/A'
-            latest = get_latest_download(series)
+            latest = get_latest_release(series)
             if latest:
                 if latest.first_seen > datetime.now() - timedelta(days=2):
                     new_ep = '>'
@@ -183,6 +183,8 @@ def display_details(name):
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
     if series.identified_by == 'sequence':
         episodes = episodes.order_by(Episode.number).all()
+    elif series.identified_by == 'ep':
+        episodes = episodes.order_by(Episode.season, Episode.number).all()
     else:
         episodes = episodes.order_by(Episode.identifier).all()
 
@@ -218,6 +220,8 @@ def display_details(name):
     else:
         console(' Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by)
     console(' See option `identified_by` for more information.')
+    if series.begin:
+        console(' Begin episode for this series set to `%s`.' % series.begin.identifier)
     session.close()
 
 

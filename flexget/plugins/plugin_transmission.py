@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 from datetime import datetime
+from datetime import timedelta
 from netrc import netrc, NetrcParseError
 import logging
 import base64
@@ -101,9 +102,27 @@ class TransmissionBase(object):
                     break
                 if not best or tf['size'] > best[1]:
                     best = (tf['name'], tf['size'])
-        if done and best and (100*float(best[1])/float(torrent.totalSize)) >= 90:
+        if done and best and (100 * float(best[1]) / float(torrent.totalSize)) >= 90:
             vloc = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
         return done, vloc
+
+    def check_seed_limits(self, torrent, session):
+        seed_limit_ok = None  # will remain if no seed ratio defined
+        idle_limit_ok = None  # will remain if no idle limit defined
+
+        if torrent.seedRatioMode == 1:  # use torrent's own seed ratio limit
+            seed_limit_ok = torrent.seedRatioLimit >= torrent.uploadRatio
+        elif torrent.seedRatioMode == 0:  # use global rules
+            if session.seedRatioLimited:
+                seed_limit_ok = torrent.uploadRatio >= session.seedRatioLimit
+
+        if torrent.seedIdleMode == 1:  # use torrent's own idle limit
+            idle_limit_ok = torrent.date_active + timedelta(minutes=torrent.seedIdleLimit) < datetime.now()
+        elif torrent.seedIdleMode == 0:  # use global rules
+            if session.idle_seeding_limit_enabled:
+                idle_limit_ok = torrent.date_active + timedelta(minutes=session.idle_seeding_limit) < datetime.now()
+
+        return seed_limit_ok, idle_limit_ok
 
     @save_opener
     def on_task_start(self, task, config):
@@ -156,13 +175,18 @@ class PluginTransmissionInput(TransmissionBase):
         if 'username' in config and 'password' in config:
             self.client.http_handler.set_authentication(self.client.url, config['username'], config['password'])
 
+        session = self.client.get_session()
+
         for torrent in self.client.get_torrents():
             downloaded, bigfella = self.torrent_info(torrent)
-            if not config['onlycomplete'] or (downloaded and torrent.status == 'stopped'):
+            seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
+            if not config['onlycomplete'] or (downloaded and torrent.status == 'stopped' and
+                                              (seed_ratio_ok is None and idle_limit_ok is None) or
+                                              (seed_ratio_ok is True or idle_limit_ok is True)):
                 entry = Entry(title=torrent.name,
                               url='file://%s' % torrent.torrentFile,
                               torrent_info_hash=torrent.hashString,
-                              content_size=torrent.totalSize/(1024*1024))
+                              content_size=torrent.totalSize / (1024 * 1024))
                 for attr in ['comment', 'downloadDir', 'isFinished', 'isPrivate']:
                     entry['transmission_' + attr] = getattr(torrent, attr)
                 entry['transmission_trackers'] = [t['announce'] for t in torrent.trackers]
@@ -199,7 +223,7 @@ class PluginTransmission(TransmissionBase):
         root.accept('boolean')
         advanced = root.accept('dict')
         self._validator(advanced)
-        advanced.accept('path', key='path', allow_replacement=True)
+        advanced.accept('text', key='path')
         advanced.accept('boolean', key='addpaused')
         advanced.accept('boolean', key='honourlimits')
         advanced.accept('integer', key='bandwidthpriority')
@@ -207,6 +231,8 @@ class PluginTransmission(TransmissionBase):
         advanced.accept('number', key='maxupspeed')
         advanced.accept('number', key='maxdownspeed')
         advanced.accept('number', key='ratio')
+        advanced.accept('boolean', key='main_file_only')
+        advanced.accept('boolean', key='include_subs')
         return root
 
     @plugin.priority(120)
@@ -251,13 +277,13 @@ class PluginTransmission(TransmissionBase):
         opt_dic = {}
 
         for opt_key in ('path', 'addpaused', 'honourlimits', 'bandwidthpriority',
-                        'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio'):
+                        'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio', 'main_file_only', 'include_subs'):
             if opt_key in entry:
                 opt_dic[opt_key] = entry[opt_key]
             elif opt_key in config:
                 opt_dic[opt_key] = config[opt_key]
 
-        options = {'add': {}, 'change': {}}
+        options = {'add': {}, 'change': {}, 'post': {}}
 
         add = options['add']
         if opt_dic.get('path'):
@@ -266,12 +292,12 @@ class PluginTransmission(TransmissionBase):
                 add['download_dir'] = pathscrub(path).encode('utf-8')
             except RenderError as e:
                 log.error('Error setting path for %s: %s' % (entry['title'], e))
-        if 'addpaused' in opt_dic:
-            add['paused'] = opt_dic['addpaused']
         if 'bandwidthpriority' in opt_dic:
             add['bandwidthPriority'] = opt_dic['bandwidthpriority']
         if 'maxconnections' in opt_dic:
             add['peer_limit'] = opt_dic['maxconnections']
+        # make sure we add it paused, will modify status after adding
+        add['paused'] = True
 
         change = options['change']
         if 'honourlimits' in opt_dic and not opt_dic['honourlimits']:
@@ -293,6 +319,15 @@ class PluginTransmission(TransmissionBase):
                 change['seedRatioMode'] = 2
             else:
                 change['seedRatioMode'] = 1
+
+        post = options['post']
+        # set to modify paused status after 
+        if 'addpaused' in opt_dic:
+            post['paused'] = opt_dic['addpaused']
+        if 'main_file_only' in opt_dic:
+            post['main_file_only'] = opt_dic['main_file_only']
+        if 'include_subs' in opt_dic:
+            post['include_subs'] = opt_dic['include_subs']
 
         return options
 
@@ -330,8 +365,35 @@ class PluginTransmission(TransmissionBase):
                 if r:
                     torrent = r
                 log.info('"%s" torrent added to transmission' % (entry['title']))
+                total_size = cli.get_torrent(r.id, ['id', 'totalSize']).totalSize
+       
                 if options['change'].keys():
                     cli.change_torrent(r.id, 30, **options['change'])
+
+                if 'main_file_only' in options['post'] and options['post']['main_file_only'] == True:
+                    fl = cli.get_files(r.id)
+
+                    ext_list = ['.srt', '.sub', '.idx', '.ssa', '.ass']
+                    found_main = False
+                    for f in fl[r.id]:
+                        would_include = fl[r.id][f]['size'] > total_size * 0.90
+                        if would_include == True:
+                            found_main = True
+                        if 'include_subs' in options['post'] and options['post']['include_subs'] == True:
+                            if not would_include:
+                                would_include = os.path.splitext(fl[r.id][f]['name'])[1] in ext_list
+                        fl[r.id][f]['selected'] = would_include
+                    
+                    # Only modify files to download if we found a file that is 90% of the torrent
+                    if found_main == True:
+                        cli.set_files(fl)
+                
+                # if addpaused was defined and set to False start the torrent;
+                # prevents downloading data before we set what files we want
+                if ('paused' in options['post'] and options['post']['paused'] == False or
+                   'paused' not in options['post'] and cli.get_session().start_added_torrents == True):
+                        cli.get_torrent(r.id).start()
+
             except TransmissionError as e:
                 log.debug('TransmissionError', exc_info=True)
                 log.debug('Failed options dict: %s' % options)
@@ -356,6 +418,9 @@ class PluginTransmissionClean(TransmissionBase):
     Examples::
       
       clean_transmission: yes  # ignore both time and ratio
+
+      clean_transmission:      # uses transmission's internal limits for idle time and seed ratio ( if defined )
+        transmission_seed_limits: yes
       
       clean_transmission:      # matches time only
         finished_for: 2 hours
@@ -383,6 +448,8 @@ class PluginTransmissionClean(TransmissionBase):
         self._validator(advanced)
         advanced.accept('number', key='min_ratio')
         advanced.accept('interval', key='finished_for')
+        advanced.accept('boolean', key='transmission_seed_limits')
+        advanced.accept('boolean', key='delete_files')
         return root
 
     def on_task_exit(self, task, config):
@@ -393,12 +460,20 @@ class PluginTransmissionClean(TransmissionBase):
             self.client = self.create_rpc_client(config)
         nrat = float(config['min_ratio']) if 'min_ratio' in config else None
         nfor = parse_timedelta(config['finished_for']) if 'finished_for' in config else None
+        delete_files = bool(config['delete_files']) if 'delete_files' in config else False
+        transmission_checks = bool(config['transmission_seed_limits']) if 'transmission_seed_limits' in config else False
+        
+        session = self.client.get_session()
+
         remove_ids = []
         for torrent in self.client.get_torrents():
-            log.verbose('Torrent "%s": status: "%s" - ratio: %s - date done: %s' % 
+            log.verbose('Torrent "%s": status: "%s" - ratio: %s - date done: %s' %
                         (torrent.name, torrent.status, torrent.ratio, torrent.date_done))
             downloaded, dummy = self.torrent_info(torrent)
-            if (downloaded and ((nrat is None and nfor is None) or
+            seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
+            if (downloaded and ((nrat is None and nfor is None and transmission_checks is None) or
+                                (transmission_checks and ((seed_ratio_ok is None and idle_limit_ok is None) or
+                                                         (seed_ratio_ok is True or idle_limit_ok is True))) or
                                 (nrat and (nrat <= torrent.ratio)) or
                                 (nfor and ((torrent.date_done + nfor) <= datetime.now())))):
                 if task.options.test:
@@ -407,7 +482,7 @@ class PluginTransmissionClean(TransmissionBase):
                 log.info('Removing finished torrent `%s` from transmission' % torrent.name)
                 remove_ids.append(torrent.id)
         if remove_ids:
-            self.client.remove_torrent(remove_ids)
+            self.client.remove_torrent(remove_ids, delete_files)
 
 
 @event('plugin.register')

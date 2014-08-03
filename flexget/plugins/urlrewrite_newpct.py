@@ -21,11 +21,11 @@ class UrlRewriteNewPCT(object):
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        if url.startswith('http://www.newpct.com/download/'):
-            return False
-        if url.startswith('http://www.newpct.com/') or url.startswith('http://newpct.com/'):
-            return True
-        return False
+        rewritable_regex='^http:\/\/(www.)?newpct1?.com\/.*'
+        if re.match(rewritable_regex,url) and not url.startswith('http://www.newpct.com/download/'):
+                return True
+        else:
+                return False
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
@@ -38,12 +38,12 @@ class UrlRewriteNewPCT(object):
             soup = get_soup(page.text)
         except Exception as e:
             raise UrlRewritingError(e)
-        torrent_id_prog = re.compile("'torrentID': '(\d+)'")
+        torrent_id_prog = re.compile("'(?:torrentID|id)'\s*:\s*'(\d+)'")
         torrent_ids = soup.findAll(text=torrent_id_prog)
         if len(torrent_ids) == 0:
             raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
         torrent_id = torrent_id_prog.search(torrent_ids[0]).group(1)
-        return 'http://www.pctorrent.com/descargar/index.php?link=descargar/torrent/%s/dummy.html' % torrent_id
+        return 'http://tumejorjuego.com/descargar/index.php?link=descargar/torrent/%s/dummy.html' % torrent_id
 
 @event('plugin.register')
 def register_plugin():

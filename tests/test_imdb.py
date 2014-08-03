@@ -182,7 +182,7 @@ class TestImdb(FlexGetBase):
     def test_genre(self):
         self.execute_task('genre')
         matrix = (self.task.find_entry(imdb_name='The Matrix')['imdb_genres'])
-        assert matrix == ['action', 'adventure', 'sci-fi'], \
+        assert matrix == ['action', 'sci-fi'], \
             'Could not find genres for The Matrix'
         toe = (self.task.find_entry(imdb_name='Terms of Endearment')['imdb_genres'])
         assert toe == ['comedy', 'drama'], \

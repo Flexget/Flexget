@@ -33,8 +33,9 @@ class SetSeriesBegin(object):
                 try:
                     set_series_begin(fshow, entry['series_id'])
                 except ValueError as e:
-                    self.log.error('An error occurred trying to set the series first episode: ' % e)
+                    self.log.error('An error occurred trying to set begin for %s: %s' % (entry['series_name'], e))
                 self.log.info('First episode for "%s" set to %s' % (entry['series_name'], entry['series_id']))
+
 
 @event('plugin.register')
 def register_plugin():

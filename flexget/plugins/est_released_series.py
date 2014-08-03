@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import timedelta, datetime
+import contextlib
 import logging
 
 from sqlalchemy import desc, func
@@ -58,8 +59,7 @@ class EstimatesReleasedSeries(object):
                           (entry['series_name'], entry['series_season'], entry['series_episode']))
 
             # If no results from tvrage, estimate a date based on series history
-            session = Session()
-            try:
+            with contextlib.closing(Session()) as session:
                 series = session.query(Series).filter(Series.name == entry['series_name']).first()
                 if not series:
                     return
@@ -68,26 +68,24 @@ class EstimatesReleasedSeries(object):
                             filter(Series.id == series.id).
                             filter(Episode.season == func.max(Episode.season).select()).
                             order_by(desc(Episode.number)).limit(2).all())
-            finally:
-                session.close()
 
-            if len(episodes) < 2:
-                return
-            # If last two eps were not contiguous, don't guess
-            if episodes[0].number != episodes[1].number + 1:
-                return
-            last_diff = episodes[0].first_seen - episodes[1].first_seen
-            # If last eps were grabbed close together, we might be catching up, don't guess
-            # Or, if last eps were too far apart, don't guess
-            # TODO: What range?
-            if last_diff < timedelta(days=2) or last_diff > timedelta(days=10):
-                return
-            # Estimate next season somewhat more than a normal episode break
-            if entry['series_season'] > episodes[0].season:
-                # TODO: How big should this be?
-                return episodes[0].first_seen + multiply_timedelta(last_diff, 2)
-            # Estimate next episode comes out about same length as last ep span, with a little leeway
-            return episodes[0].first_seen + multiply_timedelta(last_diff, 0.9)
+                if len(episodes) < 2:
+                    return
+                # If last two eps were not contiguous, don't guess
+                if episodes[0].number != episodes[1].number + 1:
+                    return
+                last_diff = episodes[0].first_seen - episodes[1].first_seen
+                # If last eps were grabbed close together, we might be catching up, don't guess
+                # Or, if last eps were too far apart, don't guess
+                # TODO: What range?
+                if last_diff < timedelta(days=2) or last_diff > timedelta(days=10):
+                    return
+                # Estimate next season somewhat more than a normal episode break
+                if entry['series_season'] > episodes[0].season:
+                    # TODO: How big should this be?
+                    return episodes[0].first_seen + multiply_timedelta(last_diff, 2)
+                # Estimate next episode comes out about same length as last ep span, with a little leeway
+                return episodes[0].first_seen + multiply_timedelta(last_diff, 0.9)
 
 
 @event('plugin.register')

@@ -1,18 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
-from collections import Mapping
+from collections import MutableMapping
 import logging
 import subprocess
-import sys
 
 
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import render_from_entry, render_from_task, RenderError
+from flexget.utils.tools import io_encoding
 
 log = logging.getLogger('exec')
 
 
-class EscapingDict(Mapping):
+class EscapingDict(MutableMapping):
     """Helper class, same as a dict, but returns all string value with quotes escaped."""
 
     def __init__(self, mapping):
@@ -29,8 +29,16 @@ class EscapingDict(Mapping):
         if isinstance(value, basestring):
             # TODO: May need to be different depending on OS
             value = value.replace('"', '\\"')
-            #value = re.escape(value)
         return value
+
+    def __setitem__(self, key, value):
+        self._data[key] = value
+
+    def __delitem__(self, key):
+        del self._data[key]
+
+    def __copy__(self):
+        return EscapingDict(self._data.copy())
 
 
 class PluginExec(object):
@@ -95,16 +103,16 @@ class PluginExec(object):
         if isinstance(config, basestring):
             config = {'on_output': {'for_accepted': config}}
         if not config.get('encoding'):
-            config['encoding'] = sys.getfilesystemencoding()
+            config['encoding'] = io_encoding
         return config
 
     def execute_cmd(self, cmd, allow_background, encoding):
         log.verbose('Executing: %s' % cmd)
         p = subprocess.Popen(cmd.encode(encoding), shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT, close_fds=False)
+                             stderr=subprocess.STDOUT, close_fds=False)
         if not allow_background:
             (r, w) = (p.stdout, p.stdin)
-            response = r.read()
+            response = r.read().decode(encoding, 'replace')
             r.close()
             w.close()
             if response:

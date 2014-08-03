@@ -9,5 +9,5 @@ from html5lib.constants import DataLossWarning
 warnings.simplefilter('ignore', DataLossWarning)
 
 
-def get_soup(obj):
-    return BeautifulSoup(obj, 'html5lib')
+def get_soup(obj, parser='html5lib'):
+    return BeautifulSoup(obj, parser)

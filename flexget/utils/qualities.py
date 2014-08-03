@@ -214,7 +214,7 @@ class Quality(object):
         """
         self.text = text
         self.clean_text = text
-        self.resolution = self._find_best(_resolutions, _UNKNOWNS['resolution'])
+        self.resolution = self._find_best(_resolutions, _UNKNOWNS['resolution'], False)
         self.source = self._find_best(_sources, _UNKNOWNS['source'])
         self.codec = self._find_best(_codecs, _UNKNOWNS['codec'])
         self.audio = self._find_best(_audios, _UNKNOWNS['audio'])
@@ -225,14 +225,19 @@ class Quality(object):
                 if not getattr(self, default.type):
                     setattr(self, default.type, default)
 
-    def _find_best(self, qlist, default=None):
+    def _find_best(self, qlist, default=None, strip_all=True):
         """Finds the highest matching quality component from `qlist`"""
         result = None
+        search_in = self.clean_text
         for item in qlist:
-            match = item.matches(self.clean_text)
+            match = item.matches(search_in)
             if match[0]:
                 result = item
                 self.clean_text = match[1]
+                if strip_all:
+                    # In some cases we want to strip all found quality components,
+                    # even though we're going to return only the last of them.
+                    search_in = self.clean_text
                 if item.modifier is not None:
                     # If this item has a modifier, do not proceed to check higher qualities in the list
                     break
