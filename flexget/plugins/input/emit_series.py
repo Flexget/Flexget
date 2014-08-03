@@ -69,7 +69,16 @@ class EmitSeries(object):
         if not task.is_rerun:
             self.try_next_season = {}
         entries = []
-        for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
+        # Determine series we should be emitting
+        seriestasks = task.session.query(SeriesTask)
+        if 'series' in task.config:
+            seriestasks = seriestasks.filter(SeriesTask.name == task.name)
+        # If this task doesn't have series plugin, check if parent does
+        elif task.parent and 'series' in task.parent.config:
+            seriestasks = seriestasks.filter(SeriesTask.name == task.parent.name)
+        # If no series plugin is found in this or parent task, we'll just emit every configured series
+
+        for seriestask in seriestasks.all():
             series = seriestask.series
             if not series:
                 # TODO: How can this happen?

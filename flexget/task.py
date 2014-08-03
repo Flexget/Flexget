@@ -179,6 +179,7 @@ class Task(object):
         """
         self.name = unicode(name)
         self.manager = manager
+        self.parent = None
         # raw_config should remain the untouched input config
         if config is None:
             config = manager.config['tasks'].get(name, {})
@@ -234,8 +235,10 @@ class Task(object):
         opts = {'builtins': False, 'auto_accept': True}
         if options:
             opts.update(options)
-        return type(self)(self.manager, self.name + name_ext, config, session=self.session, req_sess=self.requests,
-                          options=opts)
+        subtask = type(self)(self.manager, self.name + name_ext, config, session=self.session, req_sess=self.requests,
+                             options=opts)
+        subtask.parent = self
+        return subtask
 
     @property
     def undecided(self):
