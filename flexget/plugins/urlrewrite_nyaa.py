@@ -38,7 +38,7 @@ class UrlRewriteNyaa(object):
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             name = normalize_unicode(search_string)
-            url = 'http://www.nyaa.eu/?page=rss&cats=%s&filter=%s&term=%s' % (
+            url = 'http://www.nyaa.se/?page=rss&cats=%s&filter=%s&term=%s' % (
                   CATEGORIES[config['category']], FILTERS.index(config['filter']), urllib.quote(name.encode('utf-8')))
 
             log.debug('requesting: %s' % url)
@@ -46,11 +46,14 @@ class UrlRewriteNyaa(object):
 
             status = rss.get('status', False)
             if status != 200:
-                raise plugin.PluginWarning('Search result not 200 (OK), received %s' % status)
+                log.debug('Search result not 200 (OK), received %s' % status)
+            if status >= 400:
+                continue
 
             ex = rss.get('bozo_exception', False)
             if ex:
-                raise plugin.PluginWarning('Got bozo_exception (bad feed)')
+                log.error('Got bozo_exception (bad feed) on %s' % url)
+                continue
 
             for item in rss.entries:
 
