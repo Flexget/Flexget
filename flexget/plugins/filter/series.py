@@ -1120,10 +1120,11 @@ class FilterSeries(FilterSeriesBase):
                 continue
 
             # Remove any eps we already have from the list
-            for entry in reversed(entries):  # Iterate in reverse so we can safely remove from the list while iterating
-                if entry['series_parser'].quality in downloaded_qualities:
-                    entry.reject('quality already downloaded')
-                    entries.remove(entry)
+            if not 'disable_builtins' in task.config or not 'seen' in task.config['disable_builtins']:
+                for entry in reversed(entries):  # Iterate in reverse so we can safely remove from the list while iterating
+                    if entry['series_parser'].quality in downloaded_qualities:
+                        entry.reject('quality already downloaded')
+                        entries.remove(entry)
             if not entries:
                 continue
 
@@ -1152,8 +1153,12 @@ class FilterSeries(FilterSeriesBase):
                     continue
 
                 # Reject eps because we have them
-                for entry in entries:
-                    entry.reject('episode has already been downloaded')
+                if not 'disable_builtins' in task.config or not 'seen' in task.config['disable_builtins']:
+                    for entry in entries:
+                        entry.reject('episode has already been downloaded')
+                else:
+                    for entry in entries:
+                        entry.accept('seen disabled');
                 continue
 
             best = entries[0]
