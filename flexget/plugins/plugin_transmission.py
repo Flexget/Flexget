@@ -233,6 +233,7 @@ class PluginTransmission(TransmissionBase):
         advanced.accept('number', key='ratio')
         advanced.accept('boolean', key='main_file_only')
         advanced.accept('boolean', key='include_subs')
+        advanced.accept('text', key='content_filename')
         return root
 
     @plugin.priority(120)
@@ -277,7 +278,7 @@ class PluginTransmission(TransmissionBase):
         opt_dic = {}
 
         for opt_key in ('path', 'addpaused', 'honourlimits', 'bandwidthpriority',
-                        'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio', 'main_file_only', 'include_subs'):
+                        'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio', 'main_file_only', 'include_subs', 'content_filename'):
             if opt_key in entry:
                 opt_dic[opt_key] = entry[opt_key]
             elif opt_key in config:
@@ -328,7 +329,8 @@ class PluginTransmission(TransmissionBase):
             post['main_file_only'] = opt_dic['main_file_only']
         if 'include_subs' in opt_dic:
             post['include_subs'] = opt_dic['include_subs']
-
+        if 'content_filename' in opt_dic:
+            post['content_filename'] = opt_dic['content_filename']
         return options
 
     def add_to_transmission(self, cli, task, config):
@@ -387,7 +389,27 @@ class PluginTransmission(TransmissionBase):
                     # Only modify files to download if we found a file that is 90% of the torrent
                     if found_main == True:
                         cli.set_files(fl)
-                
+                # Modify the main file name according to the parameter content_filename
+                # Functions like deluge plugin.
+                if 'content_filename' in options['post']:
+                    fl = cli.get_files(r.id)
+                    for f in fl[r.id]:
+                        if fl[r.id][f]['size'] > total_size * 0.90:
+                            file_ext = os.path.splitext(fl[r.id][f]['name'])[1]
+                            file_path = os.path.dirname(os.path.join(options['add']['download_dir'], fl[r.id][f]['name']))
+                            filename = options['post']['content_filename'] + file_ext
+                            if config['host'] == 'localhost' or config['host'] == '127.0.0.1':
+                                counter = 1
+                                while os.path.exists(os.path.join(file_path, filename)):
+                                    # Try appending a (#) suffix till a unique filename is found
+                                    filename = ''.join(options['post']['content_filename'], '(', str(counter), ')', file_ext)
+                                    counter += 1
+                            else:
+                                log.debug('Cannot ensure content_filename is unique '
+                                'when adding to a remote transmission daemon.')
+                            log.debug('File %s renamed to %s' % (fl[r.id][f]['name'], filename))
+                            cli.rename_torrent_path(r.id,fl[r.id][f]['name'],os.path.basename(pathscrub(filename).encode('utf-8')))
+                            
                 # if addpaused was defined and set to False start the torrent;
                 # prevents downloading data before we set what files we want
                 if ('paused' in options['post'] and options['post']['paused'] == False or
