@@ -196,8 +196,10 @@ class Scheduler(threading.Thread):
                 streamhandler = logging.StreamHandler(job.output)
                 streamhandler.setFormatter(FlexGetFormatter())
                 logging.getLogger().addHandler(streamhandler)
-            try:
+            if job.options.loglevel != self.manager.options.loglevel:
+                log.verbose('Setting loglevel to `%s` for this execution.' % job.options.loglevel)
                 logging.getLogger().setLevel(job.options.loglevel.upper())
+            try:
                 Task(self.manager, job.task, options=job.options).execute()
             except TaskAbort as e:
                 log.debug('task %s aborted: %r' % (job.task, e))
