@@ -35,7 +35,14 @@ class FilterExists(object):
             return
         log.verbose('Scanning path(s) for existing files.')
         config = self.prepare_config(config)
-        for path in config:
+        paths = set()
+        for entry in task.accepted:
+	        for path in config:
+	            try:
+	                paths.add(entry.render(path))
+	            except RenderError as e:
+	                log.error('Error rendering path `%s`: %s', path, e)
+        for path in paths:
             # unicode path causes crashes on some paths
             path = str(os.path.expanduser(path))
             if not os.path.exists(path):
