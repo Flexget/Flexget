@@ -64,7 +64,7 @@ class SearchKAT(object):
                     # Kat returns status code 404 when no results found for some reason...
                     log.debug('No results found for search query: %s' % search_string)
                     continue
-                elif status != 200:
+                elif status not in [200, 301]:
                     raise plugin.PluginWarning('Search result not 200 (OK), received %s' % status)
 
                 ex = rss.get('bozo_exception', False)
