@@ -168,14 +168,18 @@ class Task(object):
 
     max_reruns = 5
 
-    def __init__(self, manager, name, config=None, options=None):
+    def __init__(self, manager, name, config=None, options=None, session=None, req_sess=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
         :param dict config: Task configuration.
+        :param options: dict or argparse namespace object with task options
+        :param session: If provided, database changes will be done in given sqlalchemy session
+        :param req_sess: If provided, task requests will be sent using given requests session.
         """
         self.name = unicode(name)
         self.manager = manager
+        self.parent = None
         # raw_config should remain the untouched input config
         if config is None:
             config = manager.config['tasks'].get(name, {})
@@ -197,8 +201,44 @@ class Task(object):
 
         self.config_modified = None
 
-        # use reset to init variables when creating
-        self._reset()
+        self.enabled = not self.name.startswith('_')
+        self.session = session
+        # We keep track of this, since outer scope will be responsible for comitting/closing if provided
+        self._session_provided = session is not None
+        self.priority = 65535
+
+        self.requests = req_sess or requests.Session()
+
+        # List of all entries in the task
+        self._all_entries = EntryContainer()
+
+        self.disabled_phases = []
+
+        # These are just to query what happened in task. Call task.abort to set.
+        self.aborted = False
+        self.abort_reason = None
+        self.silent_abort = False
+
+        self._rerun = False
+
+        # current state
+        self.current_phase = None
+        self.current_plugin = None
+
+    def make_subtask(self, name_ext, config, options=None):
+        """
+        Creates a new task initialized appropriately for running as a subtask within this task.
+
+        :param name_ext: This will be appended to the name of the parent task to create subtask name
+        :param dict config: Configuration for the subtask
+        """
+        opts = {'builtins': False, 'auto_accept': True}
+        if options:
+            opts.update(options)
+        subtask = type(self)(self.manager, self.name + name_ext, config, session=self.session, req_sess=self.requests,
+                             options=opts)
+        subtask.parent = self
+        return subtask
 
     @property
     def undecided(self):
@@ -245,32 +285,6 @@ class Task(object):
     @property
     def is_rerun(self):
         return self._rerun_count
-
-    # TODO: can we get rid of this now that Tasks are instantiated on demand?
-    def _reset(self):
-        """Reset task state"""
-        log.debug('resetting %s' % self.name)
-        self.enabled = not self.name.startswith('_')
-        self.session = None
-        self.priority = 65535
-
-        self.requests = requests.Session()
-
-        # List of all entries in the task
-        self._all_entries = EntryContainer()
-
-        self.disabled_phases = []
-
-        # These are just to query what happened in task. Call task.abort to set.
-        self.aborted = False
-        self.abort_reason = None
-        self.silent_abort = False
-
-        self._rerun = False
-
-        # current state
-        self.current_phase = None
-        self.current_plugin = None
 
     def __cmp__(self, other):
         return cmp(self.priority, other.priority)
@@ -335,7 +349,7 @@ class Task(object):
             plugins = sorted(get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True)
         else:
             plugins = all_plugins.itervalues()
-        return (p for p in plugins if p.name in self.config or p.builtin)
+        return (p for p in plugins if p.name in self.config or self.options.builtins and p.builtin)
 
     def __run_task_phase(self, phase):
         """Executes task phase, ie. call all enabled plugins on the task.
@@ -382,6 +396,8 @@ class Task(object):
                     # add entries returned by input to self.all_entries
                     for e in response:
                         e.task = self
+                        if self.options.auto_accept:
+                            e.accept('task auto-accepted')
                     self.all_entries.extend(response)
             finally:
                 fire_event('task.execute.after_plugin', self, plugin.name)
@@ -477,11 +493,10 @@ class Task(object):
         if self.options.cron:
             self.manager.db_cleanup()
 
-        self._reset()
         log.debug('executing %s' % self.name)
-        if not self.enabled:
-            log.debug('task %s disabled during preparation, not running' % self.name)
-            return
+        # Reset a couple things before execution
+        self._all_entries = EntryContainer()
+        self._rerun = False
 
         # Handle keyword args
         if self.options.learn:
@@ -491,12 +506,16 @@ class Task(object):
         if self.options.disable_phases:
             map(self.disable_phase, self.options.disable_phases)
         if self.options.inject:
-            # If entries are passed for this execution (eg. rerun), disable the input phase
+            # If entries are passed for this execution (eg. inject), disable the input phase
             self.disable_phase('input')
             self.all_entries.extend(self.options.inject)
+            if self.options.auto_accept:
+                for entry in self.all_entries:
+                    entry.accept('task auto-accepted')
 
-        log.debug('starting session')
-        self.session = Session()
+        if not self._session_provided:
+            log.debug('starting session')
+            self.session = Session()
 
         # Save current config hash and set config_modidied flag
         config_hash = hashlib.md5(str(sorted(self.config.items()))).hexdigest()
@@ -551,19 +570,19 @@ class Task(object):
         else:
             for entry in self.all_entries:
                 entry.complete()
-            log.debug('committing session')
-            self.session.commit()
+            if not self._session_provided:
+                log.debug('committing session')
+                self.session.commit()
             fire_event('task.execute.completed', self)
         finally:
             # this will cause database rollback on exception
-            self.session.close()
+            if not self._session_provided:
+                self.session.close()
 
         # rerun task
         if self._rerun:
             log.info('Rerunning the task in case better resolution can be achieved.')
             self._rerun_count += 1
-            # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in instead of
-            # taking another one) after input and just inject the same entries for the rerun
             self.execute()
 
     @staticmethod

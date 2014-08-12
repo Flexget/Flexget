@@ -72,7 +72,7 @@ class Entry(dict):
         self.traces = []
         self.snapshots = {}
         self._state = 'undecided'
-        self._hooks = {'accept': [], 'reject': [], 'fail': [], 'complete': []}
+        self._hooks = {'accept': [], 'reject': [], 'fail': [], 'reset': [], 'complete': []}
         self.task = None
 
         if len(args) == 2:
@@ -92,7 +92,7 @@ class Entry(dict):
         :param string operation: None, reject, accept or fail
         :param plugin: Uses task.current_plugin by default, pass value to override
         """
-        if operation not in (None, 'accept', 'reject', 'fail'):
+        if operation not in (None, 'accept', 'reject', 'fail', 'reset'):
             raise ValueError('Unknown operation %s' % operation)
         item = (plugin, operation, message)
         if item not in self.traces:
@@ -149,6 +149,15 @@ class Entry(dict):
         """
         self.add_hook('fail', func, **kwargs)
 
+    def on_reset(self, func, **kwargs):
+        """
+        Register a function to be called when this entry is reset.
+
+        :param func: The function to call
+        :param kwargs: Keyword arguments that should be passed to the registered function
+        """
+        self.add_hook('reset', func, **kwargs)
+
     def on_complete(self, func, **kwargs):
         """
         Register a function to be called when a :class:`Task` has finished processing this entry.
@@ -188,6 +197,11 @@ class Entry(dict):
             log.error('Failed %s (%s)' % (self['title'], reason))
             # Run entry on_fail hooks
             self.run_hooks('fail', reason=reason, **kwargs)
+
+    def reset(self, reason=None, **kwargs):
+        self._state = 'undecided'
+        self.trace(reason, operation='reset')
+        self.run_hooks('reset', reason=reason, **kwargs)
 
     def complete(self, **kwargs):
         # Run entry on_complete hooks

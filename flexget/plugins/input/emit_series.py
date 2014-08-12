@@ -72,7 +72,14 @@ class EmitSeries(object):
         if not task.is_rerun:
             self.try_next_season = {}
         entries = []
-        for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
+        # Determine series we should be emitting
+        seriestasks = task.session.query(SeriesTask)
+        if task.parent:
+            seriestasks = seriestasks.filter((SeriesTask.name == task.name) | (SeriesTask.name == task.parent.name))
+        else:
+            seriestasks = seriestasks.filter(SeriesTask.name == task.name)
+
+        for seriestask in seriestasks.all():
             series = seriestask.series
             if not series:
                 # TODO: How can this happen?

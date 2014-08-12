@@ -49,38 +49,31 @@ class ConfigureSeries(FilterSeriesBase):
             'type': 'object',
             'properties': {
                 'settings': self.settings_schema,
-                'from': {'$ref': '/schema/plugins?phase=input'}
+                'from': {'$ref': '/schema/plugins'}
             },
+            'required': ['from'],
             'additionalProperties': False
         }
 
     def on_task_start(self, task, config):
+        subtask = task.make_subtask('/configure_series/from', config=config['from'])
+        subtask.execute()
+        result = subtask.accepted
 
         series = {}
-        for input_name, input_config in config.get('from', {}).iteritems():
-            input = plugin.get_plugin_by_name(input_name)
-            if input.api_ver == 1:
-                raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
+        for entry in result:
+            s = series.setdefault(entry['title'], {})
+            if entry.get('tvdb_id'):
+                s['set'] = {'tvdb_id': entry['tvdb_id']}
 
-            method = input.phase_handlers['input']
-            result = method(task, input_config)
-            if not result:
-                log.warning('Input %s did not return anything' % input_name)
-                continue
-
-            for entry in result:
-                s = series.setdefault(entry['title'], {})
-                if entry.get('tvdb_id'):
-                    s['set'] = {'tvdb_id': entry['tvdb_id']}
-
-                # Allow configure_series to set anything available to series
-                for key, schema in self.settings_schema['properties'].iteritems():
-                    if 'configure_series_' + key in entry:
-                        errors = process_config(entry['configure_series_' + key], schema, set_defaults=False)
-                        if errors:
-                            log.debug('not setting series option %s for %s. errors: %s' % (key, entry['title'], errors))
-                        else:
-                            s[key] = entry['configure_series_' + key]
+            # Allow configure_series to set anything available to series
+            for key, schema in self.settings_schema['properties'].iteritems():
+                if 'configure_series_' + key in entry:
+                    errors = process_config(entry['configure_series_' + key], schema, set_defaults=False)
+                    if errors:
+                        log.debug('not setting series option %s for %s. errors: %s' % (key, entry['title'], errors))
+                    else:
+                        s[key] = entry['configure_series_' + key]
 
         # Set the config_modified flag if the list of shows changed since last time
         new_hash = hashlib.md5(unicode(sorted(series))).hexdigest().decode('ascii')
