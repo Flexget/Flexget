@@ -200,10 +200,11 @@ class TransformingOps(BaseFileOps):
         dst_file, dst_ext = os.path.splitext(dst)
         
         # Check dst contains src_ext
-        if not src_isdir and dst_ext != src_ext:
-            self.log.verbose('Adding extension `%s` to dst `%s`' % (src_ext, dst))
-            dst += src_ext
-        
+        if config.get('keep_extension', entry.get('keep_extension', True)):
+            if not src_isdir and dst_ext != src_ext:
+                self.log.verbose('Adding extension `%s` to dst `%s`' % (src_ext, dst))
+                dst += src_ext
+            
         funct_name = 'move' if self.move else 'copy'
         funct_done = 'moved' if self.move else 'copied'
         
@@ -252,6 +253,7 @@ class CopyFiles(TransformingOps):
                     'filename': {'type': 'string'},
                     'allow_dir': {'type': 'boolean'},
                     'unpack_safety': {'type': 'boolean'},
+                    'keep_extension': {'type': 'boolean'},
                     'along': {'type': 'array', 'items': {'type': 'string'}}
                 },
                 'additionalProperties': False
@@ -276,6 +278,7 @@ class MoveFiles(TransformingOps):
                     'filename': {'type': 'string'},
                     'allow_dir': {'type': 'boolean'},
                     'unpack_safety': {'type': 'boolean'},
+                    'keep_extension': {'type': 'boolean'},
                     'along': {'type': 'array', 'items': {'type': 'string'}},
                     'clean_source': {'type': 'number'}
                 },
