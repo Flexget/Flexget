@@ -14,6 +14,14 @@ def on_entry_action(entry, act=None, task=None, reason=None, **kwargs):
         entry['reason'] = reason
 
 
+def on_entry_reset(entry):
+    """Remove the metainfo we added to the entry."""
+    entry.pop('accepted_by', None)
+    entry.pop('rejected_by', None)
+    entry.pop('failed_by', None)
+    entry.pop('reason', None)
+
+
 class EntryOperations(object):
     """
     Records accept, reject and fail metainfo into entries.
@@ -33,6 +41,7 @@ class EntryOperations(object):
             entry.on_accept(on_entry_action, act='accepted', task=task)
             entry.on_reject(on_entry_action, act='rejected', task=task)
             entry.on_fail(on_entry_action, act='failed', task=task)
+            entry.on_reset(on_entry_reset)
 
 
 @event('plugin.register')
