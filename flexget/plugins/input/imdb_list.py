@@ -74,7 +74,7 @@ class ImdbList(object):
                 year = tr.find('td', class_='year').string
                 entry = Entry()
                 entry['title'] = a.string + ' (' + year + ')'
-                entry['imdb_year'] = year
+                entry['imdb_year'] = int(year)
                 entry['url'] = link
                 entry['imdb_id'] = extract_id(link)
                 entry['imdb_name'] = entry['title']
