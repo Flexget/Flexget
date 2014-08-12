@@ -29,24 +29,23 @@ class PluginInputs(object):
         entry_titles = set()
         entry_urls = set()
         for index, item in enumerate(config):
-            # This turns off auto_accept so that entries can be transferred directly to main task
-            # Perhaps it should keep it on, then reset and inject only accepted entries
-            subtask = task.make_subtask('/inputs/%s' % index, item, options={'auto_accept': False})
+            subtask = task.make_subtask('/inputs/%s' % index, item)
             try:
                 subtask.execute()
             except TaskAbort as e:
                 log.warning('Error during input number %s: %s' % (index, e))
                 continue
 
-            result = subtask.all_entries
-            if not result:
+            if not subtask.all_entries:
                 msg = 'Input %s did not return anything' % index
                 if getattr(subtask, 'no_entries_ok', False):
                     log.verbose(msg)
                 else:
                     log.warning(msg)
                 continue
-            for entry in result:
+            for entry in subtask.all_entries:
+                if not entry.accepted:
+                    continue
                 if entry['title'] in entry_titles:
                     log.debug('Title `%s` already in entry list, skipping.' % entry['title'])
                     continue
@@ -54,6 +53,7 @@ class PluginInputs(object):
                 if any(url in entry_urls for url in urls):
                     log.debug('URL for `%s` already in entry list, skipping.' % entry['title'])
                     continue
+                entry.reset('resetting before injection into parent task')
                 entries.append(entry)
                 entry_titles.add(entry['title'])
                 entry_urls.update(urls)

@@ -8,7 +8,6 @@ from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.config_schema import process_config
 from flexget.plugins.filter.series import FilterSeriesBase
-from flexget.task import Task
 
 log = logging.getLogger('configure_series')
 Base = db_schema.versioned_base('import_series', 0)
