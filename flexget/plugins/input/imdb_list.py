@@ -67,15 +67,17 @@ class ImdbList(object):
                     raise plugin.PluginError('Unable to get imdb list.')
                 soup = get_soup(page.text, 'html.parser')
 
-            tds = soup.find_all('td', class_='title')
-            for td in tds:
-                a = td.find('a')
+            trs = soup.find_all(attrs={'data-item-id': True})
+            for tr in trs:
+                a = tr.find('td', class_='title').find('a')
                 link = ('http://www.imdb.com' + a.get('href')).rstrip('/')
+                year = tr.find('td', class_='year').string
                 entry = Entry()
-                entry['title'] = a.string
+                entry['title'] = a.string + ' (' + year + ')'
+                entry['imdb_year'] = year
                 entry['url'] = link
                 entry['imdb_id'] = extract_id(link)
-                entry['imdb_name'] = a.string
+                entry['imdb_name'] = entry['title']
                 entries.append(entry)
 
         return entries
