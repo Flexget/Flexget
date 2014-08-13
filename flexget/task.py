@@ -18,26 +18,11 @@ from flexget.manager import Session
 from flexget.plugin import (get_plugins, task_phases, phase_methods, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins, plugin_schemas)
 from flexget.utils import requests
+from flexget.utils.tools import Tee
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
-
-
-class Tee(object):
-    """Used so that output to sys.stdout can be grabbed and still displayed."""
-    def __init__(self, *files):
-        self.files = files
-
-    def __getattr__(self, meth):
-        def method_runner(*args, **kwargs):
-            for f in self.files:
-                try:
-                    getattr(f, meth)(*args, **kwargs)
-                except AttributeError:
-                    # We don't really care if all of our 'files' fully support the file api
-                    pass
-        return method_runner
 
 
 class TaskConfigHash(Base):
