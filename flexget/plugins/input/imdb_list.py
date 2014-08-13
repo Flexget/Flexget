@@ -1,8 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
-import feedparser
-import math
+
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.imdb import extract_id
@@ -71,10 +69,14 @@ class ImdbList(object):
             for tr in trs:
                 a = tr.find('td', class_='title').find('a')
                 link = ('http://www.imdb.com' + a.get('href')).rstrip('/')
-                year = tr.find('td', class_='year').string
                 entry = Entry()
-                entry['title'] = a.string + ' (' + year + ')'
-                entry['imdb_year'] = int(year)
+                entry['title'] = a.string
+                try:
+                    year = int(tr.find('td', class_='year').string)
+                    entry['title'] += ' (%s)' % year
+                    entry['imdb_year'] = year
+                except TypeError:
+                    pass
                 entry['url'] = link
                 entry['imdb_id'] = extract_id(link)
                 entry['imdb_name'] = entry['title']
