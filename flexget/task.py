@@ -194,7 +194,7 @@ class Task(object):
     # Used to determine task order, when priority is the same
     _counter = itertools.count()
 
-    def __init__(self, manager, name, config=None, options=None, output=None, priority=None, trigger_id=None):
+    def __init__(self, manager, name, config=None, options=None, output=None, priority=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
@@ -203,7 +203,6 @@ class Task(object):
         :param output: A filelike that all logs and stdout will be sent to for this task.
         :param priority: If multiple tasks are waiting to run, the task with the lowest priority will be run first.
             The default is 0, if the cron option is set though, the default is lowered to 10.
-        :param trigger_id: TODO This should just be taken care of in the scheduler module.
 
         """
         self.name = unicode(name)
@@ -227,8 +226,6 @@ class Task(object):
         self.priority = priority
         self._count = next(self._counter)
         self.finished_event = threading.Event()
-        # Used to make sure a certain trigger doesn't add jobs faster than they can run
-        self.trigger_id = trigger_id
 
         # simple persistence
         self.simple_persistence = SimpleTaskPersistence(self)

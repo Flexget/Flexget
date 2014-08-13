@@ -1,7 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-import copy
 from datetime import datetime, timedelta, time as dt_time
-import fnmatch
 from hashlib import md5
 import logging
 import Queue
@@ -14,7 +12,6 @@ from flexget.config_schema import register_config_key, parse_time
 from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.manager import Session
-from flexget.task import Task, TaskAbort
 
 log = logging.getLogger('scheduler')
 Base = versioned_base('scheduler', 0)
@@ -89,12 +86,9 @@ class Scheduler(threading.Thread):
     def __init__(self, manager):
         super(Scheduler, self).__init__(name='scheduler')
         self.daemon = True
-        self.run_queue = Queue.PriorityQueue()
         self.manager = manager
         self.triggers = []
-        self.run_schedules = True
-        self._shutdown_now = False
-        self._shutdown_when_finished = False
+        self.running_triggers = {}
 
     def load_schedules(self):
         """Clears current schedules and loads them from the config."""
@@ -108,113 +102,31 @@ class Scheduler(threading.Thread):
                     tasks = [tasks]
                 self.triggers.append(Trigger(item['interval'], tasks, options={'cron': True}))
 
-    def execute(self, options=None, output=None, priority=1, trigger_id=None):
-        """
-        Add a task to the scheduler to be run immediately.
-
-        :param options: Either an :class:`argparse.Namespace` instance, or a dict, containing options for execution
-        :param output: If a file-like object is specified here, log messages and stdout from the execution will be
-            written to it.
-        :param priority: If there are other executions waiting to be run, they will be run in priority order,
-            lowest first.
-        :param trigger_id: If a trigger_id is specified, it will be attached to the :class:`Job` instance added to the
-            run queue. Used to check that triggers are not fired faster than they can be executed.
-        :returns: a list of :class:`threading.Event` instances which will be
-            set when each respective task has finished running
-        """
-        if options is None:
-            options = copy.copy(self.manager.options.execute)
-        elif isinstance(options, dict):
-            options_namespace = copy.copy(self.manager.options.execute)
-            options_namespace.__dict__.update(options)
-            options = options_namespace
-        task_names = self.manager.tasks
-        # Handle --tasks
-        if options.tasks:
-            # Create list of tasks to run, preserving order
-            task_names = []
-            for arg in options.tasks:
-                matches = [t for t in self.manager.tasks if fnmatch.fnmatchcase(unicode(t).lower(), arg.lower())]
-                if not matches:
-                    log.error('`%s` does not match any tasks' % arg)
-                    continue
-                task_names.extend(m for m in matches if m not in task_names)
-            # Set the option as a list of matching task names so plugins can use it easily
-            options.tasks = task_names
-        # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
-        task_names = sorted(task_names, key=lambda t: self.manager.config['tasks'][t].get('priority', 65535))
-
-        finished_events = []
-        for task_name in task_names:
-            task = Task(self.manager, task_name,
-                        options=options, output=output, priority=priority, trigger_id=trigger_id)
-            self.run_queue.put(task)
-            finished_events.append(task.finished_event)
-        return finished_events
-
     def queue_pending_jobs(self):
         # Add pending jobs to the run queue
         with self.triggers_lock:
             for trigger in self.triggers:
                 if trigger.should_run:
-                    with self.run_queue.mutex:
-                        if any(j.trigger_id == trigger.uid for j in self.run_queue.queue):
-                            log.error('Not firing schedule %r. Tasks from last run have still not finished.' % trigger)
-                            log.error('You may need to increase the interval for this schedule.')
-                            continue
+                    if trigger.uid in self.running_triggers:
+                        log.error('Not firing schedule %r. Tasks from last run have still not finished.' % trigger)
+                        log.error('You may need to increase the interval for this schedule.')
+                        continue
                     options = dict(trigger.options)
                     # If the user has specified all tasks with '*', don't add tasks option at all, so that manual
                     # tasks are not executed
                     if trigger.tasks != ['*']:
                         options['tasks'] = trigger.tasks
-                    self.execute(options=options, priority=5, trigger_id=trigger.uid)
+                    self.running_triggers[trigger.uid] = self.manager.execute(options=options, priority=5)
                     trigger.trigger()
 
-    def start(self, run_schedules=None):
-        if run_schedules is not None:
-            self.run_schedules = run_schedules
-        super(Scheduler, self).start()
-
     def run(self):
-        while not self._shutdown_now:
-            if self.run_schedules:
-                self.queue_pending_jobs()
-            # Grab the first job from the run queue and do it
-            try:
-                task = self.run_queue.get(timeout=0.5)
-            except Queue.Empty:
-                if self._shutdown_when_finished:
-                    self._shutdown_now = True
-                continue
-            try:
-                task.execute()
-            except TaskAbort as e:
-                log.debug('task %s aborted: %r' % (task.name, e))
-            finally:
-                self.run_queue.task_done()
-        remaining_jobs = self.run_queue.qsize()
-        if remaining_jobs:
-            log.warning('Scheduler shut down with %s jobs remaining in the queue to run.' % remaining_jobs)
+        while True:
+            for trigger_id, finished_events in self.running_triggers.items():
+                if all(e.is_set() for e in finished_events):
+                    del self.running_triggers[trigger_id]
+            self.queue_pending_jobs()
+            time.sleep(5)
         log.debug('scheduler shut down')
-
-    def wait(self):
-        """
-        Waits for the thread to exit.
-        Similar to :method:`Thread.join`, except it allows ctrl-c to be caught still.
-        """
-        while self.is_alive():
-            time.sleep(0.1)
-
-    def shutdown(self, finish_queue=True):
-        """
-        Ends the thread. If a job is running, waits for it to finish first.
-
-        :param bool finish_queue: If this is True, shutdown will wait until all queued tasks have finished.
-        """
-        if finish_queue:
-            self._shutdown_when_finished = True
-        else:
-            self._shutdown_now = True
 
 
 class Trigger(object):

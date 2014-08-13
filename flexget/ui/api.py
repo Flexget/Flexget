@@ -53,7 +53,7 @@ def execute():
 
     # We'll stream the log results as they arrive in the bufferqueue
     kwargs['output'] = BufferQueue()
-    manager.scheduler.execute(**kwargs)
+    manager.execute(**kwargs)
 
     return Response(kwargs['output'], mimetype='text/plain'), 200
 

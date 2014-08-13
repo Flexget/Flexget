@@ -26,7 +26,7 @@ def index():
             flash(escape(e.message), 'error')
             context['options'] = request.form['options']
         else:
-            manager.scheduler.execute(options=options.execute, output=bufferqueue)
+            manager.execute(options=options.execute, output=bufferqueue)
             context['execute_progress'] = True
             context['progress'] = progress(as_list=True)
 

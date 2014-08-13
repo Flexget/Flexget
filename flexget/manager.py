@@ -2,6 +2,8 @@ from __future__ import unicode_literals, division, absolute_import, print_functi
 import atexit
 import codecs
 from contextlib import contextmanager
+import copy
+import fnmatch
 import signal
 import os
 import sys
@@ -9,6 +11,7 @@ import shutil
 import logging
 import threading
 import pkg_resources
+import Queue
 import yaml
 from datetime import datetime, timedelta
 
@@ -26,6 +29,7 @@ from flexget import config_schema, db_schema
 from flexget.event import fire_event
 from flexget.ipc import IPCServer, IPCClient
 from flexget.scheduler import Scheduler
+from flexget.task import Task, TaskAbort
 from flexget.utils.tools import pid_exists
 
 log = logging.getLogger('manager')
@@ -112,6 +116,10 @@ class Manager(object):
 
         self.config = {}
 
+        self.run_queue = Queue.PriorityQueue()
+        self._shutdown_now = False
+        self._shutdown_when_finished = False
+
         self.scheduler = Scheduler(self)
         self.ipc_server = IPCServer(self, options.ipc_port)
         manager = self
@@ -163,7 +171,48 @@ class Manager(object):
     def has_lock(self):
         return self._has_lock
 
-    def run_cli_command(self):
+    def execute(self, options=None, output=None, priority=1):
+        """
+        Add a task to the scheduler to be run immediately.
+
+        :param options: Either an :class:`argparse.Namespace` instance, or a dict, containing options for execution
+        :param output: If a file-like object is specified here, log messages and stdout from the execution will be
+            written to it.
+        :param priority: If there are other executions waiting to be run, they will be run in priority order,
+            lowest first.
+        :returns: a list of :class:`threading.Event` instances which will be
+            set when each respective task has finished running
+        """
+        if options is None:
+            options = copy.copy(self.options.execute)
+        elif isinstance(options, dict):
+            options_namespace = copy.copy(self.options.execute)
+            options_namespace.__dict__.update(options)
+            options = options_namespace
+        task_names = self.tasks
+        # Handle --tasks
+        if options.tasks:
+            # Create list of tasks to run, preserving order
+            task_names = []
+            for arg in options.tasks:
+                matches = [t for t in self.tasks if fnmatch.fnmatchcase(unicode(t).lower(), arg.lower())]
+                if not matches:
+                    log.error('`%s` does not match any tasks' % arg)
+                    continue
+                task_names.extend(m for m in matches if m not in task_names)
+            # Set the option as a list of matching task names so plugins can use it easily
+            options.tasks = task_names
+        # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
+        task_names = sorted(task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535))
+
+        finished_events = []
+        for task_name in task_names:
+            task = Task(self, task_name, options=options, output=output, priority=priority)
+            self.run_queue.put(task)
+            finished_events.append(task.finished_event)
+        return finished_events
+
+    def start(self):
         """
         Starting point when executing from commandline, dispatch execution
         to correct destination.
@@ -176,15 +225,37 @@ class Manager(object):
         command = self.options.cli_command
         options = getattr(self.options, command)
         # First check for built-in commands
-        if command == 'execute':
-            self.execute_command(options)
-        elif command == 'daemon':
-            self.daemon_command(options)
-        elif command == 'webui':
-            self.webui_command(options)
+        if command in ['execute', 'daemon', 'webui']:
+            if command == 'execute':
+                self.execute_command(options)
+            elif command == 'daemon':
+                self.daemon_command(options)
+            elif command == 'webui':
+                self.webui_command(options)
         else:
             # Otherwise dispatch the command to the callback function
             options.cli_command_callback(self, options)
+        self._shutdown()
+
+    def run(self):
+        while not self._shutdown_now:
+            # Grab the first job from the run queue and do it
+            try:
+                task = self.run_queue.get(timeout=0.5)
+            except Queue.Empty:
+                if self._shutdown_when_finished:
+                    self._shutdown_now = True
+                continue
+            try:
+                task.execute()
+            except TaskAbort as e:
+                log.debug('task %s aborted: %r' % (task.name, e))
+            finally:
+                self.run_queue.task_done()
+        remaining_jobs = self.run_queue.qsize()
+        if remaining_jobs:
+            log.warning('Scheduler shut down with %s jobs remaining in the queue to run.' % remaining_jobs)
+        log.debug('manager run loop ended')
 
     def execute_command(self, options):
         """
@@ -211,17 +282,16 @@ class Manager(object):
             return
         # Otherwise we run the execution ourselves
         with self.acquire_lock():
+            # The execute and shutdown just queue up, nothing happens until we call run()
+            self.execute(options)
+            self.shutdown(finish_queue=True)
             fire_event('manager.execute.started', self)
-            self.scheduler.start(run_schedules=False)
-            self.scheduler.execute(options)
-            self.scheduler.shutdown(finish_queue=True)
             try:
-                self.scheduler.wait()
+                self.run()
             except KeyboardInterrupt:
-                log.error('Got ctrl-c exiting after this task completes. Press ctrl-c again to abort this task.')
+                log.error('Got ctrl-c, exiting')
             else:
                 fire_event('manager.execute.completed', self)
-            self.shutdown(finish_queue=False)
 
     def daemon_command(self, options):
         """
@@ -243,14 +313,13 @@ class Manager(object):
                     # main thread, this error will occur.
                     log.debug('Error registering sigterm handler: %s' % e)
                 self.ipc_server.start()
-                fire_event('manager.daemon.started', self)
                 self.scheduler.start()
+                fire_event('manager.daemon.started', self)
                 try:
-                    self.scheduler.wait()
+                    self.run()
                 except KeyboardInterrupt:
                     log.info('Got ctrl-c, shutting down.')
-                    fire_event('manager.daemon.completed', self)
-                    self.shutdown(finish_queue=False)
+                fire_event('manager.daemon.completed', self)
         elif options.action == 'status':
             ipc_info = self.check_ipc_info()
             if ipc_info:
@@ -289,6 +358,7 @@ class Manager(object):
         from flexget.ui import webui
         with self.acquire_lock():
             webui.start(self)
+            self.run()
 
     def _handle_sigterm(self, signum, frame):
         log.info('Got SIGTERM. Shutting down.')
@@ -717,20 +787,17 @@ class Manager(object):
 
     def shutdown(self, finish_queue=True):
         """
-        Application is being exited
+        Request manager shutdown.
 
         :param bool finish_queue: Should scheduler finish the task queue
         """
-        # Wait for scheduler to finish
-        self.scheduler.shutdown(finish_queue=finish_queue)
-        try:
-            self.scheduler.wait()
-        except KeyboardInterrupt:
-            log.debug('Not waiting for scheduler shutdown due to ctrl-c')
-            # show real stack trace in debug mode
-            if manager.options.debug:
-                raise
-            print('**** Keyboard Interrupt ****')
+        if finish_queue:
+            self._shutdown_when_finished = True
+        else:
+            self._shutdown_now = True
+
+    def _shutdown(self):
+        """Runs when the manager is done processing everything."""
         fire_event('manager.shutdown', self)
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutting down')

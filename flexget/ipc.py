@@ -37,7 +37,7 @@ class DaemonService(rpyc.Service):
         log.info('Executing for client.')
         cron = options and options.get('cron')
         output = None if cron else BufferQueue()
-        tasks_finished = self.manager.scheduler.execute(options=options, output=output)
+        tasks_finished = self.manager.execute(options=options, output=output)
         if output:
             # Send back any output until all tasks have finished
             while any(not t.is_set() for t in tasks_finished) or output.qsize():
@@ -57,7 +57,7 @@ class DaemonService(rpyc.Service):
     def exposed_shutdown(self, finish_queue=False):
         log.info('Shutdown requested over ipc.')
         self.client_console('Daemon shutdown requested.')
-        self.manager.scheduler.shutdown(finish_queue=finish_queue)
+        self.manager.shutdown(finish_queue=finish_queue)
 
     def client_console(self, text):
         self._conn.root.console(text)
