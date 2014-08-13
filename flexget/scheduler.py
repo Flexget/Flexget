@@ -196,6 +196,7 @@ class Scheduler(threading.Thread):
                 streamhandler = logging.StreamHandler(job.output)
                 streamhandler.setFormatter(FlexGetFormatter())
                 logging.getLogger().addHandler(streamhandler)
+            old_loglevel = logging.getLogger().getEffectiveLevel()
             if job.options.loglevel is not None and job.options.loglevel != self.manager.options.loglevel:
                 log.info('Setting loglevel to `%s` for this execution.' % job.options.loglevel)
                 logging.getLogger().setLevel(job.options.loglevel.upper())
@@ -204,8 +205,9 @@ class Scheduler(threading.Thread):
             except TaskAbort as e:
                 log.debug('task %s aborted: %r' % (job.task, e))
             finally:
-                log.debug('Returning loglevel to `%s` after task execution.' % self.manager.options.loglevel)
-                logging.getLogger().setLevel(self.manager.options.loglevel.upper())
+                if logging.getLogger().getEffectiveLevel() != old_loglevel:
+                    log.debug('Returning loglevel to `%s` after task execution.' % logging.getLevelName(old_loglevel))
+                    logging.getLogger().setLevel(old_loglevel)
                 self.run_queue.task_done()
                 job.finished_event.set()
                 if job.output:
