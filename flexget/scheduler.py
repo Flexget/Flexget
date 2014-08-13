@@ -3,20 +3,18 @@ import copy
 from datetime import datetime, timedelta, time as dt_time
 import fnmatch
 from hashlib import md5
-import itertools
 import logging
 import Queue
 import threading
 import time
-import sys
 
 from sqlalchemy import Column, String, DateTime
 
 from flexget.config_schema import register_config_key, parse_time
 from flexget.db_schema import versioned_base
 from flexget.event import event
-from flexget.logger import FlexGetFormatter
 from flexget.manager import Session
+from flexget.task import Task, TaskAbort
 
 log = logging.getLogger('scheduler')
 Base = versioned_base('scheduler', 0)
@@ -130,27 +128,28 @@ class Scheduler(threading.Thread):
             options_namespace = copy.copy(self.manager.options.execute)
             options_namespace.__dict__.update(options)
             options = options_namespace
-        tasks = self.manager.tasks
+        task_names = self.manager.tasks
         # Handle --tasks
         if options.tasks:
             # Create list of tasks to run, preserving order
-            tasks = []
+            task_names = []
             for arg in options.tasks:
                 matches = [t for t in self.manager.tasks if fnmatch.fnmatchcase(unicode(t).lower(), arg.lower())]
                 if not matches:
                     log.error('`%s` does not match any tasks' % arg)
                     continue
-                tasks.extend(m for m in matches if m not in tasks)
+                task_names.extend(m for m in matches if m not in task_names)
             # Set the option as a list of matching task names so plugins can use it easily
-            options.tasks = tasks
+            options.tasks = task_names
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
-        tasks = sorted(tasks, key=lambda t: self.manager.config['tasks'][t].get('priority', 65535))
+        task_names = sorted(task_names, key=lambda t: self.manager.config['tasks'][t].get('priority', 65535))
 
         finished_events = []
-        for task in tasks:
-            job = Job(task, options=options, output=output, priority=priority, trigger_id=trigger_id)
-            self.run_queue.put(job)
-            finished_events.append(job.finished_event)
+        for task_name in task_names:
+            task = Task(self.manager, task_name,
+                        options=options, output=output, priority=priority, trigger_id=trigger_id)
+            self.run_queue.put(task)
+            finished_events.append(task.finished_event)
         return finished_events
 
     def queue_pending_jobs(self):
@@ -177,42 +176,22 @@ class Scheduler(threading.Thread):
         super(Scheduler, self).start()
 
     def run(self):
-        from flexget.task import Task, TaskAbort
         while not self._shutdown_now:
             if self.run_schedules:
                 self.queue_pending_jobs()
             # Grab the first job from the run queue and do it
             try:
-                job = self.run_queue.get(timeout=0.5)
+                task = self.run_queue.get(timeout=0.5)
             except Queue.Empty:
                 if self._shutdown_when_finished:
                     self._shutdown_now = True
                 continue
-            if job.output:
-                # Hook up our log and stdout to give back to the requester
-                old_stdout, old_stderr = sys.stdout, sys.stderr
-                sys.stdout, sys.stderr = Tee(job.output, sys.stdout), Tee(job.output, sys.stderr)
-                # TODO: Use a filter to capture only the logging for this execution?
-                streamhandler = logging.StreamHandler(job.output)
-                streamhandler.setFormatter(FlexGetFormatter())
-                logging.getLogger().addHandler(streamhandler)
-            old_loglevel = logging.getLogger().getEffectiveLevel()
-            if job.options.loglevel is not None and job.options.loglevel != self.manager.options.loglevel:
-                log.info('Setting loglevel to `%s` for this execution.' % job.options.loglevel)
-                logging.getLogger().setLevel(job.options.loglevel.upper())
             try:
-                Task(self.manager, job.task, options=job.options).execute()
+                task.execute()
             except TaskAbort as e:
-                log.debug('task %s aborted: %r' % (job.task, e))
+                log.debug('task %s aborted: %r' % (task.name, e))
             finally:
-                if logging.getLogger().getEffectiveLevel() != old_loglevel:
-                    log.debug('Returning loglevel to `%s` after task execution.' % logging.getLevelName(old_loglevel))
-                    logging.getLogger().setLevel(old_loglevel)
                 self.run_queue.task_done()
-                job.finished_event.set()
-                if job.output:
-                    sys.stdout, sys.stderr = old_stdout, old_stderr
-                    logging.getLogger().removeHandler(streamhandler)
         remaining_jobs = self.run_queue.qsize()
         if remaining_jobs:
             log.warning('Scheduler shut down with %s jobs remaining in the queue to run.' % remaining_jobs)
@@ -236,43 +215,6 @@ class Scheduler(threading.Thread):
             self._shutdown_when_finished = True
         else:
             self._shutdown_now = True
-
-
-class Job(object):
-    """A job for the scheduler to execute."""
-    #: Used to determine which job to run first when multiple jobs are waiting.
-    priority = 1
-    #: The name of the task to execute
-    task = None
-    #: Options to run the task with
-    options = None
-    #: :class:`BufferQueue` to write the task execution output to. '[[END]]' will be sent to the queue when complete
-    output = None
-    # Used to keep jobs in order, when priority is the same
-    _counter = itertools.count()
-
-    def __init__(self, task, options=None, output=None, priority=1, trigger_id=None):
-        self.task = task
-        self.options = options
-        self.output = output
-        self.priority = priority
-        self.count = next(self._counter)
-        self.finished_event = threading.Event()
-        # Used to make sure a certain trigger doesn't add jobs faster than they can run
-        self.trigger_id = trigger_id
-        # Lower priority if cron flag is present in either dict or Namespace form
-        try:
-            cron = self.options.cron
-        except AttributeError:
-            try:
-                cron = self.options.get('cron')
-            except AttributeError:
-                cron = False
-        if cron:
-            self.priority = 5
-
-    def __lt__(self, other):
-        return (self.priority, self.count) < (other.priority, other.count)
 
 
 class Trigger(object):
@@ -390,22 +332,6 @@ class Trigger(object):
 
     def __repr__(self):
         return 'Trigger(tasks=%r, amount=%r, unit=%r)' % (self.tasks, self.amount, self.unit)
-
-
-class Tee(object):
-    """Used so that output to sys.stdout can be grabbed and still displayed."""
-    def __init__(self, *files):
-        self.files = files
-
-    def __getattr__(self, meth):
-        def method_runner(*args, **kwargs):
-            for f in self.files:
-                try:
-                    getattr(f, meth)(*args, **kwargs)
-                except AttributeError:
-                    # We don't really care if all of our 'files' fully support the file api
-                    pass
-        return method_runner
 
 
 class BufferQueue(Queue.Queue):
