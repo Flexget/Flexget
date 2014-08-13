@@ -45,7 +45,10 @@ class ImdbList(object):
         if page.status_code != 200:
             raise plugin.PluginError('Unable to get imdb list. Either list is private or does not exist.')
 
-        soup = get_soup(page.text, 'html.parser')
+        soup = get_soup(page.text)
+        # TODO: Something is messed up with the html5lib parser and imdb, have to get to our subsection without
+        # recursion before doing a regular find. Repeated in the loop below as well.
+        soup = soup.find('div', id='root').find('div', id='pagecontent', recursive=False)
         div = soup.find('div', class_='desc')
         if div:
             total_movie_count = int(div.get('data-size'))
@@ -63,7 +66,9 @@ class ImdbList(object):
                 page = task.requests.get(url, params=params)
                 if page.status_code != 200:
                     raise plugin.PluginError('Unable to get imdb list.')
-                soup = get_soup(page.text, 'html.parser')
+                soup = get_soup(page.text)
+                # TODO: This is a hack, see above
+                soup = soup.find('div', id='root').find('div', id='pagecontent', recursive=False)
 
             trs = soup.find_all(attrs={'data-item-id': True})
             for tr in trs:
