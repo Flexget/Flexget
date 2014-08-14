@@ -183,8 +183,6 @@ def start(mg):
         log.warning('Not starting scheduler, since autoreload is enabled.')
         run_with_reloader(start_server, extra_files, reloader_interval)
     else:
-        # Start the scheduler
-        manager.scheduler.start()
         start_server()
 
     log.debug('server exited')
@@ -207,7 +205,6 @@ def start_server():
 
 def stop_server(*args):
     log.debug('Shutting down server')
-    manager.scheduler.shutdown(finish_queue=False)
     if server:
         server.stop()
 

@@ -29,7 +29,8 @@ from flexget import config_schema, db_schema
 from flexget.event import fire_event
 from flexget.ipc import IPCServer, IPCClient
 from flexget.scheduler import Scheduler
-from flexget.task import Task, TaskAbort
+from flexget.task import Task
+from flexget.task_queue import TaskQueue
 from flexget.utils.tools import pid_exists
 
 log = logging.getLogger('manager')
@@ -116,12 +117,9 @@ class Manager(object):
 
         self.config = {}
 
-        self.run_queue = Queue.PriorityQueue()
-        self._shutdown_now = False
-        self._shutdown_when_finished = False
-
         self.scheduler = Scheduler(self)
         self.ipc_server = IPCServer(self, options.ipc_port)
+        self.task_queue = TaskQueue()
         manager = self
         self.initialize()
 
@@ -173,7 +171,7 @@ class Manager(object):
 
     def execute(self, options=None, output=None, priority=1):
         """
-        Add a task to the scheduler to be run immediately.
+        Run all (can be limited with options) tasks from the config.
 
         :param options: Either an :class:`argparse.Namespace` instance, or a dict, containing options for execution
         :param output: If a file-like object is specified here, log messages and stdout from the execution will be
@@ -208,7 +206,7 @@ class Manager(object):
         finished_events = []
         for task_name in task_names:
             task = Task(self, task_name, options=options, output=output, priority=priority)
-            self.run_queue.put(task)
+            self.task_queue.put(task)
             finished_events.append(task.finished_event)
         return finished_events
 
@@ -237,26 +235,6 @@ class Manager(object):
             options.cli_command_callback(self, options)
         self._shutdown()
 
-    def run(self):
-        while not self._shutdown_now:
-            # Grab the first job from the run queue and do it
-            try:
-                task = self.run_queue.get(timeout=0.5)
-            except Queue.Empty:
-                if self._shutdown_when_finished:
-                    self._shutdown_now = True
-                continue
-            try:
-                task.execute()
-            except TaskAbort as e:
-                log.debug('task %s aborted: %r' % (task.name, e))
-            finally:
-                self.run_queue.task_done()
-        remaining_jobs = self.run_queue.qsize()
-        if remaining_jobs:
-            log.warning('Scheduler shut down with %s jobs remaining in the queue to run.' % remaining_jobs)
-        log.debug('manager run loop ended')
-
     def execute_command(self, options):
         """
         Send execute command to daemon through IPC or perform execution
@@ -282,16 +260,12 @@ class Manager(object):
             return
         # Otherwise we run the execution ourselves
         with self.acquire_lock():
-            # The execute and shutdown just queue up, nothing happens until we call run()
+            fire_event('manager.execute.started', self)
+            self.task_queue.start()
             self.execute(options)
             self.shutdown(finish_queue=True)
-            fire_event('manager.execute.started', self)
-            try:
-                self.run()
-            except KeyboardInterrupt:
-                log.error('Got ctrl-c, exiting')
-            else:
-                fire_event('manager.execute.completed', self)
+            self.task_queue.wait()
+            fire_event('manager.execute.completed', self)
 
     def daemon_command(self, options):
         """
@@ -315,10 +289,8 @@ class Manager(object):
                 self.ipc_server.start()
                 self.scheduler.start()
                 fire_event('manager.daemon.started', self)
-                try:
-                    self.run()
-                except KeyboardInterrupt:
-                    log.info('Got ctrl-c, shutting down.')
+                self.task_queue.start()
+                self.task_queue.wait()
                 fire_event('manager.daemon.completed', self)
         elif options.action == 'status':
             ipc_info = self.check_ipc_info()
@@ -357,8 +329,11 @@ class Manager(object):
             self.daemonize()
         from flexget.ui import webui
         with self.acquire_lock():
+            self.ipc_server.start()
+            self.scheduler.start()
             webui.start(self)
-            self.run()
+            self.task_queue.start()
+            self.task_queue.wait()
 
     def _handle_sigterm(self, signum, frame):
         log.info('Got SIGTERM. Shutting down.')
@@ -791,10 +766,7 @@ class Manager(object):
 
         :param bool finish_queue: Should scheduler finish the task queue
         """
-        if finish_queue:
-            self._shutdown_when_finished = True
-        else:
-            self._shutdown_now = True
+        self.task_queue.shutdown(finish_queue)
 
     def _shutdown(self):
         """Runs when the manager is done processing everything."""
