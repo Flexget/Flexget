@@ -32,7 +32,7 @@ class ImdbList(object):
     @cached('imdb_list', persist='2 hours')
     def on_task_input(self, task, config):
         # Create movie entries by parsing imdb list page(s) html using beautifulsoup
-        log.verbose('Retrieving list: %s...' % config['list'])
+        log.verbose('Retrieving imdb list: %s' % config['list'])
 
         params = {'view': 'compact'}
         if config['list'] in ['watchlist', 'ratings', 'checkins']:
@@ -56,21 +56,24 @@ class ImdbList(object):
             total_movie_count = 0
 
         if total_movie_count == 0:
-            log.verbose('No movies were found in imdb list.')
+            log.verbose('No movies were found in imdb list: %s' % config['list'])
             return
 
         entries = []
-        for start_movie in xrange(1, total_movie_count + 1, 250):
-            if start_movie > 250:
-                params['start'] = start_movie
+        start = 1
+        while start < total_movie_count:
+            if start == 1:
+                trs = soup.find_all(attrs={'data-item-id': True})
+            else:
+                params['start'] = start
                 page = task.requests.get(url, params=params)
                 if page.status_code != 200:
                     raise plugin.PluginError('Unable to get imdb list.')
                 soup = get_soup(page.text)
                 # TODO: This is a hack, see above
                 soup = soup.find('div', id='root').find('div', id='pagecontent', recursive=False)
+                trs = soup.find_all(attrs={'data-item-id': True})
 
-            trs = soup.find_all(attrs={'data-item-id': True})
             for tr in trs:
                 a = tr.find('td', class_='title').find('a')
                 link = ('http://www.imdb.com' + a.get('href')).rstrip('/')
@@ -86,6 +89,8 @@ class ImdbList(object):
                 entry['imdb_id'] = extract_id(link)
                 entry['imdb_name'] = entry['title']
                 entries.append(entry)
+
+            start = len(entries) + 1
 
         return entries
 
