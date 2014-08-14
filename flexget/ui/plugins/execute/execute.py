@@ -7,7 +7,7 @@ from flask import Blueprint, escape, jsonify
 
 from flexget.options import get_parser
 from flexget.ui.webui import register_plugin, manager
-from flexget.scheduler import BufferQueue
+from flexget.utils.tools import BufferQueue
 
 execute = Blueprint('execute', __name__)
 

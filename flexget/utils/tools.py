@@ -9,6 +9,7 @@ import time
 import re
 import sys
 import locale
+import Queue
 from collections import MutableMapping
 from urlparse import urlparse
 from htmlentitydefs import name2codepoint
@@ -417,3 +418,12 @@ class Tee(object):
                     # We don't really care if all of our 'files' fully support the file api
                     pass
         return method_runner
+
+
+class BufferQueue(Queue.Queue):
+    """Used in place of a file-like object to capture text and access it safely from another thread."""
+    # Allow access to the Empty error from here
+    Empty = Queue.Empty
+
+    def write(self, line):
+        self.put(line)

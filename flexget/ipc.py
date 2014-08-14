@@ -7,8 +7,7 @@ import threading
 import rpyc
 from rpyc.utils.server import ThreadedServer
 
-from flexget.scheduler import BufferQueue
-from flexget.utils.tools import console
+from flexget.utils.tools import BufferQueue, console
 
 log = logging.getLogger('ipc')
 

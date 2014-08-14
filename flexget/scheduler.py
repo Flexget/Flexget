@@ -246,15 +246,6 @@ class Trigger(object):
         return 'Trigger(tasks=%r, amount=%r, unit=%r)' % (self.tasks, self.amount, self.unit)
 
 
-class BufferQueue(Queue.Queue):
-    """Used in place of a file-like object to capture text and access it safely from another thread."""
-    # Allow access to the Empty error from here
-    Empty = Queue.Empty
-
-    def write(self, line):
-        self.put(line)
-
-
 @event('config.register')
 def register_config():
     register_config_key('schedules', main_schema)
