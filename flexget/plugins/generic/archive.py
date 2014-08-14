@@ -453,11 +453,11 @@ def cli_inject(manager, options):
             entry.accept('injected')
             entries.append(entry)
 
-        manager.scheduler.execute(options={'inject': entries, 'tasks': [task_name]})
+        manager.execute(options={'inject': entries, 'tasks': [task_name]})
 
     with manager.acquire_lock():
-        manager.scheduler.start(run_schedules=False)
-        manager.shutdown()
+        manager.shutdown(finish_queue=True)
+        manager.run()
 
 
 def do_cli(manager, options):
