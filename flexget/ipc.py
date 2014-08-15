@@ -31,7 +31,7 @@ class DaemonService(rpyc.Service):
         # Dictionaries are pass by reference with rpyc, turn this into a real dict on our side
         if options:
             options = rpyc.utils.classic.obtain(options)
-        if self.manager.run_queue.qsize() > 0:
+        if len(self.manager.task_queue) > 0:
             self.client_console('There is already a task executing. This task will execute next.')
         log.info('Executing for client.')
         cron = options and options.get('cron')

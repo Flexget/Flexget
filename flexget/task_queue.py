@@ -44,6 +44,9 @@ class TaskQueue(threading.Thread):
         """Adds a task to be executed to the queue."""
         self.run_queue.put(task)
 
+    def __len__(self):
+        return self.run_queue.qsize()
+
     def shutdown(self, finish_queue=True):
         """
         Request shutdown.
