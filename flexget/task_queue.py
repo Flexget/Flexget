@@ -53,7 +53,7 @@ class TaskQueue(threading.Thread):
 
         :param bool finish_queue: Should all tasks be finished before ending thread.
         """
-        log.debug('Shutdown requested')
+        log.debug('task queue shutdown requested')
         if finish_queue:
             self._shutdown_when_finished = True
         else:

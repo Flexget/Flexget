@@ -330,7 +330,6 @@ class Manager(object):
         from flexget.ui import webui
         with self.acquire_lock():
             self.ipc_server.start()
-            self.scheduler.start()
             webui.start(self)
             self.task_queue.start()
             self.task_queue.wait()
