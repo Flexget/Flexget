@@ -41,7 +41,7 @@ class RunTask(object):
         log.info('Scheduling %s task to run' % run_task)
         options = copy.copy(current_task.options)
         options.tasks = [run_task]
-        current_task.manager.scheduler.execute(options=options)
+        current_task.manager.execute(options=options)
 
 
 @event('plugin.register')

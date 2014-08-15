@@ -35,7 +35,7 @@ def main(args=None):
             import cProfile as profile
         except ImportError:
             import profile
-        profile.runctx('manager.run_cli_command()', globals(), locals(),
+        profile.runctx('manager.start()', globals(), locals(),
                        os.path.join(manager.config_base, options.profile))
     else:
-        manager.run_cli_command()
+        manager.start()

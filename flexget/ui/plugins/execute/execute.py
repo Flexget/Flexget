@@ -7,7 +7,7 @@ from flask import Blueprint, escape, jsonify
 
 from flexget.options import get_parser
 from flexget.ui.webui import register_plugin, manager
-from flexget.scheduler import BufferQueue
+from flexget.utils.tools import BufferQueue
 
 execute = Blueprint('execute', __name__)
 
@@ -26,7 +26,7 @@ def index():
             flash(escape(e.message), 'error')
             context['options'] = request.form['options']
         else:
-            manager.scheduler.execute(options=options.execute, output=bufferqueue)
+            manager.execute(options=options.execute, output=bufferqueue)
             context['execute_progress'] = True
             context['progress'] = progress(as_list=True)
 

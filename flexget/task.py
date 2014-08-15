@@ -4,6 +4,8 @@ from functools import wraps
 import hashlib
 import itertools
 import logging
+import sys
+import threading
 
 from sqlalchemy import Column, Unicode, String, Integer
 
@@ -11,10 +13,12 @@ from flexget import config_schema
 from flexget import db_schema
 from flexget.entry import EntryUnicodeError
 from flexget.event import fire_event, event
+from flexget.logger import FlexGetFormatter
 from flexget.manager import Session
 from flexget.plugin import (get_plugins, task_phases, phase_methods, PluginWarning, PluginError,
                             DependencyError, plugins as all_plugins, plugin_schemas)
 from flexget.utils import requests
+from flexget.utils.tools import Tee
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 
 log = logging.getLogger('task')
@@ -48,17 +52,37 @@ def config_changed(task):
         session.close()
 
 
-def useTaskLogging(func):
+def use_task_logging(func):
 
     @wraps(func)
     def wrapper(self, *args, **kw):
         # Set the task name in the logger
         from flexget import logger
         logger.set_task(self.name)
+        if self.output:
+            # Hook up our log and stdout to give back to the requester
+            old_stdout, old_stderr = sys.stdout, sys.stderr
+            sys.stdout, sys.stderr = Tee(self.output, sys.stdout), Tee(self.output, sys.stderr)
+            # TODO: Use a filter to capture only the logging for this execution?
+            streamhandler = logging.StreamHandler(self.output)
+            streamhandler.setFormatter(FlexGetFormatter())
+            logging.getLogger().addHandler(streamhandler)
+        old_loglevel = logging.getLogger().getEffectiveLevel()
+        new_loglevel = logging.getLevelName(self.options.loglevel.upper())
+        if old_loglevel != new_loglevel:
+            log.info('Setting loglevel to `%s` for this execution.' % self.options.loglevel)
+            logging.getLogger().setLevel(new_loglevel)
+
         try:
             return func(self, *args, **kw)
         finally:
             logger.set_task('')
+            if self.output:
+                sys.stdout, sys.stderr = old_stdout, old_stderr
+                logging.getLogger().removeHandler(streamhandler)
+            if old_loglevel != new_loglevel:
+                log.debug('Returning loglevel to `%s` after task execution.' % logging.getLevelName(old_loglevel))
+                logging.getLogger().setLevel(old_loglevel)
 
     return wrapper
 
@@ -167,16 +191,22 @@ class Task(object):
     """
 
     max_reruns = 5
+    # Used to determine task order, when priority is the same
+    _counter = itertools.count()
 
-    def __init__(self, manager, name, config=None, options=None):
+    def __init__(self, manager, name, config=None, options=None, output=None, priority=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
         :param dict config: Task configuration.
+        :param options: dict or argparse namespace with options for this task
+        :param output: A filelike that all logs and stdout will be sent to for this task.
+        :param priority: If multiple tasks are waiting to run, the task with the lowest priority will be run first.
+            The default is 0, if the cron option is set though, the default is lowered to 10.
+
         """
         self.name = unicode(name)
         self.manager = manager
-        # raw_config should remain the untouched input config
         if config is None:
             config = manager.config['tasks'].get(name, {})
         self.config = copy.deepcopy(config)
@@ -188,6 +218,14 @@ class Task(object):
             options_namespace.__dict__.update(options)
             options = options_namespace
         self.options = options
+        self.output = output
+        if priority is None:
+            self.priority = 10 if self.options.cron else 0
+        else:
+            self.priority = priority
+        self.priority = priority
+        self._count = next(self._counter)
+        self.finished_event = threading.Event()
 
         # simple persistence
         self.simple_persistence = SimpleTaskPersistence(self)
@@ -197,8 +235,26 @@ class Task(object):
 
         self.config_modified = None
 
-        # use reset to init variables when creating
-        self._reset()
+        self.enabled = not self.name.startswith('_')
+
+        # These are just to query what happened in task. Call task.abort to set.
+        self.aborted = False
+        self.abort_reason = None
+        self.silent_abort = False
+
+        self.session = None
+
+        self.requests = requests.Session()
+
+        # List of all entries in the task
+        self._all_entries = EntryContainer()
+        self._rerun = False
+
+        self.disabled_phases = []
+
+        # current state
+        self.current_phase = None
+        self.current_plugin = None
 
     @property
     def undecided(self):
@@ -246,34 +302,8 @@ class Task(object):
     def is_rerun(self):
         return self._rerun_count
 
-    # TODO: can we get rid of this now that Tasks are instantiated on demand?
-    def _reset(self):
-        """Reset task state"""
-        log.debug('resetting %s' % self.name)
-        self.enabled = not self.name.startswith('_')
-        self.session = None
-        self.priority = 65535
-
-        self.requests = requests.Session()
-
-        # List of all entries in the task
-        self._all_entries = EntryContainer()
-
-        self.disabled_phases = []
-
-        # These are just to query what happened in task. Call task.abort to set.
-        self.aborted = False
-        self.abort_reason = None
-        self.silent_abort = False
-
-        self._rerun = False
-
-        # current state
-        self.current_phase = None
-        self.current_plugin = None
-
     def __cmp__(self, other):
-        return cmp(self.priority, other.priority)
+        return cmp((self.priority, self._count), (other.priority, other._count))
 
     def __str__(self):
         return '<Task(name=%s,aborted=%s)>' % (self.name, self.aborted)
@@ -459,7 +489,7 @@ class Task(object):
         """
         self.config_modified = True
 
-    @useTaskLogging
+    @use_task_logging
     def execute(self):
         """
         Executes the the task.
@@ -477,7 +507,6 @@ class Task(object):
         if self.options.cron:
             self.manager.db_cleanup()
 
-        self._reset()
         log.debug('executing %s' % self.name)
         if not self.enabled:
             log.debug('task %s disabled during preparation, not running' % self.name)
@@ -564,7 +593,11 @@ class Task(object):
             self._rerun_count += 1
             # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in instead of
             # taking another one) after input and just inject the same entries for the rerun
+            self._all_entries = EntryContainer()
+            self._rerun = False
             self.execute()
+        else:
+            self.finished_event.set()
 
     @staticmethod
     def validate_config(config):
@@ -572,11 +605,6 @@ class Task(object):
         # Don't validate commented out plugins
         schema['patternProperties'] = {'^_': {}}
         return config_schema.process_config(config, schema)
-
-    def __eq__(self, other):
-        if hasattr(other, 'name'):
-            return self.name == other.name
-        return NotImplemented
 
     def __copy__(self):
         new = type(self)(self.manager, self.name, self.config, self.options)

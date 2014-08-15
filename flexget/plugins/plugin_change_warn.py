@@ -31,7 +31,7 @@ class ChangeWarn(object):
             found_deprecated = True
 
         if found_deprecated:
-            task.manager.scheduler.shutdown(finish_queue=False)
+            task.manager.shutdown(finish_queue=False)
             task.abort('Deprecated config.')
 
 
