@@ -532,7 +532,7 @@ class PluginTransmission(TransmissionBase):
                 # prevents downloading data before we set what files we want
                 if ('paused' in options['post'] and options['post']['paused'] == False or
                    'paused' not in options['post'] and cli.get_session().start_added_torrents == True):
-                        cli.get_torrent(r.id).start()
+                        cli.start_torrent(r.id)
 
             except TransmissionError as e:
                 log.debug('TransmissionError', exc_info=True)
