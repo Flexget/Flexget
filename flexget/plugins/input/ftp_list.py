@@ -64,6 +64,12 @@ class InputFtpList(object):
 
         log.debug('Connected.')
             
+        try:
+            ftp.sendcmd('OPTS UTF8 ON')
+            utf8_enabled = True
+        except ftplib.error_perm as e:
+            utf8_enabled = False
+            
         ftp.sendcmd('TYPE I')
         ftp.set_pasv(True)
         entries = []
@@ -80,7 +86,9 @@ class InputFtpList(object):
                 log.verbose('Directory %s is empty', path)
 
             for p in dirs:
-                url = baseurl + p
+                if utf8_enabled:
+                  p = p.decode('utf-8')
+                url = urlparse.urljoin(baseurl, p)
                 title = os.path.basename(p)
                 log.info('Accepting entry %s ' % title)
                 entries.append(Entry(title, url))
