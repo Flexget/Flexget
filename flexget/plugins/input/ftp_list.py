@@ -138,8 +138,11 @@ class InputFtpList(object):
             if not files_only or mlst.get('type') == 'file':
                 url = baseurl + p
                 title = os.path.basename(p)
-                log.info('Accepting entry %s ' % title)
-                entries.append(Entry(title, url))
+                log.info('[%s] "%s"' % (mlst.get('type') or "unknown", path + '/' + p,))
+                entry = Entry(title, url)
+                if 'size' in mlst:
+                    entry['content-size'] = float(mlst.get('size')) / (1024 * 1024)
+                entries.append(entry)
 
         return True
 
