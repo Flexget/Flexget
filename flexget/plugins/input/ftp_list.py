@@ -140,7 +140,9 @@ class InputFtpList(object):
                 title = os.path.basename(p)
                 log.info('[%s] "%s"' % (mlst.get('type') or "unknown", path + '/' + p,))
                 entry = Entry(title, url)
-                if 'size' in mlst:
+                if not 'size' in mlst:
+                    entry['content-size'] = ftp.size(path + '/' + p) / (1024 * 1024)
+                else:
                     entry['content-size'] = float(mlst.get('size')) / (1024 * 1024)
                 entries.append(entry)
 
