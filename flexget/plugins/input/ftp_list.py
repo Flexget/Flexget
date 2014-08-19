@@ -1,6 +1,7 @@
 import logging
 import ftplib
 import os
+import re
 
 from flexget import plugin
 from flexget.event import event
@@ -16,12 +17,14 @@ class InputFtpList(object):
     Configuration:
       ftp_list:
         config:
-          use-ssl: no
           name: <ftp name>
           username: <username>
           password: <password>
           host: <host to connect>
           port: <port>
+          use-ssl: <yes/no>
+          encoding: <auto/utf8/ascii>
+          files-only: <yes/no>
         dirs:
           - <directory 1>
           - <directory 2>
@@ -39,12 +42,17 @@ class InputFtpList(object):
         config.accept('text', key='host', required=True)
         config.accept('integer', key='port', required=True)
         config.accept('text', key='encoding')
+        config.accept('boolean', key='files-only')
+        config.accept('boolean', key='recursive')
         config.accept('boolean', key='use-ssl')
         return root
 
     def prepare_config(self, config):
         config['config'].setdefault('use-ssl', False)
         config['config'].setdefault('encoding', 'auto')
+        config['config'].setdefault('files-only', False)
+        config['config'].setdefault('recursive', False)
+        config.setdefault('dirs', [""])
         return config
 
     def on_task_input(self, task, config):
@@ -66,37 +74,82 @@ class InputFtpList(object):
 
         log.debug('Connected.')
 
-        encoding = 'ascii'
-        if connection_config['encoding'] == 'auto':
-            feat_response = ftp.sendcmd('FEAT')
-            if 'UTF8' in [feat_item.strip().upper() for feat_item in feat_response.splitlines()]:
-                encoding = 'utf8'
-        elif connection_config['encoding']:
-            encoding = connection_config['encoding']
+        encoding = connection_config['encoding']
+        files_only = connection_config['files-only']
+        recursive = connection_config['recursive']
+        mlst_supported = False
+
+        feat_response = ftp.sendcmd('FEAT').splitlines()
+        supported_extensions = [feat_item.strip().upper() for feat_item in feat_response[1:len(feat_response)-1]]
+
+        if encoding.lower() == 'auto' and 'UTF8' in supported_extensions:
+            encoding = 'utf8'
+        else:
+            encoding = 'ascii'
+
+        for supported_extension in supported_extensions:
+            if supported_extension.startswith('MLST'):
+                mlst_supported = True
+                break
+
+        if not mlst_supported:
+            log.warning('MLST Command is not supported by the FTP server %s@%s:%s', connection_config['username'], connection_config['host'], connection_config['port'])
 
         ftp.sendcmd('TYPE I')
         ftp.set_pasv(True)
         entries = []
+
         for path in config['dirs']:
             baseurl = "ftp://%s:%s@%s:%s/" % (connection_config['username'], connection_config['password'],
                                               connection_config['host'], connection_config['port'])
 
-            try:
-                dirs = ftp.nlst(path)
-            except ftplib.error_perm as e:
-                raise plugin.PluginWarning(str(e))
+            self._handle_path(entries, ftp, baseurl, path, mlst_supported, files_only, recursive, encoding)
 
-            if not dirs:
-                log.verbose('Directory %s is empty', path)
+        return entries
 
-            for p in dirs:
+    def _handle_path(self, entries, ftp, baseurl, path='', mlst_supported=False, files_only=False, recursive=False, encoding=None):
+        try:
+            dirs = ftp.nlst(path)
+        except ftplib.error_perm as e:
+            raise plugin.PluginWarning(str(e))
+
+        if not dirs:
+            log.verbose('Directory %s is empty', path)
+
+        if len(dirs) == 1 and path == dirs[0]:
+            # It's probably a file
+            return False
+
+        for p in dirs:
+            if encoding:
                 p = p.decode(encoding)
+
+            mlst = {}
+            if mlst_supported:
+                mlst_output = ftp.sendcmd('MLST ' + path + '/' + p)
+                clean_mlst_output = [line.strip().lower() for line in mlst_output.splitlines()][1]
+                mlst = self.parse_mlst(clean_mlst_output)
+
+            if recursive and (not mlst_supported or mlst.get('type') == 'dir'):
+                is_directory = self._handle_path(entries, ftp, baseurl, path + '/' + p, mlst_supported, files_only, recursive, encoding)
+                if not is_directory and not mlst_supported:
+                    mlst['type'] = 'file'
+
+            if not files_only or mlst.get('type') == 'file':
                 url = baseurl + p
                 title = os.path.basename(p)
                 log.info('Accepting entry %s ' % title)
                 entries.append(Entry(title, url))
 
-        return entries
+        return True
+
+    def parse_mlst(self, mlst):
+        re_results = re.findall('(.*?)=(.*?);', mlst)
+        parsed = {}
+        for k, v in re_results:
+            parsed[k] = v
+        return parsed
+
 
 @event('plugin.register')
 def register_plugin():
