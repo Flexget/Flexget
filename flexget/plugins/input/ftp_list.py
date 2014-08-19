@@ -38,11 +38,13 @@ class InputFtpList(object):
         config.accept('text', key='password', required=True)
         config.accept('text', key='host', required=True)
         config.accept('integer', key='port', required=True)
+        config.accept('text', key='encoding')
         config.accept('boolean', key='use-ssl')
         return root
 
     def prepare_config(self, config):
-        config.setdefault('use-ssl', False)
+        config['config'].setdefault('use-ssl', False)
+        config['config'].setdefault('encoding', 'auto')
         return config
 
     def on_task_input(self, task, config):
@@ -56,14 +58,22 @@ class InputFtpList(object):
 
         # ftp.set_debuglevel(2)
         log.debug('Trying connecting to: %s', (connection_config['host']))
-        try: 
+        try:
             ftp.connect(connection_config['host'], connection_config['port'])
             ftp.login(connection_config['username'], connection_config['password'])
         except ftplib.all_errors as e:
             raise plugin.PluginError(e)
 
         log.debug('Connected.')
-            
+
+        encoding = 'ascii'
+        if connection_config['encoding'] == 'auto':
+            feat_response = ftp.sendcmd('FEAT')
+            if 'UTF8' in [feat_item.strip().upper() for feat_item in feat_response.splitlines()]:
+                encoding = 'utf8'
+        elif connection_config['encoding']:
+            encoding = connection_config['encoding']
+
         ftp.sendcmd('TYPE I')
         ftp.set_pasv(True)
         entries = []
@@ -80,6 +90,7 @@ class InputFtpList(object):
                 log.verbose('Directory %s is empty', path)
 
             for p in dirs:
+                p = p.decode(encoding)
                 url = baseurl + p
                 title = os.path.basename(p)
                 log.info('Accepting entry %s ' % title)
