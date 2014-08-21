@@ -123,6 +123,7 @@ class InputPlex(object):
         return globalaccesstoken
 
     def plex_get_accesstoken(self, config, globalaccesstoken = ""):
+	accesstoken = ""    
         if not globalaccesstoken:
             globalaccesstoken = self.plex_get_globalaccesstoken(config)
         try:
@@ -187,7 +188,6 @@ class InputPlex(object):
         dom = parseString(r.text.encode("utf-8"))
         plexsectionname = dom.getElementsByTagName('MediaContainer')[0].getAttribute('title1')
         viewgroup = dom.getElementsByTagName('MediaContainer')[0].getAttribute('viewGroup')
-
 
         log.debug("Plex section \"%s\" is a \"%s\" section" % (plexsectionname, viewgroup))
         if (viewgroup != "movie" and viewgroup != "show" and viewgroup != "episode"):

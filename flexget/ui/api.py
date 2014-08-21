@@ -5,7 +5,7 @@ from flexget.config_schema import resolve_ref, process_config, get_schema
 from flexget.manager import manager
 from flexget.options import get_parser
 from flexget.plugin import plugin_schemas
-from flexget.scheduler import BufferQueue
+from flexget.utils.tools import BufferQueue
 
 API_VERSION = 1
 
@@ -53,7 +53,7 @@ def execute():
 
     # We'll stream the log results as they arrive in the bufferqueue
     kwargs['output'] = BufferQueue()
-    manager.scheduler.execute(**kwargs)
+    manager.execute(**kwargs)
 
     return Response(kwargs['output'], mimetype='text/plain'), 200
 

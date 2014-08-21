@@ -9,6 +9,7 @@ import time
 import re
 import sys
 import locale
+import Queue
 from collections import MutableMapping
 from urlparse import urlparse
 from htmlentitydefs import name2codepoint
@@ -401,3 +402,28 @@ class TimedDict(MutableMapping):
 
     def __repr__(self):
         return '%s(%r)' % (self.__class__.__name__, dict(zip(self._store, (v[1] for v in self._store.values()))))
+
+
+class Tee(object):
+    """Used so that output to sys.stdout can be grabbed and still displayed."""
+    def __init__(self, *files):
+        self.files = files
+
+    def __getattr__(self, meth):
+        def method_runner(*args, **kwargs):
+            for f in self.files:
+                try:
+                    getattr(f, meth)(*args, **kwargs)
+                except AttributeError:
+                    # We don't really care if all of our 'files' fully support the file api
+                    pass
+        return method_runner
+
+
+class BufferQueue(Queue.Queue):
+    """Used in place of a file-like object to capture text and access it safely from another thread."""
+    # Allow access to the Empty error from here
+    Empty = Queue.Empty
+
+    def write(self, line):
+        self.put(line)

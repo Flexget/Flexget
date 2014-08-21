@@ -1,8 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
-import feedparser
-import math
+
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.imdb import extract_id
@@ -34,7 +32,7 @@ class ImdbList(object):
     @cached('imdb_list', persist='2 hours')
     def on_task_input(self, task, config):
         # Create movie entries by parsing imdb list page(s) html using beautifulsoup
-        log.verbose('Retrieving list: %s...' % config['list'])
+        log.verbose('Retrieving imdb list: %s' % config['list'])
 
         params = {'view': 'compact'}
         if config['list'] in ['watchlist', 'ratings', 'checkins']:
@@ -47,7 +45,10 @@ class ImdbList(object):
         if page.status_code != 200:
             raise plugin.PluginError('Unable to get imdb list. Either list is private or does not exist.')
 
-        soup = get_soup(page.text, 'html.parser')
+        soup = get_soup(page.text)
+        # TODO: Something is messed up with the html5lib parser and imdb, have to get to our subsection without
+        # recursion before doing a regular find. Repeated in the loop below as well.
+        soup = soup.find('div', id='root').find('div', id='pagecontent', recursive=False)
         div = soup.find('div', class_='desc')
         if div:
             total_movie_count = int(div.get('data-size'))
@@ -55,30 +56,41 @@ class ImdbList(object):
             total_movie_count = 0
 
         if total_movie_count == 0:
-            log.verbose('No movies were found in imdb list.')
+            log.verbose('No movies were found in imdb list: %s' % config['list'])
             return
 
         entries = []
-        for start_movie in xrange(1, total_movie_count + 1, 250):
-            if start_movie > 250:
-                params['start'] = start_movie
+        start = 1
+        while start < total_movie_count:
+            if start == 1:
+                trs = soup.find_all(attrs={'data-item-id': True})
+            else:
+                params['start'] = start
                 page = task.requests.get(url, params=params)
                 if page.status_code != 200:
                     raise plugin.PluginError('Unable to get imdb list.')
-                soup = get_soup(page.text, 'html.parser')
+                soup = get_soup(page.text)
+                # TODO: This is a hack, see above
+                soup = soup.find('div', id='root').find('div', id='pagecontent', recursive=False)
+                trs = soup.find_all(attrs={'data-item-id': True})
 
-            trs = soup.find_all(attrs={'data-item-id': True})
             for tr in trs:
                 a = tr.find('td', class_='title').find('a')
                 link = ('http://www.imdb.com' + a.get('href')).rstrip('/')
-                year = tr.find('td', class_='year').string
                 entry = Entry()
-                entry['title'] = a.string + ' (' + year + ')'
-                entry['imdb_year'] = int(year)
+                entry['title'] = a.string
+                try:
+                    year = int(tr.find('td', class_='year').string)
+                    entry['title'] += ' (%s)' % year
+                    entry['imdb_year'] = year
+                except ValueError:
+                    pass
                 entry['url'] = link
                 entry['imdb_id'] = extract_id(link)
                 entry['imdb_name'] = entry['title']
                 entries.append(entry)
+
+            start = len(entries) + 1
 
         return entries
 

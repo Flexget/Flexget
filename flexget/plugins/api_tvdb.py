@@ -250,7 +250,7 @@ def find_series_id(name):
     try:
         xmldata = ElementTree.fromstring(page)
     except ElementTree.ParseError as e:
-        log.error('error parsing tvdb result: %s' % e)
+        log.error('error parsing tvdb result for %s: %s' % (name, e))
         return
     if xmldata is None:
         log.error("Didn't get a return from tvdb on the series search for %s" % name)
