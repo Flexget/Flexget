@@ -71,16 +71,16 @@ class OutputRapidPush(object):
         config = self.prepare_config(config)
 
         if config['notify_accepted']:
-            log.info("Notify accepted entries")
+            log.debug("Notify accepted entries")
             self.process_notifications(task, task.accepted, config)
         if config['notify_rejected']:
-            log.info("Notify rejected entries")
+            log.debug("Notify rejected entries")
             self.process_notifications(task, task.rejected, config)
         if config['notify_failed']:
-            log.info("Notify failed entries")
+            log.debug("Notify failed entries")
             self.process_notifications(task, task.failed, config)
         if config['notify_undecided']:
-            log.info("Notify undecided entries")
+            log.debug("Notify undecided entries")
             self.process_notifications(task, task.undecided, config)
 
     # Process the given events.
