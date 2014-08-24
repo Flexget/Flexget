@@ -86,13 +86,13 @@ def setup_scheduler(manager):
     if not manager.is_daemon:
         return
     scheduler = Scheduler(manager)
-    if manager.config.get('schedules') is False:
-        if scheduler.is_alive():
-            scheduler.stop()
-    else:
+    if manager.config.get('schedules', True):
         scheduler.load_schedules()
         if not scheduler.is_alive():
             scheduler.start()
+    else:
+        if scheduler.is_alive():
+            scheduler.stop()
 
 
 @singleton
