@@ -80,6 +80,7 @@ class DBTrigger(Base):
 
 
 @event('manager.daemon.started')
+@event('manager.config_updated')
 def setup_scheduler(manager):
     """Loads the scheduler settings from config and starts/stops the scheduler as appropriate."""
     if not manager.is_daemon:
@@ -92,9 +93,6 @@ def setup_scheduler(manager):
         scheduler.load_schedules()
         if not scheduler.is_alive():
             scheduler.start()
-
-# We need to set up the scheduler again when the config is reloaded
-event('manager.config_updated')(setup_scheduler)
 
 
 @singleton
@@ -109,6 +107,12 @@ class Scheduler(threading.Thread):
         self.triggers = []
         self.running_triggers = {}
         self._stop = threading.Event()
+
+    def start(self):
+        # If we have already started and stopped a thread, we need to reinitialize it to create a new one
+        if self._stop.is_set() and not self.is_alive():
+            self.__init__(self.manager)
+        threading.Thread.start(self)
 
     def stop(self):
         self._stop.set()
@@ -150,8 +154,6 @@ class Scheduler(threading.Thread):
                     del self.running_triggers[trigger_id]
             self.queue_pending_jobs()
         log.debug('scheduler shut down')
-        # Ready for possible restarting
-        self.__init__(self.manager)
 
 
 class Trigger(object):
