@@ -113,6 +113,7 @@ class Manager(object):
         self.database_uri = None
         self.db_upgraded = False
         self._has_lock = False
+        self.is_daemon = False
 
         self.config = {}
 
@@ -284,6 +285,7 @@ class Manager(object):
                     # If flexget is being called from another script, e.g. windows service helper, and we are not the
                     # main thread, this error will occur.
                     log.debug('Error registering sigterm handler: %s' % e)
+                self.is_daemon = True
                 self.ipc_server.start()
                 fire_event('manager.daemon.started', self)
                 self.task_queue.start()

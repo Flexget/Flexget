@@ -51,15 +51,20 @@ yaml_schedule = {
 
 
 main_schema = {
-    'type': 'array',
-    'items': {
-        'properties': {
-            'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
-            'interval': yaml_schedule
+    'oneOf': [
+        {
+            'type': 'array',
+            'items': {
+                'properties': {
+                    'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
+                    'interval': yaml_schedule
+                },
+                'required': ['tasks', 'interval'],
+                'additionalProperties': False
+            }
         },
-        'required': ['tasks', 'interval'],
-        'additionalProperties': False
-    }
+        {'type': 'boolean', 'enum': [False]}
+    ]
 }
 
 
@@ -75,16 +80,21 @@ class DBTrigger(Base):
 
 
 @event('manager.daemon.started')
-def start_scheduler(manager):
-    if 'schedules' not in manager.config:
-        # TODO: Run with default schedule
+def setup_scheduler(manager):
+    """Loads the scheduler settings from config and starts/stops the scheduler as appropriate."""
+    if not manager.is_daemon:
         return
-    Scheduler(manager).start()
+    scheduler = Scheduler(manager)
+    if manager.config.get('schedules') is False:
+        if scheduler.is_alive():
+            scheduler.stop()
+    else:
+        scheduler.load_schedules()
+        if not scheduler.is_alive():
+            scheduler.start()
 
-
-@event('manager.config_updated')
-def create_triggers(manager):
-    Scheduler(manager).load_schedules()
+# We need to set up the scheduler again when the config is reloaded
+event('manager.config_updated')(setup_scheduler)
 
 
 @singleton
@@ -98,6 +108,10 @@ class Scheduler(threading.Thread):
         self.manager = manager
         self.triggers = []
         self.running_triggers = {}
+        self._stop = threading.Event()
+
+    def stop(self):
+        self._stop.set()
 
     def load_schedules(self):
         """Clears current schedules and loads them from the config."""
@@ -129,13 +143,15 @@ class Scheduler(threading.Thread):
                     trigger.trigger()
 
     def run(self):
-        while True:
+        log.debug('scheduler started')
+        while not self._stop.wait(5):
             for trigger_id, finished_events in self.running_triggers.items():
                 if all(e.is_set() for e in finished_events):
                     del self.running_triggers[trigger_id]
             self.queue_pending_jobs()
-            time.sleep(5)
         log.debug('scheduler shut down')
+        # Ready for possible restarting
+        self.__init__(self.manager)
 
 
 class Trigger(object):
