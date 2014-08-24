@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta, time as dt_time
 from hashlib import md5
 import logging
-import Queue
 import threading
 import time
 
@@ -12,6 +11,7 @@ from flexget.config_schema import register_config_key, parse_time
 from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.manager import Session
+from flexget.utils.tools import singleton
 
 log = logging.getLogger('scheduler')
 Base = versioned_base('scheduler', 0)
@@ -51,15 +51,20 @@ yaml_schedule = {
 
 
 main_schema = {
-    'type': 'array',
-    'items': {
-        'properties': {
-            'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
-            'interval': yaml_schedule
+    'oneOf': [
+        {
+            'type': 'array',
+            'items': {
+                'properties': {
+                    'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
+                    'interval': yaml_schedule
+                },
+                'required': ['tasks', 'interval'],
+                'additionalProperties': False
+            }
         },
-        'required': ['tasks', 'interval'],
-        'additionalProperties': False
-    }
+        {'type': 'boolean', 'enum': [False]}
+    ]
 }
 
 
@@ -74,21 +79,39 @@ class DBTrigger(Base):
         self.last_run = last_run
 
 
-@event('manager.config_updated')
-def create_triggers(manager):
-    manager.scheduler.load_schedules()
+@event('manager.daemon.started')
+def setup_scheduler(manager):
+    """Loads the scheduler settings from config and starts/stops the scheduler as appropriate."""
+    if not manager.is_daemon:
+        return
+    scheduler = Scheduler(manager)
+    if manager.config.get('schedules') is False:
+        if scheduler.is_alive():
+            scheduler.stop()
+    else:
+        scheduler.load_schedules()
+        if not scheduler.is_alive():
+            scheduler.start()
+
+# We need to set up the scheduler again when the config is reloaded
+event('manager.config_updated')(setup_scheduler)
 
 
+@singleton
 class Scheduler(threading.Thread):
     # We use a regular list for periodic jobs, so you must hold this lock while using it
     triggers_lock = threading.Lock()
 
     def __init__(self, manager):
-        super(Scheduler, self).__init__(name='scheduler')
+        threading.Thread.__init__(self, name='scheduler')
         self.daemon = True
         self.manager = manager
         self.triggers = []
         self.running_triggers = {}
+        self._stop = threading.Event()
+
+    def stop(self):
+        self._stop.set()
 
     def load_schedules(self):
         """Clears current schedules and loads them from the config."""
@@ -120,13 +143,15 @@ class Scheduler(threading.Thread):
                     trigger.trigger()
 
     def run(self):
-        while True:
+        log.debug('scheduler started')
+        while not self._stop.wait(5):
             for trigger_id, finished_events in self.running_triggers.items():
                 if all(e.is_set() for e in finished_events):
                     del self.running_triggers[trigger_id]
             self.queue_pending_jobs()
-            time.sleep(5)
         log.debug('scheduler shut down')
+        # Ready for possible restarting
+        self.__init__(self.manager)
 
 
 class Trigger(object):

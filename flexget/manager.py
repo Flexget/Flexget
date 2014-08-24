@@ -28,7 +28,6 @@ Session = sessionmaker()
 from flexget import config_schema, db_schema
 from flexget.event import fire_event
 from flexget.ipc import IPCServer, IPCClient
-from flexget.scheduler import Scheduler
 from flexget.task import Task
 from flexget.task_queue import TaskQueue
 from flexget.utils.tools import pid_exists
@@ -114,10 +113,10 @@ class Manager(object):
         self.database_uri = None
         self.db_upgraded = False
         self._has_lock = False
+        self.is_daemon = False
 
         self.config = {}
 
-        self.scheduler = Scheduler(self)
         self.ipc_server = IPCServer(self, options.ipc_port)
         self.task_queue = TaskQueue()
         manager = self
@@ -289,8 +288,8 @@ class Manager(object):
                     # If flexget is being called from another script, e.g. windows service helper, and we are not the
                     # main thread, this error will occur.
                     log.debug('Error registering sigterm handler: %s' % e)
+                self.is_daemon = True
                 self.ipc_server.start()
-                self.scheduler.start()
                 fire_event('manager.daemon.started', self)
                 self.task_queue.start()
                 self.task_queue.wait()
