@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta, time as dt_time
 from hashlib import md5
 import logging
-import Queue
 import threading
 import time
 
@@ -12,6 +11,7 @@ from flexget.config_schema import register_config_key, parse_time
 from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.manager import Session
+from flexget.utils.tools import singleton
 
 log = logging.getLogger('scheduler')
 Base = versioned_base('scheduler', 0)
@@ -87,18 +87,13 @@ def create_triggers(manager):
     Scheduler(manager).load_schedules()
 
 
+@singleton
 class Scheduler(threading.Thread):
     # We use a regular list for periodic jobs, so you must hold this lock while using it
     triggers_lock = threading.Lock()
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super(Scheduler, cls).__new__(cls)
-        return cls._instance
 
     def __init__(self, manager):
-        super(Scheduler, self).__init__(name='scheduler')
+        threading.Thread.__init__(self, name='scheduler')
         self.daemon = True
         self.manager = manager
         self.triggers = []
