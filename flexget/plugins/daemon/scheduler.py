@@ -74,14 +74,28 @@ class DBTrigger(Base):
         self.last_run = last_run
 
 
+@event('manager.daemon.started')
+def start_scheduler(manager):
+    if 'schedules' not in manager.config:
+        # TODO: Run with default schedule
+        return
+    Scheduler(manager).start()
+
+
 @event('manager.config_updated')
 def create_triggers(manager):
-    manager.scheduler.load_schedules()
+    Scheduler(manager).load_schedules()
 
 
 class Scheduler(threading.Thread):
     # We use a regular list for periodic jobs, so you must hold this lock while using it
     triggers_lock = threading.Lock()
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(Scheduler, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
 
     def __init__(self, manager):
         super(Scheduler, self).__init__(name='scheduler')
