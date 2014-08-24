@@ -195,7 +195,10 @@ class Manager(object):
             for arg in options.tasks:
                 matches = [t for t in self.tasks if fnmatch.fnmatchcase(unicode(t).lower(), arg.lower())]
                 if not matches:
-                    log.error('`%s` does not match any tasks' % arg)
+                    msg = '`%s` does not match any tasks' % arg
+                    log.error(msg)
+                    if output:
+                        output.write(msg)
                     continue
                 task_names.extend(m for m in matches if m not in task_names)
             # Set the option as a list of matching task names so plugins can use it easily
