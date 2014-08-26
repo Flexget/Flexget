@@ -9,6 +9,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.utils.template import RenderError
+from flexget.utils.parsers import get_parser, PARSER_MOVIE
 
 from socket import error as socket_error
 
@@ -264,9 +265,7 @@ class OutputAria2(object):
                             elif parser.id_type and parser.id:
                                 entry['series_id'] = parser.id
                     else:
-                        from flexget.utils.titles.movie import MovieParser
-                        parser = MovieParser()
-                        parser.data = cur_filename
+                        parser = get_parser.parse(cur_filename, PARSER_MOVIE)
                         parser.parse()
                         log.info(parser)
                         testname = parser.name

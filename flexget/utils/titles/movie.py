@@ -19,6 +19,7 @@ def diff_pos(string1, string2):
 
 
 class MovieParser(TitleParser):
+    # todo: deprecated. Should be remove.
 
     def __init__(self):
         self.data = None
