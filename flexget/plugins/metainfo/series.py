@@ -7,7 +7,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.plugins.filter.series import populate_entry_fields
 from flexget.utils.titles import SeriesParser
-from flexget.utils.titles.parser import ParseWarning
+from flexget.utils.parsers import ParseWarning
 
 log = logging.getLogger('metanfo_series')
 

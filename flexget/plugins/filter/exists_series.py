@@ -8,7 +8,7 @@ from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.log import log_once
 from flexget.utils.template import RenderError
-from flexget.utils.titles import ParseWarning
+from flexget.utils.parsers import ParseWarning
 
 log = logging.getLogger('exists_series')
 

@@ -18,7 +18,8 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.log import log_once
-from flexget.utils.titles import SeriesParser, ParseWarning, ID_TYPES
+from flexget.utils.titles import SeriesParser, ID_TYPES
+from flexget.utils.parsers import ParseWarning
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta

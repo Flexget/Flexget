@@ -3,6 +3,7 @@ import guessit
 from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO
 from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, Parser
 
+guessit.default_options = {'name_only': True}
 
 class GuessitParsedEntry(ParsedEntry):
     def __init__(self, raw, guess_result):
@@ -14,16 +15,8 @@ class GuessitParsedEntry(ParsedEntry):
         return self._guess_result.get('releaseGroup')
 
     @property
-    def valid(self):
-        return True
-
-    @property
     def proper(self):
         return 'Proper' in self._guess_result.get('other', {})
-
-    @property
-    def name(self):
-        return self._guess_result.get('series', self._guess_result.get('title'))
 
     @property
     def date(self):
@@ -117,8 +110,12 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
         GuessitParsedVideo.__init__(self, raw, guess_result)
 
     @property
-    def serie(self):
+    def series(self):
         return self._guess_result.get('series')
+
+    @property
+    def title(self):
+        self._guess_result.get('title')
 
     @property
     def episode_details(self):
@@ -129,26 +126,24 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
         return self._guess_result.get('episodeNumber')
 
     @property
-    def episode_list(self):
-        return self._guess_result.get('episodeList')
+    def episodes(self):
+        return len(self._guess_result.get('episodeList', filter(None, [self.episode])))
 
     @property
     def season(self):
         return self._guess_result.get('season')
 
-    @property
-    def title(self):
-        self._guess_result.get('title')
-
 
 class GuessitParser(Parser):
     def __init__(self):
         self._type_map = {PARSER_EPISODE: 'episode', PARSER_VIDEO: 'video', PARSER_MOVIE: 'movie'}
-        self._options = {'name_only': True}
 
-    def parse(self, input_, type_=None):
+    def parse(self, input_, type_=None, attended_name=None, **kwargs):
         type_ = self._type_map.get(type_)
-        guess_result = guessit.guess_file_info(input_, options=self._options, type=type_)
+
+        options = self._filter_options(kwargs)
+
+        guess_result = guessit.guess_file_info(input_, options=options, type=type_)
 
         type_ = guess_result.get('type', type_)
         if (type_ == 'episode'):
@@ -159,3 +154,6 @@ class GuessitParser(Parser):
             return GuessitParsedVideo
         else:
             return GuessitParsedEntry(input_, guess_result)
+
+    def _filter_options(self, options):
+        return options

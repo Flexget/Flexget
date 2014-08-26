@@ -26,6 +26,22 @@ class MovieParser(TitleParser):
         self.reset()
         TitleParser.__init__(self)
 
+    @property
+    def valid(self):
+        return True
+
+    @property
+    def proper(self):
+        return self.proper_count > 0
+
+    @property
+    def is_series(self):
+        return False
+
+    @property
+    def is_movie(self):
+        return True
+
     def reset(self):
         # parsing results
         self.name = None

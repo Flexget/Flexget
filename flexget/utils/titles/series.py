@@ -5,7 +5,8 @@ from datetime import datetime, timedelta
 
 from dateutil.parser import parse as parsedate
 
-from flexget.utils.titles.parser import TitleParser, ParseWarning
+from flexget.utils.titles.parser import TitleParser
+from flexget.utils.parsers import ParseWarning
 from flexget.utils import qualities
 from flexget.utils.tools import ReList
 
@@ -15,7 +16,7 @@ log = logging.getLogger('seriesparser')
 # switch to logging.DEBUG if you want to debug this class (produces quite a bit info ..)
 log.setLevel(logging.INFO)
 
-ID_TYPES = ['ep', 'date', 'sequence', 'id']
+ID_TYPES = ['ep', 'date', 'sequence', 'id'] # may also be 'special'
 
 default_ignore_prefixes = [
     '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
@@ -154,6 +155,14 @@ class SeriesParser(TitleParser):
         self.field = None
         self._reset()
 
+    @property
+    def is_series(self):
+        return True
+
+    @property
+    def is_movie(self):
+        return False
+
     def _reset(self):
         # parse produces these
         self.season = None
@@ -201,7 +210,7 @@ class SeriesParser(TitleParser):
 
         # check if data appears to be unwanted (abort)
         if self.parse_unwanted(self.remove_dirt(self.data)):
-            raise ParseWarning('`{data}` appears to be an episode pack'.format(data=self.data))
+            raise ParseWarning(self, '`{data}` appears to be an episode pack'.format(data=self.data))
 
         name = self.remove_dirt(self.name)
 
@@ -424,7 +433,7 @@ class SeriesParser(TitleParser):
             msg += 'any series numbering.'
         else:
             msg += 'a(n) `%s` style identifier.' % self.identified_by
-        raise ParseWarning(msg)
+        raise ParseWarning(self, msg)
 
     def parse_unwanted(self, data):
         """Parses data for an unwanted hits. Return True if the data contains unwanted hits."""
