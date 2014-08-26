@@ -1,8 +1,10 @@
-from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO
-from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, Parser
+from .parser_common import PARSER_EPISODE, PARSER_MOVIE
+from .parser_common import Parser
 
 from ..titles.movie import MovieParser
 from ..titles.series import SeriesParser
+
+import re
 
 
 class InternalParser(Parser):

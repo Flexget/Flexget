@@ -17,6 +17,38 @@ log.setLevel(logging.INFO)
 
 ID_TYPES = ['ep', 'date', 'sequence', 'id']
 
+default_ignore_prefixes = [
+    '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
+    '(?:HD.720p?:)',
+    '(?:HD.1080p?:)']
+
+
+def name_to_re(name, ignore_prefixes=None, parser=None):
+    if not ignore_prefixes:
+        ignore_prefixes = default_ignore_prefixes
+    """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
+    parenthetical = None
+    if name.endswith(')'):
+        p_start = name.rfind('(')
+        if p_start != -1:
+            parenthetical = re.escape(name[p_start + 1:-1])
+            name = name[:p_start - 1]
+    # Blanks are any non word characters except & and _
+    blank = r'(?:[^\w&]|_)'
+    ignore = '(?:' + '|'.join(ignore_prefixes) + ')?'
+    res = re.sub(re.compile(blank + '+', re.UNICODE), ' ', name)
+    res = res.strip()
+    # accept either '&' or 'and'
+    res = re.sub(' (&|and) ', ' (?:and|&) ', res, re.UNICODE)
+    res = re.sub(' +', blank + '*', res, re.UNICODE)
+    if parenthetical:
+        res += '(?:' + blank + '+' + parenthetical + ')?'
+        # Turn on exact mode for series ending with a parenthetical,
+        # so that 'Show (US)' is not accepted as 'Show (UK)'
+        if parser:
+            parser.strict_name = True
+    res = '^' + ignore + blank + '*' + '(' + res + ')(?:\\b|_)' + blank + '*'
+    return res
 
 class SeriesParser(TitleParser):
 
@@ -63,10 +95,7 @@ class SeriesParser(TitleParser):
     id_regexps = ReList([])
     clean_regexps = ReList(['\[.*?\]', '\(.*?\)'])
     # ignore prefix regexps must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
-    ignore_prefixes = [
-        '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
-        '(?:HD.720p?:)',
-        '(?:HD.1080p?:)']
+    ignore_prefixes = default_ignore_prefixes
 
     def __init__(self, name='', alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
                  date_regexps=None, sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None,
@@ -158,30 +187,6 @@ class SeriesParser(TitleParser):
         """Replaces some characters with spaces"""
         return re.sub(r'[_.,\[\]\(\): ]+', ' ', data).strip().lower()
 
-    def name_to_re(self, name):
-        """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
-        parenthetical = None
-        if name.endswith(')'):
-            p_start = name.rfind('(')
-            if p_start != -1:
-                parenthetical = re.escape(name[p_start + 1:-1])
-                name = name[:p_start - 1]
-        # Blanks are any non word characters except & and _
-        blank = r'(?:[^\w&]|_)'
-        ignore = '(?:' + '|'.join(self.ignore_prefixes) + ')?'
-        res = re.sub(re.compile(blank + '+', re.UNICODE), ' ', name)
-        res = res.strip()
-        # accept either '&' or 'and'
-        res = re.sub(' (&|and) ', ' (?:and|&) ', res, re.UNICODE)
-        res = re.sub(' +', blank + '*', res, re.UNICODE)
-        if parenthetical:
-            res += '(?:' + blank + '+' + parenthetical + ')?'
-            # Turn on exact mode for series ending with a parenthetical,
-            # so that 'Show (US)' is not accepted as 'Show (UK)'
-            self.strict_name = True
-        res = '^' + ignore + blank + '*' + '(' + res + ')(?:\\b|_)' + blank + '*'
-        return res
-
     def parse(self, data=None, field=None, quality=None):
         # Clear the output variables before parsing
         self._reset()
@@ -209,7 +214,7 @@ class SeriesParser(TitleParser):
         # regexp name matching
         if not self.name_regexps:
             # if we don't have name_regexps, generate one from the name
-            self.name_regexps = ReList(self.name_to_re(name) for name in [self.name] + self.alternate_names)
+            self.name_regexps = ReList(name_to_re(name, self.ignore_prefixes, self) for name in [self.name] + self.alternate_names)
             # With auto regex generation, the first regex group captures the name
             self.re_from_name = True
         # try all specified regexps on this data
