@@ -15,3 +15,5 @@ class InternalParser(Parser):
             internal_parser = MovieParser()
         else:
             internal_parser = MovieParser()
+        internal_parser.parse(input_)
+        return internal_parser
