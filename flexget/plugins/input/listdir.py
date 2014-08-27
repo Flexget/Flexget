@@ -36,8 +36,9 @@ class Listdir(object):
             path = os.path.expanduser(path)
             for name in os.listdir(unicode(path)):
                 e = Entry()
+                name = name.decode('utf-8')
                 filepath = os.path.join(path, name)
-                if os.path.isfile(filepath):
+                if os.path.isfile(filepath.encode('utf-8')):
                     e['title'] = os.path.splitext(name)[0]
                 else:
                     e['title'] = name
