@@ -3,7 +3,6 @@ from datetime import datetime, timedelta, time as dt_time
 from hashlib import md5
 import logging
 import threading
-import time
 
 from sqlalchemy import Column, String, DateTime
 

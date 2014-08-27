@@ -11,7 +11,6 @@ import shutil
 import logging
 import threading
 import pkg_resources
-import Queue
 import yaml
 from datetime import datetime, timedelta
 
