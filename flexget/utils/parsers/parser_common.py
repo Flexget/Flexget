@@ -11,6 +11,7 @@ PARSER_EPISODE = 3
 _default_parser = 'flexget.utils.parsers.parser_internal.InternalParser'
 _parsers = {}
 
+SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id'] # may also be 'special'
 
 class ParseWarning(Warning):
     def __init__(self, parsed, value, **kwargs):
