@@ -440,6 +440,7 @@ class ImdbLookup(object):
         finally:
             log.trace('committing session')
             session.commit()
+            session.close()
 
     def _parse_new_movie(self, imdb_url, session):
         """
