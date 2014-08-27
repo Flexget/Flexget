@@ -6,8 +6,8 @@ from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedS
 guessit.default_options = {'name_only': True}
 
 class GuessitParsedEntry(ParsedEntry):
-    def __init__(self, raw, guess_result):
-        ParsedEntry.__init__(self, raw)
+    def __init__(self, raw, name, guess_result):
+        ParsedEntry.__init__(self, raw, name)
         self._guess_result = guess_result
 
     @property
@@ -69,8 +69,8 @@ class GuessitParsedVideoQuality(ParsedVideoQuality):
 
 
 class GuessitParsedVideo(GuessitParsedEntry, ParsedVideo):
-    def __init__(self, raw, guess_result):
-        GuessitParsedEntry.__init__(self, raw, guess_result)
+    def __init__(self, raw, name, guess_result):
+        GuessitParsedEntry.__init__(self, raw, name, guess_result)
         self._quality = None
 
     @property
@@ -97,8 +97,11 @@ class GuessitParsedVideo(GuessitParsedEntry, ParsedVideo):
 
 
 class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
-    def __init__(self, raw, guess_result):
-        GuessitParsedVideo.__init__(self, raw, guess_result)
+    def __init__(self, raw, name, guess_result):
+        GuessitParsedVideo.__init__(self, raw, name, guess_result)
+
+    def title(self):
+        pass
 
     @property
     def title(self):
@@ -106,8 +109,8 @@ class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
 
 
 class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
-    def __init__(self, raw, guess_result):
-        GuessitParsedVideo.__init__(self, raw, guess_result)
+    def __init__(self, raw, name, guess_result):
+        GuessitParsedVideo.__init__(self, raw, name, guess_result)
 
     @property
     def series(self):
@@ -116,6 +119,10 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
     @property
     def title(self):
         self._guess_result.get('title')
+
+    @property
+    def is_special(self):
+        return self.episode_details and len(self.episode_details) > 0
 
     @property
     def episode_details(self):
@@ -138,7 +145,7 @@ class GuessitParser(Parser):
     def __init__(self):
         self._type_map = {PARSER_EPISODE: 'episode', PARSER_VIDEO: 'video', PARSER_MOVIE: 'movie'}
 
-    def parse(self, input_, type_=None, attended_name=None, **kwargs):
+    def parse(self, input_, type_=None, name=None, **kwargs):
         type_ = self._type_map.get(type_)
 
         options = self._filter_options(kwargs)
@@ -147,13 +154,13 @@ class GuessitParser(Parser):
 
         type_ = guess_result.get('type', type_)
         if (type_ == 'episode'):
-            return GuessitParsedSerie(input_, guess_result)
+            return GuessitParsedSerie(input_, name, guess_result)
         elif (type_ == 'movie'):
-            return GuessitParsedMovie(input_, guess_result)
+            return GuessitParsedMovie(input_, name, guess_result)
         elif (type_ == 'video'):
             return GuessitParsedVideo
         else:
-            return GuessitParsedEntry(input_, guess_result)
+            return GuessitParsedEntry(input_, name, guess_result)
 
     def _filter_options(self, options):
         return options

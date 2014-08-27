@@ -2,13 +2,15 @@ from .. import qualities
 
 from abc import abstractproperty, abstractmethod, ABCMeta
 
+from string import capwords
+
 PARSER_ANY = 0
 PARSER_VIDEO = 1
 PARSER_MOVIE = 2
 PARSER_EPISODE = 3
 
-#_default_parser = 'flexget.utils.parsers.parser_guessit.GuessitParser'
-_default_parser = 'flexget.utils.parsers.parser_internal.InternalParser'
+_default_parser = 'flexget.utils.parsers.parser_guessit.GuessitParser'
+#_default_parser = 'flexget.utils.parsers.parser_internal.InternalParser'
 _parsers = {}
 
 SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id'] # may also be 'special'
@@ -79,8 +81,17 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     A parsed entry, containing parsed data like name, year, episodeNumber and season.
     """
 
-    def __init__(self, raw):
+    def __init__(self, raw, name):
         self._raw = raw
+        self._name = name
+
+    @property
+    def name(self):
+        return self._name if self._name else self.parsed_name
+
+    @abstractproperty
+    def parsed_name(self):
+        raise NotImplementedError
 
     @property
     def raw(self):
@@ -89,10 +100,6 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     @property
     def data(self):
         return self.raw
-
-    @abstractproperty
-    def name(self):
-        raise NotImplementedError
 
     @property
     def valid(self):
@@ -164,6 +171,7 @@ class ParsedVideo(ABCMeta(str('ParsedVideoABCMeta'), (ParsedEntry,), {})):
 
     def assume_quality(self, quality):
         self._assumed_quality = quality
+        self._old_quality = None
 
     def assume_quality2(self, quality2):
         self._assumed_quality = quality2.to_old_quality()
@@ -228,7 +236,7 @@ class ParsedVideoQuality(ABCMeta(str('ParsedVideoQualityABCMeta'), (object,), {}
 
 class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
     @property
-    def name(self):
+    def parsed_name(self):
         return self.title
 
     @property
@@ -242,7 +250,7 @@ class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
 
 class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     @property
-    def name(self):
+    def parsed_name(self):
         return self.series
 
     @abstractproperty
@@ -350,7 +358,7 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
 
 class Parser(ABCMeta(str('ParserABCMeta'), (object,), {})):
     @abstractmethod
-    def parse(self, input_, type_=None, attended_name=None, **kwargs):
+    def parse(self, input_, type_=None, name=None, **kwargs):
         """
         :param input_: string to parse
         :param type_: a PARSER_* type
