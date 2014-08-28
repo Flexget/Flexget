@@ -6,7 +6,7 @@ from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedS
 
 import re
 
-guessit.default_options = {'name_only': True}
+guessit.default_options = {'name_only': True, 'episode_prefer_number': True}
 
 class GuessitParsedEntry(ParsedEntry):
     def __init__(self, raw, name, guess_result):
