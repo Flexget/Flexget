@@ -105,6 +105,7 @@ class Scheduler(threading.Thread):
         self.manager = manager
         self.triggers = []
         self.running_triggers = {}
+        self.waiting_triggers = set()
         self._stop = threading.Event()
 
     def start(self):
@@ -134,14 +135,18 @@ class Scheduler(threading.Thread):
             for trigger in self.triggers:
                 if trigger.should_run:
                     if trigger in self.running_triggers:
-                        log.error('Not firing schedule %r. Tasks from last run have still not finished.' % trigger)
-                        log.error('You may need to increase the interval for this schedule.')
+                        if trigger not in self.waiting_triggers:
+                            log.error('Not firing schedule %r. Tasks from last run have still not finished.' % trigger)
+                            log.error('You may need to increase the interval for this schedule.')
+                            self.waiting_triggers.add(trigger)
                         continue
                     options = dict(trigger.options)
                     # If the user has specified all tasks with '*', don't add tasks option at all, so that manual
                     # tasks are not executed
                     if trigger.tasks != ['*']:
                         options['tasks'] = trigger.tasks
+                    if trigger in self.waiting_triggers:
+                        self.waiting_triggers.remove(trigger)
                     self.running_triggers[trigger] = self.manager.execute(options=options, priority=5)
                     trigger.trigger()
 
