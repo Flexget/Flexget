@@ -133,7 +133,7 @@ class Scheduler(threading.Thread):
         with self.triggers_lock:
             for trigger in self.triggers:
                 if trigger.should_run:
-                    if trigger.uid in self.running_triggers:
+                    if trigger in self.running_triggers:
                         log.error('Not firing schedule %r. Tasks from last run have still not finished.' % trigger)
                         log.error('You may need to increase the interval for this schedule.')
                         continue
@@ -142,7 +142,7 @@ class Scheduler(threading.Thread):
                     # tasks are not executed
                     if trigger.tasks != ['*']:
                         options['tasks'] = trigger.tasks
-                    self.running_triggers[trigger.uid] = self.manager.execute(options=options, priority=5)
+                    self.running_triggers[trigger] = self.manager.execute(options=options, priority=5)
                     trigger.trigger()
 
     def run(self):
@@ -173,15 +173,6 @@ class Trigger(object):
         self.interval = interval
         self._get_db_last_run()
         self.schedule_next_run()
-
-    @property
-    def uid(self):
-        """A unique id which describes this trigger."""
-        # Determine uniqueness based on interval,
-        hashval = md5(str(sorted(self.interval)))
-        # and tasks run on that interval.
-        hashval.update(','.join(self.tasks).encode('utf-8'))
-        return hashval.hexdigest()
 
     # Handles getting and setting interval in form validated by config
     @property
@@ -248,7 +239,7 @@ class Trigger(object):
     def _get_db_last_run(self):
         session = Session()
         try:
-            db_trigger = session.query(DBTrigger).get(self.uid)
+            db_trigger = session.query(DBTrigger).get(hash(self))
             if db_trigger:
                 self.last_run = db_trigger.last_run
                 log.debug('loaded last_run from the database')
@@ -258,15 +249,22 @@ class Trigger(object):
     def _set_db_last_run(self):
         session = Session()
         try:
-            db_trigger = session.query(DBTrigger).get(self.uid)
+            db_trigger = session.query(DBTrigger).get(hash(self))
             if not db_trigger:
-                db_trigger = DBTrigger(self.uid)
+                db_trigger = DBTrigger(hash(self))
                 session.add(db_trigger)
             db_trigger.last_run = self.last_run
             session.commit()
         finally:
             session.close()
         log.debug('recorded last_run to the database')
+
+    def __hash__(self):
+        """A unique id which describes this trigger."""
+        return hash(tuple(sorted(self.interval.iteritems())) + tuple(sorted(self.tasks)))
+
+    def __eq__(self, other):
+        return (self.interval, self.tasks) == (other.interval, other.tasks)
 
     def __repr__(self):
         return 'Trigger(tasks=%r, amount=%r, unit=%r)' % (self.tasks, self.amount, self.unit)
