@@ -341,6 +341,8 @@ class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
 class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     @property
     def parsed_name(self):
+        if self.year:
+            return self.series + ' ' + str(self.year)
         return self.series
 
     @abstractproperty
