@@ -489,28 +489,13 @@ class Task(object):
         """
         self.config_modified = True
 
-    @use_task_logging
-    def execute(self):
-        """
-        Executes the the task.
-
-        If :attr:`.enabled` is False task is not executed. Certain :attr:`.options`
-        affect how execution is handled.
-
-        - :attr:`.options.disable_phases` is a list of phases that are not enabled
-          for this execution.
-        - :attr:`.options.inject` is a list of :class:`Entry` instances used instead
-          of running input phase.
-        """
+    def _execute(self):
+        """Executes the task without rerunning."""
         if not self.enabled:
             log.debug('Not running disabled task %s' % self.name)
-        if self.options.cron:
-            self.manager.db_cleanup()
+            return
 
         log.debug('executing %s' % self.name)
-        if not self.enabled:
-            log.debug('task %s disabled during preparation, not running' % self.name)
-            return
 
         # Handle keyword args
         if self.options.learn:
@@ -587,16 +572,36 @@ class Task(object):
             # this will cause database rollback on exception
             self.session.close()
 
-        # rerun task
-        if self._rerun:
-            log.info('Rerunning the task in case better resolution can be achieved.')
-            self._rerun_count += 1
-            # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in instead of
-            # taking another one) after input and just inject the same entries for the rerun
-            self._all_entries = EntryContainer()
-            self._rerun = False
-            self.execute()
-        else:
+    @use_task_logging
+    def execute(self):
+        """
+        Executes the the task.
+
+        If :attr:`.enabled` is False task is not executed. Certain :attr:`.options`
+        affect how execution is handled.
+
+        - :attr:`.options.disable_phases` is a list of phases that are not enabled
+          for this execution.
+        - :attr:`.options.inject` is a list of :class:`Entry` instances used instead
+          of running input phase.
+        """
+
+        try:
+            if self.options.cron:
+                self.manager.db_cleanup()
+            while True:
+                self._execute()
+                # rerun task
+                if self._rerun:
+                    log.info('Rerunning the task in case better resolution can be achieved.')
+                    self._rerun_count += 1
+                    # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in
+                    # instead of taking another one) after input and just inject the same entries for the rerun
+                    self._all_entries = EntryContainer()
+                    self._rerun = False
+                else:
+                    break
+        finally:
             self.finished_event.set()
 
     @staticmethod
