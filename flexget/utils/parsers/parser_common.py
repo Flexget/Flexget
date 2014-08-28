@@ -1,7 +1,7 @@
 from .. import qualities
 
 from abc import abstractproperty, abstractmethod, ABCMeta
-
+from string import capwords
 
 from flexget.utils.tools import ReList
 
@@ -115,6 +115,16 @@ def name_to_re(name, ignore_prefixes=None, parser=None):
     return res
 
 
+def remove_dirt(name):
+    name = re.sub(r'[_.,\[\]\(\): ]+', ' ', name).strip().lower()
+    return name
+
+
+def normalize_name(name):
+    name = capwords(name)
+    return name
+
+
 class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     """
     A parsed entry, containing parsed data like name, year, episodeNumber and season.
@@ -159,6 +169,11 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     @property
     def name(self):
         return self._name if self._name else self.parsed_name
+
+    @name.setter
+    def name(self, name):
+        self._validated_name = None
+        self._name = name
 
     @abstractproperty
     def parsed_name(self):

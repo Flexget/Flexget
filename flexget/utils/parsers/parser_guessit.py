@@ -1,7 +1,10 @@
+from string import capwords
 import guessit
 
-from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO
+from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO, remove_dirt
 from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, Parser
+
+import re
 
 guessit.default_options = {'name_only': True}
 
@@ -145,22 +148,30 @@ class GuessitParser(Parser):
     def __init__(self):
         self._type_map = {PARSER_EPISODE: 'episode', PARSER_VIDEO: 'video', PARSER_MOVIE: 'movie'}
 
-    def parse(self, input_, type_=None, name=None, **kwargs):
-        type_ = self._type_map.get(type_)
-
-        options = self._filter_options(kwargs)
-
-        guess_result = guessit.guess_file_info(input_, options=options, type=type_)
-
+    def build_parsed(self, guess_result, input_, type_=None, name=None, **kwargs):
         type_ = guess_result.get('type', type_)
         if (type_ == 'episode'):
             return GuessitParsedSerie(input_, name, guess_result)
         elif (type_ == 'movie'):
             return GuessitParsedMovie(input_, name, guess_result)
         elif (type_ == 'video'):
-            return GuessitParsedVideo
+            return GuessitParsedVideo(input_, name, guess_result)
         else:
             return GuessitParsedEntry(input_, name, guess_result)
+
+    def parse(self, input_, type_=None, name=None, **kwargs):
+        type_ = self._type_map.get(type_)
+
+        options = self._filter_options(kwargs)
+
+        guess_result = guessit.guess_file_info(input_, options=options, type=type_)
+        if name and name != input_:
+            name_guess_result = guessit.guess_file_info(name, options=options, type=type_)
+            name = self.build_parsed(name_guess_result, name, options=options, type=type_, **kwargs).name
+            #name = remove_dirt(name)
+            #name = self.normalize_name(name)
+
+        return self.build_parsed(guess_result, input_, options=options, type=type_, name=(name if name != input_ else None), **kwargs)
 
     def _filter_options(self, options):
         return options

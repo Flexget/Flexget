@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from string import capwords
-from flexget.utils.parsers.parser_common import PARSER_ANY
+from flexget.utils.parsers.parser_common import PARSER_ANY, normalize_name, remove_dirt
 import re
 
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.filter.series import populate_entry_fields
+from flexget.plugins.filter.series import populate_entry_fields, normalize_series_name
 from flexget.utils.parsers import get_parser, ParseWarning
 
 log = logging.getLogger('metainfo_series')
@@ -48,6 +48,10 @@ class MetainfoSeries(object):
 
         parsed = get_parser().parse(title, PARSER_ANY, title, identified_by='auto', allow_seasonless=allow_seasonless)
         if parsed.valid and parsed.is_series:
+            # Normalizing name.
+            # todo: Why only in metainfo series, and not other series plugin ?
+            parsed.name = remove_dirt(parsed.name)
+            parsed.name = normalize_name(parsed.name)
             return parsed
 
 
