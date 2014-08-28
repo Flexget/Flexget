@@ -1,10 +1,9 @@
-from string import capwords
 import guessit
 
 from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO, remove_dirt
 from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, Parser
 
-import re
+from copy import deepcopy
 
 guessit.default_options = {'name_only': True, 'episode_prefer_number': True}
 
@@ -166,8 +165,10 @@ class GuessitParser(Parser):
 
         guess_result = guessit.guess_file_info(input_, options=options, type=type_)
         if name and name != input_:
-            name_guess_result = guessit.guess_file_info(name, options=options, type=type_)
-            name = self.build_parsed(name_guess_result, name, options=options, type=type_, **kwargs).name
+            name_options = deepcopy(options)
+            name_options['disabled_transformers'] = ['GuessWeakEpisodesRexps']
+            name_guess_result = guessit.guess_file_info(name, options=name_options, type=type_)
+            name = self.build_parsed(name_guess_result, name, options=name_options, type=type_, **kwargs).name
             #name = remove_dirt(name)
             #name = self.normalize_name(name)
 
