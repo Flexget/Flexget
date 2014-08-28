@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime
 import logging
 import re
+import sys
 
 from path import path
 
@@ -69,21 +70,22 @@ class InputFind(object):
             folder = path(folder).expanduser()
             log.debug('scanning %s' % folder)
             if config['recursive']:
-                files = folder.walkfiles(errors='warn')
+                files = folder.walk(errors='warn')
             else:
-                files = folder.files()
+                files = folder.listdir()
             for item in files:
                 e = Entry()
-                # TODO: Find out if/how this fails with files that can't be decoded by filesystem encoding and skip
-                # Make sure filename is decodable
-                # try:
-                #     fsdecode(name)
-                # except UnicodeDecodeError as e:
-                #     log.warning('Filename `%s` in `%s` is not decodable by declared filesystem encoding `%s`. '
-                #                 'Either your environment does not declare the correct encoding, or this filename '
-                #                 'is incorrectly encoded.' %
-                #                 (fsdecode(name, replace=True), fsdecode(item[0], replace=True), FS_ENCODING))
-                #     continue
+                try:
+                    # TODO: config for listing files/dirs/both
+                    if item.isdir():
+                        continue
+                except UnicodeError as e:
+                    log.warning('Filename `%s` in `%s` is not decodable by declared filesystem encoding `%s`. '
+                                'Either your environment does not declare the correct encoding, or this filename '
+                                'is incorrectly encoded.' %
+                                (item.name, item.dirname(), sys.getfilesystemencoding()))
+                    continue
+
 
                 e['title'] = item.namebase
                 # If mask fails continue
