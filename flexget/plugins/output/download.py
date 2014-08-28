@@ -198,13 +198,6 @@ class PluginDownload(object):
             # TODO: Improve this error message?
             log.warning('RequestException %s' % e)
             return 'Network error during request: %s' % e
-        # TODO: I think these exceptions will not be thrown by requests library.
-        except urllib2.HTTPError as e:
-            log.warning('HTTPError %s' % e.code)
-            return 'HTTP error'
-        except urllib2.URLError as e:
-            log.warning('URLError %s' % e.reason)
-            return 'URL Error'
         except BadStatusLine as e:
             log.warning('Failed to reach server. Reason: %s' % getattr(e, 'message', 'N/A'))
             return 'BadStatusLine'
@@ -229,18 +222,6 @@ class PluginDownload(object):
         :raises: PluginWarning
         """
 
-        # see http://bugs.python.org/issue1712522
-        # note, url is already unicode ...
-        try:
-            url = url.encode('latin1')
-        except UnicodeEncodeError:
-            log.debug('URL for `%s` could not be encoded in latin1' % entry['title'])
-            try:
-                url = url.encode('utf-8')
-            except Exception:
-                log.warning('Unable to URL-encode URL for `%s`' % entry['title'])
-        if not isinstance(url, unicode):
-            url = urllib.quote(url, safe=b':/~?=&%;')
         log.debug('Downloading url \'%s\'' % url)
 
         # get content
@@ -249,7 +230,11 @@ class PluginDownload(object):
             auth = entry['download_auth']
             log.debug('Custom auth enabled for %s download: %s' % (entry['title'], entry['download_auth']))
 
-        response = task.requests.get(url, auth=auth, raise_status=False)
+        try:
+            response = task.requests.get(url, auth=auth, raise_status=False)
+        except UnicodeError:
+            log.error('Unicode error while encoding url %s' % url)
+            return
         if response.status_code != 200:
             log.debug('Got %s response from server. Saving error page.' % response.status_code)
             # Save the error page
@@ -281,7 +266,7 @@ class PluginDownload(object):
 
         # download and write data into a temp file
         tmp_dir = tempfile.mkdtemp(dir=tmp_path)
-        fname = hashlib.md5(url).hexdigest()
+        fname = hashlib.md5(url.encode('utf-8', 'replace')).hexdigest()
         datafile = os.path.join(tmp_dir, fname)
         outfile = open(datafile, 'wb')
         try:
