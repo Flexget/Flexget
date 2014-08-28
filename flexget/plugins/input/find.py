@@ -101,9 +101,6 @@ class InputFind(object):
                     item = '/' + item
                 e['url'] = 'file://%s' % item
                 entries.append(e)
-            # If we are not searching recursively, break after first (base) directory
-            if not config['recursive']:
-                break
         return entries
 
 @event('plugin.register')
