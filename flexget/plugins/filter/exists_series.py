@@ -8,7 +8,8 @@ from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.log import log_once
 from flexget.utils.template import RenderError
-from flexget.utils.parsers import ParseWarning
+from flexget.utils.parsers import ParseWarning, get_parser, PARSER_EPISODE
+
 
 log = logging.getLogger('exists_series')
 
@@ -82,14 +83,13 @@ class FilterExistsSeries(object):
                 files = [x.decode('utf-8', 'ignore') for x in files]
                 # For speed, only test accepted entries since our priority should be after everything is accepted.
                 for series in accepted_series:
-                    # make new parser from parser in entry
-                    disk_parser = copy.copy(accepted_series[series][0]['series_parser'])
+                    disk_parser = accepted_series[series][0]['series_parser']
                     for name in files + dirs:
                         # run parser on filename data
-                        disk_parser.data = name
                         try:
-                            disk_parser.parse(data=name)
+                            disk_parser = get_parser().parse(input_=name, type_=PARSER_EPISODE, name=disk_parser.name)
                         except ParseWarning as pw:
+                            disk_parser = pw.parsed
                             log_once(pw.value, logger=log)
                         if disk_parser.valid:
                             log.debug('name %s is same series as %s', name, series)

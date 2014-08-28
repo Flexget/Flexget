@@ -2,7 +2,13 @@ from .. import qualities
 
 from abc import abstractproperty, abstractmethod, ABCMeta
 
-from string import capwords
+
+from flexget.utils.tools import ReList
+
+import re
+import logging
+
+log = logging.getLogger('parser')
 
 PARSER_ANY = 0
 PARSER_VIDEO = 1
@@ -75,15 +81,80 @@ def get_parser(parser_name=None):
         parser = parser_class()
     return parser
 
+default_ignore_prefixes = [
+    '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
+    '(?:HD.720p?:)',
+    '(?:HD.1080p?:)']
+
+
+def name_to_re(name, ignore_prefixes=None, parser=None):
+    if not ignore_prefixes:
+        ignore_prefixes = default_ignore_prefixes
+    """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
+    parenthetical = None
+    if name.endswith(')'):
+        p_start = name.rfind('(')
+        if p_start != -1:
+            parenthetical = re.escape(name[p_start + 1:-1])
+            name = name[:p_start - 1]
+    # Blanks are any non word characters except & and _
+    blank = r'(?:[^\w&]|_)'
+    ignore = '(?:' + '|'.join(ignore_prefixes) + ')?'
+    res = re.sub(re.compile(blank + '+', re.UNICODE), ' ', name)
+    res = res.strip()
+    # accept either '&' or 'and'
+    res = re.sub(' (&|and) ', ' (?:and|&) ', res, re.UNICODE)
+    res = re.sub(' +', blank + '*', res, re.UNICODE)
+    if parenthetical:
+        res += '(?:' + blank + '+' + parenthetical + ')?'
+        # Turn on exact mode for series ending with a parenthetical,
+        # so that 'Show (US)' is not accepted as 'Show (UK)'
+        if parser:
+            parser.strict_name = True
+    res = '^' + ignore + blank + '*' + '(' + res + ')(?:\\b|_)' + blank + '*'
+    return res
+
 
 class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     """
     A parsed entry, containing parsed data like name, year, episodeNumber and season.
     """
 
-    def __init__(self, raw, name):
+    def __init__(self, raw, name=None, alternate_names=None, name_regexps=None, ignore_prefixes=None):
         self._raw = raw
         self._name = name
+        self._validated_name = None
+        self.name_regexps = name_regexps if name_regexps else []
+        self.alternate_names = alternate_names if alternate_names else []
+        self.ignore_prefixes = ignore_prefixes if ignore_prefixes else default_ignore_prefixes
+
+    def _validate_name(self):
+        # name end position
+        name_start = 0
+        name_end = 0
+
+        # regexp name matching
+        re_from_name = False
+        if not self.name_regexps:
+            # if we don't have name_regexps, generate one from the name
+            self.name_regexps = ReList(name_to_re(name, self.ignore_prefixes, self) for name in [self.name] + self.alternate_names)
+            # With auto regex generation, the first regex group captures the name
+            re_from_name = True
+        # try all specified regexps on this data
+        for name_re in self.name_regexps:
+            match = re.search(name_re, self.data)
+            if match:
+                match_start, match_end = match.span(1 if re_from_name else 0)
+                # Always pick the longest matching regex
+                if match_end > name_end:
+                    name_start, name_end = match_start, match_end
+                log.debug('NAME SUCCESS: %s matched to %s', name_re.pattern, self.data)
+        if not name_end:
+            # leave this invalid
+            log.debug('FAIL: name regexps %s do not match %s',
+                      [regexp.pattern for regexp in self.name_regexps], self.data)
+            return False
+        return True
 
     @property
     def name(self):
@@ -103,7 +174,11 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
 
     @property
     def valid(self):
-        return True
+        if not self._name:
+            return True
+        if self._validated_name is None:
+            self._validated_name = self._validate_name()
+        return self._validated_name
 
     @abstractproperty
     def proper(self):
@@ -287,14 +362,16 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
 
     @property
     def valid(self):
-        if self.is_special:
-            return True
-        if self.episode and self.season:
-            return True
-        if self.date:
-            return True
-        if self.episode and not self.season:
-            return True
+        ret = super(ParsedVideo, self).valid
+        if ret:
+            if self.is_special:
+                return True
+            if self.episode and self.season:
+                return True
+            if self.date:
+                return True
+            if self.episode and not self.season:
+                return True
         return False
 
     @property
