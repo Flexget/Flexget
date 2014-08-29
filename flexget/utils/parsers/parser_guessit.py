@@ -1,34 +1,15 @@
-import guessit
-
-from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO, remove_dirt
-from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, Parser
-
 from copy import deepcopy
-
-import re
 from string import capwords
 
+import guessit
+from guessit.plugins.transformers import add_transformer
 
-def clean_value(name):
-    # Move anything in leading brackets to the end
-    #name = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', name)
+from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO, clean_value
+from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, Parser
+import re
 
-    for char in '[]()_,.':
-        name = name.replace(char, ' ')
-
-    # if there are no spaces
-    if name.find(' ') == -1:
-        name = name.replace('-', ' ')
-
-    # remove unwanted words (imax, ..)
-    #self.remove_words(data, self.remove)
-
-    #MovieParser.strip_spaces
-    name = ' '.join(name.split())
-    return name
-
+add_transformer('guess_regexp_id = flexget.utils.parsers.guess_regexp_id:GuessRegexpId')
 guessit.default_options = {'name_only': True, 'clean_function': clean_value, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk']}
-
 
 class GuessitParsedEntry(ParsedEntry):
     def __init__(self, raw, name, guess_result):
@@ -140,6 +121,10 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
         if self.year and self._guess_result.span('year')[0] - 1 == self._guess_result.span('series')[1]:
             parsed_name = parsed_name + ' ' + self.year
         return parsed_name
+
+    @property
+    def regexp_id(self):
+        return self._guess_result.get('regexpId')
 
     @property
     def series(self):

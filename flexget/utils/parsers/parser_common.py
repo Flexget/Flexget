@@ -19,7 +19,25 @@ _default_parser = 'flexget.utils.parsers.parser_guessit.GuessitParser'
 #_default_parser = 'flexget.utils.parsers.parser_internal.InternalParser'
 _parsers = {}
 
-SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id'] # may also be 'special'
+SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
+
+def clean_value(name):
+    # Move anything in leading brackets to the end
+    #name = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', name)
+
+    for char in '[]()_,.':
+        name = name.replace(char, ' ')
+
+    # if there are no spaces
+    if name.find(' ') == -1:
+        name = name.replace('-', ' ')
+
+    # remove unwanted words (imax, ..)
+    #self.remove_words(data, self.remove)
+
+    #MovieParser.strip_spaces
+    name = ' '.join(name.split())
+    return name
 
 class ParseWarning(Warning):
     def __init__(self, parsed, value, **kwargs):
@@ -384,10 +402,16 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     def is_special(self):
         raise NotImplementedError
 
+    @abstractproperty
+    def regexp_id(self):
+        raise NotImplementedError
+
     @property
     def valid(self):
         ret = super(ParsedVideo, self).valid
         if ret:
+            if self.regexp_id:
+                return True
             if self.is_special:
                 return True
             if self.episode and self.season:
@@ -400,6 +424,8 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
 
     @property
     def id_type(self):
+        if self.regexp_id:
+            return 'id'
         if self.is_special:
             return 'special'
         if self.episode and self.season:
@@ -412,6 +438,8 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
 
     @property
     def id(self):
+        if self.regexp_id:
+            return self.regexp_id
         if self.is_special:
             return self.title
         if self.date is not None:
