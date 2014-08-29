@@ -27,7 +27,7 @@ def clean_value(name):
     name = ' '.join(name.split())
     return name
 
-guessit.default_options = {'name_only': True, 'episode_prefer_number': True, 'clean_function': clean_value, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk']}
+guessit.default_options = {'name_only': True, 'clean_function': clean_value, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk']}
 
 
 class GuessitParsedEntry(ParsedEntry):
@@ -213,4 +213,9 @@ class GuessitParser(Parser):
         return self.build_parsed(guess_result, input_, options=options, type=type_, name=(name if name != input_ else None), **kwargs)
 
     def _filter_options(self, options):
+        identified_by = options.get('identified_by')
+        if identified_by in ['ep']:
+            options['episode_prefer_number'] = False
+        else:
+            options['episode_prefer_number'] = True
         return options
