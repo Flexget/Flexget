@@ -149,14 +149,27 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     A parsed entry, containing parsed data like name, year, episodeNumber and season.
     """
 
-    def __init__(self, data, name=None, alternate_names=None, name_regexps=None, ignore_prefixes=None, allow_groups=None, **kwargs):
+    def __init__(self, data, name, **kwargs):
         self._data = data
         self._name = name
         self._valid = None
-        self.name_regexps = name_regexps if name_regexps else []
-        self.alternate_names = alternate_names if alternate_names else []
-        self.ignore_prefixes = ignore_prefixes if ignore_prefixes else default_ignore_prefixes
-        self.allow_groups = allow_groups
+        self._kwargs = kwargs
+
+    @property
+    def name_regexps(self):
+        return self._kwargs['name_regexps'] if 'name_regexps' in self._kwargs else []
+
+    @property
+    def alternate_names(self):
+        return self._kwargs['alternate_names'] if 'alternate_names' in self._kwargs else []
+
+    @property
+    def ignore_prefixes(self):
+        return self._kwargs['ignore_prefixes'] if 'ignore_prefixes' in self._kwargs else default_ignore_prefixes
+
+    @property
+    def allow_groups(self):
+        return self._kwargs['allow_groups'] if 'allow_groups' in self._kwargs else False
 
     def _validate(self):
         return self._validate_name() and self._validate_groups()
@@ -168,13 +181,14 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
 
         # regexp name matching
         re_from_name = False
-        if not self.name_regexps:
+        name_regexps = self.name_regexps
+        if not name_regexps:
             # if we don't have name_regexps, generate one from the name
-            self.name_regexps = ReList(name_to_re(name, self.ignore_prefixes, self) for name in [self.name] + self.alternate_names)
+            name_regexps = ReList(name_to_re(name, self.ignore_prefixes, self) for name in [self.name] + self.alternate_names)
             # With auto regex generation, the first regex group captures the name
             re_from_name = True
         # try all specified regexps on this data
-        for name_re in self.name_regexps:
+        for name_re in name_regexps:
             match = re.search(name_re, self.data)
             if match:
                 match_start, match_end = match.span(1 if re_from_name else 0)
@@ -370,8 +384,16 @@ class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
 
 class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     @property
+    def allow_seasonless(self):
+        return self._kwargs['allow_seasonless'] if 'allow_seasonless' in self._kwargs else False
+
+    @property
     def parsed_name(self):
         return self.series
+
+    @abstractproperty
+    def parsed_season(self):
+        raise NotImplementedError
 
     @abstractproperty
     def series(self):
@@ -385,9 +407,9 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     def is_series(self):
         return True
 
-    @abstractproperty
+    @property
     def season(self):
-        raise NotImplementedError
+        return 1 if not self.parsed_season and self.allow_seasonless else self.parsed_season
 
     @abstractproperty
     def episode(self):
@@ -417,11 +439,11 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
                 return True
             if self.is_special:
                 return True
-            if self.episode and self.season:
+            if self.episode is not None and self.season:
                 return True
             if self.date:
                 return True
-            if self.episode and not self.season:
+            if self.episode is not None and not self.season:
                 return True
         return False
 
@@ -431,11 +453,11 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
             return 'id'
         if self.is_special:
             return 'special'
-        if self.episode and self.season:
+        if self.episode is not None and self.season:
             return 'ep'
         if self.date:
             return 'date'
-        if self.episode and not self.season:
+        if self.episode is not None and not self.season:
             return 'sequence'
         raise NotImplementedError
 

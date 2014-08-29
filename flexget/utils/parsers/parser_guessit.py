@@ -38,7 +38,7 @@ class GuessitParsedEntry(ParsedEntry):
 
     @property
     def properties(self):
-        self._guess_result
+        return self._guess_result
 
 
 class GuessitParsedVideoQuality(ParsedVideoQuality):
@@ -156,10 +156,10 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
 
     @property
     def episodes(self):
-        return len(self._guess_result.get('episodeList', filter(None, [self.episode])))
+        return len(self._guess_result.get('episodeList', filter(lambda x: x is not None, [self.episode])))
 
     @property
-    def season(self):
+    def parsed_season(self):
         return self._guess_result.get('season')
 
 
