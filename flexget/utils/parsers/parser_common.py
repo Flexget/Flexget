@@ -219,19 +219,13 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
             self._valid = self._validate()
         return self._valid
 
-    @abstractproperty
-    def proper(self):
-        raise NotImplementedError
-
     @property
+    def proper(self):
+        return self.proper_count > 0
+
+    @abstractproperty
     def proper_count(self):
-        # todo: deprecated. We should remove this field from the rest of code.
-        version = self._guess_result.get('version')
-        if version is None:
-            version = 0
-        else:
-            version = -1
-        return version + 1 if self.proper else version
+        raise NotImplementedError
 
     @property
     def is_series(self):

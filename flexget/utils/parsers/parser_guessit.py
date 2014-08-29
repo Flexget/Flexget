@@ -21,8 +21,16 @@ class GuessitParsedEntry(ParsedEntry):
         return self._guess_result.get('releaseGroup')
 
     @property
-    def proper(self):
-        return 'Proper' in self._guess_result.get('other', {})
+    def proper_count(self):
+        # todo: deprecated. We should remove this field from the rest of code.
+        version = self._guess_result.get('version')
+        if version is None:
+            version = 0
+        elif version <= 0:
+            version = -1
+        proper_count = self._guess_result.get('properCount', 0)
+        fastsub = 'Fastsub' in self._guess_result.get('other', [])
+        return version + proper_count - (5 if fastsub else 0)
 
     @property
     def date(self):
