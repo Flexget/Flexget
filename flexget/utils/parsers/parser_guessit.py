@@ -5,7 +5,30 @@ from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedS
 
 from copy import deepcopy
 
-guessit.default_options = {'name_only': True, 'episode_prefer_number': True}
+import re
+from string import capwords
+
+
+def clean_value(name):
+    # Move anything in leading brackets to the end
+    #name = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', name)
+
+    for char in '[]()_,.':
+        name = name.replace(char, ' ')
+
+    # if there are no spaces
+    if name.find(' ') == -1:
+        name = name.replace('-', ' ')
+
+    # remove unwanted words (imax, ..)
+    #self.remove_words(data, self.remove)
+
+    #MovieParser.strip_spaces
+    name = ' '.join(name.split())
+    return name
+
+guessit.default_options = {'name_only': True, 'episode_prefer_number': True, 'clean_function': clean_value, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk']}
+
 
 class GuessitParsedEntry(ParsedEntry):
     def __init__(self, raw, name, guess_result):
@@ -102,9 +125,6 @@ class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
     def __init__(self, raw, name, guess_result):
         GuessitParsedVideo.__init__(self, raw, name, guess_result)
 
-    def title(self):
-        pass
-
     @property
     def title(self):
         return self._guess_result.get('title')
@@ -115,12 +135,19 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
         GuessitParsedVideo.__init__(self, raw, name, guess_result)
 
     @property
+    def parsed_name(self):
+        parsed_name = super(GuessitParsedVideo, self).parsed_name
+        if self.year and self._guess_result.span('year')[0] - 1 == self._guess_result.span('series')[1]:
+            parsed_name = parsed_name + ' ' + self.year
+        return parsed_name
+
+    @property
     def series(self):
         return self._guess_result.get('series')
 
     @property
     def title(self):
-        self._guess_result.get('title')
+        return self._guess_result.get('title')
 
     @property
     def is_special(self):
@@ -158,19 +185,30 @@ class GuessitParser(Parser):
         else:
             return GuessitParsedEntry(input_, name, guess_result)
 
+    def clean_input_name(self, name):
+        name = re.sub('[_.,\[\]\(\):]', ' ', name)
+        # Remove possible episode title from series name (anything after a ' - ')
+        name = name.split(' - ')[0]
+        # Replace some special characters with spaces
+        name = re.sub('[\._\(\) ]+', ' ', name).strip(' -')
+        # Normalize capitalization to title case
+        name = capwords(name)
+        return name
+
     def parse(self, input_, type_=None, name=None, **kwargs):
         type_ = self._type_map.get(type_)
 
         options = self._filter_options(kwargs)
 
         guess_result = guessit.guess_file_info(input_, options=options, type=type_)
-        if name and name != input_:
+        if name and name != input_ and not type_:
+            # Metainfo, we don't know if we have have a serie.
+            # Grabbing serie name.
+            name = self.clean_input_name(name)
             name_options = deepcopy(options)
-            name_options['disabled_transformers'] = ['GuessWeakEpisodesRexps']
+            name_options['disabled_transformers'] = ['GuessWeakEpisodesRexps', 'GuessYear', 'GuessCountry']
             name_guess_result = guessit.guess_file_info(name, options=name_options, type=type_)
             name = self.build_parsed(name_guess_result, name, options=name_options, type=type_, **kwargs).name
-            #name = remove_dirt(name)
-            #name = self.normalize_name(name)
 
         return self.build_parsed(guess_result, input_, options=options, type=type_, name=(name if name != input_ else None), **kwargs)
 

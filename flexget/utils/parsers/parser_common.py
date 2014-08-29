@@ -116,7 +116,8 @@ def name_to_re(name, ignore_prefixes=None, parser=None):
 
 
 def remove_dirt(name):
-    name = re.sub(r'[_.,\[\]\(\): ]+', ' ', name).strip().lower()
+    if name:
+        name = re.sub(r'[_.,\[\]\(\): ]+', ' ', name).strip().lower()
     return name
 
 
@@ -130,8 +131,8 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     A parsed entry, containing parsed data like name, year, episodeNumber and season.
     """
 
-    def __init__(self, raw, name=None, alternate_names=None, name_regexps=None, ignore_prefixes=None):
-        self._raw = raw
+    def __init__(self, data, name=None, alternate_names=None, name_regexps=None, ignore_prefixes=None):
+        self._data = data
         self._name = name
         self._validated_name = None
         self.name_regexps = name_regexps if name_regexps else []
@@ -180,12 +181,8 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
         raise NotImplementedError
 
     @property
-    def raw(self):
-        return self._raw
-
-    @property
     def data(self):
-        return self.raw
+        return self._data
 
     @property
     def valid(self):
@@ -269,6 +266,13 @@ class ParsedVideo(ABCMeta(str('ParsedVideoABCMeta'), (ParsedEntry,), {})):
     def __str__(self):
         return "<%s(name=%s,year=%s)>" % (self.__class__.__name__, self.name, self.year)
 
+    def __cmp__(self, other):
+        """Compares quality of parsed, if quality is equal, compares proper_count."""
+        return cmp((self.quality), (other.quality))
+
+    def __eq__(self, other):
+        return self is other
+
 
 class ParsedVideoQuality(ABCMeta(str('ParsedVideoQualityABCMeta'), (object,), {})):
     @abstractproperty
@@ -341,8 +345,6 @@ class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
 class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     @property
     def parsed_name(self):
-        if self.year:
-            return self.series + ' ' + str(self.year)
         return self.series
 
     @abstractproperty
@@ -448,6 +450,14 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
         return "<%s(name=%s,season=%s,episode=%s)>" % (self.__class__.__name__, self.name, self.season,
                                                        self.episodes if self.episodes and len(
                                                            self.episodes) > 1 else self.episode)
+
+    def __cmp__(self, other):
+        """Compares quality of parsers, if quality is equal, compares proper_count."""
+        return cmp((self.quality, self.episodes, self.proper_count),
+                   (other.quality, other.episodes, other.proper_count))
+
+    def __eq__(self, other):
+        return self is other
 
 
 class Parser(ABCMeta(str('ParserABCMeta'), (object,), {})):
