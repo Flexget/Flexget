@@ -199,7 +199,12 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     @property
     def proper_count(self):
         # todo: deprecated. We should remove this field from the rest of code.
-        return 1 if self.proper else 0
+        version = self._guess_result.get('version')
+        if version is None:
+            version = 0
+        else:
+            version = -1
+        return version + 1 if self.proper else version
 
     @property
     def is_series(self):
