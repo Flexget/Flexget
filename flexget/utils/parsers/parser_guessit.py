@@ -12,8 +12,8 @@ add_transformer('guess_regexp_id = flexget.utils.parsers.guess_regexp_id:GuessRe
 guessit.default_options = {'name_only': True, 'clean_function': clean_value, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk']}
 
 class GuessitParsedEntry(ParsedEntry):
-    def __init__(self, raw, name, guess_result):
-        ParsedEntry.__init__(self, raw, name)
+    def __init__(self, data, name, guess_result, **kwargs):
+        ParsedEntry.__init__(self, data, name, **kwargs)
         self._guess_result = guess_result
 
     @property
@@ -75,8 +75,8 @@ class GuessitParsedVideoQuality(ParsedVideoQuality):
 
 
 class GuessitParsedVideo(GuessitParsedEntry, ParsedVideo):
-    def __init__(self, raw, name, guess_result):
-        GuessitParsedEntry.__init__(self, raw, name, guess_result)
+    def __init__(self, data, name, guess_result, **kwargs):
+        GuessitParsedEntry.__init__(self, data, name, guess_result, **kwargs)
         self._quality = None
 
     @property
@@ -103,8 +103,8 @@ class GuessitParsedVideo(GuessitParsedEntry, ParsedVideo):
 
 
 class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
-    def __init__(self, raw, name, guess_result):
-        GuessitParsedVideo.__init__(self, raw, name, guess_result)
+    def __init__(self, data, name, guess_result, **kwargs):
+        GuessitParsedVideo.__init__(self, data, name, guess_result, **kwargs)
 
     @property
     def title(self):
@@ -112,8 +112,8 @@ class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
 
 
 class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
-    def __init__(self, raw, name, guess_result):
-        GuessitParsedVideo.__init__(self, raw, name, guess_result)
+    def __init__(self, data, name, guess_result, **kwargs):
+        GuessitParsedVideo.__init__(self, data, name, guess_result, **kwargs)
 
     @property
     def parsed_name(self):
@@ -162,13 +162,13 @@ class GuessitParser(Parser):
     def build_parsed(self, guess_result, input_, type_=None, name=None, **kwargs):
         type_ = guess_result.get('type', type_)
         if (type_ == 'episode'):
-            return GuessitParsedSerie(input_, name, guess_result)
+            return GuessitParsedSerie(input_, name, guess_result, **kwargs)
         elif (type_ == 'movie'):
-            return GuessitParsedMovie(input_, name, guess_result)
+            return GuessitParsedMovie(input_, name, guess_result, **kwargs)
         elif (type_ == 'video'):
-            return GuessitParsedVideo(input_, name, guess_result)
+            return GuessitParsedVideo(input_, name, guess_result, **kwargs)
         else:
-            return GuessitParsedEntry(input_, name, guess_result)
+            return GuessitParsedEntry(input_, name, guess_result, **kwargs)
 
     def clean_input_name(self, name):
         name = re.sub('[_.,\[\]\(\):]', ' ', name)
@@ -183,22 +183,23 @@ class GuessitParser(Parser):
     def parse(self, input_, type_=None, name=None, **kwargs):
         type_ = self._type_map.get(type_)
 
-        options = self._filter_options(kwargs)
+        guessit_options = self._guessit_options(**kwargs)
 
-        guess_result = guessit.guess_file_info(input_, options=options, type=type_)
+        guess_result = guessit.guess_file_info(input_, options=guessit_options, type=type_)
         if name and name != input_ and not type_:
             # Metainfo, we don't know if we have have a serie.
             # Grabbing serie name.
             name = self.clean_input_name(name)
-            name_options = deepcopy(options)
-            name_options['disabled_transformers'] = ['GuessWeakEpisodesRexps', 'GuessYear', 'GuessCountry']
-            name_guess_result = guessit.guess_file_info(name, options=name_options, type=type_)
-            name = self.build_parsed(name_guess_result, name, options=name_options, type=type_, **kwargs).name
+            name_guessit_options = deepcopy(guessit_options)
+            name_guessit_options['disabled_transformers'] = ['GuessWeakEpisodesRexps', 'GuessYear', 'GuessCountry']
+            name_guess_result = guessit.guess_file_info(name, options=name_guessit_options, type=type_)
+            name = self.build_parsed(name_guess_result, name, type=type_, **kwargs).name
 
-        return self.build_parsed(guess_result, input_, options=options, type=type_, name=(name if name != input_ else None), **kwargs)
+        return self.build_parsed(guess_result, input_, type=type_, name=(name if name != input_ else None), **kwargs)
 
-    def _filter_options(self, options):
-        identified_by = options.get('identified_by')
+    def _guessit_options(self, **kwargs):
+        options = dict(**kwargs)
+        identified_by = kwargs.get('identified_by')
         if identified_by in ['ep']:
             options['episode_prefer_number'] = False
         else:

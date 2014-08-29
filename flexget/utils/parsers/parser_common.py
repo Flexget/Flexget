@@ -149,13 +149,17 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     A parsed entry, containing parsed data like name, year, episodeNumber and season.
     """
 
-    def __init__(self, data, name=None, alternate_names=None, name_regexps=None, ignore_prefixes=None):
+    def __init__(self, data, name=None, alternate_names=None, name_regexps=None, ignore_prefixes=None, allow_groups=None, **kwargs):
         self._data = data
         self._name = name
-        self._validated_name = None
+        self._valid = None
         self.name_regexps = name_regexps if name_regexps else []
         self.alternate_names = alternate_names if alternate_names else []
         self.ignore_prefixes = ignore_prefixes if ignore_prefixes else default_ignore_prefixes
+        self.allow_groups = allow_groups
+
+    def _validate(self):
+        return self._validate_name() and self._validate_groups()
 
     def _validate_name(self):
         # name end position
@@ -185,13 +189,18 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
             return False
         return True
 
+    def _validate_groups(self):
+        if not self.allow_groups:
+            return True
+        return self.release_group in self.allow_groups
+
     @property
     def name(self):
         return self._name if self._name else self.parsed_name
 
     @name.setter
     def name(self, name):
-        self._validated_name = None
+        self._valid = None
         self._name = name
 
     @abstractproperty
@@ -206,9 +215,9 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     def valid(self):
         if not self._name:
             return True
-        if self._validated_name is None:
-            self._validated_name = self._validate_name()
-        return self._validated_name
+        if self._valid is None:
+            self._valid = self._validate()
+        return self._valid
 
     @abstractproperty
     def proper(self):
