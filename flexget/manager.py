@@ -319,6 +319,7 @@ class Manager(object):
         """
         :param options: argparse options
         """
+        # TODO: make webui an enablable plugin in regular daemon mode
         try:
             pkg_resources.require('flexget[webui]')
         except pkg_resources.DistributionNotFound as e:
@@ -331,8 +332,8 @@ class Manager(object):
         from flexget.ui import webui
         with self.acquire_lock():
             self.ipc_server.start()
-            webui.start(self)
             self.task_queue.start()
+            webui.start(self)
             self.task_queue.wait()
 
     def _handle_sigterm(self, signum, frame):
