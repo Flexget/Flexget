@@ -392,6 +392,10 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
         return self._kwargs['identified_by'] if 'identified_by' in self._kwargs else 'auto'
 
     @property
+    def assume_special(self):
+        return self._kwargs['assume_special'] if 'assume_special' in self._kwargs else False
+
+    @property
     def parsed_name(self):
         return self.series
 
@@ -432,7 +436,7 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
         raise NotImplementedError
 
     @abstractproperty
-    def is_special(self):
+    def special(self):
         raise NotImplementedError
 
     @abstractproperty
@@ -447,9 +451,9 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
                 return False
             if self.identified_by in ['auto', 'ep'] and self.episodes > 3:
                 return False
-            if self.regexp_id:
+            if self.special or self.assume_special:
                 return True
-            if self.is_special:
+            if self.regexp_id:
                 return True
             if self.episode is not None and self.season:
                 return True
@@ -461,10 +465,10 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
 
     @property
     def id_type(self):
+        if self.special or self.assume_special:
+            return 'special'
         if self.regexp_id:
             return 'id'
-        if self.is_special:
-            return 'special'
         if self.episode is not None and self.season:
             return 'ep'
         if self.date:
@@ -475,10 +479,10 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
 
     @property
     def id(self):
+        if self.special or self.assume_special:
+            return self.title if self.title else 'special'
         if self.regexp_id:
             return self.regexp_id
-        if self.is_special:
-            return self.title
         if self.date is not None:
             return self.date
         if self.episode is not None:

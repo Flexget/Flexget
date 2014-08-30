@@ -149,8 +149,8 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
         return self._guess_result.get('title')
 
     @property
-    def is_special(self):
-        return self.episode_details and len(self.episode_details) > 0
+    def special(self):
+        return self.episode_details and len(self.episode_details) > 0 or (self.title and self.title.lower().strip() == 'special')
 
     @property
     def episode_details(self):
