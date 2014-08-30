@@ -7,8 +7,6 @@ import shutil
 import socket
 import sys
 import tempfile
-import urllib
-import urllib2
 from cgi import parse_header
 from httplib import BadStatusLine
 
