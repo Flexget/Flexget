@@ -120,6 +120,8 @@ class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
 
 
 class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
+
+
     def __init__(self, data, name, guess_result, **kwargs):
         GuessitParsedVideo.__init__(self, data, name, guess_result, **kwargs)
 
@@ -129,6 +131,10 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
         if self.year and self._guess_result.span('year')[0] - 1 == self._guess_result.span('series')[1]:
             parsed_name = parsed_name + ' ' + self.year
         return parsed_name
+
+    @property
+    def complete(self):
+        return 'Complete' in self._guess_result.get('other', [])
 
     @property
     def regexp_id(self):

@@ -140,7 +140,7 @@ class TestMetainfoSeries(FlexGetBase):
         self.execute_task('false_positives')
         for entry in self.task.entries:
             # None of these should be detected as series
-            error = '%s sholud not be detected as a series' % entry['title']
+            error = '%s should not be detected as a series' % entry['title']
             assert 'series_name' not in entry, error
             assert 'series_guessed' not in entry, error
             assert 'series_parser' not in entry, error

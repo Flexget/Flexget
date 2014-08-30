@@ -388,6 +388,10 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
         return self._kwargs['allow_seasonless'] if 'allow_seasonless' in self._kwargs else False
 
     @property
+    def identified_by(self):
+        return self._kwargs['identified_by'] if 'identified_by' in self._kwargs else 'auto'
+
+    @property
     def parsed_name(self):
         return self.series
 
@@ -401,6 +405,10 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
 
     @abstractproperty
     def title(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def complete(self):
         raise NotImplementedError
 
     @property
@@ -435,6 +443,10 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     def valid(self):
         ret = super(ParsedVideo, self).valid
         if ret:
+            if self.complete:
+                return False
+            if self.identified_by in ['auto', 'ep'] and self.episodes > 3:
+                return False
             if self.regexp_id:
                 return True
             if self.is_special:
