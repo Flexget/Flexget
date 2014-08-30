@@ -179,8 +179,8 @@ class OutputRSS(object):
             try:
                 rss.title = entry.render(config['title'])
             except RenderError as e:
-                log.error('Error rendering jinja title for `%s`: %s' % (entry['title'], e))
-                continue
+                log.error('Error rendering jinja title for `%s` falling back to entry title: %s' % (entry['title'], e))
+                rss.title = entry['title']
             for field in config['link']:
                 if field in entry:
                     rss.link = entry[field]
