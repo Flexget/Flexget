@@ -176,7 +176,11 @@ class OutputRSS(object):
         # save entries into db for RSS generation
         for entry in task.accepted:
             rss = RSSEntry()
-            rss.title = entry.render(config['title'])
+            try:
+                rss.title = entry.render(config['title'])
+            except RenderError as e:
+                log.error('Error rendering jinja title for `%s`: %s' % (entry['title'], e))
+                continue
             for field in config['link']:
                 if field in entry:
                     rss.link = entry[field]
