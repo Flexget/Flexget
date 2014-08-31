@@ -351,17 +351,9 @@ class ParsedVideoQuality(ABCMeta(str('ParsedVideoQualityABCMeta'), (object,), {}
     def is_screener(self):
         raise NotImplementedError
 
+    @abstractmethod
     def to_old_quality(self, assumed_quality=None):
-        resolution = self.screen_size
-        source = self.format.replace('-', '') if self.format else None
-        codec = self.video_codec
-        audio = (self.audio_codec + (self.audio_channels if self.audio_channels else '')) if self.audio_codec else None
-
-        old_quality = qualities.Quality(' '.join(filter(None, [resolution, source, codec, audio])))
-        old_quality = old_assume_quality(old_quality, assumed_quality)
-
-        return old_quality
-
+        raise NotImplementedError
 
     def __str__(self):
         return "<%s(screen_size=%s,source=%s,video_codec=%s,audio_channels=%s)>" % (

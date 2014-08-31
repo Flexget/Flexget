@@ -3,8 +3,9 @@ from string import capwords
 
 import guessit
 from guessit.plugins.transformers import add_transformer
+from flexget.utils import qualities
 
-from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO, clean_value
+from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO, clean_value, old_assume_quality
 from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, Parser
 import re
 
@@ -80,6 +81,17 @@ class GuessitParsedVideoQuality(ParsedVideoQuality):
     @property
     def audio_profile(self):
         return self._guess_result.get('audioProfile')
+
+    def to_old_quality(self, assumed_quality=None):
+        resolution = self.screen_size if self.screen_size else 'HR' if 'HR' in self._guess_result.get('other', []) else None
+        source = self.format.replace('-', '') if self.format else None
+        codec = self.video_codec
+        audio = (self.audio_codec + (self.audio_channels if self.audio_channels else '')) if self.audio_codec else None
+
+        old_quality = qualities.Quality(' '.join(filter(None, [resolution, source, codec, audio])))
+        old_quality = old_assume_quality(old_quality, assumed_quality)
+
+        return old_quality
 
 
 class GuessitParsedVideo(GuessitParsedEntry, ParsedVideo):
