@@ -388,6 +388,10 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
         return self._kwargs['assume_special'] if 'assume_special' in self._kwargs else False
 
     @property
+    def prefer_specials(self):
+        return self._kwargs['prefer_specials'] if 'prefer_specials' in self._kwargs else False
+
+    @property
     def parsed_name(self):
         return self.series
 
@@ -457,29 +461,34 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
 
     @property
     def id_type(self):
-        if self.special or self.assume_special:
-            return 'special'
+        id_type = None
         if self.regexp_id:
-            return 'id'
-        if self.episode is not None and self.season:
-            return 'ep'
-        if self.date:
-            return 'date'
-        if self.episode is not None and not self.season:
-            return 'sequence'
-        raise NotImplementedError
+            id_type = 'id'
+        elif self.episode is not None:
+            if self.season:
+                id_type = 'ep'
+            else:
+                id_type = 'sequence'
+        elif self.date:
+            id_type = 'date'
+        if self.special or self.assume_special:
+            if not id_type or self.prefer_specials:
+                id_type = 'special'
+        return id_type
 
     @property
     def id(self):
-        if self.special or self.assume_special:
-            return self.title if self.title else 'special'
+        id = None
         if self.regexp_id:
-            return self.regexp_id
-        if self.date is not None:
-            return self.date
-        if self.episode is not None:
-            return self.episode
-        raise NotImplementedError
+            id = self.regexp_id
+        elif self.episode is not None:
+            id = self.episode
+        elif self.date:
+            id = self.date
+        if self.special or self.assume_special:
+            if not id or self.prefer_specials:
+                id = self.title if self.title else 'special'
+        return id
 
     @property
     def identifiers(self):
