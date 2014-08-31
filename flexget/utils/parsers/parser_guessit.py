@@ -201,12 +201,12 @@ class GuessitParser(Parser):
         name = capwords(name)
         return name
 
-    def parse(self, input_, type_=None, name=None, **kwargs):
+    def parse(self, data, type_=None, name=None, **kwargs):
         type_ = self._type_map.get(type_)
 
-        guessit_options = self._guessit_options(input_, type_, name, **kwargs)
+        guessit_options = self._guessit_options(data, type_, name, **kwargs)
 
-        if name and name != input_:
+        if name and name != data:
             if not kwargs.get('strict_name'):
                 guessit_options['attended_series'] = [name]
 
@@ -219,8 +219,8 @@ class GuessitParser(Parser):
                 name_guess_result = guessit.guess_file_info(name, options=name_guessit_options, type=type_)
                 name = self.build_parsed(name_guess_result, name, type=type_, **kwargs).name
 
-        guess_result = guessit.guess_file_info(input_, options=guessit_options, type=type_)
-        return self.build_parsed(guess_result, input_, type=type_, name=(name if name != input_ else None), **kwargs)
+        guess_result = guessit.guess_file_info(data, options=guessit_options, type=type_)
+        return self.build_parsed(guess_result, data, type=type_, name=(name if name != data else None), **kwargs)
 
     def _guessit_options(self, input_, type_, name, **kwargs):
         options = dict(**kwargs)

@@ -560,9 +560,9 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
 
 class Parser(ABCMeta(str('ParserABCMeta'), (object,), {})):
     @abstractmethod
-    def parse(self, input_, type_=None, name=None, **kwargs):
+    def parse(self, data, type_=None, name=None, **kwargs):
         """
-        :param input_: string to parse
+        :param data: string to parse
         :param type_: a PARSER_* type
         :param attended_name: an attended name, or None is unknown
         :raises ParseWarning
