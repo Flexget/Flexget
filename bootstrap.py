@@ -56,9 +56,9 @@ abiflags = getattr(sys, 'abiflags', '')
 
 user_dir = os.path.expanduser('~')
 if is_win:
-    default_storage_dir = os.path.join(user_dir, 'virtualenv')
+    default_storage_dir = os.path.join(user_dir, 'virtualenvs', 'Flexget')
 else:
-    default_storage_dir = os.path.join(user_dir, '.virtualenv')
+    default_storage_dir = os.path.join(user_dir, '.virtualenvs', 'Flexget')
 default_config_file = os.path.join(default_storage_dir, 'virtualenv.ini')
 
 if is_pypy:
@@ -1816,7 +1816,8 @@ def create_bootstrap_script(extra_text, python_version=''):
     return content.replace('##EXT' 'END##', extra_text)
 
 def adjust_options(options, args):
-    args[:] = ['.']
+    if not args:
+        args[:] = [default_storage_dir]
 
 
 def after_install(options, home_dir):
