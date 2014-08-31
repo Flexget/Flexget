@@ -152,7 +152,7 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     def __init__(self, data, name, **kwargs):
         self._data = data
         self._name = name
-        self._valid = None
+        self._validated_name = None
         self._kwargs = kwargs
 
     @property
@@ -171,8 +171,15 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     def allow_groups(self):
         return self._kwargs['allow_groups'] if 'allow_groups' in self._kwargs else False
 
+    @property
+    def strict_name(self):
+        return self._kwargs['strict_name'] if 'strict_name' in self._kwargs else False
+
     def _validate(self):
-        return self._validate_name() and self._validate_groups()
+        validate_name = self._validate_name()
+        if validate_name and self._validate_groups():
+            return validate_name
+        return None
 
     def _validate_name(self):
         # name end position
@@ -181,10 +188,10 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
 
         # regexp name matching
         re_from_name = False
-        name_regexps = self.name_regexps
+        name_regexps = ReList(self.name_regexps)
         if not name_regexps:
             # if we don't have name_regexps, generate one from the name
-            name_regexps = ReList(name_to_re(name, self.ignore_prefixes, self) for name in [self.name] + self.alternate_names)
+            name_regexps = ReList(name_to_re(name, self.ignore_prefixes, None) for name in [self.name] + self.alternate_names)
             # With auto regex generation, the first regex group captures the name
             re_from_name = True
         # try all specified regexps on this data
@@ -200,8 +207,8 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
             # leave this invalid
             log.debug('FAIL: name regexps %s do not match %s',
                       [regexp.pattern for regexp in self.name_regexps], self.data)
-            return False
-        return True
+            return ''
+        return self.data[name_start:name_end]
 
     def _validate_groups(self):
         if not self.allow_groups:
@@ -229,9 +236,11 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     def valid(self):
         if not self._name:
             return True
-        if self._valid is None:
-            self._valid = self._validate()
-        return self._valid
+        if self._validated_name is None:
+            self._validated_name = self._validate()
+        if self.strict_name and self._validated_name != self.parsed_name:
+            return False
+        return len(self._validated_name) > 0 if self._validated_name else False
 
     @property
     def proper(self):
@@ -248,10 +257,6 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     @property
     def is_movie(self):
         return False
-
-    @abstractproperty
-    def date(self):
-        raise NotImplementedError
 
     @abstractproperty
     def release_group(self):
@@ -375,6 +380,8 @@ class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
 
 
 class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
+    _valid_strict = None
+
     @property
     def allow_seasonless(self):
         return self._kwargs['allow_seasonless'] if 'allow_seasonless' in self._kwargs else False
@@ -428,6 +435,10 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
         raise NotImplementedError
 
     @abstractproperty
+    def date(self):
+        raise NotImplementedError
+
+    @abstractproperty
     def episode_details(self):
         raise NotImplementedError
 
@@ -437,6 +448,10 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
 
     @abstractproperty
     def regexp_id(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def valid_strict(self):
         raise NotImplementedError
 
     @property

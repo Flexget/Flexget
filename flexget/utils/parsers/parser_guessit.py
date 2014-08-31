@@ -34,10 +34,6 @@ class GuessitParsedEntry(ParsedEntry):
         return version + proper_count - (5 if fastsub else 0)
 
     @property
-    def date(self):
-        return self._guess_result.get('date')
-
-    @property
     def properties(self):
         return self._guess_result
 
@@ -168,8 +164,16 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
         return len(self._guess_result.get('episodeList', filter(lambda x: x is not None, [self.episode])))
 
     @property
+    def date(self):
+        return self._guess_result.get('date')
+
+    @property
     def parsed_season(self):
         return self._guess_result.get('season')
+
+    @property
+    def valid_strict(self):
+        return True
 
 
 class GuessitParser(Parser):
