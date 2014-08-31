@@ -81,41 +81,47 @@ class DBTrigger(Base):
 @event('manager.daemon.started')
 @event('manager.config_updated')
 def setup_scheduler(manager):
-    """Loads the scheduler settings from config and starts/stops the scheduler as appropriate."""
+    """Starts, stops or restarts the scheduler when config changes."""
     if not manager.is_daemon:
         return
     scheduler = Scheduler(manager)
+    if scheduler.is_alive():
+        scheduler.stop()
     if manager.config.get('schedules', True):
-        scheduler.load_schedules()
-        if not scheduler.is_alive():
-            scheduler.start()
-    else:
-        if scheduler.is_alive():
-            scheduler.stop()
+        scheduler.start()
 
 
 @singleton
-class Scheduler(threading.Thread):
+class Scheduler(object):
     # We use a regular list for periodic jobs, so you must hold this lock while using it
     triggers_lock = threading.Lock()
 
     def __init__(self, manager):
-        threading.Thread.__init__(self, name='scheduler')
-        self.daemon = True
         self.manager = manager
         self.triggers = []
         self.running_triggers = {}
         self.waiting_triggers = set()
         self._stop = threading.Event()
+        self._thread = None
 
     def start(self):
-        # If we have already started and stopped a thread, we need to reinitialize it to create a new one
-        if self._stop.is_set() and not self.is_alive():
-            self.__init__(self.manager)
-        threading.Thread.start(self)
+        if self.is_alive():
+            if self._stop.is_set():
+                # If the thread was told to stop, wait for it to end before starting a new one
+                self._thread.join()
+            else:
+                raise RuntimeError('Cannot start again, scheduler is already running.')
+        self._stop.clear()
+        self._thread = threading.Thread(name='scheduler', target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
 
     def stop(self):
-        self._stop.set()
+        if self.is_alive():
+            self._stop.set()
+
+    def is_alive(self):
+        return self._thread and self._thread.is_alive()
 
     def load_schedules(self):
         """Clears current schedules and loads them from the config."""
@@ -152,6 +158,7 @@ class Scheduler(threading.Thread):
 
     def run(self):
         log.debug('scheduler started')
+        self.load_schedules()
         while not self._stop.wait(5):
             for trigger_id, finished_events in self.running_triggers.items():
                 if all(e.is_set() for e in finished_events):
