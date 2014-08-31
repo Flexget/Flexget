@@ -166,7 +166,7 @@ class Scheduler(object):
                         del self.running_triggers[trigger_id]
                 self.queue_pending_jobs()
         except:
-            log.exception('Unhandled error in scheduler thread.')
+            log.exception('BUG: Unhandled error in scheduler thread.')
             raise
         finally:
             log.debug('scheduler shut down')
