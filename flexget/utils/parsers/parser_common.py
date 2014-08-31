@@ -458,9 +458,17 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     def valid(self):
         ret = super(ParsedVideo, self).valid
         if ret:
+            if self.identified_by != 'auto' and self.identified_by != self.id_type:
+                return False
             if self.complete:
                 return False
             if self.identified_by in ['auto', 'ep'] and self.episodes > 3:
+                return False
+            if self.identified_by in ['ep', 'sequence'] and self.episode is None:
+                return False
+            if self.identified_by == 'ep' and (self.episode is None or (self.season is None and not self.allow_seasonless)):
+                return False
+            if self.identified_by == 'date' and not self.date:
                 return False
             if self.special or self.assume_special:
                 return True
