@@ -158,13 +158,18 @@ class Scheduler(object):
 
     def run(self):
         log.debug('scheduler started')
-        self.load_schedules()
-        while not self._stop.wait(5):
-            for trigger_id, finished_events in self.running_triggers.items():
-                if all(e.is_set() for e in finished_events):
-                    del self.running_triggers[trigger_id]
-            self.queue_pending_jobs()
-        log.debug('scheduler shut down')
+        try:
+            self.load_schedules()
+            while not self._stop.wait(5):
+                for trigger_id, finished_events in self.running_triggers.items():
+                    if all(e.is_set() for e in finished_events):
+                        del self.running_triggers[trigger_id]
+                self.queue_pending_jobs()
+        except:
+            log.exception('Unhandled error in scheduler thread.')
+            raise
+        finally:
+            log.debug('scheduler shut down')
 
 
 class Trigger(object):
