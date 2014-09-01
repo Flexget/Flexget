@@ -399,12 +399,12 @@ class TestSeriesParser(object):
                 if int(mock_ep1) >= int(mock_ep2):
                     continue
 
-                s = self.parse('FooBar - %s %s-FlexGet' % (mock_ep1, quality2.name), name="FooBar")
+                s = self.parse('FooBar - %s %s-FlexGet' % (mock_ep1, quality2.name), name='FooBar')
                 assert s.episode == int(mock_ep1), "confused episode %s with quality %s" % \
                                                   (mock_ep1, quality2.name)
 
                 # Also test with reversed relative order of episode and quality
-                s = self.parse('[%s] FooBar - %s [FlexGet]' % (quality2.name, mock_ep1), name="FooBar")
+                s = self.parse('[%s] FooBar - %s [FlexGet]' % (quality2.name, mock_ep1), name='FooBar')
                 assert s.episode == int(mock_ep1), "confused episode %s with quality %s" % \
                                                   (mock_ep1, quality2.name)
 

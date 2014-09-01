@@ -20,7 +20,7 @@ class GuessitParsedEntry(ParsedEntry):
         self._guess_result = guess_result
 
     @property
-    def group(self):
+    def parsed_group(self):
         return self._guess_result.get('releaseGroup')
 
     @property
@@ -176,6 +176,8 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
     @property
     def episode(self):
         episode = self._guess_result.get('episodeNumber')
+        if episode is None and 'part' in self._guess_result:
+            return self._guess_result.get('part')
         if episode is None and self.title:
             matched = self.part_re.search(self.title)
             if matched:
@@ -200,9 +202,11 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
     @property
     def parsed_season(self):
         season = self._guess_result.get('season')
-        if season is None and not self.allow_seasonless:
+        if season is None and self.episode and not self.allow_seasonless:
+            if 'part' in self._guess_result:
+                return 1
             episode_raw = self._guess_result.metadata('episodeNumber').raw
-            if episode_raw and 'ep' in episode_raw.lower():
+            if episode_raw and any(c.isalpha() and c.lower() != 'v' for c in episode_raw):
                 return 1
         return season
 
@@ -265,4 +269,6 @@ class GuessitParser(Parser):
             options['episode_prefer_number'] = False
         else:
             options['episode_prefer_number'] = True
+        if kwargs.get('allow_groups'):
+            options['attended_group'] = kwargs.get('allow_groups')
         return options

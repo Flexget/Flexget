@@ -258,8 +258,12 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     def is_movie(self):
         return False
 
-    @abstractproperty
+    @property
     def group(self):
+        return self.parsed_group.lower() if self.parsed_group else None
+
+    @abstractproperty
+    def parsed_group(self):
         raise NotImplementedError
 
     @abstractproperty
