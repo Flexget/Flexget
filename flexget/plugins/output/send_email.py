@@ -13,6 +13,7 @@ from flexget.event import event
 from flexget.utils.template import render_from_task, get_template, RenderError
 from flexget.utils.tools import merge_dict_from_to, MergeException
 from flexget import validator
+from premailer import transform
 
 log = logging.getLogger('email')
 
@@ -103,7 +104,7 @@ def send_email(subject, content, config):
     message['Subject'] = subject
     message['Date'] = formatdate(localtime=True)
     content_type = 'html' if '<html>' in content else 'plain'
-    message.attach(MIMEText(content.encode('utf-8'), content_type, _charset='utf-8'))
+    message.attach(MIMEText(transform(content).encode('utf-8'), content_type, _charset='utf-8'))
 
     # send email message
     if manager.manager.options.test:
