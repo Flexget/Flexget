@@ -76,7 +76,7 @@ and easily install flexget with in that virtualenv.
 
     pip install -e . # with in the repo.
 
-This will install all the flexget dependencies. Now `flexget` should work just fine.
+This will install all the flexget dependencies. Now ``flexget`` should work just fine.
 
 Happy Hacking.
 
