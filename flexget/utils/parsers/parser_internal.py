@@ -60,7 +60,7 @@ class InternalParser(Parser):
             if parser.valid:
                 return True
 
-    def parse(self, input_, type_=None, name=None, **kwargs):
+    def parse(self, data, type_=None, name=None, **kwargs):
         internal_parser = None
 
         if kwargs is None:
@@ -72,7 +72,7 @@ class InternalParser(Parser):
             internal_parser = SeriesParser(**kwargs)
             internal_parser.assume_quality = types.MethodType(assume_quality_func, internal_parser)
 
-            if self.parse_serie(internal_parser, input_):
+            if self.parse_serie(internal_parser, data):
                 return internal_parser
             else:
                 type_ == PARSER_MOVIE
@@ -85,6 +85,6 @@ class InternalParser(Parser):
             internal_parser = MovieParser()
         internal_parser.assume_quality = types.MethodType(assume_quality_func, internal_parser)
 
-        internal_parser.parse(input_)
+        internal_parser.parse(data)
 
         return internal_parser

@@ -1,5 +1,7 @@
 from copy import deepcopy
 from string import capwords
+import datetime
+from time import strptime
 
 import guessit
 from guessit.plugins.transformers import add_transformer
@@ -10,7 +12,7 @@ from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedS
 import re
 
 add_transformer('guess_regexp_id = flexget.utils.parsers.guess_regexp_id:GuessRegexpId')
-guessit.default_options = {'name_only': True, 'clean_function': clean_value, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk']}
+guessit.default_options = {'name_only': True, 'clean_function': clean_value, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
 
 class GuessitParsedEntry(ParsedEntry):
     def __init__(self, data, name, guess_result, **kwargs):
@@ -18,7 +20,7 @@ class GuessitParsedEntry(ParsedEntry):
         self._guess_result = guess_result
 
     @property
-    def release_group(self):
+    def group(self):
         return self._guess_result.get('releaseGroup')
 
     @property
@@ -29,6 +31,8 @@ class GuessitParsedEntry(ParsedEntry):
             version = 0
         elif version <= 0:
             version = -1
+        else:
+            version = version - 1
         proper_count = self._guess_result.get('properCount', 0)
         fastsub = 'Fastsub' in self._guess_result.get('other', [])
         return version + proper_count - (5 if fastsub else 0)
@@ -82,7 +86,11 @@ class GuessitParsedVideoQuality(ParsedVideoQuality):
         resolution = self.screen_size if self.screen_size else 'HR' if 'HR' in self._guess_result.get('other', []) else None
         source = self.format.replace('-', '') if self.format else None
         codec = self.video_codec
-        audio = (self.audio_codec + (self.audio_channels if self.audio_channels else '')) if self.audio_codec else None
+
+        if self.audio_channels == '5.1' and self.audio_codec is None or self.audio_codec == 'DolbyDigital':
+            audio = 'dd5.1'
+        else:
+            audio = self.audio_codec
 
         old_quality = qualities.Quality(' '.join(filter(None, [resolution, source, codec, audio])))
         old_quality = old_assume_quality(old_quality, assumed_quality)
@@ -126,7 +134,10 @@ class GuessitParsedMovie(GuessitParsedVideo, ParsedMovie):
     def title(self):
         return self._guess_result.get('title')
 
+
 class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
+    part_re = re.compile('part\\s?(\\d+)', re.IGNORECASE)
+
     def __init__(self, data, name, guess_result, **kwargs):
         GuessitParsedVideo.__init__(self, data, name, guess_result, **kwargs)
 
@@ -135,13 +146,20 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
         return self._guess_result.get('series')
 
     @property
+    def country(self):
+        return str(self._guess_result.get('country')) if 'country' in self._guess_result else None
+
+    @property
     def complete(self):
         return 'Complete' in self._guess_result.get('other', [])
 
     @property
     def regexp_id(self):
-        return self._guess_result.get('regexpId')
-
+        regexp_id = self._guess_result.get('regexpId')
+        if isinstance(regexp_id, list):
+            return '-'.join(regexp_id)
+        else:
+            return regexp_id
 
     @property
     def title(self):
@@ -157,7 +175,12 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
 
     @property
     def episode(self):
-        return self._guess_result.get('episodeNumber')
+        episode = self._guess_result.get('episodeNumber')
+        if episode is None and self.title:
+            matched = self.part_re.search(self.title)
+            if matched:
+                return int(matched.group(1))
+        return episode
 
     @property
     def episodes(self):
@@ -165,11 +188,23 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
 
     @property
     def date(self):
-        return self._guess_result.get('date')
+        d = self._guess_result.get('date')
+        if d:
+            if d > datetime.date.today() + datetime.timedelta(days=1):
+                return None
+            # Don't accept dates that are too old
+            if d < datetime.date(1970, 1, 1):
+                return None
+            return d
 
     @property
     def parsed_season(self):
-        return self._guess_result.get('season')
+        season = self._guess_result.get('season')
+        if season is None and not self.allow_seasonless:
+            episode_raw = self._guess_result.metadata('episodeNumber').raw
+            if episode_raw and 'ep' in episode_raw.lower():
+                return 1
+        return season
 
     @property
     def valid_strict(self):
@@ -207,7 +242,7 @@ class GuessitParser(Parser):
         guessit_options = self._guessit_options(data, type_, name, **kwargs)
 
         if name and name != data:
-            if not kwargs.get('strict_name'):
+            if not guessit_options.get('strict_name'):
                 guessit_options['attended_series'] = [name]
 
             if not type_:
@@ -217,12 +252,13 @@ class GuessitParser(Parser):
                 name_guessit_options = deepcopy(guessit_options)
                 name_guessit_options['disabled_transformers'] = ['GuessWeakEpisodesRexps', 'GuessYear', 'GuessCountry']
                 name_guess_result = guessit.guess_file_info(name, options=name_guessit_options, type=type_)
-                name = self.build_parsed(name_guess_result, name, type=type_, **kwargs).name
+                name_guess_parsed = self.build_parsed(name_guess_result, name, type=type_, **kwargs)
+                name = name_guess_parsed.name
 
         guess_result = guessit.guess_file_info(data, options=guessit_options, type=type_)
         return self.build_parsed(guess_result, data, type=type_, name=(name if name != data else None), **kwargs)
 
-    def _guessit_options(self, input_, type_, name, **kwargs):
+    def _guessit_options(self, data, type_, name, **kwargs):
         options = dict(**kwargs)
         identified_by = kwargs.get('identified_by')
         if identified_by in ['ep']:

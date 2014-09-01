@@ -46,7 +46,7 @@ class MetainfoSeries(object):
     def guess_series(self, title, allow_seasonless=False, quality=None):
         """Returns a valid series parser if this `title` appears to be a series"""
 
-        parsed = get_parser().parse(title, PARSER_ANY, title, identified_by='auto', allow_seasonless=allow_seasonless)
+        parsed = get_parser().parse(data=title, type_=PARSER_ANY, name=title, identified_by='auto', allow_seasonless=allow_seasonless)
         if parsed.valid and parsed.is_series:
             # Normalizing name.
             # todo: Why only in metainfo series, and not other series plugin ?

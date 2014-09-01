@@ -208,12 +208,12 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
             log.debug('FAIL: name regexps %s do not match %s',
                       [regexp.pattern for regexp in self.name_regexps], self.data)
             return ''
-        return self.data[name_start:name_end]
+        return clean_value(self.data[name_start:name_end])
 
     def _validate_groups(self):
         if not self.allow_groups:
             return True
-        return self.release_group in self.allow_groups
+        return self.group in self.allow_groups
 
     @property
     def name(self):
@@ -238,7 +238,7 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
             return True
         if self._validated_name is None:
             self._validated_name = self._validate()
-        if self.strict_name and self._validated_name != self.parsed_name:
+        if self.strict_name and self._validated_name != clean_value(self.parsed_name):
             return False
         return len(self._validated_name) > 0 if self._validated_name else False
 
@@ -259,7 +259,7 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
         return False
 
     @abstractproperty
-    def release_group(self):
+    def group(self):
         raise NotImplementedError
 
     @abstractproperty
@@ -407,6 +407,10 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
         raise NotImplementedError
 
     @abstractproperty
+    def country(self):
+        raise NotImplementedError
+
+    @abstractproperty
     def series(self):
         raise NotImplementedError
 
@@ -458,9 +462,15 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     def valid(self):
         ret = super(ParsedVideo, self).valid
         if ret:
+            if self.country and self.name.endswith(')'):
+                p_start = self.name.rfind('(')
+                if p_start != -1:
+                    parenthetical = re.escape(self.name[p_start + 1:-1])
+                    if parenthetical and parenthetical.lower() != self.country.lower():
+                        return False
             if self.identified_by != 'auto' and self.identified_by != self.id_type:
                 return False
-            if self.complete:
+            if self.complete or (self.identified_by in ['auto', 'ep'] and self.season is not None and self.episode is None):
                 return False
             if self.identified_by in ['auto', 'ep'] and self.episodes > 3:
                 return False
@@ -474,7 +484,7 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
                 return True
             if self.regexp_id:
                 return True
-            if self.episode is not None and self.season:
+            if self.episode is not None or self.season is not None:
                 return True
             if self.date:
                 return True
@@ -488,7 +498,7 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
         if self.regexp_id:
             id_type = 'id'
         elif self.episode is not None:
-            if self.season:
+            if self.season is not None:
                 id_type = 'ep'
             else:
                 id_type = 'sequence'
@@ -545,9 +555,7 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
             return self.identifier
 
     def __str__(self):
-        return "<%s(name=%s,season=%s,episode=%s)>" % (self.__class__.__name__, self.name, self.season,
-                                                       self.episodes if self.episodes and len(
-                                                           self.episodes) > 1 else self.episode)
+        return "<%s(name=%s,season=%s,episode=%s)>" % (self.__class__.__name__, self.name, self.season, self.episode)
 
     def __cmp__(self, other):
         """Compares quality of parsers, if quality is equal, compares proper_count."""

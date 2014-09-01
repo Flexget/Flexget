@@ -87,7 +87,7 @@ class FilterExistsSeries(object):
                     for name in files + dirs:
                         # run parser on filename data
                         try:
-                            disk_parser = get_parser().parse(input_=name, type_=PARSER_EPISODE, name=disk_parser.name)
+                            disk_parser = get_parser().parse(data=name, type_=PARSER_EPISODE, name=disk_parser.name)
                         except ParseWarning as pw:
                             disk_parser = pw.parsed
                             log_once(pw.value, logger=log)

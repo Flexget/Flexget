@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from guessit.plugins.transformers import Transformer
 from guessit.matcher import GuessFinder
-from guessit.containers import PropertiesContainer
+from guessit.containers import PropertiesContainer, NoValidator
 
 
 class GuessRegexpId(Transformer):
@@ -15,7 +15,7 @@ class GuessRegexpId(Transformer):
     def guess_regexps_id(self, string, node=None, options=None):
         container = PropertiesContainer(enhance=False, canonical_from_pattern=False)
         for regexp in options.get("id_regexps"):
-            container.register_property('regexpId', regexp, confidence=1.0)
+            container.register_property('regexpId', regexp, confidence=1.0, validator=NoValidator())
         found = container.find_properties(string, node, options)
         return container.as_guess(found, string)
 
