@@ -228,6 +228,7 @@ class PluginTransmission(TransmissionBase):
                 'properties': {
                     'host': {'type': 'string'},
                     'port': {'type': 'integer'},
+                    'netrc': {'type': 'string'},
                     'username': {'type': 'string'},
                     'password': {'type': 'string'},
                     'path': {'type': 'string'},   
