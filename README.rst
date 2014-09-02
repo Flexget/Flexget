@@ -64,6 +64,22 @@ If you don't want to use virtualenv there's ``flexget_vanilla.py`` file which
 can be used to run FlexGet without bootstrapping, note that you will need to
 install all required dependencies yourself.
 
+Custom Virtualenv
+-----------------
+
+If you want to hack on flexget, but don't want to use paver bootstrap because
+you want to keep your virtualenv outside the repo. You can setup your own virtualenv
+and easily install flexget with in that virtualenv.
+
+    # Create virtualenv and source active it.
+    pip install paver
+
+    pip install -e . # with in the repo.
+
+This will install all the flexget dependencies. Now ``flexget`` should work just fine.
+
+Happy Hacking.
+
 
 .. image:: https://d2weczhvl823v0.cloudfront.net/Flexget/flexget/trend.png
    :alt: Bitdeli badge
