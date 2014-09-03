@@ -1,24 +1,25 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import atexit
 import codecs
-from contextlib import contextmanager
 import copy
 import fnmatch
-import signal
-import os
-import sys
-import shutil
 import logging
+import os
+import shutil
+import signal
+import sys
 import threading
-import pkg_resources
-import yaml
+from contextlib import contextmanager
 from datetime import datetime, timedelta
 
+import pkg_resources
 import sqlalchemy
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.pool import SingletonThreadPool
+import yaml
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import SingletonThreadPool
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 Base = declarative_base()
@@ -26,10 +27,11 @@ Session = sessionmaker()
 
 from flexget import config_schema, db_schema
 from flexget.event import fire_event
-from flexget.ipc import IPCServer, IPCClient
+from flexget.ipc import IPCClient, IPCServer
 from flexget.task import Task
 from flexget.task_queue import TaskQueue
 from flexget.utils.tools import pid_exists
+
 
 log = logging.getLogger('manager')
 

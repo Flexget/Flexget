@@ -1,21 +1,23 @@
 """ Plugin Loading & Management.
 """
 
-from __future__ import unicode_literals, division, absolute_import
-import sys
-import os
-import re
+from __future__ import absolute_import, division, unicode_literals
+
 import logging
-import time
+import os
 import pkgutil
+import re
+import sys
+import time
 import warnings
 from itertools import ifilter
 
 from requests import RequestException
 
-from flexget import config_schema
-from flexget.event import add_event_handler as add_phase_handler, fire_event, remove_event_handlers
 from flexget import plugins as plugins_pkg
+from flexget import config_schema
+from flexget.event import add_event_handler as add_phase_handler
+from flexget.event import fire_event, remove_event_handlers
 
 log = logging.getLogger('plugin')
 

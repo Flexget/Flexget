@@ -1,25 +1,26 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 import copy
-from functools import wraps
 import hashlib
 import itertools
 import logging
 import sys
 import threading
+from functools import wraps
 
-from sqlalchemy import Column, Unicode, String, Integer
+from sqlalchemy import Column, Integer, String, Unicode
 
-from flexget import config_schema
-from flexget import db_schema
+from flexget import config_schema, db_schema
 from flexget.entry import EntryUnicodeError
-from flexget.event import fire_event, event
+from flexget.event import event, fire_event
 from flexget.logger import FlexGetFormatter
 from flexget.manager import Session
-from flexget.plugin import (get_plugins, task_phases, phase_methods, PluginWarning, PluginError,
-                            DependencyError, plugins as all_plugins, plugin_schemas)
+from flexget.plugin import plugins as all_plugins
+from flexget.plugin import (
+    DependencyError, get_plugins, phase_methods, plugin_schemas, PluginError, PluginWarning, task_phases)
 from flexget.utils import requests
-from flexget.utils.tools import Tee
 from flexget.utils.simple_persistence import SimpleTaskPersistence
+from flexget.utils.tools import Tee
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
