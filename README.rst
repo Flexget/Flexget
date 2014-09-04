@@ -42,13 +42,15 @@ might be available under another name like 'python26' or 'python2.7' in which
 case you need to use that one instead of plain 'python'.
 
 To start using FlexGet from this directory::
- Prerequisites for bootstrap.py::
- - Either put `setuptools`_ and `pip`_ in the directory bootstrap.py resides.
- - Or install `virtualenv`_ package.
+
+  Prerequisites for bootstrap.py:
+  - Either put `setuptools`_ and `pip`_ in the directory bootstrap.py resides.
+  - Or install `virtualenv`_ package.
 
 .. _setuptools: https://pypi.python.org/pypi/setuptools
 .. _pip: https://pypi.python.org/pypi/pip
 .. _virtualenv: https://pypi.python.org/pypi/virtualenv
+
 After the prerequisites for bootstrap.py are finished, run the following commands::
 
     python bootstrap.py
