@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta, time as dt_time
 import logging
 import threading
+import time
 
 from sqlalchemy import Column, String, DateTime
 
@@ -157,18 +158,20 @@ class Scheduler(object):
 
     def run(self):
         log.debug('scheduler started')
-        try:
-            self.load_schedules()
-            while not self._stop.wait(5):
+        self.load_schedules()
+        while not self._stop.wait(5):
+            try:
                 for trigger_id, finished_events in self.running_triggers.items():
                     if all(e.is_set() for e in finished_events):
                         del self.running_triggers[trigger_id]
                 self.queue_pending_jobs()
-        except:
-            log.exception('BUG: Unhandled error in scheduler thread.')
-            raise
-        finally:
-            log.debug('scheduler shut down')
+            except Exception:
+                log.exception('BUG: Unhandled error in scheduler thread.')
+                # This is just to prevent spamming if we get in an error loop. Maybe should be different.
+                log.error('Attempting to continue running scheduler thread in one minute.')
+                time.sleep(60)
+                continue
+        log.debug('scheduler shut down')
 
 
 class Trigger(object):
