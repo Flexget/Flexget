@@ -34,6 +34,12 @@ class TestInputRSS(FlexGetBase):
           test_all_entries_yes:
             rss:
               all_entries: yes
+          test_field_sanitation:
+            rss:
+              link: "other:link"
+              title: "other:Title"
+              other_fields:
+              - "Other:field"
     """
 
     def test_rss(self):
@@ -124,6 +130,13 @@ class TestInputRSS(FlexGetBase):
         assert self.task.entries, 'Entries should have been produced on first run.'
         self.execute_task('test_all_entries_yes')
         assert self.task.entries, 'Entries should have been produced on second run.'
+
+    def test_field_sanitation(self):
+        self.execute_task('test_field_sanitation')
+        entry = self.task.entries[0]
+        assert entry['title'] == 'alt title'
+        assert entry['url'] == 'http://localhost/altlink'
+        assert entry['other:field'] == 'otherfield'
 
 
 class TestRssOnline(FlexGetBase):
