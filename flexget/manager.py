@@ -280,9 +280,9 @@ class Manager(object):
         :param options: argparse options
         """
         if options.action == 'start':
-            if options.daemonize:
-                self.daemonize()
             with self.acquire_lock():
+                if options.daemonize:
+                    self.daemonize()
                 try:
                     signal.signal(signal.SIGTERM, self._handle_sigterm)
                 except ValueError as e:
@@ -735,6 +735,9 @@ class Manager(object):
         os.dup2(si.fileno(), sys.stdin.fileno())
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
+        # If we have a lock, update the lock file with our new pid
+        if self._has_lock:
+            self.write_lock()
 
     def db_cleanup(self, force=False):
         """
