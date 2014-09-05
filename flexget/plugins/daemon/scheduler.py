@@ -61,10 +61,10 @@ main_schema = {
                 'properties': {
                     'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
                     'interval': interval_schema,
-                    'cron': cron_schema
+                    'schedule': cron_schema
                 },
                 'required': ['tasks'],
-                'oneOf': [{'required': ['cron']}, {'required': ['interval']}],
+                'oneOf': [{'required': ['schedule']}, {'required': ['interval']}],
                 'error_oneOf': 'Either `cron` or `interval` must be defined.',
                 'additionalProperties': False
             }
@@ -125,7 +125,7 @@ def setup_jobs(manager):
         if 'interval' in job_config:
             trigger = IntervalTrigger(**job_config['interval'])
         else:
-            trigger = CronTrigger(**job_config['cron'])
+            trigger = CronTrigger(**job_config['schedule'])
         tasks = job_config['tasks']
         if not isinstance(tasks, list):
             tasks = [tasks]
