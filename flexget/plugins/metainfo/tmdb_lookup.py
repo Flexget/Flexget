@@ -45,9 +45,7 @@ class PluginTmdbLookup(object):
         'movie_name': 'name',
         'movie_year': 'year'}
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     def lazy_loader(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
