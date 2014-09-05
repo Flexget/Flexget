@@ -1,12 +1,13 @@
 #!/usr/bin/python
 
 from __future__ import unicode_literals, division, absolute_import
-import os
+
 import logging
-from flexget import logger
-from flexget.options import get_parser
-from flexget import plugin
+import os
+
+from flexget import logger, plugin
 from flexget.manager import Manager
+from flexget.options import get_parser
 
 __version__ = '{git}'
 

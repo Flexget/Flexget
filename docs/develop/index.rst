@@ -38,6 +38,8 @@ How do I get started?
 Set up development environment, which is basically just two steps.
 
 #. `GIT clone`_ our repository.
+#. - Either the wheel package of `setuptools`_ and `pip`_ need to be in the directory with bootstrap.py
+   - Or `virtualenv`_ package needs to be installed.
 #. Run ``bootstrap.py`` with Python 2.6.x - 2.7.x.
 
 For easier collaboration we recommend forking us on github and sending pull
@@ -48,6 +50,9 @@ if you wish.
 If you are new to Git there are several interactive tutorials you can try to get
 you started including `tryGit`_ and `LearnGitBranching`_.
 
+.. _setuptools: https://pypi.python.org/pypi/setuptools
+.. _pip: https://pypi.python.org/pypi/pip
+.. _virtualenv: https://pypi.python.org/pypi/virtualenv
 .. _GIT clone: https://github.com/Flexget/Flexget
 .. _tryGit: http://try.github.io
 .. _LearnGitBranching: http://pcottle.github.io/learnGitBranching/

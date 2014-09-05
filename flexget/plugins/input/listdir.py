@@ -3,9 +3,12 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
 
+from path import path
+
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger('listdir')
 
@@ -19,34 +22,32 @@ class Listdir(object):
       listdir: /storage/movies/
     """
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('path')
-        bundle = root.accept('list')
-        bundle.accept('path')
-        return root
+    schema = one_or_more({'type': 'string', 'format': 'path'})
 
     def on_task_input(self, task, config):
         # If only a single path is passed turn it into a 1 element list
         if isinstance(config, basestring):
             config = [config]
         entries = []
-        for path in config:
-            path = os.path.expanduser(path)
-            for name in os.listdir(unicode(path)):
+        for folder in config:
+            folder = path(folder).expanduser()
+            for filepath in folder.listdir():
+                try:
+                    filepath.exists()
+                except UnicodeError:
+                    log.error('file %s not decodable with filesystem encoding' % filepath)
+                    continue
                 e = Entry()
-                filepath = os.path.join(path, name)
-                if os.path.isfile(filepath):
-                    e['title'] = os.path.splitext(name)[0]
+                if filepath.isfile():
+                    e['title'] = filepath.namebase
                 else:
-                    e['title'] = name
+                    e['title'] = filepath.name
                 e['location'] = filepath
                 # Windows paths need an extra / preceded to them
                 if not filepath.startswith('/'):
                     filepath = '/' + filepath
                 e['url'] = 'file://%s' % filepath
-                e['filename'] = name
+                e['filename'] = filepath.name
                 entries.append(e)
         return entries
 

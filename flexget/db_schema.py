@@ -1,10 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 import logging
 
 from sqlalchemy import Column, Integer, String
 
-from flexget.manager import Base, Session
 from flexget.event import event
+from flexget.manager import Base, Session
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_schema
 

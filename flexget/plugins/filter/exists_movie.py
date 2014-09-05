@@ -2,6 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
 
+from path import path
+
 from flexget import plugin
 from flexget.event import event
 from flexget.config_schema import one_or_more
@@ -51,57 +53,52 @@ class FilterExistsMovie(object):
         # list of imdb ids gathered from paths / cache
         imdb_ids = []
 
-        for path in config:
+        for folder in config:
+            folder = path(folder).expanduser()
             # see if this path has already been scanned
-            if path in self.cache:
-                log.verbose('Using cached scan for %s ...' % path)
-                imdb_ids.extend(self.cache[path])
+            if folder in self.cache:
+                log.verbose('Using cached scan for %s ...' % folder)
+                imdb_ids.extend(self.cache[folder])
                 continue
 
             path_ids = []
 
-            # with unicode it crashes on some paths ..
-            path = str(os.path.expanduser(path))
-            if not os.path.exists(path):
-                log.critical('Path %s does not exist' % path)
+            if not folder.isdir():
+                log.critical('Path %s does not exist' % folder)
                 continue
 
-            log.verbose('Scanning path %s ...' % path)
+            log.verbose('Scanning path %s ...' % folder)
 
             # Help debugging by removing a lot of noise
             #logging.getLogger('movieparser').setLevel(logging.WARNING)
             #logging.getLogger('imdb_lookup').setLevel(logging.WARNING)
 
             # scan through
-            for root, dirs, files in os.walk(path, followlinks=True):
-                # convert filelists into utf-8 to avoid unicode problems
-                dirs = [x.decode('utf-8', 'ignore') for x in dirs]
-                # files = [x.decode('utf-8', 'ignore') for x in files]
 
-                # TODO: add also video files?
-                for item in dirs:
-                    if item.lower() in self.skip:
+            # TODO: add also video files?
+            for item in folder.walkdirs(errors='warn'):
+                if item.name.lower() in self.skip:
+                    continue
+                count_dirs += 1
+
+                movie = get_parser().parse(item, PARSER_MOVIE)
+
+                try:
+                    imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
+                                                         raw_title=item.name,
+                                                         session=task.session)
+                    if imdb_id in path_ids:
+                        log.trace('duplicate %s' % item)
                         continue
-                    count_dirs += 1
-
-                    movie = get_parser().parse(item, PARSER_MOVIE)
-
-                    try:
-                        imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
-                                                             raw_title=item,
-                                                             session=task.session)
-                        if imdb_id in path_ids:
-                            log.trace('duplicate %s' % item)
-                            continue
-                        if imdb_id is not None:
-                            log.trace('adding: %s' % imdb_id)
-                            path_ids.append(imdb_id)
-                    except plugin.PluginError as e:
-                        log.trace('%s lookup failed (%s)' % (item, e.value))
-                        incompatible_dirs += 1
+                    if imdb_id is not None:
+                        log.trace('adding: %s' % imdb_id)
+                        path_ids.append(imdb_id)
+                except plugin.PluginError as e:
+                    log.trace('%s lookup failed (%s)' % (item, e.value))
+                    incompatible_dirs += 1
 
             # store to cache and extend to found list
-            self.cache[path] = path_ids
+            self.cache[folder] = path_ids
             imdb_ids.extend(path_ids)
 
         log.debug('-- Start filtering entries ----------------------------------')

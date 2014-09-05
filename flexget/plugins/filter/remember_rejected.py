@@ -8,7 +8,7 @@ from sqlalchemy.orm import relation
 from flexget import db_schema, options, plugin
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils.sqlalchemy_utils import table_columns, drop_tables, table_add_column
+from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
 from flexget.utils.tools import console, parse_timedelta
 
 log = logging.getLogger('remember_rej')

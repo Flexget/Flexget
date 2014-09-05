@@ -21,6 +21,11 @@ from flexget.utils.pathscrub import pathscrub
 log = logging.getLogger('rss')
 
 
+def fp_field_name(name):
+    """Translates literal field name to the sanitized one feedparser will use."""
+    return name.replace(':', '_').lower()
+
+
 class InputRSS(object):
     """
     Parses RSS feed.
@@ -117,7 +122,13 @@ class InputRSS(object):
             config = {'url': config}
         # set the default link value to 'auto'
         config.setdefault('link', 'auto')
-        # Replace : with _ and lower case other fields so they can be found in rss
+        # Convert any field names from the config to format feedparser will use for 'link', 'title' and 'other_fields'
+        if config['link'] != 'auto':
+            if not isinstance(config['link'], list):
+                config['link'] = [config['link']]
+            config['link'] = map(fp_field_name, config['link'])
+        config.setdefault('title', 'title')
+        config['title'] = fp_field_name(config['title'])
         if config.get('other_fields'):
             other_fields = []
             for item in config['other_fields']:
@@ -125,7 +136,7 @@ class InputRSS(object):
                     key, val = item, item
                 else:
                     key, val = item.items()[0]
-                other_fields.append({key.replace(':', '_').lower(): val.lower()})
+                other_fields.append({fp_field_name(key): val.lower()})
             config['other_fields'] = other_fields
         # set default value for group_links as deactivated
         config.setdefault('group_links', False)

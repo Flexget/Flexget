@@ -1,9 +1,10 @@
-from __future__ import unicode_literals, division, absolute_import
-from collections import defaultdict
-from datetime import datetime
+from __future__ import absolute_import, division, unicode_literals
+
 import os
 import re
 import urlparse
+from collections import defaultdict
+from datetime import datetime
 
 import jsonschema
 from jsonschema.compat import str_types
