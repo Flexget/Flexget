@@ -176,7 +176,7 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
     @property
     def episode(self):
         episode = self._guess_result.get('episodeNumber')
-        if episode is None and 'part' in self._guess_result:
+        if episode is None and 'part' in self._guess_result and not self.date:
             return self._guess_result.get('part')
         if episode is None and self.title:
             matched = self.part_re.search(self.title)
@@ -247,7 +247,7 @@ class GuessitParser(Parser):
 
         if name and name != data:
             if not guessit_options.get('strict_name'):
-                guessit_options['attended_series'] = [name]
+                guessit_options['expected_series'] = [name]
 
             if not type_:
                 # Metainfo, we don't know if we have have a serie.
@@ -270,5 +270,9 @@ class GuessitParser(Parser):
         else:
             options['episode_prefer_number'] = True
         if kwargs.get('allow_groups'):
-            options['attended_group'] = kwargs.get('allow_groups')
+            options['expected_group'] = kwargs.get('allow_groups')
+        if 'date_yearfirst' in kwargs:
+            options['date_year_first'] = kwargs.get('date_yearfirst')
+        if 'date_dayfirst' in kwargs:
+            options['date_day_first'] = kwargs.get('date_dayfirst')
         return options

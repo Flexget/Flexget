@@ -169,7 +169,7 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
 
     @property
     def allow_groups(self):
-        return self._kwargs['allow_groups'] if 'allow_groups' in self._kwargs else False
+        return self._kwargs['allow_groups'] if 'allow_groups' in self._kwargs else []
 
     @property
     def strict_name(self):
@@ -213,7 +213,9 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     def _validate_groups(self):
         if not self.allow_groups:
             return True
-        return self.group in self.allow_groups
+        if not self.group:
+            return True
+        return self.group.lower() in [x.lower() for x in self.allow_groups]
 
     @property
     def name(self):
