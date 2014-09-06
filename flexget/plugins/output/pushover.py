@@ -30,17 +30,24 @@ class OutputPushover(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
+    default_message = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} " \
+                      "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "\
+                      "{{imdb_year}}{% else %}{{title}}{% endif %}"
     schema = {
         'type': 'object',
         'properties': {
             'userkey': one_or_more({'type': 'string'}),
             'apikey': {'type': 'string'},
-            'device': {'type': 'string'},
-            'title': {'type': 'string'},
-            'message': {'type': 'string'},
-            'priority': {'type': 'integer'},
-            'url': {'type': 'string', 'format': 'url'},
-            'sound': {'type': 'string'}
+            'device': {'type': 'string', 'default': None},
+            'title': {'type': 'string', 'default': "{{task}}"},
+            'message': {'type': 'string', 'default': default_message},
+            'priority': {'type': 'integer', 'default': 0},
+            'url': {
+                'type': 'string',
+                'format': 'url',
+                'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'
+            },
+            'sound': {'type': 'string', 'default': 'pushover'}
         },
         'required': ['userkey', 'apikey'],
         'additionalProperties': False
@@ -49,19 +56,6 @@ class OutputPushover(object):
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {"enabled": config}
-
-        # Set the defaults
-        config.setdefault("device", None)
-        # TODO: don't assume it's a download
-        config.setdefault("title", "{{task}}")
-        # TODO: use template file
-        config.setdefault("message", "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} "
-                                     "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "
-                                     "{{imdb_year}}{% else %}{{title}}{% endif %}")
-        config.setdefault("priority", 0)
-        config.setdefault("url", "{% if imdb_url is defined %}{{imdb_url}}{% endif %}")
-        config.setdefault("sound", "pushover")
-
         return config
 
     # Run last to make sure other outputs are successful before sending notification
