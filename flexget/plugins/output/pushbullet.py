@@ -6,6 +6,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger("pushbullet")
 
@@ -26,7 +27,16 @@ class OutputPushbullet(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-
+    schema = {
+        'type': 'object',
+        'properties': {
+            'apikey': {'type': 'string'},
+            'device': one_or_more({'type': 'string'}),
+            'title': {'type': 'string'},
+            'body': {'type': 'string'}
+        },
+        'additionalProperties': False
+    }
     def validator(self):
         from flexget import validator
         config = validator.factory("dict")

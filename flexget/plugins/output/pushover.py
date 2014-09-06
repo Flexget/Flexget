@@ -5,6 +5,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger("pushover")
 
@@ -29,20 +30,21 @@ class OutputPushover(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-
-    def validator(self):
-        from flexget import validator
-        config = validator.factory("dict")
-        config.accept("text", key="userkey", required=True)
-        config.accept("list", key="userkey").accept("text")
-        config.accept("text", key="apikey", required=True)
-        config.accept("text", key="device", required=False)
-        config.accept("text", key="title", required=False)
-        config.accept("text", key="message", required=False)
-        config.accept("integer", key="priority", required=False)
-        config.accept("url", key="url", required=False)
-        config.accept("text", key="sound", required=False)
-        return config
+    schema = {
+        'type': 'object',
+        'properties': {
+            'userkey': one_or_more({'type': 'string'}),
+            'apikey': {'type': 'string'},
+            'device': {'type': 'string'},
+            'title': {'type': 'string'},
+            'message': {'type': 'string'},
+            'priority': {'type': 'integer'},
+            'url': {'type': 'string', 'format': 'url'},
+            'sound': {'type': 'string'}
+        },
+        'required': ['userkey', 'apikey'],
+        'additionalProperties': False
+    }
 
     def prepare_config(self, config):
         if isinstance(config, bool):

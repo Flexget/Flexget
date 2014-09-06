@@ -20,6 +20,7 @@ class RlsLog(object):
     """
     Adds support for rlslog.net as a feed.
     """
+    schema = {'type': 'string', 'format': 'url'}
 
     def validator(self):
         from flexget import validator

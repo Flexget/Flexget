@@ -21,25 +21,10 @@ class ModifySet(object):
       path: ~/download/path/
     """
 
-    def __init__(self):
-        self.keys = {}
-        try:
-            from jinja2 import Environment
-        except ImportError:
-            self.jinja = False
-        else:
-            self.jinja = True
-
-    def validator(self):
-        from flexget import validator
-        v = validator.factory('dict')
-        v.accept_any_key('any')
-        return v
-
-    def on_task_start(self, task, config):
-        """Checks that jinja2 is available"""
-        if not self.jinja:
-            log.warning("jinja2 module is not available, set plugin will only work with python string replacement.")
+    schema = {
+        "type": "object",
+        "minProperties": 1
+    }
 
     # Filter priority is -255 so we run after all filters are finished
     @plugin.priority(PRIORITY_LAST)

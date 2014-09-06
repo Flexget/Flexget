@@ -5,6 +5,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger('rapidpush')
 
@@ -33,36 +34,22 @@ class OutputRapidPush(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-
-    def validator(self):
-        from flexget import validator
-        config = validator.factory('dict')
-        config.accept('text', key='apikey', required=True)
-        config.accept('list', key='apikey').accept('text')
-        config.accept('text', key='category')
-        config.accept('text', key='title')
-        config.accept('text', key='group')
-        config.accept('text', key='channel')
-        config.accept('integer', key='priority')
-        config.accept('text', key='message')
-        config.accept('boolean', key='notify_accepted')
-        config.accept('boolean', key='notify_rejected')
-        config.accept('boolean', key='notify_failed')
-        config.accept('boolean', key='notify_undecided')
-        return config
-
-    def prepare_config(self, config):
-        config.setdefault('title', 'New release')
-        config.setdefault('category', 'FlexGet')
-        config.setdefault('priority', 2)
-        config.setdefault('group', '')
-        config.setdefault('channel', '')
-        config.setdefault('message', '{{title}}')
-        config.setdefault('notify_accepted', True)
-        config.setdefault('notify_rejected', False)
-        config.setdefault('notify_failed', False)
-        config.setdefault('notify_undecided', False)
-        return config
+    schema = {
+        'type': 'object',
+        'properties': {
+            'apikey': one_or_more({'type': 'string'}),
+            'category': {'type': 'string', 'default': 'Flexget'},
+            'title': {'type': 'string', 'default': 'New Release'},
+            'group': {'type': 'string', 'default': ''},
+            'channel': {'type': 'string', 'default': ''},
+            'priority': {'type': 'integer', 'default': 2},
+            'message': {'type': 'string', 'default': '{{title}}'},
+            'notify_accepted': {'type': 'boolean', 'default': True},
+            'notify_rejected': {'type': 'boolean', 'default': False},
+            'notify_failed': {'type': 'boolean', 'default': False},
+            'notify_undecided': {'type': 'boolean', 'default': False}
+        }
+    }
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)

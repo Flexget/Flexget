@@ -24,7 +24,7 @@ class InputTail(object):
       format:
         <field>: <python string formatting>
 
-    Note: each entry must have atleast two fields, title and url
+    Note: each entry must have at least two fields, title and url
 
     You may wish to specify encoding used by file so file can be properly
     decoded. List of encodings
@@ -39,19 +39,22 @@ class InputTail(object):
           url: 'URL: (.*)'
         encoding: utf8
     """
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('file', key='file', required=True)
-        root.accept('text', key='encoding')
-        entry = root.accept('dict', key='entry', required=True)
-        entry.accept('regexp', key='url', required=True)
-        entry.accept('regexp', key='title', required=True)
-        entry.accept_any_key('regexp')
-        format = root.accept('dict', key='format')
-        format.accept_any_key('text')
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'file': {'type': 'string', 'format': 'file'},
+            'encoding': {'type': 'string'},
+            'entry': {
+                'type': 'object',
+                'properties': {
+                    'url': {'type': 'string', 'format': 'regex'},
+                    'title': {'type': 'string', 'format': 'regex'}
+                },
+                'required': ['url', 'title']
+            }
+        },
+        'required': ['file', 'entry']
+    }
 
     def format_entry(self, entry, d):
         for k, v in d.iteritems():

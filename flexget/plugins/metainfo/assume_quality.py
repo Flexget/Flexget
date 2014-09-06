@@ -28,8 +28,9 @@ class AssumeQuality(object):
 
     schema = {
         'oneOf': [
-            {'title':'simple config', 'type': 'string', 'format': 'quality'},
-            {'title':'advanced config', 'type': 'object',
+            {'title': 'simple config', 'type': 'string', 'format': 'quality'},
+            {
+                'title': 'advanced config', 'type': 'object',
                    #Can't validate dict keys, so allow any
                    'additionalProperties': {'type': 'string', 'format': 'quality'}
             }

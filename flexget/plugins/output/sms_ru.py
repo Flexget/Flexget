@@ -30,14 +30,14 @@ class OutputSMSru(object):
     Configuration parameters are also supported from entries (eg. through set).
 
     """
-
-    def validator(self):
-        from flexget import validator
-        config = validator.factory("dict")
-        config.accept("text", key="phonenumber", required=True)
-        config.accept("text", key="password", required=True)
-        config.accept("text", key="message", required=False)
-        return config
+    schema = {
+        'type': 'object',
+        'properties': {
+            'phonenumber': {'type': 'string'},
+            'password': {'type': 'string'},
+            'message': {'type': 'string', 'default': 'accepted {{title}}'}
+        }
+    }
 
     def prepare_config(self, config):
         if isinstance(config, bool):
