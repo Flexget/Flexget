@@ -66,11 +66,11 @@ class BetaSeriesList(object):
             'password': {'type': 'string'},
             'api_key': {'type': 'string'},
             'members': {
-                    'type': 'array',
-                    'items': {
-                        "title": "member name",
-                        "type": "string"
-                    }
+                'type': 'array',
+                'items': {
+                    "title": 'member name',
+                    "type": "string"
+                }
             }
         },
         'required': ['username', 'password', 'api_key'],

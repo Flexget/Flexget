@@ -29,10 +29,10 @@ class GenSeries(object):
     def __init__(self):
         self.entries = []
 
-    def validator(self):
-        from flexget import validator
-        container = validator.factory('any')
-        return container
+    schema = {
+        'type': 'object',
+        'minProperties': 1
+    }
 
     @plugin.priority(200)
     def on_task_start(self, task, config):

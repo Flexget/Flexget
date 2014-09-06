@@ -17,26 +17,23 @@ log = logging.getLogger('emit_movie_queue')
 class EmitMovieQueue(object):
     """Use your movie queue as an input by emitting the content of it"""
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('boolean')
-        advanced = root.accept('dict')
-        advanced.accept('boolean', key='year')
-        advanced.accept('boolean', key='quality')
-        return root
-
-    def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {}
-        config.setdefault('year', True)
-        config.setdefault('quality', False)
-        return config
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'year': {'type': 'boolean', 'default': True},
+                    'quality': {'type': 'boolean', 'default': False},
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def on_task_input(self, task, config):
         if not config:
             return
-        config = self.prepare_config(config)
 
         entries = []
 

@@ -6,6 +6,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger("pushbullet")
 
@@ -26,29 +27,20 @@ class OutputPushbullet(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-
-    def validator(self):
-        from flexget import validator
-        config = validator.factory("dict")
-        config.accept("text", key="apikey", required=True)
-        config.accept("text", key="device", required=False)
-        config.accept("list", key="device").accept("text")
-        config.accept("text", key="title", required=False)
-        config.accept("text", key="body", required=False)
-        return config
-
-    def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {"enabled": config}
-
-        # TODO: don't assume it's a download
-        config.setdefault("title", "{{task}} - Download started")
-        # TODO: use template file
-        config.setdefault("body", "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} "
-                                     "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "
-                                     "{{imdb_year}}{% else %}{{title}}{% endif %}")
-        config.setdefault("device", None)
-        return config
+    default_body = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} {{series_id}} " \
+                   "{{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}}" \
+                   " {{imdb_year}}{% else %}{{title}}{% endif %}"
+    schema = {
+        'type': 'object',
+        'properties': {
+            'apikey': {'type': 'string'},
+            'device': one_or_more({'type': 'string', 'default': ''}),
+            'title': {'type': 'string', 'default': '{{task}} - Download started'},
+            'body': {'type': 'string', 'default': default_body}
+        },
+        'required': ['apikey'],
+        'additionalProperties': False
+    }
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)

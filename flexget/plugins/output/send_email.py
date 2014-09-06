@@ -13,45 +13,36 @@ from flexget.event import event
 from flexget.utils.template import render_from_task, get_template, RenderError
 from flexget.utils.tools import merge_dict_from_to, MergeException
 from flexget import validator
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger('email')
 
 # A dict which stores the email content from each task when plugin is configured globally
 task_content = {}
 
-
-def options_validator():
-    email = validator.factory('dict')
-    email.accept('boolean', key='active')
-    email.accept('text', key='to', required=True)
-    email.accept('list', key='to', required=True).accept('text')
-    email.accept('text', key='from', required=True)
-    email.accept('text', key='smtp_host')
-    email.accept('integer', key='smtp_port')
-    email.accept('boolean', key='smtp_login')
-    email.accept('text', key='smtp_username')
-    email.accept('text', key='smtp_password')
-    email.accept('boolean', key='smtp_tls')
-    email.accept('boolean', key='smtp_ssl')
-    email.accept('text', key='template')
-    email.accept('text', key='subject')
-    return email
-
-
+schema = {
+    'type': 'object',
+    'properties': {
+        'active': {'type': 'boolean', 'default': True},
+        'to': one_or_more({'type': 'string'}),
+        'from': {'type': 'string'},
+        'smtp_host': {'type': 'string', 'default': 'localhost'},
+        'smtp_port': {'type': 'integer', 'default': 25},
+        'smtp_login': {'type': 'boolean', 'default': False},
+        'smtp_username': {'type': 'string', 'default': ''},
+        'smtp_password': {'type': 'string', 'default': ''},
+        'smtp_tls': {'type': 'boolean', 'default': False},
+        'smtp_ssl': {'type': 'boolean', 'default': False},
+        'template': {'type': 'string', 'default': 'default.template'},
+        'subject': {'type': 'string'},
+    },
+    'required': ['to', 'from'],
+    'additionalProperties': False,
+}
 def prepare_config(config):
-    config.setdefault('active', True)
-    config.setdefault('smtp_host', 'localhost')
-    config.setdefault('smtp_port', 25)
-    config.setdefault('smtp_login', False)
-    config.setdefault('smtp_username', '')
-    config.setdefault('smtp_password', '')
-    config.setdefault('smtp_tls', False)
-    config.setdefault('smtp_ssl', False)
-    config.setdefault('template', 'default.template')
     if not isinstance(config['to'], list):
         config['to'] = [config['to']]
     return config
-
 
 @event('manager.execute.started')
 def setup(manager):
@@ -233,15 +224,9 @@ class OutputEmail(object):
         smtp_ssl: False
     """
 
-    def validator(self):
-        v = options_validator()
-        v.accept('boolean', key='global')
-        return v
-
     @plugin.priority(0)
     def on_task_output(self, task, config):
         config = prepare_config(config)
-
         if not config['active']:
             return
 
@@ -294,4 +279,4 @@ def register_plugin():
 
 @event('config.register')
 def register_config_key():
-    config_schema.register_config_key('email', options_validator().schema())
+    config_schema.register_config_key('email', schema)

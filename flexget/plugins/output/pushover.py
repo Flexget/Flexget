@@ -5,6 +5,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger("pushover")
 
@@ -29,38 +30,28 @@ class OutputPushover(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-
-    def validator(self):
-        from flexget import validator
-        config = validator.factory("dict")
-        config.accept("text", key="userkey", required=True)
-        config.accept("list", key="userkey").accept("text")
-        config.accept("text", key="apikey", required=True)
-        config.accept("text", key="device", required=False)
-        config.accept("text", key="title", required=False)
-        config.accept("text", key="message", required=False)
-        config.accept("integer", key="priority", required=False)
-        config.accept("url", key="url", required=False)
-        config.accept("text", key="sound", required=False)
-        return config
-
-    def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {"enabled": config}
-
-        # Set the defaults
-        config.setdefault("device", None)
-        # TODO: don't assume it's a download
-        config.setdefault("title", "{{task}}")
-        # TODO: use template file
-        config.setdefault("message", "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} "
-                                     "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "
-                                     "{{imdb_year}}{% else %}{{title}}{% endif %}")
-        config.setdefault("priority", 0)
-        config.setdefault("url", "{% if imdb_url is defined %}{{imdb_url}}{% endif %}")
-        config.setdefault("sound", "pushover")
-
-        return config
+    default_message = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} " \
+                      "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "\
+                      "{{imdb_year}}{% else %}{{title}}{% endif %}"
+    schema = {
+        'type': 'object',
+        'properties': {
+            'userkey': one_or_more({'type': 'string'}),
+            'apikey': {'type': 'string'},
+            'device': {'type': 'string', 'default': ''},
+            'title': {'type': 'string', 'default': "{{task}}"},
+            'message': {'type': 'string', 'default': default_message},
+            'priority': {'type': 'integer', 'default': 0},
+            'url': {
+                'type': 'string',
+                'format': 'url',
+                'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'
+            },
+            'sound': {'type': 'string', 'default': 'pushover'}
+        },
+        'required': ['userkey', 'apikey'],
+        'additionalProperties': False
+    }
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
