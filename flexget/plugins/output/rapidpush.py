@@ -48,7 +48,9 @@ class OutputRapidPush(object):
             'notify_rejected': {'type': 'boolean', 'default': False},
             'notify_failed': {'type': 'boolean', 'default': False},
             'notify_undecided': {'type': 'boolean', 'default': False}
-        }
+        },
+        'additionalProperties': False,
+        'required': ['apikey']
     }
 
     # Run last to make sure other outputs are successful before sending notification

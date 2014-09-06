@@ -36,16 +36,10 @@ class OutputSMSru(object):
             'phonenumber': {'type': 'string'},
             'password': {'type': 'string'},
             'message': {'type': 'string', 'default': 'accepted {{title}}'}
-        }
+        },
+        'additionalProperties': False,
+        'required': ['phonenumber', 'password']
     }
-
-    def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {"enabled": config}
-
-        # Set the defaults
-        config.setdefault("message", "accepted {{title}}")
-        return config
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)

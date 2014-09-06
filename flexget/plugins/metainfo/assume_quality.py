@@ -31,8 +31,8 @@ class AssumeQuality(object):
             {'title': 'simple config', 'type': 'string', 'format': 'quality'},
             {
                 'title': 'advanced config', 'type': 'object',
-                   #Can't validate dict keys, so allow any
-                   'additionalProperties': {'type': 'string', 'format': 'quality'}
+                #Can't validate dict keys, so allow any
+                'additionalProperties': {'type': 'string', 'format': 'quality'}
             }
         ]
     }

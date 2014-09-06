@@ -34,18 +34,13 @@ class OutputPushbullet(object):
         'type': 'object',
         'properties': {
             'apikey': {'type': 'string'},
-            'device': one_or_more({'type': 'string', 'default': None}),
+            'device': one_or_more({'type': 'string', 'default': ''}),
             'title': {'type': 'string', 'default': '{{task}} - Download started'},
             'body': {'type': 'string', 'default': default_body}
         },
         'required': ['apikey'],
         'additionalProperties': False
     }
-
-    def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {"enabled": config}
-        return config
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)

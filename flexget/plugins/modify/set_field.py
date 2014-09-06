@@ -22,7 +22,7 @@ class ModifySet(object):
     """
 
     schema = {
-        "type": "object",
+        'type': 'object',
         "minProperties": 1
     }
 

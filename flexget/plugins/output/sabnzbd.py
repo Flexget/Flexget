@@ -40,7 +40,8 @@ class OutputSabnzbd(object):
             'password': {'type': 'string'},
             'username': {'type': 'string'},
         },
-        'required': ['key', 'url']
+        'required': ['key', 'url'],
+        'additionalProperties': False,
     }
 
     def get_params(self, config):

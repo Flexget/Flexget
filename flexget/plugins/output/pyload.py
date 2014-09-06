@@ -60,22 +60,22 @@ class PluginPyLoad(object):
         'oneOf': [
             {'type': 'boolean'},
             {'type': 'object',
-             'properties': {
+                'properties': {
+                    'api': {'type': 'string'},
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'folder': {'type': 'string'},
+                    'package': {'type': 'string'},
+                    'queue': {'type': 'boolean'},
+                    'parse_url': {'type': 'boolean'},
+                    'multiple_hoster': {'type': 'boolean'},
+                    'hoster': one_or_more({'type': 'string'}),
+                    'preferred_hoster_only': {'type': 'boolean'},
+                    'handle_no_url_as_failure': {'type': 'boolean'},
+                    'enabled': {'type': 'boolean'},
 
-             'api': {'type': 'string'},
-             'username': {'type': 'string'},
-             'password': {'type': 'string'},
-             'folder': {'type': 'string'},
-             'package': {'type': 'string'},
-             'queue': {'type': 'boolean'},
-             'parse_url': {'type': 'boolean'},
-             'multiple_hoster': {'type': 'boolean'},
-             'hoster': one_or_more({'type': 'string'}),
-             'preferred_hoster_only': {'type': 'boolean'},
-             'handle_no_url_as_failure': {'type': 'boolean'},
-             'enabled': {'type': 'boolean'},
-
-             }
+                },
+                'additionalProperties': False
              }
         ]
     }

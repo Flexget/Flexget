@@ -22,10 +22,6 @@ class RlsLog(object):
     """
     schema = {'type': 'string', 'format': 'url'}
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('url')
-
     def parse_rlslog(self, rlslog_url, task):
         """
         :param rlslog_url: Url to parse from

@@ -38,7 +38,7 @@ class OutputPushover(object):
         'properties': {
             'userkey': one_or_more({'type': 'string'}),
             'apikey': {'type': 'string'},
-            'device': {'type': 'string', 'default': None},
+            'device': {'type': 'string', 'default': ''},
             'title': {'type': 'string', 'default': "{{task}}"},
             'message': {'type': 'string', 'default': default_message},
             'priority': {'type': 'integer', 'default': 0},
@@ -52,11 +52,6 @@ class OutputPushover(object):
         'required': ['userkey', 'apikey'],
         'additionalProperties': False
     }
-
-    def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {"enabled": config}
-        return config
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)

@@ -51,9 +51,14 @@ class InputTail(object):
                     'title': {'type': 'string', 'format': 'regex'}
                 },
                 'required': ['url', 'title']
+            },
+            'format': {
+                'type': 'object',
+                'additionalProperties': {'type': 'string'}
             }
         },
-        'required': ['file', 'entry']
+        'required': ['file', 'entry'],
+        'additionalProperties': False
     }
 
     def format_entry(self, entry, d):

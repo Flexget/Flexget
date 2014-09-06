@@ -39,19 +39,23 @@ class Text(object):
     schema = {
         'type': 'object',
         'properties': {
-            'url': {'type': 'string', 'format': 'url'},
-            'file': {'type': 'string', 'format': 'file'},
+            'url': {'type': 'string', 'format': ['url', 'file']},
             'entry': {
                 'type': 'object',
                 'properties': {
                     'url': {'type': 'string', 'format': 'regex'},
                     'title': {'type': 'string', 'format': 'regex'}
                 },
+                'additionalProperties': {'type': 'string', 'format': 'regex'},
                 'required': ['url', 'title']
             },
-            'format': {'type': 'object', 'item': {'type': 'string'}}
+            'format': {
+                'type': 'object',
+                'additionalProperties': {'type': 'string'}
+            }
         },
-        'required': ['entry']
+        'required': ['entry', 'url'],
+        'additonalProperties': False
     }
 
     def format_entry(self, entry, d):

@@ -75,7 +75,8 @@ class InputThetvdbFavorites(object):
             'account_id': {'type': 'string'},
             'strip_dates': {'type': 'boolean'}
         },
-        'required': ['account_id']
+        'required': ['account_id'],
+        'additionalProperties': False
     }
 
     @cached('thetvdb_favorites')

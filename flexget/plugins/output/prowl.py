@@ -33,7 +33,7 @@ class OutputProwl(object):
         'type': 'object',
         'properties': {
             'apikey': {'type': 'string'},
-            'application': {'type': 'string', 'default': 'Flexget'},
+            'application': {'type': 'string', 'default': 'FlexGet'},
             'event': {'type': 'string', 'default': 'New Release'},
             'priority': {'type': 'integer', 'default': 0},
             'description': {'type': 'string'}
@@ -42,15 +42,9 @@ class OutputProwl(object):
         'additionalProperties': False
     }
 
-    def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {'enabled': config}
-        return config
-
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
-        config = self.prepare_config(config)
         for entry in task.accepted:
 
             # get the parameters

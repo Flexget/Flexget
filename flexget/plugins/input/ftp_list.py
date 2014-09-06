@@ -43,9 +43,10 @@ class InputFtpList(object):
                     'password': {'type': 'string'},
                     'host': {'type': 'string'},
                     'port': {'type': 'integer'},
-                    'use-ssl': {'type': 'boolean'},
-                    'encoding': {'type': 'string', 'enum': encodings},
-                    'files-only': {'type': 'boolean'}
+                    'use-ssl': {'type': 'boolean', 'default': False},
+                    'encoding': {'type': 'string', 'enum': encodings, 'default': 'auto'},
+                    'files-only': {'type': 'boolean', 'default': False},
+                    'recursive': {'type': 'boolean', 'default': False}
                 },
                 'additionProperties': False,
                 'required': ['name', 'username', 'password', 'host', 'port'],

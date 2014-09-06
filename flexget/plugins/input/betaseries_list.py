@@ -68,7 +68,7 @@ class BetaSeriesList(object):
             'members': {
                 'type': 'array',
                 'items': {
-                    "title": "member name",
+                    "title": 'member name',
                     "type": "string"
                 }
             }

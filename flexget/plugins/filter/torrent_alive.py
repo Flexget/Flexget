@@ -170,29 +170,17 @@ class TorrentAlive(object):
                 'type': 'object',
                 'properties': {
                     'min_seeds': {'type': 'integer'},
-                    'reject_for': {'type': 'integer', 'format': 'interval'},
+                    'reject_for': {'type': 'string', 'format': 'interval'},
                 },
                 'additionalProperties': False
             }
-
-
         ]
     }
-
-    def prepare_config(self, config):
-        # Convert config to dict form
-        if not isinstance(config, dict):
-            config = {'min_seeds': int(config)}
-        # Set the defaults
-        config.setdefault('min_seeds', 1)
-        config.setdefault('reject_for', '1 hour')
-        return config
 
     @plugin.priority(150)
     def on_task_filter(self, task, config):
         if not config:
             return
-        config = self.prepare_config(config)
         for entry in task.entries:
             if 'torrent_seeds' in entry and entry['torrent_seeds'] < config['min_seeds']:
                 entry.reject(reason='Had < %d required seeds. (%s)' %
@@ -203,7 +191,6 @@ class TorrentAlive(object):
     def on_task_output(self, task, config):
         if not config:
             return
-        config = self.prepare_config(config)
         min_seeds = config['min_seeds']
 
         for entry in task.accepted:

@@ -36,14 +36,19 @@ schema = {
         'template': {'type': 'string', 'default': 'default.template'},
         'subject': {'type': 'string'},
     },
-    'required': ['to', 'from']
+    'required': ['to', 'from'],
+    'additionalProperties': False,
 }
+def prepare_config(config):
+    if not isinstance(config['to'], list):
+        config['to'] = [config['to']]
+    return config
 
 @event('manager.execute.started')
 def setup(manager):
     if not 'email' in manager.config:
         return
-    config = manager.config['email']
+    config = prepare_config(manager.config['email'])
     config['global'] = True
     global task_content
     task_content = {}
@@ -60,7 +65,7 @@ def setup(manager):
 def global_send(manager):
     if not 'email' in manager.config:
         return
-    config = manager.config['email']
+    config = prepare_config(manager.config['email'])
     content = ''
     for task, text in task_content.iteritems():
         content += '_' * 30 + ' Task: %s ' % task + '_' * 30 + '\n'
@@ -221,7 +226,7 @@ class OutputEmail(object):
 
     @plugin.priority(0)
     def on_task_output(self, task, config):
-
+        config = prepare_config(config)
         if not config['active']:
             return
 

@@ -75,12 +75,7 @@ class InputPlex(object):
             'port': {'type': 'integer', 'default': 32400},
             'username': {'type': 'string', 'default': ''},
             'password': {'type': 'string', 'default': ''},
-            'section': {
-                'oneOf': [
-                    {'item': {'type': 'string'}},
-                    {'item': {'type': 'integer'}},
-                ]
-            },
+            'section': {'type': ['string', 'integer']},
             'selection': {'type': 'string', 'default': 'all'},
             'lowercase_title': {'type': 'boolean', 'default': False},
             'strip_non_alpha': {'type': 'boolean', 'default': True},
@@ -94,6 +89,10 @@ class InputPlex(object):
         },
         'required': ['section']
     }
+    def prepare_config(self, config):
+        config['plexserver'] = config['server']
+        config = self.plex_format_server(config)
+        return config
 
     def plex_get_globalaccesstoken(self, config):
         header = {'X-Plex-Client-Identifier': 'flexget'}
@@ -140,6 +139,7 @@ class InputPlex(object):
         return isinstance(section, int)
 
     def on_task_input(self, config):
+        config = self.prepare_config(config)
         urlconfig = {}
         urlappend = "?"
         entries = []

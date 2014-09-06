@@ -57,7 +57,7 @@ class Subtitles(object):
     schema = {
         'type': 'object',
         'properties': {
-            'languages': {'type': 'array', 'items': {'type': 'string', 'default': 'eng'}},
+            'languages': {'type': 'array', 'items': {'type': 'string'}, 'default': ['eng']},
             'min_sub_rating': {'type': 'number', 'default': 0.0},
             'match_limit': {'type': 'number', 'default': 0.8},
             'output': {'type': 'string', 'format': 'path'}
@@ -68,6 +68,7 @@ class Subtitles(object):
     def prepare_config(self, config, task):
         if not isinstance(config, dict):
             config = {}
+        config.setdefault('output', task.manager.config_base)
         config['output'] = os.path.expanduser(config['output'])
         return config
 
