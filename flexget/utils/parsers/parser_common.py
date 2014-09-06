@@ -214,7 +214,7 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
         if not self.allow_groups:
             return True
         if not self.group:
-            return True
+            return False
         return self.group.lower() in [x.lower() for x in self.allow_groups]
 
     @property
