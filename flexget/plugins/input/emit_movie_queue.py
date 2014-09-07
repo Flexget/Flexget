@@ -23,18 +23,23 @@ class EmitMovieQueue(object):
             {
                 'type': 'object',
                 'properties': {
-                    'year': {'type': 'boolean', 'default': True},
-                    'quality': {'type': 'boolean', 'default': False},
+                    'year': {'type': 'boolean'},
+                    'quality': {'type': 'boolean'},
                 },
                 'additionalProperties': False
             }
         ]
     }
 
+    def prepare_config(self, config):
+        if isinstance(config, bool):
+            config = {}
+        return config
+
     def on_task_input(self, task, config):
         if not config:
             return
-
+        config = self.prepare_config(config)
         entries = []
 
         for queue_item in queue_get(session=task.session):

@@ -39,7 +39,12 @@ class Text(object):
     schema = {
         'type': 'object',
         'properties': {
-            'url': {'type': 'string', 'format': ['url', 'file']},
+            'url': {
+                'oneOf': [
+                    {'type': 'string', 'format': 'url'},
+                    {'type': 'string', 'format': 'file'}
+                ]
+            },
             'entry': {
                 'type': 'object',
                 'properties': {
