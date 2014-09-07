@@ -34,6 +34,8 @@ class EmitMovieQueue(object):
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {}
+        config.setdefault('year', True)
+        config.setdefault('quality', False)
         return config
 
     def on_task_input(self, task, config):
