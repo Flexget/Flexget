@@ -56,8 +56,6 @@ class OutputPushover(object):
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
-        # get the parameters
-        config = self.prepare_config(config)
 
         # Support for multiple userkeys 
         userkeys = config["userkey"]
