@@ -57,7 +57,6 @@ class OutputRapidPush(object):
     @plugin.priority(0)
     def on_task_output(self, task, config):
         # get the parameters
-        config = self.prepare_config(config)
 
         if config['notify_accepted']:
             log.debug("Notify accepted entries")
