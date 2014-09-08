@@ -217,12 +217,12 @@ class UrlRewriteTorrent411(object):
             discover:
               what:
                 - emit_movie_queue: yes
-            from:
-              torrent411:
-                username: xxxxxxxx  (required)
-                password: xxxxxxxx  (required)
-                category: Film
-                sub_category: Multi
+              from:
+                - torrent411:
+                    username: xxxxxxxx  (required)
+                    password: xxxxxxxx  (required)
+                    category: Film
+                    sub_category: Multi-Francais
 
 
             ---
@@ -362,7 +362,7 @@ class UrlRewriteTorrent411(object):
                     elif size.group(2) == 'K':
                         entry['content_size'] = int(float(size.group(1)) * 1000 / 1024 ** 2)
                     else:
-                        entry['content_size'] = int(float(size.group(1)) / 1024 ** 2)  
+                        entry['content_size'] = int(float(size.group(1)) / 1024 ** 2)
                 auth_handler = t411Auth(config['username'],
                                         config['password'])
 
