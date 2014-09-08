@@ -192,7 +192,7 @@ class t411Auth(AuthBase):
         return r
 
 
-class UrlRewriteIPTorrents(object):
+class UrlRewriteTorrent411(object):
     """
         torrent411 Urlrewriter and search Plugin.
 
@@ -207,7 +207,7 @@ class UrlRewriteIPTorrents(object):
 
             - OR -
 
-            -- RSS NORMAL URL REWRITE (i.e.: http://api.t411.me/torrents/download/12345678)
+            -- RSS NORMAL URL REWRITE (i.e.: http://www.t411.me/torrents/download/?id=12345678)
             -- WARNING: NEED CUSTOM COOKIES NOT HANDLE BY THIS PLUGIN
             rss:
               url: http://www.t411.me/rss/?cat=210
@@ -301,7 +301,7 @@ class UrlRewriteIPTorrents(object):
     @plugin.internet(log)
     def search(self, entry, config=None):
         """
-        Search for name from torrentleech.
+        Search for name from torrent411.
         """
         url_base = 'http://www.t411.me'
 
@@ -376,7 +376,7 @@ class UrlRewriteIPTorrents(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteIPTorrents, 'torrent411',
+    plugin.register(UrlRewriteTorrent411, 'torrent411',
                     groups=['urlrewriter', 'search'],
                     api_ver=2
                     )
