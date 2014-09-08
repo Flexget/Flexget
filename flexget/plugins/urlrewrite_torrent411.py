@@ -253,10 +253,9 @@ class UrlRewriteTorrent411(object):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'category': {'type': 'string'},
-            'sub_category': one_or_more({
-                'oneOf': [
-                    {'type': 'string', 'enum': list(SUB_CATEGORIES)},
-                ]}),
+            'sub_category': one_or_more(
+                    {'type': 'string', 'enum': list(SUB_CATEGORIES)}
+                ),
         },
         'required': ['username', 'password'],
         'additionalProperties': False
