@@ -242,9 +242,9 @@ class UrlRewriteTorrent411(object):
               BDrip-SD, Bluray-4K, Bluray-Full-Remux, BRrip-SD, DVD-R-5,
               DVD-R-9, DVDrip, HDrip-1080p, HDrip-720p, TVrip-SD,
               TVripHD-1080p, TVripHD-720p, VCD-SVCD-VHSrip, WEBrip,
-              WEBripHD-1080p, WEBripHD-1080p': 720,
+              WEBripHD-1080p, WEBripHD-1080p
 
-              2D, 3D-Converti-Amateur, 3D-Converti-Pro, 3D-Natif': 23,
+              2D, 3D-Converti-Amateur, 3D-Converti-Pro, 3D-Natif
     """
 
     schema = {
