@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:other="http://localhost/flexget">
   <channel>
     <title>FlexGet RSS test</title>
     <ttl>15</ttl>

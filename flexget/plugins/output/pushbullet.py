@@ -6,12 +6,13 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
+from flexget.config_schema import one_or_more
 
-log = logging.getLogger("pushbullet")
+log = logging.getLogger('pushbullet')
 
 __version__ = 0.1
-client_headers = {"User-Agent": "FlexGet Pushbullet plugin/%s" % str(__version__)}
-pushbullet_url = "https://api.pushbullet.com/api/pushes"
+client_headers = {'User-Agent': 'FlexGet Pushbullet plugin/%s' % str(__version__)}
+pushbullet_url = 'https://api.pushbullet.com/api/pushes'
 
 
 class OutputPushbullet(object):
@@ -26,86 +27,72 @@ class OutputPushbullet(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-
-    def validator(self):
-        from flexget import validator
-        config = validator.factory("dict")
-        config.accept("text", key="apikey", required=True)
-        config.accept("text", key="device", required=False)
-        config.accept("list", key="device").accept("text")
-        config.accept("text", key="title", required=False)
-        config.accept("text", key="body", required=False)
-        return config
-
-    def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {"enabled": config}
-
-        # TODO: don't assume it's a download
-        config.setdefault("title", "{{task}} - Download started")
-        # TODO: use template file
-        config.setdefault("body", "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} "
-                                     "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "
-                                     "{{imdb_year}}{% else %}{{title}}{% endif %}")
-        config.setdefault("device", None)
-        return config
+    default_body = ('{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} {{series_id}} '
+                    '{{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} '
+                    '{{imdb_year}}{% else %}{{title}}{% endif %}')
+    schema = {
+        'type': 'object',
+        'properties': {
+            'apikey': {'type': 'string'},
+            'device': one_or_more({'type': 'string'}),
+            'title': {'type': 'string', 'default': '{{task}} - Download started'},
+            'body': {'type': 'string', 'default': default_body}
+        },
+        'required': ['apikey'],
+        'additionalProperties': False
+    }
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
-        # get the parameters
-        config = self.prepare_config(config)
 
-        # Support for multiple devices 
-        devices = config["device"]
+        # Support for multiple devices
+        devices = config.get('device')
         if not isinstance(devices, list):
             devices = [devices]
- 
+
         # Set a bunch of local variables from the config
-        apikey = config["apikey"]
-        device = config["device"]
-            
-        client_headers["Authorization"] = "Basic %s" % base64.b64encode(apikey)
-        
+        apikey = config['apikey']
+
+        client_headers['Authorization'] = 'Basic %s' % base64.b64encode(apikey)
+
         if task.options.test:
-            log.info("Test mode. Pushbullet configuration:")
-            log.info("    API_KEY: %s" % apikey)
-            log.info("    Type: Note")
-            log.info("    Device: %s" % device)
+            log.info('Test mode. Pushbullet configuration:')
+            log.info('    API_KEY: %s' % apikey)
+            log.info('    Type: Note')
+            log.info('    Device: %s' % devices)
 
         # Loop through the provided entries
         for entry in task.accepted:
 
-            title = config["title"]
-            body = config["body"]
+            title = config['title']
+            body = config['body']
 
             # Attempt to render the title field
             try:
                 title = entry.render(title)
             except RenderError as e:
-                log.warning("Problem rendering 'title': %s" % e)
-                title = "Download started"
+                log.warning('Problem rendering `title`: %s' % e)
+                title = 'Download started'
 
             # Attempt to render the body field
             try:
                 body = entry.render(body)
             except RenderError as e:
-                log.warning("Problem rendering 'body': %s" % e)
-                body = entry["title"]
+                log.warning('Problem rendering `body`: %s' % e)
+                body = entry['title']
 
             for device in devices:
                 # Build the request
-                if not device:
-                    data = {"type": "note", "title": title, "body": body}
-                else:
-                    data = {"device_iden": device, "type": "note", "title": title, "body": body}
+                data = {'type': 'note', 'title': title, 'body': body}
+                if device:
+                    data['device_iden'] = device
 
                 # Check for test mode
                 if task.options.test:
-                    log.info("Test mode. Pushbullet notification would be:")
-                    log.info("    Title: %s" % title)
-                    log.info("    Body: %s" % body)
-                    
+                    log.info('Test mode. Pushbullet notification would be:')
+                    log.info('    Title: %s' % title)
+                    log.info('    Body: %s' % body)
                     # Test mode.  Skip remainder.
                     continue
 
@@ -117,16 +104,16 @@ class OutputPushbullet(object):
 
                 # error codes and messages from Pushbullet API
                 if request_status == 200:
-                    log.debug("Pushbullet notification sent")
+                    log.debug('Pushbullet notification sent')
                 elif request_status == 500:
-                    log.warning("Pushbullet notification failed, Pushbullet API having issues")
+                    log.warning('Pushbullet notification failed, Pushbullet API having issues')
                     #TODO: Implement retrying. API requests 5 seconds between retries.
                 elif request_status >= 400:
                     error = json.loads(response.content)['error']
-                    log.error("Pushbullet API error: %s" % error['message'])
+                    log.error('Pushbullet API error: %s' % error['message'])
                 else:
-                    log.error("Unknown error when sending Pushbullet notification")
+                    log.error('Unknown error when sending Pushbullet notification')
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(OutputPushbullet, "pushbullet", api_ver=2)
+    plugin.register(OutputPushbullet, 'pushbullet', api_ver=2)

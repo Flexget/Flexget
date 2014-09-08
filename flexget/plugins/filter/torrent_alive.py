@@ -63,7 +63,6 @@ def get_scrape_url(tracker_url, info_hash):
 
 def get_udp_seeds(url, info_hash):
     parsed_url = urlparse(url)
-    port = None
     try:
         port = parsed_url.port
     except ValueError as ve:
@@ -163,16 +162,20 @@ def get_tracker_seeds(url, info_hash):
 
 
 class TorrentAlive(object):
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('boolean')
-        root.accept('integer')
-        advanced = root.accept('dict')
-        advanced.accept('integer', key='min_seeds')
-        advanced.accept('interval', key='reject_for')
-        return root
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {'type': 'integer'},
+            {
+                'type': 'object',
+                'properties': {
+                    'min_seeds': {'type': 'integer'},
+                    'reject_for': {'type': 'string', 'format': 'interval'},
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def prepare_config(self, config):
         # Convert config to dict form

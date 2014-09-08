@@ -250,9 +250,7 @@ class ImdbLookup(object):
         'movie_name': 'title',
         'movie_year': 'year'}
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     @plugin.priority(130)
     def on_task_metainfo(self, task, config):

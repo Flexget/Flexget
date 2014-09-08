@@ -6,6 +6,7 @@ import re
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger('ftp_list')
 
@@ -30,33 +31,33 @@ class InputFtpList(object):
           - <directory 2>
           - ....
     """
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('list', key='dirs').accept('text')
-        config = root.accept('dict', key='config', required=True)
-        config.accept('text', key='name', required=True)
-        config.accept('text', key='username', required=True)
-        config.accept('text', key='password', required=True)
-        config.accept('text', key='host', required=True)
-        config.accept('integer', key='port', required=True)
-        config.accept('text', key='encoding')
-        config.accept('boolean', key='files-only')
-        config.accept('boolean', key='recursive')
-        config.accept('boolean', key='use-ssl')
-        return root
-
-    def prepare_config(self, config):
-        config['config'].setdefault('use-ssl', False)
-        config['config'].setdefault('encoding', 'auto')
-        config['config'].setdefault('files-only', False)
-        config['config'].setdefault('recursive', False)
-        config.setdefault('dirs', [""])
-        return config
+    encodings = ['auto', 'utf8', 'ascii']
+    schema = {
+        'type': 'object',
+        'properties': {
+            'config': {
+                'type': 'object',
+                'properties': {
+                    'name': {'type': 'string'},
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'host': {'type': 'string'},
+                    'port': {'type': 'integer'},
+                    'use-ssl': {'type': 'boolean', 'default': False},
+                    'encoding': {'type': 'string', 'enum': encodings, 'default': 'auto'},
+                    'files-only': {'type': 'boolean', 'default': False},
+                    'recursive': {'type': 'boolean', 'default': False}
+                },
+                'additionProperties': False,
+                'required': ['name', 'username', 'password', 'host', 'port'],
+            },
+            'dirs': one_or_more({'type': 'string'}),
+        },
+        'required': ['config'],
+        'additionalProperties': False
+    }
 
     def on_task_input(self, task, config):
-        config = self.prepare_config(config)
         connection_config = config['config']
 
         if connection_config['use-ssl']:
@@ -80,7 +81,7 @@ class InputFtpList(object):
         mlst_supported = False
 
         feat_response = ftp.sendcmd('FEAT').splitlines()
-        supported_extensions = [feat_item.strip().upper() for feat_item in feat_response[1:len(feat_response)-1]]
+        supported_extensions = [feat_item.strip().upper() for feat_item in feat_response[1:len(feat_response) - 1]]
 
         if encoding.lower() == 'auto' and 'UTF8' in supported_extensions:
             encoding = 'utf8'
@@ -93,7 +94,8 @@ class InputFtpList(object):
                 break
 
         if not mlst_supported:
-            log.warning('MLST Command is not supported by the FTP server %s@%s:%s', connection_config['username'], connection_config['host'], connection_config['port'])
+            log.warning('MLST Command is not supported by the FTP server %s@%s:%s', connection_config['username'],
+                        connection_config['host'], connection_config['port'])
 
         ftp.sendcmd('TYPE I')
         ftp.set_pasv(True)
@@ -107,7 +109,8 @@ class InputFtpList(object):
 
         return entries
 
-    def _handle_path(self, entries, ftp, baseurl, path='', mlst_supported=False, files_only=False, recursive=False, encoding=None):
+    def _handle_path(self, entries, ftp, baseurl, path='', mlst_supported=False, files_only=False, recursive=False,
+                     encoding=None):
         try:
             dirs = ftp.nlst(path)
         except ftplib.error_perm as e:
@@ -131,7 +134,8 @@ class InputFtpList(object):
                 mlst = self.parse_mlst(clean_mlst_output)
 
             if recursive and (not mlst_supported or mlst.get('type') == 'dir'):
-                is_directory = self._handle_path(entries, ftp, baseurl, path + '/' + p, mlst_supported, files_only, recursive, encoding)
+                is_directory = self._handle_path(entries, ftp, baseurl, path + '/' + p, mlst_supported, files_only,
+                                                 recursive, encoding)
                 if not is_directory and not mlst_supported:
                     mlst['type'] = 'file'
 

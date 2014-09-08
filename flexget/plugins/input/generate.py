@@ -12,8 +12,7 @@ log = logging.getLogger(__name__.rsplit('.')[-1])
 class Generate(object):
     """Generates n number of random entries. Used for debugging purposes."""
 
-    def validator(self):
-        return validator.factory('integer')
+    schema = {'type': 'integer'}
 
     def on_task_input(self, task, config):
         amount = config or 0  # hackily makes sure it's an int value

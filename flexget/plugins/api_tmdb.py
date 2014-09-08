@@ -113,27 +113,30 @@ class TMDBMovie(TMDBContainer, Base):
     genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
 
     def update_from_object(self, update_object):
-        TMDBContainer.update_from_object(self, update_object)
-        self.translated = len(update_object.translations) > 0
-        if len(update_object.languages) > 0:
-            self.language = update_object.languages[0].code #.code or .name ?
-        self.original_name = update_object.originaltitle
-        self.name = update_object.title
         try:
-            if len(update_object.alternate_titles) > 0:
-                # maybe we could choose alternate title from movie country only
-                self.alternative_name = update_object.alternate_titles[0].title
-        except UnicodeEncodeError:
-            # Bug in tmdb3 library, see #2437. Just don't set alternate_name when it fails
-            pass
-        self.imdb_id = update_object.imdb
-        self.url = update_object.homepage
-        self.rating = update_object.userrating
-        if len(update_object.youtube_trailers) > 0:
-            self.trailer = update_object.youtube_trailers[0].source # unicode: ooNSm6Uug3g
-        elif len(update_object.apple_trailers) > 0:
-            self.trailer = update_object.apple_trailers[0].source
-        self.released = update_object.releasedate
+            TMDBContainer.update_from_object(self, update_object)
+            self.translated = len(update_object.translations) > 0
+            if len(update_object.languages) > 0:
+                self.language = update_object.languages[0].code #.code or .name ?
+            self.original_name = update_object.originaltitle
+            self.name = update_object.title
+            try:
+                if len(update_object.alternate_titles) > 0:
+                    # maybe we could choose alternate title from movie country only
+                    self.alternative_name = update_object.alternate_titles[0].title
+            except UnicodeEncodeError:
+                # Bug in tmdb3 library, see #2437. Just don't set alternate_name when it fails
+                pass
+            self.imdb_id = update_object.imdb
+            self.url = update_object.homepage
+            self.rating = update_object.userrating
+            if len(update_object.youtube_trailers) > 0:
+                self.trailer = update_object.youtube_trailers[0].source # unicode: ooNSm6Uug3g
+            elif len(update_object.apple_trailers) > 0:
+                self.trailer = update_object.apple_trailers[0].source
+            self.released = update_object.releasedate
+        except tmdb3.TMDBError as e:
+            raise LookupError('Error updating data from tmdb: %s' % e)
 
 
 class TMDBGenre(TMDBContainer, Base):

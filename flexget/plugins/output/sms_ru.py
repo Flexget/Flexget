@@ -30,22 +30,16 @@ class OutputSMSru(object):
     Configuration parameters are also supported from entries (eg. through set).
 
     """
-
-    def validator(self):
-        from flexget import validator
-        config = validator.factory("dict")
-        config.accept("text", key="phonenumber", required=True)
-        config.accept("text", key="password", required=True)
-        config.accept("text", key="message", required=False)
-        return config
-
-    def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {"enabled": config}
-
-        # Set the defaults
-        config.setdefault("message", "accepted {{title}}")
-        return config
+    schema = {
+        'type': 'object',
+        'properties': {
+            'phonenumber': {'type': 'string'},
+            'password': {'type': 'string'},
+            'message': {'type': 'string', 'default': 'accepted {{title}}'}
+        },
+        'additionalProperties': False,
+        'required': ['phonenumber', 'password']
+    }
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
