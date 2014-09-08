@@ -201,6 +201,7 @@ class TorrentAlive(object):
     def on_task_output(self, task, config):
         if not config:
             return
+        config = self.prepare_config(config)
         min_seeds = config['min_seeds']
 
         for entry in task.accepted:
