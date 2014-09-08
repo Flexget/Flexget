@@ -20,25 +20,6 @@ log = logging.getLogger('email')
 # A dict which stores the email content from each task when plugin is configured globally
 task_content = {}
 
-schema = {
-    'type': 'object',
-    'properties': {
-        'active': {'type': 'boolean', 'default': True},
-        'to': one_or_more({'type': 'string'}),
-        'from': {'type': 'string'},
-        'smtp_host': {'type': 'string', 'default': 'localhost'},
-        'smtp_port': {'type': 'integer', 'default': 25},
-        'smtp_login': {'type': 'boolean', 'default': False},
-        'smtp_username': {'type': 'string', 'default': ''},
-        'smtp_password': {'type': 'string', 'default': ''},
-        'smtp_tls': {'type': 'boolean', 'default': False},
-        'smtp_ssl': {'type': 'boolean', 'default': False},
-        'template': {'type': 'string', 'default': 'default.template'},
-        'subject': {'type': 'string'},
-    },
-    'required': ['to', 'from'],
-    'additionalProperties': False,
-}
 def prepare_config(config):
     if not isinstance(config['to'], list):
         config['to'] = [config['to']]
@@ -224,6 +205,26 @@ class OutputEmail(object):
         smtp_ssl: False
     """
 
+    schema = {
+        'type': 'object',
+        'properties': {
+            'active': {'type': 'boolean', 'default': True},
+            'to': one_or_more({'type': 'string'}),
+            'from': {'type': 'string'},
+            'smtp_host': {'type': 'string', 'default': 'localhost'},
+            'smtp_port': {'type': 'integer', 'default': 25},
+            'smtp_login': {'type': 'boolean', 'default': False},
+            'smtp_username': {'type': 'string', 'default': ''},
+            'smtp_password': {'type': 'string', 'default': ''},
+            'smtp_tls': {'type': 'boolean', 'default': False},
+            'smtp_ssl': {'type': 'boolean', 'default': False},
+            'template': {'type': 'string', 'default': 'default.template'},
+            'subject': {'type': 'string'},
+            },
+        'required': ['to', 'from'],
+        'additionalProperties': False,
+        }
+
     @plugin.priority(0)
     def on_task_output(self, task, config):
         config = prepare_config(config)
@@ -275,8 +276,3 @@ class OutputEmail(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(OutputEmail, 'email', api_ver=2)
-
-
-@event('config.register')
-def register_config_key():
-    config_schema.register_config_key('email', schema)
