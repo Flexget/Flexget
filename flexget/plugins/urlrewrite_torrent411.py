@@ -229,7 +229,7 @@ class UrlRewriteTorrent411(object):
               Category is one of these:
 
               Animation, Animation-Serie, Concert, Documentaire, Emission-TV,
-              Film, erie-TV, Series, Spectacle, Sport, Video-clips
+              Film, Serie-TV, Series, Spectacle, Sport, Video-clips
 
             ---
               Sub-Category is any combination of:
