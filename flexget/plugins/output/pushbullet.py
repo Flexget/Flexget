@@ -34,7 +34,7 @@ class OutputPushbullet(object):
         'type': 'object',
         'properties': {
             'apikey': {'type': 'string'},
-            'device': one_or_more({'type': 'string', 'default': ''}),
+            'device': one_or_more({'type': 'string'}),
             'title': {'type': 'string', 'default': '{{task}} - Download started'},
             'body': {'type': 'string', 'default': default_body}
         },
@@ -46,22 +46,21 @@ class OutputPushbullet(object):
     @plugin.priority(0)
     def on_task_output(self, task, config):
 
-        # Support for multiple devices 
-        devices = config["device"]
+        # Support for multiple devices
+        devices = config.get('device')
         if not isinstance(devices, list):
             devices = [devices]
- 
+
         # Set a bunch of local variables from the config
         apikey = config["apikey"]
-        device = config["device"]
-            
+
         client_headers["Authorization"] = "Basic %s" % base64.b64encode(apikey)
-        
+
         if task.options.test:
             log.info("Test mode. Pushbullet configuration:")
             log.info("    API_KEY: %s" % apikey)
             log.info("    Type: Note")
-            log.info("    Device: %s" % device)
+            log.info("    Device: %s" % devices)
 
         # Loop through the provided entries
         for entry in task.accepted:
@@ -85,17 +84,15 @@ class OutputPushbullet(object):
 
             for device in devices:
                 # Build the request
-                if not device:
-                    data = {"type": "note", "title": title, "body": body}
-                else:
-                    data = {"device_iden": device, "type": "note", "title": title, "body": body}
+                data = {"type": "note", "title": title, "body": body}
+                if device:
+                    data['device_iden'] = device
 
                 # Check for test mode
                 if task.options.test:
                     log.info("Test mode. Pushbullet notification would be:")
                     log.info("    Title: %s" % title)
                     log.info("    Body: %s" % body)
-                    
                     # Test mode.  Skip remainder.
                     continue
 
