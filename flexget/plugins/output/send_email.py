@@ -220,10 +220,11 @@ class OutputEmail(object):
             'smtp_ssl': {'type': 'boolean', 'default': False},
             'template': {'type': 'string', 'default': 'default.template'},
             'subject': {'type': 'string'},
-            },
+            'global': {'type': 'boolean'}
+        },
         'required': ['to', 'from'],
         'additionalProperties': False,
-        }
+    }
 
     @plugin.priority(0)
     def on_task_output(self, task, config):
@@ -276,3 +277,8 @@ class OutputEmail(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(OutputEmail, 'email', api_ver=2)
+
+
+@event('config.register')
+def register_config_key():
+    config_schema.register_config_key('email', OutputEmail.schema)
