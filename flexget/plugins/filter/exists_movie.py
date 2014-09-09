@@ -7,7 +7,7 @@ from path import path
 from flexget import plugin
 from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.utils.parsers import get_parser, PARSER_MOVIE
+from flexget.plugin import get_plugin_by_name
 from flexget.utils.tools import TimedDict
 
 log = logging.getLogger('exists_movie')
@@ -81,7 +81,7 @@ class FilterExistsMovie(object):
                     continue
                 count_dirs += 1
 
-                movie = get_parser().parse(item, PARSER_MOVIE)
+                movie = get_plugin_by_name('parsing').instance.parse_movie(item)
 
                 try:
                     imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,

@@ -3,7 +3,9 @@
 from __future__ import unicode_literals, division, absolute_import
 from flexget.utils.parsers.parser_common import PARSER_EPISODE
 from nose.tools import assert_raises, raises
-from flexget.utils.parsers import ParseWarning, get_parser
+from flexget.utils.parsers import ParseWarning
+from flexget.plugin import get_plugin_by_name
+from tests import FlexGetBase
 
 #
 # NOTE:
@@ -32,9 +34,16 @@ if enable_logging:
     parser_log.setLevel(tests.setup_logging_level())
 
 
-class TestSeriesParser(object):
+class TestSeriesParser(FlexGetBase):
+    def setup(self):
+        FlexGetBase.setup(self)
+        get_plugin_by_name('parsing').instance.on_task_start(None, None)
+
+    def teardown(self):
+        FlexGetBase.teardown(self)
+
     def parse(self, data, name=None, **kwargs):
-        return get_parser().parse(data, type_=PARSER_EPISODE, name=name, **kwargs)
+        return get_plugin_by_name('parsing').instance.parse_series(data, name=name, **kwargs)
 
     def parse_invalid(self, name, data, **kwargs):
         """Makes sure either ParseWarning is raised, or return is invalid."""
@@ -576,13 +585,13 @@ class TestSeriesParser(object):
 
     def test_id_regexps(self):
         id_regexps=['(dog)?e(cat)?']
-        s = self.parse('The Show dogecat', id_regexps=id_regexps)
+        s = self.parse('The Show dogecat', name='The Show', id_regexps=id_regexps)
         assert s.valid
         assert s.id == 'dog-cat'
-        s = self.parse('The Show doge', id_regexps=id_regexps)
+        s = self.parse('The Show doge', name='The Show', id_regexps=id_regexps)
         assert s.valid
         assert s.id == 'dog'
-        s = self.parse('The Show ecat', id_regexps=id_regexps)
+        s = self.parse('The Show ecat', name='The Show', id_regexps=id_regexps)
         assert s.valid
         assert s.id == 'cat'
         #assert_raises(ParseWarning, s.parse, 'The Show e')

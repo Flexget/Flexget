@@ -8,7 +8,7 @@ from bs4.element import Tag
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session
 from flexget.utils.tools import str_to_int
-from flexget.utils.parsers import get_parser, PARSER_MOVIE
+from flexget.plugin import get_plugin_by_name
 
 log = logging.getLogger('utils.imdb')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
@@ -66,7 +66,7 @@ class ImdbSearch(object):
 
     def smart_match(self, raw_name):
         """Accepts messy name, cleans it and uses information available to make smartest and best match"""
-        parser = get_parser().parse(raw_name, PARSER_MOVIE)
+        parser = get_plugin_by_name('parsing').instance.parse_movie(raw_name)
         name = parser.name
         year = parser.year
         if name == '':

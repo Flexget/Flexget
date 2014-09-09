@@ -1,14 +1,21 @@
 from __future__ import unicode_literals, division, absolute_import
-from flexget.utils.titles import MovieParser
+from flexget.plugin import get_plugin_by_name
+from tests import FlexGetBase
 
 
-class TestMovieParser:
+class TestMovieParser(FlexGetBase):
+    def setup(self):
+        FlexGetBase.setup(self)
+        get_plugin_by_name('parsing').instance.on_task_start(None, None)
+
+    def teardown(self):
+        FlexGetBase.teardown(self)
+
+    def parse(self, data, name=None, **kwargs):
+        return get_plugin_by_name('parsing').instance.parse_series(data, name=name, **kwargs)
 
     def parse(self, data):
-        movieparser = MovieParser()
-        movieparser.data = data
-        movieparser.parse()
-        return movieparser
+        return get_plugin_by_name('parsing').instance.parse_movie(data)
 
     def test_parsing(self):
         movie = self.parse('The.Matrix.1999.1080p.HDDVD.x264-FlexGet')

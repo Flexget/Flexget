@@ -310,16 +310,18 @@ class TestFilterSeries(FlexGetBase):
         """Series plugin: test all option"""
         self.execute_task('test_all_series_mode')
         assert self.task.find_entry('accepted', title='Test.Series.S01E02.PDTV.XViD-FlexGet')
+        self.task.find_entry('accepted', title='Test Series - 1x03 - PDTV XViD-FlexGet')
         entry = self.task.find_entry('accepted', title='Test Series - 1x03 - PDTV XViD-FlexGet')
-        assert entry['series_name'] == 'Test Series'
+        assert entry
+        assert entry.get('series_name') == 'Test Series'
         entry = self.task.find_entry('accepted', title='Other.Show.S02E01.PDTV.XViD-FlexGet')
-        assert entry['series_guessed']
+        assert entry.get('series_guessed')
         entry2 = self.task.find_entry('accepted', title='other show season 2 episode 2')
         # Make sure case is normalized so series are marked with the same name no matter the case in the title
-        assert entry['series_name'] == entry2['series_name'] == 'Other Show', 'Series names should be in title case'
+        assert entry.get('series_name') == entry2.get('series_name') == 'Other Show', 'Series names should be in title case'
         entry = self.task.find_entry('accepted', title='Date.Show.03-29-2012.HDTV.XViD-FlexGet')
-        assert entry['series_guessed']
-        assert entry['series_name'] == 'Date Show'
+        assert entry.get('series_guessed')
+        assert entry.get('series_name') == 'Date Show'
 
     def test_alternate_name(self):
         self.execute_task('test_alternate_name')

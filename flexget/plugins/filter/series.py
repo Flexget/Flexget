@@ -18,7 +18,8 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.log import log_once
-from flexget.utils.parsers import get_parser, PARSER_EPISODE, ParseWarning, SERIES_ID_TYPES
+from flexget.utils.parsers import PARSER_EPISODE, ParseWarning, SERIES_ID_TYPES
+from flexget.plugin import get_plugin_by_name
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
@@ -1023,8 +1024,6 @@ class FilterSeries(FilterSeriesBase):
         for id_type in SERIES_ID_TYPES:
             params[id_type + '_regexps'] = get_as_array(config, id_type + '_regexp')
 
-        parser = get_parser()
-
         for entry in entries:
             parsed = None
 
@@ -1045,7 +1044,7 @@ class FilterSeries(FilterSeriesBase):
                     quality = entry['quality']
 
                 try:
-                    parsed = parser.parse(data, PARSER_EPISODE, series_name, **params)
+                    parsed = get_plugin_by_name('parsing').instance.parse_series(data, series_name, **params)
                 except ParseWarning as pw:
                     log_once(pw.value, logger=log)
                     parsed = pw.parsed

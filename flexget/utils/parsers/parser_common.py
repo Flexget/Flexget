@@ -15,11 +15,8 @@ PARSER_VIDEO = 1
 PARSER_MOVIE = 2
 PARSER_EPISODE = 3
 
-_default_parser = 'flexget.utils.parsers.parser_guessit.GuessitParser'
-#_default_parser = 'flexget.utils.parsers.parser_internal.InternalParser'
-_parsers = {}
-
 SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
+
 
 def clean_value(name):
     # Move anything in leading brackets to the end
@@ -38,6 +35,7 @@ def clean_value(name):
     #MovieParser.strip_spaces
     name = ' '.join(name.split())
     return name
+
 
 class ParseWarning(Warning):
     def __init__(self, parsed, value, **kwargs):
@@ -82,22 +80,6 @@ def _get_class(kls):
 
     return m
 
-
-def set_default_parser(parser_name):
-    global _default_parser
-    _default_parser = parser_name
-
-
-def get_parser(parser_name=None):
-    global _default_parser
-    parser_name = parser_name or _default_parser
-    parser = _parsers.get(parser_name)
-    if not parser:
-        parser_class = _get_class(parser_name)
-        if not parser_class:
-            parser_class = _get_class('flexget.utils.parsers.' + parser_name)
-        parser = parser_class()
-    return parser
 
 default_ignore_prefixes = [
     '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
@@ -175,6 +157,14 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
     def strict_name(self):
         return self._kwargs['strict_name'] if 'strict_name' in self._kwargs else False
 
+    @abstractproperty
+    def parsed_type(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def type(self):
+        raise NotImplementedError
+
     def _validate(self):
         validate_name = self._validate_name()
         if validate_name and self._validate_groups():
@@ -236,8 +226,10 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
 
     @property
     def valid(self):
+        if self.type != self.parsed_type:
+            return False
         if not self._name:
-            return True
+            return True # Not False ???!
         if self._validated_name is None:
             self._validated_name = self._validate()
         if self.strict_name and self._validated_name != clean_value(self.parsed_name):
@@ -299,6 +291,10 @@ class ParsedVideo(ABCMeta(str('ParsedVideoABCMeta'), (ParsedEntry,), {})):
     @abstractproperty
     def is_3d(self):
         raise NotImplementedError
+
+    @property
+    def type(self):
+        return 'video'
 
     @property
     def quality(self):
@@ -377,6 +373,10 @@ class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
         return self.title
 
     @property
+    def type(self):
+        return 'movie'
+
+    @property
     def title(self):
         raise NotImplementedError
 
@@ -407,6 +407,10 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     @property
     def parsed_name(self):
         return self.series
+
+    @property
+    def type(self):
+        return 'series'
 
     @abstractproperty
     def parsed_season(self):

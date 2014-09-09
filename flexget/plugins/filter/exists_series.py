@@ -9,7 +9,8 @@ from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.log import log_once
 from flexget.utils.template import RenderError
-from flexget.utils.parsers import ParseWarning, get_parser, PARSER_EPISODE
+from flexget.utils.parsers import ParseWarning
+from flexget.plugin import get_plugin_by_name
 
 log = logging.getLogger('exists_series')
 
@@ -84,7 +85,7 @@ class FilterExistsSeries(object):
                 for filename in folder.walk(errors='warn'):
                     # run parser on filename data
                     try:
-                        disk_parser = get_parser().parse(data=filename.name, type_=PARSER_EPISODE, name=series_parser.name)
+                        disk_parser = get_plugin_by_name('parsing').instance.parse_series(data=filename.name, name=series_parser.name)
                     except ParseWarning as pw:
                         disk_parser = pw.parsed
                         log_once(pw.value, logger=log)

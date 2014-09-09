@@ -68,7 +68,13 @@ class InternalParser(Parser):
         if name:
             kwargs['name'] = name
 
-        if not type_ or type_ == PARSER_ANY:
+        metainfo = False
+        try:
+            metainfo = kwargs.pop('metainfo')
+        except KeyError:
+            pass
+
+        if metainfo and type_ == PARSER_EPISODE:
             internal_parser = SeriesParser(**kwargs)
             internal_parser.assume_quality = types.MethodType(assume_quality_func, internal_parser)
 

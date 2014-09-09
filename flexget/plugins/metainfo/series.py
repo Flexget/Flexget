@@ -7,7 +7,7 @@ import re
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.filter.series import populate_entry_fields, normalize_series_name
-from flexget.utils.parsers import get_parser, ParseWarning
+from flexget.plugin import get_plugin_by_name
 
 log = logging.getLogger('metainfo_series')
 
@@ -37,7 +37,7 @@ class MetainfoSeries(object):
             # Return true if we already parsed this, false if series plugin parsed it
             return entry.get('series_guessed')
         parser = self.guess_series(entry['title'], allow_seasonless=allow_seasonless, quality=entry.get('quality'))
-        if parser:
+        if parser and parser.valid:
             populate_entry_fields(entry, parser)
             entry['series_guessed'] = True
             return True
@@ -46,8 +46,8 @@ class MetainfoSeries(object):
     def guess_series(self, title, allow_seasonless=False, quality=None):
         """Returns a valid series parser if this `title` appears to be a series"""
 
-        parsed = get_parser().parse(data=title, type_=PARSER_ANY, name=title, identified_by='auto', allow_seasonless=allow_seasonless)
-        if parsed.valid and parsed.is_series:
+        parsed = get_plugin_by_name('parsing').instance.parse_series(data=title, name=title, identified_by='auto', allow_seasonless=allow_seasonless, metainfo=True)
+        if parsed and parsed.valid:
             # Normalizing name.
             # todo: Why only in metainfo series, and not other series plugin ?
             parsed.name = remove_dirt(parsed.name)
