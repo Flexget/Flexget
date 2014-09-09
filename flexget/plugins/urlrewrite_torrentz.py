@@ -4,6 +4,7 @@ import re
 import urllib
 import feedparser
 
+import flexget
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
@@ -66,17 +67,20 @@ class UrlRewriteTorrentz(object):
                 url = 'http://torrentz.%s/%s?q=%s' % (domain, feed, urllib.quote(query.encode('utf-8')))
                 log.debug('requesting: %s' % url)
                 try:
-                    r = requests.get(url)
+                    r = requests.get(url)#, headers={'User-Agent': 'FlexGet/%s' % flexget.__version__})
                     break
                 except requests.RequestException as err:
                     log.warning('torrentz.%s failed. Error: %s' % (domain, err))
             else:
-                raise plugin.PluginWarning('Error getting torrentz search results')
+                raise plugin.PluginError('Error getting torrentz search results')
+
+            if not r.content.strip():
+                raise plugin.PluginError('No data from %s. Maybe torrentz is blocking the FlexGet User-Agent' % url)
 
             rss = feedparser.parse(r.content)
 
             if rss.get('bozo_exception'):
-                raise plugin.PluginError('Got bozo_exception (bad feed)')
+                raise plugin.PluginError('Got bozo_exception (bad rss feed)')
 
             for item in rss.entries:
                 m = re.search(r'Size: ([\d]+) Mb Seeds: ([,\d]+) Peers: ([,\d]+) Hash: ([a-f0-9]+)',
