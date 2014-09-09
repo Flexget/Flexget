@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals, division, absolute_import
-from flexget.utils.parsers.parser_common import PARSER_EPISODE
-from nose.tools import assert_raises, raises
-from flexget.utils.parsers import ParseWarning
 from flexget.plugin import get_plugin_by_name
 from tests import FlexGetBase
 
@@ -47,11 +44,8 @@ class TestSeriesParser(FlexGetBase):
 
     def parse_invalid(self, name, data, **kwargs):
         """Makes sure either ParseWarning is raised, or return is invalid."""
-        try:
-            r = self.parse(name, data, **kwargs)
-            assert not r.valid, '{data} should not be valid'.format(data=data)
-        except ParseWarning:
-            pass
+        r = self.parse(name, data, **kwargs)
+        assert not r.valid, '{data} should not be valid'.format(data=data)
 
     def test_proper(self):
         """SeriesParser: proper"""

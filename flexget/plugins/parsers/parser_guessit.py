@@ -11,8 +11,8 @@ import datetime
 
 
 from flexget.utils import qualities
-from flexget.utils.parsers.parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO, clean_value, old_assume_quality
-from flexget.utils.parsers.parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, Parser
+from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO, clean_value, old_assume_quality
+from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, Parser
 import re
 
 import guessit

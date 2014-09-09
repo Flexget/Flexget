@@ -5,15 +5,11 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-from flexget.utils.parsers import PARSER_MOVIE, PARSER_EPISODE
-from flexget.utils.parsers.parser_common import ParseWarning
-from flexget.utils.parsers.parser_internal import InternalParser
-
 log = logging.getLogger('parser_internal')
 
 
-from flexget.utils.parsers.parser_common import PARSER_EPISODE, PARSER_MOVIE, ParseWarning
-from flexget.utils.parsers.parser_common import Parser, old_assume_quality
+from .parser_common import PARSER_EPISODE, PARSER_MOVIE, ParseWarning
+from .parser_common import Parser, old_assume_quality
 
 from flexget.utils.titles.movie import MovieParser
 from flexget.utils.titles.series import SeriesParser

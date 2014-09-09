@@ -18,7 +18,6 @@ from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, year_property, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
-from flexget.utils.parsers import PARSER_MOVIE
 
 try:
     import tmdb3

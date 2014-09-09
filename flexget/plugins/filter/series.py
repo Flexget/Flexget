@@ -18,7 +18,7 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.log import log_once
-from flexget.utils.parsers import PARSER_EPISODE, ParseWarning, SERIES_ID_TYPES
+from flexget.plugins.parsers import ParseWarning, SERIES_ID_TYPES
 from flexget.plugin import get_plugin_by_name
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
@@ -48,7 +48,7 @@ def upgrade(ver, session):
             release_table = table_schema('episode_releases', session)
             for row in session.execute(select([release_table.c.id, release_table.c.title])):
                 # Recalculate the proper_count from title for old episodes
-                proper_count = get_parser().parse(row['title'], PARSER_EPISODE).proper_count
+                proper_count = get_plugin_by_name('parsing').parse_series(row['title']).proper_count
                 session.execute(update(release_table, release_table.c.id == row['id'], {'proper_count': proper_count}))
         ver = 0
     if ver == 0:

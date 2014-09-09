@@ -1,13 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from string import capwords
-from flexget.utils.parsers.parser_common import PARSER_ANY, normalize_name, remove_dirt
-import re
 
+from flexget.plugins.parsers.parser_common import normalize_name, remove_dirt
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.filter.series import populate_entry_fields, normalize_series_name
+from flexget.plugins.filter.series import populate_entry_fields
 from flexget.plugin import get_plugin_by_name
+
 
 log = logging.getLogger('metainfo_series')
 

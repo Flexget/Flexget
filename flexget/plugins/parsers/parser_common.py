@@ -1,4 +1,4 @@
-from .. import qualities
+from flexget.utils import qualities
 
 from abc import abstractproperty, abstractmethod, ABCMeta
 from string import capwords

@@ -9,7 +9,7 @@ from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.log import log_once
 from flexget.utils.template import RenderError
-from flexget.utils.parsers import ParseWarning
+from flexget.plugins.parsers import ParseWarning
 from flexget.plugin import get_plugin_by_name
 
 log = logging.getLogger('exists_series')
