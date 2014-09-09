@@ -25,7 +25,7 @@ class UrlRewriteTorrentz(object):
     """Torrentz urlrewriter."""
 
     schema = {
-        'oneOf' : [
+        'oneOf': [
             {
                 'title': 'specify options',
                 'type': 'object',
@@ -75,9 +75,8 @@ class UrlRewriteTorrentz(object):
 
             rss = feedparser.parse(r.content)
 
-            ex = rss.get('bozo_exception', False)
-            if ex:
-                raise plugin.PluginWarning('Got bozo_exception (bad feed)')
+            if rss.get('bozo_exception'):
+                raise plugin.PluginError('Got bozo_exception (bad feed)')
 
             for item in rss.entries:
                 m = re.search(r'Size: ([\d]+) Mb Seeds: ([,\d]+) Peers: ([,\d]+) Hash: ([a-f0-9]+)',
