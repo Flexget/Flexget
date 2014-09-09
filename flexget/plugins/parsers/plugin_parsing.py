@@ -26,11 +26,17 @@ class PluginParsing(object):
 
     def on_task_start(self, task, config):
         movie_parser_plugin = plugin.get_plugin(group='movie_parser', name=config.get('movie_parser') if config else None)
+        if not movie_parser_plugin and config and config.get('movie_parser'):
+            log.warn("Invalid value %s for movie_parser. Using default ..." % (config.get('movie_parser')))
+            movie_parser_plugin = plugin.get_plugin(group='movie_parser')
         self.movie_parser = movie_parser_plugin.instance
         if config and config.get('movie_parser'):
             log.verbose("Using %s as movie parser." % (movie_parser_plugin.name,))
 
         series_parser_plugin = plugin.get_plugin(group='series_parser', name=config.get('series_parser') if config else None)
+        if not series_parser_plugin and config and config.get('series_parser'):
+            log.warn("Invalid value %s for series_parser. Using default ..." % (config.get('series_parser')))
+            series_parser_plugin = plugin.get_plugin(group='series_parser')
         self.series_parser = series_parser_plugin.instance
         if config and config.get('series_parser'):
             log.verbose("Using %s as series parser." % (series_parser_plugin.name,))
