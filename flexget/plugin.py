@@ -226,7 +226,7 @@ class PluginInfo(dict):
     dupe_counter = 0
 
     def __init__(self, plugin_class, name=None, groups=None, builtin=False, debug=False, api_ver=1,
-                 contexts=None, category=None):
+                 contexts=None, category=None, priority=0):
         """
         Register a plugin.
 
@@ -239,6 +239,7 @@ class PluginInfo(dict):
         :param list contexts: List of where this plugin is configurable. Can be 'task', 'root', or None
         :param string category: The type of plugin. Can be one of the task phases.
             Defaults to the package name containing the plugin.
+        :param priority: The priority of this plugin. This will impact the ordering of get_plugins method.
         """
         dict.__init__(self)
 
@@ -262,6 +263,7 @@ class PluginInfo(dict):
 
         # Set basic info attributes
         self.api_ver = api_ver
+        self.priority = priority
         self.name = name
         self.groups = groups
         self.builtin = builtin
@@ -435,7 +437,7 @@ def load_plugins():
     log.debug('Plugins took %.2f seconds to load' % took)
 
 
-def get_plugins(phase=None, group=None, context=None, category=None, min_api=None):
+def get_plugin(phase=None, group=None, context=None, category=None, name=None, min_api=None):
     """
     Query other plugins characteristics.
 
@@ -443,6 +445,26 @@ def get_plugins(phase=None, group=None, context=None, category=None, min_api=Non
     :param string group: Plugin must belong to this group.
     :param string context: Where plugin is configured, eg. (root, task)
     :param string category: Type of plugin, phase names.
+    :param string name: Name of the plugin.
+    :param int min_api: Minimum api version.
+    :return: List of PluginInfo instances.
+    :rtype: list
+    """
+    try:
+        return get_plugins(phase, group, context, category, name, min_api)[0]
+    except KeyError:
+        return None
+
+
+def get_plugins(phase=None, group=None, context=None, category=None, name=None, min_api=None):
+    """
+    Query other plugins characteristics.
+
+    :param string phase: Require phase
+    :param string group: Plugin must belong to this group.
+    :param string context: Where plugin is configured, eg. (root, task)
+    :param string category: Type of plugin, phase names.
+    :param string name: Name of the plugin.
     :param int min_api: Minimum api version.
     :return: List of PluginInfo instances.
     :rtype: list
@@ -458,10 +480,12 @@ def get_plugins(phase=None, group=None, context=None, category=None, min_api=Non
             return False
         if category and not category == plugin.category:
             return False
+        if name is not None and name != plugin.name:
+            raise False
         if min_api is not None and plugin.api_ver < min_api:
             return False
         return True
-    return ifilter(matches, plugins.itervalues())
+    return sorted(ifilter(matches, plugins.itervalues()), key=lambda plugin: -plugin.priority)
 
 
 def plugin_schemas(**kwargs):

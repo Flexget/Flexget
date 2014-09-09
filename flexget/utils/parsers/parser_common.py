@@ -68,19 +68,6 @@ def old_assume_quality(guessed_quality, assumed_quality):
     return guessed_quality
 
 
-def _get_class(kls):
-    parts = kls.split('.')
-    if len(parts) <= 1:
-        return None
-
-    module = ".".join(parts[:-1])
-    m = __import__(module)
-    for comp in parts[1:]:
-        m = getattr(m, comp)
-
-    return m
-
-
 default_ignore_prefixes = [
     '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
     '(?:HD.720p?:)',

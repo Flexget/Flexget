@@ -27,5 +27,5 @@ class ParserGuessit(object):
 def register_plugin():
     plugin.register(ParserGuessit, 'parser_guessit',
                     groups=['movie_parser', 'series_parser'],
-                    api_ver=2
+                    api_ver=2, priority=100
     )
