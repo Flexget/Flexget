@@ -25,11 +25,11 @@ class InputPlex(object):
         - recentlyAdded         :
         - recentlyViewed        :
         - recentlyViewedShows   : Series only.
-      'all' and 'recentlyViewedShows' will only produce a list of show names while the other three will produce 
+      'all' and 'recentlyViewedShows' will only produce a list of show names while the other three will produce
       filename and download url.
     'username'          Myplex (http://my.plexapp.com) username, used to connect to shared PMS'.
-    'password'          Myplex (http://my.plexapp.com) password, used to connect to shared PMS'. 
-    'server'            Host/IP of PMS to connect to. 
+    'password'          Myplex (http://my.plexapp.com) password, used to connect to shared PMS'.
+    'server'            Host/IP of PMS to connect to.
     'lowercase_title'   Convert filename (title) to lower case.
     'strip_non_alpha'   Sanitize filename (title), stripping all non-alphanumeric letters.
                         Better to turn off in case of non-english titles.
@@ -138,7 +138,7 @@ class InputPlex(object):
     def plex_section_is_int(self, section):
         return isinstance(section, int)
 
-    def on_task_input(self, config):
+    def on_task_input(self, task, config):
         config = self.prepare_config(config)
         urlconfig = {}
         urlappend = "?"
