@@ -42,11 +42,7 @@ class OutputPushover(object):
             'title': {'type': 'string', 'default': "{{task}}"},
             'message': {'type': 'string', 'default': default_message},
             'priority': {'type': 'integer', 'default': 0},
-            'url': {
-                'type': 'string',
-                'format': 'url',
-                'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'
-            },
+            'url': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
             'sound': {'type': 'string', 'default': 'pushover'}
         },
         'required': ['userkey', 'apikey'],
@@ -57,11 +53,11 @@ class OutputPushover(object):
     @plugin.priority(0)
     def on_task_output(self, task, config):
 
-        # Support for multiple userkeys 
+        # Support for multiple userkeys
         userkeys = config["userkey"]
         if not isinstance(userkeys, list):
             userkeys = [userkeys]
-            
+
         # Set a bunch of local variables from the config
         apikey = config["apikey"]
         device = config["device"]
@@ -105,7 +101,7 @@ class OutputPushover(object):
                     data["priority"] = priority
                 if sound:
                     data["sound"] = sound
-    
+
                 # Check for test mode
                 if task.options.test:
                     log.info("Test mode.  Pushover notification would be:")
@@ -126,10 +122,10 @@ class OutputPushover(object):
 
                 # Make the request
                 response = task.requests.post(pushover_url, headers=client_headers, data=data, raise_status=False)
-    
+
                 # Check if it succeeded
                 request_status = response.status_code
-    
+
                 # error codes and messages from Pushover API
                 if request_status == 200:
                     log.debug("Pushover notification sent")
