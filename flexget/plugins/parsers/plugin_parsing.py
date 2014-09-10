@@ -5,55 +5,59 @@ from flexget import plugin
 from flexget.event import event
 
 log = logging.getLogger('parsing')
+PARSER_TYPES = ['movie', 'series']
 
 
 class PluginParsing(object):
     """
     Provides parsing framework
     """
-    schema = {
-        'type': 'object',
-        'properties': {
-            'movie_parser': {'type': 'string'},
-            'series_parser': {'type': 'string'}
 
-        },
-        'additionalProperties': False
-    }
+    def __init__(self):
+        self.parsers = {}
+        self.parses_names = {}
+        self.default_parser = {}
+        for parser_type in PARSER_TYPES:
+            self.parsers[parser_type] = {}
+            self.parses_names[parser_type] = {}
+            for p in plugin.get_plugins(group=parser_type + '_parser'):
+                self.parsers[parser_type][p.name.replace('parser_', '')] = p.instance
+                self.parses_names[parser_type][p.name.replace('parser_', '')] = p.name
+            # Select default parsers based on priority
+            func_name = 'parse_' + parser_type
+            self.default_parser[parser_type] = max(self.parsers[parser_type].values(), key=lambda plugin: getattr(getattr(plugin, func_name), 'priority', 0))
+        self.parser = self.default_parser
 
-    movie_parser = None
-    series_parser = None
+    @property
+    def schema(self):
+        properties = dict((parser_type, {'type': 'string', 'enum': self.parses_names[parser_type].values()})
+             for parser_type in self.parses_names)
+        s = {
+            'type': 'object',
+            'properties': properties,
+            'additionalProperties': False
+        }
+        return s
 
     def on_task_start(self, task, config):
-        movie_parser_plugin = plugin.get_plugin(group='movie_parser', name=config.get('movie_parser') if config else None)
-        if not movie_parser_plugin and config and config.get('movie_parser'):
-            log.warn("Invalid value %s for movie_parser. Using default ..." % (config.get('movie_parser')))
-            movie_parser_plugin = plugin.get_plugin(group='movie_parser')
-        self.movie_parser = movie_parser_plugin.instance
-        if config and config.get('movie_parser'):
-            log.verbose("Using %s as movie parser." % (movie_parser_plugin.name,))
-
-        series_parser_plugin = plugin.get_plugin(group='series_parser', name=config.get('series_parser') if config else None)
-        if not series_parser_plugin and config and config.get('series_parser'):
-            log.warn("Invalid value %s for series_parser. Using default ..." % (config.get('series_parser')))
-            series_parser_plugin = plugin.get_plugin(group='series_parser')
-        self.series_parser = series_parser_plugin.instance
-        if config and config.get('series_parser'):
-            log.verbose("Using %s as series parser." % (series_parser_plugin.name,))
+        if not config:
+            return
+        self.parser = self.default_parser.copy()
+        for parser_type, parser_name in config.iteritems():
+            self.parser[parser_type] = plugin.get_plugin(name='parser_'+parser_name).instance
 
     def on_task_end(self, task, config):
-        self.movie_parser = None
-        self.series_parser = None
+        self.parser = self.default_parser
 
-    #   movie_parser API
-    def parse_movie(self, data, name=None, **kwargs):
-        return self.movie_parser.parse_movie(data, name=name, **kwargs)
-
-    #   series_parser API
-    def parse_series(self, data, name=None, **kwargs):
-        return self.series_parser.parse_series(data, name=name, **kwargs)
+    def __getattr__(self, item):
+        if not item.startswith('parse_'):
+            raise AttributeError(item)
+        parser_type = item.replace('parse_', '')
+        if parser_type not in self.parser:
+            raise AttributeError(item)
+        return getattr(self.parser[parser_type], item)
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginParsing, 'parsing', builtin=True, api_ver=2)
+    plugin.register(PluginParsing, 'parsing', api_ver=2)
