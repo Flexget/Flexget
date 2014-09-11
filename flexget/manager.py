@@ -16,7 +16,6 @@ from datetime import datetime, timedelta
 import pkg_resources
 import sqlalchemy
 import yaml
-from sqlalchemy.engine import Engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -44,14 +43,6 @@ DB_CLEANUP_INTERVAL = timedelta(days=7)
 def before_commit(session):
     if not manager.has_lock and session.dirty:
         log.debug('BUG?: Database writes should not be tried when there is no database lock.')
-
-
-# WAL hopefully helps when we have multiple threads accessing the database
-@sqlalchemy.event.listens_for(Engine, 'connect')
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    cursor.execute('PRAGMA journal_mode=WAL')
-    cursor.close()
 
 
 class Manager(object):
