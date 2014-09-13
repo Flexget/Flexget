@@ -109,7 +109,7 @@ def stop_scheduler(manager):
         return
     scheduler = Scheduler(manager)
     scheduler.stop()
-    scheduler.join()
+    scheduler.wait()
 
 
 @singleton
@@ -145,8 +145,9 @@ class Scheduler(object):
     def is_alive(self):
         return self._thread and self._thread.is_alive()
 
-    def join(self):
-        self._thread and self._thread.join()
+    def wait(self):
+        while self.is_alive():
+            time.sleep(0.5)
 
     def load_schedules(self):
         """Clears current schedules and loads them from the config."""
