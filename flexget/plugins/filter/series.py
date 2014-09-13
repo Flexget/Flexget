@@ -1024,6 +1024,12 @@ class FilterSeries(FilterSeriesBase):
         for id_type in SERIES_ID_TYPES:
             params[id_type + '_regexps'] = get_as_array(config, id_type + '_regexp')
 
+        filtered_params = {}
+        for k, v in params.items():
+            if v:
+                filtered_params[k] = v
+        params = filtered_params
+
         for entry in entries:
             parsed = None
 

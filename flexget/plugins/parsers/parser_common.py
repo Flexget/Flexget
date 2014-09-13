@@ -1,3 +1,5 @@
+from __future__ import unicode_literals, division, absolute_import
+
 from flexget.utils import qualities
 
 from abc import abstractproperty, abstractmethod, ABCMeta
@@ -285,7 +287,6 @@ class ParsedVideo(ABCMeta(str('ParsedVideoABCMeta'), (ParsedEntry,), {})):
 
     @property
     def quality(self):
-        # todo: deprecated. We should remove this field from the rest of code.
         if not self._old_quality:
             self._old_quality = self.quality2.to_old_quality(self._assumed_quality)
         return self._old_quality
@@ -298,7 +299,7 @@ class ParsedVideo(ABCMeta(str('ParsedVideoABCMeta'), (ParsedEntry,), {})):
         self._assumed_quality = quality2.to_old_quality()
 
     def __str__(self):
-        return "<%s(name=%s,year=%s)>" % (self.__class__.__name__, self.name, self.year)
+        return "<%s(name=%s,year=%s,quality=%s)>" % (self.__class__.__name__, self.name, self.year, self.quality)
 
     def __cmp__(self, other):
         """Compares quality of parsed, if quality is equal, compares proper_count."""
@@ -552,7 +553,9 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
             return self.identifier
 
     def __str__(self):
-        return "<%s(name=%s,season=%s,episode=%s)>" % (self.__class__.__name__, self.name, self.season, self.episode)
+        return "<%s(name=%s,id=%s,season=%s,episode=%s,quality=%s,proper=%s,status=%s)>" % \
+               (self.__class__.__name__, self.name, self.id, self.season, self.episode,
+                self.quality, self.proper_count, self.valid)
 
     def __cmp__(self, other):
         """Compares quality of parsers, if quality is equal, compares proper_count."""

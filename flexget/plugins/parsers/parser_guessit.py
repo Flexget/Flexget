@@ -8,7 +8,7 @@ from flexget.event import event
 
 from string import capwords
 import datetime
-
+import time
 
 from flexget.utils import qualities
 from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO, clean_value, old_assume_quality
@@ -314,12 +314,22 @@ class ParserGuessit(Parser):
     #   movie_parser API
     @plugin.priority(100)
     def parse_movie(self, data, name=None, **kwargs):
-        return self.parse(data, PARSER_MOVIE, name=name, **kwargs)
+        log.verbose('Parsing movie "' + data + '"' + (' (' + name + ')' if name else '') + (' [options:' + unicode(kwargs) + ']' if kwargs else ''))
+        start = time.clock()
+        parsed = self.parse(data, PARSER_MOVIE, name=name, **kwargs)
+        end = time.clock()
+        log.verbose('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
+        return parsed
 
     #   series_parser API
     @plugin.priority(100)
     def parse_series(self, data, name=None, **kwargs):
-        return self.parse(data, PARSER_EPISODE, name=name, **kwargs)
+        log.verbose('Parsing series "' + data + '"' + (' (' + name + ')' if name else '') + (' [options:' + unicode(kwargs) + ']' if kwargs else ''))
+        start = time.clock()
+        parsed = self.parse(data, PARSER_EPISODE, name=name, **kwargs)
+        end = time.clock()
+        log.verbose('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
+        return parsed
 
 
 @event('plugin.register')

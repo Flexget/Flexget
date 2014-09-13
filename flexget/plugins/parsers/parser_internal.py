@@ -18,6 +18,7 @@ from string import capwords
 
 import types
 import re
+import time
 
 
 def assume_quality_func(self, assumed_quality):
@@ -106,19 +107,31 @@ class ParserInternal(Parser):
 
     #   movie_parser API
     def parse_movie(self, data, name=None, **kwargs):
+        log.verbose('Parsing movie "' + data + '"' + (' (' + name + ')' if name else '') + (' [options:' + unicode(kwargs) + ']' if kwargs else ''))
+        start = time.clock()
+        parsed = None
         try:
-            return self.parse(data, PARSER_MOVIE, name=name, **kwargs)
+            parsed = self.parse(data, PARSER_MOVIE, name=name, **kwargs)
         except ParseWarning as e:
             log.warn(e)
-            return e.parsed
+            parsed = e.parsed
+        end = time.clock()
+        log.verbose('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
+        return parsed
 
     #   series_parser API
     def parse_series(self, data, name=None, **kwargs):
+        log.verbose('Parsing series "' + data + '"' + (' (' + name + ')' if name else '') + (' [options:' + unicode(kwargs) + ']' if kwargs else ''))
+        start = time.clock()
+        parsed = None
         try:
-            return self.parse(data, PARSER_EPISODE, name=name, **kwargs)
+            parsed = self.parse(data, PARSER_EPISODE, name=name, **kwargs)
         except ParseWarning as e:
             log.warn(e)
-            return e.parsed
+            parsed = e.parsed
+        end = time.clock()
+        log.verbose('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
+        return parsed
 
 
 @event('plugin.register')
