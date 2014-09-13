@@ -103,6 +103,15 @@ def setup_scheduler(manager):
         scheduler.start()
 
 
+@event('manager.shutdown')
+def stop_scheduler(manager):
+    if not manager.is_daemon:
+        return
+    scheduler = Scheduler(manager)
+    scheduler.stop()
+    scheduler.join()
+
+
 @singleton
 class Scheduler(object):
     # We use a regular list for periodic jobs, so you must hold this lock while using it
@@ -130,10 +139,14 @@ class Scheduler(object):
 
     def stop(self):
         if self.is_alive():
+            log.debug('Stopping scheduler')
             self._stop.set()
 
     def is_alive(self):
         return self._thread and self._thread.is_alive()
+
+    def join(self):
+        self._thread and self._thread.join()
 
     def load_schedules(self):
         """Clears current schedules and loads them from the config."""
