@@ -77,9 +77,9 @@ default_ignore_prefixes = [
 
 
 def name_to_re(name, ignore_prefixes=None, parser=None):
+    """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
     if not ignore_prefixes:
         ignore_prefixes = default_ignore_prefixes
-    """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
     parenthetical = None
     if name.endswith(')'):
         p_start = name.rfind('(')
