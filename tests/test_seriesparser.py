@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import unicode_literals, division, absolute_import
+
 from flexget.plugin import get_plugin_by_name
-from tests import FlexGetBase
+from flexget.plugins.parsers.parser_internal import ParserInternal
+from flexget.plugins.parsers.parser_guessit import ParserGuessit
 
 #
 # NOTE:
@@ -31,16 +33,9 @@ if enable_logging:
     parser_log.setLevel(tests.setup_logging_level())
 
 
-class TestSeriesParser(FlexGetBase):
-    def setup(self):
-        FlexGetBase.setup(self)
-        get_plugin_by_name('parsing').instance.on_task_start(None, None)
-
-    def teardown(self):
-        FlexGetBase.teardown(self)
-
+class ParserTests(object):
     def parse(self, data, name=None, **kwargs):
-        return get_plugin_by_name('parsing').instance.parse_series(data, name=name, **kwargs)
+        return self.parser.parse_series(data, name=name, **kwargs)
 
     def parse_invalid(self, name, data, **kwargs):
         """Makes sure either ParseWarning is raised, or return is invalid."""
@@ -628,3 +623,11 @@ class TestSeriesParser(FlexGetBase):
         assert s.episode == 14
         assert s.quality.name == '720p hdtv h264 aac'
         assert not s.proper, 'detected proper'
+
+
+class TestInternal(ParserTests):
+    parser = ParserInternal()
+
+
+class TestGuessit(ParserTests):
+    parser = ParserGuessit()
