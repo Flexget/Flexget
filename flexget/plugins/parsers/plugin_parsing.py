@@ -49,6 +49,8 @@ class PluginParsing(object):
     def on_task_end(self, task, config):
         self.parser = self.default_parser
 
+    on_task_abort = on_task_end
+
     def __getattr__(self, item):
         if not item.startswith('parse_'):
             raise AttributeError(item)
