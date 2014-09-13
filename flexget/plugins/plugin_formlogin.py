@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
+import socket
 import urllib2
 
 from flexget import plugin
@@ -52,24 +53,27 @@ class FormLogin(object):
         #br.set_debug_responses(True)
         #br.set_debug_http(True)
 
-        for form in br.forms():
-            loginform = form
+        try:
+            for form in br.forms():
+                loginform = form
 
-            try:
-                loginform[userfield] = username
-                loginform[passfield] = password
-                break
-            except Exception as e:
-                pass
-        else:
-            received = os.path.join(task.manager.config_base, 'received')
-            if not os.path.isdir(received):
-                os.mkdir(received)
-            filename = os.path.join(received, '%s.formlogin.html' % task.name)
-            with open(filename, 'w') as f:
-                f.write(br.response().get_data())
-            log.critical('I have saved the login page content to %s for you to view' % filename)
-            raise plugin.PluginError('Unable to find login fields', log)
+                try:
+                    loginform[userfield] = username
+                    loginform[passfield] = password
+                    break
+                except Exception as e:
+                    pass
+            else:
+                received = os.path.join(task.manager.config_base, 'received')
+                if not os.path.isdir(received):
+                    os.mkdir(received)
+                filename = os.path.join(received, '%s.formlogin.html' % task.name)
+                with open(filename, 'w') as f:
+                    f.write(br.response().get_data())
+                log.critical('I have saved the login page content to %s for you to view' % filename)
+                raise plugin.PluginError('Unable to find login fields', log)
+        except socket.timeout:
+            raise plugin.PluginError('Timed out on url %s' % url)
 
         br.form = loginform
 

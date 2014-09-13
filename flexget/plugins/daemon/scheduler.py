@@ -4,16 +4,18 @@ import logging
 import threading
 import time
 
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, DateTime, Integer
 
+from flexget import db_schema
 from flexget.config_schema import register_config_key, parse_time
-from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.manager import Session
+from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.utils.tools import singleton
 
 log = logging.getLogger('scheduler')
-Base = versioned_base('scheduler', 0)
+DB_SCHEMA_VER = 1
+Base = db_schema.versioned_base('scheduler', DB_SCHEMA_VER)
 
 UNITS = ['seconds', 'minutes', 'hours', 'days', 'weeks']
 WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
@@ -70,12 +72,22 @@ main_schema = {
 class DBTrigger(Base):
     __tablename__ = 'scheduler_triggers'
 
-    uid = Column(String, primary_key=True)  # Hash of all trigger properties, to uniquely identify the trigger
+    uid = Column(Integer, primary_key=True)  # Hash of all trigger properties, to uniquely identify the trigger
     last_run = Column(DateTime)
 
     def __init__(self, uid, last_run=None):
         self.uid = uid
         self.last_run = last_run
+
+
+@db_schema.upgrade('scheduler')
+def db_upgrade(ver, session):
+    if ver == 0:
+        log.info('Recreating scheduler table. All schedules will trigger again after this upgrade.')
+        table = table_schema('scheduler_triggers', session)
+        table.drop()
+        Base.metadata.create_all(bind=session.bind)
+    return DB_SCHEMA_VER
 
 
 @event('manager.daemon.started')

@@ -150,8 +150,11 @@ class Discover(object):
 
                     result.extend(search_results)
 
-                except (PluginError, PluginWarning) as err:
-                    log.debug('No results from %s: %s' % (plugin_name, err))
+                except PluginWarning as e:
+                    log.verbose('No results from %s: %s' % (plugin_name, e))
+                    entry.complete()
+                except PluginError as e:
+                    log.error('Error searching with %s: %s' % (plugin_name, e))
                     entry.complete()
 
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
