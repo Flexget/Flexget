@@ -107,7 +107,7 @@ class ParserInternal(Parser):
 
     #   movie_parser API
     def parse_movie(self, data, name=None, **kwargs):
-        log.verbose('Parsing movie "' + data + '"' + (' (' + name + ')' if name else '') + (' [options:' + unicode(kwargs) + ']' if kwargs else ''))
+        log.verbose('Parsing movie: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
         start = time.clock()
         parsed = None
         try:
@@ -121,7 +121,7 @@ class ParserInternal(Parser):
 
     #   series_parser API
     def parse_series(self, data, name=None, **kwargs):
-        log.verbose('Parsing series "' + data + '"' + (' (' + name + ')' if name else '') + (' [options:' + unicode(kwargs) + ']' if kwargs else ''))
+        log.verbose('Parsing series: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
         start = time.clock()
         parsed = None
         try:

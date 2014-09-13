@@ -314,7 +314,7 @@ class ParserGuessit(Parser):
     #   movie_parser API
     @plugin.priority(100)
     def parse_movie(self, data, name=None, **kwargs):
-        log.verbose('Parsing movie "' + data + '"' + (' (' + name + ')' if name else '') + (' [options:' + unicode(kwargs) + ']' if kwargs else ''))
+        log.verbose('Parsing movie: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
         start = time.clock()
         parsed = self.parse(data, PARSER_MOVIE, name=name, **kwargs)
         end = time.clock()
@@ -324,7 +324,7 @@ class ParserGuessit(Parser):
     #   series_parser API
     @plugin.priority(100)
     def parse_series(self, data, name=None, **kwargs):
-        log.verbose('Parsing series "' + data + '"' + (' (' + name + ')' if name else '') + (' [options:' + unicode(kwargs) + ']' if kwargs else ''))
+        log.verbose('Parsing series: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
         start = time.clock()
         parsed = self.parse(data, PARSER_EPISODE, name=name, **kwargs)
         end = time.clock()
