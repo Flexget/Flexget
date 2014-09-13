@@ -30,7 +30,7 @@ class PluginParsing(object):
 
     @property
     def schema(self):
-        properties = dict((parser_type, {'type': 'string', 'enum': self.parses_names[parser_type].values()})
+        properties = dict((parser_type, {'type': 'string', 'enum': self.parses_names[parser_type].keys()})
              for parser_type in self.parses_names)
         s = {
             'type': 'object',
@@ -44,7 +44,7 @@ class PluginParsing(object):
             return
         self.parser = self.default_parser.copy()
         for parser_type, parser_name in config.iteritems():
-            self.parser[parser_type] = plugin.get_plugin(name='parser_'+parser_name).instance
+            self.parser[parser_type] = plugin.get_plugin_by_name('parser_' + parser_name).instance
 
     def on_task_end(self, task, config):
         self.parser = self.default_parser
