@@ -106,6 +106,7 @@ class ParserInternal(Parser):
         return internal_parser
 
     #   movie_parser API
+    @plugin.priority(1)
     def parse_movie(self, data, name=None, **kwargs):
         log.verbose('Parsing movie: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
         start = time.clock()
@@ -120,6 +121,7 @@ class ParserInternal(Parser):
         return parsed
 
     #   series_parser API
+    @plugin.priority(1)
     def parse_series(self, data, name=None, **kwargs):
         log.verbose('Parsing series: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
         start = time.clock()
