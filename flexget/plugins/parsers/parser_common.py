@@ -1,14 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from flexget.utils import qualities
-
+import logging
+import re
 from abc import abstractproperty, abstractmethod, ABCMeta
 from string import capwords
 
 from flexget.utils.tools import ReList
 
-import re
-import logging
 
 log = logging.getLogger('parser')
 

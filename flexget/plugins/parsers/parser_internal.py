@@ -1,24 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
+import re
+import time
+import types
+from string import capwords
 
 from flexget import plugin
 from flexget.event import event
-
-log = logging.getLogger('parser_internal')
-
-
+from flexget.utils.titles.movie import MovieParser
+from flexget.utils.titles.series import SeriesParser
 from .parser_common import PARSER_EPISODE, PARSER_MOVIE, ParseWarning
 from .parser_common import Parser, old_assume_quality
 
-from flexget.utils.titles.movie import MovieParser
-from flexget.utils.titles.series import SeriesParser
 
-from string import capwords
-
-import types
-import re
-import time
+log = logging.getLogger('parser_internal')
 
 
 def assume_quality_func(self, assumed_quality):

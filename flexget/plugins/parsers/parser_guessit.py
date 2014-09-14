@@ -1,27 +1,26 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import datetime
 import logging
-requests_log = logging.getLogger("guessit")
-requests_log.setLevel(logging.INFO)
+import re
+import time
+from string import capwords
 
-log = logging.getLogger('parser_guessit')
+import guessit
+from guessit.containers import PropertiesContainer, NoValidator
+from guessit.matcher import GuessFinder
+from guessit.plugins.transformers import Transformer, add_transformer
 
 from flexget import plugin
 from flexget.event import event
-
-from string import capwords
-import datetime
-import time
-
 from flexget.utils import qualities
 from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO, clean_value, old_assume_quality
 from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, Parser
-import re
 
-import guessit
-from guessit.plugins.transformers import Transformer, add_transformer
-from guessit.matcher import GuessFinder
-from guessit.containers import PropertiesContainer, NoValidator
+
+log = logging.getLogger('parser_guessit')
+# Guessit debug log is a bit too verbose
+logging.getLogger('guessit').setLevel(logging.INFO)
 
 
 class GuessRegexpId(Transformer):
