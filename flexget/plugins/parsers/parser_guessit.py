@@ -1,6 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
+requests_log = logging.getLogger("guessit")
+requests_log.setLevel(logging.INFO)
+
 log = logging.getLogger('parser_guessit')
 
 from flexget import plugin
