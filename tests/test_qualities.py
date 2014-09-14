@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from flexget.plugins.parsers.parser_guessit import ParserGuessit
 from flexget.plugins.parsers.parser_internal import ParserInternal
-from tests import FlexGetBase
+from tests import FlexGetBase, build_parser_function
 from flexget.utils.qualities import Quality
 
 
@@ -166,3 +166,15 @@ class TestFilterQuality(FlexGetBase):
         assert entry in self.task.accepted, 'HR should be accepted'
         assert len(self.task.rejected) == 3, 'wrong number of entries rejected'
         assert len(self.task.accepted) == 1, 'wrong number of entries accepted'
+
+
+class TestGuessitFilterQuality(TestFilterQuality):
+    def __init__(self):
+        super(TestGuessitFilterQuality, self).__init__()
+        self.add_tasks_function(build_parser_function('guessit'))
+
+
+class TestInternalFilterQuality(TestFilterQuality):
+    def __init__(self):
+        super(TestInternalFilterQuality, self).__init__()
+        self.add_tasks_function(build_parser_function('internal'))

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from tests import FlexGetBase
+from tests import FlexGetBase, build_parser_function
 from flexget.entry import Entry
 
 
@@ -147,3 +147,14 @@ class TestEmitSeries(FlexGetBase):
         assert self.task._rerun_count == 1
         assert len(self.task.all_entries) == 1
         assert self.task.find_entry('rejected', title='Test Series 8 S02E01')
+
+class TestGuessitEmitSeries(TestEmitSeries):
+    def __init__(self):
+        super(TestGuessitEmitSeries, self).__init__()
+        self.add_tasks_function(build_parser_function('guessit'))
+
+
+class TestInternalEmitSeries(TestEmitSeries):
+    def __init__(self):
+        super(TestInternalEmitSeries, self).__init__()
+        self.add_tasks_function(build_parser_function('internal'))

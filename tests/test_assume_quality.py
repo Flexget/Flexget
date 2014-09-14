@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
+from tests import FlexGetBase, build_parser_function
 from nose.tools import assert_raises
 from flexget.task import TaskAbort
 import flexget.utils.qualities as qualities
 
-class TestAssumeQuality(FlexGetBase):
 
+class TestAssumeQuality(FlexGetBase):
     __yaml__ = """
         templates:
           global:
@@ -110,3 +110,15 @@ class TestAssumeQuality(FlexGetBase):
     def test_with_series(self):
         self.execute_task('test_with_series')
         assert self.task.accepted, 'series plugin should have used assumed quality'
+
+
+class TestGuessitAssumeQuality(TestAssumeQuality):
+    def __init__(self):
+        super(TestGuessitAssumeQuality, self).__init__()
+        self.add_tasks_function(build_parser_function('guessit'))
+
+
+class TestInternalAssumeQuality(TestAssumeQuality):
+    def __init__(self):
+        super(TestInternalAssumeQuality, self).__init__()
+        self.add_tasks_function(build_parser_function('internal'))

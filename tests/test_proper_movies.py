@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
+from tests import FlexGetBase, build_parser_function
 
 
 class TestProperMovies(FlexGetBase):
@@ -46,3 +46,15 @@ class TestProperMovies(FlexGetBase):
         # proper version of same quality
         self.execute_task('test4')
         assert self.task.find_entry('accepted', title='Movie.Name.2011.PROPER.720p-FlexGet')
+
+
+class TestGuessitProperMovies(TestProperMovies):
+    def __init__(self):
+        super(TestGuessitProperMovies, self).__init__()
+        self.add_tasks_function(build_parser_function('guessit'))
+
+
+class TestInternalProperMovies(TestProperMovies):
+    def __init__(self):
+        super(TestInternalProperMovies, self).__init__()
+        self.add_tasks_function(build_parser_function('internal'))
