@@ -342,10 +342,6 @@ class ParsedVideoQuality(ABCMeta(str('ParsedVideoQualityABCMeta'), (object,), {}
     def audio_channels(self):
         raise NotImplementedError
 
-    @abstractproperty
-    def is_screener(self):
-        raise NotImplementedError
-
     @abstractmethod
     def to_old_quality(self, assumed_quality=None):
         raise NotImplementedError

@@ -94,10 +94,6 @@ class GuessitParsedVideoQuality(ParsedVideoQuality):
         return self._guess_result.get('source')
 
     @property
-    def is_screener(self):
-        return 'Screener' in self._guess_result.get('other', {})
-
-    @property
     def format(self):
         return self._guess_result.get('format')
 
@@ -121,15 +117,44 @@ class GuessitParsedVideoQuality(ParsedVideoQuality):
     def audio_profile(self):
         return self._guess_result.get('audioProfile')
 
-    def to_old_quality(self, assumed_quality=None):
-        resolution = self.screen_size if self.screen_size else 'HR' if 'HR' in self._guess_result.get('other', []) else None
-        source = self.format.replace('-', '') if self.format else None
-        codec = self.video_codec
+    @property
+    def old_resolution(self):
+        return self.screen_size if self.screen_size else 'HR' if 'HR' in self._guess_result.get('other', []) else None
 
-        if self.audio_channels == '5.1' and self.audio_codec is None or self.audio_codec == 'DolbyDigital':
-            audio = 'dd5.1'
-        else:
-            audio = self.audio_codec
+    @property
+    def old_source(self):
+        """
+        Those properties should really be extracted to another category of quality ...
+        """
+        if 'Screener' in self._guess_result.get('other', {}):
+            if self.format == 'BluRay':
+                return 'bdscr'
+            return 'dvdscr'
+        if 'Preair' in self._guess_result.get('other', {}):
+            return 'preair'
+        if 'R5' in self._guess_result.get('other', {}):
+            return 'r5'
+        return self.format.replace('-', '') if self.format else None
+
+    @property
+    def old_codec(self):
+        if self.video_profile == '10bit':
+            return '10bit'
+        return self.video_codec
+
+    @property
+    def old_audio(self):
+        if self.audio_codec == 'DTS' and (self.audio_profile in ['HD', 'HDMA']):
+            return 'dtshd'
+        elif self.audio_channels == '5.1' and self.audio_codec is None or self.audio_codec == 'DolbyDigital':
+            return 'dd5.1'
+        return self.audio_codec
+
+    def to_old_quality(self, assumed_quality=None):
+        resolution = self.old_resolution
+        source = self.old_source
+        codec = self.old_codec
+        audio = self.old_audio
 
         old_quality = qualities.Quality(' '.join(filter(None, [resolution, source, codec, audio])))
         old_quality = old_assume_quality(old_quality, assumed_quality)

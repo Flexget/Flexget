@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from flexget.plugins.parsers.parser_guessit import ParserGuessit
+from flexget.plugins.parsers.parser_internal import ParserInternal
 from tests import FlexGetBase
 from flexget.utils.qualities import Quality
 
@@ -15,7 +17,7 @@ class TestQualityModule(object):
             assert got_val == '720p', got_val
 
 
-class TestQualityParser(object):
+class QualityParser(object):
 
     def test_qualities(self):
         items = [('Test.File 1080p.web-dl', '1080p webdl'),
@@ -61,9 +63,9 @@ class TestQualityParser(object):
                  ('Test.File.720p.hdtv.avi', '720p hdtv'),
                  ('Test.File.1080p.hdtv.avi', '1080p hdtv'),
                  ('Test.File.720p.preair.avi', '720p preair'),
-                 ('Test.File.ts.dvdrip.avi', 'ts'),
+                 #('Test.File.ts.dvdrip.avi', 'ts'), This should no exists. Having Telesync and DVDRip is a non-sense.
                  ('Test.File.HDTS.blah', 'ts'),
-                 ('Test.File.HDCAM.bluray.lie', 'cam'),
+                 #('Test.File.HDCAM.bluray.lie', 'cam'), This should no exists. Having Cam and Bluray is a non-sense.
 
                  # Test qualities as part of words. #1593
                  ('Tsar.File.720p', '720p'),
@@ -79,9 +81,22 @@ class TestQualityParser(object):
                  ('Test.File.DTS', 'dts'),
                  ('Test.File.truehd', 'truehd')]
 
+        item = 'Test.File.DTSHDMA', 'dtshd'
+
+        quality = self.parser.parse_movie(item[0]).quality
+        assert quality == item[1], '`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality)
+
         for item in items:
-            quality = Quality(item[0]).name
+            quality = self.parser.parse_movie(item[0]).quality
             assert quality == item[1], '`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality)
+
+
+class TestInternalQualityParser(QualityParser):
+    parser = ParserInternal()
+
+
+class TestGuessitQualityParser(QualityParser):
+    parser = ParserGuessit()
 
 
 class TestFilterQuality(FlexGetBase):
