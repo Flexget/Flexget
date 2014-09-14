@@ -90,6 +90,12 @@ class MockManager(Manager):
         pass
 
 
+def build_parser_function(parser_name):
+    def parser_function(task_name, task_definition):
+        task_definition['parsing'] = {'series': parser_name, 'movie': parser_name}
+    return parser_function
+
+
 class FlexGetBase(object):
     __yaml__ = """# Yaml goes here"""
 
@@ -108,6 +114,14 @@ class FlexGetBase(object):
         self.task = None
         self.database_uri = None
         self.base_path = os.path.dirname(__file__)
+        self.config_functions = []
+        self.tasks_functions = []
+
+    def add_config_function(self, config_function):
+        self.config_functions.append(config_function)
+
+    def add_tasks_function(self, tasks_function):
+        self.tasks_functions.append(tasks_function)
 
     def setup(self):
         """Set up test env"""
@@ -116,6 +130,13 @@ class FlexGetBase(object):
             self.__tmp__ = util.maketemp() + '/'
             self.__yaml__ = self.__yaml__.replace("__tmp__", self.__tmp__)
         self.manager = MockManager(self.__yaml__, self.__class__.__name__, db_uri=self.database_uri)
+        for config_function in self.config_functions:
+            config_function(self.manager.config)
+        if self.tasks_functions and 'tasks' in self.manager.config:
+            for task_name, task_definition in self.manager.config['tasks'].items():
+                for task_function in self.tasks_functions:
+                    task_function(task_name, task_definition)
+
 
     def teardown(self):
         try:
