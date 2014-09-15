@@ -104,7 +104,7 @@ class ParserInternal(Parser):
     #   movie_parser API
     @plugin.priority(1)
     def parse_movie(self, data, name=None, **kwargs):
-        log.verbose('Parsing movie: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
+        log.debug('Parsing movie: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
         start = time.clock()
         parsed = None
         try:
@@ -113,13 +113,13 @@ class ParserInternal(Parser):
             log.warn(e)
             parsed = e.parsed
         end = time.clock()
-        log.verbose('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
+        log.debug('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
         return parsed
 
     #   series_parser API
     @plugin.priority(1)
     def parse_series(self, data, name=None, **kwargs):
-        log.verbose('Parsing series: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
+        log.debug('Parsing series: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
         start = time.clock()
         parsed = None
         try:
@@ -128,7 +128,7 @@ class ParserInternal(Parser):
             log.warn(e)
             parsed = e.parsed
         end = time.clock()
-        log.verbose('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
+        log.debug('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
         return parsed
 
 

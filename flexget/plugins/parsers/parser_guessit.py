@@ -340,20 +340,20 @@ class ParserGuessit(Parser):
 
     #   movie_parser API
     def parse_movie(self, data, name=None, **kwargs):
-        log.verbose('Parsing movie: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
+        log.debug('Parsing movie: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
         start = time.clock()
         parsed = self.parse(data, PARSER_MOVIE, name=name, **kwargs)
         end = time.clock()
-        log.verbose('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
+        log.debug('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
         return parsed
 
     #   series_parser API
     def parse_series(self, data, name=None, **kwargs):
-        log.verbose('Parsing series: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
+        log.debug('Parsing series: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
         start = time.clock()
         parsed = self.parse(data, PARSER_EPISODE, name=name, **kwargs)
         end = time.clock()
-        log.verbose('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
+        log.debug('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
         return parsed
 
 
