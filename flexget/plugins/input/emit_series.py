@@ -97,7 +97,7 @@ class EmitSeries(object):
                 entries.append(self.search_entry(series, latest_season + 1, 1, task))
             else:
                 for season in xrange(latest_season, low_season, -1):
-                    log.debug('Adding episodes for %d' % latest_season)
+                    log.debug('Adding episodes for season %d' % season)
                     check_downloaded = not config.get('backfill')
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
                     if series.begin and (not latest or latest < series.begin):
