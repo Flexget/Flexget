@@ -20,6 +20,9 @@ class UrlRewriteRedirect(object):
 
     def url_rewrite(self, task, entry):
         try:
+            # Don't accidentally go online in unit tests
+            if task.manager.unit_test:
+                return
             r = task.requests.head(entry['url'])
             if 300 <= r.status_code < 400 and 'location' in r.headers:
                 entry['url'] = r.headers['location']
