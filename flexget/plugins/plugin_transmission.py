@@ -114,7 +114,7 @@ class TransmissionBase(object):
         idle_limit_ok = None  # will remain if no idle limit defined
 
         if torrent.seedRatioMode == 1:  # use torrent's own seed ratio limit
-            seed_limit_ok = torrent.seedRatioLimit >= torrent.uploadRatio
+            seed_limit_ok = torrent.uploadRatio >= torrent.seedRatioLimit
         elif torrent.seedRatioMode == 0:  # use global rules
             if session.seedRatioLimited:
                 seed_limit_ok = torrent.uploadRatio >= session.seedRatioLimit
