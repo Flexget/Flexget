@@ -41,7 +41,8 @@ class OutputHtml:
             with open(output, 'w') as f:
                 f.write(template.encode('utf-8'))
         except RenderError as e:
-            log.error('Error while rendering entry %s, Error: %s' % (task, e))
+            log.error('Error while rendering task %s, Error: %s' % (task, e))
+            raise plugin.PluginError('There was an error rendering the specified template')
 
 @event('plugin.register')
 def register_plugin():
