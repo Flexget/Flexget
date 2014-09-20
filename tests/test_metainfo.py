@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
+from tests import FlexGetBase, build_parser_function
 
 
 class TestMetainfo(FlexGetBase):
@@ -140,7 +140,19 @@ class TestMetainfoSeries(FlexGetBase):
         self.execute_task('false_positives')
         for entry in self.task.entries:
             # None of these should be detected as series
-            error = '%s sholud not be detected as a series' % entry['title']
+            error = '%s should not be detected as a series' % entry['title']
             assert 'series_name' not in entry, error
             assert 'series_guessed' not in entry, error
             assert 'series_parser' not in entry, error
+
+
+class TestGuessitMetainfoSeries(TestMetainfoSeries):
+    def __init__(self):
+        super(TestGuessitMetainfoSeries, self).__init__()
+        self.add_tasks_function(build_parser_function('guessit'))
+
+
+class TestInternalMetainfoSeries(TestMetainfoSeries):
+    def __init__(self):
+        super(TestInternalMetainfoSeries, self).__init__()
+        self.add_tasks_function(build_parser_function('internal'))

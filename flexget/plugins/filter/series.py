@@ -18,7 +18,8 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.log import log_once
-from flexget.utils.titles import SeriesParser, ParseWarning, ID_TYPES
+from flexget.plugins.parsers import ParseWarning, SERIES_ID_TYPES
+from flexget.plugin import get_plugin_by_name
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
@@ -47,8 +48,7 @@ def upgrade(ver, session):
             release_table = table_schema('episode_releases', session)
             for row in session.execute(select([release_table.c.id, release_table.c.title])):
                 # Recalculate the proper_count from title for old episodes
-                proper_count = len([part for part in re.split('[\W_]+', row['title'].lower())
-                                    if part in SeriesParser.propers])
+                proper_count = get_plugin_by_name('parsing').parse_series(row['title']).proper_count
                 session.execute(update(release_table, release_table.c.id == row['id'], {'proper_count': proper_count}))
         ver = 0
     if ver == 0:
@@ -1011,8 +1011,7 @@ class FilterSeries(FilterSeriesBase):
                 # set flag from database
                 identified_by = series.identified_by or 'auto'
 
-        params = dict(name=series_name,
-                      identified_by=identified_by,
+        params = dict(identified_by=identified_by,
                       alternate_names=get_as_array(config, 'alternate_name'),
                       name_regexps=get_as_array(config, 'name_regexp'),
                       strict_name=config.get('exact', False),
@@ -1022,12 +1021,18 @@ class FilterSeries(FilterSeriesBase):
                       special_ids=get_as_array(config, 'special_ids'),
                       prefer_specials=config.get('prefer_specials'),
                       assume_special=config.get('assume_special'))
-        for id_type in ID_TYPES:
+        for id_type in SERIES_ID_TYPES:
             params[id_type + '_regexps'] = get_as_array(config, id_type + '_regexp')
 
-        parser = SeriesParser(**params)
+        filtered_params = {}
+        for k, v in params.items():
+            if v:
+                filtered_params[k] = v
+        params = filtered_params
 
         for entry in entries:
+            parsed = None
+
             # skip processed entries
             if (entry.get('series_parser') and entry['series_parser'].valid and
                     entry['series_parser'].name.lower() != series_name.lower()):
@@ -1043,18 +1048,22 @@ class FilterSeries(FilterSeriesBase):
                 if entry.get('quality'):
                     log.trace('Setting quality %s from entry field to parser', entry['quality'])
                     quality = entry['quality']
+
                 try:
-                    parser.parse(data, field=field, quality=quality)
+                    parsed = get_plugin_by_name('parsing').instance.parse_series(data, series_name, **params)
                 except ParseWarning as pw:
                     log_once(pw.value, logger=log)
+                    parsed = pw.parsed
+                parsed.field = field
+                parsed.assume_quality(quality)
 
-                if parser.valid:
+                if parsed.valid:
                     break
             else:
                 continue  # next field
 
-            log.debug('%s detected as %s, field: %s', entry['title'], parser, parser.field)
-            populate_entry_fields(entry, parser)
+            log.debug('%s detected as %s, field: %s', entry['title'], parsed, parsed.field)
+            populate_entry_fields(entry, parsed)
 
             # set custom download path
             if 'path' in config:

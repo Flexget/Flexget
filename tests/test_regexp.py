@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
+from tests import FlexGetBase, build_parser_function
 
 
 class TestRegexp(FlexGetBase):
@@ -139,3 +139,15 @@ class TestRegexp(FlexGetBase):
         self.execute_task('test_match_in_list')
         assert self.task.find_entry('accepted', title='expression'), '\'expression\' should have been accepted'
         assert self.task.find_entry('entries', title='regular') not in self.task.accepted, '\'regular\' should not have been accepted'
+
+
+class TestGuessitRegexp(TestRegexp):
+    def __init__(self):
+        super(TestGuessitRegexp, self).__init__()
+        self.add_tasks_function(build_parser_function('guessit'))
+
+
+class TestInternalRegexp(TestRegexp):
+    def __init__(self):
+        super(TestInternalRegexp, self).__init__()
+        self.add_tasks_function(build_parser_function('internal'))

@@ -435,7 +435,7 @@ def load_plugins():
     log.debug('Plugins took %.2f seconds to load' % took)
 
 
-def get_plugins(phase=None, group=None, context=None, category=None, min_api=None):
+def get_plugins(phase=None, group=None, context=None, category=None, name=None, min_api=None):
     """
     Query other plugins characteristics.
 
@@ -443,6 +443,7 @@ def get_plugins(phase=None, group=None, context=None, category=None, min_api=Non
     :param string group: Plugin must belong to this group.
     :param string context: Where plugin is configured, eg. (root, task)
     :param string category: Type of plugin, phase names.
+    :param string name: Name of the plugin.
     :param int min_api: Minimum api version.
     :return: List of PluginInfo instances.
     :rtype: list
@@ -457,6 +458,8 @@ def get_plugins(phase=None, group=None, context=None, category=None, min_api=Non
         if context and not context in plugin.contexts:
             return False
         if category and not category == plugin.category:
+            return False
+        if name is not None and name != plugin.name:
             return False
         if min_api is not None and plugin.api_ver < min_api:
             return False

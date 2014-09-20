@@ -14,10 +14,10 @@ from sqlalchemy.orm import relation
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
+from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, year_property, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
-from flexget.utils.titles import MovieParser
 
 try:
     import tmdb3
@@ -228,8 +228,7 @@ class ApiTmdb(object):
 
         if not (tmdb_id or imdb_id or title) and smart_match:
             # If smart_match was specified, and we don't have more specific criteria, parse it into a title and year
-            title_parser = MovieParser()
-            title_parser.parse(smart_match)
+            title_parser = get_plugin_by_name('parsing').instance.parse_movie(smart_match)
             title = title_parser.name
             year = title_parser.year
 
