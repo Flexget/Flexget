@@ -9,25 +9,10 @@ from requests import RequestException
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils import json
 from flexget.utils.cached_input import cached
+from flexget.utils.trakt import API_URL, get_session, make_list_slug
 
 log = logging.getLogger('trakt_list')
-
-API_KEY = '980c477226b9c18c9a4982cddc1bdbcd747d14b006fe044a8bbbe29bfb640b5d'
-API_URL = 'http://api.v2.trakt.tv/'
-
-
-def make_list_slug(name):
-    """Return the slug for use in url for given list name."""
-    slug = name.lower()
-    # These characters are just stripped in the url
-    for char in '!@#$%^*()[]{}/=?+\\|-_':
-        slug = slug.replace(char, '')
-    # These characters get replaced
-    slug = slug.replace('&', 'and')
-    slug = slug.replace(' ', '-')
-    return slug
 
 
 field_maps = {
@@ -99,32 +84,16 @@ class TraktList(object):
 
     @cached('trakt_list', persist='2 hours')
     def on_task_input(self, task, config):
-        headers = {
-            'Content-Type': 'application/json',
-            'trakt-api-version': 2,
-            'trakt-api-key': API_KEY
-        }
+        session = get_session(config['username'], config.get('password'))
         url = urljoin(API_URL, 'users/%s/' % config['username'])
         if config['list'] in ['collection', 'watchlist', 'watched']:
             url = urljoin(url, '%s/%s' % (config['list'], (config['type'])))
         else:
             url = urljoin(url, 'lists/%s/items' % make_list_slug(config['list']))
 
-        if 'password' in config:
-            auth = {'login': config['username'], 'password': config['password']}
-            try:
-                r = task.requests.post(urljoin(API_URL, 'auth/login'), data=json.dumps(auth), headers=headers)
-            except RequestException as e:
-                raise plugin.PluginError('Authentication to trakt failed, check your username/password: %s' % e.args[0])
-            headers['trakt-user-login'] = config['username']
-            try:
-                headers['trakt-user-token'] = r.json()['token']
-            except (ValueError, KeyError):
-                raise plugin.PluginError('Got unexpected response content while authorizing: %s' % r.text)
-
         log.verbose('Retrieving `%s` list `%s`' % (config['type'], config['list']))
         try:
-            result = task.requests.get(url, headers=headers)
+            result = session.get(url)
         except RequestException as e:
             raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e.args[0])
         try:
