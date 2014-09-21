@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import hashlib
 import logging
+from urlparse import urljoin
 
 from requests import RequestException
 
@@ -8,20 +9,9 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import json
+from flexget.utils.trakt import API_URL, get_session, make_list_slug
 
 log = logging.getLogger('trakt_emit')
-
-
-def make_list_slug(name):
-    """Return the slug for use in url for given list name."""
-    slug = name.lower()
-    # These characters are just stripped in the url
-    for char in '!@#$%^*()[]{}/=?+\\|-_':
-        slug = slug.replace(char, '')
-    # These characters get replaced
-    slug = slug.replace('&', 'and')
-    slug = slug.replace(' ', '-')
-    return slug
 
 
 class TraktEmit(object):
@@ -33,7 +23,6 @@ class TraktEmit(object):
 
     trakt_emit:
       username: <value>
-      api_key: <value>
       position: <last|next>
       context: <collect|collected|watch|watched>
       list: <value>
@@ -52,7 +41,7 @@ class TraktEmit(object):
             'context': {'type': 'string', 'enum': ['watched', 'collected'], 'default': 'watched'},
             'list': {'type': 'string'}
         },
-        'required': ['username', 'password', 'api_key'],
+        'required': ['username'],
         'additionalProperties': False
     }
 
@@ -80,23 +69,29 @@ class TraktEmit(object):
         return data
 
     def on_task_input(self, task, config):
+        session = get_session(config['username'], config.get('password'))
         listed_series = {}
         if config.get('list'):
-            url = ('http://api.trakt.tv/user/list.json/%s/%s/%s' %
-                   (config['api_key'], config['username'], make_list_slug(config['list'])))
-            data = self.get_trakt_data(task, config, url, null_data={})
-            if not data.get('items') or len(data['items']) <= 0:
+            url = urljoin(API_URL, 'users/%s/lists/%s/items' % (config['username'], make_list_slug(config['list'])))
+            try:
+                data = session.get(url).json()
+            except RequestException as e:
+                raise plugin.PluginError('Unable to get trakt list `%s`: %s' % (config['list'], e))
+            if not data:
                 log.warning('The list "%s" is empty.' % config['list'])
                 return
-            for item in data['items']:
+            for item in data:
                 if item['type'] == 'show':
-                    tvdb_id = int(item['show']['tvdb_id'])
-                    listed_series[tvdb_id] = item['show']['title']
-        url = ('http://api.trakt.tv/user/progress/%s.json/%s/%s' %
-               (config['context'], config['api_key'], config['username']))
-        if listed_series:
-            url += '/' + ','.join(unicode(s) for s in listed_series)
-        data = self.get_trakt_data(task, config, url, null_data=[])
+                    trakt_id = item['ids']['trakt']
+                    listed_series[trakt_id] = item['show']['title']
+        context = config['context']
+        if context == 'collected':
+            context = 'collection'
+        url = urljoin(API_URL, 'sync/%s/shows' % (context))
+        try:
+            data = session.get(url).json()
+        except RequestException as e:
+            raise plugin.PluginError('TODO: error message')
         entries = []
 
         for item in data:

@@ -2,9 +2,11 @@ from __future__ import absolute_import, division, unicode_literals
 
 from urlparse import urljoin
 
+from requests import Session#TODO: Switch to flexget session?
+
 from flexget import plugin
 from flexget.utils import json
-from flexget.utils.requests import RequestException, Session
+from flexget.utils.requests import RequestException#TODO: , Session
 
 
 API_KEY = '980c477226b9c18c9a4982cddc1bdbcd747d14b006fe044a8bbbe29bfb640b5d'
