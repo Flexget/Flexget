@@ -79,7 +79,7 @@ class FilterExistsSeries(object):
             for folder in paths:
                 folder = path(folder).expanduser()
                 if not folder.isdir():
-                    log.warn('Directory %s does not exist' % folder, log)
+                    log.warning('Directory %s does not exist', folder)
                     continue
 
                 for filename in folder.walk(errors='warn'):
