@@ -8,6 +8,7 @@ from string import capwords
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.log import log_once
 from flexget.utils.titles.movie import MovieParser
 from flexget.utils.titles.series import SeriesParser
 from .parser_common import PARSER_EPISODE, PARSER_MOVIE, ParseWarning
@@ -106,12 +107,11 @@ class ParserInternal(Parser):
     def parse_movie(self, data, name=None, **kwargs):
         log.debug('Parsing movie: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
         start = time.clock()
-        parsed = None
         try:
             parsed = self.parse(data, PARSER_MOVIE, name=name, **kwargs)
-        except ParseWarning as e:
-            log.warn(e)
-            parsed = e.parsed
+        except ParseWarning as pw:
+            log_once(pw.value, logger=log)
+            parsed = pw.parsed
         end = time.clock()
         log.debug('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
         return parsed
@@ -121,12 +121,11 @@ class ParserInternal(Parser):
     def parse_series(self, data, name=None, **kwargs):
         log.debug('Parsing series: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
         start = time.clock()
-        parsed = None
         try:
             parsed = self.parse(data, PARSER_EPISODE, name=name, **kwargs)
-        except ParseWarning as e:
-            log.warn(e)
-            parsed = e.parsed
+        except ParseWarning as pw:
+            log_once(pw.value, logger=log)
+            parsed = pw.parsed
         end = time.clock()
         log.debug('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
         return parsed
