@@ -44,8 +44,7 @@ class SearchFTP(object):
         output given when issuing the raw search command.
 
     == Basic usage
-
-    my-search-task:
+      my-search-task:
         discover:
                - ... (e.g. emit_movie_queue)
         from:
