@@ -186,6 +186,9 @@ class Scheduler(object):
         log.debug('scheduler started')
         self.load_schedules()
         while not self._stop.wait(5):
+            # Event.wait returns None on python 2.6, manually check the flag. #2705
+            if self._stop.is_set():
+                break
             try:
                 for trigger_id, finished_events in self.running_triggers.items():
                     if all(e.is_set() for e in finished_events):
