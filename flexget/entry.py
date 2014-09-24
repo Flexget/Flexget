@@ -1,8 +1,8 @@
-from __future__ import unicode_literals, division, absolute_import
-from exceptions import Exception, UnicodeDecodeError, TypeError, KeyError
-import logging
+from __future__ import absolute_import, division, unicode_literals
+
 import copy
 import functools
+import logging
 
 from flexget.plugin import PluginError
 from flexget.utils.imdb import extract_id, make_url

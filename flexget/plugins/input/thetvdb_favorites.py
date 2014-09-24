@@ -69,13 +69,15 @@ class InputThetvdbFavorites(object):
           thetvdb_favorites:
             account_id: 23098230
     """
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('text', key='account_id', required=True)
-        root.accept('boolean', key='strip_dates')
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'account_id': {'type': 'string'},
+            'strip_dates': {'type': 'boolean'}
+        },
+        'required': ['account_id'],
+        'additionalProperties': False
+    }
 
     @cached('thetvdb_favorites')
     @plugin.internet(log)

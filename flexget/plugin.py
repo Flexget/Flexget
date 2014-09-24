@@ -1,21 +1,23 @@
 """ Plugin Loading & Management.
 """
 
-from __future__ import unicode_literals, division, absolute_import
-import sys
-import os
-import re
+from __future__ import absolute_import, division, unicode_literals
+
 import logging
-import time
+import os
 import pkgutil
+import re
+import sys
+import time
 import warnings
 from itertools import ifilter
 
 from requests import RequestException
 
-from flexget import config_schema
-from flexget.event import add_event_handler as add_phase_handler, fire_event, remove_event_handlers
 from flexget import plugins as plugins_pkg
+from flexget import config_schema
+from flexget.event import add_event_handler as add_phase_handler
+from flexget.event import fire_event, remove_event_handlers
 
 log = logging.getLogger('plugin')
 
@@ -433,7 +435,7 @@ def load_plugins():
     log.debug('Plugins took %.2f seconds to load' % took)
 
 
-def get_plugins(phase=None, group=None, context=None, category=None, min_api=None):
+def get_plugins(phase=None, group=None, context=None, category=None, name=None, min_api=None):
     """
     Query other plugins characteristics.
 
@@ -441,6 +443,7 @@ def get_plugins(phase=None, group=None, context=None, category=None, min_api=Non
     :param string group: Plugin must belong to this group.
     :param string context: Where plugin is configured, eg. (root, task)
     :param string category: Type of plugin, phase names.
+    :param string name: Name of the plugin.
     :param int min_api: Minimum api version.
     :return: List of PluginInfo instances.
     :rtype: list
@@ -455,6 +458,8 @@ def get_plugins(phase=None, group=None, context=None, category=None, min_api=Non
         if context and not context in plugin.contexts:
             return False
         if category and not category == plugin.category:
+            return False
+        if name is not None and name != plugin.name:
             return False
         if min_api is not None and plugin.api_ver < min_api:
             return False

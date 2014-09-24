@@ -41,7 +41,17 @@ In some environments newer (or older, if your distro is on python 3,) python
 might be available under another name like 'python26' or 'python2.7' in which
 case you need to use that one instead of plain 'python'.
 
-To start using FlexGet from this directory, run the following commands::
+To start using FlexGet from this directory:
+
+Prerequisites for bootstrap.py:
+ - Either put the wheels for `setuptools`_ and `pip`_ in the directory bootstrap.py resides.
+ - Or install (a recent version of) the `virtualenv`_ package to your system.
+
+.. _setuptools: https://pypi.python.org/pypi/setuptools
+.. _pip: https://pypi.python.org/pypi/pip
+.. _virtualenv: https://pypi.python.org/pypi/virtualenv
+
+After the prerequisites for bootstrap.py are finished, run the following commands::
 
     python bootstrap.py
 
@@ -63,6 +73,22 @@ or ``C:\Documents and Setting\<username>\flexget`` (Windows).
 If you don't want to use virtualenv there's ``flexget_vanilla.py`` file which
 can be used to run FlexGet without bootstrapping, note that you will need to
 install all required dependencies yourself.
+
+Custom Virtualenv
+-----------------
+
+If you want to hack on flexget, but don't want to use paver bootstrap because
+you want to keep your virtualenv outside the repo. You can setup your own virtualenv
+and easily install flexget with in that virtualenv.
+
+    # Create virtualenv and source active it.
+    pip install paver
+
+    pip install -e . # with in the repo.
+
+This will install all the flexget dependencies. Now ``flexget`` should work just fine.
+
+Happy Hacking.
 
 
 .. image:: https://d2weczhvl823v0.cloudfront.net/Flexget/flexget/trend.png

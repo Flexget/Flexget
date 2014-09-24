@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
+from tests import FlexGetBase, build_parser_function
 
 
 class TestSeriesPremiere(FlexGetBase):
@@ -107,3 +107,15 @@ class TestSeriesPremiere(FlexGetBase):
         assert not entry.accepted
         entry = self.task.find_entry(title='other show s01e01')
         assert entry.accepted
+
+
+class TestGuessitSeriesPremiere(TestSeriesPremiere):
+    def __init__(self):
+        super(TestGuessitSeriesPremiere, self).__init__()
+        self.add_tasks_function(build_parser_function('guessit'))
+
+
+class TestInternalSeriesPremiere(TestSeriesPremiere):
+    def __init__(self):
+        super(TestInternalSeriesPremiere, self).__init__()
+        self.add_tasks_function(build_parser_function('internal'))

@@ -45,7 +45,7 @@ CATEGORIES = {
     'Games Pack': 986
 }
 
-URL = 'http://torrentshack.net/'
+URL = 'http://torrentshack.eu/'
 
 class TorrentShackSearch(object):
     """ TorrentShack Search plugin

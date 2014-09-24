@@ -1,19 +1,20 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 import copy
-import pkg_resources
 import random
 import socket
 import string
 import sys
-from argparse import (ArgumentParser as ArgParser, Action, ArgumentError, SUPPRESS, PARSER, REMAINDER, _VersionAction,
-                      Namespace, ArgumentTypeError)
+from argparse import ArgumentParser as ArgParser
+from argparse import _VersionAction, Action, ArgumentError, ArgumentTypeError, Namespace, PARSER, REMAINDER, SUPPRESS
+
+import pkg_resources
 
 import flexget
-from flexget.utils.tools import console
-from flexget.utils import requests
 from flexget.entry import Entry
 from flexget.event import fire_event
-
+from flexget.utils import requests
+from flexget.utils.tools import console
 
 _UNSET = object()
 

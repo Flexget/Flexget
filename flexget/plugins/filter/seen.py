@@ -9,6 +9,7 @@ forget (string)
 """
 
 from __future__ import unicode_literals, division, absolute_import
+import contextlib
 import logging
 from datetime import datetime, timedelta
 
@@ -270,12 +271,12 @@ def seen_add(options):
         if imdb_id:
             seen_name = imdb_id
 
-    session = Session()
-    se = SeenEntry(seen_name, 'cli_seen')
-    sf = SeenField('cli_seen', seen_name)
-    se.fields.append(sf)
-    session.add(se)
-    session.commit()
+    with contextlib.closing(Session()) as session:
+        se = SeenEntry(seen_name, 'cli_seen')
+        sf = SeenField('cli_seen', seen_name)
+        se.fields.append(sf)
+        session.add(se)
+        session.commit()
     console('Added %s as seen. This will affect all tasks.' % seen_name)
 
 

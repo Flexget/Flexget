@@ -5,6 +5,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger("pushover")
 
@@ -29,50 +30,34 @@ class OutputPushover(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-
-    def validator(self):
-        from flexget import validator
-        config = validator.factory("dict")
-        config.accept("text", key="userkey", required=True)
-        config.accept("list", key="userkey").accept("text")
-        config.accept("text", key="apikey", required=True)
-        config.accept("text", key="device", required=False)
-        config.accept("text", key="title", required=False)
-        config.accept("text", key="message", required=False)
-        config.accept("integer", key="priority", required=False)
-        config.accept("url", key="url", required=False)
-        config.accept("text", key="sound", required=False)
-        return config
-
-    def prepare_config(self, config):
-        if isinstance(config, bool):
-            config = {"enabled": config}
-
-        # Set the defaults
-        config.setdefault("device", None)
-        # TODO: don't assume it's a download
-        config.setdefault("title", "{{task}}")
-        # TODO: use template file
-        config.setdefault("message", "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} "
-                                     "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "
-                                     "{{imdb_year}}{% else %}{{title}}{% endif %}")
-        config.setdefault("priority", 0)
-        config.setdefault("url", "{% if imdb_url is defined %}{{imdb_url}}{% endif %}")
-        config.setdefault("sound", "pushover")
-
-        return config
+    default_message = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} " \
+                      "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "\
+                      "{{imdb_year}}{% else %}{{title}}{% endif %}"
+    schema = {
+        'type': 'object',
+        'properties': {
+            'userkey': one_or_more({'type': 'string'}),
+            'apikey': {'type': 'string'},
+            'device': {'type': 'string', 'default': ''},
+            'title': {'type': 'string', 'default': "{{task}}"},
+            'message': {'type': 'string', 'default': default_message},
+            'priority': {'type': 'integer', 'default': 0},
+            'url': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
+            'sound': {'type': 'string', 'default': 'pushover'}
+        },
+        'required': ['userkey', 'apikey'],
+        'additionalProperties': False
+    }
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
-        # get the parameters
-        config = self.prepare_config(config)
 
-        # Support for multiple userkeys 
+        # Support for multiple userkeys
         userkeys = config["userkey"]
         if not isinstance(userkeys, list):
             userkeys = [userkeys]
-            
+
         # Set a bunch of local variables from the config
         apikey = config["apikey"]
         device = config["device"]
@@ -116,7 +101,7 @@ class OutputPushover(object):
                     data["priority"] = priority
                 if sound:
                     data["sound"] = sound
-    
+
                 # Check for test mode
                 if task.options.test:
                     log.info("Test mode.  Pushover notification would be:")
@@ -137,10 +122,10 @@ class OutputPushover(object):
 
                 # Make the request
                 response = task.requests.post(pushover_url, headers=client_headers, data=data, raise_status=False)
-    
+
                 # Check if it succeeded
                 request_status = response.status_code
-    
+
                 # error codes and messages from Pushover API
                 if request_status == 200:
                     log.debug("Pushover notification sent")

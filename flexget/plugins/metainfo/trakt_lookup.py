@@ -98,9 +98,7 @@ class PluginTraktLookup(object):
         'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep.season, ep.number),
         'trakt_ep_tvdb_id': 'tvdb_id'}
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
+    schema = {'type': 'boolean'}
 
     def lazy_series_lookup(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""

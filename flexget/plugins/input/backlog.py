@@ -65,9 +65,7 @@ class InputBacklog(object):
     Rarely useful for end users, mainly used by other plugins.
     """
 
-    def validator(self):
-        from flexget import validator
-        return validator.factory('interval')
+    schema = {'type': 'string', 'format': 'interval'}
 
     @plugin.priority(-255)
     def on_task_input(self, task, config):

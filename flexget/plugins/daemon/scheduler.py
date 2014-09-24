@@ -1,20 +1,21 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime, timedelta, time as dt_time
-from hashlib import md5
 import logging
-import Queue
 import threading
 import time
 
-from sqlalchemy import Column, String, DateTime
+from sqlalchemy import Column, DateTime, Integer
 
+from flexget import db_schema
 from flexget.config_schema import register_config_key, parse_time
-from flexget.db_schema import versioned_base
 from flexget.event import event
 from flexget.manager import Session
+from flexget.utils.sqlalchemy_utils import table_schema
+from flexget.utils.tools import singleton
 
 log = logging.getLogger('scheduler')
-Base = versioned_base('scheduler', 0)
+DB_SCHEMA_VER = 1
+Base = db_schema.versioned_base('scheduler', DB_SCHEMA_VER)
 
 UNITS = ['seconds', 'minutes', 'hours', 'days', 'weeks']
 WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
@@ -51,22 +52,27 @@ yaml_schedule = {
 
 
 main_schema = {
-    'type': 'array',
-    'items': {
-        'properties': {
-            'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
-            'interval': yaml_schedule
+    'oneOf': [
+        {
+            'type': 'array',
+            'items': {
+                'properties': {
+                    'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
+                    'interval': yaml_schedule
+                },
+                'required': ['tasks', 'interval'],
+                'additionalProperties': False
+            }
         },
-        'required': ['tasks', 'interval'],
-        'additionalProperties': False
-    }
+        {'type': 'boolean', 'enum': [False]}
+    ]
 }
 
 
 class DBTrigger(Base):
     __tablename__ = 'scheduler_triggers'
 
-    uid = Column(String, primary_key=True)  # Hash of all trigger properties, to uniquely identify the trigger
+    uid = Column(Integer, primary_key=True)  # Hash of all trigger properties, to uniquely identify the trigger
     last_run = Column(DateTime)
 
     def __init__(self, uid, last_run=None):
@@ -74,21 +80,74 @@ class DBTrigger(Base):
         self.last_run = last_run
 
 
+@db_schema.upgrade('scheduler')
+def db_upgrade(ver, session):
+    if ver == 0:
+        log.info('Recreating scheduler table. All schedules will trigger again after this upgrade.')
+        table = table_schema('scheduler_triggers', session)
+        table.drop()
+        Base.metadata.create_all(bind=session.bind)
+    return DB_SCHEMA_VER
+
+
+@event('manager.daemon.started')
 @event('manager.config_updated')
-def create_triggers(manager):
-    manager.scheduler.load_schedules()
+def setup_scheduler(manager):
+    """Starts, stops or restarts the scheduler when config changes."""
+    if not manager.is_daemon:
+        return
+    scheduler = Scheduler(manager)
+    if scheduler.is_alive():
+        scheduler.stop()
+    if manager.config.get('schedules', True):
+        scheduler.start()
 
 
-class Scheduler(threading.Thread):
+@event('manager.shutdown')
+def stop_scheduler(manager):
+    if not manager.is_daemon:
+        return
+    scheduler = Scheduler(manager)
+    scheduler.stop()
+    scheduler.wait()
+
+
+@singleton
+class Scheduler(object):
     # We use a regular list for periodic jobs, so you must hold this lock while using it
     triggers_lock = threading.Lock()
 
     def __init__(self, manager):
-        super(Scheduler, self).__init__(name='scheduler')
-        self.daemon = True
         self.manager = manager
         self.triggers = []
         self.running_triggers = {}
+        self.waiting_triggers = set()
+        self._stop = threading.Event()
+        self._thread = None
+
+    def start(self):
+        if self.is_alive():
+            if self._stop.is_set():
+                # If the thread was told to stop, wait for it to end before starting a new one
+                self.wait()
+            else:
+                raise RuntimeError('Cannot start again, scheduler is already running.')
+        self._stop.clear()
+        self._thread = threading.Thread(name='scheduler', target=self.run)
+        self._thread.daemon = True
+        self._thread.start()
+
+    def stop(self):
+        if self.is_alive():
+            log.debug('Stopping scheduler')
+            self._stop.set()
+
+    def is_alive(self):
+        return self._thread and self._thread.is_alive()
+
+    def wait(self):
+        while self.is_alive():
+            time.sleep(0.5)
 
     def load_schedules(self):
         """Clears current schedules and loads them from the config."""
@@ -107,25 +166,40 @@ class Scheduler(threading.Thread):
         with self.triggers_lock:
             for trigger in self.triggers:
                 if trigger.should_run:
-                    if trigger.uid in self.running_triggers:
-                        log.error('Not firing schedule %r. Tasks from last run have still not finished.' % trigger)
-                        log.error('You may need to increase the interval for this schedule.')
+                    if trigger in self.running_triggers:
+                        if trigger not in self.waiting_triggers:
+                            log.error('Not firing schedule %r. Tasks from last run have still not finished.' % trigger)
+                            log.error('You may need to increase the interval for this schedule.')
+                            self.waiting_triggers.add(trigger)
                         continue
                     options = dict(trigger.options)
                     # If the user has specified all tasks with '*', don't add tasks option at all, so that manual
                     # tasks are not executed
                     if trigger.tasks != ['*']:
                         options['tasks'] = trigger.tasks
-                    self.running_triggers[trigger.uid] = self.manager.execute(options=options, priority=5)
+                    if trigger in self.waiting_triggers:
+                        self.waiting_triggers.remove(trigger)
+                    self.running_triggers[trigger] = self.manager.execute(options=options, priority=5)
                     trigger.trigger()
 
     def run(self):
-        while True:
-            for trigger_id, finished_events in self.running_triggers.items():
-                if all(e.is_set() for e in finished_events):
-                    del self.running_triggers[trigger_id]
-            self.queue_pending_jobs()
-            time.sleep(5)
+        log.debug('scheduler started')
+        self.load_schedules()
+        while not self._stop.wait(5):
+            # Event.wait returns None on python 2.6, manually check the flag. #2705
+            if self._stop.is_set():
+                break
+            try:
+                for trigger_id, finished_events in self.running_triggers.items():
+                    if all(e.is_set() for e in finished_events):
+                        del self.running_triggers[trigger_id]
+                self.queue_pending_jobs()
+            except Exception:
+                log.exception('BUG: Unhandled error in scheduler thread.')
+                # This is just to prevent spamming if we get in an error loop. Maybe should be different.
+                log.error('Attempting to continue running scheduler thread in one minute.')
+                time.sleep(60)
+                continue
         log.debug('scheduler shut down')
 
 
@@ -147,15 +221,6 @@ class Trigger(object):
         self.interval = interval
         self._get_db_last_run()
         self.schedule_next_run()
-
-    @property
-    def uid(self):
-        """A unique id which describes this trigger."""
-        # Determine uniqueness based on interval,
-        hashval = md5(str(sorted(self.interval)))
-        # and tasks run on that interval.
-        hashval.update(','.join(self.tasks).encode('utf-8'))
-        return hashval.hexdigest()
 
     # Handles getting and setting interval in form validated by config
     @property
@@ -222,7 +287,7 @@ class Trigger(object):
     def _get_db_last_run(self):
         session = Session()
         try:
-            db_trigger = session.query(DBTrigger).get(self.uid)
+            db_trigger = session.query(DBTrigger).get(hash(self))
             if db_trigger:
                 self.last_run = db_trigger.last_run
                 log.debug('loaded last_run from the database')
@@ -232,15 +297,22 @@ class Trigger(object):
     def _set_db_last_run(self):
         session = Session()
         try:
-            db_trigger = session.query(DBTrigger).get(self.uid)
+            db_trigger = session.query(DBTrigger).get(hash(self))
             if not db_trigger:
-                db_trigger = DBTrigger(self.uid)
+                db_trigger = DBTrigger(hash(self))
                 session.add(db_trigger)
             db_trigger.last_run = self.last_run
             session.commit()
         finally:
             session.close()
         log.debug('recorded last_run to the database')
+
+    def __hash__(self):
+        """A unique id which describes this trigger."""
+        return hash(tuple(sorted(self.interval.iteritems())) + tuple(sorted(self.tasks)))
+
+    def __eq__(self, other):
+        return (self.interval, self.tasks) == (other.interval, other.tasks)
 
     def __repr__(self):
         return 'Trigger(tasks=%r, amount=%r, unit=%r)' % (self.tasks, self.amount, self.unit)

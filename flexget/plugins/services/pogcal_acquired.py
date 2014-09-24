@@ -9,13 +9,12 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
-from flexget.utils.titles.series import SeriesParser
+from flexget.utils.titles.series import name_to_re
 from flexget.db_schema import versioned_base
 
 log = logging.getLogger('pogcal_acquired')
 Base = versioned_base('pogcal_acquired', 0)
 session = requests.Session(max_retries=3)
-series_parser = SeriesParser()
 
 
 class PogcalShow(Base):
@@ -86,7 +85,7 @@ class PogcalAcquired(object):
             log.error('Error looking up show show list from pogdesign calendar: %s' % e)
             return
         # Try to find the show id from pogdesign show list
-        show_re = series_parser.name_to_re(show_name)
+        show_re = name_to_re(None, show_name)
         soup = get_soup(page.content)
         search = re.compile(show_re, flags=re.I)
         show = soup.find(text=search)

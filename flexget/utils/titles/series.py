@@ -1,13 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 from datetime import datetime, timedelta
 
 from dateutil.parser import parse as parsedate
 
-from flexget.utils.titles.parser import TitleParser, ParseWarning
+import re
+from flexget.utils.titles.parser import TitleParser
+from flexget.plugins.parsers import ParseWarning
+from flexget.plugins.parsers.parser_common import default_ignore_prefixes, name_to_re
 from flexget.utils import qualities
 from flexget.utils.tools import ReList
+
 
 log = logging.getLogger('seriesparser')
 
@@ -15,8 +18,7 @@ log = logging.getLogger('seriesparser')
 # switch to logging.DEBUG if you want to debug this class (produces quite a bit info ..)
 log.setLevel(logging.INFO)
 
-ID_TYPES = ['ep', 'date', 'sequence', 'id']
-
+ID_TYPES = ['ep', 'date', 'sequence', 'id'] # may also be 'special'
 
 class SeriesParser(TitleParser):
 
@@ -63,10 +65,7 @@ class SeriesParser(TitleParser):
     id_regexps = ReList([])
     clean_regexps = ReList(['\[.*?\]', '\(.*?\)'])
     # ignore prefix regexps must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
-    ignore_prefixes = [
-        '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
-        '(?:HD.720p?:)',
-        '(?:HD.1080p?:)']
+    ignore_prefixes = default_ignore_prefixes
 
     def __init__(self, name='', alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
                  date_regexps=None, sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None,
@@ -125,6 +124,14 @@ class SeriesParser(TitleParser):
         self.field = None
         self._reset()
 
+    @property
+    def is_series(self):
+        return True
+
+    @property
+    def is_movie(self):
+        return False
+
     def _reset(self):
         # parse produces these
         self.season = None
@@ -158,30 +165,6 @@ class SeriesParser(TitleParser):
         """Replaces some characters with spaces"""
         return re.sub(r'[_.,\[\]\(\): ]+', ' ', data).strip().lower()
 
-    def name_to_re(self, name):
-        """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
-        parenthetical = None
-        if name.endswith(')'):
-            p_start = name.rfind('(')
-            if p_start != -1:
-                parenthetical = re.escape(name[p_start + 1:-1])
-                name = name[:p_start - 1]
-        # Blanks are any non word characters except & and _
-        blank = r'(?:[^\w&]|_)'
-        ignore = '(?:' + '|'.join(self.ignore_prefixes) + ')?'
-        res = re.sub(re.compile(blank + '+', re.UNICODE), ' ', name)
-        res = res.strip()
-        # accept either '&' or 'and'
-        res = re.sub(' (&|and) ', ' (?:and|&) ', res, re.UNICODE)
-        res = re.sub(' +', blank + '*', res, re.UNICODE)
-        if parenthetical:
-            res += '(?:' + blank + '+' + parenthetical + ')?'
-            # Turn on exact mode for series ending with a parenthetical,
-            # so that 'Show (US)' is not accepted as 'Show (UK)'
-            self.strict_name = True
-        res = '^' + ignore + blank + '*' + '(' + res + ')(?:\\b|_)' + blank + '*'
-        return res
-
     def parse(self, data=None, field=None, quality=None):
         # Clear the output variables before parsing
         self._reset()
@@ -196,7 +179,7 @@ class SeriesParser(TitleParser):
 
         # check if data appears to be unwanted (abort)
         if self.parse_unwanted(self.remove_dirt(self.data)):
-            raise ParseWarning('`{data}` appears to be an episode pack'.format(data=self.data))
+            raise ParseWarning(self, '`{data}` appears to be an episode pack'.format(data=self.data))
 
         name = self.remove_dirt(self.name)
 
@@ -209,7 +192,7 @@ class SeriesParser(TitleParser):
         # regexp name matching
         if not self.name_regexps:
             # if we don't have name_regexps, generate one from the name
-            self.name_regexps = ReList(self.name_to_re(name) for name in [self.name] + self.alternate_names)
+            self.name_regexps = ReList(name_to_re(name, self.ignore_prefixes, self) for name in [self.name] + self.alternate_names)
             # With auto regex generation, the first regex group captures the name
             self.re_from_name = True
         # try all specified regexps on this data
@@ -419,7 +402,7 @@ class SeriesParser(TitleParser):
             msg += 'any series numbering.'
         else:
             msg += 'a(n) `%s` style identifier.' % self.identified_by
-        raise ParseWarning(msg)
+        raise ParseWarning(self, msg)
 
     def parse_unwanted(self, data):
         """Parses data for an unwanted hits. Return True if the data contains unwanted hits."""

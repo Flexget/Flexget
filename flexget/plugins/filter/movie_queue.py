@@ -89,7 +89,7 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
             plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
         except plugin.DependencyError:
             log.debug('tmdb_lookup is not available, queue will not work if movie ids are not populated')
-    
+
         conditions = []
         # Check if a movie id is already populated before incurring a lazy lookup
         for lazy in [False, True]:
@@ -203,7 +203,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
         return {'title': title, 'imdb_id': imdb_id, 'tmdb_id': tmdb_id, 'quality': quality}
     else:
         if item.downloaded:
-            raise QueueError('ERROR: %s has already been queued and downloaded' % title)
+            raise QueueError('ERROR: %s has already been queued and downloaded' % title, errno=1)
         else:
             raise QueueError('ERROR: %s is already in the queue' % title, errno=1)
 

@@ -1,25 +1,25 @@
-from __future__ import unicode_literals, division, absolute_import, print_function
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import atexit
 import codecs
-from contextlib import contextmanager
 import copy
 import fnmatch
-import signal
-import os
-import sys
-import shutil
 import logging
+import os
+import shutil
+import signal
+import sys
 import threading
-import pkg_resources
-import Queue
-import yaml
+from contextlib import contextmanager
 from datetime import datetime, timedelta
 
+import pkg_resources
 import sqlalchemy
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.pool import SingletonThreadPool
+import yaml
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import SingletonThreadPool
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 Base = declarative_base()
@@ -27,11 +27,11 @@ Session = sessionmaker()
 
 from flexget import config_schema, db_schema
 from flexget.event import fire_event
-from flexget.ipc import IPCServer, IPCClient
-from flexget.scheduler import Scheduler
+from flexget.ipc import IPCClient, IPCServer
 from flexget.task import Task
 from flexget.task_queue import TaskQueue
 from flexget.utils.tools import pid_exists
+
 
 log = logging.getLogger('manager')
 
@@ -114,10 +114,10 @@ class Manager(object):
         self.database_uri = None
         self.db_upgraded = False
         self._has_lock = False
+        self.is_daemon = False
 
         self.config = {}
 
-        self.scheduler = Scheduler(self)
         self.ipc_server = IPCServer(self, options.ipc_port)
         self.task_queue = TaskQueue()
         manager = self
@@ -195,7 +195,10 @@ class Manager(object):
             for arg in options.tasks:
                 matches = [t for t in self.tasks if fnmatch.fnmatchcase(unicode(t).lower(), arg.lower())]
                 if not matches:
-                    log.error('`%s` does not match any tasks' % arg)
+                    msg = '`%s` does not match any tasks' % arg
+                    log.error(msg)
+                    if output:
+                        output.write(msg)
                     continue
                 task_names.extend(m for m in matches if m not in task_names)
             # Set the option as a list of matching task names so plugins can use it easily
@@ -277,17 +280,17 @@ class Manager(object):
         :param options: argparse options
         """
         if options.action == 'start':
-            if options.daemonize:
-                self.daemonize()
             with self.acquire_lock():
+                if options.daemonize:
+                    self.daemonize()
                 try:
                     signal.signal(signal.SIGTERM, self._handle_sigterm)
                 except ValueError as e:
                     # If flexget is being called from another script, e.g. windows service helper, and we are not the
                     # main thread, this error will occur.
                     log.debug('Error registering sigterm handler: %s' % e)
+                self.is_daemon = True
                 self.ipc_server.start()
-                self.scheduler.start()
                 fire_event('manager.daemon.started', self)
                 self.task_queue.start()
                 self.task_queue.wait()
@@ -318,6 +321,7 @@ class Manager(object):
         """
         :param options: argparse options
         """
+        # TODO: make webui an enablable plugin in regular daemon mode
         try:
             pkg_resources.require('flexget[webui]')
         except pkg_resources.DistributionNotFound as e:
@@ -330,8 +334,8 @@ class Manager(object):
         from flexget.ui import webui
         with self.acquire_lock():
             self.ipc_server.start()
-            webui.start(self)
             self.task_queue.start()
+            webui.start(self)
             self.task_queue.wait()
 
     def _handle_sigterm(self, signum, frame):
@@ -731,6 +735,9 @@ class Manager(object):
         os.dup2(si.fileno(), sys.stdin.fileno())
         os.dup2(so.fileno(), sys.stdout.fileno())
         os.dup2(se.fileno(), sys.stderr.fileno())
+        # If we have a lock, update the lock file with our new pid
+        if self._has_lock:
+            self.write_lock()
 
     def db_cleanup(self, force=False):
         """

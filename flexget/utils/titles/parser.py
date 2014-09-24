@@ -1,23 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import re
 
-
-class ParseWarning(Warning):
-
-    def __init__(self, value, **kwargs):
-        self.value = value
-        self.kwargs = kwargs
-
-    def __unicode__(self):
-        return self.value
-
-    def __str__(self):
-        return self.__unicode__().encode('utf-8')
-
-    def __repr__(self):
-        return str('ParseWarning({}, **{})').format(self, repr(self.kwargs))
-
-
 class TitleParser(object):
 
     propers = ['proper', 'repack', 'rerip', 'real', 'final']

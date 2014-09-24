@@ -1,10 +1,11 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 import logging
 import logging.handlers
 import re
+import string
 import sys
 import threading
-import string
 import warnings
 
 # A level more detailed than DEBUG

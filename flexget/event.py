@@ -1,7 +1,8 @@
 """
 Provides small event framework
 """
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import absolute_import, division, unicode_literals
+
 import logging
 
 log = logging.getLogger('event')

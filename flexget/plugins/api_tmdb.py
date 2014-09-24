@@ -14,10 +14,10 @@ from sqlalchemy.orm import relation
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
+from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import text_date_synonym, year_property, with_session
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
-from flexget.utils.titles import MovieParser
 
 try:
     import tmdb3
@@ -113,27 +113,30 @@ class TMDBMovie(TMDBContainer, Base):
     genres = relation('TMDBGenre', secondary=genres_table, backref='movies')
 
     def update_from_object(self, update_object):
-        TMDBContainer.update_from_object(self, update_object)
-        self.translated = len(update_object.translations) > 0
-        if len(update_object.languages) > 0:
-            self.language = update_object.languages[0].code #.code or .name ?
-        self.original_name = update_object.originaltitle
-        self.name = update_object.title
         try:
-            if len(update_object.alternate_titles) > 0:
-                # maybe we could choose alternate title from movie country only
-                self.alternative_name = update_object.alternate_titles[0].title
-        except UnicodeEncodeError:
-            # Bug in tmdb3 library, see #2437. Just don't set alternate_name when it fails
-            pass
-        self.imdb_id = update_object.imdb
-        self.url = update_object.homepage
-        self.rating = update_object.userrating
-        if len(update_object.youtube_trailers) > 0:
-            self.trailer = update_object.youtube_trailers[0].source # unicode: ooNSm6Uug3g
-        elif len(update_object.apple_trailers) > 0:
-            self.trailer = update_object.apple_trailers[0].source
-        self.released = update_object.releasedate
+            TMDBContainer.update_from_object(self, update_object)
+            self.translated = len(update_object.translations) > 0
+            if len(update_object.languages) > 0:
+                self.language = update_object.languages[0].code #.code or .name ?
+            self.original_name = update_object.originaltitle
+            self.name = update_object.title
+            try:
+                if len(update_object.alternate_titles) > 0:
+                    # maybe we could choose alternate title from movie country only
+                    self.alternative_name = update_object.alternate_titles[0].title
+            except UnicodeEncodeError:
+                # Bug in tmdb3 library, see #2437. Just don't set alternate_name when it fails
+                pass
+            self.imdb_id = update_object.imdb
+            self.url = update_object.homepage
+            self.rating = update_object.userrating
+            if len(update_object.youtube_trailers) > 0:
+                self.trailer = update_object.youtube_trailers[0].source # unicode: ooNSm6Uug3g
+            elif len(update_object.apple_trailers) > 0:
+                self.trailer = update_object.apple_trailers[0].source
+            self.released = update_object.releasedate
+        except tmdb3.TMDBError as e:
+            raise LookupError('Error updating data from tmdb: %s' % e)
 
 
 class TMDBGenre(TMDBContainer, Base):
@@ -225,8 +228,7 @@ class ApiTmdb(object):
 
         if not (tmdb_id or imdb_id or title) and smart_match:
             # If smart_match was specified, and we don't have more specific criteria, parse it into a title and year
-            title_parser = MovieParser()
-            title_parser.parse(smart_match)
+            title_parser = get_plugin_by_name('parsing').instance.parse_movie(smart_match)
             title = title_parser.name
             year = title_parser.year
 

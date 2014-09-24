@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<rss version="2.0">
+<rss version="2.0" xmlns:other="http://localhost/flexget">
   <channel>
     <title>FlexGet RSS test</title>
     <ttl>15</ttl>
     <link>http://localhost/invalid</link>
     <description>This is FlexGet RSS test feed that is used in automated Unit Tests.</description>
-    
+
     <item>
       <title>Zero sized enclosure</title>
       <link>http://localhost/zero_sized_enclosure</link>
@@ -56,11 +56,21 @@
     </item>
 
     <item>
+      <title>Colon fields</title>
+      <link>http://localhost/otherfields</link>
+      <pubDate>Sun, 28 Dec 2008 14:20:00 -0200</pubDate>
+      <description>Description, colon fields</description>
+      <other:Field>otherfield</other:Field>
+      <other:title>alt title</other:title>
+      <other:link>http://localhost/altlink</other:link>
+    </item>
+
+    <item>
       <title></title>
       <link>http://localhost/empty</link>
       <pubDate>Sun, 28 Dec 2008 14:00:00 -0200</pubDate>
       <description>Description, empty title</description>
     </item>
-    
+
   </channel>
 </rss>

@@ -113,32 +113,29 @@ class TraktSeries(TraktContainer, Base):
             data = requests.get(url).json()
         except requests.RequestException as e:
             raise LookupError('Request failed %s' % url)
-        if data:
-            if data['title']:
-                for i in data['images']:
-                    data[i] = data['images'][i]
-            if data['genres']:
-                genres = {}
-                for genre in data['genres']:
-                    db_genre = session.query(TraktGenre).filter(TraktGenre.name == genre).first()
-                    if not db_genre:
-                        genres['name'] = genre
-                        db_genre = TraktGenre(genres)
-                    if db_genre not in self.genre:
-                        self.genre.append(db_genre)
-            if data['people']['actors']:
-                series_actors = data['people']['actors']
-                for i in series_actors:
-                    if i['name']:
-                        db_character = session.query(TraktActors).filter(TraktActors.name == i['name']).first()
-                        if not db_character:
-                            db_character = TraktActors(i)
-                        if db_character not in self.actors:
-                            self.actors.append(db_character)
-            if data['title']:
-                TraktContainer.update_from_dict(self, data)
-            else:
-                raise LookupError('Could not update information to database for Trakt on ')
+        if not data or not data.get('title'):
+            raise LookupError('Could not update database info from trakt for tvdb id `%s`' % tvdb_id)
+        if data['images']:
+            data.update(data['images'])
+        if data['genres']:
+            genres = {}
+            for genre in data['genres']:
+                db_genre = session.query(TraktGenre).filter(TraktGenre.name == genre).first()
+                if not db_genre:
+                    genres['name'] = genre
+                    db_genre = TraktGenre(genres)
+                if db_genre not in self.genre:
+                    self.genre.append(db_genre)
+        if data['people']['actors']:
+            series_actors = data['people']['actors']
+            for i in series_actors:
+                if i['name']:
+                    db_character = session.query(TraktActors).filter(TraktActors.name == i['name']).first()
+                    if not db_character:
+                        db_character = TraktActors(i)
+                    if db_character not in self.actors:
+                        self.actors.append(db_character)
+        TraktContainer.update_from_dict(self, data)
 
     def __repr__(self):
         return '<Traktv Name=%s, TVDB_ID=%s>' % (self.title, self.tvdb_id)
@@ -167,23 +164,23 @@ def get_series_id(title):
     try:
         data = response.json()
     except ValueError:
-        log.debug('Error Parsing Traktv Json for %s' % title)
-        return
-    if 'status' in data:
-        log.debug('Returned Status %s' % data['status'])
+        raise LookupError('Error Parsing Traktv Json for %s' % title)
+    if 'error' in data:
+        raise LookupError('Error from trakt: %s' % data['error'])
+    for item in data:
+        if normalize_series_name(item['title']) == norm_series_name:
+            series = item['tvdb_id']
+            break
     else:
         for item in data:
-            if normalize_series_name(item['title']) == norm_series_name:
+            title_match = SequenceMatcher(lambda x: x in '\t',
+                                          normalize_series_name(item['title']), norm_series_name).ratio()
+            if title_match > .9:
+                log.debug('Warning: Using lazy matching because title was not found exactly for %s' % title)
                 series = item['tvdb_id']
-        if not series:
-            for item in data:
-                title_match = SequenceMatcher(lambda x: x in '\t',
-                                              normalize_series_name(item['title']), norm_series_name).ratio()
-                if not series and title_match > .9:
-                    log.debug('Warning: Using lazy matching because title was not found exactly for %s' % title)
-                    series = item['tvdb_id']
+                break
     if not series:
-        log.debug('Trakt.tv Returns only EXACT Name Matching: %s' % title)
+        raise LookupError('Could not find tvdb_id for `%s` on trakt' % title)
     return series
 
 
@@ -201,8 +198,7 @@ class ApiTrakt(object):
         if tvdb_id:
             series = session.query(TraktSeries).filter(TraktSeries.tvdb_id == tvdb_id).first()
         if not series and title:
-            series_filter = session.query(TraktSeries).filter(func.lower(TraktSeries.title) == title.lower())
-            series = series_filter.first()
+            series = session.query(TraktSeries).filter(func.lower(TraktSeries.title) == title.lower()).first()
             if not series:
                 found = session.query(TraktSearchResult).filter(func.lower(TraktSearchResult.search) ==
                                                                 title.lower()).first()
@@ -212,36 +208,31 @@ class ApiTrakt(object):
             if only_cached:
                 raise LookupError('Series %s not found from cache' % id_str())
             log.debug('Series %s not found in cache, looking up from trakt.' % id_str())
-            if tvdb_id is not None:
+            if tvdb_id:
                 series = TraktSeries()
                 series.tvdb_id = tvdb_id
                 series.update(session=session)
-                if series.title:
-                    session.add(series)
-            if tvdb_id is None and title is not None:
+                session.add(series)
+            elif title:
                 series_lookup = get_series_id(title)
                 if series_lookup:
                     series = session.query(TraktSeries).filter(TraktSeries.tvdb_id == series_lookup).first()
-                    if not series and series_lookup:
+                    if not series:
                         series = TraktSeries()
                         series.tvdb_id = series_lookup
                         series.update(session=session)
-                        if series.title:
-                            session.add(series)
+                        session.add(series)
                     if title.lower() != series.title.lower():
                         session.add(TraktSearchResult(search=title, series=series))
-                else:
-                    raise LookupError('Unknown Series title from Traktv: %s' % id_str())
 
         if not series:
             raise LookupError('No results found from traktv for %s' % id_str())
-        if not series.title:
-            raise LookupError('Nothing Found for %s' % id_str())
-        if series:
-            series.episodes
-            series.genre
-            series.actors
-            return series
+
+        # Make sure relations are loaded before returning
+        series.episodes
+        series.genre
+        series.actors
+        return series
 
     @staticmethod
     @with_session
@@ -249,50 +240,42 @@ class ApiTrakt(object):
         series = ApiTrakt.lookup_series(title=title, tvdb_id=tvdb_id, only_cached=only_cached, session=session)
         if not series:
             raise LookupError('Could not identify series')
-        if series.tvdb_id:
-            ep_description = '%s.S%sE%s' % (series.title, seasonnum, episodenum)
-            episode = session.query(TraktEpisode).filter(TraktEpisode.series_id == series.tvdb_id).\
-                filter(TraktEpisode.season == seasonnum).filter(TraktEpisode.number == episodenum).first()
-            url = episode_summary + api_key + '%s/%s/%s' % (series.tvdb_id, seasonnum, episodenum)
-        elif title:
-            title = normalize_series_name(title)
-            title = re.sub(' ', '-', title)
-            ep_description = '%s.S%sE%s' % (series.title, seasonnum, episodenum)
-            episode = session.query(TraktEpisode).filter(title == series.title).\
-                filter(TraktEpisode.season == seasonnum).\
-                filter(TraktEpisode.number == episodenum).first()
-            url = episode_summary + api_key + '%s/%s/%s' % (title, seasonnum, episodenum)
+        ep_description = '%s.S%sE%s' % (series.title, seasonnum, episodenum)
+        episode = session.query(TraktEpisode).filter(TraktEpisode.series_id == series.tvdb_id).\
+            filter(TraktEpisode.season == seasonnum).filter(TraktEpisode.number == episodenum).first()
+        url = episode_summary + api_key + '%s/%s/%s' % (series.tvdb_id, seasonnum, episodenum)
         if not episode:
             if only_cached:
                 raise LookupError('Episode %s not found in cache' % ep_description)
 
             log.debug('Episode %s not found in cache, looking up from trakt.' % ep_description)
             try:
-                data = requests.get(url)
+                response = requests.get(url)
             except requests.RequestException:
-                log.debug('Error Retrieving Trakt url: %s' % url)
+                raise LookupError('Error Retrieving Trakt url: %s' % url)
             try:
-                data = data.json()
+                data = response.json()
             except ValueError:
-                log.debug('Error parsing Trakt episode json for %s' % title)
-            if data:
-                if 'status' in data:
-                    raise LookupError('Error looking up episode')
-                ep_data = data['episode']
-                if ep_data:
-                    episode = session.query(TraktEpisode).filter(TraktEpisode.tvdb_id == ep_data['tvdb_id']).first()
-                    if not episode:
-                        ep_data['episode_name'] = ep_data.pop('title')
-                        for i in ep_data['images']:
-                            ep_data[i] = ep_data['images'][i]
-                            del ep_data['images']
-                        episode = TraktEpisode(ep_data)
-                    series.episodes.append(episode)
-                    session.merge(episode)
-        if episode:
-            return episode
-        else:
-            raise LookupError('No results found for (%s)' % episode)
+                raise LookupError('Error parsing Trakt episode json for %s' % title)
+            if not data:
+                raise LookupError('No data in response from trakt %s' % url)
+            if 'error' in data:
+                raise LookupError('Error looking up %s: %s' % (ep_description, data['error']))
+            ep_data = data['episode']
+            if not ep_data:
+                raise LookupError('No episode data %s' % url)
+            episode = session.query(TraktEpisode).filter(TraktEpisode.tvdb_id == ep_data['tvdb_id']).first()
+            if not episode:
+                # Update result into format TraktEpisode expects (?)
+                ep_data['episode_name'] = ep_data.pop('title')
+                ep_data.update(ep_data['images'])
+                del ep_data['images']
+
+                episode = TraktEpisode(ep_data)
+                series.episodes.append(episode)
+                session.merge(episode)
+
+        return episode
 
 
 @event('plugin.register')

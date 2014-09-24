@@ -7,6 +7,11 @@ from datetime import datetime, timedelta
 import random
 
 import xml.etree.ElementTree as ElementTree
+try:
+    from xml.etree.ElementTree import ParseError
+except ImportError:
+    # Python 2.6 throws this instead when there is invalid xml
+    from xml.parsers.expat import ExpatError as ParseError
 
 from sqlalchemy import Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey
@@ -249,7 +254,7 @@ def find_series_id(name):
         raise LookupError('Unable to get search results for %s: %s' % (name, e))
     try:
         xmldata = ElementTree.fromstring(page)
-    except ElementTree.ParseError as e:
+    except ParseError as e:
         log.error('error parsing tvdb result for %s: %s' % (name, e))
         return
     if xmldata is None:

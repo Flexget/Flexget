@@ -36,20 +36,32 @@ class Text(object):
         format:
           url: http://www.nbc.com%(url)s
     """
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('dict')
-        root.accept('url', key='url')
-        root.accept('file', key='url')
-        root.require_key('url')
-        entry = root.accept('dict', key='entry', required=True)
-        entry.accept('regexp', key='url', required=True)
-        entry.accept('regexp', key='title', required=True)
-        entry.accept_any_key('regexp')
-        format = root.accept('dict', key='format')
-        format.accept_any_key('text')
-        return root
+    schema = {
+        'type': 'object',
+        'properties': {
+            'url': {
+                'oneOf': [
+                    {'type': 'string', 'format': 'url'},
+                    {'type': 'string', 'format': 'file'}
+                ]
+            },
+            'entry': {
+                'type': 'object',
+                'properties': {
+                    'url': {'type': 'string', 'format': 'regex'},
+                    'title': {'type': 'string', 'format': 'regex'}
+                },
+                'additionalProperties': {'type': 'string', 'format': 'regex'},
+                'required': ['url', 'title']
+            },
+            'format': {
+                'type': 'object',
+                'additionalProperties': {'type': 'string'}
+            }
+        },
+        'required': ['entry', 'url'],
+        'additonalProperties': False
+    }
 
     def format_entry(self, entry, d):
         for k, v in d.iteritems():
