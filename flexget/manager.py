@@ -25,7 +25,7 @@ from sqlalchemy.pool import SingletonThreadPool
 Base = declarative_base()
 Session = sessionmaker()
 
-from flexget import config_schema, db_schema
+from flexget import config_schema, db_schema, logger
 from flexget.event import fire_event
 from flexget.ipc import IPCClient, IPCServer
 from flexget.task import Task
@@ -149,6 +149,13 @@ class Manager(object):
         """Separated from __init__ so that unit tests can modify options before loading config."""
         self.setup_yaml()
         self.find_config(create=(self.options.cli_command == 'webui'))
+
+        log_file = os.path.expanduser(manager.options.logfile)
+        # If an absolute path is not specified, use the config directory.
+        if not os.path.isabs(log_file):
+            log_file = os.path.join(self.config_base, log_file)
+        logger.start(log_file, self.options.loglevel.upper(), console=not self.options.cron)
+
         self.init_sqlalchemy()
         fire_event('manager.initialize', self)
         try:
