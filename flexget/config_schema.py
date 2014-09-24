@@ -124,7 +124,7 @@ def parse_time(time_string):
 
 def parse_interval(interval_string):
     """Takes an interval string from the config and turns it into a :class:`datetime.timedelta` object."""
-    regexp = r'^\d+ (second|minute|hour|day|week)s?$'
+    regexp = r'^[+-]?\d+ (second|minute|hour|day|week)s?$'
     if not re.match(regexp, interval_string):
         raise ValueError("should be in format 'x (seconds|minutes|hours|days|weeks)'")
     return parse_timedelta(interval_string)

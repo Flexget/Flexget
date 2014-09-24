@@ -69,8 +69,10 @@ class TVRageSeries(Base):
     __tablename__ = 'tvrage_series'
     id = Column(Integer, primary_key=True)
     name = Column(String)
-    episodes = relation('TVRageEpisodes', order_by='TVRageEpisodes.season, TVRageEpisodes.episode',
-                        cascade='all, delete, delete-orphan')
+    episodes = relation('TVRageEpisodes',
+                        order_by='TVRageEpisodes.season, TVRageEpisodes.episode',
+                        cascade='all, delete, delete-orphan',
+                        backref='series')
     showid = Column(String)
     link = Column(String)
     classification = Column(String)

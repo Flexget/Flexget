@@ -1,0 +1,9 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+{% for entry in task.accepted -%}
+BEGIN:VEVENT
+DTSTART:{{ entry.tvrage_airdate.strftime('%Y%m%dT%H%M%SZ') }}
+SUMMARY:{{ entry.series_name }} - {{ entry.series_id }} - {{ entry.title }}
+END:VEVENT
+{% endfor -%}
+END:VCALENDAR

@@ -1,0 +1,11 @@
+* Series
+:PROPERTIES:
+:CATEGORY: Series
+:END:
+{% for group in task.accepted|groupby('series_name') -%}
+** {{ group.grouper }}
+{% for entry in group.list -%}
+*** {{ entry.tvrage_airdate.strftime('<%Y-%m-%d>') }} {{ group.grouper
+}} - {{ entry.series_id }} - {{ entry.title }}
+{% endfor -%}
+{% endfor -%}
