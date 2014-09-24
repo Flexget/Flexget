@@ -121,13 +121,13 @@ class SearchFTP(object):
         log.info("Searching using command: " + search_cmd)
         response = ftp.sendcmd(search_cmd)
 
-        foundEntries = set()
+        found_entries = set()
         for resline in response.split("\n"):
             match = re.search(matchreg, resline, re.I)
             if (match and len(match.groups()) > 0):
                 repath = match.group(1).strip()
-                foundEntries.add(repath)
-        return foundEntries
+                found_entries.add(repath)
+        return found_entries
 
 
 @event('plugin.register')
