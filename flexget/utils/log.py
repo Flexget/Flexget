@@ -56,6 +56,12 @@ def log_once(message, logger=logging.getLogger('log_once'), once_level=logging.I
     Log message only once using given logger`. Returns False if suppressed logging.
     When suppressed, `suppressed_level` level is still logged.
     """
+    # If there is no active manager, don't access the db
+    from flexget.manager import manager
+    if not manager:
+        log.warning('DB not initialized. log_once will not work properly.')
+        logger.log(once_level, message)
+        return
 
     digest = hashlib.md5()
     digest.update(message.encode('latin1', 'replace')) # ticket:250
