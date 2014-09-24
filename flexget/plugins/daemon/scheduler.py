@@ -129,7 +129,7 @@ class Scheduler(object):
         if self.is_alive():
             if self._stop.is_set():
                 # If the thread was told to stop, wait for it to end before starting a new one
-                self._thread.join()
+                self.wait()
             else:
                 raise RuntimeError('Cannot start again, scheduler is already running.')
         self._stop.clear()
