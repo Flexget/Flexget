@@ -101,6 +101,7 @@ def initialize(unit_test=False):
     _buff_handler = logging.handlers.BufferingHandler(1000 * 1000)
     _buff_handler.setFormatter(formatter)
     logger.addHandler(_buff_handler)
+    logger.setLevel(logging.NOTSET)
 
 
 def start(filename=None, level=logging.INFO, console=True):
