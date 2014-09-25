@@ -2,9 +2,7 @@ from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import logging.handlers
-import re
 import string
-import sys
 import threading
 import warnings
 
@@ -78,7 +76,7 @@ _logging_started = False
 def initialize(unit_test=False):
     """Prepare logging.
     """
-    global _logging_configured, _buff_handler
+    global _logging_configured, _logging_started, _buff_handler
 
     if _logging_configured:
         return
@@ -91,6 +89,7 @@ def initialize(unit_test=False):
     # with unit test we want a bit simpler setup
     if unit_test:
         logging.basicConfig()
+        _logging_started = True
         return
 
     # Store any log messages in a buffer until we `start` function is run
