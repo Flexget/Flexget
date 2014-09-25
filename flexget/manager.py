@@ -154,7 +154,7 @@ class Manager(object):
         # If an absolute path is not specified, use the config directory.
         if not os.path.isabs(log_file):
             log_file = os.path.join(self.config_base, log_file)
-        logger.start(log_file, self.options.loglevel.upper(), console=not self.options.cron)
+        logger.start(log_file, self.options.loglevel.upper(), console=not self.options.execute.cron)
 
         self.init_sqlalchemy()
         fire_event('manager.initialize', self)

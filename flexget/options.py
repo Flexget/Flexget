@@ -352,9 +352,6 @@ manager_parser.add_argument('--loglevel', '-L', metavar='LEVEL',
                             default='verbose',
                             help='Set the verbosity of the logger. Levels: %(choices)s',
                             choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
-manager_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
-                            help='use when executing FlexGet non-interactively: allows background '
-                                 'maintenance to run, disables stdout and stderr output, reduces logging level')
 # This option is already handled above.
 manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
                             help='Use this option to create a detailed bug report, '
@@ -388,6 +385,9 @@ class CoreArgumentParser(ArgumentParser):
                                       'matching is case-insensitive')
         exec_parser.add_argument('--learn', action='store_true', dest='learn', default=False,
                                  help='matches are not downloaded but will be skipped in the future')
+        exec_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
+                                 help='use when executing FlexGet non-interactively: allows background '
+                                      'maintenance to run, disables stdout and stderr output, reduces logging level')
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
         exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
