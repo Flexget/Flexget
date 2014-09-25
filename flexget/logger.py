@@ -93,13 +93,9 @@ def initialize(unit_test=False):
         logging.basicConfig()
         return
 
-    # root logger
-    logger = logging.getLogger()
-    formatter = FlexGetFormatter()
-
     # Store any log messages in a buffer until we `start` function is run
+    logger = logging.getLogger()
     _buff_handler = logging.handlers.BufferingHandler(1000 * 1000)
-    _buff_handler.setFormatter(formatter)
     logger.addHandler(_buff_handler)
     logger.setLevel(logging.NOTSET)
 
@@ -115,7 +111,6 @@ def start(filename=None, level=logging.INFO, console=True):
 
     # root logger
     logger = logging.getLogger()
-    logger.removeHandler(_buff_handler)
     logger.setLevel(level)
 
     formatter = FlexGetFormatter()
@@ -130,6 +125,7 @@ def start(filename=None, level=logging.INFO, console=True):
         logger.addHandler(console_handler)
 
     # flush what we have stored from the plugin initialization
+    logger.removeHandler(_buff_handler)
     if _buff_handler:
         for record in _buff_handler.buffer:
             if logger.isEnabledFor(record.levelno):
