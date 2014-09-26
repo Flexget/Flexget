@@ -146,6 +146,7 @@ class InputFtpList(object):
 
             if not files_only or mlst.get('type') == 'file':
                 url = baseurl + path + '/' + p
+		url = url.replace(' ', '%20')
                 title = os.path.basename(p)
                 log.info('Accepting entry "%s" [%s]' % (path + '/' + p, mlst.get('type') or "unknown",))
                 entry = Entry(title, url)
