@@ -123,6 +123,9 @@ class InputFtpList(object):
             if encoding:
                 p = p.decode(encoding)
 
+	    #Clean file list when subdirectories are used
+	    p = p.replace(path + '/', '')
+
             mlst = {}
             if mlst_supported:
                 mlst_output = ftp.sendcmd('MLST ' + path + '/' + p)
@@ -142,9 +145,9 @@ class InputFtpList(object):
                                                  recursive, encoding)
 
             if not files_only or mlst.get('type') == 'file':
-                url = baseurl + p
+                url = baseurl + path + '/' + p
                 title = os.path.basename(p)
-                log.info('[%s] "%s"' % (mlst.get('type') or "unknown", path + '/' + p,))
+                log.info('Accepting entry "%s" [%s]' % (path + '/' + p, mlst.get('type') or "unknown",))
                 entry = Entry(title, url)
                 if not 'size' in mlst:
                     if mlst.get('type') == 'file':
@@ -176,6 +179,7 @@ class InputFtpList(object):
     def get_folder_size(self, ftp, path, p):
 	size = 0
 	for filename in ftp.nlst(path + '/' + p):
+            filename = filename.replace(path + '/' + p + '/', '')
 	    try:
 	         size += ftp.size(path + '/' + p + '/' + filename) / (1024 * 1024)
 	    except:
