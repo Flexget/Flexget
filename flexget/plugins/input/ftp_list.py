@@ -119,10 +119,6 @@ class InputFtpList(object):
         if not dirs:
             log.verbose('Directory %s is empty', path)
 
-        if len(dirs) == 1 and path == dirs[0]:
-            # It's probably a file
-            return False
-
         for p in dirs:
             if encoding:
                 p = p.decode(encoding)
@@ -132,12 +128,18 @@ class InputFtpList(object):
                 mlst_output = ftp.sendcmd('MLST ' + path + '/' + p)
                 clean_mlst_output = [line.strip().lower() for line in mlst_output.splitlines()][1]
                 mlst = self.parse_mlst(clean_mlst_output)
+            else:
+            	element_is_directory = self.is_directory(ftp, path + '/' + p)
+            	if element_is_directory:
+            	     mlst['type'] = 'dir'
+            	     log.debug('%s is a directory', p)
+            	else:
+            	    mlst['type'] = 'file'
+            	    log.debug('%s is a file', p)
 
-            if recursive and (not mlst_supported or mlst.get('type') == 'dir'):
-                is_directory = self._handle_path(entries, ftp, baseurl, path + '/' + p, mlst_supported, files_only,
+            if recursive and mlst.get('type') == 'dir':
+                self._handle_path(entries, ftp, baseurl, path + '/' + p, mlst_supported, files_only,
                                                  recursive, encoding)
-                if not is_directory and not mlst_supported:
-                    mlst['type'] = 'file'
 
             if not files_only or mlst.get('type') == 'file':
                 url = baseurl + p
@@ -149,9 +151,7 @@ class InputFtpList(object):
                 else:
                     entry['content-size'] = float(mlst.get('size')) / (1024 * 1024)
                 entries.append(entry)
-
-        return True
-
+        
     def parse_mlst(self, mlst):
         re_results = re.findall('(.*?)=(.*?);', mlst)
         parsed = {}
@@ -159,6 +159,14 @@ class InputFtpList(object):
             parsed[k] = v
         return parsed
 
+    def is_directory(self, ftp, elementpath):
+        try:
+            original_wd = ftp.pwd()
+            ftp.cwd(elementpath)
+            ftp.cwd(original_wd)
+            return True
+        except:
+            return False
 
 @event('plugin.register')
 def register_plugin():
