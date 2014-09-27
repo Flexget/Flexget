@@ -1,6 +1,7 @@
 #!/usr/bin/python
-
 from __future__ import unicode_literals, division, absolute_import
+
+__version__ = '{git}'
 
 import logging
 import os
@@ -8,8 +9,6 @@ import os
 from flexget import logger, plugin
 from flexget.manager import Manager
 from flexget.options import get_parser
-
-__version__ = '{git}'
 
 log = logging.getLogger('main')
 
