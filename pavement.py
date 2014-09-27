@@ -99,7 +99,7 @@ options(
 def set_init_version(ver):
     """Replaces the version with ``ver`` in __init__.py"""
     import fileinput
-    for line in fileinput.FileInput('flexget/__init__.py', inplace=1):
+    for line in fileinput.FileInput('flexget/version.py', inplace=1):
         if line.startswith('__version__ = '):
             line = "__version__ = '%s'\n" % ver
         print line,
