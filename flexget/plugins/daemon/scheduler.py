@@ -66,8 +66,6 @@ main_schema = {
                 'required': ['tasks'],
                 'oneOf': [{'required': ['cron']}, {'required': ['interval']}],
                 'error_oneOf': 'Either `cron` or `interval` must be defined.',
-                'not': {'required': ['cron', 'interval']},
-                'error_not': 'Cannot define both `cron` and `interval`',
                 'additionalProperties': False
             }
         },
