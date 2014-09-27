@@ -7,6 +7,7 @@ from urlparse import urlparse
 import requests
 # Allow some request objects to be imported from here instead of requests
 from requests import RequestException, HTTPError
+from flexget import __version__ as version
 from flexget.utils.tools import parse_timedelta, TimedDict
 
 log = logging.getLogger('requests')
@@ -84,6 +85,7 @@ class Session(requests.Session):
         self.adapters['http://'].max_retries = max_retries
         # Stores min intervals between requests for certain sites
         self.domain_delay = {}
+        self.headers.update({'User-Agent': 'FlexGet/%s (www.flexget.com)' % version})
 
     def add_cookiejar(self, cookiejar):
         """
