@@ -59,7 +59,9 @@ class SearchPTN(object):
     }
 
     def search(self, entry, config):
+        ua = 'Flexget (www.flexget.com)'
         login_sess = requests.Session()
+        login_sess.headers.update({'User-Agent': ua})
         login_params = {'username': config['username'],
                         'password': config['password'],
                         'loginkey': config['login_key']}
