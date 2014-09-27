@@ -260,7 +260,6 @@ class InputWhatCD(object):
         """Search on What.cd"""
 
         self.session = Session()
-        self.session.headers.update({"User-Agent": config.get('user_agent', "Flexget (What.cd plugin)")})
 
         # From the API docs: "Refrain from making more than five (5) requests every ten (10) seconds"
         self.session.set_domain_delay('ssl.what.cd', '2 seconds')

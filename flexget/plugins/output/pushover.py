@@ -9,8 +9,6 @@ from flexget.config_schema import one_or_more
 
 log = logging.getLogger("pushover")
 
-__version__ = 0.1
-client_headers = {"User-Agent": "FlexGet Pushover plugin/%s" % str(__version__)}
 pushover_url = "https://api.pushover.net/1/messages.json"
 
 
@@ -121,7 +119,7 @@ class OutputPushover(object):
                     continue
 
                 # Make the request
-                response = task.requests.post(pushover_url, headers=client_headers, data=data, raise_status=False)
+                response = task.requests.post(pushover_url, data=data, raise_status=False)
 
                 # Check if it succeeded
                 request_status = response.status_code
