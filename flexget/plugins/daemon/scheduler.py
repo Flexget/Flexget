@@ -1,52 +1,54 @@
 from __future__ import unicode_literals, division, absolute_import
-from datetime import datetime, timedelta, time as dt_time
 import logging
-import threading
-import time
 
-from sqlalchemy import Column, DateTime, Integer
+from apscheduler.executors.debug import DebugExecutor
+from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 from flexget import db_schema
-from flexget.config_schema import register_config_key, parse_time
+from flexget.config_schema import register_config_key, format_checker
 from flexget.event import event
-from flexget.manager import Session
-from flexget.utils.sqlalchemy_utils import table_schema
-from flexget.utils.tools import singleton
+from flexget.manager import Base
 
 log = logging.getLogger('scheduler')
-DB_SCHEMA_VER = 1
-Base = db_schema.versioned_base('scheduler', DB_SCHEMA_VER)
-
-UNITS = ['seconds', 'minutes', 'hours', 'days', 'weeks']
-WEEKDAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
 
 
-yaml_schedule = {
+# Add a format checker for more detailed errors on cron type schedules
+@format_checker.checks('cron_schedule', raises=ValueError)
+def is_cron_schedule(instance):
+    if not isinstance(instance, dict):
+        return True
+    return CronTrigger(**instance)
+
+
+UNITS = ['minutes', 'hours', 'days', 'weeks']
+interval_schema = {
     'type': 'object',
     'properties': {
-        'seconds': {'type': 'number'},
         'minutes': {'type': 'number'},
         'hours': {'type': 'number'},
         'days': {'type': 'number'},
-        'weeks': {'type': 'number'},
-        'at_time': {'type': 'string', 'format': 'time'},
-        'on_day': {'type': 'string', 'enum': WEEKDAYS}
+        'weeks': {'type': 'number'}
     },
     # Only allow one unit to be specified
     'oneOf': [{'required': [unit]} for unit in UNITS],
     'error_oneOf': 'Interval must be specified as one of %s' % ', '.join(UNITS),
-    'dependencies': {
-        'at_time': {
-            'properties': {'days': {'type': 'integer'}, 'weeks': {'type': 'integer'}},
-            'oneOf': [{'required': ['days']}, {'required': ['weeks']}],
-            'error': 'Interval must be an integer number of days or weeks when `at_time` is specified.',
-        },
-        'on_day': {
-            'properties': {'weeks': {'type': 'integer'}},
-            'required': ['weeks'],
-            'error': 'Unit must be an integer number of weeks when `on_day` is specified.'
-        }
+    'additionalProperties': False
+}
+
+cron_schema = {
+    'type': 'object',
+    'properties': {
+        'year': {'type': ['integer', 'string']},
+        'month': {'type': ['integer', 'string']},
+        'day': {'type': ['integer', 'string']},
+        'week': {'type': ['integer', 'string']},
+        'day_of_week': {'type': ['integer', 'string']},
+        'hour': {'type': ['integer', 'string']},
+        'minute': {'type': ['integer', 'string']}
     },
+    'format': 'cron_schedule',
     'additionalProperties': False
 }
 
@@ -58,9 +60,14 @@ main_schema = {
             'items': {
                 'properties': {
                     'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
-                    'interval': yaml_schedule
+                    'interval': interval_schema,
+                    'cron': cron_schema
                 },
-                'required': ['tasks', 'interval'],
+                'required': ['tasks'],
+                'oneOf': [{'required': ['cron']}, {'required': ['interval']}],
+                'error_oneOf': 'Either `cron` or `interval` must be defined.',
+                'not': {'required': ['cron', 'interval']},
+                'error_not': 'Cannot define both `cron` and `interval`',
                 'additionalProperties': False
             }
         },
@@ -69,6 +76,56 @@ main_schema = {
 }
 
 
+scheduler = None
+
+
+@event('manager.daemon.started')
+def setup_scheduler(manager):
+    """Configure and start apscheduler"""
+    global scheduler
+    jobstores = {'default': SQLAlchemyJobStore(engine=manager.engine, metadata=Base.metadata)}
+    executors = {'default': DebugExecutor()}
+    # If job was meant to run within last day while daemon was shutdown, run it once when continuing
+    job_defaults = {'coalesce': True, 'misfire_grace_time': 60 * 60 * 24}
+    scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults)
+    setup_jobs(manager)
+
+
+@event('manager.config_updated')
+def setup_jobs(manager):
+    """Set up the jobs for apscheduler to run."""
+    if not manager.is_daemon:
+        return
+    if 'schedules' not in manager.config:
+        log.info('No schedules defined in config. Defaulting to run all tasks on a 1 hour interval.')
+    config = manager.config.get('schedules', [{'tasks': ['*'], 'interval': {'hours': 1}}])
+    if not config and scheduler.running:
+        scheduler.shutdown()
+        return
+    jobs = []
+    for job in config:
+        pass  # TODO: scheduler.add_job
+    # Remove jobs no longer in config
+    for job in scheduler.get_jobs():
+        if job not in jobs:
+            scheduler.remove_job(job.id)
+    if not scheduler.running:
+        scheduler.start()
+
+
+@event('manager.daemon.completed')
+def stop_scheduler(manager):
+    if scheduler.running:
+        scheduler.shutdown()
+
+
+@event('config.register')
+def register_config():
+    register_config_key('schedules', main_schema)
+
+
+# TODO: remove
+'''
 class DBTrigger(Base):
     __tablename__ = 'scheduler_triggers'
 
@@ -88,28 +145,6 @@ def db_upgrade(ver, session):
         table.drop()
         Base.metadata.create_all(bind=session.bind)
     return DB_SCHEMA_VER
-
-
-@event('manager.daemon.started')
-@event('manager.config_updated')
-def setup_scheduler(manager):
-    """Starts, stops or restarts the scheduler when config changes."""
-    if not manager.is_daemon:
-        return
-    scheduler = Scheduler(manager)
-    if scheduler.is_alive():
-        scheduler.stop()
-    if manager.config.get('schedules', True):
-        scheduler.start()
-
-
-@event('manager.shutdown')
-def stop_scheduler(manager):
-    if not manager.is_daemon:
-        return
-    scheduler = Scheduler(manager)
-    scheduler.stop()
-    scheduler.wait()
 
 
 @singleton
@@ -316,8 +351,4 @@ class Trigger(object):
 
     def __repr__(self):
         return 'Trigger(tasks=%r, amount=%r, unit=%r)' % (self.tasks, self.amount, self.unit)
-
-
-@event('config.register')
-def register_config():
-    register_config_key('schedules', main_schema)
+'''
