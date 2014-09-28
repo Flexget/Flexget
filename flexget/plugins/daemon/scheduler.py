@@ -85,6 +85,8 @@ def job_id(conf):
 
 def run_job(tasks):
     from flexget.manager import manager
+    if not isinstance(tasks, list):
+        tasks = [tasks]
     manager.execute(options={'tasks': tasks, 'cron': True}, priority=5)
 
 
