@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import re
 
-from requests.auth import AuthBase
+from requests.utils import dict_from_cookiejar, cookiejar_from_dict
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -13,15 +14,7 @@ from flexget.utils.search import torrent_availability
 
 log = logging.getLogger('search_ptn')
 
-
-class CookieAuth(AuthBase):
-    def __init__(self, cookies):
-        self.cookies = cookies
-
-    def __call__(self, r):
-        r.prepare_cookies(self.cookies)
-        return r
-
+cookies = None
 
 categories = {
     '1080p': 'c5',
@@ -59,16 +52,22 @@ class SearchPTN(object):
     }
 
     def search(self, entry, config):
+        global cookies
         login_sess = requests.Session()
-        login_params = {'username': config['username'],
-                        'password': config['password'],
-                        'loginkey': config['login_key']}
-        try:
-            login_sess.post('https://piratethenet.org/takelogin.php', data=login_params, verify=False)
-        except requests.RequestException as e:
-            log.error('Error while logging in to PtN: %s', e)
 
-        download_auth = CookieAuth(login_sess.cookies)
+        if isinstance(cookies, dict):
+            cj = cookiejar_from_dict(cookies)
+            login_sess.add_cookiejar(cj)
+        else:
+            try:
+                login_params = {'username': config['username'],
+                                'password': config['password'],
+                                'loginkey': config['login_key']}
+                login_sess.post('https://piratethenet.org/takelogin.php', data=login_params, verify=False)
+                cookies = dict_from_cookiejar(login_sess.cookies)
+            except requests.RequestException as e:
+                log.error('Error while logging in to PtN: %s', e)
+
         # Default to searching by title (0=title 3=imdb_id)
         search_by = 0
         if 'imdb_id' in entry:
@@ -98,25 +97,23 @@ class SearchPTN(object):
             if 'login' in soup.head.title.text.lower():
                 log.error('PtN cookie info invalid')
                 raise plugin.PluginError('PTN cookie info invalid')
-            try:
-                results_table = soup.find_all('table', attrs={'class': 'main'}, limit=2)[1]
-            except IndexError:
-                log.debug('no results found for `%s`' % search)
-                continue
-            for row in results_table.find_all('tr')[1:]:
-                columns = row.find_all('td')
+            links = soup.findAll('a', attrs={'href': re.compile('download\.php\?torrent=\d+')})
+            for row in [l.find_parent('tr') for l in links]:
                 entry = Entry()
-                links = columns[1].find_all('a', recursive=False, limit=2)
-                entry['title'] = links[0].text
-                if len(links) > 1:
-                    entry['imdb_id'] = extract_id(links[1].get('href'))
-                entry['url'] = 'http://piratethenet.org/' + columns[2].a.get('href')
-                entry['download_auth'] = download_auth
-                entry['torrent_seeds'] = int(columns[8].text)
-                entry['torrent_leeches'] = int(columns[9].text)
+                td = row.findAll('td')
+                entry['title'] = row.find('a', attrs={'href': re.compile('details\.php\?id=\d+')}).text
+                entry['imdb_id'] = extract_id(row.find('a', attrs={'href': re.compile('imdb\.com')}).get('href'))
+                dl_href = row.find('a', attrs={'href': re.compile('download\.php\?torrent=\d+')}).get('href')
+                passkey = re.findall('passkey=([\d\w]*)"', r.text)[0]
+                entry['url'] = 'http://piratethenet.org/' + dl_href + '&' + passkey
+                # last two table cells contains amount of seeders and leeechers respectively
+                s, l = td[-2:]
+                entry['torrent_seeds'] = int(s.text)
+                entry['torrent_leeches'] = int(l.text)
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-                size = columns[6].find('br').previous_sibling
-                unit = columns[6].find('br').next_sibling
+                # 4th last table cell contains size, of which last two symbols are unit
+                size = td[-4].text[:-2]
+                unit = td[-4].text[-2:]
                 if unit == 'GB':
                     entry['content_size'] = int(float(size) * 1024)
                 elif unit == 'MB':
