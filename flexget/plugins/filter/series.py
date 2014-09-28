@@ -1424,6 +1424,10 @@ class FilterSeries(FilterSeriesBase):
         for entry in task.accepted:
             if 'series_releases' in entry:
                 for release in entry['series_releases']:
+                    # Add the release to our session,
+                    task.session.add(release)
+                    # Ensure any changes made to database aren't overwritten by old state. Not sure if this is needed.
+                    task.session.expire(release)
                     log.debug('marking %s as downloaded' % release)
                     release.downloaded = True
             else:

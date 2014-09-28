@@ -6,6 +6,7 @@ import itertools
 import logging
 import sys
 import threading
+from contextlib import closing
 from functools import wraps
 
 from sqlalchemy import Column, Integer, String, Unicode
@@ -43,14 +44,11 @@ def config_changed(task):
     """Forces config_modified flag to come out true on next run. Used when the db changes, and all
     entries need to be reprocessed."""
     log.debug('Marking config as changed.')
-    session = Session()
-    try:
+    with closing(Session()) as session:
         task_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == task).first()
         if task_hash:
             task_hash.hash = ''
         session.commit()
-    finally:
-        session.close()
 
 
 def use_task_logging(func):
@@ -406,16 +404,21 @@ class Task(object):
                 # pass method task, copy of config (so plugin cannot modify it)
                 args = (self, copy.copy(self.config.get(plugin.name)))
 
-            try:
-                fire_event('task.execute.before_plugin', self, plugin.name)
-                response = self.__run_plugin(plugin, phase, args)
-                if phase == 'input' and response:
-                    # add entries returned by input to self.all_entries
-                    for e in response:
-                        e.task = self
-                    self.all_entries.extend(response)
-            finally:
-                fire_event('task.execute.after_plugin', self, plugin.name)
+            # Hack to make task.session only active for a single plugin
+            with closing(Session()) as session:
+                self.session = session
+                try:
+                    fire_event('task.execute.before_plugin', self, plugin.name)
+                    response = self.__run_plugin(plugin, phase, args)
+                    if phase == 'input' and response:
+                        # add entries returned by input to self.all_entries
+                        for e in response:
+                            e.task = self
+                        self.all_entries.extend(response)
+                finally:
+                    fire_event('task.execute.after_plugin', self, plugin.name)
+                self.session.commit()
+                self.session = None
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
         """
@@ -510,28 +513,27 @@ class Task(object):
             self.disable_phase('input')
             self.all_entries.extend(self.options.inject)
 
-        log.debug('starting session')
-        self.session = Session()
-
         # Save current config hash and set config_modidied flag
-        config_hash = hashlib.md5(str(sorted(self.config.items()))).hexdigest()
-        last_hash = self.session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
-        if self.is_rerun:
-            # Restore the config to state right after start phase
-            if self.prepared_config:
-                self.config = copy.deepcopy(self.prepared_config)
+        with closing(Session()) as session:
+            config_hash = hashlib.md5(str(sorted(self.config.items()))).hexdigest()
+            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
+            if self.is_rerun:
+                # Restore the config to state right after start phase
+                if self.prepared_config:
+                    self.config = copy.deepcopy(self.prepared_config)
+                else:
+                    log.error('BUG: No prepared_config on rerun, please report.')
+                self.config_modified = False
+            elif not last_hash:
+                self.config_modified = True
+                last_hash = TaskConfigHash(task=self.name, hash=config_hash)
+                session.add(last_hash)
+            elif last_hash.hash != config_hash:
+                self.config_modified = True
+                last_hash.hash = config_hash
             else:
-                log.error('BUG: No prepared_config on rerun, please report.')
-            self.config_modified = False
-        elif not last_hash:
-            self.config_modified = True
-            last_hash = TaskConfigHash(task=self.name, hash=config_hash)
-            self.session.add(last_hash)
-        elif last_hash.hash != config_hash:
-            self.config_modified = True
-            last_hash.hash = config_hash
-        else:
-            self.config_modified = False
+                self.config_modified = False
+            session.commit()  # TODO: This should actually be saved after task has finished (not saved on abort)
 
         # run phases
         try:
@@ -554,24 +556,15 @@ class Task(object):
                         # Store a copy of the config state after start phase to restore for reruns
                         self.prepared_config = copy.deepcopy(self.config)
         except TaskAbort:
-            # Roll back the session before calling abort handlers
-            self.session.rollback()
             try:
                 self.__run_task_phase('abort')
-                # Commit just the abort handler changes if no exceptions are raised there
-                self.session.commit()
             except TaskAbort as e:
                 log.exception('abort handlers aborted: %s' % e)
             raise
         else:
             for entry in self.all_entries:
                 entry.complete()
-            log.debug('committing session')
-            self.session.commit()
             fire_event('task.execute.completed', self)
-        finally:
-            # this will cause database rollback on exception
-            self.session.close()
 
     @use_task_logging
     def execute(self):

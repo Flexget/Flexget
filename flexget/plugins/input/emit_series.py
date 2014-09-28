@@ -1,11 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+from contextlib import closing
 
-from sqlalchemy import desc, and_
+from sqlalchemy import desc
 
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
+from flexget.manager import Session
 
 log = logging.getLogger('emit_series')
 
@@ -141,26 +143,27 @@ class EmitSeries(object):
         return entries
 
     def on_search_complete(self, entry, task=None, identified_by=None, **kwargs):
-        series = task.session.query(Series).filter(Series.name == entry['series_name']).first()
-        latest = get_latest_release(series)
-        episode = (task.session.query(Episode).join(Episode.series).
-                   filter(Series.name == entry['series_name']).
-                   filter(Episode.season == entry['series_season']).
-                   filter(Episode.number == entry['series_episode']).
-                   first())
-        if entry.accepted or (episode and len(episode.releases) > 0):
-            self.try_next_season.pop(entry['series_name'], None)
-            task.rerun()
-        elif latest and latest.season == entry['series_season']:
-            if identified_by != 'ep':
-                # Do not try next season if this is not an 'ep' show
-                return
-            if entry['series_name'] not in self.try_next_season:
-                self.try_next_season[entry['series_name']] = True
+        with closing(Session()) as session:
+            series = session.query(Series).filter(Series.name == entry['series_name']).first()
+            latest = get_latest_release(series)
+            episode = (session.query(Episode).join(Episode.series).
+                       filter(Series.name == entry['series_name']).
+                       filter(Episode.season == entry['series_season']).
+                       filter(Episode.number == entry['series_episode']).
+                       first())
+            if entry.accepted or (episode and len(episode.releases) > 0):
+                self.try_next_season.pop(entry['series_name'], None)
                 task.rerun()
-            else:
-                # Don't try a second time
-                self.try_next_season[entry['series_name']] = False
+            elif latest and latest.season == entry['series_season']:
+                if identified_by != 'ep':
+                    # Do not try next season if this is not an 'ep' show
+                    return
+                if entry['series_name'] not in self.try_next_season:
+                    self.try_next_season[entry['series_name']] = True
+                    task.rerun()
+                else:
+                    # Don't try a second time
+                    self.try_next_season[entry['series_name']] = False
 
 
 @event('plugin.register')
