@@ -2,8 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 
-from requests.utils import dict_from_cookiejar, cookiejar_from_dict
-
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
@@ -14,7 +12,7 @@ from flexget.utils.search import torrent_availability
 
 log = logging.getLogger('search_ptn')
 
-cookies = None
+session = requests.Session()
 
 categories = {
     '1080p': 'c5',
@@ -52,19 +50,12 @@ class SearchPTN(object):
     }
 
     def search(self, entry, config):
-        global cookies
-        login_sess = requests.Session()
-
-        if isinstance(cookies, dict):
-            cj = cookiejar_from_dict(cookies)
-            login_sess.add_cookiejar(cj)
-        else:
+        if not session.cookies:
             try:
                 login_params = {'username': config['username'],
                                 'password': config['password'],
                                 'loginkey': config['login_key']}
-                login_sess.post('https://piratethenet.org/takelogin.php', data=login_params, verify=False)
-                cookies = dict_from_cookiejar(login_sess.cookies)
+                session.post('https://piratethenet.org/takelogin.php', data=login_params, verify=False)
             except requests.RequestException as e:
                 log.error('Error while logging in to PtN: %s', e)
 
@@ -89,7 +80,7 @@ class SearchPTN(object):
         for search in searches:
             params['search'] = search
             try:
-                r = login_sess.get('http://piratethenet.org/browse.php', params=params)
+                r = session.get('http://piratethenet.org/browse.php', params=params)
             except requests.RequestException as e:
                 log.error('Error searching ptn: %s' % e)
                 continue
@@ -105,7 +96,7 @@ class SearchPTN(object):
                 entry['imdb_id'] = extract_id(row.find('a', attrs={'href': re.compile('imdb\.com')}).get('href'))
                 dl_href = row.find('a', attrs={'href': re.compile('download\.php\?torrent=\d+')}).get('href')
                 passkey = re.findall('passkey=([\d\w]*)"', r.text)[0]
-                entry['url'] = 'http://piratethenet.org/' + dl_href + '&' + passkey
+                entry['url'] = 'http://piratethenet.org/' + dl_href + '&passkey=' + passkey
                 # last two table cells contains amount of seeders and leeechers respectively
                 s, l = td[-2:]
                 entry['torrent_seeds'] = int(s.text)
