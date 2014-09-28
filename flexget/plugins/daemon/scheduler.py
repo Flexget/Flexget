@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 import hashlib
 import logging
 
-from apscheduler.executors.debug import DebugExecutor
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -84,8 +83,11 @@ def job_id(conf):
 
 
 def run_job(tasks):
+    """Add the execution to the queue and waits until it is finished"""
     from flexget.manager import manager
-    manager.execute(options={'tasks': tasks, 'cron': True}, priority=5)
+    finished_events = manager.execute(options={'tasks': tasks, 'cron': True}, priority=5)
+    for event in finished_events:
+        event.wait()
 
 
 @event('manager.daemon.started')
@@ -95,10 +97,9 @@ def setup_scheduler(manager):
     if logging.getLogger().getEffectiveLevel() > logging.DEBUG:
         logging.getLogger('apscheduler').setLevel(logging.WARNING)
     jobstores = {'default': SQLAlchemyJobStore(engine=manager.engine, metadata=Base.metadata)}
-    executors = {'default': DebugExecutor()}
     # If job was meant to run within last day while daemon was shutdown, run it once when continuing
     job_defaults = {'coalesce': True, 'misfire_grace_time': 60 * 60 * 24}
-    scheduler = BackgroundScheduler(jobstores=jobstores, executors=executors, job_defaults=job_defaults)
+    scheduler = BackgroundScheduler(jobstores=jobstores, job_defaults=job_defaults)
     setup_jobs(manager)
 
 
