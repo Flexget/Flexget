@@ -3,7 +3,6 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
-import importlib
 import logging
 import os
 import pkgutil
@@ -390,7 +389,7 @@ def _load_plugins_from_dirs(dirs):
         if not importer.find_module(name).filename.endswith('.py'):
             continue
         try:
-            loaded_module = importlib.import_module(name)
+            __import__(name)
         except DependencyError as e:
             if e.has_message():
                 msg = e.message
@@ -408,7 +407,7 @@ def _load_plugins_from_dirs(dirs):
             log.exception(e)
             raise
         else:
-            log.trace('Loaded module %s from %s' % (name, loaded_module.__file__))
+            log.trace('Loaded module %s from %s' % (name, sys.modules[name].__file__))
 
     if _new_phase_queue:
         for phase, args in _new_phase_queue.iteritems():
