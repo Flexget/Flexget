@@ -85,8 +85,6 @@ def job_id(conf):
 
 def run_job(tasks):
     from flexget.manager import manager
-    if not isinstance(tasks, list):
-        tasks = [tasks]
     manager.execute(options={'tasks': tasks, 'cron': True}, priority=5)
 
 
@@ -94,6 +92,8 @@ def run_job(tasks):
 def setup_scheduler(manager):
     """Configure and start apscheduler"""
     global scheduler
+    if logging.getLogger().getEffectiveLevel() > logging.DEBUG:
+        logging.getLogger('apscheduler').setLevel(logging.WARNING)
     jobstores = {'default': SQLAlchemyJobStore(engine=manager.engine, metadata=Base.metadata)}
     executors = {'default': DebugExecutor()}
     # If job was meant to run within last day while daemon was shutdown, run it once when continuing
@@ -111,6 +111,7 @@ def setup_jobs(manager):
         log.info('No schedules defined in config. Defaulting to run all tasks on a 1 hour interval.')
     config = manager.config.get('schedules', [{'tasks': ['*'], 'interval': {'hours': 1}}])
     if not config and scheduler.running:
+        log.info('Shutting down scheduler')
         scheduler.shutdown()
         return
     jobs = []
@@ -119,13 +120,19 @@ def setup_jobs(manager):
             trigger = IntervalTrigger(**job['interval'])
         else:
             trigger = CronTrigger(**job['cron'])
-        job = scheduler.add_job(run_job, trigger=trigger, args=(job['tasks'],), id=job_id(job), replace_existing=True)
+        tasks = job['tasks']
+        if not isinstance(tasks, list):
+            tasks = [tasks]
+        name = ','.join(tasks)
+        job = scheduler.add_job(
+            run_job, trigger=trigger, args=(tasks,), id=job_id(job), name=name, replace_existing=True)
         jobs.append(job)
     # Remove jobs no longer in config
     for job in scheduler.get_jobs():
         if job not in jobs:
             scheduler.remove_job(job.id)
     if not scheduler.running:
+        log.info('Starting scheduler')
         scheduler.start()
 
 
