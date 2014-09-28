@@ -115,23 +115,26 @@ def setup_jobs(manager):
         log.info('Shutting down scheduler')
         scheduler.shutdown()
         return
-    jobs = []
-    for job in config:
-        if 'interval' in job:
-            trigger = IntervalTrigger(**job['interval'])
+    existing_job_ids = [job.id for job in scheduler.get_jobs()]
+    configured_job_ids = []
+    for job_config in config:
+        jid = job_id(job_config)
+        configured_job_ids.append(jid)
+        if jid in existing_job_ids:
+            continue
+        if 'interval' in job_config:
+            trigger = IntervalTrigger(**job_config['interval'])
         else:
-            trigger = CronTrigger(**job['cron'])
-        tasks = job['tasks']
+            trigger = CronTrigger(**job_config['cron'])
+        tasks = job_config['tasks']
         if not isinstance(tasks, list):
             tasks = [tasks]
         name = ','.join(tasks)
-        job = scheduler.add_job(
-            run_job, trigger=trigger, args=(tasks,), id=job_id(job), name=name, replace_existing=True)
-        jobs.append(job)
+        scheduler.add_job(run_job, trigger=trigger, args=(tasks,), id=jid, name=name)
     # Remove jobs no longer in config
-    for job in scheduler.get_jobs():
-        if job not in jobs:
-            scheduler.remove_job(job.id)
+    for jid in existing_job_ids:
+        if jid not in configured_job_ids:
+            scheduler.remove_job(jid)
     if not scheduler.running:
         log.info('Starting scheduler')
         scheduler.start()
