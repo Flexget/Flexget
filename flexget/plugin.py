@@ -3,6 +3,7 @@
 
 from __future__ import absolute_import, division, unicode_literals
 
+import importlib
 import logging
 import os
 import pkgutil
@@ -385,12 +386,11 @@ def _load_plugins_from_dirs(dirs):
         # This can happen if one plugin imports from another plugin
         if name in sys.modules:
             continue
-        loader = importer.find_module(name)
         # Don't load from pyc files
-        if not loader.filename.endswith('.py'):
+        if not importer.find_module(name).filename.endswith('.py'):
             continue
         try:
-            loaded_module = loader.load_module(name)
+            loaded_module = importlib.import_module(name)
         except DependencyError as e:
             if e.has_message():
                 msg = e.message
