@@ -358,7 +358,10 @@ class PluginTransmission(TransmissionBase):
         if 'include_subs' in opt_dic:
             post['include_subs'] = opt_dic['include_subs']
         if 'content_filename' in opt_dic:
-            post['content_filename'] = opt_dic['content_filename']
+            try:
+                post['content_filename'] = entry.render(opt_dic['content_filename'])
+            except RenderError as e:
+                log.error('Unable to render content_filename %s: %s' % (entry['title'], e))
         if 'skip_files' in opt_dic:
             post['skip_files'] = opt_dic['skip_files']
         if 'include_files' in opt_dic:
