@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 
 __version__ = '{git}'
 
@@ -26,7 +26,7 @@ def main(args=None):
     try:
         manager = Manager(options)
     except (IOError, ValueError) as e:
-        print('Could not initialize manager: %s' % e)
+        print('Could not initialize manager: %s' % e, file=sys.stderr)
         sys.exit(1)
 
     if options.profile:
