@@ -31,9 +31,12 @@ class UrlRewriteDivxATope(object):
         try:
             page = requests.get(url).content
             soup = get_soup(page, 'html.parser')
-            download_link = soup.findAll(href=re.compile('redirect.php'))
+            download_link = soup.findAll(href=re.compile('redirect.php|redirectlink'))
             download_href = download_link[0]['href']
-            return download_href[download_href.index('url=') + 4:]
+            if "url" in download_href:
+                return download_href[download_href.index('url=') + 4:]
+            else:
+                return download_href
         except Exception:
             raise UrlRewritingError(
                 'Unable to locate torrent from url %s' % url
