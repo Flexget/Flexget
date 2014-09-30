@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, unicode_literals
 import logging
 import logging.handlers
 import string
+import sys
 import threading
 import warnings
 
@@ -120,7 +121,7 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
 
     # without --cron we log to console
     if to_console:
-        console_handler = logging.StreamHandler()
+        console_handler = logging.StreamHandler(sys.stdout)
         console_handler.setFormatter(formatter)
         logger.addHandler(console_handler)
 
