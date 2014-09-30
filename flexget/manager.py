@@ -154,7 +154,7 @@ class Manager(object):
         self.setup_yaml()
         try:
             self.find_config(create=(self.options.cli_command == 'webui'))
-        except IOError:
+        except:
             logger.start(level=self.options.loglevel.upper(), to_file=False)
             raise
         else:
