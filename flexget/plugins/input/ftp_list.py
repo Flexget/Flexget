@@ -152,13 +152,13 @@ class InputFtpList(object):
                 entry = Entry(title, url)
                 if not 'size' in mlst:
                     if mlst.get('type') == 'file':
-                    	entry['content-size'] = ftp.size(path + '/' + p) / (1024 * 1024)
-                    	log.debug('(FILE) Size = %s', entry['content-size'])
+                    	entry['content_size'] = ftp.size(path + '/' + p) / (1024 * 1024)
+                    	log.debug('(FILE) Size = %s', entry['content_size'])
                     elif mlst.get('type') == 'dir':
-                        entry['content-size'] = self.get_folder_size(ftp, path, p)
-                    	log.debug('(DIR) Size = %s', entry['content-size'])
+                        entry['content_size'] = self.get_folder_size(ftp, path, p)
+                    	log.debug('(DIR) Size = %s', entry['content_size'])
                 else:
-                    entry['content-size'] = float(mlst.get('size')) / (1024 * 1024)
+                    entry['content_size'] = float(mlst.get('size')) / (1024 * 1024)
                 entries.append(entry)
         
     def parse_mlst(self, mlst):
