@@ -26,7 +26,7 @@ def main(args=None):
     try:
         manager = Manager(options)
     except (IOError, ValueError) as e:
-        log.critical('Could not initialize manager: %s' % e)
+        print('Could not initialize manager: %s' % e)
         sys.exit(1)
 
     if options.profile:
