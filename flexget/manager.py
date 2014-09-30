@@ -146,15 +146,23 @@ class Manager(object):
         manager = None
 
     def initialize(self):
-        """Separated from __init__ so that unit tests can modify options before loading config."""
-        self.setup_yaml()
-        self.find_config(create=(self.options.cli_command == 'webui'))
+        """
+        Separated from __init__ so that unit tests can modify options before loading config.
 
-        log_file = os.path.expanduser(manager.options.logfile)
-        # If an absolute path is not specified, use the config directory.
-        if not os.path.isabs(log_file):
-            log_file = os.path.join(self.config_base, log_file)
-        logger.start(log_file, self.options.loglevel.upper(), console=not self.options.execute.cron)
+        :raises: `IOError` if config is not found. `ValueError` if config is malformed.
+        """
+        self.setup_yaml()
+        try:
+            self.find_config(create=(self.options.cli_command == 'webui'))
+        except IOError:
+            logger.start(level=self.options.loglevel.upper(), to_file=False)
+            raise
+        else:
+            log_file = os.path.expanduser(manager.options.logfile)
+            # If an absolute path is not specified, use the config directory.
+            if not os.path.isabs(log_file):
+                log_file = os.path.join(self.config_base, log_file)
+            logger.start(log_file, self.options.loglevel.upper(), to_console=not self.options.execute.cron)
 
         self.init_sqlalchemy()
         fire_event('manager.initialize', self)
@@ -162,8 +170,7 @@ class Manager(object):
             self.load_config()
         except ValueError as e:
             log.critical('Failed to load config file: %s' % e.args[0])
-            self.shutdown(finish_queue=False)
-            sys.exit(1)
+            raise
 
     @property
     def tasks(self):
@@ -380,6 +387,7 @@ class Manager(object):
         Find the configuration file.
 
         :param bool create: If a config file is not found, and create is True, one will be created in the home folder
+        :raises: `IOError` when no config file could be found, and `create` is False.
         """
         config = None
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
@@ -419,16 +427,18 @@ class Manager(object):
             else:
                 config = None
 
-        if not (config and os.path.exists(config)):
-            if not create:
-                log.info('Tried to read from: %s' % ', '.join(possible))
-                log.critical('Failed to find configuration file %s' % options_config)
-                sys.exit(1)
+        if create and not (config and os.path.exists(config)):
             config = os.path.join(home_path, options_config)
             log.info('Config file %s not found. Creating new config %s' % (options_config, config))
             with open(config, 'w') as newconfig:
                 # Write empty tasks to the config
                 newconfig.write(yaml.dump({'tasks': {}}))
+        elif not config:
+            log.critical('Failed to find configuration file %s' % options_config)
+            log.info('Tried to read from: %s' % ', '.join(possible))
+            raise IOError('No configuration file found.')
+        if not os.path.isfile(config):
+            raise IOError('Config `%s` does not appear to be a file.' % config)
 
         log.debug('Config file %s selected' % config)
         self.config_path = config
@@ -454,7 +464,7 @@ class Manager(object):
         except Exception as e:
             msg = str(e).replace('\n', ' ')
             msg = ' '.join(msg.split())
-            log.critical(msg)
+            log.critical(msg, exc_info=False)
             print('')
             print('-' * 79)
             print(' Malformed configuration file (check messages above). Common reasons:')

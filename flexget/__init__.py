@@ -5,6 +5,7 @@ __version__ = '{git}'
 
 import logging
 import os
+import sys
 
 from flexget import logger, plugin
 from flexget.manager import Manager
@@ -22,7 +23,11 @@ def main(args=None):
 
     options = get_parser().parse_args(args)
 
-    manager = Manager(options)
+    try:
+        manager = Manager(options)
+    except (IOError, ValueError) as e:
+        log.critical('Could not initialize manager: %s' % e)
+        sys.exit(1)
 
     if options.profile:
         try:

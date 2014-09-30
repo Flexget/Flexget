@@ -99,7 +99,7 @@ def initialize(unit_test=False):
     logger.setLevel(logging.NOTSET)
 
 
-def start(filename=None, level=logging.INFO, console=True):
+def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
     """After initialization, start file logging.
     """
     global _logging_started
@@ -113,12 +113,13 @@ def start(filename=None, level=logging.INFO, console=True):
     logger.setLevel(level)
 
     formatter = FlexGetFormatter()
-    file_handler = logging.handlers.RotatingFileHandler(filename, maxBytes=1000 * 1024, backupCount=9)
-    file_handler.setFormatter(formatter)
-    logger.addHandler(file_handler)
+    if to_file:
+        file_handler = logging.handlers.RotatingFileHandler(filename, maxBytes=1000 * 1024, backupCount=9)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
 
     # without --cron we log to console
-    if console:
+    if to_console:
         console_handler = logging.StreamHandler()
         console_handler.setFormatter(formatter)
         logger.addHandler(console_handler)
