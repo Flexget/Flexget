@@ -111,6 +111,9 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
 
     # root logger
     logger = logging.getLogger()
+    if not isinstance(level, int):
+        # Python logging api is horrible. This is getting the level number, which is required on python 2.6.
+        level = logging.getLevelName(level)
     logger.setLevel(level)
 
     formatter = FlexGetFormatter()
