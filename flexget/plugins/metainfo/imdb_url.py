@@ -29,16 +29,16 @@ class MetainfoImdbUrl(object):
             if not 'description' in entry:
                 continue
             urls = re.findall(r'\bimdb.com/title/tt\d+\b', entry['description'])
-            if not urls:
+            # Find unique imdb ids
+            imdb_ids = filter(None, set(extract_id(url) for url in urls))
+            if not imdb_ids:
                 continue
 
-            # Find unique imdb ids
-            imdb_ids = set(extract_id(url) for url in urls)
             if len(imdb_ids) > 1:
                 log.debug('Found multiple imdb ids; not using any of: %s' % ' '.join(imdb_ids))
                 continue
 
-            entry['imdb_id'] = imdb_ids.pop()
+            entry['imdb_id'] = imdb_ids[0]
             entry['imdb_url'] = make_url(entry['imdb_id'])
             log.debug('Found imdb url in description %s' % entry['imdb_url'])
 
