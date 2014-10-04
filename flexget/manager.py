@@ -121,15 +121,20 @@ class Manager(object):
         self.ipc_server = IPCServer(self, options.ipc_port)
         self.task_queue = TaskQueue()
         manager = self
+
+        log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
+        log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
+        log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
+        if codecs.lookup(sys.getfilesystemencoding()).name == 'ascii' and not os.path.supports_unicode_filenames:
+            log.warning('Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '
+                        'disk will not work properly for filenames containing non-ascii characters. Make sure your '
+                        'locale env variables are set up correctly for the environment which is launching FlexGet.')
+
         self.initialize()
 
         # cannot be imported at module level because of circular references
         from flexget.utils.simple_persistence import SimplePersistence
         self.persist = SimplePersistence('manager')
-
-        log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
-        log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
-        log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
 
         if db_schema.upgrade_required():
             log.info('Database upgrade is required. Attempting now.')
