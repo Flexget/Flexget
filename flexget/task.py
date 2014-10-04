@@ -386,7 +386,11 @@ class Task(object):
                     if not p.builtin:
                         break
                 else:
-                    log.warning('Task doesn\'t have any %s plugins, you should add (at least) one!' % phase)
+                    if phase == 'filter':
+                        log.warning('Task does not have any filter plugins to accept entries. '
+                                    'You need at least one to accept the entries you  want.')
+                    else:
+                        log.warning('Task doesn\'t have any %s plugins, you should add (at least) one!' % phase)
 
         for plugin in self.plugins(phase):
             # Abort this phase if one of the plugins disables it
