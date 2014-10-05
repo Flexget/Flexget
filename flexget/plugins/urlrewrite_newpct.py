@@ -22,10 +22,7 @@ class UrlRewriteNewPCT(object):
     def url_rewritable(self, task, entry):
         url = entry['url']
         rewritable_regex='^http:\/\/(www.)?newpct1?.com\/.*'
-        if re.match(rewritable_regex,url) and not url.startswith('http://www.newpct.com/download/'):
-                return True
-        else:
-                return False
+        return re.match(rewritable_regex,url) and not url.startswith('http://www.newpct.com/descargar/')
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
@@ -43,7 +40,7 @@ class UrlRewriteNewPCT(object):
         if len(torrent_ids) == 0:
             raise UrlRewritingError('Unable to locate torrent ID from url %s' % url)
         torrent_id = torrent_id_prog.search(torrent_ids[0]).group(1)
-        return 'http://tumejorjuego.com/descargar/index.php?link=descargar/torrent/%s/dummy.html' % torrent_id
+        return 'http://www.newpct.com/descargar/torrent/%s/dummy.html' % torrent_id
 
 @event('plugin.register')
 def register_plugin():
