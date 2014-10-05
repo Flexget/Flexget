@@ -603,39 +603,119 @@ class OutputDeluge(DelugePlugin):
 
                 if opts.get('content_filename') or opts.get('main_file_only'):
 
-                    def file_exists():
-                        # Checks the download path as well as the move completed path for existence of the file
-                        if os.path.exists(os.path.join(status['save_path'], filename)):
+                    # Checks the download path as well as the move completed
+                    # path for existence of the file
+                    def file_exists(filename):
+                        if os.path.exists(os.path.join(status['save_path'],
+                                                       filename)):
                             return True
-                        elif status.get('move_on_completed') and status.get('move_on_completed_path'):
-                            if os.path.exists(os.path.join(status['move_on_completed_path'], filename)):
+                        elif (status.get('move_on_completed') and
+                              status.get('move_on_completed_path')):
+                            if os.path.exists(
+                                os.path.join(status['move_on_completed_path'],
+                                             filename)):
                                 return True
                         else:
                             return False
 
+                    # If on local computer, tries appending a (#) suffix
+                    # until a unique filename is found
+                    def unused_name(name):
+                        if client.is_localhost():
+                            counter = 2
+                            while file_exists(name):
+                                name = ''.join([os.path.splitext(name)[0],
+                                                " ",
+                                                '(',
+                                                str(counter),
+                                                ')',
+                                                os.path.splitext(name)[1]])
+                                counter += 1
+                        else:
+                            log.debug('Cannot ensure content_filename is unique '
+                                      'when adding to a remote deluge daemon.')
+                        return name
+
+                    # Renames a file
+                    def rename(file, new_name):
+                        main_file_dlist.append(
+                            client.core.rename_files(torrent_id,
+                                                     [(file['index'],
+                                                       new_name)]))
+                        log.debug('File %s in %s renamed to %s' %
+                                  (file['path'],
+                                   entry['title'],
+                                   new_name))
+
+                    sub_exts = [".srt", ".sub"]
+                    keep_sub = True
+
+                    # find a file that makes up more than 90% of the total size
+                    big_file = None
                     for file in status['files']:
-                        # Only rename file if it is > 90% of the content
                         if file['size'] > (status['total_size'] * 0.9):
-                            if opts.get('content_filename'):
-                                filename = opts['content_filename'] + os.path.splitext(file['path'])[1]
-                                counter = 1
-                                if client.is_localhost():
-                                    while file_exists():
-                                        # Try appending a (#) suffix till a unique filename is found
-                                        filename = ''.join([opts['content_filename'], '(', str(counter), ')',
-                                                            os.path.splitext(file['path'])[1]])
-                                        counter += 1
-                                else:
-                                    log.debug('Cannot ensure content_filename is unique '
-                                              'when adding to a remote deluge daemon.')
-                                log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], filename))
-                                main_file_dlist.append(
-                                    client.core.rename_files(torrent_id, [(file['index'], filename)]))
-                            if opts.get('main_file_only'):
-                                file_priorities = [1 if f['index'] == file['index'] else 0 for f in status['files']]
-                                main_file_dlist.append(
-                                    client.core.set_torrent_file_priorities(torrent_id, file_priorities))
+                            big_file = file
                             break
+
+                    # proceed with renaming only if such a big file is found
+                    if big_file is not None:
+
+                        # find the subtitle file
+                        sub_file = None
+                        if keep_sub:
+                            for file in status['files']:
+                                ext = os.path.splitext(file['path'])[1]
+                                if ext in sub_exts:
+                                    sub_file = file
+                                    break
+
+                        # rename the main file (the big one)
+                        if opts.get('content_filename'):
+                            big_file_name = opts['content_filename'] + \
+                                os.path.splitext(big_file['path'])[1]
+                            big_file_name = unused_name(big_file_name)
+                            rename(big_file, big_file_name)
+
+                            # rename the subtitle file according to the main one
+                            if sub_file is not None and keep_sub:
+                                sub_file_name = \
+                                    os.path.splitext(big_file_name)[0] + \
+                                    os.path.splitext(sub_file['path'])[1]
+                                rename(sub_file, sub_file_name)
+
+                        # download only the main file (with substitle file)
+                        # and ignore all the rest
+                        if opts.get('main_file_only'):
+
+                            # set priorities to 1 for main and subtitle file
+                            # 0 for the others
+                            file_priorities = \
+                                [1 if f == big_file or (f == sub_file and
+                                                        keep_sub)
+                                    else 0
+                                    for f in status['files']]
+                            main_file_dlist.append(
+                                client.core.set_torrent_file_priorities(
+                                    torrent_id, file_priorities))
+
+                            # sometimes deluge downloads parts of files
+                            # that it is not supposed to download
+                            # http://dev.deluge-torrent.org/ticket/1827
+                            # this will move these files into a directory,
+                            # with name beginning with '.', thus making them
+                            # hidden on unix OSes
+                            other_files = [f for f in status['files']
+                                           if f != big_file and
+                                           (f != sub_file or (not keep_sub))]
+                            other_files_dir = \
+                                "._" + (opts['content_filename'] +
+                                        "/" if opts.get('content_filename')
+                                        else "")
+                            rename_pairs = [(f['index'],
+                                             other_files_dir + f['path'])
+                                            for f in other_files]
+                            main_file_dlist.append(client.core.rename_files(
+                                torrent_id, rename_pairs))
                     else:
                         log.warning('No files in %s are > 90%% of content size, no files renamed.' % entry['title'])
 
