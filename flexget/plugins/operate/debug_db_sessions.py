@@ -42,6 +42,12 @@ def after_begin(session, transaction, connection):
         open_transactions[transaction] = (time.time(),) + caller_info
 
 
+def before_flush(session, flush_context, instances):
+    if session.new or session.deleted or session.dirty:
+        log.debug('session connection 0x%08X writing: %s %s %s',
+                  id(session.transaction), session.new, session.deleted, session.dirty)
+
+
 def after_end(session, transaction):
     caller_info = find_caller(inspect.stack()[1:])
     with open_transactions_lock:
@@ -58,6 +64,7 @@ def after_end(session, transaction):
 def debug_warnings(manager):
     if manager.options.debug_db_sessions:
         sqlalchemy.event.listen(Session, 'after_begin', after_begin)
+        sqlalchemy.event.listen(Session, 'before_flush', before_flush)
         sqlalchemy.event.listen(Session, 'after_transaction_end', after_end)
 
 
