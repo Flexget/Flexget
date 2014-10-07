@@ -560,6 +560,7 @@ def store_parser(session, parser, series=None):
             episode.releases.append(release)  # pylint:disable=E1103
             log.debug('-> added %s' % release)
         releases.append(release)
+    session.flush()  # Make sure autonumber ids are populated
     return releases
 
 
@@ -947,7 +948,7 @@ class FilterSeries(FilterSeriesBase):
             for entry in found_series[series_name]:
                 # store found episodes into database and save reference for later use
                 releases = store_parser(task.session, entry['series_parser'], series=db_series)
-                entry['series_releases'] = releases
+                entry['series_releases'] = [r.id for r in releases]
                 series_entries.setdefault(releases[0].episode, []).append(entry)
 
                 # TODO: Unfortunately we are setting these again, even though they were set in metanifo. This is for the
@@ -1423,13 +1424,9 @@ class FilterSeries(FilterSeriesBase):
         log.debug('on_task_learn')
         for entry in task.accepted:
             if 'series_releases' in entry:
-                for release in entry['series_releases']:
-                    # Add the release to our session,
-                    task.session.add(release)
-                    # Ensure any changes made to database aren't overwritten by old state. Not sure if this is needed.
-                    task.session.expire(release)
-                    log.debug('marking %s as downloaded' % release)
-                    release.downloaded = True
+                num = (task.session.query(Release).filter(Release.id.in_(entry['series_releases'])).
+                       update({'downloaded': True}, synchronize_session=False))
+                log.debug('marking %s releases as downloaded for ', num, entry)
             else:
                 log.debug('%s is not a series', entry['title'])
 
