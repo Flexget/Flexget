@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 import argparse
-import contextlib
 from datetime import datetime, timedelta
 from sqlalchemy import func
 
@@ -159,7 +158,7 @@ def display_details(name):
     """Display detailed series information, ie. series show NAME"""
 
     from flexget.manager import Session
-    with contextlib.closing(Session()) as session:
+    with Session() as session:
 
         name = normalize_series_name(name)
         # Sort by length of name, so that partial matches always show shortest matching title

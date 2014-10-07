@@ -6,7 +6,6 @@ import itertools
 import logging
 import sys
 import threading
-from contextlib import closing
 from functools import wraps
 
 from sqlalchemy import Column, Integer, String, Unicode
@@ -44,11 +43,10 @@ def config_changed(task):
     """Forces config_modified flag to come out true on next run. Used when the db changes, and all
     entries need to be reprocessed."""
     log.debug('Marking config as changed.')
-    with closing(Session()) as session:
+    with Session() as session:
         task_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == task).first()
         if task_hash:
             task_hash.hash = ''
-        session.commit()
 
 
 def use_task_logging(func):
@@ -409,7 +407,7 @@ class Task(object):
                 args = (self, copy.copy(self.config.get(plugin.name)))
 
             # Hack to make task.session only active for a single plugin
-            with closing(Session()) as session:
+            with Session() as session:
                 self.session = session
                 try:
                     fire_event('task.execute.before_plugin', self, plugin.name)
@@ -421,7 +419,6 @@ class Task(object):
                         self.all_entries.extend(response)
                 finally:
                     fire_event('task.execute.after_plugin', self, plugin.name)
-                self.session.commit()
                 self.session = None
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
@@ -518,7 +515,7 @@ class Task(object):
             self.all_entries.extend(self.options.inject)
 
         # Save current config hash and set config_modidied flag
-        with closing(Session()) as session:
+        with Session() as session:
             config_hash = hashlib.md5(str(sorted(self.config.items()))).hexdigest()
             last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
             if self.is_rerun:
@@ -537,7 +534,6 @@ class Task(object):
                 last_hash.hash = config_hash
             else:
                 self.config_modified = False
-            session.commit()  # TODO: This should actually be saved after task has finished (not saved on abort)
 
         # run phases
         try:

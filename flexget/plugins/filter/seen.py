@@ -271,12 +271,11 @@ def seen_add(options):
         if imdb_id:
             seen_name = imdb_id
 
-    with contextlib.closing(Session()) as session:
+    with Session() as session:
         se = SeenEntry(seen_name, 'cli_seen')
         sf = SeenField('cli_seen', seen_name)
         se.fields.append(sf)
         session.add(se)
-        session.commit()
     console('Added %s as seen. This will affect all tasks.' % seen_name)
 
 

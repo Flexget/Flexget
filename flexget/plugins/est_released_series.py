@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import timedelta, datetime
-import contextlib
 import logging
 
 from sqlalchemy import desc, func
@@ -59,7 +58,7 @@ class EstimatesReleasedSeries(object):
                           (entry['series_name'], entry['series_season'], entry['series_episode']))
 
             # If no results from tvrage, estimate a date based on series history
-            with contextlib.closing(Session()) as session:
+            with Session() as session:
                 series = session.query(Series).filter(Series.name == entry['series_name']).first()
                 if not series:
                     return

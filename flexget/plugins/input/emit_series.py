@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from contextlib import closing
 
 from sqlalchemy import desc
 
@@ -143,7 +142,7 @@ class EmitSeries(object):
         return entries
 
     def on_search_complete(self, entry, task=None, identified_by=None, **kwargs):
-        with closing(Session()) as session:
+        with Session() as session:
             series = session.query(Series).filter(Series.name == entry['series_name']).first()
             latest = get_latest_release(series)
             episode = (session.query(Episode).join(Episode.series).
