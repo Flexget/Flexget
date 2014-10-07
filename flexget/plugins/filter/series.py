@@ -911,7 +911,7 @@ class FilterSeries(FilterSeriesBase):
             series_name, series_config = series_item.items()[0]
             log.trace('series_name: %s series_config: %s', series_name, series_config)
             start_time = time.clock()
-            self.parse_series(task.session, task.entries, series_name, series_config)
+            self.parse_series(task.entries, series_name, series_config)
             took = time.clock() - start_time
             log.trace('parsing %s took %s', series_name, took)
 
@@ -928,66 +928,68 @@ class FilterSeries(FilterSeriesBase):
                 found_series.setdefault(entry['series_name'], []).append(entry)
 
         for series_item in config:
-            series_name, series_config = series_item.items()[0]
-            if series_config.get('parse_only'):
-                log.debug('Skipping filtering of series %s because of parse_only', series_name)
-                continue
-            # Make sure number shows (e.g. 24) are turned into strings
-            series_name = unicode(series_name)
-            db_series = task.session.query(Series).filter(Series.name == series_name).first()
-            if not db_series:
-                log.debug('adding series %s into db', series_name)
-                db_series = Series()
-                db_series.name = series_name
-                db_series.identified_by = series_config.get('identified_by', 'auto')
-                task.session.add(db_series)
-                log.debug('-> added %s' % db_series)
-            if not series_name in found_series:
-                continue
-            series_entries = {}
-            for entry in found_series[series_name]:
-                # store found episodes into database and save reference for later use
-                releases = store_parser(task.session, entry['series_parser'], series=db_series)
-                entry['series_releases'] = [r.id for r in releases]
-                series_entries.setdefault(releases[0].episode, []).append(entry)
+            with Session() as session:
+                series_name, series_config = series_item.items()[0]
+                if series_config.get('parse_only'):
+                    log.debug('Skipping filtering of series %s because of parse_only', series_name)
+                    continue
+                # Make sure number shows (e.g. 24) are turned into strings
+                series_name = unicode(series_name)
+                db_series = session.query(Series).filter(Series.name == series_name).first()
+                if not db_series:
+                    log.debug('adding series %s into db', series_name)
+                    db_series = Series()
+                    db_series.name = series_name
+                    db_series.identified_by = series_config.get('identified_by', 'auto')
+                    session.add(db_series)
+                    log.debug('-> added %s' % db_series)
+                if not series_name in found_series:
+                    continue
+                series_entries = {}
+                for entry in found_series[series_name]:
+                    # store found episodes into database and save reference for later use
+                    releases = store_parser(session, entry['series_parser'], series=db_series)
+                    entry['series_releases'] = [r.id for r in releases]
+                    series_entries.setdefault(releases[0].episode, []).append(entry)
 
-                # TODO: Unfortunately we are setting these again, even though they were set in metanifo. This is for the
-                # benefit of all_series and series_premiere. Figure a better way.
-                # set custom download path
-                if 'path' in series_config:
-                    log.debug('setting %s custom path to %s', entry['title'], series_config.get('path'))
-                    # Just add this to the 'set' dictionary, so that string replacement is done cleanly
-                    series_config.setdefault('set', {}).update(path=series_config['path'])
+                    # TODO: Unfortunately we are setting these again, even though they were set in metanifo. This is
+                    # for the benefit of all_series and series_premiere. Figure a better way.
+                    # set custom download path
+                    if 'path' in series_config:
+                        log.debug('setting %s custom path to %s', entry['title'], series_config.get('path'))
+                        # Just add this to the 'set' dictionary, so that string replacement is done cleanly
+                        series_config.setdefault('set', {}).update(path=series_config['path'])
 
-                # accept info from set: and place into the entry
-                if 'set' in series_config:
-                    set = plugin.get_plugin_by_name('set')
-                    set.instance.modify(entry, series_config.get('set'))
+                    # accept info from set: and place into the entry
+                    if 'set' in series_config:
+                        set = plugin.get_plugin_by_name('set')
+                        # TODO: Could cause lazy lookups. We don't really want to have a transaction open during this.
+                        set.instance.modify(entry, series_config.get('set'))
 
-            # If we didn't find any episodes for this series, continue
-            if not series_entries:
-                log.trace('No entries found for %s this run.', series_name)
-                continue
+                # If we didn't find any episodes for this series, continue
+                if not series_entries:
+                    log.trace('No entries found for %s this run.', series_name)
+                    continue
 
-            # configuration always overrides everything
-            if series_config.get('identified_by', 'auto') != 'auto':
-                db_series.identified_by = series_config['identified_by']
-            # if series doesn't have identified_by flag already set, calculate one now that new eps are added to db
-            if not db_series.identified_by or db_series.identified_by == 'auto':
-                db_series.identified_by = auto_identified_by(db_series)
-                log.debug('identified_by set to \'%s\' based on series history', db_series.identified_by)
+                # configuration always overrides everything
+                if series_config.get('identified_by', 'auto') != 'auto':
+                    db_series.identified_by = series_config['identified_by']
+                # if series doesn't have identified_by flag already set, calculate one now that new eps are added to db
+                if not db_series.identified_by or db_series.identified_by == 'auto':
+                    db_series.identified_by = auto_identified_by(db_series)
+                    log.debug('identified_by set to \'%s\' based on series history', db_series.identified_by)
 
-            log.trace('series_name: %s series_config: %s', series_name, series_config)
+                log.trace('series_name: %s series_config: %s', series_name, series_config)
 
-            import time
-            start_time = time.clock()
+                import time
+                start_time = time.clock()
 
-            self.process_series(task, series_entries, series_config)
+                self.process_series(task, series_entries, series_config)
 
-            took = time.clock() - start_time
-            log.trace('processing %s took %s', series_name, took)
+                took = time.clock() - start_time
+                log.trace('processing %s took %s', series_name, took)
 
-    def parse_series(self, session, entries, series_name, config):
+    def parse_series(self, entries, series_name, config):
         """
         Search for `series_name` and populate all `series_*` fields in entries when successfully parsed
 
@@ -1007,10 +1009,11 @@ class FilterSeries(FilterSeriesBase):
         # set parser flags flags based on config / database
         identified_by = config.get('identified_by', 'auto')
         if identified_by == 'auto':
-            series = session.query(Series).filter(Series.name == series_name).first()
-            if series:
-                # set flag from database
-                identified_by = series.identified_by or 'auto'
+            with Session() as session:
+                series = session.query(Series).filter(Series.name == series_name).first()
+                if series:
+                    # set flag from database
+                    identified_by = series.identified_by or 'auto'
 
         params = dict(identified_by=identified_by,
                       alternate_names=get_as_array(config, 'alternate_name'),
@@ -1424,8 +1427,9 @@ class FilterSeries(FilterSeriesBase):
         log.debug('on_task_learn')
         for entry in task.accepted:
             if 'series_releases' in entry:
-                num = (task.session.query(Release).filter(Release.id.in_(entry['series_releases'])).
-                       update({'downloaded': True}, synchronize_session=False))
+                with Session() as session:
+                    num = (session.query(Release).filter(Release.id.in_(entry['series_releases'])).
+                           update({'downloaded': True}, synchronize_session=False))
                 log.debug('marking %s releases as downloaded for ', num, entry)
             else:
                 log.debug('%s is not a series', entry['title'])
@@ -1439,33 +1443,34 @@ class SeriesDBManager(FilterSeriesBase):
         if not task.config_modified:
             return
         # Clear all series from this task
-        task.session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
-        if not task.config.get('series'):
-            return
-        config = self.prepare_config(task.config['series'])
-        for series_item in config:
-            series_name, series_config = series_item.items()[0]
-            # Make sure number shows (e.g. 24) are turned into strings
-            series_name = unicode(series_name)
-            db_series = task.session.query(Series).filter(Series.name == series_name).first()
-            if db_series:
-                # Update database with capitalization from config
-                db_series.name = series_name
-            else:
-                log.debug('adding series %s into db', series_name)
-                db_series = Series()
-                db_series.name = series_name
-                task.session.add(db_series)
-                log.debug('-> added %s' % db_series)
-            db_series.in_tasks.append(SeriesTask(task.name))
-            if series_config.get('identified_by', 'auto') != 'auto':
-                db_series.identified_by = series_config['identified_by']
-            # Set the begin episode
-            if series_config.get('begin'):
-                try:
-                    set_series_begin(db_series, series_config['begin'])
-                except ValueError as e:
-                    raise plugin.PluginError(e)
+        with Session() as session:
+            session.query(SeriesTask).filter(SeriesTask.name == task.name).delete()
+            if not task.config.get('series'):
+                return
+            config = self.prepare_config(task.config['series'])
+            for series_item in config:
+                series_name, series_config = series_item.items()[0]
+                # Make sure number shows (e.g. 24) are turned into strings
+                series_name = unicode(series_name)
+                db_series = session.query(Series).filter(Series.name == series_name).first()
+                if db_series:
+                    # Update database with capitalization from config
+                    db_series.name = series_name
+                else:
+                    log.debug('adding series %s into db', series_name)
+                    db_series = Series()
+                    db_series.name = series_name
+                    session.add(db_series)
+                    log.debug('-> added %s' % db_series)
+                db_series.in_tasks.append(SeriesTask(task.name))
+                if series_config.get('identified_by', 'auto') != 'auto':
+                    db_series.identified_by = series_config['identified_by']
+                # Set the begin episode
+                if series_config.get('begin'):
+                    try:
+                        set_series_begin(db_series, series_config['begin'])
+                    except ValueError as e:
+                        raise plugin.PluginError(e)
 
 
 @event('plugin.register')
