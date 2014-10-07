@@ -19,15 +19,10 @@ def with_session(func):
     """
 
     def wrapper(*args, **kwargs):
-        if not kwargs.get('session'):
-            kwargs['session'] = Session(autoflush=True, expire_on_commit=False)
-            try:
-                result = func(*args, **kwargs)
-                kwargs['session'].commit()
-                return result
-            finally:
-                kwargs['session'].close()
-        else:
+        if kwargs.get('session'):
+            return func(*args, **kwargs)
+        with Session() as session:
+            kwargs['session'] = session
             return func(*args, **kwargs)
     return wrapper
 
