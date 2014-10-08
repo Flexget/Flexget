@@ -1430,7 +1430,7 @@ class FilterSeries(FilterSeriesBase):
                 with Session() as session:
                     num = (session.query(Release).filter(Release.id.in_(entry['series_releases'])).
                            update({'downloaded': True}, synchronize_session=False))
-                log.debug('marking %s releases as downloaded for ', num, entry)
+                log.debug('marking %s releases as downloaded for %s', num, entry)
             else:
                 log.debug('%s is not a series', entry['title'])
 
