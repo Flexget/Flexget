@@ -9,7 +9,6 @@ can replace underlying mechanism in single point (and provide transparent switch
 
 from __future__ import unicode_literals, division, absolute_import
 from collections import MutableMapping
-from contextlib import contextmanager
 from datetime import datetime
 import logging
 import pickle
