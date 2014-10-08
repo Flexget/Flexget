@@ -97,7 +97,7 @@ class PluginThetvdbLookup(object):
     def lazy_series_lookup(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
         try:
-            with Session() as session:
+            with Session(expire_on_commit=False) as session:
                 series = lookup_series(entry.get('series_name', eval_lazy=False),
                                        tvdb_id=entry.get('tvdb_id', eval_lazy=False), session=session)
                 entry.update_using_map(self.series_map, series)
@@ -131,7 +131,7 @@ class PluginThetvdbLookup(object):
                 lookupargs['absolutenum'] = entry['series_id'] + episode_offset
             elif entry['series_id_type'] == 'date':
                 lookupargs['airdate'] = entry['series_date']
-            with Session() as session:
+            with Session(expire_on_commit=False) as session:
                 lookupargs['session'] = session
                 episode = lookup_episode(**lookupargs)
                 entry.update_using_map(self.episode_map, episode)
