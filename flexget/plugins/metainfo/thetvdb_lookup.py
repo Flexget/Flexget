@@ -3,6 +3,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+from flexget.manager import Session
 
 try:
     from flexget.plugins.api_tvdb import lookup_series, lookup_episode, get_mirror
@@ -96,8 +97,10 @@ class PluginThetvdbLookup(object):
     def lazy_series_lookup(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
         try:
-            series = lookup_series(entry.get('series_name', eval_lazy=False), tvdb_id=entry.get('tvdb_id', eval_lazy=False))
-            entry.update_using_map(self.series_map, series)
+            with Session() as session:
+                series = lookup_series(entry.get('series_name', eval_lazy=False),
+                                       tvdb_id=entry.get('tvdb_id', eval_lazy=False), session=session)
+                entry.update_using_map(self.series_map, series)
         except LookupError as e:
             log.debug('Error looking up tvdb series information for %s: %s' % (entry['title'], e.args[0]))
             entry.unregister_lazy_fields(self.series_map, self.lazy_series_lookup)
@@ -128,8 +131,10 @@ class PluginThetvdbLookup(object):
                 lookupargs['absolutenum'] = entry['series_id'] + episode_offset
             elif entry['series_id_type'] == 'date':
                 lookupargs['airdate'] = entry['series_date']
-            episode = lookup_episode(**lookupargs)
-            entry.update_using_map(self.episode_map, episode)
+            with Session() as session:
+                lookupargs['session'] = session
+                episode = lookup_episode(**lookupargs)
+                entry.update_using_map(self.episode_map, episode)
         except LookupError as e:
             log.debug('Error looking up tvdb episode information for %s: %s' % (entry['title'], e.args[0]))
             entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
@@ -150,7 +155,6 @@ class PluginThetvdbLookup(object):
                 # If there is season and ep info as well, register episode lazy fields
                 if entry.get('series_id_type') in ('ep', 'sequence', 'date'):
                     entry.register_lazy_fields(self.episode_map, self.lazy_episode_lookup)
-                # TODO: lookup for 'seq' and 'date' type series
 
 
 @event('plugin.register')

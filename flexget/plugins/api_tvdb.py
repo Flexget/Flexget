@@ -145,10 +145,10 @@ class TVDBSeries(TVDBContainer, Base):
 
     episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
-    def update(self):
-        if not self.id:
-            raise LookupError('Cannot update a series without a tvdb id.')
-        url = get_mirror() + api_key + '/series/%s/%s.xml' % (self.id, language)
+    def update(self, tvdb_id=None):
+        if tvdb_id:
+            self.id = tvdb_id
+        url = get_mirror() + api_key + '/series/%s/%s.xml' % (tvdb_id, language)
         try:
             data = requests.get(url).content
         except RequestException as e:
@@ -307,6 +307,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
             mark_expired(session=session)
         if series.expired and not only_cached:
             log.verbose('Data for %s has expired, refreshing from tvdb' % series.seriesname)
+            session.commit()
             try:
                 series.update()
             except LookupError as e:
@@ -317,11 +318,11 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         if only_cached:
             raise LookupError('Series %s not found from cache' % id_str())
         # There was no series found in the cache, do a lookup from tvdb
+        session.commit()
         log.debug('Series %s not found in cache, looking up from tvdb.' % id_str())
         if tvdb_id:
             series = TVDBSeries()
-            series.id = tvdb_id
-            series.update()
+            series.update(tvdb_id)
             if series.seriesname:
                 session.add(series)
         elif name:
@@ -329,9 +330,9 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
             if tvdb_id:
                 series = session.query(TVDBSeries).filter(TVDBSeries.id == tvdb_id).first()
                 if not series:
+                    session.commit()
                     series = TVDBSeries()
-                    series.id = tvdb_id
-                    series.update()
+                    series.update(tvdb_id)
                     session.add(series)
                 if name.lower() != series.seriesname.lower():
                     session.add(TVDBSearchResult(search=name, series=series))
@@ -371,6 +372,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
             filter(TVDBEpisode.seasonnumber == seasonnum).\
             filter(TVDBEpisode.episodenumber == episodenum).first()
         url = get_mirror() + api_key + '/series/%d/default/%d/%d/%s.xml' % (series.id, seasonnum, episodenum, language)
+    session.commit()
     if episode:
         if episode.expired and not only_cached:
             log.info('Data for %r has expired, refreshing from tvdb' % episode)
@@ -422,7 +424,8 @@ def mark_expired(session=None):
     if not last_local:
         # Never run before? Lets reset ALL series
         log.info('Setting all series to expire')
-        session.query(TVDBSeries).update({'expired': True}, 'fetch')
+        session.query(TVDBSeries).update({'expired': True}, synchronize_session=False)
+        session.commit()
         persist['last_local'] = datetime.now()
         return
     elif last_local + timedelta(hours=6) > datetime.now():
