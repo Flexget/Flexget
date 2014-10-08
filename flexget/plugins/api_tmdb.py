@@ -280,6 +280,7 @@ class ApiTmdb(object):
             if only_cached:
                 raise LookupError('Movie %s not found from cache' % id_str())
             # There was no movie found in the cache, do a lookup from tmdb
+            session.commit()
             log.verbose('Searching from TMDb %s' % id_str())
             try:
                 if imdb_id and not tmdb_id:
@@ -308,6 +309,7 @@ class ApiTmdb(object):
                         result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True))
                     if result:
                         movie = session.query(TMDBMovie).filter(TMDBMovie.id == result.id).first()
+                        session.commit()
                         if not movie:
                             movie = TMDBMovie(result)
                             ApiTmdb.get_movie_details(movie, session, result)
@@ -333,6 +335,7 @@ class ApiTmdb(object):
 
         if not result and not movie.id:
             raise LookupError('Cannot get tmdb details without tmdb id')
+        session.commit()
         if not result:
             try:
                 result = tmdb3.Movie(movie.id)
@@ -343,6 +346,7 @@ class ApiTmdb(object):
             except tmdb3.TMDBRequestInvalid as e:
                 log.debug('Error updating tmdb info: %s' % e)
                 raise LookupError('Error getting tmdb info')
+            session.commit()
         posters = result.posters
         if posters:
             # Add any posters we don't already have
@@ -354,6 +358,7 @@ class ApiTmdb(object):
                     if url not in poster_urls:
                         poster_data = {"movie_id":movie.id, "size":size, "url": url, "file": item.filename}
                         movie.posters.append(TMDBPoster(poster_data))
+        session.commit()
         genres = result.genres
         if genres:
             for genre in genres:
@@ -365,6 +370,7 @@ class ApiTmdb(object):
                 if db_genre not in movie.genres:
                     movie.genres.append(db_genre)
         movie.updated = datetime.now()
+        session.commit()
 
 def _first_result(results):
     if results and len(results) >= 1:
