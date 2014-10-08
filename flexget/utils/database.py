@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+import functools
 from datetime import datetime
 
 from sqlalchemy import extract, func
@@ -9,22 +10,32 @@ from flexget.manager import Session
 from flexget.utils import qualities
 
 
-def with_session(func):
+def with_session(*args, **kwargs):
     """"
-    A decorator which creates a new session if one was not passed
-    via keyword argument to the function.
+    A decorator which creates a new session if one was not passed via keyword argument to the function.
 
-    Automatically commits and closes the session if one was created,
-    caller is responsible for commit if passed in.
+    Automatically commits and closes the session if one was created, caller is responsible for commit if passed in.
+
+    If arguments are given when used as a decorator, they will automatically be passed to the created Session when
+    one is not supplied.
     """
 
-    def wrapper(*args, **kwargs):
-        if kwargs.get('session'):
-            return func(*args, **kwargs)
-        with Session() as session:
-            kwargs['session'] = session
-            return func(*args, **kwargs)
-    return wrapper
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            if kwargs.get('session'):
+                return func(*args, **kwargs)
+            with _Session() as session:
+                kwargs['session'] = session
+                return func(*args, **kwargs)
+        return wrapper
+
+    if len(args) == 1 and not kwargs and callable(args[0]):
+        _Session = Session
+        return decorator(args[0])
+    else:
+        _Session = functools.partial(Session, *args, **kwargs)
+        return decorator
+
 
 
 def pipe_list_synonym(name):
