@@ -53,7 +53,7 @@ class PluginTmdbLookup(object):
         imdb_id = (entry.get('imdb_id', eval_lazy=False) or
                    imdb.extract_id(entry.get('imdb_url', eval_lazy=False)))
         try:
-            with Session() as session:
+            with Session(expire_on_commit=False) as session:
                 movie = lookup(smart_match=entry['title'],
                                tmdb_id=entry.get('tmdb_id', eval_lazy=False),
                                imdb_id=imdb_id,
