@@ -347,8 +347,7 @@ class ImdbLookup(object):
         # no imdb_url, check if there is cached result for it or if the
         # search is known to fail
         if not entry.get('imdb_url', eval_lazy=False):
-            result = session.query(SearchResult).\
-                filter(SearchResult.title == entry['title']).first()
+            result = session.query(SearchResult).filter(SearchResult.title == entry['title']).first()
             if result:
                 # TODO: 1.2 this should really be checking task.options.retry
                 if result.fails and not manager.options.execute.retry:
@@ -361,10 +360,10 @@ class ImdbLookup(object):
                         entry['imdb_id'] = result.imdb_id
                         entry['imdb_url'] = result.url
 
+        movie = None
+
         # no imdb url, but information required, try searching
         if not entry.get('imdb_url', eval_lazy=False) and search_allowed:
-            # Commit before long calls to imdb to close our transaction
-            session.commit()
             log.verbose('Searching from imdb `%s`' % entry['title'])
             search = ImdbSearch()
             search_name = entry.get('movie_name', entry['title'], eval_lazy=False)
@@ -375,6 +374,7 @@ class ImdbLookup(object):
                 # every run
                 result = SearchResult(entry['title'], entry['imdb_url'])
                 session.add(result)
+                session.commit()
                 log.verbose('Found %s' % (entry['imdb_url']))
             else:
                 log_once('IMDB lookup failed for %s' % entry['title'], log, logging.WARN)
@@ -400,9 +400,9 @@ class ImdbLookup(object):
             # Remove the old movie, we'll store another one later.
             session.query(MovieLanguage).filter(MovieLanguage.movie_id == movie.id).delete()
             session.query(Movie).filter(Movie.url == entry['imdb_url']).delete()
+            session.commit()
 
         # search and store to cache
-        session.commit()
         if 'title' in entry:
             log.verbose('Parsing imdb for `%s`' % entry['title'])
         else:
@@ -427,7 +427,8 @@ class ImdbLookup(object):
         for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'mpaa_rating']:
             log.trace('movie.%s: %s' % (att, getattr(movie, att)))
 
-        # store to entry
+        # store to cache and entry
+        session.commit()
         entry.update_using_map(self.field_map, movie)
 
     def _parse_new_movie(self, imdb_url, session):
@@ -474,7 +475,6 @@ class ImdbLookup(object):
             # so that we can track how long since we've updated the info later
         movie.updated = datetime.now()
         session.add(movie)
-        session.commit()
         return movie
 
 @event('plugin.register')
