@@ -16,3 +16,4 @@ jsonschema>=2.0
 python-tvrage
 tmdb3
 guessit>=0.9.3
+rpyc
