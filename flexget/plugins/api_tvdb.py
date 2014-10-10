@@ -280,7 +280,7 @@ def find_series_id(name):
         raise LookupError('No results for `%s`' % name)
 
 
-@with_session
+@with_session(expire_on_commit=False)
 def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     """
     Look up information on a series. Will be returned from cache if available, and looked up online and cached if not.
