@@ -9,7 +9,6 @@ can replace underlying mechanism in single point (and provide transparent switch
 
 from __future__ import unicode_literals, division, absolute_import
 from collections import MutableMapping
-from contextlib import contextmanager
 from datetime import datetime
 import logging
 import pickle
@@ -74,27 +73,12 @@ Index('ix_simple_persistence_feed_plugin_key', SimpleKeyValue.task, SimpleKeyVal
 
 class SimplePersistence(MutableMapping):
 
-    def __init__(self, plugin, session=None):
+    def __init__(self, plugin=None):
         self.taskname = None
         self.plugin = plugin
-        self._session = session
-
-    @contextmanager
-    def session_manager(self):
-        """Context manager which creates commits and closes a Session if this instance does not have its own."""
-        session = self._session or Session()
-        try:
-            yield session
-            if not self._session:
-                session.commit()
-        except Exception:
-            raise
-        finally:
-            if not self._session:
-                session.close()
 
     def __setitem__(self, key, value):
-        with self.session_manager() as session:
+        with Session() as session:
             skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
                 filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
             if skv:
@@ -108,7 +92,7 @@ class SimplePersistence(MutableMapping):
                 session.add(skv)
 
     def __getitem__(self, key):
-        with self.session_manager() as session:
+        with Session() as session:
             skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
                 filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
             if not skv:
@@ -117,12 +101,12 @@ class SimplePersistence(MutableMapping):
                 return skv.value
 
     def __delitem__(self, key):
-        with self.session_manager() as session:
+        with Session() as session:
             session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
                 filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).delete()
 
     def __iter__(self):
-        with self.session_manager() as session:
+        with Session() as session:
             query = session.query(SimpleKeyValue.key).filter(SimpleKeyValue.task == self.taskname).\
                 filter(SimpleKeyValue.plugin == self.plugin).all()
             if query:
@@ -131,7 +115,7 @@ class SimplePersistence(MutableMapping):
                 return []
 
     def __len__(self):
-        with self.session_manager() as session:
+        with Session() as session:
             return session.query(SimpleKeyValue.key).filter(SimpleKeyValue.task == self.taskname).\
                 filter(SimpleKeyValue.plugin == self.plugin).count()
 
@@ -140,15 +124,8 @@ class SimpleTaskPersistence(SimplePersistence):
 
     def __init__(self, task):
         self.task = task
+        self.taskname = task.name
 
     @property
     def plugin(self):
         return self.task.current_plugin
-
-    @property
-    def taskname(self):
-        return self.task.name
-
-    @property
-    def _session(self):
-        return self.task.session
