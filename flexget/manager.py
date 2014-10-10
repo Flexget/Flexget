@@ -278,7 +278,11 @@ class Manager(object):
             except ValueError as e:
                 log.error(e)
             else:
-                client.execute(dict(options, loglevel=self.options.loglevel))
+                try:
+                    client.execute(dict(options, loglevel=self.options.loglevel))
+                except KeyboardInterrupt:
+                    log.error('Disconnecting from daemon due to ctrl-c. Executions will still continue in the '
+                              'background.')
             self.shutdown()
             return
         # Otherwise we run the execution ourselves
