@@ -21,6 +21,11 @@ _UNSET = object()
 core_parser = None
 
 
+def unicode_argv():
+    """Like sys.argv, but decodes all arguments."""
+    return [arg.decode(sys.getfilesystemencoding()) for arg in sys.argv]
+
+
 def get_parser(command=None):
     global core_parser
     if not core_parser:
@@ -211,7 +216,7 @@ class ArgumentParser(ArgParser):
             this attribute name in the root parser's namespace
         """
         # Do this early, so even option processing stuff is caught
-        if '--bugreport' in sys.argv:
+        if '--bugreport' in unicode_argv():
             self._debug_tb_callback()
 
         self.subparsers = None
@@ -279,7 +284,7 @@ class ArgumentParser(ArgParser):
     def parse_known_args(self, args=None, namespace=None):
         if args is None:
             # Decode all arguments to unicode before parsing
-            args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
+            args = unicode_argv()[1:]
         # Remove all of our defaults, to give subparsers and custom actions first priority at setting them
         self.stash_defaults()
         try:
