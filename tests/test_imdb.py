@@ -108,9 +108,9 @@ class TestImdb(FlexGetBase):
             'Failed IMDB lookup (search Spirited Away)'
         assert self.task.find_entry(imdb_name='Princess Mononoke'), \
             'Failed imdb lookup (direct)'
-        assert self.task.find_entry(imdb_name='Taken', imdb_url='http://www.imdb.com/title/tt0936501/'), \
+        assert self.task.find_entry(imdb_name='Taken', imdb_id='tt0936501'), \
             'Failed to pick correct Taken from search results'
-        assert self.task.find_entry(imdb_url='http://www.imdb.com/title/tt1049413/'), \
+        assert self.task.find_entry(imdb_id='tt1049413'), \
             'Failed to lookup Up.REPACK.720p.Bluray.x264-FlexGet'
 
     @attr(online=True)
