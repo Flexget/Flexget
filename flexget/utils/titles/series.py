@@ -310,16 +310,28 @@ class SeriesParser(TitleParser):
                 # we should be getting season, ep !
                 # support of strange numbering scheme (such as 101, 102, 103 or 0103)
                 # and seasons greater than 10 (such as 1104 or 2518)
+                # and multiple episodes packs (such as 050102 or 092223)
                 log.debug('expect_ep enabled')
-                match = re.search(self.re_not_in_word(r'([012]?\d)(\d\d)'), data_stripped, re.IGNORECASE | re.UNICODE)
+                match = re.search(self.re_not_in_word(r'([012]?\d)(\d\d)(\d\d)?'), data_stripped, re.IGNORECASE | re.UNICODE)
                 if match:
                     # strict_name
                     if self.strict_name:
                         if match.start() > 1:
                             return
 
+                    if match.group(3):
+                      if int(match.group(3)) > (int(match.group(2)) + 2):
+                      # This is a pack of too many episodes, ignore it.
+                        log.debug('Series pack contains too many episodes (%d). Rejecting',
+                                  int(match.group(3)) - int(match.group(2)))
+                        return
+
                     self.season = int(match.group(1))
                     self.episode = int(match.group(2))
+                    if match.group(3):
+                      self.episodes = (int(match.group(3)) - int(match.group(2))) + 1
+                    else:
+                      self.episodes = 1
                     log.debug(self)
                     self.id_type = 'ep'
                     self.valid = True
