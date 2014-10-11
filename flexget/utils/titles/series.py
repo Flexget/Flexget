@@ -308,11 +308,10 @@ class SeriesParser(TitleParser):
 
             if self.identified_by == 'ep':
                 # we should be getting season, ep !
-                # try to look up idiotic numbering scheme 101,102,103,201,202
-                # ressu: Added matching for 0101, 0102... It will fail on
-                #        season 11 though
+                # support of strange numbering scheme (such as 101, 102, 103 or 0103)
+                # and seasons greater than 10 (such as 1104 or 2518)
                 log.debug('expect_ep enabled')
-                match = re.search(self.re_not_in_word(r'(0?\d)(\d\d)'), data_stripped, re.IGNORECASE | re.UNICODE)
+                match = re.search(self.re_not_in_word(r'([012]?\d)(\d\d)'), data_stripped, re.IGNORECASE | re.UNICODE)
                 if match:
                     # strict_name
                     if self.strict_name:
