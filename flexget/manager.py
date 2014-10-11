@@ -334,7 +334,7 @@ class Manager(object):
                     log.error(e)
                 else:
                     if options.action == 'stop':
-                        client.shutdown()
+                        client.shutdown(options.wait)
                     elif options.action == 'reload':
                         client.reload()
                 self.shutdown()
