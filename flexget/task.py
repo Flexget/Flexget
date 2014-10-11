@@ -4,7 +4,6 @@ import copy
 import hashlib
 import itertools
 import logging
-import sys
 import threading
 from functools import wraps
 
@@ -13,14 +12,13 @@ from sqlalchemy import Column, Integer, String, Unicode
 from flexget import config_schema, db_schema
 from flexget.entry import EntryUnicodeError
 from flexget.event import event, fire_event
-from flexget.logger import FlexGetFormatter
 from flexget.manager import Session
 from flexget.plugin import plugins as all_plugins
 from flexget.plugin import (
     DependencyError, get_plugins, phase_methods, plugin_schemas, PluginError, PluginWarning, task_phases)
 from flexget.utils import requests
+from flexget.utils.log import capture_output
 from flexget.utils.simple_persistence import SimpleTaskPersistence
-from flexget.utils.tools import Tee
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
@@ -56,14 +54,6 @@ def use_task_logging(func):
         # Set the task name in the logger
         from flexget import logger
         logger.set_task(self.name)
-        if self.output:
-            # Hook up our log and stdout to give back to the requester
-            old_stdout, old_stderr = sys.stdout, sys.stderr
-            sys.stdout, sys.stderr = Tee(self.output, sys.stdout), Tee(self.output, sys.stderr)
-            # TODO: Use a filter to capture only the logging for this execution?
-            streamhandler = logging.StreamHandler(self.output)
-            streamhandler.setFormatter(FlexGetFormatter())
-            logging.getLogger().addHandler(streamhandler)
         old_loglevel = logging.getLogger().getEffectiveLevel()
         new_loglevel = logging.getLevelName(self.options.loglevel.upper())
         if old_loglevel != new_loglevel:
@@ -71,12 +61,13 @@ def use_task_logging(func):
             logging.getLogger().setLevel(new_loglevel)
 
         try:
-            return func(self, *args, **kw)
+            if self.output:
+                with capture_output(self.output):
+                    return func(self, *args, **kw)
+            else:
+                return func(self, *args, **kw)
         finally:
             logger.set_task('')
-            if self.output:
-                sys.stdout, sys.stderr = old_stdout, old_stderr
-                logging.getLogger().removeHandler(streamhandler)
             if old_loglevel != new_loglevel:
                 log.debug('Returning loglevel to `%s` after task execution.' % logging.getLevelName(old_loglevel))
                 logging.getLogger().setLevel(old_loglevel)
