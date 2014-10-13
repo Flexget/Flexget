@@ -41,7 +41,7 @@ class FilterExists(object):
             folder = path(folder).expanduser()
             if not folder.exists():
                 raise plugin.PluginWarning('Path %s does not exist' % folder, log)
-            for p in folder.walk(errors='warn'):
+            for p in folder.walk(errors='ignore'):
                 key = p.name
                 # windows file system is not case sensitive
                 if platform.system() == 'Windows':

@@ -82,7 +82,7 @@ class FilterExistsSeries(object):
                     log.warning('Directory %s does not exist', folder)
                     continue
 
-                for filename in folder.walk(errors='warn'):
+                for filename in folder.walk(errors='ignore'):
                     # run parser on filename data
                     try:
                         disk_parser = get_plugin_by_name('parsing').instance.parse_series(data=filename.name, name=series_parser.name)

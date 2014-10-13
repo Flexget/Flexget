@@ -70,7 +70,7 @@ class InputFind(object):
             folder = path(folder).expanduser()
             log.debug('scanning %s' % folder)
             if config['recursive']:
-                files = folder.walk(errors='warn')
+                files = folder.walk(errors='ignore')
             else:
                 files = folder.listdir()
             for item in files:
