@@ -25,13 +25,15 @@ class PluginParsing(object):
                 self.parses_names[parser_type][p.name.replace('parser_', '')] = p.name
             # Select default parsers based on priority
             func_name = 'parse_' + parser_type
-            self.default_parser[parser_type] = max(self.parsers[parser_type].values(), key=lambda plugin: getattr(getattr(plugin, func_name), 'priority', 0))
+            self.default_parser[parser_type] = max(self.parsers[parser_type].values(),
+                                                   key=lambda p: getattr(getattr(p, func_name), 'priority', 0))
         self.parser = self.default_parser
 
     @property
     def schema(self):
+        # Create a schema allowing only our registered parsers to be used under the key of each parser type
         properties = dict((parser_type, {'type': 'string', 'enum': self.parses_names[parser_type].keys()})
-             for parser_type in self.parses_names)
+                          for parser_type in self.parses_names)
         s = {
             'type': 'object',
             'properties': properties,
@@ -42,11 +44,13 @@ class PluginParsing(object):
     def on_task_start(self, task, config):
         if not config:
             return
+        # Set up user selected parsers from config for this task run
         self.parser = self.default_parser.copy()
         for parser_type, parser_name in config.iteritems():
             self.parser[parser_type] = plugin.get_plugin_by_name('parser_' + parser_name).instance
 
     def on_task_end(self, task, config):
+        # Restore default parsers for next task run
         self.parser = self.default_parser
 
     on_task_abort = on_task_end
