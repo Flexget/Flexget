@@ -115,6 +115,9 @@ class InputFtpList(object):
             dirs = ftp.nlst(path)
         except ftplib.error_perm as e:
             raise plugin.PluginWarning(str(e))
+        except:
+            # raises exception on empty directories
+            return
 
         if not dirs:
             log.verbose('Directory %s is empty', path)
@@ -179,7 +182,13 @@ class InputFtpList(object):
 
     def get_folder_size(self, ftp, path, p):
 	size = 0
-	for filename in ftp.nlst(path + '/' + p):
+        try:
+            dirs = ftp.nlst(path + '/' + p)
+        except:
+            # raises exception on empty dirs
+            dirs = []
+
+	for filename in dirs:
             filename = filename.replace(path + '/' + p + '/', '')
 	    try:
 	         size += ftp.size(path + '/' + p + '/' + filename) / (1024 * 1024)
