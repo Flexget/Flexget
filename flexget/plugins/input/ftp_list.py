@@ -26,6 +26,8 @@ class InputFtpList(object):
           use-ssl: <yes/no>
           encoding: <auto/utf8/ascii>
           files-only: <yes/no>
+          recursive: <yes/no>
+          get-size: <yes/no>
         dirs:
           - <directory 1>
           - <directory 2>
@@ -46,7 +48,8 @@ class InputFtpList(object):
                     'use-ssl': {'type': 'boolean', 'default': False},
                     'encoding': {'type': 'string', 'enum': encodings, 'default': 'auto'},
                     'files-only': {'type': 'boolean', 'default': False},
-                    'recursive': {'type': 'boolean', 'default': False}
+                    'recursive': {'type': 'boolean', 'default': False},
+                    'get-size': {'type': 'boolean', 'default': True}
                 },
                 'additionProperties': False,
                 'required': ['name', 'username', 'password', 'host', 'port'],
@@ -78,6 +81,7 @@ class InputFtpList(object):
         encoding = connection_config['encoding']
         files_only = connection_config['files-only']
         recursive = connection_config['recursive']
+        get_size = connection_config['get-size']
         mlst_supported = False
 
         feat_response = ftp.sendcmd('FEAT').splitlines()
@@ -105,12 +109,12 @@ class InputFtpList(object):
             baseurl = "ftp://%s:%s@%s:%s/" % (connection_config['username'], connection_config['password'],
                                               connection_config['host'], connection_config['port'])
 
-            self._handle_path(entries, ftp, baseurl, path, mlst_supported, files_only, recursive, encoding)
+            self._handle_path(entries, ftp, baseurl, path, mlst_supported, files_only, recursive, get_size, encoding)
 
         return entries
 
     def _handle_path(self, entries, ftp, baseurl, path='', mlst_supported=False, files_only=False, recursive=False,
-                     encoding=None):
+                     get_size = True, encoding=None):
         try:
             dirs = ftp.nlst(path)
         except ftplib.error_perm as e:
@@ -145,7 +149,7 @@ class InputFtpList(object):
 
             if recursive and mlst.get('type') == 'dir':
                 self._handle_path(entries, ftp, baseurl, path + '/' + p, mlst_supported, files_only,
-                                                 recursive, encoding)
+                                                 recursive, get_size, encoding)
 
             if not files_only or mlst.get('type') == 'file':
                 url = baseurl + path + '/' + p
@@ -153,14 +157,14 @@ class InputFtpList(object):
                 title = os.path.basename(p)
                 log.info('Accepting entry "%s" [%s]' % (path + '/' + p, mlst.get('type') or "unknown",))
                 entry = Entry(title, url)
-                if not 'size' in mlst:
+                if get_size and not 'size' in mlst:
                     if mlst.get('type') == 'file':
                     	entry['content_size'] = ftp.size(path + '/' + p) / (1024 * 1024)
                     	log.debug('(FILE) Size = %s', entry['content_size'])
                     elif mlst.get('type') == 'dir':
                         entry['content_size'] = self.get_folder_size(ftp, path, p)
                     	log.debug('(DIR) Size = %s', entry['content_size'])
-                else:
+                elif get_size:
                     entry['content_size'] = float(mlst.get('size')) / (1024 * 1024)
                 entries.append(entry)
         
