@@ -114,15 +114,15 @@ class InputFtpList(object):
         return entries
 
     def _handle_path(self, entries, ftp, baseurl, path='', mlst_supported=False, files_only=False, recursive=False,
-                     get_size = True, encoding=None):
+                     get_size=True, encoding=None):
         dirs = self.list_directory(ftp, path)
 
         for p in dirs:
             if encoding:
                 p = p.decode(encoding)
 
-	    #Clean file list when subdirectories are used
-	    p = p.replace(path + '/', '')
+            #Clean file list when subdirectories are used
+            p = p.replace(path + '/', '')
 
             mlst = {}
             if mlst_supported:
@@ -130,31 +130,31 @@ class InputFtpList(object):
                 clean_mlst_output = [line.strip().lower() for line in mlst_output.splitlines()][1]
                 mlst = self.parse_mlst(clean_mlst_output)
             else:
-            	element_is_directory = self.is_directory(ftp, path + '/' + p)
-            	if element_is_directory:
-            	     mlst['type'] = 'dir'
-            	     log.debug('%s is a directory', p)
-            	else:
-            	    mlst['type'] = 'file'
-            	    log.debug('%s is a file', p)
+                element_is_directory = self.is_directory(ftp, path + '/' + p)
+                if element_is_directory:
+                    mlst['type'] = 'dir'
+                    log.debug('%s is a directory', p)
+                else:
+                    mlst['type'] = 'file'
+                    log.debug('%s is a file', p)
 
             if recursive and mlst.get('type') == 'dir':
                 self._handle_path(entries, ftp, baseurl, path + '/' + p, mlst_supported, files_only,
-                                                 recursive, get_size, encoding)
+                                  recursive, get_size, encoding)
 
             if not files_only or mlst.get('type') == 'file':
                 url = baseurl + path + '/' + p
-		url = url.replace(' ', '%20')
+                url = url.replace(' ', '%20')
                 title = os.path.basename(p)
                 log.info('Accepting entry "%s" [%s]' % (path + '/' + p, mlst.get('type') or "unknown",))
                 entry = Entry(title, url)
                 if get_size and not 'size' in mlst:
                     if mlst.get('type') == 'file':
-                    	entry['content_size'] = ftp.size(path + '/' + p) / (1024 * 1024)
-                    	log.debug('(FILE) Size = %s', entry['content_size'])
+                        entry['content_size'] = ftp.size(path + '/' + p) / (1024 * 1024)
+                        log.debug('(FILE) Size = %s', entry['content_size'])
                     elif mlst.get('type') == 'dir':
                         entry['content_size'] = self.get_folder_size(ftp, path, p)
-                    	log.debug('(DIR) Size = %s', entry['content_size'])
+                        log.debug('(DIR) Size = %s', entry['content_size'])
                 elif get_size:
                     entry['content_size'] = float(mlst.get('size')) / (1024 * 1024)
                 entries.append(entry)
@@ -191,13 +191,14 @@ class InputFtpList(object):
         size = 0
         dirs = self.list_directory(ftp, path + '/' + p)
 
-	for filename in dirs:
+        for filename in dirs:
             filename = filename.replace(path + '/' + p + '/', '')
-	    try:
-	         size += ftp.size(path + '/' + p + '/' + filename) / (1024 * 1024)
-	    except ftplib.error_perm:
-		 size += self.get_folder_size(ftp, path + '/' + p, filename)
-	return size
+            try:
+                size += ftp.size(path + '/' + p + '/' + filename) / (1024 * 1024)
+            except ftplib.error_perm:
+                size += self.get_folder_size(ftp, path + '/' + p, filename)
+        return size
+
 
 @event('plugin.register')
 def register_plugin():
