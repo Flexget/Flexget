@@ -115,16 +115,7 @@ class InputFtpList(object):
 
     def _handle_path(self, entries, ftp, baseurl, path='', mlst_supported=False, files_only=False, recursive=False,
                      get_size = True, encoding=None):
-        try:
-            dirs = ftp.nlst(path)
-        except ftplib.error_perm as e:
-            raise plugin.PluginWarning(str(e))
-        except:
-            # raises exception on empty directories
-            return
-
-        if not dirs:
-            log.verbose('Directory %s is empty', path)
+        dirs = self.list_directory(ftp, path)
 
         for p in dirs:
             if encoding:
@@ -181,22 +172,30 @@ class InputFtpList(object):
             ftp.cwd(elementpath)
             ftp.cwd(original_wd)
             return True
-        except:
+        except ftplib.error_perm:
             return False
 
-    def get_folder_size(self, ftp, path, p):
-	size = 0
+    def list_directory(self, ftp, path):
         try:
-            dirs = ftp.nlst(path + '/' + p)
-        except:
-            # raises exception on empty dirs
-            dirs = []
+            dirs = ftp.nlst(path)
+        except ftplib.error_perm as e:
+            # ftp returns 550 on empty dirs
+            if str(e).startswith('550 '):
+                log.debug('Directory %s is empty.', path)
+                dirs = []
+            else:
+                raise plugin.PluginError(e)
+        return dirs
+
+    def get_folder_size(self, ftp, path, p):
+        size = 0
+        dirs = self.list_directory(ftp, path + '/' + p)
 
 	for filename in dirs:
             filename = filename.replace(path + '/' + p + '/', '')
 	    try:
 	         size += ftp.size(path + '/' + p + '/' + filename) / (1024 * 1024)
-	    except:
+	    except ftplib.error_perm:
 		 size += self.get_folder_size(ftp, path + '/' + p, filename)
 	return size
 
