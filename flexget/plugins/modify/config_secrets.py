@@ -2,9 +2,12 @@ from __future__ import unicode_literals, division, absolute_import
 import codecs
 import os
 import yaml
+import logging
 
 from flexget.config_schema import register_config_key
 from flexget.event import event
+
+log = logging.getLogger('secrets')
     
 @event('manager.before_config_validate')
 def process_secrets(manager):
@@ -19,7 +22,7 @@ def process_secrets(manager):
             raw_secrets = f.read()
         secrets = {'secrets': yaml.safe_load(raw_secrets) or {}}
     except Exception as e:
-        log.error('Invalid secrets file: ' + str(e))
+        log.error('Invalid secrets file: %s (#%s, %s).' % secret_file, e.errno, e.strerror)
         return None
     _process(manager.config, secrets)
 
