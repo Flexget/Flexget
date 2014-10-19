@@ -13,7 +13,6 @@ except ImportError:
     raise plugin.DependencyError(issued_by='trakt_lookup', missing='api_trakt',
                                  message='trakt_lookup requires the `api_trakt` plugin')
 
-from flexget import plugin
 
 log = logging.getLogger('trakt_lookup')
 
@@ -103,37 +102,33 @@ class PluginTraktLookup(object):
 
     def lazy_series_lookup(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
-        try:
-            with Session(expire_on_commit=False) as session:
+        with Session(expire_on_commit=False) as session:
+            try:
                 series = lookup_series(entry.get('series_name', eval_lazy=False),
                                        tvdb_id=entry.get('tvdb_id', eval_lazy=False), session=session)
+            except LookupError as e:
+                log.debug(e.message)
+                entry.unregister_lazy_fields(self.series_map, self.lazy_series_lookup)
+                # Also clear episode fields, since episode lookup cannot succeed without series lookup
+                entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
+            else:
                 entry.update_using_map(self.series_map, series)
-        except LookupError as e:
-            log.debug(e.message)
-            entry.unregister_lazy_fields(self.series_map, self.lazy_series_lookup)
-            # Also clear episode fields, since episode lookup cannot succeed without series lookup
-            entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
         return entry[field]
 
     def lazy_episode_lookup(self, entry, field):
-        try:
-
+        with Session(expire_on_commit=False) as session:
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
-                          'tvdb_id': entry.get('tvdb_id', eval_lazy=False)}
-            if entry['series_id_type'] == 'ep':
-                lookupargs['seasonnum'] = entry['series_season']
-                lookupargs['episodenum'] = entry['series_episode']
-            elif entry['series_id_type'] == 'sequence':
-                log.error('Trakt only accepts episode sequences in the format of Season/Episode')
-            elif entry['series_id_type'] == 'date':
-                log.error('Trakt only accepts episode sequences in the format of Season/Episode')
-            with Session(expire_on_commit=False) as session:
-                lookupargs['session'] = session
+                          'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
+                          'seasonnum': entry['series_season'],
+                          'episodenum': entry['series_episode'],
+                          'session': session}
+            try:
                 episode = lookup_episode(**lookupargs)
+            except LookupError as e:
+                log.debug('Error looking up trakt episode information for %s: %s' % (entry['title'], e.args[0]))
+                entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
+            else:
                 entry.update_using_map(self.episode_map, episode)
-        except LookupError as e:
-            log.debug('Error looking up trakt episode information for %s: %s' % (entry['title'], e.args[0]))
-            entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
         return entry[field]
 
     # Run after series and metainfo series
@@ -147,7 +142,7 @@ class PluginTraktLookup(object):
             if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False):
                 entry.register_lazy_fields(self.series_map, self.lazy_series_lookup)
 
-                if entry.get('series_id_type') in ('ep', 'sequence', 'date'):
+                if 'series_season' in entry and 'series_episode' in entry:
                     entry.register_lazy_fields(self.episode_map, self.lazy_episode_lookup)
 
 
