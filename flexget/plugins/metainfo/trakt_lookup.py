@@ -3,6 +3,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+from flexget.manager import Session
 
 try:
     from flexget.plugins.api_trakt import ApiTrakt
@@ -103,9 +104,10 @@ class PluginTraktLookup(object):
     def lazy_series_lookup(self, entry, field):
         """Does the lookup for this entry and populates the entry fields."""
         try:
-            series = lookup_series(entry.get('series_name', eval_lazy=False),
-                                   tvdb_id=entry.get('tvdb_id', eval_lazy=False))
-            entry.update_using_map(self.series_map, series)
+            with Session(expire_on_commit=False) as session:
+                series = lookup_series(entry.get('series_name', eval_lazy=False),
+                                       tvdb_id=entry.get('tvdb_id', eval_lazy=False), session=session)
+                entry.update_using_map(self.series_map, series)
         except LookupError as e:
             log.debug(e.message)
             entry.unregister_lazy_fields(self.series_map, self.lazy_series_lookup)
@@ -125,8 +127,10 @@ class PluginTraktLookup(object):
                 log.error('Trakt only accepts episode sequences in the format of Season/Episode')
             elif entry['series_id_type'] == 'date':
                 log.error('Trakt only accepts episode sequences in the format of Season/Episode')
-            episode = lookup_episode(**lookupargs)
-            entry.update_using_map(self.episode_map, episode)
+            with Session(expire_on_commit=False) as session:
+                lookupargs['session'] = session
+                episode = lookup_episode(**lookupargs)
+                entry.update_using_map(self.episode_map, episode)
         except LookupError as e:
             log.debug('Error looking up trakt episode information for %s: %s' % (entry['title'], e.args[0]))
             entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
