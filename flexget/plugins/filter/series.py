@@ -1041,30 +1041,17 @@ class FilterSeries(FilterSeriesBase):
             if (entry.get('series_parser') and entry['series_parser'].valid and
                     entry['series_parser'].name.lower() != series_name.lower()):
                 continue
-            # scan from fields
-            for field in ('title', 'description'):
-                data = entry.get(field)
-                # skip invalid fields
-                if not isinstance(data, basestring) or not data:
-                    continue
-                # in case quality will not be found from title, set it from entry['quality'] if available
-                quality = None
-                if entry.get('quality'):
-                    log.trace('Setting quality %s from entry field to parser', entry['quality'])
-                    quality = entry['quality']
+            # in case quality will not be found from title, set it from entry['quality'] if available
+            quality = None
+            if entry.get('quality'):
+                log.trace('Setting quality %s from entry field to parser', entry['quality'])
+                quality = entry['quality']
 
-                try:
-                    parsed = get_plugin_by_name('parsing').instance.parse_series(data, series_name, **params)
-                except ParseWarning as pw:
-                    log_once(pw.value, logger=log)
-                    parsed = pw.parsed
-                parsed.field = field
-                parsed.assume_quality(quality)
-
-                if parsed.valid:
-                    break
-            else:
-                continue  # next field
+            parsed = get_plugin_by_name('parsing').instance.parse_series(entry['title'], series_name, **params)
+            if not parsed.valid:
+                continue
+            parsed.field = 'title'
+            parsed.assume_quality(quality)
 
             log.debug('%s detected as %s, field: %s', entry['title'], parsed, parsed.field)
             populate_entry_fields(entry, parsed)
