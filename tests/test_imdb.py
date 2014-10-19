@@ -83,7 +83,7 @@ class TestImdb(FlexGetBase):
               - {title: 'Crank', imdb_url: 'http://www.imdb.com/title/tt0479884/'}
               - {title: 'The Damned United', imdb_url: 'http://www.imdb.com/title/tt1226271/'}
               - {title: 'Rockstar', imdb_url: 'http://www.imdb.com/title/tt1839596/'}
-              - {title: 'Breakaway', imdb_url: 'http://www.imdb.com/title/tt1736552/'}
+              - {title: 'The Host', imdb_url: 'http://www.imdb.com/title/tt0468492/'}
             imdb:
               accept_languages:
                 - english
@@ -209,10 +209,10 @@ class TestImdb(FlexGetBase):
         # rockstar = self.task.find_entry(imdb_name='Rockstar')['imdb_languages']
         # # http://flexget.com/ticket/1399
         # assert rockstar == ['hindi'], 'Did not find only primary language'
-        breakaway = self.task.find_entry(imdb_name='Breakaway')['imdb_languages']
+        host_langs = self.task.find_entry(imdb_name='The Host')['imdb_languages']
         # switched to panjabi since that's what I got ...
-        assert breakaway == ['panjabi', 'english'], \
-            'Languages were not returned in order of prominence, got %s' % (', '.join(breakaway))
+        assert host_langs == ['korean', 'english'], \
+            'Languages were not returned in order of prominence, got %s' % (', '.join(host_langs))
 
     @attr(online=True)
     def test_mpaa(self):
