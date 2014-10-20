@@ -22,7 +22,11 @@ log = logging.getLogger('scheduler')
 def is_cron_schedule(instance):
     if not isinstance(instance, dict):
         return True
-    return CronTrigger(**instance)
+    try:
+        return CronTrigger(**instance)
+    except TypeError:
+        # A more specific error message about which key will also be shown by properties schema keyword
+        raise ValueError('Invalid key for schedule.')
 
 
 UNITS = ['minutes', 'hours', 'days', 'weeks']
