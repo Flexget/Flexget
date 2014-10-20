@@ -146,8 +146,7 @@ class TVDBSeries(TVDBContainer, Base):
     episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
     def update(self, tvdb_id=None):
-        if tvdb_id:
-            self.id = tvdb_id
+        tvdb_id = tvdb_id or self.id
         url = get_mirror() + api_key + '/series/%s/%s.xml' % (tvdb_id, language)
         try:
             data = requests.get(url).content
