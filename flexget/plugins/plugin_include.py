@@ -11,6 +11,17 @@ from flexget.utils.tools import MergeException, merge_dict_from_to
 log = logging.getLogger('include')
 
 
+def load_plugin_config(path, context):
+    include = yaml.load(file(path))
+    errors = process_config(include, plugin.plugin_schemas( context=context))
+    if errors:
+        log.error('Included file %s has invalid config:' % path)
+        for error in errors:
+            log.error('[%s] %s', error.json_pointer, error.message)
+        task.abort('Invalid config in included file %s' % path)
+    #log.debug('Merging %s into task %s' % (path, task.path))
+    return include
+
 class PluginInclude(object):
     """
     Include configuration from another yaml file.
@@ -37,14 +48,7 @@ class PluginInclude(object):
             name = os.path.expanduser(name)
             if not os.path.isabs(name):
                 name = os.path.join(task.manager.config_base, name)
-            include = yaml.load(file(name))
-            errors = process_config(include, plugin.plugin_schemas(context='task'))
-            if errors:
-                log.error('Included file %s has invalid config:' % name)
-                for error in errors:
-                    log.error('[%s] %s', error.json_pointer, error.message)
-                task.abort('Invalid config in included file %s' % name)
-            log.debug('Merging %s into task %s' % (name, task.name))
+            include = load_plugin_config(name, 'task')
             # merge
             try:
                 merge_dict_from_to(include, task.config)
