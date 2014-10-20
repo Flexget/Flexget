@@ -34,7 +34,8 @@ class OutputPushbullet(object):
             'apikey': {'type': 'string'},
             'device': one_or_more({'type': 'string'}),
             'title': {'type': 'string', 'default': '{{task}} - Download started'},
-            'body': {'type': 'string', 'default': default_body}
+            'body': {'type': 'string', 'default': default_body},
+            'url': {'type': 'string'},
         },
         'required': ['apikey'],
         'additionalProperties': False
@@ -49,6 +50,9 @@ class OutputPushbullet(object):
         if not isinstance(devices, list):
             devices = [devices]
 
+        # Support for urls
+        push_type = 'link' if config.has_key('url') else 'note'
+
         # Set a bunch of local variables from the config
         apikey = config['apikey']
 
@@ -57,7 +61,7 @@ class OutputPushbullet(object):
         if task.options.test:
             log.info('Test mode. Pushbullet configuration:')
             log.info('    API_KEY: %s' % apikey)
-            log.info('    Type: Note')
+            log.info('    Type: %s' % push_type)
             log.info('    Device: %s' % devices)
 
         # Loop through the provided entries
@@ -65,6 +69,7 @@ class OutputPushbullet(object):
 
             title = config['title']
             body = config['body']
+            url = config.get('url', '')
 
             # Attempt to render the title field
             try:
@@ -80,17 +85,29 @@ class OutputPushbullet(object):
                 log.warning('Problem rendering `body`: %s' % e)
                 body = entry['title']
 
+            # Attempt to render the url field
+            if push_type is 'link':
+                try:
+                    url = entry.render(url)
+                except RenderError as e:
+                    log.warning('Problem rendering `url`: %s' % e)
+
             for device in devices:
                 # Build the request
-                data = {'type': 'note', 'title': title, 'body': body}
+                data = {'type': push_type, 'title': title, 'body': body}
+                if push_type is 'link':
+                    data['url'] = url
                 if device:
                     data['device_iden'] = device
 
                 # Check for test mode
                 if task.options.test:
                     log.info('Test mode. Pushbullet notification would be:')
+                    log.info('    Type: %s' % push_type)
                     log.info('    Title: %s' % title)
                     log.info('    Body: %s' % body)
+                    if push_type is 'link':
+                         log.info('    URL: %s' % url)
                     # Test mode.  Skip remainder.
                     continue
 

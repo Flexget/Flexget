@@ -39,6 +39,11 @@ class EstimatesReleasedSeries(object):
                         series_info = lookup_series(name=entry['series_name'], session=session)
                     except LookupError as e:
                         log.debug('tvrage lookup error: %s' % e)
+                    except OverflowError:
+                        # There is a bug in tvrage library on certain platforms if an episode is marked as airing
+                        # before 1970. We can safely assume the episode has been released. See #2739
+                        log.debug('tvrage library crash due to date before 1970, assuming released')
+                        return datetime(1970, 1, 1)
                     else:
                         if series_info:
                             try:

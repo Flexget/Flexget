@@ -30,9 +30,12 @@ def with_session(*args, **kwargs):
         return wrapper
 
     if len(args) == 1 and not kwargs and callable(args[0]):
-        _Session = Session
+        # Used without arguments, e.g. @with_session
+        # We default to expire_on_commit being false, in case the decorated function returns db instances
+        _Session = functools.partial(Session, expire_on_commit=False)
         return decorator(args[0])
     else:
+        # Arguments were specified, turn them into arguments for Session creation e.g. @with_session(autocommit=True)
         _Session = functools.partial(Session, *args, **kwargs)
         return decorator
 
