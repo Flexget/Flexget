@@ -2,6 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import hashlib
 import logging
 
+import pytz
+import tzlocal
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -99,7 +101,15 @@ def setup_scheduler(manager):
     jobstores = {'default': SQLAlchemyJobStore(engine=manager.engine, metadata=Base.metadata)}
     # If job was meant to run within last day while daemon was shutdown, run it once when continuing
     job_defaults = {'coalesce': True, 'misfire_grace_time': 60 * 60 * 24}
-    scheduler = BackgroundScheduler(jobstores=jobstores, job_defaults=job_defaults)
+    # apscheduler has a problem restoring jobs from database if we don't have a proper timezone name
+    # We'll force everything to be UTC internally in this case
+    # FlexGet #2741, upstream ticket https://bitbucket.org/agronholm/apscheduler/issue/59
+    timezone = tzlocal.get_localzone()
+    if timezone.zone == 'local':
+        log.info('Timezone name could not be determined. Scheduler will display times in UTC for any log messages. '
+                 'To resolve this set up /etc/sysconfig/clock with correct time zone name.')
+        timezone = pytz.utc
+    scheduler = BackgroundScheduler(jobstores=jobstores, job_defaults=job_defaults, timezone=timezone)
     setup_jobs(manager)
 
 
