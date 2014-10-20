@@ -157,7 +157,7 @@ def setup_jobs(manager):
 @event('manager.daemon.completed')
 def stop_scheduler(manager):
     if scheduler.running:
-        scheduler.shutdown()
+        scheduler.shutdown(wait=False)
 
 
 @event('config.register')
