@@ -183,7 +183,7 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
         if not name_end:
             # leave this invalid
             log.debug('FAIL: name regexps %s do not match %s',
-                      [regexp.pattern for regexp in self.name_regexps], self.data)
+                      [regexp.pattern for regexp in name_regexps], self.data)
             return ''
         return clean_value(self.data[name_start:name_end])
 

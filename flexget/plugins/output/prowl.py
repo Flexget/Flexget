@@ -7,11 +7,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import RenderError
 
-__version__ = 0.1
-
 log = logging.getLogger('prowl')
-
-headers = {'User-Agent': 'FlexGet Prowl plugin/%s' % str(__version__)}
 
 
 class OutputProwl(object):
@@ -77,7 +73,7 @@ class OutputProwl(object):
                 continue
 
             try:
-                response = task.requests.post(url, headers=headers, data=data, raise_status=False)
+                response = task.requests.post(url, data=data, raise_status=False)
             except RequestException as e:
                 log.error('Error with request: %s' % e)
                 continue

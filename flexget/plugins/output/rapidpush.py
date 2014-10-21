@@ -9,8 +9,6 @@ from flexget.config_schema import one_or_more
 
 log = logging.getLogger('rapidpush')
 
-__version__ = 0.4
-headers = {'User-Agent': "FlexGet RapidPush plugin/%s" % str(__version__)}
 url = 'https://rapidpush.net/api'
 
 
@@ -133,7 +131,7 @@ class OutputRapidPush(object):
                     'channel': channel})
                 data = {'apikey': apikey, 'command': 'broadcast', 'data': data_string}
 
-            response = task.requests.post(url, headers=headers, data=data, raise_status=False)
+            response = task.requests.post(url, data=data, raise_status=False)
 
             json_data = response.json()
             if 'code' in json_data:

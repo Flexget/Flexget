@@ -2,7 +2,6 @@ from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import logging.handlers
-import re
 import string
 import sys
 import threading
@@ -70,38 +69,15 @@ def set_task(task):
     FlexGetLogger.local.task = task
 
 
-class PrivacyFilter(logging.Filter):
-    """Edits log messages and <hides> obviously private information."""
-
-    def __init__(self):
-        self.replaces = []
-
-        def hide(name):
-            s = '([?&]%s=)\w+' % name
-            p = re.compile(s)
-            self.replaces.append(p)
-
-        for param in ['passwd', 'password', 'pw', 'pass', 'passkey',
-                      'key', 'apikey', 'user', 'username', 'uname', 'login', 'id']:
-            hide(param)
-
-    def filter(self, record):
-        if not isinstance(record.msg, basestring):
-            return False
-        for p in self.replaces:
-            record.msg = p.sub(r'\g<1><hidden>', record.msg)
-            record.msg = record.msg
-        return False
-
 _logging_configured = False
-_mem_handler = None
+_buff_handler = None
 _logging_started = False
 
 
 def initialize(unit_test=False):
     """Prepare logging.
     """
-    global _logging_configured, _mem_handler
+    global _logging_configured, _logging_started, _buff_handler
 
     if _logging_configured:
         return
@@ -114,35 +90,17 @@ def initialize(unit_test=False):
     # with unit test we want a bit simpler setup
     if unit_test:
         logging.basicConfig()
+        _logging_started = True
         return
 
-    # root logger
+    # Store any log messages in a buffer until we `start` function is run
     logger = logging.getLogger()
-    formatter = FlexGetFormatter()
-
-    _mem_handler = logging.handlers.MemoryHandler(1000 * 1000, 100)
-    _mem_handler.setFormatter(formatter)
-    logger.addHandler(_mem_handler)
-
-    #
-    # Process commandline options, unfortunately we need to do it before argparse is available
-    #
-
-    # turn on debug level
-    if '--debug' in sys.argv:
-        logger.setLevel(logging.DEBUG)
-    elif '--debug-trace' in sys.argv:
-        logger.setLevel(TRACE)
-
-    # without --cron we log to console
-    # this must be done at initialize because otherwise there will be too much delay (user feedback) (see #1113)
-    if not '--cron' in sys.argv:
-        console = logging.StreamHandler()
-        console.setFormatter(formatter)
-        logger.addHandler(console)
+    _buff_handler = logging.handlers.BufferingHandler(1000 * 1000)
+    logger.addHandler(_buff_handler)
+    logger.setLevel(logging.NOTSET)
 
 
-def start(filename=None, level=logging.INFO, debug=False):
+def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
     """After initialization, start file logging.
     """
     global _logging_started
@@ -151,37 +109,34 @@ def start(filename=None, level=logging.INFO, debug=False):
     if _logging_started:
         return
 
-    if debug:
-        handler = logging.StreamHandler()
-    else:
-        handler = logging.handlers.RotatingFileHandler(filename, maxBytes=1000 * 1024, backupCount=9)
-
-    handler.setFormatter(_mem_handler.formatter)
-
-    _mem_handler.setTarget(handler)
-
     # root logger
     logger = logging.getLogger()
-    logger.removeHandler(_mem_handler)
-    logger.addHandler(handler)
-    logger.addFilter(PrivacyFilter())
+    if not isinstance(level, int):
+        # Python logging api is horrible. This is getting the level number, which is required on python 2.6.
+        level = logging.getLevelName(level)
     logger.setLevel(level)
 
+    formatter = FlexGetFormatter()
+    if to_file:
+        file_handler = logging.handlers.RotatingFileHandler(filename, maxBytes=1000 * 1024, backupCount=9)
+        file_handler.setFormatter(formatter)
+        logger.addHandler(file_handler)
+
+    # without --cron we log to console
+    if to_console:
+        console_handler = logging.StreamHandler(sys.stdout)
+        console_handler.setFormatter(formatter)
+        logger.addHandler(console_handler)
+
     # flush what we have stored from the plugin initialization
-    _mem_handler.flush()
+    logger.removeHandler(_buff_handler)
+    if _buff_handler:
+        for record in _buff_handler.buffer:
+            if logger.isEnabledFor(record.levelno):
+                logger.handle(record)
+        _buff_handler.flush()
     _logging_started = True
 
-
-def flush_logging_to_console():
-    """Flushes memory logger to console"""
-    console = logging.StreamHandler()
-    console.setFormatter(_mem_handler.formatter)
-    logger = logging.getLogger()
-    logger.addHandler(console)
-    if len(_mem_handler.buffer) > 0:
-        for record in _mem_handler.buffer:
-            console.handle(record)
-    _mem_handler.flush()
 
 # Set our custom logger class as default
 logging.setLoggerClass(FlexGetLogger)

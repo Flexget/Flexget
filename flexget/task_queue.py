@@ -69,6 +69,9 @@ class TaskQueue(object):
         log.debug('task queue shutdown requested')
         if finish_queue:
             self._shutdown_when_finished = True
+            if self.run_queue.qsize():
+                log.info('There are %s tasks still executing. Shutdown will commence when they have completed.' %
+                         self.run_queue.qsize())
         else:
             self._shutdown_now = True
 
@@ -81,7 +84,7 @@ class TaskQueue(object):
             while self._thread.is_alive():
                 time.sleep(0.5)
         except KeyboardInterrupt:
-            log.error('Got ctrl-c, shutting down after this task finishes')
+            log.error('Got ctrl-c, shutting down after running task (if any) completes')
             self.shutdown(finish_queue=False)
             # We still wait to finish cleanly, pressing ctrl-c again will abort
             while self._thread.is_alive():

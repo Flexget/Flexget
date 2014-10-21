@@ -22,10 +22,11 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import SingletonThreadPool
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
+from flexget.utils.sqlalchemy_utils import ContextSession
 Base = declarative_base()
-Session = sessionmaker()
+Session = sessionmaker(class_=ContextSession)
 
-from flexget import config_schema, db_schema
+from flexget import config_schema, db_schema, logger
 from flexget.event import fire_event
 from flexget.ipc import IPCClient, IPCServer
 from flexget.task import Task
@@ -121,15 +122,20 @@ class Manager(object):
         self.ipc_server = IPCServer(self, options.ipc_port)
         self.task_queue = TaskQueue()
         manager = self
+
+        log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
+        log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
+        log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
+        if codecs.lookup(sys.getfilesystemencoding()).name == 'ascii' and not os.path.supports_unicode_filenames:
+            log.warning('Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '
+                        'disk will not work properly for filenames containing non-ascii characters. Make sure your '
+                        'locale env variables are set up correctly for the environment which is launching FlexGet.')
+
         self.initialize()
 
         # cannot be imported at module level because of circular references
         from flexget.utils.simple_persistence import SimplePersistence
         self.persist = SimplePersistence('manager')
-
-        log.debug('sys.defaultencoding: %s' % sys.getdefaultencoding())
-        log.debug('sys.getfilesystemencoding: %s' % sys.getfilesystemencoding())
-        log.debug('os.path.supports_unicode_filenames: %s' % os.path.supports_unicode_filenames)
 
         if db_schema.upgrade_required():
             log.info('Database upgrade is required. Attempting now.')
@@ -146,17 +152,31 @@ class Manager(object):
         manager = None
 
     def initialize(self):
-        """Separated from __init__ so that unit tests can modify options before loading config."""
+        """
+        Separated from __init__ so that unit tests can modify options before loading config.
+
+        :raises: `IOError` if config is not found. `ValueError` if config is malformed.
+        """
         self.setup_yaml()
-        self.find_config(create=(self.options.cli_command == 'webui'))
+        try:
+            self.find_config(create=(self.options.cli_command == 'webui'))
+        except:
+            logger.start(level=self.options.loglevel.upper(), to_file=False)
+            raise
+        else:
+            log_file = os.path.expanduser(manager.options.logfile)
+            # If an absolute path is not specified, use the config directory.
+            if not os.path.isabs(log_file):
+                log_file = os.path.join(self.config_base, log_file)
+            logger.start(log_file, self.options.loglevel.upper(), to_console=not self.options.execute.cron)
+
         self.init_sqlalchemy()
         fire_event('manager.initialize', self)
         try:
             self.load_config()
         except ValueError as e:
             log.critical('Failed to load config file: %s' % e.args[0])
-            self.shutdown(finish_queue=False)
-            sys.exit(1)
+            raise
 
     @property
     def tasks(self):
@@ -258,7 +278,11 @@ class Manager(object):
             except ValueError as e:
                 log.error(e)
             else:
-                client.execute(dict(options, loglevel=self.options.loglevel))
+                try:
+                    client.execute(dict(options, loglevel=self.options.loglevel))
+                except KeyboardInterrupt:
+                    log.error('Disconnecting from daemon due to ctrl-c. Executions will still continue in the '
+                              'background.')
             self.shutdown()
             return
         # Otherwise we run the execution ourselves
@@ -310,7 +334,7 @@ class Manager(object):
                     log.error(e)
                 else:
                     if options.action == 'stop':
-                        client.shutdown()
+                        client.shutdown(options.wait)
                     elif options.action == 'reload':
                         client.reload()
                 self.shutdown()
@@ -373,6 +397,7 @@ class Manager(object):
         Find the configuration file.
 
         :param bool create: If a config file is not found, and create is True, one will be created in the home folder
+        :raises: `IOError` when no config file could be found, and `create` is False.
         """
         config = None
         home_path = os.path.join(os.path.expanduser('~'), '.flexget')
@@ -412,16 +437,18 @@ class Manager(object):
             else:
                 config = None
 
-        if not (config and os.path.exists(config)):
-            if not create:
-                log.info('Tried to read from: %s' % ', '.join(possible))
-                log.critical('Failed to find configuration file %s' % options_config)
-                sys.exit(1)
+        if create and not (config and os.path.exists(config)):
             config = os.path.join(home_path, options_config)
             log.info('Config file %s not found. Creating new config %s' % (options_config, config))
             with open(config, 'w') as newconfig:
                 # Write empty tasks to the config
                 newconfig.write(yaml.dump({'tasks': {}}))
+        elif not config:
+            log.critical('Failed to find configuration file %s' % options_config)
+            log.info('Tried to read from: %s' % ', '.join(possible))
+            raise IOError('No configuration file found.')
+        if not os.path.isfile(config):
+            raise IOError('Config `%s` does not appear to be a file.' % config)
 
         log.debug('Config file %s selected' % config)
         self.config_path = config
@@ -447,7 +474,7 @@ class Manager(object):
         except Exception as e:
             msg = str(e).replace('\n', ' ')
             msg = ' '.join(msg.split())
-            log.critical(msg)
+            log.critical(msg, exc_info=False)
             print('')
             print('-' * 79)
             print(' Malformed configuration file (check messages above). Common reasons:')
@@ -571,7 +598,7 @@ class Manager(object):
             self.engine = sqlalchemy.create_engine(self.database_uri,
                                                    echo=self.options.debug_sql,
                                                    poolclass=SingletonThreadPool,
-                                                   connect_args={'check_same_thread': False})  # assert_unicode=True
+                                                   connect_args={'check_same_thread': False, 'timeout': 10})
         except ImportError:
             print('FATAL: Unable to use SQLite. Are you running Python 2.5 - 2.7 ?\n'
                   'Python should normally have SQLite support built in.\n'

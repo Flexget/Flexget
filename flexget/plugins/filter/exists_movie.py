@@ -76,7 +76,7 @@ class FilterExistsMovie(object):
             # scan through
 
             # TODO: add also video files?
-            for item in folder.walkdirs(errors='warn'):
+            for item in folder.walkdirs(errors='ignore'):
                 if item.name.lower() in self.skip:
                     continue
                 count_dirs += 1

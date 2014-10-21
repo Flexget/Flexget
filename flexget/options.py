@@ -21,6 +21,11 @@ _UNSET = object()
 core_parser = None
 
 
+def unicode_argv():
+    """Like sys.argv, but decodes all arguments."""
+    return [arg.decode(sys.getfilesystemencoding()) for arg in sys.argv]
+
+
 def get_parser(command=None):
     global core_parser
     if not core_parser:
@@ -211,7 +216,7 @@ class ArgumentParser(ArgParser):
             this attribute name in the root parser's namespace
         """
         # Do this early, so even option processing stuff is caught
-        if '--bugreport' in sys.argv:
+        if '--bugreport' in unicode_argv():
             self._debug_tb_callback()
 
         self.subparsers = None
@@ -279,7 +284,7 @@ class ArgumentParser(ArgParser):
     def parse_known_args(self, args=None, namespace=None):
         if args is None:
             # Decode all arguments to unicode before parsing
-            args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
+            args = unicode_argv()[1:]
         # Remove all of our defaults, to give subparsers and custom actions first priority at setting them
         self.stash_defaults()
         try:
@@ -386,7 +391,7 @@ class CoreArgumentParser(ArgumentParser):
         exec_parser.add_argument('--learn', action='store_true', dest='learn', default=False,
                                  help='matches are not downloaded but will be skipped in the future')
         exec_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
-                                 help='use when scheduling FlexGet with cron or other scheduler: allows background '
+                                 help='use when executing FlexGet non-interactively: allows background '
                                       'maintenance to run, disables stdout and stderr output, reduces logging level')
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
@@ -406,7 +411,9 @@ class CoreArgumentParser(ArgumentParser):
         daemon_parser.add_subparsers(title='actions', metavar='<action>', dest='action')
         start_parser = daemon_parser.add_subparser('start', help='start the daemon')
         start_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
-        daemon_parser.add_subparser('stop', help='shutdown the running daemon')
+        stop_parser = daemon_parser.add_subparser('stop', help='shutdown the running daemon')
+        stop_parser.add_argument('--wait', action='store_true',
+                                 help='wait for all queued tasks to finish before stopping daemon')
         daemon_parser.add_subparser('status', help='check if a daemon is running')
         daemon_parser.add_subparser('reload', help='causes a running daemon to reload the config from disk')
         daemon_parser.set_defaults(loglevel='info')

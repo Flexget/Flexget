@@ -358,7 +358,10 @@ class PluginTransmission(TransmissionBase):
         if 'include_subs' in opt_dic:
             post['include_subs'] = opt_dic['include_subs']
         if 'content_filename' in opt_dic:
-            post['content_filename'] = opt_dic['content_filename']
+            try:
+                post['content_filename'] = entry.render(opt_dic['content_filename'])
+            except RenderError as e:
+                log.error('Unable to render content_filename %s: %s' % (entry['title'], e))
         if 'skip_files' in opt_dic:
             post['skip_files'] = opt_dic['skip_files']
         if 'include_files' in opt_dic:
@@ -498,10 +501,13 @@ class PluginTransmission(TransmissionBase):
                                 log.debug('File %s renamed to %s' % (fl[r.id][index]['name'], filename + file_ext))
                         # change to below when set_files will allow setting name, more efficient to have one call
                         # fl[r.id][index]['name'] = os.path.basename(pathscrub(filename + file_ext).encode('utf-8'))
-                                cli.rename_torrent_path(r.id, fl[r.id][index]['name'],
-                                                        os.path.basename(
-                                                        pathscrub(filename + file_ext).encode('utf-8'))
-                                                        )
+                                try:
+                                    cli.rename_torrent_path(r.id, fl[r.id][index]['name'],
+                                                            os.path.basename(
+                                                                pathscrub(filename + file_ext).encode('utf-8'))
+                                                            )
+                                except TransmissionError:
+                                    log.error('content_filename only supported with transmission 2.8+')
 
                         if ('main_file_only' in options['post'] and options['post']['main_file_only'] == True and
                            main_id is not None):

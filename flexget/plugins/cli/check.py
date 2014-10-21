@@ -12,6 +12,7 @@ log = logging.getLogger('check')
 def pre_check_config(manager):
     """Checks configuration file for common mistakes that are easily detectable"""
     if manager.options.cli_command == 'check':
+        log.info('Checking config file `%s`' % manager.config_path)
         with codecs.open(manager.config_path, 'r', 'utf-8') as config_file:
             try:
                 config = config_file.read()

@@ -4,7 +4,6 @@ import re
 import urllib
 import feedparser
 
-import flexget
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
@@ -67,7 +66,7 @@ class UrlRewriteTorrentz(object):
                 url = 'http://torrentz.%s/%s?q=%s' % (domain, feed, urllib.quote(query.encode('utf-8')))
                 log.debug('requesting: %s' % url)
                 try:
-                    r = requests.get(url, headers={'User-Agent': 'FlexGet/%s' % flexget.__version__})
+                    r = requests.get(url)
                     break
                 except requests.RequestException as err:
                     log.warning('torrentz.%s failed. Error: %s' % (domain, err))

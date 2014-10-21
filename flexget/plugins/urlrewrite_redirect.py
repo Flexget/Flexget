@@ -16,6 +16,8 @@ class UrlRewriteRedirect(object):
         self.processed = set()
 
     def url_rewritable(self, task, entry):
+        if not any(entry['url'].startswith(adapter) for adapter in task.requests.adapters):
+            return False
         return entry['url'] not in self.processed
 
     def url_rewrite(self, task, entry):

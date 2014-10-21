@@ -4,7 +4,6 @@ import copy
 import hashlib
 import itertools
 import logging
-import sys
 import threading
 from functools import wraps
 
@@ -13,14 +12,13 @@ from sqlalchemy import Column, Integer, String, Unicode
 from flexget import config_schema, db_schema
 from flexget.entry import EntryUnicodeError
 from flexget.event import event, fire_event
-from flexget.logger import FlexGetFormatter
 from flexget.manager import Session
 from flexget.plugin import plugins as all_plugins
 from flexget.plugin import (
     DependencyError, get_plugins, phase_methods, plugin_schemas, PluginError, PluginWarning, task_phases)
 from flexget.utils import requests
+from flexget.utils.log import capture_output
 from flexget.utils.simple_persistence import SimpleTaskPersistence
-from flexget.utils.tools import Tee
 
 log = logging.getLogger('task')
 Base = db_schema.versioned_base('feed', 0)
@@ -43,14 +41,10 @@ def config_changed(task):
     """Forces config_modified flag to come out true on next run. Used when the db changes, and all
     entries need to be reprocessed."""
     log.debug('Marking config as changed.')
-    session = Session()
-    try:
+    with Session() as session:
         task_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == task).first()
         if task_hash:
             task_hash.hash = ''
-        session.commit()
-    finally:
-        session.close()
 
 
 def use_task_logging(func):
@@ -60,14 +54,6 @@ def use_task_logging(func):
         # Set the task name in the logger
         from flexget import logger
         logger.set_task(self.name)
-        if self.output:
-            # Hook up our log and stdout to give back to the requester
-            old_stdout, old_stderr = sys.stdout, sys.stderr
-            sys.stdout, sys.stderr = Tee(self.output, sys.stdout), Tee(self.output, sys.stderr)
-            # TODO: Use a filter to capture only the logging for this execution?
-            streamhandler = logging.StreamHandler(self.output)
-            streamhandler.setFormatter(FlexGetFormatter())
-            logging.getLogger().addHandler(streamhandler)
         old_loglevel = logging.getLogger().getEffectiveLevel()
         new_loglevel = logging.getLevelName(self.options.loglevel.upper())
         if old_loglevel != new_loglevel:
@@ -75,12 +61,13 @@ def use_task_logging(func):
             logging.getLogger().setLevel(new_loglevel)
 
         try:
-            return func(self, *args, **kw)
+            if self.output:
+                with capture_output(self.output):
+                    return func(self, *args, **kw)
+            else:
+                return func(self, *args, **kw)
         finally:
             logger.set_task('')
-            if self.output:
-                sys.stdout, sys.stderr = old_stdout, old_stderr
-                logging.getLogger().removeHandler(streamhandler)
             if old_loglevel != new_loglevel:
                 log.debug('Returning loglevel to `%s` after task execution.' % logging.getLevelName(old_loglevel))
                 logging.getLogger().setLevel(old_loglevel)
@@ -388,7 +375,11 @@ class Task(object):
                     if not p.builtin:
                         break
                 else:
-                    log.warning('Task doesn\'t have any %s plugins, you should add (at least) one!' % phase)
+                    if phase == 'filter':
+                        log.warning('Task does not have any filter plugins to accept entries. '
+                                    'You need at least one to accept the entries you  want.')
+                    else:
+                        log.warning('Task doesn\'t have any %s plugins, you should add (at least) one!' % phase)
 
         for plugin in self.plugins(phase):
             # Abort this phase if one of the plugins disables it
@@ -406,16 +397,20 @@ class Task(object):
                 # pass method task, copy of config (so plugin cannot modify it)
                 args = (self, copy.copy(self.config.get(plugin.name)))
 
-            try:
-                fire_event('task.execute.before_plugin', self, plugin.name)
-                response = self.__run_plugin(plugin, phase, args)
-                if phase == 'input' and response:
-                    # add entries returned by input to self.all_entries
-                    for e in response:
-                        e.task = self
-                    self.all_entries.extend(response)
-            finally:
-                fire_event('task.execute.after_plugin', self, plugin.name)
+            # Hack to make task.session only active for a single plugin
+            with Session() as session:
+                self.session = session
+                try:
+                    fire_event('task.execute.before_plugin', self, plugin.name)
+                    response = self.__run_plugin(plugin, phase, args)
+                    if phase == 'input' and response:
+                        # add entries returned by input to self.all_entries
+                        for e in response:
+                            e.task = self
+                        self.all_entries.extend(response)
+                finally:
+                    fire_event('task.execute.after_plugin', self, plugin.name)
+                self.session = None
 
     def __run_plugin(self, plugin, phase, args=None, kwargs=None):
         """
@@ -510,28 +505,26 @@ class Task(object):
             self.disable_phase('input')
             self.all_entries.extend(self.options.inject)
 
-        log.debug('starting session')
-        self.session = Session()
-
         # Save current config hash and set config_modidied flag
-        config_hash = hashlib.md5(str(sorted(self.config.items()))).hexdigest()
-        last_hash = self.session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
-        if self.is_rerun:
-            # Restore the config to state right after start phase
-            if self.prepared_config:
-                self.config = copy.deepcopy(self.prepared_config)
+        with Session() as session:
+            config_hash = hashlib.md5(str(sorted(self.config.items()))).hexdigest()
+            last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
+            if self.is_rerun:
+                # Restore the config to state right after start phase
+                if self.prepared_config:
+                    self.config = copy.deepcopy(self.prepared_config)
+                else:
+                    log.error('BUG: No prepared_config on rerun, please report.')
+                self.config_modified = False
+            elif not last_hash:
+                self.config_modified = True
+                last_hash = TaskConfigHash(task=self.name, hash=config_hash)
+                session.add(last_hash)
+            elif last_hash.hash != config_hash:
+                self.config_modified = True
+                last_hash.hash = config_hash
             else:
-                log.error('BUG: No prepared_config on rerun, please report.')
-            self.config_modified = False
-        elif not last_hash:
-            self.config_modified = True
-            last_hash = TaskConfigHash(task=self.name, hash=config_hash)
-            self.session.add(last_hash)
-        elif last_hash.hash != config_hash:
-            self.config_modified = True
-            last_hash.hash = config_hash
-        else:
-            self.config_modified = False
+                self.config_modified = False
 
         # run phases
         try:
@@ -554,24 +547,15 @@ class Task(object):
                         # Store a copy of the config state after start phase to restore for reruns
                         self.prepared_config = copy.deepcopy(self.config)
         except TaskAbort:
-            # Roll back the session before calling abort handlers
-            self.session.rollback()
             try:
                 self.__run_task_phase('abort')
-                # Commit just the abort handler changes if no exceptions are raised there
-                self.session.commit()
             except TaskAbort as e:
                 log.exception('abort handlers aborted: %s' % e)
             raise
         else:
             for entry in self.all_entries:
                 entry.complete()
-            log.debug('committing session')
-            self.session.commit()
             fire_event('task.execute.completed', self)
-        finally:
-            # this will cause database rollback on exception
-            self.session.close()
 
     @use_task_logging
     def execute(self):

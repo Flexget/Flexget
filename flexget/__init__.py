@@ -1,15 +1,15 @@
 #!/usr/bin/python
+from __future__ import unicode_literals, division, absolute_import, print_function
 
-from __future__ import unicode_literals, division, absolute_import
+__version__ = '{git}'
 
 import logging
 import os
+import sys
 
 from flexget import logger, plugin
 from flexget.manager import Manager
 from flexget.options import get_parser
-
-__version__ = '{git}'
 
 log = logging.getLogger('main')
 
@@ -23,14 +23,12 @@ def main(args=None):
 
     options = get_parser().parse_args(args)
 
-    manager = Manager(options)
+    try:
+        manager = Manager(options)
+    except (IOError, ValueError) as e:
+        print('Could not initialize manager: %s' % e, file=sys.stderr)
+        sys.exit(1)
 
-    log_level = logging.getLevelName(options.loglevel.upper())
-    log_file = os.path.expanduser(manager.options.logfile)
-    # If an absolute path is not specified, use the config directory.
-    if not os.path.isabs(log_file):
-        log_file = os.path.join(manager.config_base, log_file)
-    logger.start(log_file, log_level)
     if options.profile:
         try:
             import cProfile as profile

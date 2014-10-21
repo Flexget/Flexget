@@ -14,6 +14,8 @@ from flexget.utils.requests import Session
 
 log = logging.getLogger('search_sceneaccess')
 
+session = Session()
+
 CATEGORIES = {
     'browse':
         {
@@ -169,27 +171,39 @@ class SceneAccessSearch(object):
         return root
 
     def processCategories(self, config):
-        toProcess = dict()
+        """
+        sceneaccess use different url for different supercategories (let's call them scopes)
 
-        # Build request urls from config
+        For example, most categories (international tv, movies, games, ...) reside within `browse` with url
+        www.sceneaccess.eu/browse or mp3 and 0day releases have their own scope called `mp3/0day` but their url is
+        www.sceneaccess.eu/spam
+
+        this method iterates over all possible combinations and returns a list of dicts that contain both relative link
+        to scope as well as url fragments of categories that main method search() will use:
+        Return example:
+        {'url_path': 'spam',
+         'category_url_string': '&c40=40&c13=13'
+        }
+        """
+
+        toProcess = dict()
+        scope = 'browse' # Default scope to search in
         try:
-            scope = 'browse' # Default scope to search in
             category = config['category']
             if isinstance(category, dict):                          # Categories have search scope specified.
                 for scope in category:
-                    if isinstance(category[scope], bool):           # If provided boolean, search all categories
-                        category[scope] = []
-                    elif not isinstance(category[scope], list):     # Convert single category into list
+                    if isinstance(category[scope], bool):           # If provided boolean, search all categories within
+                        category[scope] = []                        # the scope.
+                    elif not isinstance(category[scope], list):     # or convert single category into list
                         category[scope] = [category[scope]]
                     toProcess[scope] = category[scope]
-            else:                       # Single category specified, will default to `browse` scope.
+            else:                       # Will default to `browse` scope, because no scope was specified (only category)
                 category = [category]
                 toProcess[scope] = category
-
-        except KeyError:    # Category was not set, will default to `browse` scope and all categories.
+        except KeyError:    # Category was not set, will default to all categories within `browse` scope.
             toProcess[scope] = []
 
-        finally:    # Process the categories to be actually in usable format for search() method
+        finally:    # Process the categories to use in search() method
             ret = list()
 
             for scope, categories in toProcess.iteritems():
@@ -219,20 +233,17 @@ class SceneAccessSearch(object):
             Search for entries on SceneAccess
         """
 
-        try:
-            multip = int(config['gravity_multiplier'])
-        except KeyError:
+        if not session.cookies:
+            log.debug('Logging in to %s...' % URL)
+            params = {'username': config['username'],
+                      'password': config['password'],
+                      'submit': 'come on in'}
+            session.post(URL + 'login', data=params)
+
+        if config.has_key('gravity_multiplier'):
+            multip = config['gravity_multiplier']
+        else:
             multip = 1
-
-        # Login...
-        params = {'username': config['username'],
-                  'password': config['password'],
-                  'submit': 'come on in'}
-
-        session = Session()
-        session.headers = {'User agent': 'Mozilla/5.0 (Windows NT 6.3; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0'}
-        log.debug('Logging in to %s...' % URL)
-        session.post(URL + 'login', data=params)
 
         # Prepare queries...
         BASE_URLS = list()
@@ -257,8 +268,8 @@ class SceneAccessSearch(object):
                     entry['title'] = result.find('a', href=re.compile(r'details\?id=\d+'))['title']
                     entry['url'] = URL + result.find('a', href=re.compile(r'.torrent$'))['href']
 
-                    entry['torrent_seeds'] = result.find('td', attrs={'class': 'ttr_seeders'}).string
-                    entry['torrent_leeches'] = result.find('td', attrs={'class': 'ttr_leechers'}).string
+                    entry['torrent_seeds'] = result.find('td', attrs={'class': 'ttr_seeders'}).text
+                    entry['torrent_leeches'] = result.find('td', attrs={'class': 'ttr_leechers'}).text
                     entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])*multip
 
                     size = result.find('td', attrs={'class': 'ttr_size'}).next

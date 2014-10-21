@@ -5,7 +5,6 @@ import functools
 import logging
 
 from flexget.plugin import PluginError
-from flexget.utils.imdb import extract_id, make_url
 from flexget.utils.template import render_from_entry
 
 log = logging.getLogger('entry')
@@ -227,16 +226,6 @@ class Entry(dict):
         if key == 'title':
             if not isinstance(value, basestring):
                 raise PluginError('Tried to set title to %r' % value)
-
-        # TODO: HACK! Implement via plugin once #348 (entry events) is implemented
-        # enforces imdb_url in same format
-        if key == 'imdb_url' and isinstance(value, basestring):
-            imdb_id = extract_id(value)
-            if imdb_id:
-                value = make_url(imdb_id)
-            else:
-                log.debug('Tried to set imdb_id to invalid imdb url: %s' % value)
-                value = None
 
         try:
             log.trace('ENTRY SET: %s = %r' % (key, value))

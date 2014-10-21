@@ -10,8 +10,6 @@ from flexget.config_schema import one_or_more
 
 log = logging.getLogger('pushbullet')
 
-__version__ = 0.1
-client_headers = {'User-Agent': 'FlexGet Pushbullet plugin/%s' % str(__version__)}
 pushbullet_url = 'https://api.pushbullet.com/api/pushes'
 
 
@@ -54,7 +52,7 @@ class OutputPushbullet(object):
         # Set a bunch of local variables from the config
         apikey = config['apikey']
 
-        client_headers['Authorization'] = 'Basic %s' % base64.b64encode(apikey)
+        client_headers = {'Authorization': 'Basic %s' % base64.b64encode(apikey)}
 
         if task.options.test:
             log.info('Test mode. Pushbullet configuration:')
