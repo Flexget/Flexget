@@ -49,16 +49,16 @@ class SearchFTP(object):
                - ... (e.g. emit_movie_queue)
         from:
             - search_ftp:
-                ftp-url:
+                url:
                   - "ftp://flexuser:flexpass@127.0.0.1:+13546"
                 search-append: 'x264'
-                replace-str: {'&': 'and'}
+                replace: {'&': 'and'}
     """
 
     schema = {
         'type': 'object',
         'properties': {
-            'ftp-url': {
+            'url': {
                 'oneOf': [
                     {'type': 'string'},
                     {'type': 'array', 'items': {'type': 'string'}},
@@ -67,7 +67,7 @@ class SearchFTP(object):
             'search-cmd': {'type': 'string', 'default': 'site search'},
             'match-regex': {'type': "string", 'format': 'regexp', 'default': '200- ([^ ]+) \([0-9]+F'},
             'search-append': {'type': 'string'},
-            'replace-str': {'type': 'object'},
+            'replace': {'type': 'object'},
             'strip-chars': {'type': 'string', 'format': 'regexp', 'default': '[\',:]'},
         },
         'required': ['ftp-url'],
