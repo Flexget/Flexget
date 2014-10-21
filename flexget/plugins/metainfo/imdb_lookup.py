@@ -385,13 +385,13 @@ class ImdbLookup(object):
                 session.commit()
                 raise plugin.PluginError('Title `%s` lookup failed' % entry['title'])
 
-            # check if this imdb page has been parsed & cached
-            movie = session.query(Movie).filter(Movie.url == entry['imdb_url']).first()
+        # check if this imdb page has been parsed & cached
+        movie = session.query(Movie).filter(Movie.url == entry['imdb_url']).first()
 
-            # If we have a movie from cache, we are done
-            if movie and not movie.expired:
-                entry.update_using_map(self.field_map, movie)
-                return
+        # If we have a movie from cache, we are done
+        if movie and not movie.expired:
+            entry.update_using_map(self.field_map, movie)
+            return
 
         # Movie was not found in cache, or was expired
         if movie is not None:
