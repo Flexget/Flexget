@@ -1,9 +1,7 @@
 #!/usr/bin/python
 
 from __future__ import unicode_literals, division, absolute_import
-import functools
 import inspect
-import socket
 import os
 import sys
 import yaml
