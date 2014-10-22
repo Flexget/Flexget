@@ -21,6 +21,11 @@ class FilterImdb(object):
       min_year: <num>
       max_year: <num>
 
+      # accept movies with any of these genres
+      accept_genres:
+        - genre1
+        - genre2
+
       # reject if genre contains any of these
       reject_genres:
         - genre1
@@ -72,6 +77,7 @@ class FilterImdb(object):
             'max_year': {'type': 'integer'},
             'min_votes': {'type': 'integer'},
             'min_score': {'type': 'number'},
+            'accept_genres': {'type': 'array', 'items': {'type': 'string'}},
             'reject_genres': {'type': 'array', 'items': {'type': 'string'}},
             'reject_languages': {'type': 'array', 'items': {'type': 'string'}},
             'accept_languages': {'type': 'array', 'items': {'type': 'string'}},
@@ -122,6 +128,17 @@ class FilterImdb(object):
             if 'max_year' in config:
                 if entry.get('imdb_year', 0) > config['max_year']:
                     reasons.append('max_year (%s > %s)' % (entry.get('imdb_year'), config['max_year']))
+            
+            if 'accept_genres' in config:
+                accepted = config['accept_genres']
+                accept_genre = False
+                for genre in entry.get('imdb_genres', []):
+                    if genre in accepted:                
+                        accept_genre = True
+                        break
+                if accept_genre == False:
+                    reasons.append('accept_genres')
+
             if 'reject_genres' in config:
                 rejected = config['reject_genres']
                 for genre in entry.get('imdb_genres', []):

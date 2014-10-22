@@ -71,10 +71,12 @@ class TestImdb(FlexGetBase):
             mock:
               - {title: 'The Matrix', imdb_url: 'http://www.imdb.com/title/tt0133093/'}
               - {title: 'Terms of Endearment', imdb_url: 'http://www.imdb.com/title/tt0086425/'}
+              - {title: 'Frozen', imdb_url: 'http://www.imdb.com/title/tt2294629/'}
             imdb:
               reject_genres:
                 - drama
-            # No accept_genres?!
+              accept_genres:
+                - sci-fi
 
           language:
             mock:
@@ -187,10 +189,16 @@ class TestImdb(FlexGetBase):
         toe = (self.task.find_entry(imdb_name='Terms of Endearment')['imdb_genres'])
         assert toe == ['comedy', 'drama'], \
             'Could not find genres for Terms of Endearment'
+        frozen = (self.task.find_entry(imdb_name='Frozen')['imdb_genres'])    
+        assert frozen == ['animation', 'adventure', 'comedy'], \
+            'Could not find genres for Frozen'
+        
         assert self.task.find_entry('accepted', imdb_name='The Matrix'), \
             'The Matrix should\'ve been accepted'
         assert not self.task.find_entry('rejected', title='Terms of Endearment'), \
             'Terms of Endearment should have been rejected'
+        assert not self.task.find_entry('rejected', title='Frozen'), \
+            'Frozen should have been rejected'
 
     @attr(online=True)
     def test_language(self):
