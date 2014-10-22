@@ -1,0 +1,176 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.4.1 CPython/2.7.3 Windows/7]
+      method: GET
+      uri: http://api.trakt.tv/search/shows.json/6c228565a45a302e49fb7d2dab066c9ab948b7be/aoeu+htns
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4uOBQApu0wNAgAAAA==
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [EXPIRED]
+        cf-ray: [17d2057ae4450ee5-EWR]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 01:46:29 GMT']
+        expires: ['Wed, 22 Oct 2014 05:46:29 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=deff3d5c299b94f333a31f81532998ae31413942388948; expires=Mon,
+            23-Dec-2019 23:50:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.11-1~dotdeb.1]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.4.1 CPython/2.7.3 Windows/7]
+      method: GET
+      uri: http://api.trakt.tv/search/shows.json/6c228565a45a302e49fb7d2dab066c9ab948b7be/aoeu+htns
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4uOBQApu0wNAgAAAA==
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [17d2057c1f750ee5-EWR]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 01:46:29 GMT']
+        expires: ['Wed, 22 Oct 2014 05:46:29 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d00a1dfb6dec0a62d397dfe892487a7e41413942389130; expires=Mon,
+            23-Dec-2019 23:50:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.11-1~dotdeb.1]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.4.1 CPython/2.7.3 Windows/7]
+      method: GET
+      uri: http://api.trakt.tv/search/shows.json/6c228565a45a302e49fb7d2dab066c9ab948b7be/aoeu+htns
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4uOBQApu0wNAgAAAA==
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [17d2144c7e220ee5-EWR]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 01:56:35 GMT']
+        expires: ['Wed, 22 Oct 2014 05:56:35 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d8e5631219a39df38cd53f213d4ae654f1413942995918; expires=Mon,
+            23-Dec-2019 23:50:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.11-1~dotdeb.1]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.4.1 CPython/2.7.3 Windows/7]
+      method: GET
+      uri: http://api.trakt.tv/search/shows.json/6c228565a45a302e49fb7d2dab066c9ab948b7be/aoeu+htns
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4uOBQApu0wNAgAAAA==
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [17d2144d8ccf0edf-EWR]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 01:56:36 GMT']
+        expires: ['Wed, 22 Oct 2014 05:56:36 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=df26c088b186fcde044b51e59a82b53981413942996082; expires=Mon,
+            23-Dec-2019 23:50:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.11-1~dotdeb.1]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.4.3 CPython/2.7.3 Windows/7]
+      method: GET
+      uri: http://api.trakt.tv/search/shows.json/6c228565a45a302e49fb7d2dab066c9ab948b7be/aoeu+htns
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4uOBQApu0wNAgAAAA==
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [17d2595380cc0edf-EWR]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 02:43:43 GMT']
+        expires: ['Wed, 22 Oct 2014 06:43:43 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=df0aa9e667b6edae8fca01ec2d7b3918e1413945823285; expires=Mon,
+            23-Dec-2019 23:50:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.11-1~dotdeb.1]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.4.3 CPython/2.7.3 Windows/7]
+      method: GET
+      uri: http://api.trakt.tv/search/shows.json/6c228565a45a302e49fb7d2dab066c9ab948b7be/aoeu+htns
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA4uOBQApu0wNAgAAAA==
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [17d25955c9740edf-EWR]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 02:43:43 GMT']
+        expires: ['Wed, 22 Oct 2014 06:43:43 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d09c509c055950a7d6278ca9ed14c6e591413945823643; expires=Mon,
+            23-Dec-2019 23:50:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.11-1~dotdeb.1]
+      status: {code: 200, message: OK}
+version: 1

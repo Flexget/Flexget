@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import httmock
-from nose.plugins.attrib import attr
 
 from flexget.plugins.api_trakt import ApiTrakt
-from tests import FlexGetBase
+from tests import FlexGetBase, use_vcr
 
 
 lookup_series = ApiTrakt.lookup_series
@@ -45,7 +44,7 @@ class TestTraktLookup(FlexGetBase):
 
     """
 
-    @attr(online=True)
+    @use_vcr
     def test_lookup(self):
         """trakt: Test Lookup (ONLINE)"""
         self.execute_task('test')
@@ -58,7 +57,7 @@ class TestTraktLookup(FlexGetBase):
         assert self.task.find_entry(trakt_ep_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
 
-    @attr(online=True)
+    @use_vcr
     def test_unknown_series(self):
         # Test an unknown series does not cause any exceptions
         self.execute_task('test_unknown_series')
@@ -66,13 +65,13 @@ class TestTraktLookup(FlexGetBase):
         entry = self.task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
-    @attr(online=True)
+    @use_vcr
     def test_date(self):
         self.execute_task('test_date')
         entry = self.task.find_entry(title='the daily show 2012-6-6')
         assert entry.get('tvdb_id') is None, 'should not have populated trakt data'
 
-    @attr(online=True)
+    @use_vcr
     def test_absolute(self):
         self.execute_task('test_absolute')
         entry = self.task.find_entry(title='naruto 128')

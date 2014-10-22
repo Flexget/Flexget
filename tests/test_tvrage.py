@@ -1,9 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from nose.plugins.attrib import attr
-
-from tests import FlexGetBase
+from tests import FlexGetBase, use_vcr
 from flexget.manager import Session
 from flexget.plugins.api_tvrage import lookup_series
 
@@ -12,7 +10,7 @@ log = logging.getLogger('TestTvRage')
 
 class TestTvRage(FlexGetBase):
 
-    @attr(online=True)
+    @use_vcr
     def test_tvrage(self):
         with Session(expire_on_commit=False) as session:
             friends = lookup_series("Friends", session=session)
