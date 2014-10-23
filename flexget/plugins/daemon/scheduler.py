@@ -102,18 +102,10 @@ def setup_scheduler(manager):
     global scheduler
     if logging.getLogger().getEffectiveLevel() > logging.DEBUG:
         logging.getLogger('apscheduler').setLevel(logging.WARNING)
-    jobstores = {'default': SQLAlchemyJobStore(engine=manager.engine, metadata=Base.metadata)}
+    jobstores = {'default': FlexGetJobStore(engine=manager.engine, metadata=Base.metadata)}
     # If job was meant to run within last day while daemon was shutdown, run it once when continuing
     job_defaults = {'coalesce': True, 'misfire_grace_time': 60 * 60 * 24}
-    # apscheduler has a problem restoring jobs from database if we don't have a proper timezone name
-    # We'll force everything to be UTC internally in this case
-    # FlexGet #2741, upstream ticket https://bitbucket.org/agronholm/apscheduler/issue/59
-    timezone = tzlocal.get_localzone()
-    if timezone.zone == 'local':
-        log.info('Timezone name could not be determined. Scheduler will display times in UTC for any log messages. '
-                 'To resolve this set up /etc/sysconfig/clock with correct time zone name.')
-        timezone = pytz.utc
-    scheduler = BackgroundScheduler(jobstores=jobstores, job_defaults=job_defaults, timezone=timezone)
+    scheduler = BackgroundScheduler(jobstores=jobstores, job_defaults=job_defaults)
     setup_jobs(manager)
 
 
@@ -152,6 +144,32 @@ def setup_jobs(manager):
     if not scheduler.running:
         log.info('Starting scheduler')
         scheduler.start()
+
+
+class FlexGetJobStore(SQLAlchemyJobStore):
+    """
+    The default sqlalchemy jobstore does not work when there isn't a name for the local timezone.
+    This just translates the time to utc before storage.
+    FlexGet #2741, upstream ticket https://bitbucket.org/agronholm/apscheduler/issue/59
+    """
+    def __init__(self, *args, **kwargs):
+        super(FlexGetJobStore, self).__init__(*args, **kwargs)
+        if tzlocal.get_localzone().zone == 'local':
+            log.warning('Timezone name could not be determined. Scheduler will display times in UTC for any log'
+                        'messages. To resolve this set up /etc/timezone with correct time zone name.')
+            self.use_utc = True
+        else:
+            self.use_utc = False
+
+    def add_job(self, job):
+        if self.use_utc:
+            job.next_run_time = job.next_run_time.astimezone(pytz.utc)
+        super(FlexGetJobStore, self).add_job(job)
+
+    def update_job(self, job):
+        if self.use_utc:
+            job.next_run_time = job.next_run_time.astimezone(pytz.utc)
+        super(FlexGetJobStore, self).update_job(job)
 
 
 @event('manager.daemon.completed')
