@@ -8,6 +8,7 @@ import yaml
 import logging
 import warnings
 from contextlib import contextmanager
+from functools import wraps
 
 import mock
 from nose.plugins.attrib import attr
@@ -51,7 +52,7 @@ def setup_once():
         setup_logging_level()
         warnings.simplefilter('error')
         # VCR.py mocked functions not handle ssl verification well
-        urllib3.disable_warnings(urllib3.exceptions.SecurityWarning)
+        warnings.simplefilter('ignore', urllib3.exceptions.SecurityWarning)
         load_plugins()
         # store options for MockManager
         test_arguments = get_parser().parse_args(['execute'])
@@ -79,7 +80,6 @@ def use_vcr(func):
     elif vcr.record_mode == 'once':
         online = not os.path.exists(cassette_path)
     func = attr(online=online, vcr=True)(func)
-    func = vcr.use_cassette(cassette_name)(func)
     # If we are not going online, disable domain delay during test
     if not online:
         func = mock.patch('flexget.utils.requests.wait_for_domain', new=mock.MagicMock())(func)
@@ -87,8 +87,18 @@ def use_vcr(func):
     if sys.platform.startswith('win') and vcr.record_mode != 'all' and os.path.exists(cassette_path):
         func = mock.patch('requests.packages.urllib3.connectionpool.is_connection_dropped',
                           new=mock.MagicMock(return_value=False))(func)
+    @wraps(func)
+    def decorator(*args, **kwargs):
+        with vcr.use_cassette(cassette_name) as cassette:
+            try:
+                func(*args, cassette=cassette, **kwargs)
+            except TypeError:
+                func(*args, **kwargs)
 
-    return func
+    if vcr.record_mode == 'off':
+        return func
+    else:
+        return decorator
 
 
 class MockManager(Manager):
