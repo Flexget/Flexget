@@ -7,7 +7,7 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_raises
 
 from flexget.task import TaskAbort
-from tests import FlexGetBase
+from tests import FlexGetBase, use_vcr
 
 # TODO more checks: fail_html, etc.
 class TestDownload(FlexGetBase):
@@ -33,19 +33,19 @@ class TestDownload(FlexGetBase):
             download: ~/
       """
 
-    @attr(online=True)
+    @use_vcr
     def test_path_and_temp(self):
         """Download plugin: Path and Temp directories set"""
         self.execute_task('path_and_temp')
         assert not self.task.aborted, 'Task should not have aborted'
 
-    @attr(online=True)
+    @use_vcr
     def test_just_path(self):
         """Download plugin: Path directory set as dict"""
         self.execute_task('just_path')
         assert not self.task.aborted, 'Task should not have aborted'
 
-    @attr(online=True)
+    @use_vcr
     def test_just_string(self):
         """Download plugin: Path directory set as string"""
         self.execute_task('just_string')

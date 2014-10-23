@@ -1,0 +1,1313 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Connection: [close]
+        Host: [services.tvrage.com]
+        User-Agent: [Python-urllib/2.7]
+      method: GET
+      uri: http://services.tvrage.com/feeds/search.php?show=Friends
+    response:
+      body: {string: '<?xml version="1.0" encoding="UTF-8" ?>
+
+
+          <Results>
+
+          <show>
+
+          <showid>3616</showid>
+
+          <name>Friends</name>
+
+          <link>http://www.tvrage.com/Friends</link>
+
+          <country>US</country>
+
+          <started>1994</started>
+
+          <ended>2004</ended>
+
+          <seasons>10</seasons>
+
+          <status>Ended</status>
+
+          <classification>Scripted</classification>
+
+          <genres><genre>Comedy</genre><genre>Romance/Dating</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>12858</showid>
+
+          <name>Friends (1979)</name>
+
+          <link>http://www.tvrage.com/Friends_1979</link>
+
+          <country>US</country>
+
+          <started>1979</started>
+
+          <ended>1979</ended>
+
+          <seasons>1</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Scripted</classification>
+
+          <genres><genre>Drama</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>3587</showid>
+
+          <name>Foster&#39;s Home for Imaginary Friends</name>
+
+          <link>http://www.tvrage.com/Fosters_Home_for_Imaginary_Friends</link>
+
+          <country>US</country>
+
+          <started>2004</started>
+
+          <ended>2009</ended>
+
+          <seasons>6</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Animation</classification>
+
+          <genres><genre>Animation General</genre><genre>Children</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>27689</showid>
+
+          <name>My Little Pony: Friendship is Magic</name>
+
+          <link>http://www.tvrage.com/My_Little_Pony-Friendship_is_Magic</link>
+
+          <country>US</country>
+
+          <started>2010</started>
+
+          <ended>0</ended>
+
+          <seasons>5</seasons>
+
+          <status>Returning Series</status>
+
+          <classification>Animation</classification>
+
+          <genres><genre>Children Cartoons</genre><genre>Children</genre><genre>Family</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>24665</showid>
+
+          <name>Friends With Benefits</name>
+
+          <link>http://www.tvrage.com/Friends_With_Benefits</link>
+
+          <country>US</country>
+
+          <started>2011</started>
+
+          <ended>2011</ended>
+
+          <seasons>1</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Scripted</classification>
+
+          <genres><genre></genre><genre>Comedy</genre><genre>Romance/Dating</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>6340</showid>
+
+          <name>Thomas The Tank Engine &amp; Friends</name>
+
+          <link>http://www.tvrage.com/Thomas_The_Tank_Engine_and_Friends</link>
+
+          <country>UK</country>
+
+          <started>1984</started>
+
+          <ended>0</ended>
+
+          <seasons>18</seasons>
+
+          <status>Returning Series</status>
+
+          <classification>Scripted</classification>
+
+          <genres><genre>Children</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>2715</showid>
+
+          <name>Barney &amp; Friends</name>
+
+          <link>http://www.tvrage.com/Barney_And_Friends</link>
+
+          <country>US</country>
+
+          <started>1992</started>
+
+          <ended>2010</ended>
+
+          <seasons>14</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Variety</classification>
+
+          <genres><genre>Children</genre><genre>Educational</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>34666</showid>
+
+          <name>Friends with Better Lives</name>
+
+          <link>http://www.tvrage.com/shows/id-34666</link>
+
+          <country>US</country>
+
+          <started>2014</started>
+
+          <ended>0</ended>
+
+          <seasons>1</seasons>
+
+          <status>Canceled</status>
+
+          <classification>Scripted</classification>
+
+          <genres><genre>Comedy</genre><genre>Family</genre><genre>Lifestyle</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>8226</showid>
+
+          <name>Happy Tree Friends</name>
+
+          <link>http://www.tvrage.com/shows/id-8226</link>
+
+          <country>US</country>
+
+          <started>2006</started>
+
+          <ended>2006</ended>
+
+          <seasons>1</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Animation</classification>
+
+          <genres><genre>Adult Cartoons</genre><genre>Horror/Supernatural</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>28370</showid>
+
+          <name>Best Friends Forever</name>
+
+          <link>http://www.tvrage.com/Best_Friends_Forever</link>
+
+          <country>US</country>
+
+          <started>2012</started>
+
+          <ended>2012</ended>
+
+          <seasons>1</seasons>
+
+          <status>Canceled</status>
+
+          <classification>Scripted</classification>
+
+          <genres><genre>Comedy</genre><genre>Family</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>3644</showid>
+
+          <name>Garfield &amp; Friends</name>
+
+          <link>http://www.tvrage.com/shows/id-3644</link>
+
+          <country>US</country>
+
+          <started>1988</started>
+
+          <ended>1994</ended>
+
+          <seasons>7</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Animation</classification>
+
+          <genres><genre>Animation General</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>4587</showid>
+
+          <name>My Little Pony and Friends</name>
+
+          <link>http://www.tvrage.com/shows/id-4587</link>
+
+          <country>US</country>
+
+          <started>1986</started>
+
+          <ended>1990</ended>
+
+          <seasons>5</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Animation</classification>
+
+          <genres><genre>Animation General</genre><genre>Children</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>5298</showid>
+
+          <name>Spider-Man and His Amazing Friends</name>
+
+          <link>http://www.tvrage.com/shows/id-5298</link>
+
+          <country>US</country>
+
+          <started>1981</started>
+
+          <ended>1984</ended>
+
+          <seasons>3</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Animation</classification>
+
+          <genres><genre>Animation General</genre><genre>Action</genre><genre>Adventure</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>450</showid>
+
+          <name>3 Friends and Jerry</name>
+
+          <link>http://www.tvrage.com/shows/id-450</link>
+
+          <country>UK</country>
+
+          <started>1998</started>
+
+          <ended>1999</ended>
+
+          <seasons>3</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Animation</classification>
+
+          <genres><genre>Animation General</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>1897</showid>
+
+          <name>Fat Friends</name>
+
+          <link>http://www.tvrage.com/shows/id-1897</link>
+
+          <country>UK</country>
+
+          <started>2000</started>
+
+          <ended>2005</ended>
+
+          <seasons>4</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Scripted</classification>
+
+          <genres><genre>Drama</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>12693</showid>
+
+          <name>My Friends Tigger &amp; Pooh</name>
+
+          <link>http://www.tvrage.com/shows/id-12693</link>
+
+          <country>US</country>
+
+          <started>2007</started>
+
+          <ended>2010</ended>
+
+          <seasons>1</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Animation</classification>
+
+          <genres><genre>Children Cartoons</genre><genre>Adventure</genre><genre>Family</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>18729</showid>
+
+          <name>Mutual Friends</name>
+
+          <link>http://www.tvrage.com/shows/id-18729</link>
+
+          <country>UK</country>
+
+          <started>2008</started>
+
+          <ended>2008</ended>
+
+          <seasons>1</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Scripted</classification>
+
+          <genres><genre>Comedy</genre><genre>Drama</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>440</showid>
+
+          <name>Just Good Friends</name>
+
+          <link>http://www.tvrage.com/shows/id-440</link>
+
+          <country>UK</country>
+
+          <started>1983</started>
+
+          <ended>1986</ended>
+
+          <seasons>3</seasons>
+
+          <status>Canceled/Ended</status>
+
+          <classification>Scripted</classification>
+
+          <genres><genre>Comedy</genre></genres>
+
+          </show>
+
+          <show>
+
+          <showid>10355</showid>
+
+          <name>Friends Like These</name>
+
+          <link>http://www.tvrage.com/shows/id-10355</link>
+
+          <country>UK</country>
+
+          <started>1999</started>
+
+          <ended>2003</ended>
+
+          <seasons>6</seasons>
+
+          <status>Ended</status>
+
+          <classification>Game Show</classification>
+
+          <genres></genres>
+
+          </show>
+
+          <show>
+
+          <showid>6978</showid>
+
+          <name>Fox &amp; Friends</name>
+
+          <link>http://www.tvrage.com/Fox_and_Friends</link>
+
+          <country>US</country>
+
+          <started>1998</started>
+
+          <ended>0</ended>
+
+          <seasons>17</seasons>
+
+          <status>Returning Series</status>
+
+          <classification>News</classification>
+
+          <genres></genres>
+
+          </show>
+
+          </Results>'}
+      headers:
+        connection: [close]
+        content-length: ['7004']
+        content-type: [text/xml; charset=UTF-8]
+        date: ['Wed, 22 Oct 2014 02:53:05 GMT']
+        server: [Apache/2.2.22 (Ubuntu)]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.4.6-1ubuntu1.5]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Connection: [close]
+        Host: [services.tvrage.com]
+        User-Agent: [Python-urllib/2.7]
+      method: GET
+      uri: http://services.tvrage.com/feeds/episode_list.php?sid=3616
+    response:
+      body: {string: '<?xml version="1.0" encoding="UTF-8" ?>
+
+
+
+          <Show>
+
+          <name>Friends</name>
+
+          <totalseasons>10</totalseasons>
+
+          <Episodelist>
+
+
+          <Season no="1">
+
+          <episode><epnum>1</epnum><seasonnum>01</seasonnum><prodnum>475085</prodnum><airdate>1994-09-22</airdate><link>http://www.tvrage.com/Friends/episodes/65035</link><title>The
+          One Where It All Began</title></episode>
+
+          <episode><epnum>2</epnum><seasonnum>02</seasonnum><prodnum>456652</prodnum><airdate>1994-09-29</airdate><link>http://www.tvrage.com/Friends/episodes/65036</link><title>The
+          One With the Sonogram at the End</title></episode>
+
+          <episode><epnum>3</epnum><seasonnum>03</seasonnum><prodnum>456651</prodnum><airdate>1994-10-06</airdate><link>http://www.tvrage.com/Friends/episodes/65037</link><title>The
+          One With the Thumb</title></episode>
+
+          <episode><epnum>4</epnum><seasonnum>04</seasonnum><prodnum>456654</prodnum><airdate>1994-10-13</airdate><link>http://www.tvrage.com/Friends/episodes/65038</link><title>The
+          One With George Stephanopoulos</title></episode>
+
+          <episode><epnum>5</epnum><seasonnum>05</seasonnum><prodnum>456653</prodnum><airdate>1994-10-20</airdate><link>http://www.tvrage.com/Friends/episodes/65039</link><title>The
+          One With the East German Laundry Detergent</title></episode>
+
+          <episode><epnum>6</epnum><seasonnum>06</seasonnum><prodnum>456655</prodnum><airdate>1994-10-27</airdate><link>http://www.tvrage.com/Friends/episodes/65040</link><title>The
+          One With the Butt</title></episode>
+
+          <episode><epnum>7</epnum><seasonnum>07</seasonnum><prodnum>456656</prodnum><airdate>1994-11-03</airdate><link>http://www.tvrage.com/Friends/episodes/65041</link><title>The
+          One With the Blackout</title></episode>
+
+          <episode><epnum>8</epnum><seasonnum>08</seasonnum><prodnum>456657</prodnum><airdate>1994-11-10</airdate><link>http://www.tvrage.com/Friends/episodes/65042</link><title>The
+          One Where Nana Dies Twice</title></episode>
+
+          <episode><epnum>9</epnum><seasonnum>09</seasonnum><prodnum>456659</prodnum><airdate>1994-11-17</airdate><link>http://www.tvrage.com/Friends/episodes/65043</link><title>The
+          One Where Underdog Gets Away</title></episode>
+
+          <episode><epnum>10</epnum><seasonnum>10</seasonnum><prodnum>456661</prodnum><airdate>1994-12-15</airdate><link>http://www.tvrage.com/Friends/episodes/65044</link><title>The
+          One With the Monkey</title></episode>
+
+          <episode><epnum>11</epnum><seasonnum>11</seasonnum><prodnum>456660</prodnum><airdate>1995-01-05</airdate><link>http://www.tvrage.com/Friends/episodes/65045</link><title>The
+          One With Mrs. Bing</title></episode>
+
+          <episode><epnum>12</epnum><seasonnum>12</seasonnum><prodnum>456658</prodnum><airdate>1995-01-12</airdate><link>http://www.tvrage.com/Friends/episodes/65046</link><title>The
+          One With the Dozen Lasagnas</title></episode>
+
+          <episode><epnum>13</epnum><seasonnum>13</seasonnum><prodnum>456664</prodnum><airdate>1995-01-19</airdate><link>http://www.tvrage.com/Friends/episodes/65047</link><title>The
+          One With the Boobies</title></episode>
+
+          <episode><epnum>14</epnum><seasonnum>14</seasonnum><prodnum>456667</prodnum><airdate>1995-02-09</airdate><link>http://www.tvrage.com/Friends/episodes/65048</link><title>The
+          One With the Candy Hearts</title></episode>
+
+          <episode><epnum>15</epnum><seasonnum>15</seasonnum><prodnum>456663</prodnum><airdate>1995-02-16</airdate><link>http://www.tvrage.com/Friends/episodes/65049</link><title>The
+          One With the Stoned Guy</title></episode>
+
+          <episode><epnum>16</epnum><seasonnum>16</seasonnum><prodnum>456665</prodnum><airdate>1995-02-23</airdate><link>http://www.tvrage.com/Friends/episodes/65050</link><title>The
+          One With Two Parts (1)</title></episode>
+
+          <episode><epnum>17</epnum><seasonnum>17</seasonnum><prodnum>456666</prodnum><airdate>1995-02-23</airdate><link>http://www.tvrage.com/Friends/episodes/65051</link><title>The
+          One With Two Parts (2)</title></episode>
+
+          <episode><epnum>18</epnum><seasonnum>18</seasonnum><prodnum>456662</prodnum><airdate>1995-03-02</airdate><link>http://www.tvrage.com/Friends/episodes/65052</link><title>The
+          One With All the Poker</title></episode>
+
+          <episode><epnum>19</epnum><seasonnum>19</seasonnum><prodnum>456668</prodnum><airdate>1995-03-09</airdate><link>http://www.tvrage.com/Friends/episodes/65053</link><title>The
+          One Where the Monkey Gets Away</title></episode>
+
+          <episode><epnum>20</epnum><seasonnum>20</seasonnum><prodnum>456669</prodnum><airdate>1995-04-06</airdate><link>http://www.tvrage.com/Friends/episodes/65054</link><title>The
+          One With the Evil Orthodontist</title></episode>
+
+          <episode><epnum>21</epnum><seasonnum>21</seasonnum><prodnum>456671</prodnum><airdate>1995-04-27</airdate><link>http://www.tvrage.com/Friends/episodes/65055</link><title>The
+          One With the Fake Monica</title></episode>
+
+          <episode><epnum>22</epnum><seasonnum>22</seasonnum><prodnum>456670</prodnum><airdate>1995-05-04</airdate><link>http://www.tvrage.com/Friends/episodes/65056</link><title>The
+          One With the Ick Factor</title></episode>
+
+          <episode><epnum>23</epnum><seasonnum>23</seasonnum><prodnum>456672</prodnum><airdate>1995-05-11</airdate><link>http://www.tvrage.com/Friends/episodes/65057</link><title>The
+          One With the Birth</title></episode>
+
+          <episode><epnum>24</epnum><seasonnum>24</seasonnum><prodnum>456673</prodnum><airdate>1995-05-18</airdate><link>http://www.tvrage.com/Friends/episodes/65058</link><title>The
+          One Where Rachel Finds Out</title></episode>
+
+          </Season>
+
+
+          <Season no="2">
+
+          <episode><epnum>25</epnum><seasonnum>01</seasonnum><prodnum>457301</prodnum><airdate>1995-09-21</airdate><link>http://www.tvrage.com/Friends/episodes/65059</link><title>The
+          One With Ross''s New Girlfriend</title></episode>
+
+          <episode><epnum>26</epnum><seasonnum>02</seasonnum><prodnum>457302</prodnum><airdate>1995-09-28</airdate><link>http://www.tvrage.com/Friends/episodes/65060</link><title>The
+          One With the Breast Milk</title></episode>
+
+          <episode><epnum>27</epnum><seasonnum>03</seasonnum><prodnum>457303</prodnum><airdate>1995-10-05</airdate><link>http://www.tvrage.com/Friends/episodes/65061</link><title>The
+          One Where Heckles Dies</title></episode>
+
+          <episode><epnum>28</epnum><seasonnum>04</seasonnum><prodnum>457305</prodnum><airdate>1995-10-12</airdate><link>http://www.tvrage.com/Friends/episodes/65062</link><title>The
+          One With Phoebe''s Husband</title></episode>
+
+          <episode><epnum>29</epnum><seasonnum>05</seasonnum><prodnum>457304</prodnum><airdate>1995-10-19</airdate><link>http://www.tvrage.com/Friends/episodes/65063</link><title>The
+          One With Five Steaks and an Eggplant</title></episode>
+
+          <episode><epnum>30</epnum><seasonnum>06</seasonnum><prodnum>457306</prodnum><airdate>1995-11-02</airdate><link>http://www.tvrage.com/Friends/episodes/65064</link><title>The
+          One With the Baby on the Bus</title></episode>
+
+          <episode><epnum>31</epnum><seasonnum>07</seasonnum><prodnum>457307</prodnum><airdate>1995-11-09</airdate><link>http://www.tvrage.com/Friends/episodes/65065</link><title>The
+          One Where Ross Finds Out</title></episode>
+
+          <episode><epnum>32</epnum><seasonnum>08</seasonnum><prodnum>457308</prodnum><airdate>1995-11-16</airdate><link>http://www.tvrage.com/Friends/episodes/65066</link><title>The
+          One With the List</title></episode>
+
+          <episode><epnum>33</epnum><seasonnum>09</seasonnum><prodnum>457309</prodnum><airdate>1995-12-14</airdate><link>http://www.tvrage.com/Friends/episodes/65067</link><title>The
+          One With Phoebe''s Dad</title></episode>
+
+          <episode><epnum>34</epnum><seasonnum>10</seasonnum><prodnum>457311</prodnum><airdate>1996-01-04</airdate><link>http://www.tvrage.com/Friends/episodes/65068</link><title>The
+          One With Russ</title></episode>
+
+          <episode><epnum>35</epnum><seasonnum>11</seasonnum><prodnum>457312</prodnum><airdate>1996-01-18</airdate><link>http://www.tvrage.com/Friends/episodes/65069</link><title>The
+          One With the Lesbian Wedding</title></episode>
+
+          <episode><epnum>36</epnum><seasonnum>12</seasonnum><prodnum>457313</prodnum><airdate>1996-01-28</airdate><link>http://www.tvrage.com/Friends/episodes/65070</link><title>The
+          One After the Superbowl (1)</title></episode>
+
+          <episode><epnum>37</epnum><seasonnum>13</seasonnum><prodnum>457314</prodnum><airdate>1996-01-28</airdate><link>http://www.tvrage.com/Friends/episodes/65071</link><title>The
+          One After the Superbowl (2)</title></episode>
+
+          <episode><epnum>38</epnum><seasonnum>14</seasonnum><prodnum>457310</prodnum><airdate>1996-02-01</airdate><link>http://www.tvrage.com/Friends/episodes/65072</link><title>The
+          One With the Prom Video</title></episode>
+
+          <episode><epnum>39</epnum><seasonnum>15</seasonnum><prodnum>457315</prodnum><airdate>1996-02-08</airdate><link>http://www.tvrage.com/Friends/episodes/65073</link><title>The
+          One Where Ross and Rachel... You Know</title></episode>
+
+          <episode><epnum>40</epnum><seasonnum>16</seasonnum><prodnum>457316</prodnum><airdate>1996-02-15</airdate><link>http://www.tvrage.com/Friends/episodes/65074</link><title>The
+          One Where Joey Moves Out</title></episode>
+
+          <episode><epnum>41</epnum><seasonnum>17</seasonnum><prodnum>457317</prodnum><airdate>1996-02-22</airdate><link>http://www.tvrage.com/Friends/episodes/65075</link><title>The
+          One Where Eddie Moves In</title></episode>
+
+          <episode><epnum>42</epnum><seasonnum>18</seasonnum><prodnum>457318</prodnum><airdate>1996-03-21</airdate><link>http://www.tvrage.com/Friends/episodes/65076</link><title>The
+          One Where Dr. Ramoray Dies</title></episode>
+
+          <episode><epnum>43</epnum><seasonnum>19</seasonnum><prodnum>457319</prodnum><airdate>1996-03-28</airdate><link>http://www.tvrage.com/Friends/episodes/65077</link><title>The
+          One Where Eddie Won''t Go</title></episode>
+
+          <episode><epnum>44</epnum><seasonnum>20</seasonnum><prodnum>457320</prodnum><airdate>1996-04-04</airdate><link>http://www.tvrage.com/Friends/episodes/65078</link><title>The
+          One Where Old Yeller Dies</title></episode>
+
+          <episode><epnum>45</epnum><seasonnum>21</seasonnum><prodnum>457321</prodnum><airdate>1996-04-25</airdate><link>http://www.tvrage.com/Friends/episodes/65079</link><title>The
+          One With the Bullies</title></episode>
+
+          <episode><epnum>46</epnum><seasonnum>22</seasonnum><prodnum>457322</prodnum><airdate>1996-05-02</airdate><link>http://www.tvrage.com/Friends/episodes/65080</link><title>The
+          One With the Two Parties</title></episode>
+
+          <episode><epnum>47</epnum><seasonnum>23</seasonnum><prodnum>457324</prodnum><airdate>1996-05-09</airdate><link>http://www.tvrage.com/Friends/episodes/65081</link><title>The
+          One With the Chicken Pox</title></episode>
+
+          <episode><epnum>48</epnum><seasonnum>24</seasonnum><prodnum>457323</prodnum><airdate>1996-05-16</airdate><link>http://www.tvrage.com/Friends/episodes/65082</link><title>The
+          One With Barry and Mindy''s Wedding</title></episode>
+
+          </Season>
+
+
+          <Season no="3">
+
+          <episode><epnum>49</epnum><seasonnum>01</seasonnum><prodnum>465251</prodnum><airdate>1996-09-16</airdate><link>http://www.tvrage.com/Friends/episodes/65083</link><title>The
+          One With the Princess Leia Fantasy</title></episode>
+
+          <episode><epnum>50</epnum><seasonnum>02</seasonnum><prodnum>465252</prodnum><airdate>1996-09-26</airdate><link>http://www.tvrage.com/Friends/episodes/65084</link><title>The
+          One Where No One''s Ready</title></episode>
+
+          <episode><epnum>51</epnum><seasonnum>03</seasonnum><prodnum>465253</prodnum><airdate>1996-10-03</airdate><link>http://www.tvrage.com/Friends/episodes/65085</link><title>The
+          One With the Jam</title></episode>
+
+          <episode><epnum>52</epnum><seasonnum>04</seasonnum><prodnum>465254</prodnum><airdate>1996-10-10</airdate><link>http://www.tvrage.com/Friends/episodes/65086</link><title>The
+          One With the Metaphorical Tunnel</title></episode>
+
+          <episode><epnum>53</epnum><seasonnum>05</seasonnum><prodnum>465255</prodnum><airdate>1996-10-17</airdate><link>http://www.tvrage.com/Friends/episodes/65087</link><title>The
+          One With Frank Jr.</title></episode>
+
+          <episode><epnum>54</epnum><seasonnum>06</seasonnum><prodnum>465256</prodnum><airdate>1996-10-31</airdate><link>http://www.tvrage.com/Friends/episodes/65088</link><title>The
+          One With the Flashback</title></episode>
+
+          <episode><epnum>55</epnum><seasonnum>07</seasonnum><prodnum>465257</prodnum><airdate>1996-11-07</airdate><link>http://www.tvrage.com/Friends/episodes/65089</link><title>The
+          One With the Race Car Bed</title></episode>
+
+          <episode><epnum>56</epnum><seasonnum>08</seasonnum><prodnum>465258</prodnum><airdate>1996-11-14</airdate><link>http://www.tvrage.com/Friends/episodes/65090</link><title>The
+          One With the Giant Poking Device</title></episode>
+
+          <episode><epnum>57</epnum><seasonnum>09</seasonnum><prodnum>465259</prodnum><airdate>1996-11-21</airdate><link>http://www.tvrage.com/Friends/episodes/65091</link><title>The
+          One With the Football</title></episode>
+
+          <episode><epnum>58</epnum><seasonnum>10</seasonnum><prodnum>465260</prodnum><airdate>1996-12-12</airdate><link>http://www.tvrage.com/Friends/episodes/65092</link><title>The
+          One Where Rachel Quits</title></episode>
+
+          <episode><epnum>59</epnum><seasonnum>11</seasonnum><prodnum>465261</prodnum><airdate>1997-01-09</airdate><link>http://www.tvrage.com/Friends/episodes/65093</link><title>The
+          One Where Chandler Can''t Remember Which Sister</title></episode>
+
+          <episode><epnum>60</epnum><seasonnum>12</seasonnum><prodnum>465262</prodnum><airdate>1997-01-16</airdate><link>http://www.tvrage.com/Friends/episodes/65094</link><title>The
+          One With All the Jealousy</title></episode>
+
+          <episode><epnum>61</epnum><seasonnum>13</seasonnum><prodnum>465265</prodnum><airdate>1997-01-30</airdate><link>http://www.tvrage.com/Friends/episodes/65095</link><title>The
+          One Where Monica and Richard are Just Friends</title></episode>
+
+          <episode><epnum>62</epnum><seasonnum>14</seasonnum><prodnum>465266</prodnum><airdate>1997-02-06</airdate><link>http://www.tvrage.com/Friends/episodes/65096</link><title>The
+          One With Phoebe''s Ex-Partner</title></episode>
+
+          <episode><epnum>63</epnum><seasonnum>15</seasonnum><prodnum>465263</prodnum><airdate>1997-02-13</airdate><link>http://www.tvrage.com/Friends/episodes/65097</link><title>The
+          One Where Ross and Rachel Take a Break (1)</title></episode>
+
+          <episode><epnum>64</epnum><seasonnum>16</seasonnum><prodnum>465264</prodnum><airdate>1997-02-20</airdate><link>http://www.tvrage.com/Friends/episodes/65098</link><title>The
+          One the Morning After (2)</title></episode>
+
+          <episode><epnum>65</epnum><seasonnum>17</seasonnum><prodnum>465267</prodnum><airdate>1997-03-06</airdate><link>http://www.tvrage.com/Friends/episodes/65099</link><title>The
+          One Without the Ski Trip</title></episode>
+
+          <episode><epnum>66</epnum><seasonnum>18</seasonnum><prodnum>465269</prodnum><airdate>1997-03-13</airdate><link>http://www.tvrage.com/Friends/episodes/65100</link><title>The
+          One With the Hypnosis Tape</title></episode>
+
+          <episode><epnum>67</epnum><seasonnum>19</seasonnum><prodnum>465268</prodnum><airdate>1997-03-27</airdate><link>http://www.tvrage.com/Friends/episodes/65101</link><title>The
+          One With the Tiny T-Shirt</title></episode>
+
+          <episode><epnum>68</epnum><seasonnum>20</seasonnum><prodnum>465270</prodnum><airdate>1997-04-10</airdate><link>http://www.tvrage.com/Friends/episodes/65102</link><title>The
+          One With the Dollhouse</title></episode>
+
+          <episode><epnum>69</epnum><seasonnum>21</seasonnum><prodnum>465271</prodnum><airdate>1997-04-17</airdate><link>http://www.tvrage.com/Friends/episodes/65103</link><title>The
+          One With a Chick and a Duck</title></episode>
+
+          <episode><epnum>70</epnum><seasonnum>22</seasonnum><prodnum>465272</prodnum><airdate>1997-04-24</airdate><link>http://www.tvrage.com/Friends/episodes/65104</link><title>The
+          One With the Screamer</title></episode>
+
+          <episode><epnum>71</epnum><seasonnum>23</seasonnum><prodnum>465274</prodnum><airdate>1997-05-01</airdate><link>http://www.tvrage.com/Friends/episodes/65105</link><title>The
+          One With Ross''s Thing</title></episode>
+
+          <episode><epnum>72</epnum><seasonnum>24</seasonnum><prodnum>465273</prodnum><airdate>1997-05-08</airdate><link>http://www.tvrage.com/Friends/episodes/65106</link><title>The
+          One With the Ultimate Fighting Champion</title></episode>
+
+          <episode><epnum>73</epnum><seasonnum>25</seasonnum><prodnum>465275</prodnum><airdate>1997-05-15</airdate><link>http://www.tvrage.com/Friends/episodes/65107</link><title>The
+          One at the Beach</title></episode>
+
+          </Season>
+
+
+          <Season no="4">
+
+          <episode><epnum>74</epnum><seasonnum>01</seasonnum><prodnum>466601</prodnum><airdate>1997-09-25</airdate><link>http://www.tvrage.com/Friends/episodes/65108</link><title>The
+          One With the Jellyfish</title></episode>
+
+          <episode><epnum>75</epnum><seasonnum>02</seasonnum><prodnum>466602</prodnum><airdate>1997-10-02</airdate><link>http://www.tvrage.com/Friends/episodes/65109</link><title>The
+          One With the Cat</title></episode>
+
+          <episode><epnum>76</epnum><seasonnum>03</seasonnum><prodnum>466603</prodnum><airdate>1997-10-09</airdate><link>http://www.tvrage.com/Friends/episodes/65110</link><title>The
+          One With the ''Cuffs</title></episode>
+
+          <episode><epnum>77</epnum><seasonnum>04</seasonnum><prodnum>466604</prodnum><airdate>1997-10-16</airdate><link>http://www.tvrage.com/Friends/episodes/65111</link><title>The
+          One With the Ballroom Dancing</title></episode>
+
+          <episode><epnum>78</epnum><seasonnum>05</seasonnum><prodnum>466605</prodnum><airdate>1997-10-30</airdate><link>http://www.tvrage.com/Friends/episodes/65112</link><title>The
+          One With Joey''s New Girlfriend</title></episode>
+
+          <episode><epnum>79</epnum><seasonnum>06</seasonnum><prodnum>466606</prodnum><airdate>1997-11-06</airdate><link>http://www.tvrage.com/Friends/episodes/65113</link><title>The
+          One With the Dirty Girl</title></episode>
+
+          <episode><epnum>80</epnum><seasonnum>07</seasonnum><prodnum>466607</prodnum><airdate>1997-11-13</airdate><link>http://www.tvrage.com/Friends/episodes/65114</link><title>The
+          One Where Chandler Crosses the Line</title></episode>
+
+          <episode><epnum>81</epnum><seasonnum>08</seasonnum><prodnum>466608</prodnum><airdate>1997-11-20</airdate><link>http://www.tvrage.com/Friends/episodes/65115</link><title>The
+          One With Chandler in a Box</title></episode>
+
+          <episode><epnum>82</epnum><seasonnum>09</seasonnum><prodnum>466609</prodnum><airdate>1997-12-11</airdate><link>http://www.tvrage.com/Friends/episodes/65116</link><title>The
+          One Where They''re Going to Party!</title></episode>
+
+          <episode><epnum>83</epnum><seasonnum>10</seasonnum><prodnum>466612</prodnum><airdate>1997-12-18</airdate><link>http://www.tvrage.com/Friends/episodes/65117</link><title>The
+          One With the Girl from Poughkeepsie</title></episode>
+
+          <episode><epnum>84</epnum><seasonnum>11</seasonnum><prodnum>466610</prodnum><airdate>1998-01-08</airdate><link>http://www.tvrage.com/Friends/episodes/65118</link><title>The
+          One With Phoebe''s Uterus</title></episode>
+
+          <episode><epnum>85</epnum><seasonnum>12</seasonnum><prodnum>466611</prodnum><airdate>1998-01-15</airdate><link>http://www.tvrage.com/Friends/episodes/65119</link><title>The
+          One With the Embryos</title></episode>
+
+          <episode><epnum>86</epnum><seasonnum>13</seasonnum><prodnum>466613</prodnum><airdate>1998-01-29</airdate><link>http://www.tvrage.com/Friends/episodes/65120</link><title>The
+          One With Rachel''s Crush</title></episode>
+
+          <episode><epnum>87</epnum><seasonnum>14</seasonnum><prodnum>466614</prodnum><airdate>1998-02-05</airdate><link>http://www.tvrage.com/Friends/episodes/65121</link><title>The
+          One With Joey''s Dirty Day</title></episode>
+
+          <episode><epnum>88</epnum><seasonnum>15</seasonnum><prodnum>466617</prodnum><airdate>1998-02-26</airdate><link>http://www.tvrage.com/Friends/episodes/65122</link><title>The
+          One With All the Rugby</title></episode>
+
+          <episode><epnum>89</epnum><seasonnum>16</seasonnum><prodnum>466615</prodnum><airdate>1998-03-19</airdate><link>http://www.tvrage.com/Friends/episodes/65123</link><title>The
+          One With the Fake Party</title></episode>
+
+          <episode><epnum>90</epnum><seasonnum>17</seasonnum><prodnum>466616</prodnum><airdate>1998-03-26</airdate><link>http://www.tvrage.com/Friends/episodes/65124</link><title>The
+          One With the Free Porn</title></episode>
+
+          <episode><epnum>91</epnum><seasonnum>18</seasonnum><prodnum>466620</prodnum><airdate>1998-04-02</airdate><link>http://www.tvrage.com/Friends/episodes/65125</link><title>The
+          One With Rachel''s New Dress</title></episode>
+
+          <episode><epnum>92</epnum><seasonnum>19</seasonnum><prodnum>466618</prodnum><airdate>1998-04-09</airdate><link>http://www.tvrage.com/Friends/episodes/65126</link><title>The
+          One With All the Haste</title></episode>
+
+          <episode><epnum>93</epnum><seasonnum>20</seasonnum><prodnum>466621</prodnum><airdate>1998-04-16</airdate><link>http://www.tvrage.com/Friends/episodes/65127</link><title>The
+          One With All the Wedding Dresses</title></episode>
+
+          <episode><epnum>94</epnum><seasonnum>21</seasonnum><prodnum>466619</prodnum><airdate>1998-04-23</airdate><link>http://www.tvrage.com/Friends/episodes/65128</link><title>The
+          One With the Invitation</title></episode>
+
+          <episode><epnum>95</epnum><seasonnum>22</seasonnum><prodnum>466622</prodnum><airdate>1998-04-30</airdate><link>http://www.tvrage.com/Friends/episodes/65129</link><title>The
+          One With the Worst Best Man Ever</title></episode>
+
+          <episode><epnum>96</epnum><seasonnum>23</seasonnum><prodnum>466623</prodnum><airdate>1998-05-07</airdate><link>http://www.tvrage.com/Friends/episodes/65130</link><title>The
+          One With Ross''s Wedding (1)</title></episode>
+
+          <episode><epnum>97</epnum><seasonnum>24</seasonnum><prodnum>466624</prodnum><airdate>1998-05-07</airdate><link>http://www.tvrage.com/Friends/episodes/65131</link><title>The
+          One With Ross''s Wedding (2)</title></episode>
+
+          </Season>
+
+
+          <Season no="5">
+
+          <episode><epnum>98</epnum><seasonnum>01</seasonnum><prodnum>467651</prodnum><airdate>1998-09-24</airdate><link>http://www.tvrage.com/Friends/episodes/65132</link><title>The
+          One After Ross Says Rachel</title></episode>
+
+          <episode><epnum>99</epnum><seasonnum>02</seasonnum><prodnum>467652</prodnum><airdate>1998-10-01</airdate><link>http://www.tvrage.com/Friends/episodes/65133</link><title>The
+          One With All the Kissing</title></episode>
+
+          <episode><epnum>100</epnum><seasonnum>03</seasonnum><prodnum>467653</prodnum><airdate>1998-10-08</airdate><link>http://www.tvrage.com/Friends/episodes/65134</link><title>The
+          One Hundredth</title></episode>
+
+          <episode><epnum>101</epnum><seasonnum>04</seasonnum><prodnum>467654</prodnum><airdate>1998-10-15</airdate><link>http://www.tvrage.com/Friends/episodes/65135</link><title>The
+          One Where Phoebe Hates PBS</title></episode>
+
+          <episode><epnum>102</epnum><seasonnum>05</seasonnum><prodnum>467655</prodnum><airdate>1998-10-29</airdate><link>http://www.tvrage.com/Friends/episodes/65136</link><title>The
+          One With the Kips</title></episode>
+
+          <episode><epnum>103</epnum><seasonnum>06</seasonnum><prodnum>467656</prodnum><airdate>1998-11-05</airdate><link>http://www.tvrage.com/Friends/episodes/65137</link><title>The
+          One With the Yeti</title></episode>
+
+          <episode><epnum>104</epnum><seasonnum>07</seasonnum><prodnum>467657</prodnum><airdate>1998-11-12</airdate><link>http://www.tvrage.com/Friends/episodes/65138</link><title>The
+          One Where Ross Moves In</title></episode>
+
+          <episode><epnum>105</epnum><seasonnum>08</seasonnum><prodnum>467659</prodnum><airdate>1998-11-19</airdate><link>http://www.tvrage.com/Friends/episodes/65139</link><title>The
+          One With All the Thanksgivings</title></episode>
+
+          <episode><epnum>106</epnum><seasonnum>09</seasonnum><prodnum>467658</prodnum><airdate>1998-12-10</airdate><link>http://www.tvrage.com/Friends/episodes/65140</link><title>The
+          One With Ross''s Sandwich</title></episode>
+
+          <episode><epnum>107</epnum><seasonnum>10</seasonnum><prodnum>467661</prodnum><airdate>1998-12-17</airdate><link>http://www.tvrage.com/Friends/episodes/65141</link><title>The
+          One With the Inappropriate Sister</title></episode>
+
+          <episode><epnum>108</epnum><seasonnum>11</seasonnum><prodnum>467660</prodnum><airdate>1999-01-07</airdate><link>http://www.tvrage.com/Friends/episodes/65142</link><title>The
+          One With All the Resolutions</title></episode>
+
+          <episode><epnum>109</epnum><seasonnum>12</seasonnum><prodnum>467663</prodnum><airdate>1999-01-21</airdate><link>http://www.tvrage.com/Friends/episodes/65143</link><title>The
+          One With Chandler''s Work Laugh</title></episode>
+
+          <episode><epnum>110</epnum><seasonnum>13</seasonnum><prodnum>467662</prodnum><airdate>1999-02-04</airdate><link>http://www.tvrage.com/Friends/episodes/65144</link><title>The
+          One With Joey''s Bag</title></episode>
+
+          <episode><epnum>111</epnum><seasonnum>14</seasonnum><prodnum>467664</prodnum><airdate>1999-02-11</airdate><link>http://www.tvrage.com/Friends/episodes/65145</link><title>The
+          One Where Everybody Finds Out</title></episode>
+
+          <episode><epnum>112</epnum><seasonnum>15</seasonnum><prodnum>467665</prodnum><airdate>1999-02-18</airdate><link>http://www.tvrage.com/Friends/episodes/65146</link><title>The
+          One With the Girl Who Hits Joey</title></episode>
+
+          <episode><epnum>113</epnum><seasonnum>16</seasonnum><prodnum>467666</prodnum><airdate>1999-02-23</airdate><link>http://www.tvrage.com/Friends/episodes/65147</link><title>The
+          One With the Cop</title></episode>
+
+          <episode><epnum>114</epnum><seasonnum>17</seasonnum><prodnum>467667</prodnum><airdate>1999-03-18</airdate><link>http://www.tvrage.com/Friends/episodes/65148</link><title>The
+          One With Rachel''s Inadvertent Kiss</title></episode>
+
+          <episode><epnum>115</epnum><seasonnum>18</seasonnum><prodnum>467668</prodnum><airdate>1999-04-08</airdate><link>http://www.tvrage.com/Friends/episodes/65149</link><title>The
+          One Where Rachel Smokes</title></episode>
+
+          <episode><epnum>116</epnum><seasonnum>19</seasonnum><prodnum>467669</prodnum><airdate>1999-04-22</airdate><link>http://www.tvrage.com/Friends/episodes/65150</link><title>The
+          One Where Ross Can''t Flirt</title></episode>
+
+          <episode><epnum>117</epnum><seasonnum>20</seasonnum><prodnum>467670</prodnum><airdate>1999-04-29</airdate><link>http://www.tvrage.com/Friends/episodes/65151</link><title>The
+          One With the Ride-Along</title></episode>
+
+          <episode><epnum>118</epnum><seasonnum>21</seasonnum><prodnum>467671</prodnum><airdate>1999-05-06</airdate><link>http://www.tvrage.com/Friends/episodes/65152</link><title>The
+          One With the Ball</title></episode>
+
+          <episode><epnum>119</epnum><seasonnum>22</seasonnum><prodnum>467672</prodnum><airdate>1999-05-13</airdate><link>http://www.tvrage.com/Friends/episodes/65153</link><title>The
+          One With Joey''s Big Break</title></episode>
+
+          <episode><epnum>120</epnum><seasonnum>23</seasonnum><prodnum>467673</prodnum><airdate>1999-05-20</airdate><link>http://www.tvrage.com/Friends/episodes/65154</link><title>The
+          One in Vegas (1)</title></episode>
+
+          <episode><epnum>121</epnum><seasonnum>24</seasonnum><prodnum>467674</prodnum><airdate>1999-05-20</airdate><link>http://www.tvrage.com/Friends/episodes/65155</link><title>The
+          One in Vegas (2)</title></episode>
+
+          </Season>
+
+
+          <Season no="6">
+
+          <episode><epnum>122</epnum><seasonnum>01</seasonnum><prodnum>225551</prodnum><airdate>1999-09-23</airdate><link>http://www.tvrage.com/Friends/episodes/65156</link><title>The
+          One After Vegas</title></episode>
+
+          <episode><epnum>123</epnum><seasonnum>02</seasonnum><prodnum>225552</prodnum><airdate>1999-09-30</airdate><link>http://www.tvrage.com/Friends/episodes/65157</link><title>The
+          One Where Ross Hugs Rachel</title></episode>
+
+          <episode><epnum>124</epnum><seasonnum>03</seasonnum><prodnum>225553</prodnum><airdate>1999-10-07</airdate><link>http://www.tvrage.com/Friends/episodes/65158</link><title>The
+          One With Ross''s Denial</title></episode>
+
+          <episode><epnum>125</epnum><seasonnum>04</seasonnum><prodnum>225554</prodnum><airdate>1999-10-14</airdate><link>http://www.tvrage.com/Friends/episodes/65159</link><title>The
+          One Where Joey Loses His Insurance</title></episode>
+
+          <episode><epnum>126</epnum><seasonnum>05</seasonnum><prodnum>225555</prodnum><airdate>1999-10-21</airdate><link>http://www.tvrage.com/Friends/episodes/65160</link><title>The
+          One With Joey''s Porsche</title></episode>
+
+          <episode><epnum>127</epnum><seasonnum>06</seasonnum><prodnum>225556</prodnum><airdate>1999-11-04</airdate><link>http://www.tvrage.com/Friends/episodes/65161</link><title>The
+          One on the Last Night</title></episode>
+
+          <episode><epnum>128</epnum><seasonnum>07</seasonnum><prodnum>225557</prodnum><airdate>1999-11-11</airdate><link>http://www.tvrage.com/Friends/episodes/65162</link><title>The
+          One Where Phoebe Runs</title></episode>
+
+          <episode><epnum>129</epnum><seasonnum>08</seasonnum><prodnum>225558</prodnum><airdate>1999-11-18</airdate><link>http://www.tvrage.com/Friends/episodes/65163</link><title>The
+          One With Ross''s Teeth</title></episode>
+
+          <episode><epnum>130</epnum><seasonnum>09</seasonnum><prodnum>225559</prodnum><airdate>1999-11-25</airdate><link>http://www.tvrage.com/Friends/episodes/65164</link><title>The
+          One Where Ross Got High</title></episode>
+
+          <episode><epnum>131</epnum><seasonnum>10</seasonnum><prodnum>225561</prodnum><airdate>1999-12-16</airdate><link>http://www.tvrage.com/Friends/episodes/65165</link><title>The
+          One With the Routine</title></episode>
+
+          <episode><epnum>132</epnum><seasonnum>11</seasonnum><prodnum>225560</prodnum><airdate>2000-01-06</airdate><link>http://www.tvrage.com/Friends/episodes/65166</link><title>The
+          One With the Apothecary Table</title></episode>
+
+          <episode><epnum>133</epnum><seasonnum>12</seasonnum><prodnum>225562</prodnum><airdate>2000-01-13</airdate><link>http://www.tvrage.com/Friends/episodes/65167</link><title>The
+          One With the Joke</title></episode>
+
+          <episode><epnum>134</epnum><seasonnum>13</seasonnum><prodnum>225563</prodnum><airdate>2000-02-03</airdate><link>http://www.tvrage.com/Friends/episodes/65168</link><title>The
+          One With Rachel''s Sister (1)</title></episode>
+
+          <episode><epnum>135</epnum><seasonnum>14</seasonnum><prodnum>225564</prodnum><airdate>2000-02-10</airdate><link>http://www.tvrage.com/Friends/episodes/65169</link><title>The
+          One Where Chandler Can''t Cry (2)</title></episode>
+
+          <episode><epnum>136</epnum><seasonnum>15</seasonnum><prodnum>225565</prodnum><airdate>2000-02-17</airdate><link>http://www.tvrage.com/Friends/episodes/65170</link><title>The
+          One That Could Have Been (1)</title></episode>
+
+          <episode><epnum>137</epnum><seasonnum>16</seasonnum><prodnum>225566</prodnum><airdate>2000-02-17</airdate><link>http://www.tvrage.com/Friends/episodes/65171</link><title>The
+          One That Could Have Been (2)</title></episode>
+
+          <episode><epnum>138</epnum><seasonnum>17</seasonnum><prodnum>225568</prodnum><airdate>2000-02-24</airdate><link>http://www.tvrage.com/Friends/episodes/65172</link><title>The
+          One With Unagi</title></episode>
+
+          <episode><epnum>139</epnum><seasonnum>18</seasonnum><prodnum>225567</prodnum><airdate>2000-03-09</airdate><link>http://www.tvrage.com/Friends/episodes/65173</link><title>The
+          One Where Ross Dates a Student</title></episode>
+
+          <episode><epnum>140</epnum><seasonnum>19</seasonnum><prodnum>225569</prodnum><airdate>2000-03-23</airdate><link>http://www.tvrage.com/Friends/episodes/65174</link><title>The
+          One With Joey''s Fridge</title></episode>
+
+          <episode><epnum>141</epnum><seasonnum>20</seasonnum><prodnum>225575</prodnum><airdate>2000-04-13</airdate><link>http://www.tvrage.com/Friends/episodes/65175</link><title>The
+          One With Mac and C.H.E.E.S.E.</title></episode>
+
+          <episode><epnum>142</epnum><seasonnum>21</seasonnum><prodnum>225570</prodnum><airdate>2000-04-27</airdate><link>http://www.tvrage.com/Friends/episodes/65176</link><title>The
+          One Where Ross Meets Elizabeth''s Dad</title></episode>
+
+          <episode><epnum>143</epnum><seasonnum>22</seasonnum><prodnum>225571</prodnum><airdate>2000-05-04</airdate><link>http://www.tvrage.com/Friends/episodes/65177</link><title>The
+          One Where Paul''s the Man</title></episode>
+
+          <episode><epnum>144</epnum><seasonnum>23</seasonnum><prodnum>225572</prodnum><airdate>2000-05-11</airdate><link>http://www.tvrage.com/Friends/episodes/65178</link><title>The
+          One With the Ring</title></episode>
+
+          <episode><epnum>145</epnum><seasonnum>24</seasonnum><prodnum>225573</prodnum><airdate>2000-05-18</airdate><link>http://www.tvrage.com/Friends/episodes/65179</link><title>The
+          One With the Proposal (1)</title></episode>
+
+          <episode><epnum>146</epnum><seasonnum>25</seasonnum><prodnum>225574</prodnum><airdate>2000-05-18</airdate><link>http://www.tvrage.com/Friends/episodes/65180</link><title>The
+          One With the Proposal (2)</title></episode>
+
+          </Season>
+
+
+          <Season no="7">
+
+          <episode><epnum>147</epnum><seasonnum>01</seasonnum><prodnum>226401</prodnum><airdate>2000-10-12</airdate><link>http://www.tvrage.com/Friends/episodes/65181</link><title>The
+          One With Monica''s Thunder</title></episode>
+
+          <episode><epnum>148</epnum><seasonnum>02</seasonnum><prodnum>226402</prodnum><airdate>2000-10-12</airdate><link>http://www.tvrage.com/Friends/episodes/65182</link><title>The
+          One With Rachel''s Book</title></episode>
+
+          <episode><epnum>149</epnum><seasonnum>03</seasonnum><prodnum>226405</prodnum><airdate>2000-10-19</airdate><link>http://www.tvrage.com/Friends/episodes/65183</link><title>The
+          One With Phoebe''s Cookies</title></episode>
+
+          <episode><epnum>150</epnum><seasonnum>04</seasonnum><prodnum>226403</prodnum><airdate>2000-10-26</airdate><link>http://www.tvrage.com/Friends/episodes/65184</link><title>The
+          One With Rachel''s Assistant</title></episode>
+
+          <episode><epnum>151</epnum><seasonnum>05</seasonnum><prodnum>226404</prodnum><airdate>2000-11-02</airdate><link>http://www.tvrage.com/Friends/episodes/65185</link><title>The
+          One With the Engagement Picture</title></episode>
+
+          <episode><epnum>152</epnum><seasonnum>06</seasonnum><prodnum>226406</prodnum><airdate>2000-11-09</airdate><link>http://www.tvrage.com/Friends/episodes/65186</link><title>The
+          One With the Nap Partners</title></episode>
+
+          <episode><epnum>153</epnum><seasonnum>07</seasonnum><prodnum>226410</prodnum><airdate>2000-11-16</airdate><link>http://www.tvrage.com/Friends/episodes/65187</link><title>The
+          One With Ross''s Library Book</title></episode>
+
+          <episode><epnum>154</epnum><seasonnum>08</seasonnum><prodnum>226407</prodnum><airdate>2000-11-23</airdate><link>http://www.tvrage.com/Friends/episodes/65188</link><title>The
+          One Where Chandler Doesn''t Like Dogs</title></episode>
+
+          <episode><epnum>155</epnum><seasonnum>09</seasonnum><prodnum>226408</prodnum><airdate>2000-12-07</airdate><link>http://www.tvrage.com/Friends/episodes/65189</link><title>The
+          One With All the Candy</title></episode>
+
+          <episode><epnum>156</epnum><seasonnum>10</seasonnum><prodnum>226409</prodnum><airdate>2000-12-14</airdate><link>http://www.tvrage.com/Friends/episodes/65190</link><title>The
+          One With the Holiday Armadillo</title></episode>
+
+          <episode><epnum>157</epnum><seasonnum>11</seasonnum><prodnum>226412</prodnum><airdate>2001-01-04</airdate><link>http://www.tvrage.com/Friends/episodes/65191</link><title>The
+          One With All the Cheesecakes</title></episode>
+
+          <episode><epnum>158</epnum><seasonnum>12</seasonnum><prodnum>226413</prodnum><airdate>2001-01-11</airdate><link>http://www.tvrage.com/Friends/episodes/65192</link><title>The
+          One Where They''re Up All Night</title></episode>
+
+          <episode><epnum>159</epnum><seasonnum>13</seasonnum><prodnum>226415</prodnum><airdate>2001-02-01</airdate><link>http://www.tvrage.com/Friends/episodes/65193</link><title>The
+          One Where Rosita Dies</title></episode>
+
+          <episode><epnum>160</epnum><seasonnum>14</seasonnum><prodnum>226411</prodnum><airdate>2001-02-08</airdate><link>http://www.tvrage.com/Friends/episodes/65194</link><title>The
+          One Where They All Turn Thirty</title></episode>
+
+          <episode><epnum>161</epnum><seasonnum>15</seasonnum><prodnum>226416</prodnum><airdate>2001-02-15</airdate><link>http://www.tvrage.com/Friends/episodes/65195</link><title>The
+          One With Joey''s New Brain</title></episode>
+
+          <episode><epnum>162</epnum><seasonnum>16</seasonnum><prodnum>226417</prodnum><airdate>2001-02-22</airdate><link>http://www.tvrage.com/Friends/episodes/65196</link><title>The
+          One With the Truth About London</title></episode>
+
+          <episode><epnum>163</epnum><seasonnum>17</seasonnum><prodnum>226414</prodnum><airdate>2001-03-15</airdate><link>http://www.tvrage.com/Friends/episodes/65197</link><title>The
+          One With the Cheap Wedding Dress</title></episode>
+
+          <episode><epnum>164</epnum><seasonnum>18</seasonnum><prodnum>226418</prodnum><airdate>2001-03-29</airdate><link>http://www.tvrage.com/Friends/episodes/65198</link><title>The
+          One With Joey''s Award</title></episode>
+
+          <episode><epnum>165</epnum><seasonnum>19</seasonnum><prodnum>226421</prodnum><airdate>2001-04-19</airdate><link>http://www.tvrage.com/Friends/episodes/65199</link><title>The
+          One With Ross and Monica''s Cousin</title></episode>
+
+          <episode><epnum>166</epnum><seasonnum>20</seasonnum><prodnum>226419</prodnum><airdate>2001-04-26</airdate><link>http://www.tvrage.com/Friends/episodes/65200</link><title>The
+          One With Rachel''s Big Kiss</title></episode>
+
+          <episode><epnum>167</epnum><seasonnum>21</seasonnum><prodnum>226424</prodnum><airdate>2001-05-03</airdate><link>http://www.tvrage.com/Friends/episodes/65201</link><title>The
+          One With the Vows</title></episode>
+
+          <episode><epnum>168</epnum><seasonnum>22</seasonnum><prodnum>226420</prodnum><airdate>2001-05-10</airdate><link>http://www.tvrage.com/Friends/episodes/65202</link><title>The
+          One With Chandler''s Dad</title></episode>
+
+          <episode><epnum>169</epnum><seasonnum>23</seasonnum><prodnum>226422</prodnum><airdate>2001-05-17</airdate><link>http://www.tvrage.com/Friends/episodes/65203</link><title>The
+          One with Monica and Chandler''s Wedding (1)</title></episode>
+
+          <episode><epnum>170</epnum><seasonnum>24</seasonnum><prodnum>226423</prodnum><airdate>2001-05-17</airdate><link>http://www.tvrage.com/Friends/episodes/65205</link><title>The
+          One with Monica and Chandler''s Wedding (2)</title></episode>
+
+          </Season>
+
+
+          <Season no="8">
+
+          <episode><epnum>171</epnum><seasonnum>01</seasonnum><prodnum>227401</prodnum><airdate>2001-09-27</airdate><link>http://www.tvrage.com/Friends/episodes/65206</link><title>The
+          One After &quot;I Do&quot;</title></episode>
+
+          <episode><epnum>172</epnum><seasonnum>02</seasonnum><prodnum>227402</prodnum><airdate>2001-10-04</airdate><link>http://www.tvrage.com/Friends/episodes/65207</link><title>The
+          One With the Red Sweater</title></episode>
+
+          <episode><epnum>173</epnum><seasonnum>03</seasonnum><prodnum>227403</prodnum><airdate>2001-10-11</airdate><link>http://www.tvrage.com/Friends/episodes/65208</link><title>The
+          One Where Rachel Tells...</title></episode>
+
+          <episode><epnum>174</epnum><seasonnum>04</seasonnum><prodnum>227406</prodnum><airdate>2001-10-18</airdate><link>http://www.tvrage.com/Friends/episodes/65209</link><title>The
+          One With the Videotape</title></episode>
+
+          <episode><epnum>175</epnum><seasonnum>05</seasonnum><prodnum>227404</prodnum><airdate>2001-10-25</airdate><link>http://www.tvrage.com/Friends/episodes/65210</link><title>The
+          One With Rachel''s Date</title></episode>
+
+          <episode><epnum>176</epnum><seasonnum>06</seasonnum><prodnum>227405</prodnum><airdate>2001-11-01</airdate><link>http://www.tvrage.com/Friends/episodes/65211</link><title>The
+          One With the Halloween Party</title></episode>
+
+          <episode><epnum>177</epnum><seasonnum>07</seasonnum><prodnum>227407</prodnum><airdate>2001-11-08</airdate><link>http://www.tvrage.com/Friends/episodes/65212</link><title>The
+          One With the Stain</title></episode>
+
+          <episode><epnum>178</epnum><seasonnum>08</seasonnum><prodnum>227408</prodnum><airdate>2001-11-15</airdate><link>http://www.tvrage.com/Friends/episodes/65213</link><title>The
+          One With the Stripper</title></episode>
+
+          <episode><epnum>179</epnum><seasonnum>09</seasonnum><prodnum>227410</prodnum><airdate>2001-11-22</airdate><link>http://www.tvrage.com/Friends/episodes/65214</link><title>The
+          One With the Rumor</title></episode>
+
+          <episode><epnum>180</epnum><seasonnum>10</seasonnum><prodnum>227409</prodnum><airdate>2001-12-06</airdate><link>http://www.tvrage.com/Friends/episodes/65215</link><title>The
+          One With Monica''s Boots</title></episode>
+
+          <episode><epnum>181</epnum><seasonnum>11</seasonnum><prodnum>227411</prodnum><airdate>2001-12-13</airdate><link>http://www.tvrage.com/Friends/episodes/65216</link><title>The
+          One With the Creepy Holiday Card</title></episode>
+
+          <episode><epnum>182</epnum><seasonnum>12</seasonnum><prodnum>227412</prodnum><airdate>2002-01-10</airdate><link>http://www.tvrage.com/Friends/episodes/65217</link><title>The
+          One Where Joey Dates Rachel</title></episode>
+
+          <episode><epnum>183</epnum><seasonnum>13</seasonnum><prodnum>227413</prodnum><airdate>2002-01-17</airdate><link>http://www.tvrage.com/Friends/episodes/65218</link><title>The
+          One Where Chandler Takes a Bath</title></episode>
+
+          <episode><epnum>184</epnum><seasonnum>14</seasonnum><prodnum>227414</prodnum><airdate>2002-01-31</airdate><link>http://www.tvrage.com/Friends/episodes/65219</link><title>The
+          One With the Secret Closet</title></episode>
+
+          <episode><epnum>185</epnum><seasonnum>15</seasonnum><prodnum>227415</prodnum><airdate>2002-02-07</airdate><link>http://www.tvrage.com/Friends/episodes/65220</link><title>The
+          One With the Birthing Video</title></episode>
+
+          <episode><epnum>186</epnum><seasonnum>16</seasonnum><prodnum>227416</prodnum><airdate>2002-02-28</airdate><link>http://www.tvrage.com/Friends/episodes/65221</link><title>The
+          One Where Joey Tells Rachel</title></episode>
+
+          <episode><epnum>187</epnum><seasonnum>17</seasonnum><prodnum>227417</prodnum><airdate>2002-03-07</airdate><link>http://www.tvrage.com/Friends/episodes/65222</link><title>The
+          One With the Tea Leaves</title></episode>
+
+          <episode><epnum>188</epnum><seasonnum>18</seasonnum><prodnum>227418</prodnum><airdate>2002-03-28</airdate><link>http://www.tvrage.com/Friends/episodes/65223</link><title>The
+          One in Massapequa</title></episode>
+
+          <episode><epnum>189</epnum><seasonnum>19</seasonnum><prodnum>227424</prodnum><airdate>2002-04-04</airdate><link>http://www.tvrage.com/Friends/episodes/65224</link><title>The
+          One With Joey''s Interview</title></episode>
+
+          <episode><epnum>190</epnum><seasonnum>20</seasonnum><prodnum>227421</prodnum><airdate>2002-04-25</airdate><link>http://www.tvrage.com/Friends/episodes/65225</link><title>The
+          One With the Baby Shower</title></episode>
+
+          <episode><epnum>191</epnum><seasonnum>21</seasonnum><prodnum>227419</prodnum><airdate>2002-05-02</airdate><link>http://www.tvrage.com/Friends/episodes/65226</link><title>The
+          One With the Cooking Class</title></episode>
+
+          <episode><epnum>192</epnum><seasonnum>22</seasonnum><prodnum>227420</prodnum><airdate>2002-05-09</airdate><link>http://www.tvrage.com/Friends/episodes/65227</link><title>The
+          One Where Rachel is Late</title></episode>
+
+          <episode><epnum>193</epnum><seasonnum>23</seasonnum><prodnum>227422</prodnum><airdate>2002-05-16</airdate><link>http://www.tvrage.com/Friends/episodes/65228</link><title>The
+          One Where Rachel Has a Baby (1)</title></episode>
+
+          <episode><epnum>194</epnum><seasonnum>24</seasonnum><prodnum>227423</prodnum><airdate>2002-05-16</airdate><link>http://www.tvrage.com/Friends/episodes/65229</link><title>The
+          One Where Rachel Has a Baby (2)</title></episode>
+
+          </Season>
+
+
+          <Season no="9">
+
+          <episode><epnum>195</epnum><seasonnum>01</seasonnum><prodnum>175251</prodnum><airdate>2002-09-26</airdate><link>http://www.tvrage.com/Friends/episodes/65230</link><title>The
+          One Where No One Proposes</title></episode>
+
+          <episode><epnum>196</epnum><seasonnum>02</seasonnum><prodnum>175252</prodnum><airdate>2002-10-03</airdate><link>http://www.tvrage.com/Friends/episodes/65231</link><title>The
+          One Where Emma Cries</title></episode>
+
+          <episode><epnum>197</epnum><seasonnum>03</seasonnum><prodnum>175253</prodnum><airdate>2002-10-10</airdate><link>http://www.tvrage.com/Friends/episodes/65232</link><title>The
+          One With the Pediatrician</title></episode>
+
+          <episode><epnum>198</epnum><seasonnum>04</seasonnum><prodnum>175254</prodnum><airdate>2002-10-17</airdate><link>http://www.tvrage.com/Friends/episodes/65233</link><title>The
+          One With the Sharks</title></episode>
+
+          <episode><epnum>199</epnum><seasonnum>05</seasonnum><prodnum>175255</prodnum><airdate>2002-10-31</airdate><link>http://www.tvrage.com/Friends/episodes/65234</link><title>The
+          One With Phoebe''s Birthday Dinner</title></episode>
+
+          <episode><epnum>200</epnum><seasonnum>06</seasonnum><prodnum>175256</prodnum><airdate>2002-11-07</airdate><link>http://www.tvrage.com/Friends/episodes/65235</link><title>The
+          One With the Male Nanny</title></episode>
+
+          <episode><epnum>201</epnum><seasonnum>07</seasonnum><prodnum>175257</prodnum><airdate>2002-11-14</airdate><link>http://www.tvrage.com/Friends/episodes/65236</link><title>The
+          One With Ross''s Inappropriate Song</title></episode>
+
+          <episode><epnum>202</epnum><seasonnum>08</seasonnum><prodnum>175258</prodnum><airdate>2002-11-21</airdate><link>http://www.tvrage.com/Friends/episodes/65237</link><title>The
+          One With Rachel''s Other Sister</title></episode>
+
+          <episode><epnum>203</epnum><seasonnum>09</seasonnum><prodnum>175259</prodnum><airdate>2002-12-05</airdate><link>http://www.tvrage.com/Friends/episodes/65238</link><title>The
+          One With Rachel''s Phone Number</title></episode>
+
+          <episode><epnum>204</epnum><seasonnum>10</seasonnum><prodnum>175260</prodnum><airdate>2002-12-12</airdate><link>http://www.tvrage.com/Friends/episodes/65239</link><title>The
+          One With Christmas In Tulsa</title></episode>
+
+          <episode><epnum>205</epnum><seasonnum>11</seasonnum><prodnum>175261</prodnum><airdate>2003-01-09</airdate><link>http://www.tvrage.com/Friends/episodes/65240</link><title>The
+          One Where Rachel Goes Back To Work</title></episode>
+
+          <episode><epnum>206</epnum><seasonnum>12</seasonnum><prodnum>175262</prodnum><airdate>2003-01-16</airdate><link>http://www.tvrage.com/Friends/episodes/65241</link><title>The
+          One With Phoebe''s Rats</title></episode>
+
+          <episode><epnum>207</epnum><seasonnum>13</seasonnum><prodnum>175263</prodnum><airdate>2003-01-30</airdate><link>http://www.tvrage.com/Friends/episodes/65242</link><title>The
+          One Where Monica Sings</title></episode>
+
+          <episode><epnum>208</epnum><seasonnum>14</seasonnum><prodnum>175265</prodnum><airdate>2003-02-06</airdate><link>http://www.tvrage.com/Friends/episodes/65243</link><title>The
+          One With the Blind Dates</title></episode>
+
+          <episode><epnum>209</epnum><seasonnum>15</seasonnum><prodnum>175264</prodnum><airdate>2003-02-13</airdate><link>http://www.tvrage.com/Friends/episodes/65244</link><title>The
+          One With the Mugging</title></episode>
+
+          <episode><epnum>210</epnum><seasonnum>16</seasonnum><prodnum>175266</prodnum><airdate>2003-02-20</airdate><link>http://www.tvrage.com/Friends/episodes/65245</link><title>The
+          One With the Boob Job</title></episode>
+
+          <episode><epnum>211</epnum><seasonnum>17</seasonnum><prodnum>175267</prodnum><airdate>2003-03-13</airdate><link>http://www.tvrage.com/Friends/episodes/65246</link><title>The
+          One With the Memorial Service</title></episode>
+
+          <episode><epnum>212</epnum><seasonnum>18</seasonnum><prodnum>175268</prodnum><airdate>2003-04-03</airdate><link>http://www.tvrage.com/Friends/episodes/65247</link><title>The
+          One With the Lottery</title></episode>
+
+          <episode><epnum>213</epnum><seasonnum>19</seasonnum><prodnum>175269</prodnum><airdate>2003-04-17</airdate><link>http://www.tvrage.com/Friends/episodes/65248</link><title>The
+          One With Rachel''s Dream</title></episode>
+
+          <episode><epnum>214</epnum><seasonnum>20</seasonnum><prodnum>175270</prodnum><airdate>2003-04-24</airdate><link>http://www.tvrage.com/Friends/episodes/65249</link><title>The
+          One With the Soap Opera Party</title></episode>
+
+          <episode><epnum>215</epnum><seasonnum>21</seasonnum><prodnum>175271</prodnum><airdate>2003-05-01</airdate><link>http://www.tvrage.com/Friends/episodes/65250</link><title>The
+          One With the Fertility Test</title></episode>
+
+          <episode><epnum>216</epnum><seasonnum>22</seasonnum><prodnum>175272</prodnum><airdate>2003-05-08</airdate><link>http://www.tvrage.com/Friends/episodes/65251</link><title>The
+          One With the Donor</title></episode>
+
+          <episode><epnum>217</epnum><seasonnum>23</seasonnum><prodnum>175273</prodnum><airdate>2003-05-15</airdate><link>http://www.tvrage.com/Friends/episodes/65252</link><title>The
+          One in Barbados (1)</title></episode>
+
+          <episode><epnum>218</epnum><seasonnum>24</seasonnum><prodnum>175274</prodnum><airdate>2003-05-15</airdate><link>http://www.tvrage.com/Friends/episodes/65253</link><title>The
+          One in Barbados (2)</title></episode>
+
+          </Season>
+
+
+          <Season no="10">
+
+          <episode><epnum>219</epnum><seasonnum>01</seasonnum><prodnum>176251</prodnum><airdate>2003-09-25</airdate><link>http://www.tvrage.com/Friends/episodes/65254</link><title>The
+          One After Joey And Rachel Kiss</title></episode>
+
+          <episode><epnum>220</epnum><seasonnum>02</seasonnum><prodnum>176252</prodnum><airdate>2003-10-02</airdate><link>http://www.tvrage.com/Friends/episodes/65255</link><title>The
+          One Where Ross is Fine</title></episode>
+
+          <episode><epnum>221</epnum><seasonnum>03</seasonnum><prodnum>176253</prodnum><airdate>2003-10-09</airdate><link>http://www.tvrage.com/Friends/episodes/65256</link><title>The
+          One With Ross''s Tan</title></episode>
+
+          <episode><epnum>222</epnum><seasonnum>04</seasonnum><prodnum>176254</prodnum><airdate>2003-10-23</airdate><link>http://www.tvrage.com/Friends/episodes/65257</link><title>The
+          One With the Cake</title></episode>
+
+          <episode><epnum>223</epnum><seasonnum>05</seasonnum><prodnum>176255</prodnum><airdate>2003-10-30</airdate><link>http://www.tvrage.com/Friends/episodes/65258</link><title>The
+          One Where Rachel''s Sister Babysits</title></episode>
+
+          <episode><epnum>224</epnum><seasonnum>06</seasonnum><prodnum>176256</prodnum><airdate>2003-11-06</airdate><link>http://www.tvrage.com/Friends/episodes/65259</link><title>The
+          One With Ross''s Grant</title></episode>
+
+          <episode><epnum>225</epnum><seasonnum>07</seasonnum><prodnum>176257</prodnum><airdate>2003-11-13</airdate><link>http://www.tvrage.com/Friends/episodes/65260</link><title>The
+          One With the Home Study</title></episode>
+
+          <episode><epnum>226</epnum><seasonnum>08</seasonnum><prodnum>176259</prodnum><airdate>2003-11-20</airdate><link>http://www.tvrage.com/Friends/episodes/65261</link><title>The
+          One With the Late Thanksgiving</title></episode>
+
+          <episode><epnum>227</epnum><seasonnum>09</seasonnum><prodnum>176258</prodnum><airdate>2004-01-08</airdate><link>http://www.tvrage.com/Friends/episodes/65262</link><title>The
+          One With the Birth Mother</title></episode>
+
+          <episode><epnum>228</epnum><seasonnum>10</seasonnum><prodnum>176266</prodnum><airdate>2004-01-15</airdate><link>http://www.tvrage.com/Friends/episodes/65263</link><title>The
+          One Where Chandler Gets Caught</title></episode>
+
+          <episode><epnum>229</epnum><seasonnum>11</seasonnum><prodnum>176260</prodnum><airdate>2004-02-05</airdate><link>http://www.tvrage.com/Friends/episodes/65264</link><title>The
+          One Where the Stripper Cries</title></episode>
+
+          <episode><epnum>230</epnum><seasonnum>12</seasonnum><prodnum>176262</prodnum><airdate>2004-02-12</airdate><link>http://www.tvrage.com/Friends/episodes/65265</link><title>The
+          One With Phoebe''s Wedding</title></episode>
+
+          <episode><epnum>231</epnum><seasonnum>13</seasonnum><prodnum>176261</prodnum><airdate>2004-02-19</airdate><link>http://www.tvrage.com/Friends/episodes/65266</link><title>The
+          One Where Joey Speaks French</title></episode>
+
+          <episode><epnum>232</epnum><seasonnum>14</seasonnum><prodnum>176263</prodnum><airdate>2004-02-26</airdate><link>http://www.tvrage.com/Friends/episodes/65267</link><title>The
+          One With Princess Consuela</title></episode>
+
+          <episode><epnum>233</epnum><seasonnum>15</seasonnum><prodnum>176264</prodnum><airdate>2004-04-22</airdate><link>http://www.tvrage.com/Friends/episodes/65268</link><title>The
+          One Where Estelle Dies</title></episode>
+
+          <episode><epnum>234</epnum><seasonnum>16</seasonnum><prodnum>176265</prodnum><airdate>2004-04-29</airdate><link>http://www.tvrage.com/Friends/episodes/65269</link><title>The
+          One With Rachel''s Going Away Party</title></episode>
+
+          <episode><epnum>235</epnum><seasonnum>17</seasonnum><prodnum></prodnum><airdate>2004-05-06</airdate><link>http://www.tvrage.com/Friends/episodes/65272</link><title>The
+          Last One (1)</title></episode>
+
+          <episode><epnum>236</epnum><seasonnum>18</seasonnum><prodnum></prodnum><airdate>2004-05-06</airdate><link>http://www.tvrage.com/Friends/episodes/65273</link><title>The
+          Last One (2)</title></episode>
+
+          </Season>
+
+
+          <Special>
+
+          <episode><season>7</season><airdate>2001-02-15</airdate><link>http://www.tvrage.com/Friends/episodes/65204</link><title>Friends:
+          The Stuff You''ve Never Seen</title></episode>
+
+          <episode><season>10</season><airdate>2004-05-06</airdate><link>http://www.tvrage.com/Friends/episodes/65270</link><title>The
+          One With All the Other Ones (1)</title></episode>
+
+          <episode><season>10</season><airdate>2004-05-06</airdate><link>http://www.tvrage.com/Friends/episodes/65271</link><title>The
+          One With All the Other Ones (2)</title></episode>
+
+          </Special>
+
+
+          </Episodelist>
+
+
+          </Show>'}
+      headers:
+        connection: [close]
+        content-type: [text/xml; charset=UTF-8]
+        date: ['Wed, 22 Oct 2014 02:37:10 GMT']
+        server: [Apache/2.2.14 (Ubuntu)]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.3.2-1ubuntu4.27]
+      status: {code: 200, message: OK}
+version: 1

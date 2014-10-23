@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
-from nose.plugins.attrib import attr
+
+from tests import FlexGetBase, use_vcr
 
 
 class TestMyEpisodes(FlexGetBase):
@@ -17,7 +17,7 @@ class TestMyEpisodes(FlexGetBase):
               password: flexget
     """
 
-    @attr(online=True)
+    @use_vcr
     def test_myepisodes_id(self):
         """Test myepisodes (DISABLED) -- account locked?"""
         return

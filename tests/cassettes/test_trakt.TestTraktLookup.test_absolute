@@ -1,0 +1,383 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.4.1 CPython/2.7.3 Windows/7]
+      method: GET
+      uri: http://api.trakt.tv/search/shows.json/6c228565a45a302e49fb7d2dab066c9ab948b7be/naruto
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [EXPIRED]
+        cf-ray: [17d2052e2eb60ee5-EWR]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 01:46:16 GMT']
+        expires: ['Wed, 22 Oct 2014 05:46:16 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d2f8670da642e74c410adf143038d953c1413942376663; expires=Mon,
+            23-Dec-2019 23:50:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.11-1~dotdeb.1]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.4.1 CPython/2.7.3 Windows/7]
+      method: GET
+      uri: http://api.trakt.tv/show/summary.json/6c228565a45a302e49fb7d2dab066c9ab948b7be/78857
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        cache-control: ['public, max-age=86400']
+        cf-cache-status: [EXPIRED]
+        cf-ray: [17d2052faf1b0ee5-EWR]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 01:46:19 GMT']
+        expires: ['Thu, 23 Oct 2014 01:46:19 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=dc91c48f6e586c8f212119f37dde065661413942376909; expires=Mon,
+            23-Dec-2019 23:50:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.11-1~dotdeb.1]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.4.1 CPython/2.7.3 Windows/7]
+      method: GET
+      uri: http://api.trakt.tv/search/shows.json/6c228565a45a302e49fb7d2dab066c9ab948b7be/naruto
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [17d2143f778a0edf-EWR]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 01:56:33 GMT']
+        expires: ['Wed, 22 Oct 2014 05:56:33 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=da33c4ecb19c632def145ed2ac86225261413942993834; expires=Mon,
+            23-Dec-2019 23:50:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.11-1~dotdeb.1]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.4.1 CPython/2.7.3 Windows/7]
+      method: GET
+      uri: http://api.trakt.tv/show/summary.json/6c228565a45a302e49fb7d2dab066c9ab948b7be/78857
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        cache-control: ['public, max-age=86400']
+        cf-cache-status: [HIT]
+        cf-ray: [17d2143ffefd0edf-EWR]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 01:56:33 GMT']
+        expires: ['Thu, 23 Oct 2014 01:56:33 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d7f7ed2d66c3b4b8461e858be1438fa3f1413942993916; expires=Mon,
+            23-Dec-2019 23:50:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.11-1~dotdeb.1]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.4.3 CPython/2.7.3 Windows/7]
+      method: GET
+      uri: http://api.trakt.tv/search/shows.json/6c228565a45a302e49fb7d2dab066c9ab948b7be/naruto
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [17d25928c2c20edf-EWR]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 02:43:36 GMT']
+        expires: ['Wed, 22 Oct 2014 06:43:36 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=db8593febb2ba4febda72a21d694b267d1413945816442; expires=Mon,
+            23-Dec-2019 23:50:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.11-1~dotdeb.1]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: [python-requests/2.4.3 CPython/2.7.3 Windows/7]
+      method: GET
+      uri: http://api.trakt.tv/show/summary.json/6c228565a45a302e49fb7d2dab066c9ab948b7be/78857
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        cache-control: ['public, max-age=86400']
+        cf-cache-status: [HIT]
+        cf-ray: [17d2592b63500edf-EWR]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 02:43:36 GMT']
+        expires: ['Thu, 23 Oct 2014 02:43:36 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d51f2bb3277ade919b07b4b7f95a430b91413945816862; expires=Mon,
+            23-Dec-2019 23:50:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.11-1~dotdeb.1]
+      status: {code: 200, message: OK}
+version: 1
