@@ -12,7 +12,6 @@ from functools import wraps
 
 import mock
 from nose.plugins.attrib import attr
-from requests.packages import urllib3
 from vcr import VCR
 
 import flexget.logger
@@ -51,8 +50,13 @@ def setup_once():
         flexget.logger.initialize(True)
         setup_logging_level()
         warnings.simplefilter('error')
-        # VCR.py mocked functions not handle ssl verification well
-        warnings.simplefilter('ignore', urllib3.exceptions.SecurityWarning)
+        # VCR.py mocked functions not handle ssl verification well. Older versions of urllib3 don't have this
+        if VCR_RECORD_MODE != 'off':
+            try:
+                from requests.packages.urllib3.exceptions import SecurityWarning
+                warnings.simplefilter('ignore', SecurityWarning)
+            except ImportError:
+                pass
         load_plugins()
         # store options for MockManager
         test_arguments = get_parser().parse_args(['execute'])
@@ -88,17 +92,17 @@ def use_vcr(func):
         func = mock.patch('requests.packages.urllib3.connectionpool.is_connection_dropped',
                           new=mock.MagicMock(return_value=False))(func)
     @wraps(func)
-    def decorator(*args, **kwargs):
+    def func_with_cassette(*args, **kwargs):
         with vcr.use_cassette(cassette_name) as cassette:
             try:
                 func(*args, cassette=cassette, **kwargs)
             except TypeError:
                 func(*args, **kwargs)
 
-    if vcr.record_mode == 'off':
+    if VCR_RECORD_MODE == 'off':
         return func
     else:
-        return decorator
+        return func_with_cassette
 
 
 class MockManager(Manager):
