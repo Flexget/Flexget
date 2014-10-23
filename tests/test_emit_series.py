@@ -4,7 +4,7 @@ from tests import FlexGetBase, build_parser_function
 from flexget.entry import Entry
 
 
-class TestEmitSeries(FlexGetBase):
+class BaseEmitSeries(FlexGetBase):
     __yaml__ = """
         tasks:
           inject_series:
@@ -148,13 +148,13 @@ class TestEmitSeries(FlexGetBase):
         assert len(self.task.all_entries) == 1
         assert self.task.find_entry('rejected', title='Test Series 8 S02E01')
 
-class TestGuessitEmitSeries(TestEmitSeries):
+class TestGuessitEmitSeries(BaseEmitSeries):
     def __init__(self):
         super(TestGuessitEmitSeries, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalEmitSeries(TestEmitSeries):
+class TestInternalEmitSeries(BaseEmitSeries):
     def __init__(self):
         super(TestInternalEmitSeries, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))

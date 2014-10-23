@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase, build_parser_function
 
 
-class TestSeriesPremiere(FlexGetBase):
+class BaseSeriesPremiere(FlexGetBase):
 
     __yaml__ = """
 
@@ -109,13 +109,13 @@ class TestSeriesPremiere(FlexGetBase):
         assert entry.accepted
 
 
-class TestGuessitSeriesPremiere(TestSeriesPremiere):
+class TestGuessitSeriesPremiere(BaseSeriesPremiere):
     def __init__(self):
         super(TestGuessitSeriesPremiere, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalSeriesPremiere(TestSeriesPremiere):
+class TestInternalSeriesPremiere(BaseSeriesPremiere):
     def __init__(self):
         super(TestInternalSeriesPremiere, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))

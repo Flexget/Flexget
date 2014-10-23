@@ -86,7 +86,7 @@ class TestMetainfoQuality(FlexGetBase):
         assert entry['quality'].name == 'hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
 
 
-class TestMetainfoSeries(FlexGetBase):
+class BaseMetainfoSeries(FlexGetBase):
     __yaml__ = """
         templates:
           global:
@@ -146,13 +146,13 @@ class TestMetainfoSeries(FlexGetBase):
             assert 'series_parser' not in entry, error
 
 
-class TestGuessitMetainfoSeries(TestMetainfoSeries):
+class TestGuessitMetainfoSeries(BaseMetainfoSeries):
     def __init__(self):
         super(TestGuessitMetainfoSeries, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalMetainfoSeries(TestMetainfoSeries):
+class TestInternalMetainfoSeries(BaseMetainfoSeries):
     def __init__(self):
         super(TestInternalMetainfoSeries, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
