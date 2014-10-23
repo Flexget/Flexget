@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import stat
-from tests import FlexGetBase
-from nose.plugins.attrib import attr
+
 from nose.tools import raises
+
+from tests import FlexGetBase, use_vcr
 from flexget.entry import EntryUnicodeError, Entry
 
 
@@ -42,7 +43,7 @@ class TestInputHtml(FlexGetBase):
             html: http://download.flexget.com/
     """
 
-    @attr(online=True)
+    @use_vcr
     def test_parsing(self):
         self.execute_task('test')
         assert self.task.entries, 'did not produce entries'
@@ -124,13 +125,13 @@ class TestDownload(FlexGetBase):
 
     def teardown(self):
         FlexGetBase.teardown(self)
-        if hasattr(self, 'testfile') and os.path.exists(self.testfile):
+        if getattr(self, 'testfile', None) and os.path.exists(self.testfile):
             os.remove(self.testfile)
         temp_dir = os.path.join(self.manager.config_base, 'temp')
         if os.path.exists(temp_dir) and os.path.isdir(temp_dir):
             os.rmdir(temp_dir)
 
-    @attr(online=True)
+    @use_vcr
     def test_download(self):
         # NOTE: what the hell is .obj and where it comes from?
         # Re: seems to come from python mimetype detection in download plugin ...

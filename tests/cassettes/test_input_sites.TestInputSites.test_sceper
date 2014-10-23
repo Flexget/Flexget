@@ -1,0 +1,1847 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+      method: GET
+      uri: http://sceper.ws/category/movies/movies-dvd-rip
+    response:
+      body: {string: "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\
+          \ \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html\
+          \ xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en-US\">\r\n<head profile=\"\
+          http://gmpg.org/xfn/11\">\r\n<LINK REL=\"SHORTCUT ICON\" HREF=\"http://sceper.ws/favicon.ico\"\
+          \ />\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"\
+          \ />\r\n\r\n<title>\r\nMovies &#8211; DVD Rip Archive | Sceper</title>\r\
+          \n\r\n<meta name=\"description\" content=\"Your source for all Scene and\
+          \ P2P Movies, TV Shows, Games, Magazines, Music and more!\" />\r\n<meta\
+          \ name=\"keywords\" content=\"scene,p2p,movies,release,games,tv,warez,shows,rlslog,rlslog\
+          \ alternative,rlslog down,oneddl,rlslog.net,alternative,oneddl alternative,hotfile,fileserve,filesonic,wupload,rapidshare,files,torrent,ul.to,uploaded,rapidgator\"\
+          \ />\r\n<link rel=\"alternate\" type=\"application/rss+xml\" title=\"Sceper.ws\"\
+          \ href=\"http://sceper.ws/feed\" />\r\n\r\n\r\n<link rel=\"stylesheet\"\
+          \ href=\"http://sceper.ws/wp-content/themes/SceneRLSv4/style.css\" type=\"\
+          text/css\" media=\"screen\" />\r\n<link rel=\"alternate\" type=\"application/rss+xml\"\
+          \ title=\"Sceper RSS Feed\" href=\"http://sceper.ws/feed\" />\r\n<link rel=\"\
+          alternate\" type=\"application/atom+xml\" title=\"Sceper Atom Feed\" href=\"\
+          http://sceper.ws/feed/atom\" />\r\n\r\n<!--[if lt IE 7]>\r\n\t<link rel=\"\
+          stylesheet\" type=\"text/css\" href=\"http://sceper.ws/wp-content/themes/SceneRLSv4/css/ie6style.css\"\
+          \ />\r\n\t<script type=\"text/javascript\" src=\"http://sceper.ws/wp-content/themes/SceneRLSv4/js/DD_belatedPNG_0.0.8a-min.js\"\
+          ></script>\r\n\t<script type=\"text/javascript\">DD_belatedPNG.fix('img#logo,\
+          \ #cat-nav-left, #cat-nav-right, #search-form, #cat-nav-content, div.top-overlay,\
+          \ .slide .description, div.overlay, a#prevlink, a#nextlink, .slide a.readmore,\
+          \ .slide a.readmore span, .recent-cat .entry .title, #recent-posts .entry\
+          \ p.date, .footer-widget ul li, #tabbed-area ul#tab_controls li span');</script>\r\
+          \n<![endif]-->\r\n<!--[if IE 7]>\r\n\t<link rel=\"stylesheet\" type=\"text/css\"\
+          \ href=\"http://sceper.ws/wp-content/themes/SceneRLSv4/css/ie7style.css\"\
+          \ />\r\n<![endif]-->\r\n<!--[if IE 8]>\r\n\t<link rel=\"stylesheet\" type=\"\
+          text/css\" href=\"http://sceper.ws/wp-content/themes/SceneRLSv4/css/ie8style.css\"\
+          \ />\r\n<![endif]-->\r\n\r\n<script type=\"text/javascript\">\r\n\tdocument.documentElement.className\
+          \ = 'js';\r\n</script>\r\n\r\n<link rel=\"alternate\" type=\"application/rss+xml\"\
+          \ title=\"Sceper &raquo; Movies - DVD Rip Category Feed\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/feed\"\
+          \ />\n\t\t<link rel=\"stylesheet\" href=\"\" type=\"text/css\" media=\"\
+          screen\" />\n\t<meta content=\"SceneRLSv4 v.4.0\" name=\"generator\"/>\t\
+          \r\n\t<style type=\"text/css\">\r\n\t\tbody { color: #303030; }\r\n\t\t\
+          #recent-posts a { color: #2335e5; }\r\n\t\tul.nav li a { color: #; }\r\n\
+          \t\tul.nav li.current_page_item a, ul.nav li a:hover, #cat-nav-content ul.nav\
+          \ li a:hover, #cat-nav-content ul.nav li.current-cat > a  { color: #06cf49;\
+          \ }\r\n\t\th1, h2, h3, h4, h5, h6, h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {\
+          \ color: #; }\r\n\t\t\r\n\t\t#sidebar a { color:#; }\t\t\r\n\t\tp#copyright\
+          \ { color:# }\r\n\t\t#footer a, ul.bottom-nav li a { color:# }\r\n\t</style>\r\
+          \n\r\n<script type='text/javascript' src='http://static.sceper.ws/js/jquery.js?ver=1.11.1'></script>\n\
+          <script type='text/javascript' src='http://sceper.ws/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>\n\
+          <link rel=\"EditURI\" type=\"application/rsd+xml\" title=\"RSD\" href=\"\
+          http://sceper.ws/xmlrpc.php?rsd\" />\n<link rel=\"wlwmanifest\" type=\"\
+          application/wlwmanifest+xml\" href=\"http://sceper.ws/wp-includes/wlwmanifest.xml\"\
+          \ /> \n\n<script language=\"JavaScript\" type=\"text/javascript\"><!-- \n\
+          function expand(param) { \nparam.style.display=(param.style.display==\"\
+          none\") ? \"\" : \"none\"; \n} \n//--></script>\n\n<link rel=\"stylesheet\"\
+          \ type=\"text/css\" href=\"http://sceper.ws/wp-content/plugins/wp-recaptcha/recaptcha.css\"\
+          \ />\t<style type=\"text/css\">.recentcomments a{display:inline !important;padding:0\
+          \ !important;margin:0 !important;}</style>\n</head>\r\n<body>\r\n\t<div\
+          \ id=\"header-top\" class=\"clearfix\">\r\n\t\t<div class=\"container clearfix\"\
+          >\r\n\t\t\t<!-- Start Logo -->\t\t\t\r\n\t\t\t<a href=\"http://sceper.ws/\"\
+          \ />\r\n\t\t\t\t<img src=\"http://static.sceper.ws/images/SceneRLSv4/logo.png\"\
+          \ alt=\"Logo\" id=\"logo\"/></a>\r\n\t\t\t<!-- <p id=\"slogan\">For your\
+          \ daily Scene and P2P releases</p> -->\r\n\t\t\t<!-- End Logo -->\r\n\t\t\
+          \t\r\n\t\t\t<!-- Start Page-menu -->\r\n\t\t\t<div id=\"page-menu\">\r\n\
+          \t\t\t\t<div id=\"p-menu-left\"> </div>\r\n\t\t\t\t<div id=\"p-menu-content\"\
+          >\r\n\t\t\t\t\r\n\t\t\t\t\t<ul class=\"nav clearfix\">\t\t\t<li ><a href=\"\
+          http://sceper.ws\">Home</a></li>\n\t\t\t<!--<li class=\"current_page_item\"\
+          ><span style=\"color: #0000ff;\"><strong><a href=\"http://sceper.ws/request\"\
+          >Requests</a></strong></span></li>-->\n\t\t<li class=\"page_item page-item-8345\"\
+          ><a href=\"http://sceper.ws/about\">About</a></li>\n<li class=\"page_item\
+          \ page-item-11219\"><a href=\"http://sceper.ws/affiliates\">Affiliates</a></li>\n\
+          <li class=\"page_item page-item-13453\"><a href=\"http://sceper.ws/contact-us\"\
+          >Contact</a></li>\n<li class=\"page_item page-item-9282\"><a href=\"http://sceper.ws/disclaimer\"\
+          >Disclaimer</a></li>\n<li class=\"page_item page-item-23017\"><a href=\"\
+          http://sceper.ws/dmca\">DMCA</a></li>\n<li class=\"page_item page-item-14071\"\
+          ><a href=\"http://sceper.ws/faq\">FAQ</a></li>\n<li class=\"page_item page-item-8350\"\
+          ><a href=\"http://sceper.ws/irc\">IRC</a></li>\n<li class=\"page_item page-item-111681\"\
+          ><a href=\"http://sceper.ws/rules\">Rules</a></li>\n<li class=\"page_item\
+          \ page-item-14714\"><a href=\"http://sceper.ws/sgl\">SGL</a></li>\n</ul>\t\
+          \t\t\t</div>\t\r\n\t\t\t\t<div id=\"p-menu-right\"> </div>\r\n\t\t\t</div>\t\
+          <!-- end #page-menu -->\t\r\n\t\t\t<!-- End Page-menu -->\t\r\n\t\t\t\r\n\
+          \t\t\t<div id=\"cat-nav\" class=\"clearfix\">\t\r\n\t\t\t\t<div id=\"cat-nav-left\"\
+          > </div>\r\n\t\t\t\t<div id=\"cat-nav-content\"> \r\n\t\t\t\t\t\r\n\t\t\t\
+          \t\t<ul class=\"superfish nav clearfix\">\t<li class=\"cat-item cat-item-11\"\
+          ><a href=\"http://sceper.ws/category/applications\" >Applications</a>\n\
+          <ul class='children'>\n\t<li class=\"cat-item cat-item-9327\"><a href=\"\
+          http://sceper.ws/category/applications/android\" >Android</a>\n</li>\n\t\
+          <li class=\"cat-item cat-item-8401\"><a href=\"http://sceper.ws/category/applications/ios\"\
+          \ >iOS</a>\n</li>\n\t<li class=\"cat-item cat-item-1156\"><a href=\"http://sceper.ws/category/applications/pda\"\
+          \ >PDA</a>\n</li>\n</ul>\n</li>\n\t<li class=\"cat-item cat-item-1252\"\
+          ><a href=\"http://sceper.ws/category/e-books\" >E Books</a>\n</li>\n\t<li\
+          \ class=\"cat-item cat-item-29\"><a href=\"http://sceper.ws/category/games\"\
+          \ >Games</a>\n<ul class='children'>\n\t<li class=\"cat-item cat-item-20\"\
+          ><a href=\"http://sceper.ws/category/games/console-games\" >Console Games</a>\n\
+          </li>\n\t<li class=\"cat-item cat-item-1054\"><a href=\"http://sceper.ws/category/games/games-pack\"\
+          \ >Games Pack</a>\n</li>\n\t<li class=\"cat-item cat-item-1074\"><a href=\"\
+          http://sceper.ws/category/games/mini-games\" >Mini Games</a>\n</li>\n\t\
+          <li class=\"cat-item cat-item-385\"><a href=\"http://sceper.ws/category/games/mobile-phone-games\"\
+          \ >Mobile Phone Games</a>\n\t<ul class='children'>\n\t<li class=\"cat-item\
+          \ cat-item-14533\"><a href=\"http://sceper.ws/category/games/mobile-phone-games/android-mobile-phone-games\"\
+          \ >Android</a>\n</li>\n\t<li class=\"cat-item cat-item-14534\"><a href=\"\
+          http://sceper.ws/category/games/mobile-phone-games/ios-mobile-phone-games\"\
+          \ >iOS</a>\n</li>\n\t</ul>\n</li>\n\t<li class=\"cat-item cat-item-13\"\
+          ><a href=\"http://sceper.ws/category/games/pc-games\" >PC Games</a>\n\t\
+          <ul class='children'>\n\t<li class=\"cat-item cat-item-384\"><a href=\"\
+          http://sceper.ws/category/games/pc-games/game-fixes\" >Game Fixes</a>\n\
+          </li>\n\t</ul>\n</li>\n</ul>\n</li>\n\t<li class=\"cat-item cat-item-28\
+          \ current-cat-parent\"><a href=\"http://sceper.ws/category/movies\" >Movies</a>\n\
+          <ul class='children'>\n\t<li class=\"cat-item cat-item-1161\"><a href=\"\
+          http://sceper.ws/category/movies/cartoons\" >Cartoons</a>\n</li>\n\t<li\
+          \ class=\"cat-item cat-item-14561\"><a href=\"http://sceper.ws/category/movies/hdrip-movies\"\
+          \ >HDRip</a>\n</li>\n\t<li class=\"cat-item cat-item-1832\"><a href=\"http://sceper.ws/category/movies/movie-packs\"\
+          \ >Movie Packs</a>\n</li>\n\t<li class=\"cat-item cat-item-865\"><a href=\"\
+          http://sceper.ws/category/movies/movies-3d\" >Movies &#8211; 3D</a>\n</li>\n\
+          \t<li class=\"cat-item cat-item-17\"><a href=\"http://sceper.ws/category/movies/movies-bluray-rip\"\
+          \ >Movies &#8211; BluRay Rip</a>\n\t<ul class='children'>\n\t<li class=\"\
+          cat-item cat-item-860\"><a href=\"http://sceper.ws/category/movies/movies-bluray-rip/movies-bdrc\"\
+          \ >Movies &#8211; BDRC</a>\n</li>\n\t<li class=\"cat-item cat-item-577\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-bluray-rip/movies-bdrip\"\
+          \ >Movies &#8211; BDRip</a>\n</li>\n\t<li class=\"cat-item cat-item-383\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-bluray-rip/movies-brrip\"\
+          \ >Movies &#8211; BRRip</a>\n</li>\n\t</ul>\n</li>\n\t<li class=\"cat-item\
+          \ cat-item-8\"><a href=\"http://sceper.ws/category/movies/movies-cam\" >Movies\
+          \ &#8211; Cam</a>\n</li>\n\t<li class=\"cat-item cat-item-857\"><a href=\"\
+          http://sceper.ws/category/movies/movies-ddc\" >Movies &#8211; DDC</a>\n\
+          </li>\n\t<li class=\"cat-item cat-item-6 current-cat\"><a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ >Movies &#8211; DVD Rip</a>\n</li>\n\t<li class=\"cat-item cat-item-22\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-dvdr\" >Movies &#8211;\
+          \ DVDR</a>\n</li>\n\t<li class=\"cat-item cat-item-9493\"><a href=\"http://sceper.ws/category/movies/movies-foreign\"\
+          \ >Movies &#8211; Foreign</a>\n</li>\n\t<li class=\"cat-item cat-item-26\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-full-bd\" >Movies &#8211;\
+          \ Full BD</a>\n</li>\n\t<li class=\"cat-item cat-item-15\"><a href=\"http://sceper.ws/category/movies/movies-hddvd-rip\"\
+          \ >Movies &#8211; HDDVD Rip</a>\n</li>\n\t<li class=\"cat-item cat-item-18\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-hdtv\" >Movies &#8211;\
+          \ HDTV</a>\n</li>\n\t<li class=\"cat-item cat-item-37\"><a href=\"http://sceper.ws/category/movies/movies-hdtv-720p\"\
+          \ >Movies &#8211; HDTV 720p</a>\n</li>\n\t<li class=\"cat-item cat-item-1829\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-mini\" >Movies &#8211;\
+          \ Mini (&lt;551MB)</a>\n</li>\n\t<li class=\"cat-item cat-item-858\"><a\
+          \ href=\"http://sceper.ws/category/movies/movies-ppv-rip\" >Movies &#8211;\
+          \ PPV Rip</a>\n</li>\n\t<li class=\"cat-item cat-item-5\"><a href=\"http://sceper.ws/category/movies/movies-r5\"\
+          \ >Movies &#8211; R5</a>\n</li>\n\t<li class=\"cat-item cat-item-52\"><a\
+          \ href=\"http://sceper.ws/category/movies/movies-screener\" >Movies &#8211;\
+          \ Screener</a>\n\t<ul class='children'>\n\t<li class=\"cat-item cat-item-859\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-screener/screener-bd\"\
+          \ >Screener &#8211; BD</a>\n</li>\n\t<li class=\"cat-item cat-item-7\"><a\
+          \ href=\"http://sceper.ws/category/movies/movies-screener/movies-screener-dvd\"\
+          \ >Screener &#8211; DVD</a>\n</li>\n\t<li class=\"cat-item cat-item-53\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-screener/movies-screener-vhs\"\
+          \ >Screener &#8211; VHS</a>\n</li>\n\t</ul>\n</li>\n\t<li class=\"cat-item\
+          \ cat-item-14\"><a href=\"http://sceper.ws/category/movies/movies-telecine\"\
+          \ >Movies &#8211; Telecine</a>\n</li>\n\t<li class=\"cat-item cat-item-4\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-telesync\" >Movies &#8211;\
+          \ Telesync</a>\n</li>\n\t<li class=\"cat-item cat-item-16\"><a href=\"http://sceper.ws/category/movies/movies-workprint\"\
+          \ >Movies &#8211; Workprint</a>\n</li>\n\t<li class=\"cat-item cat-item-1811\"\
+          ><a href=\"http://sceper.ws/category/movies/vodrip\" >VODRiP</a>\n</li>\n\
+          \t<li class=\"cat-item cat-item-11599\"><a href=\"http://sceper.ws/category/movies/web-dl\"\
+          \ >WEB-DL</a>\n</li>\n\t<li class=\"cat-item cat-item-14560\"><a href=\"\
+          http://sceper.ws/category/movies/webrip-movies\" >WEBRip</a>\n</li>\n</ul>\n\
+          </li>\n\t<li class=\"cat-item cat-item-12\"><a href=\"http://sceper.ws/category/music\"\
+          \ >Music</a>\n<ul class='children'>\n\t<li class=\"cat-item cat-item-1612\"\
+          ><a href=\"http://sceper.ws/category/music/itunes-singles\" title=\"Newly\
+          \ released interesting itunes singles/\">iTunes Singles</a>\n</li>\n\t<li\
+          \ class=\"cat-item cat-item-23\"><a href=\"http://sceper.ws/category/music/music-mdvdr\"\
+          \ >Music &#8211; MDVDR</a>\n</li>\n\t<li class=\"cat-item cat-item-578\"\
+          ><a href=\"http://sceper.ws/category/music/music-video\" >Music &#8211;\
+          \ Video</a>\n</li>\n</ul>\n</li>\n\t<li class=\"cat-item cat-item-1718\"\
+          ><a href=\"http://sceper.ws/category/sr-pack\" >SR Pack</a>\n</li>\n\t<li\
+          \ class=\"cat-item cat-item-24\"><a href=\"http://sceper.ws/category/staff-recommended\"\
+          \ >Staff Recommended</a>\n</li>\n\t<li class=\"cat-item cat-item-10\"><a\
+          \ href=\"http://sceper.ws/category/tv-shows\" >TV Shows</a>\n<ul class='children'>\n\
+          \t<li class=\"cat-item cat-item-1408\"><a href=\"http://sceper.ws/category/tv-shows/animes\"\
+          \ >Anime/Cartoons</a>\n</li>\n\t<li class=\"cat-item cat-item-50\"><a href=\"\
+          http://sceper.ws/category/tv-shows/documentaries\" >Documentaries</a>\n\
+          </li>\n\t<li class=\"cat-item cat-item-14531\"><a href=\"http://sceper.ws/category/tv-shows/mini-series\"\
+          \ >Mini Series</a>\n</li>\n\t<li class=\"cat-item cat-item-854\"><a href=\"\
+          http://sceper.ws/category/tv-shows/tv-packs\" >TV Packs</a>\n</li>\n\t<li\
+          \ class=\"cat-item cat-item-46\"><a href=\"http://sceper.ws/category/tv-shows/tv-shows-x264\"\
+          \ >TV Shows &#8211; x264</a>\n</li>\n</ul>\n</li>\n</ul>\r\n\t\t\t\t\t<!--\
+          \ Start Searchbox -->\r\n\t\t\t\t\t<div id=\"search-form\">\r\n\t\t\t\t\t\
+          \t<form method=\"get\" id=\"searchform1\" action=\"http://sceper.ws\">\r\
+          \n\t\t\t\t\t\t\t<input type=\"text\" value=\"\" name=\"s\" id=\"searchinput\"\
+          \ />\r\n\t\t\r\n\t\t\t\t\t\t\t<input type=\"image\" src=\"http://sceper.ws/wp-content/themes/SceneRLSv4/images/search_btn.png\"\
+          \ id=\"searchsubmit\" />\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</div>\r\n\
+          <div id=\"side-search-form\">\r\n<a href=\"/feed\" target=\"_blank\"><img\
+          \ src=\"http://static.sceper.ws/images/SceneRLSv4/rssicon.png\"></a>\r\n\
+          <span style=\"position:relative; top:21px;\"><iframe src=\"http://free.timeanddate.com/clock/i2plvz9y/n211/fn12/fs13/fcf90/tct/pct/ftb/th2\"\
+          \ frameborder=\"0\" width=\"91\" height=\"16\" allowTransparency=\"true\"\
+          ></iframe></span>\r\n</div>\r\n\t\t\t\t<!-- End Searchbox -->\t\r\n\t\t\t\
+          \t</div> <!-- end #cat-nav-content -->\r\n\t\t\t\t<div id=\"cat-nav-right\"\
+          > </div>\r\n\t\t\t</div>\t<!-- end #cat-nav -->\t\r\n\t\t</div> \t<!-- end\
+          \ .container -->\r\n\t</div> \t<!-- end #header-top -->\r\n\t\r\n\t\r\n\t\
+          \r\n\t<div id='content-single'>\t<div id=\"content-top-shadow\"></div>\r\
+          \n\t\t\r\n\t\t\t\t<div class=\"container\">\t\r\n\t\r\n<div id=\"main-content-wrap\"\
+          >\r\n\t<div id=\"main-content\" class=\"clearfix\">\r\n\t\t<div id=\"breadcrumbs\"\
+          >\r\n\t\t\r\n\t\t\t\t\t<a href=\"http://sceper.ws\">Home</a> &raquo;\r\n\
+          \t\t\t\t\r\n\t\t\t\t\t\t\t\t\tMovies &#8211; DVD Rip\t\t\t\t\t\r\n</div>\
+          \ <!-- end #breadcrumbs -->\t\t<div id=\"top-shadow\"></div>\r\n\t\t\t\r\
+          \n\t\t<div id=\"recent-posts\" class=\"clearfix\">\r\n\t\t\t\t\t\t\t\n<div\
+          \ class=\"entry clearfix\" >\n\t<h2 class=\"title\"><a href=\"http://sceper.ws/2014/10/school-dance-2014-dvdrip-xvid-evo.html\"\
+          >School Dance 2014 DVDRip XviD-EVO</a></h2>\n\t\n\t<div class=\"entry-content\
+          \ clearfix\">\n\t\t\t\t<div class=\"meta\">Release Info</div>\n<p><a href=\"\
+          http://img.sceper.ws/images/3jMxl.jpg\" target=\"_blank\"><img style=\"\
+          margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/3jMxl.jpg\"\
+          \ border=\"0\" alt=\"\" height=\"250\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> EVO\
+          \ (P2P)<br />\n<span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Name:</span> School.Dance.2014.DVDRip.XviD-EVO<br />\n\
+          </span><span style=\"font-family: arial;\"><span style=\"font-weight: bold;\"\
+          >Release Date:</span> 19th October 2014<br />\n</span><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Filename:</span> School.Dance.2014.DVDRip.XviD-EVO<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Source:</span> DVDR<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Size:</span> 842.192 MB<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Genre:</span>\
+          \ Comedy | Drama | Music<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Video:</span> XviD, 720&#215;400 at\
+          \ 1200 kbps<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Audio:</span> English, MP-3 at 128kbps<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Subs:</span>\
+          \ N/A<br />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">IMDB Rating:</span> 4.2/10 from 517 users<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">RT Critics:</span>\
+          \ No Reviews Yet&#8230;<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Directed By:</span> Nick Cannon<br />\n\
+          </span><span style=\"font-family: arial;\"><span style=\"font-weight: bold;\"\
+          >Starring:</span> Bobb\\&#8217;e J. Thompson, Luenell, Mike Epps</p>\n<div\
+          \ class=\"meta\">Release Description</div>\n<p>High schooler Jason has found\
+          \ his dream girl-the gorgeous Anastacia. There\\&#8217;s just one problem:\
+          \ she doesn\\&#8217;t know he exists.</p>\n<div class=\"meta\">Release Quality</div>\n\
+          <p><a href=\" http://img.sceper.ws/images/mrCVB.png \" target=\"_blank\"\
+          ><img src=\" http://img.sceper.ws/images/mrCVB.png \" border=\"0\" alt=\"\
+          \" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/SCDUQ.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/SCDUQ.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/TZj1a.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/TZj1a.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a></p>\n<div class=\"meta\"\
+          >Associated Links</div>\n<p style=\"text-align: center;\"><span style=\"\
+          color: #99cc00;\"><span style=\"font-family: arial; font-size: 130%; font-weight:\
+          \ bold;\"><a href=\"http://www.imdb.com/title/tt2179936/\" target=\"_blank\"\
+          >Homepage</a> &#8211; <a href=\"http://www.youtube.com/watch?v=aePpsyPprhM\"\
+          \ target=\"_blank\">Trailer</a> &#8211; <a href=\"http://www.imdb.com/title/tt2179936/\"\
+          \ target=\"_blank\">IMDB</a> &#8211; <a href=\"http://www.rottentomatoes.com/m/school_dance/\"\
+          \ target=\"_blank\">RT</a> &#8211; <a href=\"http://view.nfo.so/0/0/1/a54c690ef79737fee055bebb538bc249.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/School.Dance.2014.DVDRip.XviD-EVO/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=School.Dance.2014.DVDRip.XviD-EVO\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=School.Dance.2014.DVDRip.XviD-EVO\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >DOWNLOAD (<a href=\"http://uploaded.net/file/6i24o77t/School.Dance.2014.DVDRip.XviD-EVO.avi\"\
+          >Uploaded</a>) OR (<a href=\"http://rg.to/file/829deae242a02516a46dc90a1eb50906/School.Dance.2014.DVDRip.XviD-EVO.avi.html\"\
+          >RapidGator</a>)</p>\n\t\t\n\t</div> <!-- end .entry-content -->\n\t\n\t\
+          <div class=\"post-meta clearfix\">\n\t\t\t\t\t<p class=\"meta-info\">Posted\
+          \  by <a href=\"http://sceper.ws/author/thunder\" title=\"Posts by Thunder\
+          \ &#124; A True Broski\" rel=\"author\">Thunder &#124; A True Broski</a>\
+          \   in <a href=\"http://sceper.ws/category/movies\" rel=\"category tag\"\
+          >Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Sunday, October 19th, 2014\
+          \ at \r\n1:36 pm | <a href=\"http://sceper.ws/2014/10/school-dance-2014-dvdrip-xvid-evo.html#comments\"\
+          \ title=\"Comment on School Dance 2014 DVDRip XviD-EVO\">8 comments</a></p>\r\
+          \n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=School\
+          \ Dance 2014 DVDRip XviD-EVO&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/school-dance-2014-dvdrip-xvid-evo.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"\
+          title\"><a href=\"http://sceper.ws/2014/10/doc-hollidays-revenge-2014-repack-dvdrip-xvid-evo.html\"\
+          >Doc Hollidays Revenge 2014 REPACK DVDRip XviD-EVO</a></h2>\n\t\n\t<div\
+          \ class=\"entry-content clearfix\">\n\t\t\t\t<div class=\"meta\">Release\
+          \ Info</div>\n<p><a href=\"http://img.sceper.ws/images/lZws0.jpg\" target=\"\
+          _blank\"><img style=\"margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/lZws0.jpg\"\
+          \ border=\"0\" alt=\"\" height=\"250\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> EVO\
+          \ (P2P)<br />\n<span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Name:</span> Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Date:</span> 19th October 2014<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Filename:</span>\
+          \ Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Source:</span>\
+          \ DVDR<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Size:</span> 825.959 MB<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Genre:</span> Western<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Video:</span> x264, 720 x 400 at 1201 kbps<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Audio:</span>\
+          \ English, MP-3 at 128kbps<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Subs:</span> N/A<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">IMDB\
+          \ Rating:</span> 3.7/10 from 65 users<br />\n</span><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">RT Critics:</span> No Reviews\
+          \ Yet&#8230;<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Directed By:</span> David DeCoteau<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Starring:</span>\
+          \ William McNamara, Eric Roberts, Tom Berenger</p>\n<div class=\"meta\"\
+          >Release Description</div>\n<p>In 1882, Joseph and Elizabeth Cooley head\
+          \ West to reunite with family she never knew.</p>\n<div class=\"meta\">Release\
+          \ Quality</div>\n<p><a href=\" http://img.sceper.ws/images/h3gFS.png \"\
+          \ target=\"_blank\"><img src=\" http://img.sceper.ws/images/h3gFS.png \"\
+          \ border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/T6kHU.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/T6kHU.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/BjXz3.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/BjXz3.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a></p>\n<div class=\"meta\"\
+          >Associated Links</div>\n<p style=\"text-align: center;\"><span style=\"\
+          color: #99cc00;\"><span style=\"font-family: arial; font-size: 130%; font-weight:\
+          \ bold;\"><a href=\"http://www.rapidheart.com/\" target=\"_blank\">Homepage</a>\
+          \ &#8211; <a href=\"http://www.youtube.com/watch?v=0edgu_9h8M4\" target=\"\
+          _blank\">Trailer</a> &#8211; <a href=\"http://www.imdb.com/title/tt3359872/\"\
+          \ target=\"_blank\">IMDB</a> &#8211; <a href=\"http://www.rottentomatoes.com/m/doc_hollidays_revenge/\"\
+          \ target=\"_blank\">RT</a> &#8211; <a href=\"http://view.nfo.so/0/0/1/25a4d65aec22fc3726bf48c4d6274e96.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >DOWNLOAD (<a href=\"http://uploaded.net/file/h50assa4/Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO.avi\"\
+          >Uploaded</a>) OR (<a href=\"http://rg.to/file/8ac44c1f35c3e23422a2644590ea59a6/Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO.avi.html\"\
+          >RapidGator</a>)</p>\n\t\t\n\t</div> <!-- end .entry-content -->\n\t\n\t\
+          <div class=\"post-meta clearfix\">\n\t\t\t\t\t<p class=\"meta-info\">Posted\
+          \  by <a href=\"http://sceper.ws/author/thunder\" title=\"Posts by Thunder\
+          \ &#124; A True Broski\" rel=\"author\">Thunder &#124; A True Broski</a>\
+          \   in <a href=\"http://sceper.ws/category/movies\" rel=\"category tag\"\
+          >Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Sunday, October 19th, 2014\
+          \ at \r\n1:31 pm | <a href=\"http://sceper.ws/2014/10/doc-hollidays-revenge-2014-repack-dvdrip-xvid-evo.html#comments\"\
+          \ title=\"Comment on Doc Hollidays Revenge 2014 REPACK DVDRip XviD-EVO\"\
+          >6 comments</a></p>\r\n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=Doc\
+          \ Hollidays Revenge 2014 REPACK DVDRip XviD-EVO&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/doc-hollidays-revenge-2014-repack-dvdrip-xvid-evo.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"\
+          title\"><a href=\"http://sceper.ws/2014/10/how-to-train-your-dragon-2-2014-dvdrip-xvid-evo.html\"\
+          >How to Train Your Dragon 2 2014 DVDRip XviD-EVO</a></h2>\n\t\n\t<div class=\"\
+          entry-content clearfix\">\n\t\t\t\t<div class=\"meta\">Release Info</div>\n\
+          <p><a href=\"http://img.sceper.ws/images/B6COq.jpg\" target=\"_blank\"><img\
+          \ style=\"margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/B6COq.jpg\"\
+          \ alt=\"\" height=\"250\" border=\"0\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> EVO\
+          \ (P2P)<br />\n<span style=\"font-weight: bold;\">Release Name:</span>\_\
+          How.to.Train.Your.Dragon.2.2014.DVDRip.XviD-EVO<br />\n<span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Date:</span>\_Oct\
+          \ 17th\_, 2014<br />\n<span style=\"font-weight: bold;\">Filename:</span>\_\
+          How.to.Train.Your.Dragon.2.2014.DVDRip.XviD-EVO<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Source:</span>\_\
+          DVDR<br />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Size:</span>\_900 MB<br />\n<span style=\"font-weight: bold;\"\
+          >Genre:</span> Animation | Action | Adventure<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Video:</span>\_\
+          AVi | 720&#215;304<br />\n<span style=\"font-weight: bold;\">Audio:</span>\
+          \ English |\_MP3<br />\n</span><span style=\"font-family: arial;\"><span\
+          \ style=\"font-weight: bold;\">Subs:</span> N/A<br />\n<span style=\"font-weight:\
+          \ bold;\">IMDB Rating:</span> 8.3/10 from 58,265 users<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">RT Critics:</span>\
+          \ 7.8/10<br />\n<span style=\"font-weight: bold;\">Directed By:</span> Dean\
+          \ DeBlois<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Starring:</span> Jay Baruchel, Cate Blanchett, Gerard\
+          \ Butler </span></span></p>\n<div class=\"meta\">Release Description</div>\n\
+          <p>When Hiccup and Toothless discover an ice cave that is home to hundreds\
+          \ of new wild dragons and the mysterious Dragon Rider, the two friends find\
+          \ themselves at the center of a battle to protect the peace.</p>\n<div class=\"\
+          meta\">Release Quality</div>\n<p><a href=\"http://img.sceper.ws/images/MeGcT.png\"\
+          \ target=\"_blank\"><img src=\"http://img.sceper.ws/images/MeGcT.png\" alt=\"\
+          \" width=\"245\" border=\"0\" /></a><a href=\"http://img.sceper.ws/images/jRd4e.png\"\
+          \ target=\"_blank\"><img src=\"http://img.sceper.ws/images/jRd4e.png\" alt=\"\
+          \" width=\"245\" border=\"0\" /></a><a href=\"http://img.sceper.ws/images/HWk80.png\"\
+          \ target=\"_blank\"><img src=\"http://img.sceper.ws/images/HWk80.png\" alt=\"\
+          \" width=\"245\" border=\"0\" /></a></p>\n<div class=\"meta\">Associated\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          ><a href=\"https://www.howtotrainyourdragon.com/\" target=\"_blank\">Homepage</a>\
+          \ \u2013 <a href=\"https://www.youtube.com/watch?v=Z9a4PvzlqoQ\" target=\"\
+          _blank\">Trailer</a> \u2013 <a href=\"http://www.imdb.com/title/tt1646971/\"\
+          \ target=\"_blank\">IMDB</a> \u2013 <a href=\"http://www.rottentomatoes.com/m/how_to_train_your_dragon_2/\"\
+          \ target=\"_blank\">RT</a> \u2013 <a href=\"http://nfo.sceper.ws/nfo/How.to.Train.Your.Dragon.2.2014.DVDRip.XviD-EVO.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/How.to.Train.Your.Dragon.2.2014/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=How.to.Train.Your.Dragon.2.2014\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=How.to.Train.Your.Dragon.2.2014\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >\_DOWNLOAD HERE &#8212; &gt;&gt;&gt; ( <a href=\"http://ul.to/d7g11tmv\"\
+          \ target=\"_blank\">UPLOADED</a>\_)\_</span></span></p>\n\t\t\n\t</div>\
+          \ <!-- end .entry-content -->\n\t\n\t<div class=\"post-meta clearfix\">\n\
+          \t\t\t\t\t<p class=\"meta-info\">Posted  by <a href=\"http://sceper.ws/author/angel\"\
+          \ title=\"Posts by Angel\" rel=\"author\">Angel</a>   in <a href=\"http://sceper.ws/category/movies\"\
+          \ rel=\"category tag\">Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Friday, October 17th, 2014\
+          \ at \r\n7:55 pm | <a href=\"http://sceper.ws/2014/10/how-to-train-your-dragon-2-2014-dvdrip-xvid-evo.html#comments\"\
+          \ title=\"Comment on How to Train Your Dragon 2 2014 DVDRip XviD-EVO\">15\
+          \ comments</a></p>\r\n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=How\
+          \ to Train Your Dragon 2 2014 DVDRip XviD-EVO&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/how-to-train-your-dragon-2-2014-dvdrip-xvid-evo.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"\
+          title\"><a href=\"http://sceper.ws/2014/10/7500-2014-dvdrip-x264-exvid.html\"\
+          >7500 2014 DVDRip x264-EXViD</a></h2>\n\t\n\t<div class=\"entry-content\
+          \ clearfix\">\n\t\t\t\t<div class=\"meta\">Release Info</div>\n<p><a href=\"\
+          http://img.sceper.ws/images/Moz2k.jpg\" target=\"_blank\"><img style=\"\
+          margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/Moz2k.jpg\"\
+          \ alt=\"\" height=\"250\" border=\"0\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> EXViD\
+          \ ( Scene )<br />\n<span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Name:</span> 7500.2014.DVDRip.x264-EXViD<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Release\
+          \ Date:</span>\_15th Oct,\_2014<br />\n<span style=\"font-weight: bold;\"\
+          >Filename:</span> 7500.2014.DVDRip.x264-EXViD<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Source:</span>\
+          \ DVDR<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Size:</span> 600 MB<br />\n</span><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Genre:</span> Horror | Mystery\
+          \ | Thriller<br />\n<span style=\"font-weight: bold;\">Video:</span> MKV\
+          \ | 720&#215;388<br />\n</span><span style=\"font-family: arial;\"><span\
+          \ style=\"font-weight: bold;\">Audio:</span> English | AAC<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Subs:</span>\
+          \ N/A<br />\n<span style=\"font-weight: bold;\">IMDB Rating:</span> 6.2/10\
+          \ from 712 users<br />\n</span><span style=\"font-family: arial;\"><span\
+          \ style=\"font-weight: bold;\">RT Critics:</span> No Reviews Yet\u2026<br\
+          \ />\n<span style=\"font-weight: bold;\">Directed By:</span> Takashi Shimizu<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Starring:</span> Leslie Bibb, Ryan Kwanten, Amy Smart</span></span></p>\n\
+          <div class=\"meta\">Release Description</div>\n<p>Flight 7500 departs Los\
+          \ Angeles International Airport bound for Tokyo. As the overnight flight\
+          \ makes its way over the Pacific Ocean during its ten-hour course, the passengers\
+          \ encounter what appears to be a supernatural force in the cabin.</p>\n\
+          <div class=\"meta\">Associated Links</div>\n<p style=\"text-align: center;\"\
+          ><span style=\"color: #99cc00;\"><span style=\"font-family: arial; font-size:\
+          \ 130%; font-weight: bold;\"><a href=\"http://7500movie.com/\" target=\"\
+          _blank\">Homepage</a> \u2013 <a href=\"http://www.youtube.com/watch?v=rbuIUyzfX5Q\"\
+          \ target=\"_blank\">Trailer</a> \u2013 <a href=\"http://www.imdb.com/title/tt1975159/\"\
+          \ target=\"_blank\">IMDB</a> \u2013 <a href=\"http://www.rottentomatoes.com/m/7500/\"\
+          \ target=\"_blank\">RT</a> \u2013 <a href=\"http://nfo.sceper.ws/nfo/7500.2014.DVDRip.x264-EXViD.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/7500.2014\
+          \ /0/99/0\" target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=7500.2014\
+          \ \" target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=7500.2014\
+          \ \" target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >\_DOWNLOAD HERE &#8212; &gt;&gt;&gt; ( <a href=\"http://ul.to/y5ba3cxl\"\
+          \ target=\"_blank\">UPLOADED</a>\_)\_</span></span></p>\n\t\t\n\t</div>\
+          \ <!-- end .entry-content -->\n\t\n\t<div class=\"post-meta clearfix\">\n\
+          \t\t\t\t\t<p class=\"meta-info\">Posted  by <a href=\"http://sceper.ws/author/angel\"\
+          \ title=\"Posts by Angel\" rel=\"author\">Angel</a>   in <a href=\"http://sceper.ws/category/movies\"\
+          \ rel=\"category tag\">Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Wednesday, October 15th,\
+          \ 2014 at \r\n2:01 am | <a href=\"http://sceper.ws/2014/10/7500-2014-dvdrip-x264-exvid.html#comments\"\
+          \ title=\"Comment on 7500 2014 DVDRip x264-EXViD\">18 comments</a></p>\r\
+          \n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=7500 2014\
+          \ DVDRip x264-EXViD&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/7500-2014-dvdrip-x264-exvid.html\" class=\"\
+          readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end .entry\
+          \ -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"title\"\
+          ><a href=\"http://sceper.ws/2014/10/the-anomaly-2014-dvdrip-x264-exvid.html\"\
+          >The Anomaly 2014 DVDRip x264-EXViD</a></h2>\n\t\n\t<div class=\"entry-content\
+          \ clearfix\">\n\t\t\t\t<div class=\"meta\">Release Info</div>\n<p><a href=\"\
+          http://img.sceper.ws/images/u0dr1.jpg\" target=\"_blank\"><img style=\"\
+          margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/u0dr1.jpg\"\
+          \ alt=\"\" height=\"250\" border=\"0\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> EXViD\
+          \ (Scene)<br />\n<span style=\"font-weight: bold;\">Release Name:</span>\
+          \ The.Anomaly.2014.DVDRip.x264-EXViD<br />\n<span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Release Date:</span> October 15, 2014<br\
+          \ />\n<span style=\"font-weight: bold;\">Filename:</span> The.Anomaly.2014.DVDRip.x264-EXViD<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Source:</span> DVDR<br />\n<span style=\"font-weight: bold;\"\
+          >Size:\_7</span>00 MB<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Genre:</span> Action | Sci-Fi<br />\n\
+          <span style=\"font-weight: bold;\">Video:</span>\_MKV\_ | 720\xD7306<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Audio:</span> English | AAC<br />\n<span style=\"font-weight:\
+          \ bold;\">Subs:</span>\_EN HI, FR, IT, DE, NL, DA, FI, NO, SV, TR<br />\n\
+          </span><span style=\"font-family: arial;\"><span style=\"font-weight: bold;\"\
+          >IMDB Rating:</span> 5.8/10<br />\n<span style=\"font-weight: bold;\">RT\
+          \ Critics:</span> 3.7/10<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Directed By:</span> Noel Clarke<br />\n\
+          <span style=\"font-weight: bold;\">Starring:</span> Noel Clarke, Ian Somerhalder,\
+          \ Brian Cox<br />\n</span></span></p>\n<div class=\"meta\">Release Description</div>\n\
+          <p>A former soldier is taken captive and awakens in the back of a van where\
+          \ he learns that he only has a few moments to figure out how he got there.</p>\n\
+          <div class=\"meta\">Associated Links</div>\n<p style=\"text-align: center;\"\
+          ><span style=\"color: #99cc00;\"><span style=\"font-family: arial; font-size:\
+          \ 130%; font-weight: bold;\"><a href=\"https://www.facebook.com/TheAnomalyMovie\"\
+          \ target=\"_blank\">Homepage</a> \u2013 <a href=\"http://www.youtube.com/watch?v=ZaR1vzMyR1M\"\
+          \ target=\"_blank\">Trailer</a> \u2013 <a href=\"http://www.imdb.com/title/tt2962726/\"\
+          \ target=\"_blank\">IMDB</a> \u2013 <a href=\"http://www.rottentomatoes.com/m/the_anomaly/\"\
+          \ target=\"_blank\">RT</a> \u2013 <a href=\"http://nfo.sceper.ws/nfo/The.Anomaly.2014.DVDRip.x264-EXViD.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/The.Anomaly.2014/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=The.Anomaly.2014\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=The.Anomaly.2014\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >\_DOWNLOAD HERE &#8212; &gt;&gt;&gt; ( <a href=\"http://ul.to/x3nypmcd\"\
+          \ target=\"_blank\">UPLOADED</a>\_)\_</span></span></p>\n\t\t\n\t</div>\
+          \ <!-- end .entry-content -->\n\t\n\t<div class=\"post-meta clearfix\">\n\
+          \t\t\t\t\t<p class=\"meta-info\">Posted  by <a href=\"http://sceper.ws/author/angel\"\
+          \ title=\"Posts by Angel\" rel=\"author\">Angel</a>   in <a href=\"http://sceper.ws/category/movies\"\
+          \ rel=\"category tag\">Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Wednesday, October 15th,\
+          \ 2014 at \r\n1:56 am | <a href=\"http://sceper.ws/2014/10/the-anomaly-2014-dvdrip-x264-exvid.html#comments\"\
+          \ title=\"Comment on The Anomaly 2014 DVDRip x264-EXViD\">18 comments</a></p>\r\
+          \n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=The Anomaly\
+          \ 2014 DVDRip x264-EXViD&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/the-anomaly-2014-dvdrip-x264-exvid.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"\
+          title\"><a href=\"http://sceper.ws/2014/10/the-black-rider-revelation-road-2014-dvdrip-xvid-mp3-rbg.html\"\
+          >The Black Rider Revelation Road 2014 DVDRip XviD MP3-RBG</a></h2>\n\t\n\
+          \t<div class=\"entry-content clearfix\">\n\t\t\t\t<div class=\"meta\">Release\
+          \ Info</div>\n<p><a href=\"http://img.sceper.ws/images/HiOyX.jpg\" target=\"\
+          _blank\"><img style=\"margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/HiOyX.jpg\"\
+          \ border=\"0\" alt=\"\" height=\"250\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> RBG\
+          \ (P2P)<br />\n<span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Name:</span> The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RBG<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Date:</span> 14th October 2014<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Filename:</span>\
+          \ The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RBG<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Source:</span>\
+          \ DVDR<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Size:</span> 1.87 GB<br />\n</span><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Genre:</span> Action<br />\n\
+          </span><span style=\"font-family: arial;\"><span style=\"font-weight: bold;\"\
+          >Video:</span> XviD, 720&#215;400 at 2187 kbps<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Audio:</span> English,\
+          \ MP-3 at 192 kbps<br />\n</span><span style=\"font-family: arial;\"><span\
+          \ style=\"font-weight: bold;\">Subs:</span> N/A<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">IMDB Rating:</span>\
+          \ 7.2/10 from 14 users<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">RT Critics:</span> No Reviews Yet&#8230;<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Directed By:</span> Gabriel Sabloff<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Starring:</span>\
+          \ James Denton, David A.R. White, Kevin Sorbo</p>\n<div class=\"meta\">Release\
+          \ Description</div>\n<p>The Rapture has come and gone. In it\\&#8217;s wake,\
+          \ a wasteland filled with desperate bandits. Josh McManus, a drifter with\
+          \ a knack for fighting, must find the mysterious \\&quot;Shepherd\\&quot;\
+          \ &#8211; a dangerous mission that will put his faith to the test.</p>\n\
+          <div class=\"meta\">Release Quality</div>\n<p><a href=\" http://img.sceper.ws/images/m1024.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/m1024.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/C1jdi.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/C1jdi.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/nSv7.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/nSv7.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a></p>\n<div class=\"meta\"\
+          >Associated Links</div>\n<p style=\"text-align: center;\"><span style=\"\
+          color: #99cc00;\"><span style=\"font-family: arial; font-size: 130%; font-weight:\
+          \ bold;\"><a href=\"http://pureflix.com/\" target=\"_blank\">Homepage</a>\
+          \ &#8211; <a href=\"http://www.youtube.com/watch?v=O3XDrgUJeiI\" target=\"\
+          _blank\">Trailer</a> &#8211; <a href=\"http://www.imdb.com/title/tt3505812/\"\
+          \ target=\"_blank\">IMDB</a> &#8211; <a href=\"http://www.rottentomatoes.com/m/revelation_road_3_the_black_rider/\"\
+          \ target=\"_blank\">RT</a> &#8211; <a href=\"http://nfo.sceper.ws/nfo/The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RARBG.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RBG/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RBG\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RBG\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >DOWNLOAD (<a href=\"http://uploaded.net/file/vkvfnp9j/The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RARBG.avi\"\
+          >Uploaded</a>) OR (<a href=\"http://rg.to/file/ff12e06f6defbfa5a975970c0a1dcf27/The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RARBG.avi.html\"\
+          >RapidGator</a>)</p>\n\t\t\n\t</div> <!-- end .entry-content -->\n\t\n\t\
+          <div class=\"post-meta clearfix\">\n\t\t\t\t\t<p class=\"meta-info\">Posted\
+          \  by <a href=\"http://sceper.ws/author/thunder\" title=\"Posts by Thunder\
+          \ &#124; A True Broski\" rel=\"author\">Thunder &#124; A True Broski</a>\
+          \   in <a href=\"http://sceper.ws/category/movies\" rel=\"category tag\"\
+          >Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Tuesday, October 14th, 2014\
+          \ at \r\n7:03 pm | <a href=\"http://sceper.ws/2014/10/the-black-rider-revelation-road-2014-dvdrip-xvid-mp3-rbg.html#comments\"\
+          \ title=\"Comment on The Black Rider Revelation Road 2014 DVDRip XviD MP3-RBG\"\
+          >11 comments</a></p>\r\n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=The\
+          \ Black Rider Revelation Road 2014 DVDRip XviD MP3-RBG&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/the-black-rider-revelation-road-2014-dvdrip-xvid-mp3-rbg.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"\
+          title\"><a href=\"http://sceper.ws/2014/10/bhopal-a-prayer-for-rain-2013-dvdrip-xvid-aqos.html\"\
+          >Bhopal A Prayer for Rain 2013 DVDRip XviD-AQOS</a></h2>\n\t\n\t<div class=\"\
+          entry-content clearfix\">\n\t\t\t\t<div class=\"meta\">Release Info</div>\n\
+          <p><a href=\"http://img.sceper.ws/images/BesE.jpg\" target=\"_blank\"><img\
+          \ style=\"margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/BesE.jpg\"\
+          \ alt=\"\" height=\"250\" border=\"0\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> AQOS\
+          \ (P2P)<br />\n<span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Name:</span> Bhopal.A.Prayer.for.Rain.2013.DVDRip.XviD-AQOS<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Date:</span> 14th October 2014<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Filename:</span>\
+          \ aqos-bapfr.2013.dvdrip.xvid<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Source:</span> DVDR<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Size:</span>\
+          \ 700 MB<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Genre:</span> Drama | History<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Video:</span> XviD,\
+          \ 640&#215;352 at 1000 kbps<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Audio:</span> English, MP-3 at 128kbps<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Subs:</span> N/A<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">IMDB Rating:</span> 7.7/10 from 362\
+          \ users<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">RT Critics:</span> No Reviews Yet&#8230;<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Directed\
+          \ By:</span> Ravi Kumar<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Starring:</span> Mischa Barton, Martin\
+          \ Sheen, Kal Penn</span></span></p>\n<div class=\"meta\">Release Description</div>\n\
+          <p>The story follows a young rickshaw-puller in Bhopal who gets a menial\
+          \ job at a chemical plant, but in December of 1984 a chemical spill in India\
+          \ takes the lives of almost 15,000 people and injuring more than 100,000.\
+          \ The film follows how the industrial disaster in the city changes his life\
+          \ and those of others.</p>\n<div class=\"meta\">Release Quality</div>\n\
+          <p><a href=\" http://img.sceper.ws/images/ImCtT.jpg \" target=\"_blank\"\
+          ><img src=\" http://img.sceper.ws/images/ImCtT.jpg \" alt=\"\" width=\"\
+          245\" border=\"0\" /></a><a href=\" http://img.sceper.ws/images/wjhQ7.jpg\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/wjhQ7.jpg\
+          \ \" alt=\"\" width=\"245\" border=\"0\" /></a><a href=\" http://img.sceper.ws/images/GNeOv.jpg\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/GNeOv.jpg\
+          \ \" alt=\"\" width=\"245\" border=\"0\" /></a></p>\n<div class=\"meta\"\
+          >Associated Links</div>\n<p style=\"text-align: center;\"><span style=\"\
+          color: #99cc00;\"><span style=\"font-family: arial; font-size: 130%; font-weight:\
+          \ bold;\"><a href=\"http://www.facebook.com/APrayerForRain\" target=\"_blank\"\
+          >Homepage</a> &#8211; <a href=\"http://www.youtube.com/watch?v=Ii-OUujqGwE\"\
+          \ target=\"_blank\">Trailer</a> &#8211; <a href=\"http://www.imdb.com/title/tt0839742/\"\
+          \ target=\"_blank\">IMDB</a> &#8211; <a href=\"http://www.rottentomatoes.com/m/bhopal_a_prayer_for_rain/\"\
+          \ target=\"_blank\">RT</a> &#8211; <a href=\"http://nfo.sceper.ws/nfo/aqos-bapfr.2013.dvdrip.xvid.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/Bhopal.A.Prayer.for.Rain.2013.DVDRip.XviD-AQOS/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=Bhopal.A.Prayer.for.Rain.2013.DVDRip.XviD-AQOS\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=Bhopal.A.Prayer.for.Rain.2013.DVDRip.XviD-AQOS\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >DOWNLOAD (<a href=\"http://uploaded.net/file/c2vgptkm/aqos-bapfr.2013.dvdrip.xvid.avi\"\
+          >Uploaded</a>) OR (<a href=\"http://rg.to/file/4340316e18a4ce856290fff7476ee5a5/aqos-bapfr.2013.dvdrip.xvid.avi.html\"\
+          >RapidGator</a>) OR (<a href=\"http://xerver.co/6bojm95s8p4u/aqos-bapfr.2013.dvdrip.xvid.avi\"\
+          \ target=\"_blank\">XERVER</a>)<br />\n</span></span></p>\n\t\t\n\t</div>\
+          \ <!-- end .entry-content -->\n\t\n\t<div class=\"post-meta clearfix\">\n\
+          \t\t\t\t\t<p class=\"meta-info\">Posted  by <a href=\"http://sceper.ws/author/thunder\"\
+          \ title=\"Posts by Thunder &#124; A True Broski\" rel=\"author\">Thunder\
+          \ &#124; A True Broski</a>   in <a href=\"http://sceper.ws/category/movies\"\
+          \ rel=\"category tag\">Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Tuesday, October 14th, 2014\
+          \ at \r\n1:03 pm | <a href=\"http://sceper.ws/2014/10/bhopal-a-prayer-for-rain-2013-dvdrip-xvid-aqos.html#comments\"\
+          \ title=\"Comment on Bhopal A Prayer for Rain 2013 DVDRip XviD-AQOS\">9\
+          \ comments</a></p>\r\n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=Bhopal\
+          \ A Prayer for Rain 2013 DVDRip XviD-AQOS&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/bhopal-a-prayer-for-rain-2013-dvdrip-xvid-aqos.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"\
+          title\"><a href=\"http://sceper.ws/2014/10/to-be-takei-2014-dvdrip-x264-taste.html\"\
+          >To Be Takei 2014 DVDRiP X264-TASTE</a></h2>\n\t\n\t<div class=\"entry-content\
+          \ clearfix\">\n\t\t\t\t<div class=\"meta\">Release Info</div>\n<p><a href=\"\
+          http://img.sceper.ws/images/fv3be.jpg\" target=\"_blank\"><img style=\"\
+          margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/fv3be.jpg\"\
+          \ border=\"0\" alt=\"\" height=\"250\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> TASTE\
+          \ (Scene)<br />\n<span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Name:</span> To.Be.Takei.2014.DVDRiP.X264-TASTE<br />\n\
+          </span><span style=\"font-family: arial;\"><span style=\"font-weight: bold;\"\
+          >Release Date:</span> 12th October 2014<br />\n</span><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Filename:</span> To.Be.Takei.2014.DVDRiP.X264-TASTE<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Source:</span> DVDR<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Size:</span> 957 MB<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Genre:</span>\
+          \ Documentary<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Video:</span> x264, 720&#215;406, CRF21<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Audio:</span>\
+          \ English, AAC at 48KHz<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Subs:</span> English<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">IMDB\
+          \ Rating:</span> 6.9/10 from 350 users<br />\n</span><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">RT Critics:</span> 90%, average\
+          \ ratings 7/10<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Directed By:</span> Jennifer M. Kroot<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Starring:</span>\
+          \ George Takei, Brad Takei, Walter Koenig</p>\n<div class=\"meta\">Release\
+          \ Description</div>\n<p>A look at the many roles played by eclectic 77-year-old\
+          \ actor/activist George Takei, whose wit, humor and grace have helped him\
+          \ to become an internationally beloved figure and Internet phenomenon with\
+          \ 7-million Facebook fans and counting.</p>\n<div class=\"meta\">Release\
+          \ Quality</div>\n<p><a href=\" http://img.sceper.ws/images/TxVFu.jpg \"\
+          \ target=\"_blank\"><img src=\" http://img.sceper.ws/images/TxVFu.jpg \"\
+          \ border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/zNZCV.jpg\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/zNZCV.jpg\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/ptcGb.jpg\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/ptcGb.jpg\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a></p>\n<div class=\"meta\"\
+          >Associated Links</div>\n<p style=\"text-align: center;\"><span style=\"\
+          color: #99cc00;\"><span style=\"font-family: arial; font-size: 130%; font-weight:\
+          \ bold;\"><a href=\"http://www.tobetakei.com/\" target=\"_blank\">Homepage</a>\
+          \ &#8211; <a href=\"http://www.youtube.com/watch?v=VUkA3RvwcWw\" target=\"\
+          _blank\">Trailer</a> &#8211; <a href=\"http://www.imdb.com/title/tt2174896/\"\
+          \ target=\"_blank\">IMDB</a> &#8211; <a href=\"http://www.rottentomatoes.com/m/to_be_takei/\"\
+          \ target=\"_blank\">RT</a> &#8211; <a href=\"http://nfo.sceper.ws/nfo/to.be.takei.2014.dvdrip.x264-taste.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/To.Be.Takei.2014.DVDRiP.X264-TASTE/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=To.Be.Takei.2014.DVDRiP.X264-TASTE\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=To.Be.Takei.2014.DVDRiP.X264-TASTE\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >DOWNLOAD (<a href=\"http://uploaded.net/file/6gzkit7x/To.Be.Takei.2014.DVDRiP.X264-TASTE.mkv\"\
+          >Uploaded</a>) OR (<a href=\"http://rg.to/file/83ec57c797d7d02bd4bb28b0f729c4f0/To.Be.Takei.2014.DVDRiP.X264-TASTE.mkv.html\"\
+          >RapidGator</a>)</p>\n\t\t\n\t</div> <!-- end .entry-content -->\n\t\n\t\
+          <div class=\"post-meta clearfix\">\n\t\t\t\t\t<p class=\"meta-info\">Posted\
+          \  by <a href=\"http://sceper.ws/author/thunder\" title=\"Posts by Thunder\
+          \ &#124; A True Broski\" rel=\"author\">Thunder &#124; A True Broski</a>\
+          \   in <a href=\"http://sceper.ws/category/movies\" rel=\"category tag\"\
+          >Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Tuesday, October 14th, 2014\
+          \ at \r\n10:26 am | <a href=\"http://sceper.ws/2014/10/to-be-takei-2014-dvdrip-x264-taste.html#comments\"\
+          \ title=\"Comment on To Be Takei 2014 DVDRiP X264-TASTE\">15 comments</a></p>\r\
+          \n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=To Be Takei\
+          \ 2014 DVDRiP X264-TASTE&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/to-be-takei-2014-dvdrip-x264-taste.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\r\n\t\t\t\t<div class='wp-pagenavi'>\n<span class='pages'>Page\
+          \ 1 of 1,291</span><span class='current'>1</span><a class=\"page larger\"\
+          \ href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/2\">2</a><a\
+          \ class=\"page larger\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/3\"\
+          >3</a><a class=\"page larger\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/4\"\
+          >4</a><span class='extend'>...</span><a class=\"larger page\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/10\"\
+          >10</a><a class=\"larger page\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/20\"\
+          >20</a><span class='extend'>...</span><a class=\"nextpostslink\" rel=\"\
+          next\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/2\">\xBB\
+          </a><a class=\"last\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/1291\"\
+          >\xBB\xBB</a>\n</div>\r\n\t\t\t\t\t\r\n\r\n<center>\r\n<!-- BEGIN STANDARD\
+          \ TAG - 728 x 90 - ROS: web 1 - DO NOT MODIFY -->\r\n<iframe id=\"4f8f5e07be7e5\"\
+          \ name=\"4f8f5e07be7e5\"\r\nsrc=\"http://ax-d.pixfuture.net/w/1.0/afr?auid=188811&cb=2272345\"\
+          \ frameborder=\"0\" scrolling=\"no\" width=\"728\" height=\"90\"></iframe>\r\
+          \n<!-- END TAG -->\r\n</center>\r\n\t\r\n\t\t</div> <!-- end #recent-posts\
+          \ -->\r\n\r\n\t\t<div id=\"sidebar\">\r\n\t\t\t\r\n\t\t<div id=\"secondcol\"\
+          >\r\n\t\t\t<div id=\"linkcat-30\" class=\"widget widget_links\"><h4 class=\"\
+          widgettitle\"><span>Info</span></h4><div class=\"widgetcontent\">\n\t<ul\
+          \ class='xoxo blogroll'>\n<li><a href=\"http://scenegrouplist.com/index.php\"\
+          \ title=\"All the info you&#8217;ll  ever need on the scene\" target=\"\
+          _blank\">Scene Info</a>\nAll the info you&#8217;ll  ever need on the scene</li>\n\
+          \n\t</ul>\n</div><!-- end .widget-content --></div> <!-- end .widget -->\n\
+          <div id=\"recent-comments-3\" class=\"widget widget_recent_comments\"><h4\
+          \ class=\"widgettitle\"><span>Recent Comments</span></h4><div class=\"widgetcontent\"\
+          ><ul id=\"recentcomments\"><li class=\"recentcomments\"><span class=\"comment-author-link\"\
+          >datam</span> on <a href=\"http://sceper.ws/2014/10/the-flash-2014-s01e03-hdtv-x264-lol-the-flash-2014-s01e03-720p-hdtv-x264-dimension.html#comment-2493361\"\
+          >The Flash 2014 S01E03 HDTV x264-LOL &#038; The Flash 2014 S01E03 720p HDTV\
+          \ X264-DIMENSION</a></li><li class=\"recentcomments\"><span class=\"comment-author-link\"\
+          >Anonymous</span> on <a href=\"http://sceper.ws/2014/10/the-flash-2014-s01e03-hdtv-x264-lol-the-flash-2014-s01e03-720p-hdtv-x264-dimension.html#comment-2493360\"\
+          >The Flash 2014 S01E03 HDTV x264-LOL &#038; The Flash 2014 S01E03 720p HDTV\
+          \ X264-DIMENSION</a></li><li class=\"recentcomments\"><span class=\"comment-author-link\"\
+          >Anonymous</span> on <a href=\"http://sceper.ws/2014/10/ncis-s12e05-hdtv-x264-lol.html#comment-2493359\"\
+          >NCIS S12E05 HDTV x264-LOL &#038; NCIS S12E05 720p HDTV X264-DIMENSION</a></li><li\
+          \ class=\"recentcomments\"><span class=\"comment-author-link\">pippo</span>\
+          \ on <a href=\"http://sceper.ws/2014/10/ncis-s12e05-hdtv-x264-lol.html#comment-2493358\"\
+          >NCIS S12E05 HDTV x264-LOL &#038; NCIS S12E05 720p HDTV X264-DIMENSION</a></li><li\
+          \ class=\"recentcomments\"><span class=\"comment-author-link\">yaghi</span>\
+          \ on <a href=\"http://sceper.ws/2014/10/ncis-s12e05-hdtv-x264-lol.html#comment-2493357\"\
+          >NCIS S12E05 HDTV x264-LOL &#038; NCIS S12E05 720p HDTV X264-DIMENSION</a></li></ul></div><!--\
+          \ end .widget-content --></div> <!-- end .widget --><div id=\"text-3\" class=\"\
+          widget widget_text\"><h4 class=\"widgettitle\"><span>Sponsor</span></h4><div\
+          \ class=\"widgetcontent\">\t\t\t<div class=\"textwidget\"><!-- PopAds.net\
+          \ Popunder Code for sceper.ws -->\r\n<script type=\"text/javascript\">\r\
+          \n  var _pop = _pop || [];\r\n  _pop.push(['siteId', 2012]);\r\n  _pop.push(['minBid',\
+          \ 0.0005]);\r\n  _pop.push(['popundersPerIP', 1]);\r\n  _pop.push(['delayBetween',\
+          \ 1]);\r\n  _pop.push(['default', false]);\r\n  _pop.push(['defaultPerDay',\
+          \ 0]);\r\n  _pop.push(['topmostLayer', false]);\r\n  (function() {\r\n \
+          \   var pa = document.createElement('script'); pa.type = 'text/javascript';\
+          \ pa.async = true;\r\n    pa.src = 'http://world.popadscdn.net/pop.js';\r\
+          \n    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(pa,\
+          \ s);\r\n  })();\r\n</script>\r\n<!-- PopAds.net Popunder Code End --></div>\n\
+          \t\t</div><!-- end .widget-content --></div> <!-- end .widget -->\t\t</div>\
+          \ <!-- end #secondcol -->\r\n\t\t\t\r\n\t\t\r\n\t\r\n\t\t\r\n</div> <!--\
+          \ end sidebar -->\t\t\r\n\r\n\t\t\t</div> <!-- end #main-content -->\r\n\
+          \t\t</div> <!-- end #main-content-wrap -->\r\n\t</div> \t<!-- end .container\
+          \ -->\r\n</div> <!-- end #content -->\r\n\r\n<div id=\"content-bottom\"\
+          >\r\n\t<div class=\"container\"></div>\r\n</div>\r\n\t\r\n<div id=\"footer\"\
+          >\r\n\t<div class=\"container clearfix\">\r\n\t\t\r\n\t\t \r\n\t\t\t\t<div\
+          \ class=\"clear\"></div>\r\n\r\n\t</div> <!--end .container -->\r\n</div>\
+          \ <!-- end #footer -->\r\n\r\n<div id=\"footer-bottom\">\r\n\t<div class=\"\
+          container clearfix\">\r\n\t\t\t\t\r\n\t\t<ul class=\"bottom-nav\">\t\t\t\
+          <li ><a href=\"http://sceper.ws\">Home</a></li>\n\t\t\t<!--<li class=\"\
+          current_page_item\"><span style=\"color: #0000ff;\"><strong><a href=\"http://sceper.ws/request\"\
+          >Requests</a></strong></span></li>-->\n\t\t<li class=\"page_item page-item-8345\"\
+          ><a href=\"http://sceper.ws/about\">About</a></li>\n<li class=\"page_item\
+          \ page-item-11219\"><a href=\"http://sceper.ws/affiliates\">Affiliates</a></li>\n\
+          <li class=\"page_item page-item-13453\"><a href=\"http://sceper.ws/contact-us\"\
+          >Contact</a></li>\n<li class=\"page_item page-item-9282\"><a href=\"http://sceper.ws/disclaimer\"\
+          >Disclaimer</a></li>\n<li class=\"page_item page-item-23017\"><a href=\"\
+          http://sceper.ws/dmca\">DMCA</a></li>\n<li class=\"page_item page-item-14071\"\
+          ><a href=\"http://sceper.ws/faq\">FAQ</a></li>\n<li class=\"page_item page-item-8350\"\
+          ><a href=\"http://sceper.ws/irc\">IRC</a></li>\n<li class=\"page_item page-item-111681\"\
+          ><a href=\"http://sceper.ws/rules\">Rules</a></li>\n<li class=\"page_item\
+          \ page-item-14714\"><a href=\"http://sceper.ws/sgl\">SGL</a></li>\n</ul>\r\
+          \n\r\n\t\t<p id=\"copyright\">\xA9 2006-2014 <a href=\"\" />Sceper.ws</a><br>This\
+          \ server doesn't host any files. This site is indexing other sites content\
+          \ only.</p>\r\n\t</div> <!--end .container -->\r\n</div> <!-- end #footer-bottom\
+          \ -->\r\n\r\n\t\t<script type=\"text/javascript\">\n\t//<![CDATA[\n\t\t\
+          jQuery.noConflict();\n\t\n\t\tjQuery('ul.superfish, #page-menu ul.nav').superfish({\
+          \ \n\t\t\tdelay:       200,                            // one second delay\
+          \ on mouseout \n\t\t\tanimation:   {opacity:'show',height:'show'},  // fade-in\
+          \ and slide-down animation \n\t\t\tspeed:       'fast',                \
+          \          // faster animation speed \n\t\t\tautoArrows:  true,        \
+          \                   // disable generation of arrow mark-up \n\t\t\tdropShadows:\
+          \ false                            // disable drop shadows \n\t\t});\n\t\
+          \t\n\t\tjQuery('ul.nav > li > a.sf-with-ul').parent('li').addClass('sf-ul');\
+          \ \n\t\t\n\t\tet_search_bar();\n\t\tet_footer_improvements('#footer .footer-widget');\n\
+          \t\t\n\t\t<!---- et_switcher plugin v1.3 ---->\n\t\t(function($)\n\t\t{\n\
+          \t\t\t$.fn.et_switcher = function(options)\n\t\t\t{\n\t\t\t\tvar defaults\
+          \ =\n\t\t\t\t{\n\t\t\t\t   slides: '>div',\n\t\t\t\t   activeClass: 'active',\n\
+          \t\t\t\t   linksNav: '',\n\t\t\t\t   findParent: true, //use parent elements\
+          \ in defining lengths\n\t\t\t\t   lengthElement: 'li', //parent element,\
+          \ used only if findParent is set to true\n\t\t\t\t   useArrows: false,\n\
+          \t\t\t\t   arrowLeft: 'prevlink',\n\t\t\t\t   arrowRight: 'nextlink',\n\t\
+          \t\t\t   auto: false,\n\t\t\t\t   autoSpeed: 5000\n\t\t\t\t};\n\n\t\t\t\t\
+          var options = $.extend(defaults, options);\n\n\t\t\t\treturn this.each(function()\n\
+          \t\t\t\t{\n\t\t\t\t\tvar slidesContainer = jQuery(this);\n\t\t\t\t\tslidesContainer.find(options.slides).hide().end().find(options.slides).filter(':first').css('display','block');\n\
+          \t\t\t \n\t\t\t\t\tif (options.linksNav != '') { \n\t\t\t\t\t\tvar linkSwitcher\
+          \ = jQuery(options.linksNav);\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\tlinkSwitcher.click(function(){\n\
+          \t\t\t\t\t\t\tvar targetElement;\n\n\t\t\t\t\t\t\tif (options.findParent)\
+          \ targetElement = jQuery(this).parent();\n\t\t\t\t\t\t\telse targetElement\
+          \ = jQuery(this);\n\n\t\t\t\t\t\t\tif (targetElement.hasClass('active'))\
+          \ return false;\n\n\t\t\t\t\t\t\ttargetElement.siblings().removeClass('active').end().addClass('active');\n\
+          \n\t\t\t\t\t\t\tvar ordernum = targetElement.prevAll(options.lengthElement).length;\n\
+          \t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\tslidesContainer.find(options.slides).filter(':visible').hide().end().end().find(options.slides).filter(':eq('+ordernum+')').stop().fadeIn(700);\n\
+          \t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t});\n\t\t\t\t\t};\n\t\t\t\t\t\n\
+          \t\t\t\t\tjQuery('#'+options.arrowRight+', #'+options.arrowLeft).click(function(){\n\
+          \t\t\t\t\t  \n\t\t\t\t\t\tvar slideActive = slidesContainer.find(options.slides).filter(\"\
+          :visible\"),\n\t\t\t\t\t\t\tnextSlide = slideActive.next(),\n\t\t\t\t\t\t\
+          \tprevSlide = slideActive.prev();\n\n\t\t\t\t\t\tif (jQuery(this).attr(\"\
+          id\") == options.arrowRight) {\n\t\t\t\t\t\t\tif (nextSlide.length) {\n\t\
+          \t\t\t\t\t\t\tvar ordernum = nextSlide.prevAll().length;               \
+          \         \n\t\t\t\t\t\t\t} else { var ordernum = 0; }\n\t\t\t\t\t\t};\n\
+          \n\t\t\t\t\t\tif (jQuery(this).attr(\"id\") == options.arrowLeft) {\n\t\t\
+          \t\t\t\t\tif (prevSlide.length) {\n\t\t\t\t\t\t\t\tvar ordernum = prevSlide.prevAll().length;\
+          \                  \n\t\t\t\t\t\t\t} else { var ordernum = slidesContainer.find(options.slides).length-1;\
+          \ }\n\t\t\t\t\t\t};\n\n\t\t\t\t\t\tslidesContainer.find(options.slides).filter(':visible').hide().end().end().find(options.slides).filter(':eq('+ordernum+')').stop().fadeIn(700);\n\
+          \n\t\t\t\t\t\tif (typeof interval != 'undefined') {\n\t\t\t\t\t\t\tclearInterval(interval);\n\
+          \t\t\t\t\t\t\tauto_rotate();\n\t\t\t\t\t\t};\n\n\t\t\t\t\t\treturn false;\n\
+          \t\t\t\t\t});   \n\n\t\t\t\t\tif (options.auto) {\n\t\t\t\t\t\tauto_rotate();\n\
+          \t\t\t\t\t};\n\t\t\t\t\t\n\t\t\t\t\tfunction auto_rotate(){\n\t\t\t\t\t\t\
+          interval = setInterval(function(){\n\t\t\t\t\t\t\tvar slideActive = slidesContainer.find(options.slides).filter(\"\
+          :visible\"),\n\t\t\t\t\t\t\t\tnextSlide = slideActive.next();\n\t\t\t\t\t\
+          \t \n\t\t\t\t\t\t\tif (nextSlide.length) {\n\t\t\t\t\t\t\t\tvar ordernum\
+          \ = nextSlide.prevAll().length;                        \n\t\t\t\t\t\t\t\
+          } else { var ordernum = 0; }\n\t\t\t\t\t\t \n\t\t\t\t\t\t\tif (options.linksNav\
+          \ === '') \n\t\t\t\t\t\t\t\tjQuery('#'+options.arrowRight).trigger(\"click\"\
+          );\n\t\t\t\t\t\t\telse \t\t \t\t\n\t\t\t\t\t\t\t\tlinkSwitcher.filter(':eq('+ordernum+')').trigger(\"\
+          click\");\n\t\t\t\t\t\t},options.autoSpeed);\n\t\t\t\t\t};\n\t\t\t\t});\n\
+          \t\t\t}\n\t\t})(jQuery);\n\t\t\n\t\t\n\t\tvar $featuredArea = jQuery('#featured'),\n\
+          \t\t\t$all_tabs = jQuery('#all_tabs');\n\t\t\n\t\tif ($featuredArea.length)\
+          \ {\n\t\t\t$featuredArea.et_switcher({\n\t\t\t\tuseArrows: true \t\t\n\t\
+          \t\t});\n\t\t};\n\t\t\t\t\n\t\tif ($all_tabs.length) {\n\t\t\t$all_tabs.et_switcher({\n\
+          \t\t\t\tlinksNav: 'ul#tab_controls li a'\n\t\t\t});\n\t\t}; \n\n\t\t\t\t\
+          \n\t\t<!---- Footer Improvements ---->\n\t\tfunction et_footer_improvements($selector){\n\
+          \t\t\tvar $footer_widget = jQuery($selector);\n\t\t\n\t\t\tif (!($footer_widget.length\
+          \ == 0)) {\n\t\t\t\t$footer_widget.each(function (index, domEle) {\n\t\t\
+          \t\t\tif ((index+1)%4 == 0) jQuery(domEle).addClass(\"last\").after(\"<div\
+          \ class='clear'></div>\");\n\t\t\t\t});\n\t\t\t};\n\t\t};\n\t\t\n\t\t<!----\
+          \ Search Bar Improvements ---->\n\t\tfunction et_search_bar(){\n\t\t\tvar\
+          \ $searchform = jQuery('#cat-nav div#search-form'),\n\t\t\t\t$searchinput\
+          \ = $searchform.find(\"input#searchinput\"),\n\t\t\t\tsearchvalue = $searchinput.val();\n\
+          \t\t\t\t\n\t\t\t$searchinput.focus(function(){\n\t\t\t\tif (jQuery(this).val()\
+          \ === searchvalue) jQuery(this).val(\"\");\n\t\t\t}).blur(function(){\n\t\
+          \t\t\tif (jQuery(this).val() === \"\") jQuery(this).val(searchvalue);\n\t\
+          \t\t});\n\t\t};\n\t\t\n\t//]]>\t\n\t</script>\n\n\n\r\n\t\t\r\n\r\n<script\
+          \ type=\"text/javascript\">\r\n\r\n  var _gaq = _gaq || [];\r\n  _gaq.push(['_setAccount',\
+          \ 'UA-36836348-1']);\r\n  _gaq.push(['_trackPageview']);\r\n\r\n  (function()\
+          \ {\r\n    var ga = document.createElement('script'); ga.type = 'text/javascript';\
+          \ ga.async = true;\r\n    ga.src = ('https:' == document.location.protocol\
+          \ ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';\r\n \
+          \   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga,\
+          \ s);\r\n  })();\r\n\r\n</script>\r\n<div style=\"display:none;\"><script\
+          \ type=\"text/javascript\" src=\"http://widgets.amung.us/small.js\"></script><script\
+          \ type=\"text/javascript\">WAU_small('4na0a7jpef36')</script></div>\r\n\
+          </body>\r\n</html>\r\n"}
+      headers:
+        accept-ranges: [bytes]
+        age: ['0']
+        connection: [keep-alive]
+        content-length: ['66037']
+        content-type: [text/html; charset=UTF-8]
+        date: ['Wed, 22 Oct 2014 01:45:58 GMT']
+        server: [hi]
+        via: [1.1 varnish]
+        x-pingback: ['http://sceper.ws/xmlrpc.php']
+        x-varnish: ['1585481035']
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+      method: GET
+      uri: http://sceper.ws/category/movies/movies-dvd-rip
+    response:
+      body: {string: "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"\
+          \ \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n<html\
+          \ xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en-US\">\r\n<head profile=\"\
+          http://gmpg.org/xfn/11\">\r\n<LINK REL=\"SHORTCUT ICON\" HREF=\"http://sceper.ws/favicon.ico\"\
+          \ />\r\n<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\"\
+          \ />\r\n\r\n<title>\r\nMovies &#8211; DVD Rip Archive | Sceper</title>\r\
+          \n\r\n<meta name=\"description\" content=\"Your source for all Scene and\
+          \ P2P Movies, TV Shows, Games, Magazines, Music and more!\" />\r\n<meta\
+          \ name=\"keywords\" content=\"scene,p2p,movies,release,games,tv,warez,shows,rlslog,rlslog\
+          \ alternative,rlslog down,oneddl,rlslog.net,alternative,oneddl alternative,hotfile,fileserve,filesonic,wupload,rapidshare,files,torrent,ul.to,uploaded,rapidgator\"\
+          \ />\r\n<link rel=\"alternate\" type=\"application/rss+xml\" title=\"Sceper.ws\"\
+          \ href=\"http://sceper.ws/feed\" />\r\n\r\n\r\n<link rel=\"stylesheet\"\
+          \ href=\"http://sceper.ws/wp-content/themes/SceneRLSv4/style.css\" type=\"\
+          text/css\" media=\"screen\" />\r\n<link rel=\"alternate\" type=\"application/rss+xml\"\
+          \ title=\"Sceper RSS Feed\" href=\"http://sceper.ws/feed\" />\r\n<link rel=\"\
+          alternate\" type=\"application/atom+xml\" title=\"Sceper Atom Feed\" href=\"\
+          http://sceper.ws/feed/atom\" />\r\n\r\n<!--[if lt IE 7]>\r\n\t<link rel=\"\
+          stylesheet\" type=\"text/css\" href=\"http://sceper.ws/wp-content/themes/SceneRLSv4/css/ie6style.css\"\
+          \ />\r\n\t<script type=\"text/javascript\" src=\"http://sceper.ws/wp-content/themes/SceneRLSv4/js/DD_belatedPNG_0.0.8a-min.js\"\
+          ></script>\r\n\t<script type=\"text/javascript\">DD_belatedPNG.fix('img#logo,\
+          \ #cat-nav-left, #cat-nav-right, #search-form, #cat-nav-content, div.top-overlay,\
+          \ .slide .description, div.overlay, a#prevlink, a#nextlink, .slide a.readmore,\
+          \ .slide a.readmore span, .recent-cat .entry .title, #recent-posts .entry\
+          \ p.date, .footer-widget ul li, #tabbed-area ul#tab_controls li span');</script>\r\
+          \n<![endif]-->\r\n<!--[if IE 7]>\r\n\t<link rel=\"stylesheet\" type=\"text/css\"\
+          \ href=\"http://sceper.ws/wp-content/themes/SceneRLSv4/css/ie7style.css\"\
+          \ />\r\n<![endif]-->\r\n<!--[if IE 8]>\r\n\t<link rel=\"stylesheet\" type=\"\
+          text/css\" href=\"http://sceper.ws/wp-content/themes/SceneRLSv4/css/ie8style.css\"\
+          \ />\r\n<![endif]-->\r\n\r\n<script type=\"text/javascript\">\r\n\tdocument.documentElement.className\
+          \ = 'js';\r\n</script>\r\n\r\n<link rel=\"alternate\" type=\"application/rss+xml\"\
+          \ title=\"Sceper &raquo; Movies - DVD Rip Category Feed\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/feed\"\
+          \ />\n\t\t<link rel=\"stylesheet\" href=\"\" type=\"text/css\" media=\"\
+          screen\" />\n\t<meta content=\"SceneRLSv4 v.4.0\" name=\"generator\"/>\t\
+          \r\n\t<style type=\"text/css\">\r\n\t\tbody { color: #303030; }\r\n\t\t\
+          #recent-posts a { color: #2335e5; }\r\n\t\tul.nav li a { color: #; }\r\n\
+          \t\tul.nav li.current_page_item a, ul.nav li a:hover, #cat-nav-content ul.nav\
+          \ li a:hover, #cat-nav-content ul.nav li.current-cat > a  { color: #06cf49;\
+          \ }\r\n\t\th1, h2, h3, h4, h5, h6, h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {\
+          \ color: #; }\r\n\t\t\r\n\t\t#sidebar a { color:#; }\t\t\r\n\t\tp#copyright\
+          \ { color:# }\r\n\t\t#footer a, ul.bottom-nav li a { color:# }\r\n\t</style>\r\
+          \n\r\n<script type='text/javascript' src='http://static.sceper.ws/js/jquery.js?ver=1.11.1'></script>\n\
+          <script type='text/javascript' src='http://sceper.ws/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.2.1'></script>\n\
+          <link rel=\"EditURI\" type=\"application/rsd+xml\" title=\"RSD\" href=\"\
+          http://sceper.ws/xmlrpc.php?rsd\" />\n<link rel=\"wlwmanifest\" type=\"\
+          application/wlwmanifest+xml\" href=\"http://sceper.ws/wp-includes/wlwmanifest.xml\"\
+          \ /> \n\n<script language=\"JavaScript\" type=\"text/javascript\"><!-- \n\
+          function expand(param) { \nparam.style.display=(param.style.display==\"\
+          none\") ? \"\" : \"none\"; \n} \n//--></script>\n\n<link rel=\"stylesheet\"\
+          \ type=\"text/css\" href=\"http://sceper.ws/wp-content/plugins/wp-recaptcha/recaptcha.css\"\
+          \ />\t<style type=\"text/css\">.recentcomments a{display:inline !important;padding:0\
+          \ !important;margin:0 !important;}</style>\n</head>\r\n<body>\r\n\t<div\
+          \ id=\"header-top\" class=\"clearfix\">\r\n\t\t<div class=\"container clearfix\"\
+          >\r\n\t\t\t<!-- Start Logo -->\t\t\t\r\n\t\t\t<a href=\"http://sceper.ws/\"\
+          \ />\r\n\t\t\t\t<img src=\"http://static.sceper.ws/images/SceneRLSv4/logo.png\"\
+          \ alt=\"Logo\" id=\"logo\"/></a>\r\n\t\t\t<!-- <p id=\"slogan\">For your\
+          \ daily Scene and P2P releases</p> -->\r\n\t\t\t<!-- End Logo -->\r\n\t\t\
+          \t\r\n\t\t\t<!-- Start Page-menu -->\r\n\t\t\t<div id=\"page-menu\">\r\n\
+          \t\t\t\t<div id=\"p-menu-left\"> </div>\r\n\t\t\t\t<div id=\"p-menu-content\"\
+          >\r\n\t\t\t\t\r\n\t\t\t\t\t<ul class=\"nav clearfix\">\t\t\t<li ><a href=\"\
+          http://sceper.ws\">Home</a></li>\n\t\t\t<!--<li class=\"current_page_item\"\
+          ><span style=\"color: #0000ff;\"><strong><a href=\"http://sceper.ws/request\"\
+          >Requests</a></strong></span></li>-->\n\t\t<li class=\"page_item page-item-8345\"\
+          ><a href=\"http://sceper.ws/about\">About</a></li>\n<li class=\"page_item\
+          \ page-item-11219\"><a href=\"http://sceper.ws/affiliates\">Affiliates</a></li>\n\
+          <li class=\"page_item page-item-13453\"><a href=\"http://sceper.ws/contact-us\"\
+          >Contact</a></li>\n<li class=\"page_item page-item-9282\"><a href=\"http://sceper.ws/disclaimer\"\
+          >Disclaimer</a></li>\n<li class=\"page_item page-item-23017\"><a href=\"\
+          http://sceper.ws/dmca\">DMCA</a></li>\n<li class=\"page_item page-item-14071\"\
+          ><a href=\"http://sceper.ws/faq\">FAQ</a></li>\n<li class=\"page_item page-item-8350\"\
+          ><a href=\"http://sceper.ws/irc\">IRC</a></li>\n<li class=\"page_item page-item-111681\"\
+          ><a href=\"http://sceper.ws/rules\">Rules</a></li>\n<li class=\"page_item\
+          \ page-item-14714\"><a href=\"http://sceper.ws/sgl\">SGL</a></li>\n</ul>\t\
+          \t\t\t</div>\t\r\n\t\t\t\t<div id=\"p-menu-right\"> </div>\r\n\t\t\t</div>\t\
+          <!-- end #page-menu -->\t\r\n\t\t\t<!-- End Page-menu -->\t\r\n\t\t\t\r\n\
+          \t\t\t<div id=\"cat-nav\" class=\"clearfix\">\t\r\n\t\t\t\t<div id=\"cat-nav-left\"\
+          > </div>\r\n\t\t\t\t<div id=\"cat-nav-content\"> \r\n\t\t\t\t\t\r\n\t\t\t\
+          \t\t<ul class=\"superfish nav clearfix\">\t<li class=\"cat-item cat-item-11\"\
+          ><a href=\"http://sceper.ws/category/applications\" >Applications</a>\n\
+          <ul class='children'>\n\t<li class=\"cat-item cat-item-9327\"><a href=\"\
+          http://sceper.ws/category/applications/android\" >Android</a>\n</li>\n\t\
+          <li class=\"cat-item cat-item-8401\"><a href=\"http://sceper.ws/category/applications/ios\"\
+          \ >iOS</a>\n</li>\n\t<li class=\"cat-item cat-item-1156\"><a href=\"http://sceper.ws/category/applications/pda\"\
+          \ >PDA</a>\n</li>\n</ul>\n</li>\n\t<li class=\"cat-item cat-item-1252\"\
+          ><a href=\"http://sceper.ws/category/e-books\" >E Books</a>\n</li>\n\t<li\
+          \ class=\"cat-item cat-item-29\"><a href=\"http://sceper.ws/category/games\"\
+          \ >Games</a>\n<ul class='children'>\n\t<li class=\"cat-item cat-item-20\"\
+          ><a href=\"http://sceper.ws/category/games/console-games\" >Console Games</a>\n\
+          </li>\n\t<li class=\"cat-item cat-item-1054\"><a href=\"http://sceper.ws/category/games/games-pack\"\
+          \ >Games Pack</a>\n</li>\n\t<li class=\"cat-item cat-item-1074\"><a href=\"\
+          http://sceper.ws/category/games/mini-games\" >Mini Games</a>\n</li>\n\t\
+          <li class=\"cat-item cat-item-385\"><a href=\"http://sceper.ws/category/games/mobile-phone-games\"\
+          \ >Mobile Phone Games</a>\n\t<ul class='children'>\n\t<li class=\"cat-item\
+          \ cat-item-14533\"><a href=\"http://sceper.ws/category/games/mobile-phone-games/android-mobile-phone-games\"\
+          \ >Android</a>\n</li>\n\t<li class=\"cat-item cat-item-14534\"><a href=\"\
+          http://sceper.ws/category/games/mobile-phone-games/ios-mobile-phone-games\"\
+          \ >iOS</a>\n</li>\n\t</ul>\n</li>\n\t<li class=\"cat-item cat-item-13\"\
+          ><a href=\"http://sceper.ws/category/games/pc-games\" >PC Games</a>\n\t\
+          <ul class='children'>\n\t<li class=\"cat-item cat-item-384\"><a href=\"\
+          http://sceper.ws/category/games/pc-games/game-fixes\" >Game Fixes</a>\n\
+          </li>\n\t</ul>\n</li>\n</ul>\n</li>\n\t<li class=\"cat-item cat-item-28\
+          \ current-cat-parent\"><a href=\"http://sceper.ws/category/movies\" >Movies</a>\n\
+          <ul class='children'>\n\t<li class=\"cat-item cat-item-1161\"><a href=\"\
+          http://sceper.ws/category/movies/cartoons\" >Cartoons</a>\n</li>\n\t<li\
+          \ class=\"cat-item cat-item-14561\"><a href=\"http://sceper.ws/category/movies/hdrip-movies\"\
+          \ >HDRip</a>\n</li>\n\t<li class=\"cat-item cat-item-1832\"><a href=\"http://sceper.ws/category/movies/movie-packs\"\
+          \ >Movie Packs</a>\n</li>\n\t<li class=\"cat-item cat-item-865\"><a href=\"\
+          http://sceper.ws/category/movies/movies-3d\" >Movies &#8211; 3D</a>\n</li>\n\
+          \t<li class=\"cat-item cat-item-17\"><a href=\"http://sceper.ws/category/movies/movies-bluray-rip\"\
+          \ >Movies &#8211; BluRay Rip</a>\n\t<ul class='children'>\n\t<li class=\"\
+          cat-item cat-item-860\"><a href=\"http://sceper.ws/category/movies/movies-bluray-rip/movies-bdrc\"\
+          \ >Movies &#8211; BDRC</a>\n</li>\n\t<li class=\"cat-item cat-item-577\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-bluray-rip/movies-bdrip\"\
+          \ >Movies &#8211; BDRip</a>\n</li>\n\t<li class=\"cat-item cat-item-383\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-bluray-rip/movies-brrip\"\
+          \ >Movies &#8211; BRRip</a>\n</li>\n\t</ul>\n</li>\n\t<li class=\"cat-item\
+          \ cat-item-8\"><a href=\"http://sceper.ws/category/movies/movies-cam\" >Movies\
+          \ &#8211; Cam</a>\n</li>\n\t<li class=\"cat-item cat-item-857\"><a href=\"\
+          http://sceper.ws/category/movies/movies-ddc\" >Movies &#8211; DDC</a>\n\
+          </li>\n\t<li class=\"cat-item cat-item-6 current-cat\"><a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ >Movies &#8211; DVD Rip</a>\n</li>\n\t<li class=\"cat-item cat-item-22\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-dvdr\" >Movies &#8211;\
+          \ DVDR</a>\n</li>\n\t<li class=\"cat-item cat-item-9493\"><a href=\"http://sceper.ws/category/movies/movies-foreign\"\
+          \ >Movies &#8211; Foreign</a>\n</li>\n\t<li class=\"cat-item cat-item-26\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-full-bd\" >Movies &#8211;\
+          \ Full BD</a>\n</li>\n\t<li class=\"cat-item cat-item-15\"><a href=\"http://sceper.ws/category/movies/movies-hddvd-rip\"\
+          \ >Movies &#8211; HDDVD Rip</a>\n</li>\n\t<li class=\"cat-item cat-item-18\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-hdtv\" >Movies &#8211;\
+          \ HDTV</a>\n</li>\n\t<li class=\"cat-item cat-item-37\"><a href=\"http://sceper.ws/category/movies/movies-hdtv-720p\"\
+          \ >Movies &#8211; HDTV 720p</a>\n</li>\n\t<li class=\"cat-item cat-item-1829\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-mini\" >Movies &#8211;\
+          \ Mini (&lt;551MB)</a>\n</li>\n\t<li class=\"cat-item cat-item-858\"><a\
+          \ href=\"http://sceper.ws/category/movies/movies-ppv-rip\" >Movies &#8211;\
+          \ PPV Rip</a>\n</li>\n\t<li class=\"cat-item cat-item-5\"><a href=\"http://sceper.ws/category/movies/movies-r5\"\
+          \ >Movies &#8211; R5</a>\n</li>\n\t<li class=\"cat-item cat-item-52\"><a\
+          \ href=\"http://sceper.ws/category/movies/movies-screener\" >Movies &#8211;\
+          \ Screener</a>\n\t<ul class='children'>\n\t<li class=\"cat-item cat-item-859\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-screener/screener-bd\"\
+          \ >Screener &#8211; BD</a>\n</li>\n\t<li class=\"cat-item cat-item-7\"><a\
+          \ href=\"http://sceper.ws/category/movies/movies-screener/movies-screener-dvd\"\
+          \ >Screener &#8211; DVD</a>\n</li>\n\t<li class=\"cat-item cat-item-53\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-screener/movies-screener-vhs\"\
+          \ >Screener &#8211; VHS</a>\n</li>\n\t</ul>\n</li>\n\t<li class=\"cat-item\
+          \ cat-item-14\"><a href=\"http://sceper.ws/category/movies/movies-telecine\"\
+          \ >Movies &#8211; Telecine</a>\n</li>\n\t<li class=\"cat-item cat-item-4\"\
+          ><a href=\"http://sceper.ws/category/movies/movies-telesync\" >Movies &#8211;\
+          \ Telesync</a>\n</li>\n\t<li class=\"cat-item cat-item-16\"><a href=\"http://sceper.ws/category/movies/movies-workprint\"\
+          \ >Movies &#8211; Workprint</a>\n</li>\n\t<li class=\"cat-item cat-item-1811\"\
+          ><a href=\"http://sceper.ws/category/movies/vodrip\" >VODRiP</a>\n</li>\n\
+          \t<li class=\"cat-item cat-item-11599\"><a href=\"http://sceper.ws/category/movies/web-dl\"\
+          \ >WEB-DL</a>\n</li>\n\t<li class=\"cat-item cat-item-14560\"><a href=\"\
+          http://sceper.ws/category/movies/webrip-movies\" >WEBRip</a>\n</li>\n</ul>\n\
+          </li>\n\t<li class=\"cat-item cat-item-12\"><a href=\"http://sceper.ws/category/music\"\
+          \ >Music</a>\n<ul class='children'>\n\t<li class=\"cat-item cat-item-1612\"\
+          ><a href=\"http://sceper.ws/category/music/itunes-singles\" title=\"Newly\
+          \ released interesting itunes singles/\">iTunes Singles</a>\n</li>\n\t<li\
+          \ class=\"cat-item cat-item-23\"><a href=\"http://sceper.ws/category/music/music-mdvdr\"\
+          \ >Music &#8211; MDVDR</a>\n</li>\n\t<li class=\"cat-item cat-item-578\"\
+          ><a href=\"http://sceper.ws/category/music/music-video\" >Music &#8211;\
+          \ Video</a>\n</li>\n</ul>\n</li>\n\t<li class=\"cat-item cat-item-1718\"\
+          ><a href=\"http://sceper.ws/category/sr-pack\" >SR Pack</a>\n</li>\n\t<li\
+          \ class=\"cat-item cat-item-24\"><a href=\"http://sceper.ws/category/staff-recommended\"\
+          \ >Staff Recommended</a>\n</li>\n\t<li class=\"cat-item cat-item-10\"><a\
+          \ href=\"http://sceper.ws/category/tv-shows\" >TV Shows</a>\n<ul class='children'>\n\
+          \t<li class=\"cat-item cat-item-1408\"><a href=\"http://sceper.ws/category/tv-shows/animes\"\
+          \ >Anime/Cartoons</a>\n</li>\n\t<li class=\"cat-item cat-item-50\"><a href=\"\
+          http://sceper.ws/category/tv-shows/documentaries\" >Documentaries</a>\n\
+          </li>\n\t<li class=\"cat-item cat-item-14531\"><a href=\"http://sceper.ws/category/tv-shows/mini-series\"\
+          \ >Mini Series</a>\n</li>\n\t<li class=\"cat-item cat-item-854\"><a href=\"\
+          http://sceper.ws/category/tv-shows/tv-packs\" >TV Packs</a>\n</li>\n\t<li\
+          \ class=\"cat-item cat-item-46\"><a href=\"http://sceper.ws/category/tv-shows/tv-shows-x264\"\
+          \ >TV Shows &#8211; x264</a>\n</li>\n</ul>\n</li>\n</ul>\r\n\t\t\t\t\t<!--\
+          \ Start Searchbox -->\r\n\t\t\t\t\t<div id=\"search-form\">\r\n\t\t\t\t\t\
+          \t<form method=\"get\" id=\"searchform1\" action=\"http://sceper.ws\">\r\
+          \n\t\t\t\t\t\t\t<input type=\"text\" value=\"\" name=\"s\" id=\"searchinput\"\
+          \ />\r\n\t\t\r\n\t\t\t\t\t\t\t<input type=\"image\" src=\"http://sceper.ws/wp-content/themes/SceneRLSv4/images/search_btn.png\"\
+          \ id=\"searchsubmit\" />\r\n\t\t\t\t\t\t</form>\r\n\t\t\t\t\t</div>\r\n\
+          <div id=\"side-search-form\">\r\n<a href=\"/feed\" target=\"_blank\"><img\
+          \ src=\"http://static.sceper.ws/images/SceneRLSv4/rssicon.png\"></a>\r\n\
+          <span style=\"position:relative; top:21px;\"><iframe src=\"http://free.timeanddate.com/clock/i2plvz9y/n211/fn12/fs13/fcf90/tct/pct/ftb/th2\"\
+          \ frameborder=\"0\" width=\"91\" height=\"16\" allowTransparency=\"true\"\
+          ></iframe></span>\r\n</div>\r\n\t\t\t\t<!-- End Searchbox -->\t\r\n\t\t\t\
+          \t</div> <!-- end #cat-nav-content -->\r\n\t\t\t\t<div id=\"cat-nav-right\"\
+          > </div>\r\n\t\t\t</div>\t<!-- end #cat-nav -->\t\r\n\t\t</div> \t<!-- end\
+          \ .container -->\r\n\t</div> \t<!-- end #header-top -->\r\n\t\r\n\t\r\n\t\
+          \r\n\t<div id='content-single'>\t<div id=\"content-top-shadow\"></div>\r\
+          \n\t\t\r\n\t\t\t\t<div class=\"container\">\t\r\n\t\r\n<div id=\"main-content-wrap\"\
+          >\r\n\t<div id=\"main-content\" class=\"clearfix\">\r\n\t\t<div id=\"breadcrumbs\"\
+          >\r\n\t\t\r\n\t\t\t\t\t<a href=\"http://sceper.ws\">Home</a> &raquo;\r\n\
+          \t\t\t\t\r\n\t\t\t\t\t\t\t\t\tMovies &#8211; DVD Rip\t\t\t\t\t\r\n</div>\
+          \ <!-- end #breadcrumbs -->\t\t<div id=\"top-shadow\"></div>\r\n\t\t\t\r\
+          \n\t\t<div id=\"recent-posts\" class=\"clearfix\">\r\n\t\t\t\t\t\t\t\n<div\
+          \ class=\"entry clearfix\" >\n\t<h2 class=\"title\"><a href=\"http://sceper.ws/2014/10/school-dance-2014-dvdrip-xvid-evo.html\"\
+          >School Dance 2014 DVDRip XviD-EVO</a></h2>\n\t\n\t<div class=\"entry-content\
+          \ clearfix\">\n\t\t\t\t<div class=\"meta\">Release Info</div>\n<p><a href=\"\
+          http://img.sceper.ws/images/3jMxl.jpg\" target=\"_blank\"><img style=\"\
+          margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/3jMxl.jpg\"\
+          \ border=\"0\" alt=\"\" height=\"250\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> EVO\
+          \ (P2P)<br />\n<span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Name:</span> School.Dance.2014.DVDRip.XviD-EVO<br />\n\
+          </span><span style=\"font-family: arial;\"><span style=\"font-weight: bold;\"\
+          >Release Date:</span> 19th October 2014<br />\n</span><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Filename:</span> School.Dance.2014.DVDRip.XviD-EVO<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Source:</span> DVDR<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Size:</span> 842.192 MB<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Genre:</span>\
+          \ Comedy | Drama | Music<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Video:</span> XviD, 720&#215;400 at\
+          \ 1200 kbps<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Audio:</span> English, MP-3 at 128kbps<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Subs:</span>\
+          \ N/A<br />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">IMDB Rating:</span> 4.2/10 from 517 users<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">RT Critics:</span>\
+          \ No Reviews Yet&#8230;<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Directed By:</span> Nick Cannon<br />\n\
+          </span><span style=\"font-family: arial;\"><span style=\"font-weight: bold;\"\
+          >Starring:</span> Bobb\\&#8217;e J. Thompson, Luenell, Mike Epps</p>\n<div\
+          \ class=\"meta\">Release Description</div>\n<p>High schooler Jason has found\
+          \ his dream girl-the gorgeous Anastacia. There\\&#8217;s just one problem:\
+          \ she doesn\\&#8217;t know he exists.</p>\n<div class=\"meta\">Release Quality</div>\n\
+          <p><a href=\" http://img.sceper.ws/images/mrCVB.png \" target=\"_blank\"\
+          ><img src=\" http://img.sceper.ws/images/mrCVB.png \" border=\"0\" alt=\"\
+          \" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/SCDUQ.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/SCDUQ.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/TZj1a.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/TZj1a.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a></p>\n<div class=\"meta\"\
+          >Associated Links</div>\n<p style=\"text-align: center;\"><span style=\"\
+          color: #99cc00;\"><span style=\"font-family: arial; font-size: 130%; font-weight:\
+          \ bold;\"><a href=\"http://www.imdb.com/title/tt2179936/\" target=\"_blank\"\
+          >Homepage</a> &#8211; <a href=\"http://www.youtube.com/watch?v=aePpsyPprhM\"\
+          \ target=\"_blank\">Trailer</a> &#8211; <a href=\"http://www.imdb.com/title/tt2179936/\"\
+          \ target=\"_blank\">IMDB</a> &#8211; <a href=\"http://www.rottentomatoes.com/m/school_dance/\"\
+          \ target=\"_blank\">RT</a> &#8211; <a href=\"http://view.nfo.so/0/0/1/a54c690ef79737fee055bebb538bc249.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/School.Dance.2014.DVDRip.XviD-EVO/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=School.Dance.2014.DVDRip.XviD-EVO\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=School.Dance.2014.DVDRip.XviD-EVO\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >DOWNLOAD (<a href=\"http://uploaded.net/file/6i24o77t/School.Dance.2014.DVDRip.XviD-EVO.avi\"\
+          >Uploaded</a>) OR (<a href=\"http://rg.to/file/829deae242a02516a46dc90a1eb50906/School.Dance.2014.DVDRip.XviD-EVO.avi.html\"\
+          >RapidGator</a>)</p>\n\t\t\n\t</div> <!-- end .entry-content -->\n\t\n\t\
+          <div class=\"post-meta clearfix\">\n\t\t\t\t\t<p class=\"meta-info\">Posted\
+          \  by <a href=\"http://sceper.ws/author/thunder\" title=\"Posts by Thunder\
+          \ &#124; A True Broski\" rel=\"author\">Thunder &#124; A True Broski</a>\
+          \   in <a href=\"http://sceper.ws/category/movies\" rel=\"category tag\"\
+          >Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Sunday, October 19th, 2014\
+          \ at \r\n1:36 pm | <a href=\"http://sceper.ws/2014/10/school-dance-2014-dvdrip-xvid-evo.html#comments\"\
+          \ title=\"Comment on School Dance 2014 DVDRip XviD-EVO\">8 comments</a></p>\r\
+          \n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=School\
+          \ Dance 2014 DVDRip XviD-EVO&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/school-dance-2014-dvdrip-xvid-evo.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"\
+          title\"><a href=\"http://sceper.ws/2014/10/doc-hollidays-revenge-2014-repack-dvdrip-xvid-evo.html\"\
+          >Doc Hollidays Revenge 2014 REPACK DVDRip XviD-EVO</a></h2>\n\t\n\t<div\
+          \ class=\"entry-content clearfix\">\n\t\t\t\t<div class=\"meta\">Release\
+          \ Info</div>\n<p><a href=\"http://img.sceper.ws/images/lZws0.jpg\" target=\"\
+          _blank\"><img style=\"margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/lZws0.jpg\"\
+          \ border=\"0\" alt=\"\" height=\"250\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> EVO\
+          \ (P2P)<br />\n<span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Name:</span> Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Date:</span> 19th October 2014<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Filename:</span>\
+          \ Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Source:</span>\
+          \ DVDR<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Size:</span> 825.959 MB<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Genre:</span> Western<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Video:</span> x264, 720 x 400 at 1201 kbps<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Audio:</span>\
+          \ English, MP-3 at 128kbps<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Subs:</span> N/A<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">IMDB\
+          \ Rating:</span> 3.7/10 from 65 users<br />\n</span><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">RT Critics:</span> No Reviews\
+          \ Yet&#8230;<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Directed By:</span> David DeCoteau<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Starring:</span>\
+          \ William McNamara, Eric Roberts, Tom Berenger</p>\n<div class=\"meta\"\
+          >Release Description</div>\n<p>In 1882, Joseph and Elizabeth Cooley head\
+          \ West to reunite with family she never knew.</p>\n<div class=\"meta\">Release\
+          \ Quality</div>\n<p><a href=\" http://img.sceper.ws/images/h3gFS.png \"\
+          \ target=\"_blank\"><img src=\" http://img.sceper.ws/images/h3gFS.png \"\
+          \ border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/T6kHU.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/T6kHU.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/BjXz3.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/BjXz3.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a></p>\n<div class=\"meta\"\
+          >Associated Links</div>\n<p style=\"text-align: center;\"><span style=\"\
+          color: #99cc00;\"><span style=\"font-family: arial; font-size: 130%; font-weight:\
+          \ bold;\"><a href=\"http://www.rapidheart.com/\" target=\"_blank\">Homepage</a>\
+          \ &#8211; <a href=\"http://www.youtube.com/watch?v=0edgu_9h8M4\" target=\"\
+          _blank\">Trailer</a> &#8211; <a href=\"http://www.imdb.com/title/tt3359872/\"\
+          \ target=\"_blank\">IMDB</a> &#8211; <a href=\"http://www.rottentomatoes.com/m/doc_hollidays_revenge/\"\
+          \ target=\"_blank\">RT</a> &#8211; <a href=\"http://view.nfo.so/0/0/1/25a4d65aec22fc3726bf48c4d6274e96.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >DOWNLOAD (<a href=\"http://uploaded.net/file/h50assa4/Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO.avi\"\
+          >Uploaded</a>) OR (<a href=\"http://rg.to/file/8ac44c1f35c3e23422a2644590ea59a6/Doc.Hollidays.Revenge.2014.REPACK.DVDRip.XviD-EVO.avi.html\"\
+          >RapidGator</a>)</p>\n\t\t\n\t</div> <!-- end .entry-content -->\n\t\n\t\
+          <div class=\"post-meta clearfix\">\n\t\t\t\t\t<p class=\"meta-info\">Posted\
+          \  by <a href=\"http://sceper.ws/author/thunder\" title=\"Posts by Thunder\
+          \ &#124; A True Broski\" rel=\"author\">Thunder &#124; A True Broski</a>\
+          \   in <a href=\"http://sceper.ws/category/movies\" rel=\"category tag\"\
+          >Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Sunday, October 19th, 2014\
+          \ at \r\n1:31 pm | <a href=\"http://sceper.ws/2014/10/doc-hollidays-revenge-2014-repack-dvdrip-xvid-evo.html#comments\"\
+          \ title=\"Comment on Doc Hollidays Revenge 2014 REPACK DVDRip XviD-EVO\"\
+          >6 comments</a></p>\r\n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=Doc\
+          \ Hollidays Revenge 2014 REPACK DVDRip XviD-EVO&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/doc-hollidays-revenge-2014-repack-dvdrip-xvid-evo.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"\
+          title\"><a href=\"http://sceper.ws/2014/10/how-to-train-your-dragon-2-2014-dvdrip-xvid-evo.html\"\
+          >How to Train Your Dragon 2 2014 DVDRip XviD-EVO</a></h2>\n\t\n\t<div class=\"\
+          entry-content clearfix\">\n\t\t\t\t<div class=\"meta\">Release Info</div>\n\
+          <p><a href=\"http://img.sceper.ws/images/B6COq.jpg\" target=\"_blank\"><img\
+          \ style=\"margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/B6COq.jpg\"\
+          \ alt=\"\" height=\"250\" border=\"0\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> EVO\
+          \ (P2P)<br />\n<span style=\"font-weight: bold;\">Release Name:</span>\_\
+          How.to.Train.Your.Dragon.2.2014.DVDRip.XviD-EVO<br />\n<span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Date:</span>\_Oct\
+          \ 17th\_, 2014<br />\n<span style=\"font-weight: bold;\">Filename:</span>\_\
+          How.to.Train.Your.Dragon.2.2014.DVDRip.XviD-EVO<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Source:</span>\_\
+          DVDR<br />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Size:</span>\_900 MB<br />\n<span style=\"font-weight: bold;\"\
+          >Genre:</span> Animation | Action | Adventure<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Video:</span>\_\
+          AVi | 720&#215;304<br />\n<span style=\"font-weight: bold;\">Audio:</span>\
+          \ English |\_MP3<br />\n</span><span style=\"font-family: arial;\"><span\
+          \ style=\"font-weight: bold;\">Subs:</span> N/A<br />\n<span style=\"font-weight:\
+          \ bold;\">IMDB Rating:</span> 8.3/10 from 58,265 users<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">RT Critics:</span>\
+          \ 7.8/10<br />\n<span style=\"font-weight: bold;\">Directed By:</span> Dean\
+          \ DeBlois<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Starring:</span> Jay Baruchel, Cate Blanchett, Gerard\
+          \ Butler </span></span></p>\n<div class=\"meta\">Release Description</div>\n\
+          <p>When Hiccup and Toothless discover an ice cave that is home to hundreds\
+          \ of new wild dragons and the mysterious Dragon Rider, the two friends find\
+          \ themselves at the center of a battle to protect the peace.</p>\n<div class=\"\
+          meta\">Release Quality</div>\n<p><a href=\"http://img.sceper.ws/images/MeGcT.png\"\
+          \ target=\"_blank\"><img src=\"http://img.sceper.ws/images/MeGcT.png\" alt=\"\
+          \" width=\"245\" border=\"0\" /></a><a href=\"http://img.sceper.ws/images/jRd4e.png\"\
+          \ target=\"_blank\"><img src=\"http://img.sceper.ws/images/jRd4e.png\" alt=\"\
+          \" width=\"245\" border=\"0\" /></a><a href=\"http://img.sceper.ws/images/HWk80.png\"\
+          \ target=\"_blank\"><img src=\"http://img.sceper.ws/images/HWk80.png\" alt=\"\
+          \" width=\"245\" border=\"0\" /></a></p>\n<div class=\"meta\">Associated\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          ><a href=\"https://www.howtotrainyourdragon.com/\" target=\"_blank\">Homepage</a>\
+          \ \u2013 <a href=\"https://www.youtube.com/watch?v=Z9a4PvzlqoQ\" target=\"\
+          _blank\">Trailer</a> \u2013 <a href=\"http://www.imdb.com/title/tt1646971/\"\
+          \ target=\"_blank\">IMDB</a> \u2013 <a href=\"http://www.rottentomatoes.com/m/how_to_train_your_dragon_2/\"\
+          \ target=\"_blank\">RT</a> \u2013 <a href=\"http://nfo.sceper.ws/nfo/How.to.Train.Your.Dragon.2.2014.DVDRip.XviD-EVO.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/How.to.Train.Your.Dragon.2.2014/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=How.to.Train.Your.Dragon.2.2014\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=How.to.Train.Your.Dragon.2.2014\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >\_DOWNLOAD HERE &#8212; &gt;&gt;&gt; ( <a href=\"http://ul.to/d7g11tmv\"\
+          \ target=\"_blank\">UPLOADED</a>\_)\_</span></span></p>\n\t\t\n\t</div>\
+          \ <!-- end .entry-content -->\n\t\n\t<div class=\"post-meta clearfix\">\n\
+          \t\t\t\t\t<p class=\"meta-info\">Posted  by <a href=\"http://sceper.ws/author/angel\"\
+          \ title=\"Posts by Angel\" rel=\"author\">Angel</a>   in <a href=\"http://sceper.ws/category/movies\"\
+          \ rel=\"category tag\">Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Friday, October 17th, 2014\
+          \ at \r\n7:55 pm | <a href=\"http://sceper.ws/2014/10/how-to-train-your-dragon-2-2014-dvdrip-xvid-evo.html#comments\"\
+          \ title=\"Comment on How to Train Your Dragon 2 2014 DVDRip XviD-EVO\">15\
+          \ comments</a></p>\r\n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=How\
+          \ to Train Your Dragon 2 2014 DVDRip XviD-EVO&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/how-to-train-your-dragon-2-2014-dvdrip-xvid-evo.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"\
+          title\"><a href=\"http://sceper.ws/2014/10/7500-2014-dvdrip-x264-exvid.html\"\
+          >7500 2014 DVDRip x264-EXViD</a></h2>\n\t\n\t<div class=\"entry-content\
+          \ clearfix\">\n\t\t\t\t<div class=\"meta\">Release Info</div>\n<p><a href=\"\
+          http://img.sceper.ws/images/Moz2k.jpg\" target=\"_blank\"><img style=\"\
+          margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/Moz2k.jpg\"\
+          \ alt=\"\" height=\"250\" border=\"0\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> EXViD\
+          \ ( Scene )<br />\n<span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Name:</span> 7500.2014.DVDRip.x264-EXViD<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Release\
+          \ Date:</span>\_15th Oct,\_2014<br />\n<span style=\"font-weight: bold;\"\
+          >Filename:</span> 7500.2014.DVDRip.x264-EXViD<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Source:</span>\
+          \ DVDR<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Size:</span> 600 MB<br />\n</span><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Genre:</span> Horror | Mystery\
+          \ | Thriller<br />\n<span style=\"font-weight: bold;\">Video:</span> MKV\
+          \ | 720&#215;388<br />\n</span><span style=\"font-family: arial;\"><span\
+          \ style=\"font-weight: bold;\">Audio:</span> English | AAC<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Subs:</span>\
+          \ N/A<br />\n<span style=\"font-weight: bold;\">IMDB Rating:</span> 6.2/10\
+          \ from 712 users<br />\n</span><span style=\"font-family: arial;\"><span\
+          \ style=\"font-weight: bold;\">RT Critics:</span> No Reviews Yet\u2026<br\
+          \ />\n<span style=\"font-weight: bold;\">Directed By:</span> Takashi Shimizu<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Starring:</span> Leslie Bibb, Ryan Kwanten, Amy Smart</span></span></p>\n\
+          <div class=\"meta\">Release Description</div>\n<p>Flight 7500 departs Los\
+          \ Angeles International Airport bound for Tokyo. As the overnight flight\
+          \ makes its way over the Pacific Ocean during its ten-hour course, the passengers\
+          \ encounter what appears to be a supernatural force in the cabin.</p>\n\
+          <div class=\"meta\">Associated Links</div>\n<p style=\"text-align: center;\"\
+          ><span style=\"color: #99cc00;\"><span style=\"font-family: arial; font-size:\
+          \ 130%; font-weight: bold;\"><a href=\"http://7500movie.com/\" target=\"\
+          _blank\">Homepage</a> \u2013 <a href=\"http://www.youtube.com/watch?v=rbuIUyzfX5Q\"\
+          \ target=\"_blank\">Trailer</a> \u2013 <a href=\"http://www.imdb.com/title/tt1975159/\"\
+          \ target=\"_blank\">IMDB</a> \u2013 <a href=\"http://www.rottentomatoes.com/m/7500/\"\
+          \ target=\"_blank\">RT</a> \u2013 <a href=\"http://nfo.sceper.ws/nfo/7500.2014.DVDRip.x264-EXViD.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/7500.2014\
+          \ /0/99/0\" target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=7500.2014\
+          \ \" target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=7500.2014\
+          \ \" target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >\_DOWNLOAD HERE &#8212; &gt;&gt;&gt; ( <a href=\"http://ul.to/y5ba3cxl\"\
+          \ target=\"_blank\">UPLOADED</a>\_)\_</span></span></p>\n\t\t\n\t</div>\
+          \ <!-- end .entry-content -->\n\t\n\t<div class=\"post-meta clearfix\">\n\
+          \t\t\t\t\t<p class=\"meta-info\">Posted  by <a href=\"http://sceper.ws/author/angel\"\
+          \ title=\"Posts by Angel\" rel=\"author\">Angel</a>   in <a href=\"http://sceper.ws/category/movies\"\
+          \ rel=\"category tag\">Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Wednesday, October 15th,\
+          \ 2014 at \r\n2:01 am | <a href=\"http://sceper.ws/2014/10/7500-2014-dvdrip-x264-exvid.html#comments\"\
+          \ title=\"Comment on 7500 2014 DVDRip x264-EXViD\">18 comments</a></p>\r\
+          \n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=7500 2014\
+          \ DVDRip x264-EXViD&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/7500-2014-dvdrip-x264-exvid.html\" class=\"\
+          readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end .entry\
+          \ -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"title\"\
+          ><a href=\"http://sceper.ws/2014/10/the-anomaly-2014-dvdrip-x264-exvid.html\"\
+          >The Anomaly 2014 DVDRip x264-EXViD</a></h2>\n\t\n\t<div class=\"entry-content\
+          \ clearfix\">\n\t\t\t\t<div class=\"meta\">Release Info</div>\n<p><a href=\"\
+          http://img.sceper.ws/images/u0dr1.jpg\" target=\"_blank\"><img style=\"\
+          margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/u0dr1.jpg\"\
+          \ alt=\"\" height=\"250\" border=\"0\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> EXViD\
+          \ (Scene)<br />\n<span style=\"font-weight: bold;\">Release Name:</span>\
+          \ The.Anomaly.2014.DVDRip.x264-EXViD<br />\n<span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Release Date:</span> October 15, 2014<br\
+          \ />\n<span style=\"font-weight: bold;\">Filename:</span> The.Anomaly.2014.DVDRip.x264-EXViD<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Source:</span> DVDR<br />\n<span style=\"font-weight: bold;\"\
+          >Size:\_7</span>00 MB<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Genre:</span> Action | Sci-Fi<br />\n\
+          <span style=\"font-weight: bold;\">Video:</span>\_MKV\_ | 720\xD7306<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Audio:</span> English | AAC<br />\n<span style=\"font-weight:\
+          \ bold;\">Subs:</span>\_EN HI, FR, IT, DE, NL, DA, FI, NO, SV, TR<br />\n\
+          </span><span style=\"font-family: arial;\"><span style=\"font-weight: bold;\"\
+          >IMDB Rating:</span> 5.8/10<br />\n<span style=\"font-weight: bold;\">RT\
+          \ Critics:</span> 3.7/10<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Directed By:</span> Noel Clarke<br />\n\
+          <span style=\"font-weight: bold;\">Starring:</span> Noel Clarke, Ian Somerhalder,\
+          \ Brian Cox<br />\n</span></span></p>\n<div class=\"meta\">Release Description</div>\n\
+          <p>A former soldier is taken captive and awakens in the back of a van where\
+          \ he learns that he only has a few moments to figure out how he got there.</p>\n\
+          <div class=\"meta\">Associated Links</div>\n<p style=\"text-align: center;\"\
+          ><span style=\"color: #99cc00;\"><span style=\"font-family: arial; font-size:\
+          \ 130%; font-weight: bold;\"><a href=\"https://www.facebook.com/TheAnomalyMovie\"\
+          \ target=\"_blank\">Homepage</a> \u2013 <a href=\"http://www.youtube.com/watch?v=ZaR1vzMyR1M\"\
+          \ target=\"_blank\">Trailer</a> \u2013 <a href=\"http://www.imdb.com/title/tt2962726/\"\
+          \ target=\"_blank\">IMDB</a> \u2013 <a href=\"http://www.rottentomatoes.com/m/the_anomaly/\"\
+          \ target=\"_blank\">RT</a> \u2013 <a href=\"http://nfo.sceper.ws/nfo/The.Anomaly.2014.DVDRip.x264-EXViD.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/The.Anomaly.2014/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=The.Anomaly.2014\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=The.Anomaly.2014\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >\_DOWNLOAD HERE &#8212; &gt;&gt;&gt; ( <a href=\"http://ul.to/x3nypmcd\"\
+          \ target=\"_blank\">UPLOADED</a>\_)\_</span></span></p>\n\t\t\n\t</div>\
+          \ <!-- end .entry-content -->\n\t\n\t<div class=\"post-meta clearfix\">\n\
+          \t\t\t\t\t<p class=\"meta-info\">Posted  by <a href=\"http://sceper.ws/author/angel\"\
+          \ title=\"Posts by Angel\" rel=\"author\">Angel</a>   in <a href=\"http://sceper.ws/category/movies\"\
+          \ rel=\"category tag\">Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Wednesday, October 15th,\
+          \ 2014 at \r\n1:56 am | <a href=\"http://sceper.ws/2014/10/the-anomaly-2014-dvdrip-x264-exvid.html#comments\"\
+          \ title=\"Comment on The Anomaly 2014 DVDRip x264-EXViD\">18 comments</a></p>\r\
+          \n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=The Anomaly\
+          \ 2014 DVDRip x264-EXViD&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/the-anomaly-2014-dvdrip-x264-exvid.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"\
+          title\"><a href=\"http://sceper.ws/2014/10/the-black-rider-revelation-road-2014-dvdrip-xvid-mp3-rbg.html\"\
+          >The Black Rider Revelation Road 2014 DVDRip XviD MP3-RBG</a></h2>\n\t\n\
+          \t<div class=\"entry-content clearfix\">\n\t\t\t\t<div class=\"meta\">Release\
+          \ Info</div>\n<p><a href=\"http://img.sceper.ws/images/HiOyX.jpg\" target=\"\
+          _blank\"><img style=\"margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/HiOyX.jpg\"\
+          \ border=\"0\" alt=\"\" height=\"250\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> RBG\
+          \ (P2P)<br />\n<span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Name:</span> The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RBG<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Date:</span> 14th October 2014<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Filename:</span>\
+          \ The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RBG<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Source:</span>\
+          \ DVDR<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Size:</span> 1.87 GB<br />\n</span><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Genre:</span> Action<br />\n\
+          </span><span style=\"font-family: arial;\"><span style=\"font-weight: bold;\"\
+          >Video:</span> XviD, 720&#215;400 at 2187 kbps<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Audio:</span> English,\
+          \ MP-3 at 192 kbps<br />\n</span><span style=\"font-family: arial;\"><span\
+          \ style=\"font-weight: bold;\">Subs:</span> N/A<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">IMDB Rating:</span>\
+          \ 7.2/10 from 14 users<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">RT Critics:</span> No Reviews Yet&#8230;<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Directed By:</span> Gabriel Sabloff<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Starring:</span>\
+          \ James Denton, David A.R. White, Kevin Sorbo</p>\n<div class=\"meta\">Release\
+          \ Description</div>\n<p>The Rapture has come and gone. In it\\&#8217;s wake,\
+          \ a wasteland filled with desperate bandits. Josh McManus, a drifter with\
+          \ a knack for fighting, must find the mysterious \\&quot;Shepherd\\&quot;\
+          \ &#8211; a dangerous mission that will put his faith to the test.</p>\n\
+          <div class=\"meta\">Release Quality</div>\n<p><a href=\" http://img.sceper.ws/images/m1024.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/m1024.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/C1jdi.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/C1jdi.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/nSv7.png\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/nSv7.png\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a></p>\n<div class=\"meta\"\
+          >Associated Links</div>\n<p style=\"text-align: center;\"><span style=\"\
+          color: #99cc00;\"><span style=\"font-family: arial; font-size: 130%; font-weight:\
+          \ bold;\"><a href=\"http://pureflix.com/\" target=\"_blank\">Homepage</a>\
+          \ &#8211; <a href=\"http://www.youtube.com/watch?v=O3XDrgUJeiI\" target=\"\
+          _blank\">Trailer</a> &#8211; <a href=\"http://www.imdb.com/title/tt3505812/\"\
+          \ target=\"_blank\">IMDB</a> &#8211; <a href=\"http://www.rottentomatoes.com/m/revelation_road_3_the_black_rider/\"\
+          \ target=\"_blank\">RT</a> &#8211; <a href=\"http://nfo.sceper.ws/nfo/The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RARBG.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RBG/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RBG\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RBG\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >DOWNLOAD (<a href=\"http://uploaded.net/file/vkvfnp9j/The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RARBG.avi\"\
+          >Uploaded</a>) OR (<a href=\"http://rg.to/file/ff12e06f6defbfa5a975970c0a1dcf27/The.Black.Rider.Revelation.Road.2014.DVDRip.XviD.MP3-RARBG.avi.html\"\
+          >RapidGator</a>)</p>\n\t\t\n\t</div> <!-- end .entry-content -->\n\t\n\t\
+          <div class=\"post-meta clearfix\">\n\t\t\t\t\t<p class=\"meta-info\">Posted\
+          \  by <a href=\"http://sceper.ws/author/thunder\" title=\"Posts by Thunder\
+          \ &#124; A True Broski\" rel=\"author\">Thunder &#124; A True Broski</a>\
+          \   in <a href=\"http://sceper.ws/category/movies\" rel=\"category tag\"\
+          >Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Tuesday, October 14th, 2014\
+          \ at \r\n7:03 pm | <a href=\"http://sceper.ws/2014/10/the-black-rider-revelation-road-2014-dvdrip-xvid-mp3-rbg.html#comments\"\
+          \ title=\"Comment on The Black Rider Revelation Road 2014 DVDRip XviD MP3-RBG\"\
+          >11 comments</a></p>\r\n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=The\
+          \ Black Rider Revelation Road 2014 DVDRip XviD MP3-RBG&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/the-black-rider-revelation-road-2014-dvdrip-xvid-mp3-rbg.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"\
+          title\"><a href=\"http://sceper.ws/2014/10/bhopal-a-prayer-for-rain-2013-dvdrip-xvid-aqos.html\"\
+          >Bhopal A Prayer for Rain 2013 DVDRip XviD-AQOS</a></h2>\n\t\n\t<div class=\"\
+          entry-content clearfix\">\n\t\t\t\t<div class=\"meta\">Release Info</div>\n\
+          <p><a href=\"http://img.sceper.ws/images/BesE.jpg\" target=\"_blank\"><img\
+          \ style=\"margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/BesE.jpg\"\
+          \ alt=\"\" height=\"250\" border=\"0\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> AQOS\
+          \ (P2P)<br />\n<span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Name:</span> Bhopal.A.Prayer.for.Rain.2013.DVDRip.XviD-AQOS<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Date:</span> 14th October 2014<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Filename:</span>\
+          \ aqos-bapfr.2013.dvdrip.xvid<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Source:</span> DVDR<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Size:</span>\
+          \ 700 MB<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Genre:</span> Drama | History<br />\n</span><span style=\"\
+          font-family: arial;\"><span style=\"font-weight: bold;\">Video:</span> XviD,\
+          \ 640&#215;352 at 1000 kbps<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Audio:</span> English, MP-3 at 128kbps<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Subs:</span> N/A<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">IMDB Rating:</span> 7.7/10 from 362\
+          \ users<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">RT Critics:</span> No Reviews Yet&#8230;<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Directed\
+          \ By:</span> Ravi Kumar<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Starring:</span> Mischa Barton, Martin\
+          \ Sheen, Kal Penn</span></span></p>\n<div class=\"meta\">Release Description</div>\n\
+          <p>The story follows a young rickshaw-puller in Bhopal who gets a menial\
+          \ job at a chemical plant, but in December of 1984 a chemical spill in India\
+          \ takes the lives of almost 15,000 people and injuring more than 100,000.\
+          \ The film follows how the industrial disaster in the city changes his life\
+          \ and those of others.</p>\n<div class=\"meta\">Release Quality</div>\n\
+          <p><a href=\" http://img.sceper.ws/images/ImCtT.jpg \" target=\"_blank\"\
+          ><img src=\" http://img.sceper.ws/images/ImCtT.jpg \" alt=\"\" width=\"\
+          245\" border=\"0\" /></a><a href=\" http://img.sceper.ws/images/wjhQ7.jpg\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/wjhQ7.jpg\
+          \ \" alt=\"\" width=\"245\" border=\"0\" /></a><a href=\" http://img.sceper.ws/images/GNeOv.jpg\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/GNeOv.jpg\
+          \ \" alt=\"\" width=\"245\" border=\"0\" /></a></p>\n<div class=\"meta\"\
+          >Associated Links</div>\n<p style=\"text-align: center;\"><span style=\"\
+          color: #99cc00;\"><span style=\"font-family: arial; font-size: 130%; font-weight:\
+          \ bold;\"><a href=\"http://www.facebook.com/APrayerForRain\" target=\"_blank\"\
+          >Homepage</a> &#8211; <a href=\"http://www.youtube.com/watch?v=Ii-OUujqGwE\"\
+          \ target=\"_blank\">Trailer</a> &#8211; <a href=\"http://www.imdb.com/title/tt0839742/\"\
+          \ target=\"_blank\">IMDB</a> &#8211; <a href=\"http://www.rottentomatoes.com/m/bhopal_a_prayer_for_rain/\"\
+          \ target=\"_blank\">RT</a> &#8211; <a href=\"http://nfo.sceper.ws/nfo/aqos-bapfr.2013.dvdrip.xvid.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/Bhopal.A.Prayer.for.Rain.2013.DVDRip.XviD-AQOS/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=Bhopal.A.Prayer.for.Rain.2013.DVDRip.XviD-AQOS\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=Bhopal.A.Prayer.for.Rain.2013.DVDRip.XviD-AQOS\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >DOWNLOAD (<a href=\"http://uploaded.net/file/c2vgptkm/aqos-bapfr.2013.dvdrip.xvid.avi\"\
+          >Uploaded</a>) OR (<a href=\"http://rg.to/file/4340316e18a4ce856290fff7476ee5a5/aqos-bapfr.2013.dvdrip.xvid.avi.html\"\
+          >RapidGator</a>) OR (<a href=\"http://xerver.co/6bojm95s8p4u/aqos-bapfr.2013.dvdrip.xvid.avi\"\
+          \ target=\"_blank\">XERVER</a>)<br />\n</span></span></p>\n\t\t\n\t</div>\
+          \ <!-- end .entry-content -->\n\t\n\t<div class=\"post-meta clearfix\">\n\
+          \t\t\t\t\t<p class=\"meta-info\">Posted  by <a href=\"http://sceper.ws/author/thunder\"\
+          \ title=\"Posts by Thunder &#124; A True Broski\" rel=\"author\">Thunder\
+          \ &#124; A True Broski</a>   in <a href=\"http://sceper.ws/category/movies\"\
+          \ rel=\"category tag\">Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Tuesday, October 14th, 2014\
+          \ at \r\n1:03 pm | <a href=\"http://sceper.ws/2014/10/bhopal-a-prayer-for-rain-2013-dvdrip-xvid-aqos.html#comments\"\
+          \ title=\"Comment on Bhopal A Prayer for Rain 2013 DVDRip XviD-AQOS\">9\
+          \ comments</a></p>\r\n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=Bhopal\
+          \ A Prayer for Rain 2013 DVDRip XviD-AQOS&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/bhopal-a-prayer-for-rain-2013-dvdrip-xvid-aqos.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\t\t\t\t\n<div class=\"entry clearfix\" >\n\t<h2 class=\"\
+          title\"><a href=\"http://sceper.ws/2014/10/to-be-takei-2014-dvdrip-x264-taste.html\"\
+          >To Be Takei 2014 DVDRiP X264-TASTE</a></h2>\n\t\n\t<div class=\"entry-content\
+          \ clearfix\">\n\t\t\t\t<div class=\"meta\">Release Info</div>\n<p><a href=\"\
+          http://img.sceper.ws/images/fv3be.jpg\" target=\"_blank\"><img style=\"\
+          margin: 0pt 10px 10px 0pt; float: left;\" src=\"http://img.sceper.ws/images/fv3be.jpg\"\
+          \ border=\"0\" alt=\"\" height=\"250\" /></a><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Release Group:</span> TASTE\
+          \ (Scene)<br />\n<span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Release Name:</span> To.Be.Takei.2014.DVDRiP.X264-TASTE<br />\n\
+          </span><span style=\"font-family: arial;\"><span style=\"font-weight: bold;\"\
+          >Release Date:</span> 12th October 2014<br />\n</span><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">Filename:</span> To.Be.Takei.2014.DVDRiP.X264-TASTE<br\
+          \ />\n</span><span style=\"font-family: arial;\"><span style=\"font-weight:\
+          \ bold;\">Source:</span> DVDR<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Size:</span> 957 MB<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Genre:</span>\
+          \ Documentary<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Video:</span> x264, 720&#215;406, CRF21<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Audio:</span>\
+          \ English, AAC at 48KHz<br />\n</span><span style=\"font-family: arial;\"\
+          ><span style=\"font-weight: bold;\">Subs:</span> English<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">IMDB\
+          \ Rating:</span> 6.9/10 from 350 users<br />\n</span><span style=\"font-family:\
+          \ arial;\"><span style=\"font-weight: bold;\">RT Critics:</span> 90%, average\
+          \ ratings 7/10<br />\n</span><span style=\"font-family: arial;\"><span style=\"\
+          font-weight: bold;\">Directed By:</span> Jennifer M. Kroot<br />\n</span><span\
+          \ style=\"font-family: arial;\"><span style=\"font-weight: bold;\">Starring:</span>\
+          \ George Takei, Brad Takei, Walter Koenig</p>\n<div class=\"meta\">Release\
+          \ Description</div>\n<p>A look at the many roles played by eclectic 77-year-old\
+          \ actor/activist George Takei, whose wit, humor and grace have helped him\
+          \ to become an internationally beloved figure and Internet phenomenon with\
+          \ 7-million Facebook fans and counting.</p>\n<div class=\"meta\">Release\
+          \ Quality</div>\n<p><a href=\" http://img.sceper.ws/images/TxVFu.jpg \"\
+          \ target=\"_blank\"><img src=\" http://img.sceper.ws/images/TxVFu.jpg \"\
+          \ border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/zNZCV.jpg\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/zNZCV.jpg\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a><a href=\" http://img.sceper.ws/images/ptcGb.jpg\
+          \ \" target=\"_blank\"><img src=\" http://img.sceper.ws/images/ptcGb.jpg\
+          \ \" border=\"0\" alt=\"\" width=\"245\" /></a></p>\n<div class=\"meta\"\
+          >Associated Links</div>\n<p style=\"text-align: center;\"><span style=\"\
+          color: #99cc00;\"><span style=\"font-family: arial; font-size: 130%; font-weight:\
+          \ bold;\"><a href=\"http://www.tobetakei.com/\" target=\"_blank\">Homepage</a>\
+          \ &#8211; <a href=\"http://www.youtube.com/watch?v=VUkA3RvwcWw\" target=\"\
+          _blank\">Trailer</a> &#8211; <a href=\"http://www.imdb.com/title/tt2174896/\"\
+          \ target=\"_blank\">IMDB</a> &#8211; <a href=\"http://www.rottentomatoes.com/m/to_be_takei/\"\
+          \ target=\"_blank\">RT</a> &#8211; <a href=\"http://nfo.sceper.ws/nfo/to.be.takei.2014.dvdrip.x264-taste.png\"\
+          \ target=\"_blank\">NFO</a>- Search (<a href=\"http://thepiratebay.org/search/To.Be.Takei.2014.DVDRiP.X264-TASTE/0/99/0\"\
+          \ target=\"_blank\">TPB</a>, <a href=\"http://torrentz.eu/search?f=To.Be.Takei.2014.DVDRiP.X264-TASTE\"\
+          \ target=\"_blank\">Torrent</a>, <a href=\"http://binsearch.net/?q=To.Be.Takei.2014.DVDRiP.X264-TASTE\"\
+          \ target=\"_blank\">NZB</a>)</span></span></p>\n<div class=\"meta\">Download\
+          \ Links</div>\n<p style=\"text-align: center;\"><span style=\"color: #99cc00;\"\
+          ><span style=\"font-family: arial; font-size: 130%; font-weight: bold;\"\
+          >DOWNLOAD (<a href=\"http://uploaded.net/file/6gzkit7x/To.Be.Takei.2014.DVDRiP.X264-TASTE.mkv\"\
+          >Uploaded</a>) OR (<a href=\"http://rg.to/file/83ec57c797d7d02bd4bb28b0f729c4f0/To.Be.Takei.2014.DVDRiP.X264-TASTE.mkv.html\"\
+          >RapidGator</a>)</p>\n\t\t\n\t</div> <!-- end .entry-content -->\n\t\n\t\
+          <div class=\"post-meta clearfix\">\n\t\t\t\t\t<p class=\"meta-info\">Posted\
+          \  by <a href=\"http://sceper.ws/author/thunder\" title=\"Posts by Thunder\
+          \ &#124; A True Broski\" rel=\"author\">Thunder &#124; A True Broski</a>\
+          \   in <a href=\"http://sceper.ws/category/movies\" rel=\"category tag\"\
+          >Movies</a>, <a href=\"http://sceper.ws/category/movies/movies-dvd-rip\"\
+          \ rel=\"category tag\">Movies - DVD Rip</a> on Tuesday, October 14th, 2014\
+          \ at \r\n10:26 am | <a href=\"http://sceper.ws/2014/10/to-be-takei-2014-dvdrip-x264-taste.html#comments\"\
+          \ title=\"Comment on To Be Takei 2014 DVDRiP X264-TASTE\">15 comments</a></p>\r\
+          \n\t<!-- <center><a href=\"http://ads.coolmirage.com/sepr/?title=To Be Takei\
+          \ 2014 DVDRiP X264-TASTE&type=movie&dp=1090&line=1&layout=1&location=download\"\
+          \ target=\"_blank\" /><img src=\"http://img.sceper.ws/images/bselfsgzg.png\"\
+          \ alt=\"http://i27.lulzimg.com/20dcad040e.png\" /></a></center> -->\n\t\t\
+          <a href=\"http://sceper.ws/2014/10/to-be-takei-2014-dvdrip-x264-taste.html\"\
+          \ class=\"readmore\"><span>Read More</span></a>\n\t</div>\n</div> <!-- end\
+          \ .entry -->\n\t\t\t\r\n\t\t\t\t<div class='wp-pagenavi'>\n<span class='pages'>Page\
+          \ 1 of 1,291</span><span class='current'>1</span><a class=\"page larger\"\
+          \ href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/2\">2</a><a\
+          \ class=\"page larger\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/3\"\
+          >3</a><a class=\"page larger\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/4\"\
+          >4</a><span class='extend'>...</span><a class=\"larger page\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/10\"\
+          >10</a><a class=\"larger page\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/20\"\
+          >20</a><span class='extend'>...</span><a class=\"nextpostslink\" rel=\"\
+          next\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/2\">\xBB\
+          </a><a class=\"last\" href=\"http://sceper.ws/category/movies/movies-dvd-rip/page/1291\"\
+          >\xBB\xBB</a>\n</div>\r\n\t\t\t\t\t\r\n\r\n<center>\r\n<!-- BEGIN STANDARD\
+          \ TAG - 728 x 90 - ROS: web 1 - DO NOT MODIFY -->\r\n<iframe id=\"4f8f5e07be7e5\"\
+          \ name=\"4f8f5e07be7e5\"\r\nsrc=\"http://ax-d.pixfuture.net/w/1.0/afr?auid=188811&cb=2272345\"\
+          \ frameborder=\"0\" scrolling=\"no\" width=\"728\" height=\"90\"></iframe>\r\
+          \n<!-- END TAG -->\r\n</center>\r\n\t\r\n\t\t</div> <!-- end #recent-posts\
+          \ -->\r\n\r\n\t\t<div id=\"sidebar\">\r\n\t\t\t\r\n\t\t<div id=\"secondcol\"\
+          >\r\n\t\t\t<div id=\"linkcat-30\" class=\"widget widget_links\"><h4 class=\"\
+          widgettitle\"><span>Info</span></h4><div class=\"widgetcontent\">\n\t<ul\
+          \ class='xoxo blogroll'>\n<li><a href=\"http://scenegrouplist.com/index.php\"\
+          \ title=\"All the info you&#8217;ll  ever need on the scene\" target=\"\
+          _blank\">Scene Info</a>\nAll the info you&#8217;ll  ever need on the scene</li>\n\
+          \n\t</ul>\n</div><!-- end .widget-content --></div> <!-- end .widget -->\n\
+          <div id=\"recent-comments-3\" class=\"widget widget_recent_comments\"><h4\
+          \ class=\"widgettitle\"><span>Recent Comments</span></h4><div class=\"widgetcontent\"\
+          ><ul id=\"recentcomments\"><li class=\"recentcomments\"><span class=\"comment-author-link\"\
+          >Anonymous</span> on <a href=\"http://sceper.ws/2014/10/the-millers-s02e01-hdtv-x264-lol.html#comment-2493374\"\
+          >The Millers S02E01 HDTV x264-LOL &#038; The Millers S02E01 720p HDTV X264-DIMENSION</a></li><li\
+          \ class=\"recentcomments\"><span class=\"comment-author-link\">Anonymous</span>\
+          \ on <a href=\"http://sceper.ws/2014/10/the-originals-s02e03-hdtv-x264-lol.html#comment-2493373\"\
+          >The Originals S02E03 HDTV x264-LOL &#038; The Originals S02E03 720p HDTV\
+          \ X264-DIMENSION</a></li><li class=\"recentcomments\"><span class=\"comment-author-link\"\
+          >Anonymous</span> on <a href=\"http://sceper.ws/2014/10/the-good-wife-s06e05-hdtv-x264-lol.html#comment-2493372\"\
+          >The Good Wife S06E05 HDTV x264-LOL &#038; The Good Wife S06E05 720p HDTV\
+          \ X264-DIMENSION</a></li><li class=\"recentcomments\"><span class=\"comment-author-link\"\
+          >Anonymous</span> on <a href=\"http://sceper.ws/2014/10/the-blacklist-s02e05-hdtv-x264-lol.html#comment-2493371\"\
+          >The Blacklist S02E05 HDTV x264-LOL &#038; The Blacklist S02E05 720p HDTV\
+          \ X264-DIMENSION</a></li><li class=\"recentcomments\"><span class=\"comment-author-link\"\
+          >Anonymous</span> on <a href=\"http://sceper.ws/2014/10/the-sims-4-reloaded.html#comment-2493369\"\
+          >The Sims 4-RELOADED</a></li></ul></div><!-- end .widget-content --></div>\
+          \ <!-- end .widget --><div id=\"text-3\" class=\"widget widget_text\"><h4\
+          \ class=\"widgettitle\"><span>Sponsor</span></h4><div class=\"widgetcontent\"\
+          >\t\t\t<div class=\"textwidget\"><!-- PopAds.net Popunder Code for sceper.ws\
+          \ -->\r\n<script type=\"text/javascript\">\r\n  var _pop = _pop || [];\r\
+          \n  _pop.push(['siteId', 2012]);\r\n  _pop.push(['minBid', 0.0005]);\r\n\
+          \  _pop.push(['popundersPerIP', 1]);\r\n  _pop.push(['delayBetween', 1]);\r\
+          \n  _pop.push(['default', false]);\r\n  _pop.push(['defaultPerDay', 0]);\r\
+          \n  _pop.push(['topmostLayer', false]);\r\n  (function() {\r\n    var pa\
+          \ = document.createElement('script'); pa.type = 'text/javascript'; pa.async\
+          \ = true;\r\n    pa.src = 'http://world.popadscdn.net/pop.js';\r\n    var\
+          \ s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(pa,\
+          \ s);\r\n  })();\r\n</script>\r\n<!-- PopAds.net Popunder Code End --></div>\n\
+          \t\t</div><!-- end .widget-content --></div> <!-- end .widget -->\t\t</div>\
+          \ <!-- end #secondcol -->\r\n\t\t\t\r\n\t\t\r\n\t\r\n\t\t\r\n</div> <!--\
+          \ end sidebar -->\t\t\r\n\r\n\t\t\t</div> <!-- end #main-content -->\r\n\
+          \t\t</div> <!-- end #main-content-wrap -->\r\n\t</div> \t<!-- end .container\
+          \ -->\r\n</div> <!-- end #content -->\r\n\r\n<div id=\"content-bottom\"\
+          >\r\n\t<div class=\"container\"></div>\r\n</div>\r\n\t\r\n<div id=\"footer\"\
+          >\r\n\t<div class=\"container clearfix\">\r\n\t\t\r\n\t\t \r\n\t\t\t\t<div\
+          \ class=\"clear\"></div>\r\n\r\n\t</div> <!--end .container -->\r\n</div>\
+          \ <!-- end #footer -->\r\n\r\n<div id=\"footer-bottom\">\r\n\t<div class=\"\
+          container clearfix\">\r\n\t\t\t\t\r\n\t\t<ul class=\"bottom-nav\">\t\t\t\
+          <li ><a href=\"http://sceper.ws\">Home</a></li>\n\t\t\t<!--<li class=\"\
+          current_page_item\"><span style=\"color: #0000ff;\"><strong><a href=\"http://sceper.ws/request\"\
+          >Requests</a></strong></span></li>-->\n\t\t<li class=\"page_item page-item-8345\"\
+          ><a href=\"http://sceper.ws/about\">About</a></li>\n<li class=\"page_item\
+          \ page-item-11219\"><a href=\"http://sceper.ws/affiliates\">Affiliates</a></li>\n\
+          <li class=\"page_item page-item-13453\"><a href=\"http://sceper.ws/contact-us\"\
+          >Contact</a></li>\n<li class=\"page_item page-item-9282\"><a href=\"http://sceper.ws/disclaimer\"\
+          >Disclaimer</a></li>\n<li class=\"page_item page-item-23017\"><a href=\"\
+          http://sceper.ws/dmca\">DMCA</a></li>\n<li class=\"page_item page-item-14071\"\
+          ><a href=\"http://sceper.ws/faq\">FAQ</a></li>\n<li class=\"page_item page-item-8350\"\
+          ><a href=\"http://sceper.ws/irc\">IRC</a></li>\n<li class=\"page_item page-item-111681\"\
+          ><a href=\"http://sceper.ws/rules\">Rules</a></li>\n<li class=\"page_item\
+          \ page-item-14714\"><a href=\"http://sceper.ws/sgl\">SGL</a></li>\n</ul>\r\
+          \n\r\n\t\t<p id=\"copyright\">\xA9 2006-2014 <a href=\"\" />Sceper.ws</a><br>This\
+          \ server doesn't host any files. This site is indexing other sites content\
+          \ only.</p>\r\n\t</div> <!--end .container -->\r\n</div> <!-- end #footer-bottom\
+          \ -->\r\n\r\n\t\t<script type=\"text/javascript\">\n\t//<![CDATA[\n\t\t\
+          jQuery.noConflict();\n\t\n\t\tjQuery('ul.superfish, #page-menu ul.nav').superfish({\
+          \ \n\t\t\tdelay:       200,                            // one second delay\
+          \ on mouseout \n\t\t\tanimation:   {opacity:'show',height:'show'},  // fade-in\
+          \ and slide-down animation \n\t\t\tspeed:       'fast',                \
+          \          // faster animation speed \n\t\t\tautoArrows:  true,        \
+          \                   // disable generation of arrow mark-up \n\t\t\tdropShadows:\
+          \ false                            // disable drop shadows \n\t\t});\n\t\
+          \t\n\t\tjQuery('ul.nav > li > a.sf-with-ul').parent('li').addClass('sf-ul');\
+          \ \n\t\t\n\t\tet_search_bar();\n\t\tet_footer_improvements('#footer .footer-widget');\n\
+          \t\t\n\t\t<!---- et_switcher plugin v1.3 ---->\n\t\t(function($)\n\t\t{\n\
+          \t\t\t$.fn.et_switcher = function(options)\n\t\t\t{\n\t\t\t\tvar defaults\
+          \ =\n\t\t\t\t{\n\t\t\t\t   slides: '>div',\n\t\t\t\t   activeClass: 'active',\n\
+          \t\t\t\t   linksNav: '',\n\t\t\t\t   findParent: true, //use parent elements\
+          \ in defining lengths\n\t\t\t\t   lengthElement: 'li', //parent element,\
+          \ used only if findParent is set to true\n\t\t\t\t   useArrows: false,\n\
+          \t\t\t\t   arrowLeft: 'prevlink',\n\t\t\t\t   arrowRight: 'nextlink',\n\t\
+          \t\t\t   auto: false,\n\t\t\t\t   autoSpeed: 5000\n\t\t\t\t};\n\n\t\t\t\t\
+          var options = $.extend(defaults, options);\n\n\t\t\t\treturn this.each(function()\n\
+          \t\t\t\t{\n\t\t\t\t\tvar slidesContainer = jQuery(this);\n\t\t\t\t\tslidesContainer.find(options.slides).hide().end().find(options.slides).filter(':first').css('display','block');\n\
+          \t\t\t \n\t\t\t\t\tif (options.linksNav != '') { \n\t\t\t\t\t\tvar linkSwitcher\
+          \ = jQuery(options.linksNav);\n\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\tlinkSwitcher.click(function(){\n\
+          \t\t\t\t\t\t\tvar targetElement;\n\n\t\t\t\t\t\t\tif (options.findParent)\
+          \ targetElement = jQuery(this).parent();\n\t\t\t\t\t\t\telse targetElement\
+          \ = jQuery(this);\n\n\t\t\t\t\t\t\tif (targetElement.hasClass('active'))\
+          \ return false;\n\n\t\t\t\t\t\t\ttargetElement.siblings().removeClass('active').end().addClass('active');\n\
+          \n\t\t\t\t\t\t\tvar ordernum = targetElement.prevAll(options.lengthElement).length;\n\
+          \t\t\t\t\t\t\t\t\t\t\t\n\t\t\t\t\t\t\tslidesContainer.find(options.slides).filter(':visible').hide().end().end().find(options.slides).filter(':eq('+ordernum+')').stop().fadeIn(700);\n\
+          \t\t\t\t\t\t\treturn false;\n\t\t\t\t\t\t});\n\t\t\t\t\t};\n\t\t\t\t\t\n\
+          \t\t\t\t\tjQuery('#'+options.arrowRight+', #'+options.arrowLeft).click(function(){\n\
+          \t\t\t\t\t  \n\t\t\t\t\t\tvar slideActive = slidesContainer.find(options.slides).filter(\"\
+          :visible\"),\n\t\t\t\t\t\t\tnextSlide = slideActive.next(),\n\t\t\t\t\t\t\
+          \tprevSlide = slideActive.prev();\n\n\t\t\t\t\t\tif (jQuery(this).attr(\"\
+          id\") == options.arrowRight) {\n\t\t\t\t\t\t\tif (nextSlide.length) {\n\t\
+          \t\t\t\t\t\t\tvar ordernum = nextSlide.prevAll().length;               \
+          \         \n\t\t\t\t\t\t\t} else { var ordernum = 0; }\n\t\t\t\t\t\t};\n\
+          \n\t\t\t\t\t\tif (jQuery(this).attr(\"id\") == options.arrowLeft) {\n\t\t\
+          \t\t\t\t\tif (prevSlide.length) {\n\t\t\t\t\t\t\t\tvar ordernum = prevSlide.prevAll().length;\
+          \                  \n\t\t\t\t\t\t\t} else { var ordernum = slidesContainer.find(options.slides).length-1;\
+          \ }\n\t\t\t\t\t\t};\n\n\t\t\t\t\t\tslidesContainer.find(options.slides).filter(':visible').hide().end().end().find(options.slides).filter(':eq('+ordernum+')').stop().fadeIn(700);\n\
+          \n\t\t\t\t\t\tif (typeof interval != 'undefined') {\n\t\t\t\t\t\t\tclearInterval(interval);\n\
+          \t\t\t\t\t\t\tauto_rotate();\n\t\t\t\t\t\t};\n\n\t\t\t\t\t\treturn false;\n\
+          \t\t\t\t\t});   \n\n\t\t\t\t\tif (options.auto) {\n\t\t\t\t\t\tauto_rotate();\n\
+          \t\t\t\t\t};\n\t\t\t\t\t\n\t\t\t\t\tfunction auto_rotate(){\n\t\t\t\t\t\t\
+          interval = setInterval(function(){\n\t\t\t\t\t\t\tvar slideActive = slidesContainer.find(options.slides).filter(\"\
+          :visible\"),\n\t\t\t\t\t\t\t\tnextSlide = slideActive.next();\n\t\t\t\t\t\
+          \t \n\t\t\t\t\t\t\tif (nextSlide.length) {\n\t\t\t\t\t\t\t\tvar ordernum\
+          \ = nextSlide.prevAll().length;                        \n\t\t\t\t\t\t\t\
+          } else { var ordernum = 0; }\n\t\t\t\t\t\t \n\t\t\t\t\t\t\tif (options.linksNav\
+          \ === '') \n\t\t\t\t\t\t\t\tjQuery('#'+options.arrowRight).trigger(\"click\"\
+          );\n\t\t\t\t\t\t\telse \t\t \t\t\n\t\t\t\t\t\t\t\tlinkSwitcher.filter(':eq('+ordernum+')').trigger(\"\
+          click\");\n\t\t\t\t\t\t},options.autoSpeed);\n\t\t\t\t\t};\n\t\t\t\t});\n\
+          \t\t\t}\n\t\t})(jQuery);\n\t\t\n\t\t\n\t\tvar $featuredArea = jQuery('#featured'),\n\
+          \t\t\t$all_tabs = jQuery('#all_tabs');\n\t\t\n\t\tif ($featuredArea.length)\
+          \ {\n\t\t\t$featuredArea.et_switcher({\n\t\t\t\tuseArrows: true \t\t\n\t\
+          \t\t});\n\t\t};\n\t\t\t\t\n\t\tif ($all_tabs.length) {\n\t\t\t$all_tabs.et_switcher({\n\
+          \t\t\t\tlinksNav: 'ul#tab_controls li a'\n\t\t\t});\n\t\t}; \n\n\t\t\t\t\
+          \n\t\t<!---- Footer Improvements ---->\n\t\tfunction et_footer_improvements($selector){\n\
+          \t\t\tvar $footer_widget = jQuery($selector);\n\t\t\n\t\t\tif (!($footer_widget.length\
+          \ == 0)) {\n\t\t\t\t$footer_widget.each(function (index, domEle) {\n\t\t\
+          \t\t\tif ((index+1)%4 == 0) jQuery(domEle).addClass(\"last\").after(\"<div\
+          \ class='clear'></div>\");\n\t\t\t\t});\n\t\t\t};\n\t\t};\n\t\t\n\t\t<!----\
+          \ Search Bar Improvements ---->\n\t\tfunction et_search_bar(){\n\t\t\tvar\
+          \ $searchform = jQuery('#cat-nav div#search-form'),\n\t\t\t\t$searchinput\
+          \ = $searchform.find(\"input#searchinput\"),\n\t\t\t\tsearchvalue = $searchinput.val();\n\
+          \t\t\t\t\n\t\t\t$searchinput.focus(function(){\n\t\t\t\tif (jQuery(this).val()\
+          \ === searchvalue) jQuery(this).val(\"\");\n\t\t\t}).blur(function(){\n\t\
+          \t\t\tif (jQuery(this).val() === \"\") jQuery(this).val(searchvalue);\n\t\
+          \t\t});\n\t\t};\n\t\t\n\t//]]>\t\n\t</script>\n\n\n\r\n\t\t\r\n\r\n<script\
+          \ type=\"text/javascript\">\r\n\r\n  var _gaq = _gaq || [];\r\n  _gaq.push(['_setAccount',\
+          \ 'UA-36836348-1']);\r\n  _gaq.push(['_trackPageview']);\r\n\r\n  (function()\
+          \ {\r\n    var ga = document.createElement('script'); ga.type = 'text/javascript';\
+          \ ga.async = true;\r\n    ga.src = ('https:' == document.location.protocol\
+          \ ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';\r\n \
+          \   var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga,\
+          \ s);\r\n  })();\r\n\r\n</script>\r\n<div style=\"display:none;\"><script\
+          \ type=\"text/javascript\" src=\"http://widgets.amung.us/small.js\"></script><script\
+          \ type=\"text/javascript\">WAU_small('4na0a7jpef36')</script></div>\r\n\
+          </body>\r\n</html>\r\n"}
+      headers:
+        accept-ranges: [bytes]
+        age: ['0']
+        connection: [keep-alive]
+        content-length: ['65941']
+        content-type: [text/html; charset=UTF-8]
+        date: ['Wed, 22 Oct 2014 01:56:14 GMT']
+        server: [hi]
+        via: [1.1 varnish]
+        x-pingback: ['http://sceper.ws/xmlrpc.php']
+        x-varnish: ['1585548022']
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+      method: GET
+      uri: http://sceper.ws/category/movies/movies-dvd-rip
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA+2dXW/bNhSGr9lfcaYbu7NlyeswbLMUYOiKYl/tgAQFhiIXtERb3PQ1iXYSFP3v
+          IyXZUedZOxbY9uYEjmyIRwzwkHp9+JJUngD92CMQJCpLr57Yq5BqgiARPCamVntCkAnFIVGqdMXf
+          O7kPnUpsKlEnDkRFrkSuQmfpEPSPDD3iUSJcQ7wq0h76jN+7fCtC3wGPGuEzNUJeuE37UBtYbQBd
+          2an6iPtSavnp3QLukrh/Du43OzEHfwk/8xyW333rw/J739cvePnbDbXIx2+RsuLbjPduBJIh29AP
+          9QUeZZbW2QZ1VMlSgXooRegoca+8P/met2cpo7TLO/jCdWmwaZOp58HzovhLCtjs8kjJIq8JsE3A
+          RNMmzUMnha1Qbb+d3j19R4xtMmbRK54JCMFxVkTWKtny+evXv/z04lrDzcUd/FBV/GH6lCjbhAys
+          Rzkuol2m3b1F1HzJLeoylWo6WcGEqFuFDmxTVNP1WvdsfwX6PYBDMyxSkW9VYs7OZiTWlrGzV5l4
+          w1MgSbEL9oPaWI/yoVu/Xa9vD3oSkpxYps+Y3Ezbrv3Wv4UwBMrzrCM+Znq7XNQRL8WB+PKWvh7t
+          0mbsPeXSNpEST5s0AVgl1K7KoRn80YjEKly69a3iJCG1ifNoqZWVzDtTrSZXzSZiUxeLrlVFpppt
+          rBosmWr2oZ7USKbaCZJPcIJMtU8A+fRP9O0e8ulP+dg5Q6aaHY74Wj401ciKx5PDRDLW5nizEB6N
+          yxlMwgnM4D8cNn3WTETRWBsDFx1DRhsaFS6QjDYcJ2zU0WjT40G697HUUHHks6EwYYPIZ8OSwsQd
+          fbb6uHQt11b7HPY8NXsQui0hcyi5SuYQFxmX+RxqEe0qQbkaBjE+hu15BfuUx2bZhFntNgMndPSx
+          mwdt2oTmQPFAMZFmSr/r5dSfMcDwMYx1YHV/1vrywmwv42Y19xE4pRp4mohIxhr10GM9Z9Whb/Wj
+          3dhHtBEM8SE0BsGzwkQaJTZpBskwhhY+pq8Khm8jCeYD6QEeIiKS9AAB6YIQowftgIMU4QJsiNC+
+          IrSEG01oP5IqIAjiQ0gV8KwwkUYVyH7AkLo05lEVJquWME0DXcpwOJ60YJjPpaX/2kinbQYz/qUv
+          sEs5DsbT/MUgnksLaf7iUmJD8f35i56/2G6s/VVuaI5iiN7IMjNNoYqYP3TbO3/kStCG8ZEwhy4z
+          oLWPa1ZomxV/DecG/EI/aeJGZpq6HrY9dnb4Er76Wh++8Q+Hpe/7NGM0xHhcWbcvqWmdhSr0Y9n0
+          wgmZb+k2GMfz7FWUfZxFM6ZAP1nJdelhpmPQnb0m8NrnqhHWs4jGFNAz7MZQG3kNPcNuJLizl2ml
+          1WsegHfpGdwlMkrgTqZpt6gKZA7PQCdzNfA8hrUAHkWiruU6FVBLJXRwLGi4eJbwiILHVW6ThNdv
+          pMEcX+vDZA6TP0Rt3p6Zg2cOzS9lzyM4D1xC6ccAnDFFlH6Mofa/1wTrIn64Csqr31PBay3GXKrF
+          YhF45VXgtWVe839G/gFborj8vGUAAA==
+      headers:
+        cache-control: [private]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [text/html]
+        date: ['Wed, 22 Oct 2014 02:42:44 GMT']
+        keep-alive: [timeout=5]
+        last-modified: ['Fri, 12 Sep 2014 18:02:23 GMT']
+        server: [nginx]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding, Accept-Encoding]
+      status: {code: 200, message: OK}
+version: 1

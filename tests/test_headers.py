@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
-from nose.plugins.attrib import attr
+
+from tests import FlexGetBase, use_vcr
 
 class TestHeaders(FlexGetBase):
     __yaml__ = """
@@ -15,7 +15,7 @@ class TestHeaders(FlexGetBase):
               Cookie: "title=blah; url=other"
     """
 
-    @attr(online=True)
+    @use_vcr
     def test_headers(self):
         self.execute_task('test_headers', options={'nocache': True})
         assert self.task.find_entry(title='blah', url='other'), 'Entry should have been created.'

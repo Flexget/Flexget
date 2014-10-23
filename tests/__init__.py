@@ -1,12 +1,18 @@
 #!/usr/bin/python
 
 from __future__ import unicode_literals, division, absolute_import
+import inspect
 import os
 import sys
 import yaml
 import logging
 import warnings
 from contextlib import contextmanager
+from functools import wraps
+
+import mock
+from nose.plugins.attrib import attr
+from vcr import VCR
 
 import flexget.logger
 from flexget.manager import Manager
@@ -17,6 +23,10 @@ from tests import util
 
 log = logging.getLogger('tests')
 
+VCR_CASSETTE_DIR = os.path.join(os.path.dirname(__file__), 'cassettes')
+VCR_RECORD_MODE = os.environ.get('VCR_RECORD_MODE', 'once')
+
+vcr = VCR(cassette_library_dir=VCR_CASSETTE_DIR, record_mode=VCR_RECORD_MODE)
 test_arguments = None
 plugins_loaded = False
 
@@ -40,10 +50,59 @@ def setup_once():
         flexget.logger.initialize(True)
         setup_logging_level()
         warnings.simplefilter('error')
+        # VCR.py mocked functions not handle ssl verification well. Older versions of urllib3 don't have this
+        if VCR_RECORD_MODE != 'off':
+            try:
+                from requests.packages.urllib3.exceptions import SecurityWarning
+                warnings.simplefilter('ignore', SecurityWarning)
+            except ImportError:
+                pass
         load_plugins()
         # store options for MockManager
         test_arguments = get_parser().parse_args(['execute'])
         plugins_loaded = True
+
+
+def use_vcr(func):
+    """
+    Decorator for test functions which go online. A vcr cassette will automatically be created and used to capture and
+    play back online interactions. The nose 'vcr' attribute will be set, and the nose 'online' attribute will be set on
+    it based on whether it might go online.
+
+    The record mode of VCR can be set using the VCR_RECORD_MODE environment variable when running tests. Depending on
+    the record mode, and the existence of an already recorded cassette, this decorator will also dynamically set the
+    nose 'online' attribute.
+    """
+    module = func.__module__.split('tests.')[-1]
+    class_name = inspect.stack()[1][3]
+    cassette_name = '.'.join([module, class_name, func.__name__])
+    cassette_path, _ = vcr.get_path_and_merged_config(cassette_name)
+    online = True
+    # Set our nose online attribute based on the VCR record mode
+    if vcr.record_mode == 'none':
+        online = False
+    elif vcr.record_mode == 'once':
+        online = not os.path.exists(cassette_path)
+    func = attr(online=online, vcr=True)(func)
+    # If we are not going online, disable domain delay during test
+    if not online:
+        func = mock.patch('flexget.utils.requests.wait_for_domain', new=mock.MagicMock())(func)
+    # VCR playback on windows needs a bit of help https://github.com/kevin1024/vcrpy/issues/116
+    if sys.platform.startswith('win') and vcr.record_mode != 'all' and os.path.exists(cassette_path):
+        func = mock.patch('requests.packages.urllib3.connectionpool.is_connection_dropped',
+                          new=mock.MagicMock(return_value=False))(func)
+    @wraps(func)
+    def func_with_cassette(*args, **kwargs):
+        with vcr.use_cassette(cassette_name) as cassette:
+            try:
+                func(*args, cassette=cassette, **kwargs)
+            except TypeError:
+                func(*args, **kwargs)
+
+    if VCR_RECORD_MODE == 'off':
+        return func
+    else:
+        return func_with_cassette
 
 
 class MockManager(Manager):
