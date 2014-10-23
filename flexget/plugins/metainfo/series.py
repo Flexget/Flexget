@@ -35,23 +35,14 @@ class MetainfoSeries(object):
         if entry.get('series_parser') and entry['series_parser'].valid:
             # Return true if we already parsed this, false if series plugin parsed it
             return entry.get('series_guessed')
-        parser = self.guess_series(entry['title'], allow_seasonless=allow_seasonless, quality=entry.get('quality'))
-        if parser and parser.valid:
-            populate_entry_fields(entry, parser)
+        parsed = get_plugin_by_name('parsing').instance.parse_series(data=entry['title'], identified_by='auto',
+                                                                     allow_seasonless=allow_seasonless)
+        if parsed and parsed.valid:
+            parsed.name = normalize_name(remove_dirt(parsed.name))
+            populate_entry_fields(entry, parsed)
             entry['series_guessed'] = True
             return True
         return False
-
-    def guess_series(self, title, allow_seasonless=False, quality=None):
-        """Returns a valid series parser if this `title` appears to be a series"""
-
-        parsed = get_plugin_by_name('parsing').instance.parse_series(data=title, name=title, identified_by='auto', allow_seasonless=allow_seasonless, metainfo=True)
-        if parsed and parsed.valid:
-            # Normalizing name.
-            # todo: Why only in metainfo series, and not other series plugin ?
-            parsed.name = remove_dirt(parsed.name)
-            parsed.name = normalize_name(parsed.name)
-            return parsed
 
 
 @event('plugin.register')

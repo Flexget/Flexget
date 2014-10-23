@@ -4,7 +4,6 @@ import datetime
 import logging
 import re
 import time
-from string import capwords
 
 import guessit
 from guessit.containers import PropertiesContainer, NoValidator
@@ -14,8 +13,8 @@ from guessit.plugins.transformers import Transformer, add_transformer
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
-from .parser_common import PARSER_EPISODE, PARSER_MOVIE, PARSER_VIDEO, clean_value, old_assume_quality
-from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie, Parser
+from .parser_common import clean_value, old_assume_quality
+from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie
 
 
 log = logging.getLogger('parser_guessit')
@@ -281,85 +280,45 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
         return True
 
 
-class ParserGuessit(Parser):
-    def __init__(self):
-        self._type_map = {PARSER_EPISODE: 'episode', PARSER_VIDEO: 'video', PARSER_MOVIE: 'movie'}
-
-    def build_parsed(self, guess_result, input_, type_=None, name=None, **kwargs):
-        if not type_:
-            type_ = guess_result.get('type')
-        if (type_ == 'episode'):
-            return GuessitParsedSerie(input_, name, guess_result, **kwargs)
-        elif (type_ == 'movie'):
-            return GuessitParsedMovie(input_, name, guess_result, **kwargs)
-        elif (type_ == 'video'):
-            return GuessitParsedVideo(input_, name, guess_result, **kwargs)
-        else:
-            raise ValueError('Invalid type specified')
-
-    def clean_input_name(self, name):
-        name = re.sub('[_.,\[\]\(\):]', ' ', name)
-        # Remove possible episode title from series name (anything after a ' - ')
-        name = name.split(' - ')[0]
-        # Replace some special characters with spaces
-        name = re.sub('[\._\(\) ]+', ' ', name).strip(' -')
-        # Normalize capitalization to title case
-        name = capwords(name)
-        return name
-
-    def parse(self, data, type_=None, name=None, **kwargs):
-        type_ = self._type_map.get(type_)
-
-        guessit_options = self._guessit_options(data, type_, name, **kwargs)
-
-        if name and name != data:
-            if not guessit_options.get('strict_name'):
-                guessit_options['expected_series'] = [name]
-
-        guess_result = None
-        if kwargs.get('metainfo'):
-            guess_result = guessit.guess_file_info(data, options=guessit_options, type=None)
-        else:
-            guess_result = guessit.guess_file_info(data, options=guessit_options, type=type_)
-        return self.build_parsed(guess_result, data, type_=type_, name=(name if name != data else None), **kwargs)
-
-    def _guessit_options(self, data, type_, name, **kwargs):
-        options = dict(**kwargs)
-        identified_by = kwargs.get('identified_by')
-        if identified_by in ['ep']:
-            options['episode_prefer_number'] = False
-        else:
-            options['episode_prefer_number'] = True
-        if kwargs.get('allow_groups'):
-            options['expected_group'] = kwargs.get('allow_groups')
-        if 'date_yearfirst' in kwargs:
-            options['date_year_first'] = kwargs.get('date_yearfirst')
-        if 'date_dayfirst' in kwargs:
-            options['date_day_first'] = kwargs.get('date_dayfirst')
+class ParserGuessit(object):
+    def _guessit_options(self, options):
+        options['episode_prefer_number'] = not options.get('identified_by') == 'ep'
+        if options.get('allow_groups'):
+            options['expected_group'] = options['allow_groups']
+        if 'date_yearfirst' in options:
+            options['date_year_first'] = options['date_yearfirst']
+        if 'date_dayfirst' in options:
+            options['date_day_first'] = options['date_dayfirst']
         return options
 
-    #   movie_parser API
-    def parse_movie(self, data, name=None, **kwargs):
-        log.debug('Parsing movie: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
+    # movie_parser API
+    def parse_movie(self, data, **kwargs):
+        log.debug('Parsing movie: `%s` [options: %s]', data, kwargs)
         start = time.clock()
-        parsed = self.parse(data, PARSER_MOVIE, name=name, **kwargs)
+        guessit_options = self._guessit_options(kwargs)
+        guess_result = guessit.guess_file_info(data, options=guessit_options, type='movie')
+        parsed = GuessitParsedMovie(data, kwargs.pop('name', None), guess_result, **kwargs)
         end = time.clock()
-        log.debug('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
+        log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed
 
-    #   series_parser API
-    def parse_series(self, data, name=None, **kwargs):
-        log.debug('Parsing series: "' + data + '"' + ' (' + name + ')' if name else '' + ' [options:' + unicode(kwargs) + ']' if kwargs else '')
+    # series_parser API
+    def parse_series(self, data, **kwargs):
+        log.debug('Parsing series: `%s` [options: %s]', data, kwargs)
+        guessit_options = self._guessit_options(kwargs)
+        if kwargs.get('name') and not guessit_options.get('strict_name'):
+            guessit_options['expected_series'] = [kwargs['name']]
         start = time.clock()
-        parsed = self.parse(data, PARSER_EPISODE, name=name, **kwargs)
+        guess_result = guessit.guess_file_info(data, options=guessit_options, type='episode')
+        parsed = GuessitParsedSerie(data, kwargs.pop('name', None), guess_result, **kwargs)
+        # Passed in quality overrides parsed one
+        if kwargs.get('quality'):
+            parsed._old_quality = kwargs['quality']
         end = time.clock()
-        log.debug('Parsing result: ' + unicode(parsed) + ' (in ' + unicode((end - start) * 1e3) + ' ms)')
+        log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ParserGuessit, 'parser_guessit',
-                    groups=['movie_parser', 'series_parser'],
-                    api_ver=2
-    )
+    plugin.register(ParserGuessit, 'parser_guessit', groups=['movie_parser', 'series_parser'], api_ver=2)
