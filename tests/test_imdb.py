@@ -253,6 +253,13 @@ class TestImdbLookup(FlexGetBase):
             mock:
               - {title: 'Taken', imdb_url: 'imdb.com/title/tt0936501/'}
             imdb_lookup: yes
+          cached:
+            mock:
+              - title: The Matrix 1999 720p
+              - title: The Matrix 1080p
+              - title: The Matrix xvid
+            imdb_lookup: yes
+
     """
 
     @use_vcr
@@ -262,3 +269,15 @@ class TestImdbLookup(FlexGetBase):
         assert self.task.entries[0]['imdb_score'], 'didn\'t get score'
         assert self.task.entries[0]['imdb_year'], 'didn\'t get year'
         assert self.task.entries[0]['imdb_plot_outline'], 'didn\'t get plot'
+
+    @use_vcr
+    def test_cache(self, cassette=None):
+        # Hmm, this test doesn't work so well when in vcr 'all' record mode. It records new requests/responses
+        # to the cassette, but still keeps the old recorded ones, causing this to fail.
+        # Delete old cassette instead of using all mode to re-record.
+        self.execute_task('cached')
+        assert all(e['imdb_name'] == 'The Matrix' for e in self.task.all_entries)
+        # Should have only been one call to the actual imdb page
+        if cassette:
+            imdb_calls = sum(1 for r in cassette.requests if 'title/tt0133093' in r.uri)
+            assert imdb_calls == 1
