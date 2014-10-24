@@ -140,7 +140,7 @@ class UrlRewriteIPTorrents(object):
 
             page = requests.get(url, cookies={'uid': str(config['uid']),
                                 'pass': config['password']}).content
-            soup = get_soup(page)
+            soup = get_soup(page, parser="html.parser")
 
             if soup.find("title").contents[0] == "IPT":
                 raise plugin.PluginError("Page title unexpected: Could it be the login page?...")
