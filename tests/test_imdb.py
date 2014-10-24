@@ -188,10 +188,10 @@ class TestImdb(FlexGetBase):
         toe = (self.task.find_entry(imdb_name='Terms of Endearment')['imdb_genres'])
         assert toe == ['comedy', 'drama'], \
             'Could not find genres for Terms of Endearment'
-        frozen = (self.task.find_entry(imdb_name='Frozen')['imdb_genres'])    
-        assert frozen == ['animation', 'adventure', 'comedy'], \
+        frozen = (self.task.find_entry(imdb_name='Frozen')['imdb_genres'])
+        assert frozen == ['animation', 'adventure', 'comedy', 'family', 'fantasy', 'musical'], \
             'Could not find genres for Frozen'
-        
+
         assert self.task.find_entry('accepted', imdb_name='The Matrix'), \
             'The Matrix should\'ve been accepted'
         assert not self.task.find_entry('rejected', title='Terms of Endearment'), \
