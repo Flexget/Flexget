@@ -35,6 +35,7 @@ class ParserInternal(object):
         log.debug('Parsing series: `%s` kwargs: %s', data, kwargs)
         start = time.clock()
         quality = kwargs.pop('quality', None)
+        kwargs.pop('metainfo', None)
         parser = SeriesParser(**kwargs)
         try:
             parser.parse(data)

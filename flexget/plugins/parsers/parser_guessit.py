@@ -305,11 +305,15 @@ class ParserGuessit(object):
     # series_parser API
     def parse_series(self, data, **kwargs):
         log.debug('Parsing series: `%s` [options: %s]', data, kwargs)
+        if kwargs.pop('metainfo', None):
+            type = None
+        else:
+            type='episode'
         guessit_options = self._guessit_options(kwargs)
         if kwargs.get('name') and not guessit_options.get('strict_name'):
             guessit_options['expected_series'] = [kwargs['name']]
         start = time.clock()
-        guess_result = guessit.guess_file_info(data, options=guessit_options, type='episode')
+        guess_result = guessit.guess_file_info(data, options=guessit_options, type=type)
         parsed = GuessitParsedSerie(data, kwargs.pop('name', None), guess_result, **kwargs)
         # Passed in quality overrides parsed one
         if kwargs.get('quality'):

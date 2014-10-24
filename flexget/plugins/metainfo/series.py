@@ -36,7 +36,7 @@ class MetainfoSeries(object):
             # Return true if we already parsed this, false if series plugin parsed it
             return entry.get('series_guessed')
         parsed = get_plugin_by_name('parsing').instance.parse_series(data=entry['title'], identified_by='auto',
-                                                                     allow_seasonless=allow_seasonless)
+                                                                     allow_seasonless=allow_seasonless, metainfo=True)
         if parsed and parsed.valid:
             parsed.name = normalize_name(remove_dirt(parsed.name))
             populate_entry_fields(entry, parsed)
