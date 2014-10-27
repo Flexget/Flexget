@@ -33,7 +33,7 @@ class ConvertMagnet(object):
         params = libtorrent.parse_magnet_uri(magnet_uri)
         session = libtorrent.session()
         handle = session.add_torrent(params)
-        log.debug('Aquiring torrent metadata for magnet {}'.format(magnet_uri))
+        log.debug('Acquiring torrent metadata for magnet {}'.format(magnet_uri))
         timeout_value = timeout
         while not handle.has_metadata():
             time.sleep(0.1)
