@@ -1,10 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import urllib
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger("cinemageddon")
+log = logging.getLogger('cinemageddon')
 
 
 class UrlRewriteCinemageddon(object):
@@ -14,9 +15,10 @@ class UrlRewriteCinemageddon(object):
         return entry['url'].startswith('http://cinemageddon.net/details.php?id=')
 
     def url_rewrite(self, task, entry):
-        import urllib
+
         entry['url'] = entry['url'].replace('details.php?id=', 'download.php?id=')
         entry['url'] += '&name=%s.torrent' % (urllib.quote(entry['title'], safe=''))
+
 
 @event('plugin.register')
 def register_plugin():
