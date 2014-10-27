@@ -7,7 +7,7 @@ from flexget.utils.template import RenderError
 
 log = logging.getLogger('notifymyandroid')
 
-url = 'https://nma.usk.bz/publicapi/notify'
+url = 'https://www.notifymyandroid.com/publicapi/notify'
 
 
 class OutputNotifyMyAndroid(object):
