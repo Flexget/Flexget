@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase, build_parser_function
 
 
-class TestProperMovies(FlexGetBase):
+class BaseProperMovies(FlexGetBase):
 
     __yaml__ = """
         templates:
@@ -48,13 +48,13 @@ class TestProperMovies(FlexGetBase):
         assert self.task.find_entry('accepted', title='Movie.Name.2011.PROPER.720p-FlexGet')
 
 
-class TestGuessitProperMovies(TestProperMovies):
+class TestGuessitProperMovies(BaseProperMovies):
     def __init__(self):
         super(TestGuessitProperMovies, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalProperMovies(TestProperMovies):
+class TestInternalProperMovies(BaseProperMovies):
     def __init__(self):
         super(TestInternalProperMovies, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))

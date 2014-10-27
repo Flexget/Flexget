@@ -5,7 +5,7 @@ from flexget.task import TaskAbort
 import flexget.utils.qualities as qualities
 
 
-class TestAssumeQuality(FlexGetBase):
+class BaseAssumeQuality(FlexGetBase):
     __yaml__ = """
         templates:
           global:
@@ -112,13 +112,13 @@ class TestAssumeQuality(FlexGetBase):
         assert self.task.accepted, 'series plugin should have used assumed quality'
 
 
-class TestGuessitAssumeQuality(TestAssumeQuality):
+class TestGuessitAssumeQuality(BaseAssumeQuality):
     def __init__(self):
         super(TestGuessitAssumeQuality, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalAssumeQuality(TestAssumeQuality):
+class TestInternalAssumeQuality(BaseAssumeQuality):
     def __init__(self):
         super(TestInternalAssumeQuality, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))

@@ -4,7 +4,7 @@ import os
 from tests.util import maketemp
 
 
-class TestExistsSeries(FlexGetBase):
+class BaseExistsSeries(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -178,13 +178,13 @@ class TestExistsSeries(FlexGetBase):
         assert self.task.find_entry('accepted', title='jinja s01e02'), \
             'jinja s01e02 should have been accepted'
 
-class TestGuessitExistsSeries(TestExistsSeries):
+class TestGuessitExistsSeries(BaseExistsSeries):
     def __init__(self):
         super(TestGuessitExistsSeries, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalExistsSeries(TestExistsSeries):
+class TestInternalExistsSeries(BaseExistsSeries):
     def __init__(self):
         super(TestInternalExistsSeries, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))

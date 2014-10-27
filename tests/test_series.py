@@ -11,7 +11,7 @@ def age_series(**kwargs):
     session.commit()
 
 
-class TestQuality(FlexGetBase):
+class BaseQuality(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -152,19 +152,19 @@ class TestQuality(FlexGetBase):
         assert len(self.task.accepted) == 1, 'should have accepted only one (no entries should pass for series `other`'
 
 
-class TestGuessitQuality(TestQuality):
+class TestGuessitQuality(BaseQuality):
     def __init__(self):
         super(TestGuessitQuality, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalQuality(TestQuality):
+class TestInternalQuality(BaseQuality):
     def __init__(self):
         super(TestInternalQuality, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestDatabase(FlexGetBase):
+class BaseDatabase(FlexGetBase):
 
     __yaml__ = """
         templates:
@@ -214,19 +214,19 @@ class TestDatabase(FlexGetBase):
         assert not self.task.accepted, 'doppelgangers accepted'
 
 
-class TestGuessitDatabase(TestDatabase):
+class TestGuessitDatabase(BaseDatabase):
     def __init__(self):
         super(TestGuessitDatabase, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalDatabase(TestDatabase):
+class TestInternalDatabase(BaseDatabase):
     def __init__(self):
         super(TestInternalDatabase, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestFilterSeries(FlexGetBase):
+class BaseFilterSeries(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -352,18 +352,18 @@ class TestFilterSeries(FlexGetBase):
         assert all(e.accepted for e in self.task.all_entries), 'All releases should have matched a show'
 
 
-class TestGuessitFilterSeries(TestFilterSeries):
+class TestGuessitFilterSeries(BaseFilterSeries):
     def __init__(self):
         super(TestGuessitFilterSeries, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalFilterSeries(TestFilterSeries):
+class TestInternalFilterSeries(BaseFilterSeries):
     def __init__(self):
         super(TestInternalFilterSeries, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
-class TestEpisodeAdvancement(FlexGetBase):
+class BaseEpisodeAdvancement(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -547,19 +547,19 @@ class TestEpisodeAdvancement(FlexGetBase):
         assert entry not in self.task.accepted, 'Should have been too far in the past'
 
 
-class TestGuessitEpisodeAdvancement(TestEpisodeAdvancement):
+class TestGuessitEpisodeAdvancement(BaseEpisodeAdvancement):
     def __init__(self):
         super(TestGuessitEpisodeAdvancement, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalEpisodeAdvancement(TestEpisodeAdvancement):
+class TestInternalEpisodeAdvancement(BaseEpisodeAdvancement):
     def __init__(self):
         super(TestInternalEpisodeAdvancement, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestFilterSeriesPriority(FlexGetBase):
+class BaseFilterSeriesPriority(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -583,19 +583,19 @@ class TestFilterSeriesPriority(FlexGetBase):
             'foobar hdtv s01e01 is not accepted'
 
 
-class TestGuessitFilterSeriesPriority(TestFilterSeriesPriority):
+class TestGuessitFilterSeriesPriority(BaseFilterSeriesPriority):
     def __init__(self):
         super(TestGuessitFilterSeriesPriority, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalFilterSeriesPriority(TestFilterSeriesPriority):
+class TestInternalFilterSeriesPriority(BaseFilterSeriesPriority):
     def __init__(self):
         super(TestInternalFilterSeriesPriority, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestPropers(FlexGetBase):
+class BasePropers(FlexGetBase):
 
     __yaml__ = """
         templates:
@@ -804,19 +804,19 @@ class TestPropers(FlexGetBase):
         assert self.task.accepted, 'proper ep should have been accepted'
 
 
-class TestGuessitPropers(TestPropers):
+class TestGuessitPropers(BasePropers):
     def __init__(self):
         super(TestGuessitPropers, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalPropers(TestPropers):
+class TestInternalPropers(BasePropers):
     def __init__(self):
         super(TestInternalPropers, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestSimilarNames(FlexGetBase):
+class BaseSimilarNames(FlexGetBase):
 
     # hmm, not very good way to test this .. seriesparser should be tested alone?
 
@@ -854,19 +854,19 @@ class TestSimilarNames(FlexGetBase):
         assert self.task.find_entry('accepted', title='Foo.2.2')['series_name'] == 'Foo 2'
 
 
-class TestGuessitSimilarNames(TestSimilarNames):
+class TestGuessitSimilarNames(BaseSimilarNames):
     def __init__(self):
         super(TestGuessitSimilarNames, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalSimilarNames(TestSimilarNames):
+class TestInternalSimilarNames(BaseSimilarNames):
     def __init__(self):
         super(TestInternalSimilarNames, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestDuplicates(FlexGetBase):
+class BaseDuplicates(FlexGetBase):
 
     __yaml__ = """
 
@@ -941,19 +941,19 @@ class TestDuplicates(FlexGetBase):
                 '%s should have been rejected' % item
 
 
-class TestGuessitDuplicates(TestDuplicates):
+class TestGuessitDuplicates(BaseDuplicates):
     def __init__(self):
         super(TestGuessitDuplicates, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalDuplicates(TestDuplicates):
+class TestInternalDuplicates(BaseDuplicates):
     def __init__(self):
         super(TestInternalDuplicates, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestQualities(FlexGetBase):
+class BaseQualities(FlexGetBase):
 
     __yaml__ = """
         templates:
@@ -1093,19 +1093,19 @@ class TestQualities(FlexGetBase):
         assert self.task.find_entry('accepted', title='Food.S06E11.720p'), 'Should upgrade to `target`'
 
 
-class TestGuessitQualities(TestQualities):
+class TestGuessitQualities(BaseQualities):
     def __init__(self):
         super(TestGuessitQualities, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalQualities(TestQualities):
+class TestInternalQualities(BaseQualities):
     def __init__(self):
         super(TestInternalQualities, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestIdioticNumbering(FlexGetBase):
+class BaseIdioticNumbering(FlexGetBase):
 
     __yaml__ = """
         templates:
@@ -1134,19 +1134,19 @@ class TestIdioticNumbering(FlexGetBase):
         assert entry['series_episode'] == 2, 'episode not detected'
 
 
-class TestGuessitIdioticNumbering(TestIdioticNumbering):
+class TestGuessitIdioticNumbering(BaseIdioticNumbering):
     def __init__(self):
         super(TestGuessitIdioticNumbering, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalIdioticNumbering(TestIdioticNumbering):
+class TestInternalIdioticNumbering(BaseIdioticNumbering):
     def __init__(self):
         super(TestInternalIdioticNumbering, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestNormalization(FlexGetBase):
+class BaseNormalization(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -1188,19 +1188,19 @@ class TestNormalization(FlexGetBase):
         assert self.task.find_entry('rejected', title='Foo bar & co 2012.s01e01.sdtv.b')
 
 
-class TestGuessitNormalization(TestNormalization):
+class TestGuessitNormalization(BaseNormalization):
     def __init__(self):
         super(TestGuessitNormalization, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalNormalization(TestNormalization):
+class TestInternalNormalization(BaseNormalization):
     def __init__(self):
         super(TestInternalNormalization, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestMixedNumbering(FlexGetBase):
+class BaseMixedNumbering(FlexGetBase):
 
     __yaml__ = """
         templates:
@@ -1227,18 +1227,18 @@ class TestMixedNumbering(FlexGetBase):
         assert self.task.find_entry('rejected', title='FooBar.0307.PDTV-FlexGet')
 
 
-class TestGuessitMixedNumbering(TestMixedNumbering):
+class TestGuessitMixedNumbering(BaseMixedNumbering):
     def __init__(self):
         super(TestGuessitMixedNumbering, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalMixedNumbering(TestMixedNumbering):
+class TestInternalMixedNumbering(BaseMixedNumbering):
     def __init__(self):
         super(TestInternalMixedNumbering, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
-class TestExact(FlexGetBase):
+class BaseExact(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -1286,19 +1286,19 @@ class TestExact(FlexGetBase):
         assert not self.task.find_entry('accepted', title='date show b 04.02.2011 hdtv')
 
 
-class TestGuessitExact(TestExact):
+class TestGuessitExact(BaseExact):
     def __init__(self):
         super(TestGuessitExact, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalExact(TestExact):
+class TestInternalExact(BaseExact):
     def __init__(self):
         super(TestInternalExact, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestTimeframe(FlexGetBase):
+class BaseTimeframe(FlexGetBase):
 
     __yaml__ = """
         templates:
@@ -1483,19 +1483,19 @@ class TestTimeframe(FlexGetBase):
         assert self.task.accepted, 'Timeframe should have passed'
 
 
-class TestGuessitTimeframe(TestTimeframe):
+class TestGuessitTimeframe(BaseTimeframe):
     def __init__(self):
         super(TestGuessitTimeframe, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalTimeframe(TestTimeframe):
+class TestInternalTimeframe(BaseTimeframe):
     def __init__(self):
         super(TestInternalTimeframe, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestBacklog(FlexGetBase):
+class BaseBacklog(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -1517,19 +1517,19 @@ class TestBacklog(FlexGetBase):
         assert self.task.accepted, 'backlog is not injecting episodes'
 
 
-class TestGuessitBacklog(TestBacklog):
+class TestGuessitBacklog(BaseBacklog):
     def __init__(self):
         super(TestGuessitBacklog, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalBacklog(TestBacklog):
+class TestInternalBacklog(BaseBacklog):
     def __init__(self):
         super(TestInternalBacklog, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestManipulate(FlexGetBase):
+class BaseManipulate(FlexGetBase):
 
     """Tests that it's possible to manipulate entries before they're parsed by series plugin"""
 
@@ -1560,19 +1560,19 @@ class TestManipulate(FlexGetBase):
         assert self.task.accepted, 'manipulate failed to pre-clean title'
 
 
-class TestGuessitManipulate(TestManipulate):
+class TestGuessitManipulate(BaseManipulate):
     def __init__(self):
         super(TestGuessitManipulate, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalManipulate(TestManipulate):
+class TestInternalManipulate(BaseManipulate):
     def __init__(self):
         super(TestInternalManipulate, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestFromGroup(FlexGetBase):
+class BaseFromGroup(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -1595,18 +1595,18 @@ class TestFromGroup(FlexGetBase):
         assert self.task.find_entry('accepted', title='Test.14.HDTV-Name')
 
 
-class TestGuessitFromGroup(TestFromGroup):
+class TestGuessitFromGroup(BaseFromGroup):
     def __init__(self):
         super(TestGuessitFromGroup, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalFromGroup(TestFromGroup):
+class TestInternalFromGroup(BaseFromGroup):
     def __init__(self):
         super(TestInternalFromGroup, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
-class TestBegin(FlexGetBase):
+class BaseBegin(FlexGetBase):
 
     __yaml__ = """
         templates:
@@ -1720,19 +1720,19 @@ class TestBegin(FlexGetBase):
         assert self.task.accepted, 'Episode should have been accepted'
 
 
-class TestGuessitBegin(TestBegin):
+class TestGuessitBegin(BaseBegin):
     def __init__(self):
         super(TestGuessitBegin, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalBegin(TestBegin):
+class TestInternalBegin(BaseBegin):
     def __init__(self):
         super(TestInternalBegin, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestSeriesPremiere(FlexGetBase):
+class BaseSeriesPremiere(FlexGetBase):
 
     __yaml__ = """
         templates:
@@ -1756,19 +1756,19 @@ class TestSeriesPremiere(FlexGetBase):
     # TODO: Add more tests, test interaction with series plugin and series_exists
 
 
-class TestGuessitSeriesPremiere(TestSeriesPremiere):
+class TestGuessitSeriesPremiere(BaseSeriesPremiere):
     def __init__(self):
         super(TestGuessitSeriesPremiere, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalSeriesPremiere(TestSeriesPremiere):
+class TestInternalSeriesPremiere(BaseSeriesPremiere):
     def __init__(self):
         super(TestInternalSeriesPremiere, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestImportSeries(FlexGetBase):
+class BaseImportSeries(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -1811,18 +1811,18 @@ class TestImportSeries(FlexGetBase):
         assert entry['series_name'] == 'the show', 'entry series should be set to the main name'
 
 
-class TestGuessitImportSeries(TestImportSeries):
+class TestGuessitImportSeries(BaseImportSeries):
     def __init__(self):
         super(TestGuessitImportSeries, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalImportSeries(TestImportSeries):
+class TestInternalImportSeries(BaseImportSeries):
     def __init__(self):
         super(TestInternalImportSeries, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
-class TestIDTypes(FlexGetBase):
+class BaseIDTypes(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -1850,18 +1850,18 @@ class TestIDTypes(FlexGetBase):
             assert entry['series_id_type'] in entry['series_name']
 
 
-class TestGuessitIDTypes(TestIDTypes):
+class TestGuessitIDTypes(BaseIDTypes):
     def __init__(self):
         super(TestGuessitIDTypes, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalIDTypes(TestIDTypes):
+class TestInternalIDTypes(BaseIDTypes):
     def __init__(self):
         super(TestInternalIDTypes, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
-class TestCaseChange(FlexGetBase):
+class BaseCaseChange(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -1886,18 +1886,18 @@ class TestCaseChange(FlexGetBase):
         assert self.task.find_entry('rejected', title='thEshoW s02e04 other', series_name='THESHOW')
 
 
-class TestGuessitCaseChange(TestCaseChange):
+class TestGuessitCaseChange(BaseCaseChange):
     def __init__(self):
         super(TestGuessitCaseChange, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalCaseChange(TestCaseChange):
+class TestInternalCaseChange(BaseCaseChange):
     def __init__(self):
         super(TestInternalCaseChange, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
-class TestInvalidSeries(FlexGetBase):
+class BaseInvalidSeries(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -1915,19 +1915,19 @@ class TestInvalidSeries(FlexGetBase):
         assert not self.task.aborted, 'Task should not have aborted'
 
 
-class TestGuessitInvalidSeries(TestInvalidSeries):
+class TestGuessitInvalidSeries(BaseInvalidSeries):
     def __init__(self):
         super(TestGuessitInvalidSeries, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalInvalidSeries(TestInvalidSeries):
+class TestInternalInvalidSeries(BaseInvalidSeries):
     def __init__(self):
         super(TestInternalInvalidSeries, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestDoubleEps(FlexGetBase):
+class BaseDoubleEps(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -1966,19 +1966,19 @@ class TestDoubleEps(FlexGetBase):
         assert not self.task.find_entry('accepted', title='S02E03')
 
 
-class TestGuessitDoubleEps(TestDoubleEps):
+class TestGuessitDoubleEps(BaseDoubleEps):
     def __init__(self):
         super(TestGuessitDoubleEps, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalDoubleEps(TestDoubleEps):
+class TestInternalDoubleEps(BaseDoubleEps):
     def __init__(self):
         super(TestInternalDoubleEps, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestAutoLockin(FlexGetBase):
+class BaseAutoLockin(FlexGetBase):
     __yaml__ = """
         templates:
           global:
@@ -2028,19 +2028,19 @@ class TestAutoLockin(FlexGetBase):
         assert len(self.task.accepted) == 2, 'Specials should not have caused episode type lock-in'
 
 
-class TestGuessitAutoLockin(TestAutoLockin):
+class TestGuessitAutoLockin(BaseAutoLockin):
     def __init__(self):
         super(TestGuessitAutoLockin, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalAutoLockin(TestAutoLockin):
+class TestInternalAutoLockin(BaseAutoLockin):
     def __init__(self):
         super(TestInternalAutoLockin, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestReruns(FlexGetBase):
+class BaseReruns(FlexGetBase):
     __yaml__ = """
         tasks:
           one_accept:
@@ -2059,19 +2059,19 @@ class TestReruns(FlexGetBase):
             'should have accepted once!: %s' % ', '.join(e['title'] for e in self.task.mock_output)
 
 
-class TestGuessitReruns(TestReruns):
+class TestGuessitReruns(BaseReruns):
     def __init__(self):
         super(TestGuessitReruns, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalReruns(TestReruns):
+class TestInternalReruns(BaseReruns):
     def __init__(self):
         super(TestInternalReruns, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
 
-class TestSpecials(FlexGetBase):
+class BaseSpecials(FlexGetBase):
     __yaml__ = """
         tasks:
           preferspecials:
@@ -2130,13 +2130,13 @@ class TestSpecials(FlexGetBase):
         assert not entry.accepted, 'Entry which should not have been accepted was.'
 
 
-class TestGuessitSpecials(TestSpecials):
+class TestGuessitSpecials(BaseSpecials):
     def __init__(self):
         super(TestGuessitSpecials, self).__init__()
         self.add_tasks_function(build_parser_function('guessit'))
 
 
-class TestInternalSpecials(TestSpecials):
+class TestInternalSpecials(BaseSpecials):
     def __init__(self):
         super(TestInternalSpecials, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
