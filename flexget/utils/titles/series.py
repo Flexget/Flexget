@@ -68,15 +68,15 @@ class SeriesParser(TitleParser):
     # ignore prefix regexps must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
     ignore_prefixes = default_ignore_prefixes
 
-    def __init__(self, name='', alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
+    def __init__(self, name=None, alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
                  date_regexps=None, sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None,
                  allow_seasonless=True, date_dayfirst=None, date_yearfirst=None, special_ids=None,
                  prefer_specials=False, assume_special=False):
         """
         Init SeriesParser.
 
-        :param string name: Name of the series parser is going to try to parse.
-
+        :param string name: Name of the series parser is going to try to parse. If not supplied series name will be
+            guessed from data.
         :param list alternate_names: Other names for this series that should be allowed.
         :param string identified_by: What kind of episode numbering scheme is expected,
             valid values are ep, date, sequence, id and auto (default).
@@ -149,18 +149,6 @@ class SeriesParser(TitleParser):
 
         # false if item does not match series
         self.valid = False
-
-    def __setattr__(self, name, value):
-        """
-        Some conversions when setting attributes.
-        `self.name` and `self.data` are converted to unicode.
-        """
-        if name == 'name' or name == 'data':
-            if isinstance(value, str):
-                value = unicode(value)
-            elif not isinstance(value, unicode):
-                raise Exception('%s cannot be %s' % (name, repr(value)))
-        object.__setattr__(self, name, value)
 
     def remove_dirt(self, data):
         """Replaces some characters with spaces"""
