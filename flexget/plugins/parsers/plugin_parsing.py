@@ -55,13 +55,27 @@ class PluginParsing(object):
 
     on_task_abort = on_task_end
 
-    def __getattr__(self, item):
-        if not item.startswith('parse_'):
-            raise AttributeError(item)
-        parser_type = item.replace('parse_', '')
-        if parser_type not in self.parser:
-            raise AttributeError(item)
-        return getattr(self.parser[parser_type], item)
+    def parse_series(self, data, name=None, **kwargs):
+        """
+        Use the selected series parser to parse series information from `data`
+
+        :param data: The raw string to parse information from.
+        :param name: The series name to parse data for. If not supplied, parser will attempt to guess series name
+            automatically from `data`.
+
+        :returns: An object containing the parsed information. The `valid` attribute will be set depending on success.
+        """
+        return self.parser['series'].parse_series(data, name=name, **kwargs)
+
+    def parse_movie(self, data, **kwargs):
+        """
+        Use the selected movie parser to parse movie information from `data`
+
+        :param data: The raw string to parse information from
+
+        :returns: An object containing the parsed information. The `valid` attribute will be set depending on success.
+        """
+        return self.parser['movie'].parse_movie(data, **kwargs)
 
 
 @event('plugin.register')
