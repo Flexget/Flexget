@@ -15,7 +15,6 @@ class UrlRewriteCinemageddon(object):
         return entry['url'].startswith('http://cinemageddon.net/details.php?id=')
 
     def url_rewrite(self, task, entry):
-
         entry['url'] = entry['url'].replace('details.php?id=', 'download.php?id=')
         entry['url'] += '&name=%s.torrent' % (urllib.quote(entry['title'], safe=''))
 
