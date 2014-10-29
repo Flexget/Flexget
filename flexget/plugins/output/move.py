@@ -149,9 +149,9 @@ class TransformingOps(BaseFileOps):
         src_isdir = os.path.isdir(src)
         src_path, src_name = os.path.split(src)
         
-        # get proper value in order of: entry, config, above split
-        dst_path = entry.get('path', config.get('to', src_path))
-        dst_name = entry.get('filename', config.get('filename', src_name))
+        # get proper value in order of: config, entry, above split
+        dst_path = config.get('path', entry.get('to', src_path))
+        dst_name = config.get('filename', entry.get('filename', src_name))
         
         try:
             dst_path = entry.render(dst_path)
