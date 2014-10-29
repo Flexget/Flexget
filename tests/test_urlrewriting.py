@@ -22,6 +22,7 @@ class TestURLRewriters(FlexGetBase):
               - {title: 'nyaa', url: 'http://www.nyaa.eu/?page=torrentinfo&tid=12345'}
               - {title: 'isohunt search', url: 'http://isohunt.com/torrents/?ihq=Query.Here'}
               - {title: 'isohunt direct', url: 'http://isohunt.com/torrent_details/123456789/Name.Here'}
+              - {title: 'cinemageddon download', url: 'http://cinemageddon.net/details.php?id=1234'}
     """
 
     def setup(self):
@@ -68,6 +69,13 @@ class TestURLRewriters(FlexGetBase):
         entry = self.task.find_entry(title='isohunt direct')
         assert urlrewriter.url_rewritable(self.task, entry), \
             'direct entry should be url_rewritable'
+
+    def test_cinemageddon(self):
+        entry = self.task.find_entry(title='cinemageddon download')
+        urlrewriter = self.get_urlrewriter('cinemageddon')
+        assert urlrewriter.url_rewritable(self.task, entry)
+        urlrewriter.url_rewrite(self.task, entry)
+        assert entry['url'] == 'http://cinemageddon.net/download.php?id=1234&name=cinemageddon%20download.torrent'
 
 
 class TestRegexpurlrewriter(FlexGetBase):
