@@ -29,8 +29,6 @@ class SearchRSS(object):
         for search_string in search_strings:
             # Create a fake task to pass to the rss plugin input handler
             task = Task(manager, 'search_rss_task', config={})
-            # Use a copy of the config, so we don't overwrite jinja url when filling in search term
-            rss_config = rss_plugin.instance.build_config(rss_config).copy()
             rss_config['url'] = template.render({'search_term': search_string})
             # TODO: capture some other_fields to try to find seed/peer/content_size numbers?
             try:
