@@ -71,21 +71,17 @@ class VersionAction(_VersionAction):
         self.version = flexget.__version__
         # Print the version number
         console('%s' % self.version)
-        if self.version == '{git}':
-            console('To check the latest released version you have run:')
-            console('`git fetch --tags` then `git describe`')
+        # Check for latest version from server
+        try:
+            page = requests.get('http://download.flexget.com/latestversion')
+        except requests.RequestException:
+            console('Error getting latest version number from download.flexget.com')
         else:
-            # Check for latest version from server
-            try:
-                page = requests.get('http://download.flexget.com/latestversion')
-            except requests.RequestException:
-                console('Error getting latest version number from download.flexget.com')
+            ver = page.text.strip()
+            if self.version == ver:
+                console('You are on the latest release.')
             else:
-                ver = page.text.strip()
-                if self.version == ver:
-                    console('You are on the latest release.')
-                else:
-                    console('Latest release: %s' % ver)
+                console('Latest release: %s' % ver)
         parser.exit()
 
 
