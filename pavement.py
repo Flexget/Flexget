@@ -40,20 +40,16 @@ if sys.platform.startswith('win'):
 with open("README.rst") as readme:
     long_description = readme.read()
 
-# Get the version from __init__.py without importing the package
-with open('flexget/__init__.py') as verfile:
-    for line in verfile:
-        if line.startswith('__version__ = '):
-            VERSION = ast.literal_eval(line.split('=')[-1].strip())
-            break
-    else:
-        print 'Could not find version in __init__.py'
-        sys.exit(1)
-
+# Populates __version__ without importing the package
+__version__ = None
+execfile('flexget/_version.py')
+if not __version__:
+    print 'Could not find __version__ from flexget/_version.py'
+    sys.exit(1)
 
 setup(
     name='FlexGet',
-    version=VERSION,  # release task may edit this
+    version=__version__,  # release task may edit this
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) '
                 'from different sources like RSS-feeds, html-pages, various sites and more.',
     long_description=long_description,
@@ -109,9 +105,9 @@ options(
 
 
 def set_init_version(ver):
-    """Replaces the version with ``ver`` in __init__.py"""
+    """Replaces the version with ``ver`` in _version.py"""
     import fileinput
-    for line in fileinput.FileInput('flexget/__init__.py', inplace=1):
+    for line in fileinput.FileInput('flexget/_version.py', inplace=1):
         if line.startswith('__version__ = '):
             line = "__version__ = '%s'\n" % ver
         print line,
@@ -120,8 +116,8 @@ def set_init_version(ver):
 @task
 def increment_version():
     """Increments development version by one"""
-    print 'current version: %s' % VERSION
-    ver_split = VERSION.split('.')
+    print 'current version: %s' % __version__
+    ver_split = __version__.split('.')
     if 'dev' in ver_split[-1]:
         # If this is already a development version, increment the dev count by 1
         ver_split[-1] = 'dev%d' % (int(ver_split[-1].strip('dev') or 0) + 1)
@@ -189,7 +185,7 @@ def clean():
 ])
 def sdist(options):
     """Build tar.gz distribution package"""
-    print 'sdist version: %s' % VERSION
+    print 'sdist version: %s' % __version__
     # clean previous build
     print 'Cleaning build...'
     for p in ['build']:
@@ -259,8 +255,8 @@ def release(options):
             sys.exit(1)
 
     # If we are on a dev build, strip it for release
-    if 'dev' in VERSION:
-        release_version = '.'.join(VERSION.split('.')[:-1])
+    if 'dev' in __version__:
+        release_version = '.'.join(__version__.split('.')[:-1])
 
         # hack version number into setup( ... options='1.0-svn' ...)
         from paver import tasks
