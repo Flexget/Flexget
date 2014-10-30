@@ -114,17 +114,30 @@ def set_init_version(ver):
 
 
 @task
-def increment_version():
-    """Increments development version by one"""
+def version():
+    """Prints the version number of the source"""
+    print __version__
+
+
+@task
+@cmdopts([('dev', None, 'Bumps to new development version instead of release version.')])
+def increment_version(options):
+    """Increments either release or dev version by 1"""
     print 'current version: %s' % __version__
     ver_split = __version__.split('.')
+    dev = options.increment_version.get('dev')
     if 'dev' in ver_split[-1]:
-        # If this is already a development version, increment the dev count by 1
-        ver_split[-1] = 'dev%d' % (int(ver_split[-1].strip('dev') or 0) + 1)
+        if dev:
+            # If this is already a development version, increment the dev count by 1
+            ver_split[-1] = 'dev%d' % (int(ver_split[-1].strip('dev') or 0) + 1)
+        else:
+            # Just strip off dev tag for next release version
+            ver_split = ver_split[:-1]
     else:
-        # Otherwise increment the minor version by one and add 'dev' tag
+        # Increment the minor version by one
         ver_split[-1] = str(int(ver_split[-1]) + 1)
-        ver_split.append('dev')
+        if dev:
+            ver_split.append('dev')
     new_version = '.'.join(ver_split)
     print 'new version: %s' % new_version
     set_init_version(new_version)
