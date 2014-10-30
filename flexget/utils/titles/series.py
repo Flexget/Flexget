@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime, timedelta
+from string import capwords
 
 from dateutil.parser import parse as parsedate
 
@@ -67,15 +68,15 @@ class SeriesParser(TitleParser):
     # ignore prefix regexps must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
     ignore_prefixes = default_ignore_prefixes
 
-    def __init__(self, name='', alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
+    def __init__(self, name=None, alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
                  date_regexps=None, sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None,
                  allow_seasonless=True, date_dayfirst=None, date_yearfirst=None, special_ids=None,
                  prefer_specials=False, assume_special=False):
         """
         Init SeriesParser.
 
-        :param string name: Name of the series parser is going to try to parse.
-
+        :param string name: Name of the series parser is going to try to parse. If not supplied series name will be
+            guessed from data.
         :param list alternate_names: Other names for this series that should be allowed.
         :param string identified_by: What kind of episode numbering scheme is expected,
             valid values are ep, date, sequence, id and auto (default).
@@ -149,21 +150,42 @@ class SeriesParser(TitleParser):
         # false if item does not match series
         self.valid = False
 
-    def __setattr__(self, name, value):
-        """
-        Some conversions when setting attributes.
-        `self.name` and `self.data` are converted to unicode.
-        """
-        if name == 'name' or name == 'data':
-            if isinstance(value, str):
-                value = unicode(value)
-            elif not isinstance(value, unicode):
-                raise Exception('%s cannot be %s' % (name, repr(value)))
-        object.__setattr__(self, name, value)
-
     def remove_dirt(self, data):
         """Replaces some characters with spaces"""
         return re.sub(r'[_.,\[\]\(\): ]+', ' ', data).strip().lower()
+
+    def guess_name(self):
+        """This will attempt to guess a series name based on the provided data."""
+        # We need to replace certain characters with spaces to make sure episode parsing works right
+        # We don't remove anything, as the match positions should line up with the original title
+        clean_title = re.sub('[_.,\[\]\(\):]', ' ', self.data)
+        if self.parse_unwanted(clean_title):
+            return
+        match = self.parse_date(clean_title)
+        if match:
+            self.identified_by = 'date'
+        else:
+            match = self.parse_episode(clean_title)
+            self.identified_by = 'ep'
+        if not match:
+            return
+        if match['match'].start() > 1:
+            # We start using the original title here, so we can properly ignore unwanted prefixes.
+            # Look for unwanted prefixes to find out where the series title starts
+            start = 0
+            prefix = re.match('|'.join(self.ignore_prefixes), self.data)
+            if prefix:
+                start = prefix.end()
+            # If an episode id is found, assume everything before it is series name
+            name = self.data[start:match['match'].start()]
+            # Remove possible episode title from series name (anything after a ' - ')
+            name = name.split(' - ')[0]
+            # Replace some special characters with spaces
+            name = re.sub('[\._\(\) ]+', ' ', name).strip(' -')
+            # Normalize capitalization to title case
+            name = capwords(name)
+            self.name = name
+            return name
 
     def parse(self, data=None, field=None, quality=None):
         # Clear the output variables before parsing
@@ -173,9 +195,14 @@ class SeriesParser(TitleParser):
             self.quality = quality
         if data:
             self.data = data
-        if not self.name or not self.data:
-            raise Exception('SeriesParser initialization error, name: %s data: %s' %
-                            (repr(self.name), repr(self.data)))
+        if not self.data:
+            raise ParseWarning(self, 'No data supplied to parse.')
+        if not self.name:
+            log.debug('No name for series `%s` supplied, guessing name.', self.data)
+            if not self.guess_name():
+                log.debug('Could not determine a series name')
+                return
+            log.debug('Series name for %s guessed to be %s', self.data, self.name)
 
         # check if data appears to be unwanted (abort)
         if self.parse_unwanted(self.remove_dirt(self.data)):

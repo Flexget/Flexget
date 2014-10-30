@@ -1,0 +1,68 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Cookie: [url=aoeu; title=blah]
+        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+      method: GET
+      uri: http://httpbin.org/cookies
+    response:
+      body: {string: "{\n  \"cookies\": {\n    \"title\": \"blah\", \n    \"url\"\
+          : \"aoeu\"\n  }\n}"}
+      headers:
+        access-control-allow-credentials: ['true']
+        access-control-allow-origin: ['*']
+        connection: [keep-alive]
+        content-length: ['62']
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 01:44:32 GMT']
+        server: [gunicorn/18.0]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Cookie: [url=aoeu; title=blah]
+        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+      method: GET
+      uri: http://httpbin.org/cookies
+    response:
+      body: {string: "{\n  \"cookies\": {\n    \"title\": \"blah\", \n    \"url\"\
+          : \"aoeu\"\n  }\n}"}
+      headers:
+        access-control-allow-credentials: ['true']
+        access-control-allow-origin: ['*']
+        connection: [keep-alive]
+        content-length: ['62']
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 01:54:30 GMT']
+        server: [gunicorn/18.0]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Cookie: [url=aoeu; title=blah]
+        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+      method: GET
+      uri: http://httpbin.org/cookies
+    response:
+      body: {string: "{\n  \"cookies\": {\n    \"title\": \"blah\", \n    \"url\"\
+          : \"aoeu\"\n  }\n}"}
+      headers:
+        access-control-allow-credentials: ['true']
+        access-control-allow-origin: ['*']
+        connection: [keep-alive]
+        content-length: ['62']
+        content-type: [application/json]
+        date: ['Wed, 22 Oct 2014 02:41:15 GMT']
+        server: [gunicorn/18.0]
+      status: {code: 200, message: OK}
+version: 1

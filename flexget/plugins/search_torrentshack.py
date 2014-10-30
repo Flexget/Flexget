@@ -59,6 +59,7 @@ class TorrentShackSearch(object):
         username: XXXX              (required)
         password: XXXX              (required)
         category: Movies/x264       (optional)
+        type: p2p OR scene          (optional)
         gravity_multiplier: 200     (optional)
 
     == Categories
@@ -108,6 +109,7 @@ class TorrentShackSearch(object):
         root.accept('text', key='username', required=True)
         root.accept('text', key='password', required=True)
         root.accept('number', key='gravity_multiplier')
+        root.accept('choice', 'type').accept_choices(['p2p', 'scene'])
 
         root.accept('choice', key='category').accept_choices(CATEGORIES)
         root.accept('number', key='category')
@@ -117,8 +119,27 @@ class TorrentShackSearch(object):
 
         return root
 
+    def prepare_config(self, config):
+        config.setdefault('type', 'both')
+        config.setdefault('gravity_multiplier', 1)
+        config.setdefault('category', [])
+
+        if not isinstance(config['category'], list):
+            config['category'] = [config['category']]
+
+        categories_id = list()
+        for category in config['category']:
+            if not isinstance(category, int):
+                categories_id.append(CATEGORIES.get(category))
+            else:
+                categories_id.append(category)
+        config['category'] = categories_id
+        return config
+
+
     @plugin.internet(log)
     def search(self, entry, config=None):
+        config = self.prepare_config(config)
 
         if not session.cookies:
             log.debug('Logging in to %s...' % URL)
@@ -130,32 +151,17 @@ class TorrentShackSearch(object):
             }
             session.post(URL + 'login.php', data=params)
 
-        if config.has_key('category'):
-            if not isinstance(config['category'], list):
-                config['category'] = [config['category']]
-
-            categories_id = list()
-            for category in config['category']:
-                if not isinstance(category, int):
-                    categories_id.append(CATEGORIES.get(category))
-                else:
-                    categories_id.append(category)
-            category_url_fragment = ''.join(
-                ['&' + quote('filter_cat[%s]' % id) + '=1' for id in categories_id])
-        else:
-            category_url_fragment = ''
-
-        if config.has_key('gravity_multiplier'):
-            multip = config['gravity_multiplier']
-        else:
-            multip = 1
+        cat = ''.join(['&' + ('filter_cat[%s]' % id) + '=1' for id in config['category']])
+        rls = 'release_type=' + config['type']
+        url_params = rls + cat
+        multip = config['gravity_multiplier']
 
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            search_string_normalized = normalize_unicode(clean_title(search_string))
-            search_string_url_fragment = 'searchstr=' + quote(search_string_normalized.encode('utf8'))
+            srch = normalize_unicode(clean_title(search_string))
+            srch = '&searchstr=' + quote(srch.encode('utf8'))
 
-            url = URL + 'torrents.php?' + search_string_url_fragment + category_url_fragment
+            url = URL + 'torrents.php?' + url_params + srch
             log.debug('Fetching URL for `%s`: %s' % (search_string, url))
 
             page = session.get(url).content

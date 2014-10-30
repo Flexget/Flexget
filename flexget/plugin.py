@@ -5,13 +5,13 @@ from __future__ import absolute_import, division, unicode_literals
 
 import logging
 import os
-import pkgutil
 import re
 import sys
 import time
 import warnings
 from itertools import ifilter
 
+from path import path
 from requests import RequestException
 
 from flexget import plugins as plugins_pkg
@@ -376,38 +376,36 @@ def _load_plugins_from_dirs(dirs):
     """
 
     log.debug('Trying to load plugins from: %s' % dirs)
-    # add all dirs to plugins_pkg load path so that plugins are loaded from flexget and from ~/.flexget/plugins/
+    dirs = [path(d) for d in dirs if os.path.exists(d)]
+    # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
     plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
-    for importer, name, ispkg in pkgutil.walk_packages(dirs, plugins_pkg.__name__ + '.'):
-        if ispkg:
-            continue
-        # Don't load any plugins again if they are already loaded
-        # This can happen if one plugin imports from another plugin
-        if name in sys.modules:
-            continue
-        # Don't load from pyc files
-        if not importer.find_module(name).filename.endswith('.py'):
-            continue
-        try:
-            __import__(name)
-        except DependencyError as e:
-            if e.has_message():
-                msg = e.message
+    for plugins_dir in dirs:
+        for plugin_path in plugins_dir.walkfiles('*.py'):
+            if plugin_path.name == '__init__.py':
+                continue
+            # Split the relative path from the plugins dir to current file's parent dir to find subpackage names
+            plugin_subpackages = filter(None, plugin_path.relpath(plugins_dir).parent.splitall())
+            module_name = '.'.join([plugins_pkg.__name__] + plugin_subpackages + [plugin_path.namebase])
+            try:
+                __import__(module_name)
+            except DependencyError as e:
+                if e.has_message():
+                    msg = e.message
+                else:
+                    msg = 'Plugin `%s` requires `%s` to load.' % (e.issued_by or module_name, e.missing or 'N/A')
+                if not e.silent:
+                    log.warning(msg)
+                else:
+                    log.debug(msg)
+            except ImportError as e:
+                log.critical('Plugin `%s` failed to import dependencies' % module_name)
+                log.exception(e)
+            except Exception as e:
+                log.critical('Exception while loading plugin %s' % module_name)
+                log.exception(e)
+                raise
             else:
-                msg = 'Plugin `%s` requires `%s` to load.' % (e.issued_by or name, e.missing or 'N/A')
-            if not e.silent:
-                log.warning(msg)
-            else:
-                log.debug(msg)
-        except ImportError as e:
-            log.critical('Plugin `%s` failed to import dependencies' % name)
-            log.exception(e)
-        except Exception as e:
-            log.critical('Exception while loading plugin %s' % name)
-            log.exception(e)
-            raise
-        else:
-            log.trace('Loaded module %s from %s' % (name, sys.modules[name].__file__))
+                log.trace('Loaded module %s from %s' % (module_name, plugin_path))
 
     if _new_phase_queue:
         for phase, args in _new_phase_queue.iteritems():

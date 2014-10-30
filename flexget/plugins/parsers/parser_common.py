@@ -10,11 +10,6 @@ from flexget.utils.tools import ReList
 
 log = logging.getLogger('parser')
 
-PARSER_ANY = 0
-PARSER_VIDEO = 1
-PARSER_MOVIE = 2
-PARSER_EPISODE = 3
-
 SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
 
 
@@ -559,17 +554,4 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
     def __eq__(self, other):
         return self is other
 
-
-class Parser(ABCMeta(str('ParserABCMeta'), (object,), {})):
-    @abstractmethod
-    def parse(self, data, type_=None, name=None, **kwargs):
-        """
-        :param data: string to parse
-        :param type_: a PARSER_* type
-        :param attended_name: an attended name, or None is unknown
-        :raises ParseWarning
-
-        :return: an instance of :class:`ParsedEntry`
-        """
-        raise NotImplementedError
 

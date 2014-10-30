@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import yaml
-from tests import FlexGetBase
-from nose.plugins.attrib import attr
+
+from tests import FlexGetBase, use_vcr
 
 
 class TestInputRSS(FlexGetBase):
@@ -163,7 +163,7 @@ class TestRssOnline(FlexGetBase):
 
     """
 
-    @attr(online=True)
+    @use_vcr
     def test_rss_online(self):
         # Make sure entries are created for all test tasks
         tasks = yaml.load(self.__yaml__)['tasks']

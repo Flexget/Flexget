@@ -1028,30 +1028,18 @@ class FilterSeries(FilterSeriesBase):
         for id_type in SERIES_ID_TYPES:
             params[id_type + '_regexps'] = get_as_array(config, id_type + '_regexp')
 
-        filtered_params = {}
-        for k, v in params.items():
-            if v:
-                filtered_params[k] = v
-        params = filtered_params
-
         for entry in entries:
-            parsed = None
-
             # skip processed entries
             if (entry.get('series_parser') and entry['series_parser'].valid and
                     entry['series_parser'].name.lower() != series_name.lower()):
                 continue
-            # in case quality will not be found from title, set it from entry['quality'] if available
-            quality = None
-            if entry.get('quality'):
-                log.trace('Setting quality %s from entry field to parser', entry['quality'])
-                quality = entry['quality']
 
-            parsed = get_plugin_by_name('parsing').instance.parse_series(entry['title'], series_name, **params)
+            # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
+            parsed = get_plugin_by_name('parsing').instance.parse_series(entry['title'], name=series_name,
+                                                                         quality=entry.get('quality'), **params)
             if not parsed.valid:
                 continue
             parsed.field = 'title'
-            parsed.assume_quality(quality)
 
             log.debug('%s detected as %s, field: %s', entry['title'], parsed, parsed.field)
             populate_entry_fields(entry, parsed)

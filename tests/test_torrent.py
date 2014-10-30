@@ -1,8 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 
-from nose.plugins.attrib import attr
-from tests import FlexGetBase, with_filecopy
+from tests import FlexGetBase, with_filecopy, use_vcr
 from flexget.utils.bittorrent import Torrent
 
 
@@ -281,7 +280,7 @@ class TestTorrentAlive(FlexGetBase):
             torrent_alive: 0
     """
 
-    @attr(online=True)
+    @use_vcr
     @with_filecopy('test.torrent', 'test_torrent_alive.torrent')
     def test_torrent_alive_fail(self):
         self.execute_task('test_torrent_alive_fail')
@@ -294,14 +293,14 @@ class TestTorrentAlive(FlexGetBase):
         assert not self.task.accepted, 'Torrent should have been rejected by remember_rejected.'
         assert self.task._rerun_count == 0, 'Task should not have been rerun.'
 
-    @attr(online=True)
+    @use_vcr
     @with_filecopy('test.torrent', 'test_torrent_alive.torrent')
     def test_torrent_alive_pass(self):
         self.execute_task('test_torrent_alive_pass')
         assert self.task.accepted
         assert self.task._rerun_count == 0, 'Torrent should have been accepted without rerun.'
 
-    @attr(online=True)
+    @use_vcr
     def test_torrent_alive_udp_invalid_port(self):
         from flexget.plugins.filter.torrent_alive import get_udp_seeds
         assert get_udp_seeds('udp://[2001::1]/announce','HASH') == 0

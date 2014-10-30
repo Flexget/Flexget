@@ -45,8 +45,8 @@ CATEGORIES = {
     'TV-x264': 5,
     'TV-XVID': 4
 }
-import sys
 
+BASE_URL = 'http://iptorrents.com'
 
 class UrlRewriteIPTorrents(object):
     """
@@ -86,9 +86,9 @@ class UrlRewriteIPTorrents(object):
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        if url.startswith('http://iptorrents.com/download.php/'):
+        if url.startswith(BASE_URL + '/download.php/'):
             return False
-        if url.startswith('http://iptorrents.com/'):
+        if url.startswith(BASE_URL + '/'):
             return True
         return False
 
@@ -98,7 +98,7 @@ class UrlRewriteIPTorrents(object):
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
-        if entry['url'].startswith('http://iptorrents.com/t?'):
+        if entry['url'].startswith(BASE_URL + '/t?'):
             # use search
             results = self.search(entry)
             if not results:
@@ -109,15 +109,9 @@ class UrlRewriteIPTorrents(object):
     @plugin.internet(log)
     def search(self, entry, config=None):
         """
-        Search for name from torrentleech.
+        Search for name from iptorrents
         """
-        rss_key = config['rss_key']
 
-        if not isinstance(config, dict):
-            config = {}
-        # sort = SORT.get(config.get('sort_by', 'seeds'))
-        # if config.get('sort_reverse'):
-            # sort += 1
         categories = config.get('category', 'all')
         # Make sure categories is a list
         if not isinstance(categories, list):
@@ -132,58 +126,31 @@ class UrlRewriteIPTorrents(object):
 
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
+            query = urllib.quote_plus(query.encode('utf8'))
 
-            # urllib.quote will crash if the unicode string has non ascii
-            # characters, so encode in utf-8 beforehand
-            url = ('http://iptorrents.com/t?' + filter_url + '&q=' +
-                   urllib.quote_plus(query.encode('utf-8')) + '&qf=')
-
-            page = requests.get(url, cookies={'uid': str(config['uid']),
-                                'pass': config['password']}).content
-            soup = get_soup(page)
-
-            if soup.find("title").contents[0] == "IPT":
-                raise plugin.PluginError("Page title unexpected: Could it be the login page?...")
-
+            url = "{base_url}/t?{filter}&q={query}&qf=".format(base_url=BASE_URL, filter=filter_url, query=query)
             log.debug('searching with url: %s' % url)
+            req = requests.get(url, cookies={'uid': str(config['uid']), 'pass': config['password']})
 
-            tb = soup.find('table', {'class': 'torrents'})
-            if not tb:
-                continue
+            if '/u/' + str(config.get('uid')) not in req.content:
+                raise plugin.PluginError("Invalid cookies (user not logged in)...")
 
-            # list all row of torrents table except first because it is titles
-            for tr in tb.findAll('tr')[1:]:
+            soup = get_soup(req.content, parser="html.parser")
 
-                h1 = tr.find('h1')
-                if h1 is not None:
-                    if h1.contents[0] == 'No Torrents Found!':
-                        break
-
-                link = tr.find("a", attrs={'href':
-                                           re.compile('/details\.php\?id=\d+')
-                                           })
-                log.debug('link phase: %s' % link.contents[0])
-
+            for torrent in soup.findAll('a', href=re.compile('\.torrent$')):
                 entry = Entry()
-                entry['title'] = link.contents[0]
+                entry['url'] = "{base}{link}?torrent_pass={key}".format(
+                    base=BASE_URL, link=torrent['href'], key=config.get('rss_key'))
+                entry['title'] = torrent.findPrevious("a", attrs={'class': 't_title'}).text
 
-                torrent_url = tr.find("a", attrs={'href': re.compile('/download.php/\d+/.*')}).get('href')
-                torrent_url = normalize_unicode(torrent_url)
-                torrent_url = urllib.quote(torrent_url.encode('utf-8'))
-                torrent_url = 'http://iptorrents.com' + torrent_url + '?torrent_pass=' + rss_key
-
-                log.debug('RSS-ified download link: %s' % torrent_url)
-
-                entry['url'] = torrent_url
-
-                seeders = tr.find_all('td', {'class': 'ac t_seeders'})
-                leechers = tr.find_all('td', {'class': 'ac t_leechers'})
-                entry['torrent_seeds'] = int(seeders[0].contents[0])
-                entry['torrent_leeches'] = int(leechers[0].contents[0])
+                seeders = torrent.findNext('td', {'class': 'ac t_seeders'}).text
+                leechers = torrent.findNext('td', {'class': 'ac t_leechers'}).text
+                entry['torrent_seeds'] = int(seeders)
+                entry['torrent_leeches'] = int(leechers)
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
                                                             entry['torrent_leeches'])
-                size = tr.find("td", text=re.compile('([\.\d]+) ([GMK]?)B')).contents[0]
 
+                size = torrent.findNext("td", text=re.compile('([\.\d]+) ([GMK]?)B')).text
                 size = re.search('([\.\d]+) ([GMK]?)B', size)
                 if size:
                     if size.group(2) == 'G':
@@ -196,10 +163,9 @@ class UrlRewriteIPTorrents(object):
                         entry['content_size'] = int(float(size.group(1)) / 1024 ** 2)
                 entries.add(entry)
 
-        return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
+        return entries
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteIPTorrents, 'iptorrents',
-                    groups=['urlrewriter', 'search'], api_ver=2)
+    plugin.register(UrlRewriteIPTorrents, 'iptorrents', groups=['urlrewriter', 'search'], api_ver=2)

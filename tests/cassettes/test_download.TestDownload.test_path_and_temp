@@ -1,0 +1,128 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+      method: GET
+      uri: http://www.speedtest.qsc.de/1kB.qsc
+    response:
+      body:
+        string: !!binary |
+          F2KK4WQFeLGfxlU2EklRbv+hfofFlBrDi5V2g5pHU9p4rgoxExXgZteP4MOMMOcGPZ3t35LgMS6I
+          /JHLKqH3AFPyAZVc87iTAw0DSrgBLpP3xjbUGILmTphof1YA5Tau1VSzaxLC4+TH7p0714il+r/I
+          HAgylZd3Vxxc2bs9tozVd0Qj7nl0O16tXD4esovoX2BQS4bgajwPd+j+w+/5tC9AU8ywixRB4qjp
+          2bDM7zsCedhDA66nvoWVIvrFQ1hUSzyCDTaz/rX+hnQIHxbD1DuqNccPClApldj5JdFjZOXwDKJ/
+          u9ZMhQEUQBUYuxbqgo8/S7HEykdMWF3KX0UEqR2AEYhqbVdfRIeAg2LZImClZAq5uJPE0LycpQeA
+          +1UdhWYBfMLbkOlaRmsDszTrw9BkydllKZfQW+dqiixqDc3nWFNuZ93gVEJuwDWL//1JZnjxSKCR
+          b8zc11X3REsACB3VDs1pf4gQ9cIhc7zs9r7knKbzkxtEsn/mTpCoY1kqfJYTSGsKnnVjZligJbLC
+          j/fzrNilO/viKiAYRcB1TgEz8tMcLjBrjtOOi2JhUhDYBFq4qg8OFqlX6pR60DuqRPq2MGeZbbvM
+          zKc0IAKS4nzOGcmmbkDirpvVM5DTyGnf2LjScyORUtqnSTRGdjwQt2v4BDCDlXAp7xbKakoGeRg/
+          wC7qc9Yf7XC8BvJcHtmY+WTDcvpzlPzdsbHw3AjJZnTxq1mIW0DpDWUHGtV45tKtK337TExHsjvf
+          FECjRQkZQvJT5rf18umlkqcjCb/s8WxNF/nx13K4pBpWjm7cfyu2QjWD8rf0kGqUDLhxGP3r+uGZ
+          NWv58K6KBcZpoAlROs+bw/D3SfaHqvjA8WovmBb+I44Yx+nYvlu+qfOmuX4n/M13fo69S3EDcchz
+          0tpv9TZ+vkbs1LakFlMRVqCcBXdsquJHSpRiqdy13MEDzcdJyJgrQLGT4hxmOoSJMJ7n8WPeGOtv
+          u2fM9d2Czp62o2sguWF/YHsqwN8ewMR+Nf9XHO2BjaWFg2Ae6WoJfAly0ZJLlJCDLs1yHblh2HFb
+          uMf27R5FTC320kRXjOz1aNoNWLgGfvnrpXiVPp8EuiPYqAY61H+QWRWYlgMa4hiSPeTbC1tT5Mwo
+          rMKm7FAPWkLArC57f35WyiaLCRqzabXdS7+ZCyfferxTCvWd7Gvqpj1u93pZ1ZpvSlSlheK0msuB
+          1EDlMnQ34FYP5HbYRE8VwKyHfAWwHu94Ui35YMq1qWVW2815iKspWRJbTs8ns6fx8abHU7dasT7B
+          cWrKPA8lvrGqKkqoXH9b1NXtBC6CXWVzY5sJOT1gmaDLiYb7yd7ClqL63NcYOtiT2F8tDht6SA==
+      headers:
+        accept-ranges: [bytes]
+        cache-control: [no-cache]
+        connection: [keep-alive]
+        content-length: ['1024']
+        content-type: [application/octet-stream]
+        date: ['Wed, 22 Oct 2014 01:44:34 GMT']
+        etag: ['"47ce52ba-400"']
+        expires: ['Wed, 22 Oct 2014 01:44:33 GMT']
+        last-modified: ['Wed, 05 Mar 2008 07:58:50 GMT']
+        server: [nginx/1.6.2]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+      method: GET
+      uri: http://www.speedtest.qsc.de/1kB.qsc
+    response:
+      body:
+        string: !!binary |
+          F2KK4WQFeLGfxlU2EklRbv+hfofFlBrDi5V2g5pHU9p4rgoxExXgZteP4MOMMOcGPZ3t35LgMS6I
+          /JHLKqH3AFPyAZVc87iTAw0DSrgBLpP3xjbUGILmTphof1YA5Tau1VSzaxLC4+TH7p0714il+r/I
+          HAgylZd3Vxxc2bs9tozVd0Qj7nl0O16tXD4esovoX2BQS4bgajwPd+j+w+/5tC9AU8ywixRB4qjp
+          2bDM7zsCedhDA66nvoWVIvrFQ1hUSzyCDTaz/rX+hnQIHxbD1DuqNccPClApldj5JdFjZOXwDKJ/
+          u9ZMhQEUQBUYuxbqgo8/S7HEykdMWF3KX0UEqR2AEYhqbVdfRIeAg2LZImClZAq5uJPE0LycpQeA
+          +1UdhWYBfMLbkOlaRmsDszTrw9BkydllKZfQW+dqiixqDc3nWFNuZ93gVEJuwDWL//1JZnjxSKCR
+          b8zc11X3REsACB3VDs1pf4gQ9cIhc7zs9r7knKbzkxtEsn/mTpCoY1kqfJYTSGsKnnVjZligJbLC
+          j/fzrNilO/viKiAYRcB1TgEz8tMcLjBrjtOOi2JhUhDYBFq4qg8OFqlX6pR60DuqRPq2MGeZbbvM
+          zKc0IAKS4nzOGcmmbkDirpvVM5DTyGnf2LjScyORUtqnSTRGdjwQt2v4BDCDlXAp7xbKakoGeRg/
+          wC7qc9Yf7XC8BvJcHtmY+WTDcvpzlPzdsbHw3AjJZnTxq1mIW0DpDWUHGtV45tKtK337TExHsjvf
+          FECjRQkZQvJT5rf18umlkqcjCb/s8WxNF/nx13K4pBpWjm7cfyu2QjWD8rf0kGqUDLhxGP3r+uGZ
+          NWv58K6KBcZpoAlROs+bw/D3SfaHqvjA8WovmBb+I44Yx+nYvlu+qfOmuX4n/M13fo69S3EDcchz
+          0tpv9TZ+vkbs1LakFlMRVqCcBXdsquJHSpRiqdy13MEDzcdJyJgrQLGT4hxmOoSJMJ7n8WPeGOtv
+          u2fM9d2Czp62o2sguWF/YHsqwN8ewMR+Nf9XHO2BjaWFg2Ae6WoJfAly0ZJLlJCDLs1yHblh2HFb
+          uMf27R5FTC320kRXjOz1aNoNWLgGfvnrpXiVPp8EuiPYqAY61H+QWRWYlgMa4hiSPeTbC1tT5Mwo
+          rMKm7FAPWkLArC57f35WyiaLCRqzabXdS7+ZCyfferxTCvWd7Gvqpj1u93pZ1ZpvSlSlheK0msuB
+          1EDlMnQ34FYP5HbYRE8VwKyHfAWwHu94Ui35YMq1qWVW2815iKspWRJbTs8ns6fx8abHU7dasT7B
+          cWrKPA8lvrGqKkqoXH9b1NXtBC6CXWVzY5sJOT1gmaDLiYb7yd7ClqL63NcYOtiT2F8tDht6SA==
+      headers:
+        accept-ranges: [bytes]
+        cache-control: [no-cache]
+        connection: [keep-alive]
+        content-length: ['1024']
+        content-type: [application/octet-stream]
+        date: ['Wed, 22 Oct 2014 01:54:33 GMT']
+        etag: ['"47ce52ba-400"']
+        expires: ['Wed, 22 Oct 2014 01:54:32 GMT']
+        last-modified: ['Wed, 05 Mar 2008 07:58:50 GMT']
+        server: [nginx/1.6.2]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+      method: GET
+      uri: http://www.speedtest.qsc.de/1kB.qsc
+    response:
+      body:
+        string: !!binary |
+          F2KK4WQFeLGfxlU2EklRbv+hfofFlBrDi5V2g5pHU9p4rgoxExXgZteP4MOMMOcGPZ3t35LgMS6I
+          /JHLKqH3AFPyAZVc87iTAw0DSrgBLpP3xjbUGILmTphof1YA5Tau1VSzaxLC4+TH7p0714il+r/I
+          HAgylZd3Vxxc2bs9tozVd0Qj7nl0O16tXD4esovoX2BQS4bgajwPd+j+w+/5tC9AU8ywixRB4qjp
+          2bDM7zsCedhDA66nvoWVIvrFQ1hUSzyCDTaz/rX+hnQIHxbD1DuqNccPClApldj5JdFjZOXwDKJ/
+          u9ZMhQEUQBUYuxbqgo8/S7HEykdMWF3KX0UEqR2AEYhqbVdfRIeAg2LZImClZAq5uJPE0LycpQeA
+          +1UdhWYBfMLbkOlaRmsDszTrw9BkydllKZfQW+dqiixqDc3nWFNuZ93gVEJuwDWL//1JZnjxSKCR
+          b8zc11X3REsACB3VDs1pf4gQ9cIhc7zs9r7knKbzkxtEsn/mTpCoY1kqfJYTSGsKnnVjZligJbLC
+          j/fzrNilO/viKiAYRcB1TgEz8tMcLjBrjtOOi2JhUhDYBFq4qg8OFqlX6pR60DuqRPq2MGeZbbvM
+          zKc0IAKS4nzOGcmmbkDirpvVM5DTyGnf2LjScyORUtqnSTRGdjwQt2v4BDCDlXAp7xbKakoGeRg/
+          wC7qc9Yf7XC8BvJcHtmY+WTDcvpzlPzdsbHw3AjJZnTxq1mIW0DpDWUHGtV45tKtK337TExHsjvf
+          FECjRQkZQvJT5rf18umlkqcjCb/s8WxNF/nx13K4pBpWjm7cfyu2QjWD8rf0kGqUDLhxGP3r+uGZ
+          NWv58K6KBcZpoAlROs+bw/D3SfaHqvjA8WovmBb+I44Yx+nYvlu+qfOmuX4n/M13fo69S3EDcchz
+          0tpv9TZ+vkbs1LakFlMRVqCcBXdsquJHSpRiqdy13MEDzcdJyJgrQLGT4hxmOoSJMJ7n8WPeGOtv
+          u2fM9d2Czp62o2sguWF/YHsqwN8ewMR+Nf9XHO2BjaWFg2Ae6WoJfAly0ZJLlJCDLs1yHblh2HFb
+          uMf27R5FTC320kRXjOz1aNoNWLgGfvnrpXiVPp8EuiPYqAY61H+QWRWYlgMa4hiSPeTbC1tT5Mwo
+          rMKm7FAPWkLArC57f35WyiaLCRqzabXdS7+ZCyfferxTCvWd7Gvqpj1u93pZ1ZpvSlSlheK0msuB
+          1EDlMnQ34FYP5HbYRE8VwKyHfAWwHu94Ui35YMq1qWVW2815iKspWRJbTs8ns6fx8abHU7dasT7B
+          cWrKPA8lvrGqKkqoXH9b1NXtBC6CXWVzY5sJOT1gmaDLiYb7yd7ClqL63NcYOtiT2F8tDht6SA==
+      headers:
+        accept-ranges: [bytes]
+        cache-control: [no-cache]
+        connection: [keep-alive]
+        content-length: ['1024']
+        content-type: [application/octet-stream]
+        date: ['Wed, 22 Oct 2014 02:41:18 GMT']
+        etag: ['"47ce52ba-400"']
+        expires: ['Wed, 22 Oct 2014 02:41:17 GMT']
+        last-modified: ['Wed, 05 Mar 2008 07:58:50 GMT']
+        server: [nginx/1.6.2]
+      status: {code: 200, message: OK}
+version: 1

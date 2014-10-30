@@ -10,7 +10,6 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.entry import Entry
-from flexget.utils.cached_input import cached
 
 log = logging.getLogger('find')
 
@@ -61,7 +60,6 @@ class InputFind(object):
         if not config.get('regexp'):
             config['regexp'] = '.'
 
-    @cached('find')
     def on_task_input(self, task, config):
         self.prepare_config(config)
         entries = []

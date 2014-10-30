@@ -7,7 +7,6 @@ import tzlocal
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-from apscheduler.triggers.interval import IntervalTrigger
 
 from flexget.config_schema import register_config_key, format_checker
 from flexget.event import event
@@ -105,13 +104,13 @@ def setup_scheduler(manager):
     jobstores = {'default': SQLAlchemyJobStore(engine=manager.engine, metadata=Base.metadata)}
     # If job was meant to run within last day while daemon was shutdown, run it once when continuing
     job_defaults = {'coalesce': True, 'misfire_grace_time': 60 * 60 * 24}
-    # apscheduler has a problem restoring jobs from database if we don't have a proper timezone name
-    # We'll force everything to be UTC internally in this case
-    # FlexGet #2741, upstream ticket https://bitbucket.org/agronholm/apscheduler/issue/59
     timezone = tzlocal.get_localzone()
     if timezone.zone == 'local':
-        log.info('Timezone name could not be determined. Scheduler will display times in UTC for any log messages. '
-                 'To resolve this set up /etc/sysconfig/clock with correct time zone name.')
+        # The default sqlalchemy jobstore does not work when there isn't a name for the local timezone.
+        # Just fall back to utc in this case
+        # FlexGet #2741, upstream ticket https://bitbucket.org/agronholm/apscheduler/issue/59
+        log.info('Local timezone name could not be determined. Scheduler will display times in UTC for any log'
+                 'messages. To resolve this set up /etc/timezone with correct time zone name.')
         timezone = pytz.utc
     scheduler = BackgroundScheduler(jobstores=jobstores, job_defaults=job_defaults, timezone=timezone)
     setup_jobs(manager)
@@ -137,14 +136,14 @@ def setup_jobs(manager):
         if jid in existing_job_ids:
             continue
         if 'interval' in job_config:
-            trigger = IntervalTrigger(**job_config['interval'])
+            trigger, trigger_args = 'interval', job_config['interval']
         else:
-            trigger = CronTrigger(**job_config['schedule'])
+            trigger, trigger_args = 'cron', job_config['schedule']
         tasks = job_config['tasks']
         if not isinstance(tasks, list):
             tasks = [tasks]
         name = ','.join(tasks)
-        scheduler.add_job(run_job, trigger=trigger, args=(tasks,), id=jid, name=name)
+        scheduler.add_job(run_job, args=(tasks,), id=jid, name=name, trigger=trigger, **trigger_args)
     # Remove jobs no longer in config
     for jid in existing_job_ids:
         if jid not in configured_job_ids:
