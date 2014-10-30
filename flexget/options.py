@@ -63,12 +63,8 @@ def required_length(nmin, nmax):
 
 
 class VersionAction(_VersionAction):
-    """
-    Action to print the current version.
-    Also attempts to get more information from git describe if on git checkout.
-    """
+    """Action to print the current version. Also checks latest release revision."""
     def __call__(self, parser, namespace, values, option_string=None):
-        self.version = flexget.__version__
         # Print the version number
         console('%s' % self.version)
         # Check for latest version from server
@@ -341,7 +337,8 @@ class ArgumentParser(ArgParser):
 
 # This will hold just the arguments directly for Manager. Webui needs this clean, to build its parser.
 manager_parser = ArgumentParser(add_help=False)
-manager_parser.add_argument('-V', '--version', action=VersionAction, help='Print FlexGet version and exit.')
+manager_parser.add_argument('-V', '--version', action=VersionAction, version=flexget.__version__,
+                            help='Print FlexGet version and exit.')
 manager_parser.add_argument('--test', action='store_true', dest='test', default=0,
                             help='Verbose what would happen on normal execution.')
 manager_parser.add_argument('-c', dest='config', default='config.yml',
