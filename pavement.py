@@ -2,6 +2,7 @@
 FlexGet build and development utilities - unfortunately this file is somewhat messy
 """
 
+import ast
 import os
 import sys
 from paver.easy import *
@@ -39,9 +40,20 @@ if sys.platform.startswith('win'):
 with open("README.rst") as readme:
     long_description = readme.read()
 
+# Get the version from __init__.py without importing the package
+with open('flexget/__init__.py') as verfile:
+    for line in verfile:
+        if line.startswith('__version__ = '):
+            VERSION = ast.literal_eval(line.split('=')[-1].strip())
+            break
+    else:
+        print 'Could not find version in __init__.py'
+        sys.exit(1)
+
+
 setup(
     name='FlexGet',
-    version='1.2',  # our tasks append the .1234 (current build number) to the version number
+    version=VERSION,  # release task may edit this
     description='FlexGet is a program aimed to automate downloading or processing content (torrents, podcasts, etc.) '
                 'from different sources like RSS-feeds, html-pages, various sites and more.',
     long_description=long_description,
@@ -106,6 +118,23 @@ def set_init_version(ver):
 
 
 @task
+def increment_version():
+    """Increments development version by one"""
+    print 'current version: %s' % VERSION
+    ver_split = VERSION.split('.')
+    if 'dev' in ver_split[-1]:
+        # If this is already a development version, increment the dev count by 1
+        ver_split[-1] = 'dev%d' % (int(ver_split[-1].strip('dev') or 0) + 1)
+    else:
+        # Otherwise increment the minor version by one and add 'dev' tag
+        ver_split[-1] = str(int(ver_split[-1]) + 1)
+        ver_split.append('dev')
+    new_version = '.'.join(ver_split)
+    print 'new version: %s' % new_version
+    set_init_version(new_version)
+
+
+@task
 @cmdopts([
     ('online', None, 'Run online tests')
 ])
@@ -157,17 +186,10 @@ def clean():
 @cmdopts([
     ('dist-dir=', 'd', 'directory to put final built distributions in'),
     ('revision=', 'r', 'minor revision number of this build')
-], share_with=['make_egg'])
+])
 def sdist(options):
     """Build tar.gz distribution package"""
-
-    if not options.sdist.get('revision'):
-        print 'Revision number required.'
-        sys.exit(1)
-    revision = options.sdist.pop('revision')
-
-    print 'Revision: %s' % revision
-
+    print 'sdist version: %s' % VERSION
     # clean previous build
     print 'Cleaning build...'
     for p in ['build']:
@@ -184,66 +206,8 @@ def sdist(options):
     for pyc in path('tests/').files('*.pyc'):
         pyc.remove()
 
-    ver = '%s.%s' % (options['version'], revision)
-
-    print 'Building %s' % ver
-
-    # replace version number
-    set_init_version(ver)
-
-    # hack version number into setup( ... options='1.0' ...)
-    from paver import tasks
-    setup_section = tasks.environment.options.setdefault("setup", Bunch())
-    setup_section.update(version=ver)
-
     for t in ['minilib', 'generate_setup', 'setuptools.command.sdist']:
         call_task(t)
-
-    # restore version ...
-    set_init_version('{git}')
-    return ver
-
-
-@task
-@cmdopts([
-    ('dist-dir=', 'd', 'directory to put final built distributions in'),
-    ('revision=', 'r', 'minor revision number of this build')
-], share_with=['sdist'])
-def make_egg(options):
-    # naming this task to bdist_egg will make egg installation fail
-
-    if not options.make_egg.get('revision'):
-        print 'Revision number required.'
-        sys.exit(1)
-    revision = options.make_egg.revision
-    ver = '%s.%s' % (options['version'], revision)
-
-    # hack version number into setup( ... options='1.0-svn' ...)
-    from paver import tasks
-    setup_section = tasks.environment.options.setdefault("setup", Bunch())
-    setup_section.update(version=ver)
-
-    # replace version number
-    set_init_version(ver)
-
-    print 'Making egg release'
-    import shutil
-    shutil.copytree('FlexGet.egg-info', 'FlexGet.egg-info-backup')
-
-    options.setdefault('bdist_egg', Bunch())['dist_dir'] = options.make_egg.get('dist_dir')
-
-    for t in ["minilib", "generate_setup", "setuptools.command.bdist_egg"]:
-        call_task(t)
-
-    # restore version ...
-    set_init_version('{git}')
-
-    # restore egg info from backup
-    print 'Removing FlexGet.egg-info ...'
-    shutil.rmtree('FlexGet.egg-info')
-    print 'Restoring FlexGet.egg-info'
-    shutil.move('FlexGet.egg-info-backup', 'FlexGet.egg-info')
-    return ver
 
 
 @task
@@ -284,45 +248,31 @@ def docs():
 
 
 @task
-@might_call('test', 'sdist', 'make_egg')
-@cmdopts([
-    ('no-tests', None, 'skips unit tests'),
-    ('type=', None, 'type of release (src | egg)'),
-    ('ver-file=', None, 'java properties file to create with version number FG_VERSION')
-])
+@might_call('test', 'sdist')
+@cmdopts([('no-tests', None, 'skips unit tests')])
 def release(options):
-    """Make a FlexGet release. Same as bdist_egg but adds version information."""
-
-    if options.release.get('type') not in ['src', 'egg']:
-        print 'Invalid --type, must be src or egg'
-        sys.exit(1)
-
-    print 'Cleaning build...'
-    for p in ['build']:
-        pth = path(p)
-        if pth.isdir():
-            pth.rmtree()
-        elif pth.isfile():
-            pth.remove()
-        else:
-            print 'Unable to remove %s' % pth
-
+    """Make a FlexGet release. Same as sdist but updates version information."""
     # run unit tests
     if not options.release.get('no_tests'):
         if not test():
             print 'Unit tests did not pass'
             sys.exit(1)
 
-    if options.release.get('type') == 'egg':
-        print 'Making egg release'
-        ver = make_egg()
-    else:
-        print 'Making src release'
-        ver = sdist()
+    # If we are on a dev build, strip it for release
+    if 'dev' in VERSION:
+        release_version = '.'.join(VERSION.split('.')[:-1])
 
-    if getattr(options.release, 'ver_file', False):
-        with open(options.release.ver_file, 'w') as ver_file:
-            ver_file.write('FG_VERSION=%s' % ver)
+        # hack version number into setup( ... options='1.0-svn' ...)
+        from paver import tasks
+        setup_section = tasks.environment.options.setdefault("setup", Bunch())
+        setup_section.update(version=release_version)
+
+        # replace version number
+        set_init_version(release_version)
+
+    print 'Making src release'
+    sdist()
+
 
 @task
 def install_tools():

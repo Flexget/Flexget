@@ -1,7 +1,7 @@
 #!/usr/bin/python
 from __future__ import unicode_literals, division, absolute_import, print_function
 
-__version__ = '{git}'
+__version__ = '1.2.213.dev'
 
 import logging
 import os
