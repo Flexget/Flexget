@@ -2,7 +2,6 @@
 FlexGet build and development utilities - unfortunately this file is somewhat messy
 """
 
-import ast
 import os
 import sys
 from paver.easy import *
@@ -260,24 +259,11 @@ def docs():
 @might_call('test', 'sdist')
 @cmdopts([('no-tests', None, 'skips unit tests')])
 def release(options):
-    """Make a FlexGet release. Same as sdist but updates version information."""
-    # run unit tests
+    """Run tests then make an sdist if successful."""
     if not options.release.get('no_tests'):
         if not test():
             print 'Unit tests did not pass'
             sys.exit(1)
-
-    # If we are on a dev build, strip it for release
-    if 'dev' in __version__:
-        release_version = '.'.join(__version__.split('.')[:-1])
-
-        # hack version number into setup( ... options='1.0-svn' ...)
-        from paver import tasks
-        setup_section = tasks.environment.options.setdefault("setup", Bunch())
-        setup_section.update(version=release_version)
-
-        # replace version number
-        set_init_version(release_version)
 
     print 'Making src release'
     sdist()
@@ -289,14 +275,14 @@ def install_tools():
 
     try:
         import pip
-    except:
+    except ImportError:
         print 'FATAL: Unable to import pip, please install it and run this again!'
         sys.exit(1)
 
     try:
         import sphinxcontrib
         print 'sphinxcontrib INSTALLED'
-    except:
+    except ImportError:
         pip.main(['install', 'sphinxcontrib-paverutils'])
 
     pip.main(['install', '-r', 'jenkins-requirements.txt'])
