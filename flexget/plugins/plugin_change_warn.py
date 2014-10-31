@@ -91,12 +91,6 @@ try:
                 log.critical('')
                 log.critical('           After getting rid of these FlexGet should run again normally')
 
-                from flexget import __version__ as version
-                if version == '{git}':
-                    log.critical('')
-                    log.critical('           If you are using bootstrapped git checkout you can run:')
-                    log.critical('           bin/paver clean_compiled')
-
                 log.critical('')
                 log.critical('-' * 79)
                 found_deprecated = True
