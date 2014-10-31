@@ -133,8 +133,12 @@ def increment_version(options):
             # Just strip off dev tag for next release version
             ver_split = ver_split[:-1]
     else:
-        # Increment the minor version by one
-        ver_split[-1] = str(int(ver_split[-1]) + 1)
+        # Increment the revision number by one
+        if len(ver_split) == 2:
+            # We don't have a revision number, assume 0
+            ver_split.append('1')
+        else:
+            ver_split[-1] = str(int(ver_split[-1]) + 1)
         if dev:
             ver_split.append('dev')
     new_version = '.'.join(ver_split)
