@@ -301,7 +301,7 @@ class InputRSS(object):
                     # html pages (login pages) are received
                     self.process_invalid_content(task, content, config['url'])
                     if task.options.debug:
-                        log.exception(ex)
+                        log.error('bozo error parsing rss: %s' % ex)
                     raise plugin.PluginError('Received invalid RSS content from task %s (%s)' % (task.name, config['url']))
                 elif isinstance(ex, httplib.BadStatusLine) or isinstance(ex, IOError):
                     raise ex  # let the @internet decorator handle

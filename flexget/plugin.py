@@ -400,6 +400,9 @@ def _load_plugins_from_dirs(dirs):
             except ImportError as e:
                 log.critical('Plugin `%s` failed to import dependencies' % module_name)
                 log.exception(e)
+            except ValueError as e:
+                # Debugging #2755
+                log.error('ValueError attempting to import `%s` (from %s): %s', module_name, plugin_path, e)
             except Exception as e:
                 log.critical('Exception while loading plugin %s' % module_name)
                 log.exception(e)
