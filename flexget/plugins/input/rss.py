@@ -7,6 +7,8 @@ import posixpath
 import httplib
 from datetime import datetime
 
+import dateutil.parser
+
 import feedparser
 from requests import RequestException
 
@@ -19,7 +21,7 @@ from flexget.utils.tools import decode_html
 from flexget.utils.pathscrub import pathscrub
 
 log = logging.getLogger('rss')
-
+feedparser.registerDateHandler(lambda date_string: dateutil.parser.parse(date_string).timetuple())
 
 def fp_field_name(name):
     """Translates literal field name to the sanitized one feedparser will use."""
