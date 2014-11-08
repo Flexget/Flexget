@@ -78,7 +78,8 @@ class Movie(Base):
             return True
         refresh_interval = 2
         if self.year:
-            age = (datetime.now().year - self.year)
+            # Make sure age is not negative
+            age = max((datetime.now().year - self.year), 0)
             refresh_interval += age * 5
             log.debug('movie `%s` age %i expires in %i days' % (self.title, age, refresh_interval))
         return self.updated < datetime.now() - timedelta(days=refresh_interval)
