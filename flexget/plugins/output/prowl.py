@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import urllib
 
 from requests import RequestException
 
@@ -65,7 +66,7 @@ class OutputProwl(object):
 
             url = 'https://api.prowlapp.com/publicapi/add'
             data = {'priority': priority, 'application': application, 'apikey': apikey,
-                    'event': event, 'description': description.replace('\n','%0A')}
+                    'event': event, 'description': urllib.quote_plus(description)}
 
             if task.options.test:
                 log.info('Would send prowl message about: %s', entry['title'])
