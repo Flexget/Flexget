@@ -53,7 +53,7 @@ class ImdbSearch(object):
         self.aka_weight = 0.95
         # prioritize first
         self.first_weight = 1.1
-        self.min_match = 0.5
+        self.min_match = 0.7
         self.min_diff = 0.01
         self.debug = False
 

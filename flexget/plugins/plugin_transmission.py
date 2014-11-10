@@ -490,7 +490,7 @@ class PluginTransmission(TransmissionBase):
                                 counter = 1
                                 while os.path.exists(os.path.join(file_path, filename + file_ext)):
                                     # Try appending a (#) suffix till a unique filename is found
-                                    filename = ''.join(options['post']['content_filename'], '(', str(counter), ')')
+                                    filename = '%s(%s)' % (options['post']['content_filename'], counter)
                                     counter += 1
                             else:
                                 log.debug('Cannot ensure content_filename is unique '

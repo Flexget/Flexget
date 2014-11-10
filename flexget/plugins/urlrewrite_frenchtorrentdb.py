@@ -41,7 +41,7 @@ class UrlRewriteFTDB(object):
             raise UrlRewritingError(
                 'FTDB Unable to locate download link from url %s and tag_a is : %s' % (page_url, tag_a)
             )
-        torrent_url = "http://www3.frenchtorrentdb.com" + tag_a.get('href') + "&js=1"
+        torrent_url = "http://www.frenchtorrentdb.com" + tag_a.get('href') + "&js=1"
         log.debug('TORRENT URL is : %s' % torrent_url)
         return torrent_url
 

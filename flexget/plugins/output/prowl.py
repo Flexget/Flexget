@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import urllib
 
 from requests import RequestException
 
@@ -64,8 +65,8 @@ class OutputProwl(object):
                 log.error('Error rendering jinja description: %s' % e)
 
             url = 'https://api.prowlapp.com/publicapi/add'
-            data = {'priority': priority, 'application': application, 'apikey': apikey,
-                    'event': event, 'description': description}
+            data = {'priority': priority, 'application': application.encode('utf-8'), 'apikey': apikey,
+                    'event': event.encode('utf-8'), 'description': description.encode('utf-8').replace('\n', '%0A')}
 
             if task.options.test:
                 log.info('Would send prowl message about: %s', entry['title'])

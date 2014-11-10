@@ -104,8 +104,13 @@ def setup_scheduler(manager):
     jobstores = {'default': SQLAlchemyJobStore(engine=manager.engine, metadata=Base.metadata)}
     # If job was meant to run within last day while daemon was shutdown, run it once when continuing
     job_defaults = {'coalesce': True, 'misfire_grace_time': 60 * 60 * 24}
-    timezone = tzlocal.get_localzone()
-    if timezone.zone == 'local':
+    try:
+        timezone = tzlocal.get_localzone()
+        if timezone.zone == 'local':
+            timezone = None
+    except pytz.UnknownTimeZoneError:
+        timezone = None
+    if not timezone:
         # The default sqlalchemy jobstore does not work when there isn't a name for the local timezone.
         # Just fall back to utc in this case
         # FlexGet #2741, upstream ticket https://bitbucket.org/agronholm/apscheduler/issue/59

@@ -188,14 +188,13 @@ def clean_series(manager):
     # Unmark series from tasks which have been deleted.
     if not manager.has_lock:
         return
-    session = Session()
-    try:
-        deleted = (session.query(SeriesTask).filter(not_(SeriesTask.name.in_(manager.tasks))).
-                   delete(synchronize_session=False))
+    with Session() as session:
+        removed_tasks = session.query(SeriesTask)
+        if manager.tasks:
+            removed_tasks.filter(not_(SeriesTask.name.in_(manager.tasks)))
+        deleted = removed_tasks.delete(synchronize_session=False)
         if deleted:
             session.commit()
-    finally:
-        session.close()
 
 
 TRANSLATE_MAP = {ord(u'&'): u' and '}
