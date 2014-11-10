@@ -66,7 +66,7 @@ class OutputProwl(object):
 
             url = 'https://api.prowlapp.com/publicapi/add'
             data = {'priority': priority, 'application': application, 'apikey': apikey,
-                    'event': event, 'description': urllib.quote_plus(description)}
+                    'event': event, 'description': urllib.quote(description)}
 
             if task.options.test:
                 log.info('Would send prowl message about: %s', entry['title'])
