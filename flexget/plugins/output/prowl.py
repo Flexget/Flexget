@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import urllib
 
 from requests import RequestException
 
