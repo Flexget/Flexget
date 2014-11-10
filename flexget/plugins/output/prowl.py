@@ -65,8 +65,8 @@ class OutputProwl(object):
                 log.error('Error rendering jinja description: %s' % e)
 
             url = 'https://api.prowlapp.com/publicapi/add'
-            data = {'priority': priority, 'application': application, 'apikey': apikey,
-                    'event': event, 'description': urllib.quote(description)}
+            data = {'priority': priority, 'application': application.encode('utf-8'), 'apikey': apikey,
+                    'event': event.encode('utf-8'), 'description': urllib.quote_plus(description.encode('utf-8'))}
 
             if task.options.test:
                 log.info('Would send prowl message about: %s', entry['title'])
