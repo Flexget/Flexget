@@ -2,9 +2,12 @@ from __future__ import unicode_literals, division, absolute_import
 import codecs
 import os
 import yaml
+import logging
 
 from flexget.config_schema import register_config_key
 from flexget.event import event
+
+log = logging.getLogger('secrets')
     
 @event('manager.before_config_validate')
 def process_secrets(manager):
@@ -12,13 +15,15 @@ def process_secrets(manager):
         return
     secret_file = os.path.join(manager.config_base, manager.config['secrets'])
     if not os.path.exists(secret_file):
-        raise Exception('File %s does not exists!' % secret_file)
+        log.error('Secrets\' file: %s does not exists or you have no read permission!' % secret_file)
+        return None
     try:
         with codecs.open(secret_file, 'rb', 'utf-8') as f:
             raw_secrets = f.read()
         secrets = {'secrets': yaml.safe_load(raw_secrets) or {}}
     except Exception as e:
-        raise Exception('Invalid secrets file: ' + str(e))
+        log.error('Invalid secrets file: %s (#%s, %s).' % secret_file, e.errno, e.strerror)
+        return None
     _process(manager.config, secrets)
 
 def _process(element, secrets):
