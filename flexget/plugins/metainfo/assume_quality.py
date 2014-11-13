@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from collections import namedtuple
 import logging
+from collections import namedtuple
+
 import flexget.utils.qualities as qualities
 from flexget import plugin
 from flexget.event import event
@@ -40,10 +41,14 @@ class AssumeQuality(object):
     def precision(self, qualityreq):
         p = 0
         for component in qualityreq.components:
-            if component.acceptable: p += 8
-            if component.min: p += 4
-            if component.max: p += 4
-            if component.none_of: p += len(component.none_of)
+            if component.acceptable:
+                p += 8
+            if component.min:
+                p += 4
+            if component.max:
+                p += 4
+            if component.none_of:
+                p += len(component.none_of)
             #Still a long way from perfect, but probably good enough.
         return p
 
@@ -73,18 +78,18 @@ class AssumeQuality(object):
             log.verbose('New assumption: %s is %s' % (target, quality))
             try:
                 target = qualities.Requirements(target)
-            except:
+            except ValueError:
                 raise plugin.PluginError('%s is not a valid quality. Forgetting assumption.' % target)
             try:
                 quality = qualities.get(quality)
-            except:
+            except ValueError:
                 raise plugin.PluginError('%s is not a valid quality. Forgetting assumption.' % quality)
             self.assumptions.append(assume(target, quality))
         self.assumptions.sort(key=lambda assumption: self.precision(assumption.target), reverse=True)
         for assumption in self.assumptions:
             log.debug('Target %s - Priority %s' % (assumption.target, self.precision(assumption.target)))
 
-    @plugin.priority(100)  #run after other plugins which fill quality (series, quality)
+    @plugin.priority(100)  # run after other plugins which fill quality (series, quality)
     def on_task_metainfo(self, task, config):
         for entry in task.entries:
             log.verbose('%s' % entry.get('title'))
@@ -94,6 +99,7 @@ class AssumeQuality(object):
                     log.debug('Match: %s' % assumption.target)
                     self.assume(entry, assumption.quality)
             log.verbose('New quality: %s', entry.get('quality'))
+
 
 @event('plugin.register')
 def register_plugin():
