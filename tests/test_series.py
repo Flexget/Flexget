@@ -77,12 +77,6 @@ class BaseQuality(FlexGetBase):
               - MaxUnknownQTest:
                   quality: "<=hdtv"
 
-          description_quality:
-            mock:
-              - {'title': 'Description.S01E01', 'description': 'The quality should be 720p'}
-            series:
-              - description: {quality: 720p}
-
           quality_from_group:
             mock:
               - {title: 'GroupQual.S01E01.HDTV.XViD-FlexGet'}
@@ -100,6 +94,13 @@ class BaseQuality(FlexGetBase):
                 - Test
               hdtv <hr !dd5.1:
                 - Other
+          quality_in_series_name:
+            mock:
+            - title: my 720p show S01E01
+            - title: my 720p show S01E02 720p
+            series:
+            - my 720p show:
+                quality: '<720p'
     """
 
     def test_exact_quality(self):
@@ -139,17 +140,19 @@ class BaseQuality(FlexGetBase):
         self.execute_task('max_unknown_quality')
         assert len(self.task.accepted) == 1, 'should have accepted'
 
-    def test_quality_from_description(self):
-        """Series plugin: quality from description"""
-        self.execute_task('description_quality')
-        assert len(self.task.accepted) == 1, 'should have accepted'
-
     def test_group_quality(self):
         """Series plugin: quality from group name"""
         self.execute_task('quality_from_group')
         assert self.task.find_entry('accepted', title='GroupQual.S01E01.720p.XViD-FlexGet'), \
             'GroupQual.S01E01.720p.XViD-FlexGet should have been accepted'
         assert len(self.task.accepted) == 1, 'should have accepted only one (no entries should pass for series `other`'
+
+    def test_quality_in_series_name(self):
+        """Make sure quality in title does not get parsed as quality"""
+        self.execute_task('quality_in_series_name')
+        assert self.task.find_entry('accepted', title='my 720p show S01E01'), \
+            'quality in title should not have been parsed'
+        assert len(self.task.accepted) == 1, 'should not have accepted 720p entry'
 
 
 class TestGuessitQuality(BaseQuality):

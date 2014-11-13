@@ -71,16 +71,20 @@ class AssumeQuality(object):
         self.assumptions = []
         for target, quality in config.items():
             log.verbose('New assumption: %s is %s' % (target, quality))
-            try: target = qualities.Requirements(target)
-            except: raise plugin.PluginError('%s is not a valid quality. Forgetting assumption.' % target)
-            try: quality = qualities.get(quality)
-            except: raise plugin.PluginError('%s is not a valid quality. Forgetting assumption.' % quality)
+            try:
+                target = qualities.Requirements(target)
+            except:
+                raise plugin.PluginError('%s is not a valid quality. Forgetting assumption.' % target)
+            try:
+                quality = qualities.get(quality)
+            except:
+                raise plugin.PluginError('%s is not a valid quality. Forgetting assumption.' % quality)
             self.assumptions.append(assume(target, quality))
         self.assumptions.sort(key=lambda assumption: self.precision(assumption.target), reverse=True)
         for assumption in self.assumptions:
             log.debug('Target %s - Priority %s' % (assumption.target, self.precision(assumption.target)))
 
-    @plugin.priority(127)  #run after metainfo_quality@128
+    @plugin.priority(100)  #run after other plugins which fill quality (series, quality)
     def on_task_metainfo(self, task, config):
         for entry in task.entries:
             log.verbose('%s' % entry.get('title'))
