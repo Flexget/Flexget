@@ -49,6 +49,8 @@ class EmitSeries(object):
                     '%03d' % episode])
 
     def search_entry(self, series, season, episode, task, alts=None, rerun=True):
+        if alts is None:
+            alts = [] # Not sure why I get why this is better
         if series.identified_by == 'ep':
             search_strings = ['%s %s' % (series.name, id) for id in self.ep_identifiers(season, episode)]
             series_id = 'S%02dE%02d' % (season, episode)
@@ -84,7 +86,7 @@ class EmitSeries(object):
             for s in task.config['series']:
                 if isinstance(s, dict) and s.get(series.name):
                     alts = s.get(series.name).get("alternate_name")
-                    if not isinstance(alts, list):
+                    if not isinstance(alts, list) and alts is not None:
                         alts = [alts]
             if not series:
                 # TODO: How can this happen?
