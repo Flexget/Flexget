@@ -1034,8 +1034,7 @@ class FilterSeries(FilterSeriesBase):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
-            parsed = get_plugin_by_name('parsing').instance.parse_series(entry['title'], name=series_name,
-                                                                         quality=entry.get('quality'), **params)
+            parsed = get_plugin_by_name('parsing').instance.parse_series(entry['title'], name=series_name, **params)
             if not parsed.valid:
                 continue
             parsed.field = 'title'
@@ -1262,7 +1261,7 @@ class FilterSeries(FilterSeriesBase):
         result = []
         # see if any of the eps match accepted qualities
         for entry in entries:
-            if reqs.allows(entry['series_parser'].quality):
+            if reqs.allows(entry['quality']):
                 result.append(entry)
             else:
                 log.verbose('Ignored `%s`. Does not meet quality requirement `%s`.', entry['title'], reqs)

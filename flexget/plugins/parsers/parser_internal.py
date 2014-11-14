@@ -34,15 +34,11 @@ class ParserInternal(object):
     def parse_series(self, data, **kwargs):
         log.debug('Parsing series: `%s` kwargs: %s', data, kwargs)
         start = time.clock()
-        quality = kwargs.pop('quality', None)
         parser = SeriesParser(**kwargs)
         try:
             parser.parse(data)
         except ParseWarning as pw:
             log_once(pw.value, logger=log)
-        # Passed in quality overrides parsed one
-        if quality:
-            parser.quality = quality
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parser, (end - start) * 1000)
         return parser

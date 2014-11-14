@@ -319,9 +319,6 @@ class ParserGuessit(object):
                 valid = False
             return InvalidParser()
         parsed = GuessitParsedSerie(data, kwargs.pop('name', None), guess_result, **kwargs)
-        # Passed in quality overrides parsed one
-        if kwargs.get('quality'):
-            parsed._old_quality = kwargs['quality']
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed

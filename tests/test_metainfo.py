@@ -6,20 +6,12 @@ class TestMetainfo(FlexGetBase):
 
     __yaml__ = """
         tasks:
-          test_quality:
-            mock:
-              - {title: 'test quality', description: 'metainfo quality should parse quality 720p from this'}
           test_content_size:
             mock:
               - {title: 'size 10MB', description: 'metainfo content size should parse size 10.2MB from this'}
               - {title: 'size 200MB', description: 'metainfo content size should parse size 200MB from this'}
               - {title: 'size 1024MB', description: 'metainfo content size should parse size 1.0GB from this'}
     """
-
-    def test_quality(self):
-        """Metainfo: parse quality"""
-        self.execute_task('test_quality')
-        assert self.task.find_entry(quality='720p'), 'Quality not parsed'
 
     def test_content_size(self):
         """Metainfo: parse content size"""
@@ -62,7 +54,6 @@ class TestMetainfoQuality(FlexGetBase):
             mock:
               - {title: 'FooBar.S01E02.720p.HDTV'}
               - {title: 'ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264'}
-              - {title: 'Good.Movie', description: '720p'}
               - {title: 'Good.Movie.hdtv', description: '720p'}
     """
 
@@ -75,11 +66,8 @@ class TestMetainfoQuality(FlexGetBase):
         entry = self.task.find_entry(title='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
         assert entry, 'entry not found?'
         assert 'quality' in entry, 'failed to pick up quality'
-        assert entry['quality'].name == '720p webdl h264 dd5.1', 'picked up wrong quality %s' % entry.get('quality', None)
-        # Check that quality gets picked up from description when not in title
-        entry = self.task.find_entry(title='Good.Movie')
-        assert 'quality' in entry, 'failed to pick up quality from description'
-        assert entry['quality'].name == '720p', 'picked up wrong quality %s' % entry.get('quality', None)
+        assert entry['quality'].name == '720p webdl h264 dd5.1', \
+            'picked up wrong quality %s' % entry.get('quality', None)
         # quality in description should not override one found in title
         entry = self.task.find_entry(title='Good.Movie.hdtv')
         assert 'quality' in entry, 'failed to pick up quality'
