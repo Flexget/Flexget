@@ -48,13 +48,17 @@ class EmitSeries(object):
                     '%02d' % episode,
                     '%03d' % episode])
 
-    def search_entry(self, series, season, episode, task, rerun=True):
+    def search_entry(self, series, season, episode, task, alts=None, rerun=True):
         if series.identified_by == 'ep':
             search_strings = ['%s %s' % (series.name, id) for id in self.ep_identifiers(season, episode)]
             series_id = 'S%02dE%02d' % (season, episode)
+            for alt in alts:
+                search_strings.extend(['%s %s' % (alt, id) for id in self.ep_identifiers(season, episode)])
         else:
             search_strings = ['%s %s' % (series.name, id) for id in self.sequence_identifiers(episode)]
             series_id = episode
+            for alt in alts:
+                search_strings.extend(['%s %s' % (alt, id) for id in self.sequence_identifiers(episode)])
         entry = Entry(title=search_strings[0], url='',
                       search_strings=search_strings,
                       series_name=series.name,
@@ -76,6 +80,12 @@ class EmitSeries(object):
         entries = []
         for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
             series = seriestask.series
+            alts = []
+            for s in task.config['series']:
+                if isinstance(s, dict) and s.get(series.name):
+                    alts = s.get(series.name).get("alternate_name")
+                    if not isinstance(alts, list):
+                        alts = [alts]
             if not series:
                 # TODO: How can this happen?
                 log.debug('Found SeriesTask item without series specified. Cleaning up.')
@@ -96,14 +106,14 @@ class EmitSeries(object):
                 latest_season = low_season + 1
 
             if self.try_next_season.get(series.name):
-                entries.append(self.search_entry(series, latest_season + 1, 1, task))
+                entries.append(self.search_entry(series, latest_season + 1, 1, task, alts = alts))
             else:
                 for season in xrange(latest_season, low_season, -1):
                     log.debug('Adding episodes for season %d' % season)
                     check_downloaded = not config.get('backfill')
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
                     if series.begin and (not latest or latest < series.begin):
-                        entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
+                        entries.append(self.search_entry(series, series.begin.season, series.begin.number, task, alts = alts))
                     elif latest:
                         start_at_ep = 1
                         episodes_this_season = (task.session.query(Episode).
@@ -125,13 +135,13 @@ class EmitSeries(object):
                                 eps_to_get.remove(ep.number)
                             except ValueError:
                                 pass
-                        entries.extend(self.search_entry(series, season, x, task, rerun=False) for x in eps_to_get)
+                        entries.extend(self.search_entry(series, season, x, task, alts = alts, rerun=False) for x in eps_to_get)
                         # If we have already downloaded the latest known episode, try the next episode
                         if latest_ep_this_season.releases:
-                            entries.append(self.search_entry(series, season, latest_ep_this_season.number + 1, task))
+                            entries.append(self.search_entry(series, season, latest_ep_this_season.number + 1, task, alts = alts))
                     else:
                         if config.get('from_start') or config.get('backfill'):
-                            entries.append(self.search_entry(series, season, 1, task))
+                            entries.append(self.search_entry(series, season, 1, task, alts = alts))
                         else:
                             log.verbose('Series `%s` has no history. Set begin option, or use CLI `series begin` '
                                         'subcommand to set first episode to emit' % series.name)
