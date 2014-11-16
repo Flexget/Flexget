@@ -1496,7 +1496,11 @@ class SeriesDBManager(FilterSeriesBase):
                         if db_series_alt:
                             db_series_alt.alt_name = alt
                         else:
-                            db_series.alternate_names.append(AlternateNames(alt, db_series.id))
+                            # Should this happen though?
+                            log.debug('adding alternate name %s for %s into db' % (alt, series_name))
+                            db_series_alt = AlternateNames(alt, db_series.id)
+                            db_series.alternate_names.append(db_series_alt)
+                            log.debug('-> added %s' % db_series_alt)
                 else:
                     log.debug('adding series %s into db', series_name)
                     db_series = Series()
