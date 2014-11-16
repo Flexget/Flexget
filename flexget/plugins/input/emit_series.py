@@ -11,7 +11,7 @@ from flexget.manager import Session
 log = logging.getLogger('emit_series')
 
 try:
-    from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release
+    from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release, AlternateNames
 except ImportError as e:
     log.error(e.message)
     raise plugin.DependencyError(issued_by='emit_series', missing='series')
@@ -82,12 +82,7 @@ class EmitSeries(object):
         entries = []
         for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
             series = seriestask.series
-            alts = []
-            for s in task.config['series']:
-                if isinstance(s, dict) and s.get(series.name):
-                    alts = s.get(series.name).get("alternate_name")
-                    if not isinstance(alts, list) and alts is not None:
-                        alts = [alts]
+            alts = [alt.alt_name for alt in series.alternate_names]
             if not series:
                 # TODO: How can this happen?
                 log.debug('Found SeriesTask item without series specified. Cleaning up.')
