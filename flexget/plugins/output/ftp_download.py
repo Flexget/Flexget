@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 import ftplib
 from urlparse import urlparse
 
@@ -18,12 +19,13 @@ class OutputFtp(object):
 
         config:
             ftp_download:
-              tls: False
+              tls: True
+              tls_transfer: True
               ftp_tmp_path: /tmp
+              skiplist: \.message|\.diz$|Sample'
 
         TODO:
           - Resume downloads
-          - create banlists files
           - validate connection parameters
 
     """
@@ -31,21 +33,23 @@ class OutputFtp(object):
     schema = {
         'type': 'object',
         'properties': {
-            'use-ssl': {'type': 'boolean', 'default': False},
+            'tls': {'type': 'boolean', 'default': False},
+            'tls_transfer': {'type': 'boolean', 'default': False},
             'ftp_tmp_path': {'type': 'string', 'format': 'path'},
-            'delete_origin': {'type': 'boolean', 'default' : False}
+            'delete_origin': {'type': 'boolean', 'default': False},
+            'skiplist': {'type': "string", 'format': 'regexp'}
         },
         'additionalProperties': False
     }
 
     def prepare_config(self, config, task):
-        config.setdefault('use-ssl', False)
+        config.setdefault('tls', False)
         config.setdefault('delete_origin', False)
         config.setdefault('ftp_tmp_path', os.path.join(task.manager.config_base, 'temp'))
         return config
 
     def ftp_connect(self, config, ftp_url, current_path):
-        if config['use-ssl']:
+        if config['tls']:
             ftp = ftplib.FTP_TLS()
         else:
             ftp = ftplib.FTP()
@@ -55,6 +59,9 @@ class OutputFtp(object):
         ftp.sendcmd('TYPE I')
         ftp.set_pasv(True)
         ftp.cwd(current_path)
+
+        if (config.get('tls_transfer')):
+            ftp.prot_p()
 
         return ftp
 
@@ -68,12 +75,16 @@ class OutputFtp(object):
     def on_task_download(self, task, config):
         config = self.prepare_config(config, task)
         for entry in task.accepted:
+            if re.search(':\+[1-9][0-9]*/?', entry.get('url'), re.I):
+                config['tls_transfer'] = True
+
             ftp_url = urlparse(entry.get('url'))
             current_path = os.path.dirname(ftp_url.path)
             try:
                 ftp = self.ftp_connect(config, ftp_url, current_path)
-            except:
-                entry.failed("Unable to connect to server")
+            except ftplib.error_perm as e:
+                log.info("Unable to connect to server: %s", str(e))
+                entry.fail("Unable to connect to server: %s" % str(e))
                 break
 
             if not os.path.isdir(config['ftp_tmp_path']):
@@ -110,6 +121,9 @@ class OutputFtp(object):
         if not dirs:
             return ftp
 
+        if config.get('skiplist'):
+            dirs = (d for d in dirs if (not re.search(config.get('skiplist'), d, re.I)))
+
         for file_name in (path for path in dirs if path not in ('.', '..')):
             file_name = os.path.basename(file_name)
             try:
@@ -139,6 +153,8 @@ class OutputFtp(object):
             os.makedirs(tmp_path)
 
         local_file = open(os.path.join(tmp_path, file_name), 'a+b')
+        local_file.seek(0, os.SEEK_END)
+
         ftp = self.check_connection(ftp, config, ftp_url, current_path)
         try:
             ftp.sendcmd("TYPE I")
@@ -149,18 +165,18 @@ class OutputFtp(object):
         max_attempts = 5
 
         log.info("Starting download of %s into %s" % (file_name, tmp_path))
-
         while file_size > local_file.tell():
             try:
                 if local_file.tell() != 0:
                     ftp = self.check_connection(ftp, config, ftp_url, current_path)
-                    ftp.retrbinary('RETR %s' % file_name, local_file.write, local_file.tell())
+                    ftp.retrbinary('RETR %s' % file_name, local_file.write, rest=local_file.tell)
                 else:
                     ftp = self.check_connection(ftp, config, ftp_url, current_path)
                     ftp.retrbinary('RETR %s' % file_name, local_file.write)
             except Exception as error:
                 if max_attempts != 0:
-                    log.debug("Retrying download after error %s" % error);
+                    log.debug("Retrying download after error %s" % error)
+                    max_attempts -= 1
                 else:
                     log.error("Too many errors downloading %s. Aborting." % file_name)
                     break
