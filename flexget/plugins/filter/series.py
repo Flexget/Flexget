@@ -25,7 +25,7 @@ from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_ta
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property
 
-SCHEMA_VER = 12
+SCHEMA_VER = 13
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -146,6 +146,10 @@ def upgrade(ver, session):
         from flexget.task import config_changed
         config_changed()
         ver = 12
+    if ver == 12:
+        # Added table to handle alternate names for series 
+        table_add_column('series', 'alternate_names', Integer, session)
+        ver = 13
 
     return ver
 
@@ -223,6 +227,41 @@ class NormalizedComparator(Comparator):
         return op(self.__clause_element__(), normalize_series_name(other))
 
 
+class AlternateNames(Base):
+    """ Similar to Series. Name is handled case insensitively transparently.
+    """
+
+    __tablename__ = 'series_alternate_names'
+    id = Column(Integer, primary_key=True)
+    _alt_name = Column('alt_name', Unicode)
+    _alt_name_normalized = Column('alt_name_lower', Unicode, index=True, unique=True)
+    series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
+
+    # TODO unsure of what this does -- declarative mapping?
+    # Is it just a way of setting the normalized field automatically without explicitly handling it every time?
+    def name_setter(self, value):
+        self._alt_name = value
+        self._alt_name_normalized = normalize_series_name(value)
+
+    def name_getter(self):
+        return self._alt_name
+
+    def name_comparator(self):
+        return NormalizedComparator(self._alt_name_normalized)
+
+    alt_name = hybrid_property(name_getter, name_setter)
+    alt_name.comparator(name_comparator)
+
+    def __init__(self, name, series_id):
+        self.alt_name = name
+        self.series_id = series_id
+
+    def __unicode__(self):
+        return '<SeriesAlternateName(series_id=%s, alt_name=%s)>' % (self.series_id, self.alt_name)
+
+    def __repr__(self):
+        return unicode(self).encode('ascii', 'replace')
+
 class Series(Base):
 
     """ Name is handled case insensitively transparently
@@ -240,6 +279,8 @@ class Series(Base):
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan',
                         primaryjoin='Series.id == Episode.series_id')
     in_tasks = relation('SeriesTask', backref=backref('series', uselist=False), cascade='all, delete, delete-orphan')
+    alternate_names = relation('AlternateNames', backref='series', primaryjoin='Series.id == AlternateNames.series_id',
+                               cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
     def name_getter(self):
@@ -947,6 +988,16 @@ class FilterSeries(FilterSeriesBase):
                     db_series.identified_by = series_config.get('identified_by', 'auto')
                     session.add(db_series)
                     log.debug('-> added %s' % db_series)
+                    session.flush()
+                    alts = series_config.get('alternate_name', [])
+                    if not isinstance(alts, list):
+                        alts = [alts]
+                    for alt in alts:
+                        alt = unicode(alt)
+                        log.debug('adding alternate name %s for %s into db' % (alt, series_name))
+                        db_series_alt = AlternateNames(alt, db_series.id)
+                        db_series.alternate_names.append(db_series_alt)
+                        log.debug('-> added %s' % db_series_alt)
                 if not series_name in found_series:
                     continue
                 series_entries = {}
@@ -1435,12 +1486,33 @@ class SeriesDBManager(FilterSeriesBase):
                 if db_series:
                     # Update database with capitalization from config
                     db_series.name = series_name
+                    alts = series_config.get('alternate_name', [])
+                    if not isinstance(alts, list):
+                        alts = [alts]
+                    for alt in alts:
+                        alt = unicode(alt)
+                        f = and_(AlternateNames.series_id == db_series.id, AlternateNames.alt_name == alt)
+                        db_series_alt = session.query(AlternateNames).filter(f).first()
+                        if db_series_alt:
+                            db_series_alt.alt_name = alt
+                        else:
+                            db_series.alternate_names.append(AlternateNames(alt, db_series.id))
                 else:
                     log.debug('adding series %s into db', series_name)
                     db_series = Series()
                     db_series.name = series_name
                     session.add(db_series)
+                    session.flush() # flush to get id on series before handling alternate names
                     log.debug('-> added %s' % db_series)
+                    alts = series_config.get('alternate_name', [])
+                    if not isinstance(alts, list):
+                        alts = [alts]
+                    for alt in alts:
+                        alt = unicode(alt)
+                        log.debug('adding alternate name %s for %s into db' % (alt, series_name))
+                        db_series_alt = AlternateNames(alt, db_series.id)
+                        db_series.alternate_names.append(db_series_alt)
+                        log.debug('-> added %s' % db_series_alt)
                 db_series.in_tasks.append(SeriesTask(task.name))
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
