@@ -7,10 +7,10 @@ from copy import copy
 from datetime import datetime, timedelta
 
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
-                        desc, select, update, delete, ForeignKey, Index, func, and_, not_)
+                        desc, select, update, delete, ForeignKey, Index, func, and_, not_, UniqueConstraint)
 from sqlalchemy.orm import relation, backref
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, IntegrityError
 
 from flexget import db_schema, options, plugin
 from flexget.config_schema import one_or_more
@@ -234,8 +234,9 @@ class AlternateNames(Base):
     __tablename__ = 'series_alternate_names'
     id = Column(Integer, primary_key=True)
     _alt_name = Column('alt_name', Unicode)
-    _alt_name_normalized = Column('alt_name_lower', Unicode, index=True, unique=True)
+    _alt_name_normalized = Column('alt_name_lower', Unicode)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
+    #UniqueConstraint('series_id', 'alt_name_lower', name='uix_alt_1')  # Per series uniqueness.
 
     # TODO unsure of what this does -- declarative mapping?
     # Is it just a way of setting the normalized field automatically without explicitly handling it every time?
@@ -252,15 +253,17 @@ class AlternateNames(Base):
     alt_name = hybrid_property(name_getter, name_setter)
     alt_name.comparator(name_comparator)
 
-    def __init__(self, name, series_id):
+    def __init__(self, name):
         self.alt_name = name
-        self.series_id = series_id
 
     def __unicode__(self):
         return '<SeriesAlternateName(series_id=%s, alt_name=%s)>' % (self.series_id, self.alt_name)
 
     def __repr__(self):
         return unicode(self).encode('ascii', 'replace')
+
+# Per series based uniqueness of alternate names.
+Index('alternatenames_series_name', AlternateNames.series_id, AlternateNames.alt_name, unique=True)
 
 class Series(Base):
 
@@ -301,7 +304,6 @@ class Series(Base):
 
     def __repr__(self):
         return unicode(self).encode('ascii', 'replace')
-
 
 class Episode(Base):
 
@@ -994,10 +996,7 @@ class FilterSeries(FilterSeriesBase):
                         alts = [alts]
                     for alt in alts:
                         alt = unicode(alt)
-                        log.debug('adding alternate name %s for %s into db' % (alt, series_name))
-                        db_series_alt = AlternateNames(alt, db_series.id)
-                        db_series.alternate_names.append(db_series_alt)
-                        log.debug('-> added %s' % db_series_alt)
+                        _alt_names(alt, db_series, series_name, session)
                 if not series_name in found_series:
                     continue
                 series_entries = {}
@@ -1497,10 +1496,7 @@ class SeriesDBManager(FilterSeriesBase):
                             db_series_alt.alt_name = alt
                         else:
                             # Should this happen though?
-                            log.debug('adding alternate name %s for %s into db' % (alt, series_name))
-                            db_series_alt = AlternateNames(alt, db_series.id)
-                            db_series.alternate_names.append(db_series_alt)
-                            log.debug('-> added %s' % db_series_alt)
+                            _alt_names(alt, db_series, series_name, session)
                 else:
                     log.debug('adding series %s into db', series_name)
                     db_series = Series()
@@ -1513,10 +1509,7 @@ class SeriesDBManager(FilterSeriesBase):
                         alts = [alts]
                     for alt in alts:
                         alt = unicode(alt)
-                        log.debug('adding alternate name %s for %s into db' % (alt, series_name))
-                        db_series_alt = AlternateNames(alt, db_series.id)
-                        db_series.alternate_names.append(db_series_alt)
-                        log.debug('-> added %s' % db_series_alt)
+                        _alt_names(alt, db_series, series_name, session)
                 db_series.in_tasks.append(SeriesTask(task.name))
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
@@ -1527,6 +1520,17 @@ class SeriesDBManager(FilterSeriesBase):
                     except ValueError as e:
                         raise plugin.PluginError(e)
 
+def _alt_names(alt, db_series, series_name, session):
+    if session.query(AlternateNames).filter(and_(AlternateNames.alt_name == alt,
+                                                 AlternateNames.series_id == db_series.id)).first():
+        # Already exists, no need to create it then
+        # TODO is checking the list for duplicates faster/better than querying the DB?
+        pass
+    else:
+        log.debug('adding alternate name %s for %s into db' % (alt, series_name))
+        db_series_alt = AlternateNames(alt)
+        db_series.alternate_names.append(db_series_alt)
+        log.debug('-> added %s' % db_series_alt)
 
 @event('plugin.register')
 def register_plugin():
