@@ -39,7 +39,7 @@ class UrlRewriteFTDB(object):
         tag_a = soup.find("a", {"class": "dl_link"})
         if not tag_a:
             raise UrlRewritingError(
-                'FTDB Unable to locate download link from url %s and tag_a is : %s' % (page_url, tag_a)
+                'FTDB Unable to locate download link from url %s and tag_a is : %s ==> ARE YOU LOGGED IN ?? CHECK YOUR WEBSITEID COOKIE, IT COULD ALSO BE THAT YOU HAVE REACHED THE 30 TORRENT DOWNLOAD PER DAY' % (page_url, tag_a)
             )
         torrent_url = "http://www.frenchtorrentdb.com" + tag_a.get('href') + "&js=1"
         log.debug('TORRENT URL is : %s' % torrent_url)
