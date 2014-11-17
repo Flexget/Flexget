@@ -990,13 +990,12 @@ class FilterSeries(FilterSeriesBase):
                     db_series.identified_by = series_config.get('identified_by', 'auto')
                     session.add(db_series)
                     log.debug('-> added %s' % db_series)
-                    session.flush()
+                    session.flush()  # Flush to get an id on series before adding alternate names.
                     alts = series_config.get('alternate_name', [])
                     if not isinstance(alts, list):
                         alts = [alts]
                     for alt in alts:
-                        alt = unicode(alt)
-                        _alt_names(alt, db_series, series_name, session)
+                        _add_alt_name(alt, db_series, series_name, session)
                 if not series_name in found_series:
                     continue
                 series_entries = {}
@@ -1488,28 +1487,23 @@ class SeriesDBManager(FilterSeriesBase):
                     alts = series_config.get('alternate_name', [])
                     if not isinstance(alts, list):
                         alts = [alts]
+                    # Remove the alternate names not present in current config
+                    db_series.alternate_names = [alt for alt in db_series.alternate_names if alt.alt_name in alts]
+                    # Add/update the possibly new alternate names
                     for alt in alts:
-                        alt = unicode(alt)
-                        f = and_(AlternateNames.series_id == db_series.id, AlternateNames.alt_name == alt)
-                        db_series_alt = session.query(AlternateNames).filter(f).first()
-                        if db_series_alt:
-                            db_series_alt.alt_name = alt
-                        else:
-                            # Should this happen though?
-                            _alt_names(alt, db_series, series_name, session)
+                        _add_alt_name(alt, db_series, series_name, session)
                 else:
                     log.debug('adding series %s into db', series_name)
                     db_series = Series()
                     db_series.name = series_name
                     session.add(db_series)
-                    session.flush() # flush to get id on series before handling alternate names
+                    session.flush()  # flush to get id on series before creating alternate names
                     log.debug('-> added %s' % db_series)
                     alts = series_config.get('alternate_name', [])
                     if not isinstance(alts, list):
                         alts = [alts]
                     for alt in alts:
-                        alt = unicode(alt)
-                        _alt_names(alt, db_series, series_name, session)
+                        _add_alt_name(alt, db_series, series_name, session)
                 db_series.in_tasks.append(SeriesTask(task.name))
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
@@ -1520,12 +1514,14 @@ class SeriesDBManager(FilterSeriesBase):
                     except ValueError as e:
                         raise plugin.PluginError(e)
 
-def _alt_names(alt, db_series, series_name, session):
-    if session.query(AlternateNames).filter(and_(AlternateNames.alt_name == alt,
-                                                 AlternateNames.series_id == db_series.id)).first():
+def _add_alt_name(alt, db_series, series_name, session):
+    alt = unicode(alt)
+    db_series_alt = session.query(AlternateNames).filter(and_(AlternateNames.alt_name == alt,
+                                                              AlternateNames.series_id == db_series.id)).first()
+    if db_series_alt:
         # Already exists, no need to create it then
         # TODO is checking the list for duplicates faster/better than querying the DB?
-        pass
+        db_series_alt.alt_name = alt
     else:
         log.debug('adding alternate name %s for %s into db' % (alt, series_name))
         db_series_alt = AlternateNames(alt)
