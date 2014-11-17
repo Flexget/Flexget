@@ -37,14 +37,19 @@ class TaskConfigHash(Base):
         return '<TaskConfigHash(task=%s,hash=%s)>' % (self.task, self.hash)
 
 
-def config_changed(task):
-    """Forces config_modified flag to come out true on next run. Used when the db changes, and all
-    entries need to be reprocessed."""
-    log.debug('Marking config as changed.')
+def config_changed(task=None):
+    """
+    Forces config_modified flag to come out true on next run of `task`. Used when the db changes, and all
+    entries need to be reprocessed.
+
+    :param task: Name of the task. If `None`, will be set for all tasks.
+    """
+    log.debug('Marking config for %s as changed.' % (task or 'all tasks'))
     with Session() as session:
-        task_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == task).first()
-        if task_hash:
-            task_hash.hash = ''
+        task_hash = session.query(TaskConfigHash)
+        if task:
+            task_hash = task_hash.filter(TaskConfigHash.task == task)
+        task_hash.delete()
 
 
 def use_task_logging(func):

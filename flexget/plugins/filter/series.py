@@ -25,7 +25,7 @@ from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_ta
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property
 
-SCHEMA_VER = 11
+SCHEMA_VER = 12
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -141,6 +141,11 @@ def upgrade(ver, session):
         log.verbose('Repairing series_tasks table data')
         session.execute(delete(series_tasks, ~series_tasks.c.series_id.in_(select([series_table.c.id]))))
         ver = 11
+    if ver == 11:
+        # SeriesTasks was cleared out due to a bug, make sure they get recalculated next run #2772
+        from flexget.task import config_changed
+        config_changed()
+        ver = 12
 
     return ver
 
@@ -191,7 +196,7 @@ def clean_series(manager):
     with Session() as session:
         removed_tasks = session.query(SeriesTask)
         if manager.tasks:
-            removed_tasks.filter(not_(SeriesTask.name.in_(manager.tasks)))
+            removed_tasks = removed_tasks.filter(not_(SeriesTask.name.in_(manager.tasks)))
         deleted = removed_tasks.delete(synchronize_session=False)
         if deleted:
             session.commit()
