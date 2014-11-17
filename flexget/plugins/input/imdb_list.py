@@ -90,6 +90,9 @@ class ImdbList(object):
 
             for tr in trs:
                 a = tr.find('td', class_='title').find('a')
+                if not a:
+                    log.debug('no title link found for row, skipping')
+                    continue
                 link = ('http://www.imdb.com' + a.get('href')).rstrip('/')
                 entry = Entry()
                 entry['title'] = a.string
