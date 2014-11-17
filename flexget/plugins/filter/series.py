@@ -1327,12 +1327,13 @@ class FilterSeries(FilterSeriesBase):
         log.debug('timeframe: %s', config['timeframe'])
         timeframe = parse_timedelta(config['timeframe'])
 
-        releases = episode.releases
         if config.get('quality'):
             req = qualities.Requirements(config['quality'])
-            first_seen = min(rls.first_seen for rls in releases if req.allows(rls.quality))
+            seen_times = [rls.first_seen for rls in episode.releases if req.allows(rls.quality)]
         else:
-            first_seen = min(rls.first_seen for rls in releases)
+            seen_times = [rls.first_seen for rls in episode.releases]
+        # Somehow we can get here without having qualifying releases (#2779) make sure min doesn't crash
+        first_seen = min(seen_times) if seen_times else datetime.now()
         expires = first_seen + timeframe
         log.debug('timeframe: %s, first_seen: %s, expires: %s', timeframe, first_seen, expires)
 
