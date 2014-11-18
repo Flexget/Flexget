@@ -76,7 +76,7 @@ class OutputFtp(object):
         config = self.prepare_config(config, task)
         for entry in task.accepted:
             if re.search(':\+[1-9][0-9]*/?', entry.get('url'), re.I):
-                config['tls_transfer'] = True
+                config['tls'] = True
 
             ftp_url = urlparse(entry.get('url'))
             current_path = os.path.dirname(ftp_url.path)
