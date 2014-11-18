@@ -52,7 +52,7 @@ class FlexGetLogger(logging.Logger):
             command_id=getattr(self.local, 'command_id', ''))
         # Replace newlines in log messages with \n
         msg = msg.replace('\n', '\\n')
-        return super(FlexGetLogger, self).makeRecord(name, level, fn, lno, msg, args, exc_info, func, extra)
+        return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
 
     def trace(self, msg, *args, **kwargs):
         """Log at TRACE level (more detailed than DEBUG)."""
