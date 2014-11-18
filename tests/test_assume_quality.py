@@ -57,11 +57,11 @@ class BaseAssumeQuality(FlexGetBase):
           test_with_series:
             template: no_global
             mock:
-            - title: my show S01E01
+            - title: my show S01E01 hdtv
             assume_quality: 720p
             series:
             - my show:
-                quality: 720p
+                quality: 720p hdtv
     """
 
     def test_matching(self):

@@ -25,7 +25,7 @@ from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_ta
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property
 
-SCHEMA_VER = 11
+SCHEMA_VER = 12
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -141,6 +141,11 @@ def upgrade(ver, session):
         log.verbose('Repairing series_tasks table data')
         session.execute(delete(series_tasks, ~series_tasks.c.series_id.in_(select([series_table.c.id]))))
         ver = 11
+    if ver == 11:
+        # SeriesTasks was cleared out due to a bug, make sure they get recalculated next run #2772
+        from flexget.task import config_changed
+        config_changed()
+        ver = 12
 
     return ver
 
@@ -191,7 +196,7 @@ def clean_series(manager):
     with Session() as session:
         removed_tasks = session.query(SeriesTask)
         if manager.tasks:
-            removed_tasks.filter(not_(SeriesTask.name.in_(manager.tasks)))
+            removed_tasks = removed_tasks.filter(not_(SeriesTask.name.in_(manager.tasks)))
         deleted = removed_tasks.delete(synchronize_session=False)
         if deleted:
             session.commit()
@@ -1034,8 +1039,7 @@ class FilterSeries(FilterSeriesBase):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
-            parsed = get_plugin_by_name('parsing').instance.parse_series(entry['title'], name=series_name,
-                                                                         quality=entry.get('quality'), **params)
+            parsed = get_plugin_by_name('parsing').instance.parse_series(entry['title'], name=series_name, **params)
             if not parsed.valid:
                 continue
             parsed.field = 'title'
@@ -1262,7 +1266,7 @@ class FilterSeries(FilterSeriesBase):
         result = []
         # see if any of the eps match accepted qualities
         for entry in entries:
-            if reqs.allows(entry['series_parser'].quality):
+            if reqs.allows(entry['quality']):
                 result.append(entry)
             else:
                 log.verbose('Ignored `%s`. Does not meet quality requirement `%s`.', entry['title'], reqs)
@@ -1323,12 +1327,13 @@ class FilterSeries(FilterSeriesBase):
         log.debug('timeframe: %s', config['timeframe'])
         timeframe = parse_timedelta(config['timeframe'])
 
-        releases = episode.releases
         if config.get('quality'):
             req = qualities.Requirements(config['quality'])
-            first_seen = min(rls.first_seen for rls in releases if req.allows(rls.quality))
+            seen_times = [rls.first_seen for rls in episode.releases if req.allows(rls.quality)]
         else:
-            first_seen = min(rls.first_seen for rls in releases)
+            seen_times = [rls.first_seen for rls in episode.releases]
+        # Somehow we can get here without having qualifying releases (#2779) make sure min doesn't crash
+        first_seen = min(seen_times) if seen_times else datetime.now()
         expires = first_seen + timeframe
         log.debug('timeframe: %s, first_seen: %s, expires: %s', timeframe, first_seen, expires)
 
