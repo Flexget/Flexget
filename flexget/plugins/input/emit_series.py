@@ -48,9 +48,9 @@ class EmitSeries(object):
                     '%02d' % episode,
                     '%03d' % episode])
 
-    def search_entry(self, series, season, episode, task, alts=None, rerun=True):
-        if alts is None:
-            alts = [] # Not sure why I get why this is better
+    def search_entry(self, series, season, episode, task, rerun=True):
+        # Extract the alternate names for the series
+        alts = [alt.alt_name for alt in series.alternate_names]
         if series.identified_by == 'ep':
             search_strings = ['%s %s' % (series.name, id) for id in self.ep_identifiers(season, episode)]
             series_id = 'S%02dE%02d' % (season, episode)
@@ -64,6 +64,7 @@ class EmitSeries(object):
         entry = Entry(title=search_strings[0], url='',
                       search_strings=search_strings,
                       series_name=series.name,
+                      series_alternate_names=alts,  # Not sure if this field is useful down the road.
                       series_season=season,
                       series_episode=episode,
                       series_id=series_id,
@@ -82,7 +83,6 @@ class EmitSeries(object):
         entries = []
         for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
             series = seriestask.series
-            alts = [alt.alt_name for alt in series.alternate_names]
             if not series:
                 # TODO: How can this happen?
                 log.debug('Found SeriesTask item without series specified. Cleaning up.')
@@ -103,14 +103,14 @@ class EmitSeries(object):
                 latest_season = low_season + 1
 
             if self.try_next_season.get(series.name):
-                entries.append(self.search_entry(series, latest_season + 1, 1, task, alts = alts))
+                entries.append(self.search_entry(series, latest_season + 1, 1, task))
             else:
                 for season in xrange(latest_season, low_season, -1):
                     log.debug('Adding episodes for season %d' % season)
                     check_downloaded = not config.get('backfill')
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
                     if series.begin and (not latest or latest < series.begin):
-                        entries.append(self.search_entry(series, series.begin.season, series.begin.number, task, alts = alts))
+                        entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
                     elif latest:
                         start_at_ep = 1
                         episodes_this_season = (task.session.query(Episode).
@@ -132,13 +132,13 @@ class EmitSeries(object):
                                 eps_to_get.remove(ep.number)
                             except ValueError:
                                 pass
-                        entries.extend(self.search_entry(series, season, x, task, alts = alts, rerun=False) for x in eps_to_get)
+                        entries.extend(self.search_entry(series, season, x, task, rerun=False) for x in eps_to_get)
                         # If we have already downloaded the latest known episode, try the next episode
                         if latest_ep_this_season.releases:
-                            entries.append(self.search_entry(series, season, latest_ep_this_season.number + 1, task, alts = alts))
+                            entries.append(self.search_entry(series, season, latest_ep_this_season.number + 1, task))
                     else:
                         if config.get('from_start') or config.get('backfill'):
-                            entries.append(self.search_entry(series, season, 1, task, alts = alts))
+                            entries.append(self.search_entry(series, season, 1, task))
                         else:
                             log.verbose('Series `%s` has no history. Set begin option, or use CLI `series begin` '
                                         'subcommand to set first episode to emit' % series.name)
