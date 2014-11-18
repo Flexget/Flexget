@@ -2133,6 +2133,48 @@ class BaseSpecials(FlexGetBase):
         assert not entry.accepted, 'Entry which should not have been accepted was.'
 
 
+class BaseAlternateNames(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          alternate_name:
+            series:
+              - Some Show:
+                  begin: S01E01
+                  alternate_name: Other Show
+          set_other_alternate_name:
+            mock:
+              - title: Third.Show.S01E01
+              - title: Other.Show.S01E01
+            series:
+              - Some Show:
+                  alternate_name: Third Show
+            rerun: 0
+          duplicate_names_in_different_series:
+            mock:
+              #- title: First.Show.S01E01
+              - title: Third.Show.S01E01
+            series:
+              - First Show:
+                 begin: S01E01
+                 alternate_name: Third Show
+              - Second Show:
+                 begin: S01E01
+                 alternate_name: Third Show
+    """
+
+    def test_set_alternate_name(self):
+        # Tests that old alternate names are not kept in the database.
+        self.execute_task('alternate_name')
+        self.execute_task('set_other_alternate_name')
+        assert self.task.find_entry('accepted', title='Third.Show.S01E01'), 'New alternate name should be chosen.'
+        assert self.task.find_entry('undecided', title='Other.Show.S01E01'), 'Old alternate name should be removed.'
+
+    # def test_duplicate_alternate_names_in_different_series(self):
+    #     self.execute_task('duplicate_names_in_different_series')
+    #     print self.task.entries[0]
+    #     print self.task.entries[0].series_name
+    #     assert 12 == 10
+
 class TestGuessitSpecials(BaseSpecials):
     def __init__(self):
         super(TestGuessitSpecials, self).__init__()
