@@ -1,10 +1,11 @@
 from __future__ import absolute_import, division, unicode_literals
+import contextlib
 
 import logging
 import logging.handlers
-import string
 import sys
 import threading
+import uuid
 import warnings
 
 # A level more detailed than DEBUG
@@ -13,13 +14,45 @@ TRACE = 5
 VERBOSE = 15
 
 
+@contextlib.contextmanager
+def task_logging(task):
+    """Context manager which adds task information to log messages."""
+    old_task = getattr(FlexGetLogger.local, 'task', '')
+    FlexGetLogger.local.task = task
+    try:
+        yield
+    finally:
+        FlexGetLogger.local.task = old_task
+
+
+@contextlib.contextmanager
+def command_logging(command, command_id=None):
+    """Context manager which adds command information to log messages."""
+    old_command = getattr(FlexGetLogger.local, 'command', '')
+    old_id = getattr(FlexGetLogger.local, 'command_id', '')
+    # If command id not given, keep using current, or create one if none already set
+    FlexGetLogger.local.command_id = command_id or old_id or uuid.uuid4()
+    FlexGetLogger.local.command = command
+    try:
+        yield
+    finally:
+        FlexGetLogger.local.command = old_command
+        FlexGetLogger.local.command_id = old_id
+
+
 class FlexGetLogger(logging.Logger):
-    """Custom logger that adds task and execution info to log records."""
+    """Custom logger that adds trace and verbose logging methods, and contextual information to log records."""
     local = threading.local()
 
     def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None):
-        extra = {'task': getattr(FlexGetLogger.local, 'task', '')}
-        return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
+        extra = extra or {}
+        extra.update(
+            task=getattr(self.local, 'task', ''),
+            command=getattr(self.local, 'command', ''),
+            command_id=getattr(self.local, 'command_id', ''))
+        # Replace newlines in log messages with \n
+        msg = msg.replace('\n', '\\n')
+        return super(FlexGetLogger, self).makeRecord(name, level, fn, lno, msg, args, exc_info, func, extra)
 
     def trace(self, msg, *args, **kwargs):
         """Log at TRACE level (more detailed than DEBUG)."""
@@ -39,34 +72,8 @@ class FlexGetFormatter(logging.Formatter):
         logging.Formatter.__init__(self, self.plain_fmt, '%Y-%m-%d %H:%M')
 
     def format(self, record):
-        if hasattr(record, 'task'):
-            self._fmt = self.flexget_fmt
-        else:
-            self._fmt = self.plain_fmt
-        record.message = record.getMessage()
-        if string.find(self._fmt, "%(asctime)") >= 0:
-            record.asctime = self.formatTime(record, self.datefmt)
-        s = self._fmt % record.__dict__
-        # Replace newlines in log messages with \n
-        s = s.replace('\n', '\\n')
-        if record.exc_info:
-            # Cache the traceback text to avoid converting it multiple times
-            # (it's constant anyway)
-            if not record.exc_text:
-                record.exc_text = self.formatException(record.exc_info)
-        if record.exc_text:
-            if s[-1:] != "\n":
-                s += "\n"
-            s += record.exc_text
-        return s
-
-
-def set_execution(execution):
-    FlexGetLogger.local.execution = execution
-
-
-def set_task(task):
-    FlexGetLogger.local.task = task
+        self._fmt = self.flexget_fmt if hasattr(record, 'task') else self.plain_fmt
+        return super(FlexGetFormatter, self).format(record)
 
 
 _logging_configured = False

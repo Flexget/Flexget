@@ -53,24 +53,23 @@ def use_task_logging(func):
     def wrapper(self, *args, **kw):
         # Set the task name in the logger
         from flexget import logger
-        logger.set_task(self.name)
         old_loglevel = logging.getLogger().getEffectiveLevel()
         new_loglevel = logging.getLevelName(self.options.loglevel.upper())
         if old_loglevel != new_loglevel:
             log.info('Setting loglevel to `%s` for this execution.' % self.options.loglevel)
             logging.getLogger().setLevel(new_loglevel)
 
-        try:
-            if self.output:
-                with capture_output(self.output):
+        with logger.task_logging(self.name):
+            try:
+                if self.output:
+                    with capture_output(self.output):
+                        return func(self, *args, **kw)
+                else:
                     return func(self, *args, **kw)
-            else:
-                return func(self, *args, **kw)
-        finally:
-            logger.set_task('')
-            if old_loglevel != new_loglevel:
-                log.debug('Returning loglevel to `%s` after task execution.' % logging.getLevelName(old_loglevel))
-                logging.getLogger().setLevel(old_loglevel)
+            finally:
+                if old_loglevel != new_loglevel:
+                    log.debug('Returning loglevel to `%s` after task execution.' % logging.getLevelName(old_loglevel))
+                    logging.getLogger().setLevel(old_loglevel)
 
     return wrapper
 
