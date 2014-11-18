@@ -83,6 +83,24 @@ class BaseEmitSeries(FlexGetBase):
             regexp:
               reject:
               - .
+          test_emit_series_alternate_name:
+            emit_series: yes
+            series:
+            - Test Series 8:
+               begin: S01E01
+               alternate_name: Testing Series 8
+            rerun: 0
+            mock_output: yes
+          test_emit_series_alternate_name_duplicates:
+            emit_series: yes
+            series:
+            - Test Series 8:
+               begin: S01E01
+               alternate_name:
+                 - Testing Series 8
+                 - Testing SerieS 8
+            rerun: 0
+            mock_output: yes
     """
 
     def inject_series(self, release_name):
@@ -147,6 +165,19 @@ class BaseEmitSeries(FlexGetBase):
         assert self.task._rerun_count == 1
         assert len(self.task.all_entries) == 1
         assert self.task.find_entry('rejected', title='Test Series 8 S02E01')
+
+    def test_emit_series_alternate_name(self):
+        self.execute_task('test_emit_series_alternate_name')
+        assert len(self.task.mock_output) == 1  # Should only give one with rerun 0
+        # search_strings should contain  2 for each name
+        assert len(self.task.mock_output[0].get('search_strings')) == 4
+
+    def test_emit_series_alternate_name_duplicates(self):
+        self.execute_task('test_emit_series_alternate_name_duplicates')
+        assert len(self.task.mock_output) == 1  # Should only give one with rerun 0
+        # search_strings should only contain 4 as duplicate alternate names should be removed
+        # even if it is not a 'complete match' (eg. My Show == My SHOW)
+        assert len(self.task.mock_output[0].get('search_strings')) == 4
 
 class TestGuessitEmitSeries(BaseEmitSeries):
     def __init__(self):
