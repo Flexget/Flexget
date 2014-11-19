@@ -25,7 +25,11 @@ class UrlRewriteRedirect(object):
             # Don't accidentally go online in unit tests
             if task.manager.unit_test:
                 return
-            r = task.requests.head(entry['url'])
+            auth = None
+            if 'download_auth' in entry:
+                auth = entry['download_auth']
+                log.debug('Custom auth enabled for %s url_redirect: %s' % (entry['title'], entry['download_auth']))
+            r = task.requests.head(entry['url'], auth=auth)
             if 300 <= r.status_code < 400 and 'location' in r.headers:
                 entry['url'] = r.headers['location']
         except Exception:
