@@ -1,3 +1,4 @@
+import collections
 import logging
 import os
 import sys
@@ -79,6 +80,8 @@ class PluginSubliminal(object):
         logging.getLogger("enzyme").setLevel(logging.WARNING)
         langs = set([Language(s) for s in config['languages']])
         alts = set([Language(s) for s in config.get('alternatives', [])])
+        # keep all downloaded subtitles and save to disk when done (no need to write every time)
+        downloaded_subtitles = collections.defaultdict(list)
         for entry in task.accepted:
             if not 'location' in entry:
                 log.warning('Cannot act on entries that do not represent a local file.')
@@ -90,13 +93,22 @@ class PluginSubliminal(object):
                     msc = video.scores['hash'] if config['exact_match'] else 0
                     if langs & video.subtitle_languages:
                         continue  # subs for preferred lang(s) already exists
-                    elif subliminal.download_best_subtitles([video], langs, min_score=msc):
-                        log.info('Subtitles found for %s' % entry['location'])
-                    elif alts and (alts - video.subtitle_languages) and \
-                        subliminal.download_best_subtitles([video], alts, min_score=msc):
-                        entry.fail('subtitles found for a second-choice language.')
                     else:
-                        entry.fail('cannot find any subtitles for now.')
+                        subtitle = subliminal.download_best_subtitles([video], langs, min_score=msc)
+                        if subtitle:
+                            downloaded_subtitles.update(subtitle)
+                            log.info('Subtitles found for %s' % entry['location'])
+                        else:
+                            # TODO check performance hit -- this explicit check may be better on slower devices
+                            # but subliminal already handles it for us, but it loops over all providers before stopping
+                            if alts and (alts - video.subtitle_languages):
+                                subtitle = subliminal.download_best_subtitles([video], alts, min_score=msc)
+                            # this potentially just checks an already checked assignment bleh
+                            if subtitle:
+                                downloaded_subtitles.update(subtitle)
+                                entry.fail('subtitles found for a second-choice language.')
+                            else:
+                                entry.fail('cannot find any subtitles for now.')
                 except Exception as err:
                     # don't want to abort the entire task for errors in a  
                     # single video file or for occasional network timeouts
@@ -107,6 +119,9 @@ class PluginSubliminal(object):
                         msg = 'subliminal error: %s' % err.__class__.__name__
                     log.debug(msg)
                     entry.fail(msg)
+        if downloaded_subtitles:
+            # save subtitles to disk
+            subliminal.save_subtitles(downloaded_subtitles)
 
 
 @event('plugin.register')
