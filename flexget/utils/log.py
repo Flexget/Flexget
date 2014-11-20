@@ -11,6 +11,7 @@ from sqlalchemy import Column, Integer, String, DateTime, Index
 
 from flexget import db_schema
 from flexget import logger as f_logger
+from flexget.logger import capture_logging
 from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.manager import Session
 from flexget.event import event
@@ -90,15 +91,12 @@ def log_once(message, logger=logging.getLogger('log_once'), once_level=logging.I
 
 
 @contextmanager
-def capture_output(stream):
+def capture_output(stream, loglevel=None):
     """Context manager which captures all log and std output to given `stream` while in scope."""
     old_stdout, old_stderr = sys.stdout, sys.stderr
     sys.stdout, sys.stderr = Tee(stream, sys.stdout), Tee(stream, sys.stderr)
-    streamhandler = logging.StreamHandler(stream)
-    streamhandler.setFormatter(f_logger.FlexGetFormatter())
-    logging.getLogger().addHandler(streamhandler)
-    try:
-        yield
-    finally:
-        sys.stdout, sys.stderr = old_stdout, old_stderr
-        logging.getLogger().removeHandler(streamhandler)
+    with capture_logging(stream, loglevel=loglevel):
+        try:
+            yield
+        finally:
+            sys.stdout, sys.stderr = old_stdout, old_stderr
