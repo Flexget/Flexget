@@ -68,9 +68,6 @@ class DaemonService(rpyc.Service):
         if not options.cron:
             with capture_output(self.client_out_stream, loglevel=options.loglevel):
                 self.manager.handle_cli(options)
-                # TODO: Wait until done streaming log
-                #from time import sleep
-                #sleep(10)
         else:
             self.manager.handle_cli(options)
 

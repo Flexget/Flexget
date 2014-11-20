@@ -317,7 +317,11 @@ class Manager(object):
         :param options: argparse options
         """
         if self.task_queue.is_alive():
-            self.execute(options)
+            finished_events = self.execute(options)
+            if not options.cron:
+                # Wait until execution of all tasks has finished
+                for event in finished_events:
+                    event.wait()
         else:
             fire_event('manager.execute.started', self)
             self.task_queue.start()
