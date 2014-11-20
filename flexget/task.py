@@ -62,7 +62,7 @@ def use_task_logging(func):
         with logger.task_logging(self.name):
             try:
                 if self.output:
-                    with capture_output(self.output):
+                    with capture_output(self.output, loglevel=new_loglevel):
                         return func(self, *args, **kw)
                 else:
                     return func(self, *args, **kw)
