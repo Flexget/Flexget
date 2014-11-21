@@ -455,7 +455,7 @@ class InputRSS(object):
             try:
                 task.simple_persistence['%s_last_entry' % url_hash] = rss.entries[0].title + rss.entries[0].get('guid', '')
             except AttributeError:
-                log.warning('rss feed location saving skipped: no title information in first entry')
+                log.debug('rss feed location saving skipped: no title information in first entry')
 
         if ignored:
             if not config.get('silent'):
