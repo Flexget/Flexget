@@ -3,19 +3,14 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import hashlib
-import sys
-from contextlib import contextmanager
 from datetime import datetime, timedelta
 
 from sqlalchemy import Column, Integer, String, DateTime, Index
-
 from flexget import db_schema
 from flexget import logger as f_logger
-from flexget.logger import capture_logging
 from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.manager import Session
 from flexget.event import event
-from flexget.utils.tools import Tee
 
 log = logging.getLogger('util.log')
 Base = db_schema.versioned_base('log_once', 0)
@@ -88,15 +83,3 @@ def log_once(message, logger=logging.getLogger('log_once'), once_level=logging.I
 
     logger.log(once_level, message)
     return True
-
-
-@contextmanager
-def capture_output(stream, loglevel=None):
-    """Context manager which captures all log and std output to given `stream` while in scope."""
-    old_stdout, old_stderr = sys.stdout, sys.stderr
-    sys.stdout, sys.stderr = Tee(stream, sys.stdout), Tee(stream, sys.stderr)
-    with capture_logging(stream, loglevel=loglevel):
-        try:
-            yield
-        finally:
-            sys.stdout, sys.stderr = old_stdout, old_stderr

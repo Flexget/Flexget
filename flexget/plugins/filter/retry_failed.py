@@ -7,8 +7,9 @@ from sqlalchemy.schema import Index
 
 from flexget import db_schema, options, plugin
 from flexget.event import event
+from flexget.logger import console
 from flexget.manager import Session
-from flexget.utils.tools import console, parse_timedelta
+from flexget.utils.tools import parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
 SCHEMA_VER = 2

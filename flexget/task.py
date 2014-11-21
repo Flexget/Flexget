@@ -12,12 +12,12 @@ from sqlalchemy import Column, Integer, String, Unicode
 from flexget import config_schema, db_schema
 from flexget.entry import EntryUnicodeError
 from flexget.event import event, fire_event
+from flexget.logger import capture_output
 from flexget.manager import Session
 from flexget.plugin import plugins as all_plugins
 from flexget.plugin import (
     DependencyError, get_plugins, phase_methods, plugin_schemas, PluginError, PluginWarning, task_phases)
 from flexget.utils import requests
-from flexget.utils.log import capture_output
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 
 log = logging.getLogger('task')

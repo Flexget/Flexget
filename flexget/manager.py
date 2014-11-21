@@ -29,7 +29,7 @@ Session = sessionmaker(class_=ContextSession)
 from flexget import config_schema, db_schema, logger, plugin
 from flexget.event import fire_event
 from flexget.ipc import IPCClient, IPCServer
-from flexget.options import manager_parser, get_parser, unicode_argv
+from flexget.options import CoreArgumentParser, get_parser, unicode_argv
 from flexget.task import Task
 from flexget.task_queue import TaskQueue
 from flexget.utils.tools import pid_exists
@@ -137,7 +137,7 @@ class Manager(object):
 
         self.config = {}
 
-        self.options, extra = manager_parser.parse_known_args(args)
+        self.options, extra = CoreArgumentParser().parse_known_args(args)
         try:
             self.find_config(create=False)
         except:
@@ -276,6 +276,8 @@ class Manager(object):
                 except KeyboardInterrupt:
                     log.error('Disconnecting from daemon due to ctrl-c. Executions will still continue in the '
                               'background.')
+                except EOFError:
+                    log.error('Connection from daemon was severed.')
             return
         # No running process, we start our own to handle command
         with self.acquire_lock():
@@ -317,7 +319,9 @@ class Manager(object):
         :param options: argparse options
         """
         if self.task_queue.is_alive():
-            finished_events = self.execute(options)
+            if len(self.task_queue):
+                log.verbose('There is a task already running, execution queued.')
+            finished_events = self.execute(options, output=logger.get_output())
             if not options.cron:
                 # Wait until execution of all tasks has finished
                 for event in finished_events:

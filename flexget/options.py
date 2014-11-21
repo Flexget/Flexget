@@ -13,8 +13,8 @@ import pkg_resources
 import flexget
 from flexget.entry import Entry
 from flexget.event import fire_event
+from flexget.logger import console
 from flexget.utils import requests
-from flexget.utils.tools import console
 
 _UNSET = object()
 

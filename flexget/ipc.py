@@ -4,14 +4,12 @@ import logging
 import random
 import string
 import threading
-import time
 
 import rpyc
 from rpyc.utils.server import ThreadedServer
 
+from flexget.logger import console, capture_output
 from flexget.options import get_parser, ParserError
-from flexget.utils.log import capture_output
-from flexget.utils.tools import console
 
 log = logging.getLogger('ipc')
 
@@ -62,8 +60,9 @@ class DaemonService(rpyc.Service):
         try:
             options = parser.parse_args(args, raise_errors=True)
         except ParserError as e:
+            # Recreate the normal error text to the client's console
+            self.client_console('error: ' + e.message)
             e.parser.print_help(self.client_out_stream)
-            self.client_console(e.message)
             return
         if not options.cron:
             with capture_output(self.client_out_stream, loglevel=options.loglevel):

@@ -1,4 +1,4 @@
-from __future__ import absolute_import, division, unicode_literals
+from __future__ import absolute_import, division, unicode_literals, print_function
 import contextlib
 import logging
 import logging.handlers
@@ -7,10 +7,15 @@ import threading
 import uuid
 import warnings
 
+from flexget.utils.tools import io_encoding
+
 # A level more detailed than DEBUG
 TRACE = 5
 # A level more detailed than INFO
 VERBOSE = 15
+
+# Stores `task`, logging `session_id`, and redirected `output` stream in a thread local context
+local_context = threading.local()
 
 
 def get_level_no(level):
@@ -23,29 +28,12 @@ def get_level_no(level):
 @contextlib.contextmanager
 def task_logging(task):
     """Context manager which adds task information to log messages."""
-    old_task = getattr(FlexGetLogger.local, 'task', '')
-    FlexGetLogger.local.task = task
+    old_task = getattr(local_context, 'task', '')
+    local_context.task = task
     try:
         yield
     finally:
-        FlexGetLogger.local.task = old_task
-
-
-@contextlib.contextmanager
-def session_logging(session_id=None):
-    """Context manager which adds a session id to track log messages amongst threads."""
-    old_id = getattr(FlexGetLogger.local, 'session_id', '')
-    # If command id not given, keep using current, or create one if none already set
-    FlexGetLogger.local.session_id = session_id or old_id or uuid.uuid4()
-    try:
-        yield FlexGetLogger.local.session_id
-    finally:
-        FlexGetLogger.local.session_id = old_id
-
-
-def get_session_id():
-    """Returns the current logging session id."""
-    return getattr(FlexGetLogger.local, 'session_id', '')
+        local_context.task = old_task
 
 
 class SessionFilter(logging.Filter):
@@ -57,10 +45,17 @@ class SessionFilter(logging.Filter):
 
 
 @contextlib.contextmanager
-def capture_logging(stream, loglevel=None):
-    """Context manager which captures all log output to given `stream` while in scope."""
+def capture_output(stream, loglevel=None):
+    """Context manager which captures all log and console output to given `stream` while in scope."""
+    old_id = getattr(local_context, 'session_id', None)
+    # Keep using current, or create one if none already set
+    local_context.session_id = old_id or uuid.uuid4()
+    old_output = getattr(local_context, 'output', None)
+    local_context.output = stream
     root_logger = logging.getLogger()
     streamhandler = logging.StreamHandler(stream)
+    streamhandler.setFormatter(FlexGetFormatter())
+    streamhandler.addFilter(SessionFilter(local_context.session_id))
     if loglevel is not None:
         loglevel = get_level_no(loglevel)
         streamhandler.setLevel(loglevel)
@@ -68,28 +63,44 @@ def capture_logging(stream, loglevel=None):
         # All existing handlers should have their desired level set and not be affected.
         if not root_logger.isEnabledFor(loglevel):
             root_logger.setLevel(loglevel)
-    streamhandler.setFormatter(FlexGetFormatter())
-    with session_logging() as session_id:
-        # Filtering on this session id will make sure we don't get log messages from other threads
-        streamhandler.addFilter(SessionFilter(session_id))
-        root_logger.addHandler(streamhandler)
-        try:
-            yield
-        finally:
-            root_logger.removeHandler(streamhandler)
+    root_logger.addHandler(streamhandler)
+    try:
+        yield
+    finally:
+        root_logger.removeHandler(streamhandler)
+        local_context.session_id = old_id
+        local_context.output = old_output
+
+
+def get_output():
+    """If output is currently being redirected to a stream, returns that stream."""
+    return getattr(local_context, 'output', None)
+
+
+def console(text):
+    """
+    Print to console safely. Output is able to be captured by different streams in different contexts.
+
+    Any plugin wishing to output to the user's console should use this function instead of print so that
+    output can be redirected when FlexGet is invoked from another process.
+    """
+    if not isinstance(text, str):
+        text = unicode(text).encode(io_encoding, 'replace')
+    output = getattr(local_context, 'output', sys.stdout)
+    print(text, file=output)
 
 
 class FlexGetLogger(logging.Logger):
     """Custom logger that adds trace and verbose logging methods, and contextual information to log records."""
-    local = threading.local()
 
     def makeRecord(self, name, level, fn, lno, msg, args, exc_info, func=None, extra=None):
         extra = extra or {}
         extra.update(
-            task=getattr(self.local, 'task', ''),
-            session_id=getattr(self.local, 'session_id', ''))
+            task=getattr(local_context, 'task', ''),
+            session_id=getattr(local_context, 'session_id', ''))
         # Replace newlines in log messages with \n
-        msg = msg.replace('\n', '\\n')
+        if isinstance(msg, basestring):
+            msg = msg.replace('\n', '\\n')
         return logging.Logger.makeRecord(self, name, level, fn, lno, msg, args, exc_info, func, extra)
 
     def trace(self, msg, *args, **kwargs):
@@ -103,14 +114,14 @@ class FlexGetLogger(logging.Logger):
 
 class FlexGetFormatter(logging.Formatter):
     """Custom formatter that can handle both regular log records and those created by FlexGetLogger"""
-    plain_fmt = '%(asctime)-15s %(levelname)-8s %(name)-29s %(message)s'
     flexget_fmt = '%(asctime)-15s %(levelname)-8s %(name)-13s %(task)-15s %(message)s'
 
     def __init__(self):
-        logging.Formatter.__init__(self, self.plain_fmt, '%Y-%m-%d %H:%M')
+        logging.Formatter.__init__(self, self.flexget_fmt, '%Y-%m-%d %H:%M')
 
     def format(self, record):
-        self._fmt = self.flexget_fmt if hasattr(record, 'task') else self.plain_fmt
+        if not hasattr(record, 'task'):
+            record.task = ''
         return super(FlexGetFormatter, self).format(record)
 
 
