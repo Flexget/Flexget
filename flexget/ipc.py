@@ -31,15 +31,20 @@ class RemoteStream(object):
         """
         :param writer: A function which writes a line of text to remote client.
         """
-        self.buffer = ''
+        self.buffer = None
         self.writer = writer
 
     def write(self, data):
         if not self.writer:
             return
-        self.buffer += data
-        while '\n' in self.buffer:
-            line, self.buffer = self.buffer.split('\n', 1)
+        # This relies on all data up to a newline being either unicode or str, not mixed
+        if not self.buffer.strip():
+            self.buffer = data
+        else:
+            self.buffer += data
+        newline = b'\n' if isinstance(self.buffer, str) else '\n'
+        while newline in self.buffer:
+            line, self.buffer = self.buffer.split(newline, 1)
             try:
                 self.writer(line)
             except EOFError:
