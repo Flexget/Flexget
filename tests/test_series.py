@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from flexget.task import TaskAbort
 from tests import FlexGetBase, build_parser_function
 
 
@@ -2150,9 +2151,6 @@ class BaseAlternateNames(FlexGetBase):
                   alternate_name: Third Show
             rerun: 0
           duplicate_names_in_different_series:
-            mock:
-              #- title: First.Show.S01E01
-              - title: Third.Show.S01E01
             series:
               - First Show:
                  begin: S01E01
@@ -2169,11 +2167,14 @@ class BaseAlternateNames(FlexGetBase):
         assert self.task.find_entry('accepted', title='Third.Show.S01E01'), 'New alternate name should be chosen.'
         assert self.task.find_entry('undecided', title='Other.Show.S01E01'), 'Old alternate name should be removed.'
 
-    # def test_duplicate_alternate_names_in_different_series(self):
-    #     self.execute_task('duplicate_names_in_different_series')
-    #     print self.task.entries[0]
-    #     print self.task.entries[0].series_name
-    #     assert 12 == 10
+    def test_duplicate_alternate_names_in_different_series(self):
+        try:
+            assert self.execute_task('duplicate_names_in_different_series')
+        except TaskAbort:
+            assert True
+        else:
+            assert False
+
 
 class TestGuessitSpecials(BaseSpecials):
     def __init__(self):
