@@ -230,7 +230,7 @@ class AlternateNames(Base):
     __tablename__ = 'series_alternate_names'
     id = Column(Integer, primary_key=True)
     _alt_name = Column('alt_name', Unicode)
-    _alt_name_normalized = Column('alt_name_lower', Unicode, index=True, unique=True)
+    _alt_name_normalized = Column('alt_name_normalized', Unicode, index=True, unique=True)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
 
     def name_setter(self, value):
