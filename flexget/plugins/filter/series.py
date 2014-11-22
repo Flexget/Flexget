@@ -234,12 +234,9 @@ class AlternateNames(Base):
     __tablename__ = 'series_alternate_names'
     id = Column(Integer, primary_key=True)
     _alt_name = Column('alt_name', Unicode)
-    _alt_name_normalized = Column('alt_name_lower', Unicode)
+    _alt_name_normalized = Column('alt_name_lower', Unicode, index=True, unique=True)
     series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
-    #UniqueConstraint('series_id', 'alt_name_lower', name='uix_alt_1')  # Per series uniqueness.
 
-    # TODO unsure of what this does -- declarative mapping?
-    # Is it just a way of setting the normalized field automatically without explicitly handling it every time?
     def name_setter(self, value):
         self._alt_name = value
         self._alt_name_normalized = normalize_series_name(value)
@@ -262,8 +259,7 @@ class AlternateNames(Base):
     def __repr__(self):
         return unicode(self).encode('ascii', 'replace')
 
-# Per series based uniqueness of alternate names.
-Index('alternatenames_series_name', AlternateNames.series_id, AlternateNames.alt_name, unique=True)
+#Index('alternatenames_series_name', AlternateNames.alt_name, unique=True)
 
 class Series(Base):
 
@@ -1516,12 +1512,15 @@ class SeriesDBManager(FilterSeriesBase):
 
 def _add_alt_name(alt, db_series, series_name, session):
     alt = unicode(alt)
-    db_series_alt = session.query(AlternateNames).filter(and_(AlternateNames.alt_name == alt,
-                                                              AlternateNames.series_id == db_series.id)).first()
-    if db_series_alt:
+    db_series_alt = session.query(AlternateNames).join(Series).filter(AlternateNames.alt_name == alt).first()
+    if db_series_alt and db_series_alt.series_id == db_series.id:
         # Already exists, no need to create it then
         # TODO is checking the list for duplicates faster/better than querying the DB?
         db_series_alt.alt_name = alt
+    elif db_series_alt:
+        # Alternate name already exists for another series. Not good.
+        raise plugin.PluginError('Error adding alternate name for %s. %s is already associated with %s. '
+                                 'Check your config.' % (series_name, alt, db_series_alt.series.name) )
     else:
         log.debug('adding alternate name %s for %s into db' % (alt, series_name))
         db_series_alt = AlternateNames(alt)
