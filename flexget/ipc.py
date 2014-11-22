@@ -38,7 +38,7 @@ class RemoteStream(object):
         if not self.writer:
             return
         # This relies on all data up to a newline being either unicode or str, not mixed
-        if not self.buffer.strip():
+        if not self.buffer:
             self.buffer = data
         else:
             self.buffer += data
