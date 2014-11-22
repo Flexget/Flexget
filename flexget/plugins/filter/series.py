@@ -25,7 +25,7 @@ from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_ta
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property
 
-SCHEMA_VER = 13
+SCHEMA_VER = 12
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -146,10 +146,6 @@ def upgrade(ver, session):
         from flexget.task import config_changed
         config_changed()
         ver = 12
-    if ver == 12:
-        # Added table to handle alternate names for series 
-        table_add_column('series', 'alternate_names', Integer, session)
-        ver = 13
 
     return ver
 
