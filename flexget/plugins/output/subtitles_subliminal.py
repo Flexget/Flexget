@@ -88,17 +88,14 @@ class PluginSubliminal(object):
         alts = set([Language.fromietf(s) for s in config.get('alternatives', [])])
         # keep all downloaded subtitles and save to disk when done (no need to write every time)
         downloaded_subtitles = collections.defaultdict(list)
-        provs = config.get('providers', [])
-        sing = config['single']
+        providers_list = config.get('providers', None)
         # test if only one language was provided, if so we will download in single mode
         # (aka no language code added to subtitle filename)
         # unless we are forced not to by configuration
         # if we pass 'yes' for single in configuration but choose more than one language
         # we ignore the configuration and add the language code to the
         # potentially downloaded files
-        real_sing = len(langs | alts) <= 1
-        if not sing:
-            real_sing = False
+        single_mode = config['single'] and len(langs | alts) <= 1
         for entry in task.accepted:
             if not 'location' in entry:
                 log.warning('Cannot act on entries that do not represent a local file.')
@@ -109,21 +106,20 @@ class PluginSubliminal(object):
                     video = subliminal.scan_video(entry['location'])
                     log.info('Series name computed for %s was %s' % (entry['location'], video.series))
                     msc = video.scores['hash'] if config['exact_match'] else 0
-                    real_provs = provs if provs else None
                     if langs & video.subtitle_languages:
                         continue  # subs for preferred lang(s) already exists
                     else:
-                        subtitle = subliminal.download_best_subtitles([video], langs, providers=real_provs, min_score=msc)
+                        subtitle = subliminal.download_best_subtitles([video], langs, providers=providers_list, min_score=msc)
                         if subtitle:
                             downloaded_subtitles.update(subtitle)
                             log.info('Subtitles found for %s' % entry['location'])
                         else:
                             # TODO check performance hit -- this explicit check may be better on slower devices
                             # but subliminal already handles it for us, but it loops over all providers before stopping
-                            real_alts = alts - video.subtitle_languages
-                            if real_alts:
+                            remaining_alts = alts - video.subtitle_languages
+                            if remaining_alts:
                                 # only try to download for alternatives that aren't alread downloaded
-                                subtitle = subliminal.download_best_subtitles([video], real_alts, providers=real_provs, min_score=msc)
+                                subtitle = subliminal.download_best_subtitles([video], remaining_alts, providers=providers_list, min_score=msc)
                             # this potentially just checks an already checked assignment bleh
                             if subtitle:
                                 downloaded_subtitles.update(subtitle)
@@ -142,7 +138,7 @@ class PluginSubliminal(object):
                     entry.fail(msg)
         if downloaded_subtitles:
             # save subtitles to disk
-            subliminal.save_subtitles(downloaded_subtitles, single=real_sing)
+            subliminal.save_subtitles(downloaded_subtitles, single=single_mode)
 
 
 @event('plugin.register')
