@@ -96,6 +96,12 @@ class OutputDump(object):
                 dump(task.rejected, task.options.debug, eval_lazy, trace)
             elif specificstates:
                 console('No rejected entries')
+        if 'failed' in dumpstates:
+            if task.failed:
+                console('-- Failed: -----------------------------')
+                dump(task.failed, task.options.debug, eval_lazy, trace)
+            elif specificstates:
+                console('No failed entries')
 
 
 @event('plugin.register')
