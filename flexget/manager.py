@@ -29,7 +29,7 @@ Session = sessionmaker(class_=ContextSession)
 from flexget import config_schema, db_schema, logger, plugin
 from flexget.event import fire_event
 from flexget.ipc import IPCClient, IPCServer
-from flexget.options import CoreArgumentParser, get_parser, unicode_argv
+from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv
 from flexget.task import Task
 from flexget.task_queue import TaskQueue
 from flexget.utils.tools import pid_exists
@@ -137,7 +137,11 @@ class Manager(object):
 
         self.config = {}
 
-        self.options, extra = CoreArgumentParser().parse_known_args(args)
+        try:
+            self.options, extra = CoreArgumentParser().parse_known_args(args)
+        except ParserError:
+            # If a non-built-in command was used, we need to parse with a parser that doesn't define the subparsers
+            self.options, extra = manager_parser.parse_known_args(args)
         try:
             self.find_config(create=False)
         except:
