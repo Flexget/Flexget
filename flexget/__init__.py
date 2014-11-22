@@ -24,12 +24,16 @@ def main(args=None):
         print('Could not instantiate manager: %s' % e, file=sys.stderr)
         sys.exit(1)
 
-    if manager.options.profile:
-        try:
-            import cProfile as profile
-        except ImportError:
-            import profile
-        profile.runctx('manager.start()', globals(), locals(),
-                       os.path.join(manager.config_base, manager.options.profile))
-    else:
-        manager.start()
+    try:
+        if manager.options.profile:
+            try:
+                import cProfile as profile
+            except ImportError:
+                import profile
+            profile.runctx('manager.start()', globals(), locals(),
+                           os.path.join(manager.config_base, manager.options.profile))
+        else:
+            manager.start()
+    except (IOError, ValueError) as e:
+        print('Could not start manager: %s' % e, file=sys.stderr)
+        sys.exit(1)
