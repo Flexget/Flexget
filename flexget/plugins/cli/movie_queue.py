@@ -5,9 +5,9 @@ from sqlalchemy.exc import OperationalError
 
 from flexget import options
 from flexget.event import event
+from flexget.logger import console
 from flexget.plugin import DependencyError
 from flexget.utils import qualities
-from flexget.utils.tools import console
 
 try:
     from flexget.plugins.filter.movie_queue import QueueError, queue_add, queue_del, queue_get, queue_forget, parse_what

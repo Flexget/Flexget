@@ -3,7 +3,7 @@ import logging
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.utils.tools import console
+from flexget.logger import console
 
 try:
     from guppy import hpy

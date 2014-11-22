@@ -5,6 +5,7 @@ from argparse import SUPPRESS
 
 from flexget import options, plugin
 from flexget.event import event
+from flexget.logger import console
 
 log = logging.getLogger('dump_config')
 
@@ -18,12 +19,12 @@ class OutputDumpConfig(object):
     def on_task_start(self, task, config):
         if task.options.dump_config:
             import yaml
-            print('--- config from task: %s' % task.name)
-            print(yaml.safe_dump(task.config))
-            print('---')
+            console('--- config from task: %s' % task.name)
+            console(yaml.safe_dump(task.config))
+            console('---')
             task.abort(silent=True)
         if task.options.dump_config_python:
-            print(task.config)
+            console(task.config)
             task.abort(silent=True)
 
 

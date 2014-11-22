@@ -6,8 +6,8 @@ from sqlalchemy import Column, String, Integer, DateTime, Unicode, desc
 
 from flexget import options, plugin
 from flexget.event import event
+from flexget.logger import console
 from flexget.manager import Base, Session
-from flexget.utils.tools import console
 
 log = logging.getLogger('history')
 

@@ -4,13 +4,12 @@ import logging
 import random
 import string
 import threading
-import time
 
 import rpyc
 from rpyc.utils.server import ThreadedServer
 
-from flexget.utils.log import capture_output
-from flexget.utils.tools import console
+from flexget.logger import console, capture_output
+from flexget.options import get_parser, ParserError
 
 log = logging.getLogger('ipc')
 
@@ -18,7 +17,7 @@ log = logging.getLogger('ipc')
 rpyc.core.protocol.DEFAULT_CONFIG['safe_attrs'].update(['items'])
 rpyc.core.protocol.DEFAULT_CONFIG['allow_pickle'] = True
 
-IPC_VERSION = 2
+IPC_VERSION = 3
 AUTH_ERROR = 'authentication error'
 AUTH_SUCCESS = 'authentication success'
 
@@ -32,16 +31,20 @@ class RemoteStream(object):
         """
         :param writer: A function which writes a line of text to remote client.
         """
+        self.buffer = ''
         self.writer = writer
 
     def write(self, data):
         if not self.writer:
             return
-        try:
-            self.writer(data.rstrip('\n'))
-        except EOFError:
-            self.writer = None
-            log.error('Client ended connection while still streaming output.')
+        self.buffer += data
+        while '\n' in self.buffer:
+            line, self.buffer = self.buffer.split('\n', 1)
+            try:
+                self.writer(line)
+            except EOFError:
+                self.writer = None
+                log.error('Client ended connection while still streaming output.')
 
 
 class DaemonService(rpyc.Service):
@@ -51,36 +54,21 @@ class DaemonService(rpyc.Service):
     def exposed_version(self):
         return IPC_VERSION
 
-    def exposed_execute(self, options=None):
-        with capture_output(self.client_out_stream):
-            if options:
-                # Dictionaries are pass by reference with rpyc, turn this into a real dict on our side
-                options = rpyc.utils.classic.obtain(options)
-            log.info('Adding execution for client.')
-            if len(self.manager.task_queue) > 0:
-                log.info('There is already an execution running. This one will execute next.')
-            cron = options and options.get('cron')
-            output = None if cron else self.client_out_stream
-            tasks_finished = self.manager.execute(options=options, output=output)
-        if output:
-            # The task logs are being streamed back to client, wait until they have finished
-            while any(not t.is_set() for t in tasks_finished):
-                time.sleep(0.3)
-
-    def exposed_reload(self):
-        with capture_output(self.client_out_stream):
-            log.info('Reloading config from disk.')
-            try:
-                self.manager.load_config()
-            except ValueError as e:
-                log.error('Error loading config: %s' % e.args[0])
-            else:
-                log.info('Config successfully reloaded from disk.')
-
-    def exposed_shutdown(self, finish_queue=False):
-        with capture_output(self.client_out_stream):
-            log.info('Shutdown requested over ipc.')
-            self.manager.shutdown(finish_queue=finish_queue)
+    def exposed_handle_cli(self, args):
+        args = rpyc.utils.classic.obtain(args)
+        parser = get_parser()
+        try:
+            options = parser.parse_args(args, raise_errors=True)
+        except ParserError as e:
+            # Recreate the normal error text to the client's console
+            self.client_console('error: ' + e.message)
+            e.parser.print_help(self.client_out_stream)
+            return
+        if not options.cron:
+            with capture_output(self.client_out_stream, loglevel=options.loglevel):
+                self.manager.handle_cli(options)
+        else:
+            self.manager.handle_cli(options)
 
     def client_console(self, text):
         self._conn.root.console(text)

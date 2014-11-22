@@ -58,8 +58,6 @@ def setup_once():
             except ImportError:
                 pass
         load_plugins()
-        # store options for MockManager
-        test_arguments = get_parser().parse_args(['execute'])
         plugins_loaded = True
 
 
@@ -111,13 +109,11 @@ class MockManager(Manager):
     def __init__(self, config_text, config_name, db_uri=None):
         self.config_text = config_text
         self._db_uri = db_uri or 'sqlite:///:memory:'
-        super(MockManager, self).__init__(test_arguments)
+        super(MockManager, self).__init__(['execute'])
         self.config_name = config_name
-
-    def initialize(self):
         self.database_uri = self._db_uri
         log.debug('database_uri: %s' % self.database_uri)
-        super(MockManager, self).initialize()
+        self.initialize()
 
     def find_config(self, *args, **kwargs):
         """

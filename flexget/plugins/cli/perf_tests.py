@@ -3,8 +3,8 @@ import logging
 
 from flexget import options
 from flexget.event import event
+from flexget.logger import console
 from flexget.manager import Session
-from flexget.utils.tools import console
 
 log = logging.getLogger('perftests')
 

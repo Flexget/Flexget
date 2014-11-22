@@ -3,6 +3,7 @@ import logging
 
 from flexget import options
 from flexget.event import event
+from flexget.logger import console
 from flexget.plugin import get_plugins
 
 log = logging.getLogger('plugins')
@@ -10,9 +11,9 @@ log = logging.getLogger('plugins')
 
 @event('manager.subcommand.plugins')
 def plugins_summary(manager, options):
-    print('-' * 79)
-    print('%-20s%-30s%s' % ('Name', 'Roles (priority)', 'Info'))
-    print('-' * 79)
+    console('-' * 79)
+    console('%-20s%-30s%s' % ('Name', 'Roles (priority)', 'Info'))
+    console('-' * 79)
 
     # print the list
     for plugin in sorted(get_plugins(phase=options.phase, group=options.group)):
@@ -28,9 +29,9 @@ def plugins_summary(manager, options):
             flags.append('debug')
         handlers = plugin.phase_handlers
         roles = ', '.join('%s(%s)' % (phase, handlers[phase].priority) for phase in handlers)
-        print('%-20s%-30s%s' % (plugin.name, roles, ', '.join(flags)))
+        console('%-20s%-30s%s' % (plugin.name, roles, ', '.join(flags)))
 
-    print('-' * 79)
+    console('-' * 79)
 
 
 @event('options.register')

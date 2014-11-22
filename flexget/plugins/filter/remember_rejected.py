@@ -7,9 +7,10 @@ from sqlalchemy.orm import relation
 
 from flexget import db_schema, options, plugin
 from flexget.event import event
+from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
-from flexget.utils.tools import console, parse_timedelta
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('remember_rej')
 Base = db_schema.versioned_base('remember_rejected', 3)
