@@ -3,6 +3,7 @@ import logging
 
 from flexget import options, plugin
 from flexget.event import event
+from flexget.logger import console
 
 log = logging.getLogger('try_regexp')
 
@@ -31,10 +32,10 @@ class PluginTryRegexp(object):
         if self.abort:
             return
 
-        print('-' * 79)
-        print('Hi there, welcome to try regexps in realtime!')
-        print('Press ^D or type \'exit\' to continue. Type \'continue\' to continue non-interactive execution.')
-        print('Task \'%s\' has %s entries, enter regexp to see what matches it.' % (task.name, len(task.entries)))
+        console('-' * 79)
+        console('Hi there, welcome to try regexps in realtime!')
+        console('Press ^D or type \'exit\' to continue. Type \'continue\' to continue non-interactive execution.')
+        console('Task \'%s\' has %s entries, enter regexp to see what matches it.' % (task.name, len(task.entries)))
         while (True):
             try:
                 s = raw_input('--> ')
@@ -51,13 +52,13 @@ class PluginTryRegexp(object):
                 try:
                     match, field = self.matches(entry, s)
                     if match:
-                        print('Title: %-40s URL: %-30s From: %s' % (entry['title'], entry['url'], field))
+                        console('Title: %-40s URL: %-30s From: %s' % (entry['title'], entry['url'], field))
                         count += 1
                 except:
-                    print('Invalid regular expression')
+                    console('Invalid regular expression')
                     break
-            print('%s of %s entries matched' % (count, len(task.entries)))
-        print('Bye!')
+            console('%s of %s entries matched' % (count, len(task.entries)))
+        console('Bye!')
 
 
 @event('plugin.register')
