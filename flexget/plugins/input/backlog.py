@@ -8,7 +8,8 @@ from sqlalchemy import Column, Integer, String, DateTime, PickleType, Index
 from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.database import safe_pickle_synonym
+from flexget.manager import Session
+from flexget.utils.database import safe_pickle_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.utils.tools import parse_timedelta
 
@@ -86,7 +87,8 @@ class InputBacklog(object):
             log.debug('Remembering all entries to backlog because of task abort.')
             self.learn_backlog(task)
 
-    def add_backlog(self, task, entry, amount=''):
+    @with_session
+    def add_backlog(self, task, entry, amount='', session=None):
         """Add single entry to task backlog
 
         If :amount: is not specified, entry will only be injected on next execution."""
@@ -97,7 +99,7 @@ class InputBacklog(object):
                 log.warning('No input snapshot available for `%s`, using current state' % entry['title'])
             snapshot = entry
         expire_time = datetime.now() + parse_timedelta(amount)
-        backlog_entry = task.session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
+        backlog_entry = session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
             filter(BacklogEntry.task == task.name).first()
         if backlog_entry:
             # If there is already a backlog entry for this, update the expiry time if necessary.
@@ -111,17 +113,19 @@ class InputBacklog(object):
             backlog_entry.entry = snapshot
             backlog_entry.task = task.name
             backlog_entry.expire = expire_time
-            task.session.add(backlog_entry)
+            session.add(backlog_entry)
 
     def learn_backlog(self, task, amount=''):
         """Learn current entries into backlog. All task inputs must have been executed."""
-        for entry in task.entries:
-            self.add_backlog(task, entry, amount)
+        with Session() as session:
+            for entry in task.entries:
+                self.add_backlog(task, entry, amount, session=session)
 
-    def get_injections(self, task):
+    @with_session
+    def get_injections(self, task, session=None):
         """Insert missing entries from backlog."""
         entries = []
-        task_backlog = task.session.query(BacklogEntry).filter(BacklogEntry.task == task.name)
+        task_backlog = session.query(BacklogEntry).filter(BacklogEntry.task == task.name)
         for backlog_entry in task_backlog.all():
             entry = Entry(backlog_entry.entry)
 
@@ -136,7 +140,7 @@ class InputBacklog(object):
         # purge expired
         for backlog_entry in task_backlog.filter(datetime.now() > BacklogEntry.expire).all():
             log.debug('Purging %s' % backlog_entry.title)
-            task.session.delete(backlog_entry)
+            session.delete(backlog_entry)
 
         return entries
 
