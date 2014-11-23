@@ -73,6 +73,11 @@ class PluginSubliminal(object):
         if not task.accepted:
             log.debug('nothing accepted, aborting')
             return
+        #workaround for solving 'name_only = True' problem introduced by assignment to 
+        #'guessit.default_options' on flexget/plugins/parsers/parser_guessit.py
+        import guessit
+        old_default_options = guessit.default_options
+        guessit.default_options = {}
         from babelfish import Language
         from dogpile.cache.exception import RegionAlreadyConfigured
         import subliminal
@@ -139,6 +144,10 @@ class PluginSubliminal(object):
         if downloaded_subtitles:
             # save subtitles to disk
             subliminal.save_subtitles(downloaded_subtitles, single=single_mode)
+        #workaround for solving 'name_only = True' problem introduced by assignment to 
+        #'guessit.default_options' on flexget/plugins/parsers/parser_guessit.py
+        #restore old_default_options
+        guessit.default_options = old_default_options
 
 
 @event('plugin.register')
