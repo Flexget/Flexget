@@ -169,6 +169,10 @@ class Manager(object):
         manager = None
 
     def initialize(self):
+        """
+        Load plugins, database, and config. Also initializes (but does not start) the task queue and ipc server.
+        This should only be called after obtaining a lock.
+        """
         if self.initialized:
             raise RuntimeError('Cannot call initialize on an already initialized manager.')
 
@@ -666,13 +670,6 @@ class Manager(object):
         Session.configure(bind=self.engine)
         # create all tables, doesn't do anything to existing tables
         try:
-            def before_table_create(event, target, bind, tables=None, **kw):
-                if tables:
-                    # We need to acquire a lock if we are creating new tables
-                    # TODO: Detect if any database upgrading is needed and acquire the lock only in one place
-                    self.acquire_lock(event=False).__enter__()
-
-            Base.metadata.append_ddl_listener('before-create', before_table_create)
             Base.metadata.create_all(bind=self.engine)
         except OperationalError as e:
             if os.path.exists(self.db_filename):
