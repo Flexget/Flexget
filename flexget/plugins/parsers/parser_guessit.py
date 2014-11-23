@@ -44,7 +44,9 @@ class GuessRegexpId(Transformer):
 
 
 add_transformer('guess_regexp_id = flexget.plugins.parsers.parser_guessit:GuessRegexpId')
-guessit.default_options = {'name_only': True, 'clean_function': clean_value, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
+#this was affecting subliminal, causing it to fail download subtitles for some providers (e.g. addic7ed)
+#because of name_only was set to True (changing to False doesn't seem to have any negative side-effect)
+guessit.default_options = {'name_only': False, 'clean_function': clean_value, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
 
 
 class GuessitParsedEntry(ParsedEntry):
