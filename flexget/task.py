@@ -61,7 +61,7 @@ def use_task_logging(func):
         old_loglevel = logging.getLogger().getEffectiveLevel()
         new_loglevel = logging.getLevelName(self.options.loglevel.upper())
         if old_loglevel != new_loglevel:
-            log.info('Setting loglevel to `%s` for this execution.' % self.options.loglevel)
+            log.verbose('Setting loglevel to `%s` for this execution.' % self.options.loglevel)
             logging.getLogger().setLevel(new_loglevel)
 
         with logger.task_logging(self.name):
@@ -73,7 +73,7 @@ def use_task_logging(func):
                     return func(self, *args, **kw)
             finally:
                 if old_loglevel != new_loglevel:
-                    log.debug('Returning loglevel to `%s` after task execution.' % logging.getLevelName(old_loglevel))
+                    log.verbose('Returning loglevel to `%s` after task execution.' % logging.getLevelName(old_loglevel))
                     logging.getLogger().setLevel(old_loglevel)
 
     return wrapper
