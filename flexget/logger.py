@@ -122,7 +122,7 @@ class FlexGetFormatter(logging.Formatter):
     def format(self, record):
         if not hasattr(record, 'task'):
             record.task = ''
-        return super(FlexGetFormatter, self).format(record)
+        return logging.Formatter.format(self, record)
 
 
 _logging_configured = False
