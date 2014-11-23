@@ -605,7 +605,7 @@ class Manager(object):
         config will be returned.
 
         :param config: Config to check. If not provided, current manager config will be checked.
-
+        :raises: `ValueError` when config fails validation. There will be an `errors` attribute with the schema errors.
         :returns: Final validated config.
         """
         if not config:

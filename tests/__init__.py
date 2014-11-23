@@ -129,11 +129,13 @@ class MockManager(Manager):
     def load_config(self):
         pass
 
-    def validate_config(self):
+    def validate_config(self, config=None):
         # We don't actually quit on errors in the unit tests, as the configs get modified after manager start
-        errors = super(MockManager, self).validate_config()
-        for error in errors:
-            log.critical(error)
+        try:
+            return super(MockManager, self).validate_config(config)
+        except ValueError as e:
+            for error in getattr(e, 'errors', []):
+                log.critical(error)
 
     # no lock files with unit testing
     @contextmanager
