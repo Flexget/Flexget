@@ -40,19 +40,9 @@ def after_plugin(task, keyword):
     data['queries'] = data.get('queries', 0) + queries
 
 
-def results(manager, options):
-    for name, data in performance.iteritems():
-        log.info('Performance results for task %s:' % name)
-        for keyword, results in data.iteritems():
-            took = results['took']
-            queries = results['queries']
-            if took > 0.1 or queries > 10:
-                log.info('%-15s took %0.2f sec (%s queries)' % (keyword, took, queries))
-
-
 @event('manager.execute.started')
 def startup(manager, options):
-    if not options.execute.debug_perf:
+    if not options.debug_perf:
         return
 
     log.info('Enabling plugin and SQLAlchemy performance debugging')
@@ -74,19 +64,27 @@ def startup(manager, options):
 
     add_event_handler('task.execute.before_plugin', before_plugin)
     add_event_handler('task.execute.after_plugin', after_plugin)
-    add_event_handler('manager.execute.completed', results)
 
 
 @event('manager.execute.completed')
 def cleanup(manager, options):
-    if not options.execute.debug_perf:
+    if not options.debug_perf:
         return
 
+    # Print summary
+    for name, data in performance.iteritems():
+        log.info('Performance results for task %s:' % name)
+        for keyword, results in data.iteritems():
+            took = results['took']
+            queries = results['queries']
+            if took > 0.1 or queries > 10:
+                log.info('%-15s took %0.2f sec (%s queries)' % (keyword, took, queries))
+
+    # Deregister our hooks
     if hasattr(Connection, 'execute') and orig_execute:
         Connection.execute = orig_execute
     remove_event_handler('task.execute.before_plugin', before_plugin)
     remove_event_handler('task.execute.after_plugin', after_plugin)
-    remove_event_handler('manager.execute.completed', results)
 
 
 
