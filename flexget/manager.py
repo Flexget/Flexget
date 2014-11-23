@@ -322,15 +322,19 @@ class Manager(object):
 
     def execute_command(self, options):
         """
-        Send execute command to daemon through IPC or perform execution
-        on current process.
+        Handles the 'execute' CLI command.
+
+        If there is already a task queue running in this process, adds the execution to the queue.
+        If FlexGet is being invoked with this command, starts up a task queue and runs the execution.
 
         Fires events:
 
+        * manager.execute.started
         * manager.execute.completed
 
         :param options: argparse options
         """
+        fire_event('manager.execute.started', self, options)
         if self.task_queue.is_alive():
             if len(self.task_queue):
                 log.verbose('There is a task already running, execution queued.')
@@ -340,16 +344,17 @@ class Manager(object):
                 for event in finished_events:
                     event.wait()
         else:
-            fire_event('manager.execute.started', self)
             self.task_queue.start()
             self.ipc_server.start()
             self.execute(options)
             self.shutdown(finish_queue=True)
             self.task_queue.wait()
-            fire_event('manager.execute.completed', self)
+        fire_event('manager.execute.completed', self, options)
 
     def daemon_command(self, options):
         """
+        Handles the 'daemon' CLI command.
+
         Fires events:
 
         * manager.daemon.started
@@ -394,6 +399,8 @@ class Manager(object):
 
     def webui_command(self, options):
         """
+        Handles the 'webui' CLI command.
+
         :param options: argparse options
         """
         if self.is_daemon:

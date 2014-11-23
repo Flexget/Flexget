@@ -36,21 +36,23 @@ heapy = None
 
 
 @event('manager.execute.started')
-def on_exec_started(manager):
-    if not manager.options.execute.mem_usage:
+def on_exec_started(manager, options):
+    if not options.execute.mem_usage:
         return
     global heapy
     heapy = hpy()
 
 
 @event('manager.execute.completed')
-def on_exec_stopped(manager):
-    if not manager.options.execute.mem_usage:
+def on_exec_stopped(manager, options):
+    if not options.execute.mem_usage:
         return
+    global heapy
     console('Calculating memory usage:')
     console(heapy.heap())
     console('-' * 79)
     console(heapy.heap().get_rp(40))
+    heapy = None
 
 
 @event('options.register')
