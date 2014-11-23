@@ -47,12 +47,13 @@ class SessionFilter(logging.Filter):
 @contextlib.contextmanager
 def capture_output(stream, loglevel=None):
     """Context manager which captures all log and console output to given `stream` while in scope."""
+    root_logger = logging.getLogger()
+    old_level = root_logger.getEffectiveLevel()
     old_id = getattr(local_context, 'session_id', None)
     # Keep using current, or create one if none already set
     local_context.session_id = old_id or uuid.uuid4()
     old_output = getattr(local_context, 'output', None)
     local_context.output = stream
-    root_logger = logging.getLogger()
     streamhandler = logging.StreamHandler(stream)
     streamhandler.setFormatter(FlexGetFormatter())
     streamhandler.addFilter(SessionFilter(local_context.session_id))
@@ -68,6 +69,7 @@ def capture_output(stream, loglevel=None):
         yield
     finally:
         root_logger.removeHandler(streamhandler)
+        root_logger.setLevel(old_level)
         local_context.session_id = old_id
         local_context.output = old_output
 
