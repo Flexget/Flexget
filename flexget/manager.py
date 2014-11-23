@@ -571,14 +571,14 @@ class Manager(object):
         :raises: `ValueError` and rolls back to previous config if the provided config is not valid.
         """
         old_config = self.config
-        self.config = config
-        errors = self.validate_config()
-        if errors:
-            for error in errors:
-                log.critical("[%s] %s", error.json_pointer, error.message)
+        try:
+            self.config = self.validate_config(config)
+        except ValueError as e:
+            for error in getattr(e, 'errors', []):
+                log.critical('[%s] %s', error.json_pointer, error.message)
             log.debug('invalid config, rolling back')
             self.config = old_config
-            raise ValueError('Config did not pass schema validation')
+            raise
         log.debug('New config data loaded.')
         fire_event('manager.config_updated', self)
 
@@ -599,14 +599,26 @@ class Manager(object):
         for task in self.tasks:
             config_changed(task)
 
-    def validate_config(self):
+    def validate_config(self, config=None):
         """
-        Check all root level keywords are valid.
+        Check all root level keywords are valid. Config may be modified by before_config_validate hooks. Modified
+        config will be returned.
 
-        :returns: A list of `ValidationError`s
+        :param config: Config to check. If not provided, current manager config will be checked.
+
+        :returns: Final validated config.
         """
-        fire_event('manager.before_config_validate', self)
-        return config_schema.process_config(self.config)
+        if not config:
+            config = self.config
+        config = fire_event('manager.before_config_validate', config, self)
+        errors = config_schema.process_config(config)
+        if errors:
+            err = ValueError('Did not pass schema validation.')
+            err.errors = errors
+            raise err
+        else:
+            return config
+
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""

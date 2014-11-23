@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 import codecs
 import logging
+import yaml
 
 from flexget import options
-from flexget.config_schema import process_config
 from flexget.event import event
-import yaml
+from flexget.logger import console
 
 log = logging.getLogger('check')
 
@@ -137,10 +137,17 @@ def check(manager, options):
         # If we are running in a daemon, check disk config
         pre_check_config(manager.config_path)
         with codecs.open(manager.config_path, 'r', encoding='utf-8') as config_file:
-            config = yaml.load(config_file)
-            errors = process_config(config)
-            if errors:
-                for error in errors:
+            try:
+                config = yaml.load(config_file)
+            except yaml.error.YAMLError as e:
+                log.critical('Config file is invalid YAML:')
+                for line in str(e).split('\n'):
+                    console(line)
+                return
+            try:
+                manager.validate_config(config)
+            except ValueError as e:
+                for error in getattr(e, 'errors', []):
                     log.critical("[%s] %s", error.json_pointer, error.message)
             else:
                 log.verbose('Config passed check.')
