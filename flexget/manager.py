@@ -262,13 +262,11 @@ class Manager(object):
 
     def start(self):
         """
-        Starting point when executing from commandline, dispatch execution
-        to correct destination.
+        Starting point when executing from commandline, dispatch execution to correct destination.
 
-        * :meth:`.execute_command`
-        * :meth:`.daemon_command`
-        * :meth:`.webui_command`
-        * CLI plugin callback function
+        If there is a FlexGet process with an ipc server already running, the command will be sent there for execution
+        and results will be streamed back.
+        If not, this will attempt to obtain a lock, initialize the manager, and run the command here.
         """
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
@@ -295,7 +293,14 @@ class Manager(object):
 
     def handle_cli(self, options=None):
         """
-        Runs a cli command.
+        Dispatch a cli command to the appropriate function.
+
+        * :meth:`.execute_command`
+        * :meth:`.daemon_command`
+        * :meth:`.webui_command`
+        * CLI plugin callback function
+
+        The manager should have a lock and be initialized before calling this method.
 
         :param options: argparse options for command. Defaults to options that manager was instantiated with.
         """
