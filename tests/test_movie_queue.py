@@ -1,4 +1,4 @@
-from flexget.plugins.filter.movie_queue import queue_add, queue_get, QueuedMovie, QueuedItem
+from flexget.plugins.filter.movie_queue import queue_add, queue_get
 from tests import FlexGetBase
 
 class TestMovieQueue(FlexGetBase):
@@ -17,6 +17,7 @@ class TestMovieQueue(FlexGetBase):
 
            movie_queue_add_properties:
              movie_queue:
+               action: add
                quality: 720p
 
            movie_queue_remove:
@@ -46,9 +47,10 @@ class TestMovieQueue(FlexGetBase):
          assert len(queue) == 1
 
          entry = queue[0]
-         assert entry['imdb_id'] == 'tt1931533'
-         assert entry['tmdb_id'] == 603
-         assert entry['quality'] == 'any'
+         assert entry.title == 'Seven Psychopaths'
+         assert entry.imdb_id == 'tt1931533'
+         assert entry.tmdb_id == 86838
+         assert entry.quality == 'any'
 
 
      def test_movie_queue_add_properties(self):
@@ -60,9 +62,9 @@ class TestMovieQueue(FlexGetBase):
          assert len(queue) == 1
 
          entry = queue[0]
-         assert entry.get('imdb_id', eval_lazy=False) == 'tt1931533'
-         assert entry.get('tmdb_id', eval_lazy=False) == 603
-         assert entry.get('quality', eval_lazy=False) == '720p'
+         assert entry.imdb_id == 'tt1931533'
+         assert entry.tmdb_id == 86838
+         assert entry.quality == '720p'
 
 
      def test_movie_queue_remove(self):
@@ -77,6 +79,6 @@ class TestMovieQueue(FlexGetBase):
          assert len(queue) == 1
 
          entry = queue[0]
-         assert entry.get('imdb_id', eval_lazy=False) == 'tt1933533'
-         assert entry.get('tmdb_id', eval_lazy=False) == 604
+         assert entry.imdb_id == 'tt1933533'
+         assert entry.tmdb_id == 604
 

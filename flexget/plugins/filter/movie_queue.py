@@ -167,9 +167,9 @@ class MovieQueue(queue_base.FilterQueueBase):
                 if action == 'add':
                     # since entries usually have unknown quality we need to ignore that ..
                     if entry.get('quality'):
-                        quality = qualities.Requirements(entry['quality'].name)
+                        kwargs['quality'] = qualities.Requirements(entry['quality'].name)
                     else:
-                        quality = qualities.Requirements(config.get('quality', 'any'))
+                        kwargs['quality'] = qualities.Requirements(config.get('quality', 'any'))
                     queue_add(**kwargs)
                 elif action == 'remove':
                     queue_del(**kwargs)
