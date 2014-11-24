@@ -65,11 +65,14 @@ class SearchKAT(object):
                     log.debug('No results found for search query: %s' % search_string)
                     continue
                 elif status not in [200, 301]:
-                    raise plugin.PluginWarning('Search result not 200 (OK), received %s' % status)
+                    log.warning('Search result not 200 (OK), received %s' % status)
+                    continue
+
 
                 ex = rss.get('bozo_exception', False)
                 if ex:
-                    raise plugin.PluginWarning('Got bozo_exception (bad feed)')
+                    log.warning('Got bozo_exception (bad feed)')
+                    continue
 
                 for item in rss.entries:
                     entry = Entry()
