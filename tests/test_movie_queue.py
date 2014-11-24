@@ -64,7 +64,7 @@ class TestMovieQueue(FlexGetBase):
 
         entry = queue[0]
         assert entry.imdb_id == 'tt1931533'
-        assert entry.tmdb_id == 86838
+        assert entry.tmdb_id == 603
         assert entry.quality == '720p'
 
     def test_movie_queue_remove(self):
