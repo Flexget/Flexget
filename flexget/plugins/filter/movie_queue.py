@@ -81,11 +81,11 @@ class QueuedMovie(queue_base.QueuedItem, Base):
 class MovieQueue(queue_base.FilterQueueBase):
     schema = {
         'oneOf': [
-            {'type': 'string', 'enum': ['accept', 'add', 'remove']},
+            {'type': 'string', 'enum': ['accept', 'add', 'remove', 'forget']},
             {
                 'type': 'object',
                 'properties': {
-                    'action': {'type': 'string', 'enum': ['accept', 'add', 'remove']},
+                    'action': {'type': 'string', 'enum': ['accept', 'add', 'remove', 'forget']},
                     'quality': {'type': 'string', 'format': 'quality_requirements'},
                 },
                 'required': ['action'],
@@ -163,7 +163,7 @@ class MovieQueue(queue_base.FilterQueueBase):
                                entry.get('movie_name', eval_lazy=False))
             log.debug('movie_queue kwargs: %s' % kwargs)
             try:
-                action = config.get("action")
+                action = config.get('action')
                 if action == 'add':
                     # since entries usually have unknown quality we need to ignore that ..
                     if entry.get('quality'):
@@ -173,6 +173,8 @@ class MovieQueue(queue_base.FilterQueueBase):
                     queue_add(**kwargs)
                 elif action == 'remove':
                     queue_del(**kwargs)
+                elif action == 'forget':
+                    queue_forget(**kwargs)
             except QueueError as e:
                 # Ignore already in queue errors
                 if e.errno != 1:
