@@ -3,7 +3,7 @@ import logging
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.utils.tools import console
+from flexget.logger import console
 
 log = logging.getLogger('dump')
 
@@ -96,6 +96,12 @@ class OutputDump(object):
                 dump(task.rejected, task.options.debug, eval_lazy, trace)
             elif specificstates:
                 console('No rejected entries')
+        if 'failed' in dumpstates:
+            if task.failed:
+                console('-- Failed: -----------------------------')
+                dump(task.failed, task.options.debug, eval_lazy, trace)
+            elif specificstates:
+                console('No failed entries')
 
 
 @event('plugin.register')

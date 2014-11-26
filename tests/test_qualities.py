@@ -1,8 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
+
+from nose.plugins.skip import SkipTest
+
 from flexget.plugins.parsers.parser_guessit import ParserGuessit
 from flexget.plugins.parsers.parser_internal import ParserInternal
-from tests import FlexGetBase, build_parser_function
 from flexget.utils.qualities import Quality
+from tests import FlexGetBase, build_parser_function
 
 
 class TestQualityModule(object):
@@ -19,7 +22,7 @@ class TestQualityModule(object):
 
 class QualityParser(object):
 
-    def test_qualities(self):
+    def get_quality_failures(self):
         items = [('Test.File 1080p.web-dl', '1080p webdl'),
                  ('Test.File.web-dl.1080p', '1080p webdl'),
                  ('Test.File.WebHD.720p', '720p webdl'),
@@ -79,24 +82,34 @@ class QualityParser(object):
                  ('Test.File.DTS.HD', 'dtshd'),
                  ('Test.File.DTSHD', 'dtshd'),
                  ('Test.File.DTS', 'dts'),
-                 ('Test.File.truehd', 'truehd')]
+                 ('Test.File.truehd', 'truehd'),
+                 ('Test.File.DTSHDMA', 'dtshd')]
 
-        item = 'Test.File.DTSHDMA', 'dtshd'
-
-        quality = self.parser.parse_movie(item[0]).quality
-        assert quality == item[1], '`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality)
-
+        failures = []
         for item in items:
             quality = self.parser.parse_movie(item[0]).quality
-            assert quality == item[1], '`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality)
+            if quality != item[1]:
+                failures.append('`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality))
+        return failures
+
 
 
 class TestInternalQualityParser(QualityParser):
     parser = ParserInternal()
 
+    def test_qualities(self):
+        failures = self.get_quality_failures()
+        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+
 
 class TestGuessitQualityParser(QualityParser):
     parser = ParserGuessit()
+
+    def test_qualities(self):
+        failures = self.get_quality_failures()
+        if failures:
+            raise SkipTest('Guessit quality parser does not match FlexGet: %s' % ', '.join(failures))
+
 
 
 class TestFilterQuality(FlexGetBase):

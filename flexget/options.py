@@ -13,8 +13,8 @@ import pkg_resources
 import flexget
 from flexget.entry import Entry
 from flexget.event import fire_event
+from flexget.logger import console
 from flexget.utils import requests
-from flexget.utils.tools import console
 
 _UNSET = object()
 
@@ -361,6 +361,9 @@ manager_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, h
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--ipc-port', type=int, help=SUPPRESS)
+manager_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
+                            help='use when executing FlexGet non-interactively: allows background '
+                                 'maintenance to run, disables stdout and stderr output, reduces logging level')
 
 
 class CoreArgumentParser(ArgumentParser):
@@ -383,9 +386,6 @@ class CoreArgumentParser(ArgumentParser):
                                       'matching is case-insensitive')
         exec_parser.add_argument('--learn', action='store_true', dest='learn', default=False,
                                  help='matches are not downloaded but will be skipped in the future')
-        exec_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
-                                 help='use when executing FlexGet non-interactively: allows background '
-                                      'maintenance to run, disables stdout and stderr output, reduces logging level')
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
         exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)

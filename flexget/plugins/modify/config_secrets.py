@@ -11,10 +11,10 @@ from flexget.plugin import PluginError
 
 
 @event('manager.before_config_validate')
-def process_secrets(manager):
-    if not 'secrets' in manager.config:
+def process_secrets(config, manager):
+    if 'secrets' not in config:
         return
-    secret_file = os.path.join(manager.config_base, manager.config['secrets'])
+    secret_file = os.path.join(manager.config_base, config['secrets'])
     if not os.path.exists(secret_file):
         raise PluginError('File %s does not exist!' % secret_file)
     try:
@@ -23,7 +23,8 @@ def process_secrets(manager):
         secrets = {'secrets': yaml.safe_load(raw_secrets) or {}}
     except yaml.YAMLError as e:
         raise PluginError('Invalid secrets file: %s' % e)
-    _process(manager.config, secrets)
+    _process(config, secrets)
+    return config
 
 
 def _process(element, secrets):

@@ -83,6 +83,26 @@ class BaseEmitSeries(FlexGetBase):
             regexp:
               reject:
               - .
+          test_emit_series_alternate_name:
+            emit_series: yes
+            series:
+            - Test Series 8:
+               begin: S01E01
+               alternate_name:
+                 - Testing Series 8
+                 - Tests Series 8
+            rerun: 0
+            mock_output: yes
+          test_emit_series_alternate_name_duplicates:
+            emit_series: yes
+            series:
+            - Test Series 8:
+               begin: S01E01
+               alternate_name:
+                 - Testing Series 8
+                 - Testing SerieS 8
+            rerun: 0
+            mock_output: yes
     """
 
     def inject_series(self, release_name):
@@ -147,6 +167,29 @@ class BaseEmitSeries(FlexGetBase):
         assert self.task._rerun_count == 1
         assert len(self.task.all_entries) == 1
         assert self.task.find_entry('rejected', title='Test Series 8 S02E01')
+
+    def test_emit_series_alternate_name(self):
+        self.execute_task('test_emit_series_alternate_name')
+        assert len(self.task.mock_output) == 1
+        # There should be 2 alternate names
+        assert len(self.task.mock_output[0].get('series_alternate_names')) == 2
+        assert ['Testing Series 8', 'Tests Series 8'].sort() == \
+               self.task.mock_output[0].get('series_alternate_names').sort(), 'Alternate names do not match (how?).'
+
+    def test_emit_series_alternate_name_duplicates(self):
+        self.execute_task('test_emit_series_alternate_name_duplicates')
+        assert len(self.task.mock_output) == 1
+        # duplicate alternate names should only result in 1
+        # even if it is not a 'complete match' (eg. My Show == My SHOW)
+        assert len(self.task.mock_output[0].get('series_alternate_names')) == 1, 'Duplicate alternate names.'
+
+    def test_emit_series_search_strings(self):
+        # This test makes sure that the number of search strings increases when the amount of alt names increases.
+        self.execute_task('test_emit_series_alternate_name_duplicates')
+        s1 = len(self.task.mock_output[0].get('search_strings'))
+        self.execute_task('test_emit_series_alternate_name')
+        s2 = len(self.task.mock_output[0].get('search_strings'))
+        assert s2 > s1, 'Alternate names did not create sufficient search strings.'
 
 class TestGuessitEmitSeries(BaseEmitSeries):
     def __init__(self):

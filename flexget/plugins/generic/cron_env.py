@@ -13,10 +13,10 @@ log = logging.getLogger('cron_env')
 
 
 @event('manager.execute.started')
-def check_env(manager):
+def check_env(manager, options):
     persistence = SimplePersistence(plugin='cron_env')
     encoding = sys.getfilesystemencoding()
-    if manager.options.execute.cron:
+    if options.cron:
         if 'terminal_encoding' in persistence:
             terminal_encoding = persistence['terminal_encoding']
             if terminal_encoding != encoding:

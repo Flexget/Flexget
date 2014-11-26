@@ -1,10 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import time
 
 from argparse import SUPPRESS
 
 from flexget import options
-from flexget.event import event
+from flexget.event import event, add_event_handler, remove_event_handler
+
+from sqlalchemy.engine import Connection
 
 log = logging.getLogger('performance')
 
@@ -13,6 +16,7 @@ performance = {}
 _start = {}
 
 query_count = 0
+orig_execute = None
 
 
 def log_query_count(name_point):
@@ -20,51 +24,69 @@ def log_query_count(name_point):
     log.info('At point named `%s` total of %s queries were ran' % (name_point, query_count))
 
 
+def before_plugin(task, keyword):
+    fd = _start.setdefault(task.name, {})
+    fd.setdefault('time', {})[keyword] = time.time()
+    fd.setdefault('queries', {})[keyword] = query_count
+
+
+def after_plugin(task, keyword):
+    took = time.time() - _start[task.name]['time'][keyword]
+    queries = query_count - _start[task.name]['queries'][keyword]
+    # Store results, increases previous values
+    pd = performance.setdefault(task.name, {})
+    data = pd.setdefault(keyword, {})
+    data['took'] = data.get('took', 0) + took
+    data['queries'] = data.get('queries', 0) + queries
+
+
 @event('manager.execute.started')
-def startup(manager):
-    if manager.options.execute.debug_perf:
-        log.info('Enabling plugin and SQLAlchemy performance debugging')
-        import time
+def startup(manager, options):
+    if not options.debug_perf:
+        return
 
-        # Monkeypatch query counter for SQLAlchemy
-        from sqlalchemy.engine import Connection
-        if hasattr(Connection, 'execute'):
-            orig_f = Connection.execute
+    log.info('Enabling plugin and SQLAlchemy performance debugging')
+    global query_count, orig_execute
+    query_count = 0
 
-            def monkeypatched(*args, **kwargs):
-                global query_count
-                query_count += 1
-                return orig_f(*args, **kwargs)
+    # Monkeypatch query counter for SQLAlchemy
+    if hasattr(Connection, 'execute'):
+        orig_execute = Connection.execute
 
-            Connection.execute = monkeypatched
-        else:
-            log.critical('Unable to monkeypatch sqlalchemy')
+        def monkeypatched(*args, **kwargs):
+            global query_count
+            query_count += 1
+            return orig_execute(*args, **kwargs)
 
-        @event('task.execute.before_plugin')
-        def before(task, keyword):
-            fd = _start.setdefault(task.name, {})
-            fd.setdefault('time', {})[keyword] = time.time()
-            fd.setdefault('queries', {})[keyword] = query_count
+        Connection.execute = monkeypatched
+    else:
+        log.critical('Unable to monkeypatch sqlalchemy')
 
-        @event('task.execute.after_plugin')
-        def after(task, keyword):
-            took = time.time() - _start[task.name]['time'][keyword]
-            queries = query_count - _start[task.name]['queries'][keyword]
-            # Store results, increases previous values
-            pd = performance.setdefault(task.name, {})
-            data = pd.setdefault(keyword, {})
-            data['took'] = data.get('took', 0) + took
-            data['queries'] = data.get('queries', 0) + queries
+    add_event_handler('task.execute.before_plugin', before_plugin)
+    add_event_handler('task.execute.after_plugin', after_plugin)
 
-        @event('manager.execute.completed')
-        def results(manager):
-            for name, data in performance.iteritems():
-                log.info('Performance results for task %s:' % name)
-                for keyword, results in data.iteritems():
-                    took = results['took']
-                    queries = results['queries']
-                    if took > 0.1 or queries > 10:
-                        log.info('%-15s took %0.2f sec (%s queries)' % (keyword, took, queries))
+
+@event('manager.execute.completed')
+def cleanup(manager, options):
+    if not options.debug_perf:
+        return
+
+    # Print summary
+    for name, data in performance.iteritems():
+        log.info('Performance results for task %s:' % name)
+        for keyword, results in data.iteritems():
+            took = results['took']
+            queries = results['queries']
+            if took > 0.1 or queries > 10:
+                log.info('%-15s took %0.2f sec (%s queries)' % (keyword, took, queries))
+
+    # Deregister our hooks
+    if hasattr(Connection, 'execute') and orig_execute:
+        Connection.execute = orig_execute
+    remove_event_handler('task.execute.before_plugin', before_plugin)
+    remove_event_handler('task.execute.after_plugin', after_plugin)
+
+
 
 
 @event('options.register')

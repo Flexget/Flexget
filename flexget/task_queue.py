@@ -53,6 +53,9 @@ class TaskQueue(object):
         finally:
             log.debug('task_queue run loop ended')
 
+    def is_alive(self):
+        return self._thread.is_alive()
+
     def put(self, task):
         """Adds a task to be executed to the queue."""
         self.run_queue.put(task)

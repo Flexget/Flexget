@@ -9,7 +9,6 @@ import sys
 
 from flexget import logger, plugin
 from flexget.manager import Manager
-from flexget.options import get_parser
 
 log = logging.getLogger('main')
 
@@ -19,22 +18,22 @@ def main(args=None):
 
     logger.initialize()
 
-    plugin.load_plugins()
-
-    options = get_parser().parse_args(args)
-
     try:
-        manager = Manager(options)
+        manager = Manager(args)
     except (IOError, ValueError) as e:
-        print('Could not initialize manager: %s' % e, file=sys.stderr)
+        print('Could not instantiate manager: %s' % e, file=sys.stderr)
         sys.exit(1)
 
-    if options.profile:
-        try:
-            import cProfile as profile
-        except ImportError:
-            import profile
-        profile.runctx('manager.start()', globals(), locals(),
-                       os.path.join(manager.config_base, options.profile))
-    else:
-        manager.start()
+    try:
+        if manager.options.profile:
+            try:
+                import cProfile as profile
+            except ImportError:
+                import profile
+            profile.runctx('manager.start()', globals(), locals(),
+                           os.path.join(manager.config_base, manager.options.profile))
+        else:
+            manager.start()
+    except (IOError, ValueError) as e:
+        print('Could not start manager: %s' % e, file=sys.stderr)
+        sys.exit(1)

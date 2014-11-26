@@ -11,7 +11,7 @@ from flexget.manager import Session
 log = logging.getLogger('emit_series')
 
 try:
-    from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release
+    from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release, AlternateNames
 except ImportError as e:
     log.error(e.message)
     raise plugin.DependencyError(issued_by='emit_series', missing='series')
@@ -49,15 +49,22 @@ class EmitSeries(object):
                     '%03d' % episode])
 
     def search_entry(self, series, season, episode, task, rerun=True):
+        # Extract the alternate names for the series
+        alts = [alt.alt_name for alt in series.alternate_names]
         if series.identified_by == 'ep':
             search_strings = ['%s %s' % (series.name, id) for id in self.ep_identifiers(season, episode)]
             series_id = 'S%02dE%02d' % (season, episode)
+            for alt in alts:
+                search_strings.extend(['%s %s' % (alt, id) for id in self.ep_identifiers(season, episode)])
         else:
             search_strings = ['%s %s' % (series.name, id) for id in self.sequence_identifiers(episode)]
             series_id = episode
+            for alt in alts:
+                search_strings.extend(['%s %s' % (alt, id) for id in self.sequence_identifiers(episode)])
         entry = Entry(title=search_strings[0], url='',
                       search_strings=search_strings,
                       series_name=series.name,
+                      series_alternate_names=alts,  # Not sure if this field is useful down the road.
                       series_season=season,
                       series_episode=episode,
                       series_id=series_id,

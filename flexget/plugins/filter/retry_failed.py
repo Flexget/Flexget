@@ -7,11 +7,12 @@ from sqlalchemy.schema import Index
 
 from flexget import db_schema, options, plugin
 from flexget.event import event
+from flexget.logger import console
 from flexget.manager import Session
-from flexget.utils.tools import console, parse_timedelta
+from flexget.utils.tools import parse_timedelta
 from flexget.utils.sqlalchemy_utils import table_add_column, table_schema
 
-SCHEMA_VER = 2
+SCHEMA_VER = 3
 
 log = logging.getLogger('failed')
 Base = db_schema.versioned_base('failed', SCHEMA_VER)
@@ -32,6 +33,9 @@ def upgrade(ver, session):
     if ver == 1:
         table_add_column('failed', 'reason', Unicode, session)
         ver = 2
+    if ver == 2:
+        table_add_column('failed', 'retry_time', DateTime, session)
+        ver = 3
     return ver
 
 
@@ -44,6 +48,7 @@ class FailedEntry(Base):
     tof = Column(DateTime)
     reason = Column(Unicode)
     count = Column(Integer, default=1)
+    retry_time = Column(DateTime)
 
     def __init__(self, title, url, reason=None):
         self.title = title
@@ -105,34 +110,43 @@ class PluginFailed(object):
             config['retry_time_multiplier'] = 1
         return config
 
+    def retry_time(self, fail_count, config):
+        """Return the timedelta an entry that has failed `fail_count` times before should wait before being retried."""
+        base_retry_time = parse_timedelta(config['retry_time'])
+        # Timedeltas do not allow floating point multiplication. Convert to seconds and then back to avoid this.
+        base_retry_secs = base_retry_time.days * 86400 + base_retry_time.seconds
+        retry_secs = base_retry_secs * (config['retry_time_multiplier'] ** fail_count)
+        return timedelta(seconds=retry_secs)
+
     @plugin.priority(-255)
     def on_task_input(self, task, config):
+        config = self.prepare_config(config)
         for entry in task.all_entries:
-            entry.on_fail(self.add_failed)
+            entry.on_fail(self.add_failed, config=config)
 
-    def add_failed(self, entry, reason=None, **kwargs):
+    def add_failed(self, entry, reason=None, config=None, **kwargs):
         """Adds entry to internal failed list, displayed with --failed"""
         reason = reason or 'Unknown'
-        failed = Session()
-        try:
+        with Session() as session:
             # query item's existence
-            item = failed.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
+            item = session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
                 filter(FailedEntry.url == entry['original_url']).first()
             if not item:
                 item = FailedEntry(entry['title'], entry['original_url'], reason)
-            else:
-                item.count += 1
-                item.tof = datetime.now()
-                item.reason = reason
-            failed.merge(item)
+                item.count = 0
+            retry_time = self.retry_time(item.count, config)
+            item.retry_time = datetime.now() + retry_time
+            item.count += 1
+            item.tof = datetime.now()
+            item.reason = reason
+            session.merge(item)
             log.debug('Marking %s in failed list. Has failed %s times.' % (item.title, item.count))
-
+            if self.backlog and item.count <= config['max_retries']:
+                self.backlog.instance.add_backlog(entry.task, entry, amount=retry_time, session=session)
+            entry.task.rerun()
             # limit item number to 25
-            for row in failed.query(FailedEntry).order_by(FailedEntry.tof.desc())[25:]:
-                failed.delete(row)
-            failed.commit()
-        finally:
-            failed.close()
+            for row in session.query(FailedEntry).order_by(FailedEntry.tof.desc())[25:]:
+                session.delete(row)
 
     @plugin.priority(255)
     def on_task_filter(self, task, config):
@@ -142,40 +156,14 @@ class PluginFailed(object):
         max_count = config['max_retries']
         for entry in task.entries:
             item = task.session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
-                filter(FailedEntry.url == entry['original_url']).\
-                filter(FailedEntry.count > max_count).first()
-            if item:
-                entry.reject('Has already failed %s times in the past' % item.count)
-
-    def on_task_learn(self, task, config):
-        if config is False:
-            return
-        config = self.prepare_config(config)
-        base_retry_time = parse_timedelta(config['retry_time'])
-        retry_time_multiplier = config['retry_time_multiplier']
-        for entry in task.failed:
-            item = task.session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
                 filter(FailedEntry.url == entry['original_url']).first()
             if item:
-                # Do not count the failure on this run when adding additional retry time
-                fail_count = item.count - 1
-                # Don't bother saving this if it has met max retries
-                if fail_count >= config['max_retries']:
-                    continue
-                # Timedeltas do not allow floating point multiplication. Convert to seconds and then back to avoid this.
-                base_retry_secs = base_retry_time.days * 86400 + base_retry_time.seconds
-                retry_secs = base_retry_secs * (retry_time_multiplier ** fail_count)
-                retry_time = timedelta(seconds=retry_secs)
-            else:
-                retry_time = base_retry_time
-            if self.backlog:
-                self.backlog.instance.add_backlog(task, entry, amount=retry_time)
-            if retry_time:
-                fail_reason = item.reason if item else entry.get('reason', 'unknown')
-                entry.reject(reason='Waiting before trying failed entry again. (failure reason: %s)' %
-                    fail_reason, remember_time=retry_time)
-                # Cause a task rerun, to look for alternate releases
-                task.rerun()
+                if item.count > max_count:
+                    entry.reject('Has already failed %s times in the past. (failure reason: %s)' %
+                                 (item.count, item.reason))
+                elif item.retry_time and item.retry_time > datetime.now():
+                    entry.reject('Waiting before retrying entry which has failed in the past. (failure reason: %s)' %
+                                 item.reason)
 
 
 def do_cli(manager, options):

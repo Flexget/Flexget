@@ -5,8 +5,8 @@ from sqlalchemy import func
 
 from flexget import options, plugin
 from flexget.event import event
+from flexget.logger import console
 from flexget.manager import Session
-from flexget.utils.tools import console
 
 try:
     from flexget.plugins.filter.series import (Series, Episode, Release, SeriesTask, forget_series,

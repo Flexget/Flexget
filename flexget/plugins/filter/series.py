@@ -7,10 +7,10 @@ from copy import copy
 from datetime import datetime, timedelta
 
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
-                        desc, select, update, delete, ForeignKey, Index, func, and_, not_)
+                        desc, select, update, delete, ForeignKey, Index, func, and_, not_, UniqueConstraint)
 from sqlalchemy.orm import relation, backref
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, IntegrityError
 
 from flexget import db_schema, options, plugin
 from flexget.config_schema import one_or_more
@@ -223,6 +223,40 @@ class NormalizedComparator(Comparator):
         return op(self.__clause_element__(), normalize_series_name(other))
 
 
+class AlternateNames(Base):
+    """ Similar to Series. Name is handled case insensitively transparently.
+    """
+
+    __tablename__ = 'series_alternate_names'
+    id = Column(Integer, primary_key=True)
+    _alt_name = Column('alt_name', Unicode)
+    _alt_name_normalized = Column('alt_name_normalized', Unicode, index=True, unique=True)
+    series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
+
+    def name_setter(self, value):
+        self._alt_name = value
+        self._alt_name_normalized = normalize_series_name(value)
+
+    def name_getter(self):
+        return self._alt_name
+
+    def name_comparator(self):
+        return NormalizedComparator(self._alt_name_normalized)
+
+    alt_name = hybrid_property(name_getter, name_setter)
+    alt_name.comparator(name_comparator)
+
+    def __init__(self, name):
+        self.alt_name = name
+
+    def __unicode__(self):
+        return '<SeriesAlternateName(series_id=%s, alt_name=%s)>' % (self.series_id, self.alt_name)
+
+    def __repr__(self):
+        return unicode(self).encode('ascii', 'replace')
+
+#Index('alternatenames_series_name', AlternateNames.alt_name, unique=True)
+
 class Series(Base):
 
     """ Name is handled case insensitively transparently
@@ -240,6 +274,8 @@ class Series(Base):
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan',
                         primaryjoin='Series.id == Episode.series_id')
     in_tasks = relation('SeriesTask', backref=backref('series', uselist=False), cascade='all, delete, delete-orphan')
+    alternate_names = relation('AlternateNames', backref='series', primaryjoin='Series.id == AlternateNames.series_id',
+                               cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
     def name_getter(self):
@@ -260,7 +296,6 @@ class Series(Base):
 
     def __repr__(self):
         return unicode(self).encode('ascii', 'replace')
-
 
 class Episode(Base):
 
@@ -947,6 +982,12 @@ class FilterSeries(FilterSeriesBase):
                     db_series.identified_by = series_config.get('identified_by', 'auto')
                     session.add(db_series)
                     log.debug('-> added %s' % db_series)
+                    session.flush()  # Flush to get an id on series before adding alternate names.
+                    alts = series_config.get('alternate_name', [])
+                    if not isinstance(alts, list):
+                        alts = [alts]
+                    for alt in alts:
+                        _add_alt_name(alt, db_series, series_name, session)
                 if not series_name in found_series:
                     continue
                 series_entries = {}
@@ -1435,12 +1476,26 @@ class SeriesDBManager(FilterSeriesBase):
                 if db_series:
                     # Update database with capitalization from config
                     db_series.name = series_name
+                    alts = series_config.get('alternate_name', [])
+                    if not isinstance(alts, list):
+                        alts = [alts]
+                    # Remove the alternate names not present in current config
+                    db_series.alternate_names = [alt for alt in db_series.alternate_names if alt.alt_name in alts]
+                    # Add/update the possibly new alternate names
+                    for alt in alts:
+                        _add_alt_name(alt, db_series, series_name, session)
                 else:
                     log.debug('adding series %s into db', series_name)
                     db_series = Series()
                     db_series.name = series_name
                     session.add(db_series)
+                    session.flush()  # flush to get id on series before creating alternate names
                     log.debug('-> added %s' % db_series)
+                    alts = series_config.get('alternate_name', [])
+                    if not isinstance(alts, list):
+                        alts = [alts]
+                    for alt in alts:
+                        _add_alt_name(alt, db_series, series_name, session)
                 db_series.in_tasks.append(SeriesTask(task.name))
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
@@ -1451,6 +1506,22 @@ class SeriesDBManager(FilterSeriesBase):
                     except ValueError as e:
                         raise plugin.PluginError(e)
 
+def _add_alt_name(alt, db_series, series_name, session):
+    alt = unicode(alt)
+    db_series_alt = session.query(AlternateNames).join(Series).filter(AlternateNames.alt_name == alt).first()
+    if db_series_alt and db_series_alt.series_id == db_series.id:
+        # Already exists, no need to create it then
+        # TODO is checking the list for duplicates faster/better than querying the DB?
+        db_series_alt.alt_name = alt
+    elif db_series_alt:
+        # Alternate name already exists for another series. Not good.
+        raise plugin.PluginError('Error adding alternate name for %s. %s is already associated with %s. '
+                                 'Check your config.' % (series_name, alt, db_series_alt.series.name) )
+    else:
+        log.debug('adding alternate name %s for %s into db' % (alt, series_name))
+        db_series_alt = AlternateNames(alt)
+        db_series.alternate_names.append(db_series_alt)
+        log.debug('-> added %s' % db_series_alt)
 
 @event('plugin.register')
 def register_plugin():

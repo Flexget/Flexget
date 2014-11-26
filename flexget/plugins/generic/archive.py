@@ -12,9 +12,10 @@ from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 from flexget import db_schema, options, plugin
 from flexget.event import event
 from flexget.entry import Entry
+from flexget.logger import console
 from flexget.options import ParseExtrasAction, get_parser
 from flexget.utils.sqlalchemy_utils import table_schema, get_index_by_name
-from flexget.utils.tools import console, strip_html
+from flexget.utils.tools import strip_html
 from flexget.manager import Session
 
 log = logging.getLogger('archive')

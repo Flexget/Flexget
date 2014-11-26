@@ -26,7 +26,7 @@ def prepare_config(config):
     return config
 
 @event('manager.execute.started')
-def setup(manager):
+def setup(manager, options):
     if not 'email' in manager.config:
         return
     config = prepare_config(manager.config['email'])
@@ -43,7 +43,7 @@ def setup(manager):
 
 
 @event('manager.execute.completed')
-def global_send(manager):
+def global_send(manager, options):
     if not 'email' in manager.config:
         return
     config = prepare_config(manager.config['email'])

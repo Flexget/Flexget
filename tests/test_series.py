@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from flexget.task import TaskAbort
 from tests import FlexGetBase, build_parser_function
 
 
@@ -2131,6 +2132,75 @@ class BaseSpecials(FlexGetBase):
         entry = self.task.find_entry(title='the show SOMETHING')
         assert entry.get('series_id_type') != 'special', 'Entry which should not have been flagged as a special was.'
         assert not entry.accepted, 'Entry which should not have been accepted was.'
+
+
+class BaseAlternateNames(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          alternate_name:
+            series:
+              - Some Show:
+                  begin: S01E01
+                  alternate_name: Other Show
+          another_alternate_name:
+            series:
+              - Some Show:
+                  alternate_name: Good Show
+          set_other_alternate_name:
+            mock:
+              - title: Third.Show.S01E01
+              - title: Other.Show.S01E01
+            series:
+              - Some Show:
+                  alternate_name: Third Show
+            rerun: 0
+          duplicate_names_in_different_series:
+            series:
+              - First Show:
+                 begin: S01E01
+                 alternate_name: Third Show
+              - Second Show:
+                 begin: S01E01
+                 alternate_name: Third Show
+    """
+
+    def test_set_alternate_name(self):
+        # Tests that old alternate names are not kept in the database.
+        self.execute_task('alternate_name')
+        self.execute_task('set_other_alternate_name')
+        assert self.task.find_entry('accepted', title='Third.Show.S01E01'), \
+            'A new alternate name should have been associated with the series.'
+        assert self.task.find_entry('undecided', title='Other.Show.S01E01'), \
+            'The old alternate name for the series is still present.'
+
+    def test_duplicate_alternate_names_in_different_series(self):
+        try:
+            assert self.execute_task('duplicate_names_in_different_series')
+        except TaskAbort as ex:
+            # only test that the reason is about alternate names, not which names.
+            reason = 'Error adding alternate name'
+            assert ex.reason[:27] == reason, \
+                'Wrong reason for task abortion. Should be about duplicate alternate names.'
+        else:
+            assert False, 'Duplicate alternate names across series should cause a TaskAbort.'
+
+    # Test the DB behaves like we expect ie. alternate names cannot
+    def test_alternate_names_are_removed_from_db(self):
+        from flexget.manager import Session
+        from flexget.plugins.filter.series import AlternateNames
+        with Session() as session:
+            self.execute_task('alternate_name')
+            # test the current state of alternate names
+            assert len(session.query(AlternateNames).all()) == 1, 'There should be one alternate name present.'
+            assert session.query(AlternateNames).first().alt_name == 'Other Show', \
+                'Alternate name should have been Other Show.'
+
+            # run another task that overwrites the alternate names
+            self.execute_task('another_alternate_name')
+            assert len(session.query(AlternateNames).all()) == 1, \
+                'The old alternate name should have been removed from the database.'
+            assert session.query(AlternateNames).first().alt_name == 'Good Show', \
+                'The alternate name in the database should be the new one, Good Show.'
 
 
 class TestGuessitSpecials(BaseSpecials):
