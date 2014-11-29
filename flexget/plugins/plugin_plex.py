@@ -310,6 +310,19 @@ class InputPlex(object):
 #http://address-of-plex-machine:32400/library/sections/3/refresh?deep=1
 #http://address-of-plex-machine:32400/library/sections/3/refresh?force=1
 
+# TODO: Normal input stuff as in the old one
+# TODO: Input: Search multiple shared servers.
+# TODO: Input: use myplex PMS name.
+# TODO: Input: use myplex user name (if user has multiple servers).
+# TODO: Input: Maybe: prioritize by user and/or server
+# TODO: Output: make it possible to update a section on output; normal, deep and force.
+# TODO: Output: download transcoded media.
+# TODO: Output: Maybe: Add sync for later download. (Probably need some access to lower API calls from the Plex guys.)
+# TODO: Output: Maybe: Download synced media.
+# TODO: Maybe: Music? Pictures?
+
+
+
 
 @event('plugin.register')
 def register_plugin():
