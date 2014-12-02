@@ -27,6 +27,11 @@ genres_table = Table('imdb_movie_genres', Base.metadata,
     Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
     Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'))
 
+plot_keywords_table = Table('imdb_movie_plot_keywords', Base.metadata,
+    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+    Column('plot_keyword_id', Integer, ForeignKey('imdb_plot_keywords.id')),
+    Index('ix_imdb_movie_plot_keywords', 'movie_id', 'plot_keyword_id'))
+
 actors_table = Table('imdb_movie_actors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
     Column('actor_id', Integer, ForeignKey('imdb_actors.id')),
@@ -49,6 +54,7 @@ class Movie(Base):
 
     # many-to-many relations
     genres = relation('Genre', secondary=genres_table, backref='movies')
+    plot_keywords = relation('PlotKeyword', secondary=plot_keywords_table, backref='movies')
     actors = relation('Actor', secondary=actors_table, backref='movies')
     directors = relation('Director', secondary=directors_table, backref='movies')
     languages = relation('MovieLanguage', order_by='MovieLanguage.prominence')
@@ -117,6 +123,17 @@ class Language(Base):
 class Genre(Base):
 
     __tablename__ = 'imdb_genres'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+
+    def __init__(self, name):
+        self.name = name
+
+
+class PlotKeyword(Base):
+
+    __tablename__ = 'imdb_plot_keywords'
 
     id = Column(Integer, primary_key=True)
     name = Column(String)
@@ -195,6 +212,7 @@ def upgrade(ver, session):
         log.info('Adding imdb indexes delivering up to 20x speed increase \o/ ...')
         indexes = [get_index_by_name(actors_table, 'ix_imdb_movie_actors'),
                    get_index_by_name(genres_table, 'ix_imdb_movie_genres'),
+                   get_index_by_name(plot_keywords_table, 'ix_imdb_movie_plot_keywords'),
                    get_index_by_name(directors_table, 'ix_imdb_movie_directors')]
         for index in indexes:
             if index is None:
@@ -238,6 +256,7 @@ class ImdbLookup(object):
         'imdb_name': 'title',
         'imdb_original_name': 'original_title',
         'imdb_photo': 'photo',
+        'imdb_plot_keywords': lambda movie: [keyword.name for keyword in movie.plot_keywords],
         'imdb_plot_outline': 'plot_outline',
         'imdb_score': 'score',
         'imdb_votes': 'votes',
@@ -425,7 +444,7 @@ class ImdbLookup(object):
                 log.exception(e)
             raise plugin.PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
 
-        for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'mpaa_rating']:
+        for att in ['title', 'score', 'votes', 'year', 'genres', 'plot_keywords', 'languages', 'actors', 'directors', 'mpaa_rating']:
             log.trace('movie.%s: %s' % (att, getattr(movie, att)))
 
         # store to cache and entry
@@ -458,6 +477,11 @@ class ImdbLookup(object):
             if not genre:
                 genre = Genre(name)
             movie.genres.append(genre)  # pylint:disable=E1101
+        for name in parser.plot_keywords:
+            keyword = session.query(PlotKeyword).filter(PlotKeyword.name == name).first()
+            if not keyword:
+                keyword = PlotKeyword(name)
+            movie.plot_keywords.append(keyword)  # pylint:disable=E1101
         for index, name in enumerate(parser.languages):
             language = session.query(Language).filter(Language.name == name).first()
             if not language:
