@@ -73,8 +73,8 @@ class TaskQueue(object):
         if finish_queue:
             self._shutdown_when_finished = True
             if self.run_queue.qsize():
-                log.info('There are %s tasks executing. Shutdown will commence when they have completed.' %
-                         self.run_queue.qsize())
+                log.verbose('There are %s tasks to execute. Shutdown will commence when they have completed.' %
+                            self.run_queue.qsize())
         else:
             self._shutdown_now = True
 
