@@ -278,9 +278,7 @@ class ArgumentParser(ArgParser):
         except ParserError as e:
             if raise_errors:
                 raise
-            sys.stderr.write('error: %s\n' % e.message)
-            e.parser.print_help()
-            sys.exit(2)
+            super(ArgumentParser, self).error(e.message)
         finally:
             ArgumentParser.file = None
 
