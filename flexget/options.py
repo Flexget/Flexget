@@ -183,7 +183,7 @@ class ParserError(Exception):
         return self.message
 
     def __repr__(self):
-        return 'ParserError(%s, %s)' % self.message, self.parser
+        return 'ParserError(%s, %s)' % (self.message, self.parser)
 
 
 class ArgumentParser(ArgParser):
@@ -199,8 +199,10 @@ class ArgumentParser(ArgParser):
       override the main one.
     - Command shortening: If the command for a subparser is abbreviated unambiguously, it will still be accepted.
     - The add_argument `nargs` keyword argument supports a range of arguments, e.g. `"2-4"
-    - If the `raise_errors` keyword argument to `parse_args` is True, a `ValueError` will be raised instead of sys.exit
+    - If the `raise_errors` keyword argument to `parse_args` is True, a `ParserError` will be raised instead of sys.exit
+    - If the `file` argument is given to `parse_args`, output will be printed there instead of sys.stdout or stderr
     """
+    file = None  # This is created as a class attribute so that we can set it for parser and all subparsers at once
 
     def __init__(self, nested_namespace_name=None, **kwargs):
         """
@@ -241,6 +243,12 @@ class ArgumentParser(ArgParser):
         self.restore_defaults()
         super(ArgumentParser, self).print_help(file)
 
+    def _print_message(self, message, file=None):
+        """If a file argument was passed to `parse_args` make sure output goes there."""
+        if self.file:
+            file = self.file
+        super(ArgumentParser, self)._print_message(message, file)
+
     def stash_defaults(self):
         """Remove all the defaults and store them in a temporary location."""
         self.real_defaults, self._defaults = self._defaults, {}
@@ -260,10 +268,11 @@ class ArgumentParser(ArgParser):
     def error(self, msg):
         raise ParserError(msg, self)
 
-    def parse_args(self, args=None, namespace=None, raise_errors=False):
+    def parse_args(self, args=None, namespace=None, raise_errors=False, file=None):
         """
         :param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit
         """
+        ArgumentParser.file = file
         try:
             return super(ArgumentParser, self).parse_args(args, namespace)
         except ParserError as e:
@@ -272,6 +281,8 @@ class ArgumentParser(ArgParser):
             sys.stderr.write('error: %s\n' % e.message)
             e.parser.print_help()
             sys.exit(2)
+        finally:
+            ArgumentParser.file = None
 
     def parse_known_args(self, args=None, namespace=None):
         if args is None:
