@@ -65,8 +65,9 @@ class DaemonService(rpyc.Service):
         try:
             options = parser.parse_args(args, file=self.client_out_stream)
         except SystemExit as e:
-            # TODO: Not sure how to properly propagate the exit code back to client
-            log.debug('Parsing cli args caused system exit with status %s.' % e.code)
+            if e.code:
+                # TODO: Not sure how to properly propagate the exit code back to client
+                log.debug('Parsing cli args caused system exit with status %s.' % e.code)
             return
         if not options.cron:
             with capture_output(self.client_out_stream, loglevel=options.loglevel):
