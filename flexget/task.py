@@ -476,10 +476,6 @@ class Task(object):
         msg = 'Plugin %s has requested task to be ran again after execution has completed.' % self.current_plugin
         # Only print the first request for a rerun to the info log
         log.debug(msg) if self._rerun else log.info(msg)
-        if self._rerun_count >= self.max_reruns:
-            self._rerun = False
-            log.info('Task has been re-run %s times already, stopping for now' % self._rerun_count)
-            return
         self._rerun = True
 
     def config_changed(self):
@@ -581,15 +577,17 @@ class Task(object):
             while True:
                 self._execute()
                 # rerun task
-                if self._rerun:
+                if self._rerun and self._rerun_count < self.max_reruns:
                     log.info('Rerunning the task in case better resolution can be achieved.')
                     self._rerun_count += 1
                     # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in
                     # instead of taking another one) after input and just inject the same entries for the rerun
                     self._all_entries = EntryContainer()
                     self._rerun = False
-                else:
-                    break
+                    continue
+                elif self._rerun:
+                    log.info('Task has been re-run %s times already, stopping for now' % self._rerun_count)
+                break
         finally:
             self.finished_event.set()
 
