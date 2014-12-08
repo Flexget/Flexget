@@ -19,6 +19,7 @@ from flexget.utils.database import quality_requirement_property, with_session
 from flexget.utils.sqlalchemy_utils import table_exists, table_schema
 from flexget.utils.tools import parse_timedelta
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relation, backref, relationship
 from sqlalchemy.schema import Table
 
@@ -48,8 +49,8 @@ class NormalizedComparator(Comparator):
 
 
 class LangComparator(Comparator):
-    def operate(self, op, other):
-        return op(self.__clause_element__(), other)
+    def __eq__(self, other):
+        return self.__clause_element__() == Language.fromietf(other).__str__()
 
 association_table = Table('association', Base.metadata,
                           Column('sub_queue_id', Integer, ForeignKey('subtitle_queue.id')),
@@ -62,19 +63,18 @@ class SubtitleLanguages(Base):
 
     id = Column(Integer, primary_key=True)
     _language = Column('language', Unicode, unique=True, index=True)
-    #queued_sub_id = Column(Integer, ForeignKey('subtitle_queue.id'))
 
-    def name_setter(self, value):
-        self._language = value
+    @hybrid_property
+    def language(self):
+        return Language.fromietf(self._language).__str__()
 
-    def name_getter(self):
-        return Language.fromietf(self._language)
+    @language.setter
+    def language(self, value):
+        self._language = Language.fromietf(value).__str__()
 
-    def lang_comparator(self):
+    @language.comparator
+    def language(self):
         return LangComparator(self._language)
-
-    language = hybrid_property(name_getter, name_setter)
-    language.comparator(lang_comparator)
 
     def __init__(self, language):
         self.language = language
@@ -143,7 +143,7 @@ class SubtitleQueue(object):
             {
                 'type': 'object',
                 'properties': {
-                    'action': {'type': 'string', 'enum': ['add', 'remove', 'emit']},
+                    'action': {'type': 'string', 'enum': ['add', 'remove']},
                     'stop_after': {'type': 'string', 'format': 'interval'},
                     'languages': {"oneOf": [
                         {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
@@ -153,6 +153,14 @@ class SubtitleQueue(object):
                 'required': ['action'],
                 'additionalProperties': False
             },
+            {
+                'type': 'object',
+                'properties': {
+                    'action': {'type': 'string', 'enum': ['emit']}
+                },
+                'required': ['action'],
+                'additionalProperties': False
+            }
         ]
     }
 
@@ -198,16 +206,16 @@ class SubtitleQueue(object):
                     log.debug('All primary subtitles already fetched for %s.' % entry['title'])
                     continue
             entries.append(entry)
-            log.debug('Emitted subtitle entry for %s.' % entry['title'])
+            log.debug('Emitting subtitle entry for %s.' % entry['title'])
         return entries
 
     def on_task_filter(self, task, config):
-        if config:
+        if config and config.get('action') == 'emit':
             for entry in task.entries:
                 entry.accept()
 
     def on_task_input(self, task, config):
-        if not config:
+        if not config or config.get('action') != 'emit':
             return
         return self.emit(task, config)
 
@@ -288,7 +296,8 @@ def queue_add(path, title, config, alternate_path=None, session=None):
     item = session.query(QueuedSubtitle).filter(or_(QueuedSubtitle.path == path,
                                                     QueuedSubtitle.alternate_path == path)).first()
     primary = make_lang_list(config.get('languages', []), session=session)
-    default = [SubtitleLanguages('eng')]
+    eng = session.query(SubtitleLanguages).filter(SubtitleLanguages.language == 'en').first()
+    default = eng if eng else [SubtitleLanguages('eng')]
     if item:
         log.debug('Already queued. Updating values.')
         if item.path == path and alternate_path:
@@ -297,6 +306,8 @@ def queue_add(path, title, config, alternate_path=None, session=None):
             item.path = alternate_path
             #raise QueueError("ERROR: %s is already in the queue." % path, errno=1)
         item.languages = primary if primary else default
+        if config.get('stop_after', ''):
+            item.stop_after = config['stop_after']
     else:
         if config.get('stop_after', ''):
             item = QueuedSubtitle(path, alternate_path, title, stop_after=config.get('stop_after'))
@@ -331,7 +342,7 @@ def queue_edit(src, dest, title, config, session=None):
         item.alternate_path = src
         item.path = dest
         stop_after = config.get('stop_after', '')
-        if stop_after and item.stop_after is not stop_after:
+        if stop_after and not item.stop_after == stop_after:
             item.stop_after = stop_after
         primary = make_lang_list(config.get('languages', []), session=session)
         item.languages = primary
@@ -350,8 +361,7 @@ def queue_get(session=None):
 # must always pass the session
 @with_session
 def get_lang(lang, session=None):
-    l = session.query(SubtitleLanguages).filter(SubtitleLanguages.language == unicode(lang)).first()
-    return l
+    return session.query(SubtitleLanguages).filter(SubtitleLanguages.language == lang).first()
 
 
 # TODO: prettify? ugly shit code fuck me
@@ -360,12 +370,19 @@ def make_lang_list(languages, session=None):
     primary = []
     if not isinstance(languages, list):
         languages = [languages]
+    # TODO: find better way of enforcing uniqueness without catching exceptions or doing dumb shit like this
+    languages = set([Language.fromietf(l).__str__() for l in languages])
+
     for language in languages:
         l = get_lang(language, session=session)
-        if l:
+        if l and l not in primary:
             primary.append(l)
         else:
-            primary.append(SubtitleLanguages(unicode(language)))
+            print primary
+            #session.expire_all()
+            l = SubtitleLanguages(unicode(language))
+            primary.append(l)
+
     return primary
 
 
