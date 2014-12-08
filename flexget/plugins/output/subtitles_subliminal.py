@@ -106,7 +106,7 @@ class PluginSubliminal(object):
                 try:
                     temp_langs = langs
                     if not langs:
-                        langs = entry.get('subtitle_languages', '')  # config langs override entry langs
+                        langs = set(entry.get('subtitle_languages', ''))  # config langs override entry langs
                     video = subliminal.scan_video(entry['location'])
                     log.info('Series name computed for %s was %s' % (entry['location'], video.series))
                     msc = video.scores['hash'] if config['exact_match'] else 0
