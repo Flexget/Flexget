@@ -536,15 +536,18 @@ def new_eps_after(since_ep):
         return 0
 
 
-def store_parser(session, parser, series=None):
+def store_parser(session, parser, series=None, quality=None):
     """
     Push series information into database. Returns added/existing release.
 
     :param session: Database session to use
     :param parser: parser for release that should be added to database
     :param series: Series in database to add release to. Will be looked up if not provided.
+    :param quality: If supplied, this will override the quality from the series parser
     :return: List of Releases
     """
+    if quality is None:
+        quality = parser.quality
     if not series:
         # if series does not exist in database, add new
         series = session.query(Series).\
@@ -587,13 +590,13 @@ def store_parser(session, parser, series=None):
         # perhaps a bug in sqlalchemy?
         release = session.query(Release).filter(Release.episode_id == episode.id).\
             filter(Release.title == parser.data).\
-            filter(Release.quality == parser.quality).\
+            filter(Release.quality == quality).\
             filter(Release.proper_count == parser.proper_count).\
             filter(Release.episode_id != None).first()
         if not release:
             log.debug('adding release %s into episode', parser)
             release = Release()
-            release.quality = parser.quality
+            release.quality = quality
             release.proper_count = parser.proper_count
             release.title = parser.data
             episode.releases.append(release)  # pylint:disable=E1103
@@ -993,7 +996,8 @@ class FilterSeries(FilterSeriesBase):
                 series_entries = {}
                 for entry in found_series[series_name]:
                     # store found episodes into database and save reference for later use
-                    releases = store_parser(session, entry['series_parser'], series=db_series)
+                    releases = store_parser(session, entry['series_parser'], series=db_series,
+                                            quality=entry.get('quality'))
                     entry['series_releases'] = [r.id for r in releases]
                     series_entries.setdefault(releases[0].episode, []).append(entry)
 
