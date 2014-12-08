@@ -84,10 +84,9 @@ class SearchCPASBIEN(object):
             log.debug('CPASBIEN search url: %s' % url + '.html')
 # GET URL
             opener = urllib2.build_opener()
-            opener.addheaders.append(("User-Agent", "Mozilla/5.0 \
-                                     (Macintosh; Intel Mac OS X 10_6_8)\
+            opener.addheaders.append("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8)\
                                      AppleWebKit/535.1 (KHTML, like Gecko)\
-                                     Chrome/14.0.835.202 Safari/535.1"))
+                                     Chrome/14.0.835.202 Safari/535.1")
             f = opener.open(url + '.html')
             soup = get_soup(f)
             if soup.findAll(text="Pas de torrents disponibles correspondant"):
@@ -100,36 +99,22 @@ class SearchCPASBIEN(object):
                         log.debug('-----> PAGE SUIVANTE : %s' % newurl)
                         f1 = opener.open(newurl)
                         soup = get_soup(f1)
-                    for result in soup.findAll('div', attrs={
-                        'class': re.compile('ligne')
-                    }):
+                    for result in soup.findAll('div', attrs={'class': re.compile('ligne')}):
                         entry = Entry()
-                        link = result.find(
-                            'a', attrs={'href': re.compile('dl-torrent')})
+                        link = result.find('a', attrs={'href': re.compile('dl-torrent')})
                         entry['title'] = link.contents[0]
 # REWRITE URL
                         page_link = link.get('href')
                         link_rewrite = page_link.split("/")
 # get last value in array remove .html and replace by .torrent
                         endlink = link_rewrite[-1]
-                        entry['url'] = (base_url + "telecharge/"
-                                        + endlink[:-5] + ".torrent")
+                        entry['url'] = (base_url + "telecharge/" + endlink[:-5] + ".torrent")
                         log.debug('URL: %s' % (page_link))
                         log.debug('REW: %s' % (entry['url']))
-                        log.debug('Title: %s | DL LINK: %s' %
-                                  (entry['title'], entry['url']))
-                        entry['torrent_seeds'] = (int(
-                            result.find('span', attrs={
-                                'class': re.compile('seed')
-                            }).text))
-                        entry['torrent_leeches'] = (int(
-                            result.find('div', attrs={
-                                'class': re.compile('down')
-                            }).text))
-                        sizefull = (result.find('div',
-                                    attrs={
-                                        'class': re.compile('poid')
-                                    }).text)
+                        log.debug('Title: %s | DL LINK: %s' % (entry['title'], entry['url']))
+                        entry['torrent_seeds'] = (int(result.find('span', attrs={'class': re.compile('seed')}).text))
+                        entry['torrent_leeches'] = (int(result.find('div', attrs={'class': re.compile('down')}).text))
+                        sizefull = (result.find('div', attrs={'class': re.compile('poid')}).text)
                         size = sizefull[:-3]
                         unit = sizefull[-2:]
                         if unit == 'GB':
