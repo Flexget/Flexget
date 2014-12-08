@@ -114,7 +114,7 @@ class QueuedSubtitle(Base):
 
     def alt_setter(self, value):
         self._alternate_path = value
-        self._alternate_path_normalized = os.path.normcase(os.path.normpath(value))
+        self._alternate_path_normalized = os.path.normcase(os.path.normpath(value)) if value is not None else None
 
     def alt_getter(self):
         return self._alternate_path
@@ -186,12 +186,17 @@ class SubtitleQueue(object):
             entry['subtitle_languages'] = primary
 
             index = path.rfind('.')
-            for lang in primary:
-                if not glob.glob(path[:index] + "." + str(lang) + ".srt"):
-                    break
+            if len(primary) > 1:
+                for lang in primary:
+                    if not glob.glob(path[:index] + "." + str(lang) + ".srt"):
+                        break
+                else:
+                    log.debug('All primary subtitles already fetched for %s.' % entry['title'])
+                    continue
             else:
-                log.debug('All primary subtitles already fetched for %s.' % entry['title'])
-                continue
+                if glob.glob(path[:index] + ".srt"):
+                    log.debug('All primary subtitles already fetched for %s.' % entry['title'])
+                    continue
             entries.append(entry)
             log.debug('Emitted subtitle entry for %s.' % entry['title'])
         return entries
@@ -216,7 +221,7 @@ class SubtitleQueue(object):
             try:
                 if action == "add":
                     # is it a local file?
-                    if os.path.exists(entry.get('location', '')):
+                    if os.path.isfile(entry.get('location', '')):
                         src = entry.get('location', '')
                         dest = entry.get('output', '')
                         if dest:
@@ -224,8 +229,10 @@ class SubtitleQueue(object):
                             queue_edit(src, dest, entry.get('title', ''), config)
                         else:
                             queue_add(src, entry.get('title', ''), config)
-                    else:
+                    elif entry.get('url', '').endswith('.torrent'):
                         content_filename = entry.get('content_filename', '')
+                        info = None
+                        files = None
                         for url in entry.get('urls', ''):
                             try:
                                 info = flexget.bencode.bdecode(requests.get(url).text)['info']
@@ -258,11 +265,16 @@ class SubtitleQueue(object):
                             dest = entry.get('movedone', '') + title
                             queue_add(src, entry.get('title', ''), config, alternate_path=dest)
                         elif entry.get('path', ''):
-                            queue_add(src, entry.get('title', ''), config)
+                            queue_add(entry.get('path'), entry.get('title', ''), config)
                         else:
                             raise TaskAbort("Cannot queue invalid entries.")
+                    else:
+                        raise TaskAbort("Invalid entry for subtitle queue.")
                 elif action == "remove":
-                    queue_del(entry['path'])
+                    if entry.get('location', ''):
+                        queue_del(entry['location'])
+                    else:
+                        raise TaskAbort("Cannot delete non-local files.")
                 return
             except QueueError as e:
                 # ignore already in queue
@@ -271,26 +283,35 @@ class SubtitleQueue(object):
 
 
 @with_session
-def queue_add(path, title, config, alternate_path='', session=None):
-    if session.query(QueuedSubtitle).filter(or_(QueuedSubtitle.path == path,
-                                                QueuedSubtitle.alternate_path == path)).first():
-        raise QueueError("ERROR: %s is already in the queue." % path, errno=1)
+def queue_add(path, title, config, alternate_path=None, session=None):
+    path = unicode(path)
+    item = session.query(QueuedSubtitle).filter(or_(QueuedSubtitle.path == path,
+                                                    QueuedSubtitle.alternate_path == path)).first()
+    primary = make_lang_list(config.get('languages', []), session=session)
+    default = [SubtitleLanguages('eng')]
+    if item:
+        log.debug('Already queued. Updating values.')
+        if item.path == path and alternate_path:
+            item.alternate_path = alternate_path
+        elif item.alternate_path == path and alternate_path:
+            item.path = alternate_path
+            #raise QueueError("ERROR: %s is already in the queue." % path, errno=1)
+        item.languages = primary if primary else default
     else:
-        primary = make_lang_list(config.get('languages', []))
         if config.get('stop_after', ''):
             item = QueuedSubtitle(path, alternate_path, title, stop_after=config.get('stop_after'))
         else:
             item = QueuedSubtitle(path, alternate_path, title)
         session.add(item)
-        item.languages = primary if primary else [SubtitleLanguages('eng')]
+        item.languages = primary if primary else default
         log.debug('Added %s to queue with %s primary languages.' % (item.path, len(item.languages)))
         return True
 
 
 @with_session
 def queue_del(path, session=None):
-    item = session.query(QueuedSubtitle).filter(QueuedSubtitle.path == path)
-    item = item.first()
+    item = session.query(QueuedSubtitle).filter(or_(QueuedSubtitle.path == path,
+                                                    QueuedSubtitle.alternate_path == path)).first()
     if not item:
         # Not necessarily an error?
         raise QueueError("DEBUG: %s is not in the queue." % path)
@@ -312,7 +333,7 @@ def queue_edit(src, dest, title, config, session=None):
         stop_after = config.get('stop_after', '')
         if stop_after and item.stop_after is not stop_after:
             item.stop_after = stop_after
-        primary = make_lang_list(config.get('languages', []))
+        primary = make_lang_list(config.get('languages', []), session=session)
         item.languages = primary
 
 
@@ -327,22 +348,24 @@ def queue_get(session=None):
 
 
 # must always pass the session
-def get_lang(lang, session):
-    l = session.query(SubtitleLanguages).filter(SubtitleLanguages.language == lang).first()
+@with_session
+def get_lang(lang, session=None):
+    l = session.query(SubtitleLanguages).filter(SubtitleLanguages.language == unicode(lang)).first()
     return l
 
 
 # TODO: prettify? ugly shit code fuck me
-def make_lang_list(languages):
+@with_session
+def make_lang_list(languages, session=None):
     primary = []
     if not isinstance(languages, list):
         languages = [languages]
     for language in languages:
-        l = get_lang(language)
+        l = get_lang(language, session=session)
         if l:
             primary.append(l)
         else:
-            primary.append(SubtitleLanguages(language))
+            primary.append(SubtitleLanguages(unicode(language)))
     return primary
 
 
