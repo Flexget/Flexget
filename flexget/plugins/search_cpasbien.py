@@ -79,17 +79,13 @@ class SearchCPASBIEN(object):
             query = normalize_unicode(search_string)
             query_url_fragment = query.encode('iso-8859-1')
 # http://www.cpasbien.pe/recherche/ncis.html
-            url = (base_url + "recherche/" + category_url_fragment
-                   + '/' + query_url_fragment)
-            log.debug('CPASBIEN search url: %s' % url + '.html')
+            url = (base_url + "recherche/" + category_url_fragment + '/' + query_url_fragment)
+            log.debug('search url: %s' % url + '.html')
 # GET URL
             opener = urllib2.build_opener()
-            opener.addheaders.append("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8)\
-                                     AppleWebKit/535.1 (KHTML, like Gecko)\
-                                     Chrome/14.0.835.202 Safari/535.1")
             f = opener.open(url + '.html')
             soup = get_soup(f)
-            if soup.findAll(text="Pas de torrents disponibles correspondant"):
+            if soup.findAll(text=re.compile("0 torrents")):
                 log.debug('search returned no results')
             else:
                 nextpage = 0
@@ -109,9 +105,9 @@ class SearchCPASBIEN(object):
 # get last value in array remove .html and replace by .torrent
                         endlink = link_rewrite[-1]
                         entry['url'] = (base_url + "telecharge/" + endlink[:-5] + ".torrent")
-                        log.debug('URL: %s' % (page_link))
-                        log.debug('REW: %s' % (entry['url']))
+
                         log.debug('Title: %s | DL LINK: %s' % (entry['title'], entry['url']))
+
                         entry['torrent_seeds'] = (int(result.find('span', attrs={'class': re.compile('seed')}).text))
                         entry['torrent_leeches'] = (int(result.find('div', attrs={'class': re.compile('down')}).text))
                         sizefull = (result.find('div', attrs={'class': re.compile('poid')}).text)
@@ -127,10 +123,10 @@ class SearchCPASBIEN(object):
                             entries.add(entry)
                         else:
                             log.debug('0 SEED, not adding entry')
-                        if soup.find(text=re.compile("Suiv")):
-                            nextpage += 1
-                        else:
-                            nextpage = -1
+                    if soup.find(text=re.compile("Suiv")):
+                        nextpage += 1
+                    else:
+                        nextpage = -1
             return entries
 
 
