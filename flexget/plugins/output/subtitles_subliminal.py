@@ -78,13 +78,14 @@ class PluginSubliminal(object):
         import subliminal
         try:
             subliminal.cache_region.configure('dogpile.cache.dbm', 
-                arguments={'filename': os.path.join(tempfile.gettempdir(), 'cachefile.dbm'), 
-                           'lock_factory': subliminal.MutexLock})
+                                              arguments={'filename': os.path.join(tempfile.gettempdir(),
+                                                                                  'cachefile.dbm'),
+                                              'lock_factory': subliminal.MutexLock})
         except RegionAlreadyConfigured:
             pass
         logging.getLogger("subliminal").setLevel(logging.CRITICAL)
         logging.getLogger("enzyme").setLevel(logging.WARNING)
-        langs = set([Language.fromietf(s) for s in config['languages']])
+        langs = set([Language.fromietf(s) for s in config.get('languages', [])])
         alts = set([Language.fromietf(s) for s in config.get('alternatives', [])])
         # keep all downloaded subtitles and save to disk when done (no need to write every time)
         downloaded_subtitles = collections.defaultdict(list)
@@ -103,13 +104,17 @@ class PluginSubliminal(object):
                 entry.fail('file not found: %s' % entry['location'])
             elif not '$RECYCLE.BIN' in entry['location']:  # ignore deleted files in Windows shares
                 try:
+                    temp_langs = langs
+                    if not langs:
+                        langs = entry.get('subtitle_languages', '')  # config langs override entry langs
                     video = subliminal.scan_video(entry['location'])
                     log.info('Series name computed for %s was %s' % (entry['location'], video.series))
                     msc = video.scores['hash'] if config['exact_match'] else 0
                     if langs & video.subtitle_languages:
                         continue  # subs for preferred lang(s) already exists
                     else:
-                        subtitle = subliminal.download_best_subtitles([video], langs, providers=providers_list, min_score=msc)
+                        subtitle = subliminal.download_best_subtitles([video], langs, providers=providers_list,
+                                                                      min_score=msc)
                         if subtitle:
                             downloaded_subtitles.update(subtitle)
                             log.info('Subtitles found for %s' % entry['location'])
@@ -119,7 +124,8 @@ class PluginSubliminal(object):
                             remaining_alts = alts - video.subtitle_languages
                             if remaining_alts:
                                 # only try to download for alternatives that aren't alread downloaded
-                                subtitle = subliminal.download_best_subtitles([video], remaining_alts, providers=providers_list, min_score=msc)
+                                subtitle = subliminal.download_best_subtitles([video], remaining_alts,
+                                                                              providers=providers_list, min_score=msc)
                             # this potentially just checks an already checked assignment bleh
                             if subtitle:
                                 downloaded_subtitles.update(subtitle)
@@ -136,6 +142,8 @@ class PluginSubliminal(object):
                         msg = 'subliminal error: %s' % err.__class__.__name__
                     log.debug(msg)
                     entry.fail(msg)
+                finally:
+                    langs = temp_langs  # re-assign config langs
         if downloaded_subtitles:
             # save subtitles to disk
             subliminal.save_subtitles(downloaded_subtitles, single=single_mode)
