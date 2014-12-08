@@ -1,4 +1,4 @@
-from flexget.plugins.filter.subtitle_queue import queue_add, queue_get
+from flexget.plugins.filter.subtitle_queue import queue_add, queue_get, SubtitleLanguages
 from tests import FlexGetBase
 
 
@@ -22,10 +22,6 @@ class TestSubtitleQueue(FlexGetBase):
            subtitle_remove:
              subtitle_queue:
                action: remove
-           movie_queue_remove:
-             movie_queue: remove
-           movie_queue_forget:
-             movie_queue: forget
     """
 
     def test_subtitle_queue_add(self):
@@ -49,10 +45,20 @@ class TestSubtitleQueue(FlexGetBase):
         config['languages'] = ['en']
         queue_add('./series.mkv', 'Series', config)
         queue_add('./movie.mkv', 'Movie', config)
+        queue = queue_get()
+        assert len(queue) == 2
 
         self.execute_task('subtitle_emit')
 
-        assert len(self.task.entries) == 2, "2 items should be in queue."
+        assert len(self.task.entries) == 2, "2 items should be emitted from the queue."
+
+        queue = queue_get()
+        assert len(queue) == 2
+
+        self.execute_task('subtitle_emit')
+        print len(self.task.entries)
+        print len(queue_get())
+        assert len(self.task.entries) == 2, "2 items should be emitted from the queue again."
 
     def test_subtitle_queue_del(self):
         self.execute_task('subtitle_add')
@@ -62,3 +68,18 @@ class TestSubtitleQueue(FlexGetBase):
         self.execute_task('subtitle_remove')
         queue = queue_get()
         assert len(queue) == 0
+
+    def test_subtitle_queue_unique_lang(self):
+        config = {}
+        config['languages'] = ['en', 'eng']
+
+        queue_add('./series.mkv', 'Series', config)
+        queue_add('./movie.mkv', 'Movie', config)
+        queue = queue_get()
+
+        from flexget.manager import Session
+        with Session() as session:
+            for q in queue_get(session=session):
+                assert len(q.languages) == 1
+        assert len(queue) == 2
+
