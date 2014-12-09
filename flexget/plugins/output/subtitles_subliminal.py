@@ -104,16 +104,14 @@ class PluginSubliminal(object):
                 entry.fail('file not found: %s' % entry['location'])
             elif not '$RECYCLE.BIN' in entry['location']:  # ignore deleted files in Windows shares
                 try:
-                    temp_langs = langs
-                    if not langs:
-                        langs = set(entry.get('subtitle_languages', ''))  # config langs override entry langs
+                    entry_langs = set(entry.get('subtitle_languages', 'langs'))
                     video = subliminal.scan_video(entry['location'])
                     log.info('Series name computed for %s was %s' % (entry['location'], video.series))
                     msc = video.scores['hash'] if config['exact_match'] else 0
-                    if langs & video.subtitle_languages:
+                    if entry_langs & video.subtitle_languages:
                         continue  # subs for preferred lang(s) already exists
                     else:
-                        subtitle = subliminal.download_best_subtitles([video], langs, providers=providers_list,
+                        subtitle = subliminal.download_best_subtitles([video], entry_langs, providers=providers_list,
                                                                       min_score=msc)
                         if subtitle:
                             downloaded_subtitles.update(subtitle)
@@ -142,8 +140,6 @@ class PluginSubliminal(object):
                         msg = 'subliminal error: %s' % err.__class__.__name__
                     log.debug(msg)
                     entry.fail(msg)
-                finally:
-                    langs = temp_langs  # re-assign config langs
         if downloaded_subtitles:
             # save subtitles to disk
             subliminal.save_subtitles(downloaded_subtitles, single=single_mode)
