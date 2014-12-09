@@ -50,7 +50,7 @@ class NormalizedComparator(Comparator):
 
 class LangComparator(Comparator):
     def __eq__(self, other):
-        return self.__clause_element__() == Language.fromietf(other).__str__()
+        return self.__clause_element__() == unicode(Language.fromietf(other))
 
 association_table = Table('association', Base.metadata,
                           Column('sub_queue_id', Integer, ForeignKey('subtitle_queue.id')),
@@ -66,11 +66,11 @@ class SubtitleLanguages(Base):
 
     @hybrid_property
     def language(self):
-        return Language.fromietf(self._language).__str__()
+        return unicode(Language.fromietf(self._language))
 
     @language.setter
     def language(self, value):
-        self._language = Language.fromietf(value).__str__()
+        self._language = unicode(Language.fromietf(value))
 
     @language.comparator
     def language(self):
@@ -361,7 +361,7 @@ def queue_get(session=None):
 # must always pass the session
 @with_session
 def get_lang(lang, session=None):
-    return session.query(SubtitleLanguages).filter(SubtitleLanguages.language == lang).first()
+    return session.query(SubtitleLanguages).filter(SubtitleLanguages.language == unicode(lang)).first()
 
 
 # TODO: prettify? ugly shit code fuck me
@@ -371,7 +371,7 @@ def make_lang_list(languages, session=None):
     if not isinstance(languages, list):
         languages = [languages]
     # TODO: find better way of enforcing uniqueness without catching exceptions or doing dumb shit like this
-    languages = set([Language.fromietf(l).__str__() for l in languages])
+    languages = set([unicode(Language.fromietf(l)) for l in languages])
 
     for language in languages:
         l = get_lang(language, session=session)
