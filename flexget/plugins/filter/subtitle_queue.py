@@ -4,35 +4,28 @@ import logging
 import os
 import urllib
 import urlparse
-import flexget.bencode
 
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update, DateTime, Boolean, Unicode
 from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relation, backref, relationship
+from sqlalchemy.schema import Table
 
 from datetime import datetime, date, time
 from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.task import TaskAbort
-from flexget.utils import requests
-from flexget.utils.database import quality_requirement_property, with_session
-from flexget.utils.sqlalchemy_utils import table_exists, table_schema
+from flexget.utils import requests, bittorrent
+from flexget.utils.database import with_session
 from flexget.utils.tools import parse_timedelta
-from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relation, backref, relationship
-from sqlalchemy.schema import Table
 
 try:
     from flexget.plugins.filter import queue_base
 except ImportError:
     raise plugin.DependencyError(issued_by='subtitle_queue', missing='queue_base',
                                  message='subtitle_queue requires the queue_base plugin')
-try:
-    from flexget.plugins.metainfo.subtitles_check import MetainfoSubs
-except ImportError:
-    raise plugin.DependencyError(issued_by='subtitle_queue', missing='subtitles_check',
-                                 message='subtitle_queue requires way of checking for subtitles')
 try:
     from babelfish import Language
 except ImportError:
@@ -45,7 +38,8 @@ Base = db_schema.versioned_base('subtitle_queue', 0)
 
 class NormalizedComparator(Comparator):
     def operate(self, op, other):
-        return op(self.__clause_element__(), os.path.normcase(os.path.normpath(other)))
+        return op(self.__clause_element__(),
+                  os.path.normcase(os.path.normpath(other)))
 
 
 class LangComparator(Comparator):
@@ -90,37 +84,34 @@ class QueuedSubtitle(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String)  # Not completely necessary
     _path = Column('path', Unicode)  # Absolute path of file to fetch subtitles for
-    _path_normalized = Column('path_normalized', Unicode, index=True, unique=True)
     _alternate_path = Column('alternate_path', Unicode)  # Absolute path of file to fetch subtitles for
-    _alternate_path_normalized = Column('alternate_path_normalized', Unicode, index=True, unique=True)
-    #imdb_id = Column(String)  # not sure this is strictly necessary
     added = Column(DateTime)  # Used to determine age
     stop_after = Column(String)
     downloaded = Column(Boolean)
     languages = relationship(SubtitleLanguages, secondary=association_table, backref="primary")
 
     def name_setter(self, value):
-        self._path = value
-        self._path_normalized = os.path.normcase(os.path.normpath(value))
+        self._path = os.path.normcase(os.path.normpath(value))
+        #self._path_normalized = os.path.normcase(os.path.normpath(value))
 
     def name_getter(self):
         return self._path
 
     def name_comparator(self):
-        return NormalizedComparator(self._path_normalized)
+        return NormalizedComparator(self._path)
 
     path = hybrid_property(name_getter, name_setter)
     path.comparator(name_comparator)
 
     def alt_setter(self, value):
-        self._alternate_path = value
-        self._alternate_path_normalized = os.path.normcase(os.path.normpath(value)) if value is not None else None
+        self._alternate_path = os.path.normcase(os.path.normpath(value))
+        #self._alternate_path_normalized = os.path.normcase(os.path.normpath(value)) if value is not None else None
 
     def alt_getter(self):
         return self._alternate_path
 
     def alt_comparator(self):
-        return NormalizedComparator(self._alternate_path_normalized)
+        return NormalizedComparator(self._alternate_path)
 
     alternate_path = hybrid_property(alt_getter, alt_setter)
     alternate_path.comparator(alt_comparator)
@@ -190,9 +181,11 @@ class SubtitleQueue(object):
 
             primary = []
             for language in sub_item.languages:
-                primary.append(language.language)
+                primary.append(Language.fromietf(language.language))
             entry['subtitle_languages'] = primary
 
+            # get the file extension index
+            # use glob instead of subtitles_check as subtitles_check does some unnecessary hashing
             index = path.rfind('.')
             if len(primary) > 1:
                 for lang in primary:
@@ -202,9 +195,9 @@ class SubtitleQueue(object):
                     log.debug('All primary subtitles already fetched for %s.' % entry['title'])
                     continue
             else:
-                if glob.glob(path[:index] + ".srt"):
+                if glob.glob(path[:index] + ".srt") or glob.glob(path[:index] + "." + str(primary[0]) + ".srt"):
                     log.debug('All primary subtitles already fetched for %s.' % entry['title'])
-                    continue
+
             entries.append(entry)
             log.debug('Emitting subtitle entry for %s.' % entry['title'])
         return entries
@@ -237,25 +230,24 @@ class SubtitleQueue(object):
                             queue_edit(src, dest, entry.get('title', ''), config)
                         else:
                             queue_add(src, entry.get('title', ''), config)
+                    # or is it a torrent?
                     elif entry.get('url', '').endswith('.torrent'):
                         content_filename = entry.get('content_filename', '')
-                        info = None
-                        files = None
                         for url in entry.get('urls', ''):
                             try:
-                                info = flexget.bencode.bdecode(requests.get(url).text)['info']
+                                info = bittorrent.bdecode(requests.get(url).content)['info']
                                 files = info['files']
                                 break
                             except Exception:
                                 continue
-                        if not info or not files:
-                            raise TaskAbort('Invalid entry. Cannot queue.')
+                        else:
+                            raise TaskAbort('Error trying to pull torrent info.')
                         if len(files) == 1:
                             title = files[0]['path'][0]  # extract file name
                             if content_filename:
                                 # need to queue the content_filename
                                 ext = title.rfind('.')
-                                title = content_filename + title[ext:]
+                                title = os.path.join(content_filename, title[ext:])
                         else:
                             # TODO: queue dir or specific files?
                             # paths = []
@@ -269,12 +261,13 @@ class SubtitleQueue(object):
                             # set the title to be torrent name, which hopefully is download dir
                             title = info['name']
                         if entry.get('movedone', ''):
-                            src = entry.get('path', '') + title
-                            dest = entry.get('movedone', '') + title
+                            src = os.path.join(entry.get('path', ''), title)
+                            dest = os.path.join(entry.get('movedone', ''), title)
                             queue_add(src, entry.get('title', ''), config, alternate_path=dest)
                         elif entry.get('path', ''):
                             queue_add(entry.get('path'), entry.get('title', ''), config)
                         else:
+                            # TODO: maybe handle this differently?
                             raise TaskAbort("Cannot queue invalid entries.")
                     else:
                         raise TaskAbort("Invalid entry for subtitle queue.")
@@ -299,13 +292,14 @@ def queue_add(path, title, config, alternate_path=None, session=None):
     eng = session.query(SubtitleLanguages).filter(SubtitleLanguages.language == 'en').first()
     default = eng if eng else [SubtitleLanguages('eng')]
     if item:
-        log.debug('Already queued. Updating values.')
+        log.debug('%s: Already queued. Updating values.' % item.title)
         if item.path == path and alternate_path:
             item.alternate_path = alternate_path
         elif item.alternate_path == path and alternate_path:
             item.path = alternate_path
             #raise QueueError("ERROR: %s is already in the queue." % path, errno=1)
-        item.languages = primary if primary else default
+        if primary:
+            item.languages = primary
         if config.get('stop_after', ''):
             item.stop_after = config['stop_after']
     else:
@@ -315,7 +309,7 @@ def queue_add(path, title, config, alternate_path=None, session=None):
             item = QueuedSubtitle(path, alternate_path, title)
         session.add(item)
         item.languages = primary if primary else default
-        log.debug('Added %s to queue with %s primary languages.' % (item.path, len(item.languages)))
+        log.info('Added %s to queue with %s primary languages.' % (item.path, len(item.languages)))
         return True
 
 
