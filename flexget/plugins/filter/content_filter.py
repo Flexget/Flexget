@@ -91,13 +91,6 @@ class FilterContentFilter(object):
                     entry.reject('does not have a main file', remember=True)
                     return True
 
-    def parse_torrent_files(self, entry):
-        if 'torrent' in entry:
-            files = [posixpath.join(item['path'], item['name']) for item in entry['torrent'].get_filelist()]
-            if files:
-                # TODO: should not add this to entry, this is a filter plugin
-                entry['content_files'] = files
-
     @plugin.priority(150)
     def on_task_modify(self, task, config):
         if task.options.test or task.options.learn:
@@ -106,9 +99,6 @@ class FilterContentFilter(object):
 
         config = self.prepare_config(config)
         for entry in task.accepted:
-            # TODO: I don't know if we can parse filenames from nzbs, just do torrents for now
-            # possibly also do compressed files in the future
-            self.parse_torrent_files(entry)
             if self.process_entry(task, entry, config):
                 task.rerun()
             elif not 'content_files' in entry and config.get('strict'):
