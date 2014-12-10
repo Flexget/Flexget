@@ -137,11 +137,17 @@ class Manager(object):
 
         self.config = {}
 
-        try:
-            self.options, extra = CoreArgumentParser().parse_known_args(args)
-        except ParserError:
-            # If a non-built-in command was used, we need to parse with a parser that doesn't define the subparsers
-            self.options, extra = manager_parser.parse_known_args(args)
+        if '--help' in args or '-h' in args:
+            # TODO: This is a bit hacky, but we can't call parse on real arguments when --help is used because it will
+            # cause a system exit before plugins are loaded and print incomplete help. This will get us a default
+            # options object and we'll parse the real args later, or send them to daemon. #2807
+            self.options, extra = CoreArgumentParser().parse_known_args(['execute'])
+        else:
+            try:
+                self.options, extra = CoreArgumentParser().parse_known_args(args)
+            except ParserError:
+                # If a non-built-in command was used, we need to parse with a parser that doesn't define the subparsers
+                self.options, extra = manager_parser.parse_known_args(args)
         try:
             self.find_config(create=False)
         except:
@@ -268,6 +274,9 @@ class Manager(object):
         and results will be streamed back.
         If not, this will attempt to obtain a lock, initialize the manager, and run the command here.
         """
+        # When we are in test mode, we use a different lock file and db
+        if self.options.test:
+            self.lockfile = os.path.join(self.config_base, '.test-%s-lock' % self.config_name)
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
         if ipc_info:
@@ -285,6 +294,13 @@ class Manager(object):
                 except EOFError:
                     log.error('Connection from daemon was severed.')
             return
+        if self.options.test:
+            log.info('Test mode, creating a copy from database ...')
+            db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.config_name)
+            if os.path.exists(self.db_filename):
+                shutil.copy(self.db_filename, db_test_filename)
+                log.info('Test database created')
+            self.db_filename = db_test_filename
         # No running process, we start our own to handle command
         with self.acquire_lock():
             self.initialize()
@@ -516,6 +532,7 @@ class Manager(object):
         self.config_name = os.path.splitext(os.path.basename(config))[0]
         self.config_base = os.path.normpath(os.path.dirname(config))
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
+        self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
 
     def load_config(self):
         """
@@ -635,7 +652,6 @@ class Manager(object):
         else:
             return config
 
-
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
         try:
@@ -647,17 +663,6 @@ class Manager(object):
 
         # SQLAlchemy
         if self.database_uri is None:
-            self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
-            if self.options.test:
-                db_test_filename = os.path.join(self.config_base, 'test-%s.sqlite' % self.config_name)
-                log.info('Test mode, creating a copy from database ...')
-                if os.path.exists(self.db_filename):
-                    shutil.copy(self.db_filename, db_test_filename)
-                self.db_filename = db_test_filename
-                # Different database, different lock file
-                self.lockfile = os.path.join(self.config_base, '.test-%s-lock' % self.config_name)
-                log.info('Test database created')
-
             # in case running on windows, needs double \\
             filename = self.db_filename.replace('\\', '\\\\')
             self.database_uri = 'sqlite:///%s' % filename
