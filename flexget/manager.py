@@ -137,11 +137,17 @@ class Manager(object):
 
         self.config = {}
 
-        try:
-            self.options, extra = CoreArgumentParser().parse_known_args(args)
-        except ParserError:
-            # If a non-built-in command was used, we need to parse with a parser that doesn't define the subparsers
-            self.options, extra = manager_parser.parse_known_args(args)
+        if '--help' in args or '-h' in args:
+            # TODO: This is a bit hacky, but we can't call parse on real arguments when --help is used because it will
+            # cause a system exit before plugins are loaded and print incomplete help. This will get us a default
+            # options object and we'll parse the real args later, or send them to daemon. #2807
+            self.options, extra = CoreArgumentParser().parse_known_args(['execute'])
+        else:
+            try:
+                self.options, extra = CoreArgumentParser().parse_known_args(args)
+            except ParserError:
+                # If a non-built-in command was used, we need to parse with a parser that doesn't define the subparsers
+                self.options, extra = manager_parser.parse_known_args(args)
         try:
             self.find_config(create=False)
         except:
@@ -634,7 +640,6 @@ class Manager(object):
             raise err
         else:
             return config
-
 
     def init_sqlalchemy(self):
         """Initialize SQLAlchemy"""
