@@ -71,7 +71,7 @@ class SearchCPASBIEN(object):
 
         category_url_fragment = '%s' % config['category']
         base_url = 'http://www.cpasbien.pe/'
-        entries = set()
+        entries = {}
         for search_string in entry.get('search_strings', [entry['title']]):
             search_string = search_string.replace(' ', '-').lower()
             search_string = search_string.replace('(', '')
