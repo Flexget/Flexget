@@ -129,9 +129,10 @@ def setup_jobs(manager):
     if 'schedules' not in manager.config:
         log.info('No schedules defined in config. Defaulting to run all tasks on a 1 hour interval.')
     config = manager.config.get('schedules', [{'tasks': ['*'], 'interval': {'hours': 1}}])
-    if not config and scheduler.running:
-        log.info('Shutting down scheduler')
-        scheduler.shutdown()
+    if not config:  # Schedules are disabled with `schedules: no`
+        if scheduler.running:
+            log.info('Shutting down scheduler')
+            scheduler.shutdown()
         return
     existing_job_ids = [job.id for job in scheduler.get_jobs()]
     configured_job_ids = []

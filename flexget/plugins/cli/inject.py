@@ -20,8 +20,8 @@ def do_cli(manager, options):
         entry['immortal'] = True
     if options.accept:
         entry.accept(reason='accepted by CLI inject')
-    exec_options = dict(options.execute)
-    exec_options['inject'] = [entry]
+    exec_options = options.execute
+    exec_options.inject = [entry]
     manager.execute_command(exec_options)
 
 

@@ -44,7 +44,7 @@ def _process(element, secrets):
         try:
             template = environment.from_string(element)
             return template.render(secrets)
-        except TemplateError:
+        except (TemplateError, TypeError):
             return None
 
 
