@@ -16,30 +16,14 @@ log = logging.getLogger('search_cpasbien')
 
 session = requests.Session()
 
-categories = {
-    'films',
-    'series',
-    'musique',
-    'films-french',
-    '720p',
-    'series-francaise',
-    'films-dvdrip',
-    'films-vostfr',
-    '1080p',
-    'series-vostfr',
-    'ebook'
-}
-
-
 class SearchCPASBIEN(object):
     schema = {
         'type': 'object',
         'properties': {
-            'category': one_or_more({
-                'oneOf': [
-                    {'type': 'integer'},
-                    {'type': 'string', 'enum': list(categories)},
-                ]})
+            'category': {'type': 'string', 'enum': ['films', 'series', 'musique', 'films-french',
+                                                    '720p', 'series-francaise', 'films-dvdrip',
+                                                    'films-vostfr', '1080p', 'series-vostfr', 'ebook']
+            },
         },
         'additionalProperties': False
     }
@@ -71,7 +55,7 @@ class SearchCPASBIEN(object):
 
         category_url_fragment = '%s' % config['category']
         base_url = 'http://www.cpasbien.pe/'
-        entries = {}
+        entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             search_string = search_string.replace(' ', '-').lower()
             search_string = search_string.replace('(', '')
