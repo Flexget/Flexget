@@ -39,6 +39,10 @@ association_table = Table('association', Base.metadata,
                           )
 
 
+def normalize_path(path):
+    return os.path.normcase(os.path.normpath(path))
+
+
 class SubtitleLanguages(Base):
     __tablename__ = 'subtitle_language'
 
@@ -63,12 +67,12 @@ class QueuedSubtitle(Base):
     added = Column(DateTime)  # Used to determine age
     stop_after = Column(String)
     downloaded = Column(Boolean)
-    languages = relationship(SubtitleLanguages, secondary=association_table, backref="primary")
+    languages = relationship(SubtitleLanguages, secondary=association_table, backref="primary", lazy='joined')
 
     def __init__(self, path, alternate_path, title, stop_after="7 days"):
-        self.path = os.path.normcase(os.path.normpath(path))
+        self.path = normalize_path(path)
         if alternate_path:
-            self.alternate_path = os.path.normcase(os.path.normpath(alternate_path))
+            self.alternate_path = normalize_path(alternate_path)
         self.added = datetime.now()
         self.stop_after = stop_after
         self.title = title
@@ -138,7 +142,7 @@ class SubtitleQueue(object):
 
             # get the file extension index
             # use glob instead of subtitles_check as subtitles_check does some unnecessary hashing
-            path = os.path.normcase(os.path.normpath(path))
+            path = normalize_path(path)
             index = path.rfind('.')
             if len(primary) > 1:
                 for lang in primary:
@@ -177,18 +181,20 @@ class SubtitleQueue(object):
                 if action == "add":
                     # is it a local file?
                     if os.path.isfile(entry.get('location', '')):
-                        src = entry.get('location', '')
-                        dest = entry.get('output', '')
-                        if dest:
-                            # file has been moved and original location may already be in db
-                            queue_edit(src, dest, entry.get('title', ''), config)
+                        src = entry['location']
+                        path = entry.get('primary_path', src)
+                        alternate_path = entry.get('alternate_path', '')
+                        if alternate_path and src != path and src != alternate_path:
+                            # paths other than 'location' have been specified
+                            queue_edit(src, alternate_path, entry.get('title', ''), config)
                         else:
                             queue_add(src, entry.get('title', ''), config)
                     # or is it a torrent?
                     elif 'content_files' in entry:
-                        path = config.get('primary_path', '')
+                        path = entry.render(config.get('primary_path', ''))
                         if not path:
                             entry.reject('No path set for torrent. I am not a wizard. Please tell me where to look.')
+                            break
                         alternate_path = entry.render(config.get('alternate_path', ''))
                         files = entry['content_files']
                         if len(files) == 1:
@@ -202,7 +208,9 @@ class SubtitleQueue(object):
                             #    title = os.path.join(entry['content_filename'], title[ext:])
                         else:
                             title = entry['title']
-                        path = posixpath.join(entry.render(path), title)
+                        path = posixpath.join(path, title)
+                        if alternate_path:
+                            alternate_path = posixpath.join(alternate_path, title)
 
                         queue_add(path, title, config, alternate_path=alternate_path)
                     else:
@@ -221,9 +229,9 @@ class SubtitleQueue(object):
 
 @with_session
 def queue_add(path, title, config, alternate_path=None, session=None):
-    path = os.path.normcase(os.path.normpath(path))
+    path = normalize_path(path)
     if alternate_path:
-        alternate_path = os.path.normcase(os.path.normpath(alternate_path))
+        alternate_path = normalize_path(alternate_path)
     item = session.query(QueuedSubtitle).filter(or_(QueuedSubtitle.path == path,
                                                     QueuedSubtitle.alternate_path == path)).first()
     primary = make_lang_list(config.get('languages', []), session=session)
@@ -253,7 +261,7 @@ def queue_add(path, title, config, alternate_path=None, session=None):
 
 @with_session
 def queue_del(path, session=None):
-    path = os.path.normcase(os.path.normpath(path))
+    path = normalize_path(path)
     item = session.query(QueuedSubtitle).filter(or_(QueuedSubtitle.path == path,
                                                     QueuedSubtitle.alternate_path == path)).first()
     if not item:
@@ -266,8 +274,8 @@ def queue_del(path, session=None):
 
 @with_session
 def queue_edit(src, dest, title, config, session=None):
-    src = os.path.normcase(os.path.normpath(src))
-    dest = os.path.normcase(os.path.normpath(dest))
+    src = normalize_path(src)
+    dest = normalize_path(dest)
 
     item = session.query(QueuedSubtitle).filter(QueuedSubtitle.path == src).first()
     if not item:
