@@ -28,12 +28,16 @@ class TestSubtitleQueue(FlexGetBase):
              subtitle_queue:
                action: remove
            subtitle_single_file_torrent:
+             template: no_global
+             accept_all: yes
              subtitle_queue:
                action: add
                primary_path: './'
              mock:
                - {title: 'Some Torrent', content_files: ['some movie.mkv']}
            subtitle_torrent:
+             template: no_global
+             accept_all: yes
              subtitle_queue:
                action: add
                primary_path: './'
