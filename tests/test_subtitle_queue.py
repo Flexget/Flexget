@@ -1,6 +1,8 @@
 import datetime
+import posixpath
 
-from flexget.plugins.filter.subtitle_queue import queue_add, queue_get, SubtitleLanguages, QueuedSubtitle
+from flexget.plugins.filter.subtitle_queue import queue_add, queue_get, SubtitleLanguages, QueuedSubtitle, \
+    normalize_path
 from flexget.manager import Session
 from tests import FlexGetBase
 
@@ -25,23 +27,41 @@ class TestSubtitleQueue(FlexGetBase):
            subtitle_remove:
              subtitle_queue:
                action: remove
+           subtitle_single_file_torrent:
+             subtitle_queue:
+               action: add
+               primary_path: './'
+             mock:
+               - {title: 'Some Torrent', content_files: ['some movie.mkv']}
+           subtitle_torrent:
+             subtitle_queue:
+               action: add
+               primary_path: './'
+               alternate_path: '~/'
+             mock:
+               - {title: 'Some Torrent', content_files: ['some movie.mkv', 'garbage.txt']}
     """
 
     def test_subtitle_queue_add(self):
         self.execute_task('subtitle_add')
-        assert len(self.task.entries) == 1
+        assert len(self.task.entries) == 1, 'One movie should have been accepted.'
 
         entry = self.task.entries[0]
         assert entry.accepted
 
         queue = queue_get()
-        assert len(queue) == 1
+        assert len(queue) == 1, 'Accepted movie should be in queue after task is done.'
 
         self.execute_task('subtitle_add')
         assert len(self.task.entries) == 0, 'Movie should only be accepted once'
 
         queue = queue_get()
         assert len(queue) == 1
+
+        langs = queue[0].languages
+
+        assert len(langs) == 1, 'There is exactly one default language.'
+        assert langs[0].language == 'en', 'Default language should be \'en\' (English).'
 
     def test_subtitle_queue_emit(self):
         config = {}
@@ -80,12 +100,11 @@ class TestSubtitleQueue(FlexGetBase):
         queue_add('./movie.mkv', 'Movie', config)
         queue_add('./movie.mkv', 'Movie', config)
 
-        with Session() as session:
-            queue = queue_get(session=session)
-            assert len(queue) == 2
+        queue = queue_get()
+        assert len(queue) == 2
 
-            for q in queue:
-                assert len(q.languages) == 1
+        for q in queue:
+            assert len(q.languages) == 1
 
     def test_subtitle_queue_old(self):
         config = {}
@@ -112,4 +131,27 @@ class TestSubtitleQueue(FlexGetBase):
         config['stop_after'] = "15 days"
         queue_add('./movie.mkv', 'Movie', config)
         assert queue_get()[0].stop_after == "15 days", 'File\'s stop_after field should have been updated.'
+
+    def test_subtitle_queue_torrent(self):
+        assert len(queue_get()) == 0, "Queue should be empty before run."
+        self.execute_task('subtitle_single_file_torrent')
+
+        queue = queue_get()
+        assert len(queue) == 1, 'Task should have accepted one item.'
+
+        assert queue[0].path == normalize_path(posixpath.join('./', 'some movie.mkv')), \
+            'Queued path should be ./some movie.mkv'
+
+    def test_subtitle_queue_multi_file_torrent(self):
+        assert len(queue_get()) == 0, "Queue should be empty before run."
+        self.execute_task('subtitle_torrent')
+
+        queue = queue_get()
+        assert len(queue) == 1, 'Task should have accepted one item.'
+
+        assert queue[0].path == normalize_path(posixpath.join('./', 'some torrent')), \
+            'Queued path should be torrent name in current dir'
+
+        assert queue[0].alternate_path == normalize_path(posixpath.join('~/', 'some torrent')), \
+            'Queued path should be torrent name in user dir'
 
