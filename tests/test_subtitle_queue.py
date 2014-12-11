@@ -163,10 +163,10 @@ class TestSubtitleQueue(FlexGetBase):
 
         print queue[0].path
         print normalize_path(os.path.join('/', 'some torrent'))
-        assert queue[0].path == normalize_path(os.path.join('/', 'some torrent')), \
+        assert queue[0].path == normalize_path(os.path.join('/', 'Some Torrent')), \
             'Queued path should be torrent name in root dir'
 
-        assert queue[0].alternate_path == normalize_path(os.path.join('~/', 'some torrent')), \
+        assert queue[0].alternate_path == normalize_path(os.path.join('~/', 'Some Torrent')), \
             'Queued path should be torrent name in user dir'
 
     def test_subtitle_queue_subliminal_fail(self):
