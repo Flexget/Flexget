@@ -1,4 +1,5 @@
 import datetime
+import os
 import posixpath
 
 from flexget.plugins.filter.subtitle_queue import queue_add, queue_get, SubtitleLanguages, QueuedSubtitle, \
@@ -150,7 +151,7 @@ class TestSubtitleQueue(FlexGetBase):
         queue = queue_get()
         assert len(queue) == 1, 'Task should have accepted one item.'
 
-        assert queue[0].path == normalize_path(posixpath.join('/', 'some movie.mkv')), \
+        assert queue[0].path == normalize_path(os.path.join('/', 'some movie.mkv')), \
             'Queued path should be /some movie.mkv'
 
     def test_subtitle_queue_multi_file_torrent(self):
@@ -160,10 +161,12 @@ class TestSubtitleQueue(FlexGetBase):
         queue = queue_get()
         assert len(queue) == 1, 'Task should have queued one item.'
 
-        assert queue[0].path == normalize_path(posixpath.join('/', 'some torrent')), \
+        print queue[0].path
+        print normalize_path(os.path.join('/', 'some torrent'))
+        assert queue[0].path == normalize_path(os.path.join('/', 'some torrent')), \
             'Queued path should be torrent name in root dir'
 
-        assert queue[0].alternate_path == normalize_path(posixpath.join('~/', 'some torrent')), \
+        assert queue[0].alternate_path == normalize_path(os.path.join('~/', 'some torrent')), \
             'Queued path should be torrent name in user dir'
 
     def test_subtitle_queue_subliminal_fail(self):
