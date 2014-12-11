@@ -106,7 +106,7 @@ class PluginSubliminal(object):
                 try:
                     entry_langs = set(entry.get('subtitle_languages', 'langs'))
                     if not entry_langs:
-                        entry_langs = {Language.fromietf('en')}
+                        entry_langs = set(Language.fromietf('en'))
                     video = subliminal.scan_video(entry['location'])
                     log.info('Series name computed for %s was %s' % (entry['location'], video.series))
                     msc = video.scores['hash'] if config['exact_match'] else 0
