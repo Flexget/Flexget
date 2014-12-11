@@ -96,7 +96,7 @@ class PluginSubliminal(object):
         # if we pass 'yes' for single in configuration but choose more than one language
         # we ignore the configuration and add the language code to the
         # potentially downloaded files
-        single_mode = config['single'] and len(langs | alts) <= 1
+        single_mode = config.get('single', '') and len(langs | alts) <= 1
         for entry in task.accepted:
             if not 'location' in entry:
                 log.warning('Cannot act on entries that do not represent a local file.')
@@ -105,6 +105,8 @@ class PluginSubliminal(object):
             elif not '$RECYCLE.BIN' in entry['location']:  # ignore deleted files in Windows shares
                 try:
                     entry_langs = set(entry.get('subtitle_languages', 'langs'))
+                    if not entry_langs:
+                        entry_langs = {Language.fromietf('en')}
                     video = subliminal.scan_video(entry['location'])
                     log.info('Series name computed for %s was %s' % (entry['location'], video.series))
                     msc = video.scores['hash'] if config['exact_match'] else 0
@@ -134,7 +136,7 @@ class PluginSubliminal(object):
                     # don't want to abort the entire task for errors in a  
                     # single video file or for occasional network timeouts
                     if err.args:
-                        msg = err.args[0]
+                        msg = unicode(err.args[0])
                     else:
                         # Subliminal errors don't always have a message, just use the name
                         msg = 'subliminal error: %s' % err.__class__.__name__
