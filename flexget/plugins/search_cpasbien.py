@@ -30,17 +30,16 @@ class SearchCPASBIEN(object):
 
     @plugin.internet(log)
     def search(self, entry, config):
-        """
-        CPASBIEN search plugin
+        """CPASBIEN search plugin
 
         Config example:
 
-            tv_search_cpasbien:
-                discover:
-                  what:
-                      - trakt_list:
-                        username: xxxxxxx
-                        api_key: xxxxxxx
+        tv_search_cpasbien:
+            discover:
+              what:
+                 - trakt_list:
+                   username: xxxxxxx
+                   api_key: xxxxxxx
                         series: watchlist
                   from:
                     - cpasbien:
@@ -48,9 +47,18 @@ class SearchCPASBIEN(object):
                   interval: 1 day
                   ignore_estimations: yes
 
-        * Category is ONE of: films, series, musique, films-french, 1080p,
-                              720p, series-francaise, films-dvdrip,
-                              films-vostfr, series-vostfr, ebook
+        Category is ONE of: 
+            films
+            series
+            musique
+            films-french
+            1080p
+            720p
+            series-francaise
+            films-dvdrip
+            films-vostfr
+            series-vostfr
+            ebook
         """
 
         category_url_fragment = '%s' % config['category']
@@ -116,4 +124,4 @@ class SearchCPASBIEN(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(SearchCPASBIEN, 'CPASBIEN', groups=['search'], api_ver=2)
+    plugin.register(SearchCPASBIEN, 'cpasbien', groups=['search'], api_ver=2)
