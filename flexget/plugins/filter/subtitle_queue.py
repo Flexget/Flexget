@@ -40,7 +40,7 @@ association_table = Table('association', Base.metadata,
 
 
 def normalize_path(path):
-    return os.path.normcase(os.path.normpath(path))
+    return os.path.normcase(os.path.abspath(path))
 
 
 class SubtitleLanguages(Base):
