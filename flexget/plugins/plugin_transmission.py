@@ -614,15 +614,16 @@ class PluginTransmissionClean(TransmissionBase):
 
         remove_ids = []
         for torrent in self.client.get_torrents():
-            log.verbose('Torrent "%s": status: "%s" - ratio: %s - date done: %s' %
-                        (torrent.name, torrent.status, torrent.ratio, torrent.date_done))
+            log.verbose('Torrent "%s": status: "%s" - ratio: %s -  date added: %s - date done: %s' %
+                        (torrent.name, torrent.status, torrent.ratio, torrent.date_added, torrent.date_done))
             downloaded, dummy = self.torrent_info(torrent)
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             if (downloaded and ((nrat is None and nfor is None and trans_checks is None) or
                                 (trans_checks and ((seed_ratio_ok is None and idle_limit_ok is None) or
                                  (seed_ratio_ok is True or idle_limit_ok is True))) or
                                 (nrat and (nrat <= torrent.ratio)) or
-                                (nfor and ((torrent.date_done + nfor) <= datetime.now())))):
+                                (nfor and ((torrent.date_done + nfor) <= datetime.now()) and
+                                ((torrent.date_added + nfor) <= datetime.now())))):
                 if task.options.test:
                     log.info('Would remove finished torrent `%s` from transmission' % torrent.name)
                     continue
