@@ -623,6 +623,8 @@ class PluginTransmissionClean(TransmissionBase):
                                  (seed_ratio_ok is True or idle_limit_ok is True))) or
                                 (nrat and (nrat <= torrent.ratio)) or
                                 (nfor and ((torrent.date_done + nfor) <= datetime.now()) and
+                                ((torrent.date_added + nfor) <= datetime.now())) or
+                                (nfor and (torrent.date_done <= torrent.date_added) and
                                 ((torrent.date_added + nfor) <= datetime.now())))):
                 if task.options.test:
                     log.info('Would remove finished torrent `%s` from transmission' % torrent.name)
