@@ -1,11 +1,13 @@
 import datetime
 import os
 import posixpath
+import sys
 
 from flexget.plugins.filter.subtitle_queue import queue_add, queue_get, SubtitleLanguages, QueuedSubtitle, \
     normalize_path
 from flexget.manager import Session
 from tests import FlexGetBase
+from nose.plugins.skip import SkipTest
 
 
 class TestSubtitleQueue(FlexGetBase):
@@ -170,6 +172,14 @@ class TestSubtitleQueue(FlexGetBase):
             'Queued path should be torrent name in user dir'
 
     def test_subtitle_queue_subliminal_fail(self):
+        # Skip if subliminal is not installed or if python version <2.7
+        if list(sys.version_info) < [2, 7]:
+            raise SkipTest("Subliminal does not work in Python 2.6")
+        try:
+            import babelfish
+            import subliminal
+        except ImportError as e:
+            raise SkipTest("Subliminal not installed.")
         config = {}
         config['languages'] = ['en']
 
