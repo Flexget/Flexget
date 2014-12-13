@@ -4,12 +4,10 @@ import os
 import logging
 import urlparse
 
-from requests import codes
+import requests
 
 from flexget.event import event
 from flexget import plugin
-from flexget.task import TaskAbort
-from flexget.utils import requests
 from flexget.utils import json
 
 log = logging.getLogger('xbmc_library')
@@ -21,8 +19,8 @@ class XBMCLibrary(object):
             {
                 'type': 'object',
                 'properties': {
-                    'action': {'type': 'string', 'enum': {'clean', 'scan', 'full_scan'}},
-                    'category': {'type': 'string', 'enum': {'audio', 'video'}},
+                    'action': {'type': 'string', 'enum': ['clean', 'scan', 'full_scan']},
+                    'category': {'type': 'string', 'enum': ['audio', 'video']},
                     'url': {'type': 'string'},
                     'username': {'type': 'string'},
                     'password': {'type': 'string'},
@@ -53,13 +51,20 @@ class XBMCLibrary(object):
         self.username = config.get('username', '')
         self.password = config.get('password', '')
         self.url = urlparse.urljoin(config['url'], 'jsonrpc?request=')
+        if not self.url.startswith('http://'):
+            self.url = 'http://' + self.url
         self.authentication_required = True if self.username else False
         self.id = 0
 
     def ping(self):
         # Sends a ping to XBMC. It should respond with 'pong'
         log.info('Pinging XBMC server.')
-        return self.send('JSONRPC.Ping').get('result', '') == 'pong'
+        try:
+            response = self.send('JSONRPC.Ping')
+            return response.json().get('result', '') == 'pong'
+        except requests.HTTPError as ex:
+            log.error('Connection to XBMC failed: %s.' % ex.args[0])
+            return False
 
     def send(self, method, params=None, use_params=True):
         self.id += 1
@@ -67,15 +72,17 @@ class XBMCLibrary(object):
         if use_params:
             msg['params'] = [] if not params else params
 
-        url = self.url + msg
+        url = self.url + json.dumps(msg)
         if self.authentication_required:
-            request = requests.get(url, auth=(self.username, self.password))
+            response = requests.get(url, auth=(self.username, self.password))
         else:
-            request = requests.get(url)
-        return request
+            response = requests.get(url)
+        response.raise_for_status()
+        return response
 
     def experimental(self, action, params):
-        log.warning('Attempting experimental feature.')
+        log.info('Not implemented yet.')
+        #log.warning('Attempting experimental feature.')
         pass
 
     def on_task_output(self, task, config):
@@ -83,10 +90,9 @@ class XBMCLibrary(object):
             return
         action = config.get('action', '')
         category = config['category']
-        path = config.get('path', '')
+        path = config.get('dir', '')
 
         if not self.ping():
-            log.error('Could not connect to XBMC server. Please check your configs.')
             return
 
         if 'method' in config:
@@ -112,38 +118,43 @@ class XBMCLibrary(object):
                     entry.fail('File does not exist.')
                     continue
                 dir_path = os.path.dirname(entry['location'])
-            request = self.send(method, params=[dir_path])
-            rjson = request.json()
-            if request.status_code != codes.ok or rjson.get('result', '') != 'OK':
-                log.error('Failed to scan %s library.' % category)
-                if rjson.get('error', ''):
-                    log.debug('XBMC Error: %s' % unicode(rjson['error']['message']))
-            else:
-                log.info('Successfully scanned %s for %s content.' % (path, category))
+            log.debug('Scanning %s.' % dir_path)
+            try:
+                response = self.send(method, params=[dir_path])
+                response_json = response.json()
+                if response_json.get('result', '') != 'OK' or response_json.get('error', ''):
+                    log.error('XBMC Error: %s' % unicode(response_json['error']['message']))
+                else:
+                    log.info('Successfully scanned %s for %s content.' % (path, category))
+            except requests.HTTPError as ex:
+                log.error('Failed to scan library: %s.' % ex.args[0])
 
     def full_scan(self, category, path):
-        if not os.path.exists(path):
-            log.error('Directory does not exist: %s.' % path)
-            return
+        # if not os.path.exists(path):
+        #     log.error('Directory does not exist: %s.' % path)
+        #     return
         use_params = False if not path else True
-        request = self.send(category.title() + 'Library.Scan', params=[path], use_params=use_params)
-        rjson = request.json()
-        if request.status_code != codes.ok or rjson.get('result', '') != 'OK':
-            log.error('Failed to scan %s library.' % category)
-            if rjson.get('error', ''):
-                log.debug('XBMC Error: %s' % unicode(rjson['error']['message']))
-        else:
-            log.info('Successfully scanned %s for %s content.' % (path, category))
+        log.debug('Scanning %s.' % path)
+        try:
+            response = self.send(category.title() + 'Library.Scan', params=[path], use_params=use_params)
+            response_json = response.json()
+            if response_json.get('result', '') != 'OK' or response_json.get('error', ''):
+                log.debug('XBMC Error: %s' % unicode(response_json['error']['message']))
+            else:
+                log.info('Successfully scanned %s for %s content.' % (path, category))
+        except requests.HTTPError as ex:
+            log.error('Failed to scan library: %s.' % ex.args[0])
 
     def clean(self, category):
-        request = self.send(category.title() + 'Library.Clean')
-        rjson = request.json()
-        if request.status_code != codes.ok or rjson.get('result', '') != 'OK':
-            log.error('Failed to clean library.')
-            if rjson.get('error', ''):
-                log.debug('XBMC Error: %s' % unicode(rjson['error']['message']))
-        else:
-            log.info('Successfully cleaned the XBMC %s library.' % category)
+        try:
+            response = self.send(category.title() + 'Library.Clean')
+            response_json = response.json()
+            if response_json.get('result', '') != 'OK' or response_json.get('error', ''):
+                log.debug('XBMC Error: %s' % unicode(response_json['error']['message']))
+            else:
+                log.info('Successfully cleaned the XBMC %s library.' % category)
+        except requests.HTTPError as ex:
+            log.error('Failed to clean library: %s.' % ex.args[0])
 
 
 @event('plugin.register')
