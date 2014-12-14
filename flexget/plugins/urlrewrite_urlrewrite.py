@@ -4,6 +4,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 
 log = logging.getLogger('urlrewrite')
 
@@ -73,8 +74,6 @@ class UrlRewrite(object):
 
                 if regexp.match(entry['url']):
                     entry.fail('urlrewriting')
-                    task.purge()
-                    from flexget.plugins.plugin_urlrewriting import UrlRewritingError
                     raise UrlRewritingError('Regexp %s result should NOT continue to match!' % name)
                 return
 
