@@ -1,13 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import urllib
-import urllib2
 import re
 
-from flexget import plugin
+from flexget import plugin, validator
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.config_schema import one_or_more
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
@@ -21,10 +18,11 @@ class SearchCPASBIEN(object):
         'type': 'object',
         'properties': {
             'category': {'type': 'string', 'enum': ['films', 'series', 'musique', 'films-french',
-                                                    '720p', 'series-francaise', 'films-dvdrip',
+                                                    '720p', 'series-francaise', 'films-dvdrip', 'all',
                                                     'films-vostfr', '1080p', 'series-vostfr', 'ebook']
             },
         },
+        'required': ['category'],
         'additionalProperties': False
     }
 
@@ -48,6 +46,7 @@ class SearchCPASBIEN(object):
                   ignore_estimations: yes
 
         Category is ONE of: 
+            all
             films
             series
             musique
@@ -61,7 +60,6 @@ class SearchCPASBIEN(object):
             ebook
         """
 
-        category_url_fragment = '%s' % config['category']
         base_url = 'http://www.cpasbien.pe/'
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
@@ -71,11 +69,14 @@ class SearchCPASBIEN(object):
             query = normalize_unicode(search_string)
             query_url_fragment = query.encode('iso-8859-1')
 # http://www.cpasbien.pe/recherche/ncis.html
-            url = (base_url + "recherche/" + category_url_fragment + '/' + query_url_fragment)
+            if config['category'] == 'all':
+                url = (base_url + "recherche/" + query_url_fragment)
+            else:
+                category_url_fragment = '%s' % config['category']
+                url = (base_url + "recherche/" + category_url_fragment + '/' + query_url_fragment)
             log.debug('search url: %s' % url + '.html')
 # GET URL
-            opener = urllib2.build_opener()
-            f = opener.open(url + '.html')
+            f = requests.get(url + '.html').content
             soup = get_soup(f)
             if soup.findAll(text=re.compile("0 torrents")):
                 log.debug('search returned no results')
@@ -84,8 +85,8 @@ class SearchCPASBIEN(object):
                 while (nextpage >= 0):
                     if (nextpage > 0):
                         newurl = (url + '/page-' + str(nextpage))
-                        log.debug('-----> PAGE SUIVANTE : %s' % newurl)
-                        f1 = opener.open(newurl)
+                        log.debug('-----> NEXT PAGE : %s' % newurl)
+                        f1 = requests.get(newurl).content
                         soup = get_soup(f1)
                     for result in soup.findAll('div', attrs={'class': re.compile('ligne')}):
                         entry = Entry()
@@ -120,7 +121,6 @@ class SearchCPASBIEN(object):
                     else:
                         nextpage = -1
             return entries
-
 
 @event('plugin.register')
 def register_plugin():
