@@ -247,6 +247,8 @@ class XBMCLibrary(object):
                 else:
                     data = params['data']
                     type = data.get('type', data.get('item', {}).get('type'))
+                    if type == 'tvshow':
+                        continue  # skip logging this. Not interesting.
                     id = data.get('id', data.get('item', {}).get('id'))
                     self.log_item(type, id)
                     self.count += 1
