@@ -22,7 +22,7 @@ class XBMCLibrary(object):
             {
                 'type': 'object',
                 'properties': {
-                    'action': {'type': 'string', 'enum': ['clean', 'scan', 'full_scan']},
+                    'action': {'type': 'string', 'enum': ['clean', 'scan', 'dir_scan']},
                     'category': {'type': 'string', 'enum': ['audio', 'video']},
                     'url': {'type': 'string'},
                     'port': {'type': 'integer'},
@@ -178,8 +178,8 @@ class XBMCLibrary(object):
             return
         elif action == 'scan':
             self.scan(category, path, task)
-        elif action == 'full_scan':
-            self.full_scan(category, path)
+        elif action == 'dir_scan':
+            self.dir_scan(category, path)
         else:
             self.clean(category)
 
@@ -292,7 +292,7 @@ class XBMCLibrary(object):
                 log.error('Failed to scan library: %s.' % ex.args[0])
 
     # Just scan the given path for content.
-    def full_scan(self, category, path):
+    def dir_scan(self, category, path):
         log.info('Scanning %s for %s.' % (path, category))
         try:
             request = {'method': category.title() + 'Library.Scan', 'params': self.make_dir_param(path)}
