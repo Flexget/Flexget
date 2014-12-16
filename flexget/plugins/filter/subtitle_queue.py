@@ -273,7 +273,8 @@ def queue_del(path, session=None):
 @with_session
 def queue_edit(src, dest, title, config, session=None):
     src = normalize_path(src)
-    dest = normalize_path(dest)
+    if dest:
+        dest = normalize_path(dest)
 
     item = session.query(QueuedSubtitle).filter(QueuedSubtitle.path == src).first()
     if not item:
