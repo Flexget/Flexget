@@ -123,10 +123,10 @@ class SubtitleQueue(object):
             elif sub_item.alternate_path and os.path.exists(sub_item.alternate_path):
                 path = sub_item.alternate_path
             elif sub_item.path:
-                log.debug('%s: File not found.' % sub_item.path)
+                log.info('%s: File not found. Retrying later.' % sub_item.path)
                 continue
             elif sub_item.alternate_path:
-                log.debug('%s: File not found.' % sub_item.alternate_path)
+                log.info('%s: File not found. Retrying later.' % sub_item.alternate_path)
                 continue
             else:
                 log.error('Bad entry. No paths specified.')
@@ -144,6 +144,7 @@ class SubtitleQueue(object):
             # use glob instead of subtitles_check as subtitles_check does some unnecessary hashing
             path = normalize_path(path)
             index = path.rfind('.')
+            # if entry wants more than 1 subtitle, then we look for files that have the proper language extensions
             if len(primary) > 1:
                 for lang in primary:
                     if not glob.glob(path[:index] + "." + unicode(lang) + ".srt"):
@@ -151,6 +152,7 @@ class SubtitleQueue(object):
                 else:
                     log.debug('All subtitles already fetched for %s.' % entry['title'])
                     continue
+            # if entry wants only 1 subtitle, then we look for files with and without language extension
             else:
                 if glob.glob(path[:index] + ".srt") or glob.glob(path[:index] + "." + unicode(primary[0]) + ".srt"):
                     log.debug('All primary subtitles already fetched for %s.' % entry['title'])
@@ -201,30 +203,33 @@ class SubtitleQueue(object):
                             title = files[0]
                             # TODO: use content_filename in case of single-file torrents?
                             # How to handle path and alternate_path in this scenario?
-
-                            #if 'content_filename' in entry:
-                            #    # need to queue the content_filename
-                            #    ext = title.rfind('.')
-                            #    title = os.path.join(entry['content_filename'], title[ext:])
+                            alternate_title = title
+                            if 'content_filename' in entry:
+                                # need to queue the content_filename as alternate
+                                ext = title.rfind('.')
+                                alternate_title = os.path.join(entry['content_filename'], title[ext:])
                         else:
                             title = entry['title']
+                            alternate_title = title
                         path = posixpath.join(path, title)
+
                         if alternate_path:
-                            alternate_path = posixpath.join(alternate_path, title)
+                            alternate_path = posixpath.join(alternate_path, alternate_title)
 
                         queue_add(path, title, config, alternate_path=alternate_path)
                     else:
-                        raise TaskAbort("Invalid entry for subtitle queue.")
+                        #log.error("Invalid entry for subtitle queue.")
+                        entry.fail('Invalid entry.')
                 elif action == "remove":
                     if entry.get('location', ''):
                         queue_del(entry['location'])
                     else:
-                        raise TaskAbort("Cannot delete non-local files.")
+                        entry.fail('Not a local file.')
                 return
             except QueueError as e:
                 # ignore already in queue
                 if e.errno != 1:
-                    entry.fail("Error adding file to subtitle queue: %s" % e.message)
+                    entry.fail("ERROR: %s" % e.message)
 
 
 @with_session
@@ -236,18 +241,10 @@ def queue_add(path, title, config, alternate_path=None, session=None):
                                                     QueuedSubtitle.alternate_path == path)).first()
     primary = make_lang_list(config.get('languages', []), session=session)
     eng = session.query(SubtitleLanguages).filter(SubtitleLanguages.language == 'en').first()
-    default = eng if eng else [SubtitleLanguages('eng')]
+    default = [eng] if eng else [SubtitleLanguages('eng')]
     if item:
         log.debug('%s: Already queued. Updating values.' % item.title)
-        if item.path == path and alternate_path:
-            item.alternate_path = alternate_path
-        elif item.alternate_path == path and alternate_path:
-            item.path = alternate_path
-            #raise QueueError("ERROR: %s is already in the queue." % path, errno=1)
-        if primary:
-            item.languages = primary
-        if config.get('stop_after', ''):
-            item.stop_after = config['stop_after']
+        queue_edit(path, alternate_path, title, config, session=session)
     else:
         if config.get('stop_after', ''):
             item = QueuedSubtitle(path, alternate_path, title, stop_after=config.get('stop_after'))
@@ -266,8 +263,9 @@ def queue_del(path, session=None):
                                                     QueuedSubtitle.alternate_path == path)).first()
     if not item:
         # Not necessarily an error?
-        raise QueueError("DEBUG: %s is not in the queue." % path)
+        raise QueueError("Cannot remove %s, not in the queue." % path)
     else:
+        log.debug('Removed %s.' % item.path)
         session.delete(item)
         return item.path
 
@@ -279,15 +277,16 @@ def queue_edit(src, dest, title, config, session=None):
 
     item = session.query(QueuedSubtitle).filter(QueuedSubtitle.path == src).first()
     if not item:
-        log.debug("DEBUG: %s was moved but is not in the queue." % src)
+        # Two paths but not in queue could mean it comes from a torrent or has been moved with move plugin etc.
         queue_add(dest, title, config, alternate_path=src, session=session)
-        #raise QueueError("ERROR: %s is not in the queue." % src)
     else:
-        item.alternate_path = src
-        item.path = dest
-        stop_after = config.get('stop_after', '')
-        if stop_after and not item.stop_after == stop_after:
-            item.stop_after = stop_after
+        if src:
+            item.path = src
+        if dest:
+            item.alternate_path = dest
+        # if there is a stop_after value, then it is refreshed in the db
+        if config.get('stop_after', ''):
+            item.stop_after = config['stop_after']
         primary = make_lang_list(config.get('languages', []), session=session)
         item.languages = primary
 
@@ -295,6 +294,7 @@ def queue_edit(src, dest, title, config, session=None):
 @with_session
 def queue_get(session=None):
     subs = session.query(QueuedSubtitle).all()
+    # remove any items that have expired
     for sub_item in subs:
         if sub_item.added + parse_timedelta(sub_item.stop_after) < datetime.combine(date.today(), time()):
             subs.remove(sub_item)
