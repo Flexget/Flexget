@@ -27,8 +27,6 @@ class SearchRSS(object):
         template = environment.from_string(rss_config['url'])
         rss_config['all_entries'] = True
         for search_string in search_strings:
-            # Create a fake task to pass to the rss plugin input handler
-            task = Task(manager, 'search_rss_task', config={})
             rss_config['url'] = template.render({'search_term': search_string})
             # TODO: capture some other_fields to try to find seed/peer/content_size numbers?
             try:
