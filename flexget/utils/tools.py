@@ -1,6 +1,7 @@
 """Contains miscellaneous helpers"""
 
 from __future__ import unicode_literals, division, absolute_import, print_function
+import copy
 import urllib2
 import httplib
 import os
@@ -134,7 +135,6 @@ def _xmlcharref_encode(unicode_data, encoding):
 
 def merge_dict_from_to(d1, d2):
     """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
-    import copy
     for k, v in d1.items():
         if k in d2:
             if type(v) == type(d2[k]):
@@ -146,9 +146,9 @@ def merge_dict_from_to(d1, d2):
                     pass
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
-            elif isinstance(v, basestring) and isinstance(d2[k], basestring):
-                # Strings are compatible by definition
-                # (though we could get a decode error later, this is higly unlikely for config values)
+            elif (isinstance(v, (basestring, bool, int, float, type(None))) and
+                    isinstance(d2[k], (basestring, bool, int, float, type(None)))):
+                # Allow overriding of non-container types with other non-container types
                 pass
             else:
                 raise MergeException('Merging key %s failed, conflicting datatypes %r vs. %r.' % (
