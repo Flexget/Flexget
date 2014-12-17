@@ -21,19 +21,20 @@ class UrlRewriteRedirect(object):
         return entry['url'] not in self.processed
 
     def url_rewrite(self, task, entry):
+        # Don't accidentally go online in unit tests
+        if task.manager.unit_test:
+            return
+        auth = None
+        if 'download_auth' in entry:
+            auth = entry['download_auth']
+            log.debug('Custom auth enabled for %s url_redirect: %s' % (entry['title'], entry['download_auth']))
         try:
-            # Don't accidentally go online in unit tests
-            if task.manager.unit_test:
-                return
-            auth = None
-            if 'download_auth' in entry:
-                auth = entry['download_auth']
-                log.debug('Custom auth enabled for %s url_redirect: %s' % (entry['title'], entry['download_auth']))
-            r = task.requests.head(entry['url'], auth=auth)
-            if 300 <= r.status_code < 400 and 'location' in r.headers:
-                entry['url'] = r.headers['location']
+            r = task.requests.head(entry['url'], auth=auth, allow_redirects=True)
         except Exception:
             pass
+        else:
+            if r.status_code < 400 and r.url != entry['url']:
+                entry['url'] = r.url
         finally:
             # Make sure we don't try to rewrite this url again
             self.processed.add(entry['url'])
