@@ -22,22 +22,20 @@ class UrlRewriteRedirect(object):
 
     def url_rewrite(self, task, entry):
         # Don't accidentally go online in unit tests
-        if task.manager.unit_test:
-            return
-        auth = None
-        if 'download_auth' in entry:
-            auth = entry['download_auth']
-            log.debug('Custom auth enabled for %s url_redirect: %s' % (entry['title'], entry['download_auth']))
-        try:
-            r = task.requests.head(entry['url'], auth=auth, allow_redirects=True)
-        except Exception:
-            pass
-        else:
-            if r.status_code < 400 and r.url != entry['url']:
-                entry['url'] = r.url
-        finally:
-            # Make sure we don't try to rewrite this url again
-            self.processed.add(entry['url'])
+        if not task.manager.unit_test:
+            auth = None
+            if 'download_auth' in entry:
+                auth = entry['download_auth']
+                log.debug('Custom auth enabled for %s url_redirect: %s' % (entry['title'], entry['download_auth']))
+            try:
+                r = task.requests.head(entry['url'], auth=auth, allow_redirects=True)
+            except Exception:
+                pass
+            else:
+                if r.status_code < 400 and r.url != entry['url']:
+                    entry['url'] = r.url
+        # Make sure we don't try to rewrite this url again
+        self.processed.add(entry['url'])
 
 
 @event('plugin.register')
