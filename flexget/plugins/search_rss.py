@@ -16,7 +16,7 @@ class SearchRSS(object):
 
     schema = {'$ref': '/schema/plugin/rss'}
 
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         from flexget.utils.template import environment
         from flexget.manager import manager
         search_strings = [urllib.quote(normalize_unicode(s).encode('utf-8'))

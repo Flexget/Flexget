@@ -55,7 +55,7 @@ class UrlRewriteTorrentz(object):
         entry['url'] = 'https://torcache.net/torrent/%s.torrent' % thash.upper()
         entry['torrent_info_hash'] = thash
 
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         config = self.process_config(config)
         feed = REPUTATIONS[config['reputation']]
         entries = set()

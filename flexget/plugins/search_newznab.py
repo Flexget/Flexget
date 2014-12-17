@@ -74,7 +74,7 @@ class Newznab(object):
             entries.append(new_entry)
         return entries
 
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         config = self.build_config(config)
         if config['category'] == 'movie':
             return self.do_search_movie(entry, config)

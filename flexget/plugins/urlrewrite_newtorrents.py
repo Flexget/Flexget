@@ -51,7 +51,7 @@ class NewTorrents:
             raise UrlRewritingError('Bug in newtorrents urlrewriter')
 
     # Search plugin API
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         entries = set()
         for search_string in entry.get('search_string', [entry['title']]):
             entries.update(self.entries_from_search(search_string))

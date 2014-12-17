@@ -298,7 +298,7 @@ class UrlRewriteTorrent411(object):
                 raise UrlRewritingError("Cannot find torrent ID")
 
     @plugin.internet(log)
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         """
         Search for name from torrent411.
         """

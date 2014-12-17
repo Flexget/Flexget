@@ -49,7 +49,7 @@ class SearchPTN(object):
         'additionalProperties': False
     }
 
-    def search(self, entry, config):
+    def search(self, task, entry, config):
         if not session.cookies:
             try:
                 login_params = {'username': config['username'],
