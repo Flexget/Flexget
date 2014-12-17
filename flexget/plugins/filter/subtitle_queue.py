@@ -19,11 +19,6 @@ from flexget.utils.database import with_session
 from flexget.utils.tools import parse_timedelta
 
 try:
-    from flexget.plugins.filter import queue_base
-except ImportError:
-    raise plugin.DependencyError(issued_by='subtitle_queue', missing='queue_base',
-                                 message='subtitle_queue requires the queue_base plugin')
-try:
     from babelfish import Language
 except ImportError:
     raise plugin.DependencyError(issued_by='subtitle_queue', missing='babelfish',
@@ -182,15 +177,10 @@ class SubtitleQueue(object):
             try:
                 if action == "add":
                     # is it a local file?
-                    if os.path.isfile(entry.get('location', '')):
-                        src = entry['location']
-                        path = entry.get('primary_path', src)
-                        alternate_path = entry.get('alternate_path', '')
-                        if alternate_path and src != path and src != alternate_path:
-                            # paths other than 'location' have been specified
-                            queue_edit(src, alternate_path, entry.get('title', ''), config)
-                        else:
-                            queue_add(src, entry.get('title', ''), config)
+                    if 'location' in entry:
+                        path = entry.render(config.get('primary_path', entry['location']))
+                        alternate_path = entry.render(config.get('alternate_path', ''))
+                        queue_add(path, entry.get('title', ''), config, alternate_path=alternate_path)
                     # or is it a torrent?
                     elif 'content_files' in entry:
                         path = entry.render(config.get('primary_path', ''))
