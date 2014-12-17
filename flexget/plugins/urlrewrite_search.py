@@ -56,7 +56,12 @@ class PluginSearch(object):
                     name, search_config = name.items()[0]
                 log.verbose('Searching `%s` from %s' % (entry['title'], name))
                 try:
-                    results = plugins[name].search(entry, search_config)
+                    try:
+                        results = plugins[name].search(task=task, entry=entry, config=search_config)
+                    except TypeError:
+                        # Old search api did not take task argument
+                        log.warning('Search plugin %s does not support latest search api.' % name)
+                        results = plugins[name].search(entry, search_config)
                     matcher = SequenceMatcher(a=entry['title'])
                     for result in sorted(results, key=lambda e: e.get('search_sort'), reverse=True):
                         matcher.set_seq2(result['title'])
