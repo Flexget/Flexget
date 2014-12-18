@@ -43,6 +43,7 @@ class PluginSubliminal(object):
             'providers': {'type': 'array', 'items': {'type': 'string'}},
             'single': {'type': 'boolean', 'default': True},
         },
+        'required': ['languages'],
         'additionalProperties': False
     }
 
@@ -109,7 +110,8 @@ class PluginSubliminal(object):
                     if langs & video.subtitle_languages:
                         continue  # subs for preferred lang(s) already exists
                     else:
-                        subtitle = subliminal.download_best_subtitles([video], langs, providers=providers_list, min_score=msc)
+                        subtitle = subliminal.download_best_subtitles([video], langs, providers=providers_list,
+                                                                      min_score=msc)
                         if subtitle:
                             downloaded_subtitles.update(subtitle)
                             log.info('Subtitles found for %s' % entry['location'])
@@ -119,7 +121,8 @@ class PluginSubliminal(object):
                             remaining_alts = alts - video.subtitle_languages
                             if remaining_alts:
                                 # only try to download for alternatives that aren't alread downloaded
-                                subtitle = subliminal.download_best_subtitles([video], remaining_alts, providers=providers_list, min_score=msc)
+                                subtitle = subliminal.download_best_subtitles([video], remaining_alts,
+                                                                              providers=providers_list, min_score=msc)
                             # this potentially just checks an already checked assignment bleh
                             if subtitle:
                                 downloaded_subtitles.update(subtitle)
