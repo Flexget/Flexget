@@ -25,8 +25,7 @@ class TestSubtitleQueue(FlexGetBase):
                 action: add
            subtitle_emit:
              template: no_global
-             subtitle_queue:
-                action: emit
+             subtitle_queue: emit
            subtitle_remove:
              subtitle_queue:
                action: remove
@@ -49,8 +48,7 @@ class TestSubtitleQueue(FlexGetBase):
                - {title: 'Some Torrent', content_files: ['some movie.mkv', 'garbage.txt']}
            subtitle_fail:
              template: no_global
-             subtitle_queue:
-                action: emit
+             subtitle_queue: emit
              subliminal:
                 exact_match: yes
              rerun: 0
@@ -163,8 +161,6 @@ class TestSubtitleQueue(FlexGetBase):
         queue = queue_get()
         assert len(queue) == 1, 'Task should have queued one item.'
 
-        print queue[0].path
-        print normalize_path(os.path.join('/', 'some torrent'))
         assert queue[0].path == normalize_path(os.path.join('/', 'Some Torrent')), \
             'Queued path should be torrent name in root dir'
 
@@ -178,7 +174,7 @@ class TestSubtitleQueue(FlexGetBase):
         try:
             import babelfish
             import subliminal
-        except ImportError as e:
+        except ImportError:
             raise SkipTest("Subliminal not installed.")
         config = {}
         config['languages'] = ['en']
