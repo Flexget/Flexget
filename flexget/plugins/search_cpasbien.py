@@ -70,21 +70,21 @@ class SearchCPASBIEN(object):
             query_url_fragment = query.encode('iso-8859-1')
 # http://www.cpasbien.pe/recherche/ncis.html
             if config['category'] == 'all':
-                url = (base_url + "recherche/" + query_url_fragment)
+                url = join(base_url, 'recherche/', query_url_fragment)
             else:
                 category_url_fragment = '%s' % config['category']
-                url = (base_url + "recherche/" + category_url_fragment + '/' + query_url_fragment)
+                url = join(base_url, 'recherche/', category_url_fragment, '/', query_url_fragment)
             log.debug('search url: %s' % url + '.html')
 # GET URL
             f = requests.get(url + '.html').content
             soup = get_soup(f)
-            if soup.findAll(text=re.compile("0 torrents")):
+            if soup.findAll(text=re.compile('0 torrents')):
                 log.debug('search returned no results')
             else:
                 nextpage = 0
                 while (nextpage >= 0):
                     if (nextpage > 0):
-                        newurl = (url + '/page-' + str(nextpage))
+                        newurl = url + '/page-' + str(nextpage)
                         log.debug('-----> NEXT PAGE : %s' % newurl)
                         f1 = requests.get(newurl).content
                         soup = get_soup(f1)
@@ -94,10 +94,10 @@ class SearchCPASBIEN(object):
                         entry['title'] = link.contents[0]
 # REWRITE URL
                         page_link = link.get('href')
-                        link_rewrite = page_link.split("/")
+                        link_rewrite = page_link.split('/')
 # get last value in array remove .html and replace by .torrent
                         endlink = link_rewrite[-1]
-                        entry['url'] = (base_url + "telecharge/" + endlink[:-5] + ".torrent")
+                        entry['url'] = join(base_url, 'telecharge/', endlink[:-5], '.torrent')
 
                         log.debug('Title: %s | DL LINK: %s' % (entry['title'], entry['url']))
 
@@ -116,7 +116,7 @@ class SearchCPASBIEN(object):
                             entries.add(entry)
                         else:
                             log.debug('0 SEED, not adding entry')
-                    if soup.find(text=re.compile("Suiv")):
+                    if soup.find(text=re.compile('Suiv')):
                         nextpage += 1
                     else:
                         nextpage = -1
