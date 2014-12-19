@@ -43,6 +43,7 @@ class PluginSubliminal(object):
             'providers': {'type': 'array', 'items': {'type': 'string'}},
             'single': {'type': 'boolean', 'default': True},
         },
+        'required': ['languages'],
         'additionalProperties': False
     }
 
