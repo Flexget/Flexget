@@ -4,7 +4,7 @@ import logging
 import os
 import urllib
 import urlparse
-import posixpath
+import os.path
 
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, DateTime, Boolean
 from sqlalchemy.orm import backref, relationship
@@ -16,6 +16,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.task import TaskAbort
 from flexget.utils.database import with_session
+from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
 
 try:
@@ -96,12 +97,7 @@ class SubtitleQueue(object):
                 'additionalProperties': False
             },
             {
-                'type': 'object',
-                'properties': {
-                    'action': {'type': 'string', 'enum': ['emit']}
-                },
-                'required': ['action'],
-                'additionalProperties': False
+                'type': 'string', 'enum': ['emit']
             }
         ]
     }
@@ -158,36 +154,45 @@ class SubtitleQueue(object):
         return entries
 
     def on_task_filter(self, task, config):
-        if config and config.get('action') == 'emit':
+        if isinstance(config, dict) and config.get('action') == 'emit':
             for entry in task.entries:
                 entry.accept()
 
     def on_task_input(self, task, config):
-        if not config or config.get('action') != 'emit':
+        if isinstance(config, dict):
             return
         return self.emit(task, config)
 
     def on_task_output(self, task, config):
-        if not config:
+        if not config or not isinstance(config, dict):
             return
         action = config.get('action')
-        if action == 'emit':
-            return
         for entry in task.accepted:
             try:
-                if action == "add":
+                if action == 'add':
                     # is it a local file?
                     if 'location' in entry:
-                        path = entry.render(config.get('primary_path', entry['location']))
-                        alternate_path = entry.render(config.get('alternate_path', ''))
-                        queue_add(path, entry.get('title', ''), config, alternate_path=alternate_path)
+                        try:
+                            path = entry.render(config.get('primary_path', entry['location']))
+                            alternate_path = entry.render(config.get('alternate_path', ''))
+                            queue_add(path, entry.get('title', ''), config, alternate_path=alternate_path)
+                        except RenderError as ex:
+                            entry.fail('Invalid entry field %s for %s.' % (config['primary_path'], entry['title']))
+                            log.debug('Could not render! %s' % ex)
                     # or is it a torrent?
                     elif 'content_files' in entry:
-                        path = entry.render(config.get('primary_path', ''))
+                        # try to render
+                        try:
+                            path = entry.render(config.get('primary_path', ''))
+                            alternate_path = entry.render(config.get('alternate_path', ''))
+                        except RenderError as ex:
+                            entry.fail('Invalid entry field %s for %s.' % (config['primary_path'], entry['title']))
+                            log.debug('Could not render! %s' % ex)
+                            continue
+
                         if not path:
-                            entry.reject('No path set for torrent. I am not a wizard. Please tell me where to look.')
-                            break
-                        alternate_path = entry.render(config.get('alternate_path', ''))
+                            entry.fail('No path set for torrent. I am not a wizard. Please tell me where to look.')
+                            continue
                         files = entry['content_files']
                         if len(files) == 1:
                             title = files[0]
@@ -201,16 +206,16 @@ class SubtitleQueue(object):
                         else:
                             title = entry['title']
                             alternate_title = title
-                        path = posixpath.join(path, title)
+                        path = os.path.join(path, title)
 
                         if alternate_path:
-                            alternate_path = posixpath.join(alternate_path, alternate_title)
+                            alternate_path = os.path.join(alternate_path, alternate_title)
 
                         queue_add(path, title, config, alternate_path=alternate_path)
                     else:
                         #log.error("Invalid entry for subtitle queue.")
                         entry.fail('Invalid entry.')
-                elif action == "remove":
+                elif action == 'remove':
                     if entry.get('location', ''):
                         queue_del(entry['location'])
                     else:
@@ -219,7 +224,7 @@ class SubtitleQueue(object):
             except QueueError as e:
                 # ignore already in queue
                 if e.errno != 1:
-                    entry.fail("ERROR: %s" % e.message)
+                    entry.fail('ERROR: %s' % e.message)
 
 
 @with_session
@@ -242,7 +247,8 @@ def queue_add(path, title, config, alternate_path=None, session=None):
             item = QueuedSubtitle(path, alternate_path, title)
         session.add(item)
         item.languages = primary if primary else default
-        log.info('Added %s to queue with %s primary languages.' % (item.path, len(item.languages)))
+        log.info('Added %s to queue with langs: [%s].' %
+                 (item.path, ', '.join([unicode(s.language) for s in item.languages])))
         return True
 
 
@@ -280,6 +286,7 @@ def queue_edit(src, dest, title, config, session=None):
             item.stop_after = config['stop_after']
         primary = make_lang_list(config.get('languages', []), session=session)
         item.languages = primary
+        log.debug('Updated values for %s.' % item.title)
 
 
 @with_session
