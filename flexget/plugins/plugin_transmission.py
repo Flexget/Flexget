@@ -196,6 +196,13 @@ class PluginTransmissionInput(TransmissionBase):
                 entry['location'] = bigfella
                 entries.append(entry)
         return entries
+        
+    def on_task_exit(self, task, config):
+        """ 
+        Mark rpc client for garbage collector when task completed so every task can start 
+        a fresh new according its own config - fix to bug #2804
+        """
+        self.client = None
 
 
 class PluginTransmission(TransmissionBase):
@@ -554,6 +561,12 @@ class PluginTransmission(TransmissionBase):
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
             download.instance.cleanup_temp_files(task)
+        
+        """ 
+        Mark rpc client for garbage collector when task completed so every task can start 
+        a fresh new according its own config - fix to bug #2804
+        """
+        self.client = None
 
     on_task_abort = on_task_exit
 
@@ -598,6 +611,13 @@ class PluginTransmissionClean(TransmissionBase):
         advanced.accept('boolean', key='transmission_seed_limits')
         advanced.accept('boolean', key='delete_files')
         return root
+    
+    def on_task_start(self, task, config):
+        """ 
+        Mark rpc client for garbage collector when task start so every task can start 
+        a fresh new according its own config - fix to bug #2804
+        """
+        self.client = None
 
     def on_task_exit(self, task, config):
         config = self.prepare_config(config)
