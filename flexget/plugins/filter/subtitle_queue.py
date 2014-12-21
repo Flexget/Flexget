@@ -58,7 +58,7 @@ class QueuedSubtitle(Base):
 
     id = Column(Integer, primary_key=True)
     title = Column(String)  # Not completely necessary
-    path = Column(String, unique=True)  # Absolute path of file to fetch subtitles for
+    path = Column(String, unique=True, nullable=False)  # Absolute path of file to fetch subtitles for
     alternate_path = Column(String, unique=True)  # Absolute path of file to fetch subtitles for
     added = Column(DateTime)  # Used to determine age
     stop_after = Column(String)
@@ -102,6 +102,12 @@ class SubtitleQueue(object):
         ]
     }
 
+    @with_session
+    def complete(self, entry, session=None):
+        if 'missing_subtitles' in entry and not entry.get('missing_subtitles'):
+            item = session.query(QueuedSubtitle).filter(QueuedSubtitle.title == entry['title']).first()
+            item.downloaded = True
+
     def emit(self, task, config):
         if not config:
             return
@@ -113,22 +119,17 @@ class SubtitleQueue(object):
                 path = sub_item.path
             elif sub_item.alternate_path and os.path.exists(sub_item.alternate_path):
                 path = sub_item.alternate_path
-            elif sub_item.path:
-                log.info('%s: File not found. Retrying later.' % sub_item.path)
-                continue
-            elif sub_item.alternate_path:
-                log.info('%s: File not found. Retrying later.' % sub_item.alternate_path)
-                continue
             else:
-                log.error('Bad entry. No paths specified.')
+                log.error('File not found. Removing "%s" from queue.' % sub_item.title)
+                task.session.delete(sub_item)
                 continue
             entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(path))
             entry['location'] = path
             entry['title'] = sub_item.title
 
-            primary = []
+            primary = set()
             for language in sub_item.languages:
-                primary.append(Language.fromietf(language.language))
+                primary.add(Language.fromietf(language.language))
             entry['subtitle_languages'] = primary
 
             # get the file extension index
@@ -145,16 +146,17 @@ class SubtitleQueue(object):
                     continue
             # if entry wants only 1 subtitle, then we look for files with and without language extension
             else:
-                if glob.glob(path[:index] + ".srt") or glob.glob(path[:index] + "." + unicode(primary[0]) + ".srt"):
+                if glob.glob(path[:index] + ".srt") or \
+                        (primary and glob.glob(path[:index] + "." + unicode(primary.pop()) + ".srt")):
                     log.debug('All primary subtitles already fetched for %s.' % entry['title'])
                     continue
-
+            entry.on_complete(self.complete)
             entries.append(entry)
             log.debug('Emitting subtitle entry for %s.' % entry['title'])
         return entries
 
     def on_task_filter(self, task, config):
-        if isinstance(config, dict) and config.get('action') == 'emit':
+        if not isinstance(config, dict) and config == 'emit':
             for entry in task.entries:
                 entry.accept()
 
@@ -277,6 +279,9 @@ def queue_edit(src, dest, title, config, session=None):
         # Two paths but not in queue could mean it comes from a torrent or has been moved with move plugin etc.
         queue_add(dest, title, config, alternate_path=src, session=session)
     else:
+        if item.downloaded:
+            log.debug('All subtitles have already been downloaded. Not updating values.')
+            return
         if src:
             item.path = src
         if dest:
@@ -291,7 +296,7 @@ def queue_edit(src, dest, title, config, session=None):
 
 @with_session
 def queue_get(session=None):
-    subs = session.query(QueuedSubtitle).all()
+    subs = session.query(QueuedSubtitle).filter(QueuedSubtitle.downloaded == False).all()
     # remove any items that have expired
     for sub_item in subs:
         if sub_item.added + parse_timedelta(sub_item.stop_after) < datetime.combine(date.today(), time()):
