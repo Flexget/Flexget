@@ -52,6 +52,9 @@ class UrlRewriteSerienjunkies(object):
         search_title = re.sub('\[.*\] ', '', download_title)
         self.config = task.config.get('serienjunkies')
         download_url = self.parse_download(series_url, search_title, self.config, entry)
+        if download_url is None:
+            download_url = entry['url'] 
+        #Debug Information
         log.debug('TV Show URL: %s' % series_url)
         log.debug('Episode: %s' % search_title)
         log.debug('Download URL: %s' % download_url)
@@ -87,10 +90,12 @@ class UrlRewriteSerienjunkies(object):
         # filter language
         if config['language'] in ['de', 'both']:
             if not re.search('german|deutsch', episode_lang, flags=re.IGNORECASE):
-                log.verbose('Language doesn\'t match')
+                entry.reject('Language doesn\'t match selected')
+                return None
         elif config['language'] in ['en', 'both']:
             if not re.search('englisc?h', episode_lang, flags=re.IGNORECASE):
-                log.verbose('Language doesn\'t match')
+                entry.reject('Language doesn\'t match selected')
+                return None
 
         # find download links
         links = episode.find_all('a')
@@ -107,7 +112,7 @@ class UrlRewriteSerienjunkies(object):
             if re.match(pattern, url):
                 return url
             else:
-                log.verbose('Hoster doesn\'t match')
+                log.verbose('Hoster doesn\'t match selected')
                 continue
         
         raise UrlRewritingError('URL-Rewriting failed, enable verbose logging for details.')
