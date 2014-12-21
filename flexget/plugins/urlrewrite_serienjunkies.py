@@ -88,11 +88,9 @@ class UrlRewriteSerienjunkies(object):
         if config['language'] in ['de', 'both']:
             if not re.search('german|deutsch', episode_lang, flags=re.IGNORECASE):
                 log.verbose('Language doesn\'t match')
-                entry.reject('Language doesn\'t match')
         elif config['language'] in ['en', 'both']:
             if not re.search('englisc?h', episode_lang, flags=re.IGNORECASE):
                 log.verbose('Language doesn\'t match')
-                entry.reject('Language doesn\'t match')
 
         # find download links
         links = episode.find_all('a')
