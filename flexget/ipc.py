@@ -61,7 +61,7 @@ class DaemonService(rpyc.Service):
 
     def exposed_handle_cli(self, args):
         args = rpyc.utils.classic.obtain(args)
-        log.debug('Running command `%s` for client.' % ' '.join(args))
+        log.verbose('Running command `%s` for client.' % ' '.join(args))
         parser = get_parser()
         try:
             options = parser.parse_args(args, file=self.client_out_stream)
@@ -119,9 +119,13 @@ class IPCServer(threading.Thread):
         return sock, self.password
 
     def run(self):
+        # Make the rpyc logger a bit quieter when we aren't in debugging.
+        rpyc_logger = logging.getLogger('ipc.rpyc')
+        if logging.getLogger().getEffectiveLevel() > logging.DEBUG:
+            rpyc_logger.setLevel(logging.WARNING)
         DaemonService.manager = self.manager
         self.server = ThreadedServer(
-            DaemonService, hostname=self.host, port=self.port, authenticator=self.authenticator, logger=log
+            DaemonService, hostname=self.host, port=self.port, authenticator=self.authenticator, logger=rpyc_logger
         )
         # If we just chose an open port, write save the chosen one
         self.port = self.server.listener.getsockname()[1]
