@@ -2,7 +2,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import json
 import logging
-import itertools
 from time import sleep
 from datetime import datetime, timedelta
 
@@ -16,6 +15,7 @@ from flexget.db_schema import versioned_base
 from flexget.plugin import PluginError
 from flexget.manager import Session
 from requests import post
+from requests import Session as RSession
 from requests.auth import AuthBase
 from requests.cookies import cookiejar_from_dict
 from requests.utils import dict_from_cookiejar
@@ -66,11 +66,11 @@ class RutrackerAuth(AuthBase):
     """
 
     def try_authenticate(self, payload):
-        for _ in itertools.repeat(None, 5):
-            auth_response = post("http://login.rutracker.org/forum/login.php", data=payload,
-                                 cookies=cookiejar_from_dict({'spylog_test': '1'}))
-            if auth_response.cookies and len(auth_response.cookies) > 0:
-                return auth_response
+        for _ in range(5):
+            s = RSession()
+            s.post("http://login.rutracker.org/forum/login.php", data=payload)
+            if s.cookies and len(s.cookies) > 0:
+                return s.cookies
             else:
                 sleep(3)
         raise PluginError('unable to obtain cookies from rutracker')
@@ -80,8 +80,7 @@ class RutrackerAuth(AuthBase):
             log.debug('rutracker cookie not found. Requesting new one')
             payload_ = {'login_username': login,
                         'login_password': password, 'login': 'Вход'}
-            auth_response = self.try_authenticate(payload_)
-            self.cookies_ = auth_response.cookies
+            self.cookies_ = self.try_authenticate(payload_)
             if db_session:
                 db_session.add(
                     RutrackerAccount(
