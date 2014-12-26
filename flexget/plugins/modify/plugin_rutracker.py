@@ -67,7 +67,7 @@ class RutrackerAuth(AuthBase):
     """
 
     def try_authenticate(self, payload):
-        for _ in itertools.repeat(None, 5):
+        for _ in range(5):
             s = RSession()
             s.post("http://login.rutracker.org/forum/login.php", data=payload)
             if s.cookies and len(s.cookies) > 0:
