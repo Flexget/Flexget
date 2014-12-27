@@ -91,7 +91,8 @@ class EmitSeries(object):
 
             if series.identified_by not in ['ep', 'sequence']:
                 if not task.is_rerun:
-                    log.verbose('Can only emit ep or sequence based series. `%s` is identified_by %s' %
+                    log.verbose('Can only emit ep or sequence based series. '
+                                '`%s` is identified_by %s' %
                                 (series.name, series.identified_by or 'auto'))
                 continue
 
@@ -141,8 +142,10 @@ class EmitSeries(object):
                         if config.get('from_start') or config.get('backfill'):
                             entries.append(self.search_entry(series, season, 1, task))
                         else:
-                            log.verbose('Series `%s` has no history. Set begin option, or use CLI `series begin` '
-                                        'subcommand to set first episode to emit' % series.name)
+                            if not task.is_rerun:
+                                log.verbose('Series `%s` has no history. Set begin option, '
+                                            'or use CLI `series begin` '
+                                            'subcommand to set first episode to emit' % series.name)
                             break
 
                     if not config.get('backfill'):
