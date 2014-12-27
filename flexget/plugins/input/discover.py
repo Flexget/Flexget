@@ -221,7 +221,7 @@ class Discover(object):
                 log.debug('%s -> No previous run recorded' % entry['title'])
                 de = DiscoverEntry(entry['title'], task.name)
                 task.session.add(de)
-            if task.options.discover_now or not de.last_execution:
+            if (not task.is_rerun and task.options.discover_now) or not de.last_execution:
                 # First time we execute (and on --discover-now) we randomize time to avoid clumping
                 delta = multiply_timedelta(interval, random.random())
                 de.last_execution = datetime.datetime.now() - delta
