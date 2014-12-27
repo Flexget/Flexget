@@ -90,8 +90,9 @@ class EmitSeries(object):
                 continue
 
             if series.identified_by not in ['ep', 'sequence']:
-                log.verbose('Can only emit ep or sequence based series. `%s` is identified_by %s' %
-                            (series.name, series.identified_by or 'auto'))
+                if not task.is_rerun:
+                    log.verbose('Can only emit ep or sequence based series. `%s` is identified_by %s' %
+                                (series.name, series.identified_by or 'auto'))
                 continue
 
             low_season = 0 if series.identified_by == 'ep' else -1
