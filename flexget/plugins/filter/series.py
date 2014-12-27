@@ -682,7 +682,8 @@ def forget_series_episode(name, identifier):
             episode = session.query(Episode).filter(Episode.identifier == identifier).\
                 filter(Episode.series_id == series.id).first()
             if episode:
-                series.identified_by = ''  # reset identified_by flag so that it will be recalculated
+                if not series.begin:
+                    series.identified_by = ''  # reset identified_by flag so that it will be recalculated
                 session.delete(episode)
                 session.commit()
                 log.debug('Episode %s from series %s removed from database.', identifier, name)
