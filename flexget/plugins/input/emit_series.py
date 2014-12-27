@@ -150,6 +150,7 @@ class EmitSeries(object):
         return entries
 
     def on_search_complete(self, entry, task=None, identified_by=None, **kwargs):
+        """Decides whether we should look for next ep/season based on whether we found/accepted any episodes."""
         with Session() as session:
             series = session.query(Series).filter(Series.name == entry['series_name']).first()
             latest = get_latest_release(series)
@@ -160,6 +161,8 @@ class EmitSeries(object):
                        first())
             if entry.accepted or (episode and len(episode.releases) > 0):
                 self.try_next_season.pop(entry['series_name'], None)
+                log.debug('%s %s was accepted, rerunning to look for next ep.' %
+                          (entry['series_name'], entry['series_id']))
                 task.rerun()
             elif latest and latest.season == entry['series_season']:
                 if identified_by != 'ep':
@@ -167,6 +170,8 @@ class EmitSeries(object):
                     return
                 if entry['series_name'] not in self.try_next_season:
                     self.try_next_season[entry['series_name']] = True
+                    log.debug('%s %s not found, rerunning to look for next season' %
+                              (entry['series_name'], entry['series_id']))
                     task.rerun()
                 else:
                     # Don't try a second time
