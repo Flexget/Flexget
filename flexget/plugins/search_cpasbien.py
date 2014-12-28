@@ -60,7 +60,7 @@ class SearchCPASBIEN(object):
             ebook
         """
 
-        base_url = 'http://www.cpasbien.pe/'
+        base_url = 'http://www.cpasbien.pe'
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             search_string = search_string.replace(' ', '-').lower()
@@ -70,10 +70,12 @@ class SearchCPASBIEN(object):
             query_url_fragment = query.encode('iso-8859-1')
 # http://www.cpasbien.pe/recherche/ncis.html
             if config['category'] == 'all':
-                url = join(base_url, 'recherche/', query_url_fragment)
+                str_url = (base_url, 'recherche', query_url_fragment)
+                url = '/'.join(str_url)
             else:
                 category_url_fragment = '%s' % config['category']
-                url = join(base_url, 'recherche/', category_url_fragment, '/', query_url_fragment)
+                str_url = (base_url, 'recherche', category_url_fragment, query_url_fragment)
+                url = '/'.join(str_url)
             log.debug('search url: %s' % url + '.html')
 # GET URL
             f = requests.get(url + '.html').content
@@ -97,7 +99,8 @@ class SearchCPASBIEN(object):
                         link_rewrite = page_link.split('/')
 # get last value in array remove .html and replace by .torrent
                         endlink = link_rewrite[-1]
-                        entry['url'] = join(base_url, 'telecharge/', endlink[:-5], '.torrent')
+                        str_url = (base_url, '/telechargement/', endlink[:-5], '.torrent')
+                        entry['url'] = ''.join(str_url)
 
                         log.debug('Title: %s | DL LINK: %s' % (entry['title'], entry['url']))
 
