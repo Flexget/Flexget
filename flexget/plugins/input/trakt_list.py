@@ -90,7 +90,7 @@ class TraktList(object):
         session = get_session(config['username'], config.get('password'))
         url = urljoin(API_URL, 'users/%s/' % config['username'])
         if config['list'] in ['collection', 'watchlist', 'watched']:
-            url = urljoin(url, '%s/%s' % (config['list'], (config['type'])))
+            url = urljoin(url, '%s/%s' % (config['list'], config['type']))
         else:
             url = urljoin(url, 'lists/%s/items' % make_list_slug(config['list']))
 

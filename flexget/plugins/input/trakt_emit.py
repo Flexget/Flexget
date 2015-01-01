@@ -36,7 +36,6 @@ class TraktEmit(object):
         'properties': {
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'api_key': {'type': 'string'},
             'position': {'type': 'string', 'enum': ['last', 'next'], 'default': 'next'},
             'context': {'type': 'string', 'enum': ['watched', 'collected'], 'default': 'watched'},
             'list': {'type': 'string'}
@@ -72,7 +71,11 @@ class TraktEmit(object):
         session = get_session(config['username'], config.get('password'))
         listed_series = {}
         if config.get('list'):
-            url = urljoin(API_URL, 'users/%s/lists/%s/items' % (config['username'], make_list_slug(config['list'])))
+            url = urljoin(API_URL, 'users/%s/' % config['username'])
+            if config['list'] in ['collection', 'watchlist', 'watched']:
+                url = urljoin(url, '%s/shows' % config['list'])
+            else:
+                url = urljoin(url, 'lists/%s/items' % make_list_slug(config['list']))
             try:
                 data = session.get(url).json()
             except RequestException as e:
@@ -82,26 +85,22 @@ class TraktEmit(object):
                 return
             for item in data:
                 if item['type'] == 'show':
-                    trakt_id = item['ids']['trakt']
+                    trakt_id = item['show']['ids']['trakt']
                     listed_series[trakt_id] = item['show']['title']
         context = config['context']
         if context == 'collected':
             context = 'collection'
-        url = urljoin(API_URL, 'sync/%s/shows' % (context))
-        try:
-            data = session.get(url).json()
-        except RequestException as e:
-            raise plugin.PluginError('TODO: error message')
         entries = []
-
-        for item in data:
-            if item['show']['tvdb_id'] == 0:  # (sh)it happens with filtered queries
-                continue
-            eps, epn = None, None
+        for trakt_id, show in listed_series.iteritems():
+            url = urljoin(API_URL, 'shows/%s/progress/%s' % (trakt_id, context))
+            try:
+                data = session.get(url).json()
+            except RequestException as e:
+                raise plugin.PluginError('TODO: error message')
             if config['position'] == 'next' and item.get('next_episode'):
                 # If the next episode is already in the trakt database, we'll get it here
-                eps = item['next_episode']['season']
-                epn = item['next_episode']['number']
+                eps = data['next_episode']['season']
+                epn = data['next_episode']['number']
             else:
                 # If we need last ep, or next_episode was not provided, search for last ep
                 for seas in reversed(item['seasons']):
@@ -123,12 +122,12 @@ class TraktEmit(object):
                 entry = self.make_entry(item['show']['tvdb_id'], item['show']['title'], eps, epn,
                                         item['show']['imdb_id'])
                 entries.append(entry)
-                if entry['tvdb_id'] in listed_series:
-                    del listed_series[entry['tvdb_id']]
-        # If we were given an explicit list in next mode, fill in any missing series with S01E01 entries
-        if config['position'] == 'next':
-            for tvdb_id in listed_series:
-                entries.append(self.make_entry(tvdb_id, listed_series[tvdb_id], 1, 1))
+
+
+            # If we were given an explicit list in next mode, fill in any missing series with S01E01 entries
+            if config['position'] == 'next':
+                for tvdb_id in listed_series:
+                    entries.append(self.make_entry(tvdb_id, listed_series[tvdb_id], 1, 1))
         return entries
 
     def make_entry(self, tvdb_id, name, season, episode, imdb_id=None):
