@@ -7,10 +7,10 @@ from copy import copy
 from datetime import datetime, timedelta
 
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
-                        desc, select, update, delete, ForeignKey, Index, func, and_, not_, UniqueConstraint)
-from sqlalchemy.orm import relation, backref
+                        desc, select, update, delete, ForeignKey, Index, func, and_, not_)
+from sqlalchemy.orm import relation, backref, object_session
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
-from sqlalchemy.exc import OperationalError, IntegrityError
+from sqlalchemy.exc import OperationalError
 
 from flexget import db_schema, options, plugin
 from flexget.config_schema import one_or_more
@@ -18,7 +18,7 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.log import log_once
-from flexget.plugins.parsers import ParseWarning, SERIES_ID_TYPES
+from flexget.plugins.parsers import SERIES_ID_TYPES
 from flexget.plugin import get_plugin_by_name
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
@@ -1401,7 +1401,7 @@ class FilterSeries(FilterSeriesBase):
 
             # add best entry to backlog (backlog is able to handle duplicate adds)
             if self.backlog:
-                self.backlog.instance.add_backlog(task, best)
+                self.backlog.instance.add_backlog(task, best, session=object_session(episode))
             return True
 
     def process_qualities(self, config, entries, downloaded):
