@@ -2,11 +2,9 @@ from __future__ import absolute_import, division, unicode_literals
 
 from urlparse import urljoin
 
-from requests import Session#TODO: Switch to flexget session?
-
 from flexget import plugin
 from flexget.utils import json
-from flexget.utils.requests import RequestException#TODO: , Session
+from flexget.utils.requests import RequestException, Session
 
 
 API_KEY = '980c477226b9c18c9a4982cddc1bdbcd747d14b006fe044a8bbbe29bfb640b5d'
@@ -26,6 +24,7 @@ def make_list_slug(name):
 
 
 def get_session(username=None, password=None):
+    """Creates a requests session which is authenticated to trakt."""
     session = Session()
     session.headers = {
         'Content-Type': 'application/json',
@@ -45,3 +44,22 @@ def get_session(username=None, password=None):
         except (ValueError, KeyError):
             raise plugin.PluginError('Got unexpected response content while authorizing to trakt: %s' % r.text)
     return session
+
+
+def get_entry_ids(entry):
+    """Creates a trakt ids dict from id fields on an entry. Prefers already populated info over lazy lookups."""
+    ids = {}
+    for lazy in [False, True]:
+        if entry.get('trakt_id', eval_lazy=lazy):
+            ids['trakt'] = entry['trakt_id']
+        if entry.get('tmdb_id', eval_lazy=lazy):
+            ids['tmdb'] = entry['tmdb_id']
+        if entry.get('tvdb_id', eval_lazy=lazy):
+            ids['tvdb'] = entry['tvdb_id']
+        if entry.get('imdb_id', eval_lazy=lazy):
+            ids['imdb'] = entry['imdb_id']
+        if entry.get('tvrage_id', eval_lazy=lazy):
+            ids['tvrage'] = entry['tvrage_id']
+        if ids:
+            break
+    return ids
