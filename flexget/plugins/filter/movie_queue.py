@@ -78,8 +78,31 @@ class QueuedMovie(queue_base.QueuedItem, Base):
     quality_req = quality_requirement_property('quality')
 
 
-class FilterMovieQueue(queue_base.FilterQueueBase):
+class MovieQueue(queue_base.FilterQueueBase):
+    schema = {
+        'oneOf': [
+            {'type': 'string', 'enum': ['accept', 'add', 'remove', 'forget']},
+            {
+                'type': 'object',
+                'properties': {
+                    'action': {'type': 'string', 'enum': ['accept', 'add', 'remove', 'forget']},
+                    'quality': {'type': 'string', 'format': 'quality_requirements'},
+                },
+                'required': ['action'],
+                'additionalProperties': False
+            }
+        ]
+    }
+
     def matches(self, task, config, entry):
+        if not config:
+            return
+        if not isinstance(config, dict):
+            config = {'action': config}
+        #only the accept action is applied in the 'matches' section
+        if config.get('action') != 'accept':
+            return
+
         # Tell tmdb_lookup to add lazy lookup fields if not already present
         try:
             plugin.get_plugin_by_name('imdb_lookup').instance.register_lazy_fields(entry)
@@ -109,6 +132,53 @@ class FilterMovieQueue(queue_base.FilterQueueBase):
             filter(or_(*conditions)).first()
         if movie and movie.quality_req.allows(quality):
             return movie
+
+    def on_task_output(self, task, config):
+        if not config:
+            return
+        if not isinstance(config, dict):
+            config = {'action': config}
+        for entry in task.accepted:
+            # Tell tmdb_lookup to add lazy lookup fields if not already present
+            try:
+                plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
+            except plugin.DependencyError:
+                log.debug('tmdb_lookup is not available, queue will not work if movie ids are not populated')
+            # Find one or both movie id's for this entry. See if an id is already populated before incurring lazy lookup
+            kwargs = {}
+            for lazy in [False, True]:
+                if entry.get('imdb_id', eval_lazy=lazy):
+                    kwargs['imdb_id'] = entry['imdb_id']
+                if entry.get('tmdb_id', eval_lazy=lazy):
+                    kwargs['tmdb_id'] = entry['tmdb_id']
+                if kwargs:
+                    break
+            if not kwargs:
+                log.warning('Could not determine a movie id for %s, it will not be added to queue.' % entry['title'])
+                continue
+
+            # Provide movie title if it is already available, to avoid movie_queue doing a lookup
+            kwargs['title'] = (entry.get('imdb_name', eval_lazy=False) or
+                               entry.get('tmdb_name', eval_lazy=False) or
+                               entry.get('movie_name', eval_lazy=False))
+            log.debug('movie_queue kwargs: %s' % kwargs)
+            try:
+                action = config.get('action')
+                if action == 'add':
+                    # since entries usually have unknown quality we need to ignore that ..
+                    if entry.get('quality'):
+                        kwargs['quality'] = qualities.Requirements(entry['quality'].name)
+                    else:
+                        kwargs['quality'] = qualities.Requirements(config.get('quality', 'any'))
+                    queue_add(**kwargs)
+                elif action == 'remove':
+                    queue_del(**kwargs)
+                elif action == 'forget':
+                    queue_forget(**kwargs)
+            except QueueError as e:
+                # Ignore already in queue errors
+                if e.errno != 1:
+                    entry.fail('Error adding movie to queue: %s' % e.message)
 
 
 class QueueError(Exception):
@@ -304,4 +374,4 @@ def queue_get(session=None, downloaded=False):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(FilterMovieQueue, 'movie_queue', api_ver=2)
+    plugin.register(MovieQueue, 'movie_queue', api_ver=2)
