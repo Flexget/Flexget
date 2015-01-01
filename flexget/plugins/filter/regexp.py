@@ -129,7 +129,12 @@ class FilterRegexp(object):
                     opts['not'] = [re.compile(not_re, re.IGNORECASE | re.UNICODE) for not_re in opts['not']]
 
                 # compile regexp and make sure regexp is a string for series like '24'
-                regexp = re.compile(unicode(regexp), re.IGNORECASE | re.UNICODE)
+                try:
+                    regexp = re.compile(unicode(regexp), re.IGNORECASE | re.UNICODE)
+                except re.error as e:
+                    # Since validator can't validate dict keys (when an option is defined for the pattern) make sure we
+                    # raise a proper error here.
+                    raise plugin.PluginError('Invalid regex `%s`: %s' % (regexp, e))
                 out_config.setdefault(operation, []).append({regexp: opts})
         return out_config
 

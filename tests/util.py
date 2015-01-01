@@ -8,8 +8,6 @@ import os
 import shutil
 import errno
 import logging
-import time
-from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('tests.util')
 

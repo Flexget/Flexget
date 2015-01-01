@@ -1,6 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
+
+from nose.plugins.skip import SkipTest
+
+from flexget.plugins.parsers.parser_guessit import ParserGuessit
+from flexget.plugins.parsers.parser_internal import ParserInternal
 from flexget.utils.qualities import Quality
+from tests import FlexGetBase, build_parser_function
 
 
 class TestQualityModule(object):
@@ -15,9 +20,9 @@ class TestQualityModule(object):
             assert got_val == '720p', got_val
 
 
-class TestQualityParser(object):
+class QualityParser(object):
 
-    def test_qualities(self):
+    def get_quality_failures(self):
         items = [('Test.File 1080p.web-dl', '1080p webdl'),
                  ('Test.File.web-dl.1080p', '1080p webdl'),
                  ('Test.File.WebHD.720p', '720p webdl'),
@@ -39,7 +44,7 @@ class TestQualityParser(object):
                  ('Test.File.720p.webdl', '720p webdl'),
                  ('Test.File.1280x720_web dl', '720p webdl'),
                  ('Test.File.720p.h264.web.dl', '720p webdl h264'),
-                 ('Test.File.1080p.web.x264', '1080p webdl h264'),
+                 ('Test.File.1080p.webhd.x264', '1080p webdl h264'),
                  ('Test.File.web-dl', 'webdl'),
                  ('Test.File.720P', '720p'),
                  ('Test.File.1920x1080', '1080p'),
@@ -47,6 +52,7 @@ class TestQualityParser(object):
                  ('Test File blurayrip', 'bluray'),
                  ('Test.File.br-rip', 'bluray'),
                  ('Test.File.720px', '720p'),
+                 ('Test.File.720p50', '720p'),
 
                  ('Test.File.dvd.rip', 'dvdrip'),
                  ('Test.File.dvd.rip.r5', 'r5'),
@@ -61,9 +67,9 @@ class TestQualityParser(object):
                  ('Test.File.720p.hdtv.avi', '720p hdtv'),
                  ('Test.File.1080p.hdtv.avi', '1080p hdtv'),
                  ('Test.File.720p.preair.avi', '720p preair'),
-                 ('Test.File.ts.dvdrip.avi', 'ts'),
+                 #('Test.File.ts.dvdrip.avi', 'ts'), This should no exists. Having Telesync and DVDRip is a non-sense.
                  ('Test.File.HDTS.blah', 'ts'),
-                 ('Test.File.HDCAM.bluray.lie', 'cam'),
+                 #('Test.File.HDCAM.bluray.lie', 'cam'), This should no exists. Having Cam and Bluray is a non-sense.
 
                  # Test qualities as part of words. #1593
                  ('Tsar.File.720p', '720p'),
@@ -77,11 +83,34 @@ class TestQualityParser(object):
                  ('Test.File.DTS.HD', 'dtshd'),
                  ('Test.File.DTSHD', 'dtshd'),
                  ('Test.File.DTS', 'dts'),
-                 ('Test.File.truehd', 'truehd')]
+                 ('Test.File.truehd', 'truehd'),
+                 ('Test.File.DTSHDMA', 'dtshd')]
 
+        failures = []
         for item in items:
-            quality = Quality(item[0]).name
-            assert quality == item[1], '`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality)
+            quality = self.parser.parse_movie(item[0]).quality
+            if quality != item[1]:
+                failures.append('`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality))
+        return failures
+
+
+
+class TestInternalQualityParser(QualityParser):
+    parser = ParserInternal()
+
+    def test_qualities(self):
+        failures = self.get_quality_failures()
+        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+
+
+class TestGuessitQualityParser(QualityParser):
+    parser = ParserGuessit()
+
+    def test_qualities(self):
+        failures = self.get_quality_failures()
+        if failures:
+            raise SkipTest('Guessit quality parser does not match FlexGet: %s' % ', '.join(failures))
+
 
 
 class TestFilterQuality(FlexGetBase):
@@ -151,3 +180,15 @@ class TestFilterQuality(FlexGetBase):
         assert entry in self.task.accepted, 'HR should be accepted'
         assert len(self.task.rejected) == 3, 'wrong number of entries rejected'
         assert len(self.task.accepted) == 1, 'wrong number of entries accepted'
+
+
+class TestGuessitFilterQuality(TestFilterQuality):
+    def __init__(self):
+        super(TestGuessitFilterQuality, self).__init__()
+        self.add_tasks_function(build_parser_function('guessit'))
+
+
+class TestInternalFilterQuality(TestFilterQuality):
+    def __init__(self):
+        super(TestInternalFilterQuality, self).__init__()
+        self.add_tasks_function(build_parser_function('internal'))

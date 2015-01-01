@@ -4,6 +4,7 @@ import sys
 
 from flexget import options
 from flexget.event import event
+from flexget.logger import console
 from flexget.plugin import plugins
 
 
@@ -41,13 +42,13 @@ def print_doc(manager, options):
     plugin = plugins.get(plugin_name, None)
     if plugin:
         if not plugin.instance.__doc__:
-            print('Plugin %s does not have documentation' % plugin_name)
+            console('Plugin %s does not have documentation' % plugin_name)
         else:
-            print('')
-            print(trim(plugin.instance.__doc__))
-            print('')
+            console('')
+            console(trim(plugin.instance.__doc__))
+            console('')
     else:
-        print('Could not find plugin %s' % plugin_name)
+        console('Could not find plugin %s' % plugin_name)
 
 
 @event('options.register')

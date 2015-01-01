@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import urllib
 
 from requests import RequestException
 
@@ -7,11 +8,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import RenderError
 
-__version__ = 0.1
-
 log = logging.getLogger('prowl')
-
-headers = {'User-Agent': 'FlexGet Prowl plugin/%s' % str(__version__)}
 
 
 class OutputProwl(object):
@@ -69,7 +66,7 @@ class OutputProwl(object):
 
             url = 'https://api.prowlapp.com/publicapi/add'
             data = {'priority': priority, 'application': application, 'apikey': apikey,
-                    'event': event, 'description': description}
+                    'event': event.encode('utf-8'), 'description': description}
 
             if task.options.test:
                 log.info('Would send prowl message about: %s', entry['title'])
@@ -77,7 +74,7 @@ class OutputProwl(object):
                 continue
 
             try:
-                response = task.requests.post(url, headers=headers, data=data, raise_status=False)
+                response = task.requests.post(url, data=data, raise_status=False)
             except RequestException as e:
                 log.error('Error with request: %s' % e)
                 continue

@@ -2,6 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import urllib
 
+from jinja2 import TemplateSyntaxError
+
 from flexget import plugin
 from flexget.event import event
 from flexget.task import Task
@@ -23,16 +25,23 @@ class SearchRSS(object):
                           for s in entry.get('search_strings', [entry['title']])]
         rss_plugin = plugin.get_plugin_by_name('rss')
         entries = set()
+        rss_config = rss_plugin.instance.build_config(config)
+        try:
+            template = environment.from_string(rss_config['url'])
+        except TemplateSyntaxError as e:
+            raise plugin.PluginError('Invalid jinja template as rss url: %s' % e)
+        rss_config['all_entries'] = True
         for search_string in search_strings:
             # Create a fake task to pass to the rss plugin input handler
             task = Task(manager, 'search_rss_task', config={})
-            # Use a copy of the config, so we don't overwrite jinja url when filling in search term
-            config = rss_plugin.instance.build_config(config).copy()
-            template = environment.from_string(config['url'])
-            config['url'] = template.render({'search_term': search_string})
-            config['all_entries'] = True
+            rss_config['url'] = template.render({'search_term': search_string})
             # TODO: capture some other_fields to try to find seed/peer/content_size numbers?
-            entries.update(rss_plugin.phase_handlers['input'](task, config))
+            try:
+                results = rss_plugin.phase_handlers['input'](task, rss_config)
+            except plugin.PluginError as e:
+                log.error('Error attempting to get rss for %s: %s', rss_config['url'], e)
+            else:
+                entries.update(results)
         return entries
 
 

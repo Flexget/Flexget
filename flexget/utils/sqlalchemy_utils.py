@@ -3,6 +3,8 @@ Miscellaneous SQLAlchemy helpers.
 """
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
+import sqlalchemy
 from sqlalchemy import ColumnDefault, Sequence, Index
 from sqlalchemy.types import TypeEngine
 from sqlalchemy.schema import Table, MetaData
@@ -122,3 +124,18 @@ def create_index(table_name, session, *column_names):
         Index(index_name, *columns).create(bind=session.bind)
     except OperationalError:
         log.debug('Error creating index.', exc_info=True)
+
+
+class ContextSession(sqlalchemy.orm.Session):
+    """:class:`sqlalchemy.orm.Session` which can be used as context manager"""
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        try:
+            if exc_type is None:
+                self.commit()
+            else:
+                self.rollback()
+        finally:
+            self.close()

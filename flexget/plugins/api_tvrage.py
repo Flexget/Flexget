@@ -70,7 +70,9 @@ class TVRageSeries(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     episodes = relation('TVRageEpisodes', order_by='TVRageEpisodes.season, TVRageEpisodes.episode',
-                        cascade='all, delete, delete-orphan')
+                        cascade='all, delete, delete-orphan', backref='series')
+    ep_query = relation('TVRageEpisodes', order_by='TVRageEpisodes.season, TVRageEpisodes.episode',
+                        cascade='all, delete, delete-orphan', lazy='dynamic')
     showid = Column(String)
     link = Column(String)
     classification = Column(String)
@@ -105,9 +107,8 @@ class TVRageSeries(Base):
                 episode = TVRageEpisodes(season.episode(j))
                 self.episodes.append(episode)
 
-    @with_session
-    def find_episode(self, season, episode, session=None):
-        return (session.query(TVRageEpisodes).
+    def find_episode(self, season, episode):
+        return (self.ep_query.
                 filter(TVRageEpisodes.tvrage_series_id == self.id).
                 filter(TVRageEpisodes.season == season).
                 filter(TVRageEpisodes.episode == episode).first())
@@ -144,19 +145,16 @@ class TVRageEpisodes(Base):
     def __str__(self):
         return '<TVRageEpisodes(title=%s,id=%s,season=%s,episode=%s)>' % (self.title, self.id, self.season, self.episode)
 
-    @with_session
-    def next(self, session=None):
+    def next(self):
         """Returns the next episode after this episode"""
-        res = session.query(TVRageEpisodes).\
-            filter(TVRageEpisodes.tvrage_series_id == self.tvrage_series_id).\
-            filter(TVRageEpisodes.season == self.season).\
-            filter(TVRageEpisodes.episode == self.episode+1).first()
+        res = (self.series.ep_query.
+               filter(TVRageEpisodes.season == self.season).
+               filter(TVRageEpisodes.episode == self.episode+1)).first()
         if res is not None:
             return res
-        return session.query(TVRageEpisodes).\
-            filter(TVRageEpisodes.tvrage_series_id == self.tvrage_series_id).\
-            filter(TVRageEpisodes.season == self.season+1).\
-            filter(TVRageEpisodes.episode == 1).first()
+        return (self.series.ep_query.
+                filter(TVRageEpisodes.season == self.season+1).
+                filter(TVRageEpisodes.episode == 1)).first()
 
 
 def closest_airdate(series_id, session):
@@ -184,7 +182,7 @@ def closest_airdate(series_id, session):
     return datetime.datetime.max
 
 
-@with_session
+@with_session(expire_on_commit=False)
 def lookup_series(name=None, session=None):
     series = None
     res = session.query(TVRageLookup).filter(TVRageLookup.name == name.lower()).first()
@@ -220,7 +218,7 @@ def lookup_series(name=None, session=None):
             res.failed_time = datetime.datetime.now()
         else:
             session.add(TVRageLookup(name, None, failed_time=datetime.datetime.now()))
-            session.commit()
+        session.commit()
 
     log.debug('Fetching tvrage info for %s' % name)
     try:
@@ -257,4 +255,5 @@ def lookup_series(name=None, session=None):
             res.series = series
         else:
             session.add(TVRageLookup(name, series))
+    session.commit()
     return series

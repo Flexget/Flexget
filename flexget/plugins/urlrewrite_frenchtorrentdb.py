@@ -15,8 +15,8 @@ class UrlRewriteFTDB(object):
     """FTDB RSS url_rewrite"""
 
     def url_rewritable(self, task, entry):
-        #url = entry['url']
-        if re.match(r'^http://www\.frenchtorrentdb\.com/[^/]+(?!/)[^/]+&rss=1', (entry['url'])):
+        # url = entry['url']
+        if re.match(r'^http://www\.frenchtorrentdb\.com/[^/]+(?!/)[^/]+&rss=1', entry['url']):
             return True
         return False
 
@@ -38,10 +38,15 @@ class UrlRewriteFTDB(object):
             raise UrlRewritingError(e)
         tag_a = soup.find("a", {"class": "dl_link"})
         if not tag_a:
-            raise UrlRewritingError(
-                'FTDB Unable to locate download link from url %s and tag_a is : %s' % (page_url, tag_a)
-            )
-        torrent_url = "http://www3.frenchtorrentdb.com" + tag_a.get('href') + "&js=1"
+            if soup.findAll(text="Connexion ?"):
+                raise UrlRewritingError('You are not logged in,\
+                                         check if your cookie for\
+                                         authentication is up to date')
+            else:
+                raise UrlRewritingError('You have reached your download\
+                                        limit per 24hours, so I cannot\
+                                        get the torrent')
+        torrent_url = ("http://www.frenchtorrentdb.com" + tag_a.get('href') + "&js=1")
         log.debug('TORRENT URL is : %s' % torrent_url)
         return torrent_url
 

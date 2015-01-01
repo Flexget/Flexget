@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
-from nose.plugins.attrib import attr
+
+from tests import FlexGetBase, use_vcr
 
 
 class TestInputWhatCD(FlexGetBase):
@@ -36,7 +36,7 @@ class TestWhatCDOnline(FlexGetBase):
               password: invalid
     """
 
-    @attr(online=True)
+    @use_vcr
     def test_invalid_login(self):
         self.execute_task("badlogin", abort_ok=True)
         assert self.task.aborted, 'Task not aborted with invalid login credentials'

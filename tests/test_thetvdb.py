@@ -1,8 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from nose.plugins.attrib import attr
+
 from flexget.manager import Session
 from flexget.plugins.api_tvdb import lookup_episode
-from tests import FlexGetBase
+from tests import FlexGetBase, use_vcr
 
 
 class TestThetvdbLookup(FlexGetBase):
@@ -46,7 +46,7 @@ class TestThetvdbLookup(FlexGetBase):
 
     """
 
-    @attr(online=True)
+    @use_vcr
     def test_lookup(self):
         """thetvdb: Test Lookup (ONLINE)"""
         self.execute_task('test')
@@ -60,7 +60,7 @@ class TestThetvdbLookup(FlexGetBase):
         assert self.task.find_entry(tvdb_ep_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
 
-    @attr(online=True)
+    @use_vcr
     def test_unknown_series(self):
         # Test an unknown series does not cause any exceptions
         self.execute_task('test_unknown_series')
@@ -68,7 +68,7 @@ class TestThetvdbLookup(FlexGetBase):
         entry = self.task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
-    @attr(online=True)
+    @use_vcr
     def test_mark_expired(self):
 
         def test_run():
@@ -90,14 +90,14 @@ class TestThetvdbLookup(FlexGetBase):
         session.close()
         test_run()
 
-    @attr(online=True)
+    @use_vcr
     def test_date(self):
         self.execute_task('test_date')
         entry = self.task.find_entry(title='the daily show 2012-6-6')
         assert entry
         assert entry['tvdb_ep_name'] == 'Michael Fassbender'
 
-    @attr(online=True)
+    @use_vcr
     def test_absolute(self):
         self.execute_task('test_absolute')
         entry = self.task.find_entry(title='naruto 128')
@@ -133,7 +133,7 @@ class TestThetvdbFavorites(FlexGetBase):
               strip_dates: yes
     """
 
-    @attr(online=True)
+    @use_vcr
     def test_favorites(self):
         """thetvdb: Test favorites (ONLINE)"""
         self.execute_task('test')
@@ -148,7 +148,7 @@ class TestThetvdbFavorites(FlexGetBase):
         assert entry not in self.task.accepted, \
             'series Lost should not have been accepted'
 
-    @attr(online=True)
+    @use_vcr
     def test_strip_date(self):
         self.execute_task('test_strip_dates')
         assert self.task.find_entry(title='Hawaii Five-0'), \

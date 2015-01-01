@@ -9,6 +9,7 @@ import sys
 import tempfile
 from cgi import parse_header
 from httplib import BadStatusLine
+from urllib import unquote
 
 from requests import RequestException
 
@@ -310,7 +311,7 @@ class PluginDownload(object):
         self.filename_ext_from_mime(entry)
 
         if not entry.get('filename'):
-            filename = os.path.basename(url)
+            filename = unquote(url.rsplit('/', 1)[1])
             log.debug('No filename - setting from url: %s' % filename)
             entry['filename'] = filename
         log.debug('Finishing download_entry() with filename %s' % entry.get('filename'))

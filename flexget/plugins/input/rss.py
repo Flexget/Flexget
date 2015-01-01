@@ -7,6 +7,8 @@ import posixpath
 import httplib
 from datetime import datetime
 
+import dateutil.parser
+
 import feedparser
 from requests import RequestException
 
@@ -19,7 +21,7 @@ from flexget.utils.tools import decode_html
 from flexget.utils.pathscrub import pathscrub
 
 log = logging.getLogger('rss')
-
+feedparser.registerDateHandler(lambda date_string: dateutil.parser.parse(date_string).timetuple())
 
 def fp_field_name(name):
     """Translates literal field name to the sanitized one feedparser will use."""
@@ -301,7 +303,7 @@ class InputRSS(object):
                     # html pages (login pages) are received
                     self.process_invalid_content(task, content, config['url'])
                     if task.options.debug:
-                        log.exception(ex)
+                        log.error('bozo error parsing rss: %s' % ex)
                     raise plugin.PluginError('Received invalid RSS content from task %s (%s)' % (task.name, config['url']))
                 elif isinstance(ex, httplib.BadStatusLine) or isinstance(ex, IOError):
                     raise ex  # let the @internet decorator handle
@@ -450,7 +452,10 @@ class InputRSS(object):
         # Save last spot in rss
         if rss.entries:
             log.debug('Saving location in rss feed.')
-            task.simple_persistence['%s_last_entry' % url_hash] = rss.entries[0].title + rss.entries[0].get('guid', '')
+            try:
+                task.simple_persistence['%s_last_entry' % url_hash] = rss.entries[0].title + rss.entries[0].get('guid', '')
+            except AttributeError:
+                log.debug('rss feed location saving skipped: no title information in first entry')
 
         if ignored:
             if not config.get('silent'):

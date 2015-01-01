@@ -4,12 +4,13 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import hashlib
 from datetime import datetime, timedelta
+
 from sqlalchemy import Column, Integer, String, DateTime, Index
 from flexget import db_schema
+from flexget import logger as f_logger
 from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.manager import Session
 from flexget.event import event
-from flexget import logger as f_logger
 
 log = logging.getLogger('util.log')
 Base = db_schema.versioned_base('log_once', 0)
@@ -56,6 +57,12 @@ def log_once(message, logger=logging.getLogger('log_once'), once_level=logging.I
     Log message only once using given logger`. Returns False if suppressed logging.
     When suppressed, `suppressed_level` level is still logged.
     """
+    # If there is no active manager, don't access the db
+    from flexget.manager import manager
+    if not manager:
+        log.warning('DB not initialized. log_once will not work properly.')
+        logger.log(once_level, message)
+        return
 
     digest = hashlib.md5()
     digest.update(message.encode('latin1', 'replace')) # ticket:250

@@ -1,16 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from sqlalchemy import desc, and_
+from sqlalchemy import desc
 
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
+from flexget.manager import Session
 
 log = logging.getLogger('emit_series')
 
 try:
-    from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release
+    from flexget.plugins.filter.series import SeriesTask, Series, Episode, Release, get_latest_release, AlternateNames
 except ImportError as e:
     log.error(e.message)
     raise plugin.DependencyError(issued_by='emit_series', missing='series')
@@ -42,20 +43,28 @@ class EmitSeries(object):
                 '%dx%02d' % (season, episode)]
 
     def sequence_identifiers(self, episode):
-        return ['%d' % episode,
-                '%02d' % episode,
-                '%03d' % episode]
+        # Use a set to remove doubles, which will happen depending on number of digits in episode
+        return set(['%d' % episode,
+                    '%02d' % episode,
+                    '%03d' % episode])
 
     def search_entry(self, series, season, episode, task, rerun=True):
+        # Extract the alternate names for the series
+        alts = [alt.alt_name for alt in series.alternate_names]
         if series.identified_by == 'ep':
             search_strings = ['%s %s' % (series.name, id) for id in self.ep_identifiers(season, episode)]
             series_id = 'S%02dE%02d' % (season, episode)
+            for alt in alts:
+                search_strings.extend(['%s %s' % (alt, id) for id in self.ep_identifiers(season, episode)])
         else:
             search_strings = ['%s %s' % (series.name, id) for id in self.sequence_identifiers(episode)]
             series_id = episode
+            for alt in alts:
+                search_strings.extend(['%s %s' % (alt, id) for id in self.sequence_identifiers(episode)])
         entry = Entry(title=search_strings[0], url='',
                       search_strings=search_strings,
                       series_name=series.name,
+                      series_alternate_names=alts,  # Not sure if this field is useful down the road.
                       series_season=season,
                       series_episode=episode,
                       series_id=series_id,
@@ -81,8 +90,10 @@ class EmitSeries(object):
                 continue
 
             if series.identified_by not in ['ep', 'sequence']:
-                log.verbose('Can only emit ep or sequence based series. `%s` is identified_by %s' %
-                            (series.name, series.identified_by or 'auto'))
+                if not task.is_rerun:
+                    log.verbose('Can only emit ep or sequence based series. '
+                                '`%s` is identified_by %s' %
+                                (series.name, series.identified_by or 'auto'))
                 continue
 
             low_season = 0 if series.identified_by == 'ep' else -1
@@ -97,7 +108,7 @@ class EmitSeries(object):
                 entries.append(self.search_entry(series, latest_season + 1, 1, task))
             else:
                 for season in xrange(latest_season, low_season, -1):
-                    log.debug('Adding episodes for %d' % latest_season)
+                    log.debug('Adding episodes for season %d' % season)
                     check_downloaded = not config.get('backfill')
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
                     if series.begin and (not latest or latest < series.begin):
@@ -131,8 +142,10 @@ class EmitSeries(object):
                         if config.get('from_start') or config.get('backfill'):
                             entries.append(self.search_entry(series, season, 1, task))
                         else:
-                            log.verbose('Series `%s` has no history. Set begin option, or use CLI `series begin` '
-                                        'subcommand to set first episode to emit' % series.name)
+                            if not task.is_rerun:
+                                log.verbose('Series `%s` has no history. Set begin option, '
+                                            'or use CLI `series begin` '
+                                            'subcommand to set first episode to emit' % series.name)
                             break
 
                     if not config.get('backfill'):
@@ -141,26 +154,32 @@ class EmitSeries(object):
         return entries
 
     def on_search_complete(self, entry, task=None, identified_by=None, **kwargs):
-        series = task.session.query(Series).filter(Series.name == entry['series_name']).first()
-        latest = get_latest_release(series)
-        episode = (task.session.query(Episode).join(Episode.series).
-                   filter(Series.name == entry['series_name']).
-                   filter(Episode.season == entry['series_season']).
-                   filter(Episode.number == entry['series_episode']).
-                   first())
-        if entry.accepted or (episode and len(episode.releases) > 0):
-            self.try_next_season.pop(entry['series_name'], None)
-            task.rerun()
-        elif latest and latest.season == entry['series_season']:
-            if identified_by != 'ep':
-                # Do not try next season if this is not an 'ep' show
-                return
-            if entry['series_name'] not in self.try_next_season:
-                self.try_next_season[entry['series_name']] = True
+        """Decides whether we should look for next ep/season based on whether we found/accepted any episodes."""
+        with Session() as session:
+            series = session.query(Series).filter(Series.name == entry['series_name']).first()
+            latest = get_latest_release(series)
+            episode = (session.query(Episode).join(Episode.series).
+                       filter(Series.name == entry['series_name']).
+                       filter(Episode.season == entry['series_season']).
+                       filter(Episode.number == entry['series_episode']).
+                       first())
+            if entry.accepted or (episode and len(episode.releases) > 0):
+                self.try_next_season.pop(entry['series_name'], None)
+                log.debug('%s %s was accepted, rerunning to look for next ep.' %
+                          (entry['series_name'], entry['series_id']))
                 task.rerun()
-            else:
-                # Don't try a second time
-                self.try_next_season[entry['series_name']] = False
+            elif latest and latest.season == entry['series_season']:
+                if identified_by != 'ep':
+                    # Do not try next season if this is not an 'ep' show
+                    return
+                if entry['series_name'] not in self.try_next_season:
+                    self.try_next_season[entry['series_name']] = True
+                    log.debug('%s %s not found, rerunning to look for next season' %
+                              (entry['series_name'], entry['series_id']))
+                    task.rerun()
+                else:
+                    # Don't try a second time
+                    self.try_next_season[entry['series_name']] = False
 
 
 @event('plugin.register')

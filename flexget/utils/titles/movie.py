@@ -19,11 +19,26 @@ def diff_pos(string1, string2):
 
 
 class MovieParser(TitleParser):
-
     def __init__(self):
         self.data = None
         self.reset()
         TitleParser.__init__(self)
+
+    @property
+    def valid(self):
+        return True
+
+    @property
+    def proper(self):
+        return self.proper_count > 0
+
+    @property
+    def is_series(self):
+        return False
+
+    @property
+    def is_movie(self):
+        return True
 
     def reset(self):
         # parsing results

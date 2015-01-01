@@ -18,7 +18,7 @@ class VerifySSLCertificates(object):
     def validator(self):
         return validator.factory('boolean')
 
-    @plugin.priority(255)
+    @plugin.priority(253)
     def on_task_start(self, task, config):
         if config is False:
             task.requests.verify = False

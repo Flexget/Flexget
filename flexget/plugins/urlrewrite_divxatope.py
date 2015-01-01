@@ -18,12 +18,14 @@ class UrlRewriteDivxATope(object):
     def url_rewritable(self, task, entry):
         url = entry['url']
         return (
-            url.startswith('http://www.divxatope.com/descargar_torrent')
-            or url.startswith('http://divxatope.com/descargar_torrent')
+            url.startswith('http://www.divxatope.com/descargar')
+            or url.startswith('http://divxatope.com/descargar')
         )
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
+        #Rewrite divxatope.com/descargar/ to divxatope.com/descarga-torrent/
+        entry['url'] = re.sub("/descargar","/descarga-torrent",entry['url'])
         entry['url'] = self.parse_download_page(entry['url'])
 
     @plugin.internet(log)
@@ -31,9 +33,12 @@ class UrlRewriteDivxATope(object):
         try:
             page = requests.get(url).content
             soup = get_soup(page, 'html.parser')
-            download_link = soup.findAll(href=re.compile('redirect.php'))
+            download_link = soup.findAll(href=re.compile('redirect|redirectlink'))
             download_href = download_link[0]['href']
-            return download_href[download_href.index('url=') + 4:]
+            if "url" in download_href:
+                return download_href[download_href.index('url=') + 4:]
+            else:
+                return download_href
         except Exception:
             raise UrlRewritingError(
                 'Unable to locate torrent from url %s' % url

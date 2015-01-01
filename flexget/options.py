@@ -13,12 +13,17 @@ import pkg_resources
 import flexget
 from flexget.entry import Entry
 from flexget.event import fire_event
+from flexget.logger import console
 from flexget.utils import requests
-from flexget.utils.tools import console
 
 _UNSET = object()
 
 core_parser = None
+
+
+def unicode_argv():
+    """Like sys.argv, but decodes all arguments."""
+    return [arg.decode(sys.getfilesystemencoding()) for arg in sys.argv]
 
 
 def get_parser(command=None):
@@ -58,29 +63,21 @@ def required_length(nmin, nmax):
 
 
 class VersionAction(_VersionAction):
-    """
-    Action to print the current version.
-    Also attempts to get more information from git describe if on git checkout.
-    """
+    """Action to print the current version. Also checks latest release revision."""
     def __call__(self, parser, namespace, values, option_string=None):
-        self.version = flexget.__version__
         # Print the version number
         console('%s' % self.version)
-        if self.version == '{git}':
-            console('To check the latest released version you have run:')
-            console('`git fetch --tags` then `git describe`')
+        # Check for latest version from server
+        try:
+            page = requests.get('http://download.flexget.com/latestversion')
+        except requests.RequestException:
+            console('Error getting latest version number from download.flexget.com')
         else:
-            # Check for latest version from server
-            try:
-                page = requests.get('http://download.flexget.com/latestversion')
-            except requests.RequestException:
-                console('Error getting latest version number from download.flexget.com')
+            ver = page.text.strip()
+            if self.version == ver:
+                console('You are on the latest release.')
             else:
-                ver = page.text.strip()
-                if self.version == ver:
-                    console('You are on the latest release.')
-                else:
-                    console('Latest release: %s' % ver)
+                console('Latest release: %s' % ver)
         parser.exit()
 
 
@@ -186,7 +183,7 @@ class ParserError(Exception):
         return self.message
 
     def __repr__(self):
-        return 'ParserError(%s, %s)' % self.message, self.parser
+        return 'ParserError(%s, %s)' % (self.message, self.parser)
 
 
 class ArgumentParser(ArgParser):
@@ -202,8 +199,10 @@ class ArgumentParser(ArgParser):
       override the main one.
     - Command shortening: If the command for a subparser is abbreviated unambiguously, it will still be accepted.
     - The add_argument `nargs` keyword argument supports a range of arguments, e.g. `"2-4"
-    - If the `raise_errors` keyword argument to `parse_args` is True, a `ValueError` will be raised instead of sys.exit
+    - If the `raise_errors` keyword argument to `parse_args` is True, a `ParserError` will be raised instead of sys.exit
+    - If the `file` argument is given to `parse_args`, output will be printed there instead of sys.stdout or stderr
     """
+    file = None  # This is created as a class attribute so that we can set it for parser and all subparsers at once
 
     def __init__(self, nested_namespace_name=None, **kwargs):
         """
@@ -211,7 +210,7 @@ class ArgumentParser(ArgParser):
             this attribute name in the root parser's namespace
         """
         # Do this early, so even option processing stuff is caught
-        if '--bugreport' in sys.argv:
+        if '--bugreport' in unicode_argv():
             self._debug_tb_callback()
 
         self.subparsers = None
@@ -244,6 +243,12 @@ class ArgumentParser(ArgParser):
         self.restore_defaults()
         super(ArgumentParser, self).print_help(file)
 
+    def _print_message(self, message, file=None):
+        """If a file argument was passed to `parse_args` make sure output goes there."""
+        if self.file:
+            file = self.file
+        super(ArgumentParser, self)._print_message(message, file)
+
     def stash_defaults(self):
         """Remove all the defaults and store them in a temporary location."""
         self.real_defaults, self._defaults = self._defaults, {}
@@ -263,23 +268,24 @@ class ArgumentParser(ArgParser):
     def error(self, msg):
         raise ParserError(msg, self)
 
-    def parse_args(self, args=None, namespace=None, raise_errors=False):
+    def parse_args(self, args=None, namespace=None, raise_errors=False, file=None):
         """
         :param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit
         """
+        ArgumentParser.file = file
         try:
             return super(ArgumentParser, self).parse_args(args, namespace)
         except ParserError as e:
             if raise_errors:
                 raise
-            sys.stderr.write('error: %s\n' % e.message)
-            e.parser.print_help()
-            sys.exit(2)
+            super(ArgumentParser, e.parser).error(e.message)
+        finally:
+            ArgumentParser.file = None
 
     def parse_known_args(self, args=None, namespace=None):
         if args is None:
             # Decode all arguments to unicode before parsing
-            args = [unicode(arg, sys.getfilesystemencoding()) for arg in sys.argv[1:]]
+            args = unicode_argv()[1:]
         # Remove all of our defaults, to give subparsers and custom actions first priority at setting them
         self.stash_defaults()
         try:
@@ -340,7 +346,8 @@ class ArgumentParser(ArgParser):
 
 # This will hold just the arguments directly for Manager. Webui needs this clean, to build its parser.
 manager_parser = ArgumentParser(add_help=False)
-manager_parser.add_argument('-V', '--version', action=VersionAction, help='Print FlexGet version and exit.')
+manager_parser.add_argument('-V', '--version', action=VersionAction, version=flexget.__version__,
+                            help='Print FlexGet version and exit.')
 manager_parser.add_argument('--test', action='store_true', dest='test', default=0,
                             help='Verbose what would happen on normal execution.')
 manager_parser.add_argument('-c', dest='config', default='config.yml',
@@ -363,6 +370,9 @@ manager_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, h
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--ipc-port', type=int, help=SUPPRESS)
+manager_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
+                            help='use when executing FlexGet non-interactively: allows background '
+                                 'maintenance to run, disables stdout and stderr output, reduces logging level')
 
 
 class CoreArgumentParser(ArgumentParser):
@@ -385,9 +395,6 @@ class CoreArgumentParser(ArgumentParser):
                                       'matching is case-insensitive')
         exec_parser.add_argument('--learn', action='store_true', dest='learn', default=False,
                                  help='matches are not downloaded but will be skipped in the future')
-        exec_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
-                                 help='use when scheduling FlexGet with cron or other scheduler: allows background '
-                                      'maintenance to run, disables stdout and stderr output, reduces logging level')
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
         exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
@@ -406,7 +413,9 @@ class CoreArgumentParser(ArgumentParser):
         daemon_parser.add_subparsers(title='actions', metavar='<action>', dest='action')
         start_parser = daemon_parser.add_subparser('start', help='start the daemon')
         start_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
-        daemon_parser.add_subparser('stop', help='shutdown the running daemon')
+        stop_parser = daemon_parser.add_subparser('stop', help='shutdown the running daemon')
+        stop_parser.add_argument('--wait', action='store_true',
+                                 help='wait for all queued tasks to finish before stopping daemon')
         daemon_parser.add_subparser('status', help='check if a daemon is running')
         daemon_parser.add_subparser('reload', help='causes a running daemon to reload the config from disk')
         daemon_parser.set_defaults(loglevel='info')

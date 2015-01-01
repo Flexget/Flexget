@@ -7,7 +7,7 @@ import sys
 import flexget
 from flexget import options
 from flexget.event import event
-from flexget.utils.tools import console
+from flexget.logger import console
 
 log = logging.getLogger('win32_service')
 

@@ -1,13 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 from datetime import datetime, timedelta
+from string import capwords
 
 from dateutil.parser import parse as parsedate
 
-from flexget.utils.titles.parser import TitleParser, ParseWarning
+import re
+from flexget.utils.titles.parser import TitleParser
+from flexget.plugins.parsers import ParseWarning
+from flexget.plugins.parsers.parser_common import default_ignore_prefixes, name_to_re
 from flexget.utils import qualities
 from flexget.utils.tools import ReList
+
 
 log = logging.getLogger('seriesparser')
 
@@ -15,8 +19,7 @@ log = logging.getLogger('seriesparser')
 # switch to logging.DEBUG if you want to debug this class (produces quite a bit info ..)
 log.setLevel(logging.INFO)
 
-ID_TYPES = ['ep', 'date', 'sequence', 'id']
-
+ID_TYPES = ['ep', 'date', 'sequence', 'id'] # may also be 'special'
 
 class SeriesParser(TitleParser):
 
@@ -63,20 +66,17 @@ class SeriesParser(TitleParser):
     id_regexps = ReList([])
     clean_regexps = ReList(['\[.*?\]', '\(.*?\)'])
     # ignore prefix regexps must be passive groups with 0 or 1 occurrences  eg. (?:prefix)?
-    ignore_prefixes = [
-        '(?:\[[^\[\]]*\])',  # ignores group names before the name, eg [foobar] name
-        '(?:HD.720p?:)',
-        '(?:HD.1080p?:)']
+    ignore_prefixes = default_ignore_prefixes
 
-    def __init__(self, name='', alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
+    def __init__(self, name=None, alternate_names=None, identified_by='auto', name_regexps=None, ep_regexps=None,
                  date_regexps=None, sequence_regexps=None, id_regexps=None, strict_name=False, allow_groups=None,
                  allow_seasonless=True, date_dayfirst=None, date_yearfirst=None, special_ids=None,
                  prefer_specials=False, assume_special=False):
         """
         Init SeriesParser.
 
-        :param string name: Name of the series parser is going to try to parse.
-
+        :param string name: Name of the series parser is going to try to parse. If not supplied series name will be
+            guessed from data.
         :param list alternate_names: Other names for this series that should be allowed.
         :param string identified_by: What kind of episode numbering scheme is expected,
             valid values are ep, date, sequence, id and auto (default).
@@ -125,6 +125,14 @@ class SeriesParser(TitleParser):
         self.field = None
         self._reset()
 
+    @property
+    def is_series(self):
+        return True
+
+    @property
+    def is_movie(self):
+        return False
+
     def _reset(self):
         # parse produces these
         self.season = None
@@ -142,45 +150,42 @@ class SeriesParser(TitleParser):
         # false if item does not match series
         self.valid = False
 
-    def __setattr__(self, name, value):
-        """
-        Some conversions when setting attributes.
-        `self.name` and `self.data` are converted to unicode.
-        """
-        if name == 'name' or name == 'data':
-            if isinstance(value, str):
-                value = unicode(value)
-            elif not isinstance(value, unicode):
-                raise Exception('%s cannot be %s' % (name, repr(value)))
-        object.__setattr__(self, name, value)
-
     def remove_dirt(self, data):
         """Replaces some characters with spaces"""
         return re.sub(r'[_.,\[\]\(\): ]+', ' ', data).strip().lower()
 
-    def name_to_re(self, name):
-        """Convert 'foo bar' to '^[^...]*foo[^...]*bar[^...]+"""
-        parenthetical = None
-        if name.endswith(')'):
-            p_start = name.rfind('(')
-            if p_start != -1:
-                parenthetical = re.escape(name[p_start + 1:-1])
-                name = name[:p_start - 1]
-        # Blanks are any non word characters except & and _
-        blank = r'(?:[^\w&]|_)'
-        ignore = '(?:' + '|'.join(self.ignore_prefixes) + ')?'
-        res = re.sub(re.compile(blank + '+', re.UNICODE), ' ', name)
-        res = res.strip()
-        # accept either '&' or 'and'
-        res = re.sub(' (&|and) ', ' (?:and|&) ', res, re.UNICODE)
-        res = re.sub(' +', blank + '*', res, re.UNICODE)
-        if parenthetical:
-            res += '(?:' + blank + '+' + parenthetical + ')?'
-            # Turn on exact mode for series ending with a parenthetical,
-            # so that 'Show (US)' is not accepted as 'Show (UK)'
-            self.strict_name = True
-        res = '^' + ignore + blank + '*' + '(' + res + ')(?:\\b|_)' + blank + '*'
-        return res
+    def guess_name(self):
+        """This will attempt to guess a series name based on the provided data."""
+        # We need to replace certain characters with spaces to make sure episode parsing works right
+        # We don't remove anything, as the match positions should line up with the original title
+        clean_title = re.sub('[_.,\[\]\(\):]', ' ', self.data)
+        if self.parse_unwanted(clean_title):
+            return
+        match = self.parse_date(clean_title)
+        if match:
+            self.identified_by = 'date'
+        else:
+            match = self.parse_episode(clean_title)
+            self.identified_by = 'ep'
+        if not match:
+            return
+        if match['match'].start() > 1:
+            # We start using the original title here, so we can properly ignore unwanted prefixes.
+            # Look for unwanted prefixes to find out where the series title starts
+            start = 0
+            prefix = re.match('|'.join(self.ignore_prefixes), self.data)
+            if prefix:
+                start = prefix.end()
+            # If an episode id is found, assume everything before it is series name
+            name = self.data[start:match['match'].start()]
+            # Remove possible episode title from series name (anything after a ' - ')
+            name = name.split(' - ')[0]
+            # Replace some special characters with spaces
+            name = re.sub('[\._\(\) ]+', ' ', name).strip(' -')
+            # Normalize capitalization to title case
+            name = capwords(name)
+            self.name = name
+            return name
 
     def parse(self, data=None, field=None, quality=None):
         # Clear the output variables before parsing
@@ -190,13 +195,18 @@ class SeriesParser(TitleParser):
             self.quality = quality
         if data:
             self.data = data
-        if not self.name or not self.data:
-            raise Exception('SeriesParser initialization error, name: %s data: %s' %
-                            (repr(self.name), repr(self.data)))
+        if not self.data:
+            raise ParseWarning(self, 'No data supplied to parse.')
+        if not self.name:
+            log.debug('No name for series `%s` supplied, guessing name.', self.data)
+            if not self.guess_name():
+                log.debug('Could not determine a series name')
+                return
+            log.debug('Series name for %s guessed to be %s', self.data, self.name)
 
         # check if data appears to be unwanted (abort)
         if self.parse_unwanted(self.remove_dirt(self.data)):
-            raise ParseWarning('`{data}` appears to be an episode pack'.format(data=self.data))
+            raise ParseWarning(self, '`{data}` appears to be an episode pack'.format(data=self.data))
 
         name = self.remove_dirt(self.name)
 
@@ -209,7 +219,7 @@ class SeriesParser(TitleParser):
         # regexp name matching
         if not self.name_regexps:
             # if we don't have name_regexps, generate one from the name
-            self.name_regexps = ReList(self.name_to_re(name) for name in [self.name] + self.alternate_names)
+            self.name_regexps = ReList(name_to_re(name, self.ignore_prefixes, self) for name in [self.name] + self.alternate_names)
             # With auto regex generation, the first regex group captures the name
             self.re_from_name = True
         # try all specified regexps on this data
@@ -419,7 +429,7 @@ class SeriesParser(TitleParser):
             msg += 'any series numbering.'
         else:
             msg += 'a(n) `%s` style identifier.' % self.identified_by
-        raise ParseWarning(msg)
+        raise ParseWarning(self, msg)
 
     def parse_unwanted(self, data):
         """Parses data for an unwanted hits. Return True if the data contains unwanted hits."""

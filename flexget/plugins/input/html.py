@@ -125,7 +125,7 @@ class InputHtml(object):
         log.verbose('Requesting: %s' % url)
         page = task.requests.get(url, auth=auth)
         log.verbose('Response: %s (%s)' % (page.status_code, page.reason))
-        soup = get_soup(page.text)
+        soup = get_soup(page.content)
 
         # dump received content into a file
         if dump_name:

@@ -1,15 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from string import capwords
-import re
 
+from flexget.plugins.parsers.parser_common import normalize_name, remove_dirt
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.filter.series import populate_entry_fields
-from flexget.utils.titles import SeriesParser
-from flexget.utils.titles.parser import ParseWarning
+from flexget.plugin import get_plugin_by_name
 
-log = logging.getLogger('metanfo_series')
+
+log = logging.getLogger('metainfo_series')
 
 
 class MetainfoSeries(object):
@@ -36,58 +35,14 @@ class MetainfoSeries(object):
         if entry.get('series_parser') and entry['series_parser'].valid:
             # Return true if we already parsed this, false if series plugin parsed it
             return entry.get('series_guessed')
-        parser = self.guess_series(entry['title'], allow_seasonless=allow_seasonless, quality=entry.get('quality'))
-        if parser:
-            populate_entry_fields(entry, parser)
+        parsed = get_plugin_by_name('parsing').instance.parse_series(data=entry['title'], identified_by='auto',
+                                                                     allow_seasonless=allow_seasonless)
+        if parsed and parsed.valid:
+            parsed.name = normalize_name(remove_dirt(parsed.name))
+            populate_entry_fields(entry, parsed)
             entry['series_guessed'] = True
             return True
         return False
-
-    def guess_series(self, title, allow_seasonless=False, quality=None):
-        """Returns a valid series parser if this `title` appears to be a series"""
-
-        parser = SeriesParser(identified_by='auto', allow_seasonless=allow_seasonless)
-        # We need to replace certain characters with spaces to make sure episode parsing works right
-        # We don't remove anything, as the match positions should line up with the original title
-        clean_title = re.sub('[_.,\[\]\(\):]', ' ', title)
-        if parser.parse_unwanted(clean_title):
-            return
-        match = parser.parse_date(clean_title)
-        if match:
-            parser.identified_by = 'date'
-        else:
-            match = parser.parse_episode(clean_title)
-            if match and parser.parse_unwanted(clean_title):
-                return
-            parser.identified_by = 'ep'
-        if not match:
-            return
-        if match['match'].start() > 1:
-            # We start using the original title here, so we can properly ignore unwanted prefixes.
-            # Look for unwanted prefixes to find out where the series title starts
-            start = 0
-            prefix = re.match('|'.join(parser.ignore_prefixes), title)
-            if prefix:
-                start = prefix.end()
-            # If an episode id is found, assume everything before it is series name
-            name = title[start:match['match'].start()]
-            # Remove possible episode title from series name (anything after a ' - ')
-            name = name.split(' - ')[0]
-            # Replace some special characters with spaces
-            name = re.sub('[\._\(\) ]+', ' ', name).strip(' -')
-            # Normalize capitalization to title case
-            name = capwords(name)
-            # If we didn't get a series name, return
-            if not name:
-                return
-            parser.name = name
-            parser.data = title
-            try:
-                parser.parse(data=title, quality=quality)
-            except ParseWarning as pw:
-                log.debug('ParseWarning: %s' % pw.value)
-            if parser.valid:
-                return parser
 
 
 @event('plugin.register')

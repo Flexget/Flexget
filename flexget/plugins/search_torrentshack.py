@@ -14,13 +14,15 @@ from flexget.utils.requests import Session
 
 log = logging.getLogger('search_torrentshack')
 
+session = Session()
+
 CATEGORIES = {
     'Apps/PC': 100,
     'Apps/misc': 150,
     'eBooks': 180,
     'Games/PC': 200,
     'Games/PS3': 240,
-    'Games/Xbox360': 260 ,
+    'Games/Xbox360': 260,
     'HandHeld': 280,
     'Movies/x264': 300,
     'REMUX': 320,
@@ -45,7 +47,8 @@ CATEGORIES = {
     'Games Pack': 986
 }
 
-URL = 'http://torrentshack.eu/'
+URL = 'http://www.torrentshack.eu/'
+
 
 class TorrentShackSearch(object):
     """ TorrentShack Search plugin
@@ -56,6 +59,7 @@ class TorrentShackSearch(object):
         username: XXXX              (required)
         password: XXXX              (required)
         category: Movies/x264       (optional)
+        type: p2p OR scene          (optional)
         gravity_multiplier: 200     (optional)
 
     == Categories
@@ -105,6 +109,7 @@ class TorrentShackSearch(object):
         root.accept('text', key='username', required=True)
         root.accept('text', key='password', required=True)
         root.accept('number', key='gravity_multiplier')
+        root.accept('choice', 'type').accept_choices(['p2p', 'scene'])
 
         root.accept('choice', key='category').accept_choices(CATEGORIES)
         root.accept('number', key='category')
@@ -114,13 +119,10 @@ class TorrentShackSearch(object):
 
         return root
 
-    @plugin.internet(log)
-    def search(self, entry, config=None):
-
-        try:
-            multip = int(config['gravity_multiplier'])
-        except KeyError:
-            multip = 1
+    def prepare_config(self, config):
+        config.setdefault('type', 'both')
+        config.setdefault('gravity_multiplier', 1)
+        config.setdefault('category', [])
 
         if not isinstance(config['category'], list):
             config['category'] = [config['category']]
@@ -131,26 +133,35 @@ class TorrentShackSearch(object):
                 categories_id.append(CATEGORIES.get(category))
             else:
                 categories_id.append(category)
-        category_url_fragment = ''.join(
-            ['&' + quote('filter_cat[%s]' % id) + '=1' for id in categories_id])
+        config['category'] = categories_id
+        return config
 
-        params = {
-            'username': config['username'],
-            'password': config['password'],
-            'keeplogged': '1',
-            'login': 'Login'
-        }
 
-        session = Session()
-        log.debug('Logging in to %s...' % URL)
-        session.post(URL + 'login.php', data=params)
+    @plugin.internet(log)
+    def search(self, entry, config=None):
+        config = self.prepare_config(config)
+
+        if not session.cookies:
+            log.debug('Logging in to %s...' % URL)
+            params = {
+                'username': config['username'],
+                'password': config['password'],
+                'keeplogged': '1',
+                'login': 'Login'
+            }
+            session.post(URL + 'login.php', data=params)
+
+        cat = ''.join(['&' + ('filter_cat[%s]' % id) + '=1' for id in config['category']])
+        rls = 'release_type=' + config['type']
+        url_params = rls + cat
+        multip = config['gravity_multiplier']
 
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            search_string_normalized = normalize_unicode(clean_title(search_string))
-            search_string_url_fragment = 'searchstr=' + quote(search_string_normalized.encode('utf8'))
+            srch = normalize_unicode(clean_title(search_string))
+            srch = '&searchstr=' + quote(srch.encode('utf8'))
 
-            url = URL + 'torrents.php?' + search_string_url_fragment + category_url_fragment
+            url = URL + 'torrents.php?' + url_params + srch
             log.debug('Fetching URL for `%s`: %s' % (search_string, url))
 
             page = session.get(url).content
@@ -158,29 +169,27 @@ class TorrentShackSearch(object):
 
             for result in soup.findAll('tr', attrs={'class': 'torrent'}):
                 entry = Entry()
-                entry['title'] = result.find('span', attrs={'class': 'torrent_name_link'}).string
-                entry['url'] = URL + result.find('a',
-                                                 href=re.compile(r'torrents.php\?action=download'),
-                                                 attrs={'title': 'Download'})['href']
-                entry['torrent_seeds'] = result.findAll('td')[-3].string
-                entry['torrent_leeches'] = result.findAll('td')[-2].string
+                entry['title'] = result.find('span', attrs={'class': 'torrent_name_link'}).text
+                entry['url'] = URL + result.find('a', href=re.compile('torrents\.php\?action=download')).get('href')
+                entry['torrent_seeds'], entry['torrent_leeches'] = [r.text for r in result.findAll('td')[-2:]]
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches']) * multip
 
-                size = result.findAll('td')[-5].string
+                size = result.findAll('td')[-4].text
                 size = re.search('(\d+(?:[.,]\d+)*)\s?([KMG]B)', size)
 
                 if size:
-                        if size.group(2) == 'GB':
-                            entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 ** 3 / 1024 ** 2)
-                        elif size.group(2) == 'MB':
-                            entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 ** 2 / 1024 ** 2)
-                        elif size.group(2) == 'KB':
-                            entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 / 1024 ** 2)
-                        else:
-                            entry['content_size'] = int(float(size.group(1).replace(',', '')) / 1024 ** 2)
+                    if size.group(2) == 'GB':
+                        entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 ** 3 / 1024 ** 2)
+                    elif size.group(2) == 'MB':
+                        entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 ** 2 / 1024 ** 2)
+                    elif size.group(2) == 'KB':
+                        entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 / 1024 ** 2)
+                    else:
+                        entry['content_size'] = int(float(size.group(1).replace(',', '')) / 1024 ** 2)
 
                 entries.add(entry)
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

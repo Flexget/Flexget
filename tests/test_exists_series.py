@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
+from tests import FlexGetBase, build_parser_function
 import os
 from tests.util import maketemp
 
 
-class TestExistsSeries(FlexGetBase):
+class BaseExistsSeries(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -177,3 +177,14 @@ class TestExistsSeries(FlexGetBase):
             'jinja2 s01e01 should have been rejected (exists)'
         assert self.task.find_entry('accepted', title='jinja s01e02'), \
             'jinja s01e02 should have been accepted'
+
+class TestGuessitExistsSeries(BaseExistsSeries):
+    def __init__(self):
+        super(TestGuessitExistsSeries, self).__init__()
+        self.add_tasks_function(build_parser_function('guessit'))
+
+
+class TestInternalExistsSeries(BaseExistsSeries):
+    def __init__(self):
+        super(TestInternalExistsSeries, self).__init__()
+        self.add_tasks_function(build_parser_function('internal'))

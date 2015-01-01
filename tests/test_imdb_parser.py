@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from nose.plugins.attrib import attr
 
 from flexget.utils.imdb import ImdbParser
+from tests import use_vcr
 
 
 class TestImdbParser(object):
-    @attr(online=True)
+    @use_vcr
     def test_parsed_data(self):
         parser = ImdbParser()
         parser.parse('tt0114814')
@@ -48,7 +48,7 @@ class TestImdbParser(object):
         assert 400000 < parser.votes < 1000000, 'Votes not parsed correctly'
         assert parser.year == 1995, 'Year not parsed correctly'
 
-    @attr(online=True)
+    @use_vcr
     def test_no_plot(self):
         # Make sure parser doesn't crash for movies with no plot
         parser = ImdbParser()

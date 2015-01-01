@@ -31,12 +31,3 @@ class TestSimplePersistence(FlexGetBase):
         # Make sure it commits and actually persists
         persist = SimplePersistence('testplugin')
         assert persist['aoeu'] == 'test'
-
-    def test_withsession(self):
-        session = Session()
-        persist = SimplePersistence('testplugin', session=session)
-        persist['aoeu'] = 'test'
-        assert persist['aoeu'] == 'test'
-        # Make sure it didn't commit or close our session
-        session.rollback()
-        assert 'aoeu' not in persist

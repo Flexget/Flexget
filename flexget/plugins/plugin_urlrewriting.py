@@ -42,7 +42,7 @@ class PluginUrlRewriting(object):
                 log.trace('Skipping rewriter %s since it\'s disabled' % urlrewriter.name)
                 continue
             log.trace('checking urlrewriter %s' % urlrewriter.name)
-            if urlrewriter.instance.url_rewritable(self, entry):
+            if urlrewriter.instance.url_rewritable(task, entry):
                 return True
         return False
 
@@ -63,9 +63,11 @@ class PluginUrlRewriting(object):
                     continue
                 try:
                     if urlrewriter.instance.url_rewritable(task, entry):
+                        old_url = entry['url']
                         log.debug('Url rewriting %s' % entry['url'])
                         urlrewriter.instance.url_rewrite(task, entry)
-                        log.info('Entry \'%s\' URL rewritten to %s (with %s)' % (entry['title'], entry['url'], name))
+                        if entry['url'] != old_url:
+                            log.info('Entry \'%s\' URL rewritten to %s (with %s)' % (entry['title'], entry['url'], name))
                 except UrlRewritingError as r:
                     # increase failcount
                     #count = self.shared_cache.storedefault(entry['url'], 1)

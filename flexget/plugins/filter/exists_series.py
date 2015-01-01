@@ -9,7 +9,8 @@ from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.log import log_once
 from flexget.utils.template import RenderError
-from flexget.utils.titles import ParseWarning
+from flexget.plugins.parsers import ParseWarning
+from flexget.plugin import get_plugin_by_name
 
 log = logging.getLogger('exists_series')
 
@@ -74,18 +75,19 @@ class FilterExistsSeries(object):
         # For speed, only test accepted entries since our priority should be after everything is accepted.
         for series in accepted_series:
             # make new parser from parser in entry
-            disk_parser = copy.copy(accepted_series[series][0]['series_parser'])
+            series_parser = accepted_series[series][0]['series_parser']
             for folder in paths:
                 folder = path(folder).expanduser()
                 if not folder.isdir():
-                    log.warn('Directory %s does not exist' % folder, log)
+                    log.warning('Directory %s does not exist', folder)
                     continue
 
-                for filename in folder.walk(errors='warn'):
+                for filename in folder.walk(errors='ignore'):
                     # run parser on filename data
                     try:
-                        disk_parser.parse(data=filename.name)
+                        disk_parser = get_plugin_by_name('parsing').instance.parse_series(data=filename.name, name=series_parser.name)
                     except ParseWarning as pw:
+                        disk_parser = pw.parsed
                         log_once(pw.value, logger=log)
                     if disk_parser.valid:
                         log.debug('name %s is same series as %s', filename.name, series)

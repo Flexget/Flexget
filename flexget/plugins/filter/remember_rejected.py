@@ -7,9 +7,10 @@ from sqlalchemy.orm import relation
 
 from flexget import db_schema, options, plugin
 from flexget.event import event
+from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils.sqlalchemy_utils import table_columns, table_add_column
-from flexget.utils.tools import console, parse_timedelta
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('remember_rej')
 Base = db_schema.versioned_base('remember_rejected', 3)
@@ -98,7 +99,7 @@ class FilterRememberRejected(object):
     @plugin.priority(-255)
     def on_task_input(self, task, config):
         for entry in task.all_entries:
-            entry.on_reject(self.on_entry_reject, task=task)
+            entry.on_reject(self.on_entry_reject)
 
     @plugin.priority(255)
     def on_task_filter(self, task, config):
@@ -117,33 +118,43 @@ class FilterRememberRejected(object):
                     entry.reject('Rejected on behalf of %s plugin: %s' %
                         (reject_entry.rejected_by, reject_entry.reason))
 
-    def on_entry_reject(self, entry, task=None, remember=None, remember_time=None, **kwargs):
+    def on_entry_reject(self, entry, remember=None, remember_time=None, **kwargs):
         # We only remember rejections that specify the remember keyword argument
-        if not remember and not remember_time:
+        if not (remember or remember_time):
             return
-        expires = None
-        if remember_time:
-            if isinstance(remember_time, basestring):
-                remember_time = parse_timedelta(remember_time)
-            expires = datetime.now() + remember_time
         if not entry.get('title') or not entry.get('original_url'):
             log.debug('Can\'t remember rejection for entry without title or url.')
             return
+        if remember_time:
+            if isinstance(remember_time, basestring):
+                remember_time = parse_timedelta(remember_time)
         message = 'Remembering rejection of `%s`' % entry['title']
         if remember_time:
             message += ' for %i minutes' % (remember_time.seconds / 60)
         log.info(message)
-        (remember_task_id,) = task.session.query(RememberTask.id).filter(RememberTask.name == task.name).first()
-        task.session.add(RememberEntry(title=entry['title'], url=entry['original_url'], task_id=remember_task_id,
-                                       rejected_by=task.current_plugin, reason=kwargs.get('reason'), expires=expires))
-        # The test stops passing when this is taken out for some reason...
-        task.session.flush()
+        entry['remember_rejected'] = remember_time or remember
+
+    @plugin.priority(-255)
+    def on_task_learn(self, task, config):
+        for entry in task.all_entries:
+            if not entry.get('remember_rejected'):
+                continue
+            expires = None
+            if isinstance(entry['remember_rejected'], timedelta):
+                expires = datetime.now() + entry['remember_rejected']
+
+            (remember_task_id,) = task.session.query(RememberTask.id).filter(RememberTask.name == task.name).first()
+            task.session.add(RememberEntry(title=entry['title'], url=entry['original_url'], task_id=remember_task_id,
+                                           rejected_by=entry.get('rejected_by'), reason=entry.get('reason'),
+                                           expires=expires))
+
 
 def do_cli(manager, options):
     if options.rejected_action == 'list':
         list_rejected()
     elif options.rejected_action == 'clear':
         clear_rejected(manager)
+
 
 def list_rejected():
     session = Session()
@@ -170,6 +181,7 @@ def clear_rejected(manager):
     finally:
         session.close()
 
+
 @event('manager.db_cleanup')
 def db_cleanup(session):
     # Remove entries older than 30 days
@@ -177,9 +189,11 @@ def db_cleanup(session):
     if result:
         log.verbose('Removed %d entries from remember rejected table.' % result)
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterRememberRejected, 'remember_rejected', builtin=True, api_ver=2)
+
 
 @event('options.register')
 def register_parser_arguments():

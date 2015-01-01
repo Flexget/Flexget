@@ -3,6 +3,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+from flexget.manager import Session
 from flexget.utils import imdb
 from flexget.utils.log import log_once
 
@@ -52,10 +53,12 @@ class PluginTmdbLookup(object):
         imdb_id = (entry.get('imdb_id', eval_lazy=False) or
                    imdb.extract_id(entry.get('imdb_url', eval_lazy=False)))
         try:
-            movie = lookup(smart_match=entry['title'],
-                           tmdb_id=entry.get('tmdb_id', eval_lazy=False),
-                           imdb_id=imdb_id)
-            entry.update_using_map(self.field_map, movie)
+            with Session(expire_on_commit=False) as session:
+                movie = lookup(smart_match=entry['title'],
+                               tmdb_id=entry.get('tmdb_id', eval_lazy=False),
+                               imdb_id=imdb_id,
+                               session=session)
+                entry.update_using_map(self.field_map, movie)
         except LookupError:
             log_once('TMDB lookup failed for %s' % entry['title'], log, logging.WARN)
             # Set all of our fields to None if the lookup failed

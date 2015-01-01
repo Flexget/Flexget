@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
-from nose.plugins.attrib import attr
+
+from tests import FlexGetBase, use_vcr
 
 
 class TestTmdbLookup(FlexGetBase):
@@ -17,7 +17,7 @@ class TestTmdbLookup(FlexGetBase):
               afield: "{{ tmdb_id }}"
     """
 
-    @attr(online=True)
+    @use_vcr
     def test_tmdb_lookup(self):
         self.execute_task('test')
         # check that these were created

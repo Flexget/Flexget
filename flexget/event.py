@@ -90,7 +90,8 @@ def remove_event_handler(name, func):
 
 def fire_event(name, *args, **kwargs):
     """
-    Trigger an event with *name*. If event is not hooked by anything nothing happens.
+    Trigger an event with *name*. If event is not hooked by anything nothing happens. If a function that hooks an event
+    returns a value, it will replace the first argument when calling next function.
 
     :param name: Name of event to be called
     :param args: List of arguments passed to handler function
@@ -99,4 +100,7 @@ def fire_event(name, *args, **kwargs):
     if not name in _events:
         return
     for event in get_events(name):
-        event(*args, **kwargs)
+        result = event(*args, **kwargs)
+        if result is not None:
+            args = (result,) + args[1:]
+    return args and args[0]
