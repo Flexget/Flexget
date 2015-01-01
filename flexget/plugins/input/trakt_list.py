@@ -1,5 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import
-import hashlib
 import logging
 import re
 from urlparse import urljoin
@@ -22,7 +21,8 @@ field_maps = {
         'movie_year': 'movie.year',
         'imdb_id': 'movie.ids.imdb',
         'tmdb_id': 'movie.ids.tmdb',
-        'trakt_id': 'movie.ids.trakt'
+        'trakt_id': 'movie.ids.trakt',
+        'trakt_slug': 'show.ids.slug'
     },
     'show': {
         'title': 'show.title',
@@ -30,7 +30,9 @@ field_maps = {
         'imdb_id': 'show.ids.imdb',
         'tvdb_id': 'show.ids.tvdb',
         'tvrage_id': 'show.ids.tvrage',
-        'trakt_id': 'show.ids.trakt'
+        'tmdb_id': 'show.ids.tmdb',
+        'trakt_id': 'show.ids.trakt',
+        'trakt_slug': 'show.ids.slug'
     },
     'episode': {
         'title': lambda i: '%s S%02dE%02d %s' % (i['show']['title'], i['episode']['season'],
@@ -42,7 +44,8 @@ field_maps = {
         'imdb_id': 'episode.ids.imdb',
         'tvdb_id': 'episode.ids.tvdb',
         'tvrage_id': 'episode.ids.tvrage',
-        'trakt_id': 'episode.ids.trakt'
+        'trakt_id': 'show.ids.trakt',
+        'trakt_slug': 'show.ids.slug'
     }
 }
 
@@ -115,14 +118,11 @@ class TraktList(object):
                 log.debug('Skipping %s because it is not a %s' % (item[item['type']]['title'], list_type))
                 continue
             entry = Entry()
-            # TODO: proper url for episodes
-            entry['url'] = 'http://trakt.tv/%s/%s' % (item['type'], item[item['type']]['ids'].get('slug'))
-            if 'rating' in item:
-                entry['trakt_rating'] = item['rating']
-            #entry['trakt_in_collection'] = item['in_collection']
-            #entry['trakt_in_watchlist'] = item['in_watchlist']
-            #entry['trakt_rating_advanced'] = item['rating_advanced']
-            #entry['trakt_watched'] = item['watched']
+            if item['type'] == 'episode':
+                entry['url'] = 'http://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
+                    item['show']['ids']['slug'], item['episode']['season'], item['episode']['number'])
+            else:
+                entry['url'] = 'http://trakt.tv/%s/%s' % (item['type'], item[item['type']]['ids'].get('slug'))
             entry.update_using_map(field_maps[item['type']], item)
             if entry.isvalid():
                 if config.get('strip_dates'):
