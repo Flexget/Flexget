@@ -22,7 +22,7 @@ field_maps = {
         'imdb_id': 'movie.ids.imdb',
         'tmdb_id': 'movie.ids.tmdb',
         'trakt_id': 'movie.ids.trakt',
-        'trakt_slug': 'show.ids.slug'
+        'trakt_slug': 'movie.ids.slug'
     },
     'show': {
         'title': 'show.title',
