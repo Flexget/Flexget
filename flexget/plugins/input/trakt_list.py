@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
-from urlparse import urljoin
 
 from requests import RequestException
 
@@ -9,7 +8,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.utils.trakt import API_URL, get_session, make_list_slug
+from flexget.utils.trakt import get_api_url, get_session, make_list_slug
 
 log = logging.getLogger('trakt_list')
 
@@ -88,15 +87,15 @@ class TraktList(object):
     @cached('trakt_list', persist='2 hours')
     def on_task_input(self, task, config):
         session = get_session(config['username'], config.get('password'))
-        url = urljoin(API_URL, 'users/%s/' % config['username'])
+        endpoint = ['users', config['username']]
         if config['list'] in ['collection', 'watchlist', 'watched']:
-            url = urljoin(url, '%s/%s' % (config['list'], config['type']))
+            endpoint += (config['list'], config['type'])
         else:
-            url = urljoin(url, 'lists/%s/items' % make_list_slug(config['list']))
+            endpoint += ('lists', make_list_slug(config['list']), 'items')
 
         log.verbose('Retrieving `%s` list `%s`' % (config['type'], config['list']))
         try:
-            result = session.get(url)
+            result = session.get(get_api_url(endpoint))
         except RequestException as e:
             raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e.args[0])
         try:

@@ -50,6 +50,21 @@ def get_session(username=None, password=None):
     return session
 
 
+def get_api_url(*endpoint):
+    """
+    Get the address of a trakt API endpoint.
+
+    :param endpoint: Can by a string endpoint (e.g. 'sync/watchlist') or an iterable (e.g. ('sync', 'watchlist')
+        Multiple parameters can also be specified instead of a single iterable.
+    :returns: The absolute url to the specified API endpoint.
+    """
+    if len(endpoint) == 1 and not isinstance(endpoint[0], basestring):
+        endpoint = endpoint[0]
+    # Make sure integer portions are turned into strings first too
+    url = API_URL + '/'.join(map(unicode, endpoint))
+    return url
+
+
 def get_entry_ids(entry):
     """Creates a trakt ids dict from id fields on an entry. Prefers already populated info over lazy lookups."""
     ids = {}
