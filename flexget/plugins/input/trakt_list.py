@@ -116,6 +116,10 @@ class TraktList(object):
             if item['type'] != list_type:
                 log.debug('Skipping %s because it is not a %s' % (item[item['type']]['title'], list_type))
                 continue
+            if not item[item['type']]['title']:
+                # There seems to be some bad shows sometimes in lists with no titles. Skip them.
+                log.warning('Item in trakt list does not appear to have a title, skipping.')
+                continue
             entry = Entry()
             if item['type'] == 'episode':
                 entry['url'] = 'http://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
