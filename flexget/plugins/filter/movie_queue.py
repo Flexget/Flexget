@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
-from sqlalchemy.orm.exc import NoResultFound
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from flexget import db_schema, plugin
 from flexget.entry import Entry
@@ -305,6 +305,9 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None):
         return title
     except NoResultFound as e:
         raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s not found from queue' % (title, imdb_id, tmdb_id))
+    except MultipleResultsFound:
+        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s matches multiple results in queue' %
+                         (title, imdb_id, tmdb_id))
 
 
 @with_session
