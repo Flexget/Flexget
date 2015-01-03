@@ -695,7 +695,13 @@ def forget_series_episode(name, identifier):
         session.close()
 
 
-def populate_entry_fields(entry, parser):
+def populate_entry_fields(entry, parser, config):
+    """
+    Populates all series_fields for given entry based on parser.
+
+    :param parser: A valid result from a series parser used to populate the fields.
+    :config dict: If supplied, will use 'path' and 'set' options to populate specified fields.
+    """
     entry['series_parser'] = copy(parser)
     # add series, season and episode to entry
     entry['series_name'] = parser.name
@@ -716,6 +722,19 @@ def populate_entry_fields(entry, parser):
     entry['series_episodes'] = parser.episodes
     entry['series_id'] = parser.pack_identifier
     entry['series_id_type'] = parser.id_type
+
+    # If a config is passed in, also look for 'path' and 'set' options to set more fields
+    if config:
+        # set custom download path
+        if 'path' in config:
+            log.debug('setting %s custom path to %s', entry['title'], config.get('path'))
+            # Just add this to the 'set' dictionary, so that string replacement is done cleanly
+            config.setdefault('set', {}).update(path=config['path'])
+
+        # accept info from set: and place into the entry
+        if 'set' in config:
+            set = plugin.get_plugin_by_name('set')
+            set.instance.modify(entry, config.get('set'))
 
 
 class FilterSeriesBase(object):
@@ -1002,20 +1021,6 @@ class FilterSeries(FilterSeriesBase):
                     entry['series_releases'] = [r.id for r in releases]
                     series_entries.setdefault(releases[0].episode, []).append(entry)
 
-                    # TODO: Unfortunately we are setting these again, even though they were set in metanifo. This is
-                    # for the benefit of all_series and series_premiere. Figure a better way.
-                    # set custom download path
-                    if 'path' in series_config:
-                        log.debug('setting %s custom path to %s', entry['title'], series_config.get('path'))
-                        # Just add this to the 'set' dictionary, so that string replacement is done cleanly
-                        series_config.setdefault('set', {}).update(path=series_config['path'])
-
-                    # accept info from set: and place into the entry
-                    if 'set' in series_config:
-                        set = plugin.get_plugin_by_name('set')
-                        # TODO: Could cause lazy lookups. We don't really want to have a transaction open during this.
-                        set.instance.modify(entry, series_config.get('set'))
-
                 # If we didn't find any episodes for this series, continue
                 if not series_entries:
                     log.trace('No entries found for %s this run.', series_name)
@@ -1091,18 +1096,7 @@ class FilterSeries(FilterSeriesBase):
             parsed.field = 'title'
 
             log.debug('%s detected as %s, field: %s', entry['title'], parsed, parsed.field)
-            populate_entry_fields(entry, parsed)
-
-            # set custom download path
-            if 'path' in config:
-                log.debug('setting %s custom path to %s', entry['title'], config.get('path'))
-                # Just add this to the 'set' dictionary, so that string replacement is done cleanly
-                config.setdefault('set', {}).update(path=config['path'])
-
-            # accept info from set: and place into the entry
-            if 'set' in config:
-                set = plugin.get_plugin_by_name('set')
-                set.instance.modify(entry, config.get('set'))
+            populate_entry_fields(entry, parsed, config)
 
     def process_series(self, task, series_entries, config):
         """
