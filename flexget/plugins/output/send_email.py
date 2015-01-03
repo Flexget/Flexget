@@ -107,7 +107,8 @@ def send_email(subject, content, config):
         try:
 
             if config.get('smtp_username') and config.get('smtp_password'):
-                mailServer.login(config['smtp_username'], config['smtp_password'])
+                # Forcing to use `str` type
+                mailServer.login(str(config['smtp_username']), str(config['smtp_password']))
             mailServer.sendmail(message['From'], config['to'], message.as_string())
         except IOError as e:
             # Ticket #686
