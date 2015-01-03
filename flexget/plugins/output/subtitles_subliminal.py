@@ -99,15 +99,13 @@ class PluginSubliminal(object):
         # potentially downloaded files
         single_mode = config.get('single', '') and len(langs | alts) <= 1
         for entry in task.accepted:
-            if not 'location' in entry:
+            if 'location' not in entry:
                 log.warning('Cannot act on entries that do not represent a local file.')
             elif not os.path.exists(entry['location']):
                 entry.fail('file not found: %s' % entry['location'])
-            elif not '$RECYCLE.BIN' in entry['location']:  # ignore deleted files in Windows shares
+            elif '$RECYCLE.BIN' not in entry['location']:  # ignore deleted files in Windows shares
                 try:
-                    entry_langs = set(entry.get('subtitle_languages', 'langs'))
-                    if not entry_langs:
-                        entry_langs = set(Language.fromietf('en'))
+                    entry_langs = entry.get('subtitle_languages', 'langs')
                     video = subliminal.scan_video(entry['location'])
                     log.info('Series name computed for %s was %s' % (entry['location'], video.series))
                     msc = video.scores['hash'] if config['exact_match'] else 0
@@ -118,6 +116,7 @@ class PluginSubliminal(object):
                                                                       min_score=msc)
                         if subtitle:
                             downloaded_subtitles.update(subtitle)
+                            entry['missing_subtitles'] = entry_langs - set([l.languages for l in subtitle])
                             log.info('Subtitles found for %s' % entry['location'])
                         else:
                             # TODO check performance hit -- this explicit check may be better on slower devices
