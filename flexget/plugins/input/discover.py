@@ -6,9 +6,10 @@ import random
 from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 
 from flexget import options, plugin
-from flexget.event import event
-from flexget.plugin import get_plugin_by_name, PluginError, PluginWarning
 from flexget import db_schema
+from flexget.event import event
+from flexget.manager import Session
+from flexget.plugin import get_plugin_by_name, PluginError, PluginWarning
 from flexget.utils.tools import parse_timedelta, multiply_timedelta
 
 log = logging.getLogger('discover')
@@ -212,32 +213,33 @@ class Discover(object):
             log.info('Ignoring interval because of --discover-now')
         result = []
         interval_count = 0
-        for entry in entries:
-            de = task.session.query(DiscoverEntry).\
-                filter(DiscoverEntry.title == entry['title']).\
-                filter(DiscoverEntry.task == task.name).first()
+        with Session() as session:
+            for entry in entries:
+                de = session.query(DiscoverEntry).\
+                    filter(DiscoverEntry.title == entry['title']).\
+                    filter(DiscoverEntry.task == task.name).first()
 
-            if not de:
-                log.debug('%s -> No previous run recorded' % entry['title'])
-                de = DiscoverEntry(entry['title'], task.name)
-                task.session.add(de)
-            if task.options.discover_now or not de.last_execution:
-                # First time we execute (and on --discover-now) we randomize time to avoid clumping
-                delta = multiply_timedelta(interval, random.random())
-                de.last_execution = datetime.datetime.now() - delta
-            else:
-                next_time = de.last_execution + interval
-                log.debug('last_time: %r, interval: %s, next_time: %r, ',
-                          de.last_execution, config['interval'], next_time)
-                if datetime.datetime.now() < next_time:
-                    log.debug('interval not met')
-                    interval_count += 1
-                    entry.reject('discover interval not met')
-                    entry.complete()
-                    continue
-                de.last_execution = datetime.datetime.now()
-            log.debug('interval passed')
-            result.append(entry)
+                if not de:
+                    log.debug('%s -> No previous run recorded' % entry['title'])
+                    de = DiscoverEntry(entry['title'], task.name)
+                    session.add(de)
+                if (not task.is_rerun and task.options.discover_now) or not de.last_execution:
+                    # First time we execute (and on --discover-now) we randomize time to avoid clumping
+                    delta = multiply_timedelta(interval, random.random())
+                    de.last_execution = datetime.datetime.now() - delta
+                else:
+                    next_time = de.last_execution + interval
+                    log.debug('last_time: %r, interval: %s, next_time: %r, ',
+                              de.last_execution, config['interval'], next_time)
+                    if datetime.datetime.now() < next_time:
+                        log.debug('interval not met')
+                        interval_count += 1
+                        entry.reject('discover interval not met')
+                        entry.complete()
+                        continue
+                    de.last_execution = datetime.datetime.now()
+                log.debug('interval passed')
+                result.append(entry)
         if interval_count:
             log.verbose('Discover interval of %s not met for %s entries. Use --discover-now to override.' %
                         (config['interval'], interval_count))

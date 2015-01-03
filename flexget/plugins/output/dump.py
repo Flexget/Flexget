@@ -8,7 +8,7 @@ from flexget.logger import console
 log = logging.getLogger('dump')
 
 
-def dump(entries, debug=False, eval_lazy=False, trace=False):
+def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
     """
     Dump *entries* to stdout
 
@@ -16,6 +16,7 @@ def dump(entries, debug=False, eval_lazy=False, trace=False):
     :param bool debug: Print non printable fields as well.
     :param bool eval_lazy: Evaluate lazy fields.
     :param bool trace: Display trace information.
+    :param bool title_only: Display only title field
     """
     def sort_key(field):
         # Sort certain fields above the rest
@@ -29,6 +30,8 @@ def dump(entries, debug=False, eval_lazy=False, trace=False):
 
     for entry in entries:
         for field in sorted(entry, key=sort_key):
+            if title_only and field != 'title':
+                continue
             if entry.is_lazy(field) and not eval_lazy:
                 value = '<LazyField - value will be determined when it is accessed>'
             else:
@@ -55,7 +58,8 @@ def dump(entries, debug=False, eval_lazy=False, trace=False):
             console('-- Processing trace:')
             for item in entry.traces:
                 console('%-10s %-7s %s' % (item[0], '' if item[1] is None else item[1], item[2]))
-        console('')
+        if not title_only:
+            console('')
 
 
 class OutputDump(object):
@@ -72,6 +76,7 @@ class OutputDump(object):
 
         eval_lazy = 'eval' in task.options.dump_entries
         trace = 'trace' in task.options.dump_entries
+        title = 'title' in task.options.dump_entries
         states = ['accepted', 'rejected', 'failed', 'undecided']
         dumpstates = [s for s in states if s in task.options.dump_entries]
         specificstates = dumpstates
@@ -81,25 +86,25 @@ class OutputDump(object):
         if 'undecided' in dumpstates:
             if undecided:
                 console('-- Undecided: --------------------------')
-                dump(undecided, task.options.debug, eval_lazy, trace)
+                dump(undecided, task.options.debug, eval_lazy, trace, title)
             elif specificstates:
                 console('No undecided entries')
         if 'accepted' in dumpstates:
             if task.accepted:
                 console('-- Accepted: ---------------------------')
-                dump(task.accepted, task.options.debug, eval_lazy, trace)
+                dump(task.accepted, task.options.debug, eval_lazy, trace, title)
             elif specificstates:
                 console('No accepted entries')
         if 'rejected' in dumpstates:
             if task.rejected:
                 console('-- Rejected: ---------------------------')
-                dump(task.rejected, task.options.debug, eval_lazy, trace)
+                dump(task.rejected, task.options.debug, eval_lazy, trace, title)
             elif specificstates:
                 console('No rejected entries')
         if 'failed' in dumpstates:
             if task.failed:
                 console('-- Failed: -----------------------------')
-                dump(task.failed, task.options.debug, eval_lazy, trace)
+                dump(task.failed, task.options.debug, eval_lazy, trace, title)
             elif specificstates:
                 console('No failed entries')
 
@@ -112,5 +117,5 @@ def register_plugin():
 @event('options.register')
 def register_parser_arguments():
     options.get_parser('execute').add_argument('--dump', nargs='*', choices=['eval', 'trace', 'accepted', 'rejected',
-        'undecided'], dest='dump_entries', help='display all entries in task with fields they contain, '
+        'undecided', 'title'], dest='dump_entries', help='display all entries in task with fields they contain, '
         'use `--dump eval` to evaluate all lazy fields. Specify an entry state/states to only dump matching entries.')

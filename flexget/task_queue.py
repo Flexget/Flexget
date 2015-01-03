@@ -5,6 +5,8 @@ import Queue
 import threading
 import time
 
+from sqlalchemy.exc import ProgrammingError, OperationalError
+
 from flexget.task import TaskAbort
 
 log = logging.getLogger('task_queue')
@@ -29,8 +31,8 @@ class TaskQueue(object):
         self._thread.start()
 
     def run(self):
-        try:
-            while not self._shutdown_now:
+        while not self._shutdown_now:
+            try:
                 # Grab the first job from the run queue and do it
                 try:
                     task = self.run_queue.get(timeout=0.5)
@@ -44,14 +46,16 @@ class TaskQueue(object):
                     log.debug('task %s aborted: %r' % (task.name, e))
                 finally:
                     self.run_queue.task_done()
-            remaining_jobs = self.run_queue.qsize()
-            if remaining_jobs:
-                log.warning('task queue shut down with %s tasks remaining in the queue to run.' % remaining_jobs)
-        except:
-            log.exception('BUG: Unhandled exception during task_queue run loop.')
-            raise
-        finally:
-            log.debug('task_queue run loop ended')
+            except (ProgrammingError, OperationalError):
+                log.exception('Database error while running a task. Attempting to recover.')
+            except Exception:
+                log.exception('BUG: Unhandled exception during task queue run loop.')
+                raise
+        remaining_jobs = self.run_queue.qsize()
+        if remaining_jobs:
+            log.warning('task queue shut down with %s tasks remaining in the queue to run.' % remaining_jobs)
+        else:
+            log.debug('task queue shut down')
 
     def is_alive(self):
         return self._thread.is_alive()

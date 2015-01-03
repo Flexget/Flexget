@@ -30,8 +30,12 @@ class MetainfoSeries(object):
                 continue
             self.guess_entry(entry)
 
-    def guess_entry(self, entry, allow_seasonless=False):
-        """Populates series_* fields for entries that are successfully parsed."""
+    def guess_entry(self, entry, allow_seasonless=False, config=None):
+        """
+        Populates series_* fields for entries that are successfully parsed.
+
+        :param dict config: A series config to be used. This will also cause 'path' and 'set' fields to be populated.
+        """
         if entry.get('series_parser') and entry['series_parser'].valid:
             # Return true if we already parsed this, false if series plugin parsed it
             return entry.get('series_guessed')
@@ -39,7 +43,7 @@ class MetainfoSeries(object):
                                                                      allow_seasonless=allow_seasonless)
         if parsed and parsed.valid:
             parsed.name = normalize_name(remove_dirt(parsed.name))
-            populate_entry_fields(entry, parsed)
+            populate_entry_fields(entry, parsed, config)
             entry['series_guessed'] = True
             return True
         return False
