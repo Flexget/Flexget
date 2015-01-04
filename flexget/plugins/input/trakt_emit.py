@@ -62,6 +62,10 @@ class TraktEmit(object):
                 return
             for item in data:
                 if item['type'] == 'show':
+                    if not item['show']['title']:
+                        # Seems we can get entries with a blank show title sometimes
+                        log.warning('Found trakt list show with no series name.')
+                        continue
                     trakt_id = item['show']['ids']['trakt']
                     listed_series[trakt_id] = {
                         'series_name': item['show']['title'],

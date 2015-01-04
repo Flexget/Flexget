@@ -105,7 +105,11 @@ class PluginSubliminal(object):
             elif not '$RECYCLE.BIN' in entry['location']:  # ignore deleted files in Windows shares
                 try:
                     video = subliminal.scan_video(entry['location'])
-                    log.info('Series name computed for %s was %s' % (entry['location'], video.series))
+                    if isinstance(video, subliminal.Episode):
+                        title = video.series
+                    else:
+                        title = video.title
+                    log.info('Name computed for %s was %s' % (entry['location'], title))
                     msc = video.scores['hash'] if config['exact_match'] else 0
                     if langs & video.subtitle_languages:
                         continue  # subs for preferred lang(s) already exists
