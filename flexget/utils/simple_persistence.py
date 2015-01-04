@@ -16,6 +16,7 @@ import pickle
 from sqlalchemy import Column, Integer, String, DateTime, PickleType, select, Index
 
 from flexget import db_schema
+from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.sqlalchemy_utils import table_schema, create_index
@@ -76,7 +77,7 @@ Index('ix_simple_persistence_feed_plugin_key', SimpleKeyValue.task, SimpleKeyVal
 
 class SimplePersistence(MutableMapping):
     # Stores values in store[taskname][pluginname][key] format
-    class_store = defaultdict(defaultdict(dict))
+    class_store = defaultdict(lambda: defaultdict(dict))
 
     def __init__(self, plugin=None):
         self.taskname = None
@@ -91,7 +92,7 @@ class SimplePersistence(MutableMapping):
         self.store[key] = value
 
     def __getitem__(self, key):
-        if 'key' in self.store:
+        if key in self.store:
             if self.store[key] == DELETE:
                 raise KeyError('%s is not contained in the simple_persistence table.' % key)
             return self.store[key]
@@ -114,10 +115,28 @@ class SimplePersistence(MutableMapping):
     def __len__(self):
         raise NotImplementedError('simple persistence does not support `len`')
 
-    def flush(self):
+    @classmethod
+    def flush(cls, task=None):
         """Flush all in memory key/values to database."""
         log.debug('Flushing simple persistence updates to db.')
-        # TODO: the stuff
+        if task:
+            # Always flush the 'None' task (unassociated with any task)
+            tasks = [task, None]
+        else:
+            tasks = cls.class_store
+        with Session() as session:
+            for taskname in tasks:
+                for pluginname in cls.class_store[taskname]:
+                    for key, value in cls.class_store[taskname][pluginname].iteritems():
+                        query = (session.query(SimpleKeyValue).
+                            filter(SimpleKeyValue.task == taskname).
+                            filter(SimpleKeyValue.plugin == pluginname).
+                            filter(SimpleKeyValue.key == key))
+                        if value == DELETE:
+                            query.delete()
+                        else:
+                            query.update({'value': value}, synchronize_session=False)
+
 
 class SimpleTaskPersistence(SimplePersistence):
 
@@ -128,3 +147,9 @@ class SimpleTaskPersistence(SimplePersistence):
     @property
     def plugin(self):
         return self.task.current_plugin
+
+
+@event('task.execute.completed')
+def flush_to_db(task):
+    """Stores all in memory key/value pairs to database when a task has completed."""
+    SimplePersistence.flush(task.name)
