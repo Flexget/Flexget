@@ -148,7 +148,7 @@ _codecs = [
     QualityComponent('codec', 10, 'divx'),
     QualityComponent('codec', 20, 'xvid'),
     QualityComponent('codec', 30, 'h264', '[hx].?264'),
-    QualityComponent('codec', 40, 'h265', '[hx].?265'),
+    QualityComponent('codec', 40, 'h265', '[hx].?265|hvec'),
     QualityComponent('codec', 50, '10bit', '10.?bit|hi10p')
 ]
 channels = '(?:(?:[\W_]?5[\W_]?1)|(?:[\W_]?2[\W_]?(?:0|ch)))'
