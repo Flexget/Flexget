@@ -50,9 +50,15 @@ def upgrade(ver, session):
     return ver
 
 
-class SimpleKeyValue(Base):
-    """Declarative"""
+@event('manager.db_cleanup')
+def db_cleanup(manager, session):
+    """Clean up values in the db from tasks which no longer exist."""
+    # SKVs not associated with any task use None as task tame
+    existing_tasks = list(manager.tasks) + [None]
+    session.query(SimpleKeyValue).filter(~SimpleKeyValue.task.in_(existing_tasks)).delete()
 
+
+class SimpleKeyValue(Base):
     __tablename__ = 'simple_persistence'
 
     id = Column(Integer, primary_key=True)
@@ -98,52 +104,43 @@ class SimplePersistence(MutableMapping):
         self.store[key] = value
 
     def __getitem__(self, key):
-        if key in self.store:
-            if self.store[key] == DELETE:
-                raise KeyError('%s is not contained in the simple_persistence table.' % key)
-            return self.store[key]
-
-        with Session() as session:
-            skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
-                filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
-            if not skv:
-                raise KeyError('%s is not contained in the simple_persistence table.' % key)
-            else:
-                self.store[key] = skv.value
-                return skv.value
+        if key not in self.store or self.store[key] == DELETE:
+            raise KeyError('%s is not contained in the simple_persistence table.' % key)
+        return self.store[key]
 
     def __delitem__(self, key):
         self.store[key] = DELETE
 
     def __iter__(self):
-        raise NotImplementedError('simple persistence does not support iteration')
+        return iter(self.store)
 
     def __len__(self):
-        raise NotImplementedError('simple persistence does not support `len`')
+        return len(self.store)
+
+    @classmethod
+    def load(cls, task=None):
+        """Load all key/values from `task` into memory from database."""
+        with Session() as session:
+            for skv in session.query(SimpleKeyValue).filter(SimpleKeyValue.task == task).all():
+                cls.class_store[task][skv.plugin][skv.key] = skv.value
 
     @classmethod
     def flush(cls, task=None):
         """Flush all in memory key/values to database."""
         log.debug('Flushing simple persistence updates to db.')
-        if task:
-            # Always flush the 'None' task (unassociated with any task)
-            tasks = [task, None]
-        else:
-            tasks = cls.class_store
         with Session() as session:
-            for taskname in tasks:
-                for pluginname in cls.class_store[taskname]:
-                    for key, value in cls.class_store[taskname][pluginname].iteritems():
-                        query = (session.query(SimpleKeyValue).
-                            filter(SimpleKeyValue.task == taskname).
-                            filter(SimpleKeyValue.plugin == pluginname).
-                            filter(SimpleKeyValue.key == key))
-                        if value == DELETE:
-                            query.delete()
-                        else:
-                            updated = query.update({'value': value}, synchronize_session=False)
-                            if not updated:
-                                session.add(SimpleKeyValue(taskname, pluginname, key, value))
+            for pluginname in cls.class_store[task]:
+                for key, value in cls.class_store[task][pluginname].iteritems():
+                    query = (session.query(SimpleKeyValue).
+                        filter(SimpleKeyValue.task == task).
+                        filter(SimpleKeyValue.plugin == pluginname).
+                        filter(SimpleKeyValue.key == key))
+                    if value == DELETE:
+                        query.delete()
+                    else:
+                        updated = query.update({'value': value}, synchronize_session=False)
+                        if not updated:
+                            session.add(SimpleKeyValue(task, pluginname, key, value))
 
 
 class SimpleTaskPersistence(SimplePersistence):
@@ -157,7 +154,21 @@ class SimpleTaskPersistence(SimplePersistence):
         return self.task.current_plugin
 
 
+@event('manager.startup')
+def load_taskless(manager):
+    """Loads all key/value pairs into memory which aren't associated with a specific task."""
+    SimplePersistence.load()
+
+
+@event('task.execute.started')
+def load_task(task):
+    """Loads all key/value pairs into memory before a task starts."""
+    SimplePersistence.load(task.name)
+
+
 @event('task.execute.completed')
 def flush_to_db(task):
     """Stores all in memory key/value pairs to database when a task has completed."""
     SimplePersistence.flush(task.name)
+    # Also flush items not associated with any specific task
+    SimplePersistence.flush()
