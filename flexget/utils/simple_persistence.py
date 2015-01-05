@@ -163,7 +163,8 @@ def load_taskless(manager):
 @event('task.execute.started')
 def load_task(task):
     """Loads all key/value pairs into memory before a task starts."""
-    SimplePersistence.load(task.name)
+    if not SimplePersistence.class_store[task]:
+        SimplePersistence.load(task.name)
 
 
 @event('task.execute.completed')
