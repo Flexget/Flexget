@@ -76,6 +76,12 @@ Index('ix_simple_persistence_feed_plugin_key', SimpleKeyValue.task, SimpleKeyVal
 
 
 class SimplePersistence(MutableMapping):
+    """
+    Store simple values that need to be persisted between FlexGet runs. Interface is like a `dict`.
+
+    This should only be used if a plugin needs to store a few values, otherwise it should create a full table in
+    the database.
+    """
     # Stores values in store[taskname][pluginname][key] format
     class_store = defaultdict(lambda: defaultdict(dict))
 
@@ -135,7 +141,9 @@ class SimplePersistence(MutableMapping):
                         if value == DELETE:
                             query.delete()
                         else:
-                            query.update({'value': value}, synchronize_session=False)
+                            updated = query.update({'value': value}, synchronize_session=False)
+                            if not updated:
+                                session.add(SimpleKeyValue(taskname, pluginname, key, value))
 
 
 class SimpleTaskPersistence(SimplePersistence):
