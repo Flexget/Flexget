@@ -160,15 +160,20 @@ def load_taskless(manager):
     SimplePersistence.load()
 
 
+@event('manager.shutdown')
+def flush_taskless(manager):
+    SimplePersistence.flush()
+
+
 @event('task.execute.started')
 def load_task(task):
     """Loads all key/value pairs into memory before a task starts."""
-    if not SimplePersistence.class_store[task]:
+    if not SimplePersistence.class_store[task.name]:
         SimplePersistence.load(task.name)
 
 
 @event('task.execute.completed')
-def flush_to_db(task):
+def flush_task(task):
     """Stores all in memory key/value pairs to database when a task has completed."""
     SimplePersistence.flush(task.name)
     # Also flush items not associated with any specific task
