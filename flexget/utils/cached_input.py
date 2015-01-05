@@ -43,7 +43,7 @@ class InputCacheEntry(Base):
 
 
 @event('manager.db_cleanup')
-def db_cleanup(session):
+def db_cleanup(manager, session):
     """Removes old input caches from plugins that are no longer configured."""
     result = session.query(InputCache).filter(InputCache.added < datetime.now() - timedelta(days=7)).delete()
     if result:

@@ -183,7 +183,7 @@ def clear_rejected(manager):
 
 
 @event('manager.db_cleanup')
-def db_cleanup(session):
+def db_cleanup(manager, session):
     # Remove entries older than 30 days
     result = session.query(RememberEntry).filter(RememberEntry.added < datetime.now() - timedelta(days=30)).delete()
     if result:

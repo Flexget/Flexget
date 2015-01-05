@@ -44,7 +44,7 @@ class LogMessage(Base):
 
 
 @event('manager.db_cleanup')
-def purge(session):
+def purge(manager, session):
     """Purge old messages from database"""
     old = datetime.now() - timedelta(days=365)
 

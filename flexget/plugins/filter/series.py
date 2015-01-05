@@ -151,7 +151,7 @@ def upgrade(ver, session):
 
 
 @event('manager.db_cleanup')
-def db_cleanup(session):
+def db_cleanup(manager, session):
     # Clean up old undownloaded releases
     result = session.query(Release).\
         filter(Release.downloaded == False).\

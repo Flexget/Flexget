@@ -174,6 +174,10 @@ class Task(object):
 
       ``parameters: task, keyword``
 
+    * task.execute.started
+
+      Before a task starts execution
+
     * task.execute.completed
 
       After task execution has been completed
@@ -555,7 +559,6 @@ class Task(object):
         else:
             for entry in self.all_entries:
                 entry.complete()
-            fire_event('task.execute.completed', self)
 
     @use_task_logging
     def execute(self):
@@ -574,6 +577,7 @@ class Task(object):
         try:
             if self.options.cron:
                 self.manager.db_cleanup()
+            fire_event('task.execute.started', self)
             while True:
                 self._execute()
                 # rerun task
@@ -588,6 +592,7 @@ class Task(object):
                 elif self._rerun:
                     log.info('Task has been re-run %s times already, stopping for now' % self._rerun_count)
                 break
+            fire_event('task.execute.completed', self)
         finally:
             self.finished_event.set()
 

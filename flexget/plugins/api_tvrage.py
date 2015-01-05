@@ -28,7 +28,7 @@ tvrage.feeds.BASE_URL = 'http://services.tvrage.com/feeds/%s.php?%s=%s'
 
 
 @event('manager.db_cleanup')
-def db_cleanup(session):
+def db_cleanup(manager, session):
     value = datetime.datetime.now() - parse_timedelta('30 days')
     for de in session.query(TVRageSeries).filter(TVRageSeries.last_update <= value).all():
         log.debug('deleting %s' % de)
