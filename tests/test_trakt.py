@@ -1,7 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 
-import httmock
-
 from flexget.plugins.api_trakt import ApiTrakt
 from tests import FlexGetBase, use_vcr
 
@@ -83,32 +81,17 @@ class TestTraktList(FlexGetBase):
         tasks:
           test_trakt_movies:
             trakt_list:
-              api_key: 1234
-              username: testuser
-              movies: watchlist
+              username: flexgettest
+              list: watchlist
+              type: movies
     """
 
+    @use_vcr
     def test_trakt_movies(self):
-
-        @httmock.all_requests
-        def movie_request(url, request):
-            assert url.path.endswith('watchlist/movies.json/1234/testuser')
-            return (
-                b'[{"title":"12 Angry Men","year":1957,"released":-401731200,"url":"http://trakt.tv/movie/12-angry-men-'
-                b'1957","trailer":"http://youtube.com/watch?v=OvebOqneLIU","runtime":96,"tagline":"Life is in their han'
-                b'ds. Death is on their minds.","overview":"The defense and the prosecution have rested and the jury is'
-                b' filing into the jury room to decide if a young Spanish-American is guilty or innocent of murdering h'
-                b'is father. What begins as an open and shut case soon becomes a mini-drama of each of the jurors\' pre'
-                b'judices and preconceptions about the trial, the accused, and each other.","certification":"PG","imdb_'
-                b'id":"tt0050083","tmdb_id":"389","inserted":1374718966,"images":{"poster":"http://slurm.trakt.us/image'
-                b's/posters_movies/484.2.jpg","fanart":"http://slurm.trakt.us/images/fanart_movies/484.2.jpg"},"genres"'
-                b':["Drama"],"ratings":{"percentage":89,"votes":1533,"loved":1514,"hated":19}}]')
-
-        with httmock.HTTMock(movie_request):
-            self.execute_task('test_trakt_movies')
-            assert len(self.task.entries) == 1
-            entry = self.task.entries[0]
-            assert entry['title'] == '12 Angry Men'
-            assert entry['movie_name'] == '12 Angry Men'
-            assert entry['movie_year'] == 1957
-            assert entry['imdb_id'] == 'tt0050083'
+        self.execute_task('test_trakt_movies')
+        assert len(self.task.entries) == 1
+        entry = self.task.entries[0]
+        assert entry['title'] == '12 Angry Men (1957)'
+        assert entry['movie_name'] == '12 Angry Men'
+        assert entry['movie_year'] == 1957
+        assert entry['imdb_id'] == 'tt0050083'

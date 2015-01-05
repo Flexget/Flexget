@@ -19,7 +19,6 @@ import yaml
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import SingletonThreadPool
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 from flexget.utils.sqlalchemy_utils import ContextSession
@@ -39,12 +38,6 @@ log = logging.getLogger('manager')
 
 manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
-
-
-@sqlalchemy.event.listens_for(Session, 'before_commit')
-def before_commit(session):
-    if not manager.has_lock and session.dirty:
-        log.debug('BUG?: Database writes should not be tried when there is no database lock.')
 
 
 @sqlalchemy.event.listens_for(sqlalchemy.engine.Engine, 'connect')
@@ -675,7 +668,6 @@ class Manager(object):
         try:
             self.engine = sqlalchemy.create_engine(self.database_uri,
                                                    echo=self.options.debug_sql,
-                                                   poolclass=SingletonThreadPool,
                                                    connect_args={'check_same_thread': False, 'timeout': 10})
         except ImportError:
             print('FATAL: Unable to use SQLite. Are you running Python 2.5 - 2.7 ?\n'

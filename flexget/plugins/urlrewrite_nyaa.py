@@ -13,7 +13,10 @@ log = logging.getLogger('nyaa')
 
 # TODO: Other categories
 CATEGORIES = {'all': '0_0',
-              'anime': '1_0'}
+              'anime': '1_0',
+              'anime eng': '1_37',
+              'anime non-eng': '1_38',
+              'anime raw': '1_11'}
 FILTERS = ['all', 'filter remakes', 'trusted only', 'a+ only']
 
 
@@ -33,7 +36,7 @@ class UrlRewriteNyaa(object):
     def search(self, entry, config):
         if not isinstance(config, dict):
             config = {'category': config}
-        config.setdefault('category', 'anime')
+        config.setdefault('category', 'anime eng')
         config.setdefault('filter', 'all')
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):

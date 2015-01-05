@@ -1,0 +1,35 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+        trakt-user-login: [flexgettest]
+      method: GET
+      uri: https://api.trakt.tv:443/users/flexgettest/watchlist/movies
+    response:
+      body: {string: '[{"listed_at":"2015-01-01T18:37:24.000-08:00","type":"movie","movie":{"title":"12
+          Angry Men","year":1957,"ids":{"trakt":309,"slug":"12-angry-men-1957","imdb":"tt0050083","tmdb":389}}}]'}
+      headers:
+        cache-control: ['max-age=0, private, must-revalidate']
+        cf-ray: [1a2adac7a4400edf-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Fri, 02 Jan 2015 23:49:42 GMT']
+        etag: [W/"cfd93bf6219f599f9141d51f7d02210f"]
+        last-modified: ['Fri, 02 Jan 2015 02:39:49 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d6893fff03fc0992e7acef42218684d311420242581; expires=Sat,
+            02-Jan-16 23:49:41 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger 4.0.56]
+        x-request-id: [f77a76e5-2ddc-4737-9d6b-795ba6f408c1]
+        x-runtime: ['0.225817']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1

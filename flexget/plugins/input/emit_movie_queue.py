@@ -4,6 +4,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
+from flexget.manager import Session
 from flexget.utils.imdb import make_url as make_imdb_url
 
 try:
@@ -44,40 +45,41 @@ class EmitMovieQueue(object):
         config = self.prepare_config(config)
         entries = []
 
-        for queue_item in queue_get(session=task.session):
-            entry = Entry()
-            # make sure the entry has IMDB fields filled
-            entry['url'] = ''
-            if queue_item.imdb_id:
-                entry['imdb_id'] = queue_item.imdb_id
-                entry['imdb_url'] = make_imdb_url(queue_item.imdb_id)
-            if queue_item.tmdb_id:
-                entry['tmdb_id'] = queue_item.tmdb_id
+        with Session() as session:
+            for queue_item in queue_get(session=session):
+                entry = Entry()
+                # make sure the entry has IMDB fields filled
+                entry['url'] = ''
+                if queue_item.imdb_id:
+                    entry['imdb_id'] = queue_item.imdb_id
+                    entry['imdb_url'] = make_imdb_url(queue_item.imdb_id)
+                if queue_item.tmdb_id:
+                    entry['tmdb_id'] = queue_item.tmdb_id
 
-            plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
-            # check if title is a imdb url (leftovers from old database?)
-            # TODO: maybe this should be fixed at the queue_get ...
-            if 'http://' in queue_item.title:
-                log.debug('queue contains url instead of title')
-                if entry.get('movie_name'):
-                    entry['title'] = entry['movie_name']
+                plugin.get_plugin_by_name('tmdb_lookup').instance.lookup(entry)
+                # check if title is a imdb url (leftovers from old database?)
+                # TODO: maybe this should be fixed at the queue_get ...
+                if 'http://' in queue_item.title:
+                    log.debug('queue contains url instead of title')
+                    if entry.get('movie_name'):
+                        entry['title'] = entry['movie_name']
+                    else:
+                        log.error('Found imdb url in imdb queue, but lookup failed: %s' % entry['title'])
+                        continue
                 else:
-                    log.error('Found imdb url in imdb queue, but lookup failed: %s' % entry['title'])
-                    continue
-            else:
-                # normal title
-                entry['title'] = queue_item.title
+                    # normal title
+                    entry['title'] = queue_item.title
 
-            # Add the year and quality if configured to
-            if config.get('year') and entry.get('movie_year'):
-                entry['title'] += ' %s' % entry['movie_year']
-            # TODO: qualities can now be ranges.. how should we handle this?
-            if config.get('quality') and queue_item.quality != 'ANY':
-                log.info('quality option of emit_movie_queue is disabled while we figure out how to handle ranges')
-                #entry['title'] += ' %s' % queue_item.quality
-            entries.append(entry)
-            log.debug('Added title and IMDB id to new entry: %s - %s' %
-                     (entry['title'], entry['imdb_id']))
+                # Add the year and quality if configured to
+                if config.get('year') and entry.get('movie_year'):
+                    entry['title'] += ' %s' % entry['movie_year']
+                # TODO: qualities can now be ranges.. how should we handle this?
+                if config.get('quality') and queue_item.quality != 'ANY':
+                    log.info('quality option of emit_movie_queue is disabled while we figure out how to handle ranges')
+                    #entry['title'] += ' %s' % queue_item.quality
+                entries.append(entry)
+                log.debug('Added title and IMDB id to new entry: %s - %s' %
+                         (entry['title'], entry['imdb_id']))
 
         return entries
 
