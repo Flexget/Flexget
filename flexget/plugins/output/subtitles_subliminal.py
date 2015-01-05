@@ -105,7 +105,7 @@ class PluginSubliminal(object):
                 entry.fail('file not found: %s' % entry['location'])
             elif '$RECYCLE.BIN' not in entry['location']:  # ignore deleted files in Windows shares
                 try:
-                    entry_langs = entry.get('subtitle_languages', 'langs')
+                    entry_langs = entry.get('subtitle_languages', langs)
                     video = subliminal.scan_video(entry['location'])
                     if isinstance(video, subliminal.Episode):
                         title = video.series
@@ -120,7 +120,9 @@ class PluginSubliminal(object):
                                                                       min_score=msc)
                         if subtitle:
                             downloaded_subtitles.update(subtitle)
-                            entry['subtitles_missing'] = entry_langs - set([unicode(l) for l in subtitle.itervalues()])
+                            downloaded_languages = set([Language.fromietf(unicode(l.language))
+                                                        for l in subtitle[video]])
+                            entry['subtitles_missing'] = entry_langs - downloaded_languages
                             log.info('Subtitles found for %s' % entry['location'])
                         else:
                             # TODO check performance hit -- this explicit check may be better on slower devices

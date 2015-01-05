@@ -14,6 +14,7 @@ from datetime import datetime, date, time
 from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.manager import Session
 from flexget.utils.database import with_session
 from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
@@ -102,49 +103,51 @@ class SubtitleQueue(object):
     }
 
     @with_session
-    def complete(self, entry, session=None):
-        if 'subtitles_missing' in entry and not entry.get('subtitles_missing'):
+    def complete(self, entry, session=None, **kwargs):
+        subtitles_missing = entry.get('subtitles_missing', set())
+        if len(subtitles_missing) == 0:
             item = session.query(QueuedSubtitle).filter(QueuedSubtitle.title == entry['title']).first()
             item.downloaded = True
+            entry.accept()
 
     def emit(self, task, config):
         if not config:
             return
-        subtitles = queue_get(session=task.session)
         entries = []
-        for sub_item in subtitles:
-            entry = Entry()
-            if os.path.exists(sub_item.path):
-                path = sub_item.path
-            elif sub_item.alternate_path and os.path.exists(sub_item.alternate_path):
-                path = sub_item.alternate_path
-            else:
-                log.error('File not found. Removing "%s" from queue.' % sub_item.title)
-                task.session.delete(sub_item)
-                continue
-            entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(path))
-            entry['location'] = path
-            entry['title'] = sub_item.title
-
-            primary = set()
-            for language in sub_item.languages:
-                primary.add(Language.fromietf(language.language))
-            entry['subtitle_languages'] = primary
-
-            # use glob instead of subtitles_check to avoid depending on subliminal
-            path_no_ext = os.path.splitext(normalize_path(path))[0]
-            # can only check subtitles that have explicit language codes in the file name
-            if primary:
-                for lang in primary:
-                    if not glob.glob(path_no_ext + "." + unicode(lang) + ".srt"):
-                        break
+        with Session() as session:
+            for sub_item in queue_get(session=session):
+                entry = Entry()
+                if os.path.exists(sub_item.path):
+                    path = sub_item.path
+                elif sub_item.alternate_path and os.path.exists(sub_item.alternate_path):
+                    path = sub_item.alternate_path
                 else:
-                    log.debug('All subtitles already fetched for %s.' % entry['title'])
-                    sub_item.downloaded = True
+                    log.error('File not found. Removing "%s" from queue.' % sub_item.title)
+                    session.delete(sub_item)
                     continue
-            entry.on_complete(self.complete)
-            entries.append(entry)
-            log.debug('Emitting subtitle entry for %s.' % entry['title'])
+                entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(path))
+                entry['location'] = path
+                entry['title'] = sub_item.title
+
+                primary = set()
+                for language in sub_item.languages:
+                    primary.add(Language.fromietf(language.language))
+                entry['subtitle_languages'] = primary
+
+                # use glob instead of subtitles_check to avoid depending on subliminal
+                path_no_ext = os.path.splitext(normalize_path(path))[0]
+                # can only check subtitles that have explicit language codes in the file name
+                if primary:
+                    for lang in primary:
+                        if not glob.glob(path_no_ext + "." + unicode(lang) + ".srt"):
+                            break
+                    else:
+                        log.debug('All subtitles already fetched for %s.' % entry['title'])
+                        sub_item.downloaded = True
+                        continue
+                entry.on_complete(self.complete)
+                entries.append(entry)
+                log.debug('Emitting subtitle entry for %s.' % entry['title'])
         return entries
 
     def on_task_filter(self, task, config):
@@ -155,6 +158,7 @@ class SubtitleQueue(object):
     def on_task_input(self, task, config):
         if isinstance(config, dict):
             return
+        log.error(dir(task))
         return self.emit(task, config)
 
     def on_task_output(self, task, config):
