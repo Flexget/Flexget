@@ -31,54 +31,45 @@ class PluginSchema(Base):
         return '<PluginSchema(plugin=%s,version=%i)>' % (self.plugin, self.version)
 
 
-def get_version(plugin):
-    session = Session()
-    try:
-        schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
-        if not schema:
-            log.debug('No schema version stored for %s' % plugin)
-            return None
-        else:
-            return schema.version
-    finally:
-        session.close()
+@with_session
+def get_version(plugin, session=None):
+    schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
+    if not schema:
+        log.debug('No schema version stored for %s' % plugin)
+        return None
+    else:
+        return schema.version
 
 
-def set_version(plugin, version):
+@with_session
+def set_version(plugin, version, session=None):
     if plugin not in plugin_schemas:
         raise ValueError('Tried to set schema version for %s plugin with no versioned_base.' % plugin)
     base_version = plugin_schemas[plugin]['version']
     if version != base_version:
         raise ValueError('Tried to set %s plugin schema version to %d when '
                          'it should be %d as defined in versioned_base.' % (plugin, version, base_version))
-    session = Session()
-    try:
-        schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
-        if not schema:
-            log.debug('Initializing plugin %s schema version to %i' % (plugin, version))
-            schema = PluginSchema(plugin, version)
-            session.add(schema)
-        else:
-            if version < schema.version:
-                raise ValueError('Tried to set plugin %s schema version to lower value' % plugin)
-            if version != schema.version:
-                log.debug('Updating plugin %s schema version to %i' % (plugin, version))
-                schema.version = version
-        session.commit()
-    finally:
-        session.close()
+    schema = session.query(PluginSchema).filter(PluginSchema.plugin == plugin).first()
+    if not schema:
+        log.debug('Initializing plugin %s schema version to %i' % (plugin, version))
+        schema = PluginSchema(plugin, version)
+        session.add(schema)
+    else:
+        if version < schema.version:
+            raise ValueError('Tried to set plugin %s schema version to lower value' % plugin)
+        if version != schema.version:
+            log.debug('Updating plugin %s schema version to %i' % (plugin, version))
+            schema.version = version
+    session.commit()
 
 
-def upgrade_required():
+@with_session
+def upgrade_required(session=None):
     """Returns true if an upgrade of the database is required."""
-    session = Session()
-    try:
-        for old_schema in session.query(PluginSchema).all():
-            if old_schema.plugin in plugin_schemas and old_schema.version < plugin_schemas[old_schema.plugin]['version']:
-                return True
-        return False
-    finally:
-        session.close()
+    for old_schema in session.query(PluginSchema).all():
+        if old_schema.plugin in plugin_schemas and old_schema.version < plugin_schemas[old_schema.plugin]['version']:
+            return True
+    return False
 
 
 class UpgradeImpossible(Exception):
@@ -108,32 +99,32 @@ def upgrade(plugin):
            return ver
     """
 
-    def upgrade_decorator(func):
+    def upgrade_decorator(upgrade_func):
 
         @event('manager.upgrade')
         def upgrade_wrapper(manager):
-            ver = get_version(plugin)
-            session = Session()
-            try:
-                new_ver = func(ver, session)
-                if new_ver > ver:
-                    log.info('Plugin `%s` schema upgraded successfully' % plugin)
-                    set_version(plugin, new_ver)
-                    session.commit()
+            with Session() as session:
+                current_ver = get_version(plugin, session=session)
+                try:
+                    new_ver = upgrade_func(current_ver, session)
+                except UpgradeImpossible:
+                    log.info('Plugin %s database is not upgradable. Flushing data and regenerating.' % plugin)
+                    reset_schema(plugin, session=session)
                     manager.db_upgraded = True
-                elif new_ver < ver:
-                    log.critical('A lower schema version was returned (%s) from the %s upgrade function '
-                                 'than passed in (%s)' % (new_ver, plugin, ver))
+                except Exception as e:
+                    log.exception('Failed to upgrade database for plugin %s: %s' % (plugin, e))
+                    session.rollback()
                     manager.shutdown(finish_queue=False)
-            except UpgradeImpossible:
-                log.info('Plugin %s database is not upgradable. Flushing data and regenerating.' % plugin)
-                reset_schema(plugin)
-                session.commit()
-            except Exception as e:
-                log.exception('Failed to upgrade database for plugin %s: %s' % (plugin, e))
-                manager.shutdown(finish_queue=False)
-            finally:
-                session.close()
+                else:
+                    if new_ver > current_ver:
+                        log.info('Plugin `%s` schema upgraded successfully' % plugin)
+                        set_version(plugin, new_ver, session=session)
+                        manager.db_upgraded = True
+                    elif new_ver < current_ver:
+                        log.critical('A lower schema version was returned (%s) from the %s upgrade function '
+                                     'than passed in (%s)' % (new_ver, plugin, current_ver))
+                        session.rollback()
+                        manager.shutdown(finish_queue=False)
 
         return upgrade_wrapper
     return upgrade_decorator
