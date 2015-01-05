@@ -36,7 +36,7 @@ Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
 
 
 @event('manager.db_cleanup')
-def db_cleanup(session):
+def db_cleanup(manager, session):
     value = datetime.datetime.now() - parse_timedelta('7 days')
     for de in session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all():
         log.debug('deleting %s' % de)

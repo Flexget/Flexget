@@ -846,7 +846,7 @@ class Manager(object):
             log.info('Running database cleanup.')
             session = Session()
             try:
-                fire_event('manager.db_cleanup', session)
+                fire_event('manager.db_cleanup', self, session)
                 session.commit()
             finally:
                 session.close()
