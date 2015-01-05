@@ -120,7 +120,7 @@ class PluginSubliminal(object):
                                                                       min_score=msc)
                         if subtitle:
                             downloaded_subtitles.update(subtitle)
-                            entry['subtitles_missing'] = entry_langs - set([l.languages for l in subtitle])
+                            entry['subtitles_missing'] = entry_langs - set([unicode(l) for l in subtitle.itervalues()])
                             log.info('Subtitles found for %s' % entry['location'])
                         else:
                             # TODO check performance hit -- this explicit check may be better on slower devices
