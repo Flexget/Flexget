@@ -18,6 +18,7 @@ from flexget.plugin import plugins as all_plugins
 from flexget.plugin import (
     DependencyError, get_plugins, phase_methods, plugin_schemas, PluginError, PluginWarning, task_phases)
 from flexget.utils import requests
+from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 
 log = logging.getLogger('task')
@@ -37,7 +38,8 @@ class TaskConfigHash(Base):
         return '<TaskConfigHash(task=%s,hash=%s)>' % (self.task, self.hash)
 
 
-def config_changed(task=None):
+@with_session
+def config_changed(task=None, session=None):
     """
     Forces config_modified flag to come out true on next run of `task`. Used when the db changes, and all
     entries need to be reprocessed.
@@ -45,11 +47,10 @@ def config_changed(task=None):
     :param task: Name of the task. If `None`, will be set for all tasks.
     """
     log.debug('Marking config for %s as changed.' % (task or 'all tasks'))
-    with Session() as session:
-        task_hash = session.query(TaskConfigHash)
-        if task:
-            task_hash = task_hash.filter(TaskConfigHash.task == task)
-        task_hash.delete()
+    task_hash = session.query(TaskConfigHash)
+    if task:
+        task_hash = task_hash.filter(TaskConfigHash.task == task)
+    task_hash.delete()
 
 
 def use_task_logging(func):
