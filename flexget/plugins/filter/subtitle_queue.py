@@ -14,7 +14,6 @@ from datetime import datetime, date, time
 from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.task import TaskAbort
 from flexget.utils.database import with_session
 from flexget.utils.template import RenderError
 from flexget.utils.tools import parse_timedelta
@@ -90,7 +89,7 @@ class SubtitleQueue(object):
                         {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
                         {'type': 'string'},
                     ]},
-                    'primary_path': {'type': 'string'},
+                    'path': {'type': 'string'},
                     'alternate_path': {'type': 'string'},
                 },
                 'required': ['action'],
@@ -104,7 +103,7 @@ class SubtitleQueue(object):
 
     @with_session
     def complete(self, entry, session=None):
-        if 'missing_subtitles' in entry and not entry.get('missing_subtitles'):
+        if 'subtitles_missing' in entry and not entry.get('subtitles_missing'):
             item = session.query(QueuedSubtitle).filter(QueuedSubtitle.title == entry['title']).first()
             item.downloaded = True
 
@@ -132,23 +131,16 @@ class SubtitleQueue(object):
                 primary.add(Language.fromietf(language.language))
             entry['subtitle_languages'] = primary
 
-            # get the file extension index
-            # use glob instead of subtitles_check as subtitles_check does some unnecessary hashing
-            path = normalize_path(path)
-            index = path.rfind('.')
-            # if entry wants more than 1 subtitle, then we look for files that have the proper language extensions
-            if len(primary) > 1:
+            # use glob instead of subtitles_check to avoid depending on subliminal
+            path_no_ext = os.path.splitext(normalize_path(path))[0]
+            # can only check subtitles that have explicit language codes in the file name
+            if primary:
                 for lang in primary:
-                    if not glob.glob(path[:index] + "." + unicode(lang) + ".srt"):
+                    if not glob.glob(path_no_ext + "." + unicode(lang) + ".srt"):
                         break
                 else:
                     log.debug('All subtitles already fetched for %s.' % entry['title'])
-                    continue
-            # if entry wants only 1 subtitle, then we look for files with and without language extension
-            else:
-                if glob.glob(path[:index] + ".srt") or \
-                        (primary and glob.glob(path[:index] + "." + unicode(primary.pop()) + ".srt")):
-                    log.debug('All primary subtitles already fetched for %s.' % entry['title'])
+                    sub_item.downloaded = True
                     continue
             entry.on_complete(self.complete)
             entries.append(entry)
@@ -175,53 +167,59 @@ class SubtitleQueue(object):
                     # is it a local file?
                     if 'location' in entry:
                         try:
-                            path = entry.render(config.get('primary_path', entry['location']))
+                            path = entry.render(config.get('path', entry['location']))
                             alternate_path = entry.render(config.get('alternate_path', ''))
                             queue_add(path, entry.get('title', ''), config, alternate_path=alternate_path)
                         except RenderError as ex:
-                            entry.fail('Invalid entry field %s for %s.' % (config['primary_path'], entry['title']))
-                            log.debug('Could not render! %s' % ex)
+                            # entry.fail('Invalid entry field %s for %s.' % (config['path'], entry['title']))
+                            log.error('Could not render: %s. Please check your config.' % ex)
+                            break
                     # or is it a torrent?
                     elif 'content_files' in entry:
+                        if not 'path' in config:
+                            log.error('No path set for non-local file. Don\'t know where to look.')
+                            break
                         # try to render
                         try:
-                            path = entry.render(config.get('primary_path', ''))
+                            path = entry.render(config['path'])
                             alternate_path = entry.render(config.get('alternate_path', ''))
                         except RenderError as ex:
-                            entry.fail('Invalid entry field %s for %s.' % (config['primary_path'], entry['title']))
-                            log.debug('Could not render! %s' % ex)
-                            continue
-
-                        if not path:
-                            entry.fail('No path set for torrent. I am not a wizard. Please tell me where to look.')
-                            continue
+                            # entry.fail('Invalid entry field %s for %s.' % (config['path'], entry['title']))
+                            log.error('Could not render: %s. Please check your config.' % ex)
+                            break
                         files = entry['content_files']
                         if len(files) == 1:
                             title = files[0]
                             # TODO: use content_filename in case of single-file torrents?
                             # How to handle path and alternate_path in this scenario?
-                            alternate_title = title
+                            ext = os.path.splitext(title)[1]
                             if 'content_filename' in entry:
                                 # need to queue the content_filename as alternate
-                                ext = title.rfind('.')
-                                alternate_title = os.path.join(entry['content_filename'], title[ext:])
+                                if not alternate_path:
+                                    alternate_path = os.path.join(path, entry['content_filename'] + ext)
+                                else:
+                                    # if alternate_path already exists, then we simply change it
+                                    alternate_path = os.path.join(alternate_path,
+                                                                  entry['content_filename'] + ext)
+                            else:
+                                path = os.path.join(path, title)
+                                if alternate_path:
+                                    alternate_path = os.path.join(alternate_path, title)
                         else:
+                            # title of the torrent is usually the name of the folder
                             title = entry['title']
-                            alternate_title = title
-                        path = os.path.join(path, title)
-
-                        if alternate_path:
-                            alternate_path = os.path.join(alternate_path, alternate_title)
-
+                            path = os.path.join(path, title)
+                            if alternate_path:
+                                    alternate_path = os.path.join(alternate_path, title)
                         queue_add(path, title, config, alternate_path=alternate_path)
                     else:
-                        #log.error("Invalid entry for subtitle queue.")
-                        entry.fail('Invalid entry.')
+                        # should this really happen though?
+                        entry.reject('Invalid entry. Not a torrent or local file.')
                 elif action == 'remove':
                     if entry.get('location', ''):
                         queue_del(entry['location'])
                     else:
-                        entry.fail('Not a local file.')
+                        entry.fail('Not a local file. Cannot remove non-local files.')
                 return
             except QueueError as e:
                 # ignore already in queue
@@ -240,7 +238,7 @@ def queue_add(path, title, config, alternate_path=None, session=None):
     eng = session.query(SubtitleLanguages).filter(SubtitleLanguages.language == 'en').first()
     default = [eng] if eng else [SubtitleLanguages('eng')]
     if item:
-        log.debug('%s: Already queued. Updating values.' % item.title)
+        log.verbose('%s: Already queued. Updating values.' % item.title)
         queue_edit(path, alternate_path, title, config, session=session)
     else:
         if config.get('stop_after', ''):
@@ -274,7 +272,9 @@ def queue_edit(src, dest, title, config, session=None):
     if dest:
         dest = normalize_path(dest)
 
-    item = session.query(QueuedSubtitle).filter(QueuedSubtitle.path == src).first()
+    item = session.query(QueuedSubtitle).filter(or_(QueuedSubtitle.path == src,
+                                                    QueuedSubtitle.alternate_path == src)).first()
+    # item should exist, but this check might be needed in the future
     if not item:
         # Two paths but not in queue could mean it comes from a torrent or has been moved with move plugin etc.
         queue_add(dest, title, config, alternate_path=src, session=session)
@@ -289,6 +289,7 @@ def queue_edit(src, dest, title, config, session=None):
         # if there is a stop_after value, then it is refreshed in the db
         if config.get('stop_after', ''):
             item.stop_after = config['stop_after']
+            item.added = datetime.now()
         primary = make_lang_list(config.get('languages', []), session=session)
         item.languages = primary
         log.debug('Updated values for %s.' % item.title)
@@ -311,24 +312,18 @@ def get_lang(lang, session=None):
     return session.query(SubtitleLanguages).filter(SubtitleLanguages.language == unicode(lang)).first()
 
 
-# TODO: prettify? ugly shit code fuck me
 @with_session
 def make_lang_list(languages, session=None):
-    primary = []
     if not isinstance(languages, list):
         languages = [languages]
     # TODO: find better way of enforcing uniqueness without catching exceptions or doing dumb shit like this
     languages = set([unicode(Language.fromietf(l)) for l in languages])
 
+    result = set()
     for language in languages:
-        l = get_lang(language, session=session)
-        if l and l not in primary:
-            primary.append(l)
-        else:
-            l = SubtitleLanguages(unicode(language))
-            primary.append(l)
-
-    return primary
+        lang = get_lang(language, session=session) or SubtitleLanguages(unicode(language))
+        result.add(lang)
+    return list(result)
 
 
 class QueueError(Exception):

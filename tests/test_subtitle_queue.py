@@ -34,7 +34,7 @@ class TestSubtitleQueue(FlexGetBase):
              accept_all: yes
              subtitle_queue:
                action: add
-               primary_path: '/'
+               path: '/'
              mock:
                - {title: 'Some Torrent', content_files: ['some movie.mkv']}
            subtitle_torrent:
@@ -42,7 +42,7 @@ class TestSubtitleQueue(FlexGetBase):
              accept_all: yes
              subtitle_queue:
                action: add
-               primary_path: '/'
+               path: '/'
                alternate_path: '~/'
              mock:
                - {title: 'Some Torrent', content_files: ['some movie.mkv', 'garbage.txt']}
