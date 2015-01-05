@@ -371,14 +371,13 @@ class ImdbLookup(object):
             search_result = search.smart_match(search_name)
             if search_result:
                 entry['imdb_url'] = search_result['url']
-                # store url for this movie, so we don't have to search on
-                # every run
+                # store url for this movie, so we don't have to search on every run
                 result = SearchResult(entry['title'], entry['imdb_url'])
                 session.add(result)
                 session.commit()
                 log.verbose('Found %s' % (entry['imdb_url']))
             else:
-                log_once('IMDB lookup failed for %s' % entry['title'], log, logging.WARN)
+                log_once('IMDB lookup failed for %s' % entry['title'], log, logging.WARN, session=session)
                 # store FAIL for this title
                 result = SearchResult(entry['title'])
                 result.fails = True
@@ -428,8 +427,7 @@ class ImdbLookup(object):
         for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'mpaa_rating']:
             log.trace('movie.%s: %s' % (att, getattr(movie, att)))
 
-        # store to cache and entry
-        session.commit()
+        # Update the entry fields
         entry.update_using_map(self.field_map, movie)
 
     def _parse_new_movie(self, imdb_url, session):

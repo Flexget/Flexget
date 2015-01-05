@@ -44,7 +44,7 @@ class FilterAllSeries(FilterSeriesBase):
         guess_entry = metainfo_series.instance.guess_entry
         guessed_series = {}
         for entry in task.entries:
-            if guess_entry(entry):
+            if guess_entry(entry, config=group_settings):
                 guessed_series.setdefault(normalize_series_name(entry['series_name']), entry['series_name'])
         # Combine settings and series into series plugin config format
         allseries = {'settings': {'all_series': group_settings}, 'all_series': guessed_series.values()}

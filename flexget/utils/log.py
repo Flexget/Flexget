@@ -4,6 +4,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import hashlib
 from datetime import datetime, timedelta
+from flexget.utils.database import with_session
 
 from sqlalchemy import Column, Integer, String, DateTime, Index
 from flexget import db_schema
@@ -43,7 +44,7 @@ class LogMessage(Base):
 
 
 @event('manager.db_cleanup')
-def purge(session):
+def purge(manager, session):
     """Purge old messages from database"""
     old = datetime.now() - timedelta(days=365)
 
@@ -52,7 +53,9 @@ def purge(session):
         log.verbose('Purged %s entries from log_once table.' % result)
 
 
-def log_once(message, logger=logging.getLogger('log_once'), once_level=logging.INFO, suppressed_level=f_logger.VERBOSE):
+@with_session
+def log_once(message, logger=logging.getLogger('log_once'), once_level=logging.INFO, suppressed_level=f_logger.VERBOSE,
+             session=None):
     """
     Log message only once using given logger`. Returns False if suppressed logging.
     When suppressed, `suppressed_level` level is still logged.
@@ -68,18 +71,13 @@ def log_once(message, logger=logging.getLogger('log_once'), once_level=logging.I
     digest.update(message.encode('latin1', 'replace')) # ticket:250
     md5sum = digest.hexdigest()
 
-    session = Session()
-    try:
-        # abort if this has already been logged
-        if session.query(LogMessage).filter_by(md5sum=md5sum).first():
-            logger.log(suppressed_level, message)
-            return False
+    # abort if this has already been logged
+    if session.query(LogMessage).filter_by(md5sum=md5sum).first():
+        logger.log(suppressed_level, message)
+        return False
 
-        row = LogMessage(md5sum)
-        session.add(row)
-        session.commit()
-    finally:
-        session.close()
+    row = LogMessage(md5sum)
+    session.add(row)
 
     logger.log(once_level, message)
     return True

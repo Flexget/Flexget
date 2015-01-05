@@ -8,7 +8,7 @@ can replace underlying mechanism in single point (and provide transparent switch
 """
 
 from __future__ import unicode_literals, division, absolute_import
-from collections import MutableMapping
+from collections import MutableMapping, defaultdict
 from datetime import datetime
 import logging
 import pickle
@@ -16,12 +16,16 @@ import pickle
 from sqlalchemy import Column, Integer, String, DateTime, PickleType, select, Index
 
 from flexget import db_schema
+from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.sqlalchemy_utils import table_schema, create_index
 
 log = logging.getLogger('util.simple_persistence')
 Base = db_schema.versioned_base('simple_persistence', 2)
+
+# Used to signify that a given key should be deleted from simple persistence on flush
+DELETE = object()
 
 
 @db_schema.upgrade('simple_persistence')
@@ -46,9 +50,15 @@ def upgrade(ver, session):
     return ver
 
 
-class SimpleKeyValue(Base):
-    """Declarative"""
+@event('manager.db_cleanup')
+def db_cleanup(manager, session):
+    """Clean up values in the db from tasks which no longer exist."""
+    # SKVs not associated with any task use None as task tame
+    existing_tasks = list(manager.tasks) + [None]
+    session.query(SimpleKeyValue).filter(~SimpleKeyValue.task.in_(existing_tasks)).delete()
 
+
+class SimpleKeyValue(Base):
     __tablename__ = 'simple_persistence'
 
     id = Column(Integer, primary_key=True)
@@ -72,52 +82,65 @@ Index('ix_simple_persistence_feed_plugin_key', SimpleKeyValue.task, SimpleKeyVal
 
 
 class SimplePersistence(MutableMapping):
+    """
+    Store simple values that need to be persisted between FlexGet runs. Interface is like a `dict`.
+
+    This should only be used if a plugin needs to store a few values, otherwise it should create a full table in
+    the database.
+    """
+    # Stores values in store[taskname][pluginname][key] format
+    class_store = defaultdict(lambda: defaultdict(dict))
 
     def __init__(self, plugin=None):
         self.taskname = None
         self.plugin = plugin
 
+    @property
+    def store(self):
+        return self.class_store[self.taskname][self.plugin]
+
     def __setitem__(self, key, value):
-        with Session() as session:
-            skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
-                filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
-            if skv:
-                # update existing
-                log.debug('updating key %s value %s' % (key, repr(value)))
-                skv.value = value
-            else:
-                # add new key
-                skv = SimpleKeyValue(self.taskname, self.plugin, key, value)
-                log.debug('adding key %s value %s' % (key, repr(value)))
-                session.add(skv)
+        log.debug('setting key %s value %s' % (key, repr(value)))
+        self.store[key] = value
 
     def __getitem__(self, key):
-        with Session() as session:
-            skv = session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
-                filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).first()
-            if not skv:
-                raise KeyError('%s is not contained in the simple_persistence table.' % key)
-            else:
-                return skv.value
+        if key not in self.store or self.store[key] == DELETE:
+            raise KeyError('%s is not contained in the simple_persistence table.' % key)
+        return self.store[key]
 
     def __delitem__(self, key):
-        with Session() as session:
-            session.query(SimpleKeyValue).filter(SimpleKeyValue.task == self.taskname).\
-                filter(SimpleKeyValue.plugin == self.plugin).filter(SimpleKeyValue.key == key).delete()
+        self.store[key] = DELETE
 
     def __iter__(self):
-        with Session() as session:
-            query = session.query(SimpleKeyValue.key).filter(SimpleKeyValue.task == self.taskname).\
-                filter(SimpleKeyValue.plugin == self.plugin).all()
-            if query:
-                return [item.key for item in query]
-            else:
-                return []
+        return iter(self.store)
 
     def __len__(self):
+        return len(self.store)
+
+    @classmethod
+    def load(cls, task=None):
+        """Load all key/values from `task` into memory from database."""
         with Session() as session:
-            return session.query(SimpleKeyValue.key).filter(SimpleKeyValue.task == self.taskname).\
-                filter(SimpleKeyValue.plugin == self.plugin).count()
+            for skv in session.query(SimpleKeyValue).filter(SimpleKeyValue.task == task).all():
+                cls.class_store[task][skv.plugin][skv.key] = skv.value
+
+    @classmethod
+    def flush(cls, task=None):
+        """Flush all in memory key/values to database."""
+        log.debug('Flushing simple persistence updates to db.')
+        with Session() as session:
+            for pluginname in cls.class_store[task]:
+                for key, value in cls.class_store[task][pluginname].iteritems():
+                    query = (session.query(SimpleKeyValue).
+                        filter(SimpleKeyValue.task == task).
+                        filter(SimpleKeyValue.plugin == pluginname).
+                        filter(SimpleKeyValue.key == key))
+                    if value == DELETE:
+                        query.delete()
+                    else:
+                        updated = query.update({'value': value}, synchronize_session=False)
+                        if not updated:
+                            session.add(SimpleKeyValue(task, pluginname, key, value))
 
 
 class SimpleTaskPersistence(SimplePersistence):
@@ -129,3 +152,29 @@ class SimpleTaskPersistence(SimplePersistence):
     @property
     def plugin(self):
         return self.task.current_plugin
+
+
+@event('manager.startup')
+def load_taskless(manager):
+    """Loads all key/value pairs into memory which aren't associated with a specific task."""
+    SimplePersistence.load()
+
+
+@event('manager.shutdown')
+def flush_taskless(manager):
+    SimplePersistence.flush()
+
+
+@event('task.execute.started')
+def load_task(task):
+    """Loads all key/value pairs into memory before a task starts."""
+    if not SimplePersistence.class_store[task.name]:
+        SimplePersistence.load(task.name)
+
+
+@event('task.execute.completed')
+def flush_task(task):
+    """Stores all in memory key/value pairs to database when a task has completed."""
+    SimplePersistence.flush(task.name)
+    # Also flush items not associated with any specific task
+    SimplePersistence.flush()

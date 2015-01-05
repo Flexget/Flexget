@@ -110,23 +110,21 @@ class TraktList(object):
         entries = []
         list_type = (config['type']).rstrip('s')
         for item in data:
-            if item['type'] not in field_maps:
-                log.debug('Unknown type %s' % item['type'])
-                continue
-            if item['type'] != list_type:
+            # Collection and watched lists don't return 'type' along with the items (right now)
+            if 'type' in item and item['type'] != list_type:
                 log.debug('Skipping %s because it is not a %s' % (item[item['type']]['title'], list_type))
                 continue
-            if not item[item['type']]['title']:
+            if not item[list_type]['title']:
                 # There seems to be some bad shows sometimes in lists with no titles. Skip them.
                 log.warning('Item in trakt list does not appear to have a title, skipping.')
                 continue
             entry = Entry()
-            if item['type'] == 'episode':
+            if list_type == 'episode':
                 entry['url'] = 'http://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
                     item['show']['ids']['slug'], item['episode']['season'], item['episode']['number'])
             else:
-                entry['url'] = 'http://trakt.tv/%s/%s' % (item['type'], item[item['type']]['ids'].get('slug'))
-            entry.update_using_map(field_maps[item['type']], item)
+                entry['url'] = 'http://trakt.tv/%s/%s' % (list_type, item[list_type]['ids'].get('slug'))
+            entry.update_using_map(field_maps[list_type], item)
             if entry.isvalid():
                 if config.get('strip_dates'):
                     # Remove year from end of name if present

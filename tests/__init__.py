@@ -194,7 +194,6 @@ class FlexGetBase(object):
                 for task_function in self.tasks_functions:
                     task_function(task_name, task_definition)
 
-
     def teardown(self):
         try:
             try:
