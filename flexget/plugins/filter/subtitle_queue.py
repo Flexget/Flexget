@@ -104,8 +104,7 @@ class SubtitleQueue(object):
 
     @with_session
     def complete(self, entry, session=None, **kwargs):
-        subtitles_missing = entry.get('subtitles_missing', set())
-        if len(subtitles_missing) == 0:
+        if 'subtitles_missing' in entry and entry['subtitles_missing']:
             item = session.query(QueuedSubtitle).filter(QueuedSubtitle.title == entry['title']).first()
             item.downloaded = True
             entry.accept()
@@ -158,7 +157,6 @@ class SubtitleQueue(object):
     def on_task_input(self, task, config):
         if isinstance(config, dict):
             return
-        log.error(dir(task))
         return self.emit(task, config)
 
     def on_task_output(self, task, config):
