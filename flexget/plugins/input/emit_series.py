@@ -78,35 +78,39 @@ class EmitSeries(object):
             return
         if isinstance(config, bool):
             config = {}
-        if not task.is_rerun:
-            self.try_next_season = {}
-        entries = []
-        for seriestask in task.session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
-            series = seriestask.series
-            if not series:
-                # TODO: How can this happen?
-                log.debug('Found SeriesTask item without series specified. Cleaning up.')
-                task.session.delete(seriestask)
-                continue
 
-            if series.identified_by not in ['ep', 'sequence']:
-                if not task.is_rerun:
+        if task.is_rerun:
+            # Just return calculated next eps on reruns
+            entries = self.rerun_entries
+            self.rerun_entries = []
+            return entries
+        else:
+            self.rerun_entries = []
+
+        entries = []
+        with Session() as session:
+            for seriestask in session.query(SeriesTask).filter(SeriesTask.name == task.name).all():
+                series = seriestask.series
+                if not series:
+                    # TODO: How can this happen?
+                    log.debug('Found SeriesTask item without series specified. Cleaning up.')
+                    session.delete(seriestask)
+                    continue
+
+                if series.identified_by not in ['ep', 'sequence']:
                     log.verbose('Can only emit ep or sequence based series. '
                                 '`%s` is identified_by %s' %
                                 (series.name, series.identified_by or 'auto'))
-                continue
+                    continue
 
-            low_season = 0 if series.identified_by == 'ep' else -1
+                low_season = 0 if series.identified_by == 'ep' else -1
 
-            latest_season = get_latest_release(series)
-            if latest_season:
-                latest_season = latest_season.season
-            else:
-                latest_season = low_season + 1
+                latest_season = get_latest_release(series)
+                if latest_season:
+                    latest_season = latest_season.season
+                else:
+                    latest_season = low_season + 1
 
-            if self.try_next_season.get(series.name):
-                entries.append(self.search_entry(series, latest_season + 1, 1, task))
-            else:
                 for season in xrange(latest_season, low_season, -1):
                     log.debug('Adding episodes for season %d' % season)
                     check_downloaded = not config.get('backfill')
@@ -115,7 +119,7 @@ class EmitSeries(object):
                         entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
                     elif latest:
                         start_at_ep = 1
-                        episodes_this_season = (task.session.query(Episode).
+                        episodes_this_season = (session.query(Episode).
                                                 filter(Episode.series_id == series.id).
                                                 filter(Episode.season == season))
                         if series.identified_by == 'sequence':
@@ -142,12 +146,11 @@ class EmitSeries(object):
                         if config.get('from_start') or config.get('backfill'):
                             entries.append(self.search_entry(series, season, 1, task))
                         else:
-                            if not task.is_rerun:
-                                log.verbose('Series `%s` has no history. Set begin option, '
-                                            'or use CLI `series begin` '
-                                            'subcommand to set first episode to emit' % series.name)
+                            log.verbose('Series `%s` has no history. Set begin option, '
+                                        'or use CLI `series begin` '
+                                        'subcommand to set first episode to emit' % series.name)
                             break
-
+                    # Skip older seasons if we are not in backfill mode
                     if not config.get('backfill'):
                         break
 
@@ -158,28 +161,26 @@ class EmitSeries(object):
         with Session() as session:
             series = session.query(Series).filter(Series.name == entry['series_name']).first()
             latest = get_latest_release(series)
-            episode = (session.query(Episode).join(Episode.series).
+            db_release = (session.query(Release).join(Release.episode).join(Episode.series).
                        filter(Series.name == entry['series_name']).
                        filter(Episode.season == entry['series_season']).
-                       filter(Episode.number == entry['series_episode']).
-                       first())
-            if entry.accepted or (episode and len(episode.releases) > 0):
-                self.try_next_season.pop(entry['series_name'], None)
+                       filter(Episode.number == entry['series_episode']).first())
+
+            if entry.accepted:
                 log.debug('%s %s was accepted, rerunning to look for next ep.' %
                           (entry['series_name'], entry['series_id']))
+                self.rerun_entries.append(self.search_entry(series, entry['series_season'], entry['series_episode'] + 1, task))
                 task.rerun()
-            elif latest and latest.season == entry['series_season']:
-                if identified_by != 'ep':
-                    # Do not try next season if this is not an 'ep' show
-                    return
-                if entry['series_name'] not in self.try_next_season:
-                    self.try_next_season[entry['series_name']] = True
-                    log.debug('%s %s not found, rerunning to look for next season' %
-                              (entry['series_name'], entry['series_id']))
-                    task.rerun()
-                else:
-                    # Don't try a second time
-                    self.try_next_season[entry['series_name']] = False
+            elif db_release:
+                # There are know releases of this episode, but none were accepted
+                return
+            elif latest and identified_by == 'ep' and (
+                            entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
+                # We searched for next predicted episode of this season unsuccessfully, try the next season
+                self.rerun_entries.append(self.search_entry(series, latest.season + 1, 1, task))
+                log.debug('%s %s not found, rerunning to look for next season' %
+                          (entry['series_name'], entry['series_id']))
+                task.rerun()
 
 
 @event('plugin.register')
