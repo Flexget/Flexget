@@ -412,12 +412,15 @@ def _load_plugins_from_dirs(dirs):
                       'point (before, after). Plugin is not working properly.' % (args[0], phase))
 
 
-def load_plugins(extra_dirs=[]):
+def load_plugins(extra_dirs=None):
     """
     Load plugins from the standard plugin paths.
     :param list extra_dirs: Extra directories from where plugins are loaded.
     """
     global plugins_loaded
+
+    if not extra_dirs:
+        extra_dirs = []
 
     # Add flexget.plugins directory (core plugins)
     extra_dirs.extend(_get_standard_plugins_path())
