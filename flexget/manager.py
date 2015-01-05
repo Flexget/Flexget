@@ -175,7 +175,7 @@ class Manager(object):
         if self.initialized:
             raise RuntimeError('Cannot call initialize on an already initialized manager.')
 
-        plugin.load_plugins()
+        plugin.load_plugins(extra_dirs=[os.path.join(self.config_base, 'plugins')])
 
         # Reparse CLI options now that plugins are loaded
         self.options = get_parser().parse_args(self.args)
@@ -526,6 +526,7 @@ class Manager(object):
         self.config_base = os.path.normpath(os.path.dirname(config))
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
+
 
     def load_config(self):
         """

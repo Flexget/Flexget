@@ -356,14 +356,10 @@ def _get_standard_plugins_path():
     :returns: List of directories where plugins should be tried to load from.
     """
     # Get basic path from environment
+    paths = []
     env_path = os.environ.get('FLEXGET_PLUGIN_PATH')
     if env_path:
-        # Get rid of trailing slashes, since Python can't handle them when
-        # it tries to import modules.
-        paths = map(_strip_trailing_sep, env_path.split(os.pathsep))
-    else:
-        # Use standard default
-        paths = [os.path.join(os.path.expanduser('~'), '.flexget', 'plugins')]
+        paths = env_path.split(os.pathsep)
 
     # Add flexget.plugins directory (core plugins)
     paths.append(os.path.abspath(os.path.dirname(plugins_pkg.__file__)))
@@ -416,13 +412,19 @@ def _load_plugins_from_dirs(dirs):
                       'point (before, after). Plugin is not working properly.' % (args[0], phase))
 
 
-def load_plugins():
-    """Load plugins from the standard plugin paths."""
+def load_plugins(extra_dirs=[]):
+    """
+    Load plugins from the standard plugin paths.
+    :param list extra_dirs: Extra directories from where plugins are loaded.
+    """
     global plugins_loaded
+
+    # Add flexget.plugins directory (core plugins)
+    extra_dirs.extend(_get_standard_plugins_path())
 
     start_time = time.time()
     # Import all the plugins
-    _load_plugins_from_dirs(_get_standard_plugins_path())
+    _load_plugins_from_dirs(extra_dirs)
     # Register them
     fire_event('plugin.register')
     # Plugins should only be registered once, remove their handlers after
