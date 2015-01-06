@@ -108,7 +108,7 @@ def setup_scheduler(manager):
         timezone = tzlocal.get_localzone()
         if timezone.zone == 'local':
             timezone = None
-    except pytz.UnknownTimeZoneError:
+    except:
         timezone = None
     if not timezone:
         # The default sqlalchemy jobstore does not work when there isn't a name for the local timezone.
