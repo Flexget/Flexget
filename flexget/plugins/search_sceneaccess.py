@@ -228,7 +228,7 @@ class SceneAccessSearch(object):
             return ret
 
     @plugin.internet(log)
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         """
             Search for entries on SceneAccess
         """

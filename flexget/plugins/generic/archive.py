@@ -231,7 +231,7 @@ class UrlrewriteArchive(object):
         {'type': 'array', 'items': {'type': 'string'}}
     ]}
 
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         """Search plugin API method"""
 
         session = Session()

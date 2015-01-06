@@ -77,7 +77,7 @@ class UrlRewritePirateBay(object):
             log.debug("Got the URL: %s" % entry['url'])
         if URL_SEARCH.match(entry['url']):
             # use search
-            results = self.search(entry)
+            results = self.search(task, entry)
             if not results:
                 raise UrlRewritingError("No search results found")
             # TODO: Close matching was taken out of search methods, this may need to be fixed to be more picky

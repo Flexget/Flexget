@@ -63,7 +63,7 @@ class SearchPublicHD(object):
     }
 
     @plugin.internet(log)
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         """
             Search for entries on PublicHD
         """

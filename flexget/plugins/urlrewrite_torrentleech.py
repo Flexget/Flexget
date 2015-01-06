@@ -83,14 +83,14 @@ class UrlRewriteTorrentleech(object):
             log.debug("Got the URL: %s" % entry['url'])
         if entry['url'].startswith('http://torrentleech.org/torrents/browse/index/query/'):
             # use search
-            results = self.search(entry)
+            results = self.search(task, entry)
             if not results:
                 raise UrlRewritingError("No search results found")
             # TODO: Search doesn't enforce close match to title, be more picky
             entry['url'] = results[0]['url']
 
     @plugin.internet(log)
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         """
         Search for name from torrentleech.
         """

@@ -138,7 +138,7 @@ class TorrentShackSearch(object):
 
 
     @plugin.internet(log)
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         config = self.prepare_config(config)
 
         if not session.cookies:
