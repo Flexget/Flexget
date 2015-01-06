@@ -55,7 +55,7 @@ def db_cleanup(manager, session):
     """Clean up values in the db from tasks which no longer exist."""
     # SKVs not associated with any task use None as task tame
     existing_tasks = list(manager.tasks) + [None]
-    session.query(SimpleKeyValue).filter(~SimpleKeyValue.task.in_(existing_tasks)).delete()
+    session.query(SimpleKeyValue).filter(~SimpleKeyValue.task.in_(existing_tasks)).delete(synchronize_session=False)
 
 
 class SimpleKeyValue(Base):
