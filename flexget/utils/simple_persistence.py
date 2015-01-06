@@ -127,7 +127,7 @@ class SimplePersistence(MutableMapping):
     @classmethod
     def flush(cls, task=None):
         """Flush all in memory key/values to database."""
-        log.debug('Flushing simple persistence updates to db.')
+        log.debug('Flushing simple persistence for task %s to db.' % task)
         with Session() as session:
             for pluginname in cls.class_store[task]:
                 for key, value in cls.class_store[task][pluginname].iteritems():
@@ -176,5 +176,6 @@ def load_task(task):
 def flush_task(task):
     """Stores all in memory key/value pairs to database when a task has completed."""
     SimplePersistence.flush(task.name)
-    # Also flush items not associated with any specific task
-    SimplePersistence.flush()
+    # In daemon mode, we don't want to wait until shutdown to flush taskless
+    if task.manager.is_daemon:
+        SimplePersistence.flush()
