@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from requests import RequestException
+
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
@@ -131,7 +133,11 @@ class OutputRapidPush(object):
                     'channel': channel})
                 data = {'apikey': apikey, 'command': 'broadcast', 'data': data_string}
 
-            response = task.requests.post(url, data=data, raise_status=False)
+            try:
+                response = task.requests.post(url, data=data, raise_status=False)
+            except RequestException as e:
+                log.error('Error sending data to rapidpush: %s' % e)
+                continue
 
             json_data = response.json()
             if 'code' in json_data:
