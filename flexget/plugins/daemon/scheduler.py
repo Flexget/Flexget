@@ -4,6 +4,7 @@ import logging
 
 import pytz
 import tzlocal
+import struct
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -108,7 +109,7 @@ def setup_scheduler(manager):
         timezone = tzlocal.get_localzone()
         if timezone.zone == 'local':
             timezone = None
-    except:
+    except (pytz.UnknownTimeZoneError, struct.error):
         timezone = None
     if not timezone:
         # The default sqlalchemy jobstore does not work when there isn't a name for the local timezone.
