@@ -1,3 +1,9 @@
+"""
+Utilities to use api v2 api.
+
+TODO: This should probably all be moved to api_trakt.py once that is converted to api v2
+"""
+
 from __future__ import absolute_import, division, unicode_literals
 
 from urlparse import urljoin
@@ -19,7 +25,7 @@ def make_list_slug(name):
     """Return the slug for use in url for given list name."""
     slug = name.lower()
     # These characters are just stripped in the url
-    for char in '!@#$%^*()[]{}/=?+\\|-_':
+    for char in '!@#$%^*()[]{}/=?+\\|-':
         slug = slug.replace(char, '')
     # These characters get replaced
     slug = slug.replace('&', 'and')
