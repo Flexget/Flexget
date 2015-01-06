@@ -97,6 +97,9 @@ class OutputFtp(object):
 
             ftp.close()
 
+    def on_task_output(self, task, config):
+        """Count this as an output plugin."""
+
     def ftp_walk(self, ftp, tmp_path, config, ftp_url, current_path):
         log.debug("DIR->" + ftp.pwd())
         log.debug("FTP tmp_path : " + tmp_path)
