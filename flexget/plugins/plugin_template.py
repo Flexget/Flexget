@@ -56,7 +56,7 @@ class PluginTemplate(object):
             config = [config]
         return config
 
-    @plugin.priority(256)
+    @plugin.priority(257)
     def on_task_start(self, task, config):
         if config is False:  # handles 'template: no' form to turn off template on this task
             return

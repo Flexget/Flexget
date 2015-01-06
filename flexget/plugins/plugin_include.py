@@ -24,7 +24,7 @@ class PluginInclude(object):
 
     schema = one_or_more({'type': 'string'})
 
-    @plugin.priority(254)
+    @plugin.priority(256)
     def on_task_start(self, task, config):
         if not config:
             return
