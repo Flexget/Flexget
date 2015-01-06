@@ -25,7 +25,7 @@ class OutputPushover(object):
         [priority: <PRIORITY>] (default = 0 -- normal = 0, high = 1, silent = -1)
         [url: <URL>] (default: "{{imdb_url}}" -- accepts Jinja2)
         [urltitle: <URL_TITLE>] (default: (none) -- accepts Jinja2)
-        [sound: <SOUND>] (default: pushover)
+        [sound: <SOUND>] (default: pushover default)
 
     Configuration parameters are also supported from entries (eg. through set).
     """
@@ -43,7 +43,7 @@ class OutputPushover(object):
             'priority': {'type': 'integer', 'default': 0},
             'url': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
             'urltitle': {'type': 'string', 'default': ''},
-            'sound': {'type': 'string', 'default': 'pushover'}
+            'sound': {'type': 'string', 'default': ''}
         },
         'required': ['userkey', 'apikey'],
         'additionalProperties': False
