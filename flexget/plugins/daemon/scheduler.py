@@ -111,7 +111,7 @@ def setup_scheduler(manager):
             timezone = None
     except pytz.UnknownTimeZoneError:
         timezone = None
-    (except struct.error as e):
+    except struct.error as e:
         # Hiding exception that may occur in tzfile.py seen in entware
         log.warning('Hiding exception from tzlocal: %s', e)
         timezone = None
