@@ -104,7 +104,7 @@ class SubtitleQueue(object):
 
     @with_session
     def complete(self, entry, session=None, **kwargs):
-        if 'subtitles_missing' in entry and entry['subtitles_missing']:
+        if 'subtitles_missing' in entry and not entry['subtitles_missing']:
             item = session.query(QueuedSubtitle).filter(QueuedSubtitle.title == entry['title']).first()
             item.downloaded = True
             entry.accept()
@@ -113,6 +113,7 @@ class SubtitleQueue(object):
         if not config:
             return
         entries = []
+        SUBTITLE_EXTENSIONS = ('.srt', '.sub', '.smi', '.txt', '.ssa', '.ass', '.mpl')  # Borrowed from Subliminal
         with Session() as session:
             for sub_item in queue_get(session=session):
                 entry = Entry()
@@ -133,17 +134,28 @@ class SubtitleQueue(object):
                     primary.add(Language.fromietf(language.language))
                 entry['subtitle_languages'] = primary
 
-                # use glob instead of subtitles_check to avoid depending on subliminal
-                path_no_ext = os.path.splitext(normalize_path(path))[0]
-                # can only check subtitles that have explicit language codes in the file name
-                if primary:
-                    for lang in primary:
-                        if not glob.glob(path_no_ext + "." + unicode(lang) + ".srt"):
-                            break
-                    else:
+                try:
+                    import subliminal
+                    video = subliminal.scan_video(normalize_path(path))
+                    if primary and not primary - video.subtitle_languages:
                         log.debug('All subtitles already fetched for %s.' % entry['title'])
                         sub_item.downloaded = True
                         continue
+                except ImportError:
+                    log.debug('Falling back to glob since Subliminal is not installed.')
+                    # use glob since subliminal is not there
+                    path_no_ext = os.path.splitext(normalize_path(path))[0]
+                    # can only check subtitles that have explicit language codes in the file name
+                    if primary:
+                        files = glob.glob(path_no_ext + "*")
+                        files = [item.lower() for item in files]
+                        for lang in primary:
+                            if not any('%s.%s' % (path_no_ext, lang) and f.endswith(SUBTITLE_EXTENSIONS) for f in files):
+                                break
+                        else:
+                            log.debug('All subtitles already fetched for %s.' % entry['title'])
+                            sub_item.downloaded = True
+                            continue
                 entry.on_complete(self.complete)
                 entries.append(entry)
                 log.debug('Emitting subtitle entry for %s.' % entry['title'])
