@@ -1,4 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import sys
+sys.path.append("/var/lib/flexget")
+import cfscrape
+
 import logging
 import re
 
@@ -60,7 +65,7 @@ class SearchCPASBIEN(object):
             ebook
         """
 
-        base_url = 'http://www.cpasbien.pe'
+        base_url = 'http://www.cpasbien.pw'
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             search_string = search_string.replace(' ', '-').lower()
@@ -78,8 +83,9 @@ class SearchCPASBIEN(object):
                 url = '/'.join(str_url)
             log.debug('search url: %s' % url + '.html')
 # GET URL
-            f = task.requests.get(url + '.html').content
-            soup = get_soup(f)
+            scraper = cfscrape.create_scraper()
+            f = scraper.get(url + '.html')
+            soup = get_soup(f.text)
             if soup.findAll(text=re.compile('0 torrents')):
                 log.debug('search returned no results')
             else:
@@ -88,8 +94,8 @@ class SearchCPASBIEN(object):
                     if (nextpage > 0):
                         newurl = url + '/page-' + str(nextpage)
                         log.debug('-----> NEXT PAGE : %s' % newurl)
-                        f1 = task.requests.get(newurl).content
-                        soup = get_soup(f1)
+                        f1 = scraper.get(newurl)
+                        soup = get_soup(f1.text)
                     for result in soup.findAll('div', attrs={'class': re.compile('ligne')}):
                         entry = Entry()
                         link = result.find('a', attrs={'href': re.compile('dl-torrent')})
