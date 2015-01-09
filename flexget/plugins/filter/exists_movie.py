@@ -11,6 +11,7 @@ from flexget.utils.tools import TimedDict
 
 log = logging.getLogger('exists_movie')
 
+
 class FilterExistsMovie(object):
     """
     Reject existing movies.
@@ -38,7 +39,7 @@ class FilterExistsMovie(object):
     }
 
     skip = ['cd1', 'cd2', 'subs', 'sample']
-    pattern = '\.(avi|mkv|mp4|mpg|webm)$'
+    pattern = re.compile('\.(avi|mkv|mp4|mpg|webm)$',re.IGNORECASE)
 
     def __init__(self):
         self.cache = TimedDict(cache_time='1 hour')
@@ -96,7 +97,7 @@ class FilterExistsMovie(object):
             # scan through
             for root, dirs, files in os.walk(folder):
                 for item in eval(config['type']):
-                    if config['type'] == 'files' and not re.search(self.pattern, item, re.IGNORECASE):
+                    if config['type'] == 'files' and not self.pattern.search(item):
                         continue
                     if config['type'] == 'dirs' and item.lower() in self.skip:
                         continue
