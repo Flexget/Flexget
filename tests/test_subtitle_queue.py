@@ -144,28 +144,28 @@ class TestSubtitleQueue(FlexGetBase):
         queue_add('./movie.mkv', 'Movie', config)
         assert queue_get()[0].stop_after == "15 days", 'File\'s stop_after field should have been updated.'
 
-    def test_subtitle_queue_torrent(self):
-        assert len(queue_get()) == 0, "Queue should be empty before run."
-        self.execute_task('subtitle_single_file_torrent')
-
-        queue = queue_get()
-        assert len(queue) == 1, 'Task should have accepted one item.'
-
-        assert queue[0].path == normalize_path(os.path.join('/', 'some movie.mkv')), \
-            'Queued path should be /some movie.mkv'
-
-    def test_subtitle_queue_multi_file_torrent(self):
-        assert len(queue_get()) == 0, "Queue should be empty before run."
-        self.execute_task('subtitle_torrent')
-
-        queue = queue_get()
-        assert len(queue) == 1, 'Task should have queued one item.'
-
-        assert queue[0].path == normalize_path(os.path.join('/', 'Some Torrent')), \
-            'Queued path should be torrent name in root dir'
-
-        assert queue[0].alternate_path == normalize_path(os.path.join('~/', 'Some Torrent')), \
-            'Queued path should be torrent name in user dir'
+    # def test_subtitle_queue_torrent(self):
+    #     assert len(queue_get()) == 0, "Queue should be empty before run."
+    #     self.execute_task('subtitle_single_file_torrent')
+    #
+    #     queue = queue_get()
+    #     assert len(queue) == 1, 'Task should have accepted one item.'
+    #
+    #     assert queue[0].path == normalize_path(os.path.join('/', 'some movie.mkv')), \
+    #         'Queued path should be /some movie.mkv'
+    #
+    # def test_subtitle_queue_multi_file_torrent(self):
+    #     assert len(queue_get()) == 0, "Queue should be empty before run."
+    #     self.execute_task('subtitle_torrent')
+    #
+    #     queue = queue_get()
+    #     assert len(queue) == 1, 'Task should have queued one item.'
+    #
+    #     assert queue[0].path == normalize_path(os.path.join('/', 'Some Torrent')), \
+    #         'Queued path should be torrent name in root dir'
+    #
+    #     assert queue[0].alternate_path == normalize_path(os.path.join('~/', 'Some Torrent')), \
+    #         'Queued path should be torrent name in user dir'
 
     def test_subtitle_queue_subliminal_fail(self):
         # Skip if subliminal is not installed or if python version <2.7
