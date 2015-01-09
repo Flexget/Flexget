@@ -40,7 +40,8 @@ class BaseEmitSeries(FlexGetBase):
                 identified_by: ep
             rerun: 0
           test_emit_series_from_start:
-            emit_series: yes
+            emit_series:
+              backfill: yes
             series:
             - Test Series 3:
                 from_start: yes
