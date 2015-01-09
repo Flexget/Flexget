@@ -29,6 +29,9 @@ log = logging.getLogger('subtitle_queue')
 Base = db_schema.versioned_base('subtitle_queue', 0)
 
 
+SUBTITLE_EXTENSIONS = ('.srt', '.sub', '.smi', '.txt', '.ssa', '.ass', '.mpl')  # Borrowed from Subliminal
+
+
 association_table = Table('association', Base.metadata,
                           Column('sub_queue_id', Integer, ForeignKey('subtitle_queue.id')),
                           Column('lang_id', Integer, ForeignKey('subtitle_language.id'))
@@ -49,7 +52,7 @@ class SubtitleLanguages(Base):
         self.language = unicode(Language.fromietf(language))
 
     def __str__(self):
-        return '<SubtitleLanguage(%s)>' % (self.language)
+        return '<SubtitleLanguage(%s)>' % self.language
 
 
 class QueuedSubtitle(Base):
@@ -113,14 +116,17 @@ class SubtitleQueue(object):
         if not config:
             return
         entries = []
-        SUBTITLE_EXTENSIONS = ('.srt', '.sub', '.smi', '.txt', '.ssa', '.ass', '.mpl')  # Borrowed from Subliminal
         with Session() as session:
             for sub_item in queue_get(session=session):
                 entry = Entry()
-                if os.path.exists(sub_item.path):
+                if not os.path.exists(sub_item.path):
                     path = sub_item.path
                 elif sub_item.alternate_path and os.path.exists(sub_item.alternate_path):
                     path = sub_item.alternate_path
+                elif sub_item.added + parse_timedelta('24 hours') > datetime.combine(date.today(), time()):
+                    log.info('File %s was not found. Deleting after %s.' %
+                             (sub_item.path, unicode(sub_item.added + parse_timedelta('24 hours'))))
+                    continue
                 else:
                     log.error('File not found. Removing "%s" from queue.' % sub_item.title)
                     session.delete(sub_item)
@@ -136,10 +142,15 @@ class SubtitleQueue(object):
 
                 try:
                     import subliminal
-                    video = subliminal.scan_video(normalize_path(path))
-                    if primary and not primary - video.subtitle_languages:
-                        log.debug('All subtitles already fetched for %s.' % entry['title'])
-                        sub_item.downloaded = True
+                    try:
+                        video = subliminal.scan_video(normalize_path(path))
+                        if primary and not primary - video.subtitle_languages:
+                            log.debug('All subtitles already fetched for %s.' % entry['title'])
+                            sub_item.downloaded = True
+                            continue
+                    except ValueError as e:
+                        log.error('Invalid video file: %s. Removing %s from queue.' % (e, entry['title']))
+                        session.delete(sub_item)
                         continue
                 except ImportError:
                     log.debug('Falling back to glob since Subliminal is not installed.')
@@ -150,7 +161,8 @@ class SubtitleQueue(object):
                         files = glob.glob(path_no_ext + "*")
                         files = [item.lower() for item in files]
                         for lang in primary:
-                            if not any('%s.%s' % (path_no_ext, lang) and f.endswith(SUBTITLE_EXTENSIONS) for f in files):
+                            if not any('%s.%s' % (path_no_ext, lang) and
+                                       f.endswith(SUBTITLE_EXTENSIONS) for f in files):
                                 break
                         else:
                             log.debug('All subtitles already fetched for %s.' % entry['title'])
@@ -190,7 +202,7 @@ class SubtitleQueue(object):
                             break
                     # or is it a torrent?
                     elif 'content_files' in entry:
-                        if not 'path' in config:
+                        if 'path' not in config:
                             log.error('No path set for non-local file. Don\'t know where to look.')
                             break
                         # try to render
