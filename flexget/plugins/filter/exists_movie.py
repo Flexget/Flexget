@@ -32,7 +32,7 @@ class FilterExistsMovie(object):
                     'path': one_or_more({'type': 'string', 'format': 'path'}),
                     'allow_different_qualities': {'enum': ['better', True, False], 'default': False},
                     'type': {'enum': ['files', 'dirs'], 'default': 'dirs'},
-                    'imdb_lookup': {'type': 'boolean', 'default': False}
+                    'lookup': {'enum': ['imdb', False], 'default': False}
                 },
                 'required': ['path'],
                 'additionalProperties': False
@@ -114,7 +114,7 @@ class FilterExistsMovie(object):
 
                 movie = get_plugin_by_name('parsing').instance.parse_movie(item)
 
-                if config.get('imdb_lookup'):
+                if config.get('lookup') == 'imdb':
                     try:
                         imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
                                                             raw_title=item,
@@ -130,7 +130,7 @@ class FilterExistsMovie(object):
                         incompatible_files += 1
                 else:
                     path_ids[movie.name] = movie.quality
-                    log.debug(movie.name)
+                    log.trace('adding: %s' % movie.name)
 
             # store to cache and extend to found list
             self.cache[folder] = path_ids
@@ -141,7 +141,7 @@ class FilterExistsMovie(object):
         # do actual filtering
         for entry in task.accepted:
             count_entries += 1
-            if config.get('imdb_lookup'):
+            if config.get('lookup') == 'imdb':
                 key = 'imdb_id'
                 if not entry.get('imdb_id', eval_lazy=False):
                     try:
