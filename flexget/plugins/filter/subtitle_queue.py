@@ -163,7 +163,7 @@ class SubtitleQueue(object):
 
                 for file in paths:
                     entry = Entry()
-                    if not file.endswith(VIDEO_EXTENSIONS):
+                    if not file.lower().endswith(VIDEO_EXTENSIONS):
                         continue
                     file = normalize_path(os.path.join(path_dir, file))
                     entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(file))
@@ -193,7 +193,7 @@ class SubtitleQueue(object):
                             files = [item.lower() for item in files]
                             for lang in primary:
                                 if not any('%s.%s' % (path_no_ext, lang) and
-                                           f.endswith(SUBTITLE_EXTENSIONS) for f in files):
+                                           f.lower().endswith(SUBTITLE_EXTENSIONS) for f in files):
                                     break
                             else:
                                 log.debug('All subtitles already fetched for %s.' % entry['title'])
@@ -232,7 +232,7 @@ class SubtitleQueue(object):
                             log.error('Could not render: %s. Please check your config.' % ex)
                             break
                     # or is it a torrent?
-                    elif 'content_files' in entry:
+                    elif 'torrent' in entry and 'content_files' in entry:
                         if 'path' not in config:
                             log.error('No path set for non-local file. Don\'t know where to look.')
                             break
@@ -264,10 +264,10 @@ class SubtitleQueue(object):
                                     alternate_path = os.path.join(alternate_path, title)
                         else:
                             # title of the torrent is usually the name of the folder
-                            title = entry['title']
+                            title = entry['torrent'].content['info']['name']
                             path = os.path.join(path, title)
                             if alternate_path:
-                                    alternate_path = os.path.join(alternate_path, title)
+                                alternate_path = os.path.join(alternate_path, title)
                         queue_add(path, title, config, alternate_path=alternate_path)
                     else:
                         # should this really happen though?
