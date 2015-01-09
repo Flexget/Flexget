@@ -486,6 +486,7 @@ class PluginTransmission(TransmissionBase):
                                 download_dir = cli.get_session().download_dir
                             else:
                                 download_dir = options['add']['download_dir']
+                                download_dir = download_dir.encode('utf-8')
 
                             # Get new filename without ext
                             file_ext = os.path.splitext(fl[r.id][main_id]['name'])[1]
