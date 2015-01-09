@@ -120,9 +120,6 @@ class PluginSubliminal(object):
                                                                       min_score=msc)
                         if subtitle:
                             downloaded_subtitles.update(subtitle)
-                            downloaded_languages = set([Language.fromietf(unicode(l.language))
-                                                        for l in subtitle[video]])
-                            entry['subtitles_missing'] = entry_langs - downloaded_languages
                             log.info('Subtitles found for %s' % entry['location'])
                         else:
                             # TODO check performance hit -- this explicit check may be better on slower devices
@@ -138,6 +135,9 @@ class PluginSubliminal(object):
                                 entry.fail('subtitles found for a second-choice language.')
                             else:
                                 entry.fail('cannot find any subtitles for now.')
+                        downloaded_languages = set([Language.fromietf(unicode(l.language))
+                                                    for l in subtitle[video]])
+                        entry['subtitles_missing'] = entry_langs - downloaded_languages
                 except Exception as err:
                     # don't want to abort the entire task for errors in a  
                     # single video file or for occasional network timeouts

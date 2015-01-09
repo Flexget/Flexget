@@ -29,6 +29,16 @@ log = logging.getLogger('subtitle_queue')
 Base = db_schema.versioned_base('subtitle_queue', 0)
 
 
+#: Video extensions stolen from https://github.com/Diaoul/subliminal/blob/master/subliminal/video.py
+VIDEO_EXTENSIONS = ('.3g2', '.3gp', '.3gp2', '.3gpp', '.60d', '.ajp', '.asf', '.asx', '.avchd', '.avi', '.bik',
+                    '.bix', '.box', '.cam', '.dat', '.divx', '.dmf', '.dv', '.dvr-ms', '.evo', '.flc', '.fli',
+                    '.flic', '.flv', '.flx', '.gvi', '.gvp', '.h264', '.m1v', '.m2p', '.m2ts', '.m2v', '.m4e',
+                    '.m4v', '.mjp', '.mjpeg', '.mjpg', '.mkv', '.moov', '.mov', '.movhd', '.movie', '.movx', '.mp4',
+                    '.mpe', '.mpeg', '.mpg', '.mpv', '.mpv2', '.mxf', '.nsv', '.nut', '.ogg', '.ogm', '.omf', '.ps',
+                    '.qt', '.ram', '.rm', '.rmvb', '.swf', '.ts', '.vfw', '.vid', '.video', '.viv', '.vivo', '.vob',
+                    '.vro', '.wm', '.wmv', '.wmx', '.wrap', '.wvx', '.wx', '.x264', '.xvid')
+
+
 SUBTITLE_EXTENSIONS = ('.srt', '.sub', '.smi', '.txt', '.ssa', '.ass', '.mpl')  # Borrowed from Subliminal
 
 
@@ -36,7 +46,6 @@ association_table = Table('association', Base.metadata,
                           Column('sub_queue_id', Integer, ForeignKey('subtitle_queue.id')),
                           Column('lang_id', Integer, ForeignKey('subtitle_language.id'))
                           )
-
 
 def normalize_path(path):
     return os.path.normcase(os.path.abspath(path))
@@ -105,12 +114,23 @@ class SubtitleQueue(object):
         ]
     }
 
-    @with_session
-    def complete(self, entry, session=None, **kwargs):
-        if 'subtitles_missing' in entry and not entry['subtitles_missing']:
-            item = session.query(QueuedSubtitle).filter(QueuedSubtitle.title == entry['title']).first()
-            item.downloaded = True
-            entry.accept()
+    failed_paths = {}
+
+    def on_task_start(self, task, config):
+        self.failed_paths = {}
+
+    def complete(self, entry, task=None, path=None, **kwargs):
+        with Session() as session:
+            item = session.query(QueuedSubtitle).filter(or_(QueuedSubtitle.path == path,
+                                                            QueuedSubtitle.alternate_path == path)).first()
+            if 'subtitles_missing' in entry and not entry['subtitles_missing']:
+                entry.accept()
+                if not self.failed_paths.get(path):
+                    item.downloaded = True
+            elif 'subtitles_missing' in entry:
+                self.failed_paths[path] = True
+                item.downloaded = False
+                entry.fail()
 
     def emit(self, task, config):
         if not config:
@@ -118,7 +138,6 @@ class SubtitleQueue(object):
         entries = []
         with Session() as session:
             for sub_item in queue_get(session=session):
-                entry = Entry()
                 if os.path.exists(sub_item.path):
                     path = sub_item.path
                 elif sub_item.alternate_path and os.path.exists(sub_item.alternate_path):
@@ -131,46 +150,58 @@ class SubtitleQueue(object):
                     log.error('File not found. Removing "%s" from queue.' % sub_item.title)
                     session.delete(sub_item)
                     continue
-                entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(path))
-                entry['location'] = path
-                entry['title'] = sub_item.title
+                if os.path.isdir(path):
+                    paths = os.listdir(path)
+                    path_dir = path
+                else:
+                    paths = [path]
+                    path_dir = os.path.dirname(path)
 
                 primary = set()
                 for language in sub_item.languages:
                     primary.add(Language.fromietf(language.language))
-                entry['subtitle_languages'] = primary
 
-                try:
-                    import subliminal
-                    try:
-                        video = subliminal.scan_video(normalize_path(path))
-                        if primary and not primary - video.subtitle_languages:
-                            log.debug('All subtitles already fetched for %s.' % entry['title'])
-                            sub_item.downloaded = True
-                            continue
-                    except ValueError as e:
-                        log.error('Invalid video file: %s. Removing %s from queue.' % (e, entry['title']))
-                        session.delete(sub_item)
+                for file in paths:
+                    entry = Entry()
+                    if not file.endswith(VIDEO_EXTENSIONS):
                         continue
-                except ImportError:
-                    log.debug('Falling back to glob since Subliminal is not installed.')
-                    # use glob since subliminal is not there
-                    path_no_ext = os.path.splitext(normalize_path(path))[0]
-                    # can only check subtitles that have explicit language codes in the file name
-                    if primary:
-                        files = glob.glob(path_no_ext + "*")
-                        files = [item.lower() for item in files]
-                        for lang in primary:
-                            if not any('%s.%s' % (path_no_ext, lang) and
-                                       f.endswith(SUBTITLE_EXTENSIONS) for f in files):
-                                break
-                        else:
-                            log.debug('All subtitles already fetched for %s.' % entry['title'])
-                            sub_item.downloaded = True
+                    file = normalize_path(os.path.join(path_dir, file))
+                    entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(file))
+                    entry['location'] = file
+                    entry['title'] = os.path.splitext(os.path.basename(file))[0]  # filename without ext
+                    entry['subtitle_languages'] = primary
+
+                    try:
+                        import subliminal
+                        try:
+                            video = subliminal.scan_video(normalize_path(file))
+                            if primary and not primary - video.subtitle_languages:
+                                log.debug('All subtitles already fetched for %s.' % entry['title'])
+                                sub_item.downloaded = True
+                                continue
+                        except ValueError as e:
+                            log.error('Invalid video file: %s. Removing %s from queue.' % (e, entry['title']))
+                            session.delete(sub_item)
                             continue
-                entry.on_complete(self.complete)
-                entries.append(entry)
-                log.debug('Emitting subtitle entry for %s.' % entry['title'])
+                    except ImportError:
+                        log.debug('Falling back to glob since Subliminal is not installed.')
+                        # use glob since subliminal is not there
+                        path_no_ext = os.path.splitext(normalize_path(file))[0]
+                        # can only check subtitles that have explicit language codes in the file name
+                        if primary:
+                            files = glob.glob(path_no_ext + "*")
+                            files = [item.lower() for item in files]
+                            for lang in primary:
+                                if not any('%s.%s' % (path_no_ext, lang) and
+                                           f.endswith(SUBTITLE_EXTENSIONS) for f in files):
+                                    break
+                            else:
+                                log.debug('All subtitles already fetched for %s.' % entry['title'])
+                                sub_item.downloaded = True
+                                continue
+                    entry.on_complete(self.complete, path=path, task=task)
+                    entries.append(entry)
+                    log.info('Emitting subtitle entry for %s.' % entry['title'])
         return entries
 
     def on_task_filter(self, task, config):
