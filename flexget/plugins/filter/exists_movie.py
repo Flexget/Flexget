@@ -1,8 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
+import re
 import logging
-
-from path import path
 
 from flexget import plugin
 from flexget.event import event
@@ -12,9 +11,7 @@ from flexget.utils.tools import TimedDict
 
 log = logging.getLogger('exists_movie')
 
-
 class FilterExistsMovie(object):
-
     """
     Reject existing movies.
 
@@ -23,17 +20,40 @@ class FilterExistsMovie(object):
       exists_movie: /storage/movies/
     """
 
-    schema = one_or_more({'type': 'string', 'format': 'path'})
+    schema = {
+        'anyOf': [
+            one_or_more({'type': 'string', 'format': 'path'}),
+            {
+                'type': 'object',
+                'properties': {
+                    'path': one_or_more({'type': 'string', 'format': 'path'}),
+                    'allow_different_qualities': {'enum': ['better', True, False], 'default': False},
+                    'type': {'enum': ['files', 'dirs'], 'default': 'dirs'},
+                    'imdb_lookup': {'type': 'boolean', 'default': False}
+                },
+                'required': ['path'],
+                'additionalProperties': False
+            }
+        ]
+    }
 
     skip = ['cd1', 'cd2', 'subs', 'sample']
+    pattern = '\.(avi|mkv|mp4|mpg|webm)$'
 
     def __init__(self):
         self.cache = TimedDict(cache_time='1 hour')
 
-    def build_config(self, config):
+    def prepare_config(self, config):
+        # if config is not a dict, assign value to 'path' key
+        if not isinstance(config, dict):
+            config = { 'path': config }
+
+        if not config.get('type'):
+            config['type'] = 'dirs'
+
         # if only a single path is passed turn it into a 1 element list
-        if isinstance(config, basestring):
-            config = [config]
+        if isinstance(config['path'], basestring):
+            config['path'] = [config['path']]
         return config
 
     @plugin.priority(-1)
@@ -42,28 +62,28 @@ class FilterExistsMovie(object):
             log.debug('nothing accepted, aborting')
             return
 
-        config = self.build_config(config)
+        config = self.prepare_config(config)
         imdb_lookup = plugin.get_plugin_by_name('imdb_lookup').instance
 
-        incompatible_dirs = 0
+        incompatible_files = 0
         incompatible_entries = 0
         count_entries = 0
-        count_dirs = 0
+        count_files = 0
 
         # list of imdb ids gathered from paths / cache
-        imdb_ids = []
+        qualities = {}
 
-        for folder in config:
-            folder = path(folder).expanduser()
+        for folder in config['path']:
+            folder = os.path.expanduser(folder)
             # see if this path has already been scanned
             if folder in self.cache:
                 log.verbose('Using cached scan for %s ...' % folder)
-                imdb_ids.extend(self.cache[folder])
+                qualities.update(self.cache[folder])
                 continue
 
-            path_ids = []
+            path_ids = {}
 
-            if not folder.isdir():
+            if not os.path.isdir(folder):
                 log.critical('Path %s does not exist' % folder)
                 continue
 
@@ -74,54 +94,76 @@ class FilterExistsMovie(object):
             #logging.getLogger('imdb_lookup').setLevel(logging.WARNING)
 
             # scan through
-
-            # TODO: add also video files?
-            for item in folder.walkdirs(errors='ignore'):
-                if item.name.lower() in self.skip:
-                    continue
-                count_dirs += 1
-
-                movie = get_plugin_by_name('parsing').instance.parse_movie(item)
-
-                try:
-                    imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
-                                                         raw_title=item.name,
-                                                         session=task.session)
-                    if imdb_id in path_ids:
-                        log.trace('duplicate %s' % item)
+            for root, dirs, files in os.walk(folder):
+                for item in eval(config['type']):
+                    if config['type'] == 'files' and not re.search(self.pattern, item, re.IGNORECASE):
                         continue
-                    if imdb_id is not None:
-                        log.trace('adding: %s' % imdb_id)
-                        path_ids.append(imdb_id)
-                except plugin.PluginError as e:
-                    log.trace('%s lookup failed (%s)' % (item, e.value))
-                    incompatible_dirs += 1
+                    if config['type'] == 'dirs' and item.lower() in self.skip:
+                        continue
+                    count_files += 1
+
+                    movie = get_plugin_by_name('parsing').instance.parse_movie(item)
+
+                    if config.get('imdb_lookup'):
+                        try:
+                            imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
+                                                                raw_title=item,
+                                                                session=task.session)
+                            if imdb_id in path_ids:
+                                log.trace('duplicate %s' % item)
+                                continue
+                            if imdb_id is not None:
+                                log.trace('adding: %s' % imdb_id)
+                                path_ids[imdb_id] = movie.quality
+                        except plugin.PluginError as e:
+                            log.trace('%s lookup failed (%s)' % (item, e.value))
+                            incompatible_files += 1
+                    else:
+                        path_ids[movie.name] = movie.quality
+                        log.debug(movie.name)
 
             # store to cache and extend to found list
             self.cache[folder] = path_ids
-            imdb_ids.extend(path_ids)
+            qualities.update(path_ids)
 
         log.debug('-- Start filtering entries ----------------------------------')
 
         # do actual filtering
         for entry in task.accepted:
             count_entries += 1
-            if not entry.get('imdb_id', eval_lazy=False):
-                try:
-                    imdb_lookup.lookup(entry)
-                except plugin.PluginError as e:
-                    log.trace('entry %s imdb failed (%s)' % (entry['title'], e.value))
-                    incompatible_entries += 1
-                    continue
+            if config.get('imdb_lookup'):
+                key = 'imdb_id'
+                if not entry.get('imdb_id', eval_lazy=False):
+                    try:
+                        imdb_lookup.lookup(entry)
+                    except plugin.PluginError as e:
+                        log.trace('entry %s imdb failed (%s)' % (entry['title'], e.value))
+                        incompatible_entries += 1
+                        continue
+            else:
+                key = 'movie_name'
+                if not entry.get('movie_name', eval_lazy=False):
+                    movie = get_plugin_by_name('parsing').instance.parse_movie(entry['title'])
+                    entry['movie_name'] = movie.name
+
 
             # actual filtering
-            if entry['imdb_id'] in imdb_ids:
+            if entry[key] in qualities:
+                if config.get('allow_different_qualities') == 'better':
+                    if entry['quality'] > qualities[entry[key]]:
+                        log.trace('better quality')
+                        continue
+                elif config.get('allow_different_qualities'):
+                    if entry['quality'] != qualities[entry[key]]:
+                        log.trace('wrong quality')
+                        continue
+
                 entry.reject('movie exists')
 
-        if incompatible_dirs or incompatible_entries:
+        if incompatible_files or incompatible_entries:
             log.verbose('There were some incompatible items. %s of %s entries '
                         'and %s of %s directories could not be verified.' %
-                (incompatible_entries, count_entries, incompatible_dirs, count_dirs))
+                (incompatible_entries, count_entries, incompatible_files, count_dirs))
 
         log.debug('-- Finished filtering entries -------------------------------')
 
