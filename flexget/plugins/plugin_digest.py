@@ -10,6 +10,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.database import safe_pickle_synonym
+from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('digest')
 Base = versioned_base('digest', 0)
@@ -39,8 +40,13 @@ class EmitDigest(object):
         'type': 'object',
         'properties': {
             'list': {'type': 'string'},
-            'max_entries': {'type': 'integer', 'default': -1},
-            'expire_time': {'type': 'string', 'format': 'interval', 'default': '0 minutes'}
+            'limit': {'type': 'integer', 'default': -1},
+            'expire': {
+                'oneOf': [
+                    {'type': 'string', 'format': 'interval'},
+                    {'type': 'boolean'}],
+                'default': True
+            }
         },
         'required': ['list'],
         'additionalProperties': False
@@ -49,9 +55,20 @@ class EmitDigest(object):
     def on_task_input(self, task, config):
         entries = []
         with Session() as session:
-            # TODO: order by date added, limit number, expire
-            for digest_entry in session.query(DigestEntry).filter(DigestEntry.list == config['list']).all():
+            digest_entries = (session.query(DigestEntry).
+                              filter(DigestEntry.list == config['list']).
+                              order_by(DigestEntry.added.desc()))
+            if isinstance(config['expire'], basestring):
+                expire_time = parse_timedelta(config['expire'])
+                digest_entries.filter(DigestEntry.added < datetime.now() - expire_time).delete()
+            if config['limit'] > 0:
+                # TODO: This doesn't work, figure good way to clear extra
+                #digest_entries.offset(config['limit']).delete()
+                pass
+            for digest_entry in digest_entries.all():
                 entries.append(Entry(digest_entry.entry))
+                if config['expire'] is True:
+                    session.delete(digest_entry)
         return entries
 
 
