@@ -3,6 +3,8 @@ import os
 import re
 import logging
 
+from path import path
+
 from flexget import plugin
 from flexget.event import event
 from flexget.config_schema import one_or_more
@@ -75,7 +77,7 @@ class FilterExistsMovie(object):
         qualities = {}
 
         for folder in config['path']:
-            folder = os.path.expanduser(folder)
+            folder = path(folder).expanduser()
             # see if this path has already been scanned
             if folder in self.cache:
                 log.verbose('Using cached scan for %s ...' % folder)
@@ -84,7 +86,7 @@ class FilterExistsMovie(object):
 
             path_ids = {}
 
-            if not os.path.isdir(folder):
+            if not folder.isdir():
                 log.critical('Path %s does not exist' % folder)
                 continue
 
@@ -95,33 +97,40 @@ class FilterExistsMovie(object):
             #logging.getLogger('imdb_lookup').setLevel(logging.WARNING)
 
             # scan through
-            for root, dirs, files in os.walk(folder):
-                for item in eval(config['type']):
-                    if config['type'] == 'files' and not self.pattern.search(item):
+            items = []
+            if config.get('type') == 'dirs':
+                for d in folder.walkdirs(errors='ignore'):
+                    if d.name.lower() in self.skip:
                         continue
-                    if config['type'] == 'dirs' and item.lower() in self.skip:
+                    items.append(d.name)
+            elif config.get('type') == 'files':
+                for f in folder.walkfiles(errors='ignore'):
+                    if not self.pattern.search(f.name):
                         continue
-                    count_files += 1
+                    items.append(f.name)
 
-                    movie = get_plugin_by_name('parsing').instance.parse_movie(item)
+            for item in items:
+                count_files += 1
 
-                    if config.get('imdb_lookup'):
-                        try:
-                            imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
-                                                                raw_title=item,
-                                                                session=task.session)
-                            if imdb_id in path_ids:
-                                log.trace('duplicate %s' % item)
-                                continue
-                            if imdb_id is not None:
-                                log.trace('adding: %s' % imdb_id)
-                                path_ids[imdb_id] = movie.quality
-                        except plugin.PluginError as e:
-                            log.trace('%s lookup failed (%s)' % (item, e.value))
-                            incompatible_files += 1
-                    else:
-                        path_ids[movie.name] = movie.quality
-                        log.debug(movie.name)
+                movie = get_plugin_by_name('parsing').instance.parse_movie(item)
+
+                if config.get('imdb_lookup'):
+                    try:
+                        imdb_id = imdb_lookup.imdb_id_lookup(movie_title=movie.name,
+                                                            raw_title=item,
+                                                            session=task.session)
+                        if imdb_id in path_ids:
+                            log.trace('duplicate %s' % item)
+                            continue
+                        if imdb_id is not None:
+                            log.trace('adding: %s' % imdb_id)
+                            path_ids[imdb_id] = movie.quality
+                    except plugin.PluginError as e:
+                        log.trace('%s lookup failed (%s)' % (item, e.value))
+                        incompatible_files += 1
+                else:
+                    path_ids[movie.name] = movie.quality
+                    log.debug(movie.name)
 
             # store to cache and extend to found list
             self.cache[folder] = path_ids
