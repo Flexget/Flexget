@@ -40,8 +40,8 @@ class FilterExistsMovie(object):
         ]
     }
 
-    skip = ['cd1', 'cd2', 'subs', 'sample']
-    pattern = re.compile('\.(avi|mkv|mp4|mpg|webm)$',re.IGNORECASE)
+    dir_pattern = re.compile('\b(cd.\d|subs?|samples?)\b',re.IGNORECASE)
+    file_pattern = re.compile('\.(avi|mkv|mp4|mpg|webm)$',re.IGNORECASE)
 
     def __init__(self):
         self.cache = TimedDict(cache_time='1 hour')
@@ -100,12 +100,12 @@ class FilterExistsMovie(object):
             items = []
             if config.get('type') == 'dirs':
                 for d in folder.walkdirs(errors='ignore'):
-                    if d.name.lower() in self.skip:
+                    if self.dir_pattern.search(d.name):
                         continue
                     items.append(d.name)
             elif config.get('type') == 'files':
                 for f in folder.walkfiles(errors='ignore'):
-                    if not self.pattern.search(f.name):
+                    if not self.file_pattern.search(f.name):
                         continue
                     items.append(f.name)
 
