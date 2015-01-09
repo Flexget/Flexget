@@ -119,7 +119,7 @@ class SubtitleQueue(object):
         with Session() as session:
             for sub_item in queue_get(session=session):
                 entry = Entry()
-                if not os.path.exists(sub_item.path):
+                if os.path.exists(sub_item.path):
                     path = sub_item.path
                 elif sub_item.alternate_path and os.path.exists(sub_item.alternate_path):
                     path = sub_item.alternate_path
