@@ -117,7 +117,7 @@ class EmitSeries(object):
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
                     if series.begin and (not latest or latest < series.begin):
                         entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
-                    elif not config.get('backfill'):
+                    elif latest and not config.get('backfill'):
                         entries.append(self.search_entry(series, latest.season, latest.number + 1, task))
                     elif latest:
                         start_at_ep = 1
