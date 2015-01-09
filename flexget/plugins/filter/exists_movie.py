@@ -18,9 +18,13 @@ class FilterExistsMovie(object):
     """
     Reject existing movies.
 
-    Example::
+    Syntax:
 
-      exists_movie: /storage/movies/
+      exists_movie:
+        path: /path/to/movies
+        [type: {dirs|files}]
+        [allow_different_qualities: {better|yes|no}]
+        [lookup: {imdb|no}]
     """
 
     schema = {
