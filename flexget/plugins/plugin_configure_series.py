@@ -8,6 +8,7 @@ from flexget import db_schema, plugin
 from flexget.config_schema import process_config
 from flexget.event import event
 from flexget.manager import Session
+from flexget.plugin import PluginError
 from flexget.plugins.filter.series import FilterSeriesBase
 
 log = logging.getLogger('configure_series')
@@ -64,7 +65,11 @@ class ConfigureSeries(FilterSeriesBase):
                 raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
 
             method = input.phase_handlers['input']
-            result = method(task, input_config)
+            try:
+                result = method(task, input_config)
+            except PluginError as e:
+                log.warning('Error during input plugin %s: %s' % (input_name, e))
+                continue
             if not result:
                 log.warning('Input %s did not return anything' % input_name)
                 continue
