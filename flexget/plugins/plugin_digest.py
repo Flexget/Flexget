@@ -55,18 +55,18 @@ class EmitDigest(object):
     def on_task_input(self, task, config):
         entries = []
         with Session() as session:
-            digest_entries = (session.query(DigestEntry).
-                              filter(DigestEntry.list == config['list']).
-                              order_by(DigestEntry.added.desc()))
+            digest_entries = session.query(DigestEntry).filter(DigestEntry.list == config['list'])
+            # Remove any entries older than the expire time, if defined.
             if isinstance(config['expire'], basestring):
                 expire_time = parse_timedelta(config['expire'])
                 digest_entries.filter(DigestEntry.added < datetime.now() - expire_time).delete()
-            if config['limit'] > 0:
-                # TODO: This doesn't work, figure good way to clear extra
-                #digest_entries.offset(config['limit']).delete()
-                pass
-            for digest_entry in digest_entries.all():
+            for index, digest_entry in enumerate(digest_entries.order_by(DigestEntry.added.desc()).all()):
+                # Just remove any entries past the limit, if set.
+                if 0 < config['limit'] <= index:
+                    session.delete(digest_entry)
+                    continue
                 entries.append(Entry(digest_entry.entry))
+                # If expire is 'True', we remove it after it is output once.
                 if config['expire'] is True:
                     session.delete(digest_entry)
         return entries
