@@ -435,7 +435,7 @@ class PluginTransmission(TransmissionBase):
                 # We need to index the files if any of the following are defined
                 if ('main_file_only' in options['post'] and options['post']['main_file_only'] == True or 
                    'content_filename' in options['post'] or skip_files):
-                        fl = cli.get_files(r.id)
+                        fl = cli.get_files(r.id).encode('utf-8')
                 
                         # Find files based on config
                         dl_list = []
@@ -486,7 +486,6 @@ class PluginTransmission(TransmissionBase):
                                 download_dir = cli.get_session().download_dir
                             else:
                                 download_dir = options['add']['download_dir']
-                                download_dir = download_dir.encode('utf-8')
 
                             # Get new filename without ext
                             file_ext = os.path.splitext(fl[r.id][main_id]['name'])[1]
