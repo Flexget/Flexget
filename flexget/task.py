@@ -57,25 +57,14 @@ def use_task_logging(func):
 
     @wraps(func)
     def wrapper(self, *args, **kw):
-        # Set the task name in the logger
+        # Set the task name in the logger and capture output
         from flexget import logger
-        old_loglevel = logging.getLogger().getEffectiveLevel()
-        new_loglevel = logging.getLevelName(self.options.loglevel.upper())
-        if old_loglevel != new_loglevel:
-            log.verbose('Setting loglevel to `%s` for this execution.' % self.options.loglevel)
-            logging.getLogger().setLevel(new_loglevel)
-
         with logger.task_logging(self.name):
-            try:
-                if self.output:
-                    with capture_output(self.output, loglevel=new_loglevel):
-                        return func(self, *args, **kw)
-                else:
+            if self.output:
+                with capture_output(self.output, loglevel=self.loglevel):
                     return func(self, *args, **kw)
-            finally:
-                if old_loglevel != new_loglevel:
-                    log.verbose('Returning loglevel to `%s` after task execution.' % logging.getLevelName(old_loglevel))
-                    logging.getLogger().setLevel(old_loglevel)
+            else:
+                return func(self, *args, **kw)
 
     return wrapper
 
@@ -191,13 +180,14 @@ class Task(object):
     # Used to determine task order, when priority is the same
     _counter = itertools.count()
 
-    def __init__(self, manager, name, config=None, options=None, output=None, priority=None):
+    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
         :param dict config: Task configuration.
         :param options: dict or argparse namespace with options for this task
         :param output: A filelike that all logs and stdout will be sent to for this task.
+        :param loglevel: Custom loglevel, only log messages at this level will be sent to `output`
         :param priority: If multiple tasks are waiting to run, the task with the lowest priority will be run first.
             The default is 0, if the cron option is set though, the default is lowered to 10.
 
@@ -216,6 +206,7 @@ class Task(object):
             options = options_namespace
         self.options = options
         self.output = output
+        self.loglevel = loglevel
         if priority is None:
             self.priority = 10 if self.options.cron else 0
         else:

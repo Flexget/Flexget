@@ -175,16 +175,16 @@ class ScopedNamespace(Namespace):
         return new
 
 
-class ScopedSubparserAction(_SubParsersAction):
+class NestedSubparserAction(_SubParsersAction):
     def __init__(self, *args, **kwargs):
         self.nested_namespaces = kwargs.pop('nested_namespaces', False)
         self.parent_defaults = {}
-        super(ScopedSubparserAction, self).__init__(*args, **kwargs)
+        super(NestedSubparserAction, self).__init__(*args, **kwargs)
 
     def add_parser(self, name, parent_defaults=None, **kwargs):
         if parent_defaults:
             self.parent_defaults[name] = parent_defaults
-        return super(ScopedSubparserAction, self).add_parser(name, **kwargs)
+        return super(NestedSubparserAction, self).add_parser(name, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
         parser_name = values[0]
@@ -192,14 +192,14 @@ class ScopedSubparserAction(_SubParsersAction):
             parser.set_post_defaults(**self.parent_defaults[parser_name])
         if self.nested_namespaces:
             subnamespace = ScopedNamespace()
-            super(ScopedSubparserAction, self).__call__(parser, subnamespace, values, option_string)
+            super(NestedSubparserAction, self).__call__(parser, subnamespace, values, option_string)
             # If dest is set, it should be set on the parent namespace, not subnamespace
             if self.dest is not SUPPRESS:
                 setattr(namespace, self.dest, parser_name)
                 delattr(subnamespace, self.dest)
             setattr(namespace, parser_name, subnamespace)
         else:
-            super(ScopedSubparserAction, self).__call__(parser, namespace, values, option_string)
+            super(NestedSubparserAction, self).__call__(parser, namespace, values, option_string)
 
 
 class ParserError(Exception):
@@ -250,7 +250,7 @@ class ArgumentParser(ArgParser):
         self.post_defaults = {}
         ArgParser.__init__(self, **kwargs)
         # Overwrite _SubparserAction with our custom one
-        self.register('action', 'parsers', ScopedSubparserAction)
+        self.register('action', 'parsers', NestedSubparserAction)
 
     def add_argument(self, *args, **kwargs):
         if isinstance(kwargs.get('nargs'), basestring) and '-' in kwargs['nargs']:
@@ -321,6 +321,14 @@ class ArgumentParser(ArgParser):
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
         kwargs.setdefault('parser_class', ArgumentParser)
         self.subparsers = super(ArgumentParser, self).add_subparsers(**kwargs)
+
+        # Move any argument defaults to post defaults, so subparsers get a chance to override
+        post_defaults = {}
+        for action in self._actions:
+            if action.default:
+                post_defaults[action.dest] = action.default
+                action.default = SUPPRESS
+        self.set_post_defaults(**post_defaults)
         return self.subparsers
 
     def add_subparser(self, name, **kwargs):

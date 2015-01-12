@@ -215,7 +215,7 @@ class Manager(object):
     def has_lock(self):
         return self._has_lock
 
-    def execute(self, options=None, output=None, priority=1):
+    def execute(self, options=None, output=None, loglevel=None, priority=1):
         """
         Run all (can be limited with options) tasks from the config.
 
@@ -258,7 +258,7 @@ class Manager(object):
 
         finished_events = []
         for task_name in task_names:
-            task = Task(self, task_name, options=options, output=output, priority=priority)
+            task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority)
             self.task_queue.put(task)
             finished_events.append(task.finished_event)
         return finished_events
@@ -320,18 +320,18 @@ class Manager(object):
         if not options:
             options = self.options
         command = options.cli_command
-        options = getattr(options, command)
+        command_options = getattr(options, command)
         # First check for built-in commands
         if command in ['execute', 'daemon', 'webui']:
             if command == 'execute':
-                self.execute_command(options)
+                self.execute_command(command_options)
             elif command == 'daemon':
-                self.daemon_command(options)
+                self.daemon_command(command_options)
             elif command == 'webui':
-                self.webui_command(options)
+                self.webui_command(command_options)
         else:
             # Otherwise dispatch the command to the callback function
-            options.cli_command_callback(self, options)
+            options.cli_command_callback(self, command_options)
 
     def execute_command(self, options):
         """
@@ -351,7 +351,8 @@ class Manager(object):
         if self.task_queue.is_alive():
             if len(self.task_queue):
                 log.verbose('There is a task already running, execution queued.')
-            finished_events = self.execute(options, output=logger.get_output())
+            finished_events = self.execute(options, output=logger.get_capture_stream(),
+                                           loglevel=logger.get_capture_loglevel())
             if not options.cron:
                 # Wait until execution of all tasks has finished
                 for event in finished_events:
