@@ -57,17 +57,17 @@ class EmitDigest(object):
         with Session() as session:
             digest_entries = session.query(DigestEntry).filter(DigestEntry.list == config['list'])
             # Remove any entries older than the expire time, if defined.
-            if isinstance(config['expire'], basestring):
+            if isinstance(config.get('expire'), basestring):
                 expire_time = parse_timedelta(config['expire'])
                 digest_entries.filter(DigestEntry.added < datetime.now() - expire_time).delete()
             for index, digest_entry in enumerate(digest_entries.order_by(DigestEntry.added.desc()).all()):
                 # Just remove any entries past the limit, if set.
-                if 0 < config['limit'] <= index:
+                if 0 < config.get('limit', -1) <= index:
                     session.delete(digest_entry)
                     continue
                 entries.append(Entry(digest_entry.entry))
                 # If expire is 'True', we remove it after it is output once.
-                if config['expire'] is True:
+                if config.get('expire') is True:
                     session.delete(digest_entry)
         return entries
 

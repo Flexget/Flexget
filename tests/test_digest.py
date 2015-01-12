@@ -17,6 +17,7 @@ class TestDigest(FlexGetBase):
             accept_all: yes
             digest: aoeu
           emit digest:
+            seen: local
             emit_digest:
               list: aoeu
         """
