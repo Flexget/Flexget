@@ -319,6 +319,15 @@ class ArgumentParser(ArgParser):
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
         kwargs.setdefault('parser_class', ArgumentParser)
         self.subparsers = super(ArgumentParser, self).add_subparsers(**kwargs)
+
+        # Move any argument defaults to post defaults, so subparsers get a chance to override
+        post_defaults = {}
+        for action in self._actions:
+            if action.default:
+                post_defaults[action.dest] = action.default
+                action.default = SUPPRESS
+        self.set_post_defaults(**post_defaults)
+
         return self.subparsers
 
     def add_subparser(self, name, **kwargs):
