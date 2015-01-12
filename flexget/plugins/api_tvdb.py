@@ -180,11 +180,8 @@ class TVDBSeries(TVDBContainer, Base):
         self.poster_file = filename
         # If we are detached from a session, update the db
         if not Session.object_session(self):
-            session = Session()
-            try:
+            with Session() as session:
                 session.query(TVDBSeries).filter(TVDBSeries.id == self.id).update(values={'poster_file': filename})
-            finally:
-                session.close()
         return filename
 
     def __repr__(self):

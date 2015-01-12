@@ -5,8 +5,10 @@ import logging
 from sqlalchemy import Column, Integer, Unicode
 
 from flexget import db_schema, plugin
-from flexget.event import event
 from flexget.config_schema import process_config
+from flexget.event import event
+from flexget.manager import Session
+from flexget.plugin import PluginError
 from flexget.plugins.filter.series import FilterSeriesBase
 
 log = logging.getLogger('configure_series')
@@ -63,7 +65,11 @@ class ConfigureSeries(FilterSeriesBase):
                 raise plugin.PluginError('Plugin %s does not support API v2' % input_name)
 
             method = input.phase_handlers['input']
-            result = method(task, input_config)
+            try:
+                result = method(task, input_config)
+            except PluginError as e:
+                log.warning('Error during input plugin %s: %s' % (input_name, e))
+                continue
             if not result:
                 log.warning('Input %s did not return anything' % input_name)
                 continue
@@ -84,13 +90,14 @@ class ConfigureSeries(FilterSeriesBase):
 
         # Set the config_modified flag if the list of shows changed since last time
         new_hash = hashlib.md5(unicode(sorted(series))).hexdigest().decode('ascii')
-        last_hash = task.session.query(LastHash).filter(LastHash.task == task.name).first()
-        if not last_hash:
-            last_hash = LastHash(task=task.name)
-            task.session.add(last_hash)
-        if last_hash.hash != new_hash:
-            task.config_changed()
-        last_hash.hash = new_hash
+        with Session() as session:
+            last_hash = session.query(LastHash).filter(LastHash.task == task.name).first()
+            if not last_hash:
+                last_hash = LastHash(task=task.name)
+                session.add(last_hash)
+            if last_hash.hash != new_hash:
+                task.config_changed()
+            last_hash.hash = new_hash
 
         if not series:
             log.info('Did not get any series to generate series configuration')

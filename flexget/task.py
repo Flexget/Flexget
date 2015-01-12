@@ -18,6 +18,7 @@ from flexget.plugin import plugins as all_plugins
 from flexget.plugin import (
     DependencyError, get_plugins, phase_methods, plugin_schemas, PluginError, PluginWarning, task_phases)
 from flexget.utils import requests
+from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 
 log = logging.getLogger('task')
@@ -37,7 +38,8 @@ class TaskConfigHash(Base):
         return '<TaskConfigHash(task=%s,hash=%s)>' % (self.task, self.hash)
 
 
-def config_changed(task=None):
+@with_session
+def config_changed(task=None, session=None):
     """
     Forces config_modified flag to come out true on next run of `task`. Used when the db changes, and all
     entries need to be reprocessed.
@@ -45,36 +47,24 @@ def config_changed(task=None):
     :param task: Name of the task. If `None`, will be set for all tasks.
     """
     log.debug('Marking config for %s as changed.' % (task or 'all tasks'))
-    with Session() as session:
-        task_hash = session.query(TaskConfigHash)
-        if task:
-            task_hash = task_hash.filter(TaskConfigHash.task == task)
-        task_hash.delete()
+    task_hash = session.query(TaskConfigHash)
+    if task:
+        task_hash = task_hash.filter(TaskConfigHash.task == task)
+    task_hash.delete()
 
 
 def use_task_logging(func):
 
     @wraps(func)
     def wrapper(self, *args, **kw):
-        # Set the task name in the logger
+        # Set the task name in the logger and capture output
         from flexget import logger
-        old_loglevel = logging.getLogger().getEffectiveLevel()
-        new_loglevel = logging.getLevelName(self.options.loglevel.upper())
-        if old_loglevel != new_loglevel:
-            log.verbose('Setting loglevel to `%s` for this execution.' % self.options.loglevel)
-            logging.getLogger().setLevel(new_loglevel)
-
         with logger.task_logging(self.name):
-            try:
-                if self.output:
-                    with capture_output(self.output, loglevel=new_loglevel):
-                        return func(self, *args, **kw)
-                else:
+            if self.output:
+                with capture_output(self.output, loglevel=self.loglevel):
                     return func(self, *args, **kw)
-            finally:
-                if old_loglevel != new_loglevel:
-                    log.verbose('Returning loglevel to `%s` after task execution.' % logging.getLevelName(old_loglevel))
-                    logging.getLogger().setLevel(old_loglevel)
+            else:
+                return func(self, *args, **kw)
 
     return wrapper
 
@@ -174,6 +164,10 @@ class Task(object):
 
       ``parameters: task, keyword``
 
+    * task.execute.started
+
+      Before a task starts execution
+
     * task.execute.completed
 
       After task execution has been completed
@@ -186,13 +180,14 @@ class Task(object):
     # Used to determine task order, when priority is the same
     _counter = itertools.count()
 
-    def __init__(self, manager, name, config=None, options=None, output=None, priority=None):
+    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
         :param dict config: Task configuration.
         :param options: dict or argparse namespace with options for this task
         :param output: A filelike that all logs and stdout will be sent to for this task.
+        :param loglevel: Custom loglevel, only log messages at this level will be sent to `output`
         :param priority: If multiple tasks are waiting to run, the task with the lowest priority will be run first.
             The default is 0, if the cron option is set though, the default is lowered to 10.
 
@@ -211,6 +206,7 @@ class Task(object):
             options = options_namespace
         self.options = options
         self.output = output
+        self.loglevel = loglevel
         if priority is None:
             self.priority = 10 if self.options.cron else 0
         else:
@@ -555,7 +551,6 @@ class Task(object):
         else:
             for entry in self.all_entries:
                 entry.complete()
-            fire_event('task.execute.completed', self)
 
     @use_task_logging
     def execute(self):
@@ -574,6 +569,7 @@ class Task(object):
         try:
             if self.options.cron:
                 self.manager.db_cleanup()
+            fire_event('task.execute.started', self)
             while True:
                 self._execute()
                 # rerun task
@@ -588,6 +584,7 @@ class Task(object):
                 elif self._rerun:
                     log.info('Task has been re-run %s times already, stopping for now' % self._rerun_count)
                 break
+            fire_event('task.execute.completed', self)
         finally:
             self.finished_event.set()
 

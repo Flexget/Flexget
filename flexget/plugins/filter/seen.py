@@ -232,7 +232,7 @@ class FilterSeen(object):
 
 
 @event('manager.db_cleanup')
-def db_cleanup(session):
+def db_cleanup(manager, session):
     log.debug('TODO: Disabled because of ticket #1321')
     return
 

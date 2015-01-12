@@ -36,7 +36,7 @@ Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
 
 
 @event('manager.db_cleanup')
-def db_cleanup(session):
+def db_cleanup(manager, session):
     value = datetime.datetime.now() - parse_timedelta('7 days')
     for de in session.query(DiscoverEntry).filter(DiscoverEntry.last_execution <= value).all():
         log.debug('deleting %s' % de)
@@ -115,10 +115,11 @@ class Discover(object):
                     entry_urls.update(urls)
         return entries
 
-    def execute_searches(self, config, entries):
+    def execute_searches(self, config, entries, task):
         """
         :param config: Discover plugin config
         :param entries: List of pseudo entries to search
+        :param task: Task being run
         :return: List of entries found from search engines listed under `from` configuration
         """
 
@@ -135,7 +136,12 @@ class Discover(object):
                 log.verbose('Searching for `%s` with plugin `%s` (%i of %i)' %
                             (entry['title'], plugin_name, index + 1, len(entries)))
                 try:
-                    search_results = search.search(entry, plugin_config)
+                    try:
+                        search_results = search.search(task=task, entry=entry, config=plugin_config)
+                    except TypeError:
+                        # Old search api did not take task argument
+                        log.warning('Search plugin %s does not support latest search api.' % plugin_name)
+                        search_results = search.search(entry, plugin_config)
                     if not search_results:
                         log.debug('No results from %s' % plugin_name)
                         entry.complete()
@@ -256,7 +262,7 @@ class Discover(object):
         entries = self.interval_expired(config, task, entries)
         if not config.get('ignore_estimations', False):
             entries = self.estimated(entries)
-        return self.execute_searches(config, entries)
+        return self.execute_searches(config, entries, task)
 
 
 @event('plugin.register')

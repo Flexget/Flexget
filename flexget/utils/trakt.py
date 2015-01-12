@@ -1,3 +1,9 @@
+"""
+Utilities to use api v2 api.
+
+TODO: This should probably all be moved to api_trakt.py once that is converted to api v2
+"""
+
 from __future__ import absolute_import, division, unicode_literals
 
 from urlparse import urljoin
@@ -9,7 +15,7 @@ from flexget.utils.requests import RequestException, Session
 
 # Testing site
 #API_KEY = '980c477226b9c18c9a4982cddc1bdbcd747d14b006fe044a8bbbe29bfb640b5d'
-#API_URL = 'http://api.v2.trakt.tv/'
+#API_URL = 'http://api.staging.trakt.tv/'
 # Production Site
 API_KEY = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
 API_URL = 'https://api.trakt.tv/'
@@ -19,7 +25,7 @@ def make_list_slug(name):
     """Return the slug for use in url for given list name."""
     slug = name.lower()
     # These characters are just stripped in the url
-    for char in '!@#$%^*()[]{}/=?+\\|-_':
+    for char in '!@#$%^*()[]{}/=?+\\|-':
         slug = slug.replace(char, '')
     # These characters get replaced
     slug = slug.replace('&', 'and')

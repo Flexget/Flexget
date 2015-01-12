@@ -45,6 +45,7 @@ class QualityParser(object):
                  ('Test.File.1280x720_web dl', '720p webdl'),
                  ('Test.File.720p.h264.web.dl', '720p webdl h264'),
                  ('Test.File.1080p.webhd.x264', '1080p webdl h264'),
+                 ('Test.File.480.hdtv.x265', '480p hdtv h265'),
                  ('Test.File.web-dl', 'webdl'),
                  ('Test.File.720P', '720p'),
                  ('Test.File.1920x1080', '1080p'),

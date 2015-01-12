@@ -27,7 +27,7 @@ class SearchCPASBIEN(object):
     }
 
     @plugin.internet(log)
-    def search(self, entry, config):
+    def search(self, task, entry, config):
         """CPASBIEN search plugin
 
         Config example:
@@ -45,7 +45,7 @@ class SearchCPASBIEN(object):
                   interval: 1 day
                   ignore_estimations: yes
 
-        Category is ONE of: 
+        Category is ONE of:
             all
             films
             series
@@ -78,7 +78,7 @@ class SearchCPASBIEN(object):
                 url = '/'.join(str_url)
             log.debug('search url: %s' % url + '.html')
 # GET URL
-            f = requests.get(url + '.html').content
+            f = task.requests.get(url + '.html').content
             soup = get_soup(f)
             if soup.findAll(text=re.compile('0 torrents')):
                 log.debug('search returned no results')
@@ -88,7 +88,7 @@ class SearchCPASBIEN(object):
                     if (nextpage > 0):
                         newurl = url + '/page-' + str(nextpage)
                         log.debug('-----> NEXT PAGE : %s' % newurl)
-                        f1 = requests.get(newurl).content
+                        f1 = task.requests.get(newurl).content
                         soup = get_soup(f1)
                     for result in soup.findAll('div', attrs={'class': re.compile('ligne')}):
                         entry = Entry()

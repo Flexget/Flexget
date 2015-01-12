@@ -26,6 +26,11 @@ class BaseEmitSeries(FlexGetBase):
                 tracking: backfill
                 identified_by: ep
             rerun: 0
+          test_emit_series_no_backfill:
+            emit_series: yes
+            series:
+            - Test Series 1
+            rerun: 0
           test_emit_series_rejected:
             emit_series:
               backfill: yes
@@ -35,7 +40,8 @@ class BaseEmitSeries(FlexGetBase):
                 identified_by: ep
             rerun: 0
           test_emit_series_from_start:
-            emit_series: yes
+            emit_series:
+              backfill: yes
             series:
             - Test Series 3:
                 from_start: yes
@@ -106,7 +112,7 @@ class BaseEmitSeries(FlexGetBase):
     """
 
     def inject_series(self, release_name):
-        self.execute_task('inject_series', options = {'inject': [Entry(title=release_name, url='')]})
+        self.execute_task('inject_series', options = {'inject': [Entry(title=release_name, url='')], 'disable_tracking': True})
 
     def test_emit_series_backfill(self):
         self.inject_series('Test Series 1 S02E01')
@@ -123,6 +129,13 @@ class BaseEmitSeries(FlexGetBase):
         assert self.task.find_entry(title='Test Series 1 S02E05')
         assert self.task.find_entry(title='Test Series 1 S02E06')
         assert self.task.find_entry(title='Test Series 1 S02E07')
+
+    def test_emit_series_no_backfill(self):
+        self.inject_series('Test Series 1 S01E01')
+        self.inject_series('Test Series 1 S01E05')
+        self.execute_task('test_emit_series_no_backfill')
+        assert len(self.task.all_entries) == 1
+        assert self.task.find_entry(title='Test Series 1 S01E06')
 
     def test_emit_series_rejected(self):
         self.inject_series('Test Series 2 S01E03 720p')

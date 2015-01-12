@@ -21,7 +21,7 @@ class UrlRewriteNewzleech(object):
 
     # Search API
     @plugin.internet(log)
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
 
         txheaders = {
             'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)',

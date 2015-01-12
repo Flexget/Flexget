@@ -144,14 +144,14 @@ def upgrade(ver, session):
     if ver == 11:
         # SeriesTasks was cleared out due to a bug, make sure they get recalculated next run #2772
         from flexget.task import config_changed
-        config_changed()
+        config_changed(session=session)
         ver = 12
 
     return ver
 
 
 @event('manager.db_cleanup')
-def db_cleanup(session):
+def db_cleanup(manager, session):
     # Clean up old undownloaded releases
     result = session.query(Release).\
         filter(Release.downloaded == False).\

@@ -49,7 +49,6 @@ def setup_once():
     if not plugins_loaded:
         flexget.logger.initialize(True)
         setup_logging_level()
-        warnings.simplefilter('error')
         # VCR.py mocked functions not handle ssl verification well. Older versions of urllib3 don't have this
         if VCR_RECORD_MODE != 'off':
             try:
@@ -193,7 +192,6 @@ class FlexGetBase(object):
             for task_name, task_definition in self.manager.config['tasks'].items():
                 for task_function in self.tasks_functions:
                     task_function(task_name, task_definition)
-
 
     def teardown(self):
         try:

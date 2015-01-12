@@ -3,9 +3,12 @@ import copy
 import logging
 import hashlib
 from datetime import datetime, timedelta
+
 from sqlalchemy import Column, Integer, String, DateTime, PickleType, Unicode, ForeignKey
 from sqlalchemy.orm import relation
+
 from flexget import db_schema
+from flexget.manager import Session
 from flexget.utils.database import safe_pickle_synonym
 from flexget.utils.tools import parse_timedelta, TimedDict
 from flexget.entry import Entry
@@ -40,7 +43,7 @@ class InputCacheEntry(Base):
 
 
 @event('manager.db_cleanup')
-def db_cleanup(session):
+def db_cleanup(manager, session):
     """Removes old input caches from plugins that are no longer configured."""
     result = session.query(InputCache).filter(InputCache.added < datetime.now() - timedelta(days=7)).delete()
     if result:
@@ -118,16 +121,17 @@ class cached(object):
             else:
                 if self.persist and not task.options.nocache:
                     # Check database cache
-                    db_cache = task.session.query(InputCache).filter(InputCache.name == self.name).\
-                        filter(InputCache.hash == hash).\
-                        filter(InputCache.added > datetime.now() - self.persist).\
-                        first()
-                    if db_cache:
-                        entries = [Entry(e.entry) for e in db_cache.entries]
-                        log.verbose('Restored %s entries from db cache' % len(entries))
-                        # Store to in memory cache
-                        self.cache[cache_name] = copy.deepcopy(entries)
-                        return entries
+                    with Session() as session:
+                        db_cache = session.query(InputCache).filter(InputCache.name == self.name).\
+                            filter(InputCache.hash == hash).\
+                            filter(InputCache.added > datetime.now() - self.persist).\
+                            first()
+                        if db_cache:
+                            entries = [Entry(e.entry) for e in db_cache.entries]
+                            log.verbose('Restored %s entries from db cache' % len(entries))
+                            # Store to in memory cache
+                            self.cache[cache_name] = copy.deepcopy(entries)
+                            return entries
 
                 # Nothing was restored from db or memory cache, run the function
                 log.trace('cache miss')
@@ -137,16 +141,17 @@ class cached(object):
                 except PluginError as e:
                     # If there was an error producing entries, but we have valid entries in the db cache, return those.
                     if self.persist and not task.options.nocache:
-                        db_cache = task.session.query(InputCache).filter(InputCache.name == self.name).\
-                            filter(InputCache.hash == hash).first()
-                        if db_cache and db_cache.entries:
-                            log.error('There was an error during %s input (%s), using cache instead.' %
-                                    (self.name, e))
-                            entries = [Entry(e.entry) for e in db_cache.entries]
-                            log.verbose('Restored %s entries from db cache' % len(entries))
-                            # Store to in memory cache
-                            self.cache[cache_name] = copy.deepcopy(entries)
-                            return entries
+                        with Session() as session:
+                            db_cache = session.query(InputCache).filter(InputCache.name == self.name).\
+                                filter(InputCache.hash == hash).first()
+                            if db_cache and db_cache.entries:
+                                log.error('There was an error during %s input (%s), using cache instead.' %
+                                        (self.name, e))
+                                entries = [Entry(e.entry) for e in db_cache.entries]
+                                log.verbose('Restored %s entries from db cache' % len(entries))
+                                # Store to in memory cache
+                                self.cache[cache_name] = copy.deepcopy(entries)
+                                return entries
                     # If there was nothing in the db cache, re-raise the error.
                     raise
                 if api_ver == 1:
@@ -164,13 +169,14 @@ class cached(object):
                 if self.persist:
                     # Store to database
                     log.debug('Storing cache %s to database.' % cache_name)
-                    db_cache = task.session.query(InputCache).filter(InputCache.name == self.name).\
-                        filter(InputCache.hash == hash).first()
-                    if not db_cache:
-                        db_cache = InputCache(name=self.name, hash=hash)
-                    db_cache.entries = [InputCacheEntry(entry=e) for e in response]
-                    db_cache.added = datetime.now()
-                    task.session.merge(db_cache)
+                    with Session() as session:
+                        db_cache = session.query(InputCache).filter(InputCache.name == self.name).\
+                            filter(InputCache.hash == hash).first()
+                        if not db_cache:
+                            db_cache = InputCache(name=self.name, hash=hash)
+                        db_cache.entries = [InputCacheEntry(entry=e) for e in response]
+                        db_cache.added = datetime.now()
+                        session.merge(db_cache)
                 return response
 
         return wrapped_func

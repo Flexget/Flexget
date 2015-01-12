@@ -40,12 +40,6 @@ manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
-@sqlalchemy.event.listens_for(Session, 'before_commit')
-def before_commit(session):
-    if not manager.has_lock and session.dirty:
-        log.debug('BUG?: Database writes should not be tried when there is no database lock.')
-
-
 @sqlalchemy.event.listens_for(sqlalchemy.engine.Engine, 'connect')
 def set_sqlite_pragma(dbapi_connection, connection_record):
     cursor = dbapi_connection.cursor()
@@ -181,7 +175,7 @@ class Manager(object):
         if self.initialized:
             raise RuntimeError('Cannot call initialize on an already initialized manager.')
 
-        plugin.load_plugins()
+        plugin.load_plugins(extra_dirs=[os.path.join(self.config_base, 'plugins')])
 
         # Reparse CLI options now that plugins are loaded
         self.options = get_parser().parse_args(self.args)
@@ -221,7 +215,7 @@ class Manager(object):
     def has_lock(self):
         return self._has_lock
 
-    def execute(self, options=None, output=None, priority=1):
+    def execute(self, options=None, output=None, loglevel=None, priority=1):
         """
         Run all (can be limited with options) tasks from the config.
 
@@ -242,25 +236,29 @@ class Manager(object):
         task_names = self.tasks
         # Handle --tasks
         if options.tasks:
-            # Create list of tasks to run, preserving order
-            task_names = []
-            for arg in options.tasks:
-                matches = [t for t in self.tasks if fnmatch.fnmatchcase(unicode(t).lower(), arg.lower())]
-                if not matches:
-                    msg = '`%s` does not match any tasks' % arg
-                    log.error(msg)
-                    if output:
-                        output.write(msg)
-                    continue
-                task_names.extend(m for m in matches if m not in task_names)
-            # Set the option as a list of matching task names so plugins can use it easily
-            options.tasks = task_names
+            # Consider * the same as not specifying tasks at all (makes sure manual plugin still works)
+            if options.tasks == ['*']:
+                options.tasks = None
+            else:
+                # Create list of tasks to run, preserving order
+                task_names = []
+                for arg in options.tasks:
+                    matches = [t for t in self.tasks if fnmatch.fnmatchcase(unicode(t).lower(), arg.lower())]
+                    if not matches:
+                        msg = '`%s` does not match any tasks' % arg
+                        log.error(msg)
+                        if output:
+                            output.write(msg)
+                        continue
+                    task_names.extend(m for m in matches if m not in task_names)
+                # Set the option as a list of matching task names so plugins can use it easily
+                options.tasks = task_names
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
         task_names = sorted(task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535))
 
         finished_events = []
         for task_name in task_names:
-            task = Task(self, task_name, options=options, output=output, priority=priority)
+            task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority)
             self.task_queue.put(task)
             finished_events.append(task.finished_event)
         return finished_events
@@ -322,18 +320,18 @@ class Manager(object):
         if not options:
             options = self.options
         command = options.cli_command
-        options = getattr(options, command)
+        command_options = getattr(options, command)
         # First check for built-in commands
         if command in ['execute', 'daemon', 'webui']:
             if command == 'execute':
-                self.execute_command(options)
+                self.execute_command(command_options)
             elif command == 'daemon':
-                self.daemon_command(options)
+                self.daemon_command(command_options)
             elif command == 'webui':
-                self.webui_command(options)
+                self.webui_command(command_options)
         else:
             # Otherwise dispatch the command to the callback function
-            options.cli_command_callback(self, options)
+            options.cli_command_callback(self, command_options)
 
     def execute_command(self, options):
         """
@@ -353,7 +351,8 @@ class Manager(object):
         if self.task_queue.is_alive():
             if len(self.task_queue):
                 log.verbose('There is a task already running, execution queued.')
-            finished_events = self.execute(options, output=logger.get_output())
+            finished_events = self.execute(options, output=logger.get_capture_stream(),
+                                           loglevel=logger.get_capture_loglevel())
             if not options.cron:
                 # Wait until execution of all tasks has finished
                 for event in finished_events:
@@ -532,6 +531,7 @@ class Manager(object):
         self.config_base = os.path.normpath(os.path.dirname(config))
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
+
 
     def load_config(self):
         """
@@ -852,7 +852,7 @@ class Manager(object):
             log.info('Running database cleanup.')
             session = Session()
             try:
-                fire_event('manager.db_cleanup', session)
+                fire_event('manager.db_cleanup', self, session)
                 session.commit()
             finally:
                 session.close()

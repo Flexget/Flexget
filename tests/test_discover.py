@@ -13,7 +13,7 @@ class SearchPlugin(object):
     def validator(self):
         return flexget.validator.factory('boolean')
 
-    def search(self, entry, comparator=None, config=None):
+    def search(self, task, entry, config=None):
         return [Entry(entry)]
 
 plugin.register(SearchPlugin, 'test_search', groups=['search'], api_ver=2)

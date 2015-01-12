@@ -79,13 +79,14 @@ class PluginSubliminal(object):
         import subliminal
         try:
             subliminal.cache_region.configure('dogpile.cache.dbm', 
-                arguments={'filename': os.path.join(tempfile.gettempdir(), 'cachefile.dbm'), 
-                           'lock_factory': subliminal.MutexLock})
+                                              arguments={'filename': os.path.join(tempfile.gettempdir(),
+                                                                                  'cachefile.dbm'),
+                                              'lock_factory': subliminal.MutexLock})
         except RegionAlreadyConfigured:
             pass
         logging.getLogger("subliminal").setLevel(logging.CRITICAL)
         logging.getLogger("enzyme").setLevel(logging.WARNING)
-        langs = set([Language.fromietf(s) for s in config['languages']])
+        langs = set([Language.fromietf(s) for s in config.get('languages', [])])
         alts = set([Language.fromietf(s) for s in config.get('alternatives', [])])
         # keep all downloaded subtitles and save to disk when done (no need to write every time)
         downloaded_subtitles = collections.defaultdict(list)
@@ -96,21 +97,26 @@ class PluginSubliminal(object):
         # if we pass 'yes' for single in configuration but choose more than one language
         # we ignore the configuration and add the language code to the
         # potentially downloaded files
-        single_mode = config['single'] and len(langs | alts) <= 1
+        single_mode = config.get('single', '') and len(langs | alts) <= 1
         for entry in task.accepted:
-            if not 'location' in entry:
+            if 'location' not in entry:
                 log.warning('Cannot act on entries that do not represent a local file.')
             elif not os.path.exists(entry['location']):
                 entry.fail('file not found: %s' % entry['location'])
-            elif not '$RECYCLE.BIN' in entry['location']:  # ignore deleted files in Windows shares
+            elif '$RECYCLE.BIN' not in entry['location']:  # ignore deleted files in Windows shares
                 try:
+                    entry_langs = entry.get('subtitle_languages', langs)
                     video = subliminal.scan_video(entry['location'])
-                    log.info('Series name computed for %s was %s' % (entry['location'], video.series))
+                    if isinstance(video, subliminal.Episode):
+                        title = video.series
+                    else:
+                        title = video.title
+                    log.info('Name computed for %s was %s' % (entry['location'], title))
                     msc = video.scores['hash'] if config['exact_match'] else 0
-                    if langs & video.subtitle_languages:
+                    if entry_langs & video.subtitle_languages:
                         continue  # subs for preferred lang(s) already exists
                     else:
-                        subtitle = subliminal.download_best_subtitles([video], langs, providers=providers_list,
+                        subtitle = subliminal.download_best_subtitles([video], entry_langs, providers=providers_list,
                                                                       min_score=msc)
                         if subtitle:
                             downloaded_subtitles.update(subtitle)
@@ -129,11 +135,14 @@ class PluginSubliminal(object):
                                 entry.fail('subtitles found for a second-choice language.')
                             else:
                                 entry.fail('cannot find any subtitles for now.')
+                        downloaded_languages = set([Language.fromietf(unicode(l.language))
+                                                    for l in subtitle[video]])
+                        entry['subtitles_missing'] = entry_langs - downloaded_languages
                 except Exception as err:
                     # don't want to abort the entire task for errors in a  
                     # single video file or for occasional network timeouts
                     if err.args:
-                        msg = err.args[0]
+                        msg = unicode(err.args[0])
                     else:
                         # Subliminal errors don't always have a message, just use the name
                         msg = 'subliminal error: %s' % err.__class__.__name__
