@@ -53,7 +53,7 @@ def capture_output(stream, loglevel=None):
     # Keep using current, or create one if none already set
     local_context.session_id = old_id or uuid.uuid4()
     old_output = getattr(local_context, 'output', None)
-    local_context.output = stream
+    old_loglevel = getattr(local_context, 'loglevel', None)
     streamhandler = logging.StreamHandler(stream)
     streamhandler.setFormatter(FlexGetFormatter())
     streamhandler.addFilter(SessionFilter(local_context.session_id))
@@ -64,6 +64,8 @@ def capture_output(stream, loglevel=None):
         # All existing handlers should have their desired level set and not be affected.
         if not root_logger.isEnabledFor(loglevel):
             root_logger.setLevel(loglevel)
+    local_context.output = stream
+    local_context.loglevel = loglevel
     root_logger.addHandler(streamhandler)
     try:
         yield
@@ -72,11 +74,17 @@ def capture_output(stream, loglevel=None):
         root_logger.setLevel(old_level)
         local_context.session_id = old_id
         local_context.output = old_output
+        local_context.loglevel = old_loglevel
 
 
-def get_output():
+def get_capture_stream():
     """If output is currently being redirected to a stream, returns that stream."""
     return getattr(local_context, 'output', None)
+
+
+def get_capture_loglevel():
+    """If output is currently being redirected to a stream, returns declared loglevel for that stream."""
+    return getattr(local_context, 'loglevel', None)
 
 
 def console(text):

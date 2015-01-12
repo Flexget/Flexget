@@ -20,7 +20,7 @@ class MetainfoTask(object):
             return
 
         for entry in task.entries:
-            entry['task'] = task.name
+            entry.setdefault('task', task.name)
 
 
 @event('plugin.register')

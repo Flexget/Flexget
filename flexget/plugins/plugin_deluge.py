@@ -799,7 +799,10 @@ class OutputDeluge(DelugePlugin):
                 # Make another set of options, that get set after the torrent has been added
                 modify_opts = {'label': format_label(entry.get('label', config['label'])),
                                'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
-                               'main_file_only': entry.get('main_file_only', config.get('main_file_only', False))}
+                               'main_file_only': entry.get('main_file_only', config.get('main_file_only', False)),
+                               'hide_sparse_files': entry.get('hide_sparse_files', config.get('hide_sparse_files', True)),
+                               'keep_subs': entry.get('keep_subs', config.get('keep_subs', True))
+                }
                 try:
                     movedone = entry.render(entry.get('movedone', config['movedone']))
                     modify_opts['movedone'] = pathscrub(os.path.expanduser(movedone))
