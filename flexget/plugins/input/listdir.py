@@ -31,7 +31,12 @@ class Listdir(object):
         entries = []
         for folder in config:
             folder = path(folder).expanduser()
-            for filepath in folder.listdir():
+            try:
+                dir_files = folder.listdir()
+            except OSError as e:
+                log.error('error accessing folder: %s' % e.strerror)
+                continue
+            for filepath in dir_files:
                 try:
                     filepath.exists()
                 except UnicodeError:
