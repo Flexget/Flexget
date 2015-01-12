@@ -34,7 +34,7 @@ class Listdir(object):
             try:
                 dir_files = folder.listdir()
             except OSError as e:
-                log.error('error accessing folder: %s' % e.strerror)
+                log.error('Path %s could not be accessed: %s' % (folder, e.strerror))
                 continue
             for filepath in dir_files:
                 try:
