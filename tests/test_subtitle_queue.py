@@ -36,7 +36,7 @@ class TestSubtitleQueue(FlexGetBase):
                action: add
                path: '/'
              mock:
-               - {title: 'Some Torrent', content_files: ['some movie.mkv']}
+               - {title: 'test', file: 'test.torrent'}
            subtitle_torrent:
              template: no_global
              accept_all: yes
@@ -45,7 +45,7 @@ class TestSubtitleQueue(FlexGetBase):
                path: '/'
                alternate_path: '~/'
              mock:
-               - {title: 'Some Torrent', content_files: ['some movie.mkv', 'garbage.txt']}
+               - {title: 'multi', file: 'multi.torrent'}
            subtitle_fail:
              template: no_global
              subtitle_queue: emit
@@ -83,12 +83,15 @@ class TestSubtitleQueue(FlexGetBase):
         queue = queue_get()
         assert len(queue) == 2
 
-        self.execute_task('subtitle_emit')
+        try:
+            import subliminal
+        except ImportError:
+            self.execute_task('subtitle_emit')
 
-        assert len(self.task.entries) == 2, "2 items should be emitted from the queue."
+            assert len(self.task.entries) == 2, "2 items should be emitted from the queue."
 
-        queue = queue_get()
-        assert len(queue) == 2
+            queue = queue_get()
+            assert len(queue) == 2
 
         # self.execute_task('subtitle_emit')
         # print len(self.task.entries)
@@ -151,8 +154,8 @@ class TestSubtitleQueue(FlexGetBase):
         queue = queue_get()
         assert len(queue) == 1, 'Task should have accepted one item.'
 
-        assert queue[0].path == normalize_path(os.path.join('/', 'some movie.mkv')), \
-            'Queued path should be /some movie.mkv'
+        assert queue[0].path == normalize_path(os.path.join('/', 'ubuntu-12.04.1-desktop-i386.iso')), \
+            'Queued path should be /ubuntu-12.04.1-desktop-i386.iso'
 
     def test_subtitle_queue_multi_file_torrent(self):
         assert len(queue_get()) == 0, "Queue should be empty before run."
@@ -161,10 +164,10 @@ class TestSubtitleQueue(FlexGetBase):
         queue = queue_get()
         assert len(queue) == 1, 'Task should have queued one item.'
 
-        assert queue[0].path == normalize_path(os.path.join('/', 'Some Torrent')), \
+        assert queue[0].path == normalize_path(os.path.join('/', 'slackware-14.1-iso')), \
             'Queued path should be torrent name in root dir'
 
-        assert queue[0].alternate_path == normalize_path(os.path.join('~/', 'Some Torrent')), \
+        assert queue[0].alternate_path == normalize_path(os.path.join('~/', 'slackware-14.1-iso')), \
             'Queued path should be torrent name in user dir'
 
     def test_subtitle_queue_subliminal_fail(self):
