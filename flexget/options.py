@@ -48,9 +48,7 @@ def register_command(command, callback, **kwargs):
     :param kwargs: Other keyword arguments will be passed to the :class:`arparse.ArgumentParser` constructor
     :returns: An :class:`argparse.ArgumentParser` instance ready to be configured with the options for this command.
     """
-    subparser = get_parser().add_subparser(command, **kwargs)
-    subparser.set_defaults(cli_command_callback=callback)
-    return subparser
+    return get_parser().add_subparser(command, parent_defaults={'cli_command_callback': callback}, **kwargs)
 
 
 def required_length(nmin, nmax):
@@ -308,7 +306,7 @@ class ArgumentParser(ArgParser):
 
         # add any post defaults that aren't present
         for dest in self.post_defaults:
-            if not hasattr(namespace, dest):
+            if getattr(namespace, dest, None) is None:
                 setattr(namespace, dest, self.post_defaults[dest])
 
         return namespace, args
@@ -321,14 +319,6 @@ class ArgumentParser(ArgParser):
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
         kwargs.setdefault('parser_class', ArgumentParser)
         self.subparsers = super(ArgumentParser, self).add_subparsers(**kwargs)
-
-        # Move any argument defaults to post defaults, so subparsers get a chance to override
-        post_defaults = {}
-        for action in self._actions:
-            if action.default:
-                post_defaults[action.dest] = action.default
-                action.default = SUPPRESS
-        self.set_post_defaults(**post_defaults)
         return self.subparsers
 
     def add_subparser(self, name, **kwargs):
