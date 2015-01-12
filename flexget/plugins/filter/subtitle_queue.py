@@ -47,8 +47,9 @@ association_table = Table('association', Base.metadata,
                           Column('lang_id', Integer, ForeignKey('subtitle_language.id'))
                           )
 
+
 def normalize_path(path):
-    return os.path.normcase(os.path.abspath(path))
+    return os.path.normcase(os.path.abspath(path)) if path else None
 
 
 class SubtitleLanguages(Base):
@@ -218,6 +219,8 @@ class SubtitleQueue(object):
         if not config or not isinstance(config, dict):
             return
         action = config.get('action')
+        if not config.get('languages'):
+            config['languages'] = 'en'
         for entry in task.accepted:
             try:
                 if action == 'add':
@@ -226,7 +229,8 @@ class SubtitleQueue(object):
                         try:
                             path = entry.render(config.get('path', entry['location']))
                             alternate_path = entry.render(config.get('alternate_path', ''))
-                            queue_add(path, entry.get('title', ''), config, alternate_path=alternate_path)
+                            queue_add(path, entry.get('title', ''), config, alternate_path=alternate_path,
+                                      location=entry['location'])
                         except RenderError as ex:
                             # entry.fail('Invalid entry field %s for %s.' % (config['path'], entry['title']))
                             log.error('Could not render: %s. Please check your config.' % ex)
@@ -285,17 +289,17 @@ class SubtitleQueue(object):
 
 
 @with_session
-def queue_add(path, title, config, alternate_path=None, session=None):
+def queue_add(path, title, config, alternate_path=None, location=None, session=None):
     path = normalize_path(path)
-    if alternate_path:
-        alternate_path = normalize_path(alternate_path)
-    item = session.query(QueuedSubtitle).filter(or_(QueuedSubtitle.path == path,
-                                                    QueuedSubtitle.alternate_path == path)).first()
+    alternate_path = normalize_path(alternate_path)
+    conditions = [QueuedSubtitle.path == path, QueuedSubtitle.alternate_path == path]
+    if location:
+        conditions.extend([QueuedSubtitle.path == location, QueuedSubtitle.alternate_path == location])
+
+    item = session.query(QueuedSubtitle).filter(or_(*conditions)).first()
     primary = make_lang_list(config.get('languages', []), session=session)
-    eng = session.query(SubtitleLanguages).filter(SubtitleLanguages.language == 'en').first()
-    default = [eng] if eng else [SubtitleLanguages('eng')]
     if item:
-        log.verbose('%s: Already queued. Updating values.' % item.title)
+        log.info('%s: Already queued. Updating values.' % item.title)
         queue_edit(path, alternate_path, title, config, session=session)
     else:
         if config.get('stop_after', ''):
@@ -303,7 +307,7 @@ def queue_add(path, title, config, alternate_path=None, session=None):
         else:
             item = QueuedSubtitle(path, alternate_path, title)
         session.add(item)
-        item.languages = primary if primary else default
+        item.languages = primary
         log.info('Added %s to queue with langs: [%s].' %
                  (item.path, ', '.join([unicode(s.language) for s in item.languages])))
         return True
@@ -324,32 +328,35 @@ def queue_del(path, session=None):
 
 
 @with_session
-def queue_edit(src, dest, title, config, session=None):
+def queue_edit(src, dest, title, config, location=None, session=None):
     src = normalize_path(src)
-    if dest:
-        dest = normalize_path(dest)
+    dest = normalize_path(dest)
+    conditions = [QueuedSubtitle.path == src, QueuedSubtitle.alternate_path == src]
+    if location:
+        conditions.extend([QueuedSubtitle.path == location, QueuedSubtitle.alternate_path == location])
 
-    item = session.query(QueuedSubtitle).filter(or_(QueuedSubtitle.path == src,
-                                                    QueuedSubtitle.alternate_path == src)).first()
+    item = session.query(QueuedSubtitle).filter(or_(*conditions)).first()
+
     # item should exist, but this check might be needed in the future
     if not item:
-        # Two paths but not in queue could mean it comes from a torrent or has been moved with move plugin etc.
+        # tried to edit a non-queued item. Add it.
         queue_add(dest, title, config, alternate_path=src, session=session)
     else:
         if item.downloaded:
             log.debug('All subtitles have already been downloaded. Not updating values.')
             return
-        if src:
+        if item.path != src:
             item.path = src
-        if dest:
+        if item.alternate_path != dest:
             item.alternate_path = dest
         # if there is a stop_after value, then it is refreshed in the db
         if config.get('stop_after', ''):
             item.stop_after = config['stop_after']
             item.added = datetime.now()
-        primary = make_lang_list(config.get('languages', []), session=session)
-        item.languages = primary
-        log.debug('Updated values for %s.' % item.title)
+        if config.get('languages'):
+            primary = make_lang_list(config.get('languages', []), session=session)
+            item.languages = primary
+        log.info('Updated values for %s.' % item.title)
 
 
 @with_session
@@ -358,6 +365,7 @@ def queue_get(session=None):
     # remove any items that have expired
     for sub_item in subs:
         if sub_item.added + parse_timedelta(sub_item.stop_after) < datetime.combine(date.today(), time()):
+            log.debug('%s has expired. Removing.' % sub_item.title)
             subs.remove(sub_item)
             session.delete(sub_item)
     return subs
