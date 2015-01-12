@@ -187,7 +187,9 @@ class NestedSubparserAction(_SubParsersAction):
     def __call__(self, parser, namespace, values, option_string=None):
         parser_name = values[0]
         if parser_name in self.parent_defaults:
-            parser.set_post_defaults(**self.parent_defaults[parser_name])
+            for dest in self.parent_defaults[parser_name]:
+                if not hasattr(namespace, dest):
+                    setattr(namespace, dest, self.parent_defaults[parser_name][dest])
         if self.nested_namespaces:
             subnamespace = ScopedNamespace()
             super(NestedSubparserAction, self).__call__(parser, subnamespace, values, option_string)
@@ -311,7 +313,7 @@ class ArgumentParser(ArgParser):
 
         # add any post defaults that aren't present
         for dest in self.post_defaults:
-            if getattr(namespace, dest, None) is None:
+            if not hasattr(namespace, dest):
                 setattr(namespace, dest, self.post_defaults[dest])
 
         return namespace, args
