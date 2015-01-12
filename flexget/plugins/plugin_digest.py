@@ -67,7 +67,7 @@ class EmitDigest(object):
                     continue
                 entries.append(Entry(digest_entry.entry))
                 # If expire is 'True', we remove it after it is output once.
-                if config.get('expire') is True:
+                if config.get('expire', True) is True:
                     session.delete(digest_entry)
         return entries
 
