@@ -34,8 +34,8 @@ class ModifySet(object):
         """This can be called from a plugin to add set values to an entry"""
         orig_field_values = {}
         for field in config:
-            # If we aren't setting to a string, it can't be a template, so just set it now.
-            if not isinstance(config[field], basestring):
+            # If this doesn't appear to be a jinja template, just set it right away.
+            if not isinstance(config[field], basestring) or '{' not in config[field]:
                 entry[field] = config[field]
             # Store original values before overwriting with a lazy field, so that set directives can reference
             # themselves.
