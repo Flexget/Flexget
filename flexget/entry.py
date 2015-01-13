@@ -218,7 +218,7 @@ class Entry(dict):
 
         # url and original_url handling
         if key == 'url':
-            if not isinstance(value, basestring):
+            if not isinstance(value, (basestring, LazyField)):
                 raise PluginError('Tried to set %r url to %r' % (self.get('title'), value))
             self.setdefault('original_url', value)
 
