@@ -37,7 +37,7 @@ class ModifySet(object):
             # If we aren't setting to a string, it can't be a template, so just set it now.
             if not isinstance(config[field], basestring):
                 entry[field] = config[field]
-            # Ntore original values before overwriting with a lazy field, so that set directives can reference
+            # Store original values before overwriting with a lazy field, so that set directives can reference
             # themselves.
             elif field in entry:
                 orig_field_values[field] = entry.pop(field)
