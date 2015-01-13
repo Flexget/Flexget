@@ -144,8 +144,8 @@ class SubtitleQueue(object):
                 elif sub_item.alternate_path and os.path.exists(sub_item.alternate_path):
                     path = sub_item.alternate_path
                 elif sub_item.added + parse_timedelta('24 hours') > datetime.combine(date.today(), time()):
-                    log.info('File %s was not found. Deleting after %s.' %
-                             (sub_item.path, unicode(sub_item.added + parse_timedelta('24 hours'))))
+                    log.warning('File %s was not found. Deleting after %s.' %
+                                (sub_item.path, unicode(sub_item.added + parse_timedelta('24 hours'))))
                     continue
                 else:
                     log.error('File not found. Removing "%s" from queue.' % sub_item.title)
@@ -185,7 +185,7 @@ class SubtitleQueue(object):
                             session.delete(sub_item)
                             continue
                     except ImportError:
-                        log.debug('Falling back to glob since Subliminal is not installed.')
+                        log.debug('Falling back to simple check since Subliminal is not installed.')
                         # use glob since subliminal is not there
                         path_no_ext = os.path.splitext(normalize_path(file))[0]
                         # can only check subtitles that have explicit language codes in the file name
@@ -202,7 +202,7 @@ class SubtitleQueue(object):
                                 continue
                     entry.on_complete(self.complete, path=path, task=task)
                     entries.append(entry)
-                    log.info('Emitting subtitle entry for %s.' % entry['title'])
+                    log.debug('Emitting entry for %s.' % entry['title'])
         return entries
 
     def on_task_filter(self, task, config):
@@ -280,7 +280,7 @@ class SubtitleQueue(object):
                     if entry.get('location', ''):
                         queue_del(entry['location'])
                     else:
-                        entry.fail('Not a local file. Cannot remove non-local files.')
+                        entry.reject('Not a local file. Cannot remove non-local files.')
                 return
             except QueueError as e:
                 # ignore already in queue
@@ -292,6 +292,7 @@ class SubtitleQueue(object):
 def queue_add(path, title, config, alternate_path=None, location=None, session=None):
     path = normalize_path(path)
     alternate_path = normalize_path(alternate_path)
+    location = normalize_path(location)
     conditions = [QueuedSubtitle.path == path, QueuedSubtitle.alternate_path == path]
     if location:
         conditions.extend([QueuedSubtitle.path == location, QueuedSubtitle.alternate_path == location])
@@ -300,7 +301,7 @@ def queue_add(path, title, config, alternate_path=None, location=None, session=N
     primary = make_lang_list(config.get('languages', []), session=session)
     if item:
         log.info('%s: Already queued. Updating values.' % item.title)
-        queue_edit(path, alternate_path, title, config, session=session)
+        queue_edit(path, alternate_path, title, config, location=location, session=session)
     else:
         if config.get('stop_after', ''):
             item = QueuedSubtitle(path, alternate_path, title, stop_after=config.get('stop_after'))
@@ -331,6 +332,7 @@ def queue_del(path, session=None):
 def queue_edit(src, dest, title, config, location=None, session=None):
     src = normalize_path(src)
     dest = normalize_path(dest)
+    location = normalize_path(location)
     conditions = [QueuedSubtitle.path == src, QueuedSubtitle.alternate_path == src]
     if location:
         conditions.extend([QueuedSubtitle.path == location, QueuedSubtitle.alternate_path == location])
@@ -340,7 +342,7 @@ def queue_edit(src, dest, title, config, location=None, session=None):
     # item should exist, but this check might be needed in the future
     if not item:
         # tried to edit a non-queued item. Add it.
-        queue_add(dest, title, config, alternate_path=src, session=session)
+        queue_add(dest, title, config, alternate_path=src, location=location, session=session)
     else:
         if item.downloaded:
             log.debug('All subtitles have already been downloaded. Not updating values.')
