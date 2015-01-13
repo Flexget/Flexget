@@ -25,7 +25,7 @@ def make_list_slug(name):
     """Return the slug for use in url for given list name."""
     slug = name.lower()
     # These characters are just stripped in the url
-    for char in '!@#$%^*()[]{}/=?+\\|-':
+    for char in '!@#$%^*()[]{}/=?+\\|':
         slug = slug.replace(char, '')
     # These characters get replaced
     slug = slug.replace('&', 'and')
