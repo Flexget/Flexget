@@ -1,4 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+
+from StringIO import StringIO
+
+from flexget.logger import capture_output
+from flexget.manager import get_parser
 from flexget.task import TaskAbort
 from tests import FlexGetBase, build_parser_function
 
@@ -2213,3 +2218,26 @@ class TestInternalSpecials(BaseSpecials):
     def __init__(self):
         super(TestInternalSpecials, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
+
+
+class TestCLI(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          learn_series:
+            series:
+            - Some Show
+            - Other Show
+            mock:
+            - title: Some Series S01E01
+            - title: Other Series S01E02
+    """
+
+    def test_series_list(self):
+        """Very rudimentary test, mostly makes sure this doesn't crash."""
+        self.execute_task('learn_series')
+        options = get_parser().parse_args(['series', 'list'])
+        buffer = StringIO()
+        with capture_output(buffer, loglevel='error'):
+            self.manager.handle_cli(options=options)
+        lines = buffer.getvalue().split('\n')
+        assert all(any(line.lstrip().startswith(series) for line in lines) for series in ['Some Show', 'Other Show'])
