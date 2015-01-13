@@ -21,7 +21,7 @@ class TestAbort(FlexGetBase):
         tasks:
           test:
             # causes on_task_abort to be called
-            disable_builtins: yes
+            disable: builtins
 
             # causes abort
             abort: yes

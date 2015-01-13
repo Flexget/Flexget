@@ -606,7 +606,7 @@ class BasePropers(FlexGetBase):
           global:
             # prevents seen from rejecting on second execution,
             # we want to see that series is able to reject
-            disable_builtins: yes
+            disable: builtins
             series:
               - test
               - foobar
@@ -876,7 +876,7 @@ class BaseDuplicates(FlexGetBase):
 
         templates:
           global: # just cleans log a bit ..
-            disable_builtins:
+            disable:
               - seen
 
         tasks:
@@ -962,7 +962,7 @@ class BaseQualities(FlexGetBase):
     __yaml__ = """
         templates:
           global:
-            disable_builtins: yes
+            disable: builtins
             series:
               - FooBar:
                   qualities:
@@ -1155,7 +1155,7 @@ class BaseNormalization(FlexGetBase):
     __yaml__ = """
         tasks:
           global:
-            disable_builtins: [seen]
+            disable: [seen]
           test_1:
             mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}

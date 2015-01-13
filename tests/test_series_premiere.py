@@ -8,7 +8,7 @@ class BaseSeriesPremiere(FlexGetBase):
 
         templates:
           global: # just cleans log a bit ..
-            disable_builtins:
+            disable:
               - seen
 
         tasks:

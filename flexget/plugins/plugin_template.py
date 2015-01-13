@@ -3,7 +3,7 @@ import logging
 
 from flexget import options, plugin
 from flexget.event import event
-from flexget.config_schema import register_config_key, one_or_more
+from flexget.config_schema import register_config_key
 from flexget.utils.tools import MergeException, merge_dict_from_to
 
 log = logging.getLogger('template')
@@ -113,49 +113,9 @@ class PluginTemplate(object):
         log.trace('templates: %s' % config)
 
 
-class DisablePlugin(object):
-    """
-    Allows disabling plugins when using templates.
-
-    Example::
-
-      templates:
-        movies:
-          download: ~/torrents/movies/
-          .
-          .
-
-      tasks:
-        nzbs:
-          template: movies
-          disable_plugin:
-            - download
-          sabnzbd:
-            .
-            .
-
-      # Task nzbs uses all other configuration from template movies but removes the download plugin
-    """
-
-    schema = one_or_more({'type': 'string'})
-
-    @plugin.priority(250)
-    def on_task_start(self, task, config):
-        if isinstance(config, basestring):
-            config = [config]
-        # let's disable them
-        for disable in config:
-            if disable in task.config:
-                log.debug('disabling %s' % disable)
-                del(task.config[disable])
-
-
-
-
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginTemplate, 'template', builtin=True, api_ver=2)
-    plugin.register(DisablePlugin, 'disable_plugin', api_ver=2)
 
 
 @event('config.register')
