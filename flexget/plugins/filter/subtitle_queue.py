@@ -153,6 +153,9 @@ class SubtitleQueue(object):
                     continue
                 if os.path.isdir(path):
                     paths = os.listdir(path)
+                    if not paths:
+                        log.warning('Queued folder %s is empty.' % path)
+                        continue
                     path_dir = path
                 else:
                     paths = [path]
