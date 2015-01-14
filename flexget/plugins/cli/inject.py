@@ -23,9 +23,8 @@ def do_cli(manager, options):
     if options.fields:
         for key, value in options.fields:
             entry[key] = value
-    exec_options = options.execute
-    exec_options.inject = [entry]
-    manager.execute_command(exec_options)
+    options.inject = [entry]
+    manager.execute_command(options)
 
 
 def key_equals_value(text):
