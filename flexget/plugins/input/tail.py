@@ -6,7 +6,6 @@ import logging
 from flexget import options, plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.cached_input import cached
 
 log = logging.getLogger('tail')
 
@@ -65,7 +64,6 @@ class InputTail(object):
         for k, v in d.iteritems():
             entry[k] = v % entry
 
-    @cached('tail')
     def on_task_input(self, task, config):
 
         # Let details plugin know that it is ok if this task doesn't produce any entries
