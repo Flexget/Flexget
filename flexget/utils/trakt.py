@@ -48,7 +48,10 @@ def get_session(username=None, password=None):
         try:
             r = session.post(urljoin(API_URL, 'auth/login'), data=json.dumps(auth))
         except RequestException as e:
-            raise plugin.PluginError('Authentication to trakt failed, check your username/password: %s' % e.args[0])
+            if e.response.status_code in [401, 403]:
+                raise plugin.PluginError('Authentication to trakt failed, check your username/password: %s' % e.args[0])
+            else:
+                raise plugin.PluginError('Authentication to trakt failed: %s' % e.args[0])
         try:
             session.headers['trakt-user-token'] = r.json()['token']
         except (ValueError, KeyError):
