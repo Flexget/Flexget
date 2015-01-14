@@ -177,7 +177,7 @@ class FilterExistsMovie(object):
         if incompatible_files or incompatible_entries:
             log.verbose('There were some incompatible items. %s of %s entries '
                         'and %s of %s directories could not be verified.' %
-                (incompatible_entries, count_entries, incompatible_files, count_dirs))
+                (incompatible_entries, count_entries, incompatible_files, count_files))
 
         log.debug('-- Finished filtering entries -------------------------------')
 
