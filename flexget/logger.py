@@ -7,6 +7,7 @@ import threading
 import uuid
 import warnings
 
+from flexget import __version__
 from flexget.utils.tools import io_encoding
 
 # A level more detailed than DEBUG
@@ -148,7 +149,9 @@ def initialize(unit_test=False):
     if _logging_configured:
         return
 
-    warnings.simplefilter('once')
+    if 'dev' in __version__:
+        warnings.filterwarnings('always', category=DeprecationWarning, module='flexget.*')
+    warnings.simplefilter('once', append=True)
     logging.addLevelName(TRACE, 'TRACE')
     logging.addLevelName(VERBOSE, 'VERBOSE')
     _logging_configured = True
