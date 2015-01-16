@@ -463,7 +463,8 @@ class Task(object):
             self.abort(msg)
         except Exception as e:
             msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
-            log.exception(msg)
+            log.critical(msg)
+            self.manager.crash_report()
             self.abort(msg)
 
     def rerun(self):

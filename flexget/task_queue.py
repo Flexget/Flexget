@@ -32,14 +32,14 @@ class TaskQueue(object):
 
     def run(self):
         while not self._shutdown_now:
+            # Grab the first job from the run queue and do it
             try:
-                # Grab the first job from the run queue and do it
-                try:
-                    task = self.run_queue.get(timeout=0.5)
-                except Queue.Empty:
-                    if self._shutdown_when_finished:
-                        self._shutdown_now = True
-                    continue
+                task = self.run_queue.get(timeout=0.5)
+            except Queue.Empty:
+                if self._shutdown_when_finished:
+                    self._shutdown_now = True
+                continue
+            try:
                 try:
                     task.execute()
                 except TaskAbort as e:
@@ -48,9 +48,10 @@ class TaskQueue(object):
                     self.run_queue.task_done()
             except (ProgrammingError, OperationalError):
                 log.exception('Database error while running a task. Attempting to recover.')
+                task.manager.crash_report()
             except Exception:
                 log.exception('BUG: Unhandled exception during task queue run loop.')
-                raise
+                task.manager.crash_report()
         remaining_jobs = self.run_queue.qsize()
         if remaining_jobs:
             log.warning('task queue shut down with %s tasks remaining in the queue to run.' % remaining_jobs)

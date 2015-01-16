@@ -1,4 +1,5 @@
 from __future__ import absolute_import, division, unicode_literals, print_function
+import collections
 import contextlib
 import logging
 import logging.handlers
@@ -101,6 +102,12 @@ def console(text):
     print(text, file=output)
 
 
+class RollingBuffer(collections.deque):
+    """File-like that keeps a certain number of lines of text in memory."""
+    def write(self, line):
+        self.append(line)
+
+
 class FlexGetLogger(logging.Logger):
     """Custom logger that adds trace and verbose logging methods, and contextual information to log records."""
 
@@ -139,6 +146,8 @@ class FlexGetFormatter(logging.Formatter):
 _logging_configured = False
 _buff_handler = None
 _logging_started = False
+# Stores the last 50 debug messages
+debug_buffer = RollingBuffer(maxlen=50)
 
 
 def initialize(unit_test=False):
@@ -167,6 +176,12 @@ def initialize(unit_test=False):
     _buff_handler = logging.handlers.BufferingHandler(1000 * 1000)
     logger.addHandler(_buff_handler)
     logger.setLevel(logging.NOTSET)
+
+    # Add a handler that sores the last 50 debug lines to `debug_buffer` for use in crash reports
+    crash_handler = logging.StreamHandler(debug_buffer)
+    crash_handler.setLevel(logging.DEBUG)
+    crash_handler.setFormatter(FlexGetFormatter())
+    logger.addHandler(crash_handler)
 
 
 def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
