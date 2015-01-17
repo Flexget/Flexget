@@ -436,6 +436,7 @@ class PluginTransmission(TransmissionBase):
                 if ('main_file_only' in options['post'] and options['post']['main_file_only'] == True or 
                    'content_filename' in options['post'] or skip_files):
                         fl = cli.get_files(r.id)
+                        fl = fl.encode('utf-8')
                 
                         # Find files based on config
                         dl_list = []
