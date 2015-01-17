@@ -59,15 +59,16 @@ class BaseEmitSeries(FlexGetBase):
               backfill: yes
             series:
             - Test Series 5:
-                begin: S02E02
+                begin: S03E02
                 tracking: backfill
             rerun: 0
           test_emit_series_begin_backfill_and_rerun:
+            accept_all: yes  # make sure mock output stores all created entries
             emit_series:
               backfill: yes
             series:
             - Test Series 6:
-                begin: S02E02
+                begin: S03E02
                 tracking: backfill
             mock_output: yes
             rerun: 1
@@ -158,14 +159,20 @@ class BaseEmitSeries(FlexGetBase):
         assert self.task.find_entry(title='Test Series 4 S03E03')
 
     def test_emit_series_begin_and_backfill(self):
+        self.inject_series('Test Series 5 S02E02')
         self.execute_task('test_emit_series_begin_and_backfill')
         # with backfill and begin, no backfilling should be done
-        assert self.task.find_entry(title='Test Series 5 S02E02')
+        assert self.task.find_entry(title='Test Series 5 S03E02')
+        assert len(self.task.all_entries) == 1
 
     def test_emit_series_begin_backfill_and_rerun(self):
+        self.inject_series('Test Series 6 S03E01')
         self.execute_task('test_emit_series_begin_backfill_and_rerun')
         # with backfill and begin, no backfilling should be done
-        assert len(self.task.mock_output) == 2 # Should have S02E02 and S02E03
+        assert self.task._rerun_count == 1
+        assert self.task.find_entry(title='Test Series 6 S03E03')
+        assert len(self.task.all_entries) == 1
+        assert len(self.task.mock_output) == 2 # Should have S03E02 and S03E03
 
     def test_emit_series_backfill_advancement(self):
         self.inject_series('Test Series 7 S02E01')
