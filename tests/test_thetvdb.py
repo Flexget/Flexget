@@ -32,7 +32,7 @@ class TestThetvdbLookup(FlexGetBase):
               - {title: 'House.S02E02.hdtv'}
             metainfo_series: yes
             accept_all: yes
-            disable_builtins: [seen]
+            disable: [seen]
           test_date:
             mock:
               - title: the daily show 2012-6-6

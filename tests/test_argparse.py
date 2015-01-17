@@ -26,7 +26,8 @@ def test_subparser_nested_namespace():
 
 def test_subparser_parent_defaults():
     p = ArgumentParser()
-    p.add_argument('--a', default='default')
+    p.add_argument('--a')
+    p.set_post_defaults(a='default')
     p.add_subparsers()
     p.add_subparser('sub')
     p.add_subparser('sub_with_default', parent_defaults={'a': 'sub_default'})

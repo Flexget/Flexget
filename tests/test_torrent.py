@@ -169,7 +169,7 @@ class TestTorrentScrub(FlexGetBase):
               - {title: 'LICENSE-resume', file: '__tmp__LICENSE-resume.torrent'}
             accept_all: yes
             torrent_scrub: all
-            disable_builtins: [seen_info_hash]
+            disable: [seen_info_hash]
 
           test_fields:
             mock:

@@ -401,6 +401,7 @@ class Manager(object):
             if options.action == 'status':
                 log.info('Daemon running. (PID: %s)' % os.getpid())
             elif options.action == 'stop':
+                log.info('Daemon shutdown requested.')
                 self.shutdown(options.wait)
             elif options.action == 'reload':
                 log.info('Reloading config from disk.')

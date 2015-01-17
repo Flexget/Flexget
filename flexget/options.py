@@ -187,7 +187,9 @@ class NestedSubparserAction(_SubParsersAction):
     def __call__(self, parser, namespace, values, option_string=None):
         parser_name = values[0]
         if parser_name in self.parent_defaults:
-            parser.set_post_defaults(**self.parent_defaults[parser_name])
+            for dest in self.parent_defaults[parser_name]:
+                if not hasattr(namespace, dest):
+                    setattr(namespace, dest, self.parent_defaults[parser_name][dest])
         if self.nested_namespaces:
             subnamespace = ScopedNamespace()
             super(NestedSubparserAction, self).__call__(parser, subnamespace, values, option_string)
@@ -245,10 +247,15 @@ class ArgumentParser(ArgParser):
 
         self.subparsers = None
         self.raise_errors = None
-        self.post_defaults = {}
         ArgParser.__init__(self, **kwargs)
         # Overwrite _SubparserAction with our custom one
         self.register('action', 'parsers', NestedSubparserAction)
+
+        self.post_defaults = {}
+        if kwargs.get('parents'):
+            for parent in kwargs['parents']:
+                if hasattr(parent, 'post_defaults'):
+                    self.set_post_defaults(**parent.post_defaults)
 
     def add_argument(self, *args, **kwargs):
         if isinstance(kwargs.get('nargs'), basestring) and '-' in kwargs['nargs']:
@@ -306,7 +313,7 @@ class ArgumentParser(ArgParser):
 
         # add any post defaults that aren't present
         for dest in self.post_defaults:
-            if getattr(namespace, dest, None) is None:
+            if not hasattr(namespace, dest):
                 setattr(namespace, dest, self.post_defaults[dest])
 
         return namespace, args
@@ -319,15 +326,6 @@ class ArgumentParser(ArgParser):
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
         kwargs.setdefault('parser_class', ArgumentParser)
         self.subparsers = super(ArgumentParser, self).add_subparsers(**kwargs)
-
-        # Move any argument defaults to post defaults, so subparsers get a chance to override
-        post_defaults = {}
-        for action in self._actions:
-            if action.default:
-                post_defaults[action.dest] = action.default
-                action.default = SUPPRESS
-        self.set_post_defaults(**post_defaults)
-
         return self.subparsers
 
     def add_subparser(self, name, **kwargs):
@@ -378,9 +376,9 @@ manager_parser.add_argument('--logfile', '-l', default='flexget.log',
                             help='Specify a custom logfile name/location. '
                                  'Default: %(default)s in the config directory.')
 manager_parser.add_argument('--loglevel', '-L', metavar='LEVEL',
-                            default='verbose',
                             help='Set the verbosity of the logger. Levels: %(choices)s',
                             choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
+manager_parser.set_post_defaults(loglevel='verbose')
 # This option is already handled above.
 manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
                             help='Use this option to create a detailed bug report, '

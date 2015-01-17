@@ -1,4 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+
+from StringIO import StringIO
+
+from flexget.logger import capture_output
+from flexget.manager import get_parser
 from flexget.task import TaskAbort
 from tests import FlexGetBase, build_parser_function
 
@@ -606,7 +611,7 @@ class BasePropers(FlexGetBase):
           global:
             # prevents seen from rejecting on second execution,
             # we want to see that series is able to reject
-            disable_builtins: yes
+            disable: builtins
             series:
               - test
               - foobar
@@ -876,7 +881,7 @@ class BaseDuplicates(FlexGetBase):
 
         templates:
           global: # just cleans log a bit ..
-            disable_builtins:
+            disable:
               - seen
 
         tasks:
@@ -962,7 +967,7 @@ class BaseQualities(FlexGetBase):
     __yaml__ = """
         templates:
           global:
-            disable_builtins: yes
+            disable: builtins
             series:
               - FooBar:
                   qualities:
@@ -1155,7 +1160,7 @@ class BaseNormalization(FlexGetBase):
     __yaml__ = """
         tasks:
           global:
-            disable_builtins: [seen]
+            disable: [seen]
           test_1:
             mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
@@ -2213,3 +2218,26 @@ class TestInternalSpecials(BaseSpecials):
     def __init__(self):
         super(TestInternalSpecials, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
+
+
+class TestCLI(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          learn_series:
+            series:
+            - Some Show
+            - Other Show
+            mock:
+            - title: Some Series S01E01
+            - title: Other Series S01E02
+    """
+
+    def test_series_list(self):
+        """Very rudimentary test, mostly makes sure this doesn't crash."""
+        self.execute_task('learn_series')
+        options = get_parser().parse_args(['series', 'list'])
+        buffer = StringIO()
+        with capture_output(buffer, loglevel='error'):
+            self.manager.handle_cli(options=options)
+        lines = buffer.getvalue().split('\n')
+        assert all(any(line.lstrip().startswith(series) for line in lines) for series in ['Some Show', 'Other Show'])

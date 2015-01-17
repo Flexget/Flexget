@@ -10,7 +10,7 @@ class TestOnlyNew(FlexGetBase):
             mock:
               - {title: 'title 1', url: 'http://localhost/title1'}
             only_new: yes
-            disable_builtins: [seen] # Disable the seen plugin to make sure only_new does the filtering.
+            disable: [seen] # Disable the seen plugin to make sure only_new does the filtering.
             accept_all: yes
     """
 

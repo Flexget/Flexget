@@ -15,19 +15,19 @@ class TestDisableBuiltins(FlexGetBase):
 
     __yaml__ = """
         tasks:
-            test:
-                mock:
-                    - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5}
-                    - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
-                disable_builtins: true
+          test:
+            mock:
+              - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5}
+              - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
+            disable: builtins
 
             test2:
-                mock:
-                    - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5, description: 'http://www.imdb.com/title/tt0409459/'}
-                    - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
-                disable_builtins:
-                    - seen
-                    - cli_config
+              mock:
+                - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5, description: 'http://www.imdb.com/title/tt0409459/'}
+                - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
+              disable:
+                - seen
+                - cli_config
     """
 
     def test_disable_builtins(self):

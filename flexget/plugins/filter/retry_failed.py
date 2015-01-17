@@ -120,6 +120,8 @@ class PluginFailed(object):
 
     @plugin.priority(-255)
     def on_task_input(self, task, config):
+        if config is False:
+            return
         config = self.prepare_config(config)
         for entry in task.all_entries:
             entry.on_fail(self.add_failed, config=config)

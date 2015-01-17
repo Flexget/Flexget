@@ -105,7 +105,8 @@ class EmitSeries(object):
 
                 low_season = 0 if series.identified_by == 'ep' else -1
 
-                latest_season = get_latest_release(series)
+                check_downloaded = not config.get('backfill')
+                latest_season = get_latest_release(series, downloaded=check_downloaded)
                 if latest_season:
                     latest_season = latest_season.season
                 else:
@@ -113,7 +114,6 @@ class EmitSeries(object):
 
                 for season in xrange(latest_season, low_season, -1):
                     log.debug('Adding episodes for season %d' % season)
-                    check_downloaded = not config.get('backfill')
                     latest = get_latest_release(series, season=season, downloaded=check_downloaded)
                     if series.begin and (not latest or latest < series.begin):
                         entries.append(self.search_entry(series, series.begin.season, series.begin.number, task))
@@ -154,6 +154,9 @@ class EmitSeries(object):
                             break
                     # Skip older seasons if we are not in backfill mode
                     if not config.get('backfill'):
+                        break
+                    # Don't look for seasons older than begin ep
+                    if series.begin and series.begin.season >= season:
                         break
 
         return entries
