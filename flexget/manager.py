@@ -900,5 +900,5 @@ class Manager(object):
             with codecs.open(filename, 'w', encoding='utf-8') as outfile:
                 outfile.writelines(logger.debug_buffer)
                 traceback.print_exc(file=outfile)
+            log.critical('An unexpected crash has occurred. Writing crash report to %s' % filename)
         log.debug('Traceback:', exc_info=True)
-        log.critical('An unexpected crash has occurred. Writing crash report to %s' % filename)
