@@ -895,9 +895,10 @@ class Manager(object):
         This should be called when handling an unexpected exception. Will create a new log file containing the last 50
         debug messages as well as the crash traceback.
         """
-        filename = os.path.join(self.config_base, datetime.now().strftime('crash_report.%Y.%m.%d.%H%M%S%f.log'))
-        with codecs.open(filename, 'w', encoding='utf-8') as outfile:
-            outfile.writelines(logger.debug_buffer)
-            traceback.print_exc(file=outfile)
+        if not self.unit_test:
+            filename = os.path.join(self.config_base, datetime.now().strftime('crash_report.%Y.%m.%d.%H%M%S%f.log'))
+            with codecs.open(filename, 'w', encoding='utf-8') as outfile:
+                outfile.writelines(logger.debug_buffer)
+                traceback.print_exc(file=outfile)
         log.debug('Traceback:', exc_info=True)
         log.critical('An unexpected crash has occurred. Writing crash report to %s' % filename)
