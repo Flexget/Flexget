@@ -224,7 +224,7 @@ class Entry(dict):
 
         # title handling
         if key == 'title':
-            if not isinstance(value, basestring):
+            if not isinstance(value, (basestring, LazyField)):
                 raise PluginError('Tried to set title to %r' % value)
 
         try:
@@ -298,7 +298,7 @@ class Entry(dict):
             if self.is_lazy(field):
                 # If the field is already a lazy field, append this function to it's list of functions
                 dict.get(self, field).funcs.append(func)
-            elif not self.get(field, eval_lazy=False):
+            elif self.get(field, eval_lazy=False) is None:
                 # If it is not a lazy field, and isn't already populated, make it a lazy field
                 self[field] = LazyField(self, field, func)
 
