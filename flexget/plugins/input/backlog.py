@@ -55,6 +55,31 @@ class BacklogEntry(Base):
 Index('ix_backlog_feed_expire', BacklogEntry.task, BacklogEntry.expire)
 
 
+@with_session
+def get_entries(task=None, session=None):
+    query = session.query(BacklogEntry)
+    if task:
+        query = query.filter(BacklogEntry.task == task)
+    return query.all()
+
+
+@with_session
+def clear_entries(task=None, all=False, session=None):
+    """
+    Clear entries from backlog.
+
+    :param task: If given, only entries from specified task will be cleared.
+    :param all: If True, all entries will be cleared, otherwise only expired entries will be cleared.
+    :returns: Number of entries cleared from backlog.
+    """
+    query = session.query(BacklogEntry)
+    if task:
+        query = query.filter(BacklogEntry.task == task)
+    if not all:
+        query = query.filter(BacklogEntry.expire < datetime.now())
+    return query.delete()
+
+
 class InputBacklog(object):
     """
     Keeps task history for given amount of time.
@@ -125,8 +150,7 @@ class InputBacklog(object):
     def get_injections(self, task, session=None):
         """Insert missing entries from backlog."""
         entries = []
-        task_backlog = session.query(BacklogEntry).filter(BacklogEntry.task == task.name)
-        for backlog_entry in task_backlog.all():
+        for backlog_entry in get_entries(task=task.name, session=session):
             entry = Entry(backlog_entry.entry)
 
             # this is already in the task
@@ -138,9 +162,8 @@ class InputBacklog(object):
             log.verbose('Added %s entries from backlog' % len(entries))
 
         # purge expired
-        for backlog_entry in task_backlog.filter(datetime.now() > BacklogEntry.expire).all():
-            log.debug('Purging %s' % backlog_entry.title)
-            session.delete(backlog_entry)
+        purged = clear_entries(task=task.name, all=False, session=session)
+        log.debug('%s entries purged from backlog' % purged)
 
         return entries
 
