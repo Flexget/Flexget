@@ -31,7 +31,11 @@ def _process(element, secrets):
     # Environment isn't set up at import time, have to delay the import until here
     from flexget.utils.template import environment
     if isinstance(element, dict):
-        for k in element:
+        for k, v in element.iteritems():
+            new_key = _process(k, secrets)
+            if new_key:
+                element[new_key] = element.pop(k)
+                k = new_key
             val = _process(element[k], secrets)
             if val:
                 element[k] = val
