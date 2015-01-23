@@ -87,6 +87,10 @@ class Manager(object):
       If any plugins have declared a newer schema version than exists in the database, this event will be fired to
       allow plugins to upgrade their tables
 
+    * manager.shutdown_requested
+
+      When shutdown has been requested. Any plugins which might add to execution queue should stop when this is fired.
+
     * manager.shutdown
 
       When the manager is exiting
@@ -402,7 +406,8 @@ class Manager(object):
             if options.action == 'status':
                 log.info('Daemon running. (PID: %s)' % os.getpid())
             elif options.action == 'stop':
-                log.info('Daemon shutdown requested.')
+                tasks = 'all queued tasks (if any) have' if options.wait else 'currently running task (if any) has'
+                log.info('Daemon shutdown requested. Shutdown will commence when %s finished executing.' % tasks)
                 self.shutdown(options.wait)
             elif options.action == 'reload':
                 log.info('Reloading config from disk.')
@@ -872,10 +877,13 @@ class Manager(object):
         """
         if not self.initialized:
             raise RuntimeError('Cannot shutdown manager that was never initialized.')
+        fire_event('manager.shutdown_requested', self)
         self.task_queue.shutdown(finish_queue)
 
     def _shutdown(self):
         """Runs when the manager is done processing everything."""
+        if self.ipc_server:
+            self.ipc_server.shutdown()
         fire_event('manager.shutdown', self)
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutting down')
@@ -887,8 +895,6 @@ class Manager(object):
             if self._has_lock:
                 os.remove(self.db_filename)
                 log.info('Removed test database')
-        if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
-            log.debug('Shutdown completed')
 
     def crash_report(self):
         """
