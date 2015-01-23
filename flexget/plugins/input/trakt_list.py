@@ -25,7 +25,8 @@ field_maps = {
     },
     'show': {
         'title': 'show.title',
-        # TODO: Should this have series_name? We normally only have that for episodes
+        'series_name': 'show.title',
+
         'imdb_id': 'show.ids.imdb',
         'tvdb_id': 'show.ids.tvdb',
         'tvrage_id': 'show.ids.tvrage',
