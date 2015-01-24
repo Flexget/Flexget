@@ -5,3 +5,4 @@ http://github.com/cmheisel/nose-xcover/zipball/master
 pep8
 mock
 vcrpy
+virtualenv
