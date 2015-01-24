@@ -27,8 +27,12 @@ class EscapingDict(MutableMapping):
     def __getitem__(self, key):
         value = self._data[key]
         if isinstance(value, basestring):
-            # TODO: May need to be different depending on OS
-            value = value.replace('"', '\\"')
+            if sys.platform.startswith('win'):
+                value = value.replace('"', '\\"')
+            else:
+                value = value.replace('"', '\\"')
+                value = value.replace('\'', '\\\'')
+                value = value.replace(' ', '\\ ')
         return value
 
     def __setitem__(self, key, value):
