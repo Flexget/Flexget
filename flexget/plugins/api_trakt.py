@@ -5,17 +5,19 @@ import urllib
 from urlparse import urljoin
 
 import requests
-from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, func, Date, DateTime
+from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, func, Date, DateTime, Time
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
 from flexget import plugin
+from flexget.db_schema import upgrade
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugins.filter.series import normalize_series_name
-from flexget.utils.database import with_session
 from flexget.utils import json
+from flexget.utils.database import with_session
+from flexget.utils.simple_persistence import SimplePersistence
 
 api_key = '6c228565a45a302e49fb7d2dab066c9ab948b7be/'
 search_show = 'http://api.trakt.tv/search/shows.json/'
@@ -26,6 +28,9 @@ log = logging.getLogger('api_trakt')
 # Production Site
 API_KEY = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
 API_URL = 'https://api.trakt.tv/'
+
+# Stores the last time we checked for updates for shows/movies
+updated = SimplePersistence('api_trakt')
 
 
 def make_list_slug(name):
@@ -79,6 +84,23 @@ def get_api_url(*endpoint):
     # Make sure integer portions are turned into strings first too
     url = API_URL + '/'.join(map(unicode, endpoint))
     return url
+
+
+@upgrade('api_trakt')
+def upgrade_database(ver, session):
+    if ver <=2:
+        pass  # TODO: Clear out all old db
+    return ver
+
+
+@with_session
+def mark_expired(type, session=None):
+    """
+    Mark which cached shows/movies have updated information on trakt.
+
+    :param type: Either 'shows' or 'movies'
+    """
+    # TODO: Implement
 
 
 class TraktContainer(object):
@@ -139,27 +161,24 @@ class Show(TraktContainer, Base):
     tvrage_id = Column(Unicode)
     title = Column(Unicode)
     year = Column(Integer)
-    genres = relation('Genre', secondary=show_genres_table)
-    network = Column(Unicode, nullable=True)
-    certification = Column(Unicode)
-    country = Column(Unicode)
     overview = Column(Unicode)
-    first_aired = Column(Integer)
-    first_aired_iso = Column(Unicode)
-    first_aired_utc = Column(Integer)
+    first_aired = Column(DateTime)
     air_day = Column(Unicode)
-    air_day_utc = Column(Unicode)
-    air_time = Column(Unicode)
-    air_time_utc = Column(Unicode)
+    air_time = Column(Time)
     runtime = Column(Integer)
-    last_updated = Column(Integer)
-    poster = Column(String)
-    fanart = Column(String)
-    banner = Column(String)
+    certification = Column(Unicode)
+    network = Column(Unicode)
+    country = Column(Unicode)
     status = Column(String)
-    url = Column(Unicode)
+    rating = Column(Integer)
+    votes = Column(Integer)
+    language = Column(Unicode)
+    aired_episodes = Column(Integer)
     episodes = relation('Episode', backref='show', cascade='all, delete, delete-orphan')
+    genres = relation('Genre', secondary=show_genres_table)
     actors = relation('Actors', secondary=show_actors_table)
+    updated_at = Column(DateTime)
+    expired = Column(Boolean)
 
     def update(self, session):
         tvdb_id = self.tvdb_id
@@ -210,6 +229,7 @@ class Episode(TraktContainer, Base):
     nummber_abs = Column(Integer)
     overview = Column(Unicode)
     first_aired = Column(DateTime)
+    expired = Column(Boolean)
 
     series_id = Column(Integer, ForeignKey('trakt_series.trakt_id'), nullable=False)
 
@@ -228,6 +248,8 @@ class Movie(TraktContainer, Base):
     rating = Column(Integer)
     votes = Column(Integer)
     language = Column(Unicode)
+    expired = Column(Boolean)
+    updated_at = Column(DateTime)
     genres = relation('Genre', secondary=movie_genres_table)
     actors = relation('Actors', secondary=movie_actors_table)
 
