@@ -294,6 +294,37 @@ def get_id(type, name=None, year=None, trakt_slug=None, tmdb_id=None, imdb_id=No
 
     # TODO: Fall back to name/year search
 
+    clean_title = normalize_series_name(name)
+    found = None
+    try:
+        results = req_session.get(get_api_url('search'), params={'query': clean_title, 'type': type}).json()
+    except requests.RequestException as e:
+        log.debug('ID Lookup failed on error: %s' % e)
+    if results['type'] is type:
+        for result in results:
+            if clean_title == result['title']:
+                if type == 'movie' and year == result['year']:
+                    found = result[type]['ids']['trakt']
+                else:
+                    if type == 'show':
+                        found = result[type]['ids']['trakt']
+            else:
+                title_match = SequenceMatcher(lambda x: x in '\t', normalize_series_name(result['title']),
+                                              clean_title).ratio()
+                if title_match > .9:
+                    if type == 'movie' and year == result['year']:
+                        log.debug('Warning: Using lazy matching may not return correct results for %s' % name)
+                        found = result[type]['ids']['trakt']
+                    else:
+                        if type == 'show':
+                            log.debug('Warning: Using lazy matching may not return correct results for %s' % name)
+                            found = result[type]['ids']['trakt']
+    if not found:
+        raise LookupError('Unable to find Trakt ID for %s from Trakt API' % name)
+    return found
+
+
+
     # norm_series_name = normalize_series_name(title)
     # series_name = urllib.quote_plus(norm_series_name)
     # url = search_show + api_key + series_name
