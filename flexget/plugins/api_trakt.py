@@ -302,17 +302,17 @@ def get_id(type, name=None, year=None, trakt_slug=None, tmdb_id=None, imdb_id=No
         log.debug('ID Lookup failed on error: %s' % e)
     if results['type'] is type:
         for result in results:
-            if clean_title == result['title']:
-                if type == 'movie' and year == result['year']:
+            if clean_title == result[type]['title']:
+                if type == 'movie' and year == result[type]['year']:
                     found = result[type]['ids']['trakt']
                 else:
                     if type == 'show':
                         found = result[type]['ids']['trakt']
             else:
-                title_match = SequenceMatcher(lambda x: x in '\t', normalize_series_name(result['title']),
+                title_match = SequenceMatcher(lambda x: x in '\t', normalize_series_name(result[type]['title']),
                                               clean_title).ratio()
                 if title_match > .9:
-                    if type == 'movie' and year == result['year']:
+                    if type == 'movie' and year == result[type]['year']:
                         log.debug('Warning: Using lazy matching may not return correct results for %s' % name)
                         found = result[type]['ids']['trakt']
                     else:
