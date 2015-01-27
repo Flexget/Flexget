@@ -302,7 +302,7 @@ def get_id(type, name=None, year=None, trakt_slug=None, tmdb_id=None, imdb_id=No
         log.debug('ID Lookup failed on error: %s' % e)
     if results['type'] is type:
         for result in results:
-            if clean_title == result[type]['title']:
+            if clean_title == normalize_series_name(result[type]['title']):
                 if type == 'movie' and year == result[type]['year']:
                     found = result[type]['ids']['trakt']
                 else:
