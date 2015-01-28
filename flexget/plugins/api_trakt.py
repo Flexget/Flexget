@@ -287,6 +287,7 @@ def get_id(type, name=None, year=None, trakt_slug=None, tmdb_id=None, imdb_id=No
             results = req_session.get(get_api_url('search'), params={'id_type': id_type, 'id': identifier}).json()
         except requests.RequestException as e:
             continue
+        # TODO: Json error checking
         for result in results:
             if result['type'] != type:
                 raise LookupError('Provided id (%s) is for a %s not a %s' % (identifier, result['type'], type))
@@ -319,9 +320,12 @@ def get_id(type, name=None, year=None, trakt_slug=None, tmdb_id=None, imdb_id=No
                         if type == 'show':
                             log.debug('Warning: Using lazy matching may not return correct results for %s' % name)
                             found = result[type]['ids']['trakt']
-    if not found:
-        raise LookupError('Unable to find Trakt ID for %s from Trakt API' % name)
-    return found
+        if not found:
+            if type == 'show':
+                raise LookupError('Unable to find Trakt ID for %s from Trakt API' % name)
+            else:
+                raise LookupError('Unable to find Trakt ID for %s (%s) from Trakt API' % (name, year))
+        return found
 
 
 
@@ -361,13 +365,13 @@ class ApiTrakt(object):
 
     @staticmethod
     @with_session
-    def lookup_series(trakt_id, only_cached=False, session=None):
+    def lookup_series(id, only_cached=False, session=None):
         series = None
 
         def id_str():
-            return '<name=%s, tvdb_id=%s>' % (title, tvdb_id)
-        if tvdb_id:
-            series = session.query(Series).filter(Series.tvdb_id == tvdb_id).first()
+            return '<name=%s, trakt_id=%s>' % (title, id)
+        if id:
+            series = session.query(Series).filter(Series.id == id).first()
         if not series and title:
             series = session.query(Series).filter(func.lower(Series.title) == title.lower()).first()
             if not series:
