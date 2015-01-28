@@ -151,6 +151,7 @@ class TraktEpisode(TraktContainer, Base):
     __tablename__ = 'trakt_episodes'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
+    slug = Column(Unicode)
     tvdb_id = Column(Integer)
     imdb_id = Column(Unicode)
     tmdb_id = Column(Integer)
@@ -158,12 +159,35 @@ class TraktEpisode(TraktContainer, Base):
     title = Column(Unicode)
     season = Column(Integer)
     number = Column(Integer)
-    nummber_abs = Column(Integer)
+    number_abs = Column(Integer)
     overview = Column(Unicode)
     first_aired = Column(DateTime)
     expired = Column(Boolean)
+    updated_at = Column(DateTime)
 
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=False)
+
+    def update(self, trakt_episode):
+        """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
+        if self.id and self.id != trakt_episode['ids']['trakt']:
+            raise Exception('Tried to update db movie with different movie data')
+        elif not self.id:
+            self.id = trakt_episode['ids']['trakt']
+        self.slug = trakt_episode['ids']['slug']
+        self.imdb_id = trakt_episode['ids']['imdb']
+        self.tmdb_id = trakt_episode['ids']['tmdb']
+        self.tvrage_id = trakt_episode['ids']['tvrage']
+        self.tvdb_id = trakt_episode['ids']['tvdb']
+        self.first_aired = parser.parse(trakt_episode.get('first_aired'))
+        self.updated_at = parser.parse(trakt_episode.get('updated_at'))
+
+        for col in ['title', 'season', 'number', 'number_abs', 'overview']:
+            setattr(self, col, trakt_episode.get(col))
+
+        for genre in trakt_episode.get('genres', ()):
+            # TODO: the stuff
+            pass
+        self.expired = False
 
 
 class TraktShow(TraktContainer, Base):
@@ -219,39 +243,9 @@ class TraktShow(TraktContainer, Base):
             # TODO: the stuff
             pass
         self.expired = False
-    # def update(self, session):
-    #     tvdb_id = self.tvdb_id
-    #     url = ('%s%s%s' % (show_summary, api_key, tvdb_id))
-    #     try:
-    #         data = requests.get(url).json()
-    #     except requests.RequestException as e:
-    #         raise LookupError('Request failed %s' % url)
-    #     if not data or not data.get('title'):
-    #         raise LookupError('Could not update database info from trakt for tvdb id `%s`' % tvdb_id)
-    #     if data['images']:
-    #         data.update(data['images'])
-    #     if data['genres']:
-    #         genres = {}
-    #         for genre in data['genres']:
-    #             db_genre = session.query(TraktGenre).filter(TraktGenre.name == genre).first()
-    #             if not db_genre:
-    #                 genres['name'] = genre
-    #                 db_genre = TraktGenre(genres)
-    #             if db_genre not in self.genre:
-    #                 self.genre.append(db_genre)
-    #     if data['people']['actors']:
-    #         series_actors = data['people']['actors']
-    #         for i in series_actors:
-    #             if i['name']:
-    #                 db_character = session.query(TraktActors).filter(TraktActors.name == i['name']).first()
-    #                 if not db_character:
-    #                     db_character = TraktActors(i)
-    #                 if db_character not in self.actors:
-    #                     self.actors.append(db_character)
-    #     TraktContainer.update_from_dict(self, data)
 
     def __repr__(self):
-        return '<Traktv Name=%s, TVDB_ID=%s>' % (self.title, self.tvdb_id)
+        return '<Trakt Name=%s, TVDB_ID=%s>' % (self.title, self.tvdb_id)
 
 
 class TraktMovie(Base):
@@ -300,9 +294,38 @@ class TraktMovie(Base):
         return self._actors
 
 
+class TraktSearchResult(Base):
+
+    __tablename__ = 'trakt_search_results'
+
+    id = Column(Integer, primary_key=True)
+    search = Column(Unicode, nullable=False)
+    series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=True)
+    series = relation(TraktShow, backref='search_strings')
+
+
+@with_session
+def get_results(type, id, session=None):
+    if type == 'show':
+        db_class = TraktShow
+    elif type == 'movie':
+        db_class = TraktMovie
+    # Remove anything we didn't get an id for
+
+    # Try lookup from database
+    db_result = session.query(db_class).filter(getattr(db_class, 'trakt_id') == id).first()
+    if db_result:
+        return db_result.id
+
+    if type == 'movies':
+        pass
+    if type == 'show':
+        pass
+
+
 @with_session
 def get_id(type, name=None, year=None, trakt_slug=None, tmdb_id=None, imdb_id=None, tvdb_id=None, tvrage_id=None,
-           session=None):
+           trakt_id=None):
     """
     Get the trakt ID for a movie/show based on one of many lookup fields.
 
@@ -310,25 +333,18 @@ def get_id(type, name=None, year=None, trakt_slug=None, tmdb_id=None, imdb_id=No
     """
     # TODO: Slug lookup isn't working.
     ids = [
+        ('trakt_id', 'trakt', trakt_id),
         ('tmdb_id', 'tmdb', tmdb_id),
         ('imdb_id', 'imdb', imdb_id),
         ('tvdb_id', 'tvdb', tvdb_id)
     ]
     if type == 'show':
-        db_class = TraktShow
-        ids.insert(0, ('slug', 'trakt-show', trakt_slug))
+        ids.append(('slug', 'trakt-show', trakt_slug))
         ids.append(('tvrage_id', 'tvrage', tvrage_id))
     elif type == 'movie':
-        db_class = TraktMovie
-        ids.insert(0, ('slug', 'trakt-movie', trakt_slug))
+        ids.append(('slug', 'trakt-movie', trakt_slug))
     # Remove anything we didn't get an id for
     ids = filter(lambda i: i[2], ids)
-
-    # Try lookup from database
-    for db_col, _, identifier in ids:
-        db_result = session.query(db_class).filter(getattr(db_class, db_col) == identifier).first()
-        if db_result:
-            return db_result.id
 
     # Try searching on trakt
     req_session = get_session()
@@ -378,77 +394,41 @@ def get_id(type, name=None, year=None, trakt_slug=None, tmdb_id=None, imdb_id=No
         return found
 
 
-
-    # norm_series_name = normalize_series_name(title)
-    # series_name = urllib.quote_plus(norm_series_name)
-    # url = search_show + api_key + series_name
-    # series = None
-    # try:
-    #     response = requests.get(url)
-    # except requests.RequestException:
-    #     log.warning('Request failed %s' % url)
-    #     return
-    # try:
-    #     data = response.json()
-    # except ValueError:
-    #     raise LookupError('Error Parsing Traktv Json for %s' % title)
-    # if 'error' in data:
-    #     raise LookupError('Error from trakt: %s' % data['error'])
-    # for item in data:
-    #     if normalize_series_name(item['title']) == norm_series_name:
-    #         series = item['tvdb_id']
-    #         break
-    # else:
-    #     for item in data:
-    #         title_match = SequenceMatcher(lambda x: x in '\t',
-    #                                       normalize_series_name(item['title']), norm_series_name).ratio()
-    #         if title_match > .9:
-    #             log.debug('Warning: Using lazy matching because title was not found exactly for %s' % title)
-    #             series = item['tvdb_id']
-    #             break
-    # if not series:
-    #     raise LookupError('Could not find tvdb_id for `%s` on trakt' % title)
-    # return series
-
-
 class ApiTrakt(object):
 
     @staticmethod
     @with_session
-    def lookup_series(id, only_cached=False, session=None):
+    def lookup_series(name, type, id, only_cached=False, session=None):
         series = None
 
         def id_str():
-            return '<name=%s, trakt_id=%s>' % (title, id)
+            return '<name=%s, trakt_id=%s>' % (name, id)
         if id:
-            series = session.query(Series).filter(Series.id == id).first()
-        if not series and title:
-            series = session.query(Series).filter(func.lower(Series.title) == title.lower()).first()
+            series = session.query(TraktShow).filter(TraktShow.id == id).first()
+        if not series and name:
+            series = session.query(TraktShow).filter(func.lower(TraktShow.title) == TraktShow.lower()).first()
             if not series:
                 found = session.query(TraktSearchResult).filter(func.lower(TraktSearchResult.search) ==
-                                                                title.lower()).first()
+                                                                name.lower()).first()
                 if found and found.series:
                     series = found.series
         if not series:
             if only_cached:
                 raise LookupError('Series %s not found from cache' % id_str())
             log.debug('Series %s not found in cache, looking up from trakt.' % id_str())
-            if tvdb_id:
-                series = Series()
-                series.tvdb_id = tvdb_id
-                series.update(session=session)
-                session.add(series)
-            elif title:
-                series_lookup = get_series_id(title)
-                if series_lookup:
-                    series = session.query(Series).filter(Series.tvdb_id == series_lookup).first()
+            if id:
+                results = get_results(type, id, session=session)
+                series = TraktShow.update(results)
+            elif name:
+                id = get_id(name)
+                if id:
+                    series = session.query(TraktShow).filter(TraktShow.tvdb_id == id).first()
                     if not series:
-                        series = Series()
-                        series.tvdb_id = series_lookup
-                        series.update(session=session)
-                        session.add(series)
-                    if title.lower() != series.title.lower():
-                        session.add(TraktSearchResult(search=title, series=series))
+                        results = get_results(type, id, session=session)
+                        series = TraktShow()
+                        series.update(results)
+                    if name.lower() != series.title.lower():
+                        session.add(TraktSearchResult(search=name, series=series))
 
         if not series:
             raise LookupError('No results found from traktv for %s' % id_str())
