@@ -15,6 +15,7 @@ from flexget.plugins.filter.series import normalize_series_name
 from flexget.utils import json, requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimplePersistence
+from dateutil import parser
 
 api_key = '6c228565a45a302e49fb7d2dab066c9ab948b7be/'
 search_show = 'http://api.trakt.tv/search/shows.json/'
@@ -195,6 +196,29 @@ class TraktShow(TraktContainer, Base):
     updated_at = Column(DateTime)
     expired = Column(Boolean)
 
+    def update(self, trakt_series):
+        """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
+        if self.id and self.id != trakt_series['ids']['trakt']:
+            raise Exception('Tried to update db movie with different movie data')
+        elif not self.id:
+            self.id = trakt_series['ids']['trakt']
+        self.slug = trakt_series['ids']['slug']
+        self.imdb_id = trakt_series['ids']['imdb']
+        self.tmdb_id = trakt_series['ids']['tmdb']
+        self.tvrage_id = trakt_series['ids']['tvrage']
+        self.tvdb_id = trakt_series['ids']['tvdb']
+        self.air_time = parser.parse(trakt_series.get('air_time'))
+        self.first_aired = parser.parse(trakt_series.get('first_aired'))
+        self.updated_at = parser.parse(trakt_series.get('updated_at'))
+
+        for col in ['overview', 'runtime', 'rating', 'votes', 'language', 'title', 'year', 'air_day',
+                    'runtime', 'certification', 'network', 'country', 'status', 'aired_episodes']:
+            setattr(self, col, trakt_series.get(col))
+
+        for genre in trakt_series.get('genres', ()):
+            # TODO: the stuff
+            pass
+        self.expired = False
     # def update(self, session):
     #     tvdb_id = self.tvdb_id
     #     url = ('%s%s%s' % (show_summary, api_key, tvdb_id))
@@ -244,6 +268,7 @@ class TraktMovie(Base):
     rating = Column(Integer)
     votes = Column(Integer)
     language = Column(Unicode)
+    year = Column(Integer)
     expired = Column(Boolean)
     updated_at = Column(DateTime)
     genres = relation(TraktGenre, secondary=movie_genres_table)
@@ -258,10 +283,10 @@ class TraktMovie(Base):
         self.slug = trakt_movie['ids']['slug']
         self.imdb_id = trakt_movie['ids']['imdb']
         self.tmdb_id = trakt_movie['ids']['tmdb']
-        for col in ['overview', 'runtime', 'rating', 'votes', 'language']:
+        for col in ['overview', 'runtime', 'rating', 'votes', 'language', 'tagline', 'year']:
             setattr(self, col, trakt_movie.get(col))
-        self.released = parse_datetime(trakt_movie.get('released'))  # TODO: Real date parsing
-        self.updated_at = parse_datetime(trakt_movie.get('updated_at'))  # TODO: Real date parsing
+        self.released = parser.parse(trakt_movie.get('released'))  # TODO: Real date parsing
+        self.updated_at = parser.parse(trakt_movie.get('updated_at'))  # TODO: Real date parsing
         for genre in trakt_movie.get('genres', ()):
             # TODO: the stuff
             pass
