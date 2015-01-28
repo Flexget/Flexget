@@ -247,7 +247,7 @@ class TraktMovie(Base):
     expired = Column(Boolean)
     updated_at = Column(DateTime)
     genres = relation(TraktGenre, secondary=movie_genres_table)
-    actors = relation(TraktActor, secondary=movie_actors_table)
+    _actors = relation(TraktActor, secondary=movie_actors_table)
 
     def update(self, trakt_movie):
         """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
@@ -258,17 +258,21 @@ class TraktMovie(Base):
         self.slug = trakt_movie['ids']['slug']
         self.imdb_id = trakt_movie['ids']['imdb']
         self.tmdb_id = trakt_movie['ids']['tmdb']
-        for col in ['overview', 'released', 'runtime', 'rating', 'votes', 'language']:
+        for col in ['overview', 'runtime', 'rating', 'votes', 'language']:
             setattr(self, col, trakt_movie.get(col))
         self.released = parse_datetime(trakt_movie.get('released'))  # TODO: Real date parsing
         self.updated_at = parse_datetime(trakt_movie.get('updated_at'))  # TODO: Real date parsing
         for genre in trakt_movie.get('genres', ()):
             # TODO: the stuff
             pass
-        for actor in trakt_movie.get('actors', ()):
-            # TODO: the stuff
-            pass
         self.expired = False
+
+    @property
+    def actors(self):
+        if not self._actors:
+            # TODO: Update the stuff from trakt
+            pass
+        return self._actors
 
 
 @with_session
