@@ -3,6 +3,7 @@ from difflib import SequenceMatcher
 import logging
 from urlparse import urljoin
 
+from dateutil.parser import parse as dateutil_parse
 from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, func, Date, DateTime, Time
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
@@ -15,7 +16,6 @@ from flexget.plugins.filter.series import normalize_series_name
 from flexget.utils import json, requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimplePersistence
-from dateutil import parser
 
 api_key = '6c228565a45a302e49fb7d2dab066c9ab948b7be/'
 search_show = 'http://api.trakt.tv/search/shows.json/'
@@ -101,19 +101,7 @@ def mark_expired(type, session=None):
     # TODO: Implement
 
 
-class TraktContainer(object):
-
-    def __init__(self, init_dict=None):
-        if isinstance(init_dict, dict):
-            self.update_from_dict(init_dict)
-
-    def update_from_dict(self, update_dict):
-        for col in self.__table__.columns:
-            if isinstance(update_dict.get(col.name), (basestring, int, float)):
-                setattr(self, col.name, update_dict[col.name])
-
-
-class TraktGenre(TraktContainer, Base):
+class TraktGenre(Base):
 
     __tablename__ = 'trakt_genres'
 
@@ -130,7 +118,7 @@ movie_genres_table = Table('trakt_movie_genres', Base.metadata,
                           Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
 
 
-class TraktActor(TraktContainer, Base):
+class TraktActor(Base):
 
     __tablename__ = 'trakt_actors'
 
@@ -147,7 +135,7 @@ movie_actors_table = Table('trakt_movie_actors', Base.metadata,
                      Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
 
 
-class TraktEpisode(TraktContainer, Base):
+class TraktEpisode(Base):
     __tablename__ = 'trakt_episodes'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
@@ -178,8 +166,8 @@ class TraktEpisode(TraktContainer, Base):
         self.tmdb_id = trakt_episode['ids']['tmdb']
         self.tvrage_id = trakt_episode['ids']['tvrage']
         self.tvdb_id = trakt_episode['ids']['tvdb']
-        self.first_aired = parser.parse(trakt_episode.get('first_aired'))
-        self.updated_at = parser.parse(trakt_episode.get('updated_at'))
+        self.first_aired = dateutil_parse(trakt_episode.get('first_aired'))
+        self.updated_at = dateutil_parse(trakt_episode.get('updated_at'))
 
         for col in ['title', 'season', 'number', 'number_abs', 'overview']:
             setattr(self, col, trakt_episode.get(col))
@@ -190,7 +178,7 @@ class TraktEpisode(TraktContainer, Base):
         self.expired = False
 
 
-class TraktShow(TraktContainer, Base):
+class TraktShow(Base):
     __tablename__ = 'trakt_shows'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
@@ -220,32 +208,32 @@ class TraktShow(TraktContainer, Base):
     updated_at = Column(DateTime)
     expired = Column(Boolean)
 
-    def update(self, trakt_series):
-        """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
-        if self.id and self.id != trakt_series['ids']['trakt']:
+    def update(self, trakt_show):
+        """Updates this record from the trakt media object `trakt_show` returned by the trakt api."""
+        if self.id and self.id != trakt_show['ids']['trakt']:
             raise Exception('Tried to update db movie with different movie data')
         elif not self.id:
-            self.id = trakt_series['ids']['trakt']
-        self.slug = trakt_series['ids']['slug']
-        self.imdb_id = trakt_series['ids']['imdb']
-        self.tmdb_id = trakt_series['ids']['tmdb']
-        self.tvrage_id = trakt_series['ids']['tvrage']
-        self.tvdb_id = trakt_series['ids']['tvdb']
-        self.air_time = parser.parse(trakt_series.get('air_time'))
-        self.first_aired = parser.parse(trakt_series.get('first_aired'))
-        self.updated_at = parser.parse(trakt_series.get('updated_at'))
+            self.id = trakt_show['ids']['trakt']
+        self.slug = trakt_show['ids']['slug']
+        self.imdb_id = trakt_show['ids']['imdb']
+        self.tmdb_id = trakt_show['ids']['tmdb']
+        self.tvrage_id = trakt_show['ids']['tvrage']
+        self.tvdb_id = trakt_show['ids']['tvdb']
+        self.air_time = dateutil_parse(trakt_show.get('air_time'))
+        self.first_aired = dateutil_parse(trakt_show.get('first_aired'))
+        self.updated_at = dateutil_parse(trakt_show.get('updated_at'))
 
         for col in ['overview', 'runtime', 'rating', 'votes', 'language', 'title', 'year', 'air_day',
                     'runtime', 'certification', 'network', 'country', 'status', 'aired_episodes']:
-            setattr(self, col, trakt_series.get(col))
+            setattr(self, col, trakt_show.get(col))
 
-        for genre in trakt_series.get('genres', ()):
+        for genre in trakt_show.get('genres', ()):
             # TODO: the stuff
             pass
         self.expired = False
 
     def __repr__(self):
-        return '<Trakt Name=%s, TVDB_ID=%s>' % (self.title, self.tvdb_id)
+        return '<name=%s, id=%s>' % (self.title, self.id)
 
 
 class TraktMovie(Base):
@@ -279,8 +267,8 @@ class TraktMovie(Base):
         self.tmdb_id = trakt_movie['ids']['tmdb']
         for col in ['overview', 'runtime', 'rating', 'votes', 'language', 'tagline', 'year']:
             setattr(self, col, trakt_movie.get(col))
-        self.released = parser.parse(trakt_movie.get('released'))  # TODO: Real date parsing
-        self.updated_at = parser.parse(trakt_movie.get('updated_at'))  # TODO: Real date parsing
+        self.released = dateutil_parse(trakt_movie.get('released'))
+        self.updated_at = dateutil_parse(trakt_movie.get('updated_at'))
         for genre in trakt_movie.get('genres', ()):
             # TODO: the stuff
             pass
