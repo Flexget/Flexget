@@ -230,7 +230,7 @@ class TraktShow(TraktContainer, Base):
         return '<Traktv Name=%s, TVDB_ID=%s>' % (self.title, self.tvdb_id)
 
 
-class TraktMovie(TraktContainer, Base):
+class TraktMovie(Base):
     __tablename__ = 'trakt_movies'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
@@ -248,6 +248,27 @@ class TraktMovie(TraktContainer, Base):
     updated_at = Column(DateTime)
     genres = relation(TraktGenre, secondary=movie_genres_table)
     actors = relation(TraktActor, secondary=movie_actors_table)
+
+    def update(self, trakt_movie):
+        """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
+        if self.id and self.id != trakt_movie['ids']['trakt']:
+            raise Exception('Tried to update db movie with different movie data')
+        elif not self.id:
+            self.id = trakt_movie['ids']['trakt']
+        self.slug = trakt_movie['ids']['slug']
+        self.imdb_id = trakt_movie['ids']['imdb']
+        self.tmdb_id = trakt_movie['ids']['tmdb']
+        for col in ['overview', 'released', 'runtime', 'rating', 'votes', 'language']:
+            setattr(self, col, trakt_movie.get(col))
+        self.released = parse_datetime(trakt_movie.get('released'))  # TODO: Real date parsing
+        self.updated_at = parse_datetime(trakt_movie.get('updated_at'))  # TODO: Real date parsing
+        for genre in trakt_movie.get('genres', ()):
+            # TODO: the stuff
+            pass
+        for actor in trakt_movie.get('actors', ()):
+            # TODO: the stuff
+            pass
+        self.expired = False
 
 
 @with_session
