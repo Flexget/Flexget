@@ -4,7 +4,7 @@ import logging
 from urlparse import urljoin
 
 from dateutil.parser import parse as dateutil_parse
-from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, func, Date, DateTime, Time
+from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, func, Date, DateTime, Time, or_
 from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey
 
@@ -182,13 +182,13 @@ class TraktShow(Base):
     __tablename__ = 'trakt_shows'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
+    title = Column(Unicode)
+    year = Column(Integer)
     slug = Column(Unicode)
     tvdb_id = Column(Integer)
     imdb_id = Column(Unicode)
     tmdb_id = Column(Integer)
     tvrage_id = Column(Unicode)
-    title = Column(Unicode)
-    year = Column(Integer)
     overview = Column(Unicode)
     first_aired = Column(DateTime)
     air_day = Column(Unicode)
@@ -240,6 +240,8 @@ class TraktMovie(Base):
     __tablename__ = 'trakt_movies'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
+    title = Column(Unicode)
+    year = Column(Integer)
     slug = Column(Unicode)
     imdb_id = Column(Unicode)
     tmdb_id = Column(Integer)
@@ -250,7 +252,6 @@ class TraktMovie(Base):
     rating = Column(Integer)
     votes = Column(Integer)
     language = Column(Unicode)
-    year = Column(Integer)
     expired = Column(Boolean)
     updated_at = Column(DateTime)
     genres = relation(TraktGenre, secondary=movie_genres_table)
@@ -312,74 +313,86 @@ def get_results(type, id, session=None):
 
 
 @with_session
-def get_id(type, name=None, year=None, trakt_slug=None, tmdb_id=None, imdb_id=None, tvdb_id=None, tvrage_id=None,
-           trakt_id=None):
+def get_cached(type, title=None, year=None, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None, tvdb_id=None,
+               tvrage_id=None, session=None):
     """
-    Get the trakt ID for a movie/show based on one of many lookup fields.
+    Get the cached info for a given show/movie from the database.
 
     :param type: Either 'show' or 'movie'
     """
-    # TODO: Slug lookup isn't working.
-    ids = [
-        ('trakt_id', 'trakt', trakt_id),
-        ('tmdb_id', 'tmdb', tmdb_id),
-        ('imdb_id', 'imdb', imdb_id),
-        ('tvdb_id', 'tvdb', tvdb_id)
-    ]
+    ids = {
+        'id': trakt_id,
+        'slug': trakt_slug,
+        'tmdb_id': tmdb_id,
+        'imdb_id': imdb_id,
+    }
     if type == 'show':
-        ids.append(('slug', 'trakt-show', trakt_slug))
-        ids.append(('tvrage_id', 'tvrage', tvrage_id))
-    elif type == 'movie':
-        ids.append(('slug', 'trakt-movie', trakt_slug))
-    # Remove anything we didn't get an id for
-    ids = filter(lambda i: i[2], ids)
+        ids['tvdb_id'] = tvdb_id
+        ids['tvrage_id'] = tvrage_id
+        model = TraktShow
+    else:
+        model = TraktMovie
+    result = None
+    if any(ids.values()):
+        result = session.query(model).filter(
+            or_(getattr(model, col) == val for col, val in ids.iteritems() if val)).first()
+    elif title:
+        query = session.query(model).filter(model.title == title)
+        if year:
+            query = query.filter(model.year == year)
+        result = query.first()
+    return result
 
-    # Try searching on trakt
+
+def get_trakt(type, title=None, year=None, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None, tvdb_id=None,
+               tvrage_id=None):
+    """Returns the matching media object from trakt api."""
+    # TODO: Better error messages
+    # Trakt api accepts either id or slug (there is a rare possibility for conflict though, e.g. 24)
+    trakt_id = trakt_id or trakt_slug
     req_session = get_session()
-    for _, id_type, identifier in ids:
-        try:
-            results = req_session.get(get_api_url('search'), params={'id_type': id_type, 'id': identifier}).json()
-        except requests.RequestException as e:
-            continue
-        # TODO: Json error checking
-        for result in results:
-            if result['type'] != type:
-                raise LookupError('Provided id (%s) is for a %s not a %s' % (identifier, result['type'], type))
-            return result[type]['ids']['trakt']
-
-    # TODO: Fall back to name/year search
-
-    clean_title = normalize_series_name(name)
-    found = None
+    if not trakt_id:
+        # Try finding trakt_id based on other ids
+        ids = {
+            'tmdb': tmdb_id,
+            'imdb': imdb_id
+        }
+        if type == 'show':
+            ids['tvdb'] = tvdb_id
+            ids['tvrage'] = tvrage_id
+        for id_type, identifier in ids.iteritems():
+            if not identifier:
+                continue
+            try:
+                results = req_session.get(get_api_url('search'), params={'id_type': id_type, 'id': identifier}).json()
+            except requests.RequestException as e:
+                log.debug('Error searching for trakt id %s' % e)
+                continue
+            for result in results:
+                if result['type'] != type:
+                    raise LookupError('Provided id (%s) is for a %s not a %s' % (identifier, result['type'], type))
+                trakt_id = result[type]['ids']['trakt']
+                break
+        if not trakt_id:
+            # Try finding trakt id based on title and year
+            clean_title = normalize_series_name(title)
+            try:
+                results = req_session.get(get_api_url('search'), params={'query': clean_title, 'type': type}).json()
+            except requests.RequestException as e:
+                raise LookupError('Searching trakt for %s failed with error: %s' % (title, e))
+            for result in results:
+                if year and result[type]['year'] != year:
+                    continue
+                if clean_title == normalize_series_name(result[type]['title']):
+                    trakt_id = result[type]['ids']['trakt']
+                    break
+    if not trakt_id:
+        raise LookupError('Unable to find %s on trakt.' % type)
+    # Get actual data from trakt
     try:
-        results = req_session.get(get_api_url('search'), params={'query': clean_title, 'type': type}).json()
+        return req_session.get(get_api_url(type + 's', trakt_id, 'summary')).json()
     except requests.RequestException as e:
-        log.debug('ID Lookup failed on error: %s' % e)
-    if results['type'] is type:
-        for result in results:
-            if clean_title == normalize_series_name(result[type]['title']):
-                if type == 'movie' and year == result[type]['year']:
-                    found = result[type]['ids']['trakt']
-                else:
-                    if type == 'show':
-                        found = result[type]['ids']['trakt']
-            else:
-                title_match = SequenceMatcher(lambda x: x in '\t', normalize_series_name(result[type]['title']),
-                                              clean_title).ratio()
-                if title_match > .9:
-                    if type == 'movie' and year == result[type]['year']:
-                        log.debug('Warning: Using lazy matching may not return correct results for %s' % name)
-                        found = result[type]['ids']['trakt']
-                    else:
-                        if type == 'show':
-                            log.debug('Warning: Using lazy matching may not return correct results for %s' % name)
-                            found = result[type]['ids']['trakt']
-        if not found:
-            if type == 'show':
-                raise LookupError('Unable to find Trakt ID for %s from Trakt API' % name)
-            else:
-                raise LookupError('Unable to find Trakt ID for %s (%s) from Trakt API' % (name, year))
-        return found
+        raise LookupError('Error getting trakt data for id %s: %s' % (trakt_id, e))
 
 
 class ApiTrakt(object):
