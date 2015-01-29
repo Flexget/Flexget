@@ -361,7 +361,7 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('movedone', '')
         config.setdefault('label', '')
         config.setdefault('keep_subs', True)  # does nothing without 'content_filename' or 'main_file_only' enabled
-        config.setdefault('hide_sparse_files', True)  # does nothing without 'main_file_only' enabled
+        config.setdefault('hide_sparse_files', False)  # does nothing without 'main_file_only' enabled
         return config
 
     def __init__(self):

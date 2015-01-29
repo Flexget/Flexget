@@ -38,6 +38,7 @@ class DisablePlugin(object):
     """
 
     schema = one_or_more({'type': 'string'})
+    disabled_builtins = None
 
     @plugin.priority(254)
     def on_task_start(self, task, config):

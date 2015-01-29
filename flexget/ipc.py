@@ -133,7 +133,8 @@ class IPCServer(threading.Thread):
         self.server.start()
 
     def shutdown(self):
-        self.server.close()
+        if self.server:
+            self.server.close()
 
 
 class IPCClient(object):

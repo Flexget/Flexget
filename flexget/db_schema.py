@@ -146,9 +146,10 @@ def reset_schema(plugin, session=None):
         table.drop()
     # Remove the plugin from schema table
     session.query(PluginSchema).filter(PluginSchema.plugin == plugin).delete()
+    # We need to commit our current changes to close the session before calling create_all
+    session.commit()
     # Create new empty tables
     Base.metadata.create_all(bind=session.bind)
-    session.commit()
 
 
 def register_plugin_table(tablename, plugin, version):

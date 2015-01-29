@@ -164,9 +164,15 @@ def setup_jobs(manager):
         scheduler.start()
 
 
-@event('manager.daemon.completed')
+@event('manager.shutdown_requested')
+def shutdown_requested(manager):
+    if scheduler and scheduler.running:
+        scheduler.shutdown(wait=True)
+
+
+@event('manager.shutdown')
 def stop_scheduler(manager):
-    if scheduler.running:
+    if scheduler and scheduler.running:
         scheduler.shutdown(wait=False)
 
 

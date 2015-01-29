@@ -284,7 +284,6 @@ class SubtitleQueue(object):
                         queue_del(entry['location'])
                     else:
                         entry.reject('Not a local file. Cannot remove non-local files.')
-                return
             except QueueError as e:
                 # ignore already in queue
                 if e.errno != 1:

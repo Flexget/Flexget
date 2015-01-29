@@ -10,6 +10,7 @@ import shutil
 import signal
 import sys
 import threading
+import traceback
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
@@ -85,6 +86,10 @@ class Manager(object):
 
       If any plugins have declared a newer schema version than exists in the database, this event will be fired to
       allow plugins to upgrade their tables
+
+    * manager.shutdown_requested
+
+      When shutdown has been requested. Any plugins which might add to execution queue should stop when this is fired.
 
     * manager.shutdown
 
@@ -401,7 +406,8 @@ class Manager(object):
             if options.action == 'status':
                 log.info('Daemon running. (PID: %s)' % os.getpid())
             elif options.action == 'stop':
-                log.info('Daemon shutdown requested.')
+                tasks = 'all queued tasks (if any) have' if options.wait else 'currently running task (if any) has'
+                log.info('Daemon shutdown requested. Shutdown will commence when %s finished executing.' % tasks)
                 self.shutdown(options.wait)
             elif options.action == 'reload':
                 log.info('Reloading config from disk.')
@@ -871,10 +877,13 @@ class Manager(object):
         """
         if not self.initialized:
             raise RuntimeError('Cannot shutdown manager that was never initialized.')
+        fire_event('manager.shutdown_requested', self)
         self.task_queue.shutdown(finish_queue)
 
     def _shutdown(self):
         """Runs when the manager is done processing everything."""
+        if self.ipc_server:
+            self.ipc_server.shutdown()
         fire_event('manager.shutdown', self)
         if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
             log.debug('Shutting down')
@@ -886,5 +895,16 @@ class Manager(object):
             if self._has_lock:
                 os.remove(self.db_filename)
                 log.info('Removed test database')
-        if not self.unit_test:  # don't scroll "nosetests" summary results when logging is enabled
-            log.debug('Shutdown completed')
+
+    def crash_report(self):
+        """
+        This should be called when handling an unexpected exception. Will create a new log file containing the last 50
+        debug messages as well as the crash traceback.
+        """
+        if not self.unit_test:
+            filename = os.path.join(self.config_base, datetime.now().strftime('crash_report.%Y.%m.%d.%H%M%S%f.log'))
+            with codecs.open(filename, 'w', encoding='utf-8') as outfile:
+                outfile.writelines(logger.debug_buffer)
+                traceback.print_exc(file=outfile)
+            log.critical('An unexpected crash has occurred. Writing crash report to %s' % filename)
+        log.debug('Traceback:', exc_info=True)

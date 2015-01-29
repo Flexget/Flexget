@@ -619,7 +619,7 @@ def set_series_begin(series, ep_id):
     session = Session.object_session(series)
     if isinstance(ep_id, int):
         identified_by = 'sequence'
-    elif re.match(r'(?i)^S\d{1,4}E\d{1,2}$', ep_id):
+    elif re.match(r'(?i)^S\d{1,4}E\d{1,3}$', ep_id):
         identified_by = 'ep'
         ep_id = ep_id.upper()
     elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
