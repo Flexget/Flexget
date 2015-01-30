@@ -69,6 +69,7 @@ class PluginTraktLookup(object):
         'trakt_series_imdb_id': 'imdb_id',
         'trakt_series_tvdb_id': 'tvdb_id',
         'trakt_series_tmdb_id': 'tmdb_id',
+        'trakt_series_id': 'id',
         'trakt_series_slug': 'slug',
         'trakt_series_tvrage': 'tvrage_id',
         'trakt_series_runtime': 'runtime',
@@ -76,17 +77,17 @@ class PluginTraktLookup(object):
         'trakt_series_air_time': 'air_time',
         'trakt_series_air_day': 'air_day',
         'trakt_series_content_rating': 'certification',
-        'trakt_series_genres': lambda show: [genre.name for genre in show.genre],
+        #'trakt_series_genres': lambda series: [genre.name for genre in series.genre],
         'trakt_series_network': 'network',
-        'imdb_url': lambda show: show.imdb_id and 'http://www.imdb.com/title/%s' % show.imdb_id,
-        'trakt_series_url': lambda show: show.slug and 'http://trakt.tv/shows/$s' % show.slug,
-        'trakt_series_actors': lambda show: [actors.name for actors in show.actors],
+        'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
+        'trakt_series_url': lambda series: series.slug and 'http://trakt.tv/shows/%s' % series.slug,
+        #'trakt_series_actors': lambda series: [actors.name for actors in series.actors],
         'trakt_series_country': 'country',
         'trakt_series_status': 'status',
         'trakt_series_overview': 'overview',
         'trakt_series_rating': 'rating',
         'trakt_series_aired_episodes': 'aired_episodes',
-        'trakt_series_episodes': lambda show: [episodes.title for episodes in show.episodes]
+        #'trakt_series_episodes': lambda show: [episodes.title for episodes in show.episodes]
     }
 
     # Episode info
@@ -109,14 +110,14 @@ class PluginTraktLookup(object):
 
     def lazy_series_lookup(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
-        lookupargs = {'title': entry.get('series_name', eval_lazy=False),
-                      'year': entry.get('year', eval_lazy=False),
-                      'trakt_id': entry.get('trakt_id', eval_lazy=False),
-                      'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
-                      'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
-                      'type': 'show',
-                      }
         with Session(expire_on_commit=False) as session:
+            lookupargs = {'style': 'show',
+                          'title': entry.get('series_name', eval_lazy=False),
+                          #'year': entry.get('year', eval_lazy=False),
+                          #'trakt_id': entry.get('trakt_id', eval_lazy=False),
+                          'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
+                          #'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
+                          'session': session}
             try:
                 series = lookup_series(**lookupargs)
             except LookupError as e:
@@ -155,4 +156,4 @@ class PluginTraktLookup(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=2)
+    plugin.register(PluginTraktLookup, 'trakt_lookup', api_ver=3)

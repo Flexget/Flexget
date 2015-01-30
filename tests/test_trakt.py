@@ -42,6 +42,15 @@ class TestTraktLookup(FlexGetBase):
 
     """
 
+    def test_lookup_name(self):
+        """trakt: Test Lookup (ONLINE)"""
+        self.execute_task('test')
+        entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
+        assert entry['trakt_series_id'] == 1399, \
+            'Trakt_ID should be 1339 is %s for %s' % (entry['trakt_series_id'], entry['series_name'])
+        assert entry['trakt_series_status'] == 'ended', 'Series Status should be "ENDED" returned %s' \
+                                                        % (entry['trakt_series_status'])
+
     @use_vcr
     def test_lookup(self):
         """trakt: Test Lookup (ONLINE)"""
@@ -49,8 +58,8 @@ class TestTraktLookup(FlexGetBase):
         entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['trakt_ep_name'] == 'Paternity', \
             '%s trakt_ep_name should be Paternity' % entry['title']
-        assert entry['trakt_series_status'] == 'Ended', \
-            'runtime for %s is %s, should be Ended' % (entry['title'], entry['trakt_series_status'])
+        assert entry['trakt_series_status'] == 'ended', \
+            'runtime for %s is %s, should be "ended"' % (entry['title'], entry['trakt_series_status'])
         assert entry['afield'] == '73255Paternity', 'afield was not set correctly'
         assert self.task.find_entry(trakt_ep_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
