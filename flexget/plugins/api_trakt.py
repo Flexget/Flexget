@@ -294,25 +294,6 @@ class TraktSearchResult(Base):
 
 
 @with_session
-def get_results(type, id, session=None):
-    if type == 'show':
-        db_class = TraktShow
-    elif type == 'movie':
-        db_class = TraktMovie
-    # Remove anything we didn't get an id for
-
-    # Try lookup from database
-    db_result = session.query(db_class).filter(getattr(db_class, 'trakt_id') == id).first()
-    if db_result:
-        return db_result.id
-
-    if type == 'movies':
-        pass
-    if type == 'show':
-        pass
-
-
-@with_session
 def get_cached(type, title=None, year=None, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None, tvdb_id=None,
                tvrage_id=None, session=None):
     """
@@ -345,7 +326,7 @@ def get_cached(type, title=None, year=None, trakt_id=None, trakt_slug=None, tmdb
 
 
 def get_trakt(type, title=None, year=None, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None, tvdb_id=None,
-               tvrage_id=None):
+              tvrage_id=None):
     """Returns the matching media object from trakt api."""
     # TODO: Better error messages
     # Trakt api accepts either id or slug (there is a rare possibility for conflict though, e.g. 24)
@@ -399,51 +380,51 @@ class ApiTrakt(object):
 
     @staticmethod
     @with_session
-    def lookup_series(name, type, id, only_cached=False, session=None):
+    def lookup_series(type, title=None, year=None, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None, tvdb_id=None,
+               tvrage_id=None, session=None, only_cached=None):
         series = None
+        trakt_id = trakt_id or trakt_slug
+        if not trakt_id:
+            # Try finding trakt_id based on other ids
+            ids = {
+                'title': title,
+                'tmdb': tmdb_id,
+                'imdb': imdb_id
+            }
+            if type == 'show':
+                ids['tvdb'] = tvdb_id
+                ids['tvrage'] = tvrage_id
 
-        def id_str():
-            return '<name=%s, trakt_id=%s>' % (name, id)
-        if id:
-            series = session.query(TraktShow).filter(TraktShow.id == id).first()
-        if not series and name:
-            series = session.query(TraktShow).filter(func.lower(TraktShow.title) == TraktShow.lower()).first()
+            def id_str():
+                return '<name=%s, trakt_id=%s>' % (title, trakt_id)
+            if ids:
+                series = get_cached(ids)
             if not series:
-                found = session.query(TraktSearchResult).filter(func.lower(TraktSearchResult.search) ==
-                                                                name.lower()).first()
-                if found and found.series:
-                    series = found.series
-        if not series:
-            if only_cached:
-                raise LookupError('Series %s not found from cache' % id_str())
-            log.debug('Series %s not found in cache, looking up from trakt.' % id_str())
-            if id:
-                results = get_results(type, id, session=session)
-                series = TraktShow.update(results)
-            elif name:
-                id = get_id(name)
-                if id:
-                    series = session.query(TraktShow).filter(TraktShow.tvdb_id == id).first()
-                    if not series:
-                        results = get_results(type, id, session=session)
-                        series = TraktShow()
-                        series.update(results)
-                    if name.lower() != series.title.lower():
-                        session.add(TraktSearchResult(search=name, series=series))
+                if not series:
+                    found = session.query(TraktSearchResult).filter(func.lower(TraktSearchResult.search) ==
+                                                                    title.lower()).first()
+                    if found and found.series:
+                        series = get_cached(trakt_id=found.trakt_id)
+            if not series:
+                if only_cached:
+                    raise LookupError('Series %s not found from cache' % id_str())
+                log.debug('Series %s not found in cache, looking up from trakt.' % id_str())
+                if ids:
+                    series = get_trakt(ids)
 
-        if not series:
-            raise LookupError('No results found from traktv for %s' % id_str())
+            if not series:
+                raise LookupError('No results found from traktv for %s' % id_str())
 
-        # Make sure relations are loaded before returning
-        series.episodes
-        series.genre
-        series.actors
-        return series
+            # Make sure relations are loaded before returning
+            series.episodes
+            series.genre
+            series.actors
+            return series
 
     @staticmethod
     @with_session
-    def lookup_episode(title=None, seasonnum=None, episodenum=None, tvdb_id=None, session=None, only_cached=False):
-        series = ApiTrakt.lookup_series(title=title, tvdb_id=tvdb_id, only_cached=only_cached, session=session)
+    def lookup_episode(title=None, seasonnum=None, episodenum=None, trakt_id=None, session=None, only_cached=False):
+        series = get_cached(type='show', title=title, trakt_id=trakt_id, session=session)
         if not series:
             raise LookupError('Could not identify series')
         ep_description = '%s.S%sE%s' % (series.title, seasonnum, episodenum)

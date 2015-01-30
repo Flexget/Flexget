@@ -65,47 +65,60 @@ class PluginTraktLookup(object):
     # Series info
     series_map = {
         'trakt_series_name': 'title',
-        'trakt_series_runtime': 'runtime',
-        'trakt_series_first_aired_epoch': 'first_aired',
-        'trakt_series_first_aired_iso': 'first_aired_iso',
-        'trakt_series_air_time': 'air_time',
-        'trakt_series_content_rating': 'certification',
-        'trakt_series_genres': lambda series: [genre.name for genre in series.genre],
-        'trakt_series_network': 'network',
-        'trakt_series_banner_url': 'banner',
-        'trakt_series_fanart_url': 'fanart',
-        'trakt_series_poster_url': 'poster',
-        'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
-        'trakt_series_url': 'url',
+        'trakt_series_year': 'year',
         'trakt_series_imdb_id': 'imdb_id',
         'trakt_series_tvdb_id': 'tvdb_id',
-        'trakt_series_actors': lambda series: [actors.name for actors in series.actors],
+        'trakt_series_tmdb_id': 'tmdb_id',
+        'trakt_series_slug': 'slug',
+        'trakt_series_tvrage': 'tvrage_id',
+        'trakt_series_runtime': 'runtime',
+        'trakt_series_first_aired': 'first_aired',
+        'trakt_series_air_time': 'air_time',
+        'trakt_series_air_day': 'air_day',
+        'trakt_series_content_rating': 'certification',
+        'trakt_series_genres': lambda show: [genre.name for genre in show.genre],
+        'trakt_series_network': 'network',
+        'imdb_url': lambda show: show.imdb_id and 'http://www.imdb.com/title/%s' % show.imdb_id,
+        'trakt_series_url': lambda show: show.slug and 'http://trakt.tv/shows/$s' % show.slug,
+        'trakt_series_actors': lambda show: [actors.name for actors in show.actors],
         'trakt_series_country': 'country',
-        'trakt_series_year': 'year',
-        'trakt_series_tvrage_id': 'tvrage_id',
         'trakt_series_status': 'status',
-        'trakt_series_overview': 'overview'}
+        'trakt_series_overview': 'overview',
+        'trakt_series_rating': 'rating',
+        'trakt_series_aired_episodes': 'aired_episodes',
+        'trakt_series_episodes': lambda show: [episodes.title for episodes in show.episodes]
+    }
 
     # Episode info
     episode_map = {
-        'trakt_ep_name': 'episode_name',
-        'trakt_ep_first_aired_epoch': 'first_aired',
-        'trakt_ep_first_aired_iso': 'first_aired_iso',
-        'trakt_ep_image_url': 'screen',
+        'trakt_ep_name': 'title',
+        'trakt_ep_imdb_id': 'imdb_id',
+        'trakt_ep_tvdb_id': 'tvdb_id',
+        'trakt_ep_tmdb_id': 'tmdb_id',
+        'trakt_ep_slug': 'slug',
+        'trakt_ep_tvrage': 'tvrage_id',
+        'trakt_ep_first_aired': 'first_aired',
         'trakt_ep_overview': 'overview',
+        'trakt_ep_abs_number': 'number_abs',
         'trakt_season': 'season',
         'trakt_episode': 'number',
         'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep.season, ep.number),
-        'trakt_ep_tvdb_id': 'tvdb_id'}
+        }
 
     schema = {'type': 'boolean'}
 
     def lazy_series_lookup(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
+        lookupargs = {'title': entry.get('series_name', eval_lazy=False),
+                      'year': entry.get('year', eval_lazy=False),
+                      'trakt_id': entry.get('trakt_id', eval_lazy=False),
+                      'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
+                      'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
+                      'type': 'show',
+                      }
         with Session(expire_on_commit=False) as session:
             try:
-                series = lookup_series(entry.get('series_name', eval_lazy=False),
-                                       tvdb_id=entry.get('tvdb_id', eval_lazy=False), session=session)
+                series = lookup_series(**lookupargs)
             except LookupError as e:
                 log.debug(e.message)
             else:
@@ -114,7 +127,7 @@ class PluginTraktLookup(object):
     def lazy_episode_lookup(self, entry):
         with Session(expire_on_commit=False) as session:
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
-                          'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
+                          'trakt_id': entry.get('trakt_id', eval_lazy=False),
                           'seasonnum': entry['series_season'],
                           'episodenum': entry['series_episode'],
                           'session': session}
