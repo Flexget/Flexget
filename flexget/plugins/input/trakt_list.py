@@ -20,31 +20,32 @@ field_maps = {
         'movie_year': 'movie.year',
         'imdb_id': 'movie.ids.imdb',
         'tmdb_id': 'movie.ids.tmdb',
-        'trakt_id': 'movie.ids.trakt',
-        'trakt_slug': 'movie.ids.slug'
+        'trakt_movie_id': 'movie.ids.trakt',
+        'trakt_movie_slug': 'movie.ids.slug'
     },
     'show': {
-        'title': 'show.title',
-        'series_name': 'show.title',
+        'title': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
+        'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
         'imdb_id': 'show.ids.imdb',
         'tvdb_id': 'show.ids.tvdb',
         'tvrage_id': 'show.ids.tvrage',
         'tmdb_id': 'show.ids.tmdb',
-        'trakt_id': 'show.ids.trakt',
+        'trakt_show_id': 'show.ids.trakt',
         'trakt_slug': 'show.ids.slug'
     },
     'episode': {
-        'title': lambda i: '%s S%02dE%02d %s' % (i['show']['title'], i['episode']['season'],
+        'title': lambda i: '%s (%s) S%02dE%02d %s' % (i['show']['title'], i['show']['year'], i['episode']['season'],
                                                  i['episode']['number'], i['episode']['title']),
-        'series_name': 'show.title',
+        'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
         'series_season': 'episode.season',
         'series_episode': 'episode.number',
         'series_id': lambda i: 'S%02dE%02d' % (i['episode']['season'], i['episode']['number']),
-        'imdb_id': 'episode.ids.imdb',
-        'tvdb_id': 'episode.ids.tvdb',
-        'tvrage_id': 'episode.ids.tvrage',
-        'trakt_id': 'show.ids.trakt',
-        'trakt_slug': 'show.ids.slug'
+        'imdb_id': 'show.ids.imdb',
+        'tvdb_id': 'show.ids.tvdb',
+        'tvrage_id': 'show.ids.tvrage',
+        'trakt_episode_id': 'episode.ids.trakt',
+        'trakt_show_id': 'show.ids.trakt',
+        'trakt_show_slug': 'show.ids.slug'
     }
 }
 
