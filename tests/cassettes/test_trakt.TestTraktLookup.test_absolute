@@ -1,0 +1,156 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api.trakt.tv:443/search?query=naruto&type=show
+    response:
+      body: {string: "[{\"type\":\"show\",\"score\":42.88637,\"show\":{\"title\":\"\
+          Naruto\",\"overview\":\"In another world, ninja are the ultimate power,\
+          \ and in the Village Hidden in the Leaves live the stealthiest ninja in\
+          \ the land. Twelve years earlier, the fearsome Nine-Tailed Fox terrorized\
+          \ the village and claimed many lives before it was subdued and its spirit\
+          \ sealed within the body of a baby boy. That boy, Naruto Uzumaki, has grown\
+          \ up to become a ninja-in-training who's more interested in pranks than\
+          \ in studying ninjutsu.. but Naruto is determined to become the greatest\
+          \ ninja ever!\",\"year\":2002,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/046/003/posters/original/9363188ede.jpg?1422150737\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/046/003/posters/medium/9363188ede.jpg?1422150737\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/046/003/posters/thumb/9363188ede.jpg?1422150737\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/046/003/fanarts/original/0c0dae77d4.jpg?1422150737\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/046/003/fanarts/medium/0c0dae77d4.jpg?1422150737\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/046/003/fanarts/thumb/0c0dae77d4.jpg?1422150737\"\
+          }},\"ids\":{\"trakt\":46003,\"slug\":\"naruto\",\"tvdb\":78857,\"imdb\"\
+          :\"tt0409591\",\"tmdb\":46260,\"tvrage\":4620}}},{\"type\":\"show\",\"score\"\
+          :30.02046,\"show\":{\"title\":\"Naruto Shipp\u016Bden\",\"overview\":\"\
+          Naruto: Shippuden is an anime series adapted from Part II of the Naruto\
+          \ manga series by Masashi Kishimoto. The series is directed by Hayato Date\
+          \ and produced by Studio Pierrot and TV Tokyo. Naruto: Shippuden is a continuation\
+          \ of the Naruto manga, and continues the same storyline after the passing\
+          \ of two and a half years in the Naruto universe. It began broadcasting\
+          \ on TV Tokyo on February 15, 2007.\",\"year\":2007,\"images\":{\"poster\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":95397,\"slug\":\"naruto-shippuden-2007\"\
+          ,\"tvdb\":79824,\"imdb\":\"tt0988824\",\"tmdb\":31910,\"tvrage\":null}}},{\"\
+          type\":\"show\",\"score\":30.02046,\"show\":{\"title\":\"Naruto Shipp\u016B\
+          den\",\"overview\":\"Naruto: Shippuden is an anime series adapted from Part\
+          \ II of the Naruto manga series by Masashi Kishimoto. The series is directed\
+          \ by Hayato Date and produced by Studio Pierrot and TV Tokyo. Naruto: Shippuden\
+          \ is a continuation of the Naruto manga, and continues the same storyline\
+          \ after the passing of two and a half years in the Naruto universe. It began\
+          \ broadcasting on TV Tokyo on February 15, 2007.\",\"year\":2007,\"images\"\
+          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/031/770/posters/original/61c3e86d67.jpg?1422464904\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/031/770/posters/medium/61c3e86d67.jpg?1422464904\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/031/770/posters/thumb/61c3e86d67.jpg?1422464904\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/031/770/fanarts/original/e3adadb619.jpg?1422464904\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/031/770/fanarts/medium/e3adadb619.jpg?1422464904\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/031/770/fanarts/thumb/e3adadb619.jpg?1422464904\"\
+          }},\"ids\":{\"trakt\":31770,\"slug\":\"naruto-shippuden\",\"tvdb\":79824,\"\
+          imdb\":\"tt0988824\",\"tmdb\":31910,\"tvrage\":null}}},{\"type\":\"show\"\
+          ,\"score\":15.01023,\"show\":{\"title\":\"Naruto: The Abridged Comedy Fandub\
+          \ Spoof Series Show\",\"year\":2009,\"images\":{\"poster\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null}},\"ids\":{\"trakt\":67973,\"slug\":\"naruto-the-abridged-comedy-fandub-spoof-series-show\"\
+          ,\"tvdb\":261343,\"imdb\":\"tt1578671\",\"tmdb\":null,\"tvrage\":null}}},{\"\
+          type\":\"show\",\"score\":0.79628587,\"show\":{\"title\":\"Rock Lee & His\
+          \ Ninja Pals\",\"overview\":\"Welcome to the Hidden Leaf Village. The village\
+          \ where Uzumaki Naruto, star of the TV show \\\"Naruto\\\" makes his home.\
+          \ Every day, countless powerful ninjas carry out missions and train to hone\
+          \ their skills. Our main character is one of these powerful ninjas...but\
+          \ it's not Naruto! It's the ninja who can't use ninjutsu, Rock Lee! In spite\
+          \ of his handicap, Lee has big dreams. He works hard every day to perfect\
+          \ his hand-to-hand combat skills and become a splendid ninja! And to achieve\
+          \ his dream, he puts in more effort than anyone else. Under the hot-blooded\
+          \ tutelage of his teacher Guy, he works alongside his teammates Tenten and\
+          \ Neji. Watch the Beautiful Green Beast Rock Lee train, go on missions,\
+          \ and have all sorts of adventures! \",\"year\":2012,\"images\":{\"poster\"\
+          :{\"full\":\"https://walter.trakt.us/images/shows/000/066/108/posters/original/0e7a6a2614.jpg?1418951872\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/066/108/posters/medium/0e7a6a2614.jpg?1418951872\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/066/108/posters/thumb/0e7a6a2614.jpg?1418951872\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/066/108/fanarts/original/5add6a78d5.jpg?1418951875\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/066/108/fanarts/medium/5add6a78d5.jpg?1418951875\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/066/108/fanarts/thumb/5add6a78d5.jpg?1418951875\"\
+          }},\"ids\":{\"trakt\":66108,\"slug\":\"rock-lee-his-ninja-pals\",\"tvdb\"\
+          :257837,\"imdb\":\"tt2301807\",\"tmdb\":null,\"tvrage\":null}}},{\"type\"\
+          :\"show\",\"score\":0.45973587,\"show\":{\"title\":\"Pucca\",\"overview\"\
+          :\"\\\"Pucca\\\" is a TV series based on a Flash animation series published\
+          \ by Vooz Character Systems.  It follows the trails and exploits of a South\
+          \ Korean girl named Pucca who is insanely in love with a prideful ninja\
+          \ named Garu.  Meanwhile, Garu and Pucca help their town of Sooga Village\
+          \ out when evil ninjas attack, as well as diffuse a lot of the absurd situations\
+          \ that frequently plague the town.  This show could best be described as\
+          \ a cleaned-up version of South Park meets Looney Tunes meets Naruto.  There\
+          \ is some very subtly hidden adult humor; but most of the adult jokes would\
+          \ not go noticed by small children, who are the primary audience.\",\"year\"\
+          :2006,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/742/posters/original/08a1152b05.jpg?1418985192\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/006/742/posters/medium/08a1152b05.jpg?1418985192\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/006/742/posters/thumb/08a1152b05.jpg?1418985192\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/742/fanarts/original/39a770759a.jpg?1418985198\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/006/742/fanarts/medium/39a770759a.jpg?1418985198\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/006/742/fanarts/thumb/39a770759a.jpg?1418985198\"\
+          }},\"ids\":{\"trakt\":6742,\"slug\":\"pucca\",\"tvdb\":81774,\"imdb\":\"\
+          tt0795256\",\"tmdb\":6782,\"tvrage\":null}}}]"}
+      headers:
+        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+        cf-cache-status: [MISS]
+        cf-ray: [1b19b13216db185e-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Sat, 31 Jan 2015 23:29:35 GMT']
+        etag: [W/"ff6647381d84f710a44adf140c3a340b"]
+        expires: ['Sun, 01 Feb 2015 03:29:35 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=da1dad4e732c114180c10504ead881a141422746975; expires=Sun,
+            31-Jan-16 23:29:35 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger]
+        x-request-id: [704f3dc4-097e-41f5-967e-b373838886bc]
+        x-runtime: ['0.040096']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        Cookie: [__cfduid=da1dad4e732c114180c10504ead881a141422746975]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api.trakt.tv:443/shows/46003?extended=full
+    response:
+      body: {string: '{"title":"Naruto","year":2002,"ids":{"trakt":46003,"slug":"naruto","tvdb":78857,"imdb":"tt0409591","tmdb":46260,"tvrage":4620},"overview":"In
+          another world, ninja are the ultimate power, and in the Village Hidden in
+          the Leaves live the stealthiest ninja in the land. Twelve years earlier,
+          the fearsome Nine-Tailed Fox terrorized the village and claimed many lives
+          before it was subdued and its spirit sealed within the body of a baby boy.
+          That boy, Naruto Uzumaki, has grown up to become a ninja-in-training who''s
+          more interested in pranks than in studying ninjutsu.. but Naruto is determined
+          to become the greatest ninja ever!","first_aired":"2002-10-02T17:00:00.000-07:00","airs":{"day":"Thursday","time":null,"timezone":"Asia/Tokyo"},"runtime":30,"certification":"TV-PG","network":"TV
+          Tokyo","country":"jp","trailer":null,"homepage":null,"status":"ended","rating":8.255190000000001,"votes":1301,"updated_at":"2015-01-26T10:40:07.000Z","language":"ja","available_translations":["en","de","fr","he","ar","es"],"genres":["animation","comedy","drama"],"aired_episodes":228}'}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [1b19b132a6e5185e-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Sat, 31 Jan 2015 23:29:35 GMT']
+        expires: ['Sun, 01 Feb 2015 03:29:35 GMT']
+        last-modified: ['Mon, 26 Jan 2015 10:40:07 GMT']
+        server: [cloudflare-nginx]
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger 4.0.58]
+        x-request-id: [ffed2197-9837-4a6d-a2b2-0909ebab722d]
+        x-runtime: ['0.018679']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1

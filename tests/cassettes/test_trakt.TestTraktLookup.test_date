@@ -1,0 +1,95 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api.trakt.tv:443/search?query=the+daily+show+with+jon+stewart&type=show
+    response:
+      body: {string: '[{"type":"show","score":17.324814,"show":{"title":"The Daily
+          Show with Jon Stewart","overview":"Forget trying to keep pace with 24 hour
+          news networks- the best fake news show in the world will provide you with
+          all the news you can handle. The Daily Show is a comedic view of recent
+          news headlines and political figures through a series of satirical monologues
+          by Jon Stewart along with segments by correspondents and finally interviews
+          with guest celebrities and political figures.","year":1996,"images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/002/211/posters/original/90d900e587.jpg?1422029518","medium":"https://walter.trakt.us/images/shows/000/002/211/posters/medium/90d900e587.jpg?1422029518","thumb":"https://walter.trakt.us/images/shows/000/002/211/posters/thumb/90d900e587.jpg?1422029518"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/002/211/fanarts/original/f6e0f2676a.jpg?1422029518","medium":"https://walter.trakt.us/images/shows/000/002/211/fanarts/medium/f6e0f2676a.jpg?1422029518","thumb":"https://walter.trakt.us/images/shows/000/002/211/fanarts/thumb/f6e0f2676a.jpg?1422029518"}},"ids":{"trakt":2211,"slug":"the-daily-show-with-jon-stewart","tvdb":71256,"imdb":"tt0115147","tmdb":2224,"tvrage":5714}}},{"type":"show","score":6.9618564,"show":{"title":"The
+          Daily Show: Global Edition","overview":"The Daily Show: Global Edition is
+          a weekly version of the Daily Show with Jon Stewart created for overseas
+          markets and airs on foreign networks. ","year":1969,"images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/060/953/posters/original/74d9aec9bc.jpg?1418947867","medium":"https://walter.trakt.us/images/shows/000/060/953/posters/medium/74d9aec9bc.jpg?1418947867","thumb":"https://walter.trakt.us/images/shows/000/060/953/posters/thumb/74d9aec9bc.jpg?1418947867"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":60953,"slug":"the-daily-show-global-edition","tvdb":83846,"imdb":null,"tmdb":null,"tvrage":null}}},{"type":"show","score":3.7225513,"show":{"title":"heute-show","overview":"As
+          a German adaption of ''The Daily Show with Jon Stewart'' Oliver Welke and
+          his team report on political topics as well as international news giving
+          them their own satirical, comedic twist.","year":2009,"images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/045/801/posters/original/ddebd8b4f8.jpg?1419280851","medium":"https://walter.trakt.us/images/shows/000/045/801/posters/medium/ddebd8b4f8.jpg?1419280851","thumb":"https://walter.trakt.us/images/shows/000/045/801/posters/thumb/ddebd8b4f8.jpg?1419280851"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":45801,"slug":"heute-show","tvdb":234791,"imdb":"","tmdb":46056,"tvrage":null}}},{"type":"show","score":1.2992377,"show":{"title":"
+          SEE RANK The Rumble in the Air-Conditioned Auditorium","overview":"The Rumble
+          in the Air-Conditioned Auditorium: O''Reilly vs. Stewart 2012 is a debate
+          between Bill O''Reilly of The O''Reilly Factor and Jon Stewart of The Daily
+          Show and moderated by CNN news anchor E. D. Hill. It took place on October
+          6, 2012 in Washington, D.C., starting at 8 pm with most of its audience
+          viewing via Internet stream and subsequent download.","year":2012,"images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/080/328/posters/original/445b8bfc86.jpg?1418971524","medium":"https://walter.trakt.us/images/shows/000/080/328/posters/medium/445b8bfc86.jpg?1418971524","thumb":"https://walter.trakt.us/images/shows/000/080/328/posters/thumb/445b8bfc86.jpg?1418971524"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":80328,"slug":"see-rank-the-rumble-in-the-air-conditioned-auditorium","tvdb":277404,"imdb":"tt2400660","tmdb":null,"tvrage":null}}},{"type":"show","score":0.70482284,"show":{"title":"Lewis
+          Black''s Root of All Evil","overview":"A rotating roster of comedians argue
+          over who or what is the root of all evil in this courtroom parody. Lewis
+          Black of The Daily Show with Jon Stewart presides as judge, and topics debated
+          include such hot issues as ''Paris Hilton vs. Dick Cheney'' and ''chick
+          flicks vs. video games'' among others.","year":2008,"images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/007/043/posters/original/89d6199b83.jpg?1418985404","medium":"https://walter.trakt.us/images/shows/000/007/043/posters/medium/89d6199b83.jpg?1418985404","thumb":"https://walter.trakt.us/images/shows/000/007/043/posters/thumb/89d6199b83.jpg?1418985404"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/007/043/fanarts/original/75382d52ba.jpg?1418985407","medium":"https://walter.trakt.us/images/shows/000/007/043/fanarts/medium/75382d52ba.jpg?1418985407","thumb":"https://walter.trakt.us/images/shows/000/007/043/fanarts/thumb/75382d52ba.jpg?1418985407"}},"ids":{"trakt":7043,"slug":"lewis-black-s-root-of-all-evil","tvdb":81516,"imdb":"tt0995865","tmdb":7084,"tvrage":null}}}]'}
+      headers:
+        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+        cf-cache-status: [MISS]
+        cf-ray: [1b19abcd338301ed-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Sat, 31 Jan 2015 23:25:54 GMT']
+        etag: [W/"736abf0675a93ee575aa306842b31fa1"]
+        expires: ['Sun, 01 Feb 2015 03:25:53 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=df1533878cb2e40bf3eb779e6a90c59fa1422746754; expires=Sun,
+            31-Jan-16 23:25:54 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger]
+        x-request-id: [c4530ae8-4458-429f-89a0-e6dafe17526b]
+        x-runtime: ['0.057236']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        Cookie: [__cfduid=df1533878cb2e40bf3eb779e6a90c59fa1422746754]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api.trakt.tv:443/shows/2211?extended=full
+    response:
+      body: {string: '{"title":"The Daily Show with Jon Stewart","year":1996,"ids":{"trakt":2211,"slug":"the-daily-show-with-jon-stewart","tvdb":71256,"imdb":"tt0115147","tmdb":2224,"tvrage":5714},"overview":"Forget
+          trying to keep pace with 24 hour news networks- the best fake news show
+          in the world will provide you with all the news you can handle. The Daily
+          Show is a comedic view of recent news headlines and political figures through
+          a series of satirical monologues by Jon Stewart along with segments by correspondents
+          and finally interviews with guest celebrities and political figures.","first_aired":"1996-07-22T20:00:00.000-07:00","airs":{"day":"Saturday","time":"23:00","timezone":"America/New_York"},"runtime":22,"certification":"TV-14","network":"Comedy
+          Central","country":"us","trailer":null,"homepage":null,"status":"returning
+          series","rating":9.05317,"votes":2144,"updated_at":"2015-01-31T11:13:04.000Z","language":"en","available_translations":["en","tr","de","pt","es","nl","da"],"genres":["comedy"],"aired_episodes":2600}'}
+      headers:
+        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+        cf-cache-status: [MISS]
+        cf-ray: [1b19abcdd39301ed-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Sat, 31 Jan 2015 23:25:54 GMT']
+        expires: ['Sun, 01 Feb 2015 03:25:53 GMT']
+        last-modified: ['Sat, 31 Jan 2015 11:13:04 GMT']
+        server: [cloudflare-nginx]
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger]
+        x-request-id: [e31a9ba5-5386-464a-bac9-051c09bbe4ad]
+        x-runtime: ['0.096172']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1

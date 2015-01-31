@@ -1,0 +1,34 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api.trakt.tv:443/search?query=aoeu+htns&type=show
+    response:
+      body: {string: '[]'}
+      headers:
+        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+        cf-cache-status: [MISS]
+        cf-ray: [1b19b9c0e4ef1846-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Sat, 31 Jan 2015 23:35:25 GMT']
+        etag: [W/"14dcbc5176c9edfe22239a59348a8020"]
+        expires: ['Sun, 01 Feb 2015 03:35:25 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=dfac3444b9d1c29a6612cc1a575a713671422747325; expires=Sun,
+            31-Jan-16 23:35:25 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger]
+        x-request-id: [a90b4680-11a8-4830-9533-45da4980d497]
+        x-runtime: ['0.025106']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1
