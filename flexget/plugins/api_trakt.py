@@ -437,7 +437,7 @@ class ApiTrakt(object):
         if not series:
             raise LookupError('Could not identify series')
         ep_description = '%s.S%sE%s' % (series.title, seasonnum, episodenum)
-        episode = session.query(TraktEpisode).filter(TraktEpisode.series_id == series.tvdb_id).\
+        episode = session.query(TraktEpisode).filter(TraktEpisode.id == series.trakt_id).\
             filter(TraktEpisode.season == seasonnum).filter(TraktEpisode.number == episodenum).first()
         url = episode_summary + api_key + '%s/%s/%s' % (series.tvdb_id, seasonnum, episodenum)
         if not episode:

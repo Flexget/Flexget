@@ -42,6 +42,7 @@ class TestTraktLookup(FlexGetBase):
 
     """
 
+    @use_vcr
     def test_lookup_name(self):
         """trakt: Test Lookup (ONLINE)"""
         self.execute_task('test')

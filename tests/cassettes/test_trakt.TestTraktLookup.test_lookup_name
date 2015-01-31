@@ -1,0 +1,134 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api.trakt.tv:443/search?query=house&type=show
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":14.524966,\"show\":{\"title\":\"House\",\"overview\":\"Go
+        deeper into the medical mysteries of House, TV's most compelling drama. Hugh
+        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
+        physician who is devoid of bedside manner. While his behavior can border on
+        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
+        that other doctors give up on. Together with his hand-picked team of young
+        medical experts, he'll do whatever it takes in the race against the clock
+        to solve the case.\",\"year\":2004,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/399/posters/original/76fae8b69b.jpg?1420486886\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/399/posters/medium/76fae8b69b.jpg?1420486886\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/posters/thumb/76fae8b69b.jpg?1420486886\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/original/bc8a5989f5.jpg?1420486886\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/medium/bc8a5989f5.jpg?1420486886\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/bc8a5989f5.jpg?1420486886\"}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":10.270701,\"show\":{\"title\":\"House
+        vs. House\",\"year\":1969,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.167477,\"show\":{\"title\":\"House
+        Rules\",\"overview\":\"Welcome to the House Rules guide at TV Tome.  Home
+        improvement gets competitive when TBS Superstation pits three teams of amateur
+        home remodelers against each other in the new reality series House Rules,
+        presented by Lowe's. The series, which will result in one team winning the
+        home they've renovated, is hosted by Mark L. Walberg (Temptation Island) and
+        premiered Friday, Oct. 10 at 8/7c, on TBS Superstation.  The three teams chosen
+        for the inaugural edition of House Rules are;Red Team: Katie & Adam, newlyweds
+        who will spend their honeymoon competing on the show. Blue Team: Cindy & Bill,
+        who have been married for 11 years. Silver Team: Rebecca & Joseph, who have
+        been in a long-distance relationship for nearly a year.  Each week, the teams
+        must compete to win their share of a remodeling allowance to be used to pay
+        for the renovations. Once a week, they will also have an opportunity to spy
+        on each other's progress as they each host weekly dinner par\",\"year\":2003,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":29075,\"slug\":\"house-rules-2003\",\"tvdb\":73395,\"imdb\":\"tt0381766\",\"tmdb\":29201,\"tvrage\":3912}}},{\"type\":\"show\",\"score\":10.167477,\"show\":{\"title\":\"Grandma's
+        House\",\"overview\":\"TV presenter Simon Amstell plays a version of himself
+        in Grandma's House, a new six-part comedy written by Simon and his long-term
+        collaborator Dan Swimer.The series stars Simon Amstell as a TV presenter who
+        is quitting his job to try to do something more meaningful with his life.Each
+        episode is set at Grandma's house, where Simon's family regularly congregate
+        to catch up. Everything happens under the watchful eye of Grandma, who is
+        desperate to see everything going well.\",\"year\":2010,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/033/144/posters/original/8eace1ae32.jpg?1419005176\",\"medium\":\"https://walter.trakt.us/images/shows/000/033/144/posters/medium/8eace1ae32.jpg?1419005176\",\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/posters/thumb/8eace1ae32.jpg?1419005176\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/original/72aecb12bc.jpg?1419005181\",\"medium\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/medium/72aecb12bc.jpg?1419005181\",\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/thumb/72aecb12bc.jpg?1419005181\"}},\"ids\":{\"trakt\":33144,\"slug\":\"grandma-s-house\",\"tvdb\":181551,\"imdb\":\"\",\"tmdb\":33289,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.167477,\"show\":{\"title\":\"Lush
+        House\",\"overview\":\"A publishing sensation and radio star, Shannon Lush
+        is the author of best-selling books Spotless, Speed Cleaning and How to Be
+        Comfy. In this series, Shannon will combine her unique know-how with a mission
+        to instil domestic wellbeing and happiness \u2013 she wants nothing more than
+        to transform the homes of the nation. Each week, one family or household receives
+        the Shannon Lush treatment. These are people who need her help to get their
+        lives and homes in order. They are literally in a mess. Lush House is no snap
+        your fingers make-over show. The household has to make the transformation
+        themselves, Shannon is there as mentor and \u2018font of all knowledge\u2019.
+        Over 10 episodes Shannon will help all types of Australian households change
+        the way they live. Shannon\u2019s simple, non-toxic approach to cleaning and
+        household management will enable viewers to discover everything they ever
+        wanted to know about remedying domestic disasters and deliver valuable take-away
+        tips that will SAVE time, money and the planet. If you are in search of domestic
+        bliss, if you long for a house, and a life, that is clean, tidy and calm,
+        but haven\u2019t got the time, knowledge, family support or the organisational
+        skills, this series will have the solution.\",\"year\":1969,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":79984,\"slug\":\"lush-house\",\"tvdb\":283349,\"imdb\":\"tt1468529\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.167477,\"show\":{\"title\":\"Champion
+        House\",\"year\":1967,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9579,\"slug\":\"champion-house\",\"tvdb\":74193,\"imdb\":\"tt0159854\",\"tmdb\":9627,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.167477,\"show\":{\"title\":\"Party
+        House\",\"overview\":\"Fun-loving friends with a reason to celebrate are given
+        an empty mansion and 24 hours to throw the party of a lifetime\",\"year\":1969,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":78265,\"slug\":\"party-house\",\"tvdb\":281498,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.167477,\"show\":{\"title\":\"Hardwicke
+        House\",\"overview\":\"Hardwicke House was a 1987 seven-episode sitcom produced
+        by Central Independent Television for the ITV network. It was so negatively
+        received that only the first two episodes were transmitted.\",\"year\":1987,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":94076,\"slug\":\"hardwicke-house\",\"tvdb\":272786,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.167477,\"show\":{\"title\":\"Frankie's
+        House\",\"overview\":\"In 1964 in Laos, young Tim Page discovers his vocation
+        as a photo journalist and is given a job, a camera, and a trip to Vietnam.
+        There, he learns the ropes, learns about the war first in Saigon, and then
+        in country on patrol with troops. He and his colleagues, including the sons
+        of Errol Flynn and John Steinbeck, capture the war in pictures, recover from
+        their wounds, swap stories, battle censorship, and support each other between
+        the explosions at the brothel run by Tranh Ki: Frankie's House.Produced by
+        Anglia Television for the ITV Network.\",\"year\":null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":47403,\"slug\":\"frankie-s-house\",\"tvdb\":252307,\"imdb\":\"tt0104294\",\"tmdb\":47694,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.167477,\"show\":{\"title\":\"House
+        Guest\",\"overview\":\"In this non-traditional game show, a pair of hosts
+        opens up their homes to four strangers who will judge them on their hosting
+        abilities. \",\"year\":null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":8754,\"slug\":\"house-guest\",\"tvdb\":82126,\"imdb\":\"\",\"tmdb\":8800,\"tvrage\":null}}}]"}
+    headers:
+      cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+      cf-cache-status: [MISS]
+      cf-ray: [1b125f6f05400944-DFW]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Sat, 31 Jan 2015 02:10:29 GMT']
+      etag: [W/"bcef7e8d28a89b5cc72cdd68ba2f64c6"]
+      expires: ['Sat, 31 Jan 2015 06:10:29 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d3f79afde1794aa7506bfde48841ebcf61422670225; expires=Sun,
+          31-Jan-16 02:10:25 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      status: [200 OK]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-powered-by: [Phusion Passenger]
+      x-request-id: [2fa92404-7984-40df-9ab1-189f94c9acbc]
+      x-runtime: ['0.077206']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=d3f79afde1794aa7506bfde48841ebcf61422670225]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api.trakt.tv:443/shows/1399?extended=full
+  response:
+    body: {string: !!python/unicode '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
+        deeper into the medical mysteries of House, TV''s most compelling drama. Hugh
+        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
+        physician who is devoid of bedside manner. While his behavior can border on
+        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
+        that other doctors give up on. Together with his hand-picked team of young
+        medical experts, he''ll do whatever it takes in the race against the clock
+        to solve the case.","first_aired":"2004-11-15T16:00:00.000-08:00","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":42,"certification":"TV-14","network":"FOX","country":"us","trailer":null,"homepage":null,"status":"ended","rating":8.84747,"votes":13460,"updated_at":"2015-01-29T10:51:16.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'}
+    headers:
+      cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+      cf-cache-status: [MISS]
+      cf-ray: [1b125f87a6b90944-DFW]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Sat, 31 Jan 2015 02:10:33 GMT']
+      expires: ['Sat, 31 Jan 2015 06:10:33 GMT']
+      last-modified: ['Thu, 29 Jan 2015 10:51:16 GMT']
+      server: [cloudflare-nginx]
+      status: [200 OK]
+      transfer-encoding: [chunked]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-powered-by: [Phusion Passenger]
+      x-request-id: [1358bae4-87af-4606-8156-cc4a59f55571]
+      x-runtime: ['0.082875']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1
