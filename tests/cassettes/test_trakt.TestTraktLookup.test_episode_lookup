@@ -1,0 +1,461 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api.trakt.tv:443/search?query=house&type=show
+    response:
+      body: {string: "[{\"type\":\"show\",\"score\":14.8417845,\"show\":{\"title\"\
+          :\"House\",\"overview\":\"Go deeper into the medical mysteries of House,\
+          \ TV's most compelling drama. Hugh Laurie stars as the brilliant but sarcastic\
+          \ Dr. Gregory House, a maverick physician who is devoid of bedside manner.\
+          \ While his behavior can border on antisocial, Dr. House thrives on the\
+          \ challenge of solving the medical puzzles that other doctors give up on.\
+          \ Together with his hand-picked team of young medical experts, he'll do\
+          \ whatever it takes in the race against the clock to solve the case.\",\"\
+          year\":2004,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/399/posters/original/76fae8b69b.jpg?1420486886\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/399/posters/medium/76fae8b69b.jpg?1420486886\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/posters/thumb/76fae8b69b.jpg?1420486886\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/original/bc8a5989f5.jpg?1420486886\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/medium/bc8a5989f5.jpg?1420486886\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/bc8a5989f5.jpg?1420486886\"\
+          }},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"\
+          tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\"\
+          :10.494726,\"show\":{\"title\":\"House vs. House\",\"year\":1969,\"images\"\
+          :{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"\
+          full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"\
+          slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":null,\"tmdb\":null,\"\
+          tvrage\":null}}},{\"type\":\"show\",\"score\":10.389249,\"show\":{\"title\"\
+          :\"House Rules\",\"overview\":\"Welcome to the House Rules guide at TV Tome.\
+          \  Home improvement gets competitive when TBS Superstation pits three teams\
+          \ of amateur home remodelers against each other in the new reality series\
+          \ House Rules, presented by Lowe's. The series, which will result in one\
+          \ team winning the home they've renovated, is hosted by Mark L. Walberg\
+          \ (Temptation Island) and premiered Friday, Oct. 10 at 8/7c, on TBS Superstation.\
+          \  The three teams chosen for the inaugural edition of House Rules are;Red\
+          \ Team: Katie & Adam, newlyweds who will spend their honeymoon competing\
+          \ on the show. Blue Team: Cindy & Bill, who have been married for 11 years.\
+          \ Silver Team: Rebecca & Joseph, who have been in a long-distance relationship\
+          \ for nearly a year.  Each week, the teams must compete to win their share\
+          \ of a remodeling allowance to be used to pay for the renovations. Once\
+          \ a week, they will also have an opportunity to spy on each other's progress\
+          \ as they each host weekly dinner par\",\"year\":2003,\"images\":{\"poster\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":29075,\"slug\":\"house-rules-2003\"\
+          ,\"tvdb\":73395,\"imdb\":\"tt0381766\",\"tmdb\":29201,\"tvrage\":3912}}},{\"\
+          type\":\"show\",\"score\":10.389249,\"show\":{\"title\":\"Grandma's House\"\
+          ,\"overview\":\"TV presenter Simon Amstell plays a version of himself in\
+          \ Grandma's House, a new six-part comedy written by Simon and his long-term\
+          \ collaborator Dan Swimer.The series stars Simon Amstell as a TV presenter\
+          \ who is quitting his job to try to do something more meaningful with his\
+          \ life.Each episode is set at Grandma's house, where Simon's family regularly\
+          \ congregate to catch up. Everything happens under the watchful eye of Grandma,\
+          \ who is desperate to see everything going well.\",\"year\":2010,\"images\"\
+          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/033/144/posters/original/8eace1ae32.jpg?1419005176\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/033/144/posters/medium/8eace1ae32.jpg?1419005176\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/posters/thumb/8eace1ae32.jpg?1419005176\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/original/72aecb12bc.jpg?1419005181\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/medium/72aecb12bc.jpg?1419005181\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/thumb/72aecb12bc.jpg?1419005181\"\
+          }},\"ids\":{\"trakt\":33144,\"slug\":\"grandma-s-house\",\"tvdb\":181551,\"\
+          imdb\":\"\",\"tmdb\":33289,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
+          :10.389249,\"show\":{\"title\":\"Lush House\",\"overview\":\"A publishing\
+          \ sensation and radio star, Shannon Lush is the author of best-selling books\
+          \ Spotless, Speed Cleaning and How to Be Comfy. In this series, Shannon\
+          \ will combine her unique know-how with a mission to instil domestic wellbeing\
+          \ and happiness \u2013 she wants nothing more than to transform the homes\
+          \ of the nation. Each week, one family or household receives the Shannon\
+          \ Lush treatment. These are people who need her help to get their lives\
+          \ and homes in order. They are literally in a mess. Lush House is no snap\
+          \ your fingers make-over show. The household has to make the transformation\
+          \ themselves, Shannon is there as mentor and \u2018font of all knowledge\u2019\
+          . Over 10 episodes Shannon will help all types of Australian households\
+          \ change the way they live. Shannon\u2019s simple, non-toxic approach to\
+          \ cleaning and household management will enable viewers to discover everything\
+          \ they ever wanted to know about remedying domestic disasters and deliver\
+          \ valuable take-away tips that will SAVE time, money and the planet. If\
+          \ you are in search of domestic bliss, if you long for a house, and a life,\
+          \ that is clean, tidy and calm, but haven\u2019t got the time, knowledge,\
+          \ family support or the organisational skills, this series will have the\
+          \ solution.\",\"year\":1969,\"images\":{\"poster\":{\"full\":null,\"medium\"\
+          :null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\"\
+          :null}},\"ids\":{\"trakt\":79984,\"slug\":\"lush-house\",\"tvdb\":283349,\"\
+          imdb\":\"tt1468529\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
+          ,\"score\":10.389249,\"show\":{\"title\":\"Champion House\",\"year\":1967,\"\
+          images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9579,\"\
+          slug\":\"champion-house\",\"tvdb\":74193,\"imdb\":\"tt0159854\",\"tmdb\"\
+          :9627,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.389249,\"show\"\
+          :{\"title\":\"Party House\",\"overview\":\"Fun-loving friends with a reason\
+          \ to celebrate are given an empty mansion and 24 hours to throw the party\
+          \ of a lifetime\",\"year\":1969,\"images\":{\"poster\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null}},\"ids\":{\"trakt\":78265,\"slug\":\"party-house\",\"tvdb\"\
+          :281498,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
+          ,\"score\":10.389249,\"show\":{\"title\":\"Hardwicke House\",\"overview\"\
+          :\"Hardwicke House was a 1987 seven-episode sitcom produced by Central Independent\
+          \ Television for the ITV network. It was so negatively received that only\
+          \ the first two episodes were transmitted.\",\"year\":1987,\"images\":{\"\
+          poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\"\
+          :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":94076,\"slug\"\
+          :\"hardwicke-house\",\"tvdb\":272786,\"imdb\":null,\"tmdb\":null,\"tvrage\"\
+          :null}}},{\"type\":\"show\",\"score\":10.389249,\"show\":{\"title\":\"Frankie's\
+          \ House\",\"overview\":\"In 1964 in Laos, young Tim Page discovers his vocation\
+          \ as a photo journalist and is given a job, a camera, and a trip to Vietnam.\
+          \ There, he learns the ropes, learns about the war first in Saigon, and\
+          \ then in country on patrol with troops. He and his colleagues, including\
+          \ the sons of Errol Flynn and John Steinbeck, capture the war in pictures,\
+          \ recover from their wounds, swap stories, battle censorship, and support\
+          \ each other between the explosions at the brothel run by Tranh Ki: Frankie's\
+          \ House.Produced by Anglia Television for the ITV Network.\",\"year\":null,\"\
+          images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":47403,\"\
+          slug\":\"frankie-s-house\",\"tvdb\":252307,\"imdb\":\"tt0104294\",\"tmdb\"\
+          :47694,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.389249,\"show\"\
+          :{\"title\":\"House Guest\",\"overview\":\"In this non-traditional game\
+          \ show, a pair of hosts opens up their homes to four strangers who will\
+          \ judge them on their hosting abilities. \",\"year\":null,\"images\":{\"\
+          poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\"\
+          :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":8754,\"slug\"\
+          :\"house-guest\",\"tvdb\":82126,\"imdb\":\"\",\"tmdb\":8800,\"tvrage\":null}}}]"}
+      headers:
+        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+        cf-cache-status: [MISS]
+        cf-ray: [1b18fee0ebc61858-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Sat, 31 Jan 2015 21:27:59 GMT']
+        etag: [W/"16c3f9e9e460dfe4aaeaa81392950ff1"]
+        expires: ['Sun, 01 Feb 2015 01:27:59 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d040f06eff78b279f2d1bb898cc3361341422739671; expires=Sun,
+            31-Jan-16 21:27:51 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger]
+        x-request-id: [0e1f6daa-eeda-437e-9c17-14ced0292ab8]
+        x-runtime: ['0.114719']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        Cookie: [__cfduid=d040f06eff78b279f2d1bb898cc3361341422739671]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api.trakt.tv:443/shows/1399?extended=full
+    response:
+      body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
+          deeper into the medical mysteries of House, TV''s most compelling drama.
+          Hugh Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
+          physician who is devoid of bedside manner. While his behavior can border
+          on antisocial, Dr. House thrives on the challenge of solving the medical
+          puzzles that other doctors give up on. Together with his hand-picked team
+          of young medical experts, he''ll do whatever it takes in the race against
+          the clock to solve the case.","first_aired":"2004-11-15T16:00:00.000-08:00","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":42,"certification":"TV-14","network":"FOX","country":"us","trailer":null,"homepage":null,"status":"ended","rating":8.84721,"votes":13469,"updated_at":"2015-01-31T10:54:20.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'}
+      headers:
+        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+        cf-cache-status: [MISS]
+        cf-ray: [1b18ff180e791858-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Sat, 31 Jan 2015 21:28:04 GMT']
+        expires: ['Sun, 01 Feb 2015 01:28:04 GMT']
+        last-modified: ['Sat, 31 Jan 2015 10:54:20 GMT']
+        server: [cloudflare-nginx]
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger]
+        x-request-id: [b185ca17-b716-4338-9c0b-5d9d5d2377f1]
+        x-runtime: ['0.075309']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api.trakt.tv:443/shows/1399/seasons/1/episodes/2?extended=full
+    response:
+      body: {string: '{"season":1,"number":2,"title":"Paternity","ids":{"trakt":74344,"tvdb":110995,"imdb":"tt0606034","tmdb":63739,"tvrage":84700},"number_abs":null,"overview":"When
+          a teenage lacrosse player is stricken with an unidentifiable brain disease,
+          Dr. House and the team hustle to give his parents answers. Chase breaks
+          the bad news, the kid has MS, but the boy''s night-terror hallucinations
+          disprove the diagnosis and send House and his team back to square one. As
+          the boy''s health deteriorates. House''s side-bet on the paternity of the
+          patient infuriates Dr. Cuddy and the teenager''s parents, but may just pay
+          off in spades.","first_aired":"2004-11-22T21:00:00.000-08:00","rating":8.19173,"votes":266,"updated_at":"2015-01-31T15:40:09.000Z","available_translations":[]}'}
+      headers:
+        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+        cf-cache-status: [MISS]
+        cf-ray: [1b18ff3441ca0efd-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Sat, 31 Jan 2015 21:28:10 GMT']
+        expires: ['Sun, 01 Feb 2015 01:28:10 GMT']
+        last-modified: ['Sat, 31 Jan 2015 15:40:09 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d4a2a27160a32e0d6e685420a66e565f81422739684; expires=Sun,
+            31-Jan-16 21:28:04 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger]
+        x-request-id: [fd2185f0-9b6e-4953-a7e1-ac6fb8417ef9]
+        x-runtime: ['0.054227']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api.trakt.tv:443/search?query=doctor+who&type=show
+    response:
+      body: {string: "[{\"type\":\"show\",\"score\":18.877571,\"show\":{\"title\"\
+          :\"Doctor Who\",\"overview\":\"Doctor Who is the longest-running science\
+          \ fiction TV series in history, airing initially from 1963 to 1989.  Doctor\
+          \ Who is about ideas.  It pioneered sophisticated mixed-level storytelling.\
+          \ Its format was the key to its longevity: the Doctor, a mysterious traveller\
+          \ in space and time, travels in his ship, the TARDIS.  The TARDIS can take\
+          \ him and his companions anywhere in time and space. Inevitably he finds\
+          \ evil at work wherever he goes...\",\"year\":1963,\"images\":{\"poster\"\
+          :{\"full\":\"https://walter.trakt.us/images/shows/000/000/120/posters/original/ad9718d1d8.jpg?1420013212\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/000/120/posters/medium/ad9718d1d8.jpg?1420013212\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/000/120/posters/thumb/ad9718d1d8.jpg?1420013212\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/000/120/fanarts/original/e4f4d0c970.jpg?1420013215\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/000/120/fanarts/medium/e4f4d0c970.jpg?1420013215\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/000/120/fanarts/thumb/e4f4d0c970.jpg?1420013215\"\
+          }},\"ids\":{\"trakt\":120,\"slug\":\"doctor-who\",\"tvdb\":76107,\"imdb\"\
+          :\"tt0056751\",\"tmdb\":121,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
+          :18.877571,\"show\":{\"title\":\"Doctor Who\",\"overview\":\"The Doctor\
+          \ is an alien Time Lord from the planet Gallifrey who travels through all\
+          \ of time and space in his TARDIS. His current travel companion is Clara\
+          \ Oswald, though he has a long list of friends and companions who have shared\
+          \ journeys with him. Instead of dying, the Doctor is able to \u201Cregenerate\u201D\
+          \ into a new body, taking on a new personality with each regeneration. Twelve\
+          \ actors, plus John Hurt, have played The Doctor thus far.\",\"year\":2005,\"\
+          images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/posters/original/8c421e339d.jpg?1422729351\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/posters/medium/8c421e339d.jpg?1422729351\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/posters/thumb/8c421e339d.jpg?1422729351\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/original/f5b14363ae.jpg?1422729352\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/medium/f5b14363ae.jpg?1422729352\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/thumb/f5b14363ae.jpg?1422729352\"\
+          }},\"ids\":{\"trakt\":56872,\"slug\":\"doctor-who-2005\",\"tvdb\":78804,\"\
+          imdb\":\"tt0436992\",\"tmdb\":57243,\"tvrage\":3332}}},{\"type\":\"show\"\
+          ,\"score\":13.483978,\"show\":{\"title\":\"Doctor Who 2009\",\"overview\"\
+          :\"Doctor Who 2009 is a non-profit making series of short fan films celebrating\
+          \ the BBC TV series Doctor Who.  Join the adventure, with a brand new series\
+          \ of 13 episodes for the Doctor, in this exciting new fan project.\",\"\
+          year\":null,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/018/418/posters/original/697288ab37.jpg?1418996721\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/018/418/posters/medium/697288ab37.jpg?1418996721\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/018/418/posters/thumb/697288ab37.jpg?1418996721\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
+          trakt\":18418,\"slug\":\"doctor-who-2009\",\"tvdb\":112671,\"imdb\":\"\"\
+          ,\"tmdb\":18502,\"tvrage\":null}}},{\"type\":\"show\",\"score\":13.483978,\"\
+          show\":{\"title\":\"Doctor Who Greatest Moments\",\"overview\":\"Series\
+          \ taking viewers on a journey through time and space to relive all the action\
+          \ from the sci-fi show, featuring exclusive interviews with key actors offering\
+          \ unique insights on the classic moments.\",\"year\":2009,\"images\":{\"\
+          poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/194/posters/original/60b4b2f8fd.jpg?1418947987\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/061/194/posters/medium/60b4b2f8fd.jpg?1418947987\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/061/194/posters/thumb/60b4b2f8fd.jpg?1418947987\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/194/fanarts/original/60b4b2f8fd.jpg?1418947989\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/061/194/fanarts/medium/60b4b2f8fd.jpg?1418947989\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/061/194/fanarts/thumb/60b4b2f8fd.jpg?1418947989\"\
+          }},\"ids\":{\"trakt\":61194,\"slug\":\"doctor-who-greatest-moments\",\"\
+          tvdb\":110141,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"\
+          show\",\"score\":13.483978,\"show\":{\"title\":\"Totally Doctor Who\",\"\
+          overview\":\"Following up on the success of Doctor Who for the BBC is this\
+          \ special show for younger fans. Hosted by Liz Barker and Barney Harwood,\
+          \ the show features interviews with the cast and crew, behind the scenes\
+          \ footage, and clips from upcoming Doctor Who shows.\",\"year\":2006,\"\
+          images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/000/453/posters/original/0cb9377d5d.jpg?1418793741\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/000/453/posters/medium/0cb9377d5d.jpg?1418793741\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/000/453/posters/thumb/0cb9377d5d.jpg?1418793741\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
+          trakt\":453,\"slug\":\"totally-doctor-who\",\"tvdb\":80160,\"imdb\":\"tt0795296\"\
+          ,\"tmdb\":454,\"tvrage\":null}}},{\"type\":\"show\",\"score\":13.483978,\"\
+          show\":{\"title\":\"Doctor Who Confidential\",\"overview\":\"Specially filmed\
+          \ for BBC Three as a companion piece to Doctor Who, Doctor Who Confidential\
+          \ aims to give a taste of the excitement and the energy that surrounds the\
+          \ show. The programme includes behind-the-scenes filming and interviews\
+          \ with the cast, writers and production team as they bring our favourite\
+          \ Time Lord back to our screens.An abbreviated 15-minute version, concentrating\
+          \ on the production of the new series and without reference to the original\
+          \ show, is also broadcast on BBC Three as Doctor Who Confidential Cutdown.\"\
+          ,\"year\":2005,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/051/posters/original/de98e274d3.jpg?1418807161\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/051/posters/medium/de98e274d3.jpg?1418807161\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/051/posters/thumb/de98e274d3.jpg?1418807161\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/original/3b9938962b.jpg?1418807162\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/medium/3b9938962b.jpg?1418807162\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/thumb/3b9938962b.jpg?1418807162\"\
+          }},\"ids\":{\"trakt\":1051,\"slug\":\"doctor-who-confidential\",\"tvdb\"\
+          :79298,\"imdb\":\"tt0453422\",\"tmdb\":1056,\"tvrage\":null}}},{\"type\"\
+          :\"show\",\"score\":13.483978,\"show\":{\"title\":\"Doctor Who Extra\",\"\
+          overview\":\"Doctor Who Extra brings you unprecedented access to the making\
+          \ of Doctor Who... Featuring interviews with Peter Capaldi and Jenna Coleman,\
+          \ it's the ultimate backstage pass!\",\"year\":2014,\"images\":{\"poster\"\
+          :{\"full\":\"https://walter.trakt.us/images/shows/000/094/434/posters/original/4f35484261.jpg?1420536626\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/094/434/posters/medium/4f35484261.jpg?1420536626\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/094/434/posters/thumb/4f35484261.jpg?1420536626\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/094/434/fanarts/original/3d44482626.jpg?1420536627\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/094/434/fanarts/medium/3d44482626.jpg?1420536627\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/094/434/fanarts/thumb/3d44482626.jpg?1420536627\"\
+          }},\"ids\":{\"trakt\":94434,\"slug\":\"doctor-who-extra\",\"tvdb\":null,\"\
+          imdb\":\"tt4147332\",\"tmdb\":61643,\"tvrage\":null}}},{\"type\":\"show\"\
+          ,\"score\":13.398536,\"show\":{\"title\":\"Doctor Who: The Doctors Revisited\"\
+          ,\"overview\":\"As the Doctor's newest companion, Clara Oswald, steps into\
+          \ the TARDIS, take a look back at previous companions that have won over\
+          \ The Doctor's hearts in Doctor Who: The Companions. Along the way, companions\
+          \ past and present talk about how the show has changed their lives, and\
+          \ how they've never quite managed to leave the TARDIS behind. \",\"year\"\
+          :2013,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/095/362/posters/original/08592b4239.jpg?1422538213\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/095/362/posters/medium/08592b4239.jpg?1422538213\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/095/362/posters/thumb/08592b4239.jpg?1422538213\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
+          trakt\":95362,\"slug\":\"doctor-who-the-doctors-revisited\",\"tvdb\":null,\"\
+          imdb\":\"tt2795780\",\"tmdb\":53071,\"tvrage\":null}}},{\"type\":\"show\"\
+          ,\"score\":11.168615,\"show\":{\"title\":\"Doctor Dolittle\",\"overview\"\
+          :\"The adventures of veterinarian John Dolittle, who can \\\"talk to the\
+          \ animals\\\", in his ongoing battle with pirate Sam Scurvy.\",\"year\"\
+          :null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"\
+          fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\"\
+          :14725,\"slug\":\"doctor-dolittle\",\"tvdb\":265517,\"imdb\":\"\",\"tmdb\"\
+          :14789,\"tvrage\":null}}},{\"type\":\"show\",\"score\":11.129765,\"show\"\
+          :{\"title\":\"Fat Doctor\",\"overview\":\"Dr Shaw Somers is the Fat Doctor...\
+          \ the bariatric surgeon who battles to help the nation's morbidly obese\
+          \ lose weight. Every day he shrinks people in an effort to change and even\
+          \ save their lives.\",\"year\":1969,\"images\":{\"poster\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
+          thumb\":null}},\"ids\":{\"trakt\":71987,\"slug\":\"fat-doctor\",\"tvdb\"\
+          :268916,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+      headers:
+        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+        cf-cache-status: [MISS]
+        cf-ray: [1b18ff58c1730773-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Sat, 31 Jan 2015 21:28:14 GMT']
+        etag: [W/"56385e1d99d65f9c7f4caab25e13e295"]
+        expires: ['Sun, 01 Feb 2015 01:28:14 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d852bee66877c2f4e16f6f2a566f5203a1422739690; expires=Sun,
+            31-Jan-16 21:28:10 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger]
+        x-request-id: [1f93b61e-0e74-4c8d-94db-81ef1ebf494d]
+        x-runtime: ['0.071660']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        Cookie: [__cfduid=d852bee66877c2f4e16f6f2a566f5203a1422739690]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api.trakt.tv:443/shows/56872?extended=full
+    response:
+      body: {string: "{\"title\":\"Doctor Who\",\"year\":2005,\"ids\":{\"trakt\":56872,\"\
+          slug\":\"doctor-who-2005\",\"tvdb\":78804,\"imdb\":\"tt0436992\",\"tmdb\"\
+          :57243,\"tvrage\":3332},\"overview\":\"The Doctor is an alien Time Lord\
+          \ from the planet Gallifrey who travels through all of time and space in\
+          \ his TARDIS. His current travel companion is Clara Oswald, though he has\
+          \ a long list of friends and companions who have shared journeys with him.\
+          \ Instead of dying, the Doctor is able to \u201Cregenerate\u201D into a\
+          \ new body, taking on a new personality with each regeneration. Twelve actors,\
+          \ plus John Hurt, have played The Doctor thus far.\",\"first_aired\":\"\
+          2005-03-26T12:30:00.000-08:00\",\"airs\":{\"day\":\"Saturday\",\"time\"\
+          :\"20:30\",\"timezone\":\"Europe/London\"},\"runtime\":50,\"certification\"\
+          :\"TV-PG\",\"network\":\"BBC One\",\"country\":\"gb\",\"trailer\":\"http://youtube.com/watch?v=kLxBYDff6RE\"\
+          ,\"homepage\":null,\"status\":\"returning series\",\"rating\":9.10988,\"\
+          votes\":10366,\"updated_at\":\"2015-01-31T18:41:21.000Z\",\"language\":\"\
+          en\",\"available_translations\":[\"da\",\"en\",\"hu\",\"ru\",\"nl\",\"pt\"\
+          ,\"pl\",\"de\",\"bg\",\"es\",\"fr\",\"zh\",\"tr\",\"cs\",\"it\",\"el\",\"\
+          no\"],\"genres\":[\"action\",\"adventure\",\"drama\",\"science-fiction\"\
+          ],\"aired_episodes\":103}"}
+      headers:
+        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+        cf-cache-status: [MISS]
+        cf-ray: [1b18ff74e2340773-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Sat, 31 Jan 2015 21:28:19 GMT']
+        expires: ['Sun, 01 Feb 2015 01:28:19 GMT']
+        last-modified: ['Sat, 31 Jan 2015 18:41:21 GMT']
+        server: [cloudflare-nginx]
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger]
+        x-request-id: [b0c132c6-e7ba-42aa-bdcc-cd18ce478d7c]
+        x-runtime: ['0.073139']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api.trakt.tv:443/shows/56872/seasons/2/episodes/3?extended=full
+    response:
+      body: {string: "{\"season\":2,\"number\":3,\"title\":\"School Reunion\",\"ids\"\
+          :{\"trakt\":951447,\"tvdb\":302431,\"imdb\":\"\",\"tmdb\":941480,\"tvrage\"\
+          :null},\"number_abs\":null,\"overview\":\"Location: Deffry Vale High School,\
+          \ London, England, Earth \\nDate: 2007 \\nEnemies: The Krillitanes \\n\\\
+          nThere are strange goings-on at a comprehensive school - UFOs, over-intelligent\
+          \ children, and odd-tasting school dinners. This attracts the attention\
+          \ of the Tenth Doctor, Rose and Mickey Smith, as well as a couple of old\
+          \ friends\u2026\",\"first_aired\":\"2006-04-29T12:30:00.000-07:00\",\"rating\"\
+          :8.1875,\"votes\":480,\"updated_at\":\"2015-01-31T18:55:11.000Z\",\"available_translations\"\
+          :[]}"}
+      headers:
+        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+        cf-cache-status: [MISS]
+        cf-ray: [1b18ff934e0b0773-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Sat, 31 Jan 2015 21:28:23 GMT']
+        expires: ['Sun, 01 Feb 2015 01:28:23 GMT']
+        last-modified: ['Sat, 31 Jan 2015 18:55:11 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d5106d12617b5694cd4fae054962c06e71422739699; expires=Sun,
+            31-Jan-16 21:28:19 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger]
+        x-request-id: [116f91e4-cfe8-41cb-83b7-f828d6029370]
+        x-runtime: ['0.099672']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1
