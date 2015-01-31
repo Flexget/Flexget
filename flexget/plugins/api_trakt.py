@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-from difflib import SequenceMatcher
 import logging
+import re
 from urlparse import urljoin
 
 from dateutil.parser import parse as dateutil_parse
@@ -154,6 +154,10 @@ class TraktEpisode(Base):
 
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=False)
 
+    def __init__(self, trakt_episode):
+        super(TraktEpisode, self).__init__()
+        self.update(trakt_episode)
+
     def update(self, trakt_episode):
         """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
         if self.id and self.id != trakt_episode['ids']['trakt']:
@@ -200,11 +204,15 @@ class TraktShow(Base):
     votes = Column(Integer)
     language = Column(Unicode)
     aired_episodes = Column(Integer)
-    episodes = relation(TraktEpisode, backref='show', cascade='all, delete, delete-orphan')
+    episodes = relation(TraktEpisode, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic')
     #genres = relation(TraktGenre, secondary=show_genres_table)
     #actors = relation(TraktActor, secondary=show_actors_table)
     updated_at = Column(DateTime)
     expired = Column(Boolean)
+
+    def __init__(self, trakt_show):
+        super(TraktShow, self).__init__()
+        self.update(trakt_show)
 
     def update(self, trakt_show):
         """Updates this record from the trakt media object `trakt_show` returned by the trakt api."""
@@ -236,6 +244,29 @@ class TraktShow(Base):
             pass
         self.expired = False
 
+    def get_episode(self, season, number, only_cached=False):
+        # TODO: Does series data being expired mean all episode data should be refreshed?
+        episode = self.episodes.filter(TraktEpisode.season == season).filter(TraktEpisode.number == number).first()
+        if not episode:
+            url = 'https://api.trakt.tv/shows/%s/seasons/%s/episodes/%s?extended=full' % (self.id, season, number)
+            if only_cached:
+                raise LookupError('Episode %s %s not found in cache' % (season, number))
+            log.debug('Episode %s %s not found in cache, looking up from trakt.' % (season, number))
+            try:
+                ses = get_session()
+                data = ses.get(url).json()
+            except requests.RequestException:
+                raise LookupError('Error Retrieving Trakt url: %s' % url)
+            if not data:
+                raise LookupError('No data in response from trakt %s' % url)
+            episode = self.episodes.filter(TraktEpisode.id == data['ids']['trakt']).first()
+            if episode:
+                episode.update(data)
+            else:
+                episode = TraktEpisode(data)
+                self.episodes.append(episode)
+        return episode
+
     def __repr__(self):
         return '<name=%s, id=%s>' % (self.title, self.id)
 
@@ -260,6 +291,10 @@ class TraktMovie(Base):
     updated_at = Column(DateTime)
     genres = relation(TraktGenre, secondary=movie_genres_table)
     _actors = relation(TraktActor, secondary=movie_actors_table)
+
+    def __init__(self, trakt_movie):
+        super(TraktMovie, self).__init__()
+        self.update(trakt_movie)
 
     def update(self, trakt_movie):
         """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
@@ -298,6 +333,17 @@ class TraktSearchResult(Base):
     series = relation(TraktShow, backref='search_strings')
 
 
+def split_title_year(title):
+    """Splits title containing a year into a title, year pair."""
+    match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
+    title = match.group(1).strip()
+    if match.group(2):
+        year = int(match.group(2))
+    else:
+        year = None
+    return title, year
+
+
 @with_session
 def get_cached(style=None, title=None, year=None, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None, tvdb_id=None,
                tvrage_id=None, session=None):
@@ -323,6 +369,8 @@ def get_cached(style=None, title=None, year=None, trakt_id=None, trakt_slug=None
         result = session.query(model).filter(
             or_(getattr(model, col) == val for col, val in ids.iteritems() if val)).first()
     elif title:
+        title, y = split_title_year(title)
+        year = year or y
         query = session.query(model).filter(model.title == title)
         if year:
             query = query.filter(model.year == year)
@@ -359,8 +407,10 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
                     raise LookupError('Provided id (%s) is for a %s not a %s' % (identifier, result['type'], style))
                 trakt_id = result[style]['ids']['trakt']
                 break
-        if not trakt_id:
+        if not trakt_id and title:
             # Try finding trakt id based on title and year
+            title, y = split_title_year(title)
+            year = year or y
             clean_title = normalize_series_name(title)
             try:
                 results = req_session.get(get_api_url('search'), params={'query': clean_title, 'type': style}).json()
@@ -385,95 +435,28 @@ class ApiTrakt(object):
 
     @staticmethod
     @with_session
-    def lookup_series(style=None, title=None, year=None, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None,
-                      tvdb_id=None, tvrage_id=None, session=None, only_cached=None):
-        series = None
-        trakt_id = trakt_id or trakt_slug
-        if not trakt_id:
-            # Try finding trakt_id based on other ids
-            ids = {
-                'title': title,
-                'tmdb': tmdb_id,
-                'imdb': imdb_id
-            }
-            if style == 'show':
-                ids['tvdb'] = tvdb_id
-                ids['tvrage'] = tvrage_id
-
-            def id_str():
-                return '<name=%s, trakt_id=%s>' % (title, trakt_id)
-            if ids:
-                series = get_cached(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, tvdb_id=tvdb_id, tvrage_id=tvrage_id)
-            if not series:
-                if not series:
-                    found = session.query(TraktSearchResult).filter(func.lower(TraktSearchResult.search) ==
-                                                                    title.lower()).first()
-                    if found and found.series:
-                        series = get_cached(trakt_id=found.trakt_id)
-            if not series:
-                if only_cached:
-                    raise LookupError('Series %s not found from cache' % id_str())
-                log.debug('Series %s not found in cache, looking up from trakt.' % id_str())
-                if ids:
-                    results = get_trakt(title=title, trakt_slug=trakt_slug, trakt_id=trakt_id, imdb_id=imdb_id, tmdb_id=tmdb_id,
-                                        tvdb_id=tvdb_id, tvrage_id=tvrage_id, style=style)
-                    series = TraktShow()
-                    series.update(results)
-                    session.add(series)
-                    if title.lower() != series.title.lower():
-                        session.add(TraktSearchResult)(search=title, series=series)
-
-            if not series:
-                raise LookupError('No results found from traktv for %s' % id_str())
-
-            # Make sure relations are loaded before returning
-            series.episodes
-            #series.genre
-            #series.actors
+    def lookup_series(session=None, only_cached=None, **lookup_params):
+        series = get_cached('show', session=session, **lookup_params)
+        if only_cached:
+            if series:
+                return series
+            raise LookupError('Series %s not found from cache' % lookup_params)
+        if series and not series.expired:
             return series
-
-    @staticmethod
-    @with_session
-    def lookup_episode(title=None, seasonnum=None, episodenum=None, trakt_id=None, session=None, only_cached=False):
-        series = get_cached(style='show', title=title, trakt_id=trakt_id, session=session)
-
-        if not series:
-            series = ApiTrakt.lookup_series(title=title, trakt_id=trakt_id, style='show', session=session)
-
-        if not series:
-            raise LookupError('Could not identify series')
-        ep_description = '%s.S%02dE%02d' % (series.title, seasonnum, episodenum)
-        if ep_description:
-            log.debug('%s, id=%s' % (ep_description, series.id))
-        episode = session.query(TraktEpisode).filter(TraktEpisode.title == series.title).filter(TraktEpisode.season == seasonnum).filter(TraktEpisode.number == episodenum).first()
-        url = 'https://api.trakt.tv/shows/%s/seasons/%s/episodes/%s?extended=full' % (series.id, seasonnum, episodenum)
-        if not episode:
-            if only_cached:
-                raise LookupError('Episode %s not found in cache' % ep_description)
-            log.debug('Episode %s not found in cache, looking up from trakt.' % ep_description)
-            try:
-                ses = get_session()
-                response = ses.get(url)
-            except requests.RequestException:
-                raise LookupError('Error Retrieving Trakt url: %s' % url)
-            try:
-                data = response.json()
-            except ValueError:
-                raise LookupError('Error parsing Trakt episode json for %s' % title)
-            if not data:
-                raise LookupError('No data in response from trakt %s' % url)
-            if 'error' in data:
-                raise LookupError('Error looking up %s: %s' % (ep_description, data['error']))
-            episode = session.query(TraktEpisode).filter(TraktEpisode.id == data['ids']['trakt']).first()
-            if not episode:
-                # Update result into format TraktEpisode expects (?)
-
-                episode = TraktEpisode()
-                episode.update(data)
-                series.episodes.append(episode)
-                session.merge(episode)
-
-        return episode
+        try:
+            trakt_show = get_trakt('show', **lookup_params)
+        except LookupError as e:
+            if series:
+                log.debug('Error refreshing show data from trakt, using cached. %s' % e)
+                return series
+            raise
+        if series:
+            series.update(trakt_show)
+        else:
+            # TODO: Check if show with trakt id exists, update it and store to TraktSearchResult
+            series = TraktShow(trakt_show)
+            session.add(series)
+        return series
 
 
 @event('plugin.register')

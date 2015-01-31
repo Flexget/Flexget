@@ -8,7 +8,6 @@ from flexget.manager import Session
 try:
     from flexget.plugins.api_trakt import ApiTrakt
     lookup_series = ApiTrakt.lookup_series
-    lookup_episode = ApiTrakt.lookup_episode
 except ImportError:
     raise plugin.DependencyError(issued_by='trakt_lookup', missing='api_trakt',
                                  message='trakt_lookup requires the `api_trakt` plugin')
@@ -66,10 +65,10 @@ class PluginTraktLookup(object):
     series_map = {
         'trakt_series_name': 'title',
         'trakt_series_year': 'year',
-        'trakt_series_imdb_id': 'imdb_id',
-        'trakt_series_tvdb_id': 'tvdb_id',
-        'trakt_series_tmdb_id': 'tmdb_id',
-        'trakt_series_trakt_id': 'id',
+        'imdb_id': 'imdb_id',
+        'tvdb_id': 'tvdb_id',
+        'tmdb_id': 'tmdb_id',
+        'trakt_show_id': 'id',
         'trakt_series_slug': 'slug',
         'trakt_series_tvrage': 'tvrage_id',
         'trakt_series_runtime': 'runtime',
@@ -97,7 +96,7 @@ class PluginTraktLookup(object):
         'trakt_ep_tvdb_id': 'tvdb_id',
         'trakt_ep_tmdb_id': 'tmdb_id',
         'trakt_ep_tvrage': 'tvrage_id',
-        'trakt_ep_trakt_id': 'id',
+        'trakt_episode_id': 'id',
         'trakt_ep_first_aired': 'first_aired',
         'trakt_ep_overview': 'overview',
         'trakt_ep_abs_number': 'number_abs',
@@ -110,13 +109,12 @@ class PluginTraktLookup(object):
 
     def lazy_series_lookup(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
-        with Session(expire_on_commit=False) as session:
-            lookupargs = {'style': 'show',
-                          'title': entry.get('series_name', eval_lazy=False),
+        with Session() as session:
+            lookupargs = {'title': entry.get('series_name', eval_lazy=False),
                           #'year': entry.get('year', eval_lazy=False),
-                          #'trakt_id': entry.get('trakt_id', eval_lazy=False),
+                          'trakt_id': entry.get('trakt_show_id', eval_lazy=False),
                           'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
-                          #'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
+                          'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
                           'session': session}
             try:
                 series = lookup_series(**lookupargs)
@@ -128,13 +126,11 @@ class PluginTraktLookup(object):
     def lazy_episode_lookup(self, entry):
         with Session(expire_on_commit=False) as session:
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
-                          'trakt_id': entry.get('trakt_id', eval_lazy=False),
-                          'seasonnum': entry['series_season'],
-                          'episodenum': entry['series_episode'],
-                          'session': session,
-                          }
+                          'trakt_id': entry.get('trakt_show_id', eval_lazy=False),
+                          'session': session}
             try:
-                episode = lookup_episode(**lookupargs)
+                series = lookup_series(**lookupargs)
+                episode = series.get_episode(entry['series_season'], entry['series_episode'])
             except LookupError as e:
                 log.debug('Error looking up trakt episode information for %s: %s' % (entry['title'], e.args[0]))
             else:

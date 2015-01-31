@@ -5,7 +5,6 @@ from tests import FlexGetBase, use_vcr
 
 
 lookup_series = ApiTrakt.lookup_series
-lookup_episode = ApiTrakt.lookup_episode
 
 
 class TestTraktLookup(FlexGetBase):
