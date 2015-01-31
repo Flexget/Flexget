@@ -139,7 +139,6 @@ class TraktEpisode(Base):
     __tablename__ = 'trakt_episodes'
 
     id = Column(Integer, primary_key=True, autoincrement=False)
-    slug = Column(Unicode)
     tvdb_id = Column(Integer)
     imdb_id = Column(Unicode)
     tmdb_id = Column(Integer)
@@ -161,7 +160,6 @@ class TraktEpisode(Base):
             raise Exception('Tried to update db movie with different movie data')
         elif not self.id:
             self.id = trakt_episode['ids']['trakt']
-        self.slug = trakt_episode['ids']['slug']
         self.imdb_id = trakt_episode['ids']['imdb']
         self.tmdb_id = trakt_episode['ids']['tmdb']
         self.tvrage_id = trakt_episode['ids']['tvrage']
@@ -202,7 +200,7 @@ class TraktShow(Base):
     votes = Column(Integer)
     language = Column(Unicode)
     aired_episodes = Column(Integer)
-    #episodes = relation(TraktEpisode, backref='show', cascade='all, delete, delete-orphan')
+    episodes = relation(TraktEpisode, backref='show', cascade='all, delete, delete-orphan')
     #genres = relation(TraktGenre, secondary=show_genres_table)
     #actors = relation(TraktActor, secondary=show_actors_table)
     updated_at = Column(DateTime)
@@ -274,7 +272,8 @@ class TraktMovie(Base):
         self.tmdb_id = trakt_movie['ids']['tmdb']
         for col in ['overview', 'runtime', 'rating', 'votes', 'language', 'tagline', 'year']:
             setattr(self, col, trakt_movie.get(col))
-        self.released = dateutil_parse(trakt_movie.get('released'))
+        if self.released:
+            self.released = dateutil_parse(trakt_movie.get('released'))
         self.updated_at = dateutil_parse(trakt_movie.get('updated_at'))
         for genre in trakt_movie.get('genres', ()):
             # TODO: the stuff
@@ -400,6 +399,7 @@ class ApiTrakt(object):
             if style == 'show':
                 ids['tvdb'] = tvdb_id
                 ids['tvrage'] = tvrage_id
+
             def id_str():
                 return '<name=%s, trakt_id=%s>' % (title, trakt_id)
             if ids:
@@ -415,17 +415,19 @@ class ApiTrakt(object):
                     raise LookupError('Series %s not found from cache' % id_str())
                 log.debug('Series %s not found in cache, looking up from trakt.' % id_str())
                 if ids:
-                    results = get_trakt(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, tvdb_id=tvdb_id, tvrage_id=tvrage_id, style=style)
+                    results = get_trakt(title=title, trakt_slug=trakt_slug, trakt_id=trakt_id, imdb_id=imdb_id, tmdb_id=tmdb_id,
+                                        tvdb_id=tvdb_id, tvrage_id=tvrage_id, style=style)
                     series = TraktShow()
                     series.update(results)
                     session.add(series)
-
+                    if title.lower() != series.title.lower():
+                        session.add(TraktSearchResult)(search=title, series=series)
 
             if not series:
                 raise LookupError('No results found from traktv for %s' % id_str())
 
             # Make sure relations are loaded before returning
-            #series.episodes
+            series.episodes
             #series.genre
             #series.actors
             return series
@@ -434,19 +436,24 @@ class ApiTrakt(object):
     @with_session
     def lookup_episode(title=None, seasonnum=None, episodenum=None, trakt_id=None, session=None, only_cached=False):
         series = get_cached(style='show', title=title, trakt_id=trakt_id, session=session)
+
+        if not series:
+            series = ApiTrakt.lookup_series(title=title, trakt_id=trakt_id, style='show', session=session)
+
         if not series:
             raise LookupError('Could not identify series')
-        ep_description = '%s.S%sE%s' % (series.title, seasonnum, episodenum)
-        episode = session.query(TraktEpisode).filter(TraktEpisode.id == series.trakt_id).\
-            filter(TraktEpisode.season == seasonnum).filter(TraktEpisode.number == episodenum).first()
-        url = episode_summary + api_key + '%s/%s/%s' % (series.tvdb_id, seasonnum, episodenum)
+        ep_description = '%s.S%02dE%02d' % (series.title, seasonnum, episodenum)
+        if ep_description:
+            log.debug('%s, id=%s' % (ep_description, series.id))
+        episode = session.query(TraktEpisode).filter(TraktEpisode.title == series.title).filter(TraktEpisode.season == seasonnum).filter(TraktEpisode.number == episodenum).first()
+        url = 'https://api.trakt.tv/shows/%s/seasons/%s/episodes/%s?extended=full' % (series.id, seasonnum, episodenum)
         if not episode:
             if only_cached:
                 raise LookupError('Episode %s not found in cache' % ep_description)
-
             log.debug('Episode %s not found in cache, looking up from trakt.' % ep_description)
             try:
-                response = requests.get(url)
+                ses = get_session()
+                response = ses.get(url)
             except requests.RequestException:
                 raise LookupError('Error Retrieving Trakt url: %s' % url)
             try:
@@ -457,17 +464,12 @@ class ApiTrakt(object):
                 raise LookupError('No data in response from trakt %s' % url)
             if 'error' in data:
                 raise LookupError('Error looking up %s: %s' % (ep_description, data['error']))
-            ep_data = data['episode']
-            if not ep_data:
-                raise LookupError('No episode data %s' % url)
-            episode = session.query(TraktEpisode).filter(TraktEpisode.tvdb_id == ep_data['tvdb_id']).first()
+            episode = session.query(TraktEpisode).filter(TraktEpisode.id == data['ids']['trakt']).first()
             if not episode:
                 # Update result into format TraktEpisode expects (?)
-                ep_data['episode_name'] = ep_data.pop('title')
-                ep_data.update(ep_data['images'])
-                del ep_data['images']
 
-                episode = TraktEpisode(ep_data)
+                episode = TraktEpisode()
+                episode.update(data)
                 series.episodes.append(episode)
                 session.merge(episode)
 

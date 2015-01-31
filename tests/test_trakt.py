@@ -52,7 +52,7 @@ class TestTraktLookup(FlexGetBase):
         assert entry['trakt_series_status'] == 'ended', 'Series Status should be "ENDED" returned %s' \
                                                         % (entry['trakt_series_status'])
 
-    @use_vcr
+    #@use_vcr
     def test_lookup(self):
         """trakt: Test Lookup (ONLINE)"""
         self.execute_task('test')

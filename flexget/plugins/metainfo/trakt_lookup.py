@@ -69,7 +69,7 @@ class PluginTraktLookup(object):
         'trakt_series_imdb_id': 'imdb_id',
         'trakt_series_tvdb_id': 'tvdb_id',
         'trakt_series_tmdb_id': 'tmdb_id',
-        'trakt_series_id': 'id',
+        'trakt_series_trakt_id': 'id',
         'trakt_series_slug': 'slug',
         'trakt_series_tvrage': 'tvrage_id',
         'trakt_series_runtime': 'runtime',
@@ -87,7 +87,7 @@ class PluginTraktLookup(object):
         'trakt_series_overview': 'overview',
         'trakt_series_rating': 'rating',
         'trakt_series_aired_episodes': 'aired_episodes',
-        #'trakt_series_episodes': lambda show: [episodes.title for episodes in show.episodes]
+        'trakt_series_episodes': lambda show: [episodes.title for episodes in show.episodes]
     }
 
     # Episode info
@@ -96,8 +96,8 @@ class PluginTraktLookup(object):
         'trakt_ep_imdb_id': 'imdb_id',
         'trakt_ep_tvdb_id': 'tvdb_id',
         'trakt_ep_tmdb_id': 'tmdb_id',
-        'trakt_ep_slug': 'slug',
         'trakt_ep_tvrage': 'tvrage_id',
+        'trakt_ep_trakt_id': 'id',
         'trakt_ep_first_aired': 'first_aired',
         'trakt_ep_overview': 'overview',
         'trakt_ep_abs_number': 'number_abs',
@@ -131,7 +131,8 @@ class PluginTraktLookup(object):
                           'trakt_id': entry.get('trakt_id', eval_lazy=False),
                           'seasonnum': entry['series_season'],
                           'episodenum': entry['series_episode'],
-                          'session': session}
+                          'session': session,
+                          }
             try:
                 episode = lookup_episode(**lookupargs)
             except LookupError as e:
