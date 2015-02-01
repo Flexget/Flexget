@@ -127,6 +127,7 @@ class TestTraktMovieLookup(FlexGetBase):
             - title: The Matrix (1999)
     """
 
+    @use_vcr
     def test_lookup_sources(self):
         self.execute_task('test_lookup_sources')
         for e in self.task.all_entries:

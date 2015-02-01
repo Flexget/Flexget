@@ -1,0 +1,39 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api.trakt.tv:443/movies/481?extended=full
+    response:
+      body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
+          to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
+          By day he is an average computer programmer and by night a malevolent hacker
+          known as Neo, who finds himself targeted by the police when he is contacted
+          by Morpheus, a legendary computer hacker, who reveals the shocking truth
+          about our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":9.032120000000001,"votes":13731,"updated_at":"2015-01-14T08:48:31.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R"}'}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [1b1badc1479b0406-EWR]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Sun, 01 Feb 2015 05:16:45 GMT']
+        etag: [W/"e30bc5f7b923339f3a6480158084088c"]
+        expires: ['Sun, 01 Feb 2015 09:16:45 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=dd2cba6f3d93df862646d7d4e96bfced71422767805; expires=Mon,
+            01-Feb-16 05:16:45 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        status: [200 OK]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-powered-by: [Phusion Passenger]
+        x-request-id: [0fe2d9ff-2eef-4a0b-8665-e330455c5843]
+        x-runtime: ['0.095067']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1
