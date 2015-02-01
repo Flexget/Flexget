@@ -7,7 +7,7 @@ from tests import FlexGetBase, use_vcr
 lookup_series = ApiTrakt.lookup_series
 
 
-class TestTraktLookup(FlexGetBase):
+class TestTraktShowLookup(FlexGetBase):
     __yaml__ = """
         templates:
           global:
@@ -38,7 +38,6 @@ class TestTraktLookup(FlexGetBase):
               - title: naruto 128
             series:
               - naruto
-
     """
 
     @use_vcr
@@ -104,3 +103,31 @@ class TestTraktList(FlexGetBase):
         assert entry['movie_name'] == '12 Angry Men'
         assert entry['movie_year'] == 1957
         assert entry['imdb_id'] == 'tt0050083'
+
+
+class TestTraktMovieLookup(FlexGetBase):
+    __yaml__ = """
+        templates:
+          global:
+            trakt_lookup: yes
+        tasks:
+          test_lookup_sources:
+            mock:
+            - title: trakt id
+              trakt_movie_id: 481
+            - title: tmdb id
+              tmdb_id: 603
+            - title: imdb id
+              imdb_id: tt0133093
+            - title: slug
+              trakt_movie_slug: the-matrix-1999
+            - title: movie_name and movie_year
+              movie_name: The Matrix
+              movie_year: 1999
+            - title: The Matrix (1999)
+    """
+
+    def test_lookup_sources(self):
+        self.execute_task('test_lookup_sources')
+        for e in self.task.all_entries:
+            assert e['movie_name'] == 'The Matrix', 'looking up based on %s failed' % e['title']

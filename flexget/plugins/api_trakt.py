@@ -305,7 +305,7 @@ class TraktMovie(Base):
         self.slug = trakt_movie['ids']['slug']
         self.imdb_id = trakt_movie['ids']['imdb']
         self.tmdb_id = trakt_movie['ids']['tmdb']
-        for col in ['overview', 'runtime', 'rating', 'votes', 'language', 'tagline', 'year']:
+        for col in ['title', 'overview', 'runtime', 'rating', 'votes', 'language', 'tagline', 'year']:
             setattr(self, col, trakt_movie.get(col))
         if self.released:
             self.released = dateutil_parse(trakt_movie.get('released'))
@@ -388,8 +388,8 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
     if not trakt_id:
         # Try finding trakt_id based on other ids
         ids = {
-            'tmdb': tmdb_id,
-            'imdb': imdb_id
+            'imdb': imdb_id,
+            'tmdb': tmdb_id
         }
         if style == 'show':
             ids['tvdb'] = tvdb_id
@@ -404,8 +404,10 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
                 continue
             for result in results:
                 if result['type'] != style:
-                    raise LookupError('Provided id (%s) is for a %s not a %s' % (identifier, result['type'], style))
+                    continue
                 trakt_id = result[style]['ids']['trakt']
+                break
+            if trakt_id:
                 break
         if not trakt_id and title:
             # Try finding trakt id based on title and year
@@ -457,6 +459,31 @@ class ApiTrakt(object):
             series = TraktShow(trakt_show)
             session.add(series)
         return series
+
+    @staticmethod
+    @with_session
+    def lookup_movie(session=None, only_cached=None, **lookup_params):
+        movie = get_cached('movie', session=session, **lookup_params)
+        if only_cached:
+            if movie:
+                return movie
+            raise LookupError('Movie %s not found from cache' % lookup_params)
+        if movie and not movie.expired:
+            return movie
+        try:
+            trakt_movie = get_trakt('movie', **lookup_params)
+        except LookupError as e:
+            if movie:
+                log.debug('Error refreshing show data from trakt, using cached. %s' % e)
+                return movie
+            raise
+        if movie:
+            movie.update(trakt_movie)
+        else:
+            # TODO: Check if movie with trakt id exists store to search results
+            movie = TraktMovie(trakt_movie)
+            session.add(movie)
+        return movie
 
 
 @event('plugin.register')
