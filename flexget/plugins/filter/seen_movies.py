@@ -17,17 +17,12 @@ class FilterSeenMovies(FilterSeen):
         1) Remember all imdb urls from downloaded entries.
         2) If stored imdb url appears again, entry is rejected.
     """
+    schema = {'type': 'string', 'enum': ['strict', 'loose']}
 
     def __init__(self):
         # remember and filter by these fields
         self.fields = ['imdb_id', 'tmdb_id']
         self.keyword = 'seen_movies'
-
-    def validator(self):
-        from flexget import validator
-        root = validator.factory('choice', message="must be one of the following: strict, loose")
-        root.accept_choices(['strict', 'loose'])
-        return root
 
     # We run last (-255) to make sure we don't reject duplicates before all the other plugins get a chance to reject.
     @plugin.priority(-255)
