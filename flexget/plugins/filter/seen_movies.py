@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+from collections import defaultdict
 
 from flexget import plugin
 from flexget.event import event
@@ -33,7 +34,7 @@ class FilterSeenMovies(FilterSeen):
 
     def __init__(self):
         # remember and filter by these fields
-        self.fields = ['imdb_id', 'tmdb_id']
+        self.fields = ['imdb_id', 'tmdb_id', 'trakt_movie_id']
         self.keyword = 'seen_movies'
 
     # We run last (-255) to make sure we don't reject duplicates before all the other plugins get a chance to reject.
@@ -45,26 +46,20 @@ class FilterSeenMovies(FilterSeen):
         if config.get('matching') == 'strict':
             for entry in task.entries:
                 if not any(field in entry for field in self.fields):
-                    log.info('Rejecting %s because of missing movie (imdb or tmdb) id' % entry['title'])
-                    entry.reject('missing movie (imdb or tmdb) id, strict')
+                    log.info('Rejecting %s because of missing movie (imdb, tmdb or trakt) id' % entry['title'])
+                    entry.reject('missing movie (imdb, tmdb or trakt) id, strict')
         # call super
         super(FilterSeenMovies, self).on_task_filter(task, config.get('scope', True))
         # check that two copies of a movie have not been accepted this run
-        imdb_ids = set()
-        tmdb_ids = set()
+        accepted_ids = defaultdict(set)
         for entry in task.accepted:
-            if 'imdb_id' in entry:
-                if entry['imdb_id'] in imdb_ids:
-                    entry.reject('already accepted once in task')
-                    continue
-                else:
-                    imdb_ids.add(entry['imdb_id'])
-            if 'tmdb_id' in entry:
-                if entry['tmdb_id'] in tmdb_ids:
-                    entry.reject('already accepted once in task')
-                    continue
-                else:
-                    tmdb_ids.add(entry['tmdb_id'])
+            for field in self.fields:
+                if field in entry:
+                    if entry[field] in accepted_ids[field]:
+                        entry.reject('already accepted %s %s once in task' % (field, entry[field]))
+                        break
+                    else:
+                        accepted_ids[field].add(entry[field])
 
 @event('plugin.register')
 def register_plugin():

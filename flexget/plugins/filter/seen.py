@@ -152,7 +152,7 @@ class FilterSeen(object):
 
     @plugin.priority(255)
     def on_task_filter(self, task, config, remember_rejected=False):
-        """Filter seen entries"""
+        """Filter entries already accepted on previous runs."""
         if config is False:
             log.debug('%s is disabled' % self.keyword)
             return
