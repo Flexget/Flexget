@@ -17,7 +17,19 @@ class FilterSeenMovies(FilterSeen):
         1) Remember all imdb urls from downloaded entries.
         2) If stored imdb url appears again, entry is rejected.
     """
-    schema = {'type': 'string', 'enum': ['strict', 'loose']}
+    schema = {
+        'oneOf': [
+            {'type': 'string', 'enum': ['strict', 'loose']},
+            {
+                'type': 'object',
+                'properties': {
+                    'scope': {'type': 'string', 'enum': ['global', 'local']},
+                    'matching': {'type': 'string', 'enum': ['strict', 'loose']}
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def __init__(self):
         # remember and filter by these fields
@@ -27,14 +39,16 @@ class FilterSeenMovies(FilterSeen):
     # We run last (-255) to make sure we don't reject duplicates before all the other plugins get a chance to reject.
     @plugin.priority(-255)
     def on_task_filter(self, task, config):
-        # strict method
-        if config == 'strict':
+        if not isinstance(config, dict):
+            config = {'matching': config}
+        # Reject all entries without
+        if config.get('matching') == 'strict':
             for entry in task.entries:
-                if 'imdb_id' not in entry and 'tmdb_id' not in entry:
+                if not any(field in entry for field in self.fields):
                     log.info('Rejecting %s because of missing movie (imdb or tmdb) id' % entry['title'])
                     entry.reject('missing movie (imdb or tmdb) id, strict')
         # call super
-        super(FilterSeenMovies, self).on_task_filter(task, True)
+        super(FilterSeenMovies, self).on_task_filter(task, config.get('scope', True))
         # check that two copies of a movie have not been accepted this run
         imdb_ids = set()
         tmdb_ids = set()
