@@ -8,7 +8,7 @@ interactions:
       method: GET
       uri: https://api.trakt.tv:443/search?query=house&type=show
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":14.836017,\"show\":{\"title\"\
+      body: {string: "[{\"type\":\"show\",\"score\":14.836059,\"show\":{\"title\"\
           :\"House\",\"overview\":\"Go deeper into the medical mysteries of House,\
           \ TV's most compelling drama. Hugh Laurie stars as the brilliant but sarcastic\
           \ Dr. Gregory House, a maverick physician who is devoid of bedside manner.\
@@ -24,11 +24,11 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/bc8a5989f5.jpg?1420486886\"\
           }},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"\
           tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\"\
-          :10.490647,\"show\":{\"title\":\"House vs. House\",\"year\":1969,\"images\"\
+          :10.490677,\"show\":{\"title\":\"House vs. House\",\"year\":1969,\"images\"\
           :{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"\
           full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"\
           slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":null,\"tmdb\":null,\"\
-          tvrage\":null}}},{\"type\":\"show\",\"score\":10.385212,\"show\":{\"title\"\
+          tvrage\":null}}},{\"type\":\"show\",\"score\":10.385241,\"show\":{\"title\"\
           :\"House Rules\",\"overview\":\"Welcome to the House Rules guide at TV Tome.\
           \  Home improvement gets competitive when TBS Superstation pits three teams\
           \ of amateur home remodelers against each other in the new reality series\
@@ -46,7 +46,7 @@ interactions:
           :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
           medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":29075,\"slug\":\"house-rules-2003\"\
           ,\"tvdb\":73395,\"imdb\":\"tt0381766\",\"tmdb\":29201,\"tvrage\":3912}}},{\"\
-          type\":\"show\",\"score\":10.385212,\"show\":{\"title\":\"Grandma's House\"\
+          type\":\"show\",\"score\":10.385241,\"show\":{\"title\":\"Grandma's House\"\
           ,\"overview\":\"TV presenter Simon Amstell plays a version of himself in\
           \ Grandma's House, a new six-part comedy written by Simon and his long-term\
           \ collaborator Dan Swimer.The series stars Simon Amstell as a TV presenter\
@@ -62,7 +62,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/thumb/72aecb12bc.jpg?1419005181\"\
           }},\"ids\":{\"trakt\":33144,\"slug\":\"grandma-s-house\",\"tvdb\":181551,\"\
           imdb\":\"\",\"tmdb\":33289,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :10.385212,\"show\":{\"title\":\"Lush House\",\"overview\":\"A publishing\
+          :10.385241,\"show\":{\"title\":\"Lush House\",\"overview\":\"A publishing\
           \ sensation and radio star, Shannon Lush is the author of best-selling books\
           \ Spotless, Speed Cleaning and How to Be Comfy. In this series, Shannon\
           \ will combine her unique know-how with a mission to instil domestic wellbeing\
@@ -84,25 +84,25 @@ interactions:
           :null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\"\
           :null}},\"ids\":{\"trakt\":79984,\"slug\":\"lush-house\",\"tvdb\":283349,\"\
           imdb\":\"tt1468529\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":10.385212,\"show\":{\"title\":\"Champion House\",\"year\":1967,\"\
+          ,\"score\":10.385241,\"show\":{\"title\":\"Champion House\",\"year\":1967,\"\
           images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
           :{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":9579,\"\
           slug\":\"champion-house\",\"tvdb\":74193,\"imdb\":\"tt0159854\",\"tmdb\"\
-          :9627,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.385212,\"show\"\
+          :9627,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.385241,\"show\"\
           :{\"title\":\"Party House\",\"overview\":\"Fun-loving friends with a reason\
           \ to celebrate are given an empty mansion and 24 hours to throw the party\
           \ of a lifetime\",\"year\":1969,\"images\":{\"poster\":{\"full\":null,\"\
           medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"\
           thumb\":null}},\"ids\":{\"trakt\":78265,\"slug\":\"party-house\",\"tvdb\"\
           :281498,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":10.385212,\"show\":{\"title\":\"Hardwicke House\",\"overview\"\
+          ,\"score\":10.385241,\"show\":{\"title\":\"Hardwicke House\",\"overview\"\
           :\"Hardwicke House was a 1987 seven-episode sitcom produced by Central Independent\
           \ Television for the ITV network. It was so negatively received that only\
           \ the first two episodes were transmitted.\",\"year\":1987,\"images\":{\"\
           poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\"\
           :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":94076,\"slug\"\
           :\"hardwicke-house\",\"tvdb\":272786,\"imdb\":null,\"tmdb\":null,\"tvrage\"\
-          :null}}},{\"type\":\"show\",\"score\":10.385212,\"show\":{\"title\":\"Frankie's\
+          :null}}},{\"type\":\"show\",\"score\":10.385241,\"show\":{\"title\":\"Frankie's\
           \ House\",\"overview\":\"In 1964 in Laos, young Tim Page discovers his vocation\
           \ as a photo journalist and is given a job, a camera, and a trip to Vietnam.\
           \ There, he learns the ropes, learns about the war first in Saigon, and\
@@ -114,7 +114,7 @@ interactions:
           images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
           :{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":47403,\"\
           slug\":\"frankie-s-house\",\"tvdb\":252307,\"imdb\":\"tt0104294\",\"tmdb\"\
-          :47694,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.385212,\"show\"\
+          :47694,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.385241,\"show\"\
           :{\"title\":\"House Guest\",\"overview\":\"In this non-traditional game\
           \ show, a pair of hosts opens up their homes to four strangers who will\
           \ judge them on their hosting abilities. \",\"year\":null,\"images\":{\"\
@@ -122,32 +122,32 @@ interactions:
           :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":8754,\"slug\"\
           :\"house-guest\",\"tvdb\":82126,\"imdb\":\"\",\"tmdb\":8800,\"tvrage\":null}}}]"}
       headers:
-        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
-        cf-cache-status: [MISS]
-        cf-ray: [1b19b92c633b1858-EWR]
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [1b1ba8853ba706b5-EWR]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Sat, 31 Jan 2015 23:35:01 GMT']
-        etag: [W/"5e712d316f992b8be04e195fac623f00"]
-        expires: ['Sun, 01 Feb 2015 03:35:00 GMT']
+        date: ['Sun, 01 Feb 2015 05:13:11 GMT']
+        etag: [W/"411b2437ac88a3d47a224a129719486c"]
+        expires: ['Sun, 01 Feb 2015 09:13:11 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d63d0aeb8e859958731e0f043d6cbca611422747301; expires=Sun,
-            31-Jan-16 23:35:01 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d640079011d9c00d42250d47e96a090dd1422767591; expires=Mon,
+            01-Feb-16 05:13:11 GMT; path=/; domain=.trakt.tv; HttpOnly']
         status: [200 OK]
         transfer-encoding: [chunked]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
         x-powered-by: [Phusion Passenger]
-        x-request-id: [57c3ddbe-a0ef-46b1-9687-bffbc4e00d58]
-        x-runtime: ['0.072645']
+        x-request-id: [c9084776-8c3f-483b-8c24-9372b45ab0b2]
+        x-runtime: ['0.033376']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=d63d0aeb8e859958731e0f043d6cbca611422747301]
+        Cookie: [__cfduid=d640079011d9c00d42250d47e96a090dd1422767591]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -162,13 +162,13 @@ interactions:
           of young medical experts, he''ll do whatever it takes in the race against
           the clock to solve the case.","first_aired":"2004-11-15T16:00:00.000-08:00","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":42,"certification":"TV-14","network":"FOX","country":"us","trailer":null,"homepage":null,"status":"ended","rating":8.84722,"votes":13470,"updated_at":"2015-01-31T10:54:20.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es"],"genres":["comedy","drama","mystery"],"aired_episodes":176}'}
       headers:
-        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
-        cf-cache-status: [MISS]
-        cf-ray: [1b19b92d43431858-EWR]
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [1b1ba8862bb006b5-EWR]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Sat, 31 Jan 2015 23:35:02 GMT']
-        expires: ['Sun, 01 Feb 2015 03:35:00 GMT']
+        date: ['Sun, 01 Feb 2015 05:13:11 GMT']
+        expires: ['Sun, 01 Feb 2015 09:13:11 GMT']
         last-modified: ['Sat, 31 Jan 2015 10:54:20 GMT']
         server: [cloudflare-nginx]
         status: [200 OK]
@@ -177,8 +177,8 @@ interactions:
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
         x-powered-by: [Phusion Passenger]
-        x-request-id: [57bbb4c1-b9ab-475e-9f64-c62cd469bbad]
-        x-runtime: ['0.062009']
+        x-request-id: [4ef15dca-1782-49d6-9b51-198dab571ed1]
+        x-runtime: ['0.089170']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -199,25 +199,25 @@ interactions:
           patient infuriates Dr. Cuddy and the teenager''s parents, but may just pay
           off in spades.","first_aired":"2004-11-22T21:00:00.000-08:00","rating":8.19173,"votes":266,"updated_at":"2015-01-31T15:40:09.000Z","available_translations":[]}'}
       headers:
-        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
-        cf-cache-status: [MISS]
-        cf-ray: [1b19b92e91040efd-EWR]
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [1b1ba88ab5fe06b5-EWR]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Sat, 31 Jan 2015 23:35:02 GMT']
-        expires: ['Sun, 01 Feb 2015 03:35:01 GMT']
+        date: ['Sun, 01 Feb 2015 05:13:12 GMT']
+        expires: ['Sun, 01 Feb 2015 09:13:12 GMT']
         last-modified: ['Sat, 31 Jan 2015 15:40:09 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=ded7bb637f4dfc75f50448ae7917b9fe01422747302; expires=Sun,
-            31-Jan-16 23:35:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d15fcbf35907f8c93ec9532fff756940d1422767592; expires=Mon,
+            01-Feb-16 05:13:12 GMT; path=/; domain=.trakt.tv; HttpOnly']
         status: [200 OK]
         transfer-encoding: [chunked]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
         x-powered-by: [Phusion Passenger]
-        x-request-id: [7cefbf24-e597-4b22-b19f-6fb47df19a2d]
-        x-runtime: ['0.024293']
+        x-request-id: [c5f5a2e1-33c1-4f1c-bd79-240ab8a1308a]
+        x-runtime: ['0.021337']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -229,30 +229,15 @@ interactions:
       method: GET
       uri: https://api.trakt.tv:443/search?query=doctor+who&type=show
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":18.87978,\"show\":{\"title\":\"\
-          Doctor Who\",\"overview\":\"The Doctor is an alien Time Lord from the planet\
-          \ Gallifrey who travels through all of time and space in his TARDIS. His\
-          \ current travel companion is Clara Oswald, though he has a long list of\
-          \ friends and companions who have shared journeys with him. Instead of dying,\
-          \ the Doctor is able to \u201Cregenerate\u201D into a new body, taking on\
-          \ a new personality with each regeneration. Twelve actors, plus John Hurt,\
-          \ have played The Doctor thus far.\",\"year\":2005,\"images\":{\"poster\"\
-          :{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/posters/original/8c421e339d.jpg?1422729351\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/posters/medium/8c421e339d.jpg?1422729351\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/posters/thumb/8c421e339d.jpg?1422729351\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/original/f5b14363ae.jpg?1422729352\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/medium/f5b14363ae.jpg?1422729352\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/thumb/f5b14363ae.jpg?1422729352\"\
-          }},\"ids\":{\"trakt\":56872,\"slug\":\"doctor-who-2005\",\"tvdb\":78804,\"\
-          imdb\":\"tt0436992\",\"tmdb\":57243,\"tvrage\":3332}}},{\"type\":\"show\"\
-          ,\"score\":18.87978,\"show\":{\"title\":\"Doctor Who\",\"overview\":\"Doctor\
-          \ Who is the longest-running science fiction TV series in history, airing\
-          \ initially from 1963 to 1989.  Doctor Who is about ideas.  It pioneered\
-          \ sophisticated mixed-level storytelling. Its format was the key to its\
-          \ longevity: the Doctor, a mysterious traveller in space and time, travels\
-          \ in his ship, the TARDIS.  The TARDIS can take him and his companions anywhere\
-          \ in time and space. Inevitably he finds evil at work wherever he goes...\"\
-          ,\"year\":1963,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/000/120/posters/original/ad9718d1d8.jpg?1420013212\"\
+      body: {string: "[{\"type\":\"show\",\"score\":18.864084,\"show\":{\"title\"\
+          :\"Doctor Who\",\"overview\":\"Doctor Who is the longest-running science\
+          \ fiction TV series in history, airing initially from 1963 to 1989.  Doctor\
+          \ Who is about ideas.  It pioneered sophisticated mixed-level storytelling.\
+          \ Its format was the key to its longevity: the Doctor, a mysterious traveller\
+          \ in space and time, travels in his ship, the TARDIS.  The TARDIS can take\
+          \ him and his companions anywhere in time and space. Inevitably he finds\
+          \ evil at work wherever he goes...\",\"year\":1963,\"images\":{\"poster\"\
+          :{\"full\":\"https://walter.trakt.us/images/shows/000/000/120/posters/original/ad9718d1d8.jpg?1420013212\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/000/120/posters/medium/ad9718d1d8.jpg?1420013212\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/000/120/posters/thumb/ad9718d1d8.jpg?1420013212\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/000/120/fanarts/original/e4f4d0c970.jpg?1420013215\"\
@@ -260,8 +245,23 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/000/120/fanarts/thumb/e4f4d0c970.jpg?1420013215\"\
           }},\"ids\":{\"trakt\":120,\"slug\":\"doctor-who\",\"tvdb\":76107,\"imdb\"\
           :\"tt0056751\",\"tmdb\":121,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :13.485557,\"show\":{\"title\":\"Doctor Who 2009\",\"overview\":\"Doctor\
-          \ Who 2009 is a non-profit making series of short fan films celebrating\
+          :18.864084,\"show\":{\"title\":\"Doctor Who\",\"overview\":\"The Doctor\
+          \ is an alien Time Lord from the planet Gallifrey who travels through all\
+          \ of time and space in his TARDIS. His current travel companion is Clara\
+          \ Oswald, though he has a long list of friends and companions who have shared\
+          \ journeys with him. Instead of dying, the Doctor is able to \u201Cregenerate\u201D\
+          \ into a new body, taking on a new personality with each regeneration. Twelve\
+          \ actors, plus John Hurt, have played The Doctor thus far.\",\"year\":2005,\"\
+          images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/posters/original/8c421e339d.jpg?1422729351\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/posters/medium/8c421e339d.jpg?1422729351\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/posters/thumb/8c421e339d.jpg?1422729351\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/original/f5b14363ae.jpg?1422729353\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/medium/f5b14363ae.jpg?1422729353\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/thumb/f5b14363ae.jpg?1422729353\"\
+          }},\"ids\":{\"trakt\":56872,\"slug\":\"doctor-who-2005\",\"tvdb\":78804,\"\
+          imdb\":\"tt0436992\",\"tmdb\":57243,\"tvrage\":3332}}},{\"type\":\"show\"\
+          ,\"score\":13.474346,\"show\":{\"title\":\"Doctor Who 2009\",\"overview\"\
+          :\"Doctor Who 2009 is a non-profit making series of short fan films celebrating\
           \ the BBC TV series Doctor Who.  Join the adventure, with a brand new series\
           \ of 13 episodes for the Doctor, in this exciting new fan project.\",\"\
           year\":null,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/018/418/posters/original/697288ab37.jpg?1418996721\"\
@@ -269,7 +269,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/018/418/posters/thumb/697288ab37.jpg?1418996721\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":18418,\"slug\":\"doctor-who-2009\",\"tvdb\":112671,\"imdb\":\"\"\
-          ,\"tmdb\":18502,\"tvrage\":null}}},{\"type\":\"show\",\"score\":13.485557,\"\
+          ,\"tmdb\":18502,\"tvrage\":null}}},{\"type\":\"show\",\"score\":13.474346,\"\
           show\":{\"title\":\"Doctor Who Greatest Moments\",\"overview\":\"Series\
           \ taking viewers on a journey through time and space to relive all the action\
           \ from the sci-fi show, featuring exclusive interviews with key actors offering\
@@ -282,7 +282,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/061/194/fanarts/thumb/60b4b2f8fd.jpg?1418947989\"\
           }},\"ids\":{\"trakt\":61194,\"slug\":\"doctor-who-greatest-moments\",\"\
           tvdb\":110141,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"\
-          show\",\"score\":13.485557,\"show\":{\"title\":\"Totally Doctor Who\",\"\
+          show\",\"score\":13.474346,\"show\":{\"title\":\"Totally Doctor Who\",\"\
           overview\":\"Following up on the success of Doctor Who for the BBC is this\
           \ special show for younger fans. Hosted by Liz Barker and Barney Harwood,\
           \ the show features interviews with the cast and crew, behind the scenes\
@@ -292,7 +292,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/000/453/posters/thumb/0cb9377d5d.jpg?1418793741\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":453,\"slug\":\"totally-doctor-who\",\"tvdb\":80160,\"imdb\":\"tt0795296\"\
-          ,\"tmdb\":454,\"tvrage\":null}}},{\"type\":\"show\",\"score\":13.485557,\"\
+          ,\"tmdb\":454,\"tvrage\":null}}},{\"type\":\"show\",\"score\":13.474346,\"\
           show\":{\"title\":\"Doctor Who Confidential\",\"overview\":\"Specially filmed\
           \ for BBC Three as a companion piece to Doctor Who, Doctor Who Confidential\
           \ aims to give a taste of the excitement and the energy that surrounds the\
@@ -309,7 +309,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/thumb/3b9938962b.jpg?1418807162\"\
           }},\"ids\":{\"trakt\":1051,\"slug\":\"doctor-who-confidential\",\"tvdb\"\
           :79298,\"imdb\":\"tt0453422\",\"tmdb\":1056,\"tvrage\":null}}},{\"type\"\
-          :\"show\",\"score\":13.485557,\"show\":{\"title\":\"Doctor Who Extra\",\"\
+          :\"show\",\"score\":13.474346,\"show\":{\"title\":\"Doctor Who Extra\",\"\
           overview\":\"Doctor Who Extra brings you unprecedented access to the making\
           \ of Doctor Who... Featuring interviews with Peter Capaldi and Jenna Coleman,\
           \ it's the ultimate backstage pass!\",\"year\":2014,\"images\":{\"poster\"\
@@ -321,7 +321,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/094/434/fanarts/thumb/3d44482626.jpg?1420536627\"\
           }},\"ids\":{\"trakt\":94434,\"slug\":\"doctor-who-extra\",\"tvdb\":null,\"\
           imdb\":\"tt4147332\",\"tmdb\":61643,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":13.400415,\"show\":{\"title\":\"Doctor Who: The Doctors Revisited\"\
+          ,\"score\":13.38723,\"show\":{\"title\":\"Doctor Who: The Doctors Revisited\"\
           ,\"overview\":\"As the Doctor's newest companion, Clara Oswald, steps into\
           \ the TARDIS, take a look back at previous companions that have won over\
           \ The Doctor's hearts in Doctor Who: The Companions. Along the way, companions\
@@ -333,13 +333,13 @@ interactions:
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":95362,\"slug\":\"doctor-who-the-doctors-revisited\",\"tvdb\":null,\"\
           imdb\":\"tt2795780\",\"tmdb\":53071,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":11.171148,\"show\":{\"title\":\"Doctor Dolittle\",\"overview\"\
+          ,\"score\":11.153186,\"show\":{\"title\":\"Doctor Dolittle\",\"overview\"\
           :\"The adventures of veterinarian John Dolittle, who can \\\"talk to the\
           \ animals\\\", in his ongoing battle with pirate Sam Scurvy.\",\"year\"\
           :null,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"\
           fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\"\
           :14725,\"slug\":\"doctor-dolittle\",\"tvdb\":265517,\"imdb\":\"\",\"tmdb\"\
-          :14789,\"tvrage\":null}}},{\"type\":\"show\",\"score\":11.132318,\"show\"\
+          :14789,\"tvrage\":null}}},{\"type\":\"show\",\"score\":11.114398,\"show\"\
           :{\"title\":\"Fat Doctor\",\"overview\":\"Dr Shaw Somers is the Fat Doctor...\
           \ the bariatric surgeon who battles to help the nation's morbidly obese\
           \ lose weight. Every day he shrinks people in an effort to change and even\
@@ -348,32 +348,32 @@ interactions:
           thumb\":null}},\"ids\":{\"trakt\":71987,\"slug\":\"fat-doctor\",\"tvdb\"\
           :268916,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
       headers:
-        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
-        cf-cache-status: [MISS]
-        cf-ray: [1b19b92fa04b03fa-EWR]
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [1b1ba88e8ae5185e-EWR]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Sat, 31 Jan 2015 23:35:02 GMT']
-        etag: [W/"7b89530e4b1d60300156275f4ebabe03"]
-        expires: ['Sun, 01 Feb 2015 03:35:02 GMT']
+        date: ['Sun, 01 Feb 2015 05:13:12 GMT']
+        etag: [W/"2342703e4f1d2bddd2c4fa907be549a0"]
+        expires: ['Sun, 01 Feb 2015 09:13:12 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=de6d7e6d83ece5287cc97295084e665bb1422747302; expires=Sun,
-            31-Jan-16 23:35:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d0a8cb50578fed24eca282bf61770d2821422767592; expires=Mon,
+            01-Feb-16 05:13:12 GMT; path=/; domain=.trakt.tv; HttpOnly']
         status: [200 OK]
         transfer-encoding: [chunked]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
         x-powered-by: [Phusion Passenger]
-        x-request-id: [e3e5492f-7c3a-4d01-8446-6a803a60bcf2]
-        x-runtime: ['0.088319']
+        x-request-id: [db3caff4-2b4f-4599-a117-14dc59c5fa58]
+        x-runtime: ['0.046739']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=de6d7e6d83ece5287cc97295084e665bb1422747302]
+        Cookie: [__cfduid=d0a8cb50578fed24eca282bf61770d2821422767592]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -398,13 +398,13 @@ interactions:
           no\"],\"genres\":[\"action\",\"adventure\",\"drama\",\"science-fiction\"\
           ],\"aired_episodes\":103}"}
       headers:
-        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
-        cf-cache-status: [MISS]
-        cf-ray: [1b19b930905203fa-EWR]
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [1b1ba88f1ae9185e-EWR]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Sat, 31 Jan 2015 23:35:02 GMT']
-        expires: ['Sun, 01 Feb 2015 03:35:01 GMT']
+        date: ['Sun, 01 Feb 2015 05:13:12 GMT']
+        expires: ['Sun, 01 Feb 2015 09:13:12 GMT']
         last-modified: ['Sat, 31 Jan 2015 18:41:21 GMT']
         server: [cloudflare-nginx]
         status: [200 OK]
@@ -413,8 +413,8 @@ interactions:
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
         x-powered-by: [Phusion Passenger]
-        x-request-id: [ece186a6-e2df-4dda-8f65-f1fab7b28450]
-        x-runtime: ['0.085476']
+        x-request-id: [ddebbe29-1c68-4fa2-a42e-cda097ed7435]
+        x-runtime: ['0.033964']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -434,28 +434,28 @@ interactions:
           \ children, and odd-tasting school dinners. This attracts the attention\
           \ of the Tenth Doctor, Rose and Mickey Smith, as well as a couple of old\
           \ friends\u2026\",\"first_aired\":\"2006-04-29T12:30:00.000-07:00\",\"rating\"\
-          :8.1875,\"votes\":480,\"updated_at\":\"2015-01-31T18:55:11.000Z\",\"available_translations\"\
-          :[]}"}
+          :8.185029999999999,\"votes\":481,\"updated_at\":\"2015-02-01T04:23:48.000Z\"\
+          ,\"available_translations\":[]}"}
       headers:
-        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+        cache-control: ['public, max-age=14400']
         cf-cache-status: [MISS]
-        cf-ray: [1b19b931f4cd078b-EWR]
+        cf-ray: [1b1ba892deb11876-EWR]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Sat, 31 Jan 2015 23:35:02 GMT']
-        expires: ['Sun, 01 Feb 2015 03:35:02 GMT']
-        last-modified: ['Sat, 31 Jan 2015 18:55:11 GMT']
+        date: ['Sun, 01 Feb 2015 05:13:13 GMT']
+        expires: ['Sun, 01 Feb 2015 09:13:13 GMT']
+        last-modified: ['Sun, 01 Feb 2015 04:23:48 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d70ae745a3c0b8607e1f079584ecbb9d71422747302; expires=Sun,
-            31-Jan-16 23:35:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d4ac90a764a21139f5bccb3eee63b65ab1422767593; expires=Mon,
+            01-Feb-16 05:13:13 GMT; path=/; domain=.trakt.tv; HttpOnly']
         status: [200 OK]
         transfer-encoding: [chunked]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
         x-powered-by: [Phusion Passenger]
-        x-request-id: [d2ffd0da-ac0a-4dba-bb8c-4e0d1e9342f7]
-        x-runtime: ['0.029960']
+        x-request-id: [c272334e-4899-4643-8de5-0673c4cd1e5f]
+        x-runtime: ['0.022127']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -467,7 +467,7 @@ interactions:
       method: GET
       uri: https://api.trakt.tv:443/search?query=castle&type=show
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":23.235668,\"show\":{\"title\"\
+      body: {string: "[{\"type\":\"show\",\"score\":23.245121,\"show\":{\"title\"\
           :\"Castle\",\"overview\":\"Castle presenter and historian Marc Morris introduces\
           \ us to 10 of the best-preserved examples across the United Kingdom. Castles\
           \ were both a fortress and a home. Built to withstand armed assault they\
@@ -476,7 +476,7 @@ interactions:
           full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
           medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":24906,\"slug\":\"castle-2003\"\
           ,\"tvdb\":82607,\"imdb\":\"\",\"tmdb\":25018,\"tvrage\":null}}},{\"type\"\
-          :\"show\",\"score\":23.235668,\"show\":{\"title\":\"Castles\",\"overview\"\
+          :\"show\",\"score\":23.245121,\"show\":{\"title\":\"Castles\",\"overview\"\
           :\"6-part documentary featuring historian Marc Morris, who details the history\
           \ of the British castle. Each episode details either an era of castle-building,\
           \ what they were used for, and/or focuses more specifically on castle-building\
@@ -490,7 +490,7 @@ interactions:
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/071/372/fanarts/medium/e3f039d178.jpg?1418955475\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/071/372/fanarts/thumb/e3f039d178.jpg?1418955475\"\
           }},\"ids\":{\"trakt\":71372,\"slug\":\"castles\",\"tvdb\":74237,\"imdb\"\
-          :null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":23.235668,\"\
+          :null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":23.245121,\"\
           show\":{\"title\":\"Castle\",\"overview\":\"Rick Castle is one of the world's\
           \ most successful crime authors. But when his rock star lifestyle isn't\
           \ enough, this bad boy goes looking for new trouble and finds it working\
@@ -506,14 +506,14 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/410/fanarts/thumb/4024e7034e.jpg?1422341155\"\
           }},\"ids\":{\"trakt\":1410,\"slug\":\"castle\",\"tvdb\":83462,\"imdb\":\"\
           tt1219024\",\"tmdb\":1419,\"tvrage\":19267}}},{\"type\":\"show\",\"score\"\
-          :16.264969,\"show\":{\"title\":\"Noah's Castle\",\"overview\":\"An early\
+          :16.271584,\"show\":{\"title\":\"Noah's Castle\",\"overview\":\"An early\
           \ 1980s dystopian children's drama series, imagining a breakdown in British\
           \ society following high inflation and food shortages.  Based on the novel\
           \ by British children's writer, John Rowe Townsend.\",\"year\":1980,\"images\"\
           :{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"\
           full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":75799,\"\
           slug\":\"noah-s-castle\",\"tvdb\":184991,\"imdb\":\"tt0197174\",\"tmdb\"\
-          :null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":16.264969,\"show\"\
+          :null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":16.271584,\"show\"\
           :{\"title\":\"Castle Ghosts\",\"overview\":\"Throughout history, man has\
           \ been fascinated by the concept of ghosts \u2013 with sightings reported\
           \ back in ancient times. This series investigates the myths of ghosts associated\
@@ -528,12 +528,12 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/072/112/posters/thumb/72982a9871.jpg?1418955884\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":72112,\"slug\":\"castle-ghosts\",\"tvdb\":272064,\"imdb\":null,\"\
-          tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":16.264969,\"\
+          tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":16.271584,\"\
           show\":{\"title\":\"Castle Haven\",\"year\":1969,\"images\":{\"poster\"\
           :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
           medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":29677,\"slug\":\"castle-haven\"\
           ,\"tvdb\":70971,\"imdb\":\"\",\"tmdb\":29806,\"tvrage\":641}}},{\"type\"\
-          :\"show\",\"score\":16.264969,\"show\":{\"title\":\"Dani's Castle\",\"overview\"\
+          :\"show\",\"score\":16.271584,\"show\":{\"title\":\"Dani's Castle\",\"overview\"\
           :\"Dani has inherited the crumbling Bogmoor Castle from her mysterious great\
           \ aunt Marjorie. Can she turn the castle into a thriving family business\
           \ whilst dealing with a troublesome cousin and some even more troublesome\
@@ -542,7 +542,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/069/215/posters/thumb/afd6d6b1d2.jpg?1418971497\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":69215,\"slug\":\"dani-s-castle\",\"tvdb\":266240,\"imdb\":\"tt2474852\"\
-          ,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":16.264969,\"\
+          ,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":16.271584,\"\
           show\":{\"title\":\"Queenie's Castle\",\"overview\":\"Queenie Shepherd (Diana\
           \ Dors) rules the roost in a tower block called Margaret Rose House, Buckingham\
           \ Flats. Queenie has three sons, Raymond (Freddie Fletcher), Douglas (Barrie\
@@ -555,7 +555,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/009/416/fanarts/thumb/40fd61fc25.jpg?1418987253\"\
           }},\"ids\":{\"trakt\":9416,\"slug\":\"queenie-s-castle\",\"tvdb\":74533,\"\
           imdb\":\"tt0065336\",\"tmdb\":9464,\"tvrage\":7338}}},{\"type\":\"show\"\
-          ,\"score\":16.264969,\"show\":{\"title\":\"Glass Castle\",\"overview\":\"\
+          ,\"score\":16.271584,\"show\":{\"title\":\"Glass Castle\",\"overview\":\"\
           Jung Min Joo is a woman from a very tough family background. Her mother\
           \ had three children with three different fathers. However, she overcomes\
           \ this in order to become a news announcer. When she first meets Kim Joon\
@@ -566,38 +566,38 @@ interactions:
           year\":2008,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\"\
           :null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\"\
           :{\"trakt\":31210,\"slug\":\"glass-castle\",\"tvdb\":260454,\"imdb\":\"\"\
-          ,\"tmdb\":31347,\"tvrage\":null}}},{\"type\":\"show\",\"score\":16.264969,\"\
+          ,\"tmdb\":31347,\"tvrage\":null}}},{\"type\":\"show\",\"score\":16.271584,\"\
           show\":{\"title\":\"Union Castle\",\"year\":1982,\"images\":{\"poster\"\
           :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
           medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":22399,\"slug\":\"union-castle\"\
           ,\"tvdb\":75368,\"imdb\":\"\",\"tmdb\":22500,\"tvrage\":9940}}}]"}
       headers:
-        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
+        cache-control: ['public, max-age=14400']
         cf-cache-status: [MISS]
-        cf-ray: [1b19b93315e11870-EWR]
+        cf-ray: [1b1ba897aad30406-EWR]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Sat, 31 Jan 2015 23:35:02 GMT']
-        etag: [W/"bd56060edb8e1e5c9ece032b076b27ed"]
-        expires: ['Sun, 01 Feb 2015 03:35:01 GMT']
+        date: ['Sun, 01 Feb 2015 05:13:14 GMT']
+        etag: [W/"4083ac0ddcd494306ef5f354d9e0404a"]
+        expires: ['Sun, 01 Feb 2015 09:13:14 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d208eef839d46ed0c15dededd7fa9b16d1422747302; expires=Sun,
-            31-Jan-16 23:35:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d4592f871c7dff5ab65590949eb0960b41422767594; expires=Mon,
+            01-Feb-16 05:13:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
         status: [200 OK]
         transfer-encoding: [chunked]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
         x-powered-by: [Phusion Passenger]
-        x-request-id: [0e9c681f-655e-469a-b423-3870366394c7]
-        x-runtime: ['0.050616']
+        x-request-id: [56287881-36f1-45e9-8c6d-b313c37bf4c0]
+        x-runtime: ['0.117260']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=d208eef839d46ed0c15dededd7fa9b16d1422747302]
+        Cookie: [__cfduid=d4592f871c7dff5ab65590949eb0960b41422767594]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -613,13 +613,13 @@ interactions:
           with his own twist.","first_aired":"2009-03-08T19:00:00.000-07:00","airs":{"day":"Monday","time":"22:00","timezone":"America/New_York"},"runtime":43,"certification":"TV-PG","network":"ABC","country":"us","trailer":null,"homepage":null,"status":"returning
           series","rating":8.49211,"votes":7411,"updated_at":"2015-01-31T10:52:38.000Z","language":"en","available_translations":["en","sk","el","hu","nl","de","pl","bg","it","fr","pt","zh","ru","es"],"genres":["crime","drama"],"aired_episodes":140}'}
       headers:
-        cache-control: ['max-age=14400, public', no-cache="set-cookie"]
-        cf-cache-status: [MISS]
-        cf-ray: [1b19b933b5f31870-EWR]
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [1b1ba899aae20406-EWR]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Sat, 31 Jan 2015 23:35:03 GMT']
-        expires: ['Sun, 01 Feb 2015 03:35:03 GMT']
+        date: ['Sun, 01 Feb 2015 05:13:14 GMT']
+        expires: ['Sun, 01 Feb 2015 09:13:14 GMT']
         last-modified: ['Sat, 31 Jan 2015 10:52:38 GMT']
         server: [cloudflare-nginx]
         status: [200 OK]
@@ -628,8 +628,8 @@ interactions:
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
         x-powered-by: [Phusion Passenger]
-        x-request-id: [8451e018-6df4-4233-9dda-f866bafd1a3f]
-        x-runtime: ['0.029157']
+        x-request-id: [302110eb-f351-40c0-8952-41041c6a57cb]
+        x-runtime: ['0.058354']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1
