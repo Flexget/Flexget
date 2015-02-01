@@ -4,8 +4,8 @@ import re
 from urlparse import urljoin
 
 from dateutil.parser import parse as dateutil_parse
-from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, func, Date, DateTime, Time, or_
-from sqlalchemy.orm import relation
+from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, Date, DateTime, Time, or_
+from sqlalchemy.orm import relation, object_session
 from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
@@ -107,7 +107,6 @@ class TraktGenre(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(Unicode)
-    slug = Column(Unicode) # Not sure if this is needed, depends on what is returned by genres from api calls
 
 show_genres_table = Table('trakt_show_genres', Base.metadata,
                          Column('show_id', Integer, ForeignKey('trakt_shows.id')),
@@ -116,6 +115,19 @@ show_genres_table = Table('trakt_show_genres', Base.metadata,
 movie_genres_table = Table('trakt_movie_genres', Base.metadata,
                           Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
                           Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
+
+
+def get_db_genres(genres, session):
+    """Takes a list of genres as strings, returns the database instances for them."""
+    db_genres = []
+    for genre in genres:
+        genre = genre.replace('-', ' ')
+        db_genre = session.query(TraktGenre).filter(TraktGenre.name == genre).first()
+        if not db_genre:
+            db_genre = TraktGenre(name=genre)
+            session.add(db_genre)
+        db_genres.append(db_genre)
+    return db_genres
 
 
 class TraktActor(Base):
@@ -174,9 +186,6 @@ class TraktEpisode(Base):
         for col in ['title', 'season', 'number', 'number_abs', 'overview']:
             setattr(self, col, trakt_episode.get(col))
 
-        for genre in trakt_episode.get('genres', ()):
-            # TODO: the stuff
-            pass
         self.expired = False
 
 
@@ -205,16 +214,16 @@ class TraktShow(Base):
     language = Column(Unicode)
     aired_episodes = Column(Integer)
     episodes = relation(TraktEpisode, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic')
-    #genres = relation(TraktGenre, secondary=show_genres_table)
+    genres = relation(TraktGenre, secondary=show_genres_table)
     #actors = relation(TraktActor, secondary=show_actors_table)
     updated_at = Column(DateTime)
     expired = Column(Boolean)
 
-    def __init__(self, trakt_show):
+    def __init__(self, trakt_show, session):
         super(TraktShow, self).__init__()
-        self.update(trakt_show)
+        self.update(trakt_show, session)
 
-    def update(self, trakt_show):
+    def update(self, trakt_show, session):
         """Updates this record from the trakt media object `trakt_show` returned by the trakt api."""
         if self.id and self.id != trakt_show['ids']['trakt']:
             raise Exception('Tried to update db movie with different movie data')
@@ -239,9 +248,7 @@ class TraktShow(Base):
                     'runtime', 'certification', 'network', 'country', 'status', 'aired_episodes']:
             setattr(self, col, trakt_show.get(col))
 
-        for genre in trakt_show.get('genres', ()):
-            # TODO: the stuff
-            pass
+        self.genres[:] = get_db_genres(trakt_show.get('genres', []), session)
         self.expired = False
 
     def get_episode(self, season, number, only_cached=False):
@@ -292,11 +299,11 @@ class TraktMovie(Base):
     genres = relation(TraktGenre, secondary=movie_genres_table)
     _actors = relation(TraktActor, secondary=movie_actors_table)
 
-    def __init__(self, trakt_movie):
+    def __init__(self, trakt_movie, session):
         super(TraktMovie, self).__init__()
-        self.update(trakt_movie)
+        self.update(trakt_movie, session)
 
-    def update(self, trakt_movie):
+    def update(self, trakt_movie, session):
         """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
         if self.id and self.id != trakt_movie['ids']['trakt']:
             raise Exception('Tried to update db movie with different movie data')
@@ -310,9 +317,7 @@ class TraktMovie(Base):
         if self.released:
             self.released = dateutil_parse(trakt_movie.get('released'))
         self.updated_at = dateutil_parse(trakt_movie.get('updated_at'))
-        for genre in trakt_movie.get('genres', ()):
-            # TODO: the stuff
-            pass
+        self.genres[:] = get_db_genres(trakt_movie.get('genres', []), session)
         self.expired = False
 
     @property
@@ -456,7 +461,7 @@ class ApiTrakt(object):
             series.update(trakt_show)
         else:
             # TODO: Check if show with trakt id exists, update it and store to TraktSearchResult
-            series = TraktShow(trakt_show)
+            series = TraktShow(trakt_show, session)
             session.add(series)
         return series
 
@@ -478,10 +483,10 @@ class ApiTrakt(object):
                 return movie
             raise
         if movie:
-            movie.update(trakt_movie)
+            movie.update(trakt_movie, session)
         else:
             # TODO: Check if movie with trakt id exists store to search results
-            movie = TraktMovie(trakt_movie)
+            movie = TraktMovie(trakt_movie, session)
             session.add(movie)
         return movie
 

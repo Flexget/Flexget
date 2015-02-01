@@ -76,7 +76,7 @@ class PluginTraktLookup(object):
         'trakt_series_air_time': 'air_time',
         'trakt_series_air_day': 'air_day',
         'trakt_series_content_rating': 'certification',
-        #'trakt_series_genres': lambda series: [genre.name for genre in series.genre],
+        'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres],
         'trakt_series_network': 'network',
         'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
         'trakt_series_url': lambda series: series.slug and 'http://trakt.tv/shows/%s' % series.slug,
@@ -104,6 +104,26 @@ class PluginTraktLookup(object):
         'trakt_episode': 'number',
         'trakt_ep_id': lambda ep: 'S%02dE%02d' % (ep.season, ep.number),
         }
+
+    # Movie info
+    movie_map = {
+        'movie_name': 'title',
+        'movie_year': 'year',
+        'trakt_name': 'title',
+        'trakt_year': 'year',
+        'trakt_movie_id': 'id',
+        'trakt_movie_slug': 'slug',
+        'imdb_id': 'imdb_id',
+        'tmdb_id': 'tmdb_id',
+        'trakt_tagline': 'tagline',
+        'trakt_overview': 'overview',
+        'trakt_released': 'released',
+        'trakt_runtime': 'runtime',
+        'trakt_rating': 'rating',
+        'trakt_votes': 'votes',
+        'trakt_language': 'language',
+        'trakt_genres': lambda i: [db_genre.name for db_genre in i.genres]
+    }
 
     schema = {'type': 'boolean'}
 
