@@ -1480,8 +1480,6 @@ class SeriesDBManager(FilterSeriesBase):
                     # Remove the alternate names not present in current config
                     db_series.alternate_names = [alt for alt in db_series.alternate_names if alt.alt_name in alts]
                     # Add/update the possibly new alternate names
-                    for alt in alts:
-                        _add_alt_name(alt, db_series, series_name, session)
                 else:
                     log.debug('adding series %s into db', series_name)
                     db_series = Series()
@@ -1489,8 +1487,8 @@ class SeriesDBManager(FilterSeriesBase):
                     session.add(db_series)
                     session.flush()  # flush to get id on series before creating alternate names
                     log.debug('-> added %s' % db_series)
-                    for alt in alts:
-                        _add_alt_name(alt, db_series, series_name, session)
+                for alt in alts:
+                    _add_alt_name(alt, db_series, series_name, session)
                 db_series.in_tasks.append(SeriesTask(task.name))
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
