@@ -255,7 +255,6 @@ class AlternateNames(Base):
     def __repr__(self):
         return unicode(self).encode('ascii', 'replace')
 
-#Index('alternatenames_series_name', AlternateNames.alt_name, unique=True)
 
 class Series(Base):
 
@@ -274,8 +273,7 @@ class Series(Base):
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan',
                         primaryjoin='Series.id == Episode.series_id')
     in_tasks = relation('SeriesTask', backref=backref('series', uselist=False), cascade='all, delete, delete-orphan')
-    alternate_names = relation('AlternateNames', backref='series', primaryjoin='Series.id == AlternateNames.series_id',
-                               cascade='all, delete, delete-orphan')
+    alternate_names = relation('AlternateNames', backref='series', cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
     def name_getter(self):
@@ -296,6 +294,7 @@ class Series(Base):
 
     def __repr__(self):
         return unicode(self).encode('ascii', 'replace')
+
 
 class Episode(Base):
 
@@ -1472,12 +1471,12 @@ class SeriesDBManager(FilterSeriesBase):
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = unicode(series_name)
                 db_series = session.query(Series).filter(Series.name == series_name).first()
+                alts = series_config.get('alternate_name', [])
+                if not isinstance(alts, list):
+                    alts = [alts]
                 if db_series:
                     # Update database with capitalization from config
                     db_series.name = series_name
-                    alts = series_config.get('alternate_name', [])
-                    if not isinstance(alts, list):
-                        alts = [alts]
                     # Remove the alternate names not present in current config
                     db_series.alternate_names = [alt for alt in db_series.alternate_names if alt.alt_name in alts]
                     # Add/update the possibly new alternate names
@@ -1490,9 +1489,6 @@ class SeriesDBManager(FilterSeriesBase):
                     session.add(db_series)
                     session.flush()  # flush to get id on series before creating alternate names
                     log.debug('-> added %s' % db_series)
-                    alts = series_config.get('alternate_name', [])
-                    if not isinstance(alts, list):
-                        alts = [alts]
                     for alt in alts:
                         _add_alt_name(alt, db_series, series_name, session)
                 db_series.in_tasks.append(SeriesTask(task.name))
@@ -1507,7 +1503,7 @@ class SeriesDBManager(FilterSeriesBase):
 
 def _add_alt_name(alt, db_series, series_name, session):
     alt = unicode(alt)
-    db_series_alt = session.query(AlternateNames).join(Series).filter(AlternateNames.alt_name == alt).first()
+    db_series_alt = session.query(AlternateNames).filter(AlternateNames.alt_name == alt).first()
     if db_series_alt and db_series_alt.series_id == db_series.id:
         # Already exists, no need to create it then
         # TODO is checking the list for duplicates faster/better than querying the DB?
