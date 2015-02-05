@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import re
 
 from sqlalchemy import desc
 
@@ -51,6 +52,10 @@ class EmitSeries(object):
     def search_entry(self, series, season, episode, task, rerun=True):
         # Extract the alternate names for the series
         alts = [alt.alt_name for alt in series.alternate_names]
+        # Also consider series name without parenthetical (year, country) an alternate name
+        paren_match = re.match(r'(.+?)( \(.+\))?$', series.name)
+        if paren_match.group(2):
+            alts.append(paren_match.group(1))
         if series.identified_by == 'ep':
             search_strings = ['%s %s' % (series.name, id) for id in self.ep_identifiers(season, episode)]
             series_id = 'S%02dE%02d' % (season, episode)
