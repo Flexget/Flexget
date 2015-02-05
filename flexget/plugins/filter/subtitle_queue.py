@@ -88,7 +88,8 @@ class QueuedSubtitle(Base):
         self.downloaded = False
 
     def __str__(self):
-        return '<SubtitleQueue(%s, %s, %s)>' % (self.path, self.added, self.languages[0])
+        lang = None if not self.languages else self.languages[0]
+        return '<SubtitleQueue(%s, %s, %s)>' % (self.path, self.added, lang)
 
 
 class SubtitleQueue(object):
