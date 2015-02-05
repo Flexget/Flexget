@@ -222,8 +222,6 @@ class SubtitleQueue(object):
         if not config or not isinstance(config, dict):
             return
         action = config.get('action')
-        if not config.get('languages'):
-            config['languages'] = 'en'
         for entry in task.accepted:
             try:
                 if action == 'add':
