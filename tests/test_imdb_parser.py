@@ -33,6 +33,7 @@ class TestImdbParser(object):
         assert parser.languages == ['english', 'hungarian', 'spanish', 'french'], 'Languages not parsed correctly'
         assert parser.mpaa_rating == 'R', 'Rating not parsed correctly'
         assert parser.name == 'The Usual Suspects', 'Name not parsed correctly'
+        assert parser.runtime == 106, 'Runtime not parsed correctly'
         assert (parser.photo ==
                 'http://ia.media-imdb.com/images/M/MV5BMzI1MjI5MDQyOV5BMl5BanBnXkFtZTcwNzE4Mjg3NA@@._V1_SX214_AL_.jpg'
         ), 'Photo not parsed correctly'

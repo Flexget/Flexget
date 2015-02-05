@@ -247,6 +247,7 @@ class ImdbLookup(object):
         'imdb_actors': lambda movie: dict((actor.imdb_id, actor.name) for actor in movie.actors),
         'imdb_directors': lambda movie: dict((director.imdb_id, director.name) for director in movie.directors),
         'imdb_mpaa_rating': 'mpaa_rating',
+        'imdb_runtime': 'runtime',
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'title',
         'movie_year': 'year'}
@@ -424,7 +425,7 @@ class ImdbLookup(object):
                 log.exception(e)
             raise plugin.PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
 
-        for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'mpaa_rating']:
+        for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'mpaa_rating', 'runtime']:
             log.trace('movie.%s: %s' % (att, getattr(movie, att)))
 
         # Update the entry fields
@@ -448,6 +449,7 @@ class ImdbLookup(object):
         movie.score = parser.score
         movie.votes = parser.votes
         movie.year = parser.year
+        movie.runtime = parser.runtime
         movie.mpaa_rating = parser.mpaa_rating
         movie.plot_outline = parser.plot_outline
         movie.url = imdb_url
