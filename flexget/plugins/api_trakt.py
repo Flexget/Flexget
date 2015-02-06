@@ -25,7 +25,7 @@ Base = db_schema.versioned_base('api_trakt', 3)
 log = logging.getLogger('api_trakt')
 # Production Site
 API_KEY = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
-API_URL = 'https://api.trakt.tv/'
+API_URL = 'https://api-v2launch.trakt.tv/'
 
 # Stores the last time we checked for updates for shows/movies
 updated = SimplePersistence('api_trakt')
