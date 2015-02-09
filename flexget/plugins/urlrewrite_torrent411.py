@@ -76,7 +76,8 @@ SUB_CATEGORIES = {
     'VCD-SVCD-VHSrip': [7, 18],
     'WEBrip': [7, 19],
     'WEBripHD-1080p': [7, 1174],
-    'WEBripHD-1080p': [7, 720],
+    'WEBripHD-720p': [7, 1175],
+    'WEBripHD-4K': [7, 1182],
 
     '2D': [9, 22],
     '3D-Converti-Amateur': [9, 1045],
