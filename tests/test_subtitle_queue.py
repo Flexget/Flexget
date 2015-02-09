@@ -72,8 +72,7 @@ class TestSubtitleQueue(FlexGetBase):
 
         langs = queue[0].languages
 
-        assert len(langs) == 1, 'There is exactly one default language.'
-        assert langs[0].language == 'en', 'Default language should be \'en\' (English).'
+        assert len(langs) == 0, 'There should be no default language.'
 
     def test_subtitle_queue_emit(self):
         config = {}

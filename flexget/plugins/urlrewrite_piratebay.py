@@ -13,7 +13,7 @@ from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('piratebay')
 
-CUR_TLD = 'to'
+CUR_TLD = 'se'
 TLDS = 'com|org|sx|ac|pe|gy|se|%s' % CUR_TLD
 
 URL_MATCH = re.compile('^http://(?:torrents\.)?thepiratebay\.(?:%s)/.*$' % TLDS)
@@ -104,7 +104,7 @@ class UrlRewritePirateBay(object):
             raise UrlRewritingError(e)
 
     @plugin.internet(log)
-    def search(self, arg_entry, config=None):
+    def search(self, task, entry, config=None):
         """
         Search for name from piratebay.
         """
@@ -120,7 +120,7 @@ class UrlRewritePirateBay(object):
         filter_url = '/0/%d/%d' % (sort, category)
 
         entries = set()
-        for search_string in arg_entry.get('search_strings', [arg_entry['title']]):
+        for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
             # TPB search doesn't like dashes
             query = query.replace('-', ' ')

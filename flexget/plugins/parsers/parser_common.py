@@ -208,6 +208,8 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
 
     @property
     def valid(self):
+        if not self.parsed_name:
+            return False
         if self.type != self.parsed_type:
             return False
         if not self._name:

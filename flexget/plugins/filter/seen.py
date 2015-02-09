@@ -138,22 +138,21 @@ class FilterSeen(object):
         This plugin is enabled on all tasks by default.
         See wiki for more information.
     """
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {'type': 'string', 'enum': ['global', 'local']}
+        ]
+    }
 
     def __init__(self):
         # remember and filter by these fields
         self.fields = ['title', 'url', 'original_url']
         self.keyword = 'seen'
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('boolean')
-        root.accept('choice').accept_choices(['global', 'local'])
-        return root
-
     @plugin.priority(255)
     def on_task_filter(self, task, config, remember_rejected=False):
-        """Filter seen entries"""
+        """Filter entries already accepted on previous runs."""
         if config is False:
             log.debug('%s is disabled' % self.keyword)
             return
