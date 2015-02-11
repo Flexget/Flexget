@@ -16,7 +16,7 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_columns, get_index_by_name, table_schema
 
-SCHEMA_VER = 4
+SCHEMA_VER = 5
 
 Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
@@ -218,6 +218,10 @@ def upgrade(ver, session):
         log.info('Adding original title column, cached data will not have this information')
         table_add_column('imdb_movies', 'original_title', Unicode, session)
         ver = 4
+    if ver == 4:
+        log.info('Adding runtime column, cached data will not have this information')
+        table_add_column('imdb_runtime', 'runtime', Unicode, session)
+        ver = 5
     return ver
 
 
