@@ -12,15 +12,15 @@ from bs4 import BeautifulSoup, NavigableString, Tag
 
 log = logging.getLogger('serienjunkies')
 
-reSingleEp  = re.compile(r'(S\d+E\d\d+)(?!-E)', re.I)
-reMultiEp   = re.compile(r'(?P<season>S\d\d)E(?P<startep>\d\d+)-E?(?P<stopep>\d\d+)', re.I)
-reSeason    = re.compile(r'(?<=\.|\-)S\d\d(?:[-\.]S\d\d)*(?!E\d\d+)', re.I)
+regex_single_ep = re.compile(r'(S\d+E\d\d+)(?!-E)', re.I)
+regex_multi_ep  = re.compile(r'(?P<season>S\d\d)E(?P<startep>\d\d+)-E?(?P<stopep>\d\d+)', re.I)
+regex_season    = re.compile(r'(?<=\.|\-)S\d\d(?:[-\.]S\d\d)*(?!E\d\d+)', re.I)
 
-reLanguage  = re.compile(r'Sprache')
+regex_language_container = re.compile(r'Sprache')
 
-reGerman    = re.compile(r'german|deutsch', re.I)
-reForeign   = re.compile(r'englisc?h|französisch|japanisch|dänisch|norwegisch|niederländisch|ungarisch|italienisch|portugiesisch', re.I)
-reSubtitle  = re.compile(r'Untertitel|Subs?|UT', re.I)
+regex_is_german   = re.compile(r'german|deutsch', re.I)
+regex_is_foreign  = re.compile(r'englisc?h|französisch|japanisch|dänisch|norwegisch|niederländisch|ungarisch|italienisch|portugiesisch', re.I)
+regex_is_subtitle = re.compile(r'Untertitel|Subs?|UT', re.I)
 
 
 LANGUAGE = ['german', 'foreign', 'subtitle', 'dual']
@@ -34,7 +34,7 @@ class UrlRewriteSerienjunkies(object):
 
     """
     Serienjunkies urlrewriter
-    Version 1.0.1
+    Version 1.0.2
 
     Language setting works like a whitelist, the selected is needed,
     but others are still possible.
@@ -53,14 +53,12 @@ class UrlRewriteSerienjunkies(object):
         'additionalProperties': False
     }
 
-
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
         if url.startswith('http://www.serienjunkies.org/') or url.startswith('http://serienjunkies.org/'):
             return True
         return False
-
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
@@ -73,22 +71,21 @@ class UrlRewriteSerienjunkies(object):
 
         download_urls = self.parse_downloads(series_url, search_title)
         if not download_urls:
-             entry.reject('No Episode found')
+            entry.reject('No Episode found')
         else:
             entry['url'] = download_urls[-1]
             entry['description'] = ", ".join(download_urls)
             
-        #Debug Information
+        # Debug Information
         log.debug('TV Show URL: %s' % series_url)
         log.debug('Episode: %s' % search_title)
         log.debug('Download URL: %s' % download_urls)
-
 
     @plugin.internet(log)
     def parse_downloads(self, series_url, search_title):
         page = requests.get(series_url).content
         try:
-            pageSoup = get_soup(page)
+            soup = get_soup(page)
         except Exception as e:
             raise UrlRewritingError(e)
             
@@ -100,7 +97,7 @@ class UrlRewriteSerienjunkies(object):
         
         for ep_title in episode_titles:
             # find matching download
-            episode_title = pageSoup.find('strong', text=re.compile(ep_title, re.I))
+            episode_title = soup.find('strong', text=re.compile(ep_title, re.I))
             if not episode_title:
                 continue
                 
@@ -136,55 +133,54 @@ class UrlRewriteSerienjunkies(object):
                     continue
         return urls
 
-    def find_all_titles(self,search_title):
+    def find_all_titles(self, search_title):
         search_titles = []
         # Check type
-        if reMultiEp.search(search_title):
+        if regex_multi_ep.search(search_title):
             log.debug('Title seems to describe multiple episodes')
-            first_ep = int(reMultiEp.search(search_title).group('startep'))
-            last_ep = int(reMultiEp.search(search_title).group('stopep'))
-            season = reMultiEp.search(search_title).group('season') + 'E'
-            for i in range(first_ep,last_ep + 1):
+            first_ep = int(regex_multi_ep.search(search_title).group('startep'))
+            last_ep = int(regex_multi_ep.search(search_title).group('stopep'))
+            season = regex_multi_ep.search(search_title).group('season') + 'E'
+            for i in range(first_ep, last_ep + 1):
                 # ToDO: Umlaute , Mehrzeilig etc.
-                search_titles.append(reMultiEp.sub(season + str(i).zfill(2) + '[\\\\w\\\\.\\\\(\\\\)]*',search_title))
-        elif reSeason.search(search_title):
+                search_titles.append(regex_multi_ep.sub(season + str(i).zfill(2) + '[\\\\w\\\\.\\\\(\\\\)]*', search_title))
+        elif regex_season.search(search_title):
             log.debug('Title seems to describe one or more season')
-            sString = reSeason.search(search_title).group(0)
-            for s in re.findall('(?<!\-)S\d\d(?!\-)',sString):
-                search_titles.append(reSeason.sub(s + '[\\\\w\\\\.]*',search_title))
-            for s in re.finditer('(?<!\-)S(\d\d)-S(\d\d)(?!\-)',sString):
-                sStart = int(s.group(1))
-                sEnd = int(s.group(2))
-                for i in range(sStart,sEnd+1):
-                    search_titles.append(reSeason.sub('S' + str(i).zfill(2) + '[\\\\w\\\\.]*',search_title))
+            search_string = regex_season.search(search_title).group(0)
+            for s in re.findall('(?<!\-)S\d\d(?!\-)', search_string):
+                search_titles.append(regex_season.sub(s + '[\\\\w\\\\.]*', search_title))
+            for s in re.finditer('(?<!\-)S(\d\d)-S(\d\d)(?!\-)', search_string):
+                season_start = int(s.group(1))
+                season_end = int(s.group(2))
+                for i in range(season_start, season_end + 1):
+                    search_titles.append(regex_season.sub('S' + str(i).zfill(2) + '[\\\\w\\\\.]*', search_title))
         else: 
             log.debug('Title seems to describe a single episode')
             search_titles.append(re.escape(search_title))
         return search_titles
 
-
-    def check_language(self, language):
+    def check_language(self, languages):
         # Cut additional Subtitles
         try:
-            language =  language[:language.index("+")]
+            languages = languages[:languages.index("+")]
         except:
             pass
 
-        languageList = re.split(r'[,&]', language)
+        language_list = re.split(r'[,&]', languages)
 
         try:
-            if   self.config['language'] == 'german':
-                if reGerman.search(languageList[0]):               
+            if self.config['language'] == 'german':
+                if regex_is_german.search(language_list[0]):               
                     return True
             elif self.config['language'] == 'foreign':
-                if (reForeign.search(languageList[0]) and not languageList[1]) or \
-                   (languageList[1] and not reSubtitle.search(languageList[1])):
+                if (regex_is_foreign.search(language_list[0]) and not language_list[1]) or \
+                   (language_list[1] and not regex_is_subtitle.search(language_list[1])):
                     return True
             elif self.config['language'] == 'subtitle':
-                if languageList[1] and reSubtitle.search(languageList[1]): 
+                if language_list[1] and regex_is_subtitle.search(language_list[1]): 
                     return True
             elif self.config['language'] == 'dual':
-                if languageList[1] and not reSubtitle.search(languageList[1]):
+                if language_list[1] and not regex_is_subtitle.search(language_list[1]):
                     return True
         except:
             pass
