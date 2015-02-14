@@ -106,7 +106,7 @@ class IPCServer(threading.Thread):
         self.manager = manager
         self.host = '127.0.0.1'
         self.port = port or 0
-        self.password = ''.join(random.choice(string.letters + string.digits) for x in range(15))
+        self.password = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(15))
         self.server = None
 
     def authenticator(self, sock):
