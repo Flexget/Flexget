@@ -27,6 +27,7 @@ class QualityParser(object):
                  ('Test.File.web-dl.1080p', '1080p webdl'),
                  ('Test.File.WebHD.720p', '720p webdl'),
                  ('Test.File.720p.bluray', '720p bluray'),
+                 ('Test.File.720HD.bluray', '720hd bluray'),
                  ('Test.File.1080p.bluray', '1080p bluray'),
                  ('Test.File.1080p.cam', '1080p cam'),
                  ('A Movie 2011 TS 576P XviD-DTRG', '576p ts xvid'),
