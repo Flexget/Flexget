@@ -27,6 +27,7 @@ class QualityParser(object):
                  ('Test.File.web-dl.1080p', '1080p webdl'),
                  ('Test.File.WebHD.720p', '720p webdl'),
                  ('Test.File.720p.bluray', '720p bluray'),
+                 ('Test.File.720hd.bluray', '720p bluray'),
                  ('Test.File.1080p.bluray', '1080p bluray'),
                  ('Test.File.1080p.cam', '1080p cam'),
                  ('A Movie 2011 TS 576P XviD-DTRG', '576p ts xvid'),
@@ -90,7 +91,7 @@ class QualityParser(object):
         failures = []
         for item in items:
             quality = self.parser.parse_movie(item[0]).quality
-            if quality != item[1]:
+            if str(quality) != item[1]:
                 failures.append('`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality))
         return failures
 
