@@ -91,7 +91,7 @@ class QualityParser(object):
         failures = []
         for item in items:
             quality = self.parser.parse_movie(item[0]).quality
-            if quality != item[1]:
+            if str(quality) != item[1]:
                 failures.append('`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality))
         return failures
 
