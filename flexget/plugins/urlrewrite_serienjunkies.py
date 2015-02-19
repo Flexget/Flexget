@@ -109,15 +109,18 @@ class UrlRewriteSerienjunkies(object):
             # find episode language
             episode_lang = episode.find_previous('strong', text=re.compile('Sprache')).next_sibling
             if not episode_lang:
+                log.warning('No language found for: %s' % series_url)
                 continue
 
             # filter language
             if not self.check_language(episode_lang):
+                log.warning('languages not matching: %s <> %s' % (self.config['language'],episode_lang))
                 continue
 
             # find download links
             links = episode.find_all('a')
             if not links:
+                log.warning('No links found for: %s' % series_url)
                 continue
 
             for link in links:
@@ -173,17 +176,18 @@ class UrlRewriteSerienjunkies(object):
                 if regex_is_german.search(language_list[0]):               
                     return True
             elif self.config['language'] == 'foreign':
-                if (regex_is_foreign.search(language_list[0]) and not language_list[1]) or \
-                   (language_list[1] and not regex_is_subtitle.search(language_list[1])):
+                if (regex_is_foreign.search(language_list[0]) and len(language_list) == 1) or \
+                   (len(language_list) > 1 and not regex_is_subtitle.search(language_list[1])):
                     return True
             elif self.config['language'] == 'subtitle':
-                if language_list[1] and regex_is_subtitle.search(language_list[1]): 
+                if len(language_list) > 1 and regex_is_subtitle.search(language_list[1]): 
                     return True
             elif self.config['language'] == 'dual':
-                if language_list[1] and not regex_is_subtitle.search(language_list[1]):
+                if len(language_list) > 1 and not regex_is_subtitle.search(language_list[1]):
                     return True
         except:
             pass
+        
         return False
 
 
