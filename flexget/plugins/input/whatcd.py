@@ -248,8 +248,16 @@ class InputWhatCD(object):
         try:
             json_response = r.json()
             if json_response['status'] != "success":
-                raise PluginError("What.cd gave a 'failure' response: "
-                                  "'{0}'".format(json_response['error']))
+
+                # Try to deal with errors returned by the API
+                error = json_response.get('error', json_response.get('status'))
+                if not error or error == "failure":
+                    error = json_response.get('response')
+                if not error:
+                    error = str(json_response)
+
+                raise PluginError("What.cd gave a failure response: "
+                                  "'{0}'".format(error))
             return json_response['response']
         except (ValueError, TypeError) as e:
             raise PluginError("What.cd returned an invalid response")
