@@ -18,7 +18,8 @@ from flexget.utils.requests import RequestException, Session
 #API_URL = 'http://api.staging.trakt.tv/'
 # Production Site
 API_KEY = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
-API_URL = 'https://api.trakt.tv/'
+#API_URL = 'https://api.trakt.tv/'
+API_URL = 'https://api-v2launch.trakt.tv/'
 
 
 def make_list_slug(name):
