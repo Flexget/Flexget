@@ -171,7 +171,7 @@ class SubtitleQueue(object):
                     if not file.lower().endswith(VIDEO_EXTENSIONS):
                         continue
                     file = normalize_path(os.path.join(path_dir, file))
-                    entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(file))
+                    entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(file.encode('utf-8')))
                     entry['location'] = file
                     entry['title'] = os.path.splitext(os.path.basename(file))[0]  # filename without ext
                     entry['subtitle_languages'] = primary
