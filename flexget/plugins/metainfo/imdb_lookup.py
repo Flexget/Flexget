@@ -220,7 +220,7 @@ def upgrade(ver, session):
         ver = 4
     if ver == 4:
         log.info('Adding runtime column, cached data will not have this information')
-        table_add_column('imdb_runtime', 'runtime', Unicode, session)
+        table_add_column('imdb_movies', 'runtime', Unicode, session)
         ver = 5
     return ver
 
