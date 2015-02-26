@@ -88,7 +88,7 @@ class UrlRewritePirateBay(object):
 
     @plugin.internet(log)
     def parse_download_page(self, url):
-        page = requests.get(url).content
+        page = requests.get(url,verify=False).content
         try:
             soup = get_soup(page)
             tag_div = soup.find('div', attrs={'class': 'download'})
@@ -127,7 +127,7 @@ class UrlRewritePirateBay(object):
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
             url = 'http://thepiratebay.%s/search/%s%s' % (CUR_TLD, urllib.quote(query.encode('utf-8')), filter_url)
             log.debug('Using %s as piratebay search url' % url)
-            page = requests.get(url).content
+            page = requests.get(url,verify=False).content
             soup = get_soup(page)
             for link in soup.find_all('a', attrs={'class': 'detLink'}):
                 entry = Entry()
