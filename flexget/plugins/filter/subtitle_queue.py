@@ -112,6 +112,15 @@ class SubtitleQueue(object):
             },
             {
                 'type': 'string', 'enum': ['emit']
+            },
+            {
+                'type': 'object',
+                'properties': {
+                    'action': {'type': 'string', 'enum': ['emit']},
+                    'remove_not_found': {'type': 'boolean', 'default': False},
+                },
+                'required': ['action'],
+                'additionalProperties': False
             }
         ]
     }
@@ -144,7 +153,8 @@ class SubtitleQueue(object):
                     path = sub_item.path
                 elif sub_item.alternate_path and os.path.exists(sub_item.alternate_path):
                     path = sub_item.alternate_path
-                elif sub_item.added + parse_timedelta('24 hours') > datetime.combine(date.today(), time()):
+                elif not config['remove_not_found'] and \
+                        sub_item.added + parse_timedelta('24 hours') > datetime.combine(date.today(), time()):
                     log.warning('File %s was not found. Deleting after %s.' %
                                 (sub_item.path, unicode(sub_item.added + parse_timedelta('24 hours'))))
                     continue
@@ -215,7 +225,7 @@ class SubtitleQueue(object):
                 entry.accept()
 
     def on_task_input(self, task, config):
-        if isinstance(config, dict):
+        if isinstance(config, dict) and config['action'] != 'emit':
             return
         return self.emit(task, config)
 
