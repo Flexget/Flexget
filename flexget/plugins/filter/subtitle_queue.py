@@ -346,7 +346,7 @@ def queue_edit(src, dest, title, config, location=None, session=None):
         queue_add(dest, title, config, alternate_path=src, location=location, session=session)
     else:
         if item.downloaded:
-            log.debug('All subtitles have already been downloaded. Not updating values.')
+            log.info('All subtitles have already been downloaded. Not updating values.')
             return
         if item.path != src:
             item.path = src
