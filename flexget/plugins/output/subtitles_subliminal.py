@@ -105,7 +105,9 @@ class PluginSubliminal(object):
                 entry.fail('file not found: %s' % entry['location'])
             elif '$RECYCLE.BIN' not in entry['location']:  # ignore deleted files in Windows shares
                 try:
-                    entry_langs = entry.get('subtitle_languages', langs)
+                    entry_langs = entry.get('subtitle_languages', [])
+                    if not entry_langs:
+                        entry_langs = langs
                     video = subliminal.scan_video(entry['location'])
                     if isinstance(video, subliminal.Episode):
                         title = video.series
@@ -137,7 +139,8 @@ class PluginSubliminal(object):
                                 entry.fail('cannot find any subtitles for now.')
                         downloaded_languages = set([Language.fromietf(unicode(l.language))
                                                     for l in subtitle[video]])
-                        entry['subtitles_missing'] = entry_langs - downloaded_languages
+                        if entry_langs:
+                            entry['subtitles_missing'] = entry_langs - downloaded_languages
                 except Exception as err:
                     # don't want to abort the entire task for errors in a  
                     # single video file or for occasional network timeouts

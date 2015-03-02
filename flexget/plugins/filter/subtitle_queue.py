@@ -112,11 +112,25 @@ class SubtitleQueue(object):
             },
             {
                 'type': 'string', 'enum': ['emit']
+            },
+            {
+                'type': 'object',
+                'properties': {
+                    'action': {'type': 'string', 'enum': ['emit']},
+                    'remove_not_found': {'type': 'boolean', 'default': False},
+                },
+                'required': ['action'],
+                'additionalProperties': False
             }
         ]
     }
 
     failed_paths = {}
+
+    def prepare_config(self, config):
+        if isinstance(config, basestring):
+            config = {'action': config, 'remove_not_found': False}
+        return config
 
     def on_task_start(self, task, config):
         self.failed_paths = {}
@@ -144,7 +158,8 @@ class SubtitleQueue(object):
                     path = sub_item.path
                 elif sub_item.alternate_path and os.path.exists(sub_item.alternate_path):
                     path = sub_item.alternate_path
-                elif sub_item.added + parse_timedelta('24 hours') > datetime.combine(date.today(), time()):
+                elif not config['remove_not_found'] and \
+                        sub_item.added + parse_timedelta('24 hours') > datetime.combine(date.today(), time()):
                     log.warning('File %s was not found. Deleting after %s.' %
                                 (sub_item.path, unicode(sub_item.added + parse_timedelta('24 hours'))))
                     continue
@@ -210,17 +225,20 @@ class SubtitleQueue(object):
         return entries
 
     def on_task_filter(self, task, config):
-        if not isinstance(config, dict) and config == 'emit':
+        config = self.prepare_config(config)
+        if config['action'] is 'emit':
             for entry in task.entries:
                 entry.accept()
 
     def on_task_input(self, task, config):
-        if isinstance(config, dict):
+        config = self.prepare_config(config)
+        if config['action'] != 'emit':
             return
         return self.emit(task, config)
 
     def on_task_output(self, task, config):
-        if not config or not isinstance(config, dict):
+        config = self.prepare_config(config)
+        if not config or config['action'] is 'emit':
             return
         action = config.get('action')
         for entry in task.accepted:
@@ -346,7 +364,7 @@ def queue_edit(src, dest, title, config, location=None, session=None):
         queue_add(dest, title, config, alternate_path=src, location=location, session=session)
     else:
         if item.downloaded:
-            log.debug('All subtitles have already been downloaded. Not updating values.')
+            log.info('All subtitles have already been downloaded. Not updating values.')
             return
         if item.path != src:
             item.path = src
