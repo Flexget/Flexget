@@ -97,13 +97,14 @@ class TraktList(object):
         log.verbose('Retrieving `%s` list `%s`' % (config['type'], config['list']))
         try:
             result = session.get(get_api_url(endpoint))
+            try:
+                data = result.json()
+            except ValueError:
+                log.debug('Could not decode json from response: %s', result.text)
+                raise plugin.PluginError('Error getting list from trakt.')
         except RequestException as e:
             raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e.args[0])
-        try:
-            data = result.json()
-        except ValueError:
-            log.debug('Could not decode json from response: %s', result.text)
-            raise plugin.PluginError('Error getting list from trakt.')
+
         if not data:
             log.warning('No data returned from trakt for %s list %s.' % (config['type'], config['list']))
             return
