@@ -10,7 +10,8 @@ from urlparse import urljoin
 
 from flexget import plugin
 from flexget.utils import json
-from flexget.utils.requests import RequestException, Session, Timeout
+from requests.exceptions import Timeout
+from flexget.utils.requests import RequestException, Session
 
 
 # Testing site
