@@ -27,7 +27,7 @@ class SearchBTN(object):
                 if entry.get('series_id_type') == 'sequence':
                     search['name'] = 'S01E%02d' % entry['series_id']
                 else:
-                    search['name'] = entry['series_id']
+                    search['name'] = '%s%%' % entry['series_id']
             searches = [search]
 
         results = set()
