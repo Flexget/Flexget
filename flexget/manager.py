@@ -539,7 +539,6 @@ class Manager(object):
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
 
-
     def load_config(self):
         """
         Loads the config file from disk, validates and activates it.
@@ -567,7 +566,7 @@ class Manager(object):
             print(' o Indentation error')
             print(' o Missing : from end of the line')
             print(' o Non ASCII characters (use UTF8)')
-            print(' o If text contains any of :[]{}% characters it must be single-quoted ' \
+            print(' o If text contains any of :[]{}% characters it must be single-quoted '
                   '(eg. value{1} should be \'value{1}\')\n')
 
             # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
@@ -890,7 +889,7 @@ class Manager(object):
         self.engine.dispose()
         # remove temporary database used in test mode
         if self.options.test:
-            if not 'test' in self.db_filename:
+            if 'test' not in self.db_filename:
                 raise Exception('trying to delete non test database?')
             if self._has_lock:
                 os.remove(self.db_filename)

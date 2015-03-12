@@ -221,6 +221,3 @@ def set_exit_handler(func):
     else:
         import signal
         signal.signal(signal.SIGTERM, func)
-
-
-

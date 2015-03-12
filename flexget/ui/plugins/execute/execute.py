@@ -16,6 +16,7 @@ log = logging.getLogger('ui.execute')
 bufferqueue = BufferQueue()
 exec_parser = get_parser('execute')
 
+
 @execute.route('/', methods=['POST', 'GET'])
 def index():
     context = {'progress': exec_parser.format_help().split('\n')}
