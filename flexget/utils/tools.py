@@ -11,6 +11,9 @@ import re
 import sys
 import locale
 import Queue
+import ast
+import operator
+
 from collections import MutableMapping
 from urlparse import urlparse
 from htmlentitydefs import name2codepoint
@@ -371,6 +374,38 @@ else:
         # See if we couldn't get the exit code or the exit code indicates that the
         # process is still running.
         return is_running or exit_code.value == STILL_ACTIVE
+
+_binOps = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.div,
+    ast.Mod: operator.mod
+}
+
+
+def arithmeticEval(s):
+    """
+    A safe eval supporting basic arithmetic operations.
+
+    :param s: expression to evaluate
+    :return: value
+    """
+    node = ast.parse(s, mode='eval')
+
+    def _eval(node):
+        if isinstance(node, ast.Expression):
+            return _eval(node.body)
+        elif isinstance(node, ast.Str):
+            return node.s
+        elif isinstance(node, ast.Num):
+            return node.n
+        elif isinstance(node, ast.BinOp):
+            return _binOps[type(node.op)](_eval(node.left), _eval(node.right))
+        else:
+            raise Exception('Unsupported type {}'.format(node))
+
+    return _eval(node.body)
 
 
 class TimedDict(MutableMapping):
