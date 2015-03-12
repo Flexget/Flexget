@@ -1,13 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-import os
 import logging
 import re
-import urlparse
 import xmlrpclib
 
 from flexget import plugin
 from flexget.event import event
-from flexget.entry import Entry
 from flexget.utils.template import RenderError
 from flexget.plugin import get_plugin_by_name
 
@@ -319,7 +316,8 @@ class OutputAria2(object):
                                         s.aria2.unpause(r['gid'])
                                     log.info('  Unpaused download.')
                                 except xmlrpclib.Fault as err:
-                                    raise plugin.PluginError('aria2 response to unpause request: %s' % err.faultString, log)
+                                    raise plugin.PluginError('aria2 response to unpause request: %s' %
+                                                             err.faultString, log)
                             else:
                                 log.info('  Therefore, not re-adding.')
                         except xmlrpclib.Fault as err:

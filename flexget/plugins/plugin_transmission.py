@@ -236,10 +236,10 @@ class PluginTransmission(TransmissionBase):
                     'netrc': {'type': 'string'},
                     'username': {'type': 'string'},
                     'password': {'type': 'string'},
-                    'path': {'type': 'string'},   
+                    'path': {'type': 'string'},
                     'maxupspeed': {'type': 'number'},
                     'maxdownspeed': {'type': 'number'},
-                    'maxconnections': {'type': 'integer'},   
+                    'maxconnections': {'type': 'integer'},
                     'ratio': {'type': 'number'},
                     'addpaused': {'type': 'boolean'},
                     'content_filename': {'type': 'string'},
@@ -265,7 +265,7 @@ class PluginTransmission(TransmissionBase):
         config.setdefault('rename_like_files', False)
         config.setdefault('include_files', [])
         return config
-        
+
     @plugin.priority(120)
     def on_task_download(self, task, config):
         """
@@ -314,7 +314,7 @@ class PluginTransmission(TransmissionBase):
             # Task takes priority then config is used
             if opt_key in entry:
                 opt_dic[opt_key] = entry[opt_key]
-            elif opt_key in config:                
+            elif opt_key in config:
                 opt_dic[opt_key] = config[opt_key]
 
         options = {'add': {}, 'change': {}, 'post': {}}
@@ -430,21 +430,21 @@ class PluginTransmission(TransmissionBase):
                 if 'skip_files' in options['post']:
                     skip_files = True
                     options['post']['skip_files'] = _filter_list(options['post']['skip_files'])
-                
-                main_id = None       
+
+                main_id = None
                 # We need to index the files if any of the following are defined
-                if ('main_file_only' in options['post'] and options['post']['main_file_only'] == True or 
+                if ('main_file_only' in options['post'] and options['post']['main_file_only'] == True or
                    'content_filename' in options['post'] or skip_files):
                         fl = cli.get_files(r.id)
-                
+
                         # Find files based on config
                         dl_list = []
                         skip_list = []
                         main_list = []
                         full_list = []
                         ext_list = ['*.srt', '*.sub', '*.idx', '*.ssa', '*.ass']
-                                              
-                        if 'include_files' in options['post']:                
+
+                        if 'include_files' in options['post']:
                             include_files = True
                             options['post']['include_files'] = _filter_list(options['post']['include_files'])
 
@@ -459,13 +459,13 @@ class PluginTransmission(TransmissionBase):
                                 elif ('include_subs' in options['post'] and options['post']['include_subs'] == True and
                                       _find_matches(fl[r.id][f]['name'], ext_list)):
                                         dl_list.append(f)
-                                    
+
                             if skip_files:
                                 if _find_matches(fl[r.id][f]['name'], options['post']['skip_files']):
-                                    skip_list.append(f)      
+                                    skip_list.append(f)
 
                         if main_id is not None:
-                            
+
                             # Look for files matching main ID title but with a different extension
                             if 'rename_like_files' in options['post'] and options['post']['rename_like_files'] == True:
                                 for f in fl[r.id]:
@@ -475,7 +475,7 @@ class PluginTransmission(TransmissionBase):
                                         main_list.append(f)
                             else:
                                 main_list = [main_id]
-         
+
                             if main_id not in dl_list:
                                 dl_list.append(main_id)
 
@@ -500,7 +500,7 @@ class PluginTransmission(TransmissionBase):
                             else:
                                 log.debug('Cannot ensure content_filename is unique '
                                 'when adding to a remote transmission daemon.')
-                        
+
                             for index in main_list:
                                 file_ext = os.path.splitext(fl[r.id][index]['name'])[1]
                                 log.debug('File %s renamed to %s' % (fl[r.id][index]['name'], filename + file_ext))
@@ -519,9 +519,9 @@ class PluginTransmission(TransmissionBase):
                             # Set Unwanted Files
                             options['change']['files_unwanted'] = [x for x in full_list if x not in dl_list]
                             options['change']['files_wanted'] = dl_list
-                            log.debug('Downloading %s of %s files in torrent.' % 
+                            log.debug('Downloading %s of %s files in torrent.' %
                                       (len(options['change']['files_wanted']), len(full_list)))
-                        elif(('main_file_only' not in options['post'] or 
+                        elif(('main_file_only' not in options['post'] or
                               options['post']['main_file_only'] == False or
                               main_id is None) and
                              skip_files):
@@ -531,15 +531,15 @@ class PluginTransmission(TransmissionBase):
                                     log.debug('skip_files filter would cause no files to be downloaded; '
                                     'including all files in torrent.')
                                 else:
-                                    options['change']['files_unwanted'] = skip_list           
+                                    options['change']['files_unwanted'] = skip_list
                                     options['change']['files_wanted'] = [x for x in full_list if x not in skip_list]
-                                    log.debug('Downloading %s of %s files in torrent.' 
+                                    log.debug('Downloading %s of %s files in torrent.'
                                               % (len(options['change']['files_wanted']), len(full_list)))
-                
+
                 # Set any changed file properties
                 if options['change'].keys():
                     cli.change_torrent(r.id, 30, **options['change'])
-                           
+
                 # if addpaused was defined and set to False start the torrent;
                 # prevents downloading data before we set what files we want
                 if ('paused' in options['post'] and options['post']['paused'] == False or
@@ -603,7 +603,7 @@ class PluginTransmissionClean(TransmissionBase):
         advanced.accept('boolean', key='transmission_seed_limits')
         advanced.accept('boolean', key='delete_files')
         return root
-    
+
     def on_task_exit(self, task, config):
         config = self.prepare_config(config)
         if not config['enabled'] or task.options.learn:
@@ -614,7 +614,7 @@ class PluginTransmissionClean(TransmissionBase):
         nfor = parse_timedelta(config['finished_for']) if 'finished_for' in config else None
         delete_files = bool(config['delete_files']) if 'delete_files' in config else False
         trans_checks = bool(config['transmission_seed_limits']) if 'transmission_seed_limits' in config else False
-        
+
         session = self.client.get_session()
 
         remove_ids = []
@@ -629,8 +629,8 @@ class PluginTransmissionClean(TransmissionBase):
             is_transmission_seedlimit_reached = trans_checks and seed_ratio_ok is True
             is_transmission_idlelimit_reached = trans_checks and idle_limit_ok is True
             is_torrent_seed_only = torrent.date_done <= torrent.date_added
-            is_torrent_idlelimit_since_added_reached = nfor and (torrent.date_added + nfor)  <= datetime.now()
-            is_torrent_idlelimit_since_finished_reached = nfor and (torrent.date_done + nfor)  <= datetime.now()
+            is_torrent_idlelimit_since_added_reached = nfor and (torrent.date_added + nfor) <= datetime.now()
+            is_torrent_idlelimit_since_finished_reached = nfor and (torrent.date_done + nfor) <= datetime.now()
             if (downloaded and (is_clean_all or
                                 is_transmission_seedlimit_unset or
                                 is_transmission_seedlimit_reached or

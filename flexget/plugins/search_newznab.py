@@ -5,7 +5,7 @@ import urllib
 
 import feedparser
 
-from flexget import plugin, validator
+from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.api_tvrage import lookup_series
@@ -52,7 +52,7 @@ class Newznab(object):
                     'apikey': config['apikey'],
                     'extended': 1
                 }
-                config['url'] = config['website']+'/api?'+urllib.urlencode(params)
+                config['url'] = config['website'] + '/api?' + urllib.urlencode(params)
         return config
 
     def fill_entries_for_url(self, url, config):
