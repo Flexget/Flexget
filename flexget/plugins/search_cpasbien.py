@@ -13,6 +13,7 @@ log = logging.getLogger('search_cpasbien')
 
 session = requests.Session()
 
+
 class SearchCPASBIEN(object):
     schema = {
         'type': 'object',
@@ -20,7 +21,7 @@ class SearchCPASBIEN(object):
             'category': {'type': 'string', 'enum': ['films', 'series', 'musique', 'films-french',
                                                     '720p', 'series-francaise', 'films-dvdrip', 'all',
                                                     'films-vostfr', '1080p', 'series-vostfr', 'ebook']
-            },
+                         },
         },
         'required': ['category'],
         'additionalProperties': False
@@ -68,7 +69,7 @@ class SearchCPASBIEN(object):
             search_string = search_string.replace(')', '')
             query = normalize_unicode(search_string)
             query_url_fragment = query.encode('iso-8859-1')
-# http://www.cpasbien.pe/recherche/ncis.html
+            # http://www.cpasbien.pe/recherche/ncis.html
             if config['category'] == 'all':
                 str_url = (base_url, 'recherche', query_url_fragment)
                 url = '/'.join(str_url)
@@ -77,7 +78,7 @@ class SearchCPASBIEN(object):
                 str_url = (base_url, 'recherche', category_url_fragment, query_url_fragment)
                 url = '/'.join(str_url)
             log.debug('search url: %s' % url + '.html')
-# GET URL
+            # GET URL
             f = task.requests.get(url + '.html').content
             soup = get_soup(f)
             if soup.findAll(text=re.compile('0 torrents')):
@@ -94,10 +95,10 @@ class SearchCPASBIEN(object):
                         entry = Entry()
                         link = result.find('a', attrs={'href': re.compile('dl-torrent')})
                         entry['title'] = link.contents[0]
-# REWRITE URL
+                        # REWRITE URL
                         page_link = link.get('href')
                         link_rewrite = page_link.split('/')
-# get last value in array remove .html and replace by .torrent
+                        # get last value in array remove .html and replace by .torrent
                         endlink = link_rewrite[-1]
                         str_url = (base_url, '/telechargement/', endlink[:-5], '.torrent')
                         entry['url'] = ''.join(str_url)
@@ -110,12 +111,12 @@ class SearchCPASBIEN(object):
                         size = sizefull[:-3]
                         unit = sizefull[-2:]
                         if unit == 'GB':
-                            entry['content_size'] = int(float(size)*1024)
+                            entry['content_size'] = int(float(size) * 1024)
                         elif unit == 'MB':
                             entry['content_size'] = int(float(size))
                         elif unit == 'KB':
-                            entry['content_size'] = int(float(size)/1024)
-                        if(entry['torrent_seeds'] > 0):
+                            entry['content_size'] = int(float(size) / 1024)
+                        if (entry['torrent_seeds'] > 0):
                             entries.add(entry)
                         else:
                             log.debug('0 SEED, not adding entry')
@@ -124,6 +125,7 @@ class SearchCPASBIEN(object):
                     else:
                         nextpage = -1
             return entries
+
 
 @event('plugin.register')
 def register_plugin():

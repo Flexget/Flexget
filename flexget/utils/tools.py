@@ -335,11 +335,12 @@ def parse_timedelta(value):
     except TypeError:
         raise ValueError('Invalid time format \'%s\'' % value)
 
+
 def multiply_timedelta(interval, number):
     """timedeltas can not normally be multiplied by floating points. This does that."""
     # Python 2.6 doesn't have total seconds
     total_seconds = interval.seconds + interval.days * 24 * 3600
-    return timedelta(seconds=total_seconds*number)
+    return timedelta(seconds=total_seconds * number)
 
 if os.name == 'posix':
     def pid_exists(pid):

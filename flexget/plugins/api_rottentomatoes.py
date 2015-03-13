@@ -389,7 +389,6 @@ def lookup_movie(title=None, year=None, rottentomatoes_id=None, smart_match=None
                             session.add(movie)
                             session.commit()
 
-
                         if title.lower() != movie.title.lower():
                             log.debug('Saving search result for \'%s\'' % search_string)
                             session.add(RottenTomatoesSearchResult(search=search_string, movie=movie))
@@ -523,6 +522,7 @@ def movies_search(q, page_limit=None, page=None, api_key=None):
     results = get_json(url)
     if isinstance(results, dict) and results.get('total') and len(results.get('movies')):
         return results
+
 
 def get_json(url):
     try:
