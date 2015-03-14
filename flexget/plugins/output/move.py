@@ -3,6 +3,7 @@ import os
 import shutil
 import logging
 import time
+import re
 
 from flexget import plugin
 from flexget.event import event
@@ -207,7 +208,9 @@ class TransformingOps(BaseFileOps):
             
         funct_name = 'move' if self.move else 'copy'
         funct_done = 'moved' if self.move else 'copied'
-        
+
+        if self.move:
+            self.clean_target(task, config, entry, dst_path)
         if task.options.test:
             self.log.info('Would %s `%s` to `%s`' % (funct_name, src, dst))
             for s in siblings:
@@ -238,6 +241,32 @@ class TransformingOps(BaseFileOps):
         entry['output'] = dst
         if self.move and not src_isdir:
             self.clean_source(task, config, entry)
+
+    def clean_target(self, task, config, entry, dst_path):
+        clean_target_regex = config.get('clean_target', "")
+        if not clean_target_regex:
+            return
+        try:
+            clean_target_regex = entry.render(clean_target_regex)
+        except RenderError as err:
+            raise plugin.PluginWarning('Path value replacement `%s` failed: %s' % (clean_target_regex, err.args[0]))
+
+        try:
+            pattern = re.compile(clean_target_regex, re.IGNORECASE | re.UNICODE)
+        except re.error as e:
+            raise plugin.PluginError('Invalid regex `%s`: %s' % (clean_target_regex, e))
+
+        for name in os.listdir(dst_path):
+            path = os.path.join(dst_path, name)
+            if os.path.isfile(path) and pattern.match(name):
+                if task.options.test:
+                    self.log.info("Would clean %s" % path)
+                else:
+                    try:
+                        os.remove(path)
+                        self.log.info("Cleaning %s" % path)
+                    except os.error as e:
+                        self.log.error('An error occurred trying to remove file %s: %s' % (path, e))
 
 
 class CopyFiles(TransformingOps):
@@ -280,7 +309,8 @@ class MoveFiles(TransformingOps):
                     'unpack_safety': {'type': 'boolean'},
                     'keep_extension': {'type': 'boolean'},
                     'along': {'type': 'array', 'items': {'type': 'string'}},
-                    'clean_source': {'type': 'number'}
+                    'clean_source': {'type': 'number'},
+                    'clean_target': {'type': 'string'},
                 },
                 'additionalProperties': False
             }
