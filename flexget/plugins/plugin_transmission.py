@@ -244,6 +244,7 @@ class PluginTransmission(TransmissionBase):
                     'addpaused': {'type': 'boolean'},
                     'content_filename': {'type': 'string'},
                     'main_file_only': {'type': 'boolean'},
+                    'main_file_ratio': {'type': 'number'},
                     'enabled': {'type': 'boolean'},
                     'include_subs': {'type': 'boolean'},
                     'bandwidthpriority': {'type': 'number'},
@@ -261,6 +262,7 @@ class PluginTransmission(TransmissionBase):
         config = TransmissionBase.prepare_config(self, config)
         config.setdefault('path', '')
         config.setdefault('main_file_only', False)
+        config.setdefault('main_file_ratio', 0.90)
         config.setdefault('include_subs', False)
         config.setdefault('rename_like_files', False)
         config.setdefault('include_files', [])

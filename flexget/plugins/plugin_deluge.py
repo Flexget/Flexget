@@ -343,6 +343,7 @@ class OutputDeluge(DelugePlugin):
                     'compact': {'type': 'boolean'},
                     'content_filename': {'type': 'string'},
                     'main_file_only': {'type': 'boolean'},
+                    'main_file_ratio': {'type': 'number'},
                     'keep_subs': {'type': 'boolean'},
                     'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
@@ -360,6 +361,7 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('path', '')
         config.setdefault('movedone', '')
         config.setdefault('label', '')
+        config.setdefault('main_file_ratio', 0.90)
         config.setdefault('keep_subs', True)  # does nothing without 'content_filename' or 'main_file_only' enabled
         config.setdefault('hide_sparse_files', False)  # does nothing without 'main_file_only' enabled
         return config
