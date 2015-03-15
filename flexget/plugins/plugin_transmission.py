@@ -486,6 +486,8 @@ class PluginTransmission(TransmissionBase):
          
                             if main_id not in dl_list:
                                 dl_list.append(main_id)
+                        else:
+                            log.warning('No files in %s are > %d%% of content size, no files renamed.' % (entry['title'], main_ratio * 100))
 
                         # If we have a main file and want to rename it and associated files
                         if 'content_filename' in options['post'] and main_id is not None:
