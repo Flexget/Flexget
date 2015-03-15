@@ -93,7 +93,7 @@ class TransmissionBase(object):
                 raise plugin.PluginError("Error connecting to transmission: %s" % e.message)
         return cli
 
-    def torrent_info(self, torrent):
+    def torrent_info(self, torrent, config):
         done = torrent.totalSize > 0
         vloc = None
         best = None
@@ -105,7 +105,7 @@ class TransmissionBase(object):
                     break
                 if not best or tf['size'] > best[1]:
                     best = (tf['name'], tf['size'])
-        if done and best and (100 * float(best[1]) / float(torrent.totalSize)) >= 90:
+        if done and best and (100 * float(best[1]) / float(torrent.totalSize)) >= (config['main_file_ratio'] * 100):
             vloc = ('%s/%s' % (torrent.downloadDir, best[0])).replace('/', os.sep)
         return done, vloc
 
@@ -186,7 +186,7 @@ class PluginTransmissionInput(TransmissionBase):
         session = self.client.get_session()
 
         for torrent in self.client.get_torrents():
-            downloaded, bigfella = self.torrent_info(torrent)
+            downloaded, bigfella = self.torrent_info(torrent, config)
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             if not config['onlycomplete'] or (downloaded and torrent.status == 'stopped' and
                                               (seed_ratio_ok is None and idle_limit_ok is None) or
