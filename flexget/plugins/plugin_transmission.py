@@ -458,7 +458,7 @@ class PluginTransmission(TransmissionBase):
 
                         for f in fl[r.id]:
                             full_list.append(f)
-                            if fl[r.id][f]['size'] > total_size * 0.90:
+                            if fl[r.id][f]['size'] > total_size * main_ratio:
                                 main_id = f
 
                             if 'include_files' in options['post']:
