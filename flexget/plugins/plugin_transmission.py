@@ -310,7 +310,7 @@ class PluginTransmission(TransmissionBase):
         opt_dic = {}
 
         for opt_key in ('path', 'addpaused', 'honourlimits', 'bandwidthpriority',
-                        'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio', 'main_file_only',
+                        'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio', 'main_file_only', 'main_file_ratio',
                         'include_subs', 'content_filename', 'include_files', 'skip_files', 'rename_like_files'):
             # Values do not merge config with task
             # Task takes priority then config is used
@@ -362,6 +362,8 @@ class PluginTransmission(TransmissionBase):
             post['paused'] = opt_dic['addpaused']
         if 'main_file_only' in opt_dic:
             post['main_file_only'] = opt_dic['main_file_only']
+        if 'main_file_ratio' in opt_dic:
+            post['main_file_ratio'] = opt_dic['main_file_ratio']
         if 'include_subs' in opt_dic:
             post['include_subs'] = opt_dic['include_subs']
         if 'content_filename' in opt_dic:
@@ -445,6 +447,10 @@ class PluginTransmission(TransmissionBase):
                         main_list = []
                         full_list = []
                         ext_list = ['*.srt', '*.sub', '*.idx', '*.ssa', '*.ass']
+                        
+                        main_ratio = config['main_file_ratio']
+                        if 'main_file_ratio' in options['post']:
+                            main_ratio = options['post']['main_file_ratio']
                                               
                         if 'include_files' in options['post']:                
                             include_files = True
