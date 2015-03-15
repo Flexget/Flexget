@@ -640,10 +640,10 @@ class OutputDeluge(DelugePlugin):
                                                      [(file['index'], new_name)]))
                         log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], new_name))
 
-                    # find a file that makes up more than 90% of the total size
+                    # find a file that makes up more than main_file_ratio (default: 90%) of the total size
                     main_file = None
                     for file in status['files']:
-                        if file['size'] > (status['total_size'] * 0.9):
+                        if file['size'] > (status['total_size'] * opts.get('main_file_ratio')):
                             main_file = file
                             break
 
@@ -690,7 +690,7 @@ class OutputDeluge(DelugePlugin):
                                 rename_pairs = [(f['index'], other_files_dir + f['path']) for f in other_files]
                                 main_file_dlist.append(client.core.rename_files(torrent_id, rename_pairs))
                     else:
-                        log.warning('No files in %s are > 90%% of content size, no files renamed.' % entry['title'])
+                        log.warning('No files in %s are > %d%% of content size, no files renamed.' % (entry['title'], opts.get('main_file_ratio') * 100))
 
                 return defer.DeferredList(main_file_dlist)
 
