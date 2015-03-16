@@ -427,6 +427,17 @@ class PluginTransmission(TransmissionBase):
                         if fnmatch(name, mask):
                             return True
                     return False
+                
+                def _wait_for_files(cli, r, timeout):
+                    from time import sleep
+                    while timeout > 0:
+                        sleep(1)
+                        fl = cli.get_files(r.id)
+                        if len(fl[r.id]) > 0:
+                            return fl
+                        else:
+                            timeout -= 1
+                    return fl
 
                 skip_files = False
                 # Filter list because "set" plugin doesn't validate based on schema
