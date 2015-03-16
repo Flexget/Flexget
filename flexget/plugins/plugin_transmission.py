@@ -456,6 +456,14 @@ class PluginTransmission(TransmissionBase):
                    'content_filename' in options['post'] or skip_files):
                         fl = cli.get_files(r.id)
                 
+                        if 'magnetization_timeout' in options['post'] and options['post']['magnetization_timeout'] > 0 and not downloaded and len(fl[r.id]) == 0:
+                            log.debug('Waiting %d seconds for "%s" to magnetize' % (options['post']['magnetization_timeout'], entry['title']))
+                            fl = _wait_for_files(cli, r, options['post']['magnetization_timeout'])
+                            if len(fl[r.id]) == 0:
+                                log.warning('"%s" did not magnetize before the timeout elapsed, file list unavailable for processing.' % entry['title'])
+                            else:
+                                total_size = cli.get_torrent(r.id, ['id', 'totalSize']).totalSize
+                
                         # Find files based on config
                         dl_list = []
                         skip_list = []
