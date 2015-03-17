@@ -690,7 +690,7 @@ class OutputDeluge(DelugePlugin):
                                 rename_pairs = [(f['index'], other_files_dir + f['path']) for f in other_files]
                                 main_file_dlist.append(client.core.rename_files(torrent_id, rename_pairs))
                     else:
-                        log.warning('No files in %s are > %d%% of content size, no files renamed.' % (entry['title'], opts.get('main_file_ratio') * 100))
+                        log.warning('No files in "%s" are > %d%% of content size, no files renamed.' % (entry['title'], opts.get('main_file_ratio') * 100))
 
                 return defer.DeferredList(main_file_dlist)
 
