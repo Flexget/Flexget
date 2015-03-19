@@ -413,6 +413,8 @@ class PluginTransmission(TransmissionBase):
                         filedump = base64.b64encode(f.read()).encode('utf-8')
                     r = cli.add_torrent(filedump, 30, **options['add'])
                 else:
+                    # we need to set paused to false so the magnetization begins immediately
+                    options['add']['paused'] = False
                     r = cli.add_torrent(entry['url'], timeout=30, **options['add'])
                 if r:
                     torrent = r
