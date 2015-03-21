@@ -263,7 +263,6 @@ class PluginTransmission(TransmissionBase):
         config = TransmissionBase.prepare_config(self, config)
         config.setdefault('path', '')
         config.setdefault('main_file_only', False)
-        config.setdefault('main_file_ratio', 0.90)
         config.setdefault('include_subs', False)
         config.setdefault('rename_like_files', False)
         config.setdefault('include_files', [])
