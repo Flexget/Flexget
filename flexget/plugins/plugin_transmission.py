@@ -60,6 +60,7 @@ class TransmissionBase(object):
         config.setdefault('enabled', True)
         config.setdefault('host', 'localhost')
         config.setdefault('port', 9091)
+        config.setdefault('main_file_ratio', 0.9)
         if 'netrc' in config:
             netrc_path = os.path.expanduser(config['netrc'])
             try:
@@ -631,7 +632,7 @@ class PluginTransmissionClean(TransmissionBase):
         for torrent in self.client.get_torrents():
             log.verbose('Torrent "%s": status: "%s" - ratio: %s -  date added: %s - date done: %s' %
                         (torrent.name, torrent.status, torrent.ratio, torrent.date_added, torrent.date_done))
-            downloaded, dummy = self.torrent_info(torrent)
+            downloaded, dummy = self.torrent_info(torrent, config)
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
             is_clean_all= nrat is None and nfor is None and trans_checks is None
             is_minratio_reached= nrat and (nrat <= torrent.ratio)
