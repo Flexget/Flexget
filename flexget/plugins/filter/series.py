@@ -814,6 +814,8 @@ class FilterSeriesBase(object):
         for group_name in config:
             if group_name == 'settings':
                 continue
+            if group_name == "default":
+                continue
             group_series = []
             if isinstance(group_name, basestring):
                 # if group name is known quality, convenience create settings with that quality
@@ -826,6 +828,7 @@ class FilterSeriesBase(object):
             for series in config[group_name]:
                 # convert into dict-form if necessary
                 series_settings = {}
+                default_settings = config['settings'].get('default', {})
                 group_settings = config['settings'].get(group_name, {})
                 if isinstance(series, dict):
                     series, series_settings = series.items()[0]
@@ -842,6 +845,7 @@ class FilterSeriesBase(object):
                 if isinstance(series_settings, basestring):
                     series_settings = {'path': series_settings}
                 # merge group settings into this series settings
+                merge_dict_from_to(default_settings, series_settings)
                 merge_dict_from_to(group_settings, series_settings)
                 # Convert to dict if watched is in SXXEXX format
                 if isinstance(series_settings.get('watched'), basestring):
