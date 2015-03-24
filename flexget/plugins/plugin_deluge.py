@@ -795,6 +795,10 @@ class OutputDeluge(DelugePlugin):
 
                     log.verbose('Adding %s to deluge.' % entry['title'])
                     if magnet:
+						# we need to set paused to false so the magnetization begins immediately
+						# NOTE: is this the correct config property and value?
+						opts['add_paused'] = False
+						# TODO: need to get ID and then wait for magnetization here
                         return client.core.add_torrent_magnet(magnet, opts)
                     else:
                         return client.core.add_torrent_file(entry['title'], filedump, opts)
