@@ -67,10 +67,12 @@ class Newznab(object):
             log.info('No results returned')
 
         for rss_entry in rss.entries:
+            log.info(rss_entry)
             new_entry = Entry()
             for key in rss_entry.keys():
                 new_entry[key] = rss_entry[key]
             new_entry['url'] = new_entry['link']
+            # new_entry['size'] = new_entry['newznap_attr']['size']
             entries.append(new_entry)
         return entries
 

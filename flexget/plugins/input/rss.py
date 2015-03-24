@@ -91,6 +91,15 @@ class InputRSS(object):
       rss:
         url: <url>
         group_links: yes
+
+    If the URLs SSL certificate cannot be verified but you trust the site, you
+    can disable SSL verification with "verify_ssl".
+
+    Example::
+
+        rss:
+          url: <url>
+          verify_ssl: no
     """
 
     schema = {
@@ -100,6 +109,7 @@ class InputRSS(object):
         # Advanced form, with options
         'properties': {
             'url': {'type': 'string', 'anyOf': [{'format': 'url'}, {'format': 'file'}]},
+            'verify_ssl': {'type': 'boolean', 'default': True},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'title': {'type': 'string'},
@@ -142,6 +152,8 @@ class InputRSS(object):
             config['other_fields'] = other_fields
         # set default value for group_links as deactivated
         config.setdefault('group_links', False)
+        # set default for verify_ssl
+        config.setdefault('verify_ssl', True)
         # set default for all_entries
         config.setdefault('all_entries', True)
         return config
@@ -228,7 +240,7 @@ class InputRSS(object):
                 auth = (config['username'], config['password'])
             try:
                 # Use the raw response so feedparser can read the headers and status values
-                response = task.requests.get(config['url'], timeout=60, headers=headers, raise_status=False, auth=auth)
+                response = task.requests.get(config['url'], timeout=60, headers=headers, raise_status=False, auth=auth, verify=config['verify_ssl'])
                 content = response.content
             except RequestException as e:
                 raise plugin.PluginError('Unable to download the RSS for task %s (%s): %s' %
