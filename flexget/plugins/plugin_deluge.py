@@ -798,8 +798,13 @@ class OutputDeluge(DelugePlugin):
 						# we need to set paused to false so the magnetization begins immediately
 						# NOTE: is this the correct config property and value?
 						opts['add_paused'] = False
+						
+                        id = client.core.add_torrent_magnet(magnet, opts)
+						
 						# TODO: need to get ID and then wait for magnetization here
-                        return client.core.add_torrent_magnet(magnet, opts)
+						# http://deluge-torrent.org/docs/master/modules/ui/web/json_api.html?highlight=get_torrent_info#deluge.ui.web.json_api.WebApi.get_torrent_files ???
+						
+						return id
                     else:
                         return client.core.add_torrent_file(entry['title'], filedump, opts)
 
