@@ -344,6 +344,7 @@ class OutputDeluge(DelugePlugin):
                     'content_filename': {'type': 'string'},
                     'main_file_only': {'type': 'boolean'},
                     'main_file_ratio': {'type': 'number'},
+					'magnetization_timeout' : {'type': 'integer'},
                     'keep_subs': {'type': 'boolean'},
                     'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
@@ -362,6 +363,7 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('movedone', '')
         config.setdefault('label', '')
         config.setdefault('main_file_ratio', 0.90)
+		config.setdefault('magnetization_timeout', 0)
         config.setdefault('keep_subs', True)  # does nothing without 'content_filename' or 'main_file_only' enabled
         config.setdefault('hide_sparse_files', False)  # does nothing without 'main_file_only' enabled
         return config
@@ -816,6 +818,7 @@ class OutputDeluge(DelugePlugin):
                                'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
                                'main_file_only': entry.get('main_file_only', config.get('main_file_only', False)),
                                'main_file_ratio': entry.get('main_file_ratio', config.get('main_file_ratio')),
+							   'magnetization_timeout': entry.get('magnetization_timeout', config.get('magnetization_timeout')),
                                'hide_sparse_files': entry.get('hide_sparse_files', config.get('hide_sparse_files', True)),
                                'keep_subs': entry.get('keep_subs', config.get('keep_subs', True))
                 }
