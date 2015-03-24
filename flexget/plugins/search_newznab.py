@@ -71,6 +71,9 @@ class Newznab(object):
             for key in rss_entry.keys():
                 new_entry[key] = rss_entry[key]
             new_entry['url'] = new_entry['link']
+            if rss_entry.enclosures:
+                size = int(rss_entry.enclosures[0]['length'])  # B
+                new_entry['content_size'] = size / 2**20       # MB
             entries.append(new_entry)
         return entries
 
