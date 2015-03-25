@@ -14,7 +14,7 @@ class MaxReRuns(object):
     schema = {'type': 'integer'}
 
     def __init__(self):
-        self.default = Task.max_reruns
+        self.default = Task.RERUN_DEFAULT
 
     def on_task_start(self, task, config):
         self.default = task.max_reruns

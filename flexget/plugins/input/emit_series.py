@@ -180,6 +180,7 @@ class EmitSeries(object):
                 log.debug('%s %s was accepted, rerunning to look for next ep.' %
                           (entry['series_name'], entry['series_id']))
                 self.rerun_entries.append(self.search_entry(series, entry['series_season'], entry['series_episode'] + 1, task))
+                task.max_reruns += 1
                 task.rerun()
             elif db_release:
                 # There are know releases of this episode, but none were accepted

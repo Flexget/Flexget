@@ -176,9 +176,11 @@ class Task(object):
 
     """
 
-    max_reruns = 5
     # Used to determine task order, when priority is the same
     _counter = itertools.count()
+    
+    RERUN_DEFAULT = 5
+    RERUN_MAX = 100
 
     def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None):
         """
@@ -192,6 +194,7 @@ class Task(object):
             The default is 0, if the cron option is set though, the default is lowered to 10.
 
         """
+        self.max_reruns = Task.RERUN_DEFAULT
         self.name = unicode(name)
         self.manager = manager
         if config is None:
@@ -298,9 +301,6 @@ class Task(object):
 
     def disable_phase(self, phase):
         """Disable ``phase`` from execution.
-
-        All disabled phases are re-enabled by :meth:`Task._reset()` after task
-        execution has been completed.
 
         :param string phase: Name of ``phase``
         :raises ValueError: *phase* could not be found.
@@ -574,7 +574,7 @@ class Task(object):
             while True:
                 self._execute()
                 # rerun task
-                if self._rerun and self._rerun_count < self.max_reruns:
+                if self._rerun and self._rerun_count < self.max_reruns and self._rerun_count < Task.RERUN_MAX:
                     log.info('Rerunning the task in case better resolution can be achieved.')
                     self._rerun_count += 1
                     # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in
