@@ -783,6 +783,7 @@ class OutputDeluge(DelugePlugin):
                 @defer.inlineCallbacks
                 def _wait_for_files(id, timeout):
                     from time import sleep
+                    log.info('wait_for_files(%d, %d)' % (id, timeout))
                     try:
                         while timeout > 0:
                             sleep(1)
@@ -818,9 +819,13 @@ class OutputDeluge(DelugePlugin):
 						
                         magnetization_timeout = entry.get('magnetization_timeout', config.get('magnetization_timeout'))
 						if magnetization_timeout > 0:
-                            log.debug('Waiting %d seconds for "%s" to magnetize' % (magnetization_timeout, entry['title']))
+                            log.info('Waiting %d seconds for "%s" to magnetize' % (magnetization_timeout, entry['title']))
                             if _wait_for_files(id, magnetization_timeout) == False:
                                 log.warning('"%s" did not magnetize before the timeout elapsed, file list unavailable for processing.' % entry['title'])
+                            else:
+                                log.info('magnetization successful')
+                        else:
+                            log.info('not waiting for magnetization')
 						
 						return id
                     else:
