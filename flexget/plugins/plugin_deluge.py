@@ -15,6 +15,8 @@ from flexget.event import event
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
 
+from flexget.plugin import get_plugin_by_name
+
 log = logging.getLogger('deluge')
 
 
@@ -349,6 +351,7 @@ class OutputDeluge(DelugePlugin):
                     'enabled': {'type': 'boolean'},
                     'keep_container': {'type': 'boolean'},
                     'container_directory': {'type': 'string'},
+                    'container_multiple': {'type': 'boolean'},
                     'rename_main_file_only': {'type': 'boolean'},
                     'fix_year': {'type': 'boolean'},
                 },
@@ -370,6 +373,7 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('hide_sparse_files', False)  # does nothing without 'main_file_only' enabled
         config.setdefault('content_filename', '')
         config.setdefault('keep_container', True)
+        config.setdefault('container_multiple', True)
         config.setdefault('container_directory', '')
         config.setdefault('fix_year', False)
         return config
