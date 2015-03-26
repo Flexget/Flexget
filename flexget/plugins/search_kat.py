@@ -48,7 +48,7 @@ class SearchKAT(object):
             params = {'rss': 1}
             if config.get('verified'):
                 search_string_url_fragment += ' verified:1'
-            url = 'http://kickass.to/usearch/%s/?rss=1' % urllib.quote(search_string_url_fragment.encode('utf-8'))
+            url = 'http://kickass.to/search/%s/' % urllib.quote(search_string_url_fragment.encode('utf-8'))
             if config.get('category', 'all') != 'all':
                 params['category'] = config['category']
 
