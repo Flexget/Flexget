@@ -15,7 +15,7 @@ from flexget.utils.tools import parse_timedelta, TimedDict
 log = logging.getLogger('requests')
 
 # Don't emit info level urllib3 log messages or below
-logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
+logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 # Time to wait before trying an unresponsive site again
 WAIT_TIME = timedelta(seconds=60)
