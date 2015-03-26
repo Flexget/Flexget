@@ -811,14 +811,14 @@ class OutputDeluge(DelugePlugin):
 
                     log.verbose('Adding %s to deluge.' % entry['title'])
                     if magnet:
-						# we need to set paused to false so the magnetization begins immediately
-						# NOTE: is this the correct config property and value?
-						opts['add_paused'] = False
-						
+                        # we need to set paused to false so the magnetization begins immediately
+                        # NOTE: is this the correct config property and value?
+                        opts['add_paused'] = False
+                        
                         id = client.core.add_torrent_magnet(magnet, opts)
-						
+                        
                         magnetization_timeout = entry.get('magnetization_timeout', config.get('magnetization_timeout'))
-						if magnetization_timeout > 0:
+                        if magnetization_timeout > 0:
                             log.info('Waiting %d seconds for "%s" to magnetize' % (magnetization_timeout, entry['title']))
                             if _wait_for_files(id, magnetization_timeout) == False:
                                 log.warning('"%s" did not magnetize before the timeout elapsed, file list unavailable for processing.' % entry['title'])
@@ -826,8 +826,8 @@ class OutputDeluge(DelugePlugin):
                                 log.info('magnetization successful')
                         else:
                             log.info('not waiting for magnetization')
-						
-						return id
+                        
+                        return id
                     else:
                         return client.core.add_torrent_file(entry['title'], filedump, opts)
 
