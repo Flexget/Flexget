@@ -20,7 +20,7 @@ class TorrentRenameFiles(object):
             {
                 'type': 'object',
                 'properties': {
-                    'keep_container': {'oneOf': [{'type': 'string', 'enum': ['yes', 'no', 'episode', 'other']}, {'type': 'boolean'}]},
+                    'keep_container': {'type': 'boolean'},
                     'container_directory': {'type': 'string'},
                     'rename_main_file_only': {'type': 'boolean'},
                     'fix_year': {'type': 'boolean'},
@@ -31,17 +31,11 @@ class TorrentRenameFiles(object):
     }
 
     def prepare_config(self, config):
-        #if isinstance(config, bool):
-        #    config = {'enabled': config}
-        config.setdefault('keep_container', True) # can only work if there's only one file in the torrent...maybe?
+        config.setdefault('keep_container', True)
         config.setdefault('container_directory', '')
         config.setdefault('fix_year', False)
         config.setdefault('rename_main_file_only', False)
         return config
-
-    #@plugin.priority(-255)
-    #def on_task_output(self, entry, config):
-    #    return False
 
     def on_task_rename(self, entry, status, config):
         # get total torrent size
