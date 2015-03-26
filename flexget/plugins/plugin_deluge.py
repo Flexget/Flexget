@@ -813,8 +813,11 @@ class OutputDeluge(DelugePlugin):
 						
                         id = client.core.add_torrent_magnet(magnet, opts)
 						
-						# TODO: need to get ID and then wait for magnetization here
-						# http://deluge-torrent.org/docs/master/modules/ui/web/json_api.html?highlight=get_torrent_info#deluge.ui.web.json_api.WebApi.get_torrent_files ???
+                        magnetization_timeout = entry.get('magnetization_timeout', config.get('magnetization_timeout'))
+						if magnetization_timeout > 0:
+                            log.debug('Waiting %d seconds for "%s" to magnetize' % (magnetization_timeout, entry['title']))
+                            if _wait_for_files(id, magnetization_timeout) == False:
+                                log.warning('"%s" did not magnetize before the timeout elapsed, file list unavailable for processing.' % entry['title'])
 						
 						return id
                     else:
