@@ -1,20 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import urllib
-import re
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.utils import requests
 from flexget.utils.requests import Session
-from flexget.utils.soup import get_soup
-from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.search import normalize_unicode
 
 log = logging.getLogger('rarbg')
 
-session = Session()
+requests = Session()
+requests.set_domain_delay('torrentapi.org', '10.3 seconds')  # they only allow 1 request per 10 seconds
 
 CATEGORIES = {
     'all': 0,
@@ -42,7 +40,7 @@ class SearchRarBG(object):
 
         To perform search against multiple categories:
 
-        publichd:
+        rarbg:
             category:
                 - x264 720p
                 - x264 1080p
@@ -61,22 +59,28 @@ class SearchRarBG(object):
                     {'type': 'integer'},
                     {'type': 'string', 'enum': list(CATEGORIES)},
                 ]}),
-            'cookies': {'type': 'string'}
+            'sorted_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'last'], 'default': 'last'},
+            # min_seeders and min_leechers do not seem to work
+            # 'min_seeders': {'type': 'integer', 'default': 0},
+            # 'min_leechers': {'type': 'integer', 'default': 0},
+            'limit': {'type': 'integer', 'enum': [25, 50, 100], 'default': 25},
+            'ranked': {'type': 'boolean', 'default': True}
         },
         "additionalProperties": False
     }
 
-    base_url = 'http://rarbg.com'
+    base_url = 'https://torrentapi.org/pubapi.php'
 
-    def rewrite(self, entry, task=None, cookies=None, **kwargs):
-        url = entry['url']
-
-        log.info('RarBG rewriting download url: %s' % url)
-
-        page = session.get(url, cookies=cookies).content
-        soup = get_soup(page)
-
-        entry['url'] = self.base_url + soup.find('a', href=re.compile('\.torrent$'))['href']
+    def get_token(self):
+        # using rarbg.com to avoid the domain delay as tokens can be requested always
+        r = requests.get('https://rarbg.com/pubapi/pubapi.php', params={'get_token': 'get_token', 'format': 'json'})
+        token = None
+        try:
+            token = r.json().get('token')
+        except ValueError:
+            log.error('Could not retrieve RARBG token.')
+        log.debug('RarBG token: %s' % token)
+        return token
 
     @plugin.internet(log)
     def search(self, task, entry, config):
@@ -90,63 +94,45 @@ class SearchRarBG(object):
             categories = [categories]
         # Convert named category to its respective category id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-        category_url_fragment = '&category=%s' % urllib.quote(';'.join(str(c) for c in categories))
-
-        base_search_url = self.base_url + '/torrents.php?order=seeders&by=ASC'
-
-        cookies = config.get('cookies', {'7fAY799j': 'VtdTzG69'})
-        if not isinstance(cookies, dict):
-            cookies = cookies.split(':')
-            cookies = {cookies[0]: cookies[1]}
+        category_url_fragment = urllib.quote(';'.join(str(c) for c in categories))
 
         entries = set()
+
+        token = self.get_token()
+        if not token:
+            log.error('No token set. Exiting RARBG search.')
+            return entries
+
+        params = {'mode': 'search', 'token': token, 'ranked': int(config['ranked']),
+                  # 'min_seeders': config['min_seeders'], 'min_leechers': config['min_leechers'],
+                  'sort': config['sorted_by'], 'category': category_url_fragment, 'format': 'json'}
+
         for search_string in entry.get('search_strings', [entry['title']]):
-            query = normalize_unicode(search_string)
-            query_url_fragment = '&search=' + urllib.quote(query.encode('utf8'))
+            params.pop('search_string', None)
+            params.pop('search_imdb', None)
 
-            # http://rarbg.com/torrents.php?order=seeders&by=DESC&category=41;18&search=QUERY
-            url = (base_search_url + category_url_fragment + query_url_fragment)
-            log.debug('RarBG search url: %s' % url)
+            if entry.get('movie_name'):
+                params['search_imdb'] = entry.get('imdb_id')
+            else:
+                query = normalize_unicode(search_string)
+                query_url_fragment = query.encode('utf8')
+                params['search_string'] = query_url_fragment
 
-            page = requests.get(url, cookies=cookies).content
+            page = requests.get(self.base_url, params=params)
 
-            soup = get_soup(page)
-
-            if soup.find(text='Bot check !'):
-                log.error('RarBG search failed. Caught by bot detection. Please check your cookies.')
+            try:
+                r = page.json()
+            except ValueError:
+                log.debug(page.text)
                 break
 
-            for result in soup.findAll('tr', class_='lista2'):
-                if not result.find('a', href=re.compile('/torrent/')):
-                    continue
-
+            for result in r:
                 entry = Entry()
 
-                entry['title'] = result.find('a', href=re.compile('/torrent/')).text
-                download_url = self.base_url + result.find('a', href=re.compile('/torrent/'))['href']
+                entry['title'] = result.get('f')
 
-                entry['url'] = download_url
+                entry['url'] = result.get('d')
 
-                tds = result.findAll('td')
-                seeds = tds[4]
-                leeches = tds[5]
-                entry['torrent_seeds'] = int(seeds.text)
-                entry['torrent_leeches'] = int(leeches.text)
-                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-                size = result.find("td", text=re.compile('(\d+(?:[.,]\d+)*)\s?([KMG]B)')).text
-                size = re.search('(\d+(?:[.,]\d+)*)\s?([KMG]B)', size)
-
-                if size:
-                    if size.group(2) == 'GB':
-                        entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 ** 3 / 1024 ** 2)
-                    elif size.group(2) == 'MB':
-                        entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 ** 2 / 1024 ** 2)
-                    elif size.group(2) == 'KB':
-                        entry['content_size'] = int(float(size.group(1).replace(',', '')) * 1000 / 1024 ** 2)
-                    else:
-                        entry['content_size'] = int(float(size.group(1).replace(',', '')) / 1024 ** 2)
-                # use the rewrite function to rewrite accepted entry urls to avoid hammering rarbg
-                entry.on_accept(self.rewrite, cookies=cookies)
                 entries.add(entry)
 
         return entries
