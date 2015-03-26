@@ -789,12 +789,12 @@ class OutputDeluge(DelugePlugin):
                             sleep(1)
                             status = yield client.core.get_torrent_status(id, ['files'])
                             if len(status['files']) > 0:
-                                return True
+                                defer.returnValue(True)
                             else:
                                 timeout -= 1
                     except Exception as err:
                         log.error('wait_for_files Error: %s' % err)
-                    return False
+                    defer.returnValue(False)
                 
                 def add_entry(entry, opts):
                     """Adds an entry to the deluge session"""
@@ -820,7 +820,8 @@ class OutputDeluge(DelugePlugin):
                         magnetization_timeout = entry.get('magnetization_timeout', config.get('magnetization_timeout'))
                         if magnetization_timeout > 0:
                             log.info('Waiting %d seconds for "%s" to magnetize' % (magnetization_timeout, entry['title']))
-                            if _wait_for_files(id, magnetization_timeout) == False:
+                            magnetized = _wait_for_files(id, magnetization_timeout).getResult()
+                            if not magnetized:
                                 log.warning('"%s" did not magnetize before the timeout elapsed, file list unavailable for processing.' % entry['title'])
                             else:
                                 log.info('magnetization successful')
