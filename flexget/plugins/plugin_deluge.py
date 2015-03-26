@@ -783,13 +783,16 @@ class OutputDeluge(DelugePlugin):
                 @defer.inlineCallbacks
                 def _wait_for_files(id, timeout):
                     from time import sleep
-                    while timeout > 0:
-                        sleep(1)
-                        status = yield client.core.get_torrent_status(id, ['files'])
-                        if len(status['files']) > 0:
-                            return True
-                        else:
-                            timeout -= 1
+                    try:
+                        while timeout > 0:
+                            sleep(1)
+                            status = yield client.core.get_torrent_status(id, ['files'])
+                            if len(status['files']) > 0:
+                                return True
+                            else:
+                                timeout -= 1
+                    except Exception as err:
+                        log.error('wait_for_files Error: %s' % err)
                     return False
                 
                 def add_entry(entry, opts):
