@@ -827,7 +827,6 @@ class OutputDeluge(DelugePlugin):
                                'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
                                'main_file_only': entry.get('main_file_only', config.get('main_file_only', False)),
                                'main_file_ratio': entry.get('main_file_ratio', config.get('main_file_ratio')),
-							   'magnetization_timeout': entry.get('magnetization_timeout', config.get('magnetization_timeout')),
                                'hide_sparse_files': entry.get('hide_sparse_files', config.get('hide_sparse_files', True)),
                                'keep_subs': entry.get('keep_subs', config.get('keep_subs', True))
                 }
