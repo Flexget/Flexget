@@ -41,7 +41,6 @@ class RarExtract(object):
       rar_extract:
         to: '/Volumes/External/TV/{{series_name}}/Season {{series_season}}/'
         keep_dirs: yes
-        fail_entries: yes
         regexp: '.*s\d{1,2}e\d{1,2}.*\.mkv'
     """
 
