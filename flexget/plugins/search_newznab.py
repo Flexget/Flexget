@@ -93,7 +93,7 @@ class Newznab(object):
         # normally this should be used with emit_series who has provided season and episodenumber
         if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
             return []
-        if not arg_entry['tvrage_id']:
+        if 'tvrage_id' not in arg_entry:
             serie_info = lookup_series(arg_entry['series_name'])
             if not serie_info:
                 return []
