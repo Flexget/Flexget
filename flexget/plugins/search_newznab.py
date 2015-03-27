@@ -93,12 +93,14 @@ class Newznab(object):
         # normally this should be used with emit_series who has provided season and episodenumber
         if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
             return []
-        serie_info = lookup_series(arg_entry['series_name'])
-        if not serie_info:
-            return []
+        if 'tvrage_id' not in arg_entry:
+            serie_info = lookup_series(arg_entry['series_name'])
+            if not serie_info:
+                return []
+            arg_entry['tvrage_id'] = serie_info.showid
 
         url = (config['url'] + '&rid=%s&season=%s&ep=%s' %
-               (serie_info.showid, arg_entry['series_season'], arg_entry['series_episode']))
+               (arg_entry['tvrage_id'], arg_entry['series_season'], arg_entry['series_episode']))
         return self.fill_entries_for_url(url, config)
 
     def do_search_movie(self, arg_entry, config=None):
