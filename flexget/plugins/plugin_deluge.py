@@ -666,7 +666,7 @@ class OutputDeluge(DelugePlugin):
                             main_file_dlist.append(
                                 client.core.set_torrent_file_priorities(torrent_id, file_priorities))
 
-                        if renamed[file['index']]:
+                        if renamed.get(file['index'], None):
                             filename = unused_name(renamed[file['index']])
 
                             log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], filename))

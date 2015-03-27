@@ -46,10 +46,8 @@ class TorrentRenameFiles(object):
         log.debug('File ratio: %s' % file_ratio)
         log.debug('Torrent size: %s' % status['total_size'])
 
-        if not entry['main_fileid']:
-            entry['main_fileid'] = None
-        if not entry['sub_fileid']:
-            entry['sub_fileid'] = None
+        entry['main_fileid'] = -1
+        entry['sub_fileid'] = -1
 
         series_tokens = False
         if config.get('content_filename'):
@@ -82,7 +80,7 @@ class TorrentRenameFiles(object):
         if len(set(top_levels)) == 1:
             # the top level of every item's path is the same, therefore there's a container directory
             top_level = True
-        if entry['main_fileid'] is None:
+        if entry['main_fileid'] < 0:
             # if main_fileid wasn't set in the prior loop, no file is greater than
             # main_file_ratio% of the total size, therefore this is likely a season pack
             if config.get('rename_main_file_only'):
@@ -94,7 +92,7 @@ class TorrentRenameFiles(object):
         files = {}
         os_sep = os.sep
         do_container = False
-        if (config.get('container_multiple') and entry['main_fileid'] == None) or not config.get('container_multiple'):
+        if (config.get('container_multiple') and len(status['files']) > 1) or not config.get('container_multiple'):
             do_container = True
         for file in status['files']:
             original_pathfile = file['path']
