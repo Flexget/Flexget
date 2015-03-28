@@ -26,7 +26,7 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
 
-SCHEMA_VER = 3
+SCHEMA_VER = 4
 
 log = logging.getLogger('api_tvdb')
 Base = db_schema.versioned_base('api_tvdb', SCHEMA_VER)
@@ -55,6 +55,9 @@ def upgrade(ver, session):
     if ver == 2:
         table_add_column('tvdb_series', 'overview', Unicode, session)
         ver = 3
+    if ver == 3:
+        table_add_column('tvdb_series', 'actors', Unicode, session)
+        ver = 4
 
     return ver
 
@@ -142,6 +145,8 @@ class TVDBSeries(TVDBContainer, Base):
     genre = pipe_list_synonym('_genre')
     _firstaired = Column('firstaired', DateTime)
     firstaired = text_date_synonym('_firstaired')
+    _actors = Column('actors', Unicode)
+    actors = pipe_list_synonym('_actors')
 
     episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
