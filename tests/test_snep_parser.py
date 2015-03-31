@@ -46,6 +46,7 @@ class TestSnepParser(object):
         an_entry.title = "CHAMBRE 12"
         an_entry.stat_position = 1
         an_entry.best_position = 1
+        an_entry.weeks_on_charts = 0
         result.append(an_entry)
 
         an_entry = SnepChartsEntry()
@@ -54,6 +55,7 @@ class TestSnepParser(object):
         an_entry.title = "CHALEUR HUMAINE"
         an_entry.stat_position = 2
         an_entry.best_position = 2
+        an_entry.weeks_on_charts = 38
         result.append(an_entry)
 
         an_entry = SnepChartsEntry()
@@ -62,6 +64,7 @@ class TestSnepParser(object):
         an_entry.title = "FIFTY SHADES OF GREY"
         an_entry.stat_position = 5
         an_entry.best_position = 3
+        an_entry.weeks_on_charts = 2
         result.append(an_entry)
 
         an_entry = SnepChartsEntry()
@@ -70,5 +73,6 @@ class TestSnepParser(object):
         an_entry.title = "PARIS"
         an_entry.stat_position = 43
         an_entry.best_position = 2
+        an_entry.weeks_on_charts = 15
         result.append(an_entry)
         return result
