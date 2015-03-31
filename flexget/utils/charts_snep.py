@@ -27,6 +27,7 @@ class SnepChartsEntry(object):
 
         self.stat_position = None
         self.best_position = None
+        self.weeks_on_charts = 0
 
     def __str__(self):
         def s(value):
@@ -67,12 +68,15 @@ class SnepChartsParser(object):
         if tag_best_position:
             result.best_position = str_to_int(tag_best_position.text) or -1
 
+        tag_weeks_on_charts = tag_row.find('td', {'class': 'sw'})
+        if tag_weeks_on_charts:
+            result.weeks_on_charts = str_to_int(tag_weeks_on_charts.text) or 0
+
         tag_infos = tag_row.find('div', {'class': 'infos'})
         if tag_infos:
             tag_artist = tag_infos.find('strong', {'class': 'artist'})
             if tag_artist:
-                if tag_artist and tag_artist.text != 'Multi Interprètes':
-                    result.artist = tag_artist.text
+                result.artist = tag_artist.text
 
             tag_title = tag_infos.find('p', {'class': 'title'})
             if tag_title:
