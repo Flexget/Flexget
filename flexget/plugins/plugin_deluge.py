@@ -354,6 +354,16 @@ class OutputDeluge(DelugePlugin):
                     'container_multiple': {'type': 'boolean'},
                     'rename_main_file_only': {'type': 'boolean'},
                     'fix_year': {'type': 'boolean'},
+                    'unlisted_filetype_default': {'type': 'boolean'},
+                    'filetypes': {
+                        'type': 'object',
+                        'additionalProperties': {
+                            'oneOf': [
+                                {'type': 'string'},
+                                {'type': 'boolean'},
+                            ]
+                        }
+                    }
                 },
                 'additionalProperties': False
             }
@@ -375,7 +385,10 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('keep_container', True)
         config.setdefault('container_multiple', True)
         config.setdefault('container_directory', '')
+        config.setdefault('rename_main_file_only', False)
         config.setdefault('fix_year', False)
+        config.setdefault('unlisted_filetype_default', True)
+        config.setdefault('filetypes', {})
         return config
 
     def __init__(self):
@@ -657,7 +670,7 @@ class OutputDeluge(DelugePlugin):
                                                      [(file['index'], new_name)]))
                         log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], new_name))
 
-                    renamed = get_plugin_by_name('torrent_frename').instance.on_task_rename(entry, status, config)
+                    renamed = get_plugin_by_name('torrent_frename').instance.rename_files(entry, status, config)
  
                     for file in status['files']:
 
