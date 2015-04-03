@@ -11,7 +11,7 @@ from flexget.utils.template import render_from_entry, RenderError
 try:
     import rarfile
 except ImportError:
-    pass
+    rarfile = None
 
 log = logging.getLogger('rarfile')
 
@@ -184,10 +184,8 @@ class RarExtract(object):
         if isinstance(config, bool) and not config:
             return
 
-        # Slightly silly hack so dependency error only throws at execution time
-        try:
-            repr(rarfile)
-        except:
+        # Fail if rarfile is missing
+        if not rarfile:
             raise plugin.DependencyError(issued_by='rar_extract', 
                              missing='rarfile', 
                              message='rarfile plugin requires the rarfile Python\
