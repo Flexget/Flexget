@@ -116,6 +116,7 @@ class PluginSubliminal(object):
                     log.info('Name computed for %s was %s' % (entry['location'], title))
                     msc = video.scores['hash'] if config['exact_match'] else 0
                     if entry_langs & video.subtitle_languages:
+                        entry['subtitles_missing'] = set()
                         continue  # subs for preferred lang(s) already exists
                     else:
                         subtitle = subliminal.download_best_subtitles([video], entry_langs, providers=providers_list,

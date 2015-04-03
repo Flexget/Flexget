@@ -12,6 +12,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.utils import requests
+from flexget.utils.tools import arithmeticEval
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 
@@ -136,48 +137,84 @@ class t411Auth(AuthBase):
             return account.auth
         else:
             log.debug("Getting login cookies from : %s " % url_auth)
-            params = urllib.urlencode({'login': username,
-                                       'password': password,
-                                       'remember': '1'})
+            params = {'login': username, 'password': password, 'remember': '1'}
             cj = cookielib.CookieJar()
 #           WE NEED A COOKIE HOOK HERE TO AVOID REDIRECT COOKIES
             opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 #           NEED TO BE SAME USER_AGENT THAN DOWNLOAD LINK
             opener.addheaders = [('User-agent', self.USER_AGENT)]
+            login_output = None
             try:
-                opener.open(url_auth, params)
+                login_output = opener.open(url_auth, urllib.urlencode(params)).read()
             except Exception as e:
                 raise UrlRewritingError("Connection Error for %s : %s" % (url_auth, e))
 
-            authKey = None
-            uid = None
-            password = None
+            if b'confirmer le captcha' in login_output:
+                log.warn("Captcha requested for login.")
+                login_output = self._solveCaptcha(login_output, url_auth, params, opener)
 
-            for cookie in cj:
-                if cookie.name == "authKey":
-                    authKey = cookie.value
-                if cookie.name == "uid":
-                    uid = cookie.value
-                if cookie.name == "pass":
-                    password = cookie.value
+            if b'logout' in login_output:
+                authKey = None
+                uid = None
+                password = None
 
-            if authKey is not None and \
-               uid is not None and \
-               password is not None:
-                authCookie = {'uid': uid,
-                              'password': password,
-                              'authKey': authKey
-                              }
-                db_session.add(torrent411Account(username=username,
-                                                 auth=authCookie,
-                                                 expiry_time=datetime.now() + timedelta(days=1)))
-                db_session.commit()
-                return authCookie
+                for cookie in cj:
+                    if cookie.name == "authKey":
+                        authKey = cookie.value
+                    if cookie.name == "uid":
+                        uid = cookie.value
+                    if cookie.name == "pass":
+                        password = cookie.value
 
-        return {"uid": "",
-                "password": "",
-                "authKey": ""
-                }
+                if authKey is not None and \
+                   uid is not None and \
+                   password is not None:
+                    authCookie = {'uid': uid,
+                                  'password': password,
+                                  'authKey': authKey
+                                  }
+                    db_session.add(torrent411Account(username=username,
+                                                     auth=authCookie,
+                                                     expiry_time=datetime.now() + timedelta(days=1)))
+                    db_session.commit()
+                    return authCookie
+            else:
+                log.error("Login failed (Torrent411). Check your login and password.")
+                return {}
+
+    def _solveCaptcha(self, output, url_auth, params, opener):
+        """
+        When trying to connect too many times with wrong password, a captcha can be requested.
+        This captcha is really simple and can be solved by the provider.
+
+        <label for="pass">204 + 65 = </label>
+            <input type="text" size="40" name="captchaAnswer" id="lgn" value=""/>
+            <input type="hidden" name="captchaQuery" value="204 + 65 = ">
+            <input type="hidden" name="captchaToken" value="005d54a7428aaf587460207408e92145">
+        <br/>
+
+        :param output: initial login output
+        :return: output after captcha resolution
+        """
+        html = get_soup(output)
+
+        query = html.find('input', {'name': 'captchaQuery'})
+        token = html.find('input', {'name': 'captchaToken'})
+        if not query or not token:
+            log.error('Unable to solve login captcha.')
+            return output
+
+        query_expr = query.attrs['value'].strip('= ')
+        log.debug('Captcha query: ' + query_expr)
+        answer = arithmeticEval(query_expr)
+
+        log.debug('Captcha answer: %s' % answer)
+
+        params['captchaAnswer'] = answer
+        params['captchaQuery'] = query.attrs['value']
+        params['captchaToken'] = token.attrs['value']
+
+        return opener.open(url_auth, urllib.urlencode(params)).read()
 
     def __init__(self, username, password):
         self.cookies_ = self.get_login_cookies(username,
@@ -290,10 +327,8 @@ class UrlRewriteTorrent411(object):
                 torrent_id = match.group(1)
                 log.debug("Got the Torrent ID: %s" % torrent_id)
                 entry['url'] = 'http://www.t411.io/torrents/download/?id=' + torrent_id
-                if 'download_auth' in list(entry):
-                    auth_handler = t411Auth(entry['download_auth'][0],
-                                            entry['download_auth'][1])
-
+                if 'download_auth' in entry:
+                    auth_handler = t411Auth(*entry['download_auth'])
                     entry['download_auth'] = auth_handler
             else:
                 raise UrlRewritingError("Cannot find torrent ID")
