@@ -3,6 +3,7 @@ import logging
 
 from flexget import plugin
 from flexget.event import event
+from flexget.config_schema import one_or_more
 from flexget.utils.template import render_from_entry, render_from_task, RenderError
 
 log = logging.getLogger('log')
@@ -34,7 +35,7 @@ class PluginLog(object):
 
     schema = {
         'oneOf': [
-            {'type': 'string'},
+            one_or_more({'type': 'string'}),
             {
                 'type': 'object',
                 'properties': {
@@ -55,11 +56,11 @@ class PluginLog(object):
                     'level': {'enum': ['debug', 'error', 'info', 'trace',
                                        'verbose', 'warning'],
                               'default': 'info'},
-                    'phase': {'type': 'string'},
-                    'for_entries': {'type': 'string'},
-                    'for_accepted': {'type': 'string'},
-                    'for_rejected': {'type': 'string'},
-                    'for_failed': {'type': 'string'}
+                    'phase': one_or_more({'type': 'string'}),
+                    'for_entries': one_or_more({'type': 'string'}),
+                    'for_accepted': one_or_more({'type': 'string'}),
+                    'for_rejected': one_or_more({'type': 'string'}),
+                    'for_failed': one_or_more({'type': 'string'})
                 },
                 'additionalProperties': False
             }
@@ -70,6 +71,13 @@ class PluginLog(object):
         if isinstance(config, basestring):
             config = {'on_output': {'level': 'info', 'for_accepted': config}}
         config['logger_name'] = config.get('logger_name', 'log')
+        for phase_name in config:
+            if phase_name.startswith('on_'):
+                for items_name in config[phase_name]:
+                    if items_name == "level":
+                        continue
+                    if isinstance(config[phase_name][items_name], basestring):
+                        config[phase_name][items_name] = [config[phase_name][items_name]]
         return config
 
     def execute(self, task, phase_name, config):
@@ -87,48 +95,48 @@ class PluginLog(object):
                 continue
 
             for entry in entries:
-                txt = config[phase_name][operation]
-                # Do string replacement from entry
-                try:
-                    txt = render_from_entry(txt, entry)
-                except RenderError as e:
-                    log.error('Could not set log command for %s: %s'
-                              % (entry['title'], e))
-                    continue
+                for txt in config[phase_name][operation]:
+                    # Do string replacement from entry
+                    try:
+                        txt = render_from_entry(txt, entry)
+                    except RenderError as e:
+                        log.error('Could not set log command for %s: %s'
+                                % (entry['title'], e))
+                        continue
 
-                if config[phase_name]['level'] == 'trace':
-                    plugin_log.trace(txt)
-                elif config[phase_name]['level'] == 'debug':
-                    plugin_log.debug(txt)
-                elif config[phase_name]['level'] == 'verbose':
-                    plugin_log.verbose(txt)
-                elif config[phase_name]['level'] == 'info':
-                    plugin_log.info(txt)
-                elif config[phase_name]['level'] == 'warning':
-                    plugin_log.warning(txt)
-                elif config[phase_name]['level'] == 'error':
-                    plugin_log.error(txt)
+                    if config[phase_name]['level'] == 'trace':
+                        plugin_log.trace(txt)
+                    elif config[phase_name]['level'] == 'debug':
+                        plugin_log.debug(txt)
+                    elif config[phase_name]['level'] == 'verbose':
+                        plugin_log.verbose(txt)
+                    elif config[phase_name]['level'] == 'info':
+                        plugin_log.info(txt)
+                    elif config[phase_name]['level'] == 'warning':
+                        plugin_log.warning(txt)
+                    elif config[phase_name]['level'] == 'error':
+                        plugin_log.error(txt)
 
         # phase keyword in this
         if 'phase' in config[phase_name]:
-            txt = config[phase_name]['phase']
-            try:
-                txt = render_from_task(txt, task)
-            except RenderError as e:
-                log.error('Error rendering `%s`: %s' % (txt, e))
-            else:
-                if config[phase_name]['level'] == 'trace':
-                    plugin_log.trace(txt)
-                elif config[phase_name]['level'] == 'debug':
-                    plugin_log.debug(txt)
-                elif config[phase_name]['level'] == 'verbose':
-                    plugin_log.verbose(txt)
-                elif config[phase_name]['level'] == 'info':
-                    plugin_log.info(txt)
-                elif config[phase_name]['level'] == 'warning':
-                    plugin_log.warning(txt)
-                elif config[phase_name]['level'] == 'error':
-                    plugin_log.error(txt)
+            for txt in config[phase_name]['phase']:
+                try:
+                    txt = render_from_task(txt, task)
+                except RenderError as e:
+                    log.error('Error rendering `%s`: %s' % (txt, e))
+                else:
+                    if config[phase_name]['level'] == 'trace':
+                        plugin_log.trace(txt)
+                    elif config[phase_name]['level'] == 'debug':
+                        plugin_log.debug(txt)
+                    elif config[phase_name]['level'] == 'verbose':
+                        plugin_log.verbose(txt)
+                    elif config[phase_name]['level'] == 'info':
+                        plugin_log.info(txt)
+                    elif config[phase_name]['level'] == 'warning':
+                        plugin_log.warning(txt)
+                    elif config[phase_name]['level'] == 'error':
+                        plugin_log.error(txt)
 
     def __getattr__(self, item):
         """Creates methods to handle task phases."""
