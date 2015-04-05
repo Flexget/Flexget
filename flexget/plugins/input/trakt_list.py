@@ -59,7 +59,7 @@ class TraktList(object):
       username: <value>
       password: <value>
       type: <shows|movies|episodes>
-      list: <collection|watchlist|watched|custom list name>
+      list: <collection|watchlist|watched|ratings|rating:<1|2|3|4|5|6|7|8|9|10>|custom list name>
       strip_dates: <yes|no>
 
     Options username, type and list are required. password is required for private lists.
@@ -94,7 +94,7 @@ class TraktList(object):
         endpoint = ['users', config['username']]
         if type(config['list']) is dict:
             endpoint += ('ratings', config['type'], config['list']['rating'])
-        elif config['list'] in ['collection', 'watchlist', 'watched']:
+        elif config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
             endpoint += (config['list'], config['type'])
         else:
             endpoint += ('lists', make_list_slug(config['list']), 'items')
