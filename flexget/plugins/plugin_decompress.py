@@ -248,4 +248,4 @@ class Decompress(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Archive, 'decompress', api_ver=2)
+    plugin.register(Decompress, 'decompress', api_ver=2)
