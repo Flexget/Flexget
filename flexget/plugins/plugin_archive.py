@@ -211,8 +211,8 @@ class Archive(object):
                 log.verbose('File already exists: %s' % destination)
 
         if config['delete_archive']:
-            if isinstance(archive, zipfile):
-                volumes = list(archive_path)
+            if isinstance(archive, zipfile.ZipFile):
+                volumes = [archive_path]
             else:
                 volumes = archive.volumelist()
             
