@@ -14,10 +14,10 @@ try:
 except ImportError:
     rarfile = None
 
-log = logging.getLogger('archive')
+log = logging.getLogger('decompress')
 
 
-class Archive(object):
+class Decompress(object):
     """
     Extracts files from Zip or RAR archives. By default this plugin will extract to the same 
     directory as the source archive, preserving directory structure from the archive.
@@ -44,7 +44,7 @@ class Archive(object):
 
     Example:
 
-      archive_extract:
+      decompress:
         to: '/Volumes/External/TV/{{series_name}}/Season {{series_season}}/'
         keep_dirs: yes
         regexp: '.*s\d{1,2}e\d{1,2}.*\.mkv'
@@ -248,4 +248,4 @@ class Archive(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Archive, 'archive_extract', api_ver=2)
+    plugin.register(Archive, 'decompress', api_ver=2)
