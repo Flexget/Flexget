@@ -26,9 +26,6 @@ field_maps = {
     'show': {
         'title': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
         'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
-
-
-
         'imdb_id': 'show.ids.imdb',
         'tvdb_id': 'show.ids.tvdb',
         'tvrage_id': 'show.ids.tvrage',
@@ -40,7 +37,6 @@ field_maps = {
         'title': lambda i: '%s (%s) S%02dE%02d %s' % (i['show']['title'], i['show']['year'], i['episode']['season'],
                                                  i['episode']['number'], i['episode']['title']),
         'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
-
         'series_season': 'episode.season',
         'series_episode': 'episode.number',
         'series_id': lambda i: 'S%02dE%02d' % (i['episode']['season'], i['episode']['number']),
@@ -63,7 +59,7 @@ class TraktList(object):
       username: <value>
       password: <value>
       type: <shows|movies|episodes>
-      list: <collection|watchlist|watched|rating:<1|2|3|4|5|6|7|8|9|10>|custom list name>
+      list: <collection|watchlist|watched|custom list name>
       strip_dates: <yes|no>
 
     Options username, type and list are required. password is required for private lists.
@@ -106,13 +102,14 @@ class TraktList(object):
         log.verbose('Retrieving `%s` list `%s`' % (config['type'], config['list']))
         try:
             result = session.get(get_api_url(endpoint))
+            try:
+                data = result.json()
+            except ValueError:
+                log.debug('Could not decode json from response: %s', result.text)
+                raise plugin.PluginError('Error getting list from trakt.')
         except RequestException as e:
             raise plugin.PluginError('Could not retrieve list from trakt (%s)' % e.args[0])
-        try:
-            data = result.json()
-        except ValueError:
-            log.debug('Could not decode json from response: %s', result.text)
-            raise plugin.PluginError('Error getting list from trakt.')
+
         if not data:
             log.warning('No data returned from trakt for %s list %s.' % (config['type'], config['list']))
             return
