@@ -176,6 +176,9 @@ class Decompress(object):
             path = info.filename
             filename = os.path.basename(path)
 
+            if not filename:
+                log.debug('Appears to be a directory: %s' % path)
+                continue
 
             if not match(path):
                 log.debug('File did not match regexp: %s' % path)
