@@ -40,19 +40,23 @@ class UrlRewriteYTS(object):
                 raise plugin.PluginError('failed to query YTS')
 
             for item in data['data']['movies']:
-                for torrent in item['torrents']:
-                    entry = Entry()
-                    entry['title'] = item['title']
-                    entry['year'] = item['year']
-                    entry['url'] = torrent['url']
-                    entry['content_size'] = torrent['size']
-                    entry['torrent_seeds'] = torrent['seeds']
-                    entry['torrent_leeches'] = torrent['peers']
-                    entry['torrent_info_hash'] = torrent['hash']
-                    entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-                    entry['quality'] = torrent['quality']
-                    entry['imdb_id'] = item['imdb_code']
-                    entries.add(entry)
+                try:
+                    for torrent in item['torrents']:
+                        entry = Entry()
+                        entry['title'] = item['title']
+                        entry['year'] = item['year']
+                        entry['url'] = torrent['url']
+                        entry['content_size'] = torrent['size']
+                        entry['torrent_seeds'] = torrent['seeds']
+                        entry['torrent_leeches'] = torrent['peers']
+                        entry['torrent_info_hash'] = torrent['hash']
+                        entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                        entry['quality'] = torrent['quality']
+                        entry['imdb_id'] = item['imdb_code']
+                        if entry.isvalid():
+                            entries.add(entry)
+                except:
+                    log.debug('invalid return structure from YTS')
 
         log.debug('Search got %d results' % len(entries))
         return entries
