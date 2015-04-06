@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import hashlib
 import logging
 from urlparse import urljoin
+import re
 
 from requests import RequestException
 
@@ -38,7 +39,8 @@ class TraktEmit(object):
             'password': {'type': 'string'},
             'position': {'type': 'string', 'enum': ['last', 'next'], 'default': 'next'},
             'context': {'type': 'string', 'enum': ['watched', 'collected'], 'default': 'watched'},
-            'list': {'type': 'string'}
+            'list': {'type': 'string'},
+            'strip_dates': {'type': 'boolean', 'default': False}
         },
         'required': ['username'],
         'additionalProperties': False
@@ -67,10 +69,14 @@ class TraktEmit(object):
                         log.warning('Found trakt list show with no series name.')
                         continue
                     trakt_id = item['show']['ids']['trakt']
+                    title = '%s (%s)' % (item['show']['title'], item['show']['year'])
                     listed_series[trakt_id] = {
-                        'series_name': item['show']['title'],
+                        'series_name': title,
                         'trakt_id': trakt_id,
                         'tvdb_id': item['show']['ids']['tvdb']}
+                    if config.get('strip_dates'):
+                        # Remove year from end of name if present
+                        listed_series[trakt_id]['series_name'] = re.sub(r'\s+\(\d{4}\)$', '', listed_series[trakt_id]['series_name'])
         context = config['context']
         if context == 'collected':
             context = 'collection'

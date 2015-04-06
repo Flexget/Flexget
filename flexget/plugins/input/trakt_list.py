@@ -46,6 +46,16 @@ field_maps = {
         'trakt_episode_id': 'episode.ids.trakt',
         'trakt_show_id': 'show.ids.trakt',
         'trakt_show_slug': 'show.ids.slug'
+    },
+    'collection_episodes': {
+        'title': lambda i: '%s (%s) S%02dE%02d' % (i['show']['title'], i['show']['year'], i['season'],
+                                                 i['episode']),
+        'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
+        'series_season': 'season',
+        'series_episode': 'episode',
+        'series_id': lambda i: 'S%02dE%02d' % (i['season'], i['episode']),
+        'trakt_show_id': 'show.ids.trakt',
+        'trakt_show_slug': 'show.ids.slug'
     }
 }
 
@@ -75,14 +85,7 @@ class TraktList(object):
             'strip_dates': {'type': 'boolean', 'default': False}
         },
         'required': ['username', 'type', 'list'],
-        'additionalProperties': False,
-        'not': {
-            'properties': {
-                'type': {'enum': ['episodes']},
-                'list': {'enum': ['collection', 'watched']}
-            }
-        },
-        'error_not': '`collection` and `watched` lists do not support `episodes` type'
+        'additionalProperties': False
     }
 
     @cached('trakt_list', persist='2 hours')
@@ -90,7 +93,10 @@ class TraktList(object):
         session = get_session(config['username'], config.get('password'))
         endpoint = ['users', config['username']]
         if config['list'] in ['collection', 'watchlist', 'watched']:
-            endpoint += (config['list'], config['type'])
+            if config['type'] == 'episodes':
+                endpoint += (config['list'], "shows")
+            else:
+                endpoint += (config['list'], config['type'])
         else:
             endpoint += ('lists', make_list_slug(config['list']), 'items')
 
@@ -116,24 +122,45 @@ class TraktList(object):
             if 'type' in item and item['type'] != list_type:
                 log.debug('Skipping %s because it is not a %s' % (item[item['type']].get('title', 'unknown'), list_type))
                 continue
-            if not item[list_type]['title']:
-                # There seems to be some bad shows sometimes in lists with no titles. Skip them.
-                log.warning('Item in trakt list does not appear to have a title, skipping.')
-                continue
-            entry = Entry()
-            if list_type == 'episode':
-                entry['url'] = 'http://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
-                    item['show']['ids']['slug'], item['episode']['season'], item['episode']['number'])
+            if list_type == 'episode' and (config['list'] == 'collection' or config['list'] == 'watched'):
+                if not item['show']['title']:
+                    # There seems to be some bad shows sometimes in lists with no titles. Skip them.
+                    log.warning('Item in trakt list does not appear to have a title, skipping.')
+                    continue
+                for season in item['seasons']:
+                    for episode in season['episodes']:
+                        entry = Entry()
+                        entry['url'] = 'http://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
+                            item['show']['ids']['slug'], season['number'], episode['number'])
+                        entry.update_using_map(field_maps['collection_episodes'],
+                                               {'show': item['show'], 'season': season['number'],
+                                                'episode': episode['number']})
+                        if entry.isvalid():
+                            if config.get('strip_dates'):
+                                # Remove year from end of name if present
+                                entry['title'] = re.sub(r'\s+\(\d{4}\)$', '', entry['title'])
+                            entries.append(entry)
+                        else:
+                            log.debug('Invalid entry created? %s' % entry)
             else:
-                entry['url'] = 'http://trakt.tv/%s/%s' % (list_type, item[list_type]['ids'].get('slug'))
-            entry.update_using_map(field_maps[list_type], item)
-            if entry.isvalid():
-                if config.get('strip_dates'):
-                    # Remove year from end of name if present
-                    entry['title'] = re.sub(r'\s+\(\d{4}\)$', '', entry['title'])
-                entries.append(entry)
-            else:
-                log.debug('Invalid entry created? %s' % entry)
+                if not item[list_type]['title']:
+                    # There seems to be some bad shows sometimes in lists with no titles. Skip them.
+                    log.warning('Item in trakt list does not appear to have a title, skipping.')
+                    continue
+                entry = Entry()
+                if list_type == 'episode':
+                    entry['url'] = 'http://trakt.tv/shows/%s/seasons/%s/episodes/%s' % (
+                        item['show']['ids']['slug'], item['episode']['season'], item['episode']['number'])
+                else:
+                    entry['url'] = 'http://trakt.tv/%s/%s' % (list_type, item[list_type]['ids'].get('slug'))
+                entry.update_using_map(field_maps[list_type], item)
+                if entry.isvalid():
+                    if config.get('strip_dates'):
+                        # Remove year from end of name if present
+                        entry['title'] = re.sub(r'\s+\(\d{4}\)$', '', entry['title'])
+                    entries.append(entry)
+                else:
+                    log.debug('Invalid entry created? %s' % entry)
 
         return entries
 
