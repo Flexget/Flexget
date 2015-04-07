@@ -204,12 +204,16 @@ class Decompress(object):
                     archive.extract(path, dest_dir)
                     log.verbose('Extracted: %s' % path )
                 except Exception as e:
-                    log.error('Failed to extract file: %s in %s (%s)' % (path, archive_path, e))
+                    error_message = 'Failed to extract file: %s in %s (%s)' % \
+                                    (path, archive_path, e)
+                    log.error(error_message)
+                    entry.fail(error_message)
 
                     if os.path.exists(destination):
                         log.debug('Cleaning up partially extracted file: %s' % destination)
                         os.remove(destination)
-                    continue
+                    
+                    return
             else:
                 log.verbose('File already exists: %s' % destination)
 
