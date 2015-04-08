@@ -201,7 +201,7 @@ def render_from_entry(template_string, entry):
         variables['task'] = entry.task.name
     # We use the lower level render function, so that our Entry is not cast into a dict (and lazy loading lost)
     try:
-        result = u''.join(template.root_render_func(template.new_context(variables, shared=True)))
+        result = u''.join(template.root_render_func(template.new_context(variables)))
     except:
         exc_info = sys.exc_info()
         try:
