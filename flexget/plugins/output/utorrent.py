@@ -42,6 +42,18 @@ class PluginUtorrent(object):
         'required': ['username', 'password', 'url'],
         'additionalProperties': False
     }
+    
+    @plugin.priority(120)
+    def on_task_download(self, task, config):
+        """
+            Call download plugin to generate the temp files we will load
+            into deluge then verify they are valid torrents
+        """
+        # If the download plugin is not enabled, we need to call it to get
+        # our temp .torrent files
+        if 'download' not in task.config:
+            download = plugin.get_plugin_by_name('download')
+            download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
     @plugin.internet(log)
     def on_task_output(self, task, config):
@@ -66,12 +78,6 @@ class PluginUtorrent(object):
         result = session.get(url, auth=auth, params={'action': 'list-dirs', 'token': token}).json()
         download_dirs = dict((os.path.normcase(dir['path']), i) for i, dir in enumerate(result['download-dirs']))
         
-        # If the download plugin is not enabled, we need to call it to get
-        # our temp .torrent files
-        if 'download' not in task.config:
-            download = plugin.get_plugin_by_name('download')
-            download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
-
         for entry in task.accepted:
             # bunch of urls now going to check
             
@@ -135,7 +141,15 @@ class PluginUtorrent(object):
             else:
                 entry.fail('Fail to add `%s` to utorrent' % entry['url'])
 
-
+    def on_task_exit(self, task, config):
+        """Make sure all temp files are cleaned up when task exits"""
+        # If download plugin is enabled, it will handle cleanup.
+        if 'download' not in task.config:
+            download = plugin.get_plugin_by_name('download')
+            download.instance.cleanup_temp_files(task)
+            
+    on_task_abort = on_task_exit
+            
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginUtorrent, 'utorrent', api_ver=2)
