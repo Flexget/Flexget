@@ -130,16 +130,14 @@ class PluginUtorrent(object):
             if downloaded:
                 # HTTP://[IP]:[PORT]/GUI/?ACTION=ADD-FILE
                 files = {'torrent_file': open(entry['file'], 'rb')}
-                data = {'action': 'add-file', 'token': token, 'download_dir': folder}
+                data = {'action': 'add-file', 'token': token, 'download_dir': folder, 'path': path}
                 result = session.post(url, params=data, auth=auth, files=files)
             else:
                 # http://[IP]:[PORT]/gui/?action=add-url&s=[TORRENT URL]
                 data = {'action': 'add-url', 's': entry['url'], 'token': token, 'download_dir': folder, 'path': path}
                 result = session.get(url, params=data, auth=auth)
                 
-            # Add torrent
-            data = {'action': 'add-url', 's': entry['url'], 'token': token, 'download_dir': folder, 'path': path}
-            result = session.get(url, params=data, auth=auth)
+            # Check result
             if 'build' in result.json():
                 log.info('Added `%s` to utorrent' % entry['url'])
                 log.info('in folder %s ' % folder + path)
