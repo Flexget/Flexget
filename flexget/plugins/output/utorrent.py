@@ -53,13 +53,18 @@ class PluginUtorrent(object):
         # our temp .torrent files
         if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
-            download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
+            for entry in task.accepted:
+                download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
-    @plugin.internet(log)
+    @plugin.priority(135)
+    #@plugin.internet(log)
     def on_task_output(self, task, config):
         if not config.get('enabled', True):
             return
         if not task.accepted:
+            return
+        # don't add when learning
+        if task.options.learn:
             return
 
         session = requests.Session()
