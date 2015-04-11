@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
 import re
+import shutil
 import zipfile
 
 from flexget import plugin
@@ -211,9 +212,12 @@ class Decompress(object):
                 os.makedirs(dest_dir)
 
             if not os.path.exists(destination):
-                log.debug('Attempting to extract: %s to %s' % (archive_file, dest_dir))
+                log.debug('Attempting to extract: %s to %s' % (path, destination))
                 try:
-                    archive.extract(info, destination)
+                    source = archive.open(path)
+                    target = file(destination, "wb")
+                    with source, target:
+                        shutil.copyfileobj(source, target)
                     log.verbose('Extracted: %s' % path )
                 except Exception as e:
                     error_message = 'Failed to extract file: %s in %s (%s)' % \

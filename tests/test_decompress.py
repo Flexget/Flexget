@@ -89,15 +89,24 @@ class TestExtract(FlexGetBase):
         self.manager.config['templates']['rar_file']['mock'][0]['location'] = self.temp_rar
         self.manager.config['templates']['zip_file']['mock'][0]['location'] = self.temp_zip
 
-#    def teardown(self):
-#        # cleanup files
-#        for dir, _, files in os.walk(self.test_home):
-#            for file in files:
-#                path = os.path.join(dir, file)
-#                os.remove(path)
-#        os.removedirs(self.test_home)
-#
-#        super(TestExtract, self).teardown()
+    def teardown(self):
+        # cleanup files
+        curdir = os.getcwd()
+        os.chdir(self.test_home)
+
+        for dir, _, files in os.walk(self.test_home):
+            for file in files:
+                path = os.path.join(dir,file)
+                os.remove(path)
+
+        if os.path.exists('directory'):
+            os.rmdir('directory')
+
+        os.chdir(curdir)
+        os.rmdir(self.test_home)
+        
+
+        super(TestExtract, self).teardown()
 
     def test_rar(self):
         """Test basic RAR extraction"""
