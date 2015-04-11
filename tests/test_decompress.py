@@ -85,6 +85,7 @@ class TestExtract(FlexGetBase):
         # Skip RAR tests if rarfile module is missing
         if not self.rarfile_installed:
             SkipTest('Need RarFile module.')
+            return
 
         shutil.copy(self.rar_name, self.temp_rar)
         self.execute_task('test_rar')
@@ -97,6 +98,7 @@ class TestExtract(FlexGetBase):
         # Skip RAR tests if rarfile module is missing
         if not self.rarfile_installed:
             raise SkipTest('Need RarFile module.')
+            return
 
         shutil.copy(self.rar_name, self.temp_rar)
         self.execute_task('test_delete_rar')
