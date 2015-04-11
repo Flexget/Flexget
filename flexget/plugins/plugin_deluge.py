@@ -343,6 +343,7 @@ class OutputDeluge(DelugePlugin):
                     'compact': {'type': 'boolean'},
                     'content_filename': {'type': 'string'},
                     'main_file_only': {'type': 'boolean'},
+                    'main_file_ratio': {'type': 'number'},
                     'keep_subs': {'type': 'boolean'},
                     'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
@@ -360,6 +361,7 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('path', '')
         config.setdefault('movedone', '')
         config.setdefault('label', '')
+        config.setdefault('main_file_ratio', 0.90)
         config.setdefault('keep_subs', True)  # does nothing without 'content_filename' or 'main_file_only' enabled
         config.setdefault('hide_sparse_files', False)  # does nothing without 'main_file_only' enabled
         return config
@@ -638,10 +640,10 @@ class OutputDeluge(DelugePlugin):
                                                      [(file['index'], new_name)]))
                         log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], new_name))
 
-                    # find a file that makes up more than 90% of the total size
+                    # find a file that makes up more than main_file_ratio (default: 90%) of the total size
                     main_file = None
                     for file in status['files']:
-                        if file['size'] > (status['total_size'] * 0.9):
+                        if file['size'] > (status['total_size'] * opts.get('main_file_ratio')):
                             main_file = file
                             break
 
@@ -688,7 +690,7 @@ class OutputDeluge(DelugePlugin):
                                 rename_pairs = [(f['index'], other_files_dir + f['path']) for f in other_files]
                                 main_file_dlist.append(client.core.rename_files(torrent_id, rename_pairs))
                     else:
-                        log.warning('No files in %s are > 90%% of content size, no files renamed.' % entry['title'])
+                        log.warning('No files in "%s" are > %d%% of content size, no files renamed.' % (entry['title'], opts.get('main_file_ratio') * 100))
 
                 return defer.DeferredList(main_file_dlist)
 
@@ -800,6 +802,7 @@ class OutputDeluge(DelugePlugin):
                 modify_opts = {'label': format_label(entry.get('label', config['label'])),
                                'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
                                'main_file_only': entry.get('main_file_only', config.get('main_file_only', False)),
+                               'main_file_ratio': entry.get('main_file_ratio', config.get('main_file_ratio')),
                                'hide_sparse_files': entry.get('hide_sparse_files', config.get('hide_sparse_files', True)),
                                'keep_subs': entry.get('keep_subs', config.get('keep_subs', True))
                 }

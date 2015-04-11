@@ -72,6 +72,7 @@ class PluginThetvdbLookup(object):
         'tvdb_fanart_url': lambda series: series.fanart and get_mirror('banner') + series.fanart,
         'tvdb_poster_url': lambda series: series.poster and get_mirror('banner') + series.poster,
         'tvdb_airs_day_of_week': 'airs_dayofweek',
+        'tvdb_actors': 'actors',
         'tvdb_language': 'language',
         'imdb_url': lambda series: series.imdb_id and 'http://www.imdb.com/title/%s' % series.imdb_id,
         'imdb_id': 'imdb_id',

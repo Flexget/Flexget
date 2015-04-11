@@ -127,6 +127,11 @@ class SubtitleQueue(object):
 
     failed_paths = {}
 
+    def prepare_config(self, config):
+        if isinstance(config, basestring):
+            config = {'action': config, 'remove_not_found': False}
+        return config
+
     def on_task_start(self, task, config):
         self.failed_paths = {}
 
@@ -220,17 +225,20 @@ class SubtitleQueue(object):
         return entries
 
     def on_task_filter(self, task, config):
-        if not isinstance(config, dict) and config == 'emit':
+        config = self.prepare_config(config)
+        if config['action'] is 'emit':
             for entry in task.entries:
                 entry.accept()
 
     def on_task_input(self, task, config):
-        if isinstance(config, dict) and config['action'] != 'emit':
+        config = self.prepare_config(config)
+        if config['action'] != 'emit':
             return
         return self.emit(task, config)
 
     def on_task_output(self, task, config):
-        if not config or not isinstance(config, dict):
+        config = self.prepare_config(config)
+        if not config or config['action'] is 'emit':
             return
         action = config.get('action')
         for entry in task.accepted:

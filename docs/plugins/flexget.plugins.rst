@@ -193,6 +193,14 @@ plugins Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`urlrewrite_extratorrent` Module
+---------------------------------
+
+.. automodule:: flexget.plugins.urlrewrite_extratorrent
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`urlrewrite_google_cse` Module
 -----------------------------------
 

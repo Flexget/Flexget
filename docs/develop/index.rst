@@ -86,7 +86,10 @@ Unit tests
 ~~~~~~~~~~
 
 There are currently over 250 unit tests ensuring that existing functionality
-is not accidentally broken.
+is not accidentally broken. Unit tests can be invoked with the installation
+of additionnal requirments:
+
+  pip install jenkins-requirements.txt
 
 Easiest way to run tests is trough paver::
 

@@ -262,6 +262,9 @@ class InputHtml(object):
             entry['url'] = url
             entry['title'] = title
 
+            if 'username' in config and 'password' in config:
+                entry['download_auth'] = (config['username'], config['password'])
+
             queue.append(entry)
 
         # add from queue to task
