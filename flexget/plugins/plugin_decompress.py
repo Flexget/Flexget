@@ -140,13 +140,16 @@ class Decompress(object):
         return config
 
     def is_dir(self, info):
-        ret = False
+        """
+        Tests whether the file descibed in info is a directory
+        """
         if isinstance(info, zipfile.ZipInfo):
-            ret = bool(os.path.basename(info.filename))
+            base = os.path.basename(info.filename)
+            return bool(base)
         elif isinstance(info, rarfile.RarInfo):
-            ret = info.isdir()
-
-        return ret
+            return info.isdir()
+        else:
+            raise ValueError('Not a RarInfo or ZipInfo object.')
 
 
     def handle_entry(self, entry, config):
@@ -210,7 +213,7 @@ class Decompress(object):
             if not os.path.exists(destination):
                 log.debug('Attempting to extract: %s to %s' % (archive_file, dest_dir))
                 try:
-                    archive.extract(path, destination)
+                    archive.extract(info, destination)
                     log.verbose('Extracted: %s' % path )
                 except Exception as e:
                     error_message = 'Failed to extract file: %s in %s (%s)' % \
