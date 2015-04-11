@@ -146,7 +146,7 @@ class Decompress(object):
         """
         if isinstance(info, zipfile.ZipInfo):
             base = os.path.basename(info.filename)
-            return bool(base)
+            return not bool(base)
         elif isinstance(info, rarfile.RarInfo):
             return info.isdir()
         else:
