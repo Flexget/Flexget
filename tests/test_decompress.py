@@ -6,6 +6,7 @@ import imp
 
 from tests import FlexGetBase, with_filecopy
 from tests.util import maketemp
+from nose.plugins.skip import SkipTest
 
 
 class TestExtract(FlexGetBase):
@@ -83,7 +84,7 @@ class TestExtract(FlexGetBase):
         """Test basic RAR extraction"""
         # Skip RAR tests if rarfile module is missing
         if not self.rarfile_installed:
-            raise SkipTest
+            SkipTest('Need RarFile module.')
 
         shutil.copy(self.rar_name, self.temp_rar)
         self.execute_task('test_rar')
@@ -95,7 +96,7 @@ class TestExtract(FlexGetBase):
         """Test RAR deletion after extraction"""
         # Skip RAR tests if rarfile module is missing
         if not self.rarfile_installed:
-            raise SkipTest
+            raise SkipTest('Need RarFile module.')
 
         shutil.copy(self.rar_name, self.temp_rar)
         self.execute_task('test_delete_rar')
