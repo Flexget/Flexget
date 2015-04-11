@@ -127,7 +127,6 @@ class Decompress(object):
 
         config.setdefault('to', '')
         config.setdefault('keep_dirs', True)
-        config.setdefault('fail_entries', False)
         config.setdefault('unrar_tool', '')
         config.setdefault('delete_archive', False)
 
@@ -139,6 +138,16 @@ class Decompress(object):
             config['regexp'] = '.'
 
         return config
+
+    def is_dir(self, info):
+        ret = False
+        if isinstance(info, zipfile.ZipInfo):
+            ret = bool(os.path.basename(info.filename))
+        elif isinstance(info, rarfile.RarInfo):
+            ret = info.isdir()
+
+        return ret
+
 
     def handle_entry(self, entry, config):
         """
@@ -175,8 +184,8 @@ class Decompress(object):
         for info in archive.infolist():
             path = info.filename
             filename = os.path.basename(path)
-
-            if not filename:
+            
+            if self.is_dir(info):
                 log.debug('Appears to be a directory: %s' % path)
                 continue
 
@@ -201,7 +210,7 @@ class Decompress(object):
             if not os.path.exists(destination):
                 log.debug('Attempting to extract: %s to %s' % (archive_file, dest_dir))
                 try:
-                    archive.extract(path, dest_dir)
+                    archive.extract(path, destination)
                     log.verbose('Extracted: %s' % path )
                 except Exception as e:
                     error_message = 'Failed to extract file: %s in %s (%s)' % \
@@ -242,6 +251,10 @@ class Decompress(object):
 
         # Set the path of the unrar tool if it's not specified in PATH
         unrar_tool = config['unrar_tool']
+
+        if rarfile:
+            rarfile.PATH_SEP = os.path.sep
+
         if unrar_tool:
             if not rarfile:
                 raise log.warn('rarfile Python module is not installed.')
