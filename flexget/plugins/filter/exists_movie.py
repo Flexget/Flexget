@@ -167,7 +167,7 @@ class FilterExistsMovie(object):
                     if entry['quality'] > qualities[entry[key]]:
                         log.trace('better quality')
                         continue
-                if config.get('allow_different_qualities') == 'same':
+                elif config.get('allow_different_qualities') == 'same':
                     if entry['quality'] >= qualities[entry[key]]:
                         log.trace('same or better quality')
                         continue
