@@ -23,7 +23,7 @@ class FilterExistsMovie(object):
       exists_movie:
         path: /path/to/movies
         [type: {dirs|files}]
-        [allow_different_qualities: {better|yes|no}]
+        [allow_different_qualities: {better|same|yes|no}]
         [lookup: {imdb|no}]
     """
 
@@ -34,7 +34,7 @@ class FilterExistsMovie(object):
                 'type': 'object',
                 'properties': {
                     'path': one_or_more({'type': 'string', 'format': 'path'}),
-                    'allow_different_qualities': {'enum': ['better', True, False], 'default': False},
+                    'allow_different_qualities': {'enum': ['better', 'same', True, False], 'default': False},
                     'type': {'enum': ['files', 'dirs'], 'default': 'dirs'},
                     'lookup': {'enum': ['imdb', False], 'default': False}
                 },
@@ -166,6 +166,10 @@ class FilterExistsMovie(object):
                 if config.get('allow_different_qualities') == 'better':
                     if entry['quality'] > qualities[entry[key]]:
                         log.trace('better quality')
+                        continue
+                if config.get('allow_different_qualities') == 'same':
+                    if entry['quality'] >= qualities[entry[key]]:
+                        log.trace('same or better quality')
                         continue
                 elif config.get('allow_different_qualities'):
                     if entry['quality'] != qualities[entry[key]]:
