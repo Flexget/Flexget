@@ -1515,9 +1515,9 @@ class SeriesDBManager(FilterSeriesBase):
                     db_series.tvdb_id = series_config['tvdb_id']
                 if series_config.get('imdb_id', None) != None:
                     db_series.imdb_id = series_config['imdb_id']
-                if series_config.get('tvdb_id', None) != None:
+                if series_config.get('tmdb_id', None) != None:
                     db_series.tmdb_id = series_config['tmdb_id']
-                if series_config.get('tvdb_id', None) != None:
+                if series_config.get('trakt_show_id', None) != None:
                     db_series.trakt_show_id = series_config['trakt_show_id']                
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
