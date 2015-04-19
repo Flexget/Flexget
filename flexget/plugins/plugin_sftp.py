@@ -3,7 +3,6 @@ from urlparse import urljoin, urlparse
 from collections import defaultdict, namedtuple
 import logging
 import os
-import time
 from functools import partial
 
 from flexget import plugin
@@ -159,7 +158,7 @@ class SftpList(object):
         try:
             sftp = sftp_connect(conn_conf)
         except Exception as e:
-            log.error('Failed to connect to %s (%s)' % (conf.host, e))
+            log.error('Failed to connect to %s (%s)' % (host, e))
             return
 
         entries = []
@@ -384,7 +383,7 @@ class SftpDownload(object):
             try:
                 sftp = sftp_connect(sftp_config)
             except Exception as e:
-                error_message = 'Failed to connect to %s (%s)' % (conf.host, e)
+                error_message = 'Failed to connect to %s (%s)' % (sftp_config.host, e)
                 log.error(error_message)
 
             for entry in entries:
