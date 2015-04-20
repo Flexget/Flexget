@@ -15,7 +15,7 @@ from flexget.utils.template import render_from_entry, RenderError
 
 log = logging.getLogger('sftp')
 
-ConenctionConfig = namedtuple('ConenctionConfig', ['host', 'port', 'username', 'password', \
+ConenctionConfig = namedtuple('ConenctionConfig', ['host', 'port', 'username', 'password',
                               'private_key', 'private_key_pass'])
 
 # retry configuration contants
@@ -28,6 +28,7 @@ try:
     logging.getLogger("paramiko").setLevel(logging.ERROR)
 except:
     pysftp = None
+
 
 def sftp_connect(conf):
     """
@@ -48,12 +49,14 @@ def sftp_connect(conf):
                 raise e
             else:
                 log.debug('Caught exception: %s' % e)
-                log.warn('Failed to connect to %s waiting %d seconds before retrying.' % (conf.host, retry_interval))
+                log.warn('Failed to connect to %s waiting %d seconds before retrying.' % (conf.host, 
+                         retry_interval))
                 time.sleep(retry_interval)
                 retries -= 1
                 retry_interval += RETRY_STEP
     
     return sftp
+
 
 def dependency_check():
     """
@@ -63,6 +66,7 @@ def dependency_check():
         raise plugin.DependencyError(issued_by='sftp', 
                                      missing='pysftp', 
                                      message='sftp plugin requires the pysftp Python module.')
+
 
 class SftpList(object):
     """
@@ -194,12 +198,14 @@ class SftpList(object):
             Walk a directory to get its size
             """
             sizes = []
-            node_size = lambda f: sizes.append(file_size(f))
+
+            def node_size(f): 
+                sizes.append(file_size(f))
+
             sftp.walktree(path, node_size, node_size, node_size, True)
             size = sum(sizes)
 
             return size
-
 
         def handle_node(path, size_handler, is_dir):
             """
@@ -250,6 +256,7 @@ class SftpList(object):
 
         return entries
 
+
 class SftpDownload(object):
     """
     Download files from a SFTP server. This plugin requires the pysftp Python module and its 
@@ -273,12 +280,10 @@ class SftpDownload(object):
         'type': 'object',
         'properties': {
             'to': {'type': 'string', 'format': 'path'},
-            'delete_origin': {'type': 'boolean', 'default' : False}
+            'delete_origin': {'type': 'boolean', 'default': False}
         },
         'additionalProperties': False
     }
-
-
 
     def get_sftp_config(self, entry):
         """
@@ -290,20 +295,21 @@ class SftpDownload(object):
         username = parsed.username or None
         password = parsed.password or None
         port = parsed.port or 22
+
         # get private key info if it exists
         try:
             private_key = entry['private_key']
         except KeyError:
             private_key = None
+
         try:
             private_key = entry['private_key_pass']
         except KeyError:
             private_key_pass = None
 
-        sftp_config = ConenctionConfig(host, port, username, password, private_key, private_key_pass)
+        config = ConenctionConfig(host, port, username, password, private_key, private_key_pass)
 
-        return sftp_config
-
+        return config
 
     def prepare_config(self, config, task):
         """
@@ -382,7 +388,6 @@ class SftpDownload(object):
         else:
             log.warn('Skipping unknown file %s' % path)
 
-
     def on_task_download(self, task, config):
         """
         Task handler for sftp_download plugin
@@ -405,7 +410,6 @@ class SftpDownload(object):
                     self.download_entry(entry, config, sftp)
                 else:
                     entry.fail(error_message)
-                    continue
             if sftp:
                 sftp.close()
 
