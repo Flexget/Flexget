@@ -1,9 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 from urlparse import urljoin, urlparse
-from collections import defaultdict, namedtuple
+from collections import namedtuple
+from itertools import groupby
 import logging
 import os
 from functools import partial
+import time
 
 from flexget import plugin
 from flexget.event import event
@@ -16,9 +18,14 @@ log = logging.getLogger('sftp')
 ConenctionConfig = namedtuple('ConenctionConfig', ['host', 'port', 'username', 'password', \
                               'private_key', 'private_key_pass'])
 
+# retry configuration contants
+RETRIES = 3
+RETRY_INTERVAL = 15
+RETRY_STEP = 5
+
 try:
     import pysftp
-    logging.getLogger("paramiko").setLevel(logging.WARNING)
+    logging.getLogger("paramiko").setLevel(logging.ERROR)
 except:
     pysftp = None
 
@@ -26,12 +33,25 @@ def sftp_connect(conf):
     """
     Helper function to connect to an sftp server
     """
+    sftp = None
+    retries = RETRIES
+    retry_interval = RETRY_INTERVAL
 
-    sftp = pysftp.Connection(host=conf.host, username=conf.username,
-                             private_key=conf.private_key, password=conf.password, 
-                             port=conf.port, private_key_pass=conf.private_key_pass)
-    log.debug('Connected to %s' % conf.host)
-
+    while not sftp:
+        try:
+            sftp = pysftp.Connection(host=conf.host, username=conf.username,
+                                     private_key=conf.private_key, password=conf.password, 
+                                     port=conf.port, private_key_pass=conf.private_key_pass)
+            log.debug('Connected to %s' % conf.host)
+        except Exception as e:
+            if not retries:
+                raise e
+            else:
+                log.debug('Caught exception: %s' % e)
+                log.warn('Failed to connect to %s waiting %d seconds before retrying.' % (conf.host, retry_interval))
+                time.sleep(retry_interval)
+                retries -= 1
+                retry_interval += RETRY_STEP
     
     return sftp
 
@@ -370,15 +390,8 @@ class SftpDownload(object):
         dependency_check()
         config = self.prepare_config(config, task)
 
-        downloads = defaultdict(list)
-
-        # Group entries by their connection config
-        for entry in task.accepted:
-            sftp_config = self.get_sftp_config(entry)
-            downloads[sftp_config].append(entry)
-
         # Download entries by host so we can reuse the connection
-        for sftp_config, entries in downloads.iteritems():
+        for sftp_config, entries in groupby(task.accepted, self.get_sftp_config):
             error_message = None
             sftp = None
             try:
@@ -393,7 +406,8 @@ class SftpDownload(object):
                 else:
                     entry.fail(error_message)
                     continue
-            sftp.close()
+            if sftp:
+                sftp.close()
 
     def on_task_output(self, task, config):
         """Count this as an output plugin."""
