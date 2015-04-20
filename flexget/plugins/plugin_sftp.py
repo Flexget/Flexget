@@ -380,6 +380,7 @@ class SftpDownload(object):
         # Download entries by host so we can reuse the connection
         for sftp_config, entries in downloads.iteritems():
             error_message = None
+            sftp = None
             try:
                 sftp = sftp_connect(sftp_config)
             except Exception as e:
