@@ -19,7 +19,7 @@ ConenctionConfig = namedtuple('ConenctionConfig', ['host', 'port', 'username', '
                               'private_key', 'private_key_pass'])
 
 # retry configuration contants
-RETRIES = 3
+CONNECT_TRIES = 3
 RETRY_INTERVAL = 15
 RETRY_STEP = 5
 
@@ -35,7 +35,7 @@ def sftp_connect(conf):
     Helper function to connect to an sftp server
     """
     sftp = None
-    retries = RETRIES
+    tries = CONNECT_TRIES
     retry_interval = RETRY_INTERVAL
 
     while not sftp:
@@ -45,14 +45,14 @@ def sftp_connect(conf):
                                      port=conf.port, private_key_pass=conf.private_key_pass)
             log.debug('Connected to %s' % conf.host)
         except Exception as e:
-            if not retries:
+            if not tries:
                 raise e
             else:
                 log.debug('Caught exception: %s' % e)
-                log.warn('Failed to connect to %s waiting %d seconds before retrying.' % (conf.host, 
-                         retry_interval))
+                log.warn('Failed to connect to %s; waiting %d seconds before retrying.' % 
+                         (conf.host, retry_interval))
                 time.sleep(retry_interval)
-                retries -= 1
+                tries -= 1
                 retry_interval += RETRY_STEP
     
     return sftp
