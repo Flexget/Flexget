@@ -3,6 +3,8 @@ import argparse
 import logging
 import re
 import time
+import unicodedata
+import string
 from copy import copy
 from datetime import datetime, timedelta
 
@@ -1010,6 +1012,9 @@ class FilterSeries(FilterSeriesBase):
                         alts = [alts]
                     for alt in alts:
                         _add_alt_name(alt, db_series, series_name, session)
+
+                    _add_alt_name_dummy(db_series, series_name, session)
+
                 if not series_name in found_series:
                     continue
                 series_entries = {}
@@ -1489,6 +1494,9 @@ class SeriesDBManager(FilterSeriesBase):
                     log.debug('-> added %s' % db_series)
                 for alt in alts:
                     _add_alt_name(alt, db_series, series_name, session)
+
+                _add_alt_name_dummy(db_series, series_name, session)
+
                 db_series.in_tasks.append(SeriesTask(task.name))
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
@@ -1515,6 +1523,18 @@ def _add_alt_name(alt, db_series, series_name, session):
         db_series_alt = AlternateNames(alt)
         db_series.alternate_names.append(db_series_alt)
         log.debug('-> added %s' % db_series_alt)
+
+def _add_alt_name_dummy(db_series, series_name, session):
+    alt = unicodedata.normalize("NFKD", series_name)
+    alt = alt.encode("ascii", "ignore")
+    alt = re.sub(r"[^a-zA-Z0-9 ]", "", alt)
+
+    db_series_alt = session.query(AlternateNames).filter(AlternateNames.alt_name == alt).first()
+
+    if db_series_alt:
+        return
+    else:
+        _add_alt_name(alt, db_series, series_name, session)
 
 @event('plugin.register')
 def register_plugin():
