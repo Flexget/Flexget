@@ -114,7 +114,8 @@ class InjectAction(Action):
         entry = Entry(**kwargs)
         if 'accept' in [v.lower() for v in values]:
             entry.accept(reason='accepted by --inject')
-        setattr(namespace, self.dest, [entry])
+        existing = getattr(namespace, self.dest, None) or []
+        setattr(namespace, self.dest, existing + [entry])
 
 
 class ParseExtrasAction(Action):

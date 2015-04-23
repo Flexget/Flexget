@@ -102,6 +102,8 @@ class PluginExec(object):
 
     def prepare_config(self, config):
         if isinstance(config, basestring):
+            config = [config]
+        if isinstance(config, list):
             config = {'on_output': {'for_accepted': config}}
         if not config.get('encoding'):
             config['encoding'] = io_encoding

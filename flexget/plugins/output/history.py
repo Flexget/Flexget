@@ -62,6 +62,8 @@ def do_cli(manager, options):
         if options.search:
             search_term = options.search.replace(' ', '%').replace('.', '%')
             query = query.filter(History.title.like('%' + search_term + '%'))
+        if options.task:
+            query = query.filter(History.task.like('%' + options.task + '%'))
         query = query.order_by(desc(History.time)).limit(options.limit)
         for item in reversed(query.all()):
             console(' Task    : %s' % item.task)
@@ -82,7 +84,7 @@ def register_parser_arguments():
     parser.add_argument('--limit', action='store', type=int, metavar='NUM', default=50,
                         help='limit to %(metavar)s results')
     parser.add_argument('--search', action='store', metavar='TERM', help='limit to results that contain %(metavar)s')
-
+    parser.add_argument('--task', action='store', metavar='TASK', help='limit to results in specified %(metavar)s')
 
 @event('plugin.register')
 def register_plugin():

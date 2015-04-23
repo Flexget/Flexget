@@ -259,7 +259,7 @@ class InputWhatCD(object):
                 raise PluginError("What.cd gave a failure response: "
                                   "'{0}'".format(error))
             return json_response['response']
-        except (ValueError, TypeError) as e:
+        except (ValueError, TypeError, KeyError) as e:
             raise PluginError("What.cd returned an invalid response")
 
     @cached('whatcd')
@@ -268,6 +268,10 @@ class InputWhatCD(object):
         """Search on What.cd"""
 
         self.session = Session()
+        user_agent = config.get('user_agent')
+        if user_agent:
+            # Using a custom user agent
+            self.session.headers.update({"User-Agent": user_agent})
 
         # From the API docs: "Refrain from making more than five (5) requests every ten (10) seconds"
         self.session.set_domain_delay('ssl.what.cd', '2 seconds')

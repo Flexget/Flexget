@@ -9,7 +9,7 @@ log = logging.getLogger('sleep')
 
 
 class PluginSleep(object):
-    """Causes a pause to occur before execution of a task"""
+    """Causes a pause to occur during the specified phase of a task"""
     
     schema = {
         'oneOf': [
@@ -19,7 +19,7 @@ class PluginSleep(object):
                     'seconds': {'type': 'integer'},
                     'phase': {
                         'type': 'string',
-                        'enum': ['start', 'abort', 'exit', 'input', 'filter', 'output', 'learn', 'download'],
+                        'enum': ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'learn', 'abort', 'exit'],
                         'default': 'start'
                     }
                 },
@@ -42,20 +42,24 @@ class PluginSleep(object):
         self.do_sleep(config, 'start')
 
     @plugin.priority(255)
-    def on_task_abort(self, task, config):
-        self.do_sleep(config, 'abort')
-
-    @plugin.priority(255)
-    def on_task_exit(self, task, config):
-        self.do_sleep(config, 'exit')
-
-    @plugin.priority(255)
     def on_task_input(self, task, config):
         self.do_sleep(config, 'input')
 
     @plugin.priority(255)
+    def on_task_metainfo(self, task, config):
+        self.do_sleep(config, 'metainfo')
+
+    @plugin.priority(255)
     def on_task_filter(self, task, config):
         self.do_sleep(config, 'filter')
+
+    @plugin.priority(255)
+    def on_task_download(self, task, config):
+        self.do_sleep(config, 'download')
+
+    @plugin.priority(255)
+    def on_task_modify(self, task, config):
+        self.do_sleep(config, 'modify')
 
     @plugin.priority(255)
     def on_task_output(self, task, config):
@@ -66,8 +70,12 @@ class PluginSleep(object):
         self.do_sleep(config, 'learn')
 
     @plugin.priority(255)
-    def on_task_download(self, task, config):
-        self.do_sleep(config, 'download')
+    def on_task_abort(self, task, config):
+        self.do_sleep(config, 'abort')
+
+    @plugin.priority(255)
+    def on_task_exit(self, task, config):
+        self.do_sleep(config, 'exit')
 
 @event('plugin.register')
 def register_plugin():
