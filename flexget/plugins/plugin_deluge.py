@@ -661,10 +661,20 @@ class OutputDeluge(DelugePlugin):
                                     sub_file = file
                                     break
 
+                        # check for single file torrents so we dont add unnecessary folders
+                        if (os.path.dirname(main_file['path']) is not ("" or "/")):
+                            # check for top folder in user config
+                            if (os.path.dirname(opts['content_filename']) is ""):
+                                top_files_dir = os.path.dirname(main_file['path']) + "/"
+                            else:
+                                top_files_dir = os.path.dirname(opts['content_filename']) + "/"
+                        else:
+                            top_files_dir = "/"
+
                         if opts.get('content_filename'):
                             # rename the main file
-                            big_file_name = (os.path.dirname(main_file['path']) + "/" +
-                                            opts['content_filename'] +
+                            big_file_name = (top_files_dir +
+                                            os.path.basename(opts['content_filename']) +
                                             os.path.splitext(main_file['path'])[1])
                             big_file_name = unused_name(big_file_name)
                             rename(main_file, big_file_name)
@@ -688,7 +698,6 @@ class OutputDeluge(DelugePlugin):
                                 # Made sparse files behave better with deluge http://flexget.com/ticket/2881
                                 sparse_files = [f for f in status['files']
                                                if f != main_file and (f != sub_file or (not keep_subs))]
-                                top_files_dir = os.path.dirname(main_file['path']) + "/" 
                                 rename_pairs = [(f['index'],
                                                top_files_dir + ".sparse_files/" + os.path.basename(f['path']))
                                                for f in sparse_files]
