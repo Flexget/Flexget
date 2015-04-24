@@ -15,6 +15,8 @@ from flexget.event import event
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
 
+from flexget.plugin import get_plugin_by_name
+
 log = logging.getLogger('deluge')
 
 
@@ -347,6 +349,21 @@ class OutputDeluge(DelugePlugin):
                     'keep_subs': {'type': 'boolean'},
                     'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
+                    'keep_container': {'type': 'boolean'},
+                    'container_directory': {'type': 'string'},
+                    'container_multiple': {'type': 'boolean'},
+                    'rename_main_file_only': {'type': 'boolean'},
+                    'fix_year': {'type': 'boolean'},
+                    'unlisted_filetype_default': {'type': 'boolean'},
+                    'filetypes': {
+                        'type': 'object',
+                        'additionalProperties': {
+                            'oneOf': [
+                                {'type': 'string'},
+                                {'type': 'boolean'},
+                            ]
+                        }
+                    }
                 },
                 'additionalProperties': False
             }
@@ -364,6 +381,14 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('main_file_ratio', 0.90)
         config.setdefault('keep_subs', True)  # does nothing without 'content_filename' or 'main_file_only' enabled
         config.setdefault('hide_sparse_files', False)  # does nothing without 'main_file_only' enabled
+        config.setdefault('content_filename', '')
+        config.setdefault('keep_container', True)
+        config.setdefault('container_multiple', True)
+        config.setdefault('container_directory', '')
+        config.setdefault('rename_main_file_only', False)
+        config.setdefault('fix_year', False)
+        config.setdefault('unlisted_filetype_default', True)
+        config.setdefault('filetypes', {})
         return config
 
     def __init__(self):
@@ -570,10 +595,14 @@ class OutputDeluge(DelugePlugin):
                 dlist.append(client.core.set_torrent_move_completed_path(torrent_id, opts['movedone']))
                 log.debug('%s move on complete set to %s' % (entry['title'], opts['movedone']))
             if opts.get('label'):
-
                 def apply_label(result, torrent_id, label):
                     """Gets called after labels and torrent were added to deluge."""
                     return client.label.set_torrent(torrent_id, label)
+
+                try:
+                    opts['label'] = entry.render(opts.get('label'))
+                except RenderError as e:
+                    log.error('Unable to set label for %s: %s' % (entry['title'], e))
 
                 dlist.append(label_deferred.addCallback(apply_label, torrent_id, opts['label']))
             if opts.get('queuetotop') is not None:
@@ -607,7 +636,8 @@ class OutputDeluge(DelugePlugin):
                     log.debug('Moving storage for %s to %s' % (entry['title'], move_now_path))
                     main_file_dlist.append(client.core.move_storage([torrent_id], move_now_path))
 
-                if opts.get('content_filename') or opts.get('main_file_only'):
+                if (opts.get('content_filename') or opts.get('main_file_only') or
+                    not opts.get('keep_container') or opts.get('container_directory')):
 
                     def file_exists(filename):
                         # Checks the download path as well as the move completed path for existence of the file
@@ -640,57 +670,21 @@ class OutputDeluge(DelugePlugin):
                                                      [(file['index'], new_name)]))
                         log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], new_name))
 
-                    # find a file that makes up more than main_file_ratio (default: 90%) of the total size
-                    main_file = None
+                    renamed = get_plugin_by_name('torrent_frename').instance.rename_files(entry, status, config)
+ 
                     for file in status['files']:
-                        if file['size'] > (status['total_size'] * opts.get('main_file_ratio')):
-                            main_file = file
-                            break
 
-                    if main_file is not None:
-                        # proceed with renaming only if such a big file is found
-
-                        # find the subtitle file
-                        keep_subs = opts.get('keep_subs')
-                        sub_file = None
-                        if keep_subs:
-                            sub_exts = [".srt", ".sub"]
-                            for file in status['files']:
-                                ext = os.path.splitext(file['path'])[1]
-                                if ext in sub_exts:
-                                    sub_file = file
-                                    break
-
-                        if opts.get('content_filename'):
-                            # rename the main file
-                            big_file_name = opts['content_filename'] + os.path.splitext(main_file['path'])[1]
-                            big_file_name = unused_name(big_file_name)
-                            rename(main_file, big_file_name)
-
-                            # rename subs along with the main file
-                            if sub_file is not None and keep_subs:
-                                sub_file_name = os.path.splitext(big_file_name   )[0] \
-                                              + os.path.splitext(sub_file['path'])[1]
-                                rename(sub_file, sub_file_name)
-
-                        if opts.get('main_file_only'):
-                            # download only the main file (and subs)
-                            file_priorities = [1 if f == main_file or (f == sub_file and keep_subs) else 0
-                                               for f in status['files']]
+                        if file['index'] == entry['main_fileid'] and opts.get('main_file_only'):
+                            file_priorities = [1 if f['index'] == file['index'] or (f == sub_file and opts.get('keep_subs')) else 0 for f in status['files']]
                             main_file_dlist.append(
                                 client.core.set_torrent_file_priorities(torrent_id, file_priorities))
 
-                            if opts.get('hide_sparse_files'):
-                                # hide the other sparse files that are not supposed to download but are created anyway
-                                # http://dev.deluge-torrent.org/ticket/1827
-                                other_files = [f for f in status['files']
-                                               if f != main_file and (f != sub_file or (not keep_subs))]
-                                other_files_dir = "._" + (opts['content_filename'] + "/"
-                                                          if opts.get('content_filename') else "")
-                                rename_pairs = [(f['index'], other_files_dir + f['path']) for f in other_files]
-                                main_file_dlist.append(client.core.rename_files(torrent_id, rename_pairs))
-                    else:
-                        log.warning('No files in "%s" are > %d%% of content size, no files renamed.' % (entry['title'], opts.get('main_file_ratio') * 100))
+                        if renamed.get(file['index'], None):
+                            filename = unused_name(renamed[file['index']])
+
+                            log.debug('File %s in %s renamed to %s' % (file['path'], entry['title'], filename))
+                            main_file_dlist.append(
+                                client.core.rename_files(torrent_id, [(file['index'], filename)]))
 
                 return defer.DeferredList(main_file_dlist)
 
@@ -799,23 +793,25 @@ class OutputDeluge(DelugePlugin):
                         if fopt == 'ratio':
                             add_opts['stop_at_ratio'] = True
                 # Make another set of options, that get set after the torrent has been added
-                modify_opts = {'label': format_label(entry.get('label', config['label'])),
-                               'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
+                modify_opts = {'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
                                'main_file_only': entry.get('main_file_only', config.get('main_file_only', False)),
-                               'main_file_ratio': entry.get('main_file_ratio', config.get('main_file_ratio')),
+                               'keep_container': entry.get('keep_container', config.get('keep_container', True)),
+                               'container_directory': entry.get('container_directory',
+                                                      config.get('container_directory', '')),
+                               'content_filename': entry.get('content_filename', config.get('content_filename', '')),
                                'hide_sparse_files': entry.get('hide_sparse_files', config.get('hide_sparse_files', True)),
                                'keep_subs': entry.get('keep_subs', config.get('keep_subs', True))
                 }
+                try:
+                    label = entry.render(entry.get('label', config['label']))
+                    modify_opts['label'] = format_label(label)
+                except RenderError as e:
+                    log.error('Error setting label for %s: %s' % (entry['title'], e))
                 try:
                     movedone = entry.render(entry.get('movedone', config['movedone']))
                     modify_opts['movedone'] = pathscrub(os.path.expanduser(movedone))
                 except RenderError as e:
                     log.error('Error setting movedone for %s: %s' % (entry['title'], e))
-                try:
-                    content_filename = entry.get('content_filename', config.get('content_filename', ''))
-                    modify_opts['content_filename'] = pathscrub(entry.render(content_filename))
-                except RenderError as e:
-                    log.error('Error setting content_filename for %s: %s' % (entry['title'], e))
 
                 torrent_id = entry.get('deluge_id') or entry.get('torrent_info_hash')
                 torrent_id = torrent_id and torrent_id.lower()
