@@ -175,7 +175,7 @@ class SftpList(object):
         try:
             sftp = sftp_connect(conn_conf)
         except Exception as e:
-            raise PluginError('Failed to connect to %s (%s)' % (host, e))
+            raise plugin.PluginError('Failed to connect to %s (%s)' % (host, e))
 
         entries = []
 
@@ -329,7 +329,7 @@ class SftpDownload(object):
         log.verbose('Downloading file %s to %s' % (path, destination))
 
         try:
-            sftp.get(path, destination)
+            sftp.get(path, destinationƒ)
         except Exception as e:
             log.error('Failed to download %s (%s)' % (path, e))
             if remotepath.exists(destination):
