@@ -329,7 +329,7 @@ class SftpDownload(object):
         log.verbose('Downloading file %s to %s' % (path, destination))
 
         try:
-            sftp.get(path, destinationƒ)
+            sftp.get(path, destination)
         except Exception as e:
             log.error('Failed to download %s (%s)' % (path, e))
             if remotepath.exists(destination):
