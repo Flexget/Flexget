@@ -15,13 +15,18 @@ from flexget.utils.template import render_from_entry, RenderError
 
 log = logging.getLogger('sftp')
 
-ConenctionConfig = namedtuple('ConenctionConfig', ['host', 'port', 'username', 'password',
+ConnectionConfig = namedtuple('ConnectionConfig', ['host', 'port', 'username', 'password',
                               'private_key', 'private_key_pass'])
 
 # retry configuration contants
 CONNECT_TRIES = 3
 RETRY_INTERVAL = 15
 RETRY_STEP = 5
+
+# make separate os.path instances for local vs remote path styles
+localpath = os.path
+remotepath = os.path
+remotepath.sep = '/' # pysftp forces *nix style separators
 
 try:
     import pysftp
@@ -67,26 +72,23 @@ def dependency_check():
                                      missing='pysftp', 
                                      message='sftp plugin requires the pysftp Python module.')
 
-
 class SftpList(object):
     """
     Generate entries from SFTP. This plugin requires the pysftp Python module and its dependencies.
 
     Configuration:
 
-    config
-        host:                 Host to connect to
-        port:                 Port the remote SSH server is listening on. Defaults to port 22.
-        username:             Username to log in as
-        password:             The password to use. Optional if a private key is provided.
-        private_key:          Path to the private key (if any) to log into the SSH server
-        private_key_pass:     Password for the private key (if needed)
-        recursive:            Indicates whether the listing should be recursive
-        get_size:             Indicates whetern to calculate the size of the remote file/directory.
-                              WARNING: This can be very slow when computing the size of directories!
-        files_only:           Indicates wheter to omit diredtories from the results.
-    dirs:
-        List of directories to download
+    host:                 Host to connect to
+    port:                 Port the remote SSH server is listening on. Defaults to port 22.
+    username:             Username to log in as
+    password:             The password to use. Optional if a private key is provided.
+    private_key:          Path to the private key (if any) to log into the SSH server
+    private_key_pass:     Password for the private key (if needed)
+    recursive:            Indicates whether the listing should be recursive
+    get_size:             Indicates whetern to calculate the size of the remote file/directory.
+                          WARNING: This can be very slow when computing the size of directories!
+    files_only:           Indicates wheter to omit diredtories from the results.
+    dirs:                 List of directories to download
 
     Example:
 
@@ -105,37 +107,29 @@ class SftpList(object):
     schema = {
         'type': 'object',
         'properties': {
-            'config': {
-                'type': 'object',
-                'properties': {
-                    'username': {'type': 'string'},
-                    'password': {'type': 'string'},
-                    'host': {'type': 'string'},
-                    'port': {'type': 'integer'},
-                    'files_only': {'type': 'boolean', 'default': True},
-                    'recursive': {'type': 'boolean', 'default': False},
-                    'get_size': {'type': 'boolean', 'default': True},
-                    'private_key': {'type': 'string'},
-                    'private_key_pass': {'type': 'string'}
-                },
-                'additionProperties': False,
-                'required': ['host', 'username'],
-            },
-            'dirs': one_or_more({'type': 'string'}),
+            'host': {'type': 'string'},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'port': {'type': 'integer', 'default': 22},
+            'files_only': {'type': 'boolean', 'default': True},
+            'recursive': {'type': 'boolean', 'default': False},
+            'get_size': {'type': 'boolean', 'default': True},
+            'private_key': {'type': 'string'},
+            'private_key_pass': {'type': 'string'},
+            'dirs': one_or_more({'type': 'string', 'default': ['.']})
         },
-        'required': ['config'],
-        'additionalProperties': False
+        'additionProperties': False,
+        'required': ['host', 'username']
     }
 
     def prepare_config(self, config):
         """
         Sets defaults for the provided configuration
         """
-        config['config'].setdefault('port', 22)
-        config['config'].setdefault('password', None)
-        config['config'].setdefault('private_key', None)
-        config['config'].setdefault('private_key_pass', None)
-        config['config'].setdefault('dirs', ['.'])
+        config.setdefault('port', 22)
+        config.setdefault('password', None)
+        config.setdefault('private_key', None)
+        config.setdefault('private_key_pass', None)
         config.setdefault('dirs', ['.'])
 
         return config
@@ -146,21 +140,20 @@ class SftpList(object):
         """
 
         dependency_check()
-        
-        config = self.prepare_config(config)
-        connection_config = config['config']
 
-        host = connection_config['host']
-        port = connection_config['port']
-        username = connection_config['username']
-        password = connection_config['password']
-        private_key = connection_config['private_key']
-        private_key_pass = connection_config['private_key_pass']
+        config = self.prepare_config(config)
+
+        host = config['host']
+        port = config['port']
+        username = config['username']
+        password = config['password']
+        private_key = config['private_key']
+        private_key_pass = config['private_key_pass']
         
         dirs = config['dirs']
-        files_only = connection_config['files_only']
-        recursive = connection_config['recursive']
-        get_size = connection_config['get_size']
+        files_only = config['files_only']
+        recursive = config['recursive']
+        get_size = config['get_size']
 
         login_str = ''
         port_str = ''
@@ -177,13 +170,12 @@ class SftpList(object):
         
         log.debug('Connecting to %s' % host)
 
-        conn_conf = ConenctionConfig(host, port, username, password, private_key, private_key_pass)
+        conn_conf = ConnectionConfig(host, port, username, password, private_key, private_key_pass)
         
         try:
             sftp = sftp_connect(conn_conf)
         except Exception as e:
-            log.error('Failed to connect to %s (%s)' % (host, e))
-            return
+            raise PluginError('Failed to connect to %s (%s)' % (host, e))
 
         entries = []
 
@@ -215,7 +207,7 @@ class SftpList(object):
                 return
 
             url = urljoin(url_prefix, sftp.normalize(path))
-            title = os.path.basename(path)
+            title = remotepath.basename(path)
 
             entry = Entry(title, url)
 
@@ -267,6 +259,7 @@ class SftpDownload(object):
     to:                 Destination path; supports Jinja2 templating on the input entry. Fields such
                         as series_name must be populated prior to input into this plugin using
                         metainfo_series or similar.
+    recursive:          Indicates wether to download directory contents recursively.
     delete_origin:      Indicates wether to delete the remote files(s) once they've been downloaded.
 
     Example:
@@ -280,8 +273,10 @@ class SftpDownload(object):
         'type': 'object',
         'properties': {
             'to': {'type': 'string', 'format': 'path'},
+            'recursive': {'type': 'boolean', 'default': True},
             'delete_origin': {'type': 'boolean', 'default': False}
         },
+        'required': ['to'],
         'additionalProperties': False
     }
 
@@ -307,17 +302,74 @@ class SftpDownload(object):
         except KeyError:
             private_key_pass = None
 
-        config = ConenctionConfig(host, port, username, password, private_key, private_key_pass)
+        if parsed.scheme == 'sftp':
+            config= ConnectionConfig(host, port, username, password, private_key, private_key_pass)
+        else:
+            log.warn('Scheme does not match SFTP: %s' % entry['url'])
+            config = None
 
         return config
 
-    def prepare_config(self, config, task):
+    def download_file(self, path, dest, sftp, delete_origin):
         """
-        Sets defaults for the provided configuration
+        Download a file from path to dest
         """
-        config.setdefault('to', os.path.join(task.manager.config_base, 'temp'))
+        dir_name = remotepath.dirname(path)
+        dest_relpath = localpath.join(*remotepath.split(path)) # convert remote path style to local style
+        destination = localpath.join(dest, dest_relpath)
+        dest_dir = localpath.dirname(destination)
 
-        return config
+        if localpath.exists(destination):
+            log.verbose('Destination file already exists. Skipping %s' % path)
+            return
+        
+        if not localpath.exists(dest_dir):
+            os.makedirs(dest_dir)
+
+        log.verbose('Downloading file %s to %s' % (path, destination))
+
+        try:
+            sftp.get(path, destination)
+        except Exception as e:
+            log.error('Failed to download %s (%s)' % (path, e))
+            if remotepath.exists(destination):
+                log.debug('Removing partially downloaded file %s' % destination)
+                os.remove(destination)
+            raise e
+
+        if delete_origin:
+            log.debug('Deleting remote file %s' % path)
+            try:
+                sftp.remove(path)
+            except Exception as e:
+                log.error('Failed to delete file %s (%s)' % (path, e))
+                return
+
+            self.remove_dir(sftp, dir_name)
+
+    def handle_dir(self, path):
+        """
+        Dummy directory handler. Does nothing.
+        """
+        pass
+
+    def handle_unknown(self, path):
+        """
+        Dummy unknown file handler. Warns about unknown files.
+        """
+        log.warn('Skipping unknown file %s' % path)
+
+    def remove_dir(self, sftp, path):
+        """
+        Remove a directory if it's empty
+        """
+        if sftp.exists(path) and not sftp.listdir(path):
+            log.debug('Attempting to delete directory %s' % path)
+            try:
+                sftp.rmdir(path)
+            except Exception as e:
+                log.error('Failed to delete directory %s (%s)' % (path, e))
+                    
 
     def download_entry(self, entry, config, sftp):
         """
@@ -326,6 +378,7 @@ class SftpDownload(object):
 
         path = urlparse(entry['url']).path or '.'
         delete_origin = config['delete_origin']
+        recursive = config['recursive']
 
         to = config['to']
         if to:
@@ -340,51 +393,33 @@ class SftpDownload(object):
             log.error('Remote path does not exist: %s' % path)
             return
 
-        if not os.path.exists(to):
-            os.makedirs(to)
-
-        os.chdir(to)
-
-        if sftp.isdir(path):
-            base_path = os.path.normpath(os.path.join(path, '..'))
-            dir_name = os.path.basename(path)
-
-            log.verbose('Downloading directory %s' % path)
+        if sftp.isfile(path):
+            source_file = remotepath.basename(path)
+            source_dir = remotepath.dirname(path)
             try:
-                sftp.cwd(base_path)
-                sftp.get_r(dir_name, to)
-            except Exception as e:
-                error = 'Failed to download directory %s (%s)' % (path, e)
-                log.error(error)
-                entry.fail(error)
-                return
-
-            if delete_origin:
-                log.debug('Attempting to delete directory %s' % path)
-                try:
-                    sftp.rmdir(dir_name)
-                except Exception as e:
-                    log.error('Failed to delete directory %s' % e)
-                    return
-
-        elif sftp.isfile(path):
-            destination = os.path.join(to, os.path.basename(path))
-
-            log.verbose('Downloading file %s' % path)
-            try:
-                sftp.get(path, destination)
+                sftp.cwd(source_dir)
+                self.download_file(source_file, to, sftp, delete_origin)
             except Exception as e:
                 error = 'Failed to download file %s (%s)' % (path, e)
                 log.error(error)
                 entry.fail(error)
+        elif sftp.isdir(path):
+            base_path = remotepath.normpath(remotepath.join(path, '..'))
+            dir_name = remotepath.basename(path)
+            handle_file = partial(self.download_file, dest=to, sftp=sftp, delete_origin=delete_origin)
+
+            try:
+                sftp.cwd(base_path)
+                sftp.walktree(dir_name, handle_file, self.handle_dir, self.handle_unknown, recursive)
+            except Exception as e:
+                error = 'Failed to download directory %s (%s)' % (path, e)
+                log.error(error)
+                entry.fail(error)
+                
                 return
 
             if delete_origin:
-                try:
-                    sftp.remove(path)
-                except Exception as e:
-                    log.error('Failed to delete file %s (%s)' % (path, e))
-                    return
+                self.remove_dir(sftp, path)
         else:
             log.warn('Skipping unknown file %s' % path)
 
@@ -393,10 +428,12 @@ class SftpDownload(object):
         Task handler for sftp_download plugin
         """
         dependency_check()
-        config = self.prepare_config(config, task)
 
         # Download entries by host so we can reuse the connection
         for sftp_config, entries in groupby(task.accepted, self.get_sftp_config):
+            if not sftp_config:
+                continue
+
             error_message = None
             sftp = None
             try:
