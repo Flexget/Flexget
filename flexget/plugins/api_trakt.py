@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
+from datetime import datetime, timedelta
 from urlparse import urljoin
 
 from dateutil.parser import parse as dateutil_parse
@@ -12,6 +13,7 @@ from flexget import db_schema
 from flexget import plugin
 from flexget.db_schema import upgrade
 from flexget.event import event
+from flexget.manager import Session
 from flexget.plugins.filter.series import normalize_series_name
 from flexget.utils import json, requests
 from flexget.utils.database import with_session
@@ -24,11 +26,46 @@ show_summary = 'http://api.trakt.tv/show/summary.json/'
 Base = db_schema.versioned_base('api_trakt', 3)
 log = logging.getLogger('api_trakt')
 # Production Site
-API_KEY = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
+CLIENT_ID = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
+CLIENT_SECRET = 'db4af7531e8df678b134dbc22445a2c04ebdbdd7213be7f5b6d17dfdfabfcdc2'
 API_URL = 'https://api-v2launch.trakt.tv/'
 
 # Stores the last time we checked for updates for shows/movies
 updated = SimplePersistence('api_trakt')
+
+
+# Oauth account authentication
+class TraktUserAuth(Base):
+    __tablename__ = 'trakt_user_auth'
+
+    account = Column(Unicode)
+    access_token = Column(Unicode)
+    refresh_token = Column(Unicode)
+    expires = Column(DateTime)
+
+
+def account_auth(token, refresh=False):
+    """
+    Gets authorization info from a pin or refresh token.
+
+    :param account: Arbitrary account name to attach authorization to.
+    :param unicode token: The pin or refresh token, as supplied by the trakt website.
+    :param bool refresh: If True, `token` should be a refresh token rather than a pin.
+    :raises RequestException: If there is a network error while authorizing.
+    """
+    data = {
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
+        'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob'
+    }
+    if refresh:
+        data['refresh_token'] = token
+        data['grant_type'] = 'refresh_token'
+    else:
+        data['code'] = token
+        data['grant_type'] = 'authorization_code'
+
+    return get_session().post(get_api_url('oauth/token'), data=data).json()
 
 
 def make_list_slug(name):
@@ -49,7 +86,7 @@ def get_session(username=None, password=None):
     session.headers = {
         'Content-Type': 'application/json',
         'trakt-api-version': 2,
-        'trakt-api-key': API_KEY
+        'trakt-api-key': CLIENT_ID
     }
     if username:
         session.headers['trakt-user-login'] = username
