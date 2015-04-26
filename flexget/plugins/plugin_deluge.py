@@ -783,7 +783,7 @@ class OutputDeluge(DelugePlugin):
                 @defer.inlineCallbacks
                 def _wait_for_files(id, timeout):
                     from time import sleep
-                    log.info('wait_for_files(%d, %d)' % (id, timeout))
+                    log.info('wait_for_files(%s, %d)' % (id, timeout))
                     try:
                         while timeout > 0:
                             sleep(1)
@@ -795,7 +795,7 @@ class OutputDeluge(DelugePlugin):
                     except Exception as err:
                         log.error('wait_for_files Error: %s' % err)
                     defer.returnValue(False)
-                
+
                 def add_entry(entry, opts):
                     """Adds an entry to the deluge session"""
                     magnet, filedump = None, None
@@ -814,9 +814,9 @@ class OutputDeluge(DelugePlugin):
                         # we need to set paused to false so the magnetization begins immediately
                         # NOTE: is this the correct config property and value?
                         opts['add_paused'] = False
-                        
+
                         id = client.core.add_torrent_magnet(magnet, opts)
-                        
+
                         magnetization_timeout = entry.get('magnetization_timeout', config.get('magnetization_timeout'))
                         if magnetization_timeout > 0:
                             log.info('Waiting %d seconds for "%s" to magnetize' % (magnetization_timeout, entry['title']))
@@ -827,7 +827,7 @@ class OutputDeluge(DelugePlugin):
                                 log.info('magnetization successful')
                         else:
                             log.info('not waiting for magnetization')
-                        
+
                         return id
                     else:
                         return client.core.add_torrent_file(entry['title'], filedump, opts)
