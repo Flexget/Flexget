@@ -95,12 +95,12 @@ class SftpList(object):
       sftp_list:
           config:
               host: example.com
-              username: ieaston
-              private_key: /Users/uername/.ssh/id_rsa
+              username: Username
+              private_key: /Users/username/.ssh/id_rsa
               recursive: False
               get_size: True
               files_only: False
-          dirs:
+          dirs: 
               - '/path/to/list/'
     """
 
@@ -116,7 +116,7 @@ class SftpList(object):
             'get_size': {'type': 'boolean', 'default': True},
             'private_key': {'type': 'string'},
             'private_key_pass': {'type': 'string'},
-            'dirs': one_or_more({'type': 'string', 'default': ['.']})
+            'dirs': one_or_more({'type': 'string'})
         },
         'additionProperties': False,
         'required': ['host', 'username']
@@ -130,7 +130,7 @@ class SftpList(object):
         config.setdefault('password', None)
         config.setdefault('private_key', None)
         config.setdefault('private_key_pass', None)
-        config.setdefault('dirs', ['.'])
+        config.setdefault('dirs', ['.'])    
 
         return config
 
@@ -149,11 +149,12 @@ class SftpList(object):
         password = config['password']
         private_key = config['private_key']
         private_key_pass = config['private_key_pass']
-        
-        dirs = config['dirs']
         files_only = config['files_only']
         recursive = config['recursive']
         get_size = config['get_size']
+        dirs = config['dirs']
+        if not isinstance(dirs, list):
+            dirs = [dirs]
 
         login_str = ''
         port_str = ''
