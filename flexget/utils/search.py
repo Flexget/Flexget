@@ -11,7 +11,16 @@ def clean_symbols(text):
     result = text
     if isinstance(result, unicode):
         result = normalize('NFKD', result)
-    return re.sub('[ \(\)\-_\[\]\.]+', ' ', result).lower()
+    result = re.sub('[ \(\)\-_\[\]\.]+', ' ', result).lower()
+    
+    """Special cases"""
+    result = re.sub("(\'s)+", 's', result)
+    result = re.sub("(\'t)+", 't', result)
+
+    """Leftovers"""
+    result = re.sub(r"[^a-zA-Z0-9 ]", "", result)
+
+    return result
 
 
 def clean_title(title):
