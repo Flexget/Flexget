@@ -8,7 +8,7 @@ from requests import RequestException
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.search import torrent_availability, normalize_unicode, clean_title
 
 log = logging.getLogger('kat')
 
@@ -44,6 +44,7 @@ class SearchKAT(object):
         search_strings = [normalize_unicode(s).lower() for s in entry.get('search_strings', [entry['title']])]
         entries = set()
         for search_string in search_strings:
+            search_string = clean_title(search_string)
             search_string_url_fragment = search_string
             params = {'rss': 1}
             if config.get('verified'):
