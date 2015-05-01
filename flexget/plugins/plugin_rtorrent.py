@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+import os
+
 from flexget import plugin
 from flexget.event import event
 
@@ -12,21 +14,54 @@ log = logging.getLogger('rtorrent')
 
 class RtorrentPlugin(object):
 
-    # TODO: schema
+    schema = {
+        'anyOf': [
+            # allow construction with just a bool for enabled
+            {'type': 'boolean'},
+            # allow construction with options
+            {
+                'type': 'object',
+                'properties': {
+                    'enabled': {'type': 'boolean'},
+                    # connection info
+                    'url': {'type': 'string'},
+                    # properties to set on rtorrent download object
+                    'set': {
+                        'type': 'object',
+                        'properties': {
+                            'directory': {'type': 'string'},
+                            'custom1': {'type': 'string'}
+                        }
+                    }
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
 
     def prepare_config(self, config):
+        if isinstance(config, bool):
+            config = {'enabled': config}
+        config.setdefault('enabled', True)
         config.setdefault('url', 'scgi://localhost:5000')
         config.setdefault('set', {})
         return config
 
-    def request(self, config, method, *params):
+    
+    def request(self, config, method, params = []):
+        # TODO: can we add timeout or something?
         xmlreq = xmlrpclib.dumps(tuple(params), method)
         xmlresp = SCGIRequest(config['url']).send(xmlreq)
+        print method
+        print params
+        print xmlresp
         return xmlrpclib.loads(xmlresp)[0][0]
 
 
     def on_task_start(self, task, config):
         config = self.prepare_config(config)
+        if not config['enabled']:
+            return
 
         # check connection to rtorrent
         # TODO: validate response
@@ -40,6 +75,8 @@ class RtorrentPlugin(object):
             This implementation was copied from Transmission plugin.
         """
         config = self.prepare_config(config)
+        if not config['enabled']:
+            return
 
         # If the download plugin is not enabled, we need to call it to get
         # our temp .torrent files
@@ -49,9 +86,12 @@ class RtorrentPlugin(object):
 
     def on_task_output(self, task, config):
         """This method is based on Transmission plugin's implementation"""
+        config = self.prepare_config(config)
         if task.options.learn:
             return
         if not task.accepted:
+            return
+        if not config['enabled']:
             return
         
         self.add_to_client(task, config)
@@ -61,10 +101,42 @@ class RtorrentPlugin(object):
             if task.options.test:
                 log.info('Would add %s to rtorrent' % entry['url'])
                 continue
-            if not self._check_downloaded(entry):
+
+            """Check if file is downloaded and exists"""
+            downloaded = not entry['url'].startswith('magnet:')
+            # Check that file is downloaded
+            if downloaded and 'file' not in entry:
+                entry.fail('file missing?')
+                continue
+            # Verify the temp file exists
+            if downloaded and not os.path.exists(entry['file']):
+                tmp_path = os.path.join(task.manager.config_base, 'temp')
+                log.debug('entry: %s' % entry)
+                log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
+                entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                 continue
 
-            # TODO ...
+            params = []
+
+            # first param is data/url
+            if downloaded:
+                with open(entry['file'], 'rb') as f:
+                    params.append(f.read())
+            else:
+                params.append(entry['url'])
+
+            # add additional params
+            for key, val in config['set'].iteritems():
+                params.append("d.{0}.set={1}".format(key, val))
+
+            log.info(config)
+            # TODO: add config option to specify if autostart
+            # options: {,raw} verbose, start
+            load_method = 'load.' + ('raw_' if downloaded else '') + 'verbose'
+            resp = self.request(config, load_method, params)
+            log.info(resp)
+            # TODO: verify was actually added
+
 
 
     def _check_downloaded(self, entry):
