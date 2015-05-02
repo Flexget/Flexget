@@ -135,10 +135,16 @@ class RtorrentPlugin(object):
 
             # TODO: add config option to specify if autostart
             # options: {,raw} verbose, start
-            load_method = 'load.' + ('raw_' if downloaded else '') + 'verbose'
-            resp = self.request(config, load_method, params)
-            log.info(resp)
-            # TODO: verify was actually added
+            load_method = 'load.' + ('raw_' if downloaded else '') + 'start'
+
+            try:
+                resp = self.request(config, load_method, params)
+            except (xmlrpclib.Fault, xmlrpclib.ProtocolError) as e:
+                entry.fail('Failed with exception: {0}'.format(e))
+                continue
+
+            # TODO: can we verify it was actually added?
+            log.info('rtorrent response: {0}'.format(resp))
 
 
 
