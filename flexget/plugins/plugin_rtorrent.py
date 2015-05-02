@@ -161,7 +161,7 @@ class RtorrentPlugin(object):
                     entry.fail('Failed to verify add: info hash not found')
                     continue
             else:
-                log.debug('Cannot verify add because we have no info hash')
+                log.info('Cannot verify add because we have no info hash')
 
 
 
