@@ -12,7 +12,9 @@ except ImportError:
     SCGIRequest = None
 import xmlrpclib
 
+
 log = logging.getLogger('rtorrent')
+
 
 
 class RtorrentPlugin(object):
@@ -120,7 +122,8 @@ class RtorrentPlugin(object):
                 entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
                 continue
 
-            params = []
+            # not sure if empty string param is only for downloaded or not
+            params = ['']
 
             # first param is data/url
             if downloaded:
@@ -134,17 +137,31 @@ class RtorrentPlugin(object):
                 params.append("d.{0}.set={1}".format(key, val))
 
             # TODO: add config option to specify if autostart
-            # options: {,raw} verbose, start
-            load_method = 'load.' + ('raw_' if downloaded else '') + 'start'
+            # options: {, raw} {verbose, start}
+            load_method = 'load.' + ('raw_' if downloaded else '') + 'verbose'
 
             try:
                 resp = self.request(config, load_method, params)
             except (xmlrpclib.Fault, xmlrpclib.ProtocolError) as e:
-                entry.fail('Failed with exception: {0}'.format(e))
+                entry.fail('Failed to add with exception: {0}'.format(e))
                 continue
 
-            # TODO: can we verify it was actually added?
-            log.info('rtorrent response: {0}'.format(resp))
+            log.debug('rtorrent add response: {0}'.format(resp))
+
+            # verify torrent is added
+            if 'torrent_info_hash' in entry:
+                try:
+                    respHash = self.request(config, 'd.hash', [entry['torrent_info_hash']])
+                except (xmlrpclib.Fault, xmlrpclib.ProtocolError) as e:
+                    entry.fail('Failed to verify add with exception: {0}'.format(e))
+                    continue
+
+                log.debug('rtorrent verify response: {0}'.format(respHash))
+                if respHash != entry['torrent_info_hash']:
+                    entry.fail('Failed to verify add: info hash not found')
+                    continue
+            else:
+                log.debug('Cannot verify add because we have no info hash')
 
 
 
