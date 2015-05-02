@@ -6,7 +6,10 @@ import os
 from flexget import plugin
 from flexget.event import event
 
-from pyrobase.io.xmlrpc2scgi import SCGIRequest
+try:
+    from pyrobase.io.xmlrpc2scgi import SCGIRequest
+except ImportError:
+    SCGIRequest = None
 import xmlrpclib
 
 log = logging.getLogger('rtorrent')
@@ -56,12 +59,17 @@ class RtorrentPlugin(object):
 
 
     def on_task_start(self, task, config):
+        # Check dependencies
+        if SCGIRequest is None:
+            raise plugin.PluginError('pyrobase is required to use this plugin')
+
         config = self.prepare_config(config)
         if not config['enabled']:
             return
 
         # TODO: check connection to rtorrent, validate response
         # resp = self.request(config, 'system.listMethods')
+        # if fail, raise PluginError
 
     def on_task_download(self, task, config):
         """
