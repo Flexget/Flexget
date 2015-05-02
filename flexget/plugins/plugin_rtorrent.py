@@ -52,9 +52,6 @@ class RtorrentPlugin(object):
         # TODO: can we add timeout or something?
         xmlreq = xmlrpclib.dumps(tuple(params), method)
         xmlresp = SCGIRequest(config['url']).send(xmlreq)
-        print method
-        print params
-        print xmlresp
         return xmlrpclib.loads(xmlresp)[0][0]
 
 
@@ -63,9 +60,8 @@ class RtorrentPlugin(object):
         if not config['enabled']:
             return
 
-        # check connection to rtorrent
-        # TODO: validate response
-        resp = self.request(config, 'system.listMethods')
+        # TODO: check connection to rtorrent, validate response
+        # resp = self.request(config, 'system.listMethods')
 
     def on_task_download(self, task, config):
         """
@@ -121,7 +117,7 @@ class RtorrentPlugin(object):
             # first param is data/url
             if downloaded:
                 with open(entry['file'], 'rb') as f:
-                    params.append(f.read())
+                    params.append(xmlrpclib.Binary(f.read()))
             else:
                 params.append(entry['url'])
 
@@ -129,7 +125,6 @@ class RtorrentPlugin(object):
             for key, val in config['set'].iteritems():
                 params.append("d.{0}.set={1}".format(key, val))
 
-            log.info(config)
             # TODO: add config option to specify if autostart
             # options: {,raw} verbose, start
             load_method = 'load.' + ('raw_' if downloaded else '') + 'verbose'
@@ -138,22 +133,6 @@ class RtorrentPlugin(object):
             # TODO: verify was actually added
 
 
-
-    def _check_downloaded(self, entry):
-        """Check if file is downloaded and exists"""
-        downloaded = not entry['url'].startswith('magnet:')
-        # Check that file is downloaded
-        if downloaded and 'file' not in entry:
-            entry.fail('file missing?')
-            return False
-        # Verify the temp file exists
-        if downloaded and not os.path.exists(entry['file']):
-            tmp_path = os.path.join(task.manager.config_base, 'temp')
-            log.debug('entry: %s' % entry)
-            log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-            entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
-            return False
-        return True
 
 @event('plugin.register')
 def register_plugin():
