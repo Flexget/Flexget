@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 
 import os
+from time import sleep
 
 from flexget import plugin
 from flexget.event import event
@@ -17,61 +18,128 @@ log = logging.getLogger('rtorrent')
 
 
 
+class Rtorrent(object):
+    """ rTorrent API client """
+
+    def __init__(self, uri):
+        if not SCGIRequest:
+            raise plugin.PluginError('Dependency pyrobase not found')
+
+        self.uri = uri
+        self._version = None
+
+    def request(self, method, params = []):
+        # TODO: can we add a timeout?
+        xml_req = xmlrpclib.dumps(tuple(params), method)
+        xml_resp = SCGIRequest(self.uri).send(xml_req)
+        return xmlrpclib.loads(xml_resp)[0][0]
+
+    @property
+    def version(self):
+        if not self._version:
+            resp = self.request('system.client_version')
+            self._version = [int(v) for v in resp.split('.')]
+        return self._version
+
+    def load(self, data, options = {}, raw = False):
+        if raw:
+            method = 'load.raw_verbose'
+            with open(data, 'rb') as f:
+                data = xmlrpclib.Binary(f.read())
+        else:
+            method = 'load.verbose'
+
+        params = ['', data]
+
+        # verbose options
+        for key, val in options.iteritems():
+            params.append('d.{0}.set={1}'.format(key, val))
+
+        resp = self.request(method, params)
+
+    def verify_load(self, infohash, attempts = 3, delay = 0.5):
+        """ Fetch and compare just the infohash. """
+        for i in range(0, attempts):
+            try:
+                return self.request('d.hash', [infohash]) == infohash
+            except:
+                sleep(delay)
+        raise
+
+
 class RtorrentPlugin(object):
 
     schema = {
         'anyOf': [
             # allow construction with just a bool for enabled
             {'type': 'boolean'},
+            # allow construction with just a URI
+            {'type': 'string'},
             # allow construction with options
             {
                 'type': 'object',
                 'properties': {
                     'enabled': {'type': 'boolean'},
                     # connection info
-                    'url': {'type': 'string'},
+                    'uri': {'type': 'string'},
+                    # handling options
+                    'start': {'type': 'boolean'},
                     # properties to set on rtorrent download object
-                    'set': {
-                        'type': 'object',
-                        'properties': {
-                            'directory': {'type': 'string'},
-                            'custom1': {'type': 'string'}
-                        }
-                    }
+                    'directory': {'type': 'string'},
+                    'custom1': {'type': 'string'},
+                    'custom2': {'type': 'string'},
+                    'custom3': {'type': 'string'},
+                    'custom4': {'type': 'string'},
+                    'custom5': {'type': 'string'},
                 },
                 'additionalProperties': False
             }
         ]
     }
 
+
     def prepare_config(self, config):
         if isinstance(config, bool):
             config = {'enabled': config}
+        if isinstance(config, str):
+            config = {'uri': config}
+
         config.setdefault('enabled', True)
-        config.setdefault('url', 'scgi://localhost:5000')
-        config.setdefault('set', {})
+        config.setdefault('uri', 'scgi://localhost:5000')
+        config.setdefault('start', True)
+
         return config
 
+    def client_options(self, config):
+        options = {}
+
+        # These options can be copied as-is from config to options
+        options_map_equal = [
+            'directory',
+            'custom1',
+            'custom2',
+            'custom3',
+            'custom4',
+            'custom5'
+        ]
+
+        for option in options_map_equal:
+            if option in config:
+                options[option] = config[option]
+
+        return options
+
+
     
-    def request(self, config, method, params = []):
-        # TODO: can we add timeout or something?
-        xmlreq = xmlrpclib.dumps(tuple(params), method)
-        xmlresp = SCGIRequest(config['url']).send(xmlreq)
-        return xmlrpclib.loads(xmlresp)[0][0]
-
-
     def on_task_start(self, task, config):
-        # Check dependencies
-        if SCGIRequest is None:
-            raise plugin.PluginError('pyrobase is required to use this plugin')
-
         config = self.prepare_config(config)
         if not config['enabled']:
             return
 
-        # TODO: check connection to rtorrent, validate response
-        # resp = self.request(config, 'system.listMethods')
-        # if fail, raise PluginError
+        client = Rtorrent(config['uri'])
+        if client.version < [0, 9, 4]:
+            task.abort("rTorrent version >=0.9.4 required, found {0}"
+                .format('.'.join(map(str, client.version))))
 
     def on_task_download(self, task, config):
         """
@@ -93,76 +161,60 @@ class RtorrentPlugin(object):
     def on_task_output(self, task, config):
         """This method is based on Transmission plugin's implementation"""
         config = self.prepare_config(config)
+        if not config['enabled']:
+            return
         if task.options.learn:
             return
         if not task.accepted:
             return
-        if not config['enabled']:
-            return
         
-        self.add_to_client(task, config)
+        client = Rtorrent(config['uri'])
+        options = self.client_options(config)
 
-    def add_to_client(self, task, config):
         for entry in task.accepted:
             if task.options.test:
-                log.info('Would add %s to rtorrent' % entry['url'])
+                log.info('Would add {0} to rTorrent'.format(entry['url']))
                 continue
+            self.add_entry_to_client(client, entry, options)
 
-            """Check if file is downloaded and exists"""
-            downloaded = not entry['url'].startswith('magnet:')
-            # Check that file is downloaded
-            if downloaded and 'file' not in entry:
-                entry.fail('file missing?')
-                continue
-            # Verify the temp file exists
-            if downloaded and not os.path.exists(entry['file']):
-                tmp_path = os.path.join(task.manager.config_base, 'temp')
-                log.debug('entry: %s' % entry)
-                log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-                entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
-                continue
+    def add_entry_to_client(self, client, entry, options):
+        downloaded = not entry['url'].startswith('magnet:')
 
-            # not sure if empty string param is only for downloaded or not
-            params = ['']
+        # Check that file is downloaded
+        if downloaded and 'file' not in entry:
+            entry.fail('file missing?')
+            return
+        # Verify the temp file exists
+        if downloaded and not os.path.exists(entry['file']):
+            tmp_path = os.path.join(task.manager.config_base, 'temp')
+            log.debug('entry: %s' % entry)
+            log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
+            entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+            return
 
-            # first param is data/url
-            if downloaded:
-                with open(entry['file'], 'rb') as f:
-                    params.append(xmlrpclib.Binary(f.read()))
-            else:
-                params.append(entry['url'])
+        
+        data = entry['file'] if downloaded else entry['url']
 
-            # add additional params
-            for key, val in config['set'].iteritems():
-                params.append("d.{0}.set={1}".format(key, val))
+        try:
+            resp_load = client.load(data, options, downloaded)
+        except (xmlrpclib.Fault, xmlrpclib.ProtocolError) as e:
+            entry.fail('Failed to add: {0}'.format(e))
+            return
+        log.debug('Add response: {0}'.format(resp_load))
 
-            # TODO: add config option to specify if autostart
-            # options: {, raw} {verbose, start}
-            load_method = 'load.' + ('raw_' if downloaded else '') + 'verbose'
+        if 'torrent_info_hash' not in entry:
+            log.info('Cannot verify add: we have no info-hash')
+            return
 
-            try:
-                resp = self.request(config, load_method, params)
-            except (xmlrpclib.Fault, xmlrpclib.ProtocolError) as e:
-                entry.fail('Failed to add with exception: {0}'.format(e))
-                continue
+        try:
+            verified = client.verify_load(entry['torrent_info_hash'])
+        except (xmlrpclib.Fault, xmlrpclib.ProtocolError) as e:
+            entry.fail('Failed to verify add: {0}'.format(e))
+            return
 
-            log.debug('rtorrent add response: {0}'.format(resp))
-
-            # verify torrent is added
-            if 'torrent_info_hash' in entry:
-                try:
-                    respHash = self.request(config, 'd.hash', [entry['torrent_info_hash']])
-                except (xmlrpclib.Fault, xmlrpclib.ProtocolError) as e:
-                    entry.fail('Failed to verify add with exception: {0}'.format(e))
-                    continue
-
-                log.debug('rtorrent verify response: {0}'.format(respHash))
-                if respHash != entry['torrent_info_hash']:
-                    entry.fail('Failed to verify add: info hash not found')
-                    continue
-            else:
-                log.info('Cannot verify add because we have no info hash')
-
+        if not verified:
+            entry.fail('Failed to verify add: info-hash not found')
+            return
 
 
 @event('plugin.register')
