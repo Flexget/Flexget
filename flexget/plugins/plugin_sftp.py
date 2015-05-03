@@ -293,18 +293,11 @@ class SftpDownload(object):
         port = parsed.port or 22
 
         # get private key info if it exists
-        try:
-            private_key = entry['private_key']
-        except KeyError:
-            private_key = None
-
-        try:
-            private_key = entry['private_key_pass']
-        except KeyError:
-            private_key_pass = None
+        private_key = entry.get('private_key')
+        private_key_pass = entry.get('private_key_pass')
 
         if parsed.scheme == 'sftp':
-            config= ConnectionConfig(host, port, username, password, private_key, private_key_pass)
+            config = ConnectionConfig(host, port, username, password, private_key, private_key_pass)
         else:
             log.warn('Scheme does not match SFTP: %s' % entry['url'])
             config = None
