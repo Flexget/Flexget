@@ -9,13 +9,14 @@ from flexget.event import event
 
 log = logging.getLogger('subtitles')
 
-PROVIDERS = {
+PROVIDERS = [
     'opensubtitles',
     'thesubdb',
     'podnapisi',
     'addic7ed',
     'tvsubtitles'
-}
+]
+
 
 class PluginSubliminal(object):
     """
@@ -47,7 +48,7 @@ class PluginSubliminal(object):
             'languages': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
             'alternatives': {'type': 'array', 'items': {'type': 'string'}},
             'exact_match': {'type': 'boolean', 'default': True},
-            'providers': {'type': 'array', 'items': {'type': 'string', 'enum': list(PROVIDERS)}},
+            'providers': {'type': 'array', 'items': {'type': 'string', 'enum': PROVIDERS}},
             'single': {'type': 'boolean', 'default': True},
         },
         'required': ['languages'],
