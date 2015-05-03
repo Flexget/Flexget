@@ -41,19 +41,22 @@ class Rtorrent(object):
             self._version = [int(v) for v in resp.split('.')]
         return self._version
 
-    def load(self, data, options = {}, raw = False):
+    def load(self, data, options = {}, raw = False, start = False):
         if raw:
-            method = 'load.raw_verbose'
+            method = 'load.raw' + ('_start' if start else '')
+
             with open(data, 'rb') as f:
                 data = xmlrpclib.Binary(f.read())
         else:
-            method = 'load.verbose'
+            method = 'load.' + ('start' if start else 'normal')
 
+        # first param is empty string; not sure why, but it is required
         params = ['', data]
 
-        # verbose options
+        # extra commands
         for key, val in options.iteritems():
             params.append('d.{0}.set={1}'.format(key, val))
+        # TODO: add an 'execute' command to mkdir the destination
 
         resp = self.request(method, params)
 
@@ -175,9 +178,9 @@ class RtorrentPlugin(object):
             if task.options.test:
                 log.info('Would add {0} to rTorrent'.format(entry['url']))
                 continue
-            self.add_entry_to_client(client, entry, options)
+            self.add_entry_to_client(client, entry, options, config['start'])
 
-    def add_entry_to_client(self, client, entry, options):
+    def add_entry_to_client(self, client, entry, options, start):
         downloaded = not entry['url'].startswith('magnet:')
 
         # Check that file is downloaded
@@ -196,7 +199,7 @@ class RtorrentPlugin(object):
         data = entry['file'] if downloaded else entry['url']
 
         try:
-            resp_load = client.load(data, options, downloaded)
+            resp_load = client.load(data, options, downloaded, start)
         except (xmlrpclib.Fault, xmlrpclib.ProtocolError) as e:
             entry.fail('Failed to add: {0}'.format(e))
             return
