@@ -267,6 +267,8 @@ class RTorrent(object):
         :param username: Username for basic auth over http(s)
         :param password: Password for basic auth over http(s)
         """
+        self._version = None
+
         self.uri = uri
         self.username = username
         self.password = password
@@ -298,6 +300,13 @@ class RTorrent(object):
             getattr(m, method)(*args)
 
         return m()
+
+    @property
+    def version(self):
+        if not self._version:
+            method = getattr(self._conn, "system.client_version")
+            self._version = [int(v) for v in method().split(".")]
+        return self._version
 
     def get_torrent(self, info_hash):
 
@@ -351,7 +360,6 @@ class RTorrent(object):
         return torrent.info_hash
 
     def set_torrent_properties(self, info_hash, props):
-
         calls = [("d.set_%s" % field, (info_hash, value)) for field, value in props.iteritems()]
         self._call_multi(calls)
 
@@ -440,14 +448,13 @@ class PluginRTorrent(object):
         return config
 
     def on_task_start(self, task, config):
-        self.client = None
         config = self.prepare_config(config)
         if config['enabled']:
             if task.options.test:
                 log.info('Trying to connect to rtorrent...')
                 try:
-                    self.client = RTorrent(config['url'])
-                    log.info('Successfully connected to transmission.')
+                    client = RTorrent(config['url'])
+                    log.info('Successfully connected to rtorrent.')
                 except:
                     log.error('It looks like there was a problem connecting to rtorrent.')
 
@@ -476,8 +483,13 @@ class PluginRTorrent(object):
     def add_to_rtorrent(self, task, config):
         try:
             client = RTorrent(config.get('url'))
+            if client.version < [0, 9, 4]:
+                ver_str = ".".join([str(v) for v in client.version])
+                reason = "RTorrent version 0.9.4 or greater required, found %s" % ver_str
+                log.error(reason)
+                task.abort(reason=reason)
             log.debug('Successfully connected to rtorrent.')
-        except Exception as e:
+        except (IOError, xmlrpclib.Fault) as e:
             raise plugin.PluginError("Couldn't connect to rtorrent.")
 
         for entry in task.accepted:
@@ -547,6 +559,22 @@ class PluginRTorrent(object):
                     continue
 
             log.info('"%s" torrent added to rtorrent' % (entry['title']))
+
+    def on_task_exit(self, task, config):
+        """Make sure all temp files are cleaned up when task exits"""
+        # If download plugin is enabled, it will handle cleanup.
+        if 'download' not in task.config:
+            download = plugin.get_plugin_by_name('download')
+            download.instance.cleanup_temp_files(task)
+
+    on_task_abort = on_task_exit
+
+# TODO: RTorrent as an input
+# class PluginRTorrentInput(object):
+
+
+# TODO: RTorrent cleanup (similar to transmission plugin)
+# class PluginRTorrentClean(object):
 
 
 @event('plugin.register')
