@@ -94,7 +94,7 @@ class SearchSpanishTracker(object):
             # http://publichd.se/index.php?page=torrents&active=0&category=5;15&search=QUERY
             url = (base_url + category_url_fragment + query_url_fragment)
             log.debug('SpanishTracker search url: %s' % url)
-            page = requests.get(url).content
+            page = session.get(url).content
             soup = get_soup(page)
             links = soup.findAll('a', attrs={'href': re.compile('download\.php\?id=\d+')})
             #log.debug('SpanishTracker soup: %s' % links)
@@ -108,8 +108,8 @@ class SearchSpanishTracker(object):
                 #log.debug('SpanishTracker dl url %s' % dl_url)
                 td = row.findAll('td')
                 entry = Entry()
+                entry['url'] = 'http://www.spanishtracker.com/download.php?id=' + dl_url
                 entry['title'] = dl_title
-                entry['url'] = ("http://www.spanishtracker.com/download.php?id=" + dl_url)
                 # 4th and 3rd table cells contains amount of seeders and leeechers respectively
                 entry['torrent_seeds'] = int(td[-4].string)
                 entry['torrent_leeches'] = int(td[-3].string)
@@ -127,6 +127,10 @@ class SearchSpanishTracker(object):
                 results.add(entry)
                 
         log.debug('Finish search SpanishTracker with %d entries' % len(results))
+#        if len(results) > 0:
+#	    for value in results:
+#	        log.debug(value['title'])
+#	        log.debug(value['url'])
         return results
       
 
