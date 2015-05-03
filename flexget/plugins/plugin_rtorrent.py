@@ -397,16 +397,17 @@ class PluginRTorrent(object):
         url: scgi://localhost:5000
         username: myusername (http(s) Only)
         password: mypassword (http(s) Only)
-        path: the download location
+        set:
+          directory: /some/download/folder
+          priority: off/low/medium/high
 
     Default values for the config elements::
 
       transmission:
         enabled: yes
         url: scgi://localhost:5000
-        autostart: yes
+        start: yes
         verify: yes
-        priority: off
     """
 
     schema = {
@@ -419,15 +420,16 @@ class PluginRTorrent(object):
                     'url': {'type': 'string'},
                     'username': {'type': 'string'},
                     'password': {'type': 'string'},
-                    'autostart': {'type': 'boolean'},
+                    'start': {'type': 'boolean'},
                     'verify': {'type': 'boolean'},
-                    'path': {'type': 'string'},
-                    'priority': {'type': 'string'},
-                    'custom1': {'type': 'string'},
-                    'custom2': {'type': 'string'},
-                    'custom3': {'type': 'string'},
-                    'custom4': {'type': 'string'},
-                    'custom5': {'type': 'string'},
+                    'set': {
+                        'type': 'object',
+                        'properties': {
+                            'directory': {'type': 'string'},
+                            'custom1': {'type': 'string'},
+                            'priority': {'type': 'string'},
+                        }
+                    }
                 },
                 'additionalProperties': False
             }
@@ -441,10 +443,9 @@ class PluginRTorrent(object):
         config.setdefault('url', 'scgi://localhost:5000')
         config.setdefault('username', None)
         config.setdefault('password', None)
-        config.setdefault('autostart', True)
+        config.setdefault('start', True)
         config.setdefault('verify', True)
-        config.setdefault('priority', "off")
-        config.setdefault('custom', {})
+        config.setdefault('set', {})
         return config
 
     def on_task_start(self, task, config):
@@ -525,29 +526,24 @@ class PluginRTorrent(object):
                 entry.fail("Error loading torrent %s" % str(e))
                 continue
 
-            # Build up a multi call to set properties of torrent
-            props = {"priority": priorities[config.get("priority", "off")]}
+            # set fields call d.set_<field name>
+            set_fields = {}
+            for field, value in config.get('set', {}).iteritems():
+                set_fields[field] = value
 
-            # Try set the save folder. Use path if directory is not set
-            if config.get("path"):
-                props['directory'] = config.get("path")
-            elif entry.get('path'):
-                props['directory'] = entry['path']
-
-            # custom fields
-            for i in range(1, 4):
-                if config.get("custom%s" % i):
-                    props["custom%s" % i] = config["custom%s" % i]
-
-            # TODO: Add support for include/exclude files and change their priorities
+            # Convert priority to int
+            if set_fields.get('priority'):
+                set_fields['priority'] = priorities[set_fields['priority']]
 
             try:
-                client.set_torrent_properties(info_hash, props)
+                client.set_torrent_properties(info_hash, set_fields)
             except (IOError, xmlrpclib.Fault) as e:
                 entry.fail("Error setting properties of torrent %s" % str(e))
                 continue
 
-            if config.get("autostart"):
+            # TODO: Add support for include/exclude files and change their priorities
+
+            if config.get("start"):
                 # Ensure torrent was started
                 try:
                     started = client.start(info_hash)
