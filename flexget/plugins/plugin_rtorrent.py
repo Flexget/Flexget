@@ -12,6 +12,9 @@ from time import sleep
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.bittorrent import Torrent, is_torrent_file
+from flexget.utils.pathscrub import pathscrub
+from flexget.utils.template import RenderError
+
 
 log = logging.getLogger('rtorrent')
 
@@ -397,13 +400,12 @@ class PluginRTorrent(object):
         url: scgi://localhost:5000
         username: myusername (http(s) Only)
         password: mypassword (http(s) Only)
-        set:
-          directory: /some/download/folder
-          priority: off/low/medium/high
+        path: /some/download/folder
+        priority: off/low/medium/high
 
     Default values for the config elements::
 
-      transmission:
+      rtorrent:
         enabled: yes
         url: scgi://localhost:5000
         start: yes
@@ -422,19 +424,60 @@ class PluginRTorrent(object):
                     'password': {'type': 'string'},
                     'start': {'type': 'boolean'},
                     'verify': {'type': 'boolean'},
-                    'set': {
-                        'type': 'object',
-                        'properties': {
-                            'directory': {'type': 'string'},
-                            'custom1': {'type': 'string'},
-                            'priority': {'type': 'string'},
-                        }
-                    }
+                    'path': {'type': 'string'},
+                    'path_base': {'type': 'string'},
+                    'peers_max': {'type': 'string'},
+                    'peers_min': {'type': 'string'},
+                    'priority': {'type': 'string'},
+                    'message': {'type': 'string'},
+                    'custom1': {'type': 'string'},
+                    'custom2': {'type': 'string'},
+                    'custom3': {'type': 'string'},
+                    'custom4': {'type': 'string'},
+                    'custom5': {'type': 'string'},
                 },
                 'additionalProperties': False
             }
         ]
     }
+
+    def _make_torrent_properties_dict(self, config, entry):
+
+        opt_dic = {}
+
+        for opt_key in ('path', 'path_base', 'message', 'peers_max', 'peers_min', 'priority',
+                        'custom1', 'custom2', 'custom3', 'custom4', 'custom5'):
+            # Values do not merge config with task
+            # Task takes priority then config is used
+            if opt_key in entry:
+                opt_dic[opt_key] = entry[opt_key]
+            elif opt_key in config:
+                opt_dic[opt_key] = config[opt_key]
+
+        if opt_dic.get('path'):
+            try:
+                path = os.path.expanduser(entry.render(opt_dic['path']))
+                opt_dic['directory'] = pathscrub(path).encode('utf-8')
+            except RenderError as e:
+                log.error('Error setting path for %s: %s' % (entry['title'], e))
+
+            del opt_dic['path']
+
+        if opt_dic.get('path_base'):
+            try:
+                path = os.path.expanduser(entry.render(opt_dic['path']))
+                opt_dic['path_base'] = pathscrub(path).encode('utf-8')
+            except RenderError as e:
+                log.error('Error setting path for %s: %s' % (entry['title'], e))
+
+            del opt_dic['path_base']
+
+        if opt_dic.get('priority'):
+            priority = opt_dic['priority']
+            if priority in priorities:
+                opt_dic['priority'] = priorities[priority]
+
+        return opt_dic
 
     def prepare_config(self, config):
         if isinstance(config, bool):
@@ -445,7 +488,6 @@ class PluginRTorrent(object):
         config.setdefault('password', None)
         config.setdefault('start', True)
         config.setdefault('verify', True)
-        config.setdefault('set', {})
         return config
 
     def on_task_start(self, task, config):
@@ -527,21 +569,10 @@ class PluginRTorrent(object):
                 entry.fail("Error loading torrent %s" % str(e))
                 continue
 
-            # set fields call d.set_<field name>
-            set_fields = {}
-            for field, value in config.get('set', {}).iteritems():
-                set_fields[field] = value
-
-            # Convert priority to int
-            if set_fields.get('priority'):
-                set_fields['priority'] = priorities[set_fields['priority']]
-
-            # Figure out path from entry if not directory specified
-            if 'directory' not in set_fields and entry.get("path"):
-                set_fields['directory'] = entry.get("path")
+            torrent_properties = self._make_torrent_properties_dict(config, entry)
 
             try:
-                client.set_torrent_properties(info_hash, set_fields)
+                client.set_torrent_properties(info_hash, torrent_properties)
             except (IOError, xmlrpclib.Fault) as e:
                 entry.fail("Error setting properties of torrent %s" % str(e))
                 continue
