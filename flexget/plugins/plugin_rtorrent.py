@@ -455,9 +455,10 @@ class PluginRTorrent(object):
                 log.info('Trying to connect to rtorrent...')
                 try:
                     client = RTorrent(config['url'])
-                    log.info('Successfully connected to rtorrent.')
-                except:
-                    log.error('It looks like there was a problem connecting to rtorrent.')
+                    ver = ".".join([str(v) for v in client.version])
+                    log.info('Successfully connected to rtorrent ver %s .' % ver)
+                except (IOError, xmlrpclib.Fault) as e:
+                    log.error('It looks like there was a problem connecting to rtorrent %s' % str(e))
 
     def on_task_download(self, task, config):
         """ Call download plugin to generate the temp files """
@@ -535,6 +536,10 @@ class PluginRTorrent(object):
             if set_fields.get('priority'):
                 set_fields['priority'] = priorities[set_fields['priority']]
 
+            # Figure out path from entry if not directory specified
+            if 'directory' not in set_fields and entry.get("path"):
+                set_fields['directory'] = entry.get("path")
+
             try:
                 client.set_torrent_properties(info_hash, set_fields)
             except (IOError, xmlrpclib.Fault) as e:
@@ -564,9 +569,6 @@ class PluginRTorrent(object):
             download.instance.cleanup_temp_files(task)
 
     on_task_abort = on_task_exit
-
-# TODO: RTorrent as an input
-# class PluginRTorrentInput(object):
 
 
 # TODO: RTorrent cleanup (similar to transmission plugin)
