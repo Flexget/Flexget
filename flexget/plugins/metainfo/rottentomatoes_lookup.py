@@ -60,7 +60,10 @@ class PluginRottenTomatoesLookup(object):
         {'type': 'string', 'description': 'provide a custom api key'}
     ]}
 
-    def lazy_loader(self, entry, field):
+    def __init__(self):
+        self.key = None
+
+    def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields.
 
         :param entry: entry to perform lookup on
@@ -72,9 +75,6 @@ class PluginRottenTomatoesLookup(object):
             self.lookup(entry, key=self.key)
         except plugin.PluginError as e:
             log_once(e.value.capitalize(), logger=log)
-            # Set all of our fields to None if the lookup failed
-            entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
-        return entry[field]
 
     def lookup(self, entry, search_allowed=True, key=None):
         """
@@ -86,7 +86,7 @@ class PluginRottenTomatoesLookup(object):
         :raises PluginError: Failure reason
         """
         if not key:
-            key = API_KEY
+            key = self.key or API_KEY
         movie = lookup_movie(smart_match=entry['title'],
                              rottentomatoes_id=entry.get('rt_id', eval_lazy=False),
                              only_cached=(not search_allowed),
@@ -111,7 +111,7 @@ class PluginRottenTomatoesLookup(object):
             self.key = None
 
         for entry in task.entries:
-            entry.register_lazy_fields(self.field_map, self.lazy_loader)
+            entry.register_lazy_func(self.lazy_loader, self.field_map)
 
 @event('plugin.register')
 def register_plugin():

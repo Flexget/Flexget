@@ -9,6 +9,8 @@ from flexget.utils.template import RenderError
 
 log = logging.getLogger('set')
 
+UNSET = object()
+
 
 class ModifySet(object):
 
@@ -32,26 +34,24 @@ class ModifySet(object):
 
     def modify(self, entry, config, errors=True):
         """This can be called from a plugin to add set values to an entry"""
-        orig_field_values = {}
         for field in config:
             # If this doesn't appear to be a jinja template, just set it right away.
             if not isinstance(config[field], basestring) or '{' not in config[field]:
                 entry[field] = config[field]
             # Store original values before overwriting with a lazy field, so that set directives can reference
             # themselves.
-            elif field in entry:
-                orig_field_values[field] = entry.pop(field)
-        entry.register_lazy_fields(config, partial(self.lazy_set, config, orig_field_values, errors=errors))
+            else:
+                entry.register_lazy_func(
+                    partial(self.lazy_set, config, field, entry.pop(field, UNSET), errors=errors), config)
 
-    def lazy_set(self, config, orig_field_values, entry, field, errors=True):
+    def lazy_set(self, config, field, orig_field_value, entry, errors=True):
         logger = log.error if errors else log.debug
-        if field in orig_field_values:
-            entry[field] = orig_field_values[field]
+        if orig_field_value is not UNSET:
+            entry[field] = orig_field_value
         try:
             entry[field] = entry.render(config[field])
         except RenderError as e:
             logger('Could not set %s for %s: %s' % (field, entry['title'], e))
-        return entry.get(field, eval_lazy=False)
 
 @event('plugin.register')
 def register_plugin():

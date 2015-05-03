@@ -64,13 +64,13 @@ class TestInputRSS(FlexGetBase):
         # zero sized enclosure should not pick up filename (some idiotic sites)
         e = self.task.find_entry(title='Zero sized enclosure')
         assert e, 'RSS entry missing: zero sized'
-        assert not e.has_key('filename'), \
+        assert 'filename' not in e, \
             'RSS entry with 0-sized enclosure should not have explicit filename'
 
         # messy enclosure
         e = self.task.find_entry(title='Messy enclosure')
         assert e, 'RSS entry missing: messy'
-        assert e.has_key('filename'), 'Messy RSS enclosure: missing filename'
+        assert 'filename' in e, 'Messy RSS enclosure: missing filename'
         assert e['filename'] == 'enclosure.mp3', 'Messy RSS enclosure: wrong filename'
 
         # pick link from guid
