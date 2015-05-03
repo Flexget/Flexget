@@ -5,14 +5,13 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: [__cfduid=df760fe5c883ff491ff2cc4d68718f1471413942363700]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+        User-Agent: [FlexGet/1.2.304.dev (www.flexget.com)]
       method: GET
       uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=the%20daily%20show%20%28with%20jon%20stewart%29&language=en
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA3RT227bMAx991cQeXdkp03bAKqLrlmADlhXIN1zodiMrEWWDEmO5339aHlJgwJ7
+          H4sIAAAAAAAAA3VT227bMAx991cQeXdkp03bAKqLrlmADlhXIN1zodiMrEWWDEmO5339aHlJgwJ7
           scnD2+FF/OF3o+GIzitr7mf5PJsBmtJWysj72c+3TXo3g4ci4WsRBP226BR6EnwUVFXc5ovlDWdn
           PeFaGNkJiQUazs7KKfZFNFi81QhrofQA29r20KtQwzdrYBuwFy5wduGb8EetRJT9p0DOLkwJ3wlj
           0BXSibZWpdAsckvl3fxXKzn7Z074D+r3qLAvNtZJDBDcQO1CsHBAbKEVJU6UFtdQ286Bwd7TJ/TW
@@ -20,20 +19,22 @@ interactions:
           qoSRL9g9OCzRhCm+RlFpZZD8TAWt1SqMbcNeyc4RGmpnO0lFYdrOGO9FUC56NdZYbWVH+G64nD6R
           tDSOyNejbKhedCmto6ytNVVExpp7ZaijgToP00j9FDZmDVCixp0jUv9jOOfsvIuEb5Tz4VE5rIp8
           tbpJs1Wa5ZxdwAl/mZZQPI1jGeCJmDihOTvhCX/+vv7y/rwuQsjyfJlf33J2ghL+R7QLFd7pTL++
-          ZtlidZUtrzj7QBP+cdFRZeeDZ/EF/AUAAP//AwDwHcwdMAMAAA==
+          ZtlidZUtrzj7QBP+cdFRZeeDZ/EF/AXwHcwdMAMAAA==
       headers:
         cache-control: [max-age=900]
-        cf-ray: [17d204f90a7f0773-EWR]
+        cf-ray: [1e0d230bc66e0f0f-IAD]
         connection: [keep-alive]
         content-encoding: [gzip]
         content-type: [text/xml; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 01:46:08 GMT']
-        expires: ['Wed, 22 Oct 2014 01:51:44 GMT']
+        date: ['Sun, 03 May 2015 15:53:07 GMT']
+        expires: ['Sun, 03 May 2015 16:06:10 GMT']
         server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=dadc04c75154e262340e72aa3a034e5af1430668387; expires=Mon,
+            02-May-16 15:53:07 GMT; path=/; domain=.thetvdb.com; HttpOnly']
         transfer-encoding: [chunked]
         vary: [Accept-Encoding]
         x-cache: [MISS]
-        x-powered-by: [PHP/5.3.10-1ubuntu3.11]
+        x-powered-by: [PHP/5.3.10-1ubuntu3.15]
       status: {code: 200, message: OK}
   - request:
       body: null
@@ -41,38 +42,69 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: [__cfduid=df760fe5c883ff491ff2cc4d68718f1471413942363700]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+        Cookie: [__cfduid=dadc04c75154e262340e72aa3a034e5af1430668387]
+        User-Agent: [FlexGet/1.2.304.dev (www.flexget.com)]
+      method: GET
+      uri: http://www.thetvdb.com/api/4D297D8CFDE0E105/mirrors.xml
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAAA7Oxr8jNUShLLSrOzM+zVTLUM1BSSM1Lzk/JzEu3VQoNcdO1UFKwt+Oy8c0sKsov
+          KrbjUlCAskFMICczxc7QRh9IQri5YLmCxJIMu4ySkgIrff2SjNSSspQkveT8XBt9JGmI+pLKgtTc
+          xOJsO3MbfTgbZIk+zBYYC2g3AI+ix/OuAAAA
+      headers:
+        cache-control: ['public, max-age=1800']
+        cf-cache-status: [HIT]
+        cf-ray: [1e0d230cf6890f0f-IAD]
+        connection: [keep-alive]
+        content-encoding: [gzip]
+        content-type: [text/xml]
+        date: ['Sun, 03 May 2015 15:53:07 GMT']
+        expires: ['Sun, 03 May 2015 16:23:07 GMT']
+        last-modified: ['Sun, 03 May 2015 15:40:01 GMT']
+        server: [cloudflare-nginx]
+        transfer-encoding: [chunked]
+        vary: [Accept-Encoding]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Accept-Encoding: ['gzip, deflate']
+        Connection: [keep-alive]
+        Cookie: [__cfduid=dadc04c75154e262340e72aa3a034e5af1430668387]
+        User-Agent: [FlexGet/1.2.304.dev (www.flexget.com)]
       method: GET
       uri: http://thetvdb.com/api/4D297D8CFDE0E105/series/71256/en.xml
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA3RVUXPaOBB+76/YyTvYJqQJN647BUrbTEk6gR6PzGIvtg4heSQ5nG/8429tGUo6
-          0xcsffvtt7valYg//nuU8ErGCq0+3ETD8AZIpToTKv9w83O9GDzcwMfkXTxHh8k7gHhFRpBtl7wR
-          WXIfje7exwGvPPQpddrYpHnUClaOTmgcrwsFz1JwnGZTo3MwI4Vp8wmt2MMSVfYqmke07MJuZJsV
-          HlG5AmFK1Ez1DjZCur1WeTM1AhX8VDlLzfFVZLAw2rrmcwZfSR5tszCoDjCnGRrdPJIxNQcwpJrv
-          WPEHNkQZizfLNo0NSls0S8GiR1hryfgTqrQG9iYpmxdMCyQJX9EYYZsXzmSmTZaZulk5TKmGL6xp
-          dHoYbLTObBMHff39YQhjt3Osn/cc9pDMUciaKW/RK+paHCmJor/CEH4se2KHec5MK0fKvaDj9iTr
-          vwfROA7egp64YEfH3pQl0WTyfhBOBmEUB1ew533h5ClpZvpIWd080ck2a5QHWBX6xLV4s6d+W86n
-          22/zxLkwiu6i8X0cnCFP+I4qrzCnhFQcXDbe9kTupM0h8YHa7juDMg7O+BsWK14sF/Vnnp1XQadk
-          oU1ODpypuVxwGg5EJZTcDDgJV8BoDIWuDCguhn86FTsAVxDsyDrY44G80XKRIFRnYpbMWEBKKI3m
-          sSKodeUVkcGW0zm1aMoTWPDQShrCmg1dW7szA2EBIW2rFCm0+YLeg6GUC/b+BWEmBc84sACUWgon
-          UpSwFzmPp+VARlc5BwXbXbTW33JrTcc6aqWlzivGdzVcXTFOkm+Hz9dSfuR4HSXVhlVLrbIOaWPu
-          heKKaq7c+SO13q1VdZCSpJ3hpP6U4TAOLr3wreknbzK8jYM3U+g3M10pl0wezka/7xm8bMf7NmRr
-          v/YW/8xw+6PRhHUv22vrEzL9twZ0pVwdzNm14/bODl1lk/beCFVxRszxkLdjlvEFiQP/vcKm9Rnl
-          lcd3qBSZJDdYFu0pBd1zOMgfhv+UrNubPXePihNK/CfQRuRtJ3qPaOw9epL3kGhdVWbo2ns8jm7v
-          b+/HIz6Na9wzS34DOZD/2LOml+xtnuiOdnvit5WyrZasGge/IZ72H5Yj4bb8qn/+EYbcgvCO4/5C
-          23+C4PxXEAf+3+F/AAAA//8DAK7vrbJNBgAA
+          H4sIAAAAAAAAA3VVUXPaOBB+76/YyTvYJiQtN647BZq2mZJ0Aj0emcVebB1CYiQ5nG/0429tGY50
+          5l5s+dtvv93VruT0098HCa9krNDq400yjG+AVK4LocqPN79WD4MPN/Ape5fO0WH2DiBdkhFk2yV/
+          iCJ7n4zu7tOIVwH6nDttbOYftYKloxMax+tKwbMUHMevG3QOZqQw95/Rih0sUBWvwj+iZRd2I+uX
+          eEDlKoQpkZ/qLayFdDutSj81AhX8UiVLzfFVFPBgtHX+SwHfSB6sfzCo9jCnGRrtH8mYhgMYUv4H
+          1vyCNVHB4n7RprFGaSu/ECx6gJWWjD+hyhtgb5LSv2BeIUn4hsYI6184k5k2RWEav3SYUwNfWdPo
+          fD9Ya11Y79Oo34B+N4Sxmzk2zzuOu8/mKGTDlLfoFXUlDpQlyR9xDD8XPbHDAmemlSPlXtBxf7LV
+          n4NknEZvwUB8YEfH3lRkyWRyP4gngzhJoys48L5y9pT5mT5Q0fgnOlm/QrmHZaVPXEswB+r3xXy6
+          +T7PnIuT5C4Zv0+jMxQIP1CVNZaUkUqjy0ewPZE7abPPQqC2/c6gTKMz/obFihfLRf2Zh+dV0Cl7
+          0KYkB840XC44DXuiIxy5G3ASroLRGCpdG1BcDD86FTsAVxFsyTrY4Z6C0XKRIFRnYpYsWEBKOBrN
+          c0XQ6DooIoMtp3Nq0ZxHsOKplTSEFRu6tnZ7BsICQt5WKXJo8wW9A0M5Fxz8K8JCCh5yYAE4aimc
+          yFHCTpQ8n5YDGV2XHBRsd9Jaf8utNR3roJWWuqwZ3zZwdcY4ST4eIV9L5YHjdZRcG1Y9alV0SBtz
+          JxRX1HDlLmypDW6tqoOcJG0NJ/V/GQ7T6NKL0Jp+8ibD2zR6M4XhY6Zr5bIkHp2tAegpvGzn+zZm
+          a78OlnDRcP+T0YSFL5/X1idk+m8d6Gq52pmza8ftnR262mbtwRGq5oyYE6Bgx6LgE5JG4X2FTZsz
+          yquAb1EpMllp8Fi12xR1F+Kg/DD868i6vTlwd6g4oSy8Im1E2bai90jGwaMnBQ+J1tXHAl17kMe3
+          8d1kFN/zQb7GA/PItyAHCi971gySvS0Q3cFuTny7UrHRklXT6Dck0P7B40i4Dd/rX37GMbcgvuMu
+          /Ie2/4Lo/DNIo/B/+BfKiYS7TwYAAA==
       headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d204fabcb206a9-EWR]
+        cache-control: ['public, max-age=1800']
+        cf-cache-status: [REVALIDATED]
+        cf-ray: [1e0d230d546602b8-IAD]
         connection: [keep-alive]
         content-encoding: [gzip]
         content-type: [text/xml]
-        date: ['Wed, 22 Oct 2014 01:46:08 GMT']
-        expires: ['Wed, 22 Oct 2014 01:51:44 GMT']
-        last-modified: ['Sun, 19 Oct 2014 17:05:30 GMT']
+        date: ['Sun, 03 May 2015 15:53:07 GMT']
+        expires: ['Sun, 03 May 2015 16:23:07 GMT']
+        last-modified: ['Sat, 02 May 2015 18:51:00 GMT']
         server: [cloudflare-nginx]
         transfer-encoding: [chunked]
         vary: [Accept-Encoding]
@@ -83,14 +115,14 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: [__cfduid=df760fe5c883ff491ff2cc4d68718f1471413942363700]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+        Cookie: [__cfduid=dadc04c75154e262340e72aa3a034e5af1430668387]
+        User-Agent: [FlexGet/1.2.304.dev (www.flexget.com)]
       method: GET
       uri: http://thetvdb.com/api/GetEpisodeByAirDate.php?apikey=4D297D8CFDE0E105&seriesid=71256&airdate=2012-06-06&language=en
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA3RTXY/TMBB896+w+sLLXZ009Evay4m7UlSJA0SBPlZusk0NiR3ZToF/z6ZJ07SA
+          H4sIAAAAAAAAA3VTXY/TMBB896+w+sLLXZ009Evay4m7UlSJA0SBPlZusk0NiR3ZToF/z6ZJ07SA
           FCm7M7seez2Gx19Fzo9onTL6YRAOgwFHnZhU6exh8PXL8n424I8xg4X0kn5vS+VMihSpNH4dRZMo
           iEBQzODZFDulMd1iU6OrYoc2DoM5iP9wvSaH0hkdh9NecYuR+LfFNjnI0lMPiH7WcKlyCe2hodqk
           Ya71moLbPdRYK9UUXHSVxcSbU+M5rGewKrJlLrN4BOKSdMP5IAuMXxRtEXO+lM7tUKdo69oLf6nu
@@ -99,375 +131,19 @@ interactions:
           yjznmNMgyW13PLVGo+OJKbDuJZnffG9s4e5owZT/fRxa4ogyd3zwyVITiVVuwMvceF4apb0bguj2
           zYCK0uqk9Vx7FsQNwOCz9GR0YtqAwfp09+dLITdeAQw2VjUubAMGcudMXnncdia7RRjsVY66vvbW
           e05Mw9F4ItoXNPxeZiC6Iga5dL4qU+npisMomgfjeTAag+jjDBqf1g9xOp7N6B12QM1ZhY7Ck1BN
-          tTnrbFaHzbP+AwAA//8DAFgWYTUGBAAA
+          tTnrbFaHzbP+A1gWYTUGBAAA
       headers:
         cache-control: [max-age=900]
-        cf-ray: [17d204fbccc406a9-EWR]
+        cf-ray: [1e0d230e74ab02b8-IAD]
         connection: [keep-alive]
         content-encoding: [gzip]
         content-type: [text/xml; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 01:46:09 GMT']
-        expires: ['Wed, 22 Oct 2014 01:47:27 GMT']
+        date: ['Sun, 03 May 2015 15:53:08 GMT']
+        expires: ['Sun, 03 May 2015 16:07:00 GMT']
         server: [cloudflare-nginx]
         transfer-encoding: [chunked]
         vary: [Accept-Encoding]
         x-cache: [MISS]
-        x-powered-by: [PHP/5.3.10-1ubuntu3.11]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=df760fe5c883ff491ff2cc4d68718f1471413942363700]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://thetvdb.com/api/4D297D8CFDE0E105/series/71256/en.xml
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3RVUXPaOBB+76/YyTvYJqQJN647BUrbTEk6gR6PzGIvtg4heSQ5nG/8429tGUo6
-          0xcsffvtt7valYg//nuU8ErGCq0+3ETD8AZIpToTKv9w83O9GDzcwMfkXTxHh8k7gHhFRpBtl7wR
-          WXIfje7exwGvPPQpddrYpHnUClaOTmgcrwsFz1JwnGZTo3MwI4Vp8wmt2MMSVfYqmke07MJuZJsV
-          HlG5AmFK1Ez1DjZCur1WeTM1AhX8VDlLzfFVZLAw2rrmcwZfSR5tszCoDjCnGRrdPJIxNQcwpJrv
-          WPEHNkQZizfLNo0NSls0S8GiR1hryfgTqrQG9iYpmxdMCyQJX9EYYZsXzmSmTZaZulk5TKmGL6xp
-          dHoYbLTObBMHff39YQhjt3Osn/cc9pDMUciaKW/RK+paHCmJor/CEH4se2KHec5MK0fKvaDj9iTr
-          vwfROA7egp64YEfH3pQl0WTyfhBOBmEUB1ew533h5ClpZvpIWd080ck2a5QHWBX6xLV4s6d+W86n
-          22/zxLkwiu6i8X0cnCFP+I4qrzCnhFQcXDbe9kTupM0h8YHa7juDMg7O+BsWK14sF/Vnnp1XQadk
-          oU1ODpypuVxwGg5EJZTcDDgJV8BoDIWuDCguhn86FTsAVxDsyDrY44G80XKRIFRnYpbMWEBKKI3m
-          sSKodeUVkcGW0zm1aMoTWPDQShrCmg1dW7szA2EBIW2rFCm0+YLeg6GUC/b+BWEmBc84sACUWgon
-          UpSwFzmPp+VARlc5BwXbXbTW33JrTcc6aqWlzivGdzVcXTFOkm+Hz9dSfuR4HSXVhlVLrbIOaWPu
-          heKKaq7c+SO13q1VdZCSpJ3hpP6U4TAOLr3wreknbzK8jYM3U+g3M10pl0wezka/7xm8bMf7NmRr
-          v/YW/8xw+6PRhHUv22vrEzL9twZ0pVwdzNm14/bODl1lk/beCFVxRszxkLdjlvEFiQP/vcKm9Rnl
-          lcd3qBSZJDdYFu0pBd1zOMgfhv+UrNubPXePihNK/CfQRuRtJ3qPaOw9epL3kGhdVWbo2ns8jm7v
-          b+/HIz6Na9wzS34DOZD/2LOml+xtnuiOdnvit5WyrZasGge/IZ72H5Yj4bb8qn/+EYbcgvCO4/5C
-          23+C4PxXEAf+3+F/AAAA//8DAK7vrbJNBgAA
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d204ffcd0d06a9-EWR]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml]
-        date: ['Wed, 22 Oct 2014 01:46:09 GMT']
-        expires: ['Wed, 22 Oct 2014 01:51:45 GMT']
-        last-modified: ['Sun, 19 Oct 2014 17:05:30 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d8244607d0b296ad4100eba1cd9f398df1413942979905]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=the%20daily%20show%20%28with%20jon%20stewart%29&language=en
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3RT227bMAx991cQeXdkp03bAKqLrlmADlhXIN1zodiMrEWWDEmO5339aHlJgwJ7
-          scnD2+FF/OF3o+GIzitr7mf5PJsBmtJWysj72c+3TXo3g4ci4WsRBP226BR6EnwUVFXc5ovlDWdn
-          PeFaGNkJiQUazs7KKfZFNFi81QhrofQA29r20KtQwzdrYBuwFy5wduGb8EetRJT9p0DOLkwJ3wlj
-          0BXSibZWpdAsckvl3fxXKzn7Z074D+r3qLAvNtZJDBDcQO1CsHBAbKEVJU6UFtdQ286Bwd7TJ/TW
-          HXwKgUjs0AfYiwNORj+2oUw0kZeuKIHW0Dp7VBXCYLspoyBw9IlBI1oKA7UwlcY5fJqK8iCgtA1W
-          qoSRL9g9OCzRhCm+RlFpZZD8TAWt1SqMbcNeyc4RGmpnO0lFYdrOGO9FUC56NdZYbWVH+G64nD6R
-          tDSOyNejbKhedCmto6ytNVVExpp7ZaijgToP00j9FDZmDVCixp0jUv9jOOfsvIuEb5Tz4VE5rIp8
-          tbpJs1Wa5ZxdwAl/mZZQPI1jGeCJmDihOTvhCX/+vv7y/rwuQsjyfJlf33J2ghL+R7QLFd7pTL++
-          ZtlidZUtrzj7QBP+cdFRZeeDZ/EF/AUAAP//AwDwHcwdMAMAAA==
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d2140be0830773-EWR]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 01:56:25 GMT']
-        expires: ['Wed, 22 Oct 2014 01:57:44 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-        x-cache: [MISS]
-        x-powered-by: [PHP/5.3.10-1ubuntu3.11]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d8244607d0b296ad4100eba1cd9f398df1413942979905]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://thetvdb.com/api/4D297D8CFDE0E105/series/71256/en.xml
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3RVUXPaOBB+76/YyTvYJqQJN647BUrbTEk6gR6PzGIvtg4heSQ5nG/8429tGUo6
-          0xcsffvtt7valYg//nuU8ErGCq0+3ETD8AZIpToTKv9w83O9GDzcwMfkXTxHh8k7gHhFRpBtl7wR
-          WXIfje7exwGvPPQpddrYpHnUClaOTmgcrwsFz1JwnGZTo3MwI4Vp8wmt2MMSVfYqmke07MJuZJsV
-          HlG5AmFK1Ez1DjZCur1WeTM1AhX8VDlLzfFVZLAw2rrmcwZfSR5tszCoDjCnGRrdPJIxNQcwpJrv
-          WPEHNkQZizfLNo0NSls0S8GiR1hryfgTqrQG9iYpmxdMCyQJX9EYYZsXzmSmTZaZulk5TKmGL6xp
-          dHoYbLTObBMHff39YQhjt3Osn/cc9pDMUciaKW/RK+paHCmJor/CEH4se2KHec5MK0fKvaDj9iTr
-          vwfROA7egp64YEfH3pQl0WTyfhBOBmEUB1ew533h5ClpZvpIWd080ck2a5QHWBX6xLV4s6d+W86n
-          22/zxLkwiu6i8X0cnCFP+I4qrzCnhFQcXDbe9kTupM0h8YHa7juDMg7O+BsWK14sF/Vnnp1XQadk
-          oU1ODpypuVxwGg5EJZTcDDgJV8BoDIWuDCguhn86FTsAVxDsyDrY44G80XKRIFRnYpbMWEBKKI3m
-          sSKodeUVkcGW0zm1aMoTWPDQShrCmg1dW7szA2EBIW2rFCm0+YLeg6GUC/b+BWEmBc84sACUWgon
-          UpSwFzmPp+VARlc5BwXbXbTW33JrTcc6aqWlzivGdzVcXTFOkm+Hz9dSfuR4HSXVhlVLrbIOaWPu
-          heKKaq7c+SO13q1VdZCSpJ3hpP6U4TAOLr3wreknbzK8jYM3U+g3M10pl0wezka/7xm8bMf7NmRr
-          v/YW/8xw+6PRhHUv22vrEzL9twZ0pVwdzNm14/bODl1lk/beCFVxRszxkLdjlvEFiQP/vcKm9Rnl
-          lcd3qBSZJDdYFu0pBd1zOMgfhv+UrNubPXePihNK/CfQRuRtJ3qPaOw9epL3kGhdVWbo2ns8jm7v
-          b+/HIz6Na9wzS34DOZD/2LOml+xtnuiOdnvit5WyrZasGge/IZ72H5Yj4bb8qn/+EYbcgvCO4/5C
-          23+C4PxXEAf+3+F/AAAA//8DAK7vrbJNBgAA
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d2140d59020773-EWR]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml]
-        date: ['Wed, 22 Oct 2014 01:56:25 GMT']
-        expires: ['Wed, 22 Oct 2014 01:57:44 GMT']
-        last-modified: ['Sun, 19 Oct 2014 17:05:30 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d8244607d0b296ad4100eba1cd9f398df1413942979905]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://thetvdb.com/api/GetEpisodeByAirDate.php?apikey=4D297D8CFDE0E105&seriesid=71256&airdate=2012-06-06&language=en
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3RTXY/TMBB896+w+sLLXZ009Evay4m7UlSJA0SBPlZusk0NiR3ZToF/z6ZJ07SA
-          FCm7M7seez2Gx19Fzo9onTL6YRAOgwFHnZhU6exh8PXL8n424I8xg4X0kn5vS+VMihSpNH4dRZMo
-          iEBQzODZFDulMd1iU6OrYoc2DoM5iP9wvSaH0hkdh9NecYuR+LfFNjnI0lMPiH7WcKlyCe2hodqk
-          Ya71moLbPdRYK9UUXHSVxcSbU+M5rGewKrJlLrN4BOKSdMP5IAuMXxRtEXO+lM7tUKdo69oLf6nu
-          jekaYrBU1vk3pJzGoyAc3QcT+kD0YAbvKnR+7aV1/9Ts0QxWL4un7WpBxzlHDN5LnVUywxg1iC5h
-          8JFMcVT4M17LQmp/kPwJkVssjfWOG803NGejndKvHKc2tFxp7g/IC5U6z82erxPjPd/I/AdaKqIB
-          yjznmNMgyW13PLVGo+OJKbDuJZnffG9s4e5owZT/fRxa4ogyd3zwyVITiVVuwMvceF4apb0bguj2
-          zYCK0uqk9Vx7FsQNwOCz9GR0YtqAwfp09+dLITdeAQw2VjUubAMGcudMXnncdia7RRjsVY66vvbW
-          e05Mw9F4ItoXNPxeZiC6Iga5dL4qU+npisMomgfjeTAag+jjDBqf1g9xOp7N6B12QM1ZhY7Ck1BN
-          tTnrbFaHzbP+AwAA//8DAFgWYTUGBAAA
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d2140e99280773-EWR]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 01:56:26 GMT']
-        expires: ['Wed, 22 Oct 2014 01:57:44 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-        x-cache: [HIT]
-        x-powered-by: [PHP/5.3.10-1ubuntu3.11]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d8244607d0b296ad4100eba1cd9f398df1413942979905]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://thetvdb.com/api/4D297D8CFDE0E105/series/71256/en.xml
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3RVUXPaOBB+76/YyTvYJqQJN647BUrbTEk6gR6PzGIvtg4heSQ5nG/8429tGUo6
-          0xcsffvtt7valYg//nuU8ErGCq0+3ETD8AZIpToTKv9w83O9GDzcwMfkXTxHh8k7gHhFRpBtl7wR
-          WXIfje7exwGvPPQpddrYpHnUClaOTmgcrwsFz1JwnGZTo3MwI4Vp8wmt2MMSVfYqmke07MJuZJsV
-          HlG5AmFK1Ez1DjZCur1WeTM1AhX8VDlLzfFVZLAw2rrmcwZfSR5tszCoDjCnGRrdPJIxNQcwpJrv
-          WPEHNkQZizfLNo0NSls0S8GiR1hryfgTqrQG9iYpmxdMCyQJX9EYYZsXzmSmTZaZulk5TKmGL6xp
-          dHoYbLTObBMHff39YQhjt3Osn/cc9pDMUciaKW/RK+paHCmJor/CEH4se2KHec5MK0fKvaDj9iTr
-          vwfROA7egp64YEfH3pQl0WTyfhBOBmEUB1ew533h5ClpZvpIWd080ck2a5QHWBX6xLV4s6d+W86n
-          22/zxLkwiu6i8X0cnCFP+I4qrzCnhFQcXDbe9kTupM0h8YHa7juDMg7O+BsWK14sF/Vnnp1XQadk
-          oU1ODpypuVxwGg5EJZTcDDgJV8BoDIWuDCguhn86FTsAVxDsyDrY44G80XKRIFRnYpbMWEBKKI3m
-          sSKodeUVkcGW0zm1aMoTWPDQShrCmg1dW7szA2EBIW2rFCm0+YLeg6GUC/b+BWEmBc84sACUWgon
-          UpSwFzmPp+VARlc5BwXbXbTW33JrTcc6aqWlzivGdzVcXTFOkm+Hz9dSfuR4HSXVhlVLrbIOaWPu
-          heKKaq7c+SO13q1VdZCSpJ3hpP6U4TAOLr3wreknbzK8jYM3U+g3M10pl0wezka/7xm8bMf7NmRr
-          v/YW/8xw+6PRhHUv22vrEzL9twZ0pVwdzNm14/bODl1lk/beCFVxRszxkLdjlvEFiQP/vcKm9Rnl
-          lcd3qBSZJDdYFu0pBd1zOMgfhv+UrNubPXePihNK/CfQRuRtJ3qPaOw9epL3kGhdVWbo2ns8jm7v
-          b+/HIz6Na9wzS34DOZD/2LOml+xtnuiOdnvit5WyrZasGge/IZ72H5Yj4bb8qn/+EYbcgvCO4/5C
-          23+C4PxXEAf+3+F/AAAA//8DAK7vrbJNBgAA
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d2140fc9570773-EWR]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml]
-        date: ['Wed, 22 Oct 2014 01:56:26 GMT']
-        expires: ['Wed, 22 Oct 2014 02:02:02 GMT']
-        last-modified: ['Sun, 19 Oct 2014 17:05:30 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d1747df0e1644b095a31ae657626be53d1413945794242]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=the%20daily%20show%20%28with%20jon%20stewart%29&language=en
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3RT227bMAx991cQeXdkp03bAKqLrlmADlhXIN1zodiMrEWWDEmO5339aHlJgwJ7
-          scnD2+FF/OF3o+GIzitr7mf5PJsBmtJWysj72c+3TXo3g4ci4WsRBP226BR6EnwUVFXc5ovlDWdn
-          PeFaGNkJiQUazs7KKfZFNFi81QhrofQA29r20KtQwzdrYBuwFy5wduGb8EetRJT9p0DOLkwJ3wlj
-          0BXSibZWpdAsckvl3fxXKzn7Z074D+r3qLAvNtZJDBDcQO1CsHBAbKEVJU6UFtdQ286Bwd7TJ/TW
-          HXwKgUjs0AfYiwNORj+2oUw0kZeuKIHW0Dp7VBXCYLspoyBw9IlBI1oKA7UwlcY5fJqK8iCgtA1W
-          qoSRL9g9OCzRhCm+RlFpZZD8TAWt1SqMbcNeyc4RGmpnO0lFYdrOGO9FUC56NdZYbWVH+G64nD6R
-          tDSOyNejbKhedCmto6ytNVVExpp7ZaijgToP00j9FDZmDVCixp0jUv9jOOfsvIuEb5Tz4VE5rIp8
-          tbpJs1Wa5ZxdwAl/mZZQPI1jGeCJmDihOTvhCX/+vv7y/rwuQsjyfJlf33J2ghL+R7QLFd7pTL++
-          ZtlidZUtrzj7QBP+cdFRZeeDZ/EF/AUAAP//AwDwHcwdMAMAAA==
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d258bf0166077f-EWR]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 02:43:19 GMT']
-        expires: ['Wed, 22 Oct 2014 02:44:38 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-        x-cache: [EXPIRED]
-        x-powered-by: [PHP/5.3.10-1ubuntu3.11]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d1747df0e1644b095a31ae657626be53d1413945794242]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://thetvdb.com/api/4D297D8CFDE0E105/series/71256/en.xml
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3RVUXPaOBB+76/YyTvYJqQJN647BUrbTEk6gR6PzGIvtg4heSQ5nG/8429tGUo6
-          0xcsffvtt7valYg//nuU8ErGCq0+3ETD8AZIpToTKv9w83O9GDzcwMfkXTxHh8k7gHhFRpBtl7wR
-          WXIfje7exwGvPPQpddrYpHnUClaOTmgcrwsFz1JwnGZTo3MwI4Vp8wmt2MMSVfYqmke07MJuZJsV
-          HlG5AmFK1Ez1DjZCur1WeTM1AhX8VDlLzfFVZLAw2rrmcwZfSR5tszCoDjCnGRrdPJIxNQcwpJrv
-          WPEHNkQZizfLNo0NSls0S8GiR1hryfgTqrQG9iYpmxdMCyQJX9EYYZsXzmSmTZaZulk5TKmGL6xp
-          dHoYbLTObBMHff39YQhjt3Osn/cc9pDMUciaKW/RK+paHCmJor/CEH4se2KHec5MK0fKvaDj9iTr
-          vwfROA7egp64YEfH3pQl0WTyfhBOBmEUB1ew533h5ClpZvpIWd080ck2a5QHWBX6xLV4s6d+W86n
-          22/zxLkwiu6i8X0cnCFP+I4qrzCnhFQcXDbe9kTupM0h8YHa7juDMg7O+BsWK14sF/Vnnp1XQadk
-          oU1ODpypuVxwGg5EJZTcDDgJV8BoDIWuDCguhn86FTsAVxDsyDrY44G80XKRIFRnYpbMWEBKKI3m
-          sSKodeUVkcGW0zm1aMoTWPDQShrCmg1dW7szA2EBIW2rFCm0+YLeg6GUC/b+BWEmBc84sACUWgon
-          UpSwFzmPp+VARlc5BwXbXbTW33JrTcc6aqWlzivGdzVcXTFOkm+Hz9dSfuR4HSXVhlVLrbIOaWPu
-          heKKaq7c+SO13q1VdZCSpJ3hpP6U4TAOLr3wreknbzK8jYM3U+g3M10pl0wezka/7xm8bMf7NmRr
-          v/YW/8xw+6PRhHUv22vrEzL9twZ0pVwdzNm14/bODl1lk/beCFVxRszxkLdjlvEFiQP/vcKm9Rnl
-          lcd3qBSZJDdYFu0pBd1zOMgfhv+UrNubPXePihNK/CfQRuRtJ3qPaOw9epL3kGhdVWbo2ns8jm7v
-          b+/HIz6Na9wzS34DOZD/2LOml+xtnuiOdnvit5WyrZasGge/IZ72H5Yj4bb8qn/+EYbcgvCO4/5C
-          23+C4PxXEAf+3+F/AAAA//8DAK7vrbJNBgAA
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d258c33c2d0f1b-IAD]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml]
-        date: ['Wed, 22 Oct 2014 02:43:20 GMT']
-        expires: ['Wed, 22 Oct 2014 02:48:56 GMT']
-        last-modified: ['Sun, 19 Oct 2014 17:05:30 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d1747df0e1644b095a31ae657626be53d1413945794242]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://thetvdb.com/api/GetEpisodeByAirDate.php?apikey=4D297D8CFDE0E105&seriesid=71256&airdate=2012-06-06&language=en
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3RTXY/TMBB896+w+sLLXZ009Evay4m7UlSJA0SBPlZusk0NiR3ZToF/z6ZJ07SA
-          FCm7M7seez2Gx19Fzo9onTL6YRAOgwFHnZhU6exh8PXL8n424I8xg4X0kn5vS+VMihSpNH4dRZMo
-          iEBQzODZFDulMd1iU6OrYoc2DoM5iP9wvSaH0hkdh9NecYuR+LfFNjnI0lMPiH7WcKlyCe2hodqk
-          Ya71moLbPdRYK9UUXHSVxcSbU+M5rGewKrJlLrN4BOKSdMP5IAuMXxRtEXO+lM7tUKdo69oLf6nu
-          jekaYrBU1vk3pJzGoyAc3QcT+kD0YAbvKnR+7aV1/9Ts0QxWL4un7WpBxzlHDN5LnVUywxg1iC5h
-          8JFMcVT4M17LQmp/kPwJkVssjfWOG803NGejndKvHKc2tFxp7g/IC5U6z82erxPjPd/I/AdaKqIB
-          yjznmNMgyW13PLVGo+OJKbDuJZnffG9s4e5owZT/fRxa4ogyd3zwyVITiVVuwMvceF4apb0bguj2
-          zYCK0uqk9Vx7FsQNwOCz9GR0YtqAwfp09+dLITdeAQw2VjUubAMGcudMXnncdia7RRjsVY66vvbW
-          e05Mw9F4ItoXNPxeZiC6Iga5dL4qU+npisMomgfjeTAag+jjDBqf1g9xOp7N6B12QM1ZhY7Ck1BN
-          tTnrbFaHzbP+AwAA//8DAFgWYTUGBAAA
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d258c5ac660f1b-IAD]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 02:43:21 GMT']
-        expires: ['Wed, 22 Oct 2014 02:48:57 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-        x-cache: [MISS]
-        x-powered-by: [PHP/5.3.10-1ubuntu3.11]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d1747df0e1644b095a31ae657626be53d1413945794242]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://thetvdb.com/api/4D297D8CFDE0E105/series/71256/en.xml
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA3RVUXPaOBB+76/YyTvYJqQJN647BUrbTEk6gR6PzGIvtg4heSQ5nG/8429tGUo6
-          0xcsffvtt7valYg//nuU8ErGCq0+3ETD8AZIpToTKv9w83O9GDzcwMfkXTxHh8k7gHhFRpBtl7wR
-          WXIfje7exwGvPPQpddrYpHnUClaOTmgcrwsFz1JwnGZTo3MwI4Vp8wmt2MMSVfYqmke07MJuZJsV
-          HlG5AmFK1Ez1DjZCur1WeTM1AhX8VDlLzfFVZLAw2rrmcwZfSR5tszCoDjCnGRrdPJIxNQcwpJrv
-          WPEHNkQZizfLNo0NSls0S8GiR1hryfgTqrQG9iYpmxdMCyQJX9EYYZsXzmSmTZaZulk5TKmGL6xp
-          dHoYbLTObBMHff39YQhjt3Osn/cc9pDMUciaKW/RK+paHCmJor/CEH4se2KHec5MK0fKvaDj9iTr
-          vwfROA7egp64YEfH3pQl0WTyfhBOBmEUB1ew533h5ClpZvpIWd080ck2a5QHWBX6xLV4s6d+W86n
-          22/zxLkwiu6i8X0cnCFP+I4qrzCnhFQcXDbe9kTupM0h8YHa7juDMg7O+BsWK14sF/Vnnp1XQadk
-          oU1ODpypuVxwGg5EJZTcDDgJV8BoDIWuDCguhn86FTsAVxDsyDrY44G80XKRIFRnYpbMWEBKKI3m
-          sSKodeUVkcGW0zm1aMoTWPDQShrCmg1dW7szA2EBIW2rFCm0+YLeg6GUC/b+BWEmBc84sACUWgon
-          UpSwFzmPp+VARlc5BwXbXbTW33JrTcc6aqWlzivGdzVcXTFOkm+Hz9dSfuR4HSXVhlVLrbIOaWPu
-          heKKaq7c+SO13q1VdZCSpJ3hpP6U4TAOLr3wreknbzK8jYM3U+g3M10pl0wezka/7xm8bMf7NmRr
-          v/YW/8xw+6PRhHUv22vrEzL9twZ0pVwdzNm14/bODl1lk/beCFVxRszxkLdjlvEFiQP/vcKm9Rnl
-          lcd3qBSZJDdYFu0pBd1zOMgfhv+UrNubPXePihNK/CfQRuRtJ3qPaOw9epL3kGhdVWbo2ns8jm7v
-          b+/HIz6Na9wzS34DOZD/2LOml+xtnuiOdnvit5WyrZasGge/IZ72H5Yj4bb8qn/+EYbcgvCO4/5C
-          23+C4PxXEAf+3+F/AAAA//8DAK7vrbJNBgAA
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d258cb8d140f1b-IAD]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml]
-        date: ['Wed, 22 Oct 2014 02:43:21 GMT']
-        expires: ['Wed, 22 Oct 2014 02:44:40 GMT']
-        last-modified: ['Sun, 19 Oct 2014 17:05:30 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.3.10-1ubuntu3.15]
       status: {code: 200, message: OK}
 version: 1

@@ -52,17 +52,10 @@ class PluginSortBy(object):
         log.debug('sorting entries by: %s' % config)
 
         if not field:
-            task.entries.reverse()
-            task.accepted.reverse()
+            task.all_entries.reverse()
             return
 
-        def cmp_helper(a, b):
-            va = a.get(field, 0)
-            vb = b.get(field, 0)
-            return cmp(va, vb)
-
-        task.entries.sort(cmp_helper, reverse=reverse)
-        task.accepted.sort(cmp_helper, reverse=reverse)
+        task.all_entries.sort(key=lambda e: e.get(field, 0), reverse=reverse)
 
 
 @event('plugin.register')

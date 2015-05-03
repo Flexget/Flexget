@@ -283,4 +283,4 @@ class TestSetPlugin(FlexGetBase):
         self.execute_task('test_lazy_err')
         entry = self.task.find_entry('entries', title='Entry 1')
         assert entry['title'] == 'Entry 1', 'should fall back to original value when template fails'
-        assert entry['other'] is None
+        assert 'other' not in entry

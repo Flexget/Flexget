@@ -42,11 +42,7 @@ class MetainfoSubs(object):
         if config is False:
             return
         for entry in task.entries:
-            entry.register_lazy_fields(['subtitles'], self.lazy_loader)
-
-    def lazy_loader(self, entry, field):
-        self.get_subtitles(entry)
-        return entry.get(field)
+            entry.register_lazy_func(self.get_subtitles, ['subtitles'])
 
     def get_subtitles(self, entry):
         if entry.get('subtitles', eval_lazy=False) or not ('location' in entry) or \
@@ -59,8 +55,6 @@ class MetainfoSubs(object):
             if lst:
                 entry['subtitles'] = lst
                 log.trace('Found subtitles %s for %s' % ('/'.join(lst), entry['title']))
-            else:
-                entry.unregister_lazy_fields(['subtitles'], self.lazy_loader)
         except Exception as e:
             log.debug('Error checking local subtitles for %s: %s' % (entry['title'], e))
 
