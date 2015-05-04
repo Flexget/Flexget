@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import re
 
 from flexget import plugin
 from flexget.event import event
@@ -26,7 +27,8 @@ class CrossMatch(object):
         'properties': {
             'fields': {'type': 'array', 'items': {'type': 'string'}},
             'action': {'enum': ['accept', 'reject']},
-            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}}
+            'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
+            'advanced': {'type': 'boolean', 'default': False}
         },
         'required': ['fields', 'action', 'from'],
         'additionalProperties': False
@@ -36,6 +38,7 @@ class CrossMatch(object):
 
         fields = config['fields']
         action = config['action']
+        advanced = config['advanced']
 
         match_entries = []
 
@@ -64,20 +67,22 @@ class CrossMatch(object):
         for entry in task.entries:
             for generated_entry in match_entries:
                 log.trace('checking if %s matches %s' % (entry['title'], generated_entry['title']))
-                common = self.entry_intersects(entry, generated_entry, fields)
+                common = self.entry_intersects(entry, generated_entry, fields, advanced)
                 if common:
                     msg = 'intersects with %s on field(s) %s' % \
                           (generated_entry['title'], ', '.join(common))
                     if action == 'reject':
                         entry.reject(msg)
                     if action == 'accept':
+                        entry['match'] = generated_entry['title']
                         entry.accept(msg)
 
-    def entry_intersects(self, e1, e2, fields=None):
+    def entry_intersects(self, e1, e2, fields=None, advanced=False):
         """
         :param e1: First :class:`flexget.entry.Entry`
         :param e2: Second :class:`flexget.entry.Entry`
         :param fields: List of fields which are checked
+        :param advanced: Advanced Matching
         :return: List of field names in common
         """
 
@@ -94,10 +99,27 @@ class CrossMatch(object):
             log.trace('v1: %r' % v1)
             log.trace('v2: %r' % v2)
 
-            if v1 == v2:
-                common_fields.append(field)
+            if advanced == True:
+                v1Re = v1
+                v1Re = v1Re.replace(' ','.*')
+                v1Re = '.*' + v1Re + '.*'
+                v2Re = v2
+                v2Re = v2Re.replace(' ','.*')
+                v2Re = '.*' + v2Re + '.*'
+                
+                log.debug('Performing advanced Regex search %s and %s' % (v1Re, v2Re))
+                
+                if re.match(v1Re, v2, re.IGNORECASE):
+                    common_fields.append(field)
+                if re.match(v2Re, v1, re.IGNORECASE):
+                    common_fields.append(field)
+                else:
+                    log.trace('not matching')
             else:
-                log.trace('not matching')
+                if v1 == v2:
+                    common_fields.append(field)
+                else:
+                    log.trace('not matching')
         return common_fields
 
 
