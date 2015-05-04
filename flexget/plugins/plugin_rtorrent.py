@@ -53,7 +53,7 @@ class Rtorrent(object):
             self._version = [int(v) for v in resp.split('.')]
         return self._version
 
-    def load(self, data, options = {}, raw = False, start = False):
+    def load(self, data, options = {}, raw = False, start = False, mkdir = True):
         if raw:
             method = 'load.raw' + ('_start' if start else '')
 
@@ -68,9 +68,15 @@ class Rtorrent(object):
         # extra commands
         for key, val in options.iteritems():
             params.append('d.{0}.set={1}'.format(key, val))
-        # TODO: add an 'execute' command to mkdir the destination
 
-        resp = self.request(method, params)
+
+        if mkdir and 'directory' in options:
+            execute_method = 'execute.throw'
+            execute_params = ['', 'mkdir', '-p', options['directory']]
+            # TODO: execute this
+
+        # The return value from load method is always 0, success or failure
+        self.request(method, params)
 
     def verify_load(self, infohash, attempts = 3, delay = 0.5):
         """ Fetch and compare just the infohash. """
@@ -126,7 +132,7 @@ class RtorrentOutputPlugin(RtorrentPluginBase):
                     'start': {'type': 'boolean'},
                     # properties to set on rtorrent download object
                     'directory': {'type': 'string'},
-                    #directory_base
+                    'directory_base': {'type': 'string'},
                     'custom1': {'type': 'string'},
                     'custom2': {'type': 'string'},
                     'custom3': {'type': 'string'},
@@ -156,13 +162,8 @@ class RtorrentOutputPlugin(RtorrentPluginBase):
 
         # These options can be copied as-is from config to options
         options_map_equal = [
-            'directory',
-            #directory_base
-            'custom1',
-            'custom2',
-            'custom3',
-            'custom4',
-            'custom5'
+            'directory', 'directory_base',
+            'custom1', 'custom2', 'custom3', 'custom4', 'custom5'
         ]
 
         for option in options_map_equal:
