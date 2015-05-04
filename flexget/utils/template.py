@@ -9,11 +9,11 @@ import locale
 from email.utils import parsedate
 from time import mktime
 
-from jinja2 import (Environment, StrictUndefined, ChoiceLoader,
-                    FileSystemLoader, PackageLoader, TemplateNotFound,
-                    TemplateSyntaxError, Undefined)
+from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, Template,
+                    TemplateNotFound, TemplateSyntaxError, Undefined)
 
 from flexget.event import event
+from flexget.utils.lazy_dict import LazyDict
 from flexget.utils.pathscrub import pathscrub
 
 log = logging.getLogger('utils.template')
@@ -125,6 +125,15 @@ def filter_default(value, default_value=u'', boolean=False):
 filter_d = filter_default
 
 
+# TODO: In Jinja 2.8 we will be able to override the Context class to be used explicitly
+class FlexGetTemplate(Template):
+    """Adds lazy lookup support when rendering templates."""
+    def new_context(self, vars=None, shared=False, locals=None):
+        context = super(FlexGetTemplate, self).new_context(vars, shared, locals)
+        context.parent = LazyDict(context.parent)
+        return context
+
+
 @event('manager.initialize')
 def make_environment(manager):
     """Create our environment and add our custom filters"""
@@ -133,6 +142,7 @@ def make_environment(manager):
         loader=ChoiceLoader([PackageLoader('flexget'),
                              FileSystemLoader(os.path.join(manager.config_base, 'templates'))]),
         extensions=['jinja2.ext.loopcontrols'])
+    environment.template_class = FlexGetTemplate
     for name, filt in globals().items():
         if name.startswith('filter_'):
             environment.filters[name.split('_', 1)[1]] = filt
@@ -172,11 +182,16 @@ def render(template, context):
     :return: The rendered template text.
     """
     if isinstance(template, basestring):
-        template = environment.from_string(template)
+        try:
+            template = environment.from_string(template)
+        except TemplateSyntaxError as e:
+            raise RenderError('Error in template syntax: ' + e.message)
     try:
         result = template.render(context)
     except Exception as e:
-        raise RenderError('(%s) %s' % (type(e).__name__, e))
+        error = RenderError('(%s) %s' % (type(e).__name__, e))
+        log.debug('Error during rendering: %s' % error)
+        raise error
 
     return result
 
@@ -184,32 +199,13 @@ def render(template, context):
 def render_from_entry(template_string, entry):
     """Renders a Template or template string with an Entry as its context."""
 
-    # If a plain string was passed, turn it into a Template
-    if isinstance(template_string, basestring):
-        try:
-            template = environment.from_string(template_string)
-        except TemplateSyntaxError as e:
-            raise RenderError('Error in template syntax: ' + e.message)
-    else:
-        # We can also support an actual Template being passed in
-        template = template_string
     # Make a copy of the Entry so we can add some more fields
-    variables = copy(entry)
+    variables = copy(entry.store)
     variables['now'] = datetime.now()
     # Add task name to variables, usually it's there because metainfo_task plugin, but not always
     if 'task' not in variables and hasattr(entry, 'task'):
         variables['task'] = entry.task.name
-    # We use the lower level render function, so that our Entry is not cast into a dict (and lazy loading lost)
-    try:
-        result = u''.join(template.root_render_func(template.new_context(variables)))
-    except:
-        exc_info = sys.exc_info()
-        try:
-            return environment.handle_exception(exc_info, True)
-        except Exception as e:
-            error = RenderError('(%s) %s' % (type(e).__name__, e))
-            log.debug('Error during rendering: %s' % error)
-            raise error
+    result = render(template_string, variables)
 
     # Only try string replacement if jinja didn't do anything
     if result == template_string:
@@ -233,11 +229,4 @@ def render_from_task(template, task):
     :param task: Task to render the template from.
     :return: The rendered template text.
     """
-    if isinstance(template, basestring):
-        template = environment.from_string(template)
-    try:
-        result = template.render({'task': task})
-    except Exception as e:
-        raise RenderError('(%s) %s' % (type(e).__name__, e))
-
-    return result
+    return render(template, {'task': task})

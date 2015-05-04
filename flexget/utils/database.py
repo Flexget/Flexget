@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import functools
+from collections import Mapping
 from datetime import datetime
 
 from sqlalchemy import extract, func
@@ -94,7 +95,7 @@ def safe_pickle_synonym(name):
 
         if type(item) in supported_types:
             return item
-        elif isinstance(item, dict):
+        elif isinstance(item, Mapping):
             result = {}
             for key, value in item.iteritems():
                 try:

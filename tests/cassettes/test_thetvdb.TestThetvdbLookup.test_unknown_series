@@ -5,172 +5,27 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: [__cfduid=df760fe5c883ff491ff2cc4d68718f1471413942363700]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+        Cookie: [__cfduid=dadc04c75154e262340e72aa3a034e5af1430668387]
+        User-Agent: [FlexGet/1.2.304.dev (www.flexget.com)]
       method: GET
       uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=Aoeu%20Htns&language=en
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAAA7Kxr8jNUShLLSrOzM+zVTLUM1BSSM1Lzk/JzEu3VQoNcdO1UFKwt+OycUksSQRS
-          +mAaAAAA//8DAMwyaWc2AAAA
+          H4sIAAAAAAAAA7Oxr8jNUShLLSrOzM+zVTLUM1BSSM1Lzk/JzEu3VQoNcdO1UFKwt+OycUksSQRS
+          +mAaAMwyaWc2AAAA
       headers:
         cache-control: [max-age=900]
-        cf-ray: [17d205180c8f0773-EWR]
+        cf-ray: [1e0d242c12380f0f-IAD]
         connection: [keep-alive]
         content-encoding: [gzip]
         content-type: [text/xml; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 01:46:13 GMT']
-        expires: ['Wed, 22 Oct 2014 01:47:31 GMT']
+        date: ['Sun, 03 May 2015 15:53:53 GMT']
+        expires: ['Sun, 03 May 2015 16:07:45 GMT']
         server: [cloudflare-nginx]
         transfer-encoding: [chunked]
         vary: [Accept-Encoding]
         x-cache: [MISS]
-        x-powered-by: [PHP/5.3.10-1ubuntu3.11]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=df760fe5c883ff491ff2cc4d68718f1471413942363700]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=Aoeu%20Htns&language=en
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA7Kxr8jNUShLLSrOzM+zVTLUM1BSSM1Lzk/JzEu3VQoNcdO1UFKwt+OycUksSQRS
-          +mAaAAAA//8DAMwyaWc2AAAA
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d205194cd20773-EWR]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 01:46:13 GMT']
-        expires: ['Wed, 22 Oct 2014 01:51:49 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-        x-cache: [EXPIRED]
-        x-powered-by: [PHP/5.3.10-1ubuntu3.11]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d8244607d0b296ad4100eba1cd9f398df1413942979905]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=Aoeu%20Htns&language=en
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA7Kxr8jNUShLLSrOzM+zVTLUM1BSSM1Lzk/JzEu3VQoNcdO1UFKwt+OycUksSQRS
-          +mAaAAAA//8DAMwyaWc2AAAA
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d21428da4d0773-EWR]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 01:56:30 GMT']
-        expires: ['Wed, 22 Oct 2014 01:57:48 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-        x-cache: [HIT]
-        x-powered-by: [PHP/5.3.10-1ubuntu3.11]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d8244607d0b296ad4100eba1cd9f398df1413942979905]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=Aoeu%20Htns&language=en
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA7Kxr8jNUShLLSrOzM+zVTLUM1BSSM1Lzk/JzEu3VQoNcdO1UFKwt+OycUksSQRS
-          +mAaAAAA//8DAMwyaWc2AAAA
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d2142a0a730773-EWR]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 01:56:30 GMT']
-        expires: ['Wed, 22 Oct 2014 02:02:06 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-        x-cache: [HIT]
-        x-powered-by: [PHP/5.3.10-1ubuntu3.11]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d1747df0e1644b095a31ae657626be53d1413945794242]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=Aoeu%20Htns&language=en
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA7Kxr8jNUShLLSrOzM+zVTLUM1BSSM1Lzk/JzEu3VQoNcdO1UFKwt+OycUksSQRS
-          +mAaAAAA//8DAMwyaWc2AAAA
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d258fb26e1077f-EWR]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 02:43:29 GMT']
-        expires: ['Wed, 22 Oct 2014 02:49:05 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-        x-cache: [EXPIRED]
-        x-powered-by: [PHP/5.3.10-1ubuntu3.11]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [__cfduid=d1747df0e1644b095a31ae657626be53d1413945794242]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: http://www.thetvdb.com/api/GetSeries.php?seriesname=Aoeu%20Htns&language=en
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAAA7Kxr8jNUShLLSrOzM+zVTLUM1BSSM1Lzk/JzEu3VQoNcdO1UFKwt+OycUksSQRS
-          +mAaAAAA//8DAMwyaWc2AAAA
-      headers:
-        cache-control: [max-age=900]
-        cf-ray: [17d258fd471e077f-EWR]
-        connection: [keep-alive]
-        content-encoding: [gzip]
-        content-type: [text/xml; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 02:43:29 GMT']
-        expires: ['Wed, 22 Oct 2014 02:44:48 GMT']
-        server: [cloudflare-nginx]
-        transfer-encoding: [chunked]
-        vary: [Accept-Encoding]
-        x-cache: [EXPIRED]
-        x-powered-by: [PHP/5.3.10-1ubuntu3.11]
+        x-powered-by: [PHP/5.3.10-1ubuntu3.15]
       status: {code: 200, message: OK}
 version: 1
