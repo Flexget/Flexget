@@ -6,6 +6,7 @@ from time import sleep
 
 from flexget import plugin
 from flexget.event import event
+from flexget.entry import Entry
 
 try:
     from pyrobase.io.xmlrpc2scgi import SCGIRequest
@@ -19,7 +20,18 @@ log = logging.getLogger('rtorrent')
 
 
 class Rtorrent(object):
-    """ rTorrent API client """
+    """rTorrent API client"""
+
+    default_fields = [
+        'hash',
+        'name',
+        'up.total', 'down.total',
+        'is_open', 'is_active',
+        'custom1', 'custom2', 'custom3', 'custom4', 'custom5',
+        'state', 'complete',
+        'ratio',
+        'directory', 'directory_base'
+    ]
 
     def __init__(self, uri):
         if not SCGIRequest:
@@ -69,8 +81,33 @@ class Rtorrent(object):
                 sleep(delay)
         raise
 
+    def torrents(self, view = 'main', fields = None):
+        if not fields:
+            fields = self.default_fields
+        params = ['d.{0}='.format(field) for field in fields]
+        params.insert(0, view)
 
-class RtorrentPlugin(object):
+        resp = self.request('d.multicall', params)
+        # Response is formatted as a list of lists, with just the values
+        return [dict(zip(fields, val)) for val in resp]
+
+
+
+
+class RtorrentPluginBase(object):
+
+    def on_task_start(self, task, config):
+        config = self.prepare_config(config)
+        if not config['enabled']:
+            return
+
+        client = Rtorrent(config['uri'])
+        if client.version < [0, 9, 4]:
+            task.abort("rtorrent version >=0.9.4 required, found {0}"
+                .format('.'.join(map(str, client.version))))
+
+
+class RtorrentOutputPlugin(RtorrentPluginBase):
 
     schema = {
         'anyOf': [
@@ -89,6 +126,7 @@ class RtorrentPlugin(object):
                     'start': {'type': 'boolean'},
                     # properties to set on rtorrent download object
                     'directory': {'type': 'string'},
+                    #directory_base
                     'custom1': {'type': 'string'},
                     'custom2': {'type': 'string'},
                     'custom3': {'type': 'string'},
@@ -119,6 +157,7 @@ class RtorrentPlugin(object):
         # These options can be copied as-is from config to options
         options_map_equal = [
             'directory',
+            #directory_base
             'custom1',
             'custom2',
             'custom3',
@@ -133,23 +172,12 @@ class RtorrentPlugin(object):
         return options
 
 
-    
-    def on_task_start(self, task, config):
-        config = self.prepare_config(config)
-        if not config['enabled']:
-            return
-
-        client = Rtorrent(config['uri'])
-        if client.version < [0, 9, 4]:
-            task.abort("rTorrent version >=0.9.4 required, found {0}"
-                .format('.'.join(map(str, client.version))))
-
     def on_task_download(self, task, config):
         """
-            Call download plugin to generate the temp files 
-            we will load in client.
+        Call download plugin to generate the temp files 
+        we will load in client.
 
-            This implementation was copied from Transmission plugin.
+        This implementation was copied from Transmission plugin.
         """
         config = self.prepare_config(config)
         if not config['enabled']:
@@ -219,7 +247,83 @@ class RtorrentPlugin(object):
             entry.fail('Failed to verify add: info-hash not found')
             return
 
+    def on_task_exit(self, task, config):
+        """Make sure all temp files are cleaned up when task exists"""
+        # If download plugin is enabled, it will handle cleanup.
+        if 'download' not in task.config:
+            download = plugin.get_plugin_by_name('download')
+            download.instance.cleanup_temp_files(task)
+
+    on_task_abort = on_task_exit
+
+
+class RtorrentInputPlugin(RtorrentPluginBase):
+
+    schema = {
+        'anyOf': [
+            # allow construction with just a bool for enabled
+            {'type': 'boolean'},
+            # allow construction with just a URI
+            {'type': 'string'},
+            # allow construction with options
+            {
+                'type': 'object',
+                'properties': {
+                    'enabled': {'type': 'boolean'},
+                    # connection info
+                    'uri': {'type': 'string'},
+                    # additional options
+                    'view': {'type': 'string'},
+                },
+                'additionalProperties': False
+            }
+        ]
+    }
+
+    def prepare_config(self, config):
+        if isinstance(config, bool):
+            config = {'enabled': config}
+        if isinstance(config, str):
+            config = {'uri': config}
+
+        config.setdefault('enabled', True)
+        config.setdefault('uri', 'scgi://localhost:5000')
+        config.setdefault('view', 'main')
+
+        return config
+
+
+    def on_task_input(self, task, config):
+        config = self.prepare_config(config)
+        if not config['enabled']:
+            return
+
+        client = Rtorrent(config['uri'])
+
+        try:
+            torrents = client.torrents(config['view'])
+        except (xmlrpclib.Fault, xmlrpclib.ProtocolError) as e:
+            task.abort('Could not get torrents: {0}'.format(e))
+            return
+
+        entries = []
+        for torrent in torrents:
+            # TODO: add other fields like trackers, file, etc.
+            entry = Entry(
+                title=torrent['name'],
+                torrent_info_hash=torrent['hash']
+            )
+            for attr in ['custom1', 'custom2', 'custom3', 'custom4', 'custom5']:
+                entry['rtorrent_' + attr] = torrent[attr]
+
+            entries.append(entry)
+
+        return entries
+
+
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(RtorrentPlugin, 'rtorrent', api_ver=2)
+    plugin.register(RtorrentOutputPlugin, 'rtorrent', api_ver=2)
+    # plugin.register(RtorrentInputPlugin, 'from_rtorrent', api_ver=2)
+    # plugin.register(RtorrentCleanupPlugin, 'clean_rtorrent', api_ver=2)
