@@ -93,15 +93,15 @@ class SftpList(object):
     Example:
 
       sftp_list:
-          config:
-              host: example.com
-              username: Username
-              private_key: /Users/username/.ssh/id_rsa
-              recursive: False
-              get_size: True
-              files_only: False
+          host: example.com
+          username: Username
+          private_key: /Users/username/.ssh/id_rsa
+          recursive: False
+          get_size: True
+          files_only: False
           dirs: 
               - '/path/to/list/'
+              - '/another/path/'
     """
 
     schema = {
