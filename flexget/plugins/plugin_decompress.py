@@ -218,6 +218,8 @@ class Decompress(object):
                     target = file(destination, "wb")
                     shutil.copyfileobj(source, target)
                     log.verbose('Extracted: %s' % path )
+                    source.close()
+                    target.close()
                 except Exception as e:
                     error_message = 'Failed to extract file: %s in %s (%s)' % \
                                     (path, archive_path, e)
