@@ -13,7 +13,6 @@ from flexget.config_schema import one_or_more
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
-from flexget.utils.imdb import extract_id
 
 from flexget.manager import Session
 from flexget.db_schema import versioned_base
@@ -28,8 +27,6 @@ log = logging.getLogger('spanishtracker')
 Base = versioned_base('spanishtracker', 0)
 
 session = requests.Session()
-#http://www.spanishtracker.com/download.php?id=495f45f14f384dabb4f0fa6d2293cc7899883835&f=Backstrom+-+Temporada+1+%5BHDTV%5D%5BCap.110%5D%5BEspa%C3%B1ol+Castellano%5D.torrent
-URL_MATCH = re.compile('http://www.spanishtracker.com/download.php?id=.+\.torrent')
 
 CATEGORIES = {
     'all': 0,
@@ -45,6 +42,8 @@ CATEGORIES = {
     #TV
     'SeriesTV': 7
 }
+
+# Cookies Based on urlrewrite_torrent411.py
 
 class JSONEncodedDict(TypeDecorator):
 
@@ -173,18 +172,6 @@ class SearchSpanishTracker(object):
         'additionalProperties': False
     }
     
-    # UrlRewriter plugin API
-    def url_rewritable(self, task, entry):
-        # http://www.spanishtracker.com/download.php?id=495f45f14f384dabb4f0fa6d2293cc7899883835&f=Backstrom+-+Temporada+1+%5BHDTV%5D%5BCap.110%5D%5BEspa%C3%B1ol+Castellano%5D.torrent
-        # Return true only for urls that can and should be resolved
-        log.debug('Urlrewritable SpanishTracker')
-        url = entry['url']
-        return bool(URL_MATCH.match(url))
-
-    # UrlRewriter plugin API
-    def url_rewrite(self, task, entry):
-        log.debug('Urlrewrite SpanishTracker')
-
     def search(self, task, entry, config=None):
         """
             Search for entries on spanishtracker
@@ -214,13 +201,11 @@ class SearchSpanishTracker(object):
         for search_string in entry.get('search_strings', [entry['movie_name']]):
             query = normalize_unicode(search_string)
             query_url_fragment = '&search=' + urllib.quote(query.encode('utf8'))
-            # http://publichd.se/index.php?page=torrents&active=0&category=5;15&search=QUERY
             url = (base_url + category_url_fragment + query_url_fragment)
             log.debug('SpanishTracker search url: %s' % url)
             page = session.get(url).content
             soup = get_soup(page)
             links = soup.findAll('a', attrs={'href': re.compile('download\.php\?id=\d+')})
-            #log.debug('SpanishTracker soup: %s' % links)
             for row in [l.find_parent('tr') for l in links]:
                 dl_title = row.find('a', attrs={'href': re.compile('javascript')}).string
                 dl_title = normalize_unicode(dl_title.encode('ascii', 'replace'))
@@ -228,7 +213,7 @@ class SearchSpanishTracker(object):
                 idkey = re.findall('id=(.*)&f=', dl_href)
                 namekey = normalize_unicode(re.findall('f=(.*)\.torrent', dl_href))
                 dl_url = normalize_unicode(re.findall('id=(.*)', dl_href)[0]).encode('utf8')
-                #log.debug('SpanishTracker dl url %s' % dl_url)
+                log.debug('SpanishTracker dl url %s' % dl_url)
                 td = row.findAll('td')
                 entry = Entry()
                 entry['url'] = 'http://www.spanishtracker.com/download.php?id=' + dl_url
@@ -254,10 +239,6 @@ class SearchSpanishTracker(object):
                 results.add(entry)
                 
         log.debug('Finish search SpanishTracker with %d entries' % len(results))
-#        if len(results) > 0:
-#	    for value in results:
-#	        log.debug(value['title'])
-#	        log.debug(value['url'])
         return results
       
 
