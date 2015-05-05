@@ -123,6 +123,8 @@ class Decompress(object):
         """
         Prepare config for processing
         """
+        from fnmatch import translate
+        
         if not isinstance(config, dict):
             config = {}
 
