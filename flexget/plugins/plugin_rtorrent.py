@@ -204,21 +204,24 @@ class Rtorrent(object):
 
     def load(self, torrent, options={}, start=False, mkdir=True):
         if os.path.isfile(torrent):
-            load_method = 'load_raw' + ('_start' if start else '')
+            load_method = 'load.raw' + ('_start' if start else '')
+
+            # TODO: pass data directly, rather than have this rely on the filesystem
             with open(torrent, 'rb') as f:
                 torrent = xmlrpclib.Binary(f.read())
         else:
-            load_method = 'load_' + ('start' if start else 'normal')
+            load_method = 'load.' + ('start' if start else 'normal')
 
-        # First param is always the torrent
-        params = [torrent]
+        # First param is empty 'target'
+        params = ['', torrent]
 
-        # Torrent options
+        # Additional commands
         for key, val in options.iteritems():
             params.append('d.{0}.set={1}'.format(key, val))
 
         if mkdir and 'directory' in options:
-            result = self.server.execute("mkdir", "-p", options['directory'])
+            # TODO: execute this and load_method in a MultiCall
+            result = self.server.execute.throw('', "mkdir", "-p", options['directory'])
             if result != 0:
                 raise xmlrpclib.Error("Failed creating directory {0}".format(options['directory']))
 
@@ -248,17 +251,13 @@ class Rtorrent(object):
         # Response is formatted as a list of lists, with just the values
         return [dict(zip(fields, val)) for val in resp]
 
-    #TODO: Should this part of the load method?
-    def verify_load(self, info_hash):
-        # Try verify the torrent loaded. Check 3 times
-        for i in range(0, 3):
+    def verify_load(self, info_hash, delay=0.5, attempts=3):
+        for i in range(0, attempts):
             try:
-                torrent_info = self.torrent(info_hash, fields=["hash"])
-                if torrent_info['hash']:
-                    return
+                # TODO: verify this works as expected
+                return info_hash == self.server.d.hash(info_hash)
             except Exception as e:
-                sleep(0.5)
-
+                sleep(delay)
         raise
 
 
@@ -274,7 +273,7 @@ class RtorrentPluginBase(object):
             if client.version < [0, 9, 4]:
                 task.abort("rtorrent version >=0.9.4 required, found {0}".format('.'.join(map(str, client.version))))
         except (IOError, xmlrpclib.Error) as e:
-            raise plugin.PluginError("Couldn't connect to rtorrent. %s" % str(e))
+            raise plugin.PluginError("Couldn't connect to rtorrent: %s" % str(e))
 
 
 class RtorrentOutputPlugin(RtorrentPluginBase):
@@ -296,8 +295,8 @@ class RtorrentOutputPlugin(RtorrentPluginBase):
                     'start': {'type': 'boolean'},
                     # properties to set on rtorrent download object
                     'message': {'type': 'string'},
-                    'path': {'type': 'string'},  # Will be renamed to directory
-                    'path_base': {'type': 'string'},  # Will be renamed to directory_base
+                    'directory': {'type': 'string'},
+                    'directory_base': {'type': 'string'},
                     'priority': {'type': 'string'},
                     'custom1': {'type': 'string'},
                     'custom2': {'type': 'string'},
@@ -325,7 +324,7 @@ class RtorrentOutputPlugin(RtorrentPluginBase):
     def _build_options(self, config, entry):
         options = {}
 
-        for opt_key in ('path', 'path_base', 'message', 'priority',
+        for opt_key in ('directory', 'directory_base', 'message', 'priority',
                         'custom1', 'custom2', 'custom3', 'custom4', 'custom5'):
             # Values do not merge config with task
             # Task takes priority then config is used
@@ -334,26 +333,7 @@ class RtorrentOutputPlugin(RtorrentPluginBase):
             elif opt_key in config:
                 options[opt_key] = config[opt_key]
 
-        # Convert path to directory
-        if options.get('path'):
-            try:
-                path = os.path.expanduser(entry.render(options['path']))
-                options['directory'] = pathscrub(path).encode('utf-8')
-            except RenderError as e:
-                log.error('Error setting path for %s: %s' % (entry['title'], e))
-
-            del options['path']
-
-        # Convert path_base to directory_base
-        if options.get('path_base'):
-            try:
-                path = os.path.expanduser(entry.render(options['path']))
-                options['path_base'] = pathscrub(path).encode('utf-8')
-            except RenderError as e:
-                log.error('Error setting path_base for %s: %s' % (entry['title'], e))
-
-            del options['path_base']
-
+        # Convert priority from string to int
         if options.get('priority'):
             priority = options['priority']
             if priority in priority_map:
