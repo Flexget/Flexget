@@ -4,6 +4,7 @@ import os
 import re
 import shutil
 import zipfile
+import contextlib
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -219,9 +220,8 @@ class Decompress(object):
 
                 log.debug('Attempting to extract: %s to %s' % (path, destination))
                 try:
-                    with archive.open(path) as source:
-                        with open(destination, 'wb') as target:
-                            shutil.copyfileobj(source, target)
+                    with contextlib.nested(archive.open(path), open(destination, 'wb')) as (source, target):
+                        shutil.copyfileobj(source, target)
                     log.verbose('Extracted: %s' % path )
                     success = True
                 except (IOError, os.error) as e:
