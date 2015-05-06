@@ -216,6 +216,7 @@ class Decompress(object):
             if not os.path.exists(destination):
                 success = False
                 error_message = ''
+                source = None
 
                 log.debug('Attempting to extract: %s to %s' % (path, destination))
                 try:
@@ -223,7 +224,6 @@ class Decompress(object):
                     source = archive.open(path)
                     with open(destination, 'wb') as target:
                         shutil.copyfileobj(source, target)
-                    source.close()
 
                     log.verbose('Extracted: %s' % path )
                     success = True
@@ -236,6 +236,9 @@ class Decompress(object):
                 except Exception as e:
                     error_message = 'Unexpected error while extracting %s from %s (%s)' % \
                                     (path, archive_path, e)
+                finally:
+                    if source and not source.closed:
+                        source.close()
 
                 if not success:
                     log.error(error_message)
