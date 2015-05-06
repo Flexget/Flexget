@@ -4,7 +4,6 @@ import os
 import re
 import shutil
 import zipfile
-import contextlib
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -220,8 +219,12 @@ class Decompress(object):
 
                 log.debug('Attempting to extract: %s to %s' % (path, destination))
                 try:
-                    with contextlib.nested(archive.open(path), open(destination, 'wb')) as (source, target):
+                    # python 2.6 doesn't seem to like "with" in conjuntion with ZipFile.open
+                    source = archive.open(path)
+                    with open(destination, 'wb') as target:
                         shutil.copyfileobj(source, target)
+                    source.close()
+
                     log.verbose('Extracted: %s' % path )
                     success = True
                 except (IOError, os.error) as e:
