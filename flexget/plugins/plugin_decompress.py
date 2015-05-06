@@ -225,15 +225,11 @@ class Decompress(object):
                     log.verbose('Extracted: %s' % path )
                     success = True
                 except (IOError, os.error) as e:
-                    error_message = 'OS error while creting file: %s (%s)' % \
+                    error_message = 'OS error while creating file: %s (%s)' % \
                                     (destination, e)
                 except (zipfile.BadZipfile, rarfile.Error) as e:
                     error_message = 'Failed to extract file: %s in %s (%s)' % \
                                     (path, archive_path, e)
-
-                    if os.path.exists(destination):
-                        error_message = log.debug('Cleaning up partially extracted file: %s' % destination) % \
-                                        (path, archive_path, e)
                 except Exception as e:
                     error_message = 'Unexpected error while extracting %s from %s (%s)' % \
                                     (path, archive_path, e)
@@ -241,6 +237,10 @@ class Decompress(object):
                 if not success:
                     log.error(error_message)
                     entry.fail(error_message)
+
+                    if os.path.exists(destination):
+                        error_message = log.debug('Cleaning up partially extracted file: %s' % destination) % \
+                                        (path, archive_path, e)
                     return
             else:
                 log.verbose('File already exists: %s' % destination)
