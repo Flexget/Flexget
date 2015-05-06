@@ -124,7 +124,7 @@ class Decompress(object):
         Prepare config for processing
         """
         from fnmatch import translate
-        
+
         if not isinstance(config, dict):
             config = {}
 
@@ -214,21 +214,33 @@ class Decompress(object):
                 os.makedirs(dest_dir)
 
             if not os.path.exists(destination):
+                success = False
+                error_message = ''
+
                 log.debug('Attempting to extract: %s to %s' % (path, destination))
                 try:
-                    with archive.open(path) as source, open(destination, 'wb') as target:
-                        shutil.copyfileobj(source, target)
+                    with archive.open(path) as source:
+                        with open(destination, 'wb') as target:
+                            shutil.copyfileobj(source, target)
                     log.verbose('Extracted: %s' % path )
-                except Exception as e:
+                    success = True
+                except (IOError, os.error) as e:
+                    error_message = 'OS error while creting file: %s (%s)' % \
+                                    (destination, e)
+                except (zipfile.BadZipfile, rarfile.Error) as e:
                     error_message = 'Failed to extract file: %s in %s (%s)' % \
                                     (path, archive_path, e)
-                    log.error(error_message)
-                    entry.fail(error_message)
 
                     if os.path.exists(destination):
-                        log.debug('Cleaning up partially extracted file: %s' % destination)
-                        os.remove(destination)
-                    
+                        error_message = log.debug('Cleaning up partially extracted file: %s' % destination) % \
+                                        (path, archive_path, e)
+                except Exception as e:
+                    error_message = 'Unexpected error while extracting %s from %s (%s)' % \
+                                    (path, archive_path, e)
+
+                if not success:
+                    log.error(error_message)
+                    entry.fail(error_message)
                     return
             else:
                 log.verbose('File already exists: %s' % destination)
