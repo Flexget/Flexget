@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
+import urllib2
+import urllib
 
 from flexget import plugin
 from flexget.event import event
@@ -8,11 +10,29 @@ from flexget.plugins.plugin_urlrewriting import UrlRewritingError
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 
+from flexget.entry import Entry
+from flexget.utils.search import torrent_availability, normalize_unicode
+
+from flexget.manager import Session
+
 log = logging.getLogger('divxatope')
 
+session = requests.Session()
 
 class UrlRewriteDivxATope(object):
-    """divxatope urlrewriter."""
+    """
+    divxatope urlrewriter and search Plugin.
+    """
+   
+    USER_AGENT = 'Mozilla/5.0'
+    
+    schema = {
+        'type': 'object',
+        'properties': {
+            'category': {'type': 'string'},
+        },
+        'additionalProperties': False
+    }
 
     # urlrewriter API
     def url_rewritable(self, task, entry):
@@ -44,12 +64,59 @@ class UrlRewriteDivxATope(object):
                 'Unable to locate torrent from url %s' % url
             )
 
+    def search(self, task, entry, config=None):
+        log.debug('Search DivxATope')
+        url_search = 'http://www.divxatope.com/buscar/descargas/'
+        results = set()
+        regex = re.compile("(.+) \(\d\d\d\d\)")
+        #movie_name
+        for search_string in entry.get('search_strings', [entry['title']]):
+            query = normalize_unicode(search_string)
+            query = regex.findall(query)[0]
+            log.debug('Searching DivxATope %s' % query)
+            query = query.encode('utf8', 'ignore')
+            #log.debug('Searching DivxATope %s' % query)
+            data = urllib.urlencode({'search': query})
+            req = urllib2.Request(url_search, data)
+            response = urllib2.urlopen(req)
+            content = response.read()
+            #content = normalize_unicode(content).encode('utf8', 'ignore')
+            #log.debug(page.content.decode('utf8'))
+            soup = get_soup(content)
+#            log.debug(soup)
+            soup2 = soup.find('ul', attrs={'class': 'peliculas-box'})
+            #log.debug(soup2)
+            #soup3 = soup2.find('li')                               
+            #log.debug(len(soup2))
+            children = soup2.findAll('a', href=True)
+            #log.debug(len(children))
+            #log.debug(children['href'])
+            for child in children:
+                entry = Entry()
+                entry['url'] = child['href']
+                entry_title = child.find('h2').contents[0]
+                quality_lan = child.find('strong').contents
+                log.debug(len(quality_lan))
+                if len(quality_lan) > 2:
+		    entry_quality_lan = quality_lan[0] + ' ' + quality_lan[2]
+		elif len(quality_lan) == 2:
+		    entry_quality_lan = quality_lan[1]
+                entry['title'] = entry_title + ' ' + entry_quality_lan #child['title'].replace('Descargar gratis ', '', 1)
+                #log.debug(child['href'])
+                results.add(entry)
+            #links = soup2.findAll('a', href=True)
+            #for a in links:
+            #    log.debug(a['href'])
+            #log.debug(links)
+            #for row in [l.find_parent('tr') for l in links]:
+        log.debug('Finish search DivxATope with %d entries' % len(results))
+        return results
 
 @event('plugin.register')
 def register_plugin():
     plugin.register(
         UrlRewriteDivxATope,
         'divxatope',
-        groups=['urlrewriter'],
+        groups=['urlrewriter', 'search'],
         api_ver=2
     )
