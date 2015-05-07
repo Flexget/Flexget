@@ -41,8 +41,13 @@ class ModifySet(object):
             # Store original values before overwriting with a lazy field, so that set directives can reference
             # themselves.
             else:
+                orig_value = entry.get(field, UNSET, eval_lazy=False)
+                try:
+                    del entry[field]
+                except KeyError:
+                    pass
                 entry.register_lazy_func(
-                    partial(self.lazy_set, config, field, entry.pop(field, UNSET), errors=errors), config)
+                    partial(self.lazy_set, config, field, orig_value, errors=errors), config)
 
     def lazy_set(self, config, field, orig_field_value, entry, errors=True):
         logger = log.error if errors else log.debug
