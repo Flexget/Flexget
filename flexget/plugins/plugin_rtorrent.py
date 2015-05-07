@@ -226,7 +226,7 @@ class Rtorrent(object):
                 raise xmlrpclib.Error("Failed creating directory {0}".format(options['directory']))
 
         # Call method and return the response
-        return getattr(self.server, load_method)(params)
+        return getattr(self.server, load_method)(*params)
 
     def torrent(self, info_hash, fields=None):
         if not fields:
