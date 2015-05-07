@@ -233,9 +233,6 @@ class Decompress(object):
                 except (zipfile.BadZipfile, rarfile.Error) as e:
                     error_message = 'Failed to extract file: %s in %s (%s)' % \
                                     (path, archive_path, e)
-                except Exception as e:
-                    error_message = 'Unexpected error while extracting %s from %s (%s)' % \
-                                    (path, archive_path, e)
                 finally:
                     if source and not source.closed:
                         source.close()
