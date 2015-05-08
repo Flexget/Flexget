@@ -124,15 +124,17 @@ class Discover(object):
         """
 
         result = []
-        for item in config['from']:
-            if isinstance(item, dict):
-                plugin_name, plugin_config = item.items()[0]
-            else:
-                plugin_name, plugin_config = item, None
-            search = get_plugin_by_name(plugin_name).instance
-            if not callable(getattr(search, 'search')):
-                log.critical('Search plugin %s does not implement search method' % plugin_name)
-            for index, entry in enumerate(entries):
+        for index, entry in enumerate(entries):
+            entry_results = []
+            for item in config['from']:
+                if isinstance(item, dict):
+                    plugin_name, plugin_config = item.items()[0]
+                else:
+                    plugin_name, plugin_config = item, None
+                search = get_plugin_by_name(plugin_name).instance
+                if not callable(getattr(search, 'search')):
+                    log.critical('Search plugin %s does not implement search method' % plugin_name)
+                    continue
                 log.verbose('Searching for `%s` with plugin `%s` (%i of %i)' %
                             (entry['title'], plugin_name, index + 1, len(entries)))
                 try:
@@ -144,7 +146,6 @@ class Discover(object):
                         search_results = search.search(entry, plugin_config)
                     if not search_results:
                         log.debug('No results from %s' % plugin_name)
-                        entry.complete()
                         continue
                     log.debug('Discovered %s entries from %s' % (len(search_results), plugin_name))
                     if config.get('limit'):
@@ -155,14 +156,17 @@ class Discover(object):
                         e['discovered_with'] = plugin_name
                         e.on_complete(self.entry_complete, query=entry, search_results=search_results)
 
-                    result.extend(search_results)
+                    entry_results.extend(search_results)
 
                 except PluginWarning as e:
                     log.verbose('No results from %s: %s' % (plugin_name, e))
-                    entry.complete()
                 except PluginError as e:
                     log.error('Error searching with %s: %s' % (plugin_name, e))
-                    entry.complete()
+            if not entry_results:
+                log.verbose('No search results for `%s`' % entry['title'])
+                entry.complete()
+                continue
+            result.extend(entry_results)
 
         return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
 
