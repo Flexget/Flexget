@@ -61,7 +61,7 @@ class UrlRewriteTorrentz(object):
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string+config.get('extra_terms', ''))
-            for domain in ['eu', 'me', 'ch', 'in']:
+            for domain in ['eu']:  # , 'me', 'ch', 'in' point to the same two addresses!
                 # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
                 url = 'http://torrentz.%s/%s?q=%s' % (domain, feed, urllib.quote(query.encode('utf-8')))
                 log.debug('requesting: %s' % url)
