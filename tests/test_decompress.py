@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import shutil
-from unittest import SkipTest
+
+from nose.plugins.skip import SkipTest
 
 from tests import FlexGetBase
 
