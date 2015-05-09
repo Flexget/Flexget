@@ -1,12 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import shutil
-import imp
+from unittest.case import skipIf
 
+from tests import FlexGetBase
 
-from tests import FlexGetBase, with_filecopy
-from tests.util import maketemp
-from nose.plugins.skip import SkipTest
+try:
+    import rarfile
+except ImportError:
+    rarfile = None
 
 
 class TestExtract(FlexGetBase):
@@ -54,18 +56,10 @@ class TestExtract(FlexGetBase):
 
     def __init__(self):
         super(TestExtract, self).__init__()
-
-        try:
-            imp.find_module('rarfile')
-            self.rarfile_installed = True
-        except ImportError:
-            self.rarfile_installed = False
-
         self.temp_rar = None
         self.temp_zip = None
         self.temp_out = None
         self.temp_out_dir = None
-
 
     def setup(self):
         super(TestExtract, self).setup()
@@ -80,24 +74,18 @@ class TestExtract(FlexGetBase):
         self.temp_out = os.path.join(self.__tmp__, 'hooray.txt')
         self.temp_out_dir = os.path.join(self.__tmp__, 'directory', 'hooray.txt')
 
+    @skipIf(not rarfile, 'Needs RarFile module.')
     def test_rar(self):
         """Test basic RAR extraction"""
-        # Skip RAR tests if rarfile module is missing
-        if not self.rarfile_installed:
-            raise SkipTest('Need RarFile module.')
-
         shutil.copy(self.rar_name, self.temp_rar)
         self.execute_task('test_rar')
 
         assert os.path.exists(self.temp_out), 'Output file does not exist at the correct path.'
         assert os.path.exists(self.temp_rar), 'RAR archive should still exist.'
 
+    @skipIf(not rarfile, 'Needs RarFile module.')
     def test_delete_rar(self):
         """Test RAR deletion after extraction"""
-        # Skip RAR tests if rarfile module is missing
-        if not self.rarfile_installed:
-            raise SkipTest('Need RarFile module.')
-
         shutil.copy(self.rar_name, self.temp_rar)
         self.execute_task('test_delete_rar')
 
