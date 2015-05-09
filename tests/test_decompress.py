@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import shutil
-from unittest.case import skipIf
+from unittest import SkipTest
 
 from tests import FlexGetBase
 
@@ -74,18 +74,20 @@ class TestExtract(FlexGetBase):
         self.temp_out = os.path.join(self.__tmp__, 'hooray.txt')
         self.temp_out_dir = os.path.join(self.__tmp__, 'directory', 'hooray.txt')
 
-    @skipIf(not rarfile, 'Needs RarFile module.')
     def test_rar(self):
         """Test basic RAR extraction"""
+        if not rarfile:
+            raise SkipTest('Needs RarFile module.')
         shutil.copy(self.rar_name, self.temp_rar)
         self.execute_task('test_rar')
 
         assert os.path.exists(self.temp_out), 'Output file does not exist at the correct path.'
         assert os.path.exists(self.temp_rar), 'RAR archive should still exist.'
 
-    @skipIf(not rarfile, 'Needs RarFile module.')
     def test_delete_rar(self):
         """Test RAR deletion after extraction"""
+        if not rarfile:
+            raise SkipTest('Needs RarFile module.')
         shutil.copy(self.rar_name, self.temp_rar)
         self.execute_task('test_delete_rar')
 
