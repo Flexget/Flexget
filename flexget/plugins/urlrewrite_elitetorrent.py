@@ -3,6 +3,7 @@ import logging
 import re
 import urllib2
 import urllib
+import unicodedata
 
 from flexget import plugin
 from flexget.event import event
@@ -15,13 +16,13 @@ from flexget.utils.search import torrent_availability, normalize_unicode
 
 from flexget.manager import Session
 
-log = logging.getLogger('divxatope')
+log = logging.getLogger('elitetorrent')
 
 session = requests.Session()
 
-class UrlRewriteDivxATope(object):
+class UrlRewriteElitetorrent(object):
     """
-    divxatope urlrewriter and search Plugin.
+    elitetorrent urlrewriter and search Plugin.
     """
    
     USER_AGENT = 'Mozilla/5.0'
@@ -37,15 +38,10 @@ class UrlRewriteDivxATope(object):
     # urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        return (
-            url.startswith('http://www.divxatope.com/descargar')
-            or url.startswith('http://divxatope.com/descargar')
-        )
+        return (url.startswith('http://www.elitetorrent.net/torrent/'))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        #Rewrite divxatope.com/descargar/ to divxatope.com/descarga-torrent/
-        entry['url'] = re.sub("/descargar","/descarga-torrent",entry['url'])
         entry['url'] = self.parse_download_page(entry['url'])
 
     @plugin.internet(log)
@@ -53,30 +49,33 @@ class UrlRewriteDivxATope(object):
         try:
             page = requests.get(url).content
             soup = get_soup(page, 'html.parser')
-            download_link = soup.findAll(href=re.compile('redirect|redirectlink'))
-            download_href = download_link[0]['href']
-            if "url" in download_href:
-                return download_href[download_href.index('url=') + 4:]
-            else:
-                return download_href
+            download_link = soup.findAll(href=re.compile('/get-torrent/\d+'))
+            download_href = 'http://www.elitetorrent.net' + download_link[0]['href']
+            #if "url" in download_href:
+            #    return download_href[download_href.index('url=') + 4:]
+            #else:
+            return download_href
         except Exception:
             raise UrlRewritingError(
                 'Unable to locate torrent from url %s' % url
             )
+	 
+    def elimina_tildes(self, data):
+	return unicodedata.normalize('NFKD', data).encode('ASCII', 'ignore')
 
     def search(self, task, entry, config=None):
-        log.debug('Search DivxATope')
-        url_search = 'http://www.divxatope.com/buscar/descargas/'
+        log.debug('Search elitetorrent')
+        url_search = 'http://www.elitetorrent.net/buscar.php'
         results = set()
         regex = re.compile("(.+) \(\d\d\d\d\)")
         #movie_name
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
-            query = regex.findall(query)[0]
-            log.debug('Searching DivxATope %s' % query)
+            query = self.elimina_tildes(regex.findall(query)[0])
+            log.debug('Searching elitetorrent %s' % query)
             query = query.encode('utf8', 'ignore')
-            #log.debug('Searching DivxATope %s' % query)
-            data = urllib.urlencode({'search': query})
+            #log.debug('Searching elitetorrent %s' % query)
+            data = urllib.urlencode({'buscar': query})
             req = urllib2.Request(url_search, data)
             response = urllib2.urlopen(req)
             content = response.read()
@@ -84,24 +83,18 @@ class UrlRewriteDivxATope(object):
             #log.debug(page.content.decode('utf8'))
             soup = get_soup(content)
 #            log.debug(soup)
-            soup2 = soup.find('ul', attrs={'class': 'peliculas-box'})
+            #<a class="nombre" href="/torrent/25319/como-entrenar-a-tu-dragon-2-hdrip" title="Como entrenar a tu dragon 2 (HDRip)">Como entrenar a tu dragon 2 (HDRip)</a>
+            children = soup.findAll('a', attrs={'class': 'nombre'})
             #log.debug(soup2)
             #soup3 = soup2.find('li')                               
             #log.debug(len(soup2))
-            children = soup2.findAll('a', href=True)
+            #children = soup2.findAll('a', href=True)
             #log.debug(len(children))
             #log.debug(children['href'])
             for child in children:
                 entry = Entry()
-                entry['url'] = child['href']
-                entry_title = child.find('h2').contents[0]
-                quality_lan = child.find('strong').contents
-                log.debug(len(quality_lan))
-                if len(quality_lan) > 2:
-		    entry_quality_lan = quality_lan[0] + ' ' + quality_lan[2]
-		elif len(quality_lan) == 2:
-		    entry_quality_lan = quality_lan[1]
-                entry['title'] = entry_title + ' ' + entry_quality_lan #child['title'].replace('Descargar gratis ', '', 1)
+                entry['url'] = 'http://www.elitetorrent.net' + child['href']
+                entry['title'] = child['title']
                 #log.debug(child['href'])
                 results.add(entry)
             #links = soup2.findAll('a', href=True)
@@ -109,14 +102,14 @@ class UrlRewriteDivxATope(object):
             #    log.debug(a['href'])
             #log.debug(links)
             #for row in [l.find_parent('tr') for l in links]:
-        log.debug('Finish search DivxATope with %d entries' % len(results))
+        log.debug('Finish search elitetorrent with %d entries' % len(results))
         return results
 
 @event('plugin.register')
 def register_plugin():
     plugin.register(
-        UrlRewriteDivxATope,
-        'divxatope',
+        UrlRewriteElitetorrent,
+        'elitetorrent',
         groups=['urlrewriter', 'search'],
         api_ver=2
     )
