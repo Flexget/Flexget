@@ -172,15 +172,15 @@ class InputHtml(object):
                 continue
 
             url = link['href']
-            log_link = url
-            log_link = log_link.replace('\n', '')
-            log_link = log_link.replace('\r', '')
-
             # fix broken urls
             if url.startswith('//'):
                 url = 'http:' + url
             elif not url.startswith('http://') or not url.startswith('https://'):
                 url = urlparse.urljoin(page_url, url)
+
+            log_link = url
+            log_link = log_link.replace('\n', '')
+            log_link = log_link.replace('\r', '')
 
             # get only links matching regexp
             regexps = config.get('links_re', None)
