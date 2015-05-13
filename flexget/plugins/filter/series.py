@@ -1289,7 +1289,7 @@ class FilterSeries(FilterSeriesBase):
                 return True
         # scan for quality
         for entry in entries:
-            if req.allows(entry['series_parser'].quality):
+            if req.allows(entry['quality']):
                 log.debug('Series accepting. %s meets quality %s', entry['title'], req)
                 entry.accept('target quality')
                 return True
