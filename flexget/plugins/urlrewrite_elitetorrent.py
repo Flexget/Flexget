@@ -1,8 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
-import urllib2
-import urllib
+#import urllib2
+#import urllib
 import unicodedata
 
 from flexget import plugin
@@ -12,20 +12,20 @@ from flexget.utils import requests
 from flexget.utils.soup import get_soup
 
 from flexget.entry import Entry
-from flexget.utils.search import torrent_availability, normalize_unicode
+from flexget.utils.search import normalize_unicode
 
-from flexget.manager import Session
+#from flexget.manager import Session
 
 log = logging.getLogger('elitetorrent')
 
-session = requests.Session()
+#session = requests.Session()
 
 class UrlRewriteElitetorrent(object):
     """
     elitetorrent urlrewriter and search Plugin.
     """
    
-    USER_AGENT = 'Mozilla/5.0'
+#    USER_AGENT = 'Mozilla/5.0'
     
     schema = {
         'type': 'object',
@@ -51,57 +51,49 @@ class UrlRewriteElitetorrent(object):
             soup = get_soup(page, 'html.parser')
             download_link = soup.findAll(href=re.compile('/get-torrent/\d+'))
             download_href = 'http://www.elitetorrent.net' + download_link[0]['href']
-            #if "url" in download_href:
-            #    return download_href[download_href.index('url=') + 4:]
-            #else:
             return download_href
         except Exception:
             raise UrlRewritingError(
                 'Unable to locate torrent from url %s' % url
             )
 	 
-    def elimina_tildes(self, data):
-	return unicodedata.normalize('NFKD', data).encode('ASCII', 'ignore')
+    def rm_tildes(self, data):
+	    return unicodedata.normalize('NFKD', data).encode('ASCII', 'ignore')
 
     def search(self, task, entry, config=None):
         log.debug('Search elitetorrent')
         url_search = 'http://www.elitetorrent.net/buscar.php'
+        task.requests.set_domain_delay('www.elitetorrent.net', '2.5 seconds') # they only allow 1 request per 2 seconds
+
         results = set()
+        #rm year
         regex = re.compile("(.+) \(\d\d\d\d\)")
-        #movie_name
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
-            query = self.elimina_tildes(regex.findall(query)[0])
+            query = self.rm_tildes(regex.findall(query)[0])
             log.debug('Searching elitetorrent %s' % query)
             query = query.encode('utf8', 'ignore')
-            #log.debug('Searching elitetorrent %s' % query)
-            data = urllib.urlencode({'buscar': query})
-            req = urllib2.Request(url_search, data)
-            response = urllib2.urlopen(req)
-            content = response.read()
-            #content = normalize_unicode(content).encode('utf8', 'ignore')
-            #log.debug(page.content.decode('utf8'))
+            #POST request or chaneg to "http://www.elitetorrent.net/busqueda/query+with+plus"
+            data = {'buscar': query}
+            try:
+                response = task.requests.post(url_search, data=data)
+            except requests.RequestException as e:
+                log.error('Error searching elitetorrent: %s' % e)
+                continue
+            
+            #req = urllib2.Request(url_search, data)
+            #response = urllib2.urlopen(req)
+            content = response.content # read()#.content
             soup = get_soup(content)
-#            log.debug(soup)
             #<a class="nombre" href="/torrent/25319/como-entrenar-a-tu-dragon-2-hdrip" title="Como entrenar a tu dragon 2 (HDRip)">Como entrenar a tu dragon 2 (HDRip)</a>
             children = soup.findAll('a', attrs={'class': 'nombre'})
-            #log.debug(soup2)
-            #soup3 = soup2.find('li')                               
-            #log.debug(len(soup2))
-            #children = soup2.findAll('a', href=True)
-            #log.debug(len(children))
-            #log.debug(children['href'])
+            log.verbose(len(children))
             for child in children:
                 entry = Entry()
                 entry['url'] = 'http://www.elitetorrent.net' + child['href']
                 entry['title'] = child['title']
                 #log.debug(child['href'])
                 results.add(entry)
-            #links = soup2.findAll('a', href=True)
-            #for a in links:
-            #    log.debug(a['href'])
-            #log.debug(links)
-            #for row in [l.find_parent('tr') for l in links]:
         log.debug('Finish search elitetorrent with %d entries' % len(results))
         return results
 
