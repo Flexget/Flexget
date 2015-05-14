@@ -1,8 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
-#import urllib2
-#import urllib
 import unicodedata
 
 from flexget import plugin
@@ -14,18 +12,12 @@ from flexget.utils.soup import get_soup
 from flexget.entry import Entry
 from flexget.utils.search import normalize_unicode
 
-#from flexget.manager import Session
-
 log = logging.getLogger('elitetorrent')
-
-#session = requests.Session()
 
 class UrlRewriteElitetorrent(object):
     """
     elitetorrent urlrewriter and search Plugin.
     """
-   
-#    USER_AGENT = 'Mozilla/5.0'
     
     schema = {
         'type': 'object',
@@ -81,8 +73,6 @@ class UrlRewriteElitetorrent(object):
                 log.error('Error searching elitetorrent: %s' % e)
                 continue
             
-            #req = urllib2.Request(url_search, data)
-            #response = urllib2.urlopen(req)
             content = response.content # read()#.content
             soup = get_soup(content)
             #<a class="nombre" href="/torrent/25319/como-entrenar-a-tu-dragon-2-hdrip" title="Como entrenar a tu dragon 2 (HDRip)">Como entrenar a tu dragon 2 (HDRip)</a>
