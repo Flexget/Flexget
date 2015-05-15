@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
+import random
+from collections import namedtuple
 
 from flexget import plugin
 from flexget.event import event
@@ -8,12 +10,14 @@ from flexget.config_schema import one_or_more
 
 log = logging.getLogger('path_select')
 
+disk_stats_tuple = namedtuple('disk_stats', ['path', 'free_mb', 'used_mb', 'total_mb', 'free_percent', 'used_percent'])
+
 
 def percentage(part, whole):
     try:
-        return 100 * float(part)/float(whole)
+        return 100 * part/whole
     except ZeroDivisionError:
-        return float(0.0)
+        return 0.0
 
 
 def get_disk_stats(folder):
@@ -36,45 +40,61 @@ def get_disk_stats(folder):
         free_bytes = stats.f_bavail * stats.f_frsize
         total_bytes = stats.f_blocks * stats.f_frsize
 
-    free_bytes_mb = int(free_bytes / 1024 / 1024)
-    total_bytes_mb = int(total_bytes / 1024 / 1024)
-    used_bytes_mb = total_bytes_mb - free_bytes_mb
+    free_mb = int(free_bytes / 1024 / 1024)
+    total_mb = int(total_bytes / 1024 / 1024)
+    used_mb = total_mb - free_mb
 
-    return free_bytes_mb, used_bytes_mb, total_bytes_mb
+    free_percent = 0.0 if total_mb == 0 else percentage(free_mb, total_mb)
+    used_percent = 0.0 if total_mb == 0 else percentage(used_mb, total_mb)
 
-
-def get_free_space(folder):
-    return get_disk_stats(folder)[0]
-
-
-def get_used_space(folder):
-    return get_disk_stats(folder)[1]
+    return disk_stats_tuple(folder, free_mb, used_mb, total_mb, free_percent, used_percent)
 
 
-def get_free_space_percent(folder):
-    free_bytes_mb, __, total_bytes_mb = get_disk_stats(folder)
-    return percentage(free_bytes_mb, total_bytes_mb)
+def path_selector(paths, threshold, stat_attr, reverse=True):
+    paths_stats = [get_disk_stats(path) for path in paths]
+
+    # Sort paths by key
+    paths_stats.sort(key=lambda p: getattr(p, stat_attr), reverse=reverse)
+
+    if threshold:
+        valid_paths = [paths_stats[0].path]
+
+        valid_paths.extend([
+            path_stat.path for path_stat in paths_stats[1:]
+            if abs(getattr(path_stat, stat_attr) - getattr(paths_stats[0], stat_attr)) <= threshold
+        ])
+
+        return random.choice(valid_paths)
+    else:
+        return paths[0]
 
 
-def get_used_space_percent(folder):
-    __, used_bytes_mb, total_bytes_mb = get_disk_stats(folder)
-    return percentage(used_bytes_mb, total_bytes_mb)
+def select_most_free(paths, threshold):
+    return path_selector(paths, threshold, "free_mb", reverse=True)
 
 
-def select_most_free(paths, reverse=False):
-    return sorted(paths, key=get_free_space, reverse=not reverse)[0]
+def select_most_used(paths, threshold):
+    return path_selector(paths, threshold, "used_mb", reverse=True)
 
 
-def select_most_free_percent(paths, reverse=False):
-    return sorted(paths, key=get_free_space_percent, reverse=not reverse)[0]
+def select_most_free_percent(paths, threshold):
+    return path_selector(paths, threshold, "free_percent", reverse=True)
 
 
-def select_most_used(paths, reverse=True):
-    return sorted(paths, key=get_used_space, reverse=not reverse)[0]
+def select_most_used_percent(paths, threshold):
+    return path_selector(paths, threshold, "used_percent", reverse=True)
 
 
-def select_most_used_percent(paths, reverse=True):
-    return sorted(paths, key=get_used_space_percent, reverse=not reverse)[0]
+def select_has_free(paths, threshold):
+    paths_stats = [get_disk_stats(path) for path in paths]
+
+    valid_paths = [
+        path_stat.path for path_stat in paths_stats
+        if path_stat.free_mb >= threshold
+    ]
+
+    if valid_paths:
+        return random.choice(valid_paths)
 
 
 selector_map = {
@@ -82,17 +102,20 @@ selector_map = {
     "most_used": select_most_used,
     "most_free_percent": select_most_free_percent,
     "most_used_percent": select_most_used_percent,
+    "has_free": select_has_free,
 }
 
 
 class PluginPathSelect(object):
     """Allows setting a field to a folder based on it's space
 
+    Path will be selected at random if multiple paths match the threshold
+
     Example:
 
     path_select:
-      select: most_free_percent # or most_free, most_used, most_used_percent
-      reverse: False # reverse the select, default is False
+      select: most_free_percent # or most_free, most_used, most_used_percent, has_free
+      threshold: 9000 # Threshold in MB or percent.
       paths:
         - /drive1/
         - /drive2/
@@ -103,32 +126,26 @@ class PluginPathSelect(object):
         'type': 'object',
         'properties': {
             'select': {'type': 'string', 'enum': selector_map.keys()},
-            'reverse': {'type': 'boolean'},
-            'to_field': {'type': 'string'},
+            'threshold': {'type': 'integer', 'default': 0},
+            'to_field': {'type': 'string', 'default': 'path'},
             'paths': one_or_more({'type': 'string'})
         },
         'required': ['paths', 'select'],
         'additionalProperties': False,
     }
 
-    def prepare_config(self, config):
-        config.setdefault('to_field', "path")
-        config.setdefault('reverse', False)
-        return config
-
     @plugin.priority(250)  # run before other plugins
     def on_task_metainfo(self, task, config):
-        config = self.prepare_config(config)
-
-        if not config.get('paths'):
-            return
 
         selector = selector_map[config['select']]
-        path = selector(config['paths'], reverse=config['reverse'])
-        log.debug("path %s selected due to (%s)" % (path, config['select']))
-
-        for entry in task.all_entries:
-            entry[config['to_field']] = path
+        path = selector(config['paths'], threshold=config['threshold'])
+        if path:
+            log.debug("Path %s selected due to (%s)" % (path, config['select']))
+            for entry in task.all_entries:
+                entry[config['to_field']] = path
+        else:
+            log.info("Unable to select a path based on %s" % config['select'])
+            return
 
 
 @event('plugin.register')
