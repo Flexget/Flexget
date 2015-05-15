@@ -6,5 +6,5 @@ pep8
 mock
 # TODO: Requests >2.6.0 don't seem to work with vcrpy, investigate
 requests==2.6.0
-vcrpy
+vcrpy>=1.5
 virtualenv
