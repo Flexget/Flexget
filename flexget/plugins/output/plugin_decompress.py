@@ -86,36 +86,30 @@ class Decompress(object):
                 error_message = 'Bad ZIP file: %s' % archive_path
                 log.error(error_message)
                 entry.fail(error_message)
-                return None
-            except Exception as e:
-                log.error('Failed to open ZIP: %s (%s)' (archive_path, e))
-                entry.fail(e)
-                return None
-        elif rarfile:
-            if rarfile.is_rarfile(archive_path):
-                try:
-                    archive = rarfile.RarFile(rarfile=archive_path)
-                    log.debug('Successfully opened RAR: %s' % archive_path)
-                except rarfile.RarWarning as e:
-                    log.warn('Nonfatal error: %s (%s)' % (archive_path, e))
-                except rarfile.NeedFirstVolume:
-                    log.error('Not the first volume: %s' % archive_path)
-                    return None
-                except rarfile.NotRarFile:
-                    log.error('Not a RAR file: %s' % archive_path)
-                    return None
-                except Exception as e:
-                    log.error('Failed to open RAR: %s (%s)' (archive_path, e))
-                    entry.fail(e)
-                    return None
+            except Exception as error:
+                error_message = 'Failed to open ZIP: %s (%s)' (archive_path, error)
+                log.error(error_message)
+                entry.fail(error_message)
+        elif rarfile and rarfile.is_rarfile(archive_path):
+            try:
+                archive = rarfile.RarFile(rarfile=archive_path)
+                log.debug('Successfully opened RAR: %s' % archive_path)
+            except rarfile.BadRarfile:
+                error_message = 'Bad RAR file: %s' % archive_path
+                log.error(error_message)
+                entry.fail(error_message)
+            except rarfile.RarWarning as error:
+                log.warn('Nonfatal error: %s (%s)' % (archive_path, error))
+            except rarfile.NeedFirstVolume:
+                log.error('Not the first volume: %s' % archive_path)
+            except Exception as error:
+                error_message = 'Failed to open RAR: %s (%s)' % (archive_path, error)
+                log.error(error_message)
+                entry.fail(error_message) 
         else:
-            log.warn('Can''t extract RAR archives without the rarfile Python module.')
-            
-
-        if not archive:
-            error_message = 'Couldn''t open file: %s' % archive_path
-            log.error(error_message)
-            entry.fail(error_message)
+            if not rarfile:
+                log.warn('Rarfile module not installed; unable to extract RAR archives.')
+            log.error('Can\'t open file: %s' % archive_path)
 
         return archive
 
@@ -146,13 +140,12 @@ class Decompress(object):
         """
         Tests whether the file descibed in info is a directory
         """
-        if isinstance(info, zipfile.ZipInfo):
-            base = os.path.basename(info.filename)
-            return not bool(base)
-        elif isinstance(info, rarfile.RarInfo):
+
+        if hasattr(info, 'isdir'):
             return info.isdir()
         else:
-            raise ValueError('Not a RarInfo or ZipInfo object.')
+            base = os.path.basename(info.filename)
+            return not bool(base)
 
 
     def handle_entry(self, entry, config):
@@ -227,12 +220,12 @@ class Decompress(object):
 
                     log.verbose('Extracted: %s' % path )
                     success = True
-                except (IOError, os.error) as e:
+                except (IOError, os.error) as error:
                     error_message = 'OS error while creating file: %s (%s)' % \
-                                    (destination, e)
-                except (zipfile.BadZipfile, rarfile.Error) as e:
+                                    (destination, error)
+                except (zipfile.BadZipfile, rarfile.Error) as error:
                     error_message = 'Failed to extract file: %s in %s (%s)' % \
-                                    (path, archive_path, e)
+                                    (path, archive_path, error)
                 finally:
                     if source and not source.closed:
                         source.close()
@@ -243,16 +236,16 @@ class Decompress(object):
 
                     if os.path.exists(destination):
                         error_message = log.debug('Cleaning up partially extracted file: %s' % destination) % \
-                                        (path, archive_path, e)
+                                        (path, archive_path, error)
                     return
             else:
                 log.verbose('File already exists: %s' % destination)
 
         if config['delete_archive']:
-            if isinstance(archive, zipfile.ZipFile):
-                volumes = [archive_path]
-            else:
+            if hasattr(archive, 'volumelist'):
                 volumes = archive.volumelist()
+            else:
+                volumes = [archive_path]
             
             archive.close()
 
