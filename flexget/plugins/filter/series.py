@@ -1501,6 +1501,7 @@ class SeriesDBManager(FilterSeriesBase):
                     except ValueError as e:
                         raise plugin.PluginError(e)
 
+
 def _add_alt_name(alt, db_series, series_name, session):
     alt = unicode(alt)
     db_series_alt = session.query(AlternateNames).filter(AlternateNames.alt_name == alt).first()
@@ -1509,14 +1510,20 @@ def _add_alt_name(alt, db_series, series_name, session):
         # TODO is checking the list for duplicates faster/better than querying the DB?
         db_series_alt.alt_name = alt
     elif db_series_alt:
-        # Alternate name already exists for another series. Not good.
-        raise plugin.PluginError('Error adding alternate name for %s. %s is already associated with %s. '
-                                 'Check your config.' % (series_name, alt, db_series_alt.series.name) )
+        if not db_series_alt.series:
+            # Not sure how this can happen
+            log.debug('Found an alternate name not attached to series. Re-attatching %s to %s' % (alt, series_name))
+            db_series.alternate_names.append(db_series_alt)
+        else:
+            # Alternate name already exists for another series. Not good.
+            raise plugin.PluginError('Error adding alternate name for %s. %s is already associated with %s. '
+                                     'Check your config.' % (series_name, alt, db_series_alt.series.name))
     else:
         log.debug('adding alternate name %s for %s into db' % (alt, series_name))
         db_series_alt = AlternateNames(alt)
         db_series.alternate_names.append(db_series_alt)
         log.debug('-> added %s' % db_series_alt)
+
 
 @event('plugin.register')
 def register_plugin():
