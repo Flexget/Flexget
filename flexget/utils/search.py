@@ -12,12 +12,8 @@ def clean_symbols(text):
     if isinstance(result, unicode):
         result = normalize('NFKD', result)
     result = re.sub('[ \(\)\-_\[\]\.]+', ' ', result).lower()
-    
-    """Special cases"""
-    result = re.sub("(\'s)+", 's', result)
-    result = re.sub("(\'t)+", 't', result)
 
-    """Leftovers"""
+	# Leftovers
     result = re.sub(r"[^a-zA-Z0-9 ]", "", result)
 
     return result
@@ -41,7 +37,6 @@ def normalize_unicode(text):
 
 def torrent_availability(seeds, leeches):
     """Returns a rating based on seeds and leeches for a given torrent.
-
     :param seeds: Number of seeds on the torrent
     :param leeches: Number of leeches on the torrent
     :return: A numeric rating
