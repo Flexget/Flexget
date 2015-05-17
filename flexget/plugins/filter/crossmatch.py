@@ -11,9 +11,7 @@ log = logging.getLogger('crossmatch')
 class CrossMatch(object):
     """
     Perform action based on item on current task and other inputs.
-
     Example::
-
       crossmatch:
         from:
           - rss: http://example.com/
@@ -28,7 +26,7 @@ class CrossMatch(object):
             'fields': {'type': 'array', 'items': {'type': 'string'}},
             'action': {'enum': ['accept', 'reject']},
             'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}},
-            'advanced': {'type': 'boolean', 'default': False}
+            'mode': {'enum': ['standard', 'flexible'], 'default': 'standard'},
         },
         'required': ['fields', 'action', 'from'],
         'additionalProperties': False
@@ -38,7 +36,7 @@ class CrossMatch(object):
 
         fields = config['fields']
         action = config['action']
-        advanced = config['advanced']
+        mode = config['mode']
 
         match_entries = []
 
@@ -67,7 +65,7 @@ class CrossMatch(object):
         for entry in task.entries:
             for generated_entry in match_entries:
                 log.trace('checking if %s matches %s' % (entry['title'], generated_entry['title']))
-                common = self.entry_intersects(entry, generated_entry, fields, advanced)
+                common = self.entry_intersects(entry, generated_entry, fields, mode)
                 if common:
                     msg = 'intersects with %s on field(s) %s' % \
                           (generated_entry['title'], ', '.join(common))
@@ -77,7 +75,7 @@ class CrossMatch(object):
                         entry['match'] = generated_entry['title']
                         entry.accept(msg)
 
-    def entry_intersects(self, e1, e2, fields=None, advanced=False):
+    def entry_intersects(self, e1, e2, fields=None, mode="standard"):
         """
         :param e1: First :class:`flexget.entry.Entry`
         :param e2: Second :class:`flexget.entry.Entry`
@@ -99,7 +97,7 @@ class CrossMatch(object):
             log.trace('v1: %r' % v1)
             log.trace('v2: %r' % v2)
 
-            if advanced == True:
+            if mode == "flexible":
                 v1Re = v1.lower()
                 v1Re = unicodedata.normalize('NFKD', v1Re).encode('ASCII', 'ignore')
                 v1Re = re.sub("[^a-zA-Z0-9 ]", " ", v1Re)
@@ -111,7 +109,7 @@ class CrossMatch(object):
                 v2Re = v2Re.replace(' ','.*')
                 v2Re = '.*' + v2Re + '.*'
                 
-                log.debug('Performing advanced Regex search %s and %s' % (v1Re, v2Re))
+                log.debug('Performing flexible Regex search %s and %s' % (v1Re, v2Re))
                 
                 if re.match(v1Re, v2, re.IGNORECASE):
                     common_fields.append(field)
