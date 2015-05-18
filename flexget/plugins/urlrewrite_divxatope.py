@@ -13,6 +13,29 @@ from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('divxatope')
 
+CATEGORIES = {
+    'all': '',
+
+    #Estrenos
+    #'Estrenos': 'Estrenos',
+    'Estrenos de cartelera': 1,
+    'Estrenos en CVCD': 47,
+    'Estrenos en DVD-R': 42,
+
+    #Peliculas
+    #'Peliculas':'Peliculas',
+    'Alta definicion': 52,
+    'DVDRip Castellano': 9,
+    'BDRip Castellano': 40,
+    'DVDRip-BDRip Castellano Latino': 56,
+    'VO': 55,
+
+    #DVD
+    #'DVD': 'DVD',
+    'DVD-R': 18,
+    'DVD-R Colaboraciones': 45
+}
+
 class UrlRewriteDivxATope(object):
     """
     divxatope urlrewriter and search Plugin.
@@ -47,10 +70,11 @@ class UrlRewriteDivxATope(object):
             soup = get_soup(page, 'html.parser')
             download_link = soup.findAll(href=re.compile('redirect|redirectlink'))
             download_href = download_link[0]['href']
-            if "url" in download_href:
-                return download_href[download_href.index('url=') + 4:]
-            else:
-                return download_href
+            return download_href
+            #if "url" in download_href:
+            #    return download_href[download_href.index('url=') + 4:]
+            #else:
+            #    return download_href
         except Exception:
             raise UrlRewritingError(
                 'Unable to locate torrent from url %s' % url
