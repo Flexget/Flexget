@@ -48,7 +48,7 @@ class PluginTmdbLookup(object):
 
     schema = {'type': 'boolean'}
 
-    def lazy_loader(self, entry, field):
+    def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
         imdb_id = (entry.get('imdb_id', eval_lazy=False) or
                    imdb.extract_id(entry.get('imdb_url', eval_lazy=False)))
@@ -61,9 +61,6 @@ class PluginTmdbLookup(object):
                 entry.update_using_map(self.field_map, movie)
         except LookupError:
             log_once('TMDB lookup failed for %s' % entry['title'], log, logging.WARN)
-            # Set all of our fields to None if the lookup failed
-            entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
-        return entry[field]
 
     def lookup(self, entry):
         """
@@ -72,7 +69,7 @@ class PluginTmdbLookup(object):
 
         :param entry: Entry instance
         """
-        entry.register_lazy_fields(self.field_map, self.lazy_loader)
+        entry.register_lazy_func(self.lazy_loader, self.field_map)
 
     def on_task_metainfo(self, task, config):
         if not config:

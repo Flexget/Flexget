@@ -246,6 +246,7 @@ class PluginTransmission(TransmissionBase):
                     'content_filename': {'type': 'string'},
                     'main_file_only': {'type': 'boolean'},
                     'main_file_ratio': {'type': 'number'},
+                    'magnetization_timeout' : {'type': 'integer'},
                     'enabled': {'type': 'boolean'},
                     'include_subs': {'type': 'boolean'},
                     'bandwidthpriority': {'type': 'number'},
@@ -263,7 +264,7 @@ class PluginTransmission(TransmissionBase):
         config = TransmissionBase.prepare_config(self, config)
         config.setdefault('path', '')
         config.setdefault('main_file_only', False)
-        config.setdefault('main_file_ratio', 0.90)
+        config.setdefault('magnetization_timeout', 0)
         config.setdefault('include_subs', False)
         config.setdefault('rename_like_files', False)
         config.setdefault('include_files', [])
@@ -310,8 +311,8 @@ class PluginTransmission(TransmissionBase):
 
         opt_dic = {}
 
-        for opt_key in ('path', 'addpaused', 'honourlimits', 'bandwidthpriority',
-                        'maxconnections', 'maxupspeed', 'maxdownspeed', 'ratio', 'main_file_only', 'main_file_ratio',
+        for opt_key in ('path', 'addpaused', 'honourlimits', 'bandwidthpriority', 'maxconnections', 'maxupspeed', 
+                        'maxdownspeed', 'ratio', 'main_file_only', 'main_file_ratio', 'magnetization_timeout',
                         'include_subs', 'content_filename', 'include_files', 'skip_files', 'rename_like_files'):
             # Values do not merge config with task
             # Task takes priority then config is used
@@ -365,6 +366,8 @@ class PluginTransmission(TransmissionBase):
             post['main_file_only'] = opt_dic['main_file_only']
         if 'main_file_ratio' in opt_dic:
             post['main_file_ratio'] = opt_dic['main_file_ratio']
+        if 'magnetization_timeout' in opt_dic:
+            post['magnetization_timeout'] = opt_dic['magnetization_timeout']
         if 'include_subs' in opt_dic:
             post['include_subs'] = opt_dic['include_subs']
         if 'content_filename' in opt_dic:
@@ -410,6 +413,8 @@ class PluginTransmission(TransmissionBase):
                         filedump = base64.b64encode(f.read()).encode('utf-8')
                     r = cli.add_torrent(filedump, 30, **options['add'])
                 else:
+                    # we need to set paused to false so the magnetization begins immediately
+                    options['add']['paused'] = False
                     r = cli.add_torrent(entry['url'], timeout=30, **options['add'])
                 if r:
                     torrent = r
@@ -428,6 +433,17 @@ class PluginTransmission(TransmissionBase):
                         if fnmatch(name, mask):
                             return True
                     return False
+                
+                def _wait_for_files(cli, r, timeout):
+                    from time import sleep
+                    while timeout > 0:
+                        sleep(1)
+                        fl = cli.get_files(r.id)
+                        if len(fl[r.id]) > 0:
+                            return fl
+                        else:
+                            timeout -= 1
+                    return fl
 
                 skip_files = False
                 # Filter list because "set" plugin doesn't validate based on schema
@@ -441,6 +457,14 @@ class PluginTransmission(TransmissionBase):
                 if ('main_file_only' in options['post'] and options['post']['main_file_only'] == True or 
                    'content_filename' in options['post'] or skip_files):
                         fl = cli.get_files(r.id)
+                
+                        if 'magnetization_timeout' in options['post'] and options['post']['magnetization_timeout'] > 0 and not downloaded and len(fl[r.id]) == 0:
+                            log.debug('Waiting %d seconds for "%s" to magnetize' % (options['post']['magnetization_timeout'], entry['title']))
+                            fl = _wait_for_files(cli, r, options['post']['magnetization_timeout'])
+                            if len(fl[r.id]) == 0:
+                                log.warning('"%s" did not magnetize before the timeout elapsed, file list unavailable for processing.' % entry['title'])
+                            else:
+                                total_size = cli.get_torrent(r.id, ['id', 'totalSize']).totalSize
                 
                         # Find files based on config
                         dl_list = []

@@ -261,17 +261,14 @@ class ImdbLookup(object):
             self.register_lazy_fields(entry)
 
     def register_lazy_fields(self, entry):
-        entry.register_lazy_fields(self.field_map, self.lazy_loader)
+        entry.register_lazy_func(self.lazy_loader, self.field_map)
 
-    def lazy_loader(self, entry, field):
+    def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
         try:
             self.lookup(entry)
         except plugin.PluginError as e:
             log_once(unicode(e.value).capitalize(), logger=log)
-            # Set all of our fields to None if the lookup failed
-            entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
-        return entry[field]
 
     @with_session
     def imdb_id_lookup(self, movie_title=None, raw_title=None, session=None):

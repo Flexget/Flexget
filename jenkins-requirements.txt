@@ -4,5 +4,6 @@ nose>=0.11
 http://github.com/cmheisel/nose-xcover/zipball/master
 pep8
 mock
-vcrpy
+requests
+vcrpy>=1.5
 virtualenv

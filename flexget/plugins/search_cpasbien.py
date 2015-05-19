@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
+import urllib 
 
 from flexget import plugin, validator
 from flexget.entry import Entry
@@ -67,7 +68,7 @@ class SearchCPASBIEN(object):
             search_string = search_string.replace('(', '')
             search_string = search_string.replace(')', '')
             query = normalize_unicode(search_string)
-            query_url_fragment = query.encode('iso-8859-1')
+            query_url_fragment = urllib.quote_plus(query.encode('utf-8'))
 # http://www.cpasbien.pe/recherche/ncis.html
             if config['category'] == 'all':
                 str_url = (base_url, 'recherche', query_url_fragment)

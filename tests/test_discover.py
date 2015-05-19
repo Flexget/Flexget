@@ -3,17 +3,24 @@ from datetime import datetime, timedelta
 
 from flexget.entry import Entry
 from flexget import plugin
-import flexget.validator
 from tests import FlexGetBase
 
 
 class SearchPlugin(object):
-    """Fake search plugin. Just returns the entry it was given."""
+    """
+    Fake search plugin. Result differs depending on config value:
+      `'fail'`: raises a PluginError
+      `False`: Returns an empty list
+      otherwise: Just passes back the entry that was searched for
+    """
 
-    def validator(self):
-        return flexget.validator.factory('boolean')
+    schema = {}
 
     def search(self, task, entry, config=None):
+        if not config:
+            return []
+        elif config == 'fail':
+            raise plugin.PluginError('search plugin failure')
         return [Entry(entry)]
 
 plugin.register(SearchPlugin, 'test_search', groups=['search'], api_ver=2)
@@ -72,6 +79,21 @@ class TestDiscover(FlexGetBase):
             - My Show:
                 identified_by: ep
             rerun: 0
+          test_emit_series_with_bad_search:
+            discover:
+              ignore_estimations: yes
+              what:
+              - emit_series:
+                  from_start: yes
+              from:
+              - test_search: fail
+              - test_search: no
+              - test_search: yes
+            series:
+            - My Show:
+                identified_by: ep
+            mock_output: yes
+            rerun: 3
 
     """
 
@@ -111,6 +133,15 @@ class TestDiscover(FlexGetBase):
     def test_emit_series(self):
         self.execute_task('test_emit_series')
         assert self.task.find_entry(title='My Show S01E01')
+
+    def test_emit_series_with_bad_search(self):
+        self.execute_task('test_emit_series_with_bad_search')
+        for epnum in xrange(1, 5):
+            title = 'My Show S01E0%d' % epnum
+            assert any(e['title'] == title for e in self.task.mock_output), '%s not accepted' % title
+        assert len(self.task.mock_output) == 4, \
+            '4 episodes should have been accepted, not %s' % len(self.task.mock_output)
+
 
 class TestEmitSeriesInDiscover(FlexGetBase):
     __yaml__ = """

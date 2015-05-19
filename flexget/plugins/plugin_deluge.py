@@ -661,16 +661,28 @@ class OutputDeluge(DelugePlugin):
                                     sub_file = file
                                     break
 
+                        # check for single file torrents so we dont add unnecessary folders
+                        if (os.path.dirname(main_file['path']) is not ("" or "/")):
+                            # check for top folder in user config
+                            if (opts.get('content_filename') and os.path.dirname(opts['content_filename']) is not ""):
+                                top_files_dir = os.path.dirname(opts['content_filename']) + "/"
+                            else:
+                                top_files_dir = os.path.dirname(main_file['path']) + "/"
+                        else:
+                            top_files_dir = "/"
+
                         if opts.get('content_filename'):
                             # rename the main file
-                            big_file_name = opts['content_filename'] + os.path.splitext(main_file['path'])[1]
+                            big_file_name = (top_files_dir +
+                                            os.path.basename(opts['content_filename']) +
+                                            os.path.splitext(main_file['path'])[1])
                             big_file_name = unused_name(big_file_name)
                             rename(main_file, big_file_name)
 
                             # rename subs along with the main file
                             if sub_file is not None and keep_subs:
-                                sub_file_name = os.path.splitext(big_file_name   )[0] \
-                                              + os.path.splitext(sub_file['path'])[1]
+                                sub_file_name = (os.path.splitext(big_file_name)[0] +
+                                                os.path.splitext(sub_file['path'])[1])
                                 rename(sub_file, sub_file_name)
 
                         if opts.get('main_file_only'):
@@ -683,11 +695,12 @@ class OutputDeluge(DelugePlugin):
                             if opts.get('hide_sparse_files'):
                                 # hide the other sparse files that are not supposed to download but are created anyway
                                 # http://dev.deluge-torrent.org/ticket/1827
-                                other_files = [f for f in status['files']
+                                # Made sparse files behave better with deluge http://flexget.com/ticket/2881
+                                sparse_files = [f for f in status['files']
                                                if f != main_file and (f != sub_file or (not keep_subs))]
-                                other_files_dir = "._" + (opts['content_filename'] + "/"
-                                                          if opts.get('content_filename') else "")
-                                rename_pairs = [(f['index'], other_files_dir + f['path']) for f in other_files]
+                                rename_pairs = [(f['index'],
+                                               top_files_dir + ".sparse_files/" + os.path.basename(f['path']))
+                                               for f in sparse_files]
                                 main_file_dlist.append(client.core.rename_files(torrent_id, rename_pairs))
                     else:
                         log.warning('No files in "%s" are > %d%% of content size, no files renamed.' % (entry['title'], opts.get('main_file_ratio') * 100))
