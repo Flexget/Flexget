@@ -15,7 +15,7 @@ SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
 
 def clean_value(name):
     # Move anything in leading brackets to the end
-    #name = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', name)
+    # name = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', name)
 
     for char in '[]()_,.':
         name = name.replace(char, ' ')
@@ -25,9 +25,9 @@ def clean_value(name):
         name = name.replace('-', ' ')
 
     # remove unwanted words (imax, ..)
-    #self.remove_words(data, self.remove)
+    # self.remove_words(data, self.remove)
 
-    #MovieParser.strip_spaces
+    # MovieParser.strip_spaces
     name = ' '.join(name.split())
     return name
 
@@ -343,7 +343,7 @@ class ParsedVideoQuality(ABCMeta(str('ParsedVideoQualityABCMeta'), (object,), {}
 
     def __str__(self):
         return "<%s(screen_size=%s,source=%s,video_codec=%s,audio_channels=%s)>" % (
-        self.__class__.__name__, self.screen_size, self.source, self.video_codec, self.audio_channels)
+            self.__class__.__name__, self.screen_size, self.source, self.video_codec, self.audio_channels)
 
 
 class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
@@ -557,3 +557,91 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
         return self is other
 
 
+class ParsedAudio(ABCMeta(str('ParsedAudioABCMeta'), (ParsedEntry,), {})):
+    def __init__(self):
+        self._assumed_quality = None
+
+    @abstractproperty
+    def year(self):
+        raise NotImplementedError
+
+    @property
+    def type(self):
+        return 'audio'
+
+    @abstractproperty
+    def quality(self):
+        raise NotImplementedError
+
+    @property
+    def proper_count(self):
+        return 0
+
+    def assume_quality(self, quality):
+        self._assumed_quality = quality
+
+    def __str__(self):
+        return "<%s(name=%s,year=%s,quality=%s)>" % (self.__class__.__name__, self.name, self.year, self.quality)
+
+    def __cmp__(self, other):
+        """Compares quality of parsed, if quality is equal, compares proper_count."""
+        return cmp((self.quality), (other.quality))
+
+    def __eq__(self, other):
+        return self is other
+
+
+class ParsedAlbum(ABCMeta(str('ParsedAlbumABCMeta'), (ParsedAudio,), {})):
+    @property
+    def parsed_name(self):
+        return "%s - %s" % (self.artist, self.title)
+
+    @property
+    def type(self):
+        return 'album'
+
+    @abstractproperty
+    def artist(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def title(self):
+        raise NotImplementedError
+
+
+class ParsedAudioQuality(ABCMeta(str('ParsedAudioQualityABCMeta'), (object,), {})):
+    @abstractproperty
+    def source(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_codec(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_profile(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_sampling(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_bit_depth(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_bit_rate(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_bit_rate_distribution(self):
+        raise NotImplementedError
+
+    @abstractproperty
+    def audio_channels(self):
+        raise NotImplementedError
+
+    def __str__(self):
+        return "<%s(source=%s,audio_codec=%s,audio_bitrate=%s,audio_channels=%s)>" % (
+            self.__class__.__name__, self.source, self.audio_codec, self.audio_bit_rate, self.audio_channels)
