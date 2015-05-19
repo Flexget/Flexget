@@ -98,8 +98,6 @@ class Decompress(object):
                 error_message = 'Bad RAR file: %s' % archive_path
                 log.error(error_message)
                 entry.fail(error_message)
-            except rarfile.RarWarning as error:
-                log.warn('Nonfatal error: %s (%s)' % (archive_path, error))
             except rarfile.NeedFirstVolume:
                 log.error('Not the first volume: %s' % archive_path)
             except Exception as error:
@@ -235,8 +233,8 @@ class Decompress(object):
                     entry.fail(error_message)
 
                     if os.path.exists(destination):
-                        error_message = log.debug('Cleaning up partially extracted file: %s' % destination) % \
-                                        (path, archive_path, error)
+                        log.debug('Cleaning up partially extracted file: %s' % destination) % \
+                                  (path, archive_path, error)
                     return
             else:
                 log.verbose('File already exists: %s' % destination)
@@ -257,6 +255,7 @@ class Decompress(object):
         else:
             archive.close()
 
+    @plugin.priority(255)
     def on_task_output(self, task, config):
         """Task handler for archive_extract"""
         if isinstance(config, bool) and not config:
