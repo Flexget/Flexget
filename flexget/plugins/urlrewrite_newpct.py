@@ -39,7 +39,7 @@ class UrlRewriteNewPCT(object):
     # urlrewriter API
     def url_rewrite(self, task, entry):
         if 'newpct1' in entry['url']:
-	    auth_handler = NewPCTAuth()
+            auth_handler = NewPCTAuth()
             entry['download_auth'] = auth_handler
             entry['urls'] = [self.parse_download_page_newpct1(task, entry['url'])]
         else:
@@ -47,7 +47,7 @@ class UrlRewriteNewPCT(object):
         task.requests = Session() 
     
     def parse_download_page_newpct1(self, task, url):
-        log.verbose('URL newpct1')
+        log.debug('URL newpct1')
         log.debug(url)
         url = url.replace('newpct1.com/', 'newpct1.com/descarga-torrent/')
         page = task.requests.get(url).content
@@ -62,7 +62,7 @@ class UrlRewriteNewPCT(object):
 
     @plugin.internet(log)
     def parse_download_page(self, task, url):
-        log.verbose('URL newpct')
+        log.debug('URL newpct')
         log.debug(url)
         page = task.requests.get(url)
         try:
@@ -77,10 +77,6 @@ class UrlRewriteNewPCT(object):
         if len(torrent_tag) == 0:
             raise UrlRewritingError('Unable to locate torrent from url %s' % url)
         return torrent_tag[0]['href']
-
-    def remove_parentheses(self, result):
-        result = re.sub('[()]', ' ', result)
-        return result
 
 @event('plugin.register')
 def register_plugin():
