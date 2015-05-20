@@ -6,7 +6,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.utils.requests import Session
+from flexget.utils.requests import Session, get
 from flexget.utils.search import normalize_unicode
 
 log = logging.getLogger('rarbg')
@@ -72,8 +72,8 @@ class SearchRarBG(object):
     base_url = 'https://torrentapi.org/pubapi.php'
 
     def get_token(self):
-        # using rarbg.com to avoid the domain delay as tokens can be requested always
-        r = requests.get('https://rarbg.com/pubapi/pubapi.php', params={'get_token': 'get_token', 'format': 'json'})
+        # Don't use a session as tokens are not affected by domain limit
+        r = get('https://torrentapi.org/pubapi.php', params={'get_token': 'get_token', 'format': 'json'})
         token = None
         try:
             token = r.json().get('token')
