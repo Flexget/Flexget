@@ -60,9 +60,9 @@ class SearchRarBG(object):
                     {'type': 'string', 'enum': list(CATEGORIES)},
                 ]}),
             'sorted_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'last'], 'default': 'last'},
-            # min_seeders and min_leechers do not seem to work
-            # 'min_seeders': {'type': 'integer', 'default': 0},
-            # 'min_leechers': {'type': 'integer', 'default': 0},
+            # min_seeders and min_leechers seem to be working again
+            'min_seeders': {'type': 'integer', 'default': 0},
+            'min_leechers': {'type': 'integer', 'default': 0},
             'limit': {'type': 'integer', 'enum': [25, 50, 100], 'default': 25},
             'ranked': {'type': 'boolean', 'default': True}
         },
