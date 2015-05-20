@@ -592,14 +592,23 @@ class ParsedAudio(ABCMeta(str('ParsedAudioABCMeta'), (ParsedEntry,), {})):
         return self is other
 
 
-class ParsedAlbum(ABCMeta(str('ParsedAlbumABCMeta'), (ParsedAudio,), {})):
+titled_audio_types = ['titled_audio', 'album', 'single', 'track']
+class ParsedTitledAudio(ABCMeta(str('ParsedTitledAudioABCMeta'), (ParsedAudio,), {})):
+    """
+    Terminology : https://musicbrainz.org/doc/MusicBrainz_Terminology
+    Because it's very difficult to distinguish an album of a single, this class
+    assume the role to do that.
+    """
+    def __init__(self):
+        self._type = titled_audio_types[0] # titled_audio
+
     @property
     def parsed_name(self):
         return "%s - %s" % (self.artist, self.title)
 
     @property
     def type(self):
-        return 'album'
+        return self._type
 
     @abstractproperty
     def artist(self):

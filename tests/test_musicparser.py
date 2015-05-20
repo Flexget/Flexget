@@ -290,7 +290,7 @@ class TestMusicParser(object):
 
     def check_entry(self, parsed_entry, expected_dict, assertor):
         """
-        @type parsed_entry: flexget.plugins.parsers.parser_common.ParsedAlbum
+        @type parsed_entry: flexget.plugins.parsers.parser_common.ParsedTitledAudio
         @type expected_dict: dict[str,str]
         """
         if expected_dict.get('artist') is not None:
