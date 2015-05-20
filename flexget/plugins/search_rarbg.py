@@ -64,7 +64,8 @@ class SearchRarBG(object):
             'min_seeders': {'type': 'integer', 'default': 0},
             'min_leechers': {'type': 'integer', 'default': 0},
             'limit': {'type': 'integer', 'enum': [25, 50, 100], 'default': 25},
-            'ranked': {'type': 'boolean', 'default': True}
+            'ranked': {'type': 'boolean', 'default': True},
+            'use_tvdb': {'type': 'boolean', 'default': False},
         },
         "additionalProperties": False
     }
@@ -94,7 +95,7 @@ class SearchRarBG(object):
             categories = [categories]
         # Convert named category to its respective category id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-        category_url_fragment = urllib.quote(';'.join(str(c) for c in categories))
+        category_url_fragment = ';'.join(str(c) for c in categories)
 
         entries = set()
 
@@ -104,7 +105,7 @@ class SearchRarBG(object):
             return entries
 
         params = {'mode': 'search', 'token': token, 'ranked': int(config['ranked']),
-                  # 'min_seeders': config['min_seeders'], 'min_leechers': config['min_leechers'],
+                  'min_seeders': config['min_seeders'], 'min_leechers': config['min_leechers'],
                   'sort': config['sorted_by'], 'category': category_url_fragment, 'format': 'json'}
 
         for search_string in entry.get('search_strings', [entry['title']]):
@@ -117,6 +118,10 @@ class SearchRarBG(object):
                 query = normalize_unicode(search_string)
                 query_url_fragment = query.encode('utf8')
                 params['search_string'] = query_url_fragment
+                if config['use_tvdb']:
+                    plugin.get_plugin_by_name('thetvdb_lookup').instance.lazy_series_lookup(entry)
+                    params['search_tvdb'] = entry.get('tvdb_id')
+                    log.debug('Using tvdb id %s' % entry.get('tvdb_id'))
 
             page = requests.get(self.base_url, params=params)
 
@@ -127,13 +132,12 @@ class SearchRarBG(object):
                 break
 
             for result in r:
-                entry = Entry()
+                e = Entry()
 
-                entry['title'] = result.get('f')
+                e['title'] = result.get('f')
+                e['url'] = result.get('d')
 
-                entry['url'] = result.get('d')
-
-                entries.add(entry)
+                entries.add(e)
 
         return entries
 
