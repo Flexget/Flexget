@@ -79,6 +79,7 @@ class GuessitParsedAudioQuality(ParsedAudioQuality):
 
 class GuessitParsedTitledAudio(GuessitParsedAudio, ParsedTitledAudio):
     def __init__(self, data, name, guess_result, **kwargs):
+        ParsedTitledAudio.__init__(self);
         GuessitParsedAudio.__init__(self, data, name, guess_result, **kwargs)
 
     @property
@@ -92,7 +93,10 @@ class GuessitParsedTitledAudio(GuessitParsedAudio, ParsedTitledAudio):
     @property
     def parsed_type(self):
         # TODO: parsed_type = self._guess_result.get('type', self.type)
-        return 'album'
+        if self.artist and self.title:
+            return self.type
+        else:
+            return None
 
 
 class ParserGuessitMusic(object):
@@ -172,4 +176,4 @@ class MusicTransformerExtensionManager(CustomTransformerExtensionManager):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ParserGuessitMusic, 'parser_guessit_music', groups=['album_parser'], api_ver=2)
+    plugin.register(ParserGuessitMusic, 'parser_guessit_music', groups=['titled_audio_parser'], api_ver=2)
