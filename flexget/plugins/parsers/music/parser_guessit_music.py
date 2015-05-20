@@ -15,9 +15,9 @@ log = logging.getLogger('parser_guessit_music')
 logging.getLogger('guessit').setLevel(logging.INFO)
 
 
-class GuessitParsedAudio(ParsedEntry):
+class GuessitParsedAudio(ParsedAudio):
     def __init__(self, data, name, guess_result, **kwargs):
-        ParsedEntry.__init__(self, data, name, **kwargs)
+        ParsedAudio.__init__(self, data, name, **kwargs)
         self._quality = None
         self._guess_result = guess_result
 
