@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import time
 from flexget import plugin
 from flexget.event import event
-from flexget.plugins.parsers.parser_common import ParsedAudio, ParsedAudioQuality, ParsedEntry, ParsedAlbum
+from flexget.plugins.parsers.parser_common import ParsedAudio, ParsedAudioQuality, ParsedEntry, ParsedTitledAudio
 
 from pkg_resources import EntryPoint
 from guessit.textutils import normalize_unicode, clean_default
@@ -77,7 +77,7 @@ class GuessitParsedAudioQuality(ParsedAudioQuality):
         return self._guess_result.get('audioChannels')
 
 
-class GuessitParsedAlbum(GuessitParsedAudio, ParsedAlbum):
+class GuessitParsedTitledAudio(GuessitParsedAudio, ParsedTitledAudio):
     def __init__(self, data, name, guess_result, **kwargs):
         GuessitParsedAudio.__init__(self, data, name, guess_result, **kwargs)
 
@@ -132,7 +132,7 @@ class ParserGuessitMusic(object):
         log.debug('Parsing album: `%s` [options: %s]', data, kwargs)
         start = time.clock()
         guess_result = self.parse(data, **kwargs).matched()
-        parsed = GuessitParsedAlbum(data, kwargs.pop('name', None), guess_result, **kwargs)
+        parsed = GuessitParsedTitledAudio(data, kwargs.pop('name', None), guess_result, **kwargs)
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed
