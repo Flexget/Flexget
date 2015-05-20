@@ -558,7 +558,8 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
 
 
 class ParsedAudio(ABCMeta(str('ParsedAudioABCMeta'), (ParsedEntry,), {})):
-    def __init__(self):
+    def __init__(self, data, name, **kwargs):
+        ParsedEntry.__init__(self, data, name, **kwargs)
         self._assumed_quality = None
 
     @abstractproperty
