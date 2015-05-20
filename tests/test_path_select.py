@@ -57,7 +57,6 @@ class BaseExistsMovie(FlexGetBase):
               select: most_used
               paths:
                 - /data/90G,100G
-                - /data/90.5G,100G
                 - /data/80G,100G
                 - /data/90.5G,100G
                 - /data/88G,100G
@@ -123,7 +122,7 @@ class BaseExistsMovie(FlexGetBase):
         self.execute_task('test_most_used')
         assert self.task.entries[0].get('path') in [
             '/data/90G,100G',
-            '/data/90.5,100G',
+            '/data/90.5G,100G',
         ]
 
     @mock.patch('flexget.plugins.modify.path_select.get_disk_stats', side_effect=mock_disk_stats)
