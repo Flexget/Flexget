@@ -174,7 +174,7 @@ class PluginPathSelect(object):
         'type': 'object',
         'properties': {
             'select': {'type': 'string', 'enum': selector_map.keys()},
-            'threshold': {'type': 'string', 'default': "0%", 'pattern': '^\d+\s?(%|[KMGT]?B)$'},
+            'threshold': {'type': 'string', 'default': "0%", 'pattern': '^\d+\s?(%|[BKMGT]?)$'},
             'to_field': {'type': 'string', 'default': 'path'},
             'paths': one_or_more({'type': 'string', 'format': 'path'})
         },
