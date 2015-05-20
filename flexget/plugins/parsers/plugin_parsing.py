@@ -80,6 +80,17 @@ class PluginParsing(object):
         parser = parsers['movie'][selected_parsers.get('movie') or default_parsers['movie']]
         return parser.parse_movie(data, **kwargs)
 
+    def parse_titled_audio(self, data, **kwargs):
+        """
+        Use the selected audio parser to parse audio information from `data`
+        :param data: The raw string to parse information from
+        :returns: An object containing the parsed information. The `valid` attribute will be set depending on success.
+        """
+        parser = parsers['titled_audio'][selected_parsers.get('titled_audio') or default_parsers['titled_audio']]
+        return parser.parse(data, **kwargs)
+
+
+
 
 @event('plugin.register')
 def register_plugin():
