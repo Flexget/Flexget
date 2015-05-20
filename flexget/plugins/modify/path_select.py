@@ -10,7 +10,42 @@ from flexget.config_schema import one_or_more
 
 log = logging.getLogger('path_select')
 
-disk_stats_tuple = namedtuple('disk_stats', ['path', 'free_mb', 'used_mb', 'total_mb', 'free_percent', 'used_percent'])
+SYMBOLS = {
+    'customary': ('B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'),
+    'customary_ext': ('byte', 'kilo', 'mega', 'giga', 'tera', 'peta', 'exa', 'zetta', 'iotta'),
+    'iec': ('Bi', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi', 'Yi'),
+    'iec_ext': ('byte', 'kibi', 'mebi', 'gibi', 'tebi', 'pebi', 'exbi', 'zebi', 'yobi'),
+}
+
+
+def human2bytes(s):
+    """
+    Attempts to guess the string format based on default symbols
+    set and return the corresponding bytes as an integer.
+    When unable to recognize the format ValueError is raised.
+    """
+
+    init = s
+    num = ""
+    while s and s[0:1].isdigit() or s[0:1] == '.':
+        num += s[0]
+        s = s[1:]
+    num = float(num)
+    letter = s.strip()
+    for name, sset in SYMBOLS.items():
+        if letter in sset:
+            break
+    else:
+        if letter == 'k':
+            # treat 'k' as an alias for 'K' as per: http://goo.gl/kTQMs
+            sset = SYMBOLS['customary']
+            letter = letter.upper()
+        else:
+            raise ValueError("can't interpret %r" % init)
+    prefix = {sset[0]: 1}
+    for i, s in enumerate(sset[1:]):
+        prefix[s] = 1 << (i+1)*10
+    return int(num * prefix[letter])
 
 
 def percentage(part, whole):
@@ -18,6 +53,13 @@ def percentage(part, whole):
         return 100 * part/whole
     except ZeroDivisionError:
         return 0.0
+
+
+disk_stats_tuple = namedtuple(
+    'disk_stats', [
+        'path', 'free_bytes', 'used_bytes', 'total_bytes', 'free_percent',  'used_percent'
+    ]
+)
 
 
 def get_disk_stats(folder):
@@ -40,14 +82,14 @@ def get_disk_stats(folder):
         free_bytes = stats.f_bavail * stats.f_frsize
         total_bytes = stats.f_blocks * stats.f_frsize
 
-    free_mb = int(free_bytes / 1024 / 1024)
-    total_mb = int(total_bytes / 1024 / 1024)
-    used_mb = total_mb - free_mb
+    free_bytes = int(free_bytes)
+    total_bytes = int(total_bytes)
+    used_bytes = total_bytes - free_bytes
 
-    free_percent = 0.0 if total_mb == 0 else percentage(free_mb, total_mb)
-    used_percent = 0.0 if total_mb == 0 else percentage(used_mb, total_mb)
+    free_percent = 0.0 if total_bytes == 0 else percentage(free_bytes, total_bytes)
+    used_percent = 0.0 if total_bytes == 0 else percentage(used_bytes, total_bytes)
 
-    return disk_stats_tuple(folder, free_mb, used_mb, total_mb, free_percent, used_percent)
+    return disk_stats_tuple(folder, free_bytes, used_bytes, total_bytes, free_percent, used_percent)
 
 
 def path_selector(paths, threshold, stat_attr, reverse=True):
@@ -56,25 +98,31 @@ def path_selector(paths, threshold, stat_attr, reverse=True):
     # Sort paths by key
     paths_stats.sort(key=lambda p: getattr(p, stat_attr), reverse=reverse)
 
-    if threshold:
-        valid_paths = [paths_stats[0].path]
+    valid_paths = [paths_stats[0].path]
 
+    if isinstance(threshold, float):
+        # Percentage
         valid_paths.extend([
             path_stat.path for path_stat in paths_stats[1:]
             if abs(getattr(path_stat, stat_attr) - getattr(paths_stats[0], stat_attr)) <= threshold
         ])
 
-        return random.choice(valid_paths)
-    else:
-        return paths[0]
+    elif isinstance(threshold, int) and threshold > 0:
+        # Size in bytes
+        valid_paths.extend([
+            path_stat.path for path_stat in paths_stats[1:]
+            if abs(getattr(path_stat, stat_attr) - getattr(paths_stats[0], stat_attr)) <= threshold
+        ])
+
+    return random.choice(valid_paths)
 
 
 def select_most_free(paths, threshold):
-    return path_selector(paths, threshold, "free_mb", reverse=True)
+    return path_selector(paths, threshold, "free_bytes", reverse=True)
 
 
 def select_most_used(paths, threshold):
-    return path_selector(paths, threshold, "used_mb", reverse=True)
+    return path_selector(paths, threshold, "used_bytes", reverse=True)
 
 
 def select_most_free_percent(paths, threshold):
@@ -90,7 +138,7 @@ def select_has_free(paths, threshold):
 
     valid_paths = [
         path_stat.path for path_stat in paths_stats
-        if path_stat.free_mb >= threshold
+        if path_stat.free_bytes >= threshold
     ]
 
     if valid_paths:
@@ -126,9 +174,9 @@ class PluginPathSelect(object):
         'type': 'object',
         'properties': {
             'select': {'type': 'string', 'enum': selector_map.keys()},
-            'threshold': {'type': 'integer', 'default': 0},
+            'threshold': {'type': 'string', 'default': "0%", 'pattern': '^\d+\s?(%|[KMGT]?B)$'},
             'to_field': {'type': 'string', 'default': 'path'},
-            'paths': one_or_more({'type': 'string'})
+            'paths': one_or_more({'type': 'string', 'format': 'path'})
         },
         'required': ['paths', 'select'],
         'additionalProperties': False,
@@ -138,13 +186,28 @@ class PluginPathSelect(object):
     def on_task_metainfo(self, task, config):
 
         selector = selector_map[config['select']]
-        path = selector(config['paths'], threshold=config['threshold'])
+
+        # Convert threshold to bytes (int) or percent (float)
+        if '%' in config['threshold']:
+            try:
+                threshold = float(config['threshold'].strip('%'))
+            except ValueError:
+                raise plugin.PluginError("%s is not a valid percentage" % config['threshold'])
+        else:
+            try:
+                threshold = human2bytes(config['threshold'])
+            except ValueError as e:
+                raise plugin.PluginError("%s is not a valid size" % config['threshold'])
+
+        path = selector(config['paths'], threshold=threshold)
+
         if path:
             log.debug("Path %s selected due to (%s)" % (path, config['select']))
+
             for entry in task.all_entries:
                 entry[config['to_field']] = path
         else:
-            log.info("Unable to select a path based on %s" % config['select'])
+            log.warning("Unable to select a path based on %s" % config['select'])
             return
 
 
