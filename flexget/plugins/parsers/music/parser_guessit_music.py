@@ -132,7 +132,7 @@ class ParserGuessitMusic(object):
 
         return match_tree
 
-    def parse_album(self, data, **kwargs):
+    def parse_titled_audio(self, data, **kwargs):
         log.debug('Parsing album: `%s` [options: %s]', data, kwargs)
         start = time.clock()
         guess_result = self.parse(data, **kwargs).matched()
