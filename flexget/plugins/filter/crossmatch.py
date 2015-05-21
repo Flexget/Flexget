@@ -25,7 +25,7 @@ class CrossMatch(object):
         'type': 'object',
         'properties': {
             'fields': {'type': 'array', 'items': {'type': 'string'}},
-            'action': {'enum': ['accept', 'reject']},
+            'action': {'enum': ['accept', 'reject', 'reject_like', 'accept_like']},
             'from': {'type': 'array', 'items': {'$ref': '/schema/plugins?phase=input'}}
         },
         'required': ['fields', 'action', 'from'],
@@ -64,13 +64,18 @@ class CrossMatch(object):
         for entry in task.entries:
             for generated_entry in match_entries:
                 log.trace('checking if %s matches %s' % (entry['title'], generated_entry['title']))
-                common = self.entry_intersects(entry, generated_entry, fields)
+                if action in ('accept', 'reject'):
+                    log.trace('Checking if fields are the same')
+                    common = self.entry_intersects(entry, generated_entry, fields)
+                elif action in ('accept_like', 'reject_like'):
+                    log.trace('Checking if fields are alike')
+                    common = self.entry_matches(entry, generated_entry, fields)
                 if common:
                     msg = 'intersects with %s on field(s) %s' % \
-                          (generated_entry['title'], ', '.join(common))
-                    if action == 'reject':
+                       (generated_entry['title'], ', '.join(common))
+                    if action in( 'reject', 'reject_like'):
                         entry.reject(msg)
-                    if action == 'accept':
+                    if action in ('accept', 'accept_like'):
                         entry.accept(msg)
 
     def entry_intersects(self, e1, e2, fields=None):
@@ -100,6 +105,34 @@ class CrossMatch(object):
                 log.trace('not matching')
         return common_fields
 
+    def entry_matches(self, e1, e2, fields=None):
+        """
+        :param e1: First :class:`flexget.entry.Entry`
+        :param e2: Second :class:`flexget.entry.Entry`
+        :param fields: List of fields which are checked
+        :return: List of field names in common
+        """
+
+        if fields is None:
+            fields = []
+
+        common_fields = []
+
+        for field in fields:
+            # TODO: simplify if seems to work (useless debug)
+            log.trace('checking field %s' % field)
+            v1 = e1.get(field, object())
+            v2 = e2.get(field, object())
+            log.trace('v1: %r' % v1)
+            log.trace('v2: %r' % v2)
+
+            if v1 in v2:
+                common_fields.append(field)
+            elif v2 in v1:
+                common_fields.append(field)
+            else:
+                log.trace('not matching')
+        return common_fields
 
 @event('plugin.register')
 def register_plugin():
