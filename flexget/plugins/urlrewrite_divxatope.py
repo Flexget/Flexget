@@ -36,15 +36,15 @@ class UrlRewriteDivxATope(object):
             download_link = soup.findAll(href=re.compile('redirect|redirectlink'))
             download_href = download_link[0]['href']
             if "url" in download_href:
-                    redirect_search = re.search('.*url=(.*)', download_href)
-                    if redirect_search:
-                            redirect_link = redirect_search.group(1)
-                    else:
-                            raise UrlRewritingError('Redirect link for %s could not be found %s' % url)
-                    if redirect_link.startswith("http"):
-                        return redirect_link
-                    else:
-                        return "http://www.divxatope.com/" + redirect_link
+                redirect_search = re.search('.*url=(.*)', download_href)
+                if redirect_search:
+                        redirect_link = redirect_search.group(1)
+                else:
+                    raise UrlRewritingError('Redirect link for %s could not be found %s' % url)
+                if redirect_link.startswith("http"):
+                    return redirect_link
+                else:
+                    return "http://www.divxatope.com/" + redirect_link
             else:
                 return download_href
         except Exception:
