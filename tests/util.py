@@ -3,7 +3,7 @@ A method to create test-specific temporary directories
 """
 
 from __future__ import unicode_literals, division, absolute_import
-import sys
+import inspect
 import os
 import shutil
 import errno
@@ -23,44 +23,15 @@ def mkdir(*a, **kw):
 
 
 def find_test_name():
-    try:
-        from nose.case import Test
-        from nose.suite import ContextSuite
-        import types
-
-        def get_nose_name(its_self):
-            if isinstance(its_self, Test):
-                file_, module, class_ = its_self.address()
-                name = '%s:%s' % (module, class_)
-                return name
-            elif isinstance(its_self, ContextSuite):
-                if isinstance(its_self.context, types.ModuleType):
-                    return its_self.context.__name__
-    except ImportError:
-        # older nose
-        from nose.case import FunctionTestCase, MethodTestCase
-        from nose.suite import TestModule
-        from nose.util import test_address
-
-        def get_nose_name(its_self):
-            if isinstance(its_self, (FunctionTestCase, MethodTestCase)):
-                file_, module, class_ = test_address(its_self)
-                name = '%s:%s' % (module, class_)
-                return name
-            elif isinstance(its_self, TestModule):
-                return its_self.moduleName
-
-    i = 0
-    while True:
-        i += 1
-        frame = sys._getframe(i)
+    for frame_tuple in inspect.stack():
+        frame = frame_tuple[0]
         # kludge, hunt callers upwards until we find our nose
-        if (frame.f_code.co_varnames
-            and frame.f_code.co_varnames[0] == 'self'):
+        if frame.f_code.co_varnames and frame.f_code.co_varnames[0] == 'self':
             its_self = frame.f_locals['self']
-            name = get_nose_name(its_self)
-            if name is not None:
-                return name
+            try:
+                return its_self.id()
+            except AttributeError:
+                continue
 
 
 def maketemp(name=None):
