@@ -101,12 +101,12 @@ class CrossMatch(object):
                 v1Re = v1.lower()
                 v1Re = unicodedata.normalize('NFKD', v1Re).encode('ASCII', 'ignore')
                 v1Re = re.sub("[^a-zA-Z0-9 ]", " ", v1Re)
-                v1Re = v1Re.replace(' ','.*')
+                v1Re = v1Re.replace(' ','.?')
                 v1Re = '.*' + v1Re + '.*'
                 v2Re = v2.lower()
                 v2Re = unicodedata.normalize('NFKD', v2Re).encode('ASCII', 'ignore')
                 v2Re = re.sub("[^a-zA-Z0-9 ]", " ", v2Re)
-                v2Re = v2Re.replace(' ','.*')
+                v2Re = v2Re.replace(' ','.?')
                 v2Re = '.*' + v2Re + '.*'
                 
                 log.debug('Performing flexible Regex search %s and %s' % (v1Re, v2Re))
