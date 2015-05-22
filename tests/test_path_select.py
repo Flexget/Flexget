@@ -2,25 +2,20 @@ from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase
 import os
 import mock
-from flexget.plugins.modify.path_select import disk_stats_tuple, percentage, human2bytes
+from flexget.config_schema import parse_size
 
-
-def mock_disk_stats(folder):
+def mock_os_disk_stats(folder):
 
     used, total = os.path.basename(folder).split(',')
 
-    # Convert GB to bytes
-    used_bytes = human2bytes(used)
-    total_bytes = human2bytes(total)
-
+    used_bytes = parse_size(used)
+    total_bytes = parse_size(total)
     free_bytes = total_bytes - used_bytes
-    free_percent = 0.0 if total_bytes == 0 else percentage(free_bytes, total_bytes)
-    used_percent = 0.0 if total_bytes == 0 else percentage(used_bytes, total_bytes)
 
-    return disk_stats_tuple(folder, free_bytes, used_bytes, total_bytes, free_percent, used_percent)
+    return free_bytes, total_bytes
 
 
-class BaseExistsMovie(FlexGetBase):
+class TestPathSelect(FlexGetBase):
 
     __yaml__ = """
         tasks:
@@ -29,7 +24,7 @@ class BaseExistsMovie(FlexGetBase):
               - {title: 'Existence.2012'}
             path_select:
               to_field: path
-              threshold: 0B
+              threshold: 0
               select: most_free
               paths:
                 - /data/1.5G,100G
@@ -100,13 +95,13 @@ class BaseExistsMovie(FlexGetBase):
                 - /data/90G,100G
     """
 
-    @mock.patch('flexget.plugins.modify.path_select.get_disk_stats', side_effect=mock_disk_stats)
+    @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_most_free(self, disk_static_func):
         """exists_movie plugin: existing"""
         self.execute_task('test_most_free')
         assert self.task.entries[0].get('path') == "/data/1G,100G"
 
-    @mock.patch('flexget.plugins.modify.path_select.get_disk_stats', side_effect=mock_disk_stats)
+    @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_most_free_threshold(self, disk_static_func):
         """exists_movie plugin: existing"""
         self.execute_task('test_most_free_threshold')
@@ -116,7 +111,7 @@ class BaseExistsMovie(FlexGetBase):
             "/data/50G,100G",
         ]
 
-    @mock.patch('flexget.plugins.modify.path_select.get_disk_stats', side_effect=mock_disk_stats)
+    @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_most_used(self, disk_static_func):
         """exists_movie plugin: existing"""
         self.execute_task('test_most_used')
@@ -125,7 +120,7 @@ class BaseExistsMovie(FlexGetBase):
             '/data/90.5G,100G',
         ]
 
-    @mock.patch('flexget.plugins.modify.path_select.get_disk_stats', side_effect=mock_disk_stats)
+    @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_most_free_percent(self, disk_static_func):
         """exists_movie plugin: existing"""
         self.execute_task('test_most_free_percent')
@@ -134,7 +129,7 @@ class BaseExistsMovie(FlexGetBase):
             '/data/50G,100G',
         ]
 
-    @mock.patch('flexget.plugins.modify.path_select.get_disk_stats', side_effect=mock_disk_stats)
+    @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def most_used_percent(self, disk_static_func):
         """exists_movie plugin: existing"""
         self.execute_task('most_used_percent')
@@ -143,7 +138,7 @@ class BaseExistsMovie(FlexGetBase):
             '/data/40.5G,50G',
         ]
 
-    @mock.patch('flexget.plugins.modify.path_select.get_disk_stats', side_effect=mock_disk_stats)
+    @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_has_free(self, disk_static_func):
         """exists_movie plugin: existing"""
         self.execute_task('test_has_free')
