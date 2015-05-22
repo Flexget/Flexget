@@ -4,6 +4,7 @@ import os
 import mock
 from flexget.config_schema import parse_size
 
+
 def mock_os_disk_stats(folder):
 
     used, total = os.path.basename(folder).split(',')
@@ -97,54 +98,48 @@ class TestPathSelect(FlexGetBase):
 
     @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_most_free(self, disk_static_func):
-        """exists_movie plugin: existing"""
         self.execute_task('test_most_free')
         assert self.task.entries[0].get('path') == "/data/1G,100G"
 
     @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_most_free_threshold(self, disk_static_func):
-        """exists_movie plugin: existing"""
         self.execute_task('test_most_free_threshold')
         assert self.task.entries[0].get('path') in [
             "/data/49.5G,100G",
             "/data/50.5G,100G",
             "/data/50G,100G",
-        ]
+        ], "path %s not in list" % self.task.entries[0].get('path')
 
     @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_most_used(self, disk_static_func):
-        """exists_movie plugin: existing"""
         self.execute_task('test_most_used')
         assert self.task.entries[0].get('path') in [
             '/data/90G,100G',
             '/data/90.5G,100G',
-        ]
+        ], "path %s not in list" % self.task.entries[0].get('path')
 
     @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_most_free_percent(self, disk_static_func):
-        """exists_movie plugin: existing"""
         self.execute_task('test_most_free_percent')
         assert self.task.entries[0].get('path') in [
             '/data/50.5G,100G',
             '/data/50G,100G',
-        ]
+        ], "path %s not in list" % self.task.entries[0].get('path')
 
     @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def most_used_percent(self, disk_static_func):
-        """exists_movie plugin: existing"""
         self.execute_task('most_used_percent')
         assert self.task.entries[0].get('path') in [
             '/data/40G,50G',
             '/data/40.5G,50G',
-        ]
+        ], "path %s not in list" % self.task.entries[0].get('path')
 
     @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_has_free(self, disk_static_func):
-        """exists_movie plugin: existing"""
         self.execute_task('test_has_free')
         assert self.task.entries[0].get('path') in [
             '/data/45G,100G',
             '/data/20G,100G',
             '/data/30G,100G',
-        ]
+        ], "path %s not in list" % self.task.entries[0].get('path')
 
