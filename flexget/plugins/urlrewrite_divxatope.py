@@ -25,7 +25,7 @@ class UrlRewriteDivxATope(object):
     # urlrewriter API
     def url_rewrite(self, task, entry):
         # Rewrite divxatope.com/descargar/ to divxatope.com/descarga-torrent/
-        entry['url'] = re.sub("/descargar", "/descarga-torrent", entry['url'])
+        entry['url'] = re.sub('/descargar', '/descarga-torrent', entry['url'])
         entry['url'] = self.parse_download_page(entry['url'])
 
     @plugin.internet(log)
@@ -41,10 +41,10 @@ class UrlRewriteDivxATope(object):
                         redirect_link = redirect_search.group(1)
                 else:
                     raise UrlRewritingError('Redirect link for %s could not be found %s' % url)
-                if redirect_link.startswith("http"):
+                if redirect_link.startswith('http'):
                     return redirect_link
                 else:
-                    return "http://www.divxatope.com/" + redirect_link
+                    return 'http://www.divxatope.com/' + redirect_link
             else:
                 return download_href
         except Exception:
