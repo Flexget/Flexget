@@ -143,7 +143,7 @@ class Decompress(object):
             return info.isdir()
         else:
             base = os.path.basename(info.filename)
-            return not bool(base)
+            return not base
 
 
     def handle_entry(self, entry, config):
@@ -233,8 +233,7 @@ class Decompress(object):
                     entry.fail(error_message)
 
                     if os.path.exists(destination):
-                        log.debug('Cleaning up partially extracted file: %s' % destination) % \
-                                  (path, archive_path, error)
+                        log.debug('Cleaning up partially extracted file: %s' % destination) % path
                     return
             else:
                 log.verbose('File already exists: %s' % destination)
