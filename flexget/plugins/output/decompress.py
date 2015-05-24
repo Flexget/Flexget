@@ -269,7 +269,7 @@ class Decompress(object):
                 raise log.warn('rarfile Python module is not installed.')
             else:
                 rarfile.UNRAR_TOOL = unrar_tool
-                log.debug('Set RarFile.unrar_tool to: %s'.unrar_tool)
+                log.debug('Set RarFile.unrar_tool to: %s', unrar_tool)
 
         for entry in task.accepted:
             self.handle_entry(entry, config)
