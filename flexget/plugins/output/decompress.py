@@ -20,19 +20,19 @@ log = logging.getLogger('decompress')
 
 class Decompress(object):
     """
-    Extracts files from Zip or RAR archives. By default this plugin will extract to the same 
+    Extracts files from Zip or RAR archives. By default this plugin will extract to the same
     directory as the source archive, preserving directory structure from the archive.
 
-    This plugin requires the rarfile Python module and unrar command line utility to extract RAR 
+    This plugin requires the rarfile Python module and unrar command line utility to extract RAR
     archives.
 
     Configuration:
 
     to:                 Destination path; supports Jinja2 templating on the input entry. Fields such
                         as series_name must be populated prior to input into this plugin using
-                        metainfo_series or similar. If no path is specified, archive contents will 
+                        metainfo_series or similar. If no path is specified, archive contents will
                         be extraced in the same directory as the archve itself.
-    keep_dirs:          [yes|no] (default: yes) Indicates whether to preserve the directory 
+    keep_dirs:          [yes|no] (default: yes) Indicates whether to preserve the directory
                         structure from within the archive in the destination path.
     mask:               Shell-style file mask; any matching files will be extracted. When used, this
                         field will override regexp.
@@ -71,7 +71,7 @@ class Decompress(object):
 
     def open_archive(self, entry):
         """
-        Returns the appropriate archive 
+        Returns the appropriate archive
         """
 
         archive_path = entry['location']
@@ -81,41 +81,33 @@ class Decompress(object):
         if zipfile.is_zipfile(archive_path):
             try:
                 archive = zipfile.ZipFile(file=archive_path)
-                log.debug('Successfully opened ZIP: %s' % archive_path)
+                log.debug('Successfully opened ZIP: %s', archive_path)
             except zipfile.BadZipfile:
                 error_message = 'Bad ZIP file: %s' % archive_path
                 log.error(error_message)
                 entry.fail(error_message)
-                return None
-            except Exception as e:
-                log.error('Failed to open ZIP: %s (%s)' (archive_path, e))
-                entry.fail(e)
-                return None
-        elif rarfile:
-            if rarfile.is_rarfile(archive_path):
-                try:
-                    archive = rarfile.RarFile(rarfile=archive_path)
-                    log.debug('Successfully opened RAR: %s' % archive_path)
-                except rarfile.RarWarning as e:
-                    log.warn('Nonfatal error: %s (%s)' % (archive_path, e))
-                except rarfile.NeedFirstVolume:
-                    log.error('Not the first volume: %s' % archive_path)
-                    return None
-                except rarfile.NotRarFile:
-                    log.error('Not a RAR file: %s' % archive_path)
-                    return None
-                except Exception as e:
-                    log.error('Failed to open RAR: %s (%s)' (archive_path, e))
-                    entry.fail(e)
-                    return None
+            except Exception as error:
+                error_message = 'Failed to open ZIP: %s (%s)' % (archive_path, error)
+                log.error(error_message)
+                entry.fail(error_message)
+        elif rarfile and rarfile.is_rarfile(archive_path):
+            try:
+                archive = rarfile.RarFile(rarfile=archive_path)
+                log.debug('Successfully opened RAR: %s', archive_path)
+            except rarfile.BadRarFile:
+                error_message = 'Bad RAR file: %s' % archive_path
+                log.error(error_message)
+                entry.fail(error_message)
+            except rarfile.NeedFirstVolume:
+                log.error('Not the first volume: %s', archive_path)
+            except Exception as error:
+                error_message = 'Failed to open RAR: %s (%s)' % (archive_path, error)
+                log.error(error_message)
+                entry.fail(error_message)
         else:
-            log.warn('Can''t extract RAR archives without the rarfile Python module.')
-            
-
-        if not archive:
-            error_message = 'Couldn''t open file: %s' % archive_path
-            log.error(error_message)
-            entry.fail(error_message)
+            if not rarfile:
+                log.warn('Rarfile module not installed; unable to extract RAR archives.')
+            log.error('Can\'t open file: %s', archive_path)
 
         return archive
 
@@ -146,14 +138,12 @@ class Decompress(object):
         """
         Tests whether the file descibed in info is a directory
         """
-        if isinstance(info, zipfile.ZipInfo):
-            base = os.path.basename(info.filename)
-            return not bool(base)
-        elif isinstance(info, rarfile.RarInfo):
+
+        if hasattr(info, 'isdir'):
             return info.isdir()
         else:
-            raise ValueError('Not a RarInfo or ZipInfo object.')
-
+            base = os.path.basename(info.filename)
+            return not base
 
     def handle_entry(self, entry, config):
         """
@@ -168,9 +158,9 @@ class Decompress(object):
         archive_file = os.path.basename(archive_path)
 
         if not os.path.exists(archive_path):
-            log.warn('File no longer exists: %s' % archive_path)
+            log.warn('File no longer exists: %s', archive_path)
             return
-        
+
         archive = self.open_archive(entry)
 
         if not archive:
@@ -181,7 +171,7 @@ class Decompress(object):
             try:
                 to = render_from_entry(to, entry)
             except RenderError as e:
-                log.error('Could not render path: %s' % to)
+                log.error('Could not render path: %s', to)
                 entry.fail(e)
                 return
         else:
@@ -190,18 +180,17 @@ class Decompress(object):
         for info in archive.infolist():
             path = info.filename
             filename = os.path.basename(path)
-            
+
             if self.is_dir(info):
-                log.debug('Appears to be a directory: %s' % path)
+                log.debug('Appears to be a directory: %s', path)
                 continue
 
             if not match(path):
-                log.debug('File did not match regexp: %s' % path)
+                log.debug('File did not match regexp: %s', path)
                 continue
 
-            log.debug('Found matching file: %s' %path)
+            log.debug('Found matching file: %s', path)
 
-            
             if config['keep_dirs']:
                 path_suffix = path
             else:
@@ -210,7 +199,7 @@ class Decompress(object):
             dest_dir = os.path.dirname(destination)
 
             if not os.path.exists(dest_dir):
-                log.debug('Creating path: %s' % dest_dir)
+                log.debug('Creating path: %s', dest_dir)
                 os.makedirs(dest_dir)
 
             if not os.path.exists(destination):
@@ -218,21 +207,19 @@ class Decompress(object):
                 error_message = ''
                 source = None
 
-                log.debug('Attempting to extract: %s to %s' % (path, destination))
+                log.debug('Attempting to extract: %s to %s', path, destination)
                 try:
                     # python 2.6 doesn't seem to like "with" in conjuntion with ZipFile.open
                     source = archive.open(path)
                     with open(destination, 'wb') as target:
                         shutil.copyfileobj(source, target)
 
-                    log.verbose('Extracted: %s' % path )
+                    log.verbose('Extracted: %s', path)
                     success = True
-                except (IOError, os.error) as e:
-                    error_message = 'OS error while creating file: %s (%s)' % \
-                                    (destination, e)
-                except (zipfile.BadZipfile, rarfile.Error) as e:
-                    error_message = 'Failed to extract file: %s in %s (%s)' % \
-                                    (path, archive_path, e)
+                except (IOError, os.error) as error:
+                    error_message = 'OS error while creating file: %s (%s)' % (destination, error)
+                except (zipfile.BadZipfile, rarfile.Error) as error:
+                    error_message = 'Failed to extract file: %s in %s (%s)' % (path, archive_path, error)
                 finally:
                     if source and not source.closed:
                         source.close()
@@ -242,28 +229,28 @@ class Decompress(object):
                     entry.fail(error_message)
 
                     if os.path.exists(destination):
-                        error_message = log.debug('Cleaning up partially extracted file: %s' % destination) % \
-                                        (path, archive_path, e)
+                        log.debug('Cleaning up partially extracted file: %s', destination)
                     return
             else:
-                log.verbose('File already exists: %s' % destination)
+                log.verbose('File already exists: %s', destination)
 
         if config['delete_archive']:
-            if isinstance(archive, zipfile.ZipFile):
-                volumes = [archive_path]
-            else:
+            if hasattr(archive, 'volumelist'):
                 volumes = archive.volumelist()
-            
+            else:
+                volumes = [archive_path]
+
             archive.close()
 
             for volume in volumes:
-                log.debug('Deleting volume: %s' % volume)
+                log.debug('Deleting volume: %s', volume)
                 os.remove(volume)
 
-            log.verbose('Deleted archive: %s' % archive_file)
+            log.verbose('Deleted archive: %s', archive_file)
         else:
             archive.close()
 
+    @plugin.priority(255)
     def on_task_output(self, task, config):
         """Task handler for archive_extract"""
         if isinstance(config, bool) and not config:
@@ -282,10 +269,10 @@ class Decompress(object):
                 raise log.warn('rarfile Python module is not installed.')
             else:
                 rarfile.UNRAR_TOOL = unrar_tool
-                log.debug('Set RarFile.unrar_tool to: %s' % unrar_tool)
+                log.debug('Set RarFile.unrar_tool to: %s', unrar_tool)
 
         for entry in task.accepted:
-            self.handle_entry(entry, config)     
+            self.handle_entry(entry, config)
 
 
 @event('plugin.register')
