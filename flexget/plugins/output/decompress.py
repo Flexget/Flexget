@@ -233,7 +233,7 @@ class Decompress(object):
                     entry.fail(error_message)
 
                     if os.path.exists(destination):
-                        log.debug('Cleaning up partially extracted file: %s' % destination) % path
+                        log.debug('Cleaning up partially extracted file: %s' % destination)
                     return
             else:
                 log.verbose('File already exists: %s' % destination)
