@@ -30,7 +30,7 @@ class Sonarr(object):
             showName = show['title']
             entry = Entry(title=showName,
                             url = '',
-							series_name=showName)
+                            series_name=showName)
             if entry.isvalid():
                 entries.append(entry)
             else:
