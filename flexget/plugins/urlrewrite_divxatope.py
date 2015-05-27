@@ -16,25 +16,26 @@ log = logging.getLogger('divxatope')
 CATEGORIES = {
     'all': '',
 
-    #Estrenos
-    #'Estrenos': 'Estrenos',
+    # Estrenos
+    # 'Estrenos': 'Estrenos',
     'Estrenos de cartelera': 1,
     'Estrenos en CVCD': 47,
     'Estrenos en DVD-R': 42,
 
-    #Peliculas
-    #'Peliculas':'Peliculas',
+    # Peliculas
+    # 'Peliculas':'Peliculas',
     'Alta definicion': 52,
     'DVDRip Castellano': 9,
     'BDRip Castellano': 40,
     'DVDRip-BDRip Castellano Latino': 56,
     'VO': 55,
 
-    #DVD
-    #'DVD': 'DVD',
+    # DVD
+    # 'DVD': 'DVD',
     'DVD-R': 18,
     'DVD-R Colaboraciones': 45
 }
+
 
 class UrlRewriteDivxATope(object):
     """
@@ -53,14 +54,13 @@ class UrlRewriteDivxATope(object):
     def url_rewritable(self, task, entry):
         url = entry['url']
         return (
-            url.startswith('http://www.divxatope.com/descargar')
-            or url.startswith('http://divxatope.com/descargar')
+            url.startswith('http://www.divxatope.com/descargar') or url.startswith('http://divxatope.com/descargar')
         )
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        #Rewrite divxatope.com/descargar/ to divxatope.com/descarga-torrent/
-        entry['url'] = re.sub("/descargar","/descarga-torrent",entry['url'])
+        # Rewrite divxatope.com/descargar/ to divxatope.com/descarga-torrent/
+        entry['url'] = re.sub("/descargar", "/descarga-torrent", entry['url'])
         entry['url'] = self.parse_download_page(entry['url'])
 
     @plugin.internet(log)
@@ -71,9 +71,9 @@ class UrlRewriteDivxATope(object):
             download_link = soup.findAll(href=re.compile('redirect|redirectlink'))
             download_href = download_link[0]['href']
             return download_href
-            #if "url" in download_href:
+            # if "url" in download_href:
             #    return download_href[download_href.index('url=') + 4:]
-            #else:
+            # else:
             #    return download_href
         except Exception:
             raise UrlRewritingError(
@@ -85,13 +85,11 @@ class UrlRewriteDivxATope(object):
         url_search = 'http://www.divxatope.com/buscar/descargas/'
         results = set()
         regex = re.compile("(.+) \(\d\d\d\d\)")
-        #movie_name
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
             query = regex.findall(query)[0]
             log.debug('Searching DivxATope %s' % query)
             query = query.encode('utf8', 'ignore')
-            #log.debug('Searching DivxATope %s' % query)
             data = {'search': query}
             try:
                 response = task.requests.post(url_search, data=data)
@@ -102,9 +100,7 @@ class UrlRewriteDivxATope(object):
             
             soup = get_soup(content)
             soup2 = soup.find('ul', attrs={'class': 'peliculas-box'})
-            #log.debug(len(soup2))
             children = soup2.findAll('a', href=True)
-            #log.debug(len(children))
             for child in children:
                 entry = Entry()
                 entry['url'] = child['href']
@@ -112,14 +108,14 @@ class UrlRewriteDivxATope(object):
                 quality_lan = child.find('strong').contents
                 log.debug(len(quality_lan))
                 if len(quality_lan) > 2:
-	            entry_quality_lan = quality_lan[0] + ' ' + quality_lan[2]
-		elif len(quality_lan) == 2:
-	            entry_quality_lan = quality_lan[1]
-                entry['title'] = entry_title + ' ' + entry_quality_lan #child['title'].replace('Descargar gratis ', '', 1)
-                #log.debug(child['href'])
+                    entry_quality_lan = quality_lan[0] + ' ' + quality_lan[2]
+                elif len(quality_lan) == 2:
+                    entry_quality_lan = quality_lan[1]
+                entry['title'] = entry_title + ' ' + entry_quality_lan
                 results.add(entry)
         log.debug('Finish search DivxATope with %d entries' % len(results))
         return results
+
 
 @event('plugin.register')
 def register_plugin():

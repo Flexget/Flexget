@@ -19,10 +19,10 @@ class NewPCTAuth(AuthBase):
     """Attaches HTTP Pizza Authentication to the given Request object."""
 
     def __call__(self, r):
-        headers = {'user-agent':'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:32.0) Gecko/20100101 Firefox/32.0'
-                  }
+        headers = {'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:32.0) Gecko/20100101 Firefox/32.0'}
         r.prepare_headers(headers)
         return r
+
 
 class UrlRewriteNewPCT(object):
     """NewPCT urlrewriter."""
@@ -33,8 +33,9 @@ class UrlRewriteNewPCT(object):
             url = entry.get('urls')[0]
         else:
             url = entry['url']
-        rewritable_regex='^http:\/\/(www.)?newpct1?.com\/.*'
-        return re.match(rewritable_regex,url) and not url.startswith('http://www.newpct.com/descargar/') and not url.endswith('.torrent') and not url.startswith('http://www.newpct1.com/descargar-torrent/')
+        rewritable_regex = '^http:\/\/(www.)?newpct1?.com\/.*'
+        return (re.match(rewritable_regex, url) and not url.startswith('http://www.newpct.com/descargar/') and not
+                url.endswith('.torrent') and not url.startswith('http://www.newpct1.com/descargar-torrent/'))
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
@@ -53,7 +54,7 @@ class UrlRewriteNewPCT(object):
         page = task.requests.get(url).content
         soup = get_soup(page)
         regex = re.compile(r'http:\/\/tumejorjuego\.com\/download\/index\.php\?link=descargar-torrent\/.+')
-        query = soup.findAll('a', href = regex)
+        query = soup.findAll('a', href=regex)
         if len(query) == 0:
             raise UrlRewritingError('Unable to locate torrent from url %s' % url)
         url = query[0]['href']
@@ -77,6 +78,7 @@ class UrlRewriteNewPCT(object):
         if len(torrent_tag) == 0:
             raise UrlRewritingError('Unable to locate torrent from url %s' % url)
         return torrent_tag[0]['href']
+
 
 @event('plugin.register')
 def register_plugin():

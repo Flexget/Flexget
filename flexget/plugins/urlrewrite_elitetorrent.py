@@ -14,6 +14,7 @@ from flexget.utils.search import normalize_unicode
 
 log = logging.getLogger('elitetorrent')
 
+
 class UrlRewriteElitetorrent(object):
     """
     elitetorrent urlrewriter and search Plugin.
@@ -48,9 +49,9 @@ class UrlRewriteElitetorrent(object):
             raise UrlRewritingError(
                 'Unable to locate torrent from url %s' % url
             )
-	 
+
     def rm_tildes(self, data):
-	    return unicodedata.normalize('NFKD', data).encode('ASCII', 'ignore')
+        return unicodedata.normalize('NFKD', data).encode('ASCII', 'ignore')
 
     def search(self, task, entry, config=None):
         log.debug('Search elitetorrent')
@@ -58,14 +59,14 @@ class UrlRewriteElitetorrent(object):
         task.requests.set_domain_delay('www.elitetorrent.net', '2.5 seconds') # they only allow 1 request per 2 seconds
 
         results = set()
-        #rm year
+        # rm year
         regex = re.compile("(.+) \(\d\d\d\d\)")
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
             query = self.rm_tildes(regex.findall(query)[0])
             log.debug('Searching elitetorrent %s' % query)
             query = query.encode('utf8', 'ignore')
-            #POST request or chaneg to "http://www.elitetorrent.net/busqueda/query+with+plus"
+            # POST request or change to "http://www.elitetorrent.net/busqueda/query+with+plus"
             data = {'buscar': query}
             try:
                 response = task.requests.post(url_search, data=data)
@@ -75,17 +76,16 @@ class UrlRewriteElitetorrent(object):
             
             content = response.content # read()#.content
             soup = get_soup(content)
-            #<a class="nombre" href="/torrent/25319/como-entrenar-a-tu-dragon-2-hdrip" title="Como entrenar a tu dragon 2 (HDRip)">Como entrenar a tu dragon 2 (HDRip)</a>
             children = soup.findAll('a', attrs={'class': 'nombre'})
             log.verbose(len(children))
             for child in children:
                 entry = Entry()
                 entry['url'] = 'http://www.elitetorrent.net' + child['href']
                 entry['title'] = child['title']
-                #log.debug(child['href'])
                 results.add(entry)
         log.debug('Finish search elitetorrent with %d entries' % len(results))
         return results
+
 
 @event('plugin.register')
 def register_plugin():
