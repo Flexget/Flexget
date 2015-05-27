@@ -27,10 +27,10 @@ class Sonarr(object):
         json = task.requests.get(url, headers=headers).json()
         entries = []
         for show in json:
-            showName = show["title"]
-            entry = Entry(title = '%s' % (showName),
+            showName = show['title']
+            entry = Entry(title=showName,
                             url = '',
-							series_name=(showName))
+							series_name=showName)
             if entry.isvalid():
                 entries.append(entry)
             else:
