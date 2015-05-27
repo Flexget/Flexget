@@ -77,24 +77,26 @@ class TestRTorrentClient(object):
     def test_torrent(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
         mocked_proxy.system.multicall.return_value = [
-            ['/data/downloads'], ['private.torrent'], [torrent_info_hash], ['test_custom1']
+            ['/data/downloads'], ['private.torrent'], [torrent_info_hash], ['test_custom1'], [123456]
         ]
 
         client = RTorrent('http://localhost/RPC2')
 
-        torrent = client.torrent(torrent_info_hash, fields=['custom1'])  # Required fields should be added
+        torrent = client.torrent(torrent_info_hash, fields=['custom1', 'down_rate'])  # Required fields should be added
 
         assert isinstance(torrent, dict)
         assert torrent.get('directory_base') == '/data/downloads'
         assert torrent.get('hash') == torrent_info_hash
         assert torrent.get('custom1') == 'test_custom1'
         assert torrent.get('name') == 'private.torrent'
+        assert torrent.get('down_rate') == 123456
 
         assert mocked_proxy.system.multicall.called_with(([
             {'params': (torrent_info_hash,), 'methodName': 'd.directory_base'},
             {'params': (torrent_info_hash,), 'methodName': 'd.name'},
             {'params': (torrent_info_hash,), 'methodName': 'd.hash'},
-            {'params': (torrent_info_hash,), 'methodName': 'd.custom1'}
+            {'params': (torrent_info_hash,), 'methodName': 'd.custom1'},
+            {'params': (torrent_info_hash,), 'methodName': 'd.down.rate'},
         ]))
 
     @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
@@ -288,6 +290,7 @@ class TestRTorrentInputPlugin(FlexGetBase):
               fields:
                 - custom1
                 - custom3
+                - down_rate
 
     """
 
@@ -302,6 +305,7 @@ class TestRTorrentInputPlugin(FlexGetBase):
             'directory_base': '/data/downloads/private',
             'custom1': 'test_custom1',
             'custom3': 'test_custom3',
+            'down_rate': 123456,
         }
 
         mocked_client.torrents.return_value = [mocked_torrent, mocked_torrent]
@@ -310,7 +314,7 @@ class TestRTorrentInputPlugin(FlexGetBase):
 
         mocked_client.torrents.assert_called_with(
             'complete',
-            fields=['custom1', 'custom3'],
+            fields=['custom1', 'custom3', 'down_rate'],
         )
 
         assert len(self.task.all_entries) == 2

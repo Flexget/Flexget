@@ -137,7 +137,7 @@ class RTorrent(object):
     default_fields = [
         'hash',
         'name',
-        'up.total', 'down.total', 'down.rate',
+        'up_total', 'down_total', 'down_rate',
         'is_open', 'is_active',
         'custom1', 'custom2', 'custom3', 'custom4', 'custom5',
         'state', 'complete',
@@ -193,12 +193,23 @@ class RTorrent(object):
 
         self._server = sp(self.uri)
 
-    def _clean_fields(self, fields):
+    def _clean_fields(self, fields, reverse=False):
+        if reverse:
+            for field in ['up.total', 'down.total', 'down.rate']:
+                if field in fields:
+                    fields[fields.index(field)] = field.replace('.', '_')
+            return fields
+
         if not fields:
             return self.default_fields
         for required_field in self.required_fields:
             if required_field not in fields:
                 fields.insert(0, required_field)
+
+        for field in ['up_total', 'down_total', 'down_rate']:
+            if field in fields:
+                fields[fields.index(field)] = field.replace('_', '.')
+
         return fields
 
     @property
@@ -236,7 +247,7 @@ class RTorrent(object):
             getattr(multi_call, method_name)(info_hash)
 
         resp = multi_call()
-        return dict(zip(fields, [val for val in resp]))
+        return dict(zip(self._clean_fields(fields, reverse=True), [val for val in resp]))
 
     def torrents(self, view='main', fields=default_fields):
         fields = self._clean_fields(fields)
@@ -247,7 +258,7 @@ class RTorrent(object):
         resp = self._server.d.multicall(params)
 
         # Response is formatted as a list of lists, with just the values
-        return [dict(zip(fields, val)) for val in resp]
+        return [dict(zip(self._clean_fields(fields, reverse=True), val)) for val in resp]
 
     def update(self, info_hash, fields):
         multi_call = xmlrpclib.MultiCall(self._server)
