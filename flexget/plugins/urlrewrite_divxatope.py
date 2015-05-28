@@ -38,7 +38,7 @@ class UrlRewriteDivxATope(object):
             if "url" in download_href:
                 redirect_search = re.search('.*url=(.*)', download_href)
                 if redirect_search:
-                        redirect_link = redirect_search.group(1)
+                    redirect_link = redirect_search.group(1)
                 else:
                     raise UrlRewritingError('Redirect link for %s could not be found %s' % url)
                 if redirect_link.startswith('http'):
