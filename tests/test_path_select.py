@@ -74,10 +74,10 @@ class TestPathSelect(FlexGetBase):
             path_select:
               to_field: path
               threshold: 2%
-              select: most_free_percent
+              select: most_used_percent
               paths:
-                - /data/90G,100G
-                - /data/40G,50G
+                - /data/99G,100G
+                - /data/49G,50G
                 - /data/40.5G,50G
                 - /data/90.5G,100G
           test_has_free:
@@ -86,7 +86,7 @@ class TestPathSelect(FlexGetBase):
             path_select:
               to_field: path
               threshold: 50G
-              select: most_free_percent
+              select: has_free
               paths:
                 - /data/65G,100G
                 - /data/50.2G,100G
@@ -103,43 +103,47 @@ class TestPathSelect(FlexGetBase):
 
     @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_most_free_threshold(self, disk_static_func):
-        self.execute_task('test_most_free_threshold')
-        assert self.task.entries[0].get('path') in [
-            "/data/49.5G,100G",
-            "/data/50.5G,100G",
-            "/data/50G,100G",
-        ], "path %s not in list" % self.task.entries[0].get('path')
+        for i in range(0, 3):
+            self.execute_task('test_most_free_threshold')
+            assert self.task.entries[0].get('path') in [
+                "/data/49.5G,100G",
+                "/data/50.5G,100G",
+                "/data/50G,100G",
+            ], "path %s not in list" % self.task.entries[0].get('path')
 
     @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_most_used(self, disk_static_func):
-        self.execute_task('test_most_used')
-        assert self.task.entries[0].get('path') in [
-            '/data/90G,100G',
-            '/data/90.5G,100G',
-        ], "path %s not in list" % self.task.entries[0].get('path')
+        for i in range(0, 2):
+            self.execute_task('test_most_used')
+            assert self.task.entries[0].get('path') in [
+                '/data/90G,100G',
+                '/data/90.5G,100G',
+            ], "path %s not in list" % self.task.entries[0].get('path')
 
     @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_most_free_percent(self, disk_static_func):
-        self.execute_task('test_most_free_percent')
-        assert self.task.entries[0].get('path') in [
-            '/data/50.5G,100G',
-            '/data/50G,100G',
-        ], "path %s not in list" % self.task.entries[0].get('path')
+        for i in range(0, 2):
+            self.execute_task('test_most_free_percent')
+            assert self.task.entries[0].get('path') in [
+                '/data/50.5G,100G',
+                '/data/50G,100G',
+            ], "path %s not in list" % self.task.entries[0].get('path')
 
     @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
-    def most_used_percent(self, disk_static_func):
-        self.execute_task('most_used_percent')
-        assert self.task.entries[0].get('path') in [
-            '/data/40G,50G',
-            '/data/40.5G,50G',
-        ], "path %s not in list" % self.task.entries[0].get('path')
+    def test_most_used_percent(self, disk_static_func):
+        for i in range(0, 2):
+            self.execute_task('test_most_used_percent')
+            assert self.task.entries[0].get('path') in [
+                '/data/99G,100G',
+                '/data/49G,50G',
+            ], "path %s not in list" % self.task.entries[0].get('path')
 
     @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
     def test_has_free(self, disk_static_func):
-        self.execute_task('test_has_free')
-        assert self.task.entries[0].get('path') in [
-            '/data/45G,100G',
-            '/data/20G,100G',
-            '/data/30G,100G',
-        ], "path %s not in list" % self.task.entries[0].get('path')
-
+        for i in range(0, 3):
+            self.execute_task('test_has_free')
+            assert self.task.entries[0].get('path') in [
+                '/data/45G,100G',
+                '/data/20G,100G',
+                '/data/30G,100G',
+            ], "path %s not in list" % self.task.entries[0].get('path')

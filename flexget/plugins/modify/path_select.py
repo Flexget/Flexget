@@ -56,15 +56,7 @@ def _path_selector(paths, threshold, stat_attr, reverse=True):
 
     valid_paths = [paths_stats[0].path]
 
-    if isinstance(threshold, float):
-        # Percentage
-        valid_paths.extend([
-            path_stat.path for path_stat in paths_stats[1:]
-            if abs(getattr(path_stat, stat_attr) - getattr(paths_stats[0], stat_attr)) <= threshold
-        ])
-
-    elif isinstance(threshold, int) and threshold > 0:
-        # Size in bytes
+    if threshold > 0:
         valid_paths.extend([
             path_stat.path for path_stat in paths_stats[1:]
             if abs(getattr(path_stat, stat_attr) - getattr(paths_stats[0], stat_attr)) <= threshold
@@ -162,7 +154,7 @@ class PluginPathSelect(object):
             for entry in task.all_entries:
                 entry[config['to_field']] = path
         else:
-            log.warning('Unable to select a path based on %s' % config['select'])
+            task.abort('Unable to select a path based on %s' % config['select'])
             return
 
 
