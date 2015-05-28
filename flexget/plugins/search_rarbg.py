@@ -124,12 +124,12 @@ class SearchRarBG(object):
                     log.debug('Using tvdb id %s' % entry.get('tvdb_id'))
 
             page = requests.get(self.base_url, params=params)
-
+            log.debug('requesting: %s' % page.url)
             try:
                 r = page.json()
             except ValueError:
                 log.debug(page.text)
-                break
+                continue
 
             for result in r:
                 e = Entry()
