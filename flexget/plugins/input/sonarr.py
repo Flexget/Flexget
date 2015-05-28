@@ -8,6 +8,7 @@ from flexget.entry import Entry
 
 log = logging.getLogger('sonarr')
 
+
 class Sonarr(object):
 
     schema = {
@@ -15,7 +16,7 @@ class Sonarr(object):
         'properties': {
             'base_url': {'type': 'string'},
             'port': {'type': 'number'},
-            'api_key': {'type':'string'}
+            'api_key': {'type': 'string'}
         },
         'required': ['api_key', 'base_url', 'port'],
         'additionalProperties': False
@@ -27,16 +28,18 @@ class Sonarr(object):
         json = task.requests.get(url, headers=headers).json()
         entries = []
         for show in json:
-            showName = show['title']
-            entry = Entry(title=showName,
-                            url = '',
-                            series_name=showName)
+            entry = Entry(title=show['title'],
+                          url='',
+                          series_name=show['title'],
+                          tvdb_id=show['tvdbId'],
+                          tvrage_id=show['tvRageId'])
             if entry.isvalid():
                 entries.append(entry)
             else:
                 log.debug('Invalid entry created? %s' % entry)
 
         return entries
+
 
 @event('plugin.register')
 def register_plugin():
