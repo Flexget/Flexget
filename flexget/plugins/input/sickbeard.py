@@ -30,8 +30,8 @@ class Sickbeard(object):
             entry = Entry(title=show['show_name'],
                           url='',
                           series_name=show['show_name'],
-						  tvdb_id=show['tvdbid'].
-						  tvrage_id=show['tvrage_id'])
+                          tvdb_id=show['tvdbid'],
+                          tvrage_id=show['tvrage_id'])
             if entry.isvalid():
                 entries.append(entry)
             else:
