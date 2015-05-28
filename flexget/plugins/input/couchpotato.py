@@ -46,8 +46,8 @@ class CouchPotato(object):
                 tmdb = movie['info']['tmdb_id']
                 entry = Entry(title=title,
                               url='',
-                              imdb_id = imdb,
-                              tmdb_id = tmdb)
+                              imdb_id=imdb,
+                              tmdb_id=tmdb)
                 if entry.isvalid():
                     entries.append(entry)
                 else:
