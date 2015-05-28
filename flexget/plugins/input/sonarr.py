@@ -23,6 +23,42 @@ class Sonarr(object):
     }
 
     def on_task_input(self, task, config):
+        '''
+        This plugin returns ALL of the shows monitored by Sonarr.
+        This includes both ongoing and ended.
+        Syntax:
+
+        sonarr:
+          base_url=<value>
+          port=<value>
+          api_key=<value>
+
+        Use with input plugin like discover and/or cofnigure_series.
+        Example:
+
+        download-tv-task:
+          configure_series:
+            settings:
+              quality:
+                - 720p
+            from:
+              sonarr:
+                base_url: http://localhost
+                port: 8989
+                api_key: MYAPIKEY1123
+          discover:
+            what:
+              - emit_series: yes
+            from:
+              torrentz: any
+          download:
+            /download/tv
+
+        Note that when using the configure_series plugin with Sonarr
+        you are basically synced to it, so removing a show in Sonarr will remove it
+        in flexget as well,which good be positive or negative, depending on your
+        usage.a
+        '''
         url = '%s:%s/api/series' % (config['base_url'], config['port'])
         headers = {'X-Api-Key': config['api_key']}
         json = task.requests.get(url, headers=headers).json()
