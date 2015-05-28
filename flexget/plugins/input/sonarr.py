@@ -55,9 +55,9 @@ class Sonarr(object):
             /download/tv
 
         Note that when using the configure_series plugin with Sonarr
-        you are basically synced to it, so removing a show in Sonarr will remove it
-        in flexget as well,which good be positive or negative, depending on your
-        usage.a
+        you are basically synced to it, so removing a show in Sonarr will
+        remove it in flexget as well,which good be positive or negative,
+        depending on your usage.
         '''
         url = '%s:%s/api/series' % (config['base_url'], config['port'])
         headers = {'X-Api-Key': config['api_key']}
