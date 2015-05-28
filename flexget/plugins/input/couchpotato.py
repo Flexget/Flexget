@@ -42,8 +42,12 @@ class CouchPotato(object):
         for movie in json['movies']:
             if movie['status'] == 'active':
                 title = movie["title"]
+                imdb = movie['info']['imdb']
+                tmdb = movie['info']['tmdb_id']
                 entry = Entry(title=title,
-                              url='')
+                              url='',
+                              imdb_id = imdb,
+                              tmdb_id = tmdb)
                 if entry.isvalid():
                     entries.append(entry)
                 else:
