@@ -85,14 +85,14 @@ class TestRTorrentClient(object):
         torrent = client.torrent(torrent_info_hash, fields=['custom1', 'down_rate'])  # Required fields should be added
 
         assert isinstance(torrent, dict)
-        assert torrent.get('directory_base') == '/data/downloads'
+        assert torrent.get('base_path') == '/data/downloads'
         assert torrent.get('hash') == torrent_info_hash
         assert torrent.get('custom1') == 'test_custom1'
         assert torrent.get('name') == 'private.torrent'
         assert torrent.get('down_rate') == 123456
 
         assert mocked_proxy.system.multicall.called_with(([
-            {'params': (torrent_info_hash,), 'methodName': 'd.directory_base'},
+            {'params': (torrent_info_hash,), 'methodName': 'd.base_path'},
             {'params': (torrent_info_hash,), 'methodName': 'd.name'},
             {'params': (torrent_info_hash,), 'methodName': 'd.hash'},
             {'params': (torrent_info_hash,), 'methodName': 'd.custom1'},
@@ -116,7 +116,7 @@ class TestRTorrentClient(object):
         assert isinstance(torrents, list)
 
         for torrent in torrents:
-            assert torrent.get('directory_base') == '/data/downloads'
+            assert torrent.get('base_path') == '/data/downloads'
             assert torrent.get('name') == 'private.torrent'
 
             if torrent.get('hash') == hash1:
@@ -163,6 +163,49 @@ class TestRTorrentClient(object):
         assert resp == 0
         assert mocked_proxy.d.erase.called_with((torrent_info_hash,))
 
+    @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
+    def test_move(self, mocked_proxy):
+        mocked_proxy = mocked_proxy()
+        mocked_proxy.system.multicall.return_value = [
+            ['private.torrent'], [torrent_info_hash], ['/data/downloads'],
+        ]
+
+        mocked_proxy.move.return_value = 0
+        mocked_proxy.d.set_directory.return_value = 0
+        mocked_proxy.execute.throw.return_value = 0
+
+        client = RTorrent('http://localhost/RPC2')
+        client.move(torrent_info_hash, '/new/folder')
+
+        mocked_proxy.execute.throw.assert_has_calls([
+            mock.call('', 'mkdir', '-p', '/new/folder'),
+            mock.call('', 'mv', '-u', '/data/downloads', '/new/folder'),
+        ])
+
+    @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
+    def test_start(self, mocked_proxy):
+        mocked_proxy = mocked_proxy()
+        mocked_proxy.d.start.return_value = 0
+
+        client = RTorrent('http://localhost/RPC2')
+        resp = client.start(torrent_info_hash)
+
+        assert resp == 0
+        assert mocked_proxy.d.start.called_with((torrent_info_hash,))
+
+    @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
+    def test_stop(self, mocked_proxy):
+        mocked_proxy = mocked_proxy()
+        mocked_proxy.d.close.return_value = 0
+        mocked_proxy.d.stop.return_value = 0
+
+        client = RTorrent('http://localhost/RPC2')
+        resp = client.stop(torrent_info_hash)
+
+        assert resp == 0
+        assert mocked_proxy.d.stop.called_with((torrent_info_hash,))
+        assert mocked_proxy.d.close.called_with((torrent_info_hash,))
+
 
 class TestRTorrentOutputPlugin(FlexGetBase):
 
@@ -200,15 +243,24 @@ class TestRTorrentOutputPlugin(FlexGetBase):
               path: /data/downloads
               priority: low
             mock:
-              - {title: 'test', url: '""" + torrent_url + """'}
+              - {title: 'test', url: '""" + torrent_url + """', 'torrent_info_hash': '09977FE761B8D293AD8A929CCAF2E9322D525A6C'}
             rtorrent:
               action: update
               uri: http://localhost/SCGI
               custom1: test_custom1
+          test_update_path:
+            accept_all: yes
+            mock:
+              - {title: 'test', url: '""" + torrent_url + """', 'torrent_info_hash': '09977FE761B8D293AD8A929CCAF2E9322D525A6C'}
+            rtorrent:
+              action: update
+              custom1: test_custom1
+              uri: http://localhost/SCGI
+              path: /new/path
           test_delete:
             accept_all: yes
             mock:
-              - {title: 'test', url: '""" + torrent_url + """'}
+              - {title: 'test', url: '""" + torrent_url + """', 'torrent_info_hash': '09977FE761B8D293AD8A929CCAF2E9322D525A6C'}
             rtorrent:
               action: delete
               uri: http://localhost/SCGI
@@ -220,7 +272,7 @@ class TestRTorrentOutputPlugin(FlexGetBase):
         mocked_client = mocked_client()
         mocked_client.load.return_value = 0
         mocked_client.version = [0, 9, 4]
-        mocked_client.torrent.return_value = {'hash': torrent_info_hash}
+        mocked_client.torrent.side_effect = [False, {'hash': torrent_info_hash}]
 
         self.execute_task('test_add_torrent')
 
@@ -236,7 +288,7 @@ class TestRTorrentOutputPlugin(FlexGetBase):
         mocked_client = mocked_client()
         mocked_client.load.return_value = 0
         mocked_client.version = [0, 9, 4]
-        mocked_client.torrent.return_value = {'hash': torrent_info_hash}
+        mocked_client.torrent.side_effect = [False, {'hash': torrent_info_hash}]
 
         self.execute_task('test_add_torrent_set')
 
@@ -253,9 +305,8 @@ class TestRTorrentOutputPlugin(FlexGetBase):
         )
 
     @mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
-    def test_update(self, mocked_client):
+    def teest_update(self, mocked_client):
         mocked_client = mocked_client()
-        mocked_client.load.return_value = 0
         mocked_client.version = [0, 9, 4]
         mocked_client.update.return_value = 0
 
@@ -263,7 +314,27 @@ class TestRTorrentOutputPlugin(FlexGetBase):
 
         mocked_client.update.assert_called_with(
             torrent_info_hash,
-            {'directory': '/data/downloads', 'priority': 1, 'custom1': 'test_custom1'}
+            {'priority': 1, 'custom1': 'test_custom1'}
+        )
+
+    @mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
+    def test_update_path(self, mocked_client):
+        mocked_client = mocked_client()
+        mocked_client.version = [0, 9, 4]
+        mocked_client.update.return_value = 0
+        mocked_client.move.return_value = 0
+        mocked_client.torrent.return_value = {'directory': '/some/path'}
+
+        self.execute_task('test_update_path')
+
+        mocked_client.update.assert_called_with(
+            torrent_info_hash,
+            {'custom1': 'test_custom1'}
+        )
+
+        mocked_client.move.assert_called_with(
+            torrent_info_hash,
+            '/new/path',
         )
 
     @mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
@@ -302,7 +373,7 @@ class TestRTorrentInputPlugin(FlexGetBase):
         mocked_torrent = {
             'name': 'private.torrent',
             'hash': torrent_info_hash,
-            'directory_base': '/data/downloads/private',
+            'base_path': '/data/downloads/private',
             'custom1': 'test_custom1',
             'custom3': 'test_custom3',
             'down_rate': 123456,

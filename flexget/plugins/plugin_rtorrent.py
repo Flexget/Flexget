@@ -8,6 +8,8 @@ import xmlrpclib
 from time import sleep
 from urlparse import urlparse
 
+from flexget.utils.template import RenderError
+from flexget.utils.pathscrub import pathscrub
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
@@ -143,13 +145,13 @@ class RTorrent(object):
         'state', 'complete',
         'bytes_done', 'down.rate', 'left_bytes',
         'ratio',
-        'directory_base'
+        'base_path',
     ]
 
     required_fields = [
         'hash',
         'name',
-        'directory_base'
+        'base_path'
     ]
 
     def __init__(self, uri, username=None, password=None):
@@ -194,14 +196,15 @@ class RTorrent(object):
         self._server = sp(self.uri)
 
     def _clean_fields(self, fields, reverse=False):
+        if not fields:
+            fields = self.default_fields
+
         if reverse:
             for field in ['up.total', 'down.total', 'down.rate']:
                 if field in fields:
                     fields[fields.index(field)] = field.replace('.', '_')
             return fields
 
-        if not fields:
-            return self.default_fields
         for required_field in self.required_fields:
             if required_field not in fields:
                 fields.insert(0, required_field)
@@ -247,6 +250,7 @@ class RTorrent(object):
             getattr(multi_call, method_name)(info_hash)
 
         resp = multi_call()
+        # TODO: Maybe we should return a named tuple or a Torrent class?
         return dict(zip(self._clean_fields(fields, reverse=True), [val for val in resp]))
 
     def torrents(self, view='main', fields=default_fields):
@@ -272,6 +276,28 @@ class RTorrent(object):
     def delete(self, info_hash):
         return self._server.d.erase(info_hash)
 
+    def stop(self, info_hash):
+        self._server.d.stop(info_hash)
+        return self._server.d.close(info_hash)
+
+    def start(self, info_hash):
+        return self._server.d.start(info_hash)
+
+    def move(self, info_hash, dst_path):
+        self.stop(info_hash)
+
+        torrent = self.torrent(info_hash, fields=['base_path'])
+
+        try:
+            log.verbose('Creating destination directory `%s`' % dst_path)
+            self._server.execute.throw('', 'mkdir', '-p', dst_path)
+        except xmlrpclib.Error:
+            raise xmlrpclib.Error("unable to create folder %s" % dst_path)
+
+        self._server.execute.throw('', 'mv', '-u', torrent['base_path'], dst_path)
+        self._server.d.set_directory(info_hash, dst_path)
+        self.start(info_hash)
+
 
 class RTorrentPluginBase(object):
 
@@ -282,17 +308,26 @@ class RTorrentPluginBase(object):
         'off': 0,
     }
 
-    def _build_options(self, config, entry):
+    def _build_options(self, config, entry, entry_first=True):
         options = {}
 
         for opt_key in ('path', 'message', 'priority',
                         'custom1', 'custom2', 'custom3', 'custom4', 'custom5'):
             # Values do not merge config with task
             # Task takes priority then config is used
-            if opt_key in entry:
-                options[opt_key] = entry[opt_key]
-            elif opt_key in config:
-                options[opt_key] = config[opt_key]
+            entry_value = entry.get(opt_key)
+            config_value = config.get(opt_key)
+
+            if entry_first:
+                if entry_value:
+                    options[opt_key] = entry.render(entry_value)
+                elif config_value:
+                    options[opt_key] = entry.render(config_value)
+            else:
+                if config_value:
+                    options[opt_key] = entry.render(config_value)
+                elif entry_value:
+                    options[opt_key] = entry.render(entry_value)
 
         # Convert priority from string to int
         priority = options.get('priority')
@@ -303,6 +338,9 @@ class RTorrentPluginBase(object):
         if options.get('path'):
             options['directory'] = options['path']
             del options['path']
+
+        if 'directory' in options:
+            options['directory'] = pathscrub(options['directory'])
 
         return options
 
@@ -352,7 +390,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
     def on_task_download(self, task, config):
         # If the download plugin is not enabled, we need to call it to get
         # our temp .torrent files
-        if 'download' not in task.config:
+        if config['action'] == 'add' and 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
             download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
@@ -365,7 +403,12 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 continue
 
             if config['action'] == 'add':
-                options = self._build_options(config, entry)
+                try:
+                    options = self._build_options(config, entry)
+                except RenderError as e:
+                    entry.fail("failed to render properties %s" % str(e))
+                    continue
+
                 self.add_entry(client, entry, options, start=config['start'], mkdir=config['mkdir'])
 
             info_hash = entry.get('torrent_info_hash')
@@ -375,21 +418,55 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
                 continue
 
             if config['action'] == 'delete':
-                try:
-                    client.delete(info_hash)
-                    log.verbose('Deleted %s (%s) in rtorrent ' % (entry['title'], info_hash))
-                except (IOError, xmlrpclib.Error) as e:
-                    entry.fail('Failed to delete: %s' % str(e))
-                    return
+                self.delete_entry(client, entry)
 
             if config['action'] == 'update':
-                try:
-                    options = self._build_options(config, entry)
-                    client.update(info_hash, options)
-                    log.verbose('Updated %s (%s) in rtorrent ' % (entry['title'], info_hash))
-                except (IOError, xmlrpclib.Error) as e:
-                    entry.fail('Failed to update: %s' % str(e))
-                    return
+                self.update_entry(client, entry, config)
+
+    def delete_entry(self, client, entry):
+        try:
+            client.delete(entry['torrent_info_hash'])
+            log.verbose('Deleted %s (%s) in rtorrent ' % (entry['title'], entry['torrent_info_hash']))
+        except (IOError, xmlrpclib.Error) as e:
+            entry.fail('Failed to delete: %s' % str(e))
+            return
+
+    def update_entry(self, client, entry, config):
+        info_hash = entry['torrent_info_hash']
+
+        # First check if it already exists
+        try:
+            existing = client.torrent(info_hash, fields=['directory'])
+        except IOError as e:
+            entry.fail("Error updating torrent %s" % str(e))
+            return
+        except xmlrpclib.Error:
+            existing = False
+
+        # Build options but make config values overide entry values
+        try:
+            options = self._build_options(config, entry, entry_first=False)
+        except RenderError as e:
+            entry.fail("failed to render properties %s" % str(e))
+            return
+
+        if existing and existing['directory'] != options['directory']:
+            try:
+                log.verbose("Path is changing, moving files from '%s' to '%s'" % (existing['directory'], options['directory']))
+                client.move(info_hash, options['directory'])
+            except (IOError, xmlrpclib.Error) as e:
+                entry.fail('Failed moving torrent: %s' % str(e))
+                return
+
+            # Remove directory from update otherwise rTorrent will append the title to the directory path
+            del options['directory']
+
+        try:
+            client.update(info_hash, options)
+            log.verbose('Updated %s (%s) in rtorrent ' % (entry['title'], info_hash))
+        except (IOError, xmlrpclib.Error) as e:
+            entry.fail('Failed to update: %s' % str(e))
+            return
 
     def add_entry(self, client, entry, options, start=True, mkdir=False):
 
@@ -420,6 +497,17 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
         except SyntaxError as e:
             entry.fail('Strange, unable to decode torrent, raise a BUG: %s' % str(e))
             return
+
+        # First check if it already exists
+        try:
+            if client.torrent(torrent.info_hash):
+                log.warning("Torrent %s already exists, won't add" % entry['title'])
+                return
+        except IOError as e:
+            entry.fail("Error checking if torrent already exists %s" % str(e))
+        except xmlrpclib.Error:
+            # No existing found
+            pass
 
         try:
             resp = client.load(torrent_raw, fields=options, start=start, mkdir=mkdir)
@@ -478,7 +566,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
             entry = Entry(
                 title=torrent['name'],
                 url='%s/%s' % (config['uri'], torrent['hash']),
-                path=torrent['directory_base'],
+                path=torrent['base_path'],
                 torrent_info_hash=torrent['hash'],
             )
 
