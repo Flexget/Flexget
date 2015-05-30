@@ -16,7 +16,9 @@ class Sonarr(object):
         'properties': {
             'base_url': {'type': 'string'},
             'port': {'type': 'number'},
-            'api_key': {'type': 'string'}
+            'api_key': {'type': 'string'},
+            'include_ended': {'type': 'boolean', 'default': True},
+            'only_monitored': {'type': 'boolean', 'default': False}
         },
         'required': ['api_key', 'base_url', 'port'],
         'additionalProperties': False
@@ -32,6 +34,10 @@ class Sonarr(object):
           base_url=<value>
           port=<value>
           api_key=<value>
+          include_ended=<yes|no>
+          only_monitored=<yes|no>
+
+        Options base_url, port and api_key are required.
 
         Use with input plugin like discover and/or cofnigure_series.
         Example:
@@ -64,15 +70,17 @@ class Sonarr(object):
         json = task.requests.get(url, headers=headers).json()
         entries = []
         for show in json:
-            entry = Entry(title=show['title'],
-                          url='',
-                          series_name=show['title'],
-                          tvdb_id=show['tvdbId'],
-                          tvrage_id=show['tvRageId'])
-            if entry.isvalid():
-                entries.append(entry)
-            else:
-                log.debug('Invalid entry created? %s' % entry)
+            if show['monitored'] or not config.get('only_monitored'):
+                if config.get('include_ended') or show['status'] != 'ended':
+                    entry = Entry(title=show['title'],
+                                  url='',
+                                  series_name=show['title'],
+                                  tvdb_id=show['tvdbId'],
+                                  tvrage_id=show['tvRageId'])
+                    if entry.isvalid():
+                        entries.append(entry)
+                    else:
+                        log.debug('Invalid entry created? %s' % entry)
 
         return entries
 
