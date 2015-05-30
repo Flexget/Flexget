@@ -226,7 +226,8 @@ class RTorrent(object):
 
         # Additional fields to set
         for key, val in fields.iteritems():
-            params.append('d.{0}.set={1}'.format(key, val))
+            # Values must be escaped if within params
+            params.append('d.%s.set=%s' % (key, re.escape(str(val))))
 
         if mkdir and 'directory' in fields:
             result = self._server.execute.throw('', 'mkdir', '-p', fields['directory'])
@@ -268,8 +269,8 @@ class RTorrent(object):
         multi_call = xmlrpclib.MultiCall(self._server)
 
         for key, val in fields.iteritems():
-            method_name = 'd.set_{0}'.format(key)
-            getattr(multi_call, method_name)(info_hash, val)
+            method_name = 'd.%s.set' % key
+            getattr(multi_call, method_name)(info_hash, str(val))
 
         return multi_call()[0]
 
@@ -414,7 +415,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             info_hash = entry.get('torrent_info_hash')
 
             if not info_hash:
-                entry.fail('Failed to %s as no info_hash found' % (config['action'], entry))
+                entry.fail('Failed to %s as no info_hash found' % config['action'])
                 continue
 
             if config['action'] == 'delete':
@@ -436,29 +437,32 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
         # First check if it already exists
         try:
-            existing = client.torrent(info_hash, fields=['directory'])
+            existing = client.torrent(info_hash, fields=['base_path'])
         except IOError as e:
             entry.fail("Error updating torrent %s" % str(e))
             return
-        except xmlrpclib.Error:
+        except xmlrpclib.Error as e:
             existing = False
 
-        # Build options but make config values overide entry values
+        # Build options but make config values override entry values
         try:
             options = self._build_options(config, entry, entry_first=False)
         except RenderError as e:
             entry.fail("failed to render properties %s" % str(e))
             return
 
-        if existing and existing['directory'] != options['directory']:
-            try:
-                log.verbose("Path is changing, moving files from '%s' to '%s'" % (existing['directory'], options['directory']))
-                client.move(info_hash, options['directory'])
-            except (IOError, xmlrpclib.Error) as e:
-                entry.fail('Failed moving torrent: %s' % str(e))
-                return
+        if existing and 'directory' in options:
+            # Check if a move is required
+            if os.path.dirname(existing['base_path']) != options['directory']:
+                try:
+                    log.verbose("Path is changing, moving files from '%s' to '%s'" % (existing['base_path'], options['directory']))
+                    client.move(info_hash, options['directory'])
+                except (IOError, xmlrpclib.Error) as e:
+                    entry.fail('Failed moving torrent: %s' % str(e))
+                    return
 
-            # Remove directory from update otherwise rTorrent will append the title to the directory path
+        # Remove directory from update otherwise rTorrent will append the title to the directory path
+        if 'directory' in options:
             del options['directory']
 
         try:
