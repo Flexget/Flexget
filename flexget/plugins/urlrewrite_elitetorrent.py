@@ -63,7 +63,11 @@ class UrlRewriteElitetorrent(object):
         regex = re.compile("(.+) \(\d\d\d\d\)")
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
-            query = self.rm_tildes(regex.findall(query)[0])
+            query_no_year = regex.findall(query)
+            # if contains (YEAR) remove
+            if len(query_no_year) > 0:
+                query = query_no_year[0]
+            query = self.rm_tildes(query)
             log.debug('Searching elitetorrent %s' % query)
             query = query.encode('utf8', 'ignore')
             # POST request or change to "http://www.elitetorrent.net/busqueda/query+with+plus"
