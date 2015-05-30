@@ -69,8 +69,8 @@ class TestRTorrentClient(object):
             '',
             match_binary,
             'd.priority.set=3',
-            'd.directory.set=/data/downloads',
-            'd.custom1.set=test_custom1'
+            'd.directory.set=\\/data\\/downloads',
+            'd.custom1.set=test\\_custom1'
         )
 
     @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
@@ -171,7 +171,7 @@ class TestRTorrentClient(object):
         ]
 
         mocked_proxy.move.return_value = 0
-        mocked_proxy.d.set_directory.return_value = 0
+        mocked_proxy.d.directory.set.return_value = 0
         mocked_proxy.execute.throw.return_value = 0
 
         client = RTorrent('http://localhost/RPC2')
@@ -323,7 +323,7 @@ class TestRTorrentOutputPlugin(FlexGetBase):
         mocked_client.version = [0, 9, 4]
         mocked_client.update.return_value = 0
         mocked_client.move.return_value = 0
-        mocked_client.torrent.return_value = {'directory': '/some/path'}
+        mocked_client.torrent.return_value = {'base_path': '/some/path'}
 
         self.execute_task('test_update_path')
 
