@@ -452,10 +452,12 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             return
 
         if existing and 'directory' in options:
-            # Check if a move is required
-            if os.path.dirname(existing['base_path']) != options['directory']:
+            # Check if changing to another directory which requires a move
+            if options['directory'] != existing['base_path']\
+                    and options['directory'] != os.path.dirname(existing['base_path']):
                 try:
-                    log.verbose("Path is changing, moving files from '%s' to '%s'" % (existing['base_path'], options['directory']))
+                    log.verbose("Path is changing, moving files from '%s' to '%s'"
+                                % (existing['base_path'], options['directory']))
                     client.move(info_hash, options['directory'])
                 except (IOError, xmlrpclib.Error) as e:
                     entry.fail('Failed moving torrent: %s' % str(e))
