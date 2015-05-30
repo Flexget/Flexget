@@ -33,7 +33,7 @@ class Sickbeard(object):
           port=<value>
           api_key=<value>
 
-        Use with input plugin like discover and/or cofnigure_series.
+        Use with input plugin like discover and/or configure_series.
         Example:
 
         download-tv-task:
@@ -56,7 +56,7 @@ class Sickbeard(object):
 
         Note that when using the configure_series plugin with Sickbeard
         you are basically synced to it, so removing a show in Sickbeard will
-        remove it in flexget as well,which good be positive or negative,
+        remove it in flexget as well, which could be positive or negative,
         depending on your usage.
         '''
         url = '%s:%s/api/%s/?cmd=shows' % (config['base_url'], config['port'], config['api_key'])
