@@ -35,7 +35,10 @@ def dump(entries, debug=False, eval_lazy=False, trace=False, title_only=False):
             if entry.is_lazy(field) and not eval_lazy:
                 value = '<LazyField - value will be determined when it is accessed>'
             else:
-                value = entry[field]
+                try:
+                    value = entry[field]
+                except KeyError:
+                    value = '<LazyField - lazy lookup failed>'
             if isinstance(value, basestring):
                 try:
                     console('%-17s: %s' % (field, value.replace('\r', '').replace('\n', '')))

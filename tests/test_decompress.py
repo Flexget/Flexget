@@ -1,12 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 import shutil
-import imp
 
-
-from tests import FlexGetBase, with_filecopy
-from tests.util import maketemp
 from nose.plugins.skip import SkipTest
+
+from tests import FlexGetBase
+
+try:
+    import rarfile
+except ImportError:
+    rarfile = None
 
 
 class TestExtract(FlexGetBase):
@@ -54,18 +57,10 @@ class TestExtract(FlexGetBase):
 
     def __init__(self):
         super(TestExtract, self).__init__()
-
-        try:
-            imp.find_module('rarfile')
-            self.rarfile_installed = True
-        except ImportError:
-            self.rarfile_installed = False
-
         self.temp_rar = None
         self.temp_zip = None
         self.temp_out = None
         self.temp_out_dir = None
-
 
     def setup(self):
         super(TestExtract, self).setup()
@@ -82,11 +77,8 @@ class TestExtract(FlexGetBase):
 
     def test_rar(self):
         """Test basic RAR extraction"""
-        # Skip RAR tests if rarfile module is missing
-        if not self.rarfile_installed:
-            SkipTest('Need RarFile module.')
-            return
-
+        if not rarfile:
+            raise SkipTest('Needs RarFile module.')
         shutil.copy(self.rar_name, self.temp_rar)
         self.execute_task('test_rar')
 
@@ -95,11 +87,8 @@ class TestExtract(FlexGetBase):
 
     def test_delete_rar(self):
         """Test RAR deletion after extraction"""
-        # Skip RAR tests if rarfile module is missing
-        if not self.rarfile_installed:
-            raise SkipTest('Need RarFile module.')
-            return
-
+        if not rarfile:
+            raise SkipTest('Needs RarFile module.')
         shutil.copy(self.rar_name, self.temp_rar)
         self.execute_task('test_delete_rar')
 

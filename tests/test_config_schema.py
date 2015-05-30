@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
+from datetime import timedelta
 import jsonschema
 
 from flexget import config_schema
@@ -149,3 +150,140 @@ class TestSchemaValidator(FlexGetBase):
         config = {"p": "foo"}
         config_schema.process_config(config, schema)
         assert config["p"] == "foo"
+
+
+class TestSchemaFormats(object):
+
+    def _test_format(self, format, items, invalid=False):
+        failures = []
+        for item in items:
+            try:
+                config_schema.format_checker.check(item, format)
+                if invalid:
+                    failures.append("'%s' should not be a valid '%s" % (item, format))
+            except jsonschema.FormatError as e:
+                if not invalid:
+                    failures.append(e.message)
+        return failures
+
+    def test_format_size(self):
+        valid_sizes = [
+            '100 MB',  # Spaces
+            '100 MiB',  # Spaces
+            '100 mib',  # Lowercase
+            1048576,  # bytes as int
+            '1048576',  # bytes as string
+            '20.5GB',  # decimal
+            '100KiB',
+            '100KB',
+            '100MiB',
+            '100MB',
+            '20GiB',
+            '20GB',
+            '2TiB',
+            '2TB',
+            ]
+
+        invalid_sizes = [
+            '1AiB',
+            '1bytes',
+            '1megabytes',
+            '1gig',
+            '1gigabytes',
+        ]
+
+        failures = self._test_format('size', valid_sizes)
+        failures.extend(self._test_format('size', invalid_sizes, invalid=True))
+
+        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+
+    def test_format_interval(self):
+        valid_intervals = [
+            '3 days',
+            '12 hours',
+            '1 minute',
+        ]
+
+        invalid_intervals = [
+            'aoeu',
+            '14',
+            '3 dayz',
+            'about 5 minutes',
+        ]
+
+        failures = self._test_format('interval', valid_intervals)
+        failures.extend(self._test_format('interval', invalid_intervals, invalid=True))
+
+        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+
+    def test_format_percent(self):
+        valid_percent = [
+            '1%',
+            '1 %',
+            '70.05 %',
+        ]
+
+        invalid_percent = [
+            '%5',
+            'abc%',
+        ]
+
+        failures = self._test_format('percent', valid_percent)
+        failures.extend(self._test_format('percent', invalid_percent, invalid=True))
+
+        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+
+
+class TestFormatParsers(object):
+
+    def _test_parser(self, parser, items):
+        failures = []
+        for item in items:
+            value = parser(item[0])
+            if value != item[1]:
+                failures.append('`%s` should parse to `%s` not `%s`' % (item[0], item[1], value))
+        return failures
+
+    def test_parser_size(self):
+        size_tests = [
+            ('100 MB', 104857600),  # Space
+            ('100 MiB', 104857600),  # Spaces
+            ('100 mib', 104857600),  # Lowercase
+            (1048576, 1048576),  # bytes as int
+            ('1048576', 1048576),  # bytes as string
+            ('20.5GB', 22011707392),  # decimal
+            ('100KiB', 102400),
+            ('100KB', 102400),
+            ('100MiB', 104857600),
+            ('100MB', 104857600),
+            ('20GiB', 21474836480),
+            ('20GB', 21474836480),
+            ('2TiB', 2199023255552),
+            ('2TB', 2199023255552),
+            ]
+
+        failures = self._test_parser(config_schema.parse_size, size_tests)
+
+        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+
+    def test_parser_interval(self):
+        intervals_tests = [
+            ('3 days', timedelta(days=3)),
+            ('12 hours', timedelta(hours=12)),
+            ('1 minute', timedelta(seconds=60)),
+        ]
+
+        failures = self._test_parser(config_schema.parse_interval, intervals_tests)
+
+        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+
+    def test_parser_percent(self):
+        percent_tests = [
+            ('3%', 3.0),
+            ('30.05%', 30.05),
+            ('30 %', 30.0),
+        ]
+
+        failures = self._test_parser(config_schema.parse_percent, percent_tests)
+
+        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
