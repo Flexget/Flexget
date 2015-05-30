@@ -87,7 +87,10 @@ class UrlRewriteDivxATope(object):
         regex = re.compile("(.+) \(\d\d\d\d\)")
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
-            query = regex.findall(query)[0]
+            query_no_year = regex.findall(query)
+            # if contains (YEAR) remove
+            if len(query_no_year) > 0:
+                query = query_no_year[0]
             log.debug('Searching DivxATope %s' % query)
             query = query.encode('utf8', 'ignore')
             data = {'search': query}
