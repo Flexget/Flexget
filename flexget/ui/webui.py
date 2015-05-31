@@ -16,22 +16,28 @@ import socket
 import sys
 
 from flask import Flask, redirect, url_for, abort, request, send_from_directory
-from sqlalchemy.orm import scoped_session
-from sqlalchemy.orm.session import sessionmaker
 
 from flexget.event import fire_event
 from flexget.plugin import DependencyError
 from flexget.ui.api import api, api_schema
+from flexget.ui import plugins as ui_plugins_pkg
+from flexget.manager import manager, Session
+from sqlalchemy.orm import scoped_session
+
+from flexget.manager import Manager
 
 log = logging.getLogger('webui')
 
 app = Flask(__name__)
-manager = None
-db_session = None
 server = None
 
 _home = None
 _menu = []
+
+manager = None
+config = {}
+
+db_session = None
 
 
 def _update_menu(root):
@@ -67,32 +73,66 @@ def flexget_variables():
     return {'menu': _menu, 'manager': manager}
 
 
-def load_ui_plugins():
+def _strip_trailing_sep(path):
+    return path.rstrip("\\/")
 
-    # TODO: load from ~/.flexget/ui/plugins too (or something like that)
 
+def _get_standard_ui_plugins_path():
+    """
+    :returns: List of directories where ui plugins should be tried to load from.
+    """
+
+    # Get basic path from environment
+    paths = []
+
+    env_path = os.environ.get('FLEXGET_UI_PLUGIN_PATH')
+    if env_path:
+        paths = [path for path in env_path.split(os.pathsep) if os.path.isdir(path)]
+
+    # Add flexget.ui.plugins directory (core ui plugins)
     import flexget.ui.plugins
-    d = flexget.ui.plugins.__path__[0]
+    paths.append(flexget.ui.plugins.__path__[0])
+    return paths
 
-    plugin_names = set()
-    for f in os.listdir(d):
-        path = os.path.join(d, f, '__init__.py')
-        if os.path.isfile(path):
-            plugin_names.add(f)
 
-    for name in plugin_names:
+def _load_ui_plugins_from_dirs(dirs):
+
+    # Ensure plugins can be loaded via flexget.ui.plugins
+    ui_plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
+
+    plugins = set()
+    for d in dirs:
+        for f in os.listdir(d):
+            path = os.path.join(d, f, '__init__.py')
+            if os.path.isfile(path):
+                plugins.add(f)
+
+    for plugin in plugins:
+        name = plugin.split(".")[-1]
         try:
             log.info('Loading UI plugin %s' % name)
-            exec "import flexget.ui.plugins.%s" % name
+            exec "import flexget.ui.plugins.%s" % plugin
         except DependencyError as e:
             # plugin depends on another plugin that was not imported successfully
             log.error(e.message)
         except EnvironmentError as e:
-            log.info('Plugin %s: %s' % (name, e.message))
+            log.info('Plugin %s: %s' % (name, str(e)))
         except Exception as e:
             log.critical('Exception while loading plugin %s' % name)
             log.exception(e)
             raise
+
+
+def load_ui_plugins():
+
+    # Add flexget.plugins directory (core plugins)
+    ui_plugin_dirs = _get_standard_ui_plugins_path()
+
+    user_plugin_dir = os.path.join(manager.config_base, 'ui_plugins')
+    if os.path.isdir(user_plugin_dir):
+        ui_plugin_dirs.append(user_plugin_dir)
+
+    _load_ui_plugins_from_dirs(ui_plugin_dirs)
 
 
 def register_plugin(blueprint, menu=None, order=128, home=False):
@@ -133,24 +173,18 @@ def register_home(route, order=128):
 
 @app.teardown_appcontext
 def shutdown_session(exception=None):
-    """Remove db_session after request"""
+    """Closes the database again at the end of the request."""
     db_session.remove()
-    log.debug('db_session removed')
 
 
 def start(mg):
     """Start WEB UI"""
-
-    global manager
+    global manager, config
     manager = mg
+    config = manager.config.get('webui')
 
-    # Create sqlalchemy session for Flask usage
     global db_session
-    db_session = scoped_session(sessionmaker(autocommit=False,
-                                             autoflush=False,
-                                             bind=manager.engine))
-    if db_session is None:
-        raise Exception('db_session is None')
+    db_session = scoped_session(Session)
 
     load_ui_plugins()
 
@@ -166,11 +200,9 @@ def start(mg):
     # Start Flask
     app.secret_key = os.urandom(24)
 
-    set_exit_handler(stop_server)
+    log.info('Starting server on port %s' % config.get('port'))
 
-    log.info('Starting server on port %s' % manager.options.webui.port)
-
-    if manager.options.webui.autoreload:
+    if config['autoreload']:
         # Create and destroy a socket so that any exceptions are raised before
         # we spawn a separate Python interpreter and lose this ability.
         from werkzeug.serving import run_with_reloader
@@ -178,23 +210,24 @@ def start(mg):
         extra_files = None
         test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         test_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        test_socket.bind((manager.options.webui.bind, manager.options.webui.port))
+        test_socket.bind((config.get('bind'), config.get('port')))
         test_socket.close()
         log.warning('Not starting scheduler, since autoreload is enabled.')
         run_with_reloader(start_server, extra_files, reloader_interval)
     else:
-        start_server()
+        start_server(config.get('bind'), config.get('port'))
 
     log.debug('server exited')
     fire_event('webui.stop')
-    manager.shutdown(finish_queue=False)
 
 
-def start_server():
+def start_server(bind, port=5050):
     global server
     from cherrypy import wsgiserver
+    #import cherrypy
+    #cherrypy.engine
     d = wsgiserver.WSGIPathInfoDispatcher({'/': app})
-    server = wsgiserver.CherryPyWSGIServer((manager.options.webui.bind, manager.options.webui.port), d)
+    server = wsgiserver.CherryPyWSGIServer((bind, port), d)
 
     log.debug('server %s' % server)
     try:
@@ -207,20 +240,3 @@ def stop_server(*args):
     log.debug('Shutting down server')
     if server:
         server.stop()
-
-
-def set_exit_handler(func):
-    """Sets a callback function for term signal on windows or linux"""
-    if os.name == 'nt':
-        try:
-            import win32api
-            win32api.SetConsoleCtrlHandler(func, True)
-        except ImportError:
-            version = '.'.join(map(str, sys.version_info[:2]))
-            raise Exception('pywin32 not installed for Python ' + version)
-    else:
-        import signal
-        signal.signal(signal.SIGTERM, func)
-
-
-

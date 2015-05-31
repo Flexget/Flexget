@@ -33,6 +33,8 @@ class LogEntry(Base):
 class DBLogHandler(logging.Handler):
 
     def emit(self, record):
+        # TODO: disable this for now as it causes db_locks
+        return
         session = Session()
         try:
             session.add(LogEntry(record))

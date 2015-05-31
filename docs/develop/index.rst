@@ -23,7 +23,7 @@ Core
 * jsonschema
 * Some smaller misc libraries
 
-WebUI
+HTTPServer
 ~~~~~
 
 * Flask

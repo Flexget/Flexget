@@ -7,11 +7,11 @@ from flask import Blueprint, request, Response
 from flexget.event import event
 from flexget.ui.webui import register_plugin, app, manager, db_session
 from flexget.manager import Base
+from flexget.ui.webui import config
 
 log = logging.getLogger('ui.authentication')
 auth = Blueprint('authentication', __name__)
 credentials = None
-
 
 class AuthCredentials(Base):
     __tablename__ = 'authentication'
@@ -41,18 +41,30 @@ def authenticate():
 
 @event('webui.start')
 def enable_authentication():
-    if manager.options.webui.no_auth:
+
+    webui_config = manager.config.get('webui', False)
+
+    # Not enabled
+    if not webui_config:
         return
+
+    auth_config = webui_config.get('authentication')
+
+    if not auth_config:
+        log.warning("Authentication disabled, not recommended for security reasons!")
+        return
+
     global credentials
     credentials = db_session.query(AuthCredentials).first()
+
     if not credentials:
         credentials = AuthCredentials('flexget', 'flexget')
         db_session.add(credentials)
 
-    if manager.options.webui.username:
-        credentials.username = manager.options.webui.username
-    if manager.options.webui.password:
-        credentials.password = manager.options.webui.password
+    if auth_config.get("username"):
+        credentials.username = auth_config['username']
+    if auth_config.get("password"):
+        credentials.password = auth_config['password']
     db_session.commit()
 
     app.before_request(check_authenticated)
@@ -60,8 +72,10 @@ def enable_authentication():
 
 def check_authenticated():
     # TODO: Is this a big security hole? Maybe figure out a better way to authenticate for local IPC
-    if manager.options.webui.no_local_auth and request.remote_addr == '127.0.0.1':
-        return
+    if request.remote_addr == '127.0.0.1':
+        if not config['authentication'] or config['authentication']['no_local_auth']:
+            return
+
     auth = request.authorization
     if not auth or not check_auth(auth.username, auth.password):
         return authenticate()
