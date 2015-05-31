@@ -48,48 +48,37 @@ def disk_stats(folder):
     return disk_stats_tuple(folder, free_bytes, used_bytes, total_bytes, free_percent, used_percent)
 
 
-def _path_selector(paths, threshold, stat_attr, reverse=True):
+def _path_selector(paths, within, stat_attr):
     paths_stats = [disk_stats(path) for path in paths]
 
     # Sort paths by key
-    paths_stats.sort(key=lambda p: getattr(p, stat_attr), reverse=reverse)
+    paths_stats.sort(key=lambda p: getattr(p, stat_attr), reverse=True)
 
     valid_paths = [paths_stats[0].path]
 
-    if threshold > 0:
+    if within > 0:
         valid_paths.extend([
             path_stat.path for path_stat in paths_stats[1:]
-            if abs(getattr(path_stat, stat_attr) - getattr(paths_stats[0], stat_attr)) <= threshold
+            if abs(getattr(path_stat, stat_attr) - getattr(paths_stats[0], stat_attr)) <= within
         ])
 
     return random.choice(valid_paths)
 
 
-def select_most_free(paths, threshold):
-    return _path_selector(paths, threshold, 'free_bytes', reverse=True)
+def select_most_free(paths, within):
+    return _path_selector(paths, within, 'free_bytes')
 
 
-def select_most_used(paths, threshold):
-    return _path_selector(paths, threshold, 'used_bytes', reverse=True)
+def select_most_used(paths, within):
+    return _path_selector(paths, within, 'used_bytes')
 
 
-def select_most_free_percent(paths, threshold):
-    return _path_selector(paths, threshold, 'free_percent', reverse=True)
+def select_most_free_percent(paths, within):
+    return _path_selector(paths, within, 'free_percent')
 
 
-def select_most_used_percent(paths, threshold):
-    return _path_selector(paths, threshold, 'used_percent', reverse=True)
-
-
-def select_has_free(paths, threshold):
-    paths_stats = [disk_stats(path) for path in paths]
-
-    valid_paths = [
-        path_stat.path for path_stat in paths_stats
-        if path_stat.free_bytes >= threshold
-    ]
-    if valid_paths:
-        return random.choice(valid_paths)
+def select_most_used_percent(paths, within):
+    return _path_selector(paths, within, 'used_percent')
 
 
 selector_map = {
@@ -97,20 +86,19 @@ selector_map = {
     'most_used': select_most_used,
     'most_free_percent': select_most_free_percent,
     'most_used_percent': select_most_used_percent,
-    'has_free': select_has_free,
 }
 
 
 class PluginPathSelect(object):
     """Allows setting a field to a folder based on it's space
 
-    Path will be selected at random if multiple paths match the threshold
+    Path will be selected at random if multiple paths match the within
 
     Example:
 
     path_select:
       select: most_free_percent # or most_free, most_used, most_used_percent, has_free
-      threshold: 9000 # Threshold in MB or percent.
+      within: 9000 # within in MB or percent.
       paths:
         - /drive1/
         - /drive2/
@@ -123,7 +111,7 @@ class PluginPathSelect(object):
             'select': {'type': 'string', 'enum': selector_map.keys()},
             'to_field': {'type': 'string', 'default': 'path'},
             'paths': one_or_more({'type': 'string', 'format': 'path'}),
-            'threshold': {
+            'within': {
                 'oneOf': [
                     {'type': 'string', 'format': 'size'},
                     {'type': 'string', 'format': 'percent'},
@@ -139,14 +127,14 @@ class PluginPathSelect(object):
 
         selector = selector_map[config['select']]
 
-        # Convert threshold to bytes (int) or percent (float)
-        threshold = config.get('threshold')
-        if isinstance(threshold, basestring) and '%' in threshold:
-            threshold = parse_percent(threshold)
+        # Convert within to bytes (int) or percent (float)
+        within = config.get('within')
+        if isinstance(within, basestring) and '%' in within:
+            within = parse_percent(within)
         else:
-            threshold = parse_size(threshold)
+            within = parse_size(within)
 
-        path = selector(config['paths'], threshold=threshold)
+        path = selector(config['paths'], within=within)
 
         if path:
             log.debug('Path %s selected due to (%s)' % (path, config['select']))
