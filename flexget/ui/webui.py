@@ -22,6 +22,8 @@ from sqlalchemy.orm.session import sessionmaker
 from flexget.event import fire_event
 from flexget.plugin import DependencyError
 from flexget.ui.api import api, api_schema
+from flexget.ui import plugins as ui_plugins_pkg
+
 
 log = logging.getLogger('webui')
 
@@ -67,23 +69,45 @@ def flexget_variables():
     return {'menu': _menu, 'manager': manager}
 
 
-def load_ui_plugins():
+def _strip_trailing_sep(path):
+    return path.rstrip("\\/")
 
-    # TODO: load from ~/.flexget/ui/plugins too (or something like that)
 
+def _get_standard_ui_plugins_path():
+    """
+    :returns: List of directories where ui plugins should be tried to load from.
+    """
+
+    # Get basic path from environment
+    paths = []
+
+    env_path = os.environ.get('FLEXGET_UI_PLUGIN_PATH')
+    if env_path:
+        paths = [path for path in env_path.split(os.pathsep) if os.path.isdir(path)]
+
+    # Add flexget.ui.plugins directory (core ui plugins)
     import flexget.ui.plugins
-    d = flexget.ui.plugins.__path__[0]
+    paths.append(flexget.ui.plugins.__path__[0])
+    return paths
 
-    plugin_names = set()
-    for f in os.listdir(d):
-        path = os.path.join(d, f, '__init__.py')
-        if os.path.isfile(path):
-            plugin_names.add(f)
 
-    for name in plugin_names:
+def _load_ui_plugins_from_dirs(dirs):
+
+    # Ensure plugins can be loaded via flexget.ui.plugins
+    ui_plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
+
+    plugins = set()
+    for d in dirs:
+        for f in os.listdir(d):
+            path = os.path.join(d, f, '__init__.py')
+            if os.path.isfile(path):
+                plugins.add(f)
+
+    for plugin in plugins:
+        name = plugin.split(".")[-1]
         try:
             log.info('Loading UI plugin %s' % name)
-            exec "import flexget.ui.plugins.%s" % name
+            exec "import flexget.ui.plugins.%s" % plugin
         except DependencyError as e:
             # plugin depends on another plugin that was not imported successfully
             log.error(e.message)
@@ -93,6 +117,18 @@ def load_ui_plugins():
             log.critical('Exception while loading plugin %s' % name)
             log.exception(e)
             raise
+
+
+def load_ui_plugins():
+
+    # Add flexget.plugins directory (core plugins)
+    ui_plugin_dirs = _get_standard_ui_plugins_path()
+
+    user_plugin_dir = os.path.join(manager.config_base, 'ui_plugins')
+    if os.path.isdir(user_plugin_dir):
+        ui_plugin_dirs.append(user_plugin_dir)
+
+    _load_ui_plugins_from_dirs(ui_plugin_dirs)
 
 
 def register_plugin(blueprint, menu=None, order=128, home=False):
@@ -221,6 +257,3 @@ def set_exit_handler(func):
     else:
         import signal
         signal.signal(signal.SIGTERM, func)
-
-
-
