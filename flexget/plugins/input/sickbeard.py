@@ -16,7 +16,9 @@ class Sickbeard(object):
         'properties': {
             'base_url': {'type': 'string'},
             'port': {'type': 'number'},
-            'api_key': {'type': 'string'}
+            'api_key': {'type': 'string'},
+            'include_ended': {'type': 'boolean', 'default': True},
+            'only_monitored': {'type': 'boolean', 'default': False}
         },
         'required': ['api_key', 'base_url', 'port'],
         'additionalProperties': False
@@ -63,11 +65,13 @@ class Sickbeard(object):
         json = task.requests.get(url).json()
         entries = []
         for id, show in json['data'].items():
-            entry = Entry(title=show['show_name'],
-                          url='',
-                          series_name=show['show_name'],
-                          tvdb_id=show['tvdbid'],
-                          tvrage_id=show['tvrage_id'])
+            if show['paused'] == 0 or not config.get('only_monitored'):
+                if config.get('include_ended') or show['status'] != 'Ended':
+                    entry = Entry(title=show['show_name'],
+                                  url='',
+                                  series_name=show['show_name'],
+                                  tvdb_id=show['tvdbid'],
+                                  tvrage_id=show['tvrage_id'])
             if entry.isvalid():
                 entries.append(entry)
             else:
