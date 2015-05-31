@@ -65,7 +65,7 @@ class Sickbeard(object):
         json = task.requests.get(url).json()
         entries = []
         for id, show in json['data'].items():
-            if show['paused'] == 0 or not config.get('only_monitored'):
+            if not show['paused'] or not config.get('only_monitored'):
                 if config.get('include_ended') or show['status'] != 'Ended':
                     entry = Entry(title=show['show_name'],
                                   url='',
