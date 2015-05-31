@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from urlparse import urlparse
 import logging
 import requests
 
@@ -65,7 +66,8 @@ class Sonarr(object):
         remove it in flexget as well,which good be positive or negative,
         depending on your usage.
         '''
-        url = '%s:%s/api/series' % (config['base_url'], config['port'])
+        parsedurl = urlparse(config.get('base_url'))
+        url = '%s://%s:%s%s/api/series' % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path)
         headers = {'X-Api-Key': config['api_key']}
         json = task.requests.get(url, headers=headers).json()
         entries = []

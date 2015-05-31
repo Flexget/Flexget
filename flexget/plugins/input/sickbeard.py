@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from urlparse import urlparse
 import logging
 import requests
 
@@ -61,7 +62,9 @@ class Sickbeard(object):
         remove it in flexget as well,which good be positive or negative,
         depending on your usage.
         '''
-        url = '%s:%s/api/%s/?cmd=shows' % (config['base_url'], config['port'], config['api_key'])
+        parsedurl = urlparse(config.get('base_url'))
+        url = '%s://%s:%s%s/api/%s/?cmd=shows' % (parsedurl.scheme, parsedurl.netloc,
+                                                  config.get('port'), parsedurl.path, config.get('api_key'))
         json = task.requests.get(url).json()
         entries = []
         for id, show in json['data'].items():
