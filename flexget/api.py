@@ -1,15 +1,18 @@
 from flask import request, jsonify, Blueprint, Response, flash
+from Queue import Empty
 
 import flexget
 from flexget.config_schema import resolve_ref, process_config, get_schema
 from flexget.manager import manager
-from flexget.options import get_parser
+from flexget.options import get_parser, ParserError
 from flexget.plugin import plugin_schemas
 from flexget.utils.tools import BufferQueue
+from flexget import logger
 
 API_VERSION = 1
 
 api = Blueprint('api', __name__, url_prefix='/api')
+
 # Serves the appropriate schema for any /api method. Schema for /api/x/y can be found at /schema/api/x/y
 api_schema = Blueprint('api_schema', __name__, url_prefix='/schema/api')
 
@@ -22,41 +25,111 @@ def attach_schema(response):
     return response
 
 
-@api_schema.route('/version')
-def version_schema():
-    return jsonify({
-        'type': 'object',
-        'properties': {
-            'flexget_version': {'type': 'string', 'description': 'FlexGet version string'},
-            'api_version': {'type': 'integer', 'description': 'Version of the json api'}
-        }
-    })
-
-
-@api.route('/version')
+@api.route('/version/')
 def version():
     return jsonify(flexget_version=flexget.__version__, api_version=API_VERSION)
 
 
+# Execution API
+
 exec_parser = get_parser('execute')
 
+def _get_task(task_id):
+    if manager.task_queue.running_task and manager.task_queue.running_task.uniq_id == task_id:
+        return manager.task_queue.running_task
+    else:
+        for i, t in enumerate(manager.task_queue.run_queue.queue):
+            if t.uniq_id == task_id:
+                return t
 
-@api.route('/execute', methods=['GET', 'POST'])
-def execute():
-    kwargs = request.json or {}
-    options_string = kwargs.pop('options_string', '')
-    if options_string:
-        try:
-            kwargs['options'] = exec_parser.parse_args(options_string, raise_errors=True).execute
-        except ValueError as e:
-            return jsonify(error='invalid options_string specified: %s' % e.message), 400
+def _task_info(task_id):
 
-    # We'll stream the log results as they arrive in the bufferqueue
-    kwargs['output'] = BufferQueue()
-    manager.execute(**kwargs)
+    task = _get_task(task_id)
+    if not task:
+        return
 
-    return Response(kwargs['output'], mimetype='text/plain'), 200
+    if manager.task_queue.running_task and manager.task_queue.running_task.uniq_id == task_id:
+        queue_id = 0
+        status = "running"
+    else:
+        queue_id = manager.task_queue.run_queue.queue.index(task)
+        status = "pending"
 
+    return {
+        "id": task.uniq_id,
+        "queue_id": queue_id,
+        "name": task.name,
+        "status": status,
+        "current_phase": task.current_phase,
+        "current_plugin": task.current_plugin,
+    }
+
+
+@api.route('/execution/', methods=['GET', 'POST'])
+def execution():
+    if request.method == 'GET':
+        task_ids = [task.uniq_id for task in manager.task_queue.run_queue.queue]
+        if manager.task_queue.running_task:
+            task_ids.append(manager.task_queue.running_task.uniq_id)
+
+        tasks_info = [_task_info(task_id) for task_id in task_ids]
+        return jsonify({"tasks": tasks_info})
+
+    if request.method == "POST":
+        kwargs = request.json or {}
+
+        options_string = kwargs.pop('options_string', '')
+        if options_string:
+            try:
+                kwargs['options'] = exec_parser.parse_args(options_string, raise_errors=True)
+            except ValueError as e:
+                return jsonify(error='invalid options_string specified: %s' % e.message), 400
+
+        # We'll stream the log results as they arrive in the bufferqueue
+        kwargs['output'] = BufferQueue()
+        events = manager.execute(**kwargs)
+
+        def read_log():
+            for event in events:
+                while True:
+                    if event.is_set():
+                        break
+                    try:
+                        yield kwargs['output'].get(timeout=0.5)
+                    except Empty:
+                        continue
+
+        # TODO: Return as json in log format??
+        # {'date': date, 'task': <task_name>, 'plugin': <plugin>, message: <message>}
+        return Response(read_log(), mimetype='text/event-stream')
+
+
+@api.route('/execution/<exec_id>/')
+def execution_by_id(exec_id):
+    task = _task_info(exec_id)
+
+    if not task:
+        return jsonify({'detail': '%s not found' % exec_id}), 400
+
+    return jsonify({'task': task})
+
+@api.route('/execution/<exec_id>/log/')
+def execution_log(exec_id):
+    task = _get_task(exec_id)
+
+    if not task:
+        return jsonify({'detail': '%s not found' % exec_id}), 400
+
+    def read_log():
+        # TODO: Not sure how to get output for tasks running? What if output=None?
+        while task.is_alive():
+            for output in task.output:
+                yield output
+
+    return Response(read_log(), mimetype='text/event-stream')
+
+
+# Task API
 
 task_schema = {
     'type': 'object',

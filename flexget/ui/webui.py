@@ -19,7 +19,7 @@ from flask import Flask, redirect, url_for, abort, request, send_from_directory
 
 from flexget.event import fire_event
 from flexget.plugin import DependencyError
-from flexget.ui.api import api, api_schema
+from flexget.api import api, api_schema
 from flexget.ui import plugins as ui_plugins_pkg
 from flexget.manager import manager, Session
 from sqlalchemy.orm import scoped_session

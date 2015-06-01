@@ -19,6 +19,7 @@ class TaskQueue(object):
     """
     def __init__(self):
         self.run_queue = Queue.PriorityQueue()
+        self.running_task = None
         self._shutdown_now = False
         self._shutdown_when_finished = False
 
@@ -34,21 +35,21 @@ class TaskQueue(object):
         while not self._shutdown_now:
             # Grab the first job from the run queue and do it
             try:
-                task = self.run_queue.get(timeout=0.5)
+                self.running_task = self.run_queue.get(timeout=0.5)
             except Queue.Empty:
                 if self._shutdown_when_finished:
                     self._shutdown_now = True
                 continue
             try:
-                task.execute()
+                self.running_task.execute()
             except TaskAbort as e:
-                log.debug('task %s aborted: %r' % (task.name, e))
+                log.debug('task %s aborted: %r' % (self.running_task.name, e))
             except (ProgrammingError, OperationalError):
                 log.critical('Database error while running a task. Attempting to recover.')
-                task.manager.crash_report()
+                self.running_task.manager.crash_report()
             except Exception:
                 log.critical('BUG: Unhandled exception during task queue run loop.')
-                task.manager.crash_report()
+                self.running_task.manager.crash_report()
             finally:
                 self.run_queue.task_done()
         remaining_jobs = self.run_queue.qsize()
