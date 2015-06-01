@@ -16,12 +16,12 @@ class Sonarr(object):
         'type': 'object',
         'properties': {
             'base_url': {'type': 'string'},
-            'port': {'type': 'number'},
+            'port': {'type': 'number', 'default': 80},
             'api_key': {'type': 'string'},
             'include_ended': {'type': 'boolean', 'default': True},
             'only_monitored': {'type': 'boolean', 'default': False}
         },
-        'required': ['api_key', 'base_url', 'port'],
+        'required': ['api_key', 'base_url'],
         'additionalProperties': False
     }
 
@@ -38,7 +38,7 @@ class Sonarr(object):
           include_ended=<yes|no>
           only_monitored=<yes|no>
 
-        Options base_url, port and api_key are required.
+        Options base_url and api_key are required.
 
         Use with input plugin like discover and/or cofnigure_series.
         Example:

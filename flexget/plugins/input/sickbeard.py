@@ -16,12 +16,12 @@ class Sickbeard(object):
         'type': 'object',
         'properties': {
             'base_url': {'type': 'string'},
-            'port': {'type': 'number'},
+            'port': {'type': 'number', 'default': 80},
             'api_key': {'type': 'string'},
             'include_ended': {'type': 'boolean', 'default': True},
             'only_monitored': {'type': 'boolean', 'default': False}
         },
-        'required': ['api_key', 'base_url', 'port'],
+        'required': ['api_key', 'base_url'],
         'additionalProperties': False
     }
 
@@ -35,6 +35,8 @@ class Sickbeard(object):
           base_url=<value>
           port=<value>
           api_key=<value>
+
+        Options base_url and api_key are required.
 
         Use with input plugin like discover and/or cofnigure_series.
         Example:

@@ -16,10 +16,10 @@ class CouchPotato(object):
         'type': 'object',
         'properties': {
             'base_url': {'type': 'string'},
-            'port': {'type': 'number'},
+            'port': {'type': 'number', 'default': 80},
             'api_key': {'type': 'string'}
         },
-        'required': ['api_key', 'base_url', 'port'],
+        'required': ['api_key', 'base_url'],
         'additionalProperties': False
     }
 
@@ -33,7 +33,7 @@ class CouchPotato(object):
           port: <value>
           api_key: <value>
 
-        Options base_url, port and api_key are required.
+        Options base_url and api_key are required.
         """
         parsedurl = urlparse(config.get('base_url'))
         url = '%s://%s:%s%s/api/%s/movie.list?status=active' \
