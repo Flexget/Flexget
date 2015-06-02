@@ -5,7 +5,8 @@ import hashlib
 import itertools
 import logging
 import threading
-import uuid
+import random
+import string
 from functools import wraps
 
 from sqlalchemy import Column, Integer, String, Unicode
@@ -194,10 +195,7 @@ class Task(object):
 
         """
         self.name = unicode(name)
-
-        # Unqiue identifier for this task
-        self.uniq_id = uuid.uuid4().hex
-
+        self.id = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(6))
         self.manager = manager
         if config is None:
             config = manager.config['tasks'].get(name, {})

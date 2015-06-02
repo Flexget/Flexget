@@ -11,8 +11,9 @@ from apscheduler.triggers.cron import CronTrigger
 
 from flexget.config_schema import register_config_key, format_checker
 from flexget.event import event
-from flexget.manager import Base
+from flexget.manager import Base, manager
 from flexget.utils import json
+from flask import request, jsonify
 
 log = logging.getLogger('scheduler')
 
@@ -92,7 +93,7 @@ def run_job(tasks):
     """Add the execution to the queue and waits until it is finished"""
     from flexget.manager import manager
     finished_events = manager.execute(options={'tasks': tasks, 'cron': True}, priority=5)
-    for event in finished_events:
+    for task_id, event in finished_events:
         event.wait()
 
 
@@ -179,3 +180,17 @@ def stop_scheduler(manager):
 @event('config.register')
 def register_config():
     register_config_key('schedules', main_schema)
+
+from flexget.api import api
+
+@api.route('/schedules/', methods=['GET', 'POST'])
+def schedules():
+    if request.method == 'GET':
+        schedules = manager.config.get('schedules', [{'tasks': ['*'], 'interval': {'hours': 1}}])
+
+        return jsonify({"schedules": schedules})
+
+@api.route('/schedules/<schedule_id>/')
+def get_schedule(schedule_id):
+    #TODO: write logic
+    return jsonify({"schedule": {}})

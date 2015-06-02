@@ -4,10 +4,9 @@ from Queue import Empty
 import flexget
 from flexget.config_schema import resolve_ref, process_config, get_schema
 from flexget.manager import manager
-from flexget.options import get_parser, ParserError
 from flexget.plugin import plugin_schemas
 from flexget.utils.tools import BufferQueue
-from flexget import logger
+from flexget.options import get_parser
 
 API_VERSION = 1
 
@@ -31,49 +30,10 @@ def version():
 
 
 # Execution API
-
-exec_parser = get_parser('execute')
-
-def _get_task(task_id):
-    if manager.task_queue.running_task and manager.task_queue.running_task.uniq_id == task_id:
-        return manager.task_queue.running_task
-    else:
-        for i, t in enumerate(manager.task_queue.run_queue.queue):
-            if t.uniq_id == task_id:
-                return t
-
-def _task_info(task_id):
-
-    task = _get_task(task_id)
-    if not task:
-        return
-
-    if manager.task_queue.running_task and manager.task_queue.running_task.uniq_id == task_id:
-        queue_id = 0
-        status = "running"
-    else:
-        queue_id = manager.task_queue.run_queue.queue.index(task)
-        status = "pending"
-
-    return {
-        "id": task.uniq_id,
-        "queue_id": queue_id,
-        "name": task.name,
-        "status": status,
-        "current_phase": task.current_phase,
-        "current_plugin": task.current_plugin,
-    }
-
-
 @api.route('/execution/', methods=['GET', 'POST'])
 def execution():
     if request.method == 'GET':
-        task_ids = [task.uniq_id for task in manager.task_queue.run_queue.queue]
-        if manager.task_queue.running_task:
-            task_ids.append(manager.task_queue.running_task.uniq_id)
-
-        tasks_info = [_task_info(task_id) for task_id in task_ids]
-        return jsonify({"tasks": tasks_info})
+        return jsonify({"tasks": [task_state for task_state in manager.task_queue.tasks_data.itervalues()]})
 
     if request.method == "POST":
         kwargs = request.json or {}
@@ -81,89 +41,56 @@ def execution():
         options_string = kwargs.pop('options_string', '')
         if options_string:
             try:
-                kwargs['options'] = exec_parser.parse_args(options_string, raise_errors=True)
+                kwargs['options'] = get_parser('execute').parse_args(options_string, raise_errors=True)
             except ValueError as e:
                 return jsonify(error='invalid options_string specified: %s' % e.message), 400
 
-        # We'll stream the log results as they arrive in the bufferqueue
-        kwargs['output'] = BufferQueue()
-        events = manager.execute(**kwargs)
+        tasks = manager.execute(**kwargs)
 
-        def read_log():
-            for event in events:
-                while True:
-                    if event.is_set():
-                        break
-                    try:
-                        yield kwargs['output'].get(timeout=0.5)
-                    except Empty:
-                        continue
-
-        # TODO: Return as json in log format??
-        # {'date': date, 'task': <task_name>, 'plugin': <plugin>, message: <message>}
-        return Response(read_log(), mimetype='text/event-stream')
+        return jsonify({"tasks": [manager.task_queue.tasks_data.get(task_id) for task_id, event in tasks]})
 
 
-@api.route('/execution/<exec_id>/')
-def execution_by_id(exec_id):
-    task = _task_info(exec_id)
+@api.route('/execution/<task_id>/')
+def execution_by_id(task_id):
+    task_info = manager.task_queue.tasks_data.get(task_id)
 
-    if not task:
-        return jsonify({'detail': '%s not found' % exec_id}), 400
+    if not task_info:
+        return jsonify({'detail': '%s not found' % task_id}), 400
 
-    return jsonify({'task': task})
+    return jsonify({'task': task_info})
 
-@api.route('/execution/<exec_id>/log/')
-def execution_log(exec_id):
-    task = _get_task(exec_id)
 
-    if not task:
-        return jsonify({'detail': '%s not found' % exec_id}), 400
+@api.route('/execution/<task_id>/log/')
+def execution_log(task_id):
+    task_info = manager.task_queue.tasks_data.get(task_id)
+
+    if not task_info:
+        return jsonify({'detail': '%s not found' % task_id}), 400
 
     def read_log():
-        # TODO: Not sure how to get output for tasks running? What if output=None?
-        while task.is_alive():
-            for output in task.output:
-                yield output
+        while task_info['status'] == "running":
+            # TODO: get log file data..
+            pass
 
     return Response(read_log(), mimetype='text/event-stream')
 
 
 # Task API
-
-task_schema = {
-    'type': 'object',
-    'properties': {
-        'name': {'type': 'string', 'description': 'The name of this task.'},
-        'config': plugin_schemas(context='task')
-    },
-    'required': ['name'],
-    'additionalProperties': False,
-    'links': [
-        {'rel': 'self', 'href': '/api/tasks/{name}/'},
-        {'rel': 'edit', 'method': 'PUT', 'href': '', 'schema': {'$ref': '#'}},
-        {'rel': 'delete', 'method': 'DELETE', 'href': ''}
-    ]
-}
-
-tasks_schema = {
-    'type': 'object',
-    'properties': {
-        'tasks': {
-            'type': 'array',
-            'items': {'$ref': '/schema/api/tasks/task'},
-            'links': [
-                {'rel': 'add', 'method': 'POST', 'href': '/api/tasks/', 'schema': {'$ref': '/schema/api/tasks/task'}}
-            ]
-        }
-    }
-}
-
-
 # TODO: Maybe these should be in /config/tasks
 @api_schema.route('/tasks/')
 def schema_tasks():
-    return jsonify(tasks_schema)
+    return jsonify({
+        'type': 'object',
+        'properties': {
+            'tasks': {
+                'type': 'array',
+                'items': {'$ref': '/schema/api/tasks/task'},
+                'links': [
+                    {'rel': 'add', 'method': 'POST', 'href': '/api/tasks/', 'schema': {'$ref': '/schema/api/tasks/task'}}
+                ]
+            }
+        }
+    })
 
 
 @api.route('/tasks/', methods=['GET', 'POST'])
@@ -180,7 +107,20 @@ def api_tasks():
 
 @api_schema.route('/tasks/<task>/')
 def schema_task(task):
-    return jsonify(task_schema)
+    return jsonify({
+        'type': 'object',
+        'properties': {
+            'name': {'type': 'string', 'description': 'The name of this task.'},
+            'config': plugin_schemas(context='task')
+        },
+        'required': ['name'],
+        'additionalProperties': False,
+        'links': [
+            {'rel': 'self', 'href': '/api/tasks/{name}/'},
+            {'rel': 'edit', 'method': 'PUT', 'href': '', 'schema': {'$ref': '#'}},
+            {'rel': 'delete', 'method': 'DELETE', 'href': ''}
+        ]
+    })
 
 
 @api.route('/tasks/<task>/', methods=['GET', 'PUT', 'DELETE'])

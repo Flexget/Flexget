@@ -261,12 +261,12 @@ class Manager(object):
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
         task_names = sorted(task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535))
 
-        finished_events = []
+        tasks = []
         for task_name in task_names:
             task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority)
             self.task_queue.put(task)
-            finished_events.append(task.finished_event)
-        return finished_events
+            tasks.append((task.id, task.finished_event))
+        return tasks
 
     def start(self):
         """
@@ -356,11 +356,11 @@ class Manager(object):
         if self.task_queue.is_alive():
             if len(self.task_queue):
                 log.verbose('There is a task already running, execution queued.')
-            finished_events = self.execute(options, output=logger.get_capture_stream(),
+            tasks = self.execute(options, output=logger.get_capture_stream(),
                                            loglevel=logger.get_capture_loglevel())
             if not options.cron:
                 # Wait until execution of all tasks has finished
-                for event in finished_events:
+                for task_id, event in tasks:
                     event.wait()
         else:
             self.task_queue.start()
