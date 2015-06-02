@@ -23,6 +23,7 @@ class FilterAcceptAll(object):
             for entry in task.entries:
                 entry.accept()
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterAcceptAll, 'accept_all', api_ver=2)

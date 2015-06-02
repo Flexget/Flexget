@@ -22,11 +22,12 @@ CATEGORIES = {
     'XviD': 15,
     'BRRip': 16,
 
-    #TV
+    # TV
     'HDTV': 7,
     'SDTV': 24,
     'TV WEB-DL': 14
 }
+
 
 class SearchPublicHD(object):
     """
@@ -120,6 +121,7 @@ class SearchPublicHD(object):
                 entries.add(entry)
 
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

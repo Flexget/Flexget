@@ -30,6 +30,7 @@ except ImportError:
     # If sleekxmpp is not found, errors will be shown later
     pass
         
+
 class OutputNotifyXmpp(object):
     
     schema = {
@@ -60,7 +61,9 @@ class OutputNotifyXmpp(object):
                 import dnspython
             except ImportError as e:
                 log.debug('Error importing dnspython: %s' % e)
-                raise plugin.DependencyError('notify_xmpp', 'dnspython', 'dnspython module required. ImportError: %s' % e)
+                raise plugin.DependencyError('notify_xmpp',
+                                             'dnspython',
+                                             'dnspython module required. ImportError: %s' % e)
     
     def on_task_output(self, task, config):
         """

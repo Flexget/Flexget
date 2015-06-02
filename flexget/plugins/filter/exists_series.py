@@ -85,7 +85,8 @@ class FilterExistsSeries(object):
                 for filename in folder.walk(errors='ignore'):
                     # run parser on filename data
                     try:
-                        disk_parser = get_plugin_by_name('parsing').instance.parse_series(data=filename.name, name=series_parser.name)
+                        disk_parser = get_plugin_by_name('parsing').instance.parse_series(data=filename.name,
+                                                                                          name=series_parser.name)
                     except ParseWarning as pw:
                         disk_parser = pw.parsed
                         log_once(pw.value, logger=log)
@@ -116,6 +117,7 @@ class FilterExistsSeries(object):
                             else:
                                 log.trace('new one is better proper, allowing')
                                 continue
+
 
 @event('plugin.register')
 def register_plugin():

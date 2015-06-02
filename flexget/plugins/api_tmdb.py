@@ -77,7 +77,8 @@ class TMDBContainer(object):
     def update_from_object(self, update_object):
         """Populates any simple (string or number) attributes from object attributes"""
         for col in self.__table__.columns:
-            if hasattr(update_object, col.name) and isinstance(getattr(update_object, col.name), (basestring, int, float)):
+            if (hasattr(update_object, col.name) and
+                    isinstance(getattr(update_object, col.name), (basestring, int, float))):
                 setattr(self, col.name, getattr(update_object, col.name))
 
 
@@ -117,7 +118,7 @@ class TMDBMovie(TMDBContainer, Base):
             TMDBContainer.update_from_object(self, update_object)
             self.translated = len(update_object.translations) > 0
             if len(update_object.languages) > 0:
-                self.language = update_object.languages[0].code #.code or .name ?
+                self.language = update_object.languages[0].code # .code or .name ?
             self.original_name = update_object.originaltitle
             self.name = update_object.title
             try:
@@ -349,7 +350,7 @@ class ApiTmdb(object):
                 for size in item.sizes():
                     url = item.geturl(size)
                     if url not in poster_urls:
-                        poster_data = {"movie_id":movie.id, "size":size, "url": url, "file": item.filename}
+                        poster_data = {"movie_id": movie.id, "size": size, "url": url, "file": item.filename}
                         movie.posters.append(TMDBPoster(poster_data))
         genres = result.genres
         if genres:

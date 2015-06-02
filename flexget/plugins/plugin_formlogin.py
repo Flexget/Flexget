@@ -49,9 +49,9 @@ class FormLogin(object):
             # TODO: improve error handling
             raise plugin.PluginError('Unable to post login form', log)
 
-        #br.set_debug_redirects(True)
-        #br.set_debug_responses(True)
-        #br.set_debug_http(True)
+        # br.set_debug_redirects(True)
+        # br.set_debug_responses(True)
+        # br.set_debug_http(True)
 
         try:
             for form in br.forms():
@@ -99,6 +99,7 @@ class FormLogin(object):
 
     # Task aborted, unhook the cookiejar
     on_task_abort = on_task_exit
+
 
 @event('plugin.register')
 def register_plugin():

@@ -134,7 +134,7 @@ class RutrackerModify(object):
         username = config['username']
         db_session = Session()
         cookies = self.try_find_cookie(db_session, username)
-        if not username in self.auth_cache:
+        if username not in self.auth_cache:
             auth_handler = RutrackerAuth(
                 username, config['password'], cookies, db_session)
             self.auth_cache[username] = auth_handler

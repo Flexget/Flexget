@@ -22,6 +22,7 @@ CATEGORIES = {
     'tv': 8,
 }
 
+
 class UrlRewriteExtraTorrent(object):
     """
     ExtraTorrent search plugin.
@@ -97,6 +98,7 @@ class UrlRewriteExtraTorrent(object):
                 entries.add(entry)
 
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

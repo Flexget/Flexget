@@ -143,38 +143,39 @@ class TVRageEpisodes(Base):
         self.title = ep.title
 
     def __str__(self):
-        return '<TVRageEpisodes(title=%s,id=%s,season=%s,episode=%s)>' % (self.title, self.id, self.season, self.episode)
+        return '<TVRageEpisodes(title=%s,id=%s,season=%s,episode=%s)>' % (
+            self.title, self.id, self.season, self.episode)
 
     def next(self):
         """Returns the next episode after this episode"""
         res = (self.series.ep_query.
                filter(TVRageEpisodes.season == self.season).
-               filter(TVRageEpisodes.episode == self.episode+1)).first()
+               filter(TVRageEpisodes.episode == self.episode + 1)).first()
         if res is not None:
             return res
         return (self.series.ep_query.
-                filter(TVRageEpisodes.season == self.season+1).
+                filter(TVRageEpisodes.season == self.season + 1).
                 filter(TVRageEpisodes.episode == 1)).first()
 
 
 def closest_airdate(series_id, session):
     """Returns the next upcoming show's airdate or last airdate."""
     sq = session.query(TVRageEpisodes).\
-         filter(TVRageEpisodes.tvrage_series_id == series_id).\
-         filter(TVRageEpisodes.airdate > datetime.datetime.now()).subquery()
+        filter(TVRageEpisodes.tvrage_series_id == series_id).\
+        filter(TVRageEpisodes.airdate > datetime.datetime.now()).subquery()
 
     upcoming_episode = session.query(sq).\
-                       filter(sq.c.airdate == func.min(sq.c.airdate).select()).first()
+        filter(sq.c.airdate == func.min(sq.c.airdate).select()).first()
 
     if upcoming_episode is not None:
         return upcoming_episode.airdate
 
     sq = session.query(TVRageEpisodes).\
-         filter(TVRageEpisodes.tvrage_series_id == series_id).\
-         filter(TVRageEpisodes.airdate < datetime.datetime.now()).subquery()
+        filter(TVRageEpisodes.tvrage_series_id == series_id).\
+        filter(TVRageEpisodes.airdate < datetime.datetime.now()).subquery()
 
     past_episode = session.query(sq).\
-                   filter(sq.c.airdate == func.max(sq.c.airdate).select()).first()
+        filter(sq.c.airdate == func.max(sq.c.airdate).select()).first()
 
     if past_episode is not None:
         return past_episode.airdate

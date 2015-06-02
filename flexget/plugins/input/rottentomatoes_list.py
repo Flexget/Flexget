@@ -68,6 +68,7 @@ class RottenTomatoesList(object):
                             (l_type, l_name))
         return entries
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(RottenTomatoesList, 'rottentomatoes_list', api_ver=2)

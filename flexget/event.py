@@ -51,7 +51,7 @@ def get_events(name):
     :param String name: event name
     :return: List of :class:`Event` for *name* ordered by priority
     """
-    if not name in _events:
+    if name not in _events:
         raise KeyError('No such event %s' % name)
     _events[name].sort(reverse=True)
     return _events[name]
@@ -97,7 +97,7 @@ def fire_event(name, *args, **kwargs):
     :param args: List of arguments passed to handler function
     :param kwargs: Key Value arguments passed to handler function
     """
-    if not name in _events:
+    if name not in _events:
         return
     for event in get_events(name):
         result = event(*args, **kwargs)

@@ -111,8 +111,8 @@ class FilterImdb(object):
                     log.verbose(msg)
                 continue
 
-            #for key, value in entry.iteritems():
-            #    log.debug('%s = %s (type: %s)' % (key, value, type(value)))
+            # for key, value in entry.iteritems():
+            #     log.debug('%s = %s (type: %s)' % (key, value, type(value)))
 
             # Check defined conditions, TODO: rewrite into functions?
             reasons = []
@@ -214,6 +214,7 @@ class FilterImdb(object):
             else:
                 log.debug('Accepting %s' % (entry['title']))
                 entry.accept()
+
 
 @event('plugin.register')
 def register_plugin():

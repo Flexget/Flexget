@@ -87,7 +87,7 @@ class Text(object):
         # now parse text
         for line in lines:
             for field, regexp in entry_config.iteritems():
-                #log.debug('search field: %s regexp: %s' % (field, regexp))
+                # log.debug('search field: %s regexp: %s' % (field, regexp))
                 match = re.search(regexp, line)
                 if match:
                     # check if used field detected, in such case start with new entry

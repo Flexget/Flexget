@@ -195,9 +195,9 @@ def register_task_phase(name, before=None, after=None):
         raise RegisterException('Phase %s already exists.' % name)
 
     def add_phase(phase_name, before, after):
-        if not before is None and not before in task_phases:
+        if before is not None and before not in task_phases:
             return False
-        if not after is None and not after in task_phases:
+        if after is not None and after not in task_phases:
             return False
         # add method name to phase -> method lookup table
         phase_methods[phase_name] = 'on_task_' + phase_name
@@ -456,11 +456,11 @@ def get_plugins(phase=None, group=None, context=None, category=None, name=None, 
     def matches(plugin):
         if phase is not None and phase not in phase_methods:
             raise ValueError('Unknown phase %s' % phase)
-        if phase and not phase in plugin.phase_handlers:
+        if phase and phase not in plugin.phase_handlers:
             return False
-        if group and not group in plugin.groups:
+        if group and group not in plugin.groups:
             return False
-        if context and not context in plugin.contexts:
+        if context and context not in plugin.contexts:
             return False
         if category and not category == plugin.category:
             return False
@@ -492,7 +492,7 @@ def get_plugins_by_phase(phase):
     Return an iterator over all plugins that hook :phase:
     """
     warnings.warn('Deprecated API', DeprecationWarning, stacklevel=2)
-    if not phase in phase_methods:
+    if phase not in phase_methods:
         raise Exception('Unknown phase %s' % phase)
     return get_plugins(phase=phase)
 
@@ -520,6 +520,6 @@ def get_plugin_keywords():
 
 def get_plugin_by_name(name, issued_by='???'):
     """Get plugin by name, preferred way since this structure may be changed at some point."""
-    if not name in plugins:
+    if name not in plugins:
         raise DependencyError(issued_by=issued_by, missing=name, message='Unknown plugin %s' % name)
     return plugins[name]

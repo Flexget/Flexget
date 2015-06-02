@@ -153,7 +153,7 @@ def parse_size(size_input):
         return int(1024 ** prefixes.index(unit) * value)
 
 
-## Public API end here, the rest should not be used outside this module
+# Public API end here, the rest should not be used outside this module
 
 
 class RefResolver(jsonschema.RefResolver):
@@ -177,7 +177,6 @@ def is_quality_req(instance):
     if not isinstance(instance, str_types):
         return True
     return qualities.Requirements(instance)
-
 
 
 @format_checker.checks('time', raises=ValueError)
@@ -241,7 +240,7 @@ def is_path(instance):
     raise ValueError('`%s` does not exist' % instance)
 
 
-#TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
+# TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
 @format_checker.checks('url')
 def is_url(instance):
     if not isinstance(instance, str_types):

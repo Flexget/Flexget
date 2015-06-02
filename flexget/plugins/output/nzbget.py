@@ -46,7 +46,11 @@ class OutputNzbget(object):
                 params['category'] = entry['category']
 
             try:
-                server.appendurl(entry["title"] + '.nzb', params["category"], params["priority"], params["top"], entry["url"])
+                server.appendurl(entry["title"] + '.nzb',
+                                 params["category"],
+                                 params["priority"],
+                                 params["top"],
+                                 entry["url"])
                 log.info("Added `%s` to nzbget" % entry["title"])
             except:
                 log.critical("rpc call to nzbget failed")

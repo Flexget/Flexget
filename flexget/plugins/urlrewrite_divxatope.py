@@ -18,14 +18,13 @@ class UrlRewriteDivxATope(object):
     def url_rewritable(self, task, entry):
         url = entry['url']
         return (
-            url.startswith('http://www.divxatope.com/descargar')
-            or url.startswith('http://divxatope.com/descargar')
+            url.startswith('http://www.divxatope.com/descargar') or url.startswith('http://divxatope.com/descargar')
         )
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        #Rewrite divxatope.com/descargar/ to divxatope.com/descarga-torrent/
-        entry['url'] = re.sub("/descargar","/descarga-torrent",entry['url'])
+        # Rewrite divxatope.com/descargar/ to divxatope.com/descarga-torrent/
+        entry['url'] = re.sub("/descargar", "/descarga-torrent", entry['url'])
         entry['url'] = self.parse_download_page(entry['url'])
 
     @plugin.internet(log)

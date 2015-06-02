@@ -26,5 +26,3 @@ class ManualTask(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(ManualTask, 'manual', api_ver=2)
-
-

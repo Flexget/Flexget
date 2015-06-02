@@ -62,7 +62,8 @@ class PluginPeriscope(object):
                 languages: List of languages in order of preference (at least one is required).
                 alternatives: List of second-choice languages; subs will be downloaded but entries rejected.
                 overwrite: If yes it will try to download even for videos that are already subbed. Default: no.
-                subexts: List of subtitles file extensions to check (only useful with overwrite=no). Default: srt, stp, sub, stl, ssa.
+                subexts: List of subtitles file extensions to check (only useful with overwrite=no). 
+                    Default: srt, stp, sub, stl, ssa.
         """
         if not task.accepted:
             log.debug('nothing accepted, aborting')
@@ -73,9 +74,9 @@ class PluginPeriscope(object):
         langs = [s.encode('utf8') for s in config['languages']]  # avoid unicode warnings
         alts = [s.encode('utf8') for s in config.get('alternatives', [])]
         if not config['overwrite']:
-            self.exts = ['.'+s for s in config['subexts']]
+            self.exts = ['.' + s for s in config['subexts']]
         for entry in task.accepted:
-            if not 'location' in entry:
+            if 'location' not in entry:
                 log.warning('Cannot act on entries that do not represent a local file.')
             elif not os.path.exists(entry['location']):
                 entry.fail('file not found: %s' % entry['location'])

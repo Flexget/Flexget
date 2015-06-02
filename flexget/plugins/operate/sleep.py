@@ -19,7 +19,8 @@ class PluginSleep(object):
                     'seconds': {'type': 'integer'},
                     'phase': {
                         'type': 'string',
-                        'enum': ['start', 'input', 'metainfo', 'filter', 'download', 'modify', 'output', 'learn', 'abort', 'exit'],
+                        'enum': ['start', 'input', 'metainfo', 'filter', 'download',
+                                 'modify', 'output', 'learn', 'abort', 'exit'],
                         'default': 'start'
                     }
                 },
@@ -76,6 +77,7 @@ class PluginSleep(object):
     @plugin.priority(255)
     def on_task_exit(self, task, config):
         self.do_sleep(config, 'exit')
+
 
 @event('plugin.register')
 def register_plugin():

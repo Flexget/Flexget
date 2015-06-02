@@ -130,7 +130,7 @@ class PluginExec(object):
 
     def execute(self, task, phase_name, config):
         config = self.prepare_config(config)
-        if not phase_name in config:
+        if phase_name not in config:
             log.debug('phase %s not configured' % phase_name)
             return
 
@@ -139,7 +139,7 @@ class PluginExec(object):
 
         allow_background = config.get('allow_background')
         for operation, entries in name_map.iteritems():
-            if not operation in config[phase_name]:
+            if operation not in config[phase_name]:
                 continue
 
             log.debug('running phase_name: %s operation: %s entries: %s' % (phase_name, operation, len(entries)))
@@ -154,7 +154,8 @@ class PluginExec(object):
                         log.error('Could not set exec command for %s: %s' % (entry['title'], e))
                         # fail the entry if configured to do so
                         if config.get('fail_entries'):
-                            entry.fail('Entry `%s` does not have required fields for string replacement.' % entry['title'])
+                            entry.fail('Entry `%s` does not have required fields for string replacement.' %
+                                       entry['title'])
                         continue
 
                     log.debug('phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd))
@@ -171,7 +172,8 @@ class PluginExec(object):
                                 entry.fail('cmd `%s` could not be encoded to %s.' % (cmd, config['encoding']))
                             continue
                         # Run the command, fail entries with non-zero return code if configured to
-                        if self.execute_cmd(cmd, allow_background, config['encoding']) != 0 and config.get('fail_entries'):
+                        if (self.execute_cmd(cmd, allow_background, config['encoding']) != 0 and
+                                config.get('fail_entries')):
                             entry.fail('exec return code was non-zero')
 
         # phase keyword in this
