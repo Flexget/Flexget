@@ -1,12 +1,11 @@
-from flask import request, jsonify, Blueprint, Response, flash
-from Queue import Empty
+from flask import request, jsonify, Blueprint, Response, Flask
 
 import flexget
 from flexget.config_schema import resolve_ref, process_config, get_schema
 from flexget.manager import manager
-from flexget.plugin import plugin_schemas
-from flexget.utils.tools import BufferQueue
 from flexget.options import get_parser
+from flexget.plugin import plugin_schemas
+from flexget.utils import json
 
 API_VERSION = 1
 
@@ -141,7 +140,7 @@ def api_task(task):
     if request.method == 'GET':
         if not task in manager.tasks:
             return jsonify(error='task {task} not found'.format(task=task)), 404
-        return jsonify({'name': task, 'config': manager.config[task]})
+        return jsonify({'name': task, 'config': manager.config['tasks'][task]})
     elif request.method == 'PUT':
         # TODO: Validate then set
         # TODO: Return 204 if name has been changed
@@ -231,3 +230,42 @@ def cs_task_container(section):
 @api_schema.route('/config/tasks/<name>', defaults={'section': 'tasks'})
 def cs_plugin_container(section, name):
     return plugin_schemas(context='task')
+
+
+class ApiClient(object):
+    """
+    This is an client which can be used as a more pythonic interface to the rest api.
+
+    It skips http, and is only usable from within the running flexget process.
+    """
+    def __init__(self):
+        app = Flask(__name__)
+        app.register_blueprint(api)
+        self.app = app.test_client()
+
+    def __getattr__(self, item):
+        return ApiEndopint('/api/' + item, self.get_endpoint)
+
+    def get_endpoint(self, url, data, method=None):
+        if method is None:
+            method = 'POST' if data is not None else 'GET'
+        response = self.app.open(url, data=data, follow_redirects=True, method=method)
+        result = json.loads(response.data)
+        # TODO: Proper exceptions
+        if 200 > response.status_code >= 300:
+            raise Exception(result['error'])
+        return result
+
+
+class ApiEndopint(object):
+    def __init__(self, endpoint, caller):
+        self.endpoint = endpoint
+        self.caller = caller
+
+    def __getattr__(self, item):
+        return self.__class__(self.endpoint + '/' + item, self.caller)
+
+    __getitem__ = __getattr__
+
+    def __call__(self, data=None, method=None):
+        return self.caller(self.endpoint, data=data, method=method)
