@@ -37,7 +37,7 @@ class OutputPushalot(object):
         'type': 'object',
         'properties': {
             'token': one_or_more({'type': 'string'}),
-            'title': {'type': 'string', 'default': "{{task}}"},
+            'title': {'type': 'string', 'default': "Task {{task}}"},
             'body': {'type': 'string', 'default': default_body},
             'link': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
             'linktitle': {'type': 'string', 'default': ''},
@@ -45,7 +45,7 @@ class OutputPushalot(object):
             'silent': {'type': 'boolean', 'default': False},
             'image': {'type': 'string', 'default': ''},
             'source': {'type': 'string', 'default': 'FlexGet'},
-            'timetolive': {'type': 'integer'},
+            'timetolive': {'type': 'integer', 'default': 0},
         },
         'required': ['token'],
         'additionalProperties': False
