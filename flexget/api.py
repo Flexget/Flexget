@@ -30,10 +30,23 @@ def version():
 
 
 # Execution API
+
+def _task_info_dict(task_info):
+    return {
+        'id': task_info.id,
+        'name': task_info.name,
+        'status': task_info.status,
+        'created': task_info.created,
+        'started': task_info.started,
+        'finished': task_info.finished,
+        'message': task_info.message,
+        'log': {'href': '/execution/%s/log/' % task_info.id},
+    }
+
 @api.route('/execution/', methods=['GET', 'POST'])
 def execution():
     if request.method == 'GET':
-        return jsonify({"tasks": [task_state for task_state in manager.task_queue.tasks_data.itervalues()]})
+        return jsonify({"tasks": [_task_info_dict(task_info) for task_info in manager.task_queue.tasks_info.itervalues()]})
 
     if request.method == "POST":
         kwargs = request.json or {}
@@ -47,28 +60,28 @@ def execution():
 
         tasks = manager.execute(**kwargs)
 
-        return jsonify({"tasks": [manager.task_queue.tasks_data.get(task_id) for task_id, event in tasks]})
+        return jsonify({"tasks": [_task_info_dict(manager.task_queue.tasks_info[task_id]) for task_id, event in tasks]})
 
 
 @api.route('/execution/<task_id>/')
 def execution_by_id(task_id):
-    task_info = manager.task_queue.tasks_data.get(task_id)
+    task_info = manager.task_queue.tasks_info.get(task_id)
 
     if not task_info:
         return jsonify({'detail': '%s not found' % task_id}), 400
 
-    return jsonify({'task': task_info})
+    return jsonify({'task': _task_info_dict(task_info)})
 
 
 @api.route('/execution/<task_id>/log/')
 def execution_log(task_id):
-    task_info = manager.task_queue.tasks_data.get(task_id)
+    task_info = manager.task_queue.tasks_info.get(task_id)
 
     if not task_info:
         return jsonify({'detail': '%s not found' % task_id}), 400
 
     def read_log():
-        while task_info['status'] == "running":
+        while task_info.running:
             # TODO: get log file data..
             pass
 
