@@ -101,6 +101,12 @@ class OutputPushalot(object):
                 log.warning("Problem rendering 'linktitle': %s" % e)
                 linktitle = ""
 
+            try:
+                image = entry.render(image)
+            except RenderError as e:
+                log.warning("Problem rendering 'image': %s" % e)
+                image = ""
+
             for token in tokens:
                 # Build the request
                 data = {"AuthorizationToken": token, "title": title, "body": body,
@@ -115,6 +121,11 @@ class OutputPushalot(object):
                     log.info("    link: %s" % link)
                     log.info("    link Title: %s" % linktitle)
                     log.info("    token: %s" % token)
+                    log.info("    important: %s" % important)
+                    log.info("    silent: %s" % silent)
+                    log.info("    image: %s" % image)
+                    log.info("    source: %s" % source)
+                    log.info("    timetolive: %s" % timetolive)
                     # Test mode.  Skip remainder.
                     continue
 
