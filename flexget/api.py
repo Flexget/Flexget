@@ -1,5 +1,10 @@
 from flask import request, jsonify, Blueprint, Response, Flask
 
+import logging
+import os
+from time import sleep
+from datetime import datetime
+
 import flexget
 from flexget.config_schema import resolve_ref, process_config, get_schema
 from flexget.manager import manager
@@ -13,6 +18,12 @@ api = Blueprint('api', __name__, url_prefix='/api')
 
 # Serves the appropriate schema for any /api method. Schema for /api/x/y can be found at /schema/api/x/y
 api_schema = Blueprint('api_schema', __name__, url_prefix='/schema/api')
+
+
+log_file = os.path.expanduser('%s.json' % manager.options.logfile)
+# If an absolute path is not specified, use the config directory.
+if not os.path.isabs(log_file):
+    log_file = os.path.join(manager.config_base, log_file)
 
 
 @api.after_request
@@ -42,24 +53,27 @@ def _task_info_dict(task_info):
         'log': {'href': '/execution/%s/log/' % task_info.id},
     }
 
-@api.route('/execution/', methods=['GET', 'POST'])
-def execution():
-    if request.method == 'GET':
-        return jsonify({"tasks": [_task_info_dict(task_info) for task_info in manager.task_queue.tasks_info.itervalues()]})
 
-    if request.method == "POST":
-        kwargs = request.json or {}
+@api.route('/execution/')
+def execution_list():
+    tasks = [_task_info_dict(task_info) for task_info in manager.task_queue.tasks_info.itervalues()]
+    return jsonify({"tasks": tasks})
 
-        options_string = kwargs.pop('options_string', '')
-        if options_string:
-            try:
-                kwargs['options'] = get_parser('execute').parse_args(options_string, raise_errors=True)
-            except ValueError as e:
-                return jsonify(error='invalid options_string specified: %s' % e.message), 400
 
-        tasks = manager.execute(**kwargs)
+@api.route('/execution/', methods=['POST'])
+def execute_task():
+    kwargs = request.json or {}
 
-        return jsonify({"tasks": [_task_info_dict(manager.task_queue.tasks_info[task_id]) for task_id, event in tasks]})
+    options_string = kwargs.pop('options_string', '')
+    if options_string:
+        try:
+            kwargs['options'] = get_parser('execute').parse_args(options_string, raise_errors=True)
+        except ValueError as e:
+            return jsonify(error='invalid options_string specified: %s' % e.message), 400
+
+    tasks = manager.execute(**kwargs)
+
+    return jsonify({"tasks": [_task_info_dict(manager.task_queue.tasks_info[task_id]) for task_id, event in tasks]})
 
 
 @api.route('/execution/<task_id>/')
@@ -72,19 +86,48 @@ def execution_by_id(task_id):
     return jsonify({'task': _task_info_dict(task_info)})
 
 
+@api.route('/execution/log/')
+def execution_log():
+    def tail():
+        f = open(log_file, 'r')
+        while True:
+            line = f.readline()
+            if not line:
+                sleep(0.1)
+                continue
+            yield line
+
+    return Response(tail(), mimetype='text/event-stream')
+
+
 @api.route('/execution/<task_id>/log/')
-def execution_log(task_id):
+def execution_task_log(task_id):
     task_info = manager.task_queue.tasks_info.get(task_id)
 
     if not task_info:
         return jsonify({'detail': '%s not found' % task_id}), 400
 
-    def read_log():
-        while task_info.running:
-            # TODO: get log file data..
-            pass
+    def follow():
+        f = open(log_file, 'r')
+        while True:
+            if not task_info.started:
+                continue
 
-    return Response(read_log(), mimetype='text/event-stream')
+            # First check if it has finished, if there is no new lines then we can return
+            finished = task_info.finished is not None
+            line = f.readline()
+            if not line:
+                if finished:
+                    return
+                sleep(0.1)
+                continue
+
+            record = json.loads(line)
+            if record['task_id'] != task_id:
+                continue
+            yield line
+
+    return Response(follow(), mimetype='text/event-stream')
 
 
 # Task API

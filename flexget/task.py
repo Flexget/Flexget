@@ -61,7 +61,7 @@ def use_task_logging(func):
     def wrapper(self, *args, **kw):
         # Set the task name in the logger and capture output
         from flexget import logger
-        with logger.task_logging(self.name):
+        with logger.task_logging(self.name, self.id):
             if self.output:
                 with capture_output(self.output, loglevel=self.loglevel):
                     return func(self, *args, **kw)
@@ -195,7 +195,7 @@ class Task(object):
 
         """
         self.name = unicode(name)
-        self.id = ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(6))
+        self.id = ''.join(random.choice(string.digits) for _ in range(6))
         self.manager = manager
         if config is None:
             config = manager.config['tasks'].get(name, {})

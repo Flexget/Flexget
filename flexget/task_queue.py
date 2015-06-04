@@ -103,7 +103,7 @@ class TaskQueue(object):
         """Adds a task to be executed to the queue."""
         if len(self.tasks_info) >= 15:
             # Delete tasks older then 1 hr
-            clear = len(self.tasks_info) - self._max
+            clear = len(self.tasks_info) - 15
             now = datetime.now()
             for i, task_id in enumerate(self.tasks_info.keys()):
                 task_info = self.tasks_info[task_id]

@@ -7,6 +7,8 @@ import sys
 import threading
 import uuid
 import warnings
+import json
+from collections import OrderedDict
 
 from flexget import __version__
 from flexget.utils.tools import io_encoding
@@ -28,14 +30,17 @@ def get_level_no(level):
 
 
 @contextlib.contextmanager
-def task_logging(task):
+def task_logging(task, task_id):
     """Context manager which adds task information to log messages."""
     old_task = getattr(local_context, 'task', '')
+    old_task_id = getattr(local_context, 'task_id', '')
     local_context.task = task
+    local_context.task_id = task_id
     try:
         yield
     finally:
         local_context.task = old_task
+        local_context.task_id = old_task_id
 
 
 class SessionFilter(logging.Filter):
@@ -115,6 +120,7 @@ class FlexGetLogger(logging.Logger):
         extra = extra or {}
         extra.update(
             task=getattr(local_context, 'task', ''),
+            task_id=getattr(local_context, 'task_id', ''),
             session_id=getattr(local_context, 'session_id', ''))
         # Replace newlines in log messages with \n
         if isinstance(msg, basestring):
@@ -142,6 +148,31 @@ class FlexGetFormatter(logging.Formatter):
             record.task = ''
         return logging.Formatter.format(self, record)
 
+
+class FlexGetJsonFormatter(logging.Formatter):
+    fields = [
+        'asctime',
+        'levelname',
+        'name',
+        'task',
+        'task_id',
+        'message',
+    ]
+
+    def __init__(self):
+        logging.Formatter.__init__(self, datefmt='%Y-%m-%d %H:%M')
+
+    def format(self, record):
+        if not hasattr(record, 'task'):
+            record.task = ''
+        if not hasattr(record, 'task_id'):
+            record.task_id = ''
+
+        record_dict = OrderedDict()
+        for field in self.fields:
+            record_dict[field] = record.__dict__[field]
+
+        return json.dumps(record_dict)
 
 _logging_configured = False
 _buff_handler = None
@@ -204,6 +235,12 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
         file_handler.setFormatter(formatter)
         file_handler.setLevel(level)
         logger.addHandler(file_handler)
+
+        # Additional log in machine readable format for streaming via API
+        json_file_handler = logging.handlers.RotatingFileHandler('%s.json' % filename, maxBytes=1000 * 1024, backupCount=0)
+        json_file_handler.setFormatter(FlexGetJsonFormatter())
+        json_file_handler.setLevel(level)
+        logger.addHandler(json_file_handler)
 
     # without --cron we log to console
     if to_console:
