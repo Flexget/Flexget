@@ -8,7 +8,12 @@ import threading
 import uuid
 import warnings
 import json
-from collections import OrderedDict
+
+# Support order in python 2.7 and 3
+try:
+    from collections import OrderedDict
+except ImportError:
+    pass
 
 from flexget import __version__
 from flexget.utils.tools import io_encoding
@@ -168,11 +173,15 @@ class FlexGetJsonFormatter(logging.Formatter):
         if not hasattr(record, 'task_id'):
             record.task_id = ''
 
-        record_dict = OrderedDict()
-        for field in self.fields:
-            record_dict[field] = record.__dict__[field]
+        try:
+            log_record = OrderedDict()
+        except NameError:
+            log_record = {}
 
-        return json.dumps(record_dict)
+        for field in self.fields:
+            log_record[field] = record.__dict__[field]
+
+        return json.dumps(log_record)
 
 _logging_configured = False
 _buff_handler = None
