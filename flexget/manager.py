@@ -637,6 +637,7 @@ class Manager(object):
         from flexget.task import config_changed
         for task in self.tasks:
             config_changed(task)
+        fire_event('manager.config_updated', self)
 
     def validate_config(self, config=None):
         """
