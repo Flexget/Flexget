@@ -34,7 +34,7 @@ main_schema = {
 
 
 @event('manager.daemon.started')
-@event('manager.config_updated')
+# @event('manager.config_updated') # Disabled for now
 def setup_webui(manager):
     """Sets up and starts/restarts the webui."""
     if not manager.is_daemon:
