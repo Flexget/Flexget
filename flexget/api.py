@@ -3,7 +3,6 @@ from flask import request, jsonify, Blueprint, Response, Flask
 import logging
 import os
 from time import sleep
-from datetime import datetime
 
 import flexget
 from flexget.config_schema import resolve_ref, process_config, get_schema

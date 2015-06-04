@@ -2,9 +2,13 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
 
+from flask import jsonify, request
+
 from sqlalchemy import Column, String, Integer, DateTime, Unicode, desc
 
 from flexget import options, plugin
+from flexget.manager import db_session
+from flexget.api import api
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Base, Session
@@ -30,6 +34,16 @@ class History(Base):
     def __str__(self):
         return '<History(filename=%s,task=%s)>' % (self.filename, self.task)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'task': self.task,
+            'filename': self.filename,
+            'url': self.url,
+            'title': self.title,
+            'time': self.time,
+            'details': self.details,
+        }
 
 class PluginHistory(object):
     """Records all accepted entries for later lookup"""
@@ -89,3 +103,17 @@ def register_parser_arguments():
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginHistory, 'history', builtin=True, api_ver=2)
+
+
+@api.route('/history/')
+def get_history():
+    max_results = 50
+    if request.args.get('max'):
+        try:
+            max_results = int(request.args['max'])
+        except ValueError:
+            pass  # invalid value leave it at 50
+
+    items = db_session.query(History).order_by(desc(History.time)).limit(max_results).all()
+
+    return jsonify({'items': [item.to_dict() for item in items]})

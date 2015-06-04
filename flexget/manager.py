@@ -23,8 +23,12 @@ from sqlalchemy.orm import sessionmaker
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 from flexget.utils.sqlalchemy_utils import ContextSession
+from sqlalchemy.orm import scoped_session
+
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)
+db_session = scoped_session(Session)
+
 
 from flexget import config_schema, db_schema, logger, plugin
 from flexget.event import fire_event

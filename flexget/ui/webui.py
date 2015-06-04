@@ -21,10 +21,7 @@ from flexget.event import fire_event
 from flexget.plugin import DependencyError
 from flexget.api import api, api_schema
 from flexget.ui import plugins as ui_plugins_pkg
-from flexget.manager import manager, Session
-from sqlalchemy.orm import scoped_session
-
-from flexget.manager import Manager
+from flexget.manager import manager, db_session
 
 log = logging.getLogger('webui')
 
@@ -36,9 +33,6 @@ _menu = []
 
 manager = None
 config = {}
-
-db_session = None
-
 
 def _update_menu(root):
     """Iterates trough menu navigation and sets the item selected based on the :root:"""
@@ -182,9 +176,6 @@ def start(mg):
     global manager, config
     manager = mg
     config = manager.config.get('webui')
-
-    global db_session
-    db_session = scoped_session(Session)
 
     load_ui_plugins()
 
