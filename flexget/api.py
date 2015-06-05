@@ -2,6 +2,7 @@ from flask import request, Blueprint, Response, Flask
 import flask_restful
 
 import os
+import logging
 from time import sleep
 
 import flexget
@@ -12,10 +13,11 @@ from flexget.utils.database import with_session
 
 API_VERSION = 1
 
+log = logging.getLogger('api')
+
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 api = flask_restful.Api(api_bp, catch_all_404s=True)
 
-json_log = os.path.join(manager.config_base, 'log-%s.json' % manager.config_name)
 
 class APIResource(flask_restful.Resource):
     method_decorators = [with_session]
@@ -28,6 +30,52 @@ class VersionAPI(APIResource):
         return {'flexget_version': flexget.__version__, 'api_version': API_VERSION}
 
 api.add_resource(VersionAPI, '/version/ ')
+
+
+class ManagementAPI(APIResource):
+
+    get_actions = [
+        'status',
+    ]
+
+    post_actions = [
+        'shutdown',
+        'reload',
+    ]
+
+    def post(self, action, session=None):
+        if action not in self.post_actions:
+            return {'detail': 'invalid action'}, 404
+
+        return getattr(self, action)()
+
+    def get(self, action, session=None):
+        if action not in self.get_actions:
+            return {'detail': 'invalid action'}, 404
+
+        return getattr(self, action)()
+
+    def status(self):
+        return{'pid': os.getpid()}
+
+    def shutdown(self):
+        data = request.json if request.json else {}
+        force = data.get('force', False)
+        manager.shutdown(force)
+        return {'detail': 'shutdown requested'}
+
+    def reload(self):
+        log.info('Reloading config from disk.')
+        try:
+            manager.load_config()
+        except ValueError as e:
+            return {'detail': 'Error loading config %s' % e.args[0]}, 500
+
+        log.info('Config successfully reloaded from disk.')
+        return {'detail': 'Config successfully reloaded from disk.'}
+
+
+api.add_resource(ManagementAPI, '/server/<string:action>/')
 
 
 # Execution API
@@ -80,7 +128,7 @@ class ExecutionLogAPI(APIResource):
 
     def get(self, session=None):
         def tail():
-            f = open(json_log, 'r')
+            f = open(os.path.join(manager.config_base, 'log-%s.json' % manager.config_name), 'r')
             while True:
                 line = f.readline()
                 if not line:
@@ -100,7 +148,7 @@ class ExecutionTaskLogAPI(APIResource):
             return {'detail': '%s not found' % task_id}, 400
 
         def follow():
-            f = open(json_log, 'r')
+            f = open(os.path.join(manager.config_base, 'log-%s.json' % manager.config_name), 'r')
             while True:
                 if not task_info.started:
                     continue
@@ -154,7 +202,11 @@ class TaskAPI(APIResource):
         return {}
 
     def delete(self, task, session=None):
-        manager.config['tasks'].pop(task)
+        try:
+            manager.config['tasks'].pop(task)
+        except KeyError:
+            return {'detail': 'invalid task'}, 404
+
         return {'detail': 'deleted'}
 
 
@@ -164,7 +216,7 @@ api.add_resource(TaskAPI, '/tasks/<task>/')
 
 class ConfigAPI(APIResource):
 
-    def get(self):
+    def get(self, session=None):
         return manager.config
 
 
