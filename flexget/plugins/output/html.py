@@ -28,21 +28,26 @@ class OutputHtml:
         if not config.get('template'):
             config['template'] = 'default.template'
 
-        filename = os.path.expanduser(config['template'])
-        output = os.path.expanduser(config['file'])
-        # Output to config directory if absolute path has not been specified
-        if not os.path.isabs(output):
-            output = os.path.join(task.manager.config_base, output)
+        if not task.accepted:
+            return			
 
-        # create the template
-        try:
-            template = render_from_task(get_template(filename, PLUGIN_NAME), task)
-            log.verbose('Writing output html to %s' % output)
-            with open(output, 'w') as f:
-                f.write(template.encode('utf-8'))
-        except RenderError as e:
-            log.error('Error while rendering task %s, Error: %s' % (task, e))
-            raise plugin.PluginError('There was an error rendering the specified template')
+        for entry in task.accepted:
+            output = os.path.expanduser(entry.render(config['file']))
+            filename = os.path.expanduser(entry.render(config['template']))
+            
+            # Output to config directory if absolute path has not been specified
+            if not os.path.isabs(output):
+                output = os.path.join(task.manager.config_base, output)
+
+            # create the template
+            try:
+                template = render_from_task(get_template(filename, PLUGIN_NAME), task)
+                log.verbose('Writing output html to %s' % output)
+                with open(output, 'w') as f:
+                    f.write(template.encode('utf-8'))
+            except RenderError as e:
+                log.error('Error while rendering task %s, Error: %s' % (task, e))
+                raise plugin.PluginError('There was an error rendering the specified template')
 
 @event('plugin.register')
 def register_plugin():
