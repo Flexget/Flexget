@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 from tests import FlexGetBase, use_vcr
 
+
 class TestChartsSnepInput(FlexGetBase):
     __yaml__ = """
         tasks:
