@@ -69,7 +69,7 @@ setup(
         'memusage': ['guppy'],
         'NZB': ['pynzb'],
         'TaskTray': ['pywin32'],
-        'webui': ['cherrypy']  # TODO: move this if API is baked in
+        'webui': ['cherrypy']
     },
     entry_points=entry_points,
     classifiers=[
