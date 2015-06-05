@@ -2,13 +2,12 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
 
-from flask import jsonify, request
+from flask import request, jsonify
 
 from sqlalchemy import Column, String, Integer, DateTime, Unicode, desc
 
 from flexget import options, plugin
-from flexget.manager import db_session
-from flexget.api import api
+from flexget.api import api, APIResource
 from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Base, Session
@@ -105,15 +104,18 @@ def register_plugin():
     plugin.register(PluginHistory, 'history', builtin=True, api_ver=2)
 
 
-@api.route('/history/')
-def get_history():
-    max_results = 50
-    if request.args.get('max'):
-        try:
-            max_results = int(request.args['max'])
-        except ValueError:
-            pass  # invalid value leave it at 50
+class HistoryAPI(APIResource):
+    def get(self, session=None):
+        max_results = 50
+        if request.args.get('max'):
+            try:
+                max_results = int(request.args['max'])
+            except ValueError:
+                pass  # invalid value leave it at 50
 
-    items = db_session.query(History).order_by(desc(History.time)).limit(max_results).all()
+        items = session.query(History).order_by(desc(History.time)).limit(max_results).all()
 
-    return jsonify({'items': [item.to_dict() for item in items]})
+        return jsonify({'items': [item.to_dict() for item in items]})
+
+
+api.add_resource(HistoryAPI, '/history/')

@@ -8,8 +8,9 @@ import threading
 import uuid
 import warnings
 import json
+import os
 
-# Support order in python 2.7 and 3
+#Support order in python 2.7 and 3
 try:
     from collections import OrderedDict
 except ImportError:
@@ -224,7 +225,7 @@ def initialize(unit_test=False):
     logger.addHandler(crash_handler)
 
 
-def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
+def start(filename=None, filename_json=None, level=logging.INFO, to_console=True, to_file=True):
     """After initialization, start file logging.
     """
     global _logging_started
@@ -246,7 +247,7 @@ def start(filename=None, level=logging.INFO, to_console=True, to_file=True):
         logger.addHandler(file_handler)
 
         # Additional log in machine readable format for streaming via API
-        json_file_handler = logging.handlers.RotatingFileHandler('%s.json' % filename, maxBytes=1000 * 1024, backupCount=0)
+        json_file_handler = logging.handlers.RotatingFileHandler(filename_json, maxBytes=1000 * 1024, backupCount=0)
         json_file_handler.setFormatter(FlexGetJsonFormatter())
         json_file_handler.setLevel(level)
         logger.addHandler(json_file_handler)

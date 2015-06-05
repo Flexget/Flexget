@@ -14,25 +14,23 @@ import os
 import urllib
 import socket
 import sys
+from sqlalchemy.orm import scoped_session
 
 from flask import Flask, redirect, url_for, abort, request, send_from_directory
 
 from flexget.event import fire_event
 from flexget.plugin import DependencyError
-from flexget.api import api, api_schema
 from flexget.ui import plugins as ui_plugins_pkg
-from flexget.manager import manager, db_session
+from flexget.webserver import app
 
 log = logging.getLogger('webui')
-
-app = Flask(__name__)
-server = None
 
 _home = None
 _menu = []
 
 manager = None
 config = {}
+db_session = None
 
 def _update_menu(root):
     """Iterates trough menu navigation and sets the item selected based on the :root:"""
@@ -43,15 +41,6 @@ def _update_menu(root):
         else:
             if 'current' in item:
                 item.pop('current')
-
-
-@app.route('/')
-def start_page():
-    """Redirect user to registered home plugin"""
-    if not _home:
-        abort(404)
-    return redirect(url_for(_home))
-
 
 @app.route('/userstatic/<path:filename>')
 def userstatic(filename):
@@ -163,71 +152,3 @@ def register_home(route, order=128):
     if _home is not None:
         raise Exception('Home is already registered')
     _home = route
-
-
-@app.teardown_appcontext
-def shutdown_session(exception=None):
-    """Closes the database again at the end of the request."""
-    db_session.remove()
-
-
-def start(mg):
-    """Start WEB UI"""
-    global manager, config
-    manager = mg
-    config = manager.config.get('webui')
-
-    load_ui_plugins()
-
-    # quick hack: since ui plugins may add tables to SQLAlchemy too and they're not initialized because create
-    # was called when instantiating manager .. so we need to call it again
-    from flexget.manager import Base
-    Base.metadata.create_all(bind=manager.engine)
-
-    app.register_blueprint(api)
-    app.register_blueprint(api_schema)
-    fire_event('webui.start')
-
-    # Start Flask
-    app.secret_key = os.urandom(24)
-
-    log.info('Starting server on port %s' % config.get('port'))
-
-    if config['autoreload']:
-        # Create and destroy a socket so that any exceptions are raised before
-        # we spawn a separate Python interpreter and lose this ability.
-        from werkzeug.serving import run_with_reloader
-        reloader_interval = 1
-        extra_files = None
-        test_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        test_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        test_socket.bind((config.get('bind'), config.get('port')))
-        test_socket.close()
-        log.warning('Not starting scheduler, since autoreload is enabled.')
-        run_with_reloader(start_server, extra_files, reloader_interval)
-    else:
-        start_server(config.get('bind'), config.get('port'))
-
-    log.debug('server exited')
-    fire_event('webui.stop')
-
-
-def start_server(bind, port=5050):
-    global server
-    from cherrypy import wsgiserver
-    #import cherrypy
-    #cherrypy.engine
-    d = wsgiserver.WSGIPathInfoDispatcher({'/': app})
-    server = wsgiserver.CherryPyWSGIServer((bind, port), d)
-
-    log.debug('server %s' % server)
-    try:
-        server.start()
-    except KeyboardInterrupt:
-        stop_server()
-
-
-def stop_server(*args):
-    log.debug('Shutting down server')
-    if server:
-        server.stop()

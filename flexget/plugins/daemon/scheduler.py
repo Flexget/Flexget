@@ -14,7 +14,7 @@ from flexget.event import event
 from flexget.manager import Base, manager
 from flexget.utils import json
 from flask import request, jsonify
-from flexget.api import api
+from flexget.api import api, APIResource
 
 log = logging.getLogger('scheduler')
 
@@ -83,6 +83,7 @@ main_schema = {
 
 
 scheduler = None
+scheduler_job_map = {}
 
 
 def job_id(conf):
@@ -133,6 +134,10 @@ def setup_jobs(manager):
     """Set up the jobs for apscheduler to run."""
     if not manager.is_daemon:
         return
+
+    global scheduler_job_map
+    scheduler_job_map = {}
+
     if 'schedules' not in manager.config:
         log.info('No schedules defined in config. Defaulting to run all tasks on a 1 hour interval.')
     config = manager.config.get('schedules', [{'tasks': ['*'], 'interval': {'hours': 1}}])
@@ -144,8 +149,9 @@ def setup_jobs(manager):
     existing_job_ids = [job.id for job in scheduler.get_jobs()]
     configured_job_ids = []
     for job_config in config:
-        jid = unicode(id(job_config))
+        jid = job_id(job_config)
         configured_job_ids.append(jid)
+        scheduler_job_map[id(job_config)] = jid
         if jid in existing_job_ids:
             continue
         if 'interval' in job_config:
@@ -191,9 +197,9 @@ def _schedule_by_id(schedule_id):
             return schedule
 
 
-@api.route('/schedules/', methods=['GET', 'POST'])
-def schedules():
-    if request.method == 'GET':
+class SchedulesAPI(APIResource):
+
+    def get(self, session=None):
         schedule_list = []
         if 'schedules' not in manager.config or not manager.config['schedules']:
             return jsonify({'schedules': []})
@@ -205,9 +211,9 @@ def schedules():
             schedule['id'] = schedule_id
             schedule_list.append(schedule)
 
-        return jsonify({'schedules': schedule_list})
+        return {'schedules': schedule_list}
 
-    if request.method == 'POST':
+    def post(self, session=None):
         # TODO: Validate schema
         data = request.json
 
@@ -219,62 +225,79 @@ def schedules():
         new_schedule = _schedule_by_id(id(data['schedule']))
 
         if not new_schedule:
-            return jsonify({'error': 'schedule went missing after add'}), 500
+            return {'error': 'schedule went missing after add'}, 500
 
         manager.save_config()
         manager.config_changed()
+        return {'schedule': new_schedule}
+
+
+class ScheduleAPI(APIResource):
+
+    def get(self, schedule_id, session=None):
+        schedule = _schedule_by_id(schedule_id)
+        if not schedule:
+            return {'error': 'invalid schedule id'}, 404
+
+        job_id = scheduler_job_map.get(schedule_id)
+        if job_id:
+            job = scheduler.get_job(job_id)
+            if job:
+                schedule['next_run_time'] = job.next_run_time
+
+        return jsonify({'schedule': schedule})
+
+    def _get_schedule(self, schedule_id):
+        for i in range(len(manager.config.get('schedules', []))):
+            if id(manager.config['schedules'][i]) == schedule_id:
+                return manager.config['schedules'][i]
+
+    def _update_schedule(self, existing, update, merge=False):
+        if 'id' in update:
+            del update['id']
+
+        if not merge:
+            existing.clear()
+
+        existing.update(update)
+        manager.save_config()
+        manager.config_changed()
+        return existing
+
+    def post(self, schedule_id, session=None):
+        data = request.json
+
+        # TODO: Validate schema
+        schedule = self._get_schedule(schedule_id)
+
+        if not schedule:
+            return {'detail': 'invalid schedule id'}, 404
+
+        new_schedule = self._update_schedule(schedule, data['schedule'])
         return jsonify({'schedule': new_schedule})
 
+    def patch(self, schedule_id, session=None):
+        data = request.json
 
-@api.route('/schedules/<int:schedule_id>/', methods=['GET'])
-def get_schedule(schedule_id):
-    schedule = _schedule_by_id(schedule_id)
-    if not schedule:
-        return jsonify({'error': 'invalid schedule id'}), 400
+        # TODO: Validate schema
+        schedule = self._get_schedule(schedule_id)
 
-    job = scheduler.get_job(unicode(schedule_id))
-    if job:
-        schedule['next_run_time'] = job.next_run_time
+        if not schedule:
+            return {'detail': 'invalid schedule id'}, 404
 
-    return jsonify({'schedule': schedule})
+        new_schedule = self._update_schedule(schedule, data['schedule'], merge=True)
+        return jsonify({'schedule': new_schedule})
 
+    def delete(self, schedule_id, session=None):
+        for i in range(len(manager.config.get('schedules', []))):
+            if id(manager.config['schedules'][i]) == schedule_id:
+                del manager.config['schedules'][i]
+                manager.save_config()
+                manager.config_changed()
+                return {'detail': 'deleted schedule'}, 400
 
-@api.route('/schedules/<int:schedule_id>/', methods=['POST', 'PATCH'])
-def update_schedule(schedule_id):
-    data = request.json
-
-    # TODO: Validate schema
-
-    for i in range(len(manager.config.get('schedules', []))):
-        if id(manager.config['schedules'][i]) == schedule_id:
-            new_schedule = data['schedule']
-
-            if 'id' in new_schedule:
-                del new_schedule['id']
-
-            if request.method == 'POST':
-                manager.config['schedules'][i].clear()
-
-            manager.config['schedules'][i].update(new_schedule)
-
-            new_schedule = _schedule_by_id(schedule_id)
-            if not new_schedule:
-                return jsonify({'error': 'schedule went missing after update'}), 500
-
-            manager.save_config()
-            manager.config_changed()
-            return jsonify({'schedule': new_schedule})
-
-    return jsonify({'error': 'Invalid id'}), 400
+        return {'error': 'invalid schedule id'}, 400
 
 
-@api.route('/schedules/<int:schedule_id>/', methods=['DELETE'])
-def delete_schedule(schedule_id):
-    for i in range(len(manager.config.get('schedules', []))):
-        if id(manager.config['schedules'][i]) == schedule_id:
-            del manager.config['schedules'][i]
-            manager.save_config()
-            manager.config_changed()
-            return jsonify({'detail': 'deleted schedule'}), 400
-
-    return jsonify({'error': 'invalid schedule id'}), 400
+api.add_resource(SchedulesAPI, '/schedules/')
+api.add_resource(ScheduleAPI, '/schedules/<int:schedule_id>/')

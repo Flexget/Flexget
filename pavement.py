@@ -68,7 +68,7 @@ setup(
         'memusage': ['guppy'],
         'NZB': ['pynzb'],
         'TaskTray': ['pywin32'],
-        'webui': ['flask>=0.7', 'cherrypy']
+        'webui': ['flask>=0.7', 'cherrypy', 'flask-restful=>0.3.3']  # TODO: move this if API is baked in
     },
     entry_points=entry_points,
     classifiers=[

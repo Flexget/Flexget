@@ -1,45 +1,36 @@
-from flask import request, jsonify, Blueprint, Response, Flask
+from flask import request, Blueprint, Response, Flask
+import flask_restful
 
-import logging
 import os
 from time import sleep
 
 import flexget
-from flexget.config_schema import resolve_ref, process_config, get_schema
 from flexget.manager import manager
 from flexget.options import get_parser
-from flexget.plugin import plugin_schemas
 from flexget.utils import json
+from flexget.utils.database import with_session
 
 API_VERSION = 1
 
-api = Blueprint('api', __name__, url_prefix='/api')
+api_bp = Blueprint('api', __name__, url_prefix='/api')
+api = flask_restful.Api(api_bp, catch_all_404s=True)
 
-# Serves the appropriate schema for any /api method. Schema for /api/x/y can be found at /schema/api/x/y
-api_schema = Blueprint('api_schema', __name__, url_prefix='/schema/api')
+json_log = os.path.join(manager.config_base, 'log-%s.json' % manager.config_name)
 
-
-log_file = os.path.expanduser('%s.json' % manager.options.logfile)
-# If an absolute path is not specified, use the config directory.
-if not os.path.isabs(log_file):
-    log_file = os.path.join(manager.config_base, log_file)
+class APIResource(flask_restful.Resource):
+    method_decorators = [with_session]
 
 
-@api.after_request
-def attach_schema(response):
-    # TODO: Check if /schema/ourpath exists
-    schema_path = '/schema' + request.path
-    response.headers[b'Content-Type'] += '; profile=%s' % schema_path
-    return response
+# Version API
+class VersionAPI(APIResource):
 
+    def get(self, session=None):
+        return {'flexget_version': flexget.__version__, 'api_version': API_VERSION}
 
-@api.route('/version/')
-def version():
-    return jsonify(flexget_version=flexget.__version__, api_version=API_VERSION)
+api.add_resource(VersionAPI, '/version/ ')
 
 
 # Execution API
-
 def _task_info_dict(task_info):
     return {
         'id': task_info.id,
@@ -53,225 +44,131 @@ def _task_info_dict(task_info):
     }
 
 
-@api.route('/execution/')
-def execution_list():
-    tasks = [_task_info_dict(task_info) for task_info in manager.task_queue.tasks_info.itervalues()]
-    return jsonify({"tasks": tasks})
+class ExecutionAPI(APIResource):
+
+    def get(self, session=None):
+        tasks = [_task_info_dict(task_info) for task_info in manager.task_queue.tasks_info.itervalues()]
+        return {"tasks": tasks}
+
+    def post(self, session=None):
+        kwargs = request.json or {}
+
+        options_string = kwargs.pop('options_string', '')
+        if options_string:
+            try:
+                kwargs['options'] = get_parser('execute').parse_args(options_string, raise_errors=True)
+            except ValueError as e:
+                return {'error': 'invalid options_string specified: %s' % e.message}, 400
+
+        tasks = manager.execute(**kwargs)
+
+        return {"tasks": [_task_info_dict(manager.task_queue.tasks_info[task_id]) for task_id, event in tasks]}
 
 
-@api.route('/execution/', methods=['POST'])
-def execute_task():
-    kwargs = request.json or {}
+class ExecutionTaskAPI(APIResource):
 
-    options_string = kwargs.pop('options_string', '')
-    if options_string:
-        try:
-            kwargs['options'] = get_parser('execute').parse_args(options_string, raise_errors=True)
-        except ValueError as e:
-            return jsonify(error='invalid options_string specified: %s' % e.message), 400
+    def execution_by_id(self, task_id, session=None):
+        task_info = manager.task_queue.tasks_info.get(task_id)
 
-    tasks = manager.execute(**kwargs)
+        if not task_info:
+            return {'detail': '%s not found' % task_id}, 400
 
-    return jsonify({"tasks": [_task_info_dict(manager.task_queue.tasks_info[task_id]) for task_id, event in tasks]})
+        return {'task': _task_info_dict(task_info)}
 
 
-@api.route('/execution/<task_id>/')
-def execution_by_id(task_id):
-    task_info = manager.task_queue.tasks_info.get(task_id)
+class ExecutionLogAPI(APIResource):
 
-    if not task_info:
-        return jsonify({'detail': '%s not found' % task_id}), 400
+    def get(self, session=None):
+        def tail():
+            f = open(json_log, 'r')
+            while True:
+                line = f.readline()
+                if not line:
+                    sleep(0.1)
+                    continue
+                yield line
 
-    return jsonify({'task': _task_info_dict(task_info)})
-
-
-@api.route('/execution/log/')
-def execution_log():
-    def tail():
-        f = open(log_file, 'r')
-        while True:
-            line = f.readline()
-            if not line:
-                sleep(0.1)
-                continue
-            yield line
-
-    return Response(tail(), mimetype='text/event-stream')
+        return Response(tail(), mimetype='text/event-stream')
 
 
-@api.route('/execution/<task_id>/log/')
-def execution_task_log(task_id):
-    task_info = manager.task_queue.tasks_info.get(task_id)
+class ExecutionTaskLogAPI(APIResource):
 
-    if not task_info:
-        return jsonify({'detail': '%s not found' % task_id}), 400
+    def get(self, task_id, session=None):
+        task_info = manager.task_queue.tasks_info.get(task_id)
 
-    def follow():
-        f = open(log_file, 'r')
-        while True:
-            if not task_info.started:
-                continue
+        if not task_info:
+            return {'detail': '%s not found' % task_id}, 400
 
-            # First check if it has finished, if there is no new lines then we can return
-            finished = task_info.finished is not None
-            line = f.readline()
-            if not line:
-                if finished:
-                    return
-                sleep(0.1)
-                continue
+        def follow():
+            f = open(json_log, 'r')
+            while True:
+                if not task_info.started:
+                    continue
 
-            record = json.loads(line)
-            if record['task_id'] != task_id:
-                continue
-            yield line
+                # First check if it has finished, if there is no new lines then we can return
+                finished = task_info.finished is not None
+                line = f.readline()
+                if not line:
+                    if finished:
+                        return
+                    sleep(0.1)
+                    continue
 
-    return Response(follow(), mimetype='text/event-stream')
+                record = json.loads(line)
+                if record['task_id'] != task_id:
+                    continue
+                yield line
 
+        return Response(follow(), mimetype='text/event-stream')
 
-# Task API
-# TODO: Maybe these should be in /config/tasks
-@api_schema.route('/tasks/')
-def schema_tasks():
-    return jsonify({
-        'type': 'object',
-        'properties': {
-            'tasks': {
-                'type': 'array',
-                'items': {'$ref': '/schema/api/tasks/task'},
-                'links': [
-                    {'rel': 'add', 'method': 'POST', 'href': '/api/tasks/', 'schema': {'$ref': '/schema/api/tasks/task'}}
-                ]
-            }
-        }
-    })
+api.add_resource(ExecutionAPI, '/execution/')
+api.add_resource(ExecutionLogAPI, '/execution/log/')
+api.add_resource(ExecutionTaskAPI, '/execution/<task_id>/')
+api.add_resource(ExecutionTaskLogAPI, '/execution/<task_id>/log/')
 
 
-@api.route('/tasks/', methods=['GET', 'POST'])
-def api_tasks():
-    if request.method == 'GET':
+class TasksAPI(APIResource):
+
+    def get(self, session=None):
         tasks = []
         for name in manager.tasks:
             tasks.append({'name': name, 'config': manager.config['tasks'][name]})
-        return jsonify(tasks=tasks)
-    elif request.method == 'POST':
-        # TODO: Validate and add task
-        pass
+        return {'tasks': tasks}
+
+    def post(self):
+        # TODO
+        return {}
 
 
-@api_schema.route('/tasks/<task>/')
-def schema_task(task):
-    return jsonify({
-        'type': 'object',
-        'properties': {
-            'name': {'type': 'string', 'description': 'The name of this task.'},
-            'config': plugin_schemas(context='task')
-        },
-        'required': ['name'],
-        'additionalProperties': False,
-        'links': [
-            {'rel': 'self', 'href': '/api/tasks/{name}/'},
-            {'rel': 'edit', 'method': 'PUT', 'href': '', 'schema': {'$ref': '#'}},
-            {'rel': 'delete', 'method': 'DELETE', 'href': ''}
-        ]
-    })
+class TaskAPI(APIResource):
 
-
-@api.route('/tasks/<task>/', methods=['GET', 'PUT', 'DELETE'])
-def api_task(task):
-    if request.method == 'GET':
+    def get(self, task, session=None):
         if not task in manager.tasks:
-            return jsonify(error='task {task} not found'.format(task=task)), 404
-        return jsonify({'name': task, 'config': manager.config['tasks'][task]})
-    elif request.method == 'PUT':
+            return {'error': 'task %s not found' % task}, 404
+
+        return {'name': task, 'config': manager.config['tasks'][task]}
+
+    def put(self, task, session=None):
         # TODO: Validate then set
         # TODO: Return 204 if name has been changed
-        pass
-    elif request.method == 'DELETE':
+        return {}
+
+    def delete(self, task, session=None):
         manager.config['tasks'].pop(task)
+        return {'detail': 'deleted'}
 
 
-@api_schema.route('/config/')
-def cs_root():
-    root_schema = get_schema()
-    hyper_schema = root_schema.copy()
-    hyper_schema['links'] = [{'rel': 'self', 'href': '/api/config/'}]
-    hyper_schema['properties'] = root_schema.get('properties', {}).copy()
-    hs_props = hyper_schema['properties']
-    for key, key_schema in root_schema.get('properties', {}).iteritems():
-        hs_props[key] = hs_props[key].copy()
-        hs_props[key]['links'] = [{'rel': 'self', 'href': key}]
-        if key not in root_schema.get('required', []):
-            hs_props[key]['links'].append({'rel': 'delete', 'href': '', 'method': 'DELETE'})
-    return jsonify(hyper_schema)
+api.add_resource(TasksAPI, '/tasks/')
+api.add_resource(TaskAPI, '/tasks/<task>/')
 
 
-# TODO: none of these should allow setting invalid config
-@api.route('/config/', methods=['GET', 'PUT'])
-def config_root():
-    return jsonify(manager.config)
+class ConfigAPI(APIResource):
+
+    def get(self):
+        return manager.config
 
 
-@api_schema.route('/config/<section>')
-def schema_config_section(section):
-    return jsonify(resolve_ref('/schema/config/%s' % section))
-
-
-@api.route('/config/<section>/', methods=['GET', 'PUT', 'DELETE'])
-def config_section(section):
-    if request.method == 'PUT':
-        schema = resolve_ref('/schema/config/%s' % section)
-        errors = process_config(request.json, schema, set_defaults=False)
-        if errors:
-            return jsonify({'$errors': errors}), 400
-        manager.config[section] = request.json
-    if section not in manager.config:
-        return jsonify(error='Not found'), 404
-    if request.method == 'DELETE':
-        del manager.config[section]
-        return Response(status=204)
-    response = jsonify(manager.config[section])
-    response.headers[b'Content-Type'] += '; profile=/schema/config/%s' % section
-    return response
-
-
-# TODO: Abandon this and move above task handlers into /config?
-@api.route('/config/tasks/<taskname>/', methods=['GET', 'PUT', 'DELETE'])
-def config_tasks(taskname):
-    if request.method != 'PUT':
-        if taskname not in manager.config['tasks']:
-            return jsonify(error='Requested task does not exist'), 404
-    status_code = 200
-    if request.method == 'PUT':
-        if 'rename' in request.args:
-            pass  # TODO: Rename the task, return 204 with new location header
-        if taskname not in manager.config['tasks']:
-            status_code = 201
-        manager.config['tasks'][taskname] = request.json
-    elif request.method == 'DELETE':
-        del manager.config['tasks'][taskname]
-        return Response(status=204)
-    return jsonify(manager.config['tasks'][taskname]), status_code
-
-
-# TODO: Move this route to template plugin
-@api_schema.route('/config/templates/', defaults={'section': 'templates'})
-@api_schema.route('/config/tasks/', defaults={'section': 'tasks'})
-def cs_task_container(section):
-    hyper_schema = {'links': [{'rel': 'create',
-                               'href': '',
-                               'method': 'POST',
-                               'schema': {
-                                   'type': 'object',
-                                   'properties': {'name': {'type': 'string'}},
-                                   'required': ['name']}}]}
-
-
-# TODO: Move this route to template plugin
-@api_schema.route('/config/templates/<name>', defaults={'section': 'templates'})
-@api_schema.route('/config/tasks/<name>', defaults={'section': 'tasks'})
-def cs_plugin_container(section, name):
-    return plugin_schemas(context='task')
+api.add_resource(ConfigAPI, '/config/')
 
 
 class ApiClient(object):

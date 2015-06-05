@@ -23,14 +23,12 @@ from sqlalchemy.orm import sessionmaker
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 from flexget.utils.sqlalchemy_utils import ContextSession
-from sqlalchemy.orm import scoped_session
 
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)
-db_session = scoped_session(Session)
 
 
-from flexget import config_schema, db_schema, logger, plugin
+from flexget import config_schema, db_schema, logger, plugin, webserver
 from flexget.event import fire_event
 from flexget.ipc import IPCClient, IPCServer
 from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv
@@ -160,7 +158,9 @@ class Manager(object):
             # If an absolute path is not specified, use the config directory.
             if not os.path.isabs(log_file):
                 log_file = os.path.join(self.config_base, log_file)
-            logger.start(log_file, self.options.loglevel.upper(), to_console=not self.options.cron)
+            json_log = os.path.join(self.config_base, 'log-%s.json' % self.config_name)
+
+            logger.start(log_file, json_log, self.options.loglevel.upper(), to_console=not self.options.cron)
 
         manager = self
 
@@ -319,7 +319,6 @@ class Manager(object):
 
         * :meth:`.execute_command`
         * :meth:`.daemon_command`
-        * :meth:`.webui_command`
         * CLI plugin callback function
 
         The manager should have a lock and be initialized before calling this method.
@@ -331,13 +330,11 @@ class Manager(object):
         command = options.cli_command
         command_options = getattr(options, command)
         # First check for built-in commands
-        if command in ['execute', 'daemon', 'webui']:
+        if command in ['execute', 'daemon']:
             if command == 'execute':
                 self.execute_command(command_options)
             elif command == 'daemon':
                 self.daemon_command(command_options)
-            elif command == 'webui':
-                self.webui_command(command_options)
         else:
             # Otherwise dispatch the command to the callback function
             options.cli_command_callback(self, command_options)
@@ -421,32 +418,6 @@ class Manager(object):
                     log.error('Error loading config: %s' % e.args[0])
                 else:
                     log.info('Config successfully reloaded from disk.')
-
-    def webui_command(self, options):
-        """
-        Handles the 'webui' CLI command.
-
-        :param options: argparse options
-        """
-        if self.is_daemon:
-            log.error('Webui or daemon is already running.')
-            return
-        # TODO: make webui an enablable plugin in regular daemon mode
-        try:
-            pkg_resources.require('flexget[webui]')
-        except pkg_resources.DistributionNotFound as e:
-            log.error('Dependency not met. %s' % e)
-            log.error('Webui dependencies not installed. You can use `pip install flexget[webui]` to install them.')
-            self.shutdown()
-            return
-        if options.daemonize:
-            self.daemonize()
-        self.is_daemon = True
-        from flexget.ui import webui
-        self.task_queue.start()
-        self.ipc_server.start()
-        webui.start(self)
-        self.task_queue.wait()
 
     def _handle_sigterm(self, signum, frame):
         log.info('Got SIGTERM. Shutting down.')
@@ -542,7 +513,6 @@ class Manager(object):
         self.config_base = os.path.normpath(os.path.dirname(config))
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
-
 
     def load_config(self):
         """
