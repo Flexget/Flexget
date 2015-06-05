@@ -25,7 +25,8 @@ options = environment.options
 install_requires = ['FeedParser>=5.1.3', 'SQLAlchemy >=0.7.5, !=0.9.0, <0.9.99', 'PyYAML',
                     'beautifulsoup4>=4.1, !=4.2.0, <4.4', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar', 'rpyc',
                     'jinja2', 'requests>=1.0, !=2.4.0, <2.99', 'python-dateutil!=2.0, !=2.2', 'jsonschema>=2.0',
-                    'python-tvrage', 'tmdb3', 'path.py', 'guessit>=0.9.3', 'apscheduler']
+                    'python-tvrage', 'tmdb3', 'path.py', 'guessit>=0.9.3', 'apscheduler',
+                    'flask>=0.7', 'flask-restful>=0.3.3']
 if sys.version_info < (2, 7):
     # argparse is part of the standard library in python 2.7+
     install_requires.append('argparse')
@@ -68,7 +69,7 @@ setup(
         'memusage': ['guppy'],
         'NZB': ['pynzb'],
         'TaskTray': ['pywin32'],
-        'webui': ['flask>=0.7', 'cherrypy', 'flask-restful>=0.3.3']  # TODO: move this if API is baked in
+        'webui': ['cherrypy']  # TODO: move this if API is baked in
     },
     entry_points=entry_points,
     classifiers=[
