@@ -9,14 +9,17 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
+from flask import request, jsonify, Blueprint
+
 from flexget.config_schema import register_config_key, format_checker
 from flexget.event import event
 from flexget.manager import Base, manager
 from flexget.utils import json
-from flask import request, jsonify
 from flexget.api import api, APIResource
 
 log = logging.getLogger('scheduler')
+
+schedule_api = Blueprint('api', __name__, url_prefix='/api')
 
 
 # Add a format checker for more detailed errors on cron type schedules

@@ -1,70 +1,72 @@
-from flask import request, Blueprint, Response, Flask
-import flask_restful
-
-import os
 import logging
+import os
 from time import sleep
+from functools import wraps
 
 import flexget
+from flask import Flask, Blueprint, request, jsonify, Response
+from flask_restplus import Api as RestPlusAPI
+from flask_restplus import swagger
+from flask_restplus.resource import Resource
+from flask_restplus import fields
+
 from flexget.manager import manager
-from flexget.options import get_parser
 from flexget.utils import json
 from flexget.utils.database import with_session
+from flexget.options import get_parser
 
 API_VERSION = 1
 
 log = logging.getLogger('api')
 
+class Swagger(swagger.Swagger):
+    def serialize_schema(self, model):
+        if isinstance(model, dict):
+            return model
+        return swagger.Swagger.serialize_schema(self, model)
+
+
+class _Api(RestPlusAPI):
+
+    def swagger_view(self):
+        class SwaggerView(Resource):
+            api = self
+
+            def get(self):
+                return Swagger(self.api).as_dict()
+
+            def mediatypes(self):
+                return ['application/json']
+        return SwaggerView
+
+    def expect(self, schema):
+        # Add doc here
+
+        def decorator(func):
+            @api.doc(body=schema)
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                # TODO: Validate Schema here
+                return func(*args, **kwargs)
+            return wrapper
+        return decorator
+
+
 api_bp = Blueprint('api', __name__, url_prefix='/api')
-api = flask_restful.Api(api_bp, catch_all_404s=True)
+api = _Api(api_bp, catch_all_404s=True, title='Flexget API')
 
 
-class APIResource(flask_restful.Resource):
+class APIResource(Resource):
     method_decorators = [with_session]
 
 
-# Version API
-class VersionAPI(APIResource):
-
-    def get(self, session=None):
-        return {'flexget_version': flexget.__version__, 'api_version': API_VERSION}
-
-api.add_resource(VersionAPI, '/version/ ')
+# Server API
+server_api = api.namespace('server', description='Manage Flexget Server')
 
 
-class ManagementAPI(APIResource):
-
-    get_actions = [
-        'status',
-    ]
-
-    post_actions = [
-        'shutdown',
-        'reload',
-    ]
-
-    def post(self, action, session=None):
-        if action not in self.post_actions:
-            return {'detail': 'invalid action'}, 404
-
-        return getattr(self, action)()
-
-    def get(self, action, session=None):
-        if action not in self.get_actions:
-            return {'detail': 'invalid action'}, 404
-
-        return getattr(self, action)()
-
-    def status(self):
-        return{'pid': os.getpid()}
-
-    def shutdown(self):
-        data = request.json if request.json else {}
-        force = data.get('force', False)
-        manager.shutdown(force)
-        return {'detail': 'shutdown requested'}
-
-    def reload(self):
+@server_api.route('/reload/')
+class ServerReloadAPI(APIResource):
+    def post(self, session=None):
         log.info('Reloading config from disk.')
         try:
             manager.load_config()
@@ -75,10 +77,52 @@ class ManagementAPI(APIResource):
         return {'detail': 'Config successfully reloaded from disk.'}
 
 
-api.add_resource(ManagementAPI, '/server/<string:action>/')
+@server_api.route('/pid/')
+class ServerPIDAPI(APIResource):
+    def get(self, session=None):
+        return{'pid': os.getpid()}
+
+
+@server_api.route('/shutdown/')
+class ServerShutdownAPI(APIResource):
+    def get(self, session=None):
+        data = request.json if request.json else {}
+        force = data.get('force', False)
+        manager.shutdown(force)
+        return {'detail': 'shutdown requested'}
+
+
+@server_api.route('/config/')
+class ServerConfigAPI(APIResource):
+    def get(self, session=None):
+        return manager.config
+
+
+@server_api.route('/version/')
+class ServerVersionAPI(APIResource):
+    def get(self, session=None):
+        return {'flexget_version': flexget.__version__, 'api_version': API_VERSION}
+
+
+@server_api.route('/log/')
+class ServerLogAPI(APIResource):
+    def get(self, session=None):
+        def tail():
+            f = open(os.path.join(manager.config_base, 'log-%s.json' % manager.config_name), 'r')
+            while True:
+                line = f.readline()
+                if not line:
+                    sleep(0.1)
+                    continue
+                yield line
+
+        return Response(tail(), mimetype='text/event-stream')
 
 
 # Execution API
+execution_api = api.namespace('execution', description='Execute tasks')
+
+
 def _task_info_dict(task_info):
     return {
         'id': task_info.id,
@@ -92,12 +136,33 @@ def _task_info_dict(task_info):
     }
 
 
+execute_post_schema = {
+    "type": "object",
+    "properties": {
+        "options": {
+            "type": "object",
+            "properties": {
+                "tasks": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                }
+            },
+            "required": ["tasks"]
+        }
+    },
+    "required": ["options"]
+}
+
+@execution_api.route('/')
 class ExecutionAPI(APIResource):
 
     def get(self, session=None):
         tasks = [_task_info_dict(task_info) for task_info in manager.task_queue.tasks_info.itervalues()]
-        return {"tasks": tasks}
+        return jsonify({"tasks": tasks})
 
+    @api.expect(execute_post_schema)
     def post(self, session=None):
         kwargs = request.json or {}
 
@@ -113,6 +178,7 @@ class ExecutionAPI(APIResource):
         return {"tasks": [_task_info_dict(manager.task_queue.tasks_info[task_id]) for task_id, event in tasks]}
 
 
+@execution_api.route('/<task_id>/')
 class ExecutionTaskAPI(APIResource):
 
     def execution_by_id(self, task_id, session=None):
@@ -124,21 +190,7 @@ class ExecutionTaskAPI(APIResource):
         return {'task': _task_info_dict(task_info)}
 
 
-class ExecutionLogAPI(APIResource):
-
-    def get(self, session=None):
-        def tail():
-            f = open(os.path.join(manager.config_base, 'log-%s.json' % manager.config_name), 'r')
-            while True:
-                line = f.readline()
-                if not line:
-                    sleep(0.1)
-                    continue
-                yield line
-
-        return Response(tail(), mimetype='text/event-stream')
-
-
+@execution_api.route('/<task_id>/log/')
 class ExecutionTaskLogAPI(APIResource):
 
     def get(self, task_id, session=None):
@@ -169,12 +221,12 @@ class ExecutionTaskLogAPI(APIResource):
 
         return Response(follow(), mimetype='text/event-stream')
 
-api.add_resource(ExecutionAPI, '/execution/')
-api.add_resource(ExecutionLogAPI, '/execution/log/')
-api.add_resource(ExecutionTaskAPI, '/execution/<task_id>/')
-api.add_resource(ExecutionTaskLogAPI, '/execution/<task_id>/log/')
+
+# Tasks API
+tasks_api = api.namespace('tasks', description='Manage Tasks')
 
 
+@tasks_api.route('/')
 class TasksAPI(APIResource):
 
     def get(self, session=None):
@@ -188,6 +240,7 @@ class TasksAPI(APIResource):
         return {}
 
 
+@tasks_api.route('/tasks/<task>/')
 class TaskAPI(APIResource):
 
     def get(self, task, session=None):
@@ -208,19 +261,6 @@ class TaskAPI(APIResource):
             return {'detail': 'invalid task'}, 404
 
         return {'detail': 'deleted'}
-
-
-api.add_resource(TasksAPI, '/tasks/')
-api.add_resource(TaskAPI, '/tasks/<task>/')
-
-
-class ConfigAPI(APIResource):
-
-    def get(self, session=None):
-        return manager.config
-
-
-api.add_resource(ConfigAPI, '/config/')
 
 
 class ApiClient(object):
