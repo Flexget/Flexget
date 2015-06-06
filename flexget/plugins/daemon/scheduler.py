@@ -210,7 +210,7 @@ def _schedule_by_id(schedule_id):
 api_schedule_schema = {
     'type': 'object',
     'properties': {
-        'schedule': {'$ref': '/schema/config/schedulea'},
+        'schedule': {'$ref': '/schema/config/schedule'},
     },
     'additionalProperties': False
 }
