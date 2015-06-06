@@ -26,7 +26,7 @@ install_requires = ['FeedParser>=5.1.3', 'SQLAlchemy >=0.7.5, !=0.9.0, <0.9.99',
                     'beautifulsoup4>=4.1, !=4.2.0, <4.4', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar', 'rpyc',
                     'jinja2', 'requests>=1.0, !=2.4.0, <2.99', 'python-dateutil!=2.0, !=2.2', 'jsonschema>=2.0',
                     'python-tvrage', 'tmdb3', 'path.py', 'guessit>=0.9.3', 'apscheduler',
-                    'flask>=0.7', 'flask-restful>=0.3.3', 'ordereddict>=1.1']
+                    'flask>=0.7', 'flask-restful>=0.3.3', 'ordereddict>=1.1', 'flask-restplus>=0.7.2']
 if sys.version_info < (2, 7):
     # argparse is part of the standard library in python 2.7+
     install_requires.append('argparse')

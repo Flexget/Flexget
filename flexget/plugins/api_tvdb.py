@@ -527,7 +527,9 @@ def mark_expired(session=None):
         persist['last_server'] = new_server
 
 
+tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
 
+@tvdb_api.route('/search/')
 class TVDBSearchApi(APIResource):
 
     def get(self, session=None):
@@ -547,7 +549,3 @@ class TVDBSearchApi(APIResource):
             result = lookup_series(name=search, session=session)
 
         return jsonify(result)
-
-
-api.add_resource(TVDBSearchApi, '/tvdb/search/')
-

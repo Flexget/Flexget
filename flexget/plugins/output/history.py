@@ -104,8 +104,12 @@ def register_plugin():
     plugin.register(PluginHistory, 'history', builtin=True, api_ver=2)
 
 
+history_api = api.namespace('history', description='Entry History')
+
+@history_api.route('/')
 class HistoryAPI(APIResource):
     def get(self, session=None):
+        """ List entries """
         max_results = 50
         if request.args.get('max'):
             try:
@@ -116,6 +120,3 @@ class HistoryAPI(APIResource):
         items = session.query(History).order_by(desc(History.time)).limit(max_results).all()
 
         return jsonify({'items': [item.to_dict() for item in items]})
-
-
-api.add_resource(HistoryAPI, '/history/')

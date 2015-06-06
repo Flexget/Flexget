@@ -11,7 +11,7 @@ from apscheduler.triggers.cron import CronTrigger
 
 from flask import request, jsonify, Blueprint
 
-from flexget.config_schema import register_config_key, format_checker
+from flexget.config_schema import register_config_key, format_checker, register_schema
 from flexget.event import event
 from flexget.manager import Base, manager
 from flexget.utils import json
@@ -64,21 +64,24 @@ cron_schema = {
     'additionalProperties': False
 }
 
+schedule_schema = {
+    'properties': {
+        'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
+        'interval': interval_schema,
+        'schedule': cron_schema
+    },
+    'required': ['tasks'],
+    'oneOf': [{'required': ['schedule']}, {'required': ['interval']}],
+    'error_oneOf': 'Either `cron` or `interval` must be defined.',
+    'additionalProperties': False
+}
+
+
 main_schema = {
     'oneOf': [
         {
             'type': 'array',
-            'items': {
-                'properties': {
-                    'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
-                    'interval': interval_schema,
-                    'schedule': cron_schema
-                },
-                'required': ['tasks'],
-                'oneOf': [{'required': ['schedule']}, {'required': ['interval']}],
-                'error_oneOf': 'Either `cron` or `interval` must be defined.',
-                'additionalProperties': False
-            }
+            'items': schedule_schema
         },
         {'type': 'boolean', 'enum': [False]}
     ]
@@ -190,7 +193,10 @@ def stop_scheduler(manager):
 @event('config.register')
 def register_config():
     register_config_key('schedules', main_schema)
+    register_schema('/schema/config/schedule', schedule_schema)
 
+
+schedule_api = api.namespace('schedules', description='Task Scheduler')
 
 def _schedule_by_id(schedule_id):
     for schedule in manager.config.get('schedules', []):
@@ -200,9 +206,23 @@ def _schedule_by_id(schedule_id):
             return schedule
 
 
+
+api_schedule_schema = {
+    'type': 'object',
+    'properties': {
+        'schedule': {'$ref': '/schema/config/schedulea'},
+    },
+    'additionalProperties': False
+}
+
+
+@schedule_api.route('/')
 class SchedulesAPI(APIResource):
 
     def get(self, session=None):
+        """ Get list of schedules
+        Schedule has a unique ID that is only valid for the life of the daemon. It will change on restart.
+        """
         schedule_list = []
         if 'schedules' not in manager.config or not manager.config['schedules']:
             return jsonify({'schedules': []})
@@ -216,7 +236,9 @@ class SchedulesAPI(APIResource):
 
         return {'schedules': schedule_list}
 
+    @api.validate(api_schedule_schema)
     def post(self, session=None):
+        """ Add new schedule """
         # TODO: Validate schema
         data = request.json
 
@@ -235,9 +257,12 @@ class SchedulesAPI(APIResource):
         return {'schedule': new_schedule}
 
 
+@schedule_api.route('/<int:schedule_id>/')
+@api.doc(params={'schedule_id': 'ID of Schedule (changes each restart)'})
 class ScheduleAPI(APIResource):
 
     def get(self, schedule_id, session=None):
+        """ Get schedule details """
         schedule = _schedule_by_id(schedule_id)
         if not schedule:
             return {'error': 'invalid schedule id'}, 404
@@ -267,7 +292,9 @@ class ScheduleAPI(APIResource):
         manager.config_changed()
         return existing
 
+    @api.validate(api_schedule_schema)
     def post(self, schedule_id, session=None):
+        """ Add a new schedule """
         data = request.json
 
         # TODO: Validate schema
@@ -279,19 +306,8 @@ class ScheduleAPI(APIResource):
         new_schedule = self._update_schedule(schedule, data['schedule'])
         return jsonify({'schedule': new_schedule})
 
-    def patch(self, schedule_id, session=None):
-        data = request.json
-
-        # TODO: Validate schema
-        schedule = self._get_schedule(schedule_id)
-
-        if not schedule:
-            return {'detail': 'invalid schedule id'}, 404
-
-        new_schedule = self._update_schedule(schedule, data['schedule'], merge=True)
-        return jsonify({'schedule': new_schedule})
-
     def delete(self, schedule_id, session=None):
+        """ Delete a schedule """
         for i in range(len(manager.config.get('schedules', []))):
             if id(manager.config['schedules'][i]) == schedule_id:
                 del manager.config['schedules'][i]
@@ -300,7 +316,3 @@ class ScheduleAPI(APIResource):
                 return {'detail': 'deleted schedule'}, 400
 
         return {'error': 'invalid schedule id'}, 400
-
-
-api.add_resource(SchedulesAPI, '/schedules/')
-api.add_resource(ScheduleAPI, '/schedules/<int:schedule_id>/')
