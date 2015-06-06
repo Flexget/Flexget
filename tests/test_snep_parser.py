@@ -1,5 +1,6 @@
 # -*- coding: utf8 -*-
 from __future__ import unicode_literals, division, absolute_import
+from flexget.entry import Entry
 
 from flexget.utils.charts_snep import SnepChartsParser
 from flexget.utils.charts_snep import SnepParsedChartEntry
@@ -15,15 +16,15 @@ class TestSnepParser(object):
         assert (len(parser.charts_entries) == 200), "Expected 200 entries but parser produce %i entries." % len(parser.charts_entries)
         responses = TestSnepParser.build_test_responses()
         for a_response in responses:
-            TestSnepParser.check_one_entry(parser.charts_entries[a_response.rank-1], a_response)
+            TestSnepParser.check_charts_entry(parser.charts_entries[a_response.rank - 1], a_response)
+            TestSnepParser.check_mapped_entry(parser.charts_entries[a_response.rank - 1], a_response)
 
     @staticmethod
-    def check_one_entry(unchecked, reference):
+    def check_charts_entry(unchecked, reference):
         """Kind of SnepParsedChartEntry.equals
         :param unchecked: flexget.utils.charts_snep.SnepParsedChartEntry
         :param reference: flexget.utils.charts_snep.SnepParsedChartEntry
         """
-
         assert unchecked is not None, "Expected a charts entry but got None"
         assert unchecked.artist == reference.artist, "Expected %s but got %s" % (reference.artist, unchecked.artist)
         assert unchecked.company == reference.company, "Expected %s but got %s" % (reference.company, unchecked.company)
@@ -31,6 +32,21 @@ class TestSnepParser(object):
         assert unchecked.rank == reference.rank, "Expected %i but got %i" % (reference.rank, unchecked.rank)
         assert unchecked.best_rank <= reference.best_rank, "Expected better position than #%i but got #%i" % (reference.best_rank, unchecked.best_rank)
         assert unchecked.charted_weeks >= reference.charted_weeks, "Expected longer in charts than %i week(s) but got %i" % (reference.charted_weeks, unchecked.charted_weeks)
+
+    @staticmethod
+    def check_mapped_entry(unchecked, reference):
+        """
+        :param unchecked: flexget.utils.charts_snep.SnepParsedChartEntry
+        :param reference: flexget.utils.charts_snep.SnepParsedChartEntry
+        """
+        mapped_entry = Entry()
+        mapped_entry.update_using_map(SnepParsedChartEntry.get_entry_map(), unchecked)
+        assert mapped_entry.get('artist', None) == reference.artist, "Expected %s but got %s" % (reference.artist, mapped_entry.get('artist', None))
+        assert mapped_entry.get('company', None) == reference.company, "Expected %s but got %s" % (reference.company, mapped_entry.get('company', None))
+        assert mapped_entry.get('title', None) == reference.song_title, "Expected %s but got %s" % (reference.song_title, mapped_entry.get('title', None))
+        assert mapped_entry.get('charts_snep_rank', None) == reference.rank, "Expected %i but got %i" % (reference.rank, mapped_entry.get('charts_snep_rank', None))
+        assert mapped_entry.get('charts_snep_best_rank', None) <= reference.best_rank, "Expected better position than #%i but got #%i" % (reference.best_rank, mapped_entry.get('charts_snep_best_rank', None))
+        assert mapped_entry.get('charts_snep_weeks', None) >= reference.charted_weeks, "Expected longer in charts than %i week(s) but got %i" % (reference.charted_weeks, mapped_entry.get('charts_snep_weeks', None))
 
     @staticmethod
     def build_test_responses():
