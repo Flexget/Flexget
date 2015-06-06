@@ -24,38 +24,35 @@ API_VERSION = 1
 log = logging.getLogger('api')
 
 
-class Swagger(swagger.Swagger):
-    def serialize_schema(self, model):
-        # TODO: This is broken. Perhaps we can somehow create a ApiModel instance from dict on the fly??
-        if isinstance(model, dict) and not isinstance(model, ApiModel):
-            self.register_model(model)
-            return ref(model)
-        return swagger.Swagger.serialize_schema(self, model)
+class ApiSchemaModel(ApiModel):
+    def __init__(self, schema, *args, **kwargs):
+        self._schema = schema
+        super(ApiSchemaModel, self).__init__()
+
+    @property
+    def __schema__(self):
+        return self._schema
 
 
 class _Api(RestPlusAPI):
 
-    def swagger_view(self):
-        class SwaggerView(Resource):
-            api = self
+    def schema(self, name, schema, **kwargs):
+        """Register a schema"""
+        return self.model(name, **kwargs)(ApiSchemaModel(schema))
 
-            def get(self):
-                return Swagger(self.api).as_dict()
-
-            def mediatypes(self):
-                return ['application/json']
-        return SwaggerView
-
-    def validate(self, schema):
+    def validate(self, model):
 
         # TODO: Raise error is schema format incorrect
+        # I think better to do this in a test. Loop through registered schema models, validate against metaschema
 
         def decorator(func):
+
+            @api.expect(model)
             @wraps(func)
             def wrapper(*args, **kwargs):
                 payload = request.json
                 try:
-                    errors = process_config(config=payload, schema=schema)
+                    errors = process_config(config=payload, schema=model.__schema__)
                     if errors:
                         return {'detail': [error.message for error in errors]}, 400
                 except RefResolutionError as e:

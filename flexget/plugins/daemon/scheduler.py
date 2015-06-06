@@ -207,13 +207,14 @@ def _schedule_by_id(schedule_id):
 
 
 
-api_schedule_schema = {
+api_schedule_schema = api.schema('schedule', {
     'type': 'object',
     'properties': {
         'schedule': {'$ref': '/schema/config/schedule'},
     },
+    'required': ['schedule'],
     'additionalProperties': False
-}
+})
 
 
 @schedule_api.route('/')
