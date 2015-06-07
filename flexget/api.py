@@ -24,6 +24,58 @@ API_VERSION = 1
 log = logging.getLogger('api')
 
 
+class ApiError(Exception):
+    code = 500
+
+    schema_properties = {
+        'code': {'type': 'integer'},
+        'error': {'type': 'string'}
+    }
+
+    def __init__(self, message, status_code=None, payload=None):
+        self.message = message
+        if status_code:
+            self.status_code=status_code
+        self.payload = payload
+
+    def to_dict(self):
+        rv = self.payload or {}
+        rv.update(code=self.status_code, error=self.message)
+        return rv
+
+
+class ValidationError(ApiError):
+    code = 400
+
+    schema_properties = ApiError.schema_properties.copy()
+    schema_properties.update({
+        'validation_errors': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'message': {'type': 'string', 'description': 'A human readable message explaining the error.'},
+                    'validator': {'type': 'string', 'description': 'The name of the failed validator.'},
+                    'validator_value': {'type': 'string', 'description': 'The value for the failed validator in the schema.'},
+                    'path': {'type': 'string'},
+                    'schema_path': {'type': 'string'},
+                }
+            }
+        }
+    })
+
+    verror_attrs = ('message', 'cause', 'context', 'validator', 'validator_value',
+                   'path', 'schema_path', 'instance', 'schema', 'parent')
+
+    def __init__(self, validation_errors):
+        payload = {'validation_errors': [self._verror_to_dict(error) for error in validation_errors]}
+        super(ValidationError, self).__init__('validation error', payload=payload)
+
+    def _verror_to_dict(self, error):
+        # TODO: massage some types to json serializable stuff
+        return dict((attr, getattr(error, attr)) for attr in self.verror_attrs)
+
+
 class ApiSchemaModel(ApiModel):
     def __init__(self, schema, *args, **kwargs):
         self._schema = schema
