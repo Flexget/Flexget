@@ -43,6 +43,10 @@ class ApiError(Exception):
         rv.update(code=self.status_code, error=self.message)
         return rv
 
+    @classmethod
+    def schema(cls):
+        return {'type': 'object', 'properties': cls.schema_properties}
+
 
 class ValidationError(ApiError):
     code = 400
@@ -112,6 +116,12 @@ class _Api(RestPlusAPI):
                 return func(*args, **kwargs)
             return wrapper
         return decorator
+
+    def response(self, *args, **kwargs):
+        if args and isinstance(args[0], ApiError):
+            # TODO: Register error schema and add expected model
+            return self.doc(responses=dict((e.code, e.message) for e in args))
+        return super(_Api, self).response(*args, **kwargs)
 
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
