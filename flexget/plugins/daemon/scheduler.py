@@ -15,7 +15,7 @@ from flexget.config_schema import register_config_key, format_checker, register_
 from flexget.event import event
 from flexget.manager import Base, manager
 from flexget.utils import json
-from flexget.api import api, APIResource
+from flexget.api import api, APIResource, ApiSchemaModel
 
 log = logging.getLogger('scheduler')
 
@@ -198,23 +198,14 @@ def register_config():
 
 schedule_api = api.namespace('schedules', description='Task Scheduler')
 
+api_schedule_schema = api.schema('schedule', schedule_schema)
+
 def _schedule_by_id(schedule_id):
     for schedule in manager.config.get('schedules', []):
         if id(schedule) == schedule_id:
             schedule = schedule.copy()
             schedule['id'] = schedule_id
             return schedule
-
-
-
-api_schedule_schema = api.schema('schedule', {
-    'type': 'object',
-    'properties': {
-        'schedule': {'$ref': '/schema/config/schedule'},
-    },
-    'required': ['schedule'],
-    'additionalProperties': False
-})
 
 
 @schedule_api.route('/')
@@ -238,6 +229,8 @@ class SchedulesAPI(APIResource):
         return {'schedules': schedule_list}
 
     @api.validate(api_schedule_schema)
+    @api.expect(api_schedule_schema)
+    @api.response(200, 'task config', api_schedule_schema)
     def post(self, session=None):
         """ Add new schedule """
         # TODO: Validate schema
@@ -261,6 +254,7 @@ class SchedulesAPI(APIResource):
 @schedule_api.route('/<int:schedule_id>/')
 @api.doc(params={'schedule_id': 'ID of Schedule (changes each restart)'})
 class ScheduleAPI(APIResource):
+    """ test 123  """
 
     def get(self, schedule_id, session=None):
         """ Get schedule details """
@@ -274,7 +268,7 @@ class ScheduleAPI(APIResource):
             if job:
                 schedule['next_run_time'] = job.next_run_time
 
-        return jsonify({'schedule': schedule})
+        return jsonify(schedule)
 
     def _get_schedule(self, schedule_id):
         for i in range(len(manager.config.get('schedules', []))):
@@ -294,8 +288,10 @@ class ScheduleAPI(APIResource):
         return existing
 
     @api.validate(api_schedule_schema)
+    @api.expect(api_schedule_schema)
+    @api.response(200, 'task config', api_schedule_schema)
     def post(self, schedule_id, session=None):
-        """ Add a new schedule """
+        """ Update schedule """
         data = request.json
 
         # TODO: Validate schema
