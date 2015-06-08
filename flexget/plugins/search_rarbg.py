@@ -6,7 +6,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.utils.requests import Session
+from flexget.utils.requests import Session, get
 from flexget.utils.search import normalize_unicode
 
 log = logging.getLogger('rarbg')
@@ -60,11 +60,12 @@ class SearchRarBG(object):
                     {'type': 'string', 'enum': list(CATEGORIES)},
                 ]}),
             'sorted_by': {'type': 'string', 'enum': ['seeders', 'leechers', 'last'], 'default': 'last'},
-            # min_seeders and min_leechers do not seem to work
-            # 'min_seeders': {'type': 'integer', 'default': 0},
-            # 'min_leechers': {'type': 'integer', 'default': 0},
+            # min_seeders and min_leechers seem to be working again
+            'min_seeders': {'type': 'integer', 'default': 0},
+            'min_leechers': {'type': 'integer', 'default': 0},
             'limit': {'type': 'integer', 'enum': [25, 50, 100], 'default': 25},
-            'ranked': {'type': 'boolean', 'default': True}
+            'ranked': {'type': 'boolean', 'default': True},
+            'use_tvdb': {'type': 'boolean', 'default': False},
         },
         "additionalProperties": False
     }
@@ -72,8 +73,8 @@ class SearchRarBG(object):
     base_url = 'https://torrentapi.org/pubapi.php'
 
     def get_token(self):
-        # using rarbg.com to avoid the domain delay as tokens can be requested always
-        r = requests.get('https://rarbg.com/pubapi/pubapi.php', params={'get_token': 'get_token', 'format': 'json'})
+        # Don't use a session as tokens are not affected by domain limit
+        r = get('https://torrentapi.org/pubapi.php', params={'get_token': 'get_token', 'format': 'json'})
         token = None
         try:
             token = r.json().get('token')
@@ -94,7 +95,7 @@ class SearchRarBG(object):
             categories = [categories]
         # Convert named category to its respective category id number
         categories = [c if isinstance(c, int) else CATEGORIES[c] for c in categories]
-        category_url_fragment = urllib.quote(';'.join(str(c) for c in categories))
+        category_url_fragment = ';'.join(str(c) for c in categories)
 
         entries = set()
 
@@ -104,7 +105,7 @@ class SearchRarBG(object):
             return entries
 
         params = {'mode': 'search', 'token': token, 'ranked': int(config['ranked']),
-                  # 'min_seeders': config['min_seeders'], 'min_leechers': config['min_leechers'],
+                  'min_seeders': config['min_seeders'], 'min_leechers': config['min_leechers'],
                   'sort': config['sorted_by'], 'category': category_url_fragment, 'format': 'json'}
 
         for search_string in entry.get('search_strings', [entry['title']]):
@@ -117,23 +118,26 @@ class SearchRarBG(object):
                 query = normalize_unicode(search_string)
                 query_url_fragment = query.encode('utf8')
                 params['search_string'] = query_url_fragment
+                if config['use_tvdb']:
+                    plugin.get_plugin_by_name('thetvdb_lookup').instance.lazy_series_lookup(entry)
+                    params['search_tvdb'] = entry.get('tvdb_id')
+                    log.debug('Using tvdb id %s' % entry.get('tvdb_id'))
 
             page = requests.get(self.base_url, params=params)
-
+            log.debug('requesting: %s' % page.url)
             try:
                 r = page.json()
             except ValueError:
                 log.debug(page.text)
-                break
+                continue
 
             for result in r:
-                entry = Entry()
+                e = Entry()
 
-                entry['title'] = result.get('f')
+                e['title'] = result.get('f')
+                e['url'] = result.get('d')
 
-                entry['url'] = result.get('d')
-
-                entries.add(entry)
+                entries.add(e)
 
         return entries
 

@@ -7,7 +7,7 @@ from collections import defaultdict
 from datetime import datetime
 
 import jsonschema
-from jsonschema.compat import str_types
+from jsonschema.compat import str_types, int_types
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
@@ -130,6 +130,29 @@ def parse_interval(interval_string):
     return parse_timedelta(interval_string)
 
 
+def parse_percent(percent_input):
+    """Takes a size string from the config and turns it into int(bytes)."""
+    percent_input = percent_input.rstrip('%')
+    try:
+        return float(percent_input)
+    except ValueError:
+        raise ValueError("should be in format '0-x%'")
+
+
+def parse_size(size_input):
+    """Takes a size string from the config and turns it into int(bytes)."""
+    prefixes = [None, 'K', 'M', 'G', 'T', 'P']
+    try:
+        # Bytes
+        return int(size_input)
+    except ValueError:
+        size_input = size_input.upper().rstrip('IB')
+        value, unit = float(size_input[:-1]), size_input[-1:]
+        if unit not in prefixes:
+            raise ValueError("should be in format '0-x (KiB, MiB, GiB, TiB, PiB)'")
+        return int(1024 ** prefixes.index(unit) * value)
+
+
 ## Public API end here, the rest should not be used outside this module
 
 
@@ -169,6 +192,20 @@ def is_interval(interval_string):
     if not isinstance(interval_string, str_types):
         return True
     return parse_interval(interval_string) is not None
+
+
+@format_checker.checks('size', raises=ValueError)
+def is_size(size_string):
+    if not isinstance(size_string, (str_types, int_types)):
+        return True
+    return parse_size(size_string) is not None
+
+
+@format_checker.checks('percent', raises=ValueError)
+def is_percent(percent_string):
+    if not isinstance(percent_string, str_types):
+        return True
+    return parse_percent(percent_string) is not None
 
 
 @format_checker.checks('regex', raises=ValueError)
