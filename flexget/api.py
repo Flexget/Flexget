@@ -7,10 +7,8 @@ from jsonschema.exceptions import RefResolutionError
 
 from flask import Flask, Blueprint, request, jsonify, Response
 from flask_restplus import Api as RestPlusAPI
-from flask_restplus import swagger
 from flask_restplus.resource import Resource
 from flask_restplus.model import ApiModel
-from flask_restplus.swagger import ref
 
 from flexget import __version__
 from flexget.config_schema import process_config
@@ -18,6 +16,7 @@ from flexget.manager import manager
 from flexget.utils import json
 from flexget.utils.database import with_session
 from flexget.options import get_parser
+from flexget import config_schema
 
 API_VERSION = 1
 
@@ -34,8 +33,7 @@ class ApiError(Exception):
 
     def __init__(self, message, status_code=None, payload=None):
         self.message = message
-        if status_code:
-            self.status_code=status_code
+        self.status_code = status_code
         self.payload = payload
 
     def to_dict(self):
@@ -60,7 +58,9 @@ class ValidationError(ApiError):
                 'properties': {
                     'message': {'type': 'string', 'description': 'A human readable message explaining the error.'},
                     'validator': {'type': 'string', 'description': 'The name of the failed validator.'},
-                    'validator_value': {'type': 'string', 'description': 'The value for the failed validator in the schema.'},
+                    'validator_value': {
+                        'type': 'string', 'description': 'The value for the failed validator in the schema.'
+                    },
                     'path': {'type': 'string'},
                     'schema_path': {'type': 'string'},
                 }
@@ -68,8 +68,10 @@ class ValidationError(ApiError):
         }
     })
 
-    verror_attrs = ('message', 'cause', 'context', 'validator', 'validator_value',
-                   'path', 'schema_path', 'instance', 'schema', 'parent')
+    verror_attrs = (
+        'message', 'cause', 'context', 'validator', 'validator_value',
+        'path', 'schema_path', 'instance', 'schema', 'parent'
+    )
 
     def __init__(self, validation_errors):
         payload = {'validation_errors': [self._verror_to_dict(error) for error in validation_errors]}
@@ -82,6 +84,7 @@ class ValidationError(ApiError):
 
 class ApiSchemaModel(ApiModel):
     def __init__(self, schema, *args, **kwargs):
+        # TODO: Args etc should be populated with fields for return model doc to work
         self._schema = schema
         super(ApiSchemaModel, self).__init__()
 
@@ -102,7 +105,6 @@ class _Api(RestPlusAPI):
         # I think better to do this in a test. Loop through registered schema models, validate against metaschema
 
         def decorator(func):
-
             @api.expect(model)
             @wraps(func)
             def wrapper(*args, **kwargs):
@@ -110,9 +112,9 @@ class _Api(RestPlusAPI):
                 try:
                     errors = process_config(config=payload, schema=model.__schema__)
                     if errors:
-                        return {'detail': [error.message for error in errors]}, 400
+                        raise ValidationError(errors)
                 except RefResolutionError as e:
-                    return {'detail': str(e)}, 400
+                    raise ValidationError(str(e))
                 return func(*args, **kwargs)
             return wrapper
         return decorator
@@ -124,16 +126,26 @@ class _Api(RestPlusAPI):
         return super(_Api, self).response(*args, **kwargs)
 
 
-api_bp = Blueprint('api', __name__, url_prefix='/api')
-api = _Api(api_bp, catch_all_404s=True, title='Flexget API')
-
-
 class APIResource(Resource):
     method_decorators = [with_session]
 
 
+api_bp = Blueprint('api', __name__, url_prefix='/api')
+api = _Api(api_bp, catch_all_404s=True, title='Flexget API')
+
+
+@api.errorhandler(ApiError)
+def handle_api_errors(error):
+    return error.to_dict(), ApiError.code
+
+
+@api.errorhandler(ValidationError)
+def handle_validation_errors(error):
+    return error.to_dict(), ValidationError.code
+
+
 # Server API
-server_api = api.namespace('server', description='Manage Flexget Server')
+server_api = api.namespace('server', description='Manage Flexget Daemon')
 
 
 @server_api.route('/reload/')
@@ -142,7 +154,7 @@ class ServerReloadAPI(APIResource):
     @api.response(500, 'Error loading the config')
     @api.response(200, 'Reloaded config')
     def get(self, session=None):
-        """ Reload Flexget Config """
+        """ Reload Flexget config """
         log.info('Reloading config from disk.')
         try:
             manager.load_config()
@@ -152,9 +164,18 @@ class ServerReloadAPI(APIResource):
         log.info('Config successfully reloaded from disk.')
         return {'detail': 'Config successfully reloaded from disk.'}
 
+pid_schema = {
+    "type": "object",  "properties": {
+        "pid": {
+            "type": "integer"
+        }
+    }
+}
+pid_schema = api.schema('server_pid', pid_schema)
 
 @server_api.route('/pid/')
 class ServerPIDAPI(APIResource):
+    @api.response(200, 'Reloaded config', pid_schema)
     def get(self, session=None):
         """ Get server PID """
         return{'pid': os.getpid()}
@@ -163,25 +184,39 @@ class ServerPIDAPI(APIResource):
 shutdown_parser = api.parser()
 shutdown_parser.add_argument('force', type=bool, required=False, default=False, help='Ignore tasks in the queue')
 
+
 @server_api.route('/shutdown/')
 class ServerShutdownAPI(APIResource):
     @api.doc(parser=shutdown_parser)
+    @api.response(200, 'Shutdown requested')
     def get(self, session=None):
         """ Shutdown Flexget Daemon """
         args = shutdown_parser.parse_args()
         manager.shutdown(args['force'])
-        return {'detail': 'shutdown requested'}
+        return {}
 
 
 @server_api.route('/config/')
 class ServerConfigAPI(APIResource):
+    @api.response(200, 'Flexget config')
     def get(self, session=None):
         """ Get Flexget Config """
         return manager.config
 
 
+version_schema = {
+    "type": "object",  "properties": {
+        "pid": {
+            "type": "integer"
+        }
+    }
+}
+version_schema = api.schema('version', version_schema)
+
+
 @server_api.route('/version/')
 class ServerVersionAPI(APIResource):
+    @api.response(200, 'Flexget version', version_schema)
     def get(self, session=None):
         """ Flexget Version """
         return {'flexget_version': __version__, 'api_version': API_VERSION}
@@ -189,6 +224,7 @@ class ServerVersionAPI(APIResource):
 
 @server_api.route('/log/')
 class ServerLogAPI(APIResource):
+    @api.response(200, 'Streams as line delimited JSON')
     def get(self, session=None):
         """ Stream Flexget log
         Streams as line delimited JSON
@@ -210,7 +246,7 @@ execution_api = api.namespace('execution', description='Execute tasks')
 
 def _task_info_dict(task_info):
     return {
-        'id': task_info.id,
+        'id': int(task_info.id),
         'name': task_info.name,
         'status': task_info.status,
         'created': task_info.created,
@@ -221,16 +257,56 @@ def _task_info_dict(task_info):
     }
 
 
+task_execution_api_schema = {
+    "type": "object",
+    "properties": {
+        "created": {"type": "string"},
+        "finished": {"type": "string"},
+        "id": {"type": "integer"},
+        "log": {
+            "type": "object",
+            "properties": {
+                "href": {
+                    "type": "string"
+                }
+            }
+        },
+        "message": {"type": "string"},
+        "name": {"type": "string"},
+        "started": {"type": "string"},
+        "status": {"type": "string"}
+    }
+}
+
+tasks_execution_api_schema = {
+    "type": "object",
+    "properties": {
+        "tasks": {
+            "type": "array",
+            "items": task_execution_api_schema
+        }
+    }
+}
+
+task_execution_api_schema = api.schema('task_execution', task_execution_api_schema)
+tasks_execution_api_schema = api.schema('tasks_execution', tasks_execution_api_schema)
+
+
 @execution_api.route('/')
+@api.doc(description='Execution ID are held in memory, they will be lost upon daemon restart')
 class ExecutionAPI(APIResource):
 
+    @api.response(200, 'list of task executions', tasks_execution_api_schema)
     def get(self, session=None):
-        """ List Task executions
+        """ List task executions
         List current, pending and previous(hr max) executions
         """
         tasks = [_task_info_dict(task_info) for task_info in manager.task_queue.tasks_info.itervalues()]
         return jsonify({"tasks": tasks})
 
+    @api.validate(tasks_execution_api_schema)
+    @api.response(400, 'invalid options specified')
+    @api.response(200, 'list of tasks queued for execution')
     def post(self, session=None):
         """ Execute task
         Return a unique execution ID for tracking and log streaming
@@ -249,30 +325,37 @@ class ExecutionAPI(APIResource):
         return {"tasks": [_task_info_dict(manager.task_queue.tasks_info[task_id]) for task_id, event in tasks]}
 
 
-@execution_api.route('/<task_id>/')
+@api.doc(params={'exec_id': 'Execution ID of the Task'})
+@execution_api.route('/<exec_id>/')
+@api.doc(description='Execution ID are held in memory, they will be lost upon daemon restart')
 class ExecutionTaskAPI(APIResource):
 
-    def execution_by_id(self, task_id, session=None):
+    @api.response(404, 'task execution not found')
+    @api.response(200, 'list of tasks queued for execution', task_execution_api_schema)
+    def get(self, exec_id, session=None):
         """ Status of existing task execution """
-        task_info = manager.task_queue.tasks_info.get(task_id)
+        task_info = manager.task_queue.tasks_info.get(exec_id)
 
         if not task_info:
-            return {'detail': '%s not found' % task_id}, 400
+            return {'detail': '%s not found' % exec_id}, 404
 
-        return {'task': _task_info_dict(task_info)}
+        return _task_info_dict(task_info)
 
 
-@execution_api.route('/<task_id>/log/')
+@api.doc(params={'exec_id': 'Execution ID of the Task'})
+@api.doc(description='Execution ID are held in memory, they will be lost upon daemon restart')
+@execution_api.route('/<exec_id>/log/')
 class ExecutionTaskLogAPI(APIResource):
-
-    def get(self, task_id, session=None):
+    @api.response(200, 'Streams as line delimited JSON')
+    @api.response(404, 'task log not found')
+    def get(self, exec_id, session=None):
         """ Log stream of executed task
         Streams as line delimited JSON
         """
-        task_info = manager.task_queue.tasks_info.get(task_id)
+        task_info = manager.task_queue.tasks_info.get(exec_id)
 
         if not task_info:
-            return {'detail': '%s not found' % task_id}, 400
+            return {'detail': '%s not found' % exec_id}, 404
 
         def follow():
             f = open(os.path.join(manager.config_base, 'log-%s.json' % manager.config_name), 'r')
@@ -290,7 +373,7 @@ class ExecutionTaskLogAPI(APIResource):
                     continue
 
                 record = json.loads(line)
-                if record['task_id'] != task_id:
+                if record['task_id'] != exec_id:
                     continue
                 yield line
 
@@ -300,40 +383,104 @@ class ExecutionTaskLogAPI(APIResource):
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
 
+task_api_schema = {
+    'type': 'object',
+    'properties': {
+        'name': {'type': 'string'},
+        'config': {'$ref': '/schema/config/tasks'}
+    }
+}
+
+tasks_api_schema = {
+    "type": "object",
+    "properties": {
+        "tasks": {
+            "type": "array",
+            "items": task_api_schema
+        }
+    }
+}
+
+tasks_api_schema = api.schema('tasks', tasks_api_schema)
+task_api_schema = api.schema('task', task_api_schema)
+
 
 @tasks_api.route('/')
 class TasksAPI(APIResource):
 
+    @api.response(200, 'list of tasks', tasks_api_schema)
     def get(self, session=None):
         """ Show all tasks """
+        # TODO: Should we only return config items or also include the default fields..
+
         tasks = []
         for name in manager.tasks:
             tasks.append({'name': name, 'config': manager.config['tasks'][name]})
         return {'tasks': tasks}
 
-    def post(self):
+    @api.validate(task_api_schema)
+    @api.response(201, 'newly created task', task_api_schema)
+    @api.response(409, 'task already exists', task_api_schema)
+    def post(self, session=None):
         """ Add new task """
-        # TODO
-        return {}
+        data = request.json
+
+        task_name = data['name']
+
+        if task_name in manager.config['tasks']:
+            return {'error': 'task already exists'}, 409
+
+        manager.config['tasks'][task_name] = data['config']
+        manager.save_config()
+        manager.config_changed()
+        return {'name': task_name, 'config': manager.config['tasks'][task_name]}, 201
 
 
-@tasks_api.route('/tasks/<task>/')
+@tasks_api.route('/<task>/')
 @api.doc(params={'task': 'task name'})
 class TaskAPI(APIResource):
 
+    @api.response(200, 'task config', task_api_schema)
+    @api.response(404, 'task not found')
     def get(self, task, session=None):
         """ Get task config """
-        if not task in manager.tasks:
+        if task not in manager.tasks:
             return {'error': 'task %s not found' % task}, 404
 
         return {'name': task, 'config': manager.config['tasks'][task]}
 
-    def put(self, task, session=None):
-        """ Updates tasks config """
-        # TODO: Validate then set
-        # TODO: Return 204 if name has been changed
-        return {}
+    @api.validate(task_api_schema)
+    @api.response(200, 'updated task', task_api_schema)
+    @api.response(201, 'renamed task', task_api_schema)
+    @api.response(404, 'task does not exist', task_api_schema)
+    @api.response(400, 'cannot rename task as it already exist', task_api_schema)
+    def post(self, task, session=None):
+        """ Update tasks config """
+        # TODO: Should we only return config items or also include the default fields..
+        data = request.json or {}
 
+        new_task_name = data['name']
+
+        if task not in manager.config['tasks']:
+            return {'error': 'task does not exist'}, 404
+
+        code = 200
+        if task != new_task_name:
+            # Rename task
+            if new_task_name in manager.config['tasks']:
+                return {'error': 'cannot rename task as it already exist'}, 400
+
+            del manager.config['tasks'][task]
+            code = 201
+
+        manager.config['tasks'][new_task_name] = data['config']
+        manager.save_config()
+        manager.config_changed()
+
+        return {'name': task, 'config': manager.config['tasks'][new_task_name]}, code
+
+    @api.response(200, 'deleted task')
+    @api.response(404, 'task not found')
     def delete(self, task, session=None):
         """ Delete a task """
         try:
@@ -341,7 +488,9 @@ class TaskAPI(APIResource):
         except KeyError:
             return {'detail': 'invalid task'}, 404
 
-        return {'detail': 'deleted'}
+        manager.save_config()
+        manager.config_changed()
+        return {}
 
 
 class ApiClient(object):

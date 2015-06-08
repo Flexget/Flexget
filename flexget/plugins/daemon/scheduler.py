@@ -9,17 +9,15 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from flask import request, jsonify, Blueprint
+from flask import request, jsonify
 
 from flexget.config_schema import register_config_key, format_checker, register_schema
 from flexget.event import event
 from flexget.manager import Base, manager
 from flexget.utils import json
-from flexget.api import api, APIResource, ApiSchemaModel
+from flexget.api import api, APIResource
 
 log = logging.getLogger('scheduler')
-
-schedule_api = Blueprint('api', __name__, url_prefix='/api')
 
 
 # Add a format checker for more detailed errors on cron type schedules
@@ -60,7 +58,6 @@ cron_schema = {
         'hour': {'type': ['integer', 'string']},
         'minute': {'type': ['integer', 'string']}
     },
-    'format': 'cron_schedule',
     'additionalProperties': False
 }
 
@@ -199,6 +196,7 @@ def register_config():
 schedule_api = api.namespace('schedules', description='Task Scheduler')
 
 api_schedule_schema = api.schema('schedule', schedule_schema)
+api_schedules_list_schema = api.schema('schedule', main_schema)
 
 def _schedule_by_id(schedule_id):
     for schedule in manager.config.get('schedules', []):
@@ -211,10 +209,9 @@ def _schedule_by_id(schedule_id):
 @schedule_api.route('/')
 class SchedulesAPI(APIResource):
 
+    @api.response(200, 'List of schedules', api_schedules_list_schema)
     def get(self, session=None):
-        """ Get list of schedules
-        Schedule has a unique ID that is only valid for the life of the daemon. It will change on restart.
-        """
+        """ List schedules """
         schedule_list = []
         if 'schedules' not in manager.config or not manager.config['schedules']:
             return jsonify({'schedules': []})
@@ -229,15 +226,13 @@ class SchedulesAPI(APIResource):
         return {'schedules': schedule_list}
 
     @api.validate(api_schedule_schema)
-    @api.expect(api_schedule_schema)
-    @api.response(200, 'task config', api_schedule_schema)
+    @api.response(201, 'Newly created schedule', api_schedule_schema)
     def post(self, session=None):
         """ Add new schedule """
-        # TODO: Validate schema
         data = request.json
 
         if 'schedules' not in manager.config or not manager.config['schedules']:
-            # Schedules not defined or are disabled, enable as we are adding one
+            # Schedules not defined or are disabled, enable as one is being created
             manager.config['schedules'] = []
 
         manager.config['schedules'].append(data['schedule'])
@@ -248,19 +243,22 @@ class SchedulesAPI(APIResource):
 
         manager.save_config()
         manager.config_changed()
-        return {'schedule': new_schedule}
+        return {'schedule': new_schedule}, 201
 
 
 @schedule_api.route('/<int:schedule_id>/')
-@api.doc(params={'schedule_id': 'ID of Schedule (changes each restart)'})
+@api.doc(params={'schedule_id': 'ID of Schedule'})
+@api.doc(description='Schedule ID changes upon daemon restart')
 class ScheduleAPI(APIResource):
-    """ test 123  """
 
+    # TODO: Add additional addtirbutes to schema (last, next run and id)
+    @api.response(200, 'Schedule config', api_schedule_schema)
+    @api.response(404, 'Schedule not found')
     def get(self, schedule_id, session=None):
         """ Get schedule details """
         schedule = _schedule_by_id(schedule_id)
         if not schedule:
-            return {'error': 'invalid schedule id'}, 404
+            return {'error': 'schedule not found'}, 404
 
         job_id = scheduler_job_map.get(schedule_id)
         if job_id:
@@ -288,21 +286,21 @@ class ScheduleAPI(APIResource):
         return existing
 
     @api.validate(api_schedule_schema)
-    @api.expect(api_schedule_schema)
-    @api.response(200, 'task config', api_schedule_schema)
+    @api.response(200, 'Updated schedule', api_schedule_schema)
+    @api.response(404, 'Schedule not found')
     def post(self, schedule_id, session=None):
         """ Update schedule """
         data = request.json
-
-        # TODO: Validate schema
         schedule = self._get_schedule(schedule_id)
 
         if not schedule:
             return {'detail': 'invalid schedule id'}, 404
 
-        new_schedule = self._update_schedule(schedule, data['schedule'])
+        new_schedule = self._update_schedule(schedule, data)
         return jsonify({'schedule': new_schedule})
 
+    @api.response(404, 'Schedule not found')
+    @api.response(200, 'Schedule deleted')
     def delete(self, schedule_id, session=None):
         """ Delete a schedule """
         for i in range(len(manager.config.get('schedules', []))):
@@ -310,6 +308,6 @@ class ScheduleAPI(APIResource):
                 del manager.config['schedules'][i]
                 manager.save_config()
                 manager.config_changed()
-                return {'detail': 'deleted schedule'}, 400
+                return {}, 200
 
-        return {'error': 'invalid schedule id'}, 400
+        return {'error': 'Schedule not found'}, 404

@@ -9,7 +9,7 @@ from datetime import datetime
 import jsonschema
 from jsonschema.compat import str_types, int_types
 
-from flexget.event import fire_event
+from flexget.event import fire_event, event
 from flexget.utils import qualities, template
 from flexget.utils.tools import parse_timedelta
 
@@ -45,7 +45,6 @@ def register_config_key(key, schema, required=False):
     if required:
         _root_config_schema.setdefault('required', []).append(key)
     register_schema('/schema/config/%s' % key, schema)
-
 
 def get_schema():
     global _root_config_schema
