@@ -105,18 +105,17 @@ def register_plugin():
 
 
 history_api = api.namespace('history', description='Entry History')
+history_parser = api.parser()
+history_parser.add_argument('max', type=int, required=False, default=50, help='Max results')
+
 
 @history_api.route('/')
 class HistoryAPI(APIResource):
+    @api.doc(parser=history_parser)
     def get(self, session=None):
         """ List entries """
-        max_results = 50
-        if request.args.get('max'):
-            try:
-                max_results = int(request.args['max'])
-            except ValueError:
-                pass  # invalid value leave it at 50
+        args = history_parser.parse_args()
 
-        items = session.query(History).order_by(desc(History.time)).limit(max_results).all()
+        items = session.query(History).order_by(desc(History.time)).limit(args['max']).all()
 
         return jsonify({'items': [item.to_dict() for item in items]})

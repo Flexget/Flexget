@@ -2,6 +2,7 @@ import logging
 import os
 from time import sleep
 from functools import wraps
+from collections import deque
 
 from jsonschema.exceptions import RefResolutionError
 
@@ -16,7 +17,7 @@ from flexget.manager import manager
 from flexget.utils import json
 from flexget.utils.database import with_session
 from flexget.options import get_parser
-from flexget import config_schema
+
 
 API_VERSION = 1
 
@@ -70,7 +71,7 @@ class ValidationError(ApiError):
 
     verror_attrs = (
         'message', 'cause', 'context', 'validator', 'validator_value',
-        'path', 'schema_path', 'instance', 'schema', 'parent'
+        'path', 'schema_path', 'parent'
     )
 
     def __init__(self, validation_errors):
@@ -78,8 +79,13 @@ class ValidationError(ApiError):
         super(ValidationError, self).__init__('validation error', payload=payload)
 
     def _verror_to_dict(self, error):
-        # TODO: massage some types to json serializable stuff
-        return dict((attr, getattr(error, attr)) for attr in self.verror_attrs)
+        error_dict = {}
+        for attr in self.verror_attrs:
+            if isinstance(getattr(error, attr), deque):
+                error_dict[attr] = list(getattr(error, attr))
+            else:
+                error_dict[attr] = getattr(error, attr)
+        return error_dict
 
 
 class ApiSchemaModel(ApiModel):
@@ -92,6 +98,8 @@ class ApiSchemaModel(ApiModel):
     def __schema__(self):
         return self._schema
 
+    def __nonzero__(self):
+        return True if self._schema else False
 
 class _Api(RestPlusAPI):
 
@@ -100,10 +108,6 @@ class _Api(RestPlusAPI):
         return self.model(name, **kwargs)(ApiSchemaModel(schema))
 
     def validate(self, model):
-
-        # TODO: Raise error is schema format incorrect
-        # I think better to do this in a test. Loop through registered schema models, validate against metaschema
-
         def decorator(func):
             @api.expect(model)
             @wraps(func)
@@ -119,11 +123,12 @@ class _Api(RestPlusAPI):
             return wrapper
         return decorator
 
-    def response(self, *args, **kwargs):
-        if args and isinstance(args[0], ApiError):
+    def response(self, code, description, model=None, **kwargs):
+        if isinstance(model, ApiError):
             # TODO: Register error schema and add expected model
-            return self.doc(responses=dict((e.code, e.message) for e in args))
-        return super(_Api, self).response(*args, **kwargs)
+            #return self.doc(responses=dict((e.code, e.message) for e in args))
+            pass
+        return super(_Api, self).response(code, description, model, **kwargs)
 
 
 class APIResource(Resource):
@@ -387,7 +392,7 @@ task_api_schema = {
     'type': 'object',
     'properties': {
         'name': {'type': 'string'},
-        'config': {'$ref': '/schema/config/tasks'}
+        'config': {'$ref': '/schema/plugins'}
     }
 }
 

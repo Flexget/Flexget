@@ -529,11 +529,18 @@ def mark_expired(session=None):
 
 tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
 
+tvdb_api_parser = api.parser()
+tvdb_api_parser.add_argument('search', type=str, required=True, help='TV Show name or tvdbid')
+
+
 @tvdb_api.route('/search/')
 class TVDBSearchApi(APIResource):
 
+    @api.doc(parser=tvdb_api_parser)
+    @api.response(400, 'missing search parameter')
     def get(self, session=None):
-        search = request.args.get('q')
+        args = tvdb_api_parser.parse_args()
+        search = args['search']
 
         if not search:
             return {'detail': 'missing query parameter'}, 400
