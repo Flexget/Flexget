@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from urlparse import urlparse
 import logging
 import requests
 
@@ -15,12 +16,12 @@ class Sickbeard(object):
         'type': 'object',
         'properties': {
             'base_url': {'type': 'string'},
-            'port': {'type': 'number'},
+            'port': {'type': 'number', 'default': 80},
             'api_key': {'type': 'string'},
             'include_ended': {'type': 'boolean', 'default': True},
             'only_monitored': {'type': 'boolean', 'default': False}
         },
-        'required': ['api_key', 'base_url', 'port'],
+        'required': ['api_key', 'base_url'],
         'additionalProperties': False
     }
 
@@ -34,6 +35,8 @@ class Sickbeard(object):
           base_url=<value>
           port=<value>
           api_key=<value>
+
+        Options base_url and api_key are required.
 
         Use with input plugin like discover and/or cofnigure_series.
         Example:
@@ -61,7 +64,9 @@ class Sickbeard(object):
         remove it in flexget as well,which good be positive or negative,
         depending on your usage.
         '''
-        url = '%s:%s/api/%s/?cmd=shows' % (config['base_url'], config['port'], config['api_key'])
+        parsedurl = urlparse(config.get('base_url'))
+        url = '%s://%s:%s%s/api/%s/?cmd=shows' % (parsedurl.scheme, parsedurl.netloc,
+                                                  config.get('port'), parsedurl.path, config.get('api_key'))
         json = task.requests.get(url).json()
         entries = []
         for id, show in json['data'].items():
