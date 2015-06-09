@@ -14,7 +14,7 @@ class CouchPotato(object):
     schema = {
         'type': 'object',
         'properties': {
-            'base_url': {'tpye': 'string'},
+            'base_url': {'type': 'string'},
             'port': {'type': 'number'},
             'api_key': {'type': 'string'}
         },
