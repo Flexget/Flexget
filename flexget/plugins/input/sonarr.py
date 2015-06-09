@@ -83,7 +83,15 @@ class Sonarr(object):
                         entries.append(entry)
                     else:
                         log.debug('Invalid entry created? %s' % entry)
-
+            # Test mode logging
+            if task.options.test: 
+                log.info("Test mode. Entry includes:")
+                log.info("    Title: %s" % entry["title"])
+                log.info("    URL: %s" % entry["url"])
+                log.info("    Show name: %s" % entry["series_name"])
+                log.info("    TVDB ID: %s" % entry["tvdb_id"])
+                log.info("    TVRAGE ID: %s" % entry["tvrage_id"])
+                continue
         return entries
 
 
