@@ -132,14 +132,24 @@ class ParserGuessitMusic(object):
 
         return match_tree
 
-    def parse_titled_audio(self, data, **kwargs):
-        log.debug('Parsing album: `%s` [options: %s]', data, kwargs)
+    def parse_music(self, data, **kwargs):
+        log.debug('Parsing music entry: `%s` [options: %s]', data, kwargs)
         start = time.clock()
         guess_result = self.parse(data, **kwargs).matched()
         parsed = GuessitParsedTitledAudio(data, kwargs.pop('name', None), guess_result, **kwargs)
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
         return parsed
+
+    @staticmethod
+    # TODO: Manage quality properties
+    def get_entry_map():
+        return {
+            'music_artist': 'artist',
+            'music_title': 'title',
+            'year': 'year',
+            'quality': 'quality'
+        }
 
 
 class MusicTransformerExtensionManager(CustomTransformerExtensionManager):
@@ -176,4 +186,4 @@ class MusicTransformerExtensionManager(CustomTransformerExtensionManager):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ParserGuessitMusic, 'parser_guessit_music', groups=['titled_audio_parser'], api_ver=2)
+    plugin.register(ParserGuessitMusic, 'parser_guessit_music', groups=['music_parser'], api_ver=2)
