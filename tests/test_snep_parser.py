@@ -28,7 +28,7 @@ class TestSnepParser(object):
         assert unchecked is not None, "Expected a charts entry but got None"
         assert unchecked.artist == reference.artist, "Expected %s but got %s" % (reference.artist, unchecked.artist)
         assert unchecked.company == reference.company, "Expected %s but got %s" % (reference.company, unchecked.company)
-        assert unchecked.song_title == reference.song_title, "Expected %s but got %s" % (reference.song_title, unchecked.song_title)
+        assert unchecked.recording_title == reference.recording_title, "Expected %s but got %s" % (reference.recording_title, unchecked.recording_title)
         assert unchecked.rank == reference.rank, "Expected %i but got %i" % (reference.rank, unchecked.rank)
         assert unchecked.best_rank <= reference.best_rank, "Expected better position than #%i but got #%i" % (reference.best_rank, unchecked.best_rank)
         assert unchecked.charted_weeks >= reference.charted_weeks, "Expected longer in charts than %i week(s) but got %i" % (reference.charted_weeks, unchecked.charted_weeks)
@@ -43,7 +43,7 @@ class TestSnepParser(object):
         mapped_entry.update_using_map(SnepParsedChartEntry.get_entry_map(), unchecked)
         assert mapped_entry.get('music_artist', None) == reference.artist, "Expected %s but got %s" % (reference.artist, mapped_entry.get('music_artist', None))
         assert mapped_entry.get('music_company', None) == reference.company, "Expected %s but got %s" % (reference.company, mapped_entry.get('music_company', None))
-        assert mapped_entry.get('music_title', None) == reference.song_title, "Expected %s but got %s" % (reference.song_title, mapped_entry.get('music_title', None))
+        assert mapped_entry.get('music_title', None) == reference.recording_title, "Expected %s but got %s" % (reference.recording_title, mapped_entry.get('music_title', None))
         assert mapped_entry.get('charts_snep_rank', None) == reference.rank, "Expected %i but got %i" % (reference.rank, mapped_entry.get('charts_snep_rank', None))
         assert mapped_entry.get('charts_snep_best_rank', None) <= reference.best_rank, "Expected better position than #%i but got #%i" % (reference.best_rank, mapped_entry.get('charts_snep_best_rank', None))
         assert mapped_entry.get('charts_snep_weeks', None) >= reference.charted_weeks, "Expected longer in charts than %i week(s) but got %i" % (reference.charted_weeks, mapped_entry.get('charts_snep_weeks', None))
