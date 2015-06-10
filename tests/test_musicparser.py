@@ -320,7 +320,7 @@ class TestMusicParser(object):
 
     def test_parser(self):
         for check in checks:
-            challenger = self.parser.parse_album(check['raw'])
+            challenger = self.parser.parse_music(check['raw'])
             self.check_entry(challenger, check, self.permissive_assertor)
 
         error_rating = self.fails / (self.fails+self.success)
