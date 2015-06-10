@@ -41,9 +41,9 @@ class TestSnepParser(object):
         """
         mapped_entry = Entry()
         mapped_entry.update_using_map(SnepParsedChartEntry.get_entry_map(), unchecked)
-        assert mapped_entry.get('artist', None) == reference.artist, "Expected %s but got %s" % (reference.artist, mapped_entry.get('artist', None))
-        assert mapped_entry.get('company', None) == reference.company, "Expected %s but got %s" % (reference.company, mapped_entry.get('company', None))
-        assert mapped_entry.get('title', None) == reference.song_title, "Expected %s but got %s" % (reference.song_title, mapped_entry.get('title', None))
+        assert mapped_entry.get('music_artist', None) == reference.artist, "Expected %s but got %s" % (reference.artist, mapped_entry.get('music_artist', None))
+        assert mapped_entry.get('music_company', None) == reference.company, "Expected %s but got %s" % (reference.company, mapped_entry.get('music_company', None))
+        assert mapped_entry.get('music_title', None) == reference.song_title, "Expected %s but got %s" % (reference.song_title, mapped_entry.get('music_title', None))
         assert mapped_entry.get('charts_snep_rank', None) == reference.rank, "Expected %i but got %i" % (reference.rank, mapped_entry.get('charts_snep_rank', None))
         assert mapped_entry.get('charts_snep_best_rank', None) <= reference.best_rank, "Expected better position than #%i but got #%i" % (reference.best_rank, mapped_entry.get('charts_snep_best_rank', None))
         assert mapped_entry.get('charts_snep_weeks', None) >= reference.charted_weeks, "Expected longer in charts than %i week(s) but got %i" % (reference.charted_weeks, mapped_entry.get('charts_snep_weeks', None))

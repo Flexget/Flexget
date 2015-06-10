@@ -98,8 +98,8 @@ class SnepParsedChartEntry(ParsedChartEntry):
             'charts_snep_rank': 'rank',
             'charts_snep_best_rank': 'best_rank',
             'charts_snep_weeks': 'charted_weeks',
-            'artist': 'artist',
-            'title': 'song_title',
+            'music_artist': 'artist',
+            'music_title': 'song_title',
             'music_company': 'company',
             'url': 'url'
         }
