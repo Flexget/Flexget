@@ -11,6 +11,7 @@ from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('letterboxd_list')
+base_url = 'http://letterboxd.com'
 
 P_SLUGS = {
     'diary': '/%s/films/diary/',
@@ -66,10 +67,13 @@ class LetterboxdList(object):
     }
 
     @cached('letterboxd_list', persist='2 hours')
+
     def on_task_input(self, task, config):        
-        base_url = 'http://letterboxd.com'
-        max_pages = config.get('max_pages', 1)
         m_list = config['list'].lower().replace(' ', '-')
+        max_pages = config.get('max_pages', 1)
+        pagecount = 0
+        next_page = ''
+        sort_by = ''
         
         if m_list in list(P_SLUGS.keys()):
             p_slug = P_SLUGS.get(m_list) % config['username']
@@ -80,13 +84,12 @@ class LetterboxdList(object):
             m_slug = M_SLUGS.get('other')
             log.verbose(LOG_STR.get('other') % (config['username'], m_list))
         
-        next_page = ''
-        sort_by = ''
         if 'sort_by' in config:
             sort_by = SORT_BY.get(config['sort_by'])
-        pagecount = 0
+
         url = base_url + p_slug + sort_by
         entries = []
+
         while next_page is not None and pagecount < max_pages:
             try:
                 page = task.requests.get(url)
@@ -104,8 +107,7 @@ class LetterboxdList(object):
                 else:
                     m_url = base_url + movie.find('div').get(m_slug)
                 m_page = task.requests.get(m_url)
-                m_soup = get_soup(m_page.text)
-                
+                m_soup = get_soup(m_page.text)                
                 entry = Entry()
                 title = m_soup.find('section', attrs={'id': 'featured-film-header'}).find('h1').string
                 year = m_soup.find('section', attrs={'id': 'featured-film-header'}).find('small').string
