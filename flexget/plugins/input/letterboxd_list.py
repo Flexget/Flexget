@@ -119,12 +119,13 @@ class LetterboxdList(object):
                 entry['tmdb_id'] = re.search(r'\/(\d+)\/$', tmdb_url.get('href')).group(1)
                 entry['letterboxd_list'] = '%s (%s)' % (m_list, config['username'])
                 entry['letterboxd_score'] = 0
-                entry['letterboxd_score'] = m_soup.find('span', attrs={'class': 'average-rating'})\
+                avg_rating = m_soup.find('span', attrs={'class': 'average-rating'})\
                     .find('meta', attrs={'itemprop': 'average'}).get('content')
+                entry['letterboxd_score'] = float(avg_rating)
                 if m_list in ['diary', 'rated']:
                     try:
                         user_rating = movie.find('meta', attrs={'itemprop': 'rating'}).get('content')
-                        entry['letterboxd_score'] = user_rating
+                        entry['letterboxd_score'] = float(user_rating)
                     except AttributeError:
                         pass
                 entries.append(entry)
