@@ -31,7 +31,7 @@ class LetterboxdList(object):
         'properties': {
             'username': {'type': 'string'},
             'list': {'type': 'string'},
-            'sort_by': {'type': 'string', 'enum': SORT_BY},
+            'sort_by': {'type': 'string', 'enum': list(SORT_BY.keys())},
             'max_pages': {'type': 'integer'}
         },
         'required': ['username', 'list'],
