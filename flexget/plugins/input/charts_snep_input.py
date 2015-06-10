@@ -34,6 +34,7 @@ class ChartsSnepInput(object):
         input_entries = []
         for charts_entry in chart_entries:
             flexget_entry = Entry()
+            flexget_entry['title'] = "%s - %s" % (charts_entry.artist, charts_entry.recording_title)
             flexget_entry.update_using_map(SnepParsedChartEntry.get_entry_map(), charts_entry)
             input_entries.append(flexget_entry)
 

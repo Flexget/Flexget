@@ -29,7 +29,7 @@ class ParsedChartEntry(ABCMeta(str('ParsedChartEntryABCMeta'), (object,), {})):
         raise NotImplementedError
 
     @abstractproperty
-    def song_title(self):
+    def recording_title(self):
         """@:rtype str"""
         raise NotImplementedError
 
@@ -69,7 +69,7 @@ class SnepParsedChartEntry(ParsedChartEntry):
         return self._artist
 
     @property
-    def song_title(self):
+    def recording_title(self):
         return self._song_title
 
     @property
@@ -99,7 +99,7 @@ class SnepParsedChartEntry(ParsedChartEntry):
             'charts_snep_best_rank': 'best_rank',
             'charts_snep_weeks': 'charted_weeks',
             'music_artist': 'artist',
-            'music_title': 'song_title',
+            'music_title': 'recording_title',
             'music_company': 'company',
             'url': 'url'
         }
