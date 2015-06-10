@@ -12,6 +12,17 @@ from flexget.utils.soup import get_soup
 
 log = logging.getLogger('letterboxd_list')
 
+SORT_BY = {
+    'added': 'by/added/',
+    'length-ascending': 'by/shortest/',
+    'length-descending': 'by/longest/',
+    'name': 'by/name/',
+    'popularity': 'by/popular/',
+    'rating-ascending': 'by/rating-lowest/',
+    'rating-descending': 'by/rating/',
+    'release-ascending': 'by/release-earliest/',
+    'release-descending': 'by/release/'
+}
 
 class LetterboxdList(object):
 
@@ -20,7 +31,8 @@ class LetterboxdList(object):
         'properties': {
             'username': {'type': 'string'},
             'list': {'type': 'string'},
-            'maxpages': {'type': 'integer'}
+            'sort_by': {'type': 'string', 'enum': SORT_BY},
+            'max_pages': {'type': 'integer'}
         },
         'required': ['username', 'list'],
         'addditionalProperties': False
@@ -30,33 +42,46 @@ class LetterboxdList(object):
     def on_task_input(self, task, config):        
         base_url = 'http://letterboxd.com'
         list = config['list'].lower().replace(' ', '-')
-        maxpages = config.get('maxpages', 1)
+        max_pages = config.get('max_pages', 1)
 
         if list == 'watchlist':
-            next_page = '/%s/watchlist/' % config['username']
+            p_slug = '/%s/watchlist/' % config['username']
             m_slug = 'data-film-slug'
             log.verbose('Retrieving %s\'s watchlist from Letterboxd.' % config['username'])
         elif list == 'diary':
-            next_page = '/%s/films/diary/' % config['username']
+            p_slug = '/%s/films/diary/' % config['username']
             m_slug = 'data-film-link'
             log.verbose('Retrieving %s\'s film diary from Letterboxd.' % config['username'])
         elif list == 'likes':
-            next_page = '/%s/likes/films/' % config['username']
+            p_slug = '/%s/likes/films/' % config['username']
             m_slug = 'data-film-link'
             log.verbose('Retrieving list of films %s has liked on Letterboxd.' % config['username'])
+        elif list == 'watched':
+            p_slug = '/%s/films/' % config['username']
+            m_slug = 'data-film-slug'
+            log.verbose('Retrieving list of films watched by %s from Letterboxd.' % config['username'])
+        elif list == 'rated':
+            p_slug = '/%s/films/ratings/' % config['username']
+            m_slug = 'data-film-slug'
+            log.verbose('Retrieving list of films rated by %s on Letterboxd.' % config['username'])
         else:
-            next_page =  '/%s/list/%s/' % (config['username'], list)
+            p_slug =  '/%s/list/%s/' % (config['username'], list)
             m_slug = 'data-film-slug'
             log.verbose('Retrieving %s\'s Letterboxd list: %s.' % (config['username'], list))
-
+        
+        next_page = ''
+        sort_by = ''
+        if 'sort_by' in config:
+            sort_by = SORT_BY.get(config['sort_by'])
         pagecount = 0
+        url = base_url + p_slug + sort_by
         entries = []
-        while next_page is not None and pagecount < maxpages:
-            url = base_url + next_page
+        while next_page is not None and pagecount < max_pages:
             try:
                 page = task.requests.get(url)
             except RequestException as e:
-                raise plugin.PluginError('Can\'t retrieve Letterboxd list. If it\'s not set to private, it may not exist. Check your config.')
+                raise plugin.PluginError('Can\'t retrieve Letterboxd list from %s. Make sure it\'s not set to private; ' + \
+                                         'if not, the URL may be incorrect. Check your config.') % url
             soup = get_soup(page.text)
             if list == 'diary':
                 movies = soup.find_all('tr', attrs={'class': 'diary-entry-row'})
@@ -66,10 +91,6 @@ class LetterboxdList(object):
             for movie in movies:
                 if list == 'diary':
                     m_url = base_url + movie.find('td', attrs={'class': 'td-actions'}).get(m_slug)
-                    try:
-                        user_rating = movie.find('meta', attrs={'itemprop': 'rating'}).get('content')
-                    except AttributeError:
-                        pass
                 else:
                     m_url = base_url + movie.find('div').get(m_slug)
                 m_page = task.requests.get(m_url)
@@ -86,17 +107,21 @@ class LetterboxdList(object):
                 entry['tmdb_id'] = re.search(r'\/(\d+)\/$', tmdb_url.get('href')).group(1)
                 entry['letterboxd_list'] = '%s (%s)' % (list, config['username'])
                 entry['letterboxd_score'] = 0
-                if list == 'diary' and user_rating:
-                    entry['letterboxd_score'] = user_rating
-                else:
-                    entry['letterboxd_score'] = m_soup.find('span', attrs={'class': 'average-rating'})\
-                    .find('meta', attrs={'itemprop': 'average'}).get('content')                
+                entry['letterboxd_score'] = m_soup.find('span', attrs={'class': 'average-rating'})\
+                    .find('meta', attrs={'itemprop': 'average'}).get('content')
+                if list in ['diary', 'rated']:
+                    try:
+                        user_rating = movie.find('meta', attrs={'itemprop': 'rating'}).get('content')
+                        entry['letterboxd_score'] = user_rating
+                    except AttributeError:
+                        pass
                 entries.append(entry)
 
             next_page = soup.find('a', attrs={'class': 'paginate-next'})
             if next_page is not None:
                 next_page = next_page.get('href')
-            if config['maxpages']:
+                url = base_url + next_page
+            if 'max_pages' in config:
                 pagecount += 1
 
         return entries
