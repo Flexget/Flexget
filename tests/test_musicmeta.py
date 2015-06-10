@@ -13,8 +13,10 @@ class TestMusicMetaInfo(FlexGetBase):
               - {title: 'Vitaa - Celle Que Je Vois - 320 Kbps - MP3 - 2009'}
             music: yes
     """
+
     def test_populate_entry(self):
         self.execute_task('populate')
+        assert len(self.task.entries) == 1, "This should not append"
         assert self.task.find_entry(year=2009), "year is missing"
         assert self.task.find_entry(music_title='Celle Que Je Vois'), "music_title is missing"
         assert self.task.find_entry(music_artist='Vitaa'), "music_artist is missing"
