@@ -10,7 +10,7 @@ from flexget.utils.imdb import extract_id
 from flexget.utils.requests import RequestException
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('letterboxd_list')
+log = logging.getLogger('letterboxd')
 base_url = 'http://letterboxd.com'
 
 P_SLUGS = {
@@ -52,7 +52,8 @@ SORT_BY = {
     'release-descending': 'by/release/'
 }
 
-class LetterboxdList(object):
+
+class Letterboxd(object):
 
     schema = {
         'type': 'object',
@@ -66,8 +67,7 @@ class LetterboxdList(object):
         'addditionalProperties': False
     }
 
-    @cached('letterboxd_list', persist='2 hours')
-
+    @cached('letterboxd', persist='2 hours')
     def on_task_input(self, task, config):        
         m_list = config['list'].lower().replace(' ', '-')
         max_pages = config.get('max_pages', 1)
@@ -91,7 +91,6 @@ class LetterboxdList(object):
         entries = []
 
         while next_page is not None and pagecount < max_pages:
-
             try:
                 page = task.requests.get(url).content
             except RequestException as e:
@@ -135,4 +134,4 @@ class LetterboxdList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(LetterboxdList, 'letterboxd_list', api_ver=2)
+    plugin.register(LetterboxdList, 'letterboxd', api_ver=2)
