@@ -23,7 +23,7 @@ P_SLUGS = {
 }
 
 M_SLUGS = {
-    'diary': 'data-film-link',
+    'diary': 'data-film-slug',
     'likes': 'data-film-link',
     'rated': 'data-film-slug',
     'watched': 'data-film-slug',
@@ -91,46 +91,39 @@ class LetterboxdList(object):
         entries = []
 
         while next_page is not None and pagecount < max_pages:
+
             try:
-                page = task.requests.get(url)
+                page = task.requests.get(url).content
             except RequestException as e:
                 raise plugin.PluginError('Can\'t retrieve Letterboxd list from %s. Make sure it\'s not set to private, and check your config.' % url)
-            soup = get_soup(page.text)
-            if m_list == 'diary':
-                movies = soup.find_all('tr', attrs={'class': 'diary-entry-row'})
-            else:
-                movies = soup.find_all('li', attrs={'class': 'poster-container'})
+            soup = get_soup(page)
 
-            for movie in movies:
-                if m_list == 'diary':
-                    m_url = base_url + movie.find('td', attrs={'class': 'td-actions'}).get(m_slug)
-                else:
-                    m_url = base_url + movie.find('div').get(m_slug)
-                m_page = task.requests.get(m_url)
-                m_soup = get_soup(m_page.text)                
+            for movie in soup.find_all(attrs={m_slug: True}):
+                m_url = base_url + movie.get(m_slug)
+                try:
+                    m_page = task.requests.get(m_url).content
+                except RequestException:
+                    continue
+                m_soup = get_soup(m_page)                
+
                 entry = Entry()
-                title = m_soup.find('section', attrs={'id': 'featured-film-header'}).find('h1').string
-                year = m_soup.find('section', attrs={'id': 'featured-film-header'}).find('small').string
-                entry['title'] = '%s (%s)' % (title, year)
+                entry['title'] = m_soup.find(property='og:title').get('content')
                 entry['url'] = m_url
-                imdb_url = m_soup.find('p', attrs={'class': 'text-link'}).find(href=re.compile('imdb')).get('href')
-                entry['imdb_id'] = extract_id(imdb_url)
-                tmdb_url = m_soup.find('p', attrs={'class': 'text-link'}).find(href=re.compile('themoviedb'))
-                entry['tmdb_id'] = re.search(r'\/(\d+)\/$', tmdb_url.get('href')).group(1)
+                entry['imdb_id'] = extract_id(m_soup.find(href=re.compile('imdb')).get('href'))
+                entry['tmdb_id'] = re.search(r'\/(\d+)\/$', m_soup.find(href=re.compile('themoviedb')).get('href')).group(1)
                 entry['letterboxd_list'] = '%s (%s)' % (m_list, config['username'])
-                entry['letterboxd_score'] = 0
-                avg_rating = m_soup.find('span', attrs={'class': 'average-rating'})\
-                    .find('meta', attrs={'itemprop': 'average'}).get('content')
-                entry['letterboxd_score'] = float(avg_rating)
+                try:
+                    entry['letterboxd_score'] = float(m_soup.find(itemprop='average').get('content'))
+                except AttributeError:
+                    pass
                 if m_list in ['diary', 'rated']:
                     try:
-                        user_rating = movie.find('meta', attrs={'itemprop': 'rating'}).get('content')
-                        entry['letterboxd_score'] = float(user_rating)
+                        entry['letterboxd_score'] = float(movie.find_next(itemprop='rating').get('content'))
                     except AttributeError:
                         pass
                 entries.append(entry)
 
-            next_page = soup.find('a', attrs={'class': 'paginate-next'})
+            next_page = soup.find(class_='paginate-next')
             if next_page is not None:
                 next_page = next_page.get('href')
                 url = base_url + next_page
