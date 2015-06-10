@@ -12,7 +12,9 @@ from flask_restplus.resource import Resource
 from flask_restplus.model import ApiModel
 
 from flexget import __version__
-from flexget.config_schema import process_config
+from flexget.event import event
+from flexget.webserver import register_app
+from flexget.config_schema import process_config, register_config_key
 from flexget.manager import manager
 from flexget.utils import json
 from flexget.utils.database import with_session
@@ -22,6 +24,22 @@ from flexget.options import get_parser
 API_VERSION = 1
 
 log = logging.getLogger('api')
+
+
+# TODO: Allow just api: yes or api: no
+api_config_schema = {
+    'type': 'object',
+    'properties': {
+        'bind': {'type': 'string', 'format': 'ipv4', 'default': '0.0.0.0'},
+        'port': {'type': 'integer', 'default': 5050},
+    },
+    'additionalProperties': False
+}
+
+
+@event('config.register')
+def register_config():
+    register_config_key('api', api_config_schema)
 
 
 class ApiError(Exception):
@@ -90,7 +108,6 @@ class ValidationError(ApiError):
 
 class ApiSchemaModel(ApiModel):
     def __init__(self, schema, *args, **kwargs):
-        # TODO: Args etc should be populated with fields for return model doc to work
         self._schema = schema
         super(ApiSchemaModel, self).__init__()
 
@@ -99,7 +116,8 @@ class ApiSchemaModel(ApiModel):
         return self._schema
 
     def __nonzero__(self):
-        return True if self._schema else False
+        return bool(self._schema)
+
 
 class _Api(RestPlusAPI):
 
@@ -123,20 +141,29 @@ class _Api(RestPlusAPI):
             return wrapper
         return decorator
 
-    def response(self, code, description, model=None, **kwargs):
-        if isinstance(model, ApiError):
-            # TODO: Register error schema and add expected model
-            #return self.doc(responses=dict((e.code, e.message) for e in args))
-            pass
-        return super(_Api, self).response(code, description, model, **kwargs)
+    def response(self, *args, **kwargs):
+        if isinstance(args[0], ApiError):
+            return self.doc(responses={args[0].code: (args[0].message, ApiSchemaModel(args[0].schema()))})
+
+        return super(_Api, self).response(*args, **kwargs)
 
 
 class APIResource(Resource):
     method_decorators = [with_session]
 
 
-api_bp = Blueprint('api', __name__, url_prefix='/api')
-api = _Api(api_bp, catch_all_404s=True, title='Flexget API')
+app = Flask(__name__)
+api = _Api(app, catch_all_404s=True, title='Flexget API')
+
+
+@event('manager.daemon.started')
+def register_api(manager):
+    api_config = manager.config.get('api')
+
+    if api_config:
+        bind = api_config.get('bind')
+        port = api_config.get('port')
+        register_app('/api', app, bind=bind, port=port)
 
 
 @api.errorhandler(ApiError)
@@ -164,10 +191,10 @@ class ServerReloadAPI(APIResource):
         try:
             manager.load_config()
         except ValueError as e:
-            return {'detail': 'Error loading config %s' % e.args[0]}, 500
+            return {'error': 'Error loading config %s' % e.args[0]}, 500
 
         log.info('Config successfully reloaded from disk.')
-        return {'detail': 'Config successfully reloaded from disk.'}
+        return {'error': 'Config successfully reloaded from disk.'}
 
 pid_schema = {
     "type": "object",  "properties": {
@@ -342,7 +369,7 @@ class ExecutionTaskAPI(APIResource):
         task_info = manager.task_queue.tasks_info.get(exec_id)
 
         if not task_info:
-            return {'detail': '%s not found' % exec_id}, 404
+            return {'error': '%s not found' % exec_id}, 404
 
         return _task_info_dict(task_info)
 
@@ -360,7 +387,7 @@ class ExecutionTaskLogAPI(APIResource):
         task_info = manager.task_queue.tasks_info.get(exec_id)
 
         if not task_info:
-            return {'detail': '%s not found' % exec_id}, 404
+            return {'error': '%s not found' % exec_id}, 404
 
         def follow():
             f = open(os.path.join(manager.config_base, 'log-%s.json' % manager.config_name), 'r')
@@ -491,7 +518,7 @@ class TaskAPI(APIResource):
         try:
             manager.config['tasks'].pop(task)
         except KeyError:
-            return {'detail': 'invalid task'}, 404
+            return {'error': 'invalid task'}, 404
 
         manager.save_config()
         manager.config_changed()

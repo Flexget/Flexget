@@ -5,48 +5,37 @@ import threading
 import socket
 
 from flask import Flask, abort, redirect, url_for
+from werkzeug.wsgi import DispatcherMiddleware
 
-from flexget.config_schema import register_config_key
 from flexget.event import event
 from flexget.utils.tools import singleton
 
 log = logging.getLogger('web_server')
 
-app = Flask(__name__)
-_home = None
 server = None
 
-main_schema = {
-    'type': 'object',
-    'properties': {
-        'bind': {'type': 'string', 'format': 'ipv4', 'default': '0.0.0.0'},
-        'port': {'type': 'integer', 'default': 5050},
-        'autoreload': {'type': 'boolean', 'default': False},
-        'authentication': {
-            'oneOf': [
-                {"type": "boolean"},
-                {
-                    "type": "object",
-                    "properties": {
-                        'username': {'type': 'string'},
-                        'password': {'type': 'string'},
-                        'no_local_auth': {'type': 'boolean', 'default': True}
-                    },
-                    'additionalProperties': False
-                }
-            ],
-        },
-    },
-    'additionalProperties': False
-}
+_home = None
+_app_register = {}
+_default_app = Flask(__name__)
+_server_port = None
+_server_bind = None
+
+app = None
 
 
-@app.route('/')
-def start_page():
-    """Redirect user to registered UI home"""
-    if not _home:
-        abort(404)
-    return redirect(url_for(_home))
+def register_app(path, app, bind=None, port=None):
+    if path in _app_register:
+        raise ValueError('path %s already registered')
+    global _server_port, _server_bind
+    if bind:
+        if _server_bind and _server_bind != bind:
+            raise ValueError('web server port already bound to %s' % _server_bind)
+        _server_bind = bind
+    if port:
+        if _server_port and _server_port != port:
+            raise ValueError('web server port already registered on %s' % _server_port)
+        _server_port = port
+    _app_register[path] = app
 
 
 def register_home(route):
@@ -55,22 +44,35 @@ def register_home(route):
     _home = route
 
 
-@event('manager.daemon.started')
-# @event('manager.config_updated') # Disabled for now
+@_default_app.route('/')
+def start_page():
+    """ Redirect user to registered UI home """
+    if not _home:
+        abort(404)
+    return redirect(url_for(_home))
+
+
+# Low priority so plugins can register apps
+@event('manager.daemon.started', -255)
+@event('manager.config_updated')
 def setup_server(manager):
-    """Sets up and starts/restarts the web service."""
+    """ Sets up and starts/restarts the web service. """
     if not manager.is_daemon:
         return
+
     web_server = WebServer(manager)
     if web_server.is_alive():
         web_server.stop()
-    if manager.config.get('webui'):
-        web_server.start(manager.config['webui'])
+
+    if _app_register:
+        global app
+        app = DispatcherMiddleware(_default_app, _app_register)
+        web_server.start(bind=_server_bind, port=_server_port)
 
 
 @event('manager.shutdown_requested')
-def stop_webui(manager):
-    """Sets up and starts/restarts the webui."""
+def stop_server(manager):
+    """ Sets up and starts/restarts the webui. """
     if not manager.is_daemon:
         return
     web_server = WebServer(manager)
@@ -87,9 +89,11 @@ class WebServer(threading.Thread):
         threading.Thread.__init__(self, name='webui')
         self.daemon = True
         self.manager = manager
-        self.config = {}
         self._stopped = False
         self._server = None
+        self.bind = '0.0.0.0'
+        self.port = 5050
+        self.autoreload = False
 
     def _start_server(self, bind, port=5050):
         from cherrypy import wsgiserver
@@ -102,11 +106,15 @@ class WebServer(threading.Thread):
         except KeyboardInterrupt:
             self.stop()
 
-    def start(self, config):
+    def start(self, bind='0.0.0.0', port=5050):
         # If we have already started and stopped a thread, we need to reinitialize it to create a new one
+        if bind:
+            self.bind = bind
+        if port:
+            self.port = port
+
         if self._stopped and not self.is_alive():
             self.__init__(self.manager)
-        self.config = config
         threading.Thread.start(self)
 
     def stop(self):
@@ -116,14 +124,12 @@ class WebServer(threading.Thread):
 
     def run(self):
         # Start Flask
-        app.secret_key = os.urandom(24)
+        _default_app.secret_key = os.urandom(24)
 
-        log.info('Starting web server on port %s' % self.config.get('port'))
+        log.info('Starting web server on port %s' % self.port)
 
-        from flexget.api import api_bp
-        app.register_blueprint(api_bp)
-
-        if self.config['autoreload']:
+        if self.autoreload:
+            # TODO: Broken, fix
             # Create and destroy a socket so that any exceptions are raised before
             # we spawn a separate Python interpreter and lose this ability.
             from werkzeug.serving import run_with_reloader
@@ -137,12 +143,9 @@ class WebServer(threading.Thread):
             # TODO: run_with_reloader should not be used here
             run_with_reloader(self._start_server, extra_files, reloader_interval)
         else:
-            self._start_server(self.config.get('bind'), self.config.get('port'))
+            self._start_server(self.bind, self.port)
 
         self._stopped = True
         log.debug('webui shut down')
 
 
-@event('config.register')
-def register_config():
-    register_config_key('webui', main_schema)
