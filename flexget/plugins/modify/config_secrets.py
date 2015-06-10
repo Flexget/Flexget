@@ -16,14 +16,14 @@ def process_secrets(manager):
     secret_file = os.path.join(manager.config_base, manager.config['secrets'])
     if not os.path.exists(secret_file):
         log.error('Secrets\' file: %s does not exists or you have no read permission!' % secret_file)
-        return None
+        return
     try:
         with codecs.open(secret_file, 'rb', 'utf-8') as f:
             raw_secrets = f.read()
         secrets = {'secrets': yaml.safe_load(raw_secrets) or {}}
     except Exception as e:
         log.error('Invalid secrets file: %s (#%s, %s).' % secret_file, e.errno, e.strerror)
-        return None
+        return
     _process(manager.config, secrets)
 
 def _process(element, secrets):
@@ -43,7 +43,7 @@ def _process(element, secrets):
             template = environment.from_string(element)
             return template.render(secrets)
         except:
-            return None
+            return
 
 secrets_config_schema = {
     'type': 'string'
