@@ -134,4 +134,4 @@ class Letterboxd(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(LetterboxdList, 'letterboxd', api_ver=2)
+    plugin.register(Letterboxd, 'letterboxd', api_ver=2)
