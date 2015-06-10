@@ -7,10 +7,13 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.imdb import extract_id
-from flexget.utils.requests import RequestException
+from flexget.utils.requests import RequestException, Session
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('letterboxd')
+
+requests = Session()
+requests.set_domain_delay('letterboxd.com', '2 seconds')
 base_url = 'http://letterboxd.com'
 
 P_SLUGS = {
@@ -92,7 +95,7 @@ class Letterboxd(object):
 
         while next_page is not None and pagecount < max_pages:
             try:
-                page = task.requests.get(url).content
+                page = requests.get(url).content
             except RequestException as e:
                 raise plugin.PluginError('Can\'t retrieve Letterboxd list from %s. Make sure it\'s not set to private, and check your config.' % url)
             soup = get_soup(page)
@@ -100,7 +103,7 @@ class Letterboxd(object):
             for movie in soup.find_all(attrs={m_slug: True}):
                 m_url = base_url + movie.get(m_slug)
                 try:
-                    m_page = task.requests.get(m_url).content
+                    m_page = requests.get(m_url).content
                 except RequestException:
                     continue
                 m_soup = get_soup(m_page)                
