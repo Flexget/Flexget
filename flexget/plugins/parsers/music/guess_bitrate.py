@@ -3,7 +3,7 @@ import re
 from guessit.plugins.transformers import Transformer
 from guessit.matcher import GuessFinder
 
-common_bitrates = {32, 64, 96, 112, 128, 160, 192, 224, 256, 320}
+common_bitrates = [32, 64, 96, 112, 128, 160, 192, 224, 256, 320]
 
 
 class GuessBitrate(Transformer):
