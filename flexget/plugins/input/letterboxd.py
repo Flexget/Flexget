@@ -34,15 +34,6 @@ M_SLUGS = {
     'other': 'data-film-slug'
 }
 
-LOG_STR = {
-    'diary': 'Retrieving %s\'s film diary from Letterboxd.',
-    'likes': 'Retrieving list of films %s has liked on Letterboxd.',
-    'rated': 'Retrieving list of films rated by %s on Letterboxd.',
-    'watched': 'Retrieving list of films watched by %s from Letterboxd.',
-    'watchlist': 'Retrieving %s\'s watchlist from Letterboxd.',
-    'other': 'Retrieving %s\'s Letterboxd list: %s.'
-}
-
 SORT_BY = {
     'added': 'by/added/',
     'length-ascending': 'by/shortest/',
@@ -81,17 +72,17 @@ class Letterboxd(object):
         if m_list in list(P_SLUGS.keys()):
             p_slug = P_SLUGS.get(m_list) % config['username']
             m_slug = M_SLUGS.get(m_list)
-            log.verbose(LOG_STR.get(m_list) % config['username'])
         else:
             p_slug = P_SLUGS.get('other') % (config['username'], m_list)
             m_slug = M_SLUGS.get('other')
-            log.verbose(LOG_STR.get('other') % (config['username'], m_list))
         
         if 'sort_by' in config:
             sort_by = SORT_BY.get(config['sort_by'])
 
         url = base_url + p_slug + sort_by
         entries = []
+
+        log.verbose('Retrieving list from Letterboxd: %s' % url)
 
         while next_page is not None and pagecount < max_pages:
             try:
