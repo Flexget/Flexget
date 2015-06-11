@@ -14,10 +14,9 @@ class ChartsSnepInput(object):
     """Create an entrie for each charted single in your charts request"""
 
     schema = {
-        'type': {
-            'type': {'all_album', 'disk_album', 'digit_album',
+        'type': {'all_album', 'disk_album', 'digit_album',
                      'digit_single', 'stream_single',
-                     'compil', 'back_catalog', 'radio'}
+                     'compil', 'back_catalog', 'radio'
         }
     }
 
