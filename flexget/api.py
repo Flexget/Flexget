@@ -1,12 +1,19 @@
 import logging
 import os
+import base64
+import hashlib
+import random
+import codecs
+import yaml
+import copy
+
 from time import sleep
 from functools import wraps
 from collections import deque
 
 from jsonschema.exceptions import RefResolutionError
 
-from flask import Flask, Blueprint, request, jsonify, Response
+from flask import Flask, request, jsonify, Response
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.resource import Resource
 from flask_restplus.model import ApiModel
@@ -26,13 +33,23 @@ API_VERSION = 1
 log = logging.getLogger('api')
 
 
-# TODO: Allow just api: yes or api: no
+def generate_key():
+    """ Generate api key for use to authentication """
+    return base64.b64encode(hashlib.sha256(str(random.getrandbits(256))).digest(),
+                            random.choice(['rA', 'aZ', 'gQ', 'hH', 'hG', 'aR', 'DD'])).rstrip('==')
+
+
 api_config_schema = {
-    'type': 'object',
-    'properties': {
-        'bind': {'type': 'string', 'format': 'ipv4', 'default': '0.0.0.0'},
-        'port': {'type': 'integer', 'default': 5050},
-    },
+    'oneOf': [
+        {'type': 'boolean'},
+        {
+            'type': 'object',
+            'properties': {
+                'api_key': {'type': 'string', 'default': generate_key()}
+            },
+            'additionalProperties': False
+        }
+    ],
     'additionalProperties': False
 }
 
@@ -88,7 +105,7 @@ class ValidationError(ApiError):
     })
 
     verror_attrs = (
-        'message', 'cause', 'context', 'validator', 'validator_value',
+        'message', 'cause', 'validator', 'validator_value',
         'path', 'schema_path', 'parent'
     )
 
@@ -132,7 +149,7 @@ class _Api(RestPlusAPI):
             def wrapper(*args, **kwargs):
                 payload = request.json
                 try:
-                    errors = process_config(config=payload, schema=model.__schema__)
+                    errors = process_config(config=payload, schema=model.__schema__, set_defaults=False)
                     if errors:
                         raise ValidationError(errors)
                 except RefResolutionError as e:
@@ -157,13 +174,12 @@ api = _Api(app, catch_all_404s=True, title='Flexget API')
 
 
 @event('manager.daemon.started')
-def register_api(manager):
-    api_config = manager.config.get('api')
+def register_api(mgr):
+    api_config = mgr.config.get('api')
+    api_config = mgr.config.get('api')
 
     if api_config:
-        bind = api_config.get('bind')
-        port = api_config.get('port')
-        register_app('/api', app, bind=bind, port=port)
+        register_app('/api', app)
 
 
 @api.errorhandler(ApiError)
@@ -204,6 +220,7 @@ pid_schema = {
     }
 }
 pid_schema = api.schema('server_pid', pid_schema)
+
 
 @server_api.route('/pid/')
 class ServerPIDAPI(APIResource):
@@ -276,6 +293,7 @@ class ServerLogAPI(APIResource):
 # Execution API
 execution_api = api.namespace('execution', description='Execute tasks')
 
+
 def _task_info_dict(task_info):
     return {
         'id': int(task_info.id),
@@ -320,6 +338,7 @@ tasks_execution_api_schema = {
     }
 }
 
+
 task_execution_api_schema = api.schema('task_execution', task_execution_api_schema)
 tasks_execution_api_schema = api.schema('tasks_execution', tasks_execution_api_schema)
 
@@ -358,8 +377,8 @@ class ExecutionAPI(APIResource):
 
 
 @api.doc(params={'exec_id': 'Execution ID of the Task'})
-@execution_api.route('/<exec_id>/')
 @api.doc(description='Execution ID are held in memory, they will be lost upon daemon restart')
+@execution_api.route('/<exec_id>/')
 class ExecutionTaskAPI(APIResource):
 
     @api.response(404, 'task execution not found')
@@ -437,33 +456,65 @@ tasks_api_schema = api.schema('tasks', tasks_api_schema)
 task_api_schema = api.schema('task', task_api_schema)
 
 
+def _load_config():
+    with codecs.open(manager.config_path, 'rb', 'utf-8') as f:
+        try:
+            raw_config = f.read()
+        except UnicodeDecodeError:
+            raise ValueError('Config file is not UTF-8 encoded')
+    return yaml.safe_load(raw_config) or {}
+
+
 @tasks_api.route('/')
 class TasksAPI(APIResource):
 
     @api.response(200, 'list of tasks', tasks_api_schema)
+    @api.response(500, 'unable to read config')
     def get(self, session=None):
         """ Show all tasks """
-        # TODO: Should we only return config items or also include the default fields..
+
+        # Read from config so default values, unless set in the config, are not sent
+        try:
+            config = _load_config()
+        except Exception as e:
+            return {'error': 'unable to read config: %s' % str(e)}, 500
 
         tasks = []
         for name in manager.tasks:
-            tasks.append({'name': name, 'config': manager.config['tasks'][name]})
+            tasks.append({'name': name, 'config': config['tasks'][name]})
         return {'tasks': tasks}
 
     @api.validate(task_api_schema)
     @api.response(201, 'newly created task', task_api_schema)
     @api.response(409, 'task already exists', task_api_schema)
+    @api.response(500, 'unable to read config')
     def post(self, session=None):
         """ Add new task """
+        try:
+            config = _load_config()
+        except Exception as e:
+            return {'error': 'unable to read config: %s' % str(e)}, 500
+
         data = request.json
 
         task_name = data['name']
 
-        if task_name in manager.config['tasks']:
+        if task_name in config.get('tasks', {}):
             return {'error': 'task already exists'}, 409
 
-        manager.config['tasks'][task_name] = data['config']
-        manager.save_config()
+        if 'tasks' not in config:
+            config['tasks'] = {}
+
+        config['tasks'][task_name] = data['config']
+
+        config_processed = copy.deepcopy(config)
+        errors = process_config(config_processed)
+
+        if errors:
+            return {'error': 'problem loading config, raise a BUG as this should not happen!'}, 500
+
+        manager.config['tasks'][task_name] = config_processed['tasks'][task_name]
+        manager.save_config(config=config)
         manager.config_changed()
         return {'name': task_name, 'config': manager.config['tasks'][task_name]}, 201
 
@@ -474,42 +525,62 @@ class TaskAPI(APIResource):
 
     @api.response(200, 'task config', task_api_schema)
     @api.response(404, 'task not found')
+    @api.response(500, 'unable to read config')
     def get(self, task, session=None):
         """ Get task config """
-        if task not in manager.tasks:
+        try:
+            config = _load_config()
+        except Exception as e:
+            return {'error': 'unable to read config: %s' % str(e)}, 500
+
+        if task not in config.get('tasks', {}):
             return {'error': 'task %s not found' % task}, 404
 
-        return {'name': task, 'config': manager.config['tasks'][task]}
+        return {'name': task, 'config': config['tasks'][task]}
 
     @api.validate(task_api_schema)
     @api.response(200, 'updated task', task_api_schema)
     @api.response(201, 'renamed task', task_api_schema)
     @api.response(404, 'task does not exist', task_api_schema)
     @api.response(400, 'cannot rename task as it already exist', task_api_schema)
+    @api.response(500, 'unable to read config')
     def post(self, task, session=None):
         """ Update tasks config """
-        # TODO: Should we only return config items or also include the default fields..
         data = request.json or {}
 
         new_task_name = data['name']
 
-        if task not in manager.config['tasks']:
+        try:
+            config = _load_config()
+        except Exception as e:
+            return {'error': 'unable to read config: %s' % str(e)}, 500
+
+        if task not in config.get('tasks', {}):
             return {'error': 'task does not exist'}, 404
 
         code = 200
         if task != new_task_name:
             # Rename task
-            if new_task_name in manager.config['tasks']:
+            if new_task_name in config['tasks']:
                 return {'error': 'cannot rename task as it already exist'}, 400
 
+            del config['tasks'][task]
             del manager.config['tasks'][task]
             code = 201
 
-        manager.config['tasks'][new_task_name] = data['config']
-        manager.save_config()
+        config['tasks'][new_task_name] = data['config']
+
+        config_processed = copy.deepcopy(config)
+        errors = process_config(config_processed)
+
+        if errors:
+            return {'error': 'problem loading config, raise a BUG as this should not happen!'}, 500
+
+        manager.config['tasks'][new_task_name] = config_processed['tasks'][new_task_name]
+        manager.save_config(config=config)
         manager.config_changed()
 
-        return {'name': task, 'config': manager.config['tasks'][new_task_name]}, code
+        return {'name': task, 'config': config['tasks'][new_task_name]}, code
 
     @api.response(200, 'deleted task')
     @api.response(404, 'task not found')

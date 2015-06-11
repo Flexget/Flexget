@@ -42,6 +42,7 @@ def _update_menu(root):
             if 'current' in item:
                 item.pop('current')
 
+
 @app.route('/userstatic/<path:filename>')
 def userstatic(filename):
     return send_from_directory(os.path.join(manager.config_base, 'userstatic'), filename)

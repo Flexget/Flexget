@@ -382,6 +382,8 @@ class Manager(object):
 
         :param options: argparse options
         """
+
+        # Import API so it can register to daemon.started event
         if options.action == 'start':
             if self.is_daemon:
                 log.error('Daemon already running for this config.')
@@ -595,15 +597,18 @@ class Manager(object):
         log.debug('New config data loaded.')
         fire_event('manager.config_updated', self)
 
-    def save_config(self):
+    def save_config(self, config=None):
         """Dumps current config to yaml config file"""
+        if not config:
+            config = self.config
+
         # Back up the user's current config before overwriting
         backup_path = os.path.join(self.config_base,
                                    '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')))
         log.debug('backing up old config to %s before new save' % backup_path)
         shutil.copy(self.config_path, backup_path)
         with open(self.config_path, 'w') as config_file:
-            config_file.write(yaml.dump(self.config, default_flow_style=False))
+            config_file.write(yaml.dump(config, default_flow_style=False))
 
     def config_changed(self):
         """Makes sure that all tasks will have the config_modified flag come out true on the next run.

@@ -19,8 +19,8 @@ main_schema = {
                     },
                     'additionalProperties': False
                 }
-            ],
-        },
+            ]
+        }
     },
     'additionalProperties': False
 }
