@@ -32,7 +32,7 @@ from flexget.ipc import IPCClient, IPCServer
 from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv
 from flexget.task import Task
 from flexget.task_queue import TaskQueue
-from flexget.utils.tools import pid_exists
+from flexget.utils.tools import pid_exists, console
 
 
 log = logging.getLogger('manager')
@@ -282,8 +282,9 @@ class Manager(object):
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
         if ipc_info:
+            console('There is a FlexGet process already running for this config, sending execution there.')
+            log.debug('Sending command to running FlexGet process: %s' % self.args)
             try:
-                log.info('There is a FlexGet process already running for this config, sending execution there.')
                 client = IPCClient(ipc_info['port'], ipc_info['password'])
             except ValueError as e:
                 log.error(e)

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from urlparse import urlparse
 import logging
 import requests
 
@@ -15,12 +16,12 @@ class Sonarr(object):
         'type': 'object',
         'properties': {
             'base_url': {'type': 'string'},
-            'port': {'type': 'number'},
+            'port': {'type': 'number', 'default': 80},
             'api_key': {'type': 'string'},
             'include_ended': {'type': 'boolean', 'default': True},
             'only_monitored': {'type': 'boolean', 'default': False}
         },
-        'required': ['api_key', 'base_url', 'port'],
+        'required': ['api_key', 'base_url'],
         'additionalProperties': False
     }
 
@@ -37,7 +38,7 @@ class Sonarr(object):
           include_ended=<yes|no>
           only_monitored=<yes|no>
 
-        Options base_url, port and api_key are required.
+        Options base_url and api_key are required.
 
         Use with input plugin like discover and/or cofnigure_series.
         Example:
@@ -65,7 +66,8 @@ class Sonarr(object):
         remove it in flexget as well,which good be positive or negative,
         depending on your usage.
         '''
-        url = '%s:%s/api/series' % (config['base_url'], config['port'])
+        parsedurl = urlparse(config.get('base_url'))
+        url = '%s://%s:%s%s/api/series' % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path)
         headers = {'X-Api-Key': config['api_key']}
         json = task.requests.get(url, headers=headers).json()
         entries = []
@@ -81,7 +83,15 @@ class Sonarr(object):
                         entries.append(entry)
                     else:
                         log.debug('Invalid entry created? %s' % entry)
-
+            # Test mode logging
+            if task.options.test: 
+                log.info("Test mode. Entry includes:")
+                log.info("    Title: %s" % entry["title"])
+                log.info("    URL: %s" % entry["url"])
+                log.info("    Show name: %s" % entry["series_name"])
+                log.info("    TVDB ID: %s" % entry["tvdb_id"])
+                log.info("    TVRAGE ID: %s" % entry["tvrage_id"])
+                continue
         return entries
 
 
