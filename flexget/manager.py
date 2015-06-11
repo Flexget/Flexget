@@ -386,6 +386,9 @@ class Manager(object):
             if self.is_daemon:
                 log.error('Daemon already running for this config.')
                 return
+            elif self.task_queue.is_alive():
+                log.error('Non-daemon execution of FlexGet is running. Cannot start daemon until it is finished.')
+                return
             if options.daemonize:
                 self.daemonize()
             try:
