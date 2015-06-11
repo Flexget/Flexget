@@ -36,5 +36,5 @@ class TestLazyFields(object):
         entry = setup_entry()
         entry['fail'] = True
         assert entry['a_fail'] == 'b', 'Lookup should have fallen back to b'
-        assert 'a_field' not in entry, 'a_field should no longer be in entry after failed lookup'
+        assert entry['a_field'] is None, 'a_field should be None after failed lookup'
         assert entry['ab_field'] == 'b', 'ab_field should be `b`'

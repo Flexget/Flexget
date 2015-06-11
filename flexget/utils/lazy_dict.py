@@ -29,7 +29,7 @@ class LazyLookup(object):
             index = next((i for i, keys in enumerate(self.key_list) if key in keys), None)
             if index is None:
                 # All lazy lookup functions for this key were tried unsuccessfully
-                raise KeyError(key)
+                return None
             func = self.func_list.pop(index)
             self.key_list.pop(index)
             try:
