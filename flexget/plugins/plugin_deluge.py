@@ -783,8 +783,6 @@ class OutputDeluge(DelugePlugin):
                 @defer.inlineCallbacks
                 def _wait_for_metadata(id, timeout):
                     from time import sleep
-                    status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path',
-                                    'move_on_completed', 'progress']
                     log.info('Waiting %d seconds for "%s" to magnetize' % (timeout, entry['title']))
                     try:
                         while timeout > 0:
