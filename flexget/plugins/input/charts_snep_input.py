@@ -15,10 +15,9 @@ class ChartsSnepInput(object):
 
     schema = {
         'type': {
-            'type': 'string',
-            'enum': ['all_album', 'disk_album', 'digit_album',
+            'type': {'all_album', 'disk_album', 'digit_album',
                      'digit_single', 'stream_single',
-                     'compil', 'back_catalog', 'radio']
+                     'compil', 'back_catalog', 'radio'}
         }
     }
 
