@@ -781,19 +781,25 @@ class OutputDeluge(DelugePlugin):
             for entry in task.accepted:
 
                 @defer.inlineCallbacks
-                def _wait_for_files(id, timeout):
+                def _wait_for_metadata(id, timeout):
                     from time import sleep
-                    log.info('wait_for_files(%s, %d)' % (id, timeout))
+                    status_keys = ['files', 'total_size', 'save_path', 'move_on_completed_path',
+                                    'move_on_completed', 'progress']
+                    log.info('Waiting %d seconds for "%s" to magnetize' % (timeout, entry['title']))
                     try:
                         while timeout > 0:
                             sleep(1)
                             status = yield client.core.get_torrent_status(id, ['files'])
+                            print status
                             if len(status['files']) > 0:
+                                log.info('"%s" magnetization successful' % (entry['title']))
                                 defer.returnValue(True)
                             else:
                                 timeout -= 1
                     except Exception as err:
-                        log.error('wait_for_files Error: %s' % err)
+                        log.error('wait_for_metadata Error: %s' % err)
+
+                    log.warning('"%s" did not magnetize before the timeout elapsed, file list unavailable for processing.' % entry['title'])
                     defer.returnValue(False)
 
                 def add_entry(entry, opts):
@@ -811,24 +817,10 @@ class OutputDeluge(DelugePlugin):
 
                     log.verbose('Adding %s to deluge.' % entry['title'])
                     if magnet:
-                        # we need to set paused to false so the magnetization begins immediately
-                        # NOTE: is this the correct config property and value?
-                        opts['add_paused'] = False
-
-                        id = client.core.add_torrent_magnet(magnet, opts)
-
-                        magnetization_timeout = entry.get('magnetization_timeout', config.get('magnetization_timeout'))
-                        if magnetization_timeout > 0:
-                            log.info('Waiting %d seconds for "%s" to magnetize' % (magnetization_timeout, entry['title']))
-                            magnetized = _wait_for_files(id, magnetization_timeout).getResult()
-                            if not magnetized:
-                                log.warning('"%s" did not magnetize before the timeout elapsed, file list unavailable for processing.' % entry['title'])
-                            else:
-                                log.info('magnetization successful')
-                        else:
-                            log.info('not waiting for magnetization')
-
-                        return id
+                        d = client.core.add_torrent_magnet(magnet, opts)
+                        if config.get('magnetization_timeout'):
+                            d.addCallback(_wait_for_metadata, config['magnetization_timeout'])
+                        return d
                     else:
                         return client.core.add_torrent_file(entry['title'], filedump, opts)
 
