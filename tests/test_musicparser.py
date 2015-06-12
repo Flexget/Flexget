@@ -324,7 +324,9 @@ class TestMusicParser(object):
             self.check_entry(challenger, check, self.permissive_assertor)
 
         error_rating = self.fails / (self.fails+self.success)
-        assert error_rating < self.error_margin, "Too much parse error ({:.1%})".format(error_rating)
+        assert error_rating < self.error_margin, \
+            "Too much parse error ({0:.1%} > {1:.1%})".format(error_rating, self.error_margin)
 
         if self.fails > 0:
-            log.info("{:} faillure(s) on {:} tests ({:.1%})".format(self.fails, self.fails+self.success, error_rating))
+            log.info("{0:} faillure(s) on {1:} tests but test pass ({2:.1%} < {3:.1%})"
+                     .format(self.fails, self.fails+self.success, error_rating, self.error_margin))
