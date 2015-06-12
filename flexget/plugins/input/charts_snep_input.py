@@ -9,20 +9,26 @@ from flexget.utils.cached_input import cached
 log = logging.getLogger('charts_snep_input')
 
 
+source_enum = ['all_album', 'disk_album', 'digit_album',
+               'digit_single', 'stream_single',
+               'compil', 'back_catalog', 'radio']
+
 class ChartsSnepInput(object):
     """Create an entrie for each charted single in your charts request"""
 
     schema = {
-        'type': {'enum': ['all_album', 'disk_album', 'digit_album',
-                     'digit_single', 'stream_single',
-                     'compil', 'back_catalog', 'radio']
-        }
+        'type': 'string'
     }
-
 
 
     @cached('charts_snep_input', persist='2 hours')
     def on_task_input(self, task, config):
+        if config not in source_enum:
+            log.warning("'%s' is an unknow charts type for charts_snep. Please to use %s."
+                        % (config, ', '.join(source_enum)))
+            return []
+
+
         log.verbose('Retrieving weekly SNEP charts of %s' % config)
         parser = SnepChartsParser()
         chart_entries = parser.retrieve_charts(config)
