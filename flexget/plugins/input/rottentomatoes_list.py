@@ -44,14 +44,19 @@ class RottenTomatoesList(object):
         root = validator.factory('dict')
         root.accept('list', key='dvds').accept('choice').accept_choices(self.dvd_lists)
         root.accept('list', key='movies').accept('choice').accept_choices(self.movie_lists)
+        root.accept('text', key='api_key')
         return root
 
     @cached('rottentomatoes_list', persist='2 hours')
     def on_task_input(self, task, config):
         entries = []
+        api_key = config.get('api_key', None)
         for l_type, l_names in config.items():
+            if type(l_names) is not list: 
+                continue
+            
             for l_name in l_names:
-                results = lists(list_type=l_type, list_name=l_name)
+                results = lists(list_type=l_type, list_name=l_name, api_key=api_key)
                 if results:
                     for movie in results['movies']:
                         if [entry for entry in entries if movie['title'] == entry.get('title')]:
