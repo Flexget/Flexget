@@ -3,6 +3,7 @@ import time
 import logging
 import difflib
 import random
+import urllib
 from datetime import datetime, timedelta
 from urllib2 import URLError
 
@@ -423,9 +424,10 @@ def _set_movie_details(movie, session, movie_data=None, api_key=None):
     if movie_data:
         if movie.id:
             log.debug("Updating movie info (actually just deleting the old info and adding the new)")
-            session.delete(movie)
-            session.flush()
-            movie = RottenTomatoesMovie()
+            del movie.release_dates[:]
+            del movie.posters[:]
+            del movie.alternate_ids[:]
+            del movie.links[:]
         movie.update_from_dict(movie_data)
         movie.update_from_dict(movie_data.get('ratings'))
         genres = movie_data.get('genres')
@@ -508,7 +510,7 @@ def lists(list_type, list_name, limit=20, page_limit=20, page=None, api_key=None
 
 def movies_search(q, page_limit=None, page=None, api_key=None):
     if isinstance(q, basestring):
-        q = q.replace(' ', '+').encode('utf-8')
+        q = urllib.quote_plus(q.encode('latin-1', errors='ignore'))
 
     if not api_key:
         api_key = API_KEY
