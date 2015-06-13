@@ -783,23 +783,23 @@ class OutputDeluge(DelugePlugin):
             for entry in task.accepted:
 
                 @defer.inlineCallbacks
-                def _wait_for_metadata(id, timeout):
-                    from time import sleep
-                    log.info('Waiting %d seconds for "%s" to magnetize' % (timeout, entry['title']))
-                    try:
-                        while timeout > 0:
-                            sleep(1)
-                            status = yield client.core.get_torrent_status(id, ['files'])
-                            if len(status['files']) > 0:
-                                log.info('"%s" magnetization successful' % (entry['title']))
-                                defer.returnValue(id)
-                            else:
-                                timeout -= 1
-                    except Exception as err:
-                        log.error('wait_for_metadata Error: %s' % err)
+                def _wait_for_metadata(torrent_id, timeout):
+                    log.verbose('Waiting %d seconds for "%s" to magnetize' % (timeout, entry['title']))
+                    for i in xrange(timeout):
+                        time.sleep(1)
+                        try:
+                            status = yield client.core.get_torrent_status(torrent_id, ['files'])
+                        except Exception as err:
+                            log.error('wait_for_metadata Error: %s' % err)
+                            break
+                        if len(status['files']) > 0:
+                            log.info('"%s" magnetization successful' % (entry['title']))
+                            break
+                    else:
+                        log.warning('"%s" did not magnetize before the timeout elapsed, '
+                                    'file list unavailable for processing.' % entry['title'])
 
-                    log.warning('"%s" did not magnetize before the timeout elapsed, file list unavailable for processing.' % entry['title'])
-                    defer.returnValue(id)
+                    defer.returnValue(torrent_id)
 
                 def add_entry(entry, opts):
                     """Adds an entry to the deluge session"""
