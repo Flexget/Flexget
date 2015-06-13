@@ -1,3 +1,5 @@
+# coding=utf-8
+
 from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
@@ -5,10 +7,8 @@ import logging
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.task import Task
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
-from bs4 import BeautifulSoup, NavigableString, Tag
 
 log = logging.getLogger('serienjunkies')
 
@@ -19,7 +19,8 @@ regex_season    = re.compile(r'(?<=\.|\-)S\d\d(?:[-\.]S\d\d)*(?!E\d\d+)', re.I)
 regex_language_container = re.compile(r'Sprache')
 
 regex_is_german   = re.compile(r'german|deutsch', re.I)
-regex_is_foreign  = re.compile(r'englisc?h|französisch|japanisch|dänisch|norwegisch|niederländisch|ungarisch|italienisch|portugiesisch', re.I)
+regex_is_foreign  = re.compile(
+    r'englisc?h|franzÃ¶sisch|japanisch|dÃ¤nisch|norwegisch|niederlÃ¤ndisch|ungarisch|italienisch|portugiesisch', re.I)
 regex_is_subtitle = re.compile(r'Untertitel|Subs?|UT', re.I)
 
 
