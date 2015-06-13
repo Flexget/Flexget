@@ -5,9 +5,9 @@ from sqlalchemy import Column, Unicode
 from flask import Blueprint, request, Response
 
 from flexget.event import event
-from flexget.ui.webui import register_plugin, app, manager, db_session
+from flexget.ui import register_plugin, manager, webui_app
 from flexget.manager import Base
-from flexget.ui.webui import config
+
 
 log = logging.getLogger('ui.authentication')
 auth = Blueprint('authentication', __name__)
@@ -81,4 +81,4 @@ def check_authenticated():
         return authenticate()
 
 
-register_plugin(auth)
+#register_plugin(auth)

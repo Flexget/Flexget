@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from sqlalchemy import desc
-from flexget.ui.webui import register_plugin, db_session
+from flexget.ui import register_plugin
 from flask import render_template, Blueprint
 from flexget.plugin import DependencyError
 

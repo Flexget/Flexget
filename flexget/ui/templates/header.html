@@ -1,0 +1,45 @@
+<div class="container header">
+    <div class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="/"></a>
+            </div>
+
+            <div class="collapse navbar-collapse">
+                <div>
+                    <ul class="nav navbar-nav">
+                        {% for item in menu -%}
+                            <li>
+                                <a href="{{ item.href }}" {%- if item.current is defined %} class="current" {% endif -%}>
+                                    {{ item.caption }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class="col-sm-3 col-md-3 pull-right">
+                </div>
+            </div><!--/.nav-collapse -->
+        </div>
+    </div>
+</div>
+
+
+<!-- flash messages -->
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+  <div id="flash">
+  <ul id="flashes">
+  {% for category, message in messages %}
+    <li class="{{ category }}">{{ message }}</li>
+  {% endfor %}
+  </ul>
+  </div>
+{% endif %}
+{% endwith %}

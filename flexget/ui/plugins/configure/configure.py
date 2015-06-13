@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from flexget.ui.webui import manager, register_plugin, app
+from flexget.ui import manager, register_plugin, webui_app
 from flexget.task import Task
 from flask import render_template, request, flash, redirect, Blueprint
 import yaml
@@ -110,7 +110,7 @@ def jsonary():
     return render_template('configure/edit_jsonary.html')
 
 
-@app.template_filter('other_type')
+@webui_app.template_filter('other_type')
 def other_type(root):
     if root == 'tasks':
         return 'presets'

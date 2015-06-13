@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 from jsonschema import RefResolutionError
 
 from flexget.config_schema import resolve_ref
-from flexget.ui.webui import register_plugin
+from flexget.ui import register_plugin
 
 schema = Blueprint('schema', __name__)
 

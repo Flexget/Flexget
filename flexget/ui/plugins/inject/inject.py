@@ -4,7 +4,7 @@ import posixpath
 import urlparse
 from flask import render_template, request, flash, redirect, Blueprint
 from flask.helpers import url_for
-from flexget.ui.webui import register_plugin, manager
+from flexget.ui import register_plugin, manager
 from flexget.entry import Entry
 
 inject = Blueprint('inject', __name__)

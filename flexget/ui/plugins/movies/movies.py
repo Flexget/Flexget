@@ -5,7 +5,7 @@ import posixpath
 from flask import render_template, Blueprint, request, redirect, flash, send_file
 from flask.helpers import url_for
 from flexget.plugin import DependencyError, get_plugin_by_name
-from flexget.ui.webui import register_plugin, app, manager
+from flexget.ui import register_plugin, webui_app, manager
 from flexget.utils import qualities
 
 try:
@@ -23,7 +23,7 @@ log = logging.getLogger('ui.movies')
 #       ... mainly because we have flexget/utils for that :)
 
 
-@app.template_filter('pretty_age')
+@webui_app.template_filter('pretty_age')
 def pretty_age_filter(value):
     from flexget.ui.utils import pretty_date
     return pretty_date(time.mktime(value.timetuple()))

@@ -3,7 +3,7 @@ import logging
 from datetime import datetime
 from flask import render_template, Blueprint, jsonify, request
 from sqlalchemy import Column, DateTime, Integer, Unicode, String, asc, desc, or_, and_
-from flexget.ui.webui import register_plugin, db_session
+from flexget.ui import register_plugin
 from flexget.manager import Base, Session
 from flexget.event import event
 

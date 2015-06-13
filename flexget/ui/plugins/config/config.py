@@ -3,7 +3,7 @@ import logging
 
 from flask import request, Blueprint, jsonify, json
 
-from flexget.ui.webui import manager, register_plugin
+from flexget.ui import manager, register_plugin
 
 
 config = Blueprint('config', __name__)

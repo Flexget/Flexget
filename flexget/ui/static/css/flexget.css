@@ -1,0 +1,42 @@
+/* ####### */
+/* General */
+/* ####### */
+
+.header .navbar {
+    background-image: url('/ui/static/img/FlexGet.png');
+    background-size: 180px;
+    background-repeat: no-repeat;
+    background-position: right;
+}
+
+@media screen and (max-width: 699px) {
+    .container.header {
+        background-color: white;
+    }
+    .header .navbar {
+        background-position: left;
+    }
+
+}
+
+
+
+@media screen and (min-width: 700px) {
+    body {
+        background-color: #EDEDED;
+    }
+
+    .container {
+        border-radius: 5px;
+        background-color: white;
+        padding-top: 10px;
+        padding-right: 15px;
+        padding-left: 15px;
+        margin-bottom: 20px;
+    }
+
+    .container.header {
+        background-color: #EDEDED;
+        padding: 10px 0px 10px 0px;
+    }
+}

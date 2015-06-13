@@ -177,7 +177,6 @@ api = _Api(app, catch_all_404s=True, title='Flexget API')
 @event('manager.daemon.started')
 def register_api(mgr):
     api_config = mgr.config.get('api')
-    api_config = mgr.config.get('api')
 
     if api_config:
         register_app('/api', app)
@@ -211,7 +210,7 @@ class ServerReloadAPI(APIResource):
             return {'error': 'Error loading config %s' % e.args[0]}, 500
 
         log.info('Config successfully reloaded from disk.')
-        return {'error': 'Config successfully reloaded from disk.'}
+        return {}
 
 pid_schema = {
     "type": "object",  "properties": {

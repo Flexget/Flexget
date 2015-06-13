@@ -6,7 +6,7 @@ import threading
 from sqlalchemy import Column, Integer, Unicode
 from flask import request, render_template, flash, Blueprint, redirect, url_for
 
-from flexget.ui.webui import register_plugin, db_session, manager
+from flexget.ui import register_plugin, manager
 from flexget.manager import Base
 from flexget.event import event, fire_event
 

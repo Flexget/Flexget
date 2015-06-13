@@ -1,39 +1,26 @@
+import logging
+
 from flexget.event import event
 from flexget.config_schema import register_config_key
+from flexget.ui import register_web_ui
 
+log = logging.getLogger("webui")
 
-main_schema = {
-    'type': 'object',
-    'properties': {
-        'bind': {'type': 'string', 'format': 'ipv4', 'default': '0.0.0.0'},
-        'port': {'type': 'integer', 'default': 5050},
-        'authentication': {
-            'oneOf': [
-                {"type": "boolean"},
-                {
-                    "type": "object",
-                    "properties": {
-                        'username': {'type': 'string'},
-                        'password': {'type': 'string'},
-                        'no_local_auth': {'type': 'boolean', 'default': True}
-                    },
-                    'additionalProperties': False
-                }
-            ]
-        }
-    },
-    'additionalProperties': False
+webui_config_schema = {
+    'type': 'boolean'
 }
+
 
 @event('config.register')
 def register_config():
-    register_config_key('webui', main_schema)
+    register_config_key('webui', webui_config_schema)
 
 
 @event('manager.daemon.started')
 def register_webui(manager):
-    webui_config = manager.config.get('api')
+    webui_config = manager.config.get('webui')
 
-    if webui_config:
-        # TODO: register webui app
-        pass
+    if not webui_config:
+        log.info("Not starting webui as it's disabled or not set in the config")
+    else:
+        register_web_ui(manager)

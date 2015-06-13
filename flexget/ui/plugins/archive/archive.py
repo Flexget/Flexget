@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.ui.webui import db_session, app
+from flexget.ui import webui_app
 from flask import request, render_template, flash, Blueprint
 from flexget.plugin import DependencyError
 
@@ -18,7 +18,7 @@ archive = Blueprint('archive', __name__)
 #       ... mainly because we have flexget/utils for that :)
 
 
-@app.template_filter('pretty_age')
+@webui_app.template_filter('pretty_age')
 def pretty_age_filter(value):
     import time
     from flexget.ui.utils import pretty_date

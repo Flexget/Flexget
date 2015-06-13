@@ -6,7 +6,7 @@ from flask import redirect, render_template, Blueprint, request, flash, url_for
 from sqlalchemy.sql.expression import desc, asc
 
 from flexget.plugin import DependencyError
-from flexget.ui.webui import register_plugin, db_session, app
+from flexget.ui import register_plugin, webui_app
 from flexget.ui.utils import pretty_date
 
 try:
@@ -27,8 +27,7 @@ log = logging.getLogger('ui.series')
 # says  seems to illeviated the need to do this no? I don't think this
 #       will be of use for anything but UI related functions.
 
-
-@app.template_filter('pretty_age')
+@webui_app.template_filter('pretty_age')
 def pretty_age_filter(value):
     return pretty_date(time.mktime(value.timetuple()))
 

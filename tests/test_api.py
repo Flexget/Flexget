@@ -1,20 +1,17 @@
-from flexget import api
-from tests import FlexGetBase
 import json
-
-from flexget.manager import Manager
-
+import os
 from mock import patch
 
-def test_schema_models():
-    # TODO: Loop through registered schema models, validate against metaschema
-    pass
+from tests import FlexGetBase, MockManager
+from flexget import __version__
+from flexget.manager import Manager
+from flexget.api import app, API_VERSION
 
 
 class APITest(FlexGetBase):
 
     def __init__(self):
-        self.client = api.app.test_client()
+        self.client = app.test_client()
         FlexGetBase.__init__(self)
 
     def json_post(self, *args, **kwargs):
@@ -25,23 +22,47 @@ class APITest(FlexGetBase):
 
 class TestServerAPI(APITest):
 
+    __yaml__ = """
+        tasks:
+          test:
+            rss:
+              url: http://test/rss
+            mock:
+              - title: entry 1
+        """
+
     def test_pid(self):
-        pass
+        rsp = self.client.get('/server/pid/')
+        assert rsp.status_code == 200
+        assert json.loads(rsp.data) == {'pid': os.getpid()}
 
-    def test_reload(self):
-        pass
+    @patch.object(MockManager, 'load_config')
+    def test_reload(self, mocked_load_config):
+        rsp = self.client.get('/server/reload/')
+        assert rsp.status_code == 200
+        assert mocked_load_config.called
 
-    def test_shutdown(self):
-        pass
+    @patch.object(Manager, 'shutdown')
+    def test_shutdown(self, mocked_shutdown):
+        self.client.get('/server/shutdown/')
+        assert mocked_shutdown.called
 
     def test_get_config(self):
-        pass
+        rsp = self.client.get('/server/config/')
+        assert rsp.status_code == 200
+        assert json.loads(rsp.data) == {
+            'tasks': {
+                'test': {
+                    'mock': [{'title': 'entry 1'}],
+                    'rss': {'url': 'http://test/rss'}
+                }
+            }
+        }
 
     def test_version(self):
-        pass
-
-    def test_log(self):
-        pass
+        rsp = self.client.get('/server/version/')
+        assert rsp.status_code == 200
+        assert json.loads(rsp.data) == {'flexget_version': __version__, 'api_version': API_VERSION}
 
 
 class TestTaskAPI(APITest):
@@ -56,8 +77,8 @@ class TestTaskAPI(APITest):
         """
 
     def test_list_tasks(self):
-        req = self.client.get('/tasks/')
-        data = json.loads(req.data)
+        rsp = self.client.get('/tasks/')
+        data = json.loads(rsp.data)
         assert data == {
             'tasks': [
                 {
@@ -80,11 +101,11 @@ class TestTaskAPI(APITest):
             }
         }
 
-        req = self.json_post('/tasks/', data=json.dumps(new_task))
+        rsp = self.json_post('/tasks/', data=json.dumps(new_task))
 
-        assert req.status_code == 201
+        assert rsp.status_code == 201
         assert mocked_save_config.called
-        assert json.loads(req.data) == new_task
+        assert json.loads(rsp.data) == new_task
         assert self.manager.user_config['tasks']['new_task'] == new_task['config']
 
         # With defaults
@@ -102,12 +123,12 @@ class TestTaskAPI(APITest):
             }
         }
 
-        req = self.json_post('/tasks/', data=json.dumps(new_task))
-        assert req.status_code == 409
+        rsp = self.json_post('/tasks/', data=json.dumps(new_task))
+        assert rsp.status_code == 409
 
     def test_get_task(self):
-        req = self.client.get('/tasks/test/')
-        data = json.loads(req.data)
+        rsp = self.client.get('/tasks/test/')
+        data = json.loads(rsp.data)
         assert data == {
             'name': 'test',
             'config': {
@@ -126,11 +147,11 @@ class TestTaskAPI(APITest):
             }
         }
 
-        req = self.json_post('/tasks/test/', data=json.dumps(updated_task))
+        rsp = self.json_post('/tasks/test/', data=json.dumps(updated_task))
 
-        assert req.status_code == 200
+        assert rsp.status_code == 200
         assert mocked_save_config.called
-        assert json.loads(req.data) == updated_task
+        assert json.loads(rsp.data) == updated_task
         assert self.manager.user_config['tasks']['test'] == updated_task['config']
 
         # With defaults
@@ -150,11 +171,11 @@ class TestTaskAPI(APITest):
             }
         }
 
-        req = self.json_post('/tasks/test/', data=json.dumps(updated_task))
+        rsp = self.json_post('/tasks/test/', data=json.dumps(updated_task))
 
-        assert req.status_code == 201
+        assert rsp.status_code == 201
         assert mocked_save_config.called
-        assert json.loads(req.data) == updated_task
+        assert json.loads(rsp.data) == updated_task
         assert 'test' not in self.manager.user_config['tasks']
         assert 'test' not in self.manager.config['tasks']
         assert self.manager.user_config['tasks']['new_test'] == updated_task['config']
@@ -168,9 +189,9 @@ class TestTaskAPI(APITest):
 
     @patch.object(Manager, 'save_config')
     def test_delete_task(self, mocked_save_config):
-        req = self.client.delete('/tasks/test/')
+        rsp = self.client.delete('/tasks/test/')
 
-        assert req.status_code == 200
+        assert rsp.status_code == 200
         assert mocked_save_config.called
         assert 'test' not in self.manager.user_config['tasks']
         assert 'test' not in self.manager.config['tasks']
