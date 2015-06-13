@@ -80,7 +80,6 @@ class PluginPyLoad(object):
         ]
     }
 
-
     def on_task_output(self, task, config):
         if not config.get('enabled', True):
             return

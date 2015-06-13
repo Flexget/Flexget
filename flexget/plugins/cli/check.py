@@ -69,17 +69,17 @@ def pre_check_config(config_path):
         if list_open:
             if line.strip().endswith(']'):
                 list_open = False
-#                    print 'closed list at line %s' % line
+                # print 'closed list at line %s' % line
             continue
         else:
             list_open = line.strip().endswith(': [') or line.strip().endswith(':[')
             if list_open:
-#                    print 'list open at line %s' % line
+                # print 'list open at line %s' % line
                 continue
 
-#            print '#%i: %s' % (line_num, line)
-#            print 'indentation: %s, prev_ind: %s, prev_mapping: %s, prev_list: %s, cur_list: %s' % \
-#                  (indentation, prev_indentation, prev_mapping, prev_list, cur_list)
+            # print '#%i: %s' % (line_num, line)
+            # print 'indentation: %s, prev_ind: %s, prev_mapping: %s, prev_list: %s, cur_list: %s' % \
+            #        (indentation, prev_indentation, prev_mapping, prev_list, cur_list)
 
         if ':\t' in line:
             log.critical('Line %s has TAB character after : character. '

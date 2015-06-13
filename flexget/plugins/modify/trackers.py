@@ -28,7 +28,7 @@ class AddTrackers(object):
         for entry in task.entries:
             if 'torrent' in entry:
                 for url in config:
-                    if not url in entry['torrent'].trackers:
+                    if url not in entry['torrent'].trackers:
                         entry['torrent'].add_multitracker(url)
                         log.info('Added %s tracker to %s' % (url, entry['title']))
             if entry['url'].startswith('magnet:'):

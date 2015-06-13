@@ -26,7 +26,7 @@ class MetainfoImdbUrl(object):
             # Don't override already populated imdb_ids
             if entry.get('imdb_id', eval_lazy=False):
                 continue
-            if not 'description' in entry:
+            if 'description' not in entry:
                 continue
             urls = re.findall(r'\bimdb.com/title/tt\d+\b', entry['description'])
             # Find unique imdb ids
@@ -41,6 +41,7 @@ class MetainfoImdbUrl(object):
             entry['imdb_id'] = imdb_ids[0]
             entry['imdb_url'] = make_url(entry['imdb_id'])
             log.debug('Found imdb url in description %s' % entry['imdb_url'])
+
 
 @event('plugin.register')
 def register_plugin():

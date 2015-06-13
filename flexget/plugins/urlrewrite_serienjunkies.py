@@ -13,6 +13,7 @@ log = logging.getLogger('serienjunkies')
 LANGUAGE = ['de', 'en', 'both']
 HOSTER = ['ul', 'cz', 'so']
 
+
 class UrlRewriteSerienjunkies(object):
 
     """
@@ -52,7 +53,7 @@ class UrlRewriteSerienjunkies(object):
         search_title = re.sub('\[.*\] ', '', download_title)
         self.config = task.config.get('serienjunkies')
         download_url = self.parse_download(series_url, search_title, self.config, entry)
-        #Debug Information
+        # Debug Information
         log.debug('TV Show URL: %s' % series_url)
         log.debug('Episode: %s' % search_title)
         log.debug('Download URL: %s' % download_url)
@@ -114,6 +115,7 @@ class UrlRewriteSerienjunkies(object):
                 continue
         
         raise UrlRewritingError('URL-Rewriting failed, enable verbose logging for details.')
+
 
 @event('plugin.register')
 def register_plugin():

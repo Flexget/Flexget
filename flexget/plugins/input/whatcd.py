@@ -316,7 +316,7 @@ class InputWhatCD(object):
                     torrent_seeds=tor['seeders'],
                     torrent_leeches=tor['leechers'],
                     # Size is given in bytes, convert it
-                    content_size=int(tor['size']/(1024**2)*100)/100
+                    content_size=int(tor['size'] / (1024**2) * 100) / 100
                 ))
 
         return entries

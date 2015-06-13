@@ -14,13 +14,17 @@ log = logging.getLogger('search_cpasbien')
 
 session = requests.Session()
 
+
 class SearchCPASBIEN(object):
     schema = {
         'type': 'object',
-        'properties': {
-            'category': {'type': 'string', 'enum': ['films', 'series', 'musique', 'films-french',
-                                                    '720p', 'series-francaise', 'films-dvdrip', 'all',
-                                                    'films-vostfr', '1080p', 'series-vostfr', 'ebook']
+        'properties':
+        {
+            'category': {
+                'type': 'string',
+                'enum': ['films', 'series', 'musique', 'films-french',
+                         '720p', 'series-francaise', 'films-dvdrip', 'all',
+                         'films-vostfr', '1080p', 'series-vostfr', 'ebook']
             },
         },
         'required': ['category'],
@@ -111,11 +115,11 @@ class SearchCPASBIEN(object):
                         size = sizefull[:-3]
                         unit = sizefull[-2:]
                         if unit == 'GB':
-                            entry['content_size'] = int(float(size)*1024)
+                            entry['content_size'] = int(float(size) * 1024)
                         elif unit == 'MB':
                             entry['content_size'] = int(float(size))
                         elif unit == 'KB':
-                            entry['content_size'] = int(float(size)/1024)
+                            entry['content_size'] = int(float(size) / 1024)
                         if(entry['torrent_seeds'] > 0):
                             entries.add(entry)
                         else:
@@ -125,6 +129,7 @@ class SearchCPASBIEN(object):
                     else:
                         nextpage = -1
             return entries
+
 
 @event('plugin.register')
 def register_plugin():

@@ -86,6 +86,7 @@ def register_parser_arguments():
     parser.add_argument('--search', action='store', metavar='TERM', help='limit to results that contain %(metavar)s')
     parser.add_argument('--task', action='store', metavar='TASK', help='limit to results in specified %(metavar)s')
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginHistory, 'history', builtin=True, api_ver=2)

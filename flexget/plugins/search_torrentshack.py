@@ -136,7 +136,6 @@ class TorrentShackSearch(object):
         config['category'] = categories_id
         return config
 
-
     @plugin.internet(log)
     def search(self, task, entry, config=None):
         config = self.prepare_config(config)

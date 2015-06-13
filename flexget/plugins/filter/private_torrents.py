@@ -34,7 +34,7 @@ class FilterPrivateTorrents(object):
         private_torrents = config
 
         for entry in task.accepted:
-            if not 'torrent' in entry:
+            if 'torrent' not in entry:
                 log.debug('`%s` is not a torrent' % entry['title'])
                 continue
             private = entry['torrent'].private

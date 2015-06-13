@@ -114,7 +114,8 @@ class TraktList(object):
         for item in data:
             # Collection and watched lists don't return 'type' along with the items (right now)
             if 'type' in item and item['type'] != list_type:
-                log.debug('Skipping %s because it is not a %s' % (item[item['type']].get('title', 'unknown'), list_type))
+                log.debug('Skipping %s because it is not a %s' % (item[item['type']].get('title', 'unknown'),
+                                                                  list_type))
                 continue
             if not item[list_type]['title']:
                 # There seems to be some bad shows sometimes in lists with no titles. Skip them.

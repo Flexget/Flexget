@@ -20,14 +20,16 @@ log = logging.getLogger('email')
 # A dict which stores the email content from each task when plugin is configured globally
 task_content = {}
 
+
 def prepare_config(config):
     if not isinstance(config['to'], list):
         config['to'] = [config['to']]
     return config
 
+
 @event('manager.execute.started')
 def setup(manager, options):
-    if not 'email' in manager.config:
+    if 'email' not in manager.config:
         return
     config = prepare_config(manager.config['email'])
     config['global'] = True
@@ -44,7 +46,7 @@ def setup(manager, options):
 
 @event('manager.execute.completed')
 def global_send(manager, options):
-    if not 'email' in manager.config:
+    if 'email' not in manager.config:
         return
     config = prepare_config(manager.config['email'])
     content = ''

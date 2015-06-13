@@ -76,12 +76,13 @@ class EmitMovieQueue(object):
                 # TODO: qualities can now be ranges.. how should we handle this?
                 if config.get('quality') and queue_item.quality != 'ANY':
                     log.info('quality option of emit_movie_queue is disabled while we figure out how to handle ranges')
-                    #entry['title'] += ' %s' % queue_item.quality
+                    # entry['title'] += ' %s' % queue_item.quality
                 entries.append(entry)
                 log.debug('Added title and IMDB id to new entry: %s - %s' %
                          (entry['title'], entry['imdb_id']))
 
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

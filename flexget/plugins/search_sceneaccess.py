@@ -78,6 +78,7 @@ CATEGORIES = {
 
 URL = 'https://sceneaccess.eu/'
 
+
 class SceneAccessSearch(object):
     """ Scene Access Search plugin
 
@@ -240,7 +241,7 @@ class SceneAccessSearch(object):
                       'submit': 'come on in'}
             session.post(URL + 'login', data=params)
 
-        if config.has_key('gravity_multiplier'):
+        if 'gravity_multiplier' in config:
             multip = config['gravity_multiplier']
         else:
             multip = 1
@@ -270,7 +271,8 @@ class SceneAccessSearch(object):
 
                     entry['torrent_seeds'] = result.find('td', attrs={'class': 'ttr_seeders'}).text
                     entry['torrent_leeches'] = result.find('td', attrs={'class': 'ttr_leechers'}).text
-                    entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])*multip
+                    entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
+                                                                entry['torrent_leeches']) * multip
 
                     size = result.find('td', attrs={'class': 'ttr_size'}).next
                     size = re.search('(\d+(?:[.,]\d+)*)\s?([KMG]B)', size)
@@ -288,6 +290,7 @@ class SceneAccessSearch(object):
                     entries.add(entry)
 
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

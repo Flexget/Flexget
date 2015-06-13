@@ -40,6 +40,7 @@ class UrlRewriteKoreus(object):
             raise UrlRewritingError('Unable to locate download link from url %s' % url)
         return down_link.get('href')
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(UrlRewriteKoreus, 'koreus', groups=['urlrewriter'], api_ver=2)

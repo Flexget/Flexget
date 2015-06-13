@@ -208,7 +208,7 @@ class FilterSeen(object):
         se = SeenEntry(entry['title'], unicode(task.name), reason, local)
         remembered = []
         for field in fields:
-            if not field in entry:
+            if field not in entry:
                 continue
             # removes duplicate values (eg. url, original_url are usually same)
             if entry[field] in remembered:

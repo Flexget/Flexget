@@ -46,7 +46,7 @@ CATEGORIES = {
     'Sport': 636,
     'Video-clips': 402
 
-    }
+}
 
 SUB_CATEGORIES = {
 
@@ -292,8 +292,8 @@ class UrlRewriteTorrent411(object):
             'password': {'type': 'string'},
             'category': {'type': 'string'},
             'sub_category': one_or_more(
-                    {'type': 'string', 'enum': list(SUB_CATEGORIES)}
-                ),
+                {'type': 'string', 'enum': list(SUB_CATEGORIES)}
+            ),
         },
         'required': ['username', 'password'],
         'additionalProperties': False
@@ -357,7 +357,8 @@ class UrlRewriteTorrent411(object):
 
             if sub_categories[0] is not None:
                 sub_categories = [SUB_CATEGORIES[c] for c in sub_categories]
-                filter_url = filter_url + '&' + '&'.join([urllib.quote_plus('term[%s][]' % c[0]).encode('utf-8') + '=' + str(c[1])
+                filter_url = filter_url + '&' + '&'.join([urllib.quote_plus('term[%s][]' % c[0]).
+                                                          encode('utf-8') + '=' + str(c[1])
                                                           for c in sub_categories])
 
         entries = set()
@@ -380,7 +381,9 @@ class UrlRewriteTorrent411(object):
                 nfo_link_res = re.search('torrents/nfo/\?id=(\d+)', str(tr))
                 if nfo_link_res is not None:
                     tid = nfo_link_res.group(1)
-                title_res = re.search('<a href=\"//www.t411.io/torrents/([-A-Za-z0-9+&@#/%|?=~_|!:,.;]+)\" title="([^"]*)">',str(tr))
+                title_res = re.search(
+                    '<a href=\"//www.t411.io/torrents/([-A-Za-z0-9+&@#/%|?=~_|!:,.;]+)\" title="([^"]*)">',
+                    str(tr))
                 if title_res is not None:
                     entry['title'] = title_res.group(2).decode('utf-8')
                 size = tr('td')[5].contents[0]

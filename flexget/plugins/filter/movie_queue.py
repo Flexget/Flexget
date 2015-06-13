@@ -99,7 +99,7 @@ class MovieQueue(queue_base.FilterQueueBase):
             return
         if not isinstance(config, dict):
             config = {'action': config}
-        #only the accept action is applied in the 'matches' section
+        # only the accept action is applied in the 'matches' section
         if config.get('action') != 'accept':
             return
 
