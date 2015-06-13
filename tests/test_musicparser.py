@@ -281,7 +281,12 @@ checks = [{
               'audioCodec': 'FLAC'
           }]
 
+
 class TestMusicParser(object):
+    """
+    I assume that a parser cannot manage all situations so I set a tolerance limit (5%) of
+    parse error against a human parsing. The test will fail if failures exceed this limit.
+    """
     def __init__(self):
         self.parser = ParserGuessitMusic()
         self.error_margin = 0.05
@@ -323,10 +328,10 @@ class TestMusicParser(object):
             challenger = self.parser.parse_music(check['raw'])
             self.check_entry(challenger, check, self.permissive_assertor)
 
-        error_rating = self.fails / (self.fails+self.success)
+        error_rating = self.fails / (self.fails + self.success)
         assert error_rating < self.error_margin, \
             "Too much parse error ({0:.1%} > {1:.1%})".format(error_rating, self.error_margin)
 
         if self.fails > 0:
             log.info("{0:} faillure(s) on {1:} tests but test pass ({2:.1%} < {3:.1%})"
-                     .format(self.fails, self.fails+self.success, error_rating, self.error_margin))
+                     .format(self.fails, self.fails + self.success, error_rating, self.error_margin))
