@@ -19,20 +19,18 @@ class MetainfoMusic(object):
         if config is False:
             return
         for entry in task.entries:
-            # If series plugin already parsed this, don't touch it.
+            # If plugin already parsed this, don't touch it.
             if entry.get('music_title'):
                 continue
             self.guess_entry(entry)
 
-
-    def guess_entry(self, entry, config=None):
+    @staticmethod
+    def guess_entry(entry):
         """
         Populates music_* fields for entries that are successfully parsed.
-
-        :param dict config: A series config to be used. This will also cause 'path' and 'set' fields to be populated.
         """
         if entry.get('music_parser') and entry['music_parser'].valid:
-            # Return true if we already parsed this, false if series plugin parsed it
+            # Return true if we already parsed
             return entry.get('music_guessed')
 
         parsed = get_plugin_by_name('parsing').instance.parse_music(data=entry['title'])
