@@ -3,6 +3,7 @@ import time
 import logging
 import difflib
 import random
+import urllib
 from datetime import datetime, timedelta
 from urllib2 import URLError
 
@@ -509,7 +510,7 @@ def lists(list_type, list_name, limit=20, page_limit=20, page=None, api_key=None
 
 def movies_search(q, page_limit=None, page=None, api_key=None):
     if isinstance(q, basestring):
-        q = q.replace(' ', '+').encode('ascii', errors='ignore')
+        q = urllib.quote_plus(q.encode('latin-1', errors='ignore'))
 
     if not api_key:
         api_key = API_KEY
