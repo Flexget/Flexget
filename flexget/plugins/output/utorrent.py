@@ -89,14 +89,16 @@ class PluginUtorrent(object):
             folder = 0
             path = entry.get('path', config.get('path', ''))
             try:
-                path = os.path.normcase(os.path.expanduser(entry.render(path)))
+                path = os.path.expanduser(entry.render(path))
             except RenderError as e:
                 log.error('Could not render path for `%s` downloading to default directory.' % entry['title'])
                 # Add to default folder
                 path = ''
             if path:
+                path_normcase = os.path.normcase(path)
+                
                 for dir in download_dirs:
-                    if path.startswith(dir):
+                    if path_normcase.startswith(dir):
                         folder = download_dirs[dir]
                         path = path[len(dir):].lstrip('\\')
                         break
