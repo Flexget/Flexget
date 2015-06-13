@@ -59,7 +59,7 @@ class TraktList(object):
       username: <value>
       password: <value>
       type: <shows|movies|episodes>
-      list: <collection|watchlist|watched|custom list name>
+      list: <collection|watchlist|watched|ratings|rating:<1|2|3|4|5|6|7|8|9|10>|custom list name>
       strip_dates: <yes|no>
 
     Options username, type and list are required. password is required for private lists.
@@ -71,7 +71,10 @@ class TraktList(object):
             'username': {'type': 'string'},
             'password': {'type': 'string'},
             'type': {'type': 'string', 'enum': ['shows', 'movies', 'episodes']},
-            'list': {'type': 'string'},
+            'list': {"oneOf": [
+              {'type': 'string'}, 
+              {"type": "object", "properties": {"rating": {"type": "integer", 'enum': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}}
+            }]},
             'strip_dates': {'type': 'boolean', 'default': False}
         },
         'required': ['username', 'type', 'list'],
@@ -89,7 +92,9 @@ class TraktList(object):
     def on_task_input(self, task, config):
         session = get_session(config['username'], config.get('password'))
         endpoint = ['users', config['username']]
-        if config['list'] in ['collection', 'watchlist', 'watched']:
+        if type(config['list']) is dict:
+            endpoint += ('ratings', config['type'], config['list']['rating'])
+        elif config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
             endpoint += (config['list'], config['type'])
         else:
             endpoint += ('lists', make_list_slug(config['list']), 'items')
