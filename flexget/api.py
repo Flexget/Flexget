@@ -3,8 +3,6 @@ import os
 import base64
 import hashlib
 import random
-import codecs
-import yaml
 import copy
 
 from time import sleep
@@ -22,7 +20,7 @@ from flexget import __version__
 from flexget.event import event
 from flexget.webserver import register_app
 from flexget.config_schema import process_config, register_config_key
-from flexget.manager import manager
+from flexget import manager
 from flexget.utils import json
 from flexget.utils.database import with_session
 from flexget.options import get_parser
@@ -168,6 +166,9 @@ class _Api(RestPlusAPI):
 class APIResource(Resource):
     method_decorators = [with_session]
 
+    def __init__(self):
+        self.manager = manager.manager
+        super(APIResource, self).__init__()
 
 app = Flask(__name__)
 api = _Api(app, catch_all_404s=True, title='Flexget API')
@@ -205,7 +206,7 @@ class ServerReloadAPI(APIResource):
         """ Reload Flexget config """
         log.info('Reloading config from disk.')
         try:
-            manager.load_config()
+            self.manager.load_config()
         except ValueError as e:
             return {'error': 'Error loading config %s' % e.args[0]}, 500
 
@@ -241,7 +242,7 @@ class ServerShutdownAPI(APIResource):
     def get(self, session=None):
         """ Shutdown Flexget Daemon """
         args = shutdown_parser.parse_args()
-        manager.shutdown(args['force'])
+        self.manager.shutdown(args['force'])
         return {}
 
 
@@ -250,7 +251,7 @@ class ServerConfigAPI(APIResource):
     @api.response(200, 'Flexget config')
     def get(self, session=None):
         """ Get Flexget Config """
-        return manager.config
+        return self.manager.config
 
 
 version_schema = {
@@ -279,7 +280,7 @@ class ServerLogAPI(APIResource):
         Streams as line delimited JSON
         """
         def tail():
-            f = open(os.path.join(manager.config_base, 'log-%s.json' % manager.config_name), 'r')
+            f = open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'r')
             while True:
                 line = f.readline()
                 if not line:
@@ -352,7 +353,7 @@ class ExecutionAPI(APIResource):
         """ List task executions
         List current, pending and previous(hr max) executions
         """
-        tasks = [_task_info_dict(task_info) for task_info in manager.task_queue.tasks_info.itervalues()]
+        tasks = [_task_info_dict(task_info) for task_info in self.manager.task_queue.tasks_info.itervalues()]
         return jsonify({"tasks": tasks})
 
     @api.validate(tasks_execution_api_schema)
@@ -371,9 +372,9 @@ class ExecutionAPI(APIResource):
             except ValueError as e:
                 return {'error': 'invalid options_string specified: %s' % e.message}, 400
 
-        tasks = manager.execute(**kwargs)
+        tasks = self.manager.execute(**kwargs)
 
-        return {"tasks": [_task_info_dict(manager.task_queue.tasks_info[task_id]) for task_id, event in tasks]}
+        return {"tasks": [_task_info_dict(self.manager.task_queue.tasks_info[task_id]) for task_id, event in tasks]}
 
 
 @api.doc(params={'exec_id': 'Execution ID of the Task'})
@@ -385,7 +386,7 @@ class ExecutionTaskAPI(APIResource):
     @api.response(200, 'list of tasks queued for execution', task_execution_api_schema)
     def get(self, exec_id, session=None):
         """ Status of existing task execution """
-        task_info = manager.task_queue.tasks_info.get(exec_id)
+        task_info = self.manager.task_queue.tasks_info.get(exec_id)
 
         if not task_info:
             return {'error': '%s not found' % exec_id}, 404
@@ -403,13 +404,13 @@ class ExecutionTaskLogAPI(APIResource):
         """ Log stream of executed task
         Streams as line delimited JSON
         """
-        task_info = manager.task_queue.tasks_info.get(exec_id)
+        task_info = self.manager.task_queue.tasks_info.get(exec_id)
 
         if not task_info:
             return {'error': '%s not found' % exec_id}, 404
 
         def follow():
-            f = open(os.path.join(manager.config_base, 'log-%s.json' % manager.config_name), 'r')
+            f = open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'r')
             while True:
                 if not task_info.started:
                     continue
@@ -439,7 +440,8 @@ task_api_schema = {
     'properties': {
         'name': {'type': 'string'},
         'config': {'$ref': '/schema/plugins'}
-    }
+    },
+    'additionalProperties': False
 }
 
 tasks_api_schema = {
@@ -449,74 +451,55 @@ tasks_api_schema = {
             "type": "array",
             "items": task_api_schema
         }
-    }
+    },
+    'additionalProperties': False
 }
 
 tasks_api_schema = api.schema('tasks', tasks_api_schema)
 task_api_schema = api.schema('task', task_api_schema)
 
 
-def _load_config():
-    with codecs.open(manager.config_path, 'rb', 'utf-8') as f:
-        try:
-            raw_config = f.read()
-        except UnicodeDecodeError:
-            raise ValueError('Config file is not UTF-8 encoded')
-    return yaml.safe_load(raw_config) or {}
-
-
 @tasks_api.route('/')
 class TasksAPI(APIResource):
 
     @api.response(200, 'list of tasks', tasks_api_schema)
-    @api.response(500, 'unable to read config')
     def get(self, session=None):
         """ Show all tasks """
 
-        # Read from config so default values, unless set in the config, are not sent
-        try:
-            config = _load_config()
-        except Exception as e:
-            return {'error': 'unable to read config: %s' % str(e)}, 500
-
         tasks = []
-        for name in manager.tasks:
-            tasks.append({'name': name, 'config': config['tasks'][name]})
+        for name, config in self.manager.user_config.get('tasks', {}).iteritems():
+            tasks.append({'name': name, 'config': config})
         return {'tasks': tasks}
 
     @api.validate(task_api_schema)
     @api.response(201, 'newly created task', task_api_schema)
     @api.response(409, 'task already exists', task_api_schema)
-    @api.response(500, 'unable to read config')
     def post(self, session=None):
         """ Add new task """
-        try:
-            config = _load_config()
-        except Exception as e:
-            return {'error': 'unable to read config: %s' % str(e)}, 500
-
         data = request.json
 
         task_name = data['name']
 
-        if task_name in config.get('tasks', {}):
+        if task_name in self.manager.user_config.get('tasks', {}):
             return {'error': 'task already exists'}, 409
 
-        if 'tasks' not in config:
-            config['tasks'] = {}
+        if 'tasks' not in self.manager.user_config:
+            self.manager.user_config['tasks'] = {}
+        if 'tasks' not in self.manager.config:
+            self.manager.config['tasks'] = {}
 
-        config['tasks'][task_name] = data['config']
-
-        config_processed = copy.deepcopy(config)
-        errors = process_config(config_processed)
+        task_schema_processed = copy.deepcopy(data)
+        errors = process_config(task_schema_processed, schema=task_api_schema.__schema__, set_defaults=True)
 
         if errors:
             return {'error': 'problem loading config, raise a BUG as this should not happen!'}, 500
 
-        manager.config['tasks'][task_name] = config_processed['tasks'][task_name]
-        manager.save_config(config=config)
-        manager.config_changed()
-        return {'name': task_name, 'config': manager.config['tasks'][task_name]}, 201
+        self.manager.user_config['tasks'][task_name] = data['config']
+        self.manager.config['tasks'][task_name] = task_schema_processed['config']
+
+        self.manager.save_config()
+        self.manager.config_changed()
+        return {'name': task_name, 'config': self.manager.user_config['tasks'][task_name]}, 201
 
 
 @tasks_api.route('/<task>/')
@@ -528,71 +511,67 @@ class TaskAPI(APIResource):
     @api.response(500, 'unable to read config')
     def get(self, task, session=None):
         """ Get task config """
-        try:
-            config = _load_config()
-        except Exception as e:
-            return {'error': 'unable to read config: %s' % str(e)}, 500
-
-        if task not in config.get('tasks', {}):
+        if task not in self.manager.user_config.get('tasks', {}):
             return {'error': 'task %s not found' % task}, 404
 
-        return {'name': task, 'config': config['tasks'][task]}
+        return {'name': task, 'config': self.manager.user_config['tasks'][task]}
 
     @api.validate(task_api_schema)
     @api.response(200, 'updated task', task_api_schema)
     @api.response(201, 'renamed task', task_api_schema)
     @api.response(404, 'task does not exist', task_api_schema)
     @api.response(400, 'cannot rename task as it already exist', task_api_schema)
-    @api.response(500, 'unable to read config')
     def post(self, task, session=None):
         """ Update tasks config """
-        data = request.json or {}
+        data = request.json
 
         new_task_name = data['name']
 
-        try:
-            config = _load_config()
-        except Exception as e:
-            return {'error': 'unable to read config: %s' % str(e)}, 500
-
-        if task not in config.get('tasks', {}):
+        if task not in self.manager.user_config.get('tasks', {}):
             return {'error': 'task does not exist'}, 404
+
+        if 'tasks' not in self.manager.user_config:
+            self.manager.user_config['tasks'] = {}
+        if 'tasks' not in self.manager.config:
+            self.manager.config['tasks'] = {}
 
         code = 200
         if task != new_task_name:
             # Rename task
-            if new_task_name in config['tasks']:
+            if new_task_name in self.manager.user_config['tasks']:
                 return {'error': 'cannot rename task as it already exist'}, 400
 
-            del config['tasks'][task]
-            del manager.config['tasks'][task]
+            del self.manager.user_config['tasks'][task]
+            del self.manager.config['tasks'][task]
             code = 201
 
-        config['tasks'][new_task_name] = data['config']
-
-        config_processed = copy.deepcopy(config)
-        errors = process_config(config_processed)
+        # Process the task config
+        task_schema_processed = copy.deepcopy(data)
+        errors = process_config(task_schema_processed, schema=task_api_schema.__schema__, set_defaults=True)
 
         if errors:
             return {'error': 'problem loading config, raise a BUG as this should not happen!'}, 500
 
-        manager.config['tasks'][new_task_name] = config_processed['tasks'][new_task_name]
-        manager.save_config(config=config)
-        manager.config_changed()
+        self.manager.user_config['tasks'][new_task_name] = data['config']
+        self.manager.config['tasks'][new_task_name] = task_schema_processed['config']
 
-        return {'name': task, 'config': config['tasks'][new_task_name]}, code
+        self.manager.save_config()
+        self.manager.config_changed()
+
+        return {'name': new_task_name, 'config': self.manager.user_config['tasks'][new_task_name]}, code
 
     @api.response(200, 'deleted task')
     @api.response(404, 'task not found')
     def delete(self, task, session=None):
         """ Delete a task """
         try:
-            manager.config['tasks'].pop(task)
+            self.manager.config['tasks'].pop(task)
+            self.manager.user_config['tasks'].pop(task)
         except KeyError:
             return {'error': 'invalid task'}, 404
 
-        manager.save_config()
-        manager.config_changed()
+        self.manager.save_config()
+        self.manager.config_changed()
         return {}
 
 

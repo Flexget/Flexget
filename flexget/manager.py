@@ -136,6 +136,7 @@ class Manager(object):
         self.initialized = False
 
         self.config = {}
+        self.user_config = {}  # Reflects user config without default set
 
         if '--help' in args or '-h' in args:
             # TODO: This is a bit hacky, but we can't call parse on real arguments when --help is used because it will
@@ -585,6 +586,7 @@ class Manager(object):
 
         :raises: `ValueError` and rolls back to previous config if the provided config is not valid.
         """
+        new_user_config = config
         old_config = self.config
         try:
             self.config = self.validate_config(config)
@@ -595,12 +597,12 @@ class Manager(object):
             self.config = old_config
             raise
         log.debug('New config data loaded.')
+        self.user_config = new_user_config
         fire_event('manager.config_updated', self)
 
-    def save_config(self, config=None):
+    def save_config(self):
         """Dumps current config to yaml config file"""
-        if not config:
-            config = self.config
+        # TODO: Only keep x number of backups..
 
         # Back up the user's current config before overwriting
         backup_path = os.path.join(self.config_base,
@@ -608,7 +610,7 @@ class Manager(object):
         log.debug('backing up old config to %s before new save' % backup_path)
         shutil.copy(self.config_path, backup_path)
         with open(self.config_path, 'w') as config_file:
-            config_file.write(yaml.dump(config, default_flow_style=False))
+            config_file.write(yaml.dump(self.user_config, default_flow_style=False))
 
     def config_changed(self):
         """Makes sure that all tasks will have the config_modified flag come out true on the next run.
