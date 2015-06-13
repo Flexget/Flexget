@@ -2,12 +2,13 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 import urllib
+
 import feedparser
+import requests
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils import requests
 from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('torrentz')
@@ -66,10 +67,15 @@ class UrlRewriteTorrentz(object):
                 url = 'http://torrentz.%s/%s?q=%s' % (domain, feed, urllib.quote(query.encode('utf-8')))
                 log.debug('requesting: %s' % url)
                 try:
-                    r = requests.get(url)
+                    r = task.requests.get(url)
                     break
+                except requests.ConnectionError as err:
+                    # The different domains all resolve to the same ip, so only try more if it was a dns error
+                    log.warning('torrentz.%s connection failed. Error: %s' % (domain, err))
+                    continue
                 except requests.RequestException as err:
-                    log.warning('torrentz.%s failed. Error: %s' % (domain, err))
+                    raise plugin.PluginError('Error getting torrentz search results: %s' % err)
+
             else:
                 raise plugin.PluginError('Error getting torrentz search results')
 
