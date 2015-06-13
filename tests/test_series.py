@@ -2241,3 +2241,35 @@ class TestCLI(FlexGetBase):
             self.manager.handle_cli(options=options)
         lines = buffer.getvalue().split('\n')
         assert all(any(line.lstrip().startswith(series) for line in lines) for series in ['Some Show', 'Other Show'])
+
+
+class TestSeriesForget(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          get_episode:
+            seen: local
+            series:
+            - My Show
+            mock:
+            - title: My Show S01E01 1080p
+            - title: My Show S01E01 720p
+          forget_episode:
+            seen: no
+            mock:
+            - title: My Show S01E01
+              series_name: My Show
+              series_id: S01E01
+            accept_all: yes
+            series_forget: yes
+    """
+
+    def test_forget_episode(self):
+        self.execute_task('get_episode')
+        assert len(self.task.accepted) == 1
+        first_rls = self.task.accepted[0]
+        self.execute_task('get_episode')
+        assert not self.task.accepted, 'series plugin duplicate blocking not working?'
+        self.execute_task('forget_episode')
+        self.execute_task('get_episode')
+        assert len(self.task.accepted) == 1, 'new release not accepted after forgetting ep'
+        assert self.task.accepted[0] != first_rls, 'same release accepted on second run'
