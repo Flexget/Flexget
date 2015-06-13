@@ -136,7 +136,7 @@ class Subtitles(object):
 
                     def seqmatch(subfile):
                         s = difflib.SequenceMatcher(lambda x: x in " ._", entry['title'], subfile)
-                        #print "matching: ", entry['title'], subfile, s.ratio()
+                        # print "matching: ", entry['title'], subfile, s.ratio()
                         return s.ratio() > match_limit
 
                     # filter only those that have matching release names

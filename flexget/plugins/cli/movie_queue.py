@@ -74,7 +74,7 @@ def do_cli(manager, options):
             if e.errno == 1:
                 # This is an invalid quality error, display some more info
                 # TODO: Fix this error?
-                #console('Recognized qualities are %s' % ', '.join([qual.name for qual in qualities.all()]))
+                # console('Recognized qualities are %s' % ', '.join([qual.name for qual in qualities.all()]))
                 console('ANY is the default and can also be used explicitly to specify that quality should be ignored.')
         except OperationalError:
             console('OperationalError')
@@ -105,6 +105,7 @@ def clear():
     if not items:
         console('No results')
     console('-' * 79)
+
 
 @event('options.register')
 def register_parser_arguments():

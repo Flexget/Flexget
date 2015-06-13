@@ -28,7 +28,7 @@ CATEGORIES = {
     'Movie Boxsets': 15,
     'Documentaries': 29,
 
-    #TV
+    # TV
     'Episodes': 26,
     'TV Boxsets': 27,
     'Episodes HD': 32
@@ -60,7 +60,8 @@ class UrlRewriteTorrentleech(object):
                 'oneOf': [
                     {'type': 'integer'},
                     {'type': 'string', 'enum': list(CATEGORIES)},
-            ]}),
+                ]
+            }),
         },
         'required': ['rss_key', 'username', 'password'],
         'additionalProperties': False
@@ -77,7 +78,7 @@ class UrlRewriteTorrentleech(object):
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        if not 'url' in entry:
+        if 'url' not in entry:
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
@@ -137,7 +138,8 @@ class UrlRewriteTorrentleech(object):
                 # parse link and split along /download/12345 and /name.torrent
                 download_url = re.search('(/download/\d+)/(.+\.torrent)', torrent_url)
                 # change link to rss and splice in rss_key
-                torrent_url = 'http://torrentleech.org/rss' + download_url.group(1) + '/' + rss_key + '/' + download_url.group(2)
+                torrent_url = 'http://torrentleech.org/rss' + download_url.group(1) + '/' \
+                              + rss_key + '/' + download_url.group(2)
                 log.debug('RSS-ified download link: %s' % torrent_url)
                 entry['url'] = torrent_url
 
@@ -164,6 +166,7 @@ class UrlRewriteTorrentleech(object):
                 entries.add(entry)
 
         return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
+
 
 @event('plugin.register')
 def register_plugin():

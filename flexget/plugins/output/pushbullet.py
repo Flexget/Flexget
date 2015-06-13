@@ -51,7 +51,7 @@ class OutputPushbullet(object):
             devices = [devices]
 
         # Support for urls
-        push_type = 'link' if config.has_key('url') else 'note'
+        push_type = 'link' if 'url' in config else 'note'
 
         # Set a bunch of local variables from the config
         apikey = config['apikey']
@@ -107,7 +107,7 @@ class OutputPushbullet(object):
                     log.info('    Title: %s' % title)
                     log.info('    Body: %s' % body)
                     if push_type is 'link':
-                         log.info('    URL: %s' % url)
+                        log.info('    URL: %s' % url)
                     # Test mode.  Skip remainder.
                     continue
 
@@ -122,12 +122,13 @@ class OutputPushbullet(object):
                     log.debug('Pushbullet notification sent')
                 elif request_status == 500:
                     log.warning('Pushbullet notification failed, Pushbullet API having issues')
-                    #TODO: Implement retrying. API requests 5 seconds between retries.
+                    # TODO: Implement retrying. API requests 5 seconds between retries.
                 elif request_status >= 400:
                     error = json.loads(response.content)['error']
                     log.error('Pushbullet API error: %s' % error['message'])
                 else:
                     log.error('Unknown error when sending Pushbullet notification')
+
 
 @event('plugin.register')
 def register_plugin():

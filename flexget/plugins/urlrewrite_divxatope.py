@@ -18,14 +18,13 @@ class UrlRewriteDivxATope(object):
     def url_rewritable(self, task, entry):
         url = entry['url']
         return (
-            url.startswith('http://www.divxatope.com/descargar')
-            or url.startswith('http://divxatope.com/descargar')
+            url.startswith('http://www.divxatope.com/descargar') or url.startswith('http://divxatope.com/descargar')
         )
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        #Rewrite divxatope.com/descargar/ to divxatope.com/descarga-torrent/
-        entry['url'] = re.sub("/descargar","/descarga-torrent",entry['url'])
+        # Rewrite divxatope.com/descargar/ to divxatope.com/descarga-torrent/
+        entry['url'] = re.sub('/descargar', '/descarga-torrent', entry['url'])
         entry['url'] = self.parse_download_page(entry['url'])
 
     @plugin.internet(log)
@@ -36,7 +35,15 @@ class UrlRewriteDivxATope(object):
             download_link = soup.findAll(href=re.compile('redirect|redirectlink'))
             download_href = download_link[0]['href']
             if "url" in download_href:
-                return download_href[download_href.index('url=') + 4:]
+                redirect_search = re.search('.*url=(.*)', download_href)
+                if redirect_search:
+                    redirect_link = redirect_search.group(1)
+                else:
+                    raise UrlRewritingError('Redirect link for %s could not be found %s' % url)
+                if redirect_link.startswith('http'):
+                    return redirect_link
+                else:
+                    return 'http://www.divxatope.com/' + redirect_link
             else:
                 return download_href
         except Exception:

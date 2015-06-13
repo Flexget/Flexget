@@ -89,6 +89,7 @@ class InputPlex(object):
         },
         'required': ['section']
     }
+    
     def prepare_config(self, config):
         config['plexserver'] = config['server']
         config = self.plex_format_server(config)

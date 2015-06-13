@@ -81,7 +81,7 @@ class Validator(object):
 
         def __init__(cls, name, bases, dict):
             type.__init__(cls, name, bases, dict)
-            if not 'name' in dict:
+            if 'name' not in dict:
                 raise Exception('Validator %s is missing class-attribute name' % name)
             registry[dict['name']] = cls
 
@@ -417,7 +417,7 @@ class DictValidator(Validator):
 
     def require_key(self, key):
         """Flag key as mandatory"""
-        if not key in self.required_keys:
+        if key not in self.required_keys:
             self.required_keys.append(key)
 
     def accept_any_key(self, value, **kwargs):
@@ -471,8 +471,8 @@ class DictValidator(Validator):
         else:
             schema['additionalProperties'] = False
         # TODO: implement this
-        #if self.reject_keys:
-        #    schema['reject_keys'] = self.reject
+        # if self.reject_keys:
+        #     schema['reject_keys'] = self.reject
 
         return schema
 
@@ -585,7 +585,7 @@ def complex_test():
 
 if __name__ == '__main__':
     from flexget.plugins.input.rss import InputRSS
-    #v = complex_test()
+    # v = complex_test()
     v = InputRSS().validator()
     schema = v.schema()
 

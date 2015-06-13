@@ -476,37 +476,44 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
     def add_entry(self, client, entry, options, start=True, mkdir=False):
 
-        # Check that file is downloaded
-        if 'file' not in entry:
-            entry.fail('file missing?')
+        if 'torrent_info_hash' not in entry:
+            entry.fail('missing torrent_info_hash')
             return
 
-        # Verify the temp file exists
-        if not os.path.exists(entry['file']):
-            entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
-            return
+        if entry['url'].startswith('magnet:'):
+            torrent_raw = 'd10:magnet-uri%d:%se' % (len(entry['url']), entry['url'])
+        else:
+            # Check that file is downloaded
+            if 'file' not in entry:
+                entry.fail('file missing?')
+                return
 
-        # Verify valid torrent file
-        if not is_torrent_file(entry['file']):
-            entry.fail("Downloaded temp file '%s' is not a torrent file" % entry['file'])
-            return
+            # Verify the temp file exists
+            if not os.path.exists(entry['file']):
+                entry.fail("Downloaded temp file '%s' doesn't exist!?" % entry['file'])
+                return
 
-        try:
-            with open(entry['file'], 'rb') as f:
-                torrent_raw = f.read()
-        except IOError as e:
-            entry.fail('Failed to add to rTorrent %s' % str(e))
-            return
+            # Verify valid torrent file
+            if not is_torrent_file(entry['file']):
+                entry.fail("Downloaded temp file '%s' is not a torrent file" % entry['file'])
+                return
 
-        try:
-            torrent = Torrent(torrent_raw)
-        except SyntaxError as e:
-            entry.fail('Strange, unable to decode torrent, raise a BUG: %s' % str(e))
-            return
+            try:
+                with open(entry['file'], 'rb') as f:
+                    torrent_raw = f.read()
+            except IOError as e:
+                entry.fail('Failed to add to rTorrent %s' % str(e))
+                return
+
+            try:
+                Torrent(torrent_raw)
+            except SyntaxError as e:
+                entry.fail('Strange, unable to decode torrent, raise a BUG: %s' % str(e))
+                return
 
         # First check if it already exists
         try:
-            if client.torrent(torrent.info_hash):
+            if client.torrent(entry['torrent_info_hash']):
                 log.warning("Torrent %s already exists, won't add" % entry['title'])
                 return
         except IOError as e:
@@ -525,7 +532,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
 
         # Verify the torrent loaded
         try:
-            self._verify_load(client, torrent.info_hash)
+            self._verify_load(client, entry['torrent_info_hash'])
             log.info('%s added to rtorrent' % entry['title'])
         except (IOError, xmlrpclib.Error) as e:
             entry.fail('Failed to verify torrent loaded: %s' % str(e))

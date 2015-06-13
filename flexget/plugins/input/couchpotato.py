@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from urlparse import urlparse
 import logging
 import requests
 
@@ -14,11 +15,11 @@ class CouchPotato(object):
     schema = {
         'type': 'object',
         'properties': {
-            'base_url': {'tpye': 'string'},
-            'port': {'type': 'number'},
+            'base_url': {'type': 'string'},
+            'port': {'type': 'number', 'default': 80},
             'api_key': {'type': 'string'}
         },
-        'required': ['api_key', 'base_url', 'port'],
+        'required': ['api_key', 'base_url'],
         'additionalProperties': False
     }
 
@@ -32,11 +33,12 @@ class CouchPotato(object):
           port: <value>
           api_key: <value>
 
-        Options base_url, port and api_key are required.
+        Options base_url and api_key are required.
         """
-
-        url = '%s:%s/api/%s/movie.list?status=active' \
-              % (config['base_url'], config['port'], config['api_key'])
+        parsedurl = urlparse(config.get('base_url'))
+        url = '%s://%s:%s%s/api/%s/movie.list?status=active' \
+              % (parsedurl.scheme, parsedurl.netloc,
+                 config.get('port'), parsedurl.path, config.get('api_key'))
         json = task.requests.get(url).json()
         entries = []
         for movie in json['movies']:
@@ -52,7 +54,14 @@ class CouchPotato(object):
                     entries.append(entry)
                 else:
                     log.debug('Invalid entry created? %s' % entry)
-
+            # Test mode logging
+            if task.options.test: 
+                log.info("Test mode. Entry includes:")
+                log.info("    Title: %s" % entry["title"])
+                log.info("    URL: %s" % entry["url"])
+                log.info("    IMDB ID: %s" % entry["imdb_id"])
+                log.info("    TMDB ID: %s" % entry["tmdb_id"])
+                continue
         return entries
 
 

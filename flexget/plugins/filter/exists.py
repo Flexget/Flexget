@@ -56,6 +56,7 @@ class FilterExists(object):
                 log.debug('Found %s in %s' % (name, filenames[name]))
                 entry.reject('exists in %s' % filenames[name])
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterExists, 'exists', api_ver=2)

@@ -39,7 +39,7 @@ class BaseFileOps(object):
             sexts = [('.' + s).replace('..', '.').lower() for s in config['along']]
         
         for entry in task.accepted:
-            if not 'location' in entry:
+            if 'location' not in entry:
                 self.log.verbose('Cannot handle %s because it does not have the field location.' % entry['title'])
                 continue
             src = entry['location']

@@ -180,13 +180,13 @@ log = logging.getLogger('imdb_lookup')
 def upgrade(ver, session):
     if ver is None:
         columns = table_columns('imdb_movies', session)
-        if not 'photo' in columns:
+        if 'photo' not in columns:
             log.info('Adding photo column to imdb_movies table.')
             table_add_column('imdb_movies', 'photo', String, session)
-        if not 'updated' in columns:
+        if 'updated' not in columns:
             log.info('Adding updated column to imdb_movies table.')
             table_add_column('imdb_movies', 'updated', DateTime, session)
-        if not 'mpaa_rating' in columns:
+        if 'mpaa_rating' not in columns:
             log.info('Adding mpaa_rating column to imdb_movies table.')
             table_add_column('imdb_movies', 'mpaa_rating', String, session)
         ver = 0
@@ -472,6 +472,7 @@ class ImdbLookup(object):
         movie.updated = datetime.now()
         session.add(movie)
         return movie
+
 
 @event('plugin.register')
 def register_plugin():

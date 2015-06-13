@@ -2,12 +2,13 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 import urllib
+
 import feedparser
+import requests
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils import requests
 from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('torrentz')
@@ -44,7 +45,7 @@ class UrlRewriteTorrentz(object):
         if isinstance(config, basestring):
             config = {'reputation': config}
         if config.get('extra_terms'):
-            config['extra_terms'] = ' '+config['extra_terms']
+            config['extra_terms'] = ' ' + config['extra_terms']
         return config
 
     def url_rewritable(self, task, entry):
@@ -60,16 +61,21 @@ class UrlRewriteTorrentz(object):
         feed = REPUTATIONS[config['reputation']]
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            query = normalize_unicode(search_string+config.get('extra_terms', ''))
+            query = normalize_unicode(search_string + config.get('extra_terms', ''))
             for domain in ['eu', 'me', 'ch', 'in']:
                 # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
                 url = 'http://torrentz.%s/%s?q=%s' % (domain, feed, urllib.quote(query.encode('utf-8')))
                 log.debug('requesting: %s' % url)
                 try:
-                    r = requests.get(url)
+                    r = task.requests.get(url)
                     break
+                except requests.ConnectionError as err:
+                    # The different domains all resolve to the same ip, so only try more if it was a dns error
+                    log.warning('torrentz.%s connection failed. Error: %s' % (domain, err))
+                    continue
                 except requests.RequestException as err:
-                    log.warning('torrentz.%s failed. Error: %s' % (domain, err))
+                    raise plugin.PluginError('Error getting torrentz search results: %s' % err)
+
             else:
                 raise plugin.PluginError('Error getting torrentz search results')
 

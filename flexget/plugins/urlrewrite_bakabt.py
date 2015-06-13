@@ -42,6 +42,7 @@ class UrlRewriteBakaBT(object):
         torrent_url = 'http://www.bakabt.com' + tag_a.get('href')
         return torrent_url
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(UrlRewriteBakaBT, 'bakabt', groups=['urlrewriter'], api_ver=2)

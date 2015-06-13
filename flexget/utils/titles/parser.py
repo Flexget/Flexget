@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import re
 
+
 class TitleParser(object):
 
     propers = ['proper', 'repack', 'rerip', 'real', 'final']

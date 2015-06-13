@@ -57,7 +57,7 @@ class PluginUtorrent(object):
                 download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
     @plugin.priority(135)
-    #@plugin.internet(log)
+    # @plugin.internet(log)
     def on_task_output(self, task, config):
         if not config.get('enabled', True):
             return
@@ -152,7 +152,8 @@ class PluginUtorrent(object):
             download.instance.cleanup_temp_files(task)
             
     on_task_abort = on_task_exit
-            
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginUtorrent, 'utorrent', api_ver=2)

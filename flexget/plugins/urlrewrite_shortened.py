@@ -19,6 +19,7 @@ class UrlRewriteShortened(object):
         request = task.requests.head(entry['url'], allow_redirects=True)
         entry['url'] = request.url
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(UrlRewriteShortened, 'shortened', groups=['urlrewriter'], api_ver=2)

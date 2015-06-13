@@ -41,7 +41,6 @@ def with_session(*args, **kwargs):
         return decorator
 
 
-
 def pipe_list_synonym(name):
     """Converts pipe separated text into a list"""
 

@@ -72,6 +72,7 @@ def dependency_check():
                                      missing='pysftp', 
                                      message='sftp plugin requires the pysftp Python module.')
 
+
 class SftpList(object):
     """
     Generate entries from SFTP. This plugin requires the pysftp Python module and its dependencies.
@@ -363,7 +364,6 @@ class SftpDownload(object):
                 sftp.rmdir(path)
             except Exception as e:
                 log.error('Failed to delete directory %s (%s)' % (path, e))
-                    
 
     def download_entry(self, entry, config, sftp):
         """

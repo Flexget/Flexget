@@ -113,6 +113,7 @@ class PluginRottenTomatoesLookup(object):
         for entry in task.entries:
             entry.register_lazy_func(self.lazy_loader, self.field_map)
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginRottenTomatoesLookup, 'rottentomatoes_lookup', api_ver=2)
