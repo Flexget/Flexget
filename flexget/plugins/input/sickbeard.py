@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from urlparse import urlparse
 import logging
-import requests
 
 from flexget import plugin
 from flexget.event import event
@@ -38,7 +37,7 @@ class Sickbeard(object):
 
         Options base_url and api_key are required.
 
-        Use with input plugin like discover and/or cofnigure_series.
+        Use with input plugin like discover and/or configure_series.
         Example:
 
         download-tv-task:
@@ -61,7 +60,7 @@ class Sickbeard(object):
 
         Note that when using the configure_series plugin with Sickbeard
         you are basically synced to it, so removing a show in Sickbeard will
-        remove it in flexget as well,which good be positive or negative,
+        remove it in flexget as well, which could be positive or negative,
         depending on your usage.
         '''
         parsedurl = urlparse(config.get('base_url'))
