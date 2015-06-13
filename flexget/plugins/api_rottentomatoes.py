@@ -423,9 +423,10 @@ def _set_movie_details(movie, session, movie_data=None, api_key=None):
     if movie_data:
         if movie.id:
             log.debug("Updating movie info (actually just deleting the old info and adding the new)")
-            session.delete(movie)
-            session.flush()
-            movie = RottenTomatoesMovie()
+            del movie.release_dates[:]
+            del movie.posters[:]
+            del movie.alternate_ids[:]
+            del movie.links[:]
         movie.update_from_dict(movie_data)
         movie.update_from_dict(movie_data.get('ratings'))
         genres = movie_data.get('genres')
