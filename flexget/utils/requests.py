@@ -128,6 +128,8 @@ class Session(requests.Session):
         """
         Does a request, but raises Timeout immediately if site is known to timeout, and records sites that timeout.
         Also raises errors getting the content by default.
+
+        :param bool raise_status: If True, non-success status code responses will be raised as errors (True by default)
         """
 
         # Raise Timeout right away if site is known to timeout
