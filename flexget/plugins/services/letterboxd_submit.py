@@ -17,11 +17,13 @@ LISTS = {
     'watchlist': {
         'add_command': 'add-to-watchlist',
         'remove_command': 'remove-from-watchlist',
-        'log': 'Added film to your Letterboxd watchlist: %s'},
+        'add_log': 'Added film to your Letterboxd watchlist: %s'},
+        'remove_log': 'Removed film from your Letterboxd watchlist: %s'
     'watched': {
         'add_command': 'mark-as-watched',
         'remove_command': 'mark-as-not-watched',
-        'log': 'Marked film as seen on Letterboxd: %s'}
+        'add_log': 'Marked film as seen on Letterboxd: %s'},
+        'remove_log': 'Marked film as not seen on Letterboxd: %s'
 }
 
 
@@ -69,8 +71,10 @@ class LetterboxdSubmit(object):
 
         if self.add:
             command = LISTS[config['list']]['add_command']
+            log_str = LISTS[config['list']]['add_log']
         elif self.remove:
             command = LISTS[config['list']]['remove_command']
+            log_str = LISTS[config['list']]['remove_log']
 
         for entry in task.accepted:
             if any(field in entry for field in ['imdb_id', 'tmdb_id', 'movie_name']):
@@ -78,7 +82,7 @@ class LetterboxdSubmit(object):
                     film = self.parse_film(entry['imdb_id'])
                     r = requests.post('%s/film/%s/%s/' % (base_url, film, command), data=params)
                     if 200 <= r.status_code < 300:
-                        self.log.verbose(LISTS[config['list']]['log'] % entry['title'])
+                        self.log.verbose(log_str % entry['title'])
                         self.log.debug('Letterboxd response: ' + r.text)
                 else:
                     log.warning('No imdb_id found for %s. '  % entry['title'] + \
