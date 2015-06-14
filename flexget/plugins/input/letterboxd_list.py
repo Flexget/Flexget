@@ -139,7 +139,7 @@ class LetterboxdList(object):
                     if 'max_results' in config:
                         rcount += 1
 
-            next_page = soup.find(class_='paginate-next').get('href)
+            next_page = soup.find(class_='paginate-next').get('href')
             if next_page is not None:
                 url = base_url + next_page
 
