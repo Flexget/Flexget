@@ -9,7 +9,7 @@ from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException, Session
 from flexget.utils.soup import get_soup
 
-log = logging.getLogger('letterboxd')
+log = logging.getLogger('letterboxd_list')
 logging.getLogger('api_tmdb').setLevel(logging.CRITICAL)
 
 requests = Session(max_retries=5)
@@ -51,7 +51,7 @@ SORT_BY = {
 }
 
 
-class Letterboxd(object):
+class LetterboxdList(object):
 
     schema = {
         'type': 'object',
@@ -142,11 +142,12 @@ class Letterboxd(object):
             next_page = soup.find(class_='paginate-next')
             if next_page is not None:
                 next_page = next_page.get('href')
-                url = base_url + next_page
+                if next_page is not None:
+                    url = base_url + next_page
 
         return entries
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Letterboxd, 'letterboxd', api_ver=2)
+    plugin.register(LetterboxdList, 'letterboxd_list', api_ver=2)
