@@ -83,7 +83,14 @@ class LetterboxdSubmit(object):
                     r = requests.post('%s/film/%s/%s/' % (base_url, film, command), data=params)
                     if 200 <= r.status_code < 300:
                         self.log.verbose(log_str % entry['title'])
-                        self.log.debug('Letterboxd response: ' + r.text)
+                        self.log.debug('Letterboxd response: %s' % r.text)
+                    elif r.status_code == 404:
+                        self.log.error('Can\'t access film data at: %s/film/%s' % (base_url, film))
+                    elif r.status_code == 401:
+                        self.log.error('Authentication error. Check your Letterboxd username and password.')
+                        self.log.debug('Letterboxd response: %s' % r.text)
+                    else:
+                        self.log.error('Unknown error accessing film data on Letterboxd: %s' % r.text)
                 else:
                     log.warning('No imdb_id found for %s. '  % entry['title'] + \
                                 'This field is required to add entry to Letterboxd.')
