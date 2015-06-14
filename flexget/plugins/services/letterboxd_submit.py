@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
+import json, logging, re
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -13,6 +13,18 @@ requests.set_domain_delay('letterboxd.com', '1 seconds')
 base_url = 'http://letterboxd.com'
 
 
+LISTS = {
+    'watchlist': {
+        'add_command': 'add-to-watchlist',
+        'remove_command': 'remove-from-watchlist',
+        'log': 'Added film to your Letterboxd watchlist: %s'},
+    'watched': {
+        'add_command': 'mark-as-watched',
+        'remove_command': 'mark-as-not-watched',
+        'log': 'Marked film as seen on Letterboxd: %s'}
+}
+
+
 class LetterboxdSubmit(object):
 
     schema = {
@@ -20,11 +32,13 @@ class LetterboxdSubmit(object):
         'properties': {
             'username': {'type': 'string'},
             'password': {'type': 'string'},
-            'list': {'type': 'string'}
+            'list': {'type': 'string', 'enum': list(LISTS.keys())}
         },
         'required': ['username', 'password', 'list'],
         'additionalProperties': False
     }
+
+
 
     # Defined by subclasses
     add = None
@@ -37,7 +51,7 @@ class LetterboxdSubmit(object):
         soup = get_soup(requests.get(url).content)
         film = soup.find(attrs={'data-film-link': True})
         if film is not None:
-            film = film.get('data-film-link')
+            film = re.search(r'\/film\/(.*)\/', film.get('data-film-link')).group(1)
 
         return film
 
@@ -54,16 +68,22 @@ class LetterboxdSubmit(object):
         r = requests.post('%s/user/login.do' % base_url, data=dict(params, **auth), headers=headers)
 
         if self.add:
-            for entry in task.accepted:
-                if any(field in entry for field in ['imdb_id', 'tmdb_id', 'movie_name']):
-                    if 'imdb_id' in entry:
-                        film = self.parse_film(entry['imdb_id'])
-                        r = requests.post(base_url + film + 'remove-from-watchlist/', data=params)
+            command = LISTS[config['list']]['add_command']
+        elif self.remove:
+            command = LISTS[config['list']]['remove_command']
 
-                    else:
-                        log.warning('No imdb_id found for %s. '  % entry['title'] + \
-                                    'This field is required to add entry to Letterboxd.')
-                        continue
+        for entry in task.accepted:
+            if any(field in entry for field in ['imdb_id', 'tmdb_id', 'movie_name']):
+                if 'imdb_id' in entry:
+                    film = self.parse_film(entry['imdb_id'])
+                    r = requests.post('%s/film/%s/%s/' % (base_url, film, command), data=params)
+                    if 200 <= r.status_code < 300:
+                        self.log.verbose(LISTS[config['list']]['log'] % entry['title'])
+                        self.log.debug('Letterboxd response: ' + r.text)
+                else:
+                    log.warning('No imdb_id found for %s. '  % entry['title'] + \
+                                'This field is required to add entry to Letterboxd.')
+                    continue
 
 
 class LetterboxdAdd(LetterboxdSubmit):
@@ -71,6 +91,12 @@ class LetterboxdAdd(LetterboxdSubmit):
     log = logging.getLogger('letterboxd_add')
 
 
+class LetterboxdRemove(LetterboxdSubmit):
+    remove = True
+    log = logging.getLogger('letterboxd_remove')
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(LetterboxdAdd, 'letterboxd_add', api_ver=2)
+    plugin.register(LetterboxdRemove, 'letterboxd_remove', api_ver=2)
