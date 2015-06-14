@@ -121,7 +121,7 @@ class InputFtpList(object):
             if encoding:
                 p = p.decode(encoding)
 
-            #Clean file list when subdirectories are used
+            # Clean file list when subdirectories are used
             p = p.replace(path + '/', '')
 
             mlst = {}
@@ -148,7 +148,7 @@ class InputFtpList(object):
                 title = os.path.basename(p)
                 log.info('Accepting entry "%s" [%s]' % (path + '/' + p, mlst.get('type') or "unknown",))
                 entry = Entry(title, url)
-                if get_size and not 'size' in mlst:
+                if get_size and 'size' not in mlst:
                     if mlst.get('type') == 'file':
                         entry['content_size'] = ftp.size(path + '/' + p) / (1024 * 1024)
                         log.debug('(FILE) Size = %s', entry['content_size'])

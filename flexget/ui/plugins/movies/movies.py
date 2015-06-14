@@ -44,8 +44,8 @@ def index():
             # this is probably not needed since non cached movies are retried also
             # in the cover function
             #
-            #import thread
-            #thread.start_new_thread(tmdb_lookup, (), {'imdb_id': item.imdb_id})
+            # import thread
+            # thread.start_new_thread(tmdb_lookup, (), {'imdb_id': item.imdb_id})
             continue
 
         # set thumb, but only if already in cache because retrieving is too slow here

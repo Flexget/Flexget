@@ -113,7 +113,7 @@ def schema_task(task):
 @api.route('/tasks/<task>/', methods=['GET', 'PUT', 'DELETE'])
 def api_task(task):
     if request.method == 'GET':
-        if not task in manager.tasks:
+        if task not in manager.tasks:
             return jsonify(error='task {task} not found'.format(task=task)), 404
         return jsonify({'name': task, 'config': manager.config[task]})
     elif request.method == 'PUT':

@@ -125,6 +125,7 @@ class Manipulate(object):
                 entry[field] = field_value
         return modified
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(Manipulate, 'manipulate', api_ver=2)

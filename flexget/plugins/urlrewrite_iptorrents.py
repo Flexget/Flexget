@@ -32,7 +32,7 @@ CATEGORIES = {
     'Movie-Packs': 68,
     'Movie-XviD': 17,
 
-    #TV
+    # TV
     'TV-all': 73,
 
     'TV-Sports': 55,
@@ -47,6 +47,7 @@ CATEGORIES = {
 }
 
 BASE_URL = 'http://iptorrents.com'
+
 
 class UrlRewriteIPTorrents(object):
     """
@@ -94,7 +95,7 @@ class UrlRewriteIPTorrents(object):
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        if not 'url' in entry:
+        if 'url' not in entry:
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])

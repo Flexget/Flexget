@@ -33,7 +33,7 @@ class OutputFtp(object):
         'properties': {
             'use-ssl': {'type': 'boolean', 'default': False},
             'ftp_tmp_path': {'type': 'string', 'format': 'path'},
-            'delete_origin': {'type': 'boolean', 'default' : False}
+            'delete_origin': {'type': 'boolean', 'default': False}
         },
         'additionalProperties': False
     }
@@ -163,7 +163,7 @@ class OutputFtp(object):
                     ftp.retrbinary('RETR %s' % file_name, local_file.write)
             except Exception as error:
                 if max_attempts != 0:
-                    log.debug("Retrying download after error %s" % error);
+                    log.debug("Retrying download after error %s" % error)
                 else:
                     log.error("Too many errors downloading %s. Aborting." % file_name)
                     break

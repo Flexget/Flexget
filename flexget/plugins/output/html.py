@@ -44,6 +44,7 @@ class OutputHtml:
             log.error('Error while rendering task %s, Error: %s' % (task, e))
             raise plugin.PluginError('There was an error rendering the specified template')
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(OutputHtml, PLUGIN_NAME, api_ver=2)

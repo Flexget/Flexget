@@ -15,7 +15,7 @@ SERIES_ID_TYPES = ['ep', 'date', 'sequence', 'id']
 
 def clean_value(name):
     # Move anything in leading brackets to the end
-    #name = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', name)
+    # name = re.sub(r'^\[(.*?)\](.*)', r'\2 \1', name)
 
     for char in '[]()_,.':
         name = name.replace(char, ' ')
@@ -25,9 +25,9 @@ def clean_value(name):
         name = name.replace('-', ' ')
 
     # remove unwanted words (imax, ..)
-    #self.remove_words(data, self.remove)
+    # self.remove_words(data, self.remove)
 
-    #MovieParser.strip_spaces
+    # MovieParser.strip_spaces
     name = ' '.join(name.split())
     return name
 
@@ -163,7 +163,9 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
         name_regexps = ReList(self.name_regexps)
         if not name_regexps:
             # if we don't have name_regexps, generate one from the name
-            name_regexps = ReList(name_to_re(name, self.ignore_prefixes, None) for name in [self.name] + self.alternate_names)
+            name_regexps = ReList(name_to_re(name,
+                                             self.ignore_prefixes,
+                                             None) for name in [self.name] + self.alternate_names)
             # With auto regex generation, the first regex group captures the name
             re_from_name = True
         # try all specified regexps on this data
@@ -343,7 +345,7 @@ class ParsedVideoQuality(ABCMeta(str('ParsedVideoQualityABCMeta'), (object,), {}
 
     def __str__(self):
         return "<%s(screen_size=%s,source=%s,video_codec=%s,audio_channels=%s)>" % (
-        self.__class__.__name__, self.screen_size, self.source, self.video_codec, self.audio_channels)
+            self.__class__.__name__, self.screen_size, self.source, self.video_codec, self.audio_channels)
 
 
 class ParsedMovie(ABCMeta(str('ParsedMovieABCMeta'), (ParsedVideo,), {})):
@@ -459,13 +461,15 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
                         return False
             if self.identified_by != 'auto' and self.identified_by != self.id_type:
                 return False
-            if self.complete or (self.identified_by in ['auto', 'ep'] and self.season is not None and self.episode is None):
+            if self.complete or (self.identified_by in ['auto', 'ep'] and
+                                 self.season is not None and self.episode is None):
                 return False
             if self.identified_by in ['auto', 'ep'] and self.episodes > 3:
                 return False
             if self.identified_by in ['ep', 'sequence'] and self.episode is None:
                 return False
-            if self.identified_by == 'ep' and (self.episode is None or (self.season is None and not self.allow_seasonless)):
+            if self.identified_by == 'ep' and (self.episode is None or (self.season is None and
+                                                                        not self.allow_seasonless)):
                 return False
             if self.identified_by == 'date' and not self.date:
                 return False
@@ -555,5 +559,3 @@ class ParsedSerie(ABCMeta(str('ParsedSerieABCMeta'), (ParsedVideo,), {})):
 
     def __eq__(self, other):
         return self is other
-
-

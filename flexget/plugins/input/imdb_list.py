@@ -111,6 +111,7 @@ class ImdbList(object):
 
         return entries
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(ImdbList, 'imdb_list', api_ver=2)

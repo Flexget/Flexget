@@ -23,6 +23,7 @@ from flexget.utils.pathscrub import pathscrub
 log = logging.getLogger('rss')
 feedparser.registerDateHandler(lambda date_string: dateutil.parser.parse(date_string).timetuple())
 
+
 def fp_field_name(name):
     """Translates literal field name to the sanitized one feedparser will use."""
     return name.replace(':', '_').lower()
@@ -304,7 +305,8 @@ class InputRSS(object):
                     self.process_invalid_content(task, content, config['url'])
                     if task.options.debug:
                         log.error('bozo error parsing rss: %s' % ex)
-                    raise plugin.PluginError('Received invalid RSS content from task %s (%s)' % (task.name, config['url']))
+                    raise plugin.PluginError('Received invalid RSS content from task %s (%s)' % (task.name,
+                                                                                                 config['url']))
                 elif isinstance(ex, httplib.BadStatusLine) or isinstance(ex, IOError):
                     raise ex  # let the @internet decorator handle
                 else:
@@ -401,7 +403,7 @@ class InputRSS(object):
                 # There is more than 1 enclosure, create an Entry for each of them
                 log.debug('adding %i entries from enclosures', len(enclosures))
                 for enclosure in enclosures:
-                    if not 'href' in enclosure:
+                    if 'href' not in enclosure:
                         log.debug('RSS-entry `%s` enclosure does not have URL', entry.title)
                         continue
                     # There is a valid url for this enclosure, create an Entry for it
@@ -453,7 +455,8 @@ class InputRSS(object):
         if rss.entries:
             log.debug('Saving location in rss feed.')
             try:
-                task.simple_persistence['%s_last_entry' % url_hash] = rss.entries[0].title + rss.entries[0].get('guid', '')
+                task.simple_persistence['%s_last_entry' % url_hash] = (rss.entries[0].title +
+                                                                       rss.entries[0].get('guid', ''))
             except AttributeError:
                 log.debug('rss feed location saving skipped: no title information in first entry')
 

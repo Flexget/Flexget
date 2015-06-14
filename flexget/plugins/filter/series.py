@@ -42,7 +42,7 @@ def upgrade(ver, session):
             Base.metadata.create_all(bind=session.bind)
         # Upgrade episode_releases table to have a proper count and seed it with appropriate numbers
         columns = table_columns('episode_releases', session)
-        if not 'proper_count' in columns:
+        if 'proper_count' not in columns:
             log.info('Upgrading episode_releases table to have proper_count column')
             table_add_column('episode_releases', 'proper_count', Integer, session)
             release_table = table_schema('episode_releases', session)
@@ -633,7 +633,7 @@ def set_series_begin(series, ep_id):
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
-                              (ep_id, series.identified_by))
+                (ep_id, series.identified_by))
     series.identified_by = identified_by
     episode = (session.query(Episode).filter(Episode.series_id == series.id).
                filter(Episode.identified_by == series.identified_by).
@@ -959,7 +959,7 @@ class FilterSeries(FilterSeriesBase):
             for name in all_series.keys():
                 if (name.lower().startswith(series_name.lower())) and \
                    (name.lower() != series_name.lower()):
-                    if not 'exact' in series_config:
+                    if 'exact' not in series_config:
                         log.verbose('Auto enabling exact matching for series %s (reason %s)', series_name, name)
                         series_config['exact'] = True
 
@@ -1010,7 +1010,7 @@ class FilterSeries(FilterSeriesBase):
                         alts = [alts]
                     for alt in alts:
                         _add_alt_name(alt, db_series, series_name, session)
-                if not series_name in found_series:
+                if series_name not in found_series:
                     continue
                 series_entries = {}
                 for entry in found_series[series_name]:
@@ -1200,7 +1200,7 @@ class FilterSeries(FilterSeriesBase):
                     log.debug('-' * 20 + ' episode tracking -->')
                     # Grace is number of distinct eps in the task for this series + 2
                     backfill = config.get('tracking') == 'backfill'
-                    if self.process_episode_tracking(ep, entries, grace=len(series_entries)+2, backfill=backfill):
+                    if self.process_episode_tracking(ep, entries, grace=len(series_entries) + 2, backfill=backfill):
                         continue
 
             # quality

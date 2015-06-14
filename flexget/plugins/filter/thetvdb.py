@@ -153,10 +153,12 @@ class FilterTvdb(object):
                     reasons.append('tvdb_ep_rating (%s < %s)' % (entry['tvdb_ep_rating'], config['min_episode_rating']))
             if 'min_episode_air_year' in config:
                 if entry['tvdb_ep_air_date'].strftime("%Y") < config['min_episode_air_year']:
-                    reasons.append('tvdb_ep_air_date (%s < %s)' % (entry['tvdb_ep_air_date'].strftime("%Y"), config['min_episode_air_year']))
+                    reasons.append('tvdb_ep_air_date (%s < %s)' % (entry['tvdb_ep_air_date'].strftime("%Y"),
+                                                                   config['min_episode_air_year']))
             if 'max_episode_air_year' in config:
                 if entry['tvdb_ep_air_date'].strftime("%Y") > config['max_episode_air_year']:
-                    reasons.append('tvdb_ep_air_date (%s < %s)' % (entry['tvdb_ep_air_date'].strftime("%Y"), config['max_episode_air_year']))
+                    reasons.append('tvdb_ep_air_date (%s < %s)' % (entry['tvdb_ep_air_date'].strftime("%Y"),
+                                                                   config['max_episode_air_year']))
 
             if self.is_in_set(config, 'reject_content_rating', entry['tvdb_content_rating']):
                 reasons.append('reject_content_rating')

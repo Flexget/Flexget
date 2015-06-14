@@ -64,10 +64,10 @@ class UrlRewriteNyaa(object):
                 entry['title'] = item.title
                 entry['url'] = item.link
                 # TODO: parse some shit
-                #entry['torrent_seeds'] = int(item.seeds)
-                #entry['torrent_leeches'] = int(item.leechs)
-                #entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-                #entry['content_size'] = int(item.size) / 1024 / 1024
+                # entry['torrent_seeds'] = int(item.seeds)
+                # entry['torrent_leeches'] = int(item.leechs)
+                # entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+                # entry['content_size'] = int(item.size) / 1024 / 1024
 
                 entries.add(entry)
 

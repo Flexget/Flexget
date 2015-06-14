@@ -1,5 +1,3 @@
-__author__ = 'deksan'
-
 import logging
 import urllib
 
@@ -9,6 +7,8 @@ from flexget import plugin, validator
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.api_tvrage import lookup_series
+
+__author__ = 'deksan'
 
 log = logging.getLogger('newznab')
 
@@ -52,7 +52,7 @@ class Newznab(object):
                     'apikey': config['apikey'],
                     'extended': 1
                 }
-                config['url'] = config['website']+'/api?'+urllib.urlencode(params)
+                config['url'] = config['website'] + '/api?' + urllib.urlencode(params)
         return config
 
     def fill_entries_for_url(self, url, config):

@@ -21,6 +21,7 @@ log.setLevel(logging.INFO)
 
 ID_TYPES = ['ep', 'date', 'sequence', 'id'] # may also be 'special'
 
+
 class SeriesParser(TitleParser):
 
     """
@@ -219,7 +220,8 @@ class SeriesParser(TitleParser):
         # regexp name matching
         if not self.name_regexps:
             # if we don't have name_regexps, generate one from the name
-            self.name_regexps = ReList(name_to_re(name, self.ignore_prefixes, self) for name in [self.name] + self.alternate_names)
+            self.name_regexps = ReList(
+                name_to_re(name, self.ignore_prefixes, self) for name in [self.name] + self.alternate_names)
             # With auto regex generation, the first regex group captures the name
             self.re_from_name = True
         # try all specified regexps on this data

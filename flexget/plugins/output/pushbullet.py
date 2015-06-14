@@ -19,7 +19,8 @@ class OutputPushbullet(object):
 
       pushbullet:
         apikey: <API_KEY>
-        device: <DEVICE_IDEN> (can also be a list of device idens, or don't specify any idens to send to all devices)
+        [device: <DEVICE_IDEN> (can also be a list of device idens, or don't specify any idens to send to all devices)]
+        [email: <EMAIL_ADDRESS> (can also be a list of user email addresses)]
         [title: <MESSAGE_TITLE>] (default: "{{task}} - Download started" -- accepts Jinja2)
         [body: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}" -- accepts Jinja2)
 
@@ -31,8 +32,9 @@ class OutputPushbullet(object):
     schema = {
         'type': 'object',
         'properties': {
-            'apikey': {'type': 'string'},
+            'apikey': one_or_more({'type': 'string'}),
             'device': one_or_more({'type': 'string'}),
+            'email': one_or_more({'type': 'string'}),
             'title': {'type': 'string', 'default': '{{task}} - Download started'},
             'body': {'type': 'string', 'default': default_body},
             'url': {'type': 'string'},
@@ -45,31 +47,22 @@ class OutputPushbullet(object):
     @plugin.priority(0)
     def on_task_output(self, task, config):
 
-        # Support for multiple devices
-        devices = config.get('device')
+        devices = config.get('device', [])
         if not isinstance(devices, list):
             devices = [devices]
 
-        # Support for urls
-        push_type = 'link' if config.has_key('url') else 'note'
+        emails = config.get('email', [])
+        if not isinstance(emails, list):
+            emails = [emails]
 
-        # Set a bunch of local variables from the config
-        apikey = config['apikey']
+        apikeys = config.get('apikey', [])
+        if not isinstance(apikeys, list):
+            apikeys = [apikeys]
 
-        client_headers = {'Authorization': 'Basic %s' % base64.b64encode(apikey)}
-
-        if task.options.test:
-            log.info('Test mode. Pushbullet configuration:')
-            log.info('    API_KEY: %s' % apikey)
-            log.info('    Type: %s' % push_type)
-            log.info('    Device: %s' % devices)
-
-        # Loop through the provided entries
         for entry in task.accepted:
-
             title = config['title']
             body = config['body']
-            url = config.get('url', '')
+            url = config.get('url')
 
             # Attempt to render the title field
             try:
@@ -86,48 +79,77 @@ class OutputPushbullet(object):
                 body = entry['title']
 
             # Attempt to render the url field
-            if push_type is 'link':
+            if url:
                 try:
                     url = entry.render(url)
                 except RenderError as e:
                     log.warning('Problem rendering `url`: %s' % e)
 
-            for device in devices:
-                # Build the request
-                data = {'type': push_type, 'title': title, 'body': body}
-                if push_type is 'link':
-                    data['url'] = url
-                if device:
-                    data['device_iden'] = device
-
-                # Check for test mode
-                if task.options.test:
-                    log.info('Test mode. Pushbullet notification would be:')
-                    log.info('    Type: %s' % push_type)
-                    log.info('    Title: %s' % title)
-                    log.info('    Body: %s' % body)
-                    if push_type is 'link':
-                         log.info('    URL: %s' % url)
-                    # Test mode.  Skip remainder.
-                    continue
-
-                # Make the request
-                response = task.requests.post(pushbullet_url, headers=client_headers, data=data, raise_status=False)
-
-                # Check if it succeeded
-                request_status = response.status_code
-
-                # error codes and messages from Pushbullet API
-                if request_status == 200:
-                    log.debug('Pushbullet notification sent')
-                elif request_status == 500:
-                    log.warning('Pushbullet notification failed, Pushbullet API having issues')
-                    #TODO: Implement retrying. API requests 5 seconds between retries.
-                elif request_status >= 400:
-                    error = json.loads(response.content)['error']
-                    log.error('Pushbullet API error: %s' % error['message'])
+            for apikey in apikeys:
+                if devices or emails:
+                    for device in devices:
+                        self.send_push(task, apikey, title, body, url, device, 'device_iden')
+                    for email in emails:
+                        self.send_push(task, apikey, title, body, url, email, 'email')
                 else:
-                    log.error('Unknown error when sending Pushbullet notification')
+                    self.send_push(task, apikey, title, body, url)
+
+    def send_push(self, task, api_key, title, body, url=None, destination=None, destination_type=None):
+
+        if url:
+            push_type = 'link'
+        else:
+            push_type = 'note'
+
+        data = {'type': push_type, 'title': title, 'body': body}
+        if url:
+            data['url'] = url
+        if destination:
+            data[destination_type] = destination
+
+        # Check for test mode
+        if task.options.test:
+            log.info('Test mode. Pushbullet notification would be:')
+            log.info('    API Key: %s' % api_key)
+            log.info('    Type: %s' % push_type)
+            log.info('    Title: %s' % title)
+            log.info('    Body: %s' % body)
+            if destination:
+                log.info('    Destination: %s (%s)' % (destination, destination_type))
+            if url:
+                log.info('    URL: %s' % url)
+            log.info('    Raw Data: %s' % json.dumps(data))
+            # Test mode.  Skip remainder.
+            return
+
+        # Make the request
+        headers = {
+            'Authorization': 'Basic %s' % base64.b64encode(api_key),
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'User-Agent': 'Flexget'
+        }
+        response = task.requests.post(pushbullet_url, headers=headers, data=json.dumps(data), raise_status=False)
+
+        # Check if it succeeded
+        request_status = response.status_code
+
+        # error codes and messages from Pushbullet API
+        if request_status == 200:
+            log.debug('Pushbullet notification sent')
+        elif request_status == 500:
+            log.warning('Pushbullet notification failed, Pushbullet API having issues')
+            # TODO: Implement retrying. API requests 5 seconds between retries.
+        elif request_status >= 400:
+            if response.content:
+                try:
+                    error = json.loads(response.content)['error']
+                except ValueError:
+                    error = 'Unknown Error (Invalid JSON returned)'
+            log.error('Pushbullet API error: %s' % error['message'])
+        else:
+            log.error('Unknown error when sending Pushbullet notification')
+
 
 @event('plugin.register')
 def register_plugin():

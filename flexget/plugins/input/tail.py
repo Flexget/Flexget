@@ -130,7 +130,7 @@ class InputTail(object):
                         break
 
                     for field, regexp in entry_config.iteritems():
-                        #log.debug('search field: %s regexp: %s' % (field, regexp))
+                        # log.debug('search field: %s regexp: %s' % (field, regexp))
                         match = re.search(regexp, line)
                         if match:
                             # check if used field detected, in such case start with new entry
@@ -141,7 +141,8 @@ class InputTail(object):
                                     self.format_entry(entry, format_config)
                                     entries.append(entry)
                                 else:
-                                    log.info('Invalid data, entry field %s is already found once. Ignoring entry.' % field)
+                                    log.info(
+                                        'Invalid data, entry field %s is already found once. Ignoring entry.' % field)
                                 # start new entry
                                 entry = Entry()
                                 used = {}
