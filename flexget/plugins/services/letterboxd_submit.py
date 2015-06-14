@@ -64,8 +64,7 @@ class LetterboxdSubmit(object):
             'password': config['password']
         }
         headers = {'Referer': base_url}
-        r = requests.post('%s/user/login.do' % base_url,
-                          data=dict(params, **auth), headers=headers, raise_status=False)
+        r = requests.post('%s/user/login.do' % base_url, data=dict(params, **auth), headers=headers)
 
         if self.add:
             command = LISTS[config['list']]['add_command']
@@ -79,7 +78,8 @@ class LetterboxdSubmit(object):
                 if 'imdb_id' in entry:
                     film = self.parse_film(entry['imdb_id'])
                     try:
-                        r = requests.post('%s/film/%s/%s/' % (base_url, film, command), data=params)
+                        r = requests.post('%s/film/%s/%s/' % (base_url, film, command),
+                                          data=params, raise_status=False)
                     except RequestException as e:
                         self.log.error('Error accessing %s/film/%s/%s/' % (base_url, film, command))
                     if 200 <= r.status_code < 300:
