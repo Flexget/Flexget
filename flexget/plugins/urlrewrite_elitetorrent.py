@@ -45,7 +45,7 @@ class UrlRewriteElitetorrent(object):
             download_link = soup.findAll(href=re.compile('/get-torrent/\d+'))
             download_href = 'http://www.elitetorrent.net' + download_link[0]['href']
             return download_href
-        except Exception:
+        except IndexError:
             raise UrlRewritingError(
                 'Unable to locate torrent from url %s' % url
             )
