@@ -1,41 +1,4 @@
-.header .navbar {
-    background-image: url('/ui/static/img/FlexGet.png');
-    background-size: 180px;
-    background-repeat: no-repeat;
-    background-position: right;
-}
-
-
-/* Mobile Device Screens */
-@media screen and (max-width: 699px) {
-    .header.navbar {
-        background-position: left;
-    }
-
-}
-
-/* Tablets and Higher */
-@media screen and (min-width: 700px) {
-    body {
-        background-color: #EDEDED;
-    }
-
-    .container {
-        border-radius: 5px;
-    }
-
-    .container.body {
-        background-color: white;
-        padding-bottom: 10px;
-    }
-
-    .container.header {
-        background-color: #EDEDED;
-        padding: 10px 0px 10px 0px;
-    }
-
-    .container.footer {
-
-    }
-
+.main-header .logo {
+    background: #222D32 url(/ui/static/img/flexget.png) no-repeat center !important;
+    background-size: 220px !important;
 }

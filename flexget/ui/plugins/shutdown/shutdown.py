@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from flexget.ui import register_plugin
+from flexget.ui import register_plugin, menu
 from flask import render_template, Blueprint
 
 import logging
@@ -20,4 +20,4 @@ def now():
     return 'Shutdown Complete'
 
 
-register_plugin(shutdown, menu='Shutdown', order=512)
+register_plugin(shutdown)

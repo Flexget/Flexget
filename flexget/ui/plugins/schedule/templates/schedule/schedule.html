@@ -1,9 +1,10 @@
 {% extends "layout.html" %}
 
+{% block title %}
+Schedules
+{% endblock %}
+
 {% block main %}
-<style>
-label>p {color: #000000}
-</style>
 <form action="{{ url_for('.index') }}" method="post" class="simple">
     <h3>Task schedules:</h3>
     <ol>
@@ -27,6 +28,5 @@ label>p {color: #000000}
         <td><input name="default_schedule" value="{{ default_schedule.schedule }}"></td>
         </tr>
     </table>
-
 </form>
 {% endblock %}

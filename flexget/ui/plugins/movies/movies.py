@@ -5,7 +5,7 @@ import posixpath
 from flask import render_template, Blueprint, request, redirect, flash, send_file
 from flask.helpers import url_for
 from flexget.plugin import DependencyError, get_plugin_by_name
-from flexget.ui import register_plugin, webui_app, manager
+from flexget.ui import register_plugin, webui_app, manager, menu
 from flexget.utils import qualities
 
 try:
@@ -27,7 +27,6 @@ log = logging.getLogger('ui.movies')
 def pretty_age_filter(value):
     from flexget.ui.utils import pretty_date
     return pretty_date(time.mktime(value.timetuple()))
-
 
 @movies_module.route('/')
 def index():
@@ -138,4 +137,4 @@ def cover(imdb_id):
     return send_file(filepath, mimetype='image/png')
 
 
-register_plugin(movies_module, menu='Movies')
+register_plugin(movies_module)

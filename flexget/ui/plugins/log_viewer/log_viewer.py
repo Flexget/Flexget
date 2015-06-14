@@ -11,4 +11,4 @@ log_viewer = Blueprint('log_viewier', __name__, url_prefix='/log')
 def index():
     return render_template('log_viewer/log.html')
 
-register_plugin(log_viewer, menu='Log', order=256)
+register_plugin(log_viewer)

@@ -6,7 +6,7 @@ from flask import redirect, render_template, Blueprint, request, flash, url_for
 from sqlalchemy.sql.expression import desc, asc
 
 from flexget.plugin import DependencyError
-from flexget.ui import register_plugin, webui_app
+from flexget.ui import register_plugin, webui_app, menu
 from flexget.ui.utils import pretty_date
 
 try:
@@ -33,6 +33,7 @@ def pretty_age_filter(value):
 
 
 @series_module.route('/')
+@menu.register_menu(series_module, '.series', 'Series', order=128)
 def index():
     releases = db_session.query(Release).order_by(desc(Release.id)).limit(10).all()
     for release in releases:
@@ -98,4 +99,4 @@ def forget_episode(rel_id):
     return render_template('series/forget.html', **context)
 
 
-register_plugin(series_module, menu='Series')
+register_plugin(series_module)

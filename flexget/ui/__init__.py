@@ -1,34 +1,27 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
-import urllib
 
-from flask import request, send_from_directory, Flask
+import flask_menu as menu
+from flask import send_from_directory, Flask
 
 from flexget.plugin import DependencyError
+from flexget import __version__
 from flexget.ui import plugins as ui_plugins_pkg
 from flexget.webserver import register_app, register_home
+
 
 log = logging.getLogger('webui')
 
 _home = None
-_menu = []
 
 manager = None
 config = {}
 
 webui_app = Flask(__name__)
+webui_app.debug = True
 
-
-def _update_menu(root):
-    """Iterates trough menu navigation and sets the item selected based on the :root:"""
-    for item in _menu:
-        if item['href'].startswith(root):
-            item['current'] = True
-            log.debug('current menu item %s' % root)
-        else:
-            if 'current' in item:
-                item.pop('current')
+menu.Menu(app=webui_app)
 
 
 @webui_app.route('/userstatic/<path:filename>')
@@ -38,11 +31,9 @@ def user_static(filename):
 
 @webui_app.context_processor
 def flexget_variables():
-    path = urllib.splitquery(request.path)[0]
-    root = '/' + path.split('/', 2)[1]
-    # log.debug('root is: %s' % root)
-    _update_menu(root)
-    return {'menu': _menu, 'manager': manager}
+    return {
+        'version': __version__
+    }
 
 
 def _strip_trailing_sep(path):
@@ -107,7 +98,7 @@ def load_ui_plugins():
     _load_ui_plugins_from_dirs(ui_plugin_dirs)
 
 
-def register_plugin(blueprint, menu=None, order=128):
+def register_plugin(blueprint):
     """
     Registers UI plugin.
 
@@ -122,14 +113,6 @@ def register_plugin(blueprint, menu=None, order=128):
         blueprint.static_folder = 'static'
     log.verbose('Registering UI plugin %s' % blueprint.name)
     webui_app.register_blueprint(blueprint)
-    if menu:
-        register_menu('/ui%s' % blueprint.url_prefix, menu, order=order)
-
-
-def register_menu(href, caption, order=128):
-    global _menu
-    _menu.append({'href': href, 'caption': caption, 'order': order})
-    _menu = sorted(_menu, key=lambda item: item['order'])
 
 
 def register_web_ui(mgr):

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from flexget.ui import webui_app
+from flexget.ui import webui_app, menu
 from flask import request, render_template, flash, Blueprint
 from flexget.plugin import DependencyError
 
@@ -26,6 +26,7 @@ def pretty_age_filter(value):
 
 
 @archive.route('/', methods=['POST', 'GET'])
+@menu.register_menu(archive, '.archive', "Archive")
 def index():
     context = {}
     if request.method == 'POST':

@@ -133,4 +133,4 @@ def get_related(root, name):
         return tasks
 
 
-register_plugin(configure, menu='Configure', order=10)
+register_plugin(configure)
