@@ -61,7 +61,7 @@ class LetterboxdSubmit(object):
                         film = self.parse_film(entry['imdb_id'])
                         r = requests.post('%s%sremove-from-watchlist/' % (base_url, film), data=params)
                     else:
-                        log.warning('No imdb_id found for %s. '  % entry['title'] + \ 
+                        log.warning('No imdb_id found for %s. '  % entry['title'] + \
                                     'This field is required to add entry to Letterboxd.')
                         continue
 
