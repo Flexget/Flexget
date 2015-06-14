@@ -49,7 +49,7 @@ class LetterboxdSubmit(object):
 
 
     def parse_film(self, search):
-        url = base_url + '/search/%s/' % search
+        url = base_url + '/search/films/%s/' % search
         film = re.search(r'\/film\/(.*?)\/', requests.get(url).content).group(1)
 
         return film
@@ -61,10 +61,11 @@ class LetterboxdSubmit(object):
         params = {'__csrf': token}
         auth = {
             'username': config['username'],
-            'password': config['password']
+            'password': config['password'],
         }
         headers = {'Referer': base_url}
-        r = requests.post('%s/user/login.do' % base_url, data=dict(params, **auth), headers=headers)
+        r = requests.post('%s/user/login.do' % base_url,
+                          data=dict(params, **auth), headers=headers, raise_status=False)
 
         if self.add:
             command = LISTS[config['list']]['add_command']
