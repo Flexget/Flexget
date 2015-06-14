@@ -17,13 +17,13 @@ LISTS = {
     'watchlist': {
         'add_command': 'add-to-watchlist',
         'remove_command': 'remove-from-watchlist',
-        'add_log': 'Added film to your Letterboxd watchlist: %s'},
-        'remove_log': 'Removed film from your Letterboxd watchlist: %s'
+        'add_log': 'Added film to your Letterboxd watchlist: %s',
+        'remove_log': 'Removed film from your Letterboxd watchlist: %s'}
     'watched': {
         'add_command': 'mark-as-watched',
         'remove_command': 'mark-as-not-watched',
-        'add_log': 'Marked film as seen on Letterboxd: %s'},
-        'remove_log': 'Marked film as not seen on Letterboxd: %s'
+        'add_log': 'Marked film as seen on Letterboxd: %s',
+        'remove_log': 'Marked film as not seen on Letterboxd: %s'}
 }
 
 
