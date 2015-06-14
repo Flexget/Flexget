@@ -61,7 +61,7 @@ class LetterboxdSubmit(object):
         params = {'__csrf': token}
         auth = {
             'username': config['username'],
-            'password': config['password'],
+            'password': config['password']
         }
         headers = {'Referer': base_url}
         r = requests.post('%s/user/login.do' % base_url,
