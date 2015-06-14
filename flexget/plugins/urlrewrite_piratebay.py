@@ -27,6 +27,7 @@ CATEGORIES = {
     'movies': 201,
     'tv': 205,
     'highres movies': 207,
+    'highres tv': 208,
     'comics': 602
 }
 
