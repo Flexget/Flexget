@@ -9,12 +9,13 @@ from time import sleep
 from functools import wraps
 from collections import deque
 
-from jsonschema.exceptions import RefResolutionError
 
 from flask import Flask, request, jsonify, Response
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.resource import Resource
 from flask_restplus.model import ApiModel
+from jsonschema.exceptions import RefResolutionError
+from werkzeug.exceptions import HTTPException
 
 from flexget import __version__
 from flexget.event import event
@@ -57,49 +58,147 @@ def register_config():
     register_config_key('api', api_config_schema)
 
 
+class ApiSchemaModel(ApiModel):
+    def __init__(self, schema, *args, **kwargs):
+        self._schema = schema
+        super(ApiSchemaModel, self).__init__()
+
+    @property
+    def __schema__(self):
+        if self.__parent__:
+            return {
+                'allOf': [
+                    {'$ref': '#/definitions/{0}'.format(self.__parent__.name)},
+                    self._schema
+                ]
+            }
+        else:
+            return self._schema
+
+    def __nonzero__(self):
+        return bool(self._schema)
+
+    def __repr__(self):
+        return '<ApiSchemaModel(%r)>' % self._schema
+
+
+class _Api(RestPlusAPI):
+
+    def schema(self, name, schema, **kwargs):
+        """Register a schema"""
+        return self.model(name, **kwargs)(ApiSchemaModel(schema))
+
+    def inherit(self, name, parent, fields):
+        if isinstance(parent, ApiSchemaModel):
+            model = ApiSchemaModel(fields)
+            model.__apidoc__['name'] = name
+            model.__parent__ = parent
+            self.models[name] = model
+            return model
+        return super(_Api, self).inherit(name, parent, fields)
+
+    def validate(self, model):
+        def decorator(func):
+            @api.expect(model)
+            @api.response(ValidationError)
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                payload = request.json
+                try:
+                    errors = process_config(config=payload, schema=model.__schema__, set_defaults=False)
+                    if errors:
+                        raise ValidationError(errors)
+                except RefResolutionError as e:
+                    raise ValidationError(str(e))
+                return func(*args, **kwargs)
+            return wrapper
+        return decorator
+
+    def response(self, *args, **kwargs):
+        try:
+            if issubclass(args[0], ApiError):
+                description = kwargs.get('description', args[1] if len(args) > 1 else args[0].description)
+                return self.doc(responses={args[0].code: (description, args[0].response_model)})
+        except TypeError:
+            # If first argument isn't a class this happens
+            pass
+        return super(_Api, self).response(*args, **kwargs)
+
+    def handle_error(self, error):
+        if isinstance(error, ApiError):
+            return jsonify(error.to_dict()), error.code
+        elif isinstance(error, HTTPException):
+            return jsonify({'code': error.code, 'error': error.description})
+        return super(_Api, self).handle_error(error)
+
+
+class APIResource(Resource):
+    method_decorators = [with_session]
+
+    def __init__(self):
+        self.manager = manager.manager
+        super(APIResource, self).__init__()
+
+app = Flask(__name__)
+api = _Api(app, catch_all_404s=True, title='Flexget API')
+
+
 class ApiError(Exception):
     code = 500
+    description = 'server error'
 
-    schema_properties = {
-        'code': {'type': 'integer'},
-        'error': {'type': 'string'}
-    }
+    response_model = api.schema('error', {
+        'type': 'object',
+        'properties': {
+            'code': {'type': 'integer'},
+            'error': {'type': 'string'}
+        },
+        'required': ['code', 'error']
+    })
 
-    def __init__(self, message, status_code=None, payload=None):
+    def __init__(self, message, payload=None):
         self.message = message
-        self.status_code = status_code
         self.payload = payload
 
     def to_dict(self):
         rv = self.payload or {}
-        rv.update(code=self.status_code, error=self.message)
+        rv.update(code=self.code, error=self.message)
         return rv
 
     @classmethod
     def schema(cls):
-        return {'type': 'object', 'properties': cls.schema_properties}
+        return cls.response_model.__schema__
+
+
+class NotFoundError(ApiError):
+    code = 404
+    description = 'not found'
 
 
 class ValidationError(ApiError):
     code = 400
+    description = 'validation error'
 
-    schema_properties = ApiError.schema_properties.copy()
-    schema_properties.update({
-        'validation_errors': {
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'properties': {
-                    'message': {'type': 'string', 'description': 'A human readable message explaining the error.'},
-                    'validator': {'type': 'string', 'description': 'The name of the failed validator.'},
-                    'validator_value': {
-                        'type': 'string', 'description': 'The value for the failed validator in the schema.'
-                    },
-                    'path': {'type': 'string'},
-                    'schema_path': {'type': 'string'},
+    response_model = api.inherit('validation_error', ApiError.response_model, {
+        'type': 'object',
+        'properties': {
+            'validation_errors': {
+                'type': 'array',
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'message': {'type': 'string', 'description': 'A human readable message explaining the error.'},
+                        'validator': {'type': 'string', 'description': 'The name of the failed validator.'},
+                        'validator_value': {
+                            'type': 'string', 'description': 'The value for the failed validator in the schema.'
+                        },
+                        'path': {'type': 'string'},
+                        'schema_path': {'type': 'string'},
+                    }
                 }
             }
-        }
+        },
+        'required': ['validation_errors']
     })
 
     verror_attrs = (
@@ -121,75 +220,12 @@ class ValidationError(ApiError):
         return error_dict
 
 
-class ApiSchemaModel(ApiModel):
-    def __init__(self, schema, *args, **kwargs):
-        self._schema = schema
-        super(ApiSchemaModel, self).__init__()
-
-    @property
-    def __schema__(self):
-        return self._schema
-
-    def __nonzero__(self):
-        return bool(self._schema)
-
-
-class _Api(RestPlusAPI):
-
-    def schema(self, name, schema, **kwargs):
-        """Register a schema"""
-        return self.model(name, **kwargs)(ApiSchemaModel(schema))
-
-    def validate(self, model):
-        def decorator(func):
-            @api.expect(model)
-            @wraps(func)
-            def wrapper(*args, **kwargs):
-                payload = request.json
-                try:
-                    errors = process_config(config=payload, schema=model.__schema__, set_defaults=False)
-                    if errors:
-                        raise ValidationError(errors)
-                except RefResolutionError as e:
-                    raise ValidationError(str(e))
-                return func(*args, **kwargs)
-            return wrapper
-        return decorator
-
-    def response(self, *args, **kwargs):
-        if isinstance(args[0], ApiError):
-            return self.doc(responses={args[0].code: (args[0].message, ApiSchemaModel(args[0].schema()))})
-
-        return super(_Api, self).response(*args, **kwargs)
-
-
-class APIResource(Resource):
-    method_decorators = [with_session]
-
-    def __init__(self):
-        self.manager = manager.manager
-        super(APIResource, self).__init__()
-
-app = Flask(__name__)
-api = _Api(app, catch_all_404s=True, title='Flexget API')
-
-
 @event('manager.daemon.started')
 def register_api(mgr):
     api_config = mgr.config.get('api')
 
     if api_config:
         register_app('/api', app)
-
-
-@api.errorhandler(ApiError)
-def handle_api_errors(error):
-    return error.to_dict(), ApiError.code
-
-
-@api.errorhandler(ValidationError)
-def handle_validation_errors(error):
-    return error.to_dict(), ValidationError.code
 
 
 # Server API
@@ -199,7 +235,7 @@ server_api = api.namespace('server', description='Manage Flexget Daemon')
 @server_api.route('/reload/')
 class ServerReloadAPI(APIResource):
 
-    @api.response(500, 'Error loading the config')
+    @api.response(ApiError, 'Error loading the config')
     @api.response(200, 'Reloaded config')
     def get(self, session=None):
         """ Reload Flexget config """
@@ -207,19 +243,19 @@ class ServerReloadAPI(APIResource):
         try:
             self.manager.load_config()
         except ValueError as e:
-            return {'error': 'Error loading config %s' % e.args[0]}, 500
+            raise ApiError('Error loading config: %s' % e.args[0])
 
         log.info('Config successfully reloaded from disk.')
         return {}
 
-pid_schema = {
-    "type": "object",  "properties": {
-        "pid": {
-            "type": "integer"
+pid_schema = api.schema('server_pid', {
+    'type': 'object',
+    'properties': {
+        'pid': {
+            'type': 'integer'
         }
     }
-}
-pid_schema = api.schema('server_pid', pid_schema)
+})
 
 
 @server_api.route('/pid/')
@@ -253,14 +289,13 @@ class ServerConfigAPI(APIResource):
         return self.manager.config
 
 
-version_schema = {
-    "type": "object",  "properties": {
-        "pid": {
-            "type": "integer"
-        }
+version_schema = api.schema('version', {
+    'type': 'object',
+    'properties': {
+        'flexget_version': {'type': 'string'},
+        'api_version': {'type': 'integer'}
     }
-}
-version_schema = api.schema('version', version_schema)
+})
 
 
 @server_api.route('/version/')
@@ -381,14 +416,14 @@ class ExecutionAPI(APIResource):
 @execution_api.route('/<exec_id>/')
 class ExecutionTaskAPI(APIResource):
 
-    @api.response(404, 'task execution not found')
+    @api.response(NotFoundError, 'task execution not found')
     @api.response(200, 'list of tasks queued for execution', task_execution_api_schema)
     def get(self, exec_id, session=None):
         """ Status of existing task execution """
         task_info = self.manager.task_queue.tasks_info.get(exec_id)
 
         if not task_info:
-            return {'error': '%s not found' % exec_id}, 404
+            raise NotFoundError('%s not found' % exec_id)
 
         return _task_info_dict(task_info)
 
@@ -398,7 +433,7 @@ class ExecutionTaskAPI(APIResource):
 @execution_api.route('/<exec_id>/log/')
 class ExecutionTaskLogAPI(APIResource):
     @api.response(200, 'Streams as line delimited JSON')
-    @api.response(404, 'task log not found')
+    @api.response(NotFoundError, 'task log not found')
     def get(self, exec_id, session=None):
         """ Log stream of executed task
         Streams as line delimited JSON
@@ -406,7 +441,7 @@ class ExecutionTaskLogAPI(APIResource):
         task_info = self.manager.task_queue.tasks_info.get(exec_id)
 
         if not task_info:
-            return {'error': '%s not found' % exec_id}, 404
+            raise NotFoundError('%s not found' % exec_id)
 
         def follow():
             f = open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'r')
@@ -506,12 +541,12 @@ class TasksAPI(APIResource):
 class TaskAPI(APIResource):
 
     @api.response(200, 'task config', task_api_schema)
-    @api.response(404, 'task not found')
-    @api.response(500, 'unable to read config')
+    @api.response(NotFoundError, 'task not found')
+    @api.response(ApiError, 'unable to read config')
     def get(self, task, session=None):
         """ Get task config """
         if task not in self.manager.user_config.get('tasks', {}):
-            return {'error': 'task %s not found' % task}, 404
+            raise NotFoundError('task `%s` not found' % task)
 
         return {'name': task, 'config': self.manager.user_config['tasks'][task]}
 
