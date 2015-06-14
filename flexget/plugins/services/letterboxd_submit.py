@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
-import json, logging, re
+import logging
+import re
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
 from flexget.utils.requests import RequestException, Session
-from flexget.utils.soup import get_soup
 
 requests = Session(max_retries=5)
 requests.set_domain_delay('letterboxd.com', '1 seconds')
@@ -50,10 +50,7 @@ class LetterboxdSubmit(object):
 
     def parse_film(self, search):
         url = base_url + '/search/%s/' % search
-        soup = get_soup(requests.get(url).content)
-        film = soup.find(attrs={'data-film-link': True})
-        if film is not None:
-            film = re.search(r'\/film\/(.*)\/', film.get('data-film-link')).group(1)
+        film = re.search(r'\/film\/(.*?)\/', requests.get(url).content).group(1)
 
         return film
 
@@ -80,7 +77,10 @@ class LetterboxdSubmit(object):
             if any(field in entry for field in ['imdb_id', 'tmdb_id', 'movie_name']):
                 if 'imdb_id' in entry:
                     film = self.parse_film(entry['imdb_id'])
-                    r = requests.post('%s/film/%s/%s/' % (base_url, film, command), data=params)
+                    try:
+                        r = requests.post('%s/film/%s/%s/' % (base_url, film, command), data=params)
+                    except RequestException as e:
+                        self.log.error('Error accessing %s/film/%s/%s/' % (base_url, film, command))
                     if 200 <= r.status_code < 300:
                         self.log.verbose(log_str % entry['title'])
                         self.log.debug('Letterboxd response: %s' % r.text)
