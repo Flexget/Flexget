@@ -128,7 +128,7 @@ class _Api(RestPlusAPI):
         if isinstance(error, ApiError):
             return jsonify(error.to_dict()), error.code
         elif isinstance(error, HTTPException):
-            return jsonify({'code': error.code, 'error': error.description})
+            return jsonify({'code': error.code, 'error': error.description}), error.code
         return super(_Api, self).handle_error(error)
 
 
