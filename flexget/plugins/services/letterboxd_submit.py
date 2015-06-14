@@ -48,8 +48,7 @@ class LetterboxdSubmit(object):
         params = {'__csrf': token}
         auth = {
             'username': config['username'],
-            'password': config['password'],
-            'remember': True
+            'password': config['password']
         }
         headers = {'Referer': base_url}
         r = requests.post('%s/user/login.do' % base_url, data=dict(params, **auth), headers=headers)
@@ -59,7 +58,8 @@ class LetterboxdSubmit(object):
                 if any(field in entry for field in ['imdb_id', 'tmdb_id', 'movie_name']):
                     if 'imdb_id' in entry:
                         film = self.parse_film(entry['imdb_id'])
-                        r = requests.post('%s%sremove-from-watchlist/' % (base_url, film), data=params)
+                        r = requests.post(base_url + film + 'remove-from-watchlist/', data=params)
+
                     else:
                         log.warning('No imdb_id found for %s. '  % entry['title'] + \
                                     'This field is required to add entry to Letterboxd.')
