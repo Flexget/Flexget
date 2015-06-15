@@ -1,7 +1,7 @@
 """
 FlexGet build and development utilities - unfortunately this file is somewhat messy
 """
-
+from __future__ import print_function
 import os
 import sys
 from paver.easy import *
@@ -45,7 +45,7 @@ with open("README.rst") as readme:
 __version__ = None
 execfile('flexget/_version.py')
 if not __version__:
-    print 'Could not find __version__ from flexget/_version.py'
+    print('Could not find __version__ from flexget/_version.py')
     sys.exit(1)
 
 setup(
@@ -110,20 +110,20 @@ def set_init_version(ver):
     for line in fileinput.FileInput('flexget/_version.py', inplace=1):
         if line.startswith('__version__ = '):
             line = "__version__ = '%s'\n" % ver
-        print line,
+        print(line, end='')
 
 
 @task
 def version():
     """Prints the version number of the source"""
-    print __version__
+    print(__version__)
 
 
 @task
 @cmdopts([('dev', None, 'Bumps to new development version instead of release version.')])
 def increment_version(options):
     """Increments either release or dev version by 1"""
-    print 'current version: %s' % __version__
+    print('current version: %s' % __version__)
     ver_split = __version__.split('.')
     dev = options.increment_version.get('dev')
     if 'dev' in ver_split[-1]:
@@ -143,7 +143,7 @@ def increment_version(options):
         if dev:
             ver_split.append('dev')
     new_version = '.'.join(ver_split)
-    print 'new version: %s' % new_version
+    print('new version: %s' % new_version)
     set_init_version(new_version)
 
 
@@ -202,9 +202,9 @@ def clean():
 ])
 def sdist(options):
     """Build tar.gz distribution package"""
-    print 'sdist version: %s' % __version__
+    print('sdist version: %s' % __version__)
     # clean previous build
-    print 'Cleaning build...'
+    print('Cleaning build...')
     for p in ['build']:
         pth = path(p)
         if pth.isdir():
@@ -212,7 +212,7 @@ def sdist(options):
         elif pth.isfile():
             pth.remove()
         else:
-            print 'Unable to remove %s' % pth
+            print('Unable to remove %s' % pth)
 
     # remove pre-compiled pycs from tests, I don't know why paver even tries to include them ...
     # seems to happen only with sdist though
@@ -238,7 +238,7 @@ def coverage():
     argv.extend(['--cover-package', 'flexget'])
     argv.extend(['--cover-html-dir', '/var/www/flexget_coverage/'])
     nose.run(argv=argv, config=cfg)
-    print 'Coverage generated'
+    print('Coverage generated')
 
 
 @task
@@ -247,7 +247,7 @@ def coverage():
 ])
 def docs():
     if not sphinxcontrib:
-        print 'ERROR: requires sphinxcontrib-paverutils'
+        print('ERROR: requires sphinxcontrib-paverutils')
         sys.exit(1)
     from paver import tasks
     if not os.path.exists('build'):
@@ -267,10 +267,10 @@ def release(options):
     """Run tests then make an sdist if successful."""
     if not options.release.get('no_tests'):
         if not test():
-            print 'Unit tests did not pass'
+            print('Unit tests did not pass')
             sys.exit(1)
 
-    print 'Making src release'
+    print('Making src release')
     sdist()
 
 
@@ -281,12 +281,12 @@ def install_tools():
     try:
         import pip
     except ImportError:
-        print 'FATAL: Unable to import pip, please install it and run this again!'
+        print('FATAL: Unable to import pip, please install it and run this again!')
         sys.exit(1)
 
     try:
         import sphinxcontrib
-        print 'sphinxcontrib INSTALLED'
+        print('sphinxcontrib INSTALLED')
     except ImportError:
         pip.main(['install', 'sphinxcontrib-paverutils'])
 
@@ -299,7 +299,7 @@ def clean_compiled():
         for name in files:
             fqn = os.path.join(root, name)
             if fqn[-3:] == 'pyc' or fqn[-3:] == 'pyo' or fqn[-5:] == 'cover':
-                print 'Deleting %s' % fqn
+                print('Deleting %s' % fqn)
                 os.remove(fqn)
 
 
@@ -309,7 +309,7 @@ def pep8(args):
     try:
         import pep8
     except:
-        print 'Run bin/paver install_tools'
+        print('Run bin/paver install_tools')
         sys.exit(1)
 
     # Ignoring certain errors
@@ -321,3 +321,13 @@ def pep8(args):
     styleguide = pep8.StyleGuide(show_source=True, ignore=ignore, repeat=1, max_line_length=120,
                                  parse_argv=args)
     styleguide.input_dir('flexget')
+
+
+@task
+@cmdopts([
+    ('file=', 'f', 'name of the requirements file to create')
+])
+def requirements(options):
+    filename = options.requirements.get('file', 'requirements.txt')
+    with open(filename, mode='w') as req_file:
+        req_file.write('\n'.join(options.install_requires))
