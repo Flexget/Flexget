@@ -59,6 +59,7 @@ def register_config():
 
 
 class ApiSchemaModel(ApiModel):
+    """A flask restplus :class:`flask_restplus.models.ApiModel` which can take a json schema directly."""
     def __init__(self, schema, *args, **kwargs):
         self._schema = schema
         super(ApiSchemaModel, self).__init__()
@@ -83,12 +84,27 @@ class ApiSchemaModel(ApiModel):
 
 
 class _Api(RestPlusAPI):
+    """
+    Extends a flask restplus :class:`flask_restplus.api.Api` with:
+      - methods to make using json schemas easier
+      - methods to auto document and handle :class:`ApiError` responses
+    """
 
     def schema(self, name, schema, **kwargs):
-        """Register a schema"""
+        """
+        Register a json schema.
+
+        Usable like :method:`flask_restplus.api.Api.model`, except takes a json schema as its argument.
+
+        :returns: A :class:`ApiSchemaModel` instance registered to this api.
+        """
         return self.model(name, **kwargs)(ApiSchemaModel(schema))
 
     def inherit(self, name, parent, fields):
+        """
+        Extends :method:`flask_restplus.model.Api.inherit` to allow `fields` to be a json schema, if `parent` is a
+        :class:`ApiSchemaModel`.
+        """
         if isinstance(parent, ApiSchemaModel):
             model = ApiSchemaModel(fields)
             model.__apidoc__['name'] = name
@@ -98,6 +114,10 @@ class _Api(RestPlusAPI):
         return super(_Api, self).inherit(name, parent, fields)
 
     def validate(self, model):
+        """
+        When a method is decorated with this, json data submitted to the endpoint will be validated with the given
+        `model`. This also auto-documents the expected model, as well as the possible :class:`ValidationError` response.
+        """
         def decorator(func):
             @api.expect(model)
             @api.response(ValidationError)
@@ -109,22 +129,28 @@ class _Api(RestPlusAPI):
                     if errors:
                         raise ValidationError(errors)
                 except RefResolutionError as e:
-                    raise ValidationError(str(e))
+                    raise ApiError(str(e))
                 return func(*args, **kwargs)
             return wrapper
         return decorator
 
-    def response(self, *args, **kwargs):
+    def response(self, code_or_apierror, description=None, model=None, **kwargs):
+        """
+        Extends :method:`flask_restplus.api.Api.response` to allow passing an :class:`ApiError` class instead of
+        response code. If an `ApiError` is used, the response code, and expected response model, is automatically
+        documented.
+        """
         try:
-            if issubclass(args[0], ApiError):
-                description = kwargs.get('description', args[1] if len(args) > 1 else args[0].description)
-                return self.doc(responses={args[0].code: (description, args[0].response_model)})
+            if issubclass(code_or_apierror, ApiError):
+                description = description or code_or_apierror.description
+                return self.doc(responses={code_or_apierror.code: (description, code_or_apierror.response_model)})
         except TypeError:
             # If first argument isn't a class this happens
             pass
-        return super(_Api, self).response(*args, **kwargs)
+        return super(_Api, self).response(code_or_apierror, description)
 
     def handle_error(self, error):
+        """Responsible for returning the proper response for errors in api methods."""
         if isinstance(error, ApiError):
             return jsonify(error.to_dict()), error.code
         elif isinstance(error, HTTPException):
@@ -133,6 +159,7 @@ class _Api(RestPlusAPI):
 
 
 class APIResource(Resource):
+    """All api resources should subclass this class."""
     method_decorators = [with_session]
 
     def __init__(self):
@@ -206,9 +233,9 @@ class ValidationError(ApiError):
         'path', 'schema_path', 'parent'
     )
 
-    def __init__(self, validation_errors):
+    def __init__(self, validation_errors, message='validation error'):
         payload = {'validation_errors': [self._verror_to_dict(error) for error in validation_errors]}
-        super(ValidationError, self).__init__('validation error', payload=payload)
+        super(ValidationError, self).__init__(message, payload=payload)
 
     def _verror_to_dict(self, error):
         error_dict = {}
