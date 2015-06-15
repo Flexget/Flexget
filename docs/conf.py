@@ -257,6 +257,8 @@ intersphinx_mapping = {
     'flask': ('http://flask.pocoo.org/docs/0.10/', None),
     'flask_restful': ('http://flask-restful.readthedocs.org/en/0.3.3/', None),
     'flask_restplus': ('http://flask-restplus.readthedocs.org/en/stable/', None),
+    'jsonschema': ('http://python-jsonschema.readthedocs.org/en/latest/', None),
+    'python': ('https://docs.python.org/2.7', None),
     'requests': ('http://docs.python-requests.org/en/latest/', None)
 }
 

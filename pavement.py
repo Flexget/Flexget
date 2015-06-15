@@ -257,7 +257,7 @@ def docs():
 
     setup_section = tasks.environment.options.setdefault("sphinx", Bunch())
     setup_section.update(outdir=options.docs.get('docs_dir', 'build/sphinx'))
-    call_task('html')
+    call_task('sphinxcontrib.paverutils.html')
 
 
 @task
