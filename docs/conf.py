@@ -253,5 +253,10 @@ texinfo_documents = [
 extlinks = {'ticket': ('http://flexget.com/ticket/%s', 'ticket '),
             'wiki': ('http://flexget.com/wiki/%s', 'wiki ')}
 
-intersphinx_mapping = {'flask_restplus': ('http://flask-restplus.readthedocs.org/en/stable/', None)}
+intersphinx_mapping = {
+    'flask': ('http://flask.pocoo.org/docs/0.10/', None),
+    'flask_restful': ('http://flask-restful.readthedocs.org/en/0.3.3/', None),
+    'flask_restplus': ('http://flask-restplus.readthedocs.org/en/stable/', None),
+    'requests': ('http://docs.python-requests.org/en/latest/', None)
+}
 
