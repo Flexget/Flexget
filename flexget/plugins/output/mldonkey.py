@@ -35,7 +35,7 @@ class OutputMlDonkey(object):
 
         params = dict(config)
 
-    tn = telnetlib.Telnet()
+        tn = telnetlib.Telnet()
 
 	try:
 	    tn.open(params['ip'],params['port'],params['timeout'])
