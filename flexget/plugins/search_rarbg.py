@@ -106,7 +106,8 @@ class SearchRarBG(object):
 
         params = {'mode': 'search', 'token': token, 'ranked': int(config['ranked']),
                   'min_seeders': config['min_seeders'], 'min_leechers': config['min_leechers'],
-                  'sort': config['sorted_by'], 'category': category_url_fragment, 'format': 'json_extended'}
+                  'sort': config['sorted_by'], 'category': category_url_fragment, 'format': 'json_extended',
+                  'app_id': 'flexget'}
 
         for search_string in entry.get('search_strings', [entry['title']]):
             params.pop('search_string', None)
