@@ -18,7 +18,8 @@ class Sickbeard(object):
             'port': {'type': 'number', 'default': 80},
             'api_key': {'type': 'string'},
             'include_ended': {'type': 'boolean', 'default': True},
-            'only_monitored': {'type': 'boolean', 'default': False}
+            'only_monitored': {'type': 'boolean', 'default': False},
+            'include_data': {'type': 'boolean', 'default': False}
         },
         'required': ['api_key', 'base_url'],
         'additionalProperties': False
