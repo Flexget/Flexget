@@ -122,7 +122,7 @@ class LetterboxdList(object):
         rcount = 0
         next_page = ''
 
-        log.verbose('Looking for films in Letterboxd list: %s' % url)
+        log.verbose('Looking for films in Letterboxd list: `%s`' % url)
 
         entries = []
         while next_page is not None and rcount < max_results:
