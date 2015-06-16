@@ -17,13 +17,13 @@ LISTS = {
     'watchlist': {
         'add_command': 'add-to-watchlist',
         'remove_command': 'remove-from-watchlist',
-        'add_log': 'Added film to your Letterboxd watchlist: %s',
-        'remove_log': 'Removed film from your Letterboxd watchlist: %s'},
+        'add_log': 'Added film to your Letterboxd watchlist: `%s`',
+        'remove_log': 'Removed film from your Letterboxd watchlist: `%s`'},
     'watched': {
         'add_command': 'mark-as-watched',
         'remove_command': 'mark-as-not-watched',
-        'add_log': 'Marked film as seen on Letterboxd: %s',
-        'remove_log': 'Marked film as not seen on Letterboxd: %s'}
+        'add_log': 'Marked film as seen on Letterboxd: `%s`',
+        'remove_log': 'Marked film as not seen on Letterboxd: `%s`'}
 }
 
 
@@ -81,19 +81,19 @@ class LetterboxdSubmit(object):
                         r = requests.post('%s/film/%s/%s/' % (base_url, film, command),
                                           data=params, raise_status=False)
                     except RequestException as e:
-                        self.log.error('Error accessing %s/film/%s/%s/' % (base_url, film, command))
+                        self.log.error('Error accessing `%s/film/%s/%s/`' % (base_url, film, command))
                     if 200 <= r.status_code < 300:
                         self.log.verbose(log_str % entry['title'])
                         self.log.debug('Letterboxd response: %s' % r.text)
                     elif r.status_code == 404:
-                        self.log.error('Can\'t access film data at: %s/film/%s' % (base_url, film))
+                        self.log.error('Can\'t access film data at: `%s/film/%s`' % (base_url, film))
                     elif r.status_code == 401:
                         self.log.error('Authentication error. Check your Letterboxd username and password.')
                         self.log.debug('Letterboxd response: %s' % r.text)
                     else:
                         self.log.error('Unknown error accessing film data on Letterboxd: %s' % r.text)
                 else:
-                    log.warning('No imdb_id found for %s. '  % entry['title'] + \
+                    log.warning('No imdb_id found for `%s`. '  % entry['title'] + \
                                 'This field is required to add entry to Letterboxd.')
                     continue
 
