@@ -16,7 +16,7 @@ session.set_domain_delay('tls.passthepopcorn.me', '9 seconds')
 base_url = 'https://tls.passthepopcorn.me'
 
 
-class SearchPTP2(object):
+class SearchPTP(object):
 
     schema = {
         'type': 'object',
