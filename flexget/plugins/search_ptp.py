@@ -62,7 +62,7 @@ class SearchPTP(object):
                 entry['title'] = item['ReleaseName']
                 entry['url'] = '%s/torrents.php?action=download&id=%s&authkey=%s&torrent_pass=%s' \
                                    % (base_url, item['Id'], content['AuthKey'], content['PassKey'])
-                entry['imdb_id'] = 'tt%s' % content['ImdbId']
+                entry['imdb_id'] = 'tt%s' % str(content['ImdbId']).zfill()
                 entry['ptp_checked'] = item['Checked']
                 entry['ptp_gp'] = item['GoldenPopcorn']
                 entry['ptp_scene'] = item['Scene']
