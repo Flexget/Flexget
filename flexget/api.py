@@ -83,9 +83,9 @@ class ApiSchemaModel(ApiModel):
         return '<ApiSchemaModel(%r)>' % self._schema
 
 
-class _Api(RestPlusAPI):
+class Api(RestPlusAPI):
     """
-    Extends a flask restplus :class:`flask_restplus.api.Api` with:
+    Extends a flask restplus :class:`flask_restplus.Api` with:
       - methods to make using json schemas easier
       - methods to auto document and handle :class:`ApiError` responses
     """
@@ -94,15 +94,15 @@ class _Api(RestPlusAPI):
         """
         Register a json schema.
 
-        Usable like :method:`flask_restplus.api.Api.model`, except takes a json schema as its argument.
+        Usable like :meth:`flask_restplus.Api.model`, except takes a json schema as its argument.
 
-        :returns: A :class:`ApiSchemaModel` instance registered to this api.
+        :returns: An :class:`ApiSchemaModel` instance registered to this api.
         """
         return self.model(name, **kwargs)(ApiSchemaModel(schema))
 
     def inherit(self, name, parent, fields):
         """
-        Extends :method:`flask_restplus.model.Api.inherit` to allow `fields` to be a json schema, if `parent` is a
+        Extends :meth:`flask_restplus.Api.inherit` to allow `fields` to be a json schema, if `parent` is a
         :class:`ApiSchemaModel`.
         """
         if isinstance(parent, ApiSchemaModel):
@@ -111,7 +111,7 @@ class _Api(RestPlusAPI):
             model.__parent__ = parent
             self.models[name] = model
             return model
-        return super(_Api, self).inherit(name, parent, fields)
+        return super(Api, self).inherit(name, parent, fields)
 
     def validate(self, model):
         """
@@ -136,7 +136,7 @@ class _Api(RestPlusAPI):
 
     def response(self, code_or_apierror, description=None, model=None, **kwargs):
         """
-        Extends :method:`flask_restplus.api.Api.response` to allow passing an :class:`ApiError` class instead of
+        Extends :meth:`flask_restplus.Api.response` to allow passing an :class:`ApiError` class instead of
         response code. If an `ApiError` is used, the response code, and expected response model, is automatically
         documented.
         """
@@ -147,7 +147,7 @@ class _Api(RestPlusAPI):
         except TypeError:
             # If first argument isn't a class this happens
             pass
-        return super(_Api, self).response(code_or_apierror, description)
+        return super(Api, self).response(code_or_apierror, description)
 
     def handle_error(self, error):
         """Responsible for returning the proper response for errors in api methods."""
@@ -155,7 +155,7 @@ class _Api(RestPlusAPI):
             return jsonify(error.to_dict()), error.code
         elif isinstance(error, HTTPException):
             return jsonify({'code': error.code, 'error': error.description}), error.code
-        return super(_Api, self).handle_error(error)
+        return super(Api, self).handle_error(error)
 
 
 class APIResource(Resource):
@@ -167,7 +167,7 @@ class APIResource(Resource):
         super(APIResource, self).__init__()
 
 app = Flask(__name__)
-api = _Api(app, catch_all_404s=True, title='Flexget API')
+api = Api(app, catch_all_404s=True, title='Flexget API')
 
 
 class ApiError(Exception):
