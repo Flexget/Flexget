@@ -30,3 +30,13 @@ Schedules
     </table>
 </form>
 {% endblock %}
+
+
+{% block jsimports %}
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.0/angular-sanitize.min.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/tv4.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/ObjectPath.js') }}"></script>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/schema-form.min.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap-decorator.min.js') }}"></script>
+{% endblock %}

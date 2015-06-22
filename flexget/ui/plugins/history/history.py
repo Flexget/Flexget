@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from sqlalchemy import desc
-from flexget.ui import register_plugin, menu
+from flexget.ui import register_plugin, register_menu
 from flask import render_template, Blueprint
 from flexget.plugin import DependencyError
 
@@ -15,9 +15,9 @@ history = Blueprint('history', __name__)
 
 
 @history.route('/')
-@menu.register_menu(history, '.history', 'History', order=80)
 def index():
     context = {'items': db_session.query(History).order_by(desc(History.time)).limit(50).all()}
     return render_template('history/history.html', **context)
 
 register_plugin(history)
+register_menu(history.url_prefix, 'History', angular=False)

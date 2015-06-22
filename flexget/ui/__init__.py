@@ -2,8 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
 
-import flask_menu as menu
-from flask import send_from_directory, Flask
+from flask import send_from_directory, Flask, jsonify
+from flask import Blueprint as FlaskBlueprint
 
 from flexget.plugin import DependencyError
 from flexget import __version__
@@ -16,24 +16,77 @@ log = logging.getLogger('webui')
 _home = None
 
 manager = None
-config = {}
+_menu = []
+_angular_routes = []
 
 webui_app = Flask(__name__)
 webui_app.debug = True
+webui_app_root = '/ui'
+webui_static_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static')
 
-menu.Menu(app=webui_app)
+
+def register_menu(href, caption, icon='fa fa-link', order=128, angular=True):
+    global _menu
+
+    if angular:
+        href = '%s/#%s' % (webui_app_root, href)
+    elif href.startswith('/'):
+        href = '%s%s' % (webui_app_root, href)
+
+    _menu.append({'href': href, 'caption': caption, 'icon': icon, 'order': order})
+    _menu = sorted(_menu, key=lambda item: item['order'])
 
 
-@webui_app.route('/userstatic/<path:filename>')
-def user_static(filename):
-    return send_from_directory(os.path.join(manager.config_base, 'userstatic'), filename)
+def register_angular_route(name, url, template_url=None, controller=None, controller_url=None):
+    _angular_routes.append({
+        'name': name,
+        'url': url,
+        'template_url': template_url,
+        'controller_url': controller_url,
+        'controller': controller,
+    })
+
+
+class Blueprint(FlaskBlueprint):
+
+    def register_angular_route(self, name, url, template_url=None, controller=None, controller_url=None):
+        # TODO: Not sure how safe this is
+
+        # Relative URLS
+        if not template_url.startswith('/'):
+            template_url = "%s/static/%s/%s" % (webui_app_root, self.name, template_url)
+        if not controller_url.startswith('/'):
+            controller_url = "%s/static/%s/%s" % (webui_app_root, self.name, controller_url)
+
+        register_angular_route(
+            name,
+            url,
+            template_url=template_url,
+            controller=controller,
+            controller_url=controller_url
+        )
 
 
 @webui_app.context_processor
 def flexget_variables():
     return {
-        'version': __version__
+        'version': __version__,
+        'menu': _menu,
     }
+
+
+@webui_app.route('/static/<plugin>/<path:path>')
+def static_server(plugin, path):
+    bp = webui_app.blueprints.get(plugin)
+    if bp:
+        return send_from_directory(bp.static_folder, path)
+    else:
+        return send_from_directory(webui_static_path, '%s/%s' % (plugin, path))
+
+
+@webui_app.route('/routes')
+def routes():
+    return jsonify({'routes': _angular_routes})
 
 
 def _strip_trailing_sep(path):
@@ -120,5 +173,5 @@ def register_web_ui(mgr):
     manager = mgr
 
     load_ui_plugins()
-    register_app('/ui', webui_app)
-    register_home('/ui/')
+    register_app(webui_app_root, webui_app)
+    register_home('%s/' % webui_app_root)

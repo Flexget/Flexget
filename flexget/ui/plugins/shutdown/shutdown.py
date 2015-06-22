@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-from flexget.ui import register_plugin, menu
+from flexget.ui import register_plugin
 from flask import render_template, Blueprint
 
 import logging

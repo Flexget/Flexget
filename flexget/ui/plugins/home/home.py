@@ -1,8 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 from flask import render_template, Blueprint
-from flexget.ui import register_plugin, webui_app, menu
+from flexget.ui import register_plugin, webui_app
+
 
 home = Blueprint('home', __name__)
+
 
 @webui_app.route('/')
 def index():

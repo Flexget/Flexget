@@ -6,7 +6,7 @@ from flask import render_template, request, flash
 from flask import Blueprint, escape, jsonify
 
 from flexget.options import get_parser
-from flexget.ui import register_plugin, manager, menu
+from flexget.ui import register_plugin, manager, register_menu
 from flexget.utils.tools import BufferQueue
 
 execute = Blueprint('execute', __name__)
@@ -16,9 +16,7 @@ log = logging.getLogger('ui.execute')
 bufferqueue = BufferQueue()
 exec_parser = get_parser('execute')
 
-
 @execute.route('/', methods=['POST', 'GET'])
-@menu.register_menu(execute, '.execute', 'Execute', order=10)
 def index():
     context = {'progress': exec_parser.format_help().split('\n')}
     if request.method == 'POST':
@@ -56,3 +54,4 @@ def progress(as_list=False):
 
 
 register_plugin(execute)
+register_menu(execute.url_prefix, 'Execute', angular=False)

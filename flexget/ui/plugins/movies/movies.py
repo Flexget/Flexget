@@ -5,7 +5,7 @@ import posixpath
 from flask import render_template, Blueprint, request, redirect, flash, send_file
 from flask.helpers import url_for
 from flexget.plugin import DependencyError, get_plugin_by_name
-from flexget.ui import register_plugin, webui_app, manager, menu
+from flexget.ui import register_plugin, webui_app, manager, register_menu
 from flexget.utils import qualities
 
 try:
