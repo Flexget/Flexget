@@ -39,7 +39,7 @@ scheduleModule.controller('SchedulesCtrl', function($scope) {
   };
 
   $scope.models = [
-    {},
+    {name: 'test', bah: 'asasa'},
     {}
   ];
 });
