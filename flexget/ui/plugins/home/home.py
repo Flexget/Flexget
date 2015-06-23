@@ -1,14 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
-from flask import render_template, Blueprint
-from flexget.ui import register_plugin, webui_app
-
+from flask import render_template
+from flexget.ui import register_plugin, Blueprint, webui_app
 
 home = Blueprint('home', __name__)
+register_plugin(home)
 
 
 @webui_app.route('/')
 def index():
-    return render_template('home/home.html')
+    return render_template('home/index.html')
 
 
-register_plugin(home)
+home.register_angular_route(
+    'home',
+    url=home.url_prefix,
+    template_url='index.html',
+)

@@ -11,20 +11,20 @@
     <link href="{{ url_for('static', filename='css/AdminLTE.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ url_for('static', filename='css/skin-yellow.min.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ url_for('static', filename='css/flexget.css') }}" rel="stylesheet">
+    <script src="/ui/static/js/flexget.js"></script>
     {% block head %}
         {# UI plugin templates can insert content here #}
     {% endblock %}
-    <script data-main="/ui/static/js/main.js" src="//marcoslin.github.io/angularAMD/js/lib/requirejs/require.js"></script>
 </head>
 
-<body class="skin-yellow sidebar-mini">
+<body class="skin-yellow sidebar-mini" ng-app="flexgetApp">
 <div class="wrapper">
 
     <!-- Main Header -->
     <header class="main-header">
 
         <!-- Logo -->
-        <a href="/ui/" class="logo"></a>
+        <a href="/ui/#/home" class="logo"></a>
 
         <!-- Header Navbar -->
         <nav class="navbar navbar-static-top" role="navigation">

@@ -37,34 +37,22 @@ def register_menu(href, caption, icon='fa fa-link', order=128, angular=True):
     _menu = sorted(_menu, key=lambda item: item['order'])
 
 
-def register_angular_route(name, url, template_url=None, controller=None, controller_url=None):
+def register_angular_route(name, url, template_url=None, controller=None):
     _angular_routes.append({
         'name': name,
         'url': url,
         'template_url': template_url,
-        'controller_url': controller_url,
         'controller': controller,
     })
 
 
 class Blueprint(FlaskBlueprint):
 
-    def register_angular_route(self, name, url, template_url=None, controller=None, controller_url=None):
-        # TODO: Not sure how safe this is
-
+    def register_angular_route(self, name, url, template_url=None, controller=None):
         # Relative URLS
         if not template_url.startswith('/'):
             template_url = "%s/static/%s/%s" % (webui_app_root, self.name, template_url)
-        if not controller_url.startswith('/'):
-            controller_url = "%s/static/%s/%s" % (webui_app_root, self.name, controller_url)
-
-        register_angular_route(
-            name,
-            url,
-            template_url=template_url,
-            controller=controller,
-            controller_url=controller_url
-        )
+        register_angular_route(name, url, template_url=template_url, controller=controller)
 
 
 @webui_app.context_processor

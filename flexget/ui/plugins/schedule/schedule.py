@@ -5,13 +5,11 @@ from flexget.ui import register_plugin, Blueprint, register_menu
 schedule = Blueprint('schedule', __name__)
 register_plugin(schedule)
 
-
 schedule.register_angular_route(
     'schedules',
     url=schedule.url_prefix,
     template_url='index.html',
     controller='SchedulesCtrl',
-    controller_url='js/controller.js',
 )
 
 register_menu(schedule.url_prefix, 'Schedule', icon='fa fa-calendar')

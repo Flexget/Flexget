@@ -20,7 +20,7 @@ from werkzeug.exceptions import HTTPException
 from flexget import __version__
 from flexget.event import event
 from flexget.webserver import register_app
-from flexget.config_schema import process_config, register_config_key
+from flexget.config_schema import process_config, register_config_key, schema_paths
 from flexget import manager
 from flexget.utils import json
 from flexget.utils.database import with_session
@@ -253,6 +253,28 @@ def register_api(mgr):
 
     if api_config:
         register_app('/api', app)
+
+
+# Schema API
+schema_api = api.namespace('schema', description='Flexget JSON schema')
+
+@schema_api.route('/')
+class schemasAPI(APIResource):
+
+    def get(self, session=None):
+        return {'schemas': jsonify(schema_paths)}
+
+
+@schema_api.route('/<path:path>')
+@api.doc(params={'path': 'Path of schema'})
+@api.response(404, 'invalid schema path')
+class schemaAPI(APIResource):
+
+    def get(self, path, session=None):
+        path = '/schema/%s' % path
+        if path in schema_paths:
+            return schema_paths[path]
+        return {'error': 'invalid schema path'}, 404
 
 
 # Server API
