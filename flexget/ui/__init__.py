@@ -15,12 +15,12 @@ from flask.ext.assets import Environment, Bundle
 log = logging.getLogger('webui')
 
 _home = None
-
-manager = None
-assets = None
 _menu = []
 _angular_routes = []
 _asset_registry = {}
+
+manager = None
+assets = None
 
 webui_app = Flask(__name__)
 webui_app.url_path = '/ui'
@@ -75,8 +75,6 @@ def _load_assets():
 
 
 # Required core js files
-register_js('jquery', 'js/libs/jquery.js', order=1)
-register_js('bootstrap', 'js/libs/bootstrap.js', order=2)
 register_js('adminlte', 'js/libs/adminlte.js', order=3)
 register_js('angular', 'js/libs/angular/angular.js', order=10)
 register_js('angular-ui-router', 'js/libs/angular/angular-ui-router.js', order=11)
@@ -88,8 +86,6 @@ register_js('schema-form', 'js/libs/schema-form/schema-form.js', order=25)
 register_js('bootstrap-decorator', 'js/libs/schema-form/bootstrap-decorator.js', order=26)
 
 # Register core css files
-register_css('bootstrap', 'css/libs/bootstrap.css', order=1)
-register_css('font-awesome', 'css/libs/font-awesome.css', order=1)
 register_css('adminlte', 'css/libs/adminLTE/AdminLTE.css', order=2)
 register_css('skin-yellow', 'css/libs/adminLTE/skin-yellow.css', order=3)
 register_css('flexget', 'css/flexget.css', order=20)
@@ -246,6 +242,10 @@ def register_web_ui(mgr):
     assets.directory = user_static_folder
     assets.cache = assets_cache
     assets.url = '%s/userstatic' % webui_app.url_path
+
+    # TODO: Better way to do this?
+    if 'debug' in manager.args:
+        assets.debug = True
 
     load_ui_plugins()
 

@@ -6,20 +6,15 @@
     <title>FlexGet Manager</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
-    {% assets "css_all" %}
-        <link href="{{ ASSET_URL }}" rel="stylesheet">
-    {% endassets %}
-
-    {% assets "js_all" %}
-        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-    {% endassets %}
-
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    {% assets "css_all" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
     {% block head %}
         {# UI plugin templates can insert content here #}
     {% endblock %}
 </head>
 
-<body class="skin-yellow sidebar-mini" ng-app="flexgetApp">
+<body class="skin-yellow sidebar-mini">
 <div class="wrapper">
 
     <!-- Main Header -->
@@ -82,6 +77,10 @@
     </footer>
 
 </div><!-- ./wrapper -->
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
+{% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
 
 </body>
 </html>

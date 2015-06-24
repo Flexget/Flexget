@@ -1,42 +1,41 @@
 'use strict';
 
-// To dynamically load the routes we need to set a reference
-// to the route provider as http is not avaliable during app.config
-var $stateProviderReference, $urlRouterProviderReference;
-var app = angular.module('flexgetApp', ['ui.router']);
 
-app.factory('menuItems', function ($http) {
-    return {
-      all: function () {
-        return $http({
-            url: '/ui/routes',
-            method: 'GET'
-        });
-    }
-  };
- });
+(function() {
+  var app = angular.module("flexgetApp", ['ui.router']);
 
+  fetchData().then(bootstrapApplication);
 
-app.config(function($stateProvider, $urlRouterProvider) {
-  $urlRouterProvider.otherwise("/home");
+  function fetchData() {
+    var initInjector = angular.injector(["ng"]);
+    var $http = initInjector.get("$http");
 
-  $stateProviderReference = $stateProvider;
-  $urlRouterProviderReference = $urlRouterProvider
-});
+    return $http.get("/ui/routes").then(function(response) {
+      app.constant("appRoutes", response.data);
+    }, function(errorResponse) {
+      // Handle error case
+    });
+  }
 
+  function bootstrapApplication() {
+    angular.element(document).ready(function() {
+      angular.bootstrap(document, ["flexgetApp"]);
+    });
+  }
 
-app.run(['$http', 'menuItems', function($http, menuItems) {
-  menuItems.all().success(function (data) {
+  app.config(function(appRoutes, $stateProvider, $urlRouterProvider) {
+    $urlRouterProvider.otherwise("/home");
     var currentRoute;
     var j = 0;
 
-    for ( ; j < data.routes.length; j++ ) {
-      currentRoute = data.routes[j];
-      $stateProviderReference.state(currentRoute.name, {
+    for ( ; j < appRoutes.routes.length; j++ ) {
+      currentRoute = appRoutes.routes[j];
+      $stateProvider.state(currentRoute.name, {
         url: currentRoute.url,
         templateUrl: currentRoute.template_url,
         controller: currentRoute.controller
       });
     }
   });
-}]);
+
+}());
