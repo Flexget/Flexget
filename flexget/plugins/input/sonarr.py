@@ -19,7 +19,8 @@ class Sonarr(object):
             'port': {'type': 'number', 'default': 80},
             'api_key': {'type': 'string'},
             'include_ended': {'type': 'boolean', 'default': True},
-            'only_monitored': {'type': 'boolean', 'default': False}
+            'only_monitored': {'type': 'boolean', 'default': True},
+            'include_data': {'type': 'boolean', 'default': False}
         },
         'required': ['api_key', 'base_url'],
         'additionalProperties': False
@@ -28,7 +29,9 @@ class Sonarr(object):
     def on_task_input(self, task, config):
         '''
         This plugin returns ALL of the shows monitored by Sonarr.
-        This includes both ongoing and ended.
+        Return ended shows by default and does not return unmonitored 
+        show by default.
+        
         Syntax:
 
         sonarr:
@@ -37,6 +40,7 @@ class Sonarr(object):
           api_key=<value>
           include_ended=<yes|no>
           only_monitored=<yes|no>
+          include_data=<yes|no>
 
         Options base_url and api_key are required.
 
@@ -71,14 +75,39 @@ class Sonarr(object):
         headers = {'X-Api-Key': config['api_key']}
         json = task.requests.get(url, headers=headers).json()
         entries = []
+        # Dictionary based on Sonarr's quality list.
+        qualities = {0: '',
+                     1: 'sdtv',
+                     2: 'dvdrip',
+                     3: '1080p webdl',
+                     4: '720p hdtv',
+                     5: '720p webdl',
+                     6: '720p bluray',
+                     7: '1080p bluray',
+                     8: '480p webdl',
+                     9: '1080p hdtv',
+                     10: '1080p bluray'}
+        # Retreives Sonarr's profile list if include_data is set to true              
+        if config.get('include_data'):  
+                        url2 = '%s://%s:%s%s/api/profile' % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path)
+                        profiles_json = task.requests.get(url2, headers=headers).json()             
         for show in json:
-            if show['monitored'] or not config.get('only_monitored'):
-                if config.get('include_ended') or show['status'] != 'ended':
+            fg_quality = '' # Initializes the quality parameter
+            if show['monitored'] or not config.get('only_monitored'): # Checks if to retreive just monitored shows
+                if config.get('include_ended') or show['status'] != 'ended': # Checks if to retreive ended shows
+                    if config.get('include_data'): # Check if to retreive quality & path 
+                        for profile in profiles_json:
+                            if profile['id'] == show['profileId']: # Get show's profile data from all possible profiles 
+                                current_profile = profile    
+                        fg_quality = qualities[current_profile['cutoff']['id']] # Sets profile cutoff quality as show's quality              
+                        show_path = show['path']
                     entry = Entry(title=show['title'],
                                   url='',
                                   series_name=show['title'],
                                   tvdb_id=show['tvdbId'],
-                                  tvrage_id=show['tvRageId'])
+                                  tvrage_id=show['tvRageId'],
+                                  # configure_series plugin requires that all settings will have the configure_series prefix
+                                  configure_series_quality=fg_quality)
                     if entry.isvalid():
                         entries.append(entry)
                     else:
@@ -91,10 +120,11 @@ class Sonarr(object):
                 log.info("    Show name: %s" % entry["series_name"])
                 log.info("    TVDB ID: %s" % entry["tvdb_id"])
                 log.info("    TVRAGE ID: %s" % entry["tvrage_id"])
-                continue
+                log.info("    Quality: %s" % entry["configure_series_quality"])
+            continue
         return entries
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Sonarr, 'sonarr', api_ver=2)
+    plugin.register(sonarr, 'sonarr', api_ver=2)
