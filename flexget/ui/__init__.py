@@ -9,6 +9,7 @@ from flexget.plugin import DependencyError
 from flexget import __version__
 from flexget.ui import plugins as ui_plugins_pkg
 from flexget.webserver import register_app, register_home
+from flask.ext.assets import Environment, Bundle
 
 
 log = logging.getLogger('webui')
@@ -16,22 +17,91 @@ log = logging.getLogger('webui')
 _home = None
 
 manager = None
+assets = None
 _menu = []
 _angular_routes = []
+_asset_registry = {}
 
 webui_app = Flask(__name__)
-webui_app.debug = True
-webui_app_root = '/ui'
+webui_app.url_path = '/ui'
 webui_static_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static')
+
+
+def register_asset_type(name, output_file, filters=None):
+    _asset_registry[name] = {'out': output_file, 'filters': filters, 'items': []}
+
+
+register_asset_type('js_all', 'js/flexget.min.js', filters='rjsmin')
+register_asset_type('css_all', 'css/flexget.min.css', filters='cssmin')
+
+
+def register_asset(asset_type, name, f, order=128, bp=None):
+    global _asset_registry
+    name = name.lower()
+
+    if asset_type not in _asset_registry:
+        raise KeyError('asset registry %s does not exist' % asset_type)
+
+    registry = _asset_registry[asset_type]
+
+    for item in registry['items']:
+        if item['name'] == name:
+            log.error('%s is already registered to %s' % registry['items'][name]['file'])
+            return
+
+    if bp:
+        f = '%s/%s' % (bp.name, f)
+
+    registry['items'].append({'name': name, 'file': f, 'order': order})
+    registry['items'] = sorted(registry['items'], key=lambda item: item['order'])
+
+
+def register_js(name, f, order=128, bp=None):
+    """ Shortcut to register javascript files. Calls register_asset """
+    register_asset('js_all', name, f, order=order, bp=bp)
+
+
+def register_css(name, f, order=128, bp=None):
+    """ Shortcut to register javascript files. Calls register_asset """
+    register_asset('css_all', name, f, order=order, bp=bp)
+
+
+@webui_app.before_first_request
+def _load_assets():
+    for name, asset_registry in _asset_registry.iteritems():
+        asset_files = [item['file'] for item in asset_registry['items']]
+        asset_bundle = Bundle(*asset_files, filters=asset_registry['filters'], output=asset_registry['out'])
+        assets.register(name, asset_bundle)
+
+
+# Required core js files
+register_js('jquery', 'js/libs/jquery.js', order=1)
+register_js('bootstrap', 'js/libs/bootstrap.js', order=2)
+register_js('adminlte', 'js/libs/adminlte.js', order=3)
+register_js('angular', 'js/libs/angular/angular.js', order=10)
+register_js('angular-ui-router', 'js/libs/angular/angular-ui-router.js', order=11)
+register_js('angular-sanitize', 'js/libs/angular/angular-sanitize.js', order=11)
+register_js('flexget', 'js/app.js', order=20)
+register_js('tv4', 'js/libs/schema-form/tv4.js', order=25)
+register_js('ObjectPath', 'js/libs/schema-form/ObjectPath.js', order=25)
+register_js('schema-form', 'js/libs/schema-form/schema-form.js', order=25)
+register_js('bootstrap-decorator', 'js/libs/schema-form/bootstrap-decorator.js', order=26)
+
+# Register core css files
+register_css('bootstrap', 'css/libs/bootstrap.css', order=1)
+register_css('font-awesome', 'css/libs/font-awesome.css', order=1)
+register_css('adminlte', 'css/libs/adminLTE/AdminLTE.css', order=2)
+register_css('skin-yellow', 'css/libs/adminLTE/skin-yellow.css', order=3)
+register_css('flexget', 'css/flexget.css', order=20)
 
 
 def register_menu(href, caption, icon='fa fa-link', order=128, angular=True):
     global _menu
 
     if angular:
-        href = '%s/#%s' % (webui_app_root, href)
+        href = '%s/#%s' % (webui_app.url_path, href)
     elif href.startswith('/'):
-        href = '%s%s' % (webui_app_root, href)
+        href = '%s%s' % (webui_app.url_path, href)
 
     _menu.append({'href': href, 'caption': caption, 'icon': icon, 'order': order})
     _menu = sorted(_menu, key=lambda item: item['order'])
@@ -51,7 +121,7 @@ class Blueprint(FlaskBlueprint):
     def register_angular_route(self, name, url, template_url=None, controller=None):
         # Relative URLS
         if not template_url.startswith('/'):
-            template_url = "%s/static/%s/%s" % (webui_app_root, self.name, template_url)
+            template_url = "%s/static/%s/%s" % (webui_app.url_path, self.name, template_url)
         register_angular_route(name, url, template_url=template_url, controller=controller)
 
 
@@ -70,6 +140,11 @@ def static_server(plugin, path):
         return send_from_directory(bp.static_folder, path)
     else:
         return send_from_directory(webui_static_path, '%s/%s' % (plugin, path))
+
+
+@webui_app.route('/userstatic/<path:filename>')
+def user_static_server(filename):
+    return send_from_directory(os.path.join(manager.config_base, 'userstatic'), filename)
 
 
 @webui_app.route('/routes')
@@ -157,9 +232,22 @@ def register_plugin(blueprint):
 
 
 def register_web_ui(mgr):
-    global manager
+    global manager, assets
     manager = mgr
 
+    assets_cache = os.path.join(manager.config_base, '.webassets-cache')
+    user_static_folder = os.path.join(manager.config_base, 'userstatic')
+
+    for folder in [assets_cache, user_static_folder]:
+        if not os.path.isdir(folder):
+            os.mkdir(folder)
+
+    assets = Environment(webui_app)
+    assets.directory = user_static_folder
+    assets.cache = assets_cache
+    assets.url = '%s/userstatic' % webui_app.url_path
+
     load_ui_plugins()
-    register_app(webui_app_root, webui_app)
-    register_home('%s/' % webui_app_root)
+
+    register_app(webui_app.url_path, webui_app)
+    register_home('%s/' % webui_app.url_path)
