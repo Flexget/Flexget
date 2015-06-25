@@ -1,10 +1,11 @@
 'use strict';
 
 var scheduleModule = angular.module("scheduleModule", ['schemaForm']);
-
-angular.module('flexgetApp').requires.push('scheduleModule');
+registerFlexModule(scheduleModule);
 
 scheduleModule.controller('SchedulesCtrl', function($scope) {
+  $scope.title = 'Schedules';
+  $scope.description = 'Task execution';
   $scope.schema = {
     type: "object",
     additionalProperties: false,

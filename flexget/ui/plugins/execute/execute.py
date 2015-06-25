@@ -1,57 +1,33 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
-from Queue import Empty
 
-from flask import render_template, request, flash
-from flask import Blueprint, escape, jsonify
-
-from flexget.options import get_parser
-from flexget.ui import register_plugin, manager, register_menu
-from flexget.utils.tools import BufferQueue
+from flexget.ui import register_plugin, register_js, Blueprint, register_menu
 
 execute = Blueprint('execute', __name__)
-
-log = logging.getLogger('ui.execute')
-
-bufferqueue = BufferQueue()
-exec_parser = get_parser('execute')
-
-@execute.route('/', methods=['POST', 'GET'])
-def index():
-    context = {'progress': exec_parser.format_help().split('\n')}
-    if request.method == 'POST':
-        try:
-            options = exec_parser.parse_args(request.form.get('options', ''), raise_errors=True)
-        except ValueError as e:
-            flash(escape(e.message), 'error')
-            context['options'] = request.form['options']
-        else:
-            manager.execute(options=options.execute, output=bufferqueue)
-            context['execute_progress'] = True
-            context['progress'] = progress(as_list=True)
-
-    return render_template('execute/execute.html', **context)
-
-
-@execute.route('/progress.json')
-def progress(as_list=False):
-    """
-    Gets messages from the queue and exports them to JSON.
-    """
-    result = {'items': []}
-    try:
-        while True:
-            item = bufferqueue.get_nowait()
-            result['items'].append(item)
-            bufferqueue.task_done()
-    except Empty:
-        pass
-
-    if as_list:
-        return result['items']
-
-    return jsonify(result)
-
-
 register_plugin(execute)
-register_menu(execute.url_prefix, 'Execute', angular=False)
+
+execute.register_angular_route(
+    '',
+    url=execute.url_prefix,
+    template_url='execute.html',
+    controller='ExecuteCtrl'
+)
+
+execute.register_angular_route(
+    'log',
+    url='/log',
+    template_url='log.html',
+    controller='ExecuteLogCtrl',
+)
+
+execute.register_angular_route(
+    'history',
+    url='/history',
+    template_url='history.html',
+    controller='ExecuteHistoryCtrl',
+)
+
+register_js('execute', 'js/controllers.js', bp=execute)
+register_js('angular-oboe', 'js/libs/angular-oboe.js', bp=execute)
+register_js('oboe-browser', 'js/libs/oboe-browser.js', bp=execute)
+
+register_menu(execute.url_prefix, 'Execute', icon='fa fa-cog')

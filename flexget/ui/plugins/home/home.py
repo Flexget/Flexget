@@ -12,7 +12,7 @@ def index():
 
 
 home.register_angular_route(
-    'home',
+    '',
     url=home.url_prefix,
     template_url='index.html',
 )

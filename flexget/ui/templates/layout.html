@@ -50,33 +50,21 @@
     </aside>
 
     <!-- Content Wrapper. Contains page content -->
-    <div class="content-wrapper">
-        <!-- Content Header (Page header) -->
-        <section class="content-header">
-            <h1>{% block title %}{% endblock %}</h1>
-        </section>
+    {% block main %}
+        <div ui-view class="content-wrapper">
+        </div>
+    {% endblock %}
 
-        <!-- Main content -->
-        <section class="content">
-            {% block main %}
-                <div class="main-content" ui-view></div>
-            {% endblock %}
-        </section><!-- /.content -->
-    </div><!-- /.content-wrapper -->
-
-    <!-- Main Footer -->
     <footer class="main-footer">
         {% block footer %}
-            <!-- To the right -->
             <div class="pull-right hidden-xs">
                 v{{ version }}
             </div>
-            <!-- Default to the left -->
             <strong>Copyright &copy; 2015 <a href="#">Company</a>.</strong> All rights reserved.
         {% endblock %}
     </footer>
 
-</div><!-- ./wrapper -->
+</div>
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>

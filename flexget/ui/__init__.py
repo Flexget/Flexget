@@ -80,6 +80,7 @@ register_js('angular', 'js/libs/angular/angular.js', order=10)
 register_js('angular-ui-router', 'js/libs/angular/angular-ui-router.js', order=11)
 register_js('angular-sanitize', 'js/libs/angular/angular-sanitize.js', order=11)
 register_js('flexget', 'js/app.js', order=20)
+register_js('flex-directives', 'js/directives.js', order=25)
 register_js('tv4', 'js/libs/schema-form/tv4.js', order=25)
 register_js('ObjectPath', 'js/libs/schema-form/ObjectPath.js', order=25)
 register_js('schema-form', 'js/libs/schema-form/schema-form.js', order=25)
@@ -118,6 +119,10 @@ class Blueprint(FlaskBlueprint):
         # Relative URLS
         if not template_url.startswith('/'):
             template_url = "%s/static/%s/%s" % (webui_app.url_path, self.name, template_url)
+
+        # Append blueprint name to create nested states
+        name = '%s.%s' % (self.name, name) if name else self.name
+
         register_angular_route(name, url, template_url=template_url, controller=controller)
 
 

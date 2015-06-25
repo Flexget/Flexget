@@ -39,3 +39,8 @@
   });
 
 }());
+
+
+function registerFlexModule(module) {
+  angular.module('flexgetApp').requires.push(module.name);
+}
