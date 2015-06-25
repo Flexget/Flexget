@@ -1,6 +1,6 @@
 'use strict';
 
-var historyModule = angular.module("historyModule", ['schemaForm']);
+var historyModule = angular.module("historyModule", []);
 registerFlexModule(historyModule);
 
 historyModule.controller('HistoryCtrl', function($scope, $http) {

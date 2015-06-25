@@ -1,9 +1,16 @@
 <page-header></page-header>
 
 <div class="row">
-    <div ng-repeat="entry in entries">
-        <div ng-controller="SchedulesCtrl" class="col-xs-3">
-            {{entry.title}}
+    <div ng-controller="SchedulesCtrl">
+        <div ng-repeat="entry in entries" class="col-md-6">
+            <div class="panel">
+                <div class="panel-heading" style="word-wrap: break-word"><h4>{{ entry.title }}</h4></div>
+                <div class="panel-body" style="overflow: auto">
+                    URL: {{ entry.url }}<br>
+                    Task: {{ entry.task }}<br>
+                    Time: {{ entry.time }}
+                </div>
+            </div>
         </div>
     </div>
 </div>
