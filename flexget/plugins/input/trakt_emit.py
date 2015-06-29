@@ -101,6 +101,8 @@ class TraktEmit(object):
                             else:
                                 epn += 1
                         break
+                    else:
+                        eps = 0;
             if eps and epn:
                 entry = self.make_entry(fields, eps, epn)
                 entries.append(entry)
