@@ -127,4 +127,4 @@ class Sonarr(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(sonarr, 'sonarr', api_ver=2)
+    plugin.register(Sonarr, 'sonarr', api_ver=2)
