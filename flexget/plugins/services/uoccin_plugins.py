@@ -10,6 +10,12 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import json
 
+try:
+    from flexget.plugins.api_tvdb import lookup_series
+except ImportError:
+    raise plugin.DependencyError(issued_by='myepisodes', missing='api_tvdb',
+                                 message='myepisodes requires the `api_tvdb` plugin')
+
 
 def load_uoccin_data(path):
     udata = {}
@@ -72,13 +78,19 @@ class UoccinEmit(object):
                 if config['check_tags'] == 'none' and n > 0:
                     continue
             entry = Entry()
-            entry['title'] = itm['name']
             if config['type'] == 'movies':
                 entry['url'] = 'http://www.imdb.com/title/' + eid
                 entry['imdb_id'] = eid
+                entry['title'] = itm['name']  # TODO: lookup by imdb_id
             else:
                 entry['url'] = 'http://thetvdb.com/?tab=series&id=' + eid
                 entry['tvdb_id'] = eid
+                # series name could be unknown at this time
+                try:
+                    series = lookup_series(tvdb_id=entry['tvdb_id'])
+                    entry['title'] = series.seriesname
+                except LookupError:
+                    self.log.warning('Unable to lookup series %s from tvdb, using raw name.' % entry['tvdb_id'])
             if 'tags' in itm:
                 entry['uoccin_tags'] = itm['tags']
             if entry.isvalid():
@@ -239,8 +251,13 @@ class UoccinProcess(object):
                 sno = tmp[1] if len(tmp) > 2 else None
                 eno = tmp[2] if len(tmp) > 2 else None
                 # default
-                ser = udata['series'].setdefault(sid, 
-                    {'name':'N/A', 'watchlist':False, 'collected':{}, 'watched':{}})
+                ser = udata['series'].setdefault(sid, {'name':'N/A', 'watchlist':False, 'collected':{}, 'watched':{}})
+                # series name could be unknown at this time
+                try:
+                    series = lookup_series(tvdb_id=sid)
+                    ser['name'] = series.seriesname
+                except LookupError:
+                    self.log.warning('Unable to lookup series %s from tvdb, using raw name.' % sid)
                 # setting
                 if fld == 'watchlist':
                     ser['watchlist'] = val == 'true'
