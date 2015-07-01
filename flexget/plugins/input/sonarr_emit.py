@@ -85,7 +85,7 @@ class Sonarr_emit(object):
         json = self.get_page(task, config, 1)
         entries = []
         pages = int(json['totalRecords'] / config.get('page_size')) + (json['totalRecords'] % config.get('page_size') > 0)  # Sets number of requested pages
-        current_series_id = 0  # Initliazises current series parameter
+        current_series_id = 0  # Initializes current series parameter
         for page in range(2, pages):
             for record in json['records']:
                 if current_series_id != record['seriesId']:
