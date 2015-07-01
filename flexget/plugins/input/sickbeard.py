@@ -77,11 +77,10 @@ class Sickbeard(object):
                      'SD': '<hr'}
         for id, show in json['data'].items():
             fg_quality = '' # Initializes the quality parameter
-            show_path='' # Initializes the path parameter
-            if not show['paused'] or not config.get('only_monitored'): 
+            if not show['paused'] or not config.get('only_monitored'):
                 if config.get('include_ended') or show['status'] != 'Ended':
                     if config.get('include_data'):
-                        show_url ='%s:%s/api/%s/?cmd=show&tvdbid=%s' % (config['base_url'], config['port'], config['api_key'], show['tvdbid'])
+                        show_url = '%s:%s/api/%s/?cmd=show&tvdbid=%s' % (config['base_url'], config['port'], config['api_key'], show['tvdbid'])
                         show_json = task.requests.get(show_url).json()
                         sb_quality = show_json['data']['quality']
                         fg_quality = qualities[sb_quality]
@@ -92,8 +91,7 @@ class Sickbeard(object):
                                   tvdb_id=show['tvdbid'],
                                   tvrage_id=show['tvrage_id'],
                                   # configure_series plugin requires that all settings will have the configure_series prefix
-                                  configure_series_quality=fg_quality,
-                                  configure_series_path=show_path)
+                                  configure_series_quality=fg_quality)
             if entry.isvalid():
                 entries.append(entry)
             else:
@@ -107,7 +105,6 @@ class Sickbeard(object):
                 log.info("    TVDB ID: %s" % entry["tvdb_id"])
                 log.info("    TVRAGE ID: %s" % entry["tvrage_id"])
                 log.info("    Quality: %s" % entry["configure_series_quality"])
-                log.info("    Path: %s" % entry["configure_series_path"])
                 continue
         return entries
 
