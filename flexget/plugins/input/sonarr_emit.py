@@ -73,16 +73,19 @@ class SonarrEmit(object):
         'additionalProperties': False
     }
 
-    def get_page(self, task, config, page_number):  # Function that gets a page number and page size and returns the responding result json
+    # Function that gets a page number and page size and returns the responding result json
+    def get_page(self, task, config, page_number):
         parsedurl = urlparse(config.get('base_url'))
-        url = '%s://%s:%s%s/api/wanted/missing?page=%d&pageSize=%d&sortKey=series.title&sortdir=asc' % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
-                                                                                                        parsedurl.path, page_number, config.get('page_size'))
+        url = '%s://%s:%s%s/api/wanted/missing?page=%d&pageSize=%d&sortKey=series.title&sortdir=asc' \
+              % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
+                 parsedurl.path, page_number, config.get('page_size'))
         headers = {'X-Api-Key': config['api_key']}
         try:
             json = task.requests.get(url, headers=headers).json()
         except RequestException as e:
-            raise plugin.PluginError('Unable to connect to Sonarr at %s://%s:%s%s. Error: %s' % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
-                                                                                                 parsedurl.path, e))
+            raise plugin.PluginError('Unable to connect to Sonarr at %s://%s:%s%s. Error: %s'
+                                     % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
+                                        parsedurl.path, e))
         return json
 
     def on_task_input(self, task, config):
@@ -107,7 +110,7 @@ class SonarrEmit(object):
                     if entry.isvalid():
                         entries.append(entry)
                     else:
-                        log.debug('Invalid entry created? %s' % entry)
+                        log.error('Invalid entry created? %s' % entry)
                     # Test mode logging
                     if task.options.test:
                         log.info("Test mode. Entry includes:")

@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from urlparse import urlparse
 import logging
-import requests
+from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
@@ -27,11 +27,11 @@ class Sonarr(object):
     }
 
     def on_task_input(self, task, config):
-        '''
+        """
         This plugin returns ALL of the shows monitored by Sonarr.
-        Return ended shows by default and does not return unmonitored 
+        Return ended shows by default and does not return unmonitored
         show by default.
-        
+
         Syntax:
 
         sonarr:
@@ -69,11 +69,16 @@ class Sonarr(object):
         you are basically synced to it, so removing a show in Sonarr will
         remove it in flexget as well,which good be positive or negative,
         depending on your usage.
-        '''
+        """
         parsedurl = urlparse(config.get('base_url'))
         url = '%s://%s:%s%s/api/series' % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path)
         headers = {'X-Api-Key': config['api_key']}
-        json = task.requests.get(url, headers=headers).json()
+        try:
+            json = task.requests.get(url, headers=headers).json()
+        except RequestException as e:
+            raise plugin.PluginError('Unable to connect to Sonarr at %s://%s:%s%s. Error: %s'
+                                     % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
+                                        parsedurl.path, e))
         entries = []
         # Dictionary based on Sonarr's quality list.
         qualities = {0: '',
@@ -87,20 +92,24 @@ class Sonarr(object):
                      8: '480p webdl',
                      9: '1080p hdtv',
                      10: '1080p bluray'}
-        # Retreives Sonarr's profile list if include_data is set to true              
+        # Retrieves Sonarr's profile list if include_data is set to true
         if config.get('include_data'):  
-                        url2 = '%s://%s:%s%s/api/profile' % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path)
-                        profiles_json = task.requests.get(url2, headers=headers).json()             
+            url2 = '%s://%s:%s%s/api/profile' % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path)
+            try:
+                profiles_json = task.requests.get(url2, headers=headers).json()
+            except RequestException as e:
+                raise plugin.PluginError('Unable to connect to Sonarr at %s://%s:%s%s. Error: %s'
+                                         % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
+                                            parsedurl.path, e))
         for show in json:
             fg_quality = '' # Initializes the quality parameter
-            if show['monitored'] or not config.get('only_monitored'): # Checks if to retreive just monitored shows
-                if config.get('include_ended') or show['status'] != 'ended': # Checks if to retreive ended shows
-                    if config.get('include_data'): # Check if to retreive quality & path 
+            if show['monitored'] or not config.get('only_monitored'):  # Checks if to retrieve just monitored shows
+                if config.get('include_ended') or show['status'] != 'ended':  # Checks if to retrieve ended shows
+                    if config.get('include_data'):  # Check if to retrieve quality & path
                         for profile in profiles_json:
-                            if profile['id'] == show['profileId']: # Get show's profile data from all possible profiles 
+                            if profile['id'] == show['profileId']:  # Get show's profile data from all possible profiles
                                 current_profile = profile    
-                        fg_quality = qualities[current_profile['cutoff']['id']] # Sets profile cutoff quality as show's quality              
-                        show_path = show['path']
+                        fg_quality = qualities[current_profile['cutoff']['id']]  # Sets profile cutoff quality as show's quality
                     entry = Entry(title=show['title'],
                                   url='',
                                   series_name=show['title'],

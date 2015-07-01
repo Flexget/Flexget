@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from urlparse import urlparse
 import logging
+from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
@@ -26,7 +27,7 @@ class Sickbeard(object):
     }
 
     def on_task_input(self, task, config):
-        '''
+        """
         This plugin returns ALL of the shows monitored by Sickbeard.
         This includes both ongoing and ended.
         Syntax:
@@ -63,11 +64,15 @@ class Sickbeard(object):
         you are basically synced to it, so removing a show in Sickbeard will
         remove it in flexget as well, which could be positive or negative,
         depending on your usage.
-        '''
+        """
         parsedurl = urlparse(config.get('base_url'))
         url = '%s://%s:%s%s/api/%s/?cmd=shows' % (parsedurl.scheme, parsedurl.netloc,
                                                   config.get('port'), parsedurl.path, config.get('api_key'))
-        json = task.requests.get(url).json()
+        try:
+            json = task.requests.get(url).json()
+        except RequestException as e:
+            raise plugin.PluginError('Unable to connect to Sonarr at %s://%s:%s%s. Error: %s' % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
+                                                                                                 parsedurl.path, e))
         entries = []
         # Dictionary based on SB quality list.
         qualities = {'Any': '',
@@ -76,7 +81,7 @@ class Sickbeard(object):
                      'HD720p': '720p',
                      'SD': '<hr'}
         for id, show in json['data'].items():
-            fg_quality = '' # Initializes the quality parameter
+            fg_quality = ''  # Initializes the quality parameter
             if not show['paused'] or not config.get('only_monitored'):
                 if config.get('include_ended') or show['status'] != 'Ended':
                     if config.get('include_data'):
@@ -84,7 +89,6 @@ class Sickbeard(object):
                         show_json = task.requests.get(show_url).json()
                         sb_quality = show_json['data']['quality']
                         fg_quality = qualities[sb_quality]
-                        show_path = show_json['data']['location']
                     entry = Entry(title=show['show_name'],
                                   url='',
                                   series_name=show['show_name'],
