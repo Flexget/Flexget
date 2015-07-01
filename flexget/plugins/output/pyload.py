@@ -32,7 +32,6 @@ class PluginPyLoad(object):
         parse_url: no
         multiple_hoster: yes
         enabled: yes
-        verify_ssl: yes
 
     Default values for the config elements::
 
@@ -43,7 +42,6 @@ class PluginPyLoad(object):
           parse_url: no
           multiple_hoster: yes
           enabled: yes
-          verify_ssl: yes
     """
 
     __author__ = 'http://pyload.org'
@@ -57,7 +55,6 @@ class PluginPyLoad(object):
     DEFAULT_MULTIPLE_HOSTER = True
     DEFAULT_PREFERRED_HOSTER_ONLY = False
     DEFAULT_HANDLE_NO_URL_AS_FAILURE = False
-    DEFAULT_VERIFY_SSL = True
 
     schema = {
         'oneOf': [
@@ -76,7 +73,6 @@ class PluginPyLoad(object):
                     'preferred_hoster_only': {'type': 'boolean'},
                     'handle_no_url_as_failure': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
-                    'verify_ssl': {'type': 'boolean'},
 
                 },
                 'additionalProperties': False
@@ -106,8 +102,6 @@ class PluginPyLoad(object):
 
         api = config.get('api', self.DEFAULT_API)
         hoster = config.get('hoster', self.DEFAULT_HOSTER)
-        verify_ssl = config.get('verify_ssl', self.DEFAULT_VERIFY_SSL)
-
 
         for entry in task.accepted:
             # bunch of urls now going to check
@@ -118,9 +112,7 @@ class PluginPyLoad(object):
 
             log.debug("Parsing url %s" % url)
 
-            result = query_api(api, "parseURLs",
-                               {"html": content, "url": url, "session": session},
-                               verify_ssl=verify_ssl)
+            result = query_api(api, "parseURLs", {"html": content, "url": url, "session": session})
 
             # parsed { plugins: [urls] }
             parsed = result.json()
@@ -172,7 +164,7 @@ class PluginPyLoad(object):
                         'dest': dest,
                         'session': session}
 
-                pid = query_api(api, "addPackage", post, verify_ssl=verify_ssl).text
+                pid = query_api(api, "addPackage", post).text
                 log.debug('added package pid: %s' % pid)
 
                 # Set Folder
@@ -187,32 +179,29 @@ class PluginPyLoad(object):
                         log.error('Error rendering jinja event: %s' % e)
                     # set folder with api
                     data = json.dumps({'folder': folder})
-                    query_api(api, "setPackageData",
-                              {'pid': pid, 'data': data, 'session': session},
-                              verify_ssl=verify_ssl)
+                    query_api(api, "setPackageData", {'pid': pid, 'data': data, 'session': session})
 
             except Exception as e:
                 entry.fail(str(e))
 
     def get_session(self, config):
         url = config.get('api', self.DEFAULT_API)
-        verify_ssl = config.get('verify_ssl', self.DEFAULT_VERIFY_SSL)
 
         # Login
         post = {'username': config['username'], 'password': config['password']}
-        result = query_api(url, "login", post, verify_ssl=verify_ssl)
+        result = query_api(url, "login", post)
         response = result.json()
         if not response:
             raise plugin.PluginError('Login failed', log)
         return response.replace('"', '')
 
 
-def query_api(url, method, post=None, verify_ssl=True):
+def query_api(url, method, post=None):
     try:
         response = requests.request(
             'post' if post is not None else 'get',
             url.rstrip("/") + "/" + method.strip("/"),
-            data=post, verify=verify_ssl)
+            data=post)
         response.raise_for_status()
         return response
     except RequestException as e:
