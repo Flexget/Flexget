@@ -56,7 +56,7 @@ class UrlRewriteDivxATope(object):
             )
 
     def search(self, task, entry, config=None):
-        if config is False:
+        if not config:
             log.debug('Divxatope disabled')
             return set()
         log.debug('Search DivxATope')
