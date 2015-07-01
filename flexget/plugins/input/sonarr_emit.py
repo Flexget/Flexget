@@ -12,7 +12,7 @@ log = logging.getLogger('sonarr_emit')
 
 class SonarrEmit(object):
 
-    '''
+    """
     This plugin return the 1st missing episode of every show configures in Sonarr.
     This can be used with the discover plugin or set_series_begin plugin to
     get the relevant data from Sonarr.
@@ -27,7 +27,7 @@ class SonarrEmit(object):
       only_monitored=<yes|no> (Default is yes)
       page_size=<value> (Default is 50)
 
-    Page size determines the amount of results per each API call. 
+    Page size determines the amount of results per each API call.
     Higher value means a bigger response. Lower value means more calls.
     Should be changed if there are performance issues.
 
@@ -58,7 +58,7 @@ class SonarrEmit(object):
         include_ended: false
       accept_all: yes
       set_series_begin: yes
-    '''
+    """
     schema = {
         'type': 'object',
         'properties': {
