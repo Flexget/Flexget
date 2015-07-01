@@ -13,41 +13,16 @@ from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('divxatope')
 
-CATEGORIES = {
-    'all': '',
-
-    # Estrenos
-    # 'Estrenos': 'Estrenos',
-    'Estrenos de cartelera': 1,
-    'Estrenos en CVCD': 47,
-    'Estrenos en DVD-R': 42,
-
-    # Peliculas
-    # 'Peliculas':'Peliculas',
-    'Alta definicion': 52,
-    'DVDRip Castellano': 9,
-    'BDRip Castellano': 40,
-    'DVDRip-BDRip Castellano Latino': 56,
-    'VO': 55,
-
-    # DVD
-    # 'DVD': 'DVD',
-    'DVD-R': 18,
-    'DVD-R Colaboraciones': 45
-}
-
 
 class UrlRewriteDivxATope(object):
     """
     divxatope urlrewriter and search Plugin.
     """
 
+    
     schema = {
-        'type': 'object',
-        'properties': {
-            'category': {'type': 'string'},
-        },
-        'additionalProperties': False
+        'type': 'boolean',
+        'default': False
     }
 
     # urlrewriter API
@@ -81,6 +56,9 @@ class UrlRewriteDivxATope(object):
             )
 
     def search(self, task, entry, config=None):
+        if config is False:
+            log.debug('Divxatope disabled')
+            return set()
         log.debug('Search DivxATope')
         url_search = 'http://www.divxatope.com/buscar/descargas/'
         results = set()
