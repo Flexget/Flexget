@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from urlparse import urlparse
 import logging
-import requests
+from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
@@ -10,7 +10,7 @@ from flexget.entry import Entry
 log = logging.getLogger('sonarr_emit')
 
 
-class Sonarr_emit(object):
+class SonarrEmit(object):
 
     '''
     This plugin return the 1st missing episode of every show configures in Sonarr.
@@ -78,7 +78,11 @@ class Sonarr_emit(object):
         url = '%s://%s:%s%s/api/wanted/missing?page=%d&pageSize=%d&sortKey=series.title&sortdir=asc' % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
                                                                                                         parsedurl.path, page_number, config.get('page_size'))
         headers = {'X-Api-Key': config['api_key']}
-        json = task.requests.get(url, headers=headers).json()
+        try:
+            json = task.requests.get(url, headers=headers).json()
+        except RequestException as e:
+            raise plugin.PluginError('Unable to connect to Sonarr at %s://%s:%s%s. Error: %s' % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
+                                                                                                 parsedurl.path, e))
         return json
 
     def on_task_input(self, task, config):
@@ -122,4 +126,4 @@ class Sonarr_emit(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(Sonarr_emit, 'sonarr_emit', api_ver=2)
+    plugin.register(SonarrEmit, 'sonarr_emit', api_ver=2)
