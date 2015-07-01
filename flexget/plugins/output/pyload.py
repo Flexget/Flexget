@@ -19,7 +19,6 @@ class PyloadApi(object):
     def __init__(self, requests, url):
         self.requests = requests
         self.url = url
-        self.session = ""
 
     def get_session(self, config):
         # Login
