@@ -2,3 +2,7 @@
     background: #222D32 url(/ui/static/img/flexget.png) no-repeat center !important;
     background-size: 220px !important;
 }
+
+.text-lightgrey {
+    color: #B8B8B8;
+}

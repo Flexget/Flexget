@@ -258,8 +258,9 @@ def register_api(mgr):
 # Schema API
 schema_api = api.namespace('schema', description='Flexget JSON schema')
 
+
 @schema_api.route('/')
-class schemasAPI(APIResource):
+class SchemaAllAPI(APIResource):
 
     def get(self, session=None):
         return {'schemas': jsonify(schema_paths)}
@@ -268,7 +269,7 @@ class schemasAPI(APIResource):
 @schema_api.route('/<path:path>')
 @api.doc(params={'path': 'Path of schema'})
 @api.response(404, 'invalid schema path')
-class schemaAPI(APIResource):
+class SchemaAPI(APIResource):
 
     def get(self, path, session=None):
         path = '/schema/%s' % path
@@ -296,6 +297,7 @@ class ServerReloadAPI(APIResource):
 
         log.info('Config successfully reloaded from disk.')
         return {}
+
 
 pid_schema = api.schema('server_pid', {
     'type': 'object',
@@ -355,23 +357,56 @@ class ServerVersionAPI(APIResource):
         return {'flexget_version': __version__, 'api_version': API_VERSION}
 
 
+server_log_parser = api.parser()
+server_log_parser.add_argument('lines', type=int, required=False, default=30, help='How many lines to get')
+
+
+def file_seek(f, lines):
+    # Increment by 1 so we can discard the first line in case it's partial
+    lines += 1
+
+    f.seek(0, 2)  # Seek to end of file
+    current_byte = f.tell()
+
+    block_size = 512  # bytes to read at a time
+    lines_found = 0
+
+    while lines_found < lines and current_byte > 0:
+        next_byte = current_byte - block_size
+        if next_byte > 0:
+            f.seek(next_byte)
+            data = f.read(block_size)
+            lines_found += data.count('\n')
+            current_byte = next_byte
+        else:
+            # Files does not contain enough lines, start from beginning
+            return 0
+
+    f.readline()  # Go to next new line (prevents partial lines)
+    return f.tell()
+
+
 @server_api.route('/log/')
 class ServerLogAPI(APIResource):
+
+    @api.doc(parser=server_log_parser)
     @api.response(200, 'Streams as line delimited JSON')
     def get(self, session=None):
-        """ Stream Flexget log
-        Streams as line delimited JSON
-        """
-        def tail():
-            f = open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'r')
-            while True:
-                line = f.readline()
-                if not line:
-                    sleep(0.1)
-                    continue
-                yield line
+        """ Stream Flexget log Streams as line delimited JSON """
+        args = server_log_parser.parse_args()
 
-        return Response(tail(), mimetype='text/event-stream')
+        def follow(lines):
+            with open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'r') as f:
+                f.seek(file_seek(f, lines=lines))
+                while True:
+                    line = f.readline()
+                    if not line:
+                        # If line is empty then delay and send an empty line to flask can ensure the client is alive
+                        line = '{}'
+                        sleep(0.5)
+                    yield line
+
+        return Response(follow(args['lines']), mimetype='text/event-stream')
 
 
 # Execution API
@@ -504,11 +539,12 @@ class ExecutionTaskLogAPI(APIResource):
                 if not line:
                     if finished:
                         return
-                    sleep(0.1)
-                    continue
+                    sleep(0.5)
+                    line = '{}'
+                    yield line
 
                 record = json.loads(line)
-                if record['task_id'] != exec_id:
+                if record.get('task_id') != exec_id:
                     continue
                 yield line
 
