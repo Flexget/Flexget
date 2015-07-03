@@ -5,26 +5,36 @@ var executeModule = angular.module("executeModule", ['ngOboe']);
 registerFlexModule(executeModule);
 
 executeModule.filter('logclass', function () {
-  return function (levelname) {
-    var level;
-    switch (levelname) {
+  return function (log) {
+    var cssClass;
+    switch (log.levelname) {
       case "CRITICAL":
       case "ERROR":
-        level = "danger";
+        cssClass = "danger";
         break;
       case "WARNING":
-        level = "warning";
+        cssClass = "warning";
         break;
       case "DEBUG":
-        level = "text-muted text-lightgrey";
+        cssClass = "text-lightgrey";
         break;
       case "VERBOSE":
-        level = "active text-muted";
+        cssClass = "active text-muted";
         break;
       default:
-        level = "default";
+        cssClass = "default";
     }
-    return level;
+
+    if (log.message.startsWith("Summary")) {
+      cssClass = "info";
+    }
+
+    if (log.message.startsWith("ACCEPTED")) {
+      cssClass = "success";
+    }
+
+
+    return cssClass;
   }
 });
 

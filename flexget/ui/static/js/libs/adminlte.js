@@ -13,7 +13,7 @@
 
 'use strict';
 
-//Make sure jQuery has been loaded before app.js
+//Make sure jQuery has been loaded before flexget.js
 if (typeof jQuery === "undefined") {
   throw new Error("AdminLTE requires jQuery");
 }
@@ -37,7 +37,7 @@ $.AdminLTE = {};
 $.AdminLTE.options = {
   //Add slimscroll to navbar menus
   //This requires you to load the slimscroll plugin
-  //in every page before app.js
+  //in every page before flexget.js
   navbarMenuSlimscroll: true,
   navbarMenuSlimscrollWidth: "3px", //The width of the scroll bar
   navbarMenuHeight: "200px", //The height of the inner menu
@@ -63,7 +63,7 @@ $.AdminLTE.options = {
   //Enable Fast Click. Fastclick.js creates a more
   //native touch experience with touch devices. If you
   //choose to enable the plugin, make sure you load the script
-  //before AdminLTE's app.js
+  //before AdminLTE's flexget.js
   enableFastclick: true,
   //Control Sidebar Options
   enableControlSidebar: true,
@@ -670,7 +670,7 @@ function _init() {
  * EXPLICIT BOX ACTIVATION
  * -----------------------
  * This is a custom plugin to use with the component BOX. It allows you to activate
- * a box inserted in the DOM after the app.js was loaded.
+ * a box inserted in the DOM after the flexget.js was loaded.
  *
  * @type plugin
  * @usage $("#box-widget").activateBox();

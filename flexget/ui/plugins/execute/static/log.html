@@ -21,11 +21,11 @@
             <div class="box-body table-responsive">
                 <table class="table table-condensed small">
                     <colgroup>
-                        <col>
-                        <col>
-                        <col>
-                        <col>
-                        <col class="col-md-8">
+                        <col/>
+                        <col/>
+                        <col/>
+                        <col/>
+                        <col class="col-md-8"/>
                     </colgroup>
                     <thead>
                     <tr>
@@ -38,7 +38,7 @@
                     </thead>
                     <tbody>
                     <small>
-                        <tr ng-repeat="l in log" class="{{ l.levelname| logclass }}">
+                        <tr ng-repeat="l in log" class="{{ l | logclass }}">
                             <td>{{ l.asctime }}</td>
                             <td>{{ l.levelname }}</td>
                             <td>{{ l.name }}</td>

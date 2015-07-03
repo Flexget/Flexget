@@ -14,42 +14,68 @@
     {% endblock %}
 </head>
 
-<body class="skin-yellow sidebar-mini">
+<body class="skin-yellow fixed sidebar-mini">
 <div class="wrapper">
-
-    <!-- Main Header -->
     <header class="main-header">
-
-        <!-- Logo -->
         <a href="/ui/#/home" class="logo"></a>
-
-        <!-- Header Navbar -->
         <nav class="navbar navbar-static-top" role="navigation">
-            <!-- Sidebar toggle button-->
+
             <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
                 <span class="sr-only">Toggle navigation</span>
             </a>
-            <!-- Navbar Right Menu -->
-            <div class="navbar-custom-menu">
+
+            <div class="navbar-custom-menu" ng-controller="serverCtrl">
+                <ul class="nav navbar-nav">
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-bell-o"></i>
+                            <span class="label label-warning">10</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li class="header">You have 10 notifications</li>
+                            <li>
+                                <!-- Inner Menu: contains the notifications -->
+                                <ul class="menu">
+                                    <li>
+                                        <a href="#">
+                                            <i class="fa fa-users text-aqua"></i> flexget notification 123
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="footer"><a href="#">View all</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown tasks-menu">
+                        <!-- Menu toggle button -->
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            <i class="fa fa-gears"></i>
+                        </a>
+                        <ul class="dropdown-menu" style="width: auto;">
+                            <li>
+                                <ul class="menu">
+                                    <li><a href="#" ng-click="reload()"><h3><i class="fa fa-refresh"></i> Reload</h3></a></li>
+                                    <li><a href="#" ng-click="shutdown()"><h3><i class="fa fa-power-off"></i> Shutdown</h3></a></li>
+                                    <li><a href="/ui/#/execute/log"><h3><i class="fa fa-file-text-o"></i> Log</h3></a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
         </nav>
     </header>
-    <!-- Left side column. contains the logo and sidebar -->
     <aside class="main-sidebar">
-        <!-- sidebar: style can be found in sidebar.less -->
         <section class="sidebar">
-            <!-- Sidebar Menu -->
             <ul class="sidebar-menu">
                 <li class="header">Menu</li>
                 {%- for item in menu recursive -%}
                     <li><a href="{{ item.href }}"><i class="{{ item.icon }}"></i> <span>{{ item.caption }}</span></a></li>
                 {% endfor %}
-            </ul><!-- /.sidebar-menu -->
+            </ul>
         </section>
-        <!-- /.sidebar -->
     </aside>
 
-    <!-- Content Wrapper. Contains page content -->
     {% block main %}
         <div ui-view class="content-wrapper">
         </div>
@@ -63,9 +89,12 @@
             <strong>Copyright &copy; 2015 <a href="#">Company</a>.</strong> All rights reserved.
         {% endblock %}
     </footer>
-
 </div>
 
+<script>
+  var AdminLTEOptions = {
+  };
+</script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
 {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
