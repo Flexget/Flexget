@@ -10,7 +10,7 @@ from flexget.config_schema import one_or_more
 
 log = logging.getLogger('pushbullet')
 
-pushbullet_url = 'https://api.pushbullet.com/api/pushes'
+pushbullet_url = 'https://api.pushbullet.com/v2/pushes'
 
 
 class OutputPushbullet(object):
