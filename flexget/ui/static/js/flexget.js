@@ -1,13 +1,13 @@
 'use strict';
 
-var app = angular.module("flexgetApp", ['ui.router', 'ui.bootstrap']);
+var app = angular.module('flexgetApp', ['ui.router', 'ui.bootstrap']);
 
 function getRoutes() {
-  var initInjector = angular.injector(["ng"]);
-  var $http = initInjector.get("$http");
+  var initInjector = angular.injector(['ng']);
+  var $http = initInjector.get('$http');
 
-  return $http.get("/ui/routes").then(function(response) {
-    app.constant("appRoutes", response.data);
+  return $http.get('/ui/routes').then(function(response) {
+    app.constant('appRoutes', response.data);
   }, function(errorResponse) {
     // Handle error case
   });
@@ -15,12 +15,12 @@ function getRoutes() {
 
 function bootstrapApplication() {
   angular.element(document).ready(function() {
-    angular.bootstrap(document, ["flexgetApp"]);
+    angular.bootstrap(document, ['flexgetApp']);
   });
 }
 
 app.config(function(appRoutes, $stateProvider, $urlRouterProvider) {
-  $urlRouterProvider.otherwise("/home");
+  $urlRouterProvider.otherwise('/home');
   var currentRoute;
   var j = 0;
 

@@ -20,20 +20,33 @@ app.controller('flexgetCtrl', ['$scope', '$http', 'modalService', function($scop
   };
 
   $scope.shutdown = function() {
-    var modalOptions = {
+    var modal = {
       headerText: 'Shutdown',
-      bodyText: 'Flexget shutting down',
+      bodyText: 'Are you sure you want to shutdown flexget?',
       size: 'sm',
-      closeText: null
+      okText: 'Shutdown',
+      okType: 'danger',
+      closeText: 'Cancel'
     };
 
-    $http.get('/api/server/shutdown/').
-      success(function(data, status, headers, config) {
-        modalService.showModal(modalOptions)
-      }).
-      error(function(data, status, headers, config) {
-        modalOptions.bodyText = 'Error shutting down ' + data.error;
-        modalService.showModal(modalOptions)
-      });
+    modalService.showModal(modal).then(function (result) {
+      $http.get('/api/server/shutdown/').
+        success(function(data, status, headers, config) {
+          modalService.showModal({
+              headerText: 'Shutdown',
+              size: 'sm',
+              closeText: null,
+              bodyText: 'Flexget shutdown'}
+          )
+        }).
+        error(function(data, status, headers, config) {
+          modalService.showModal({
+              headerText: 'Shutdown',
+              size: 'sm',
+              closeText: null,
+              bodyText: 'Error shutting down ' + data.error}
+          )
+        });
+    })
   };
 }]);

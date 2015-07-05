@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module("flexgetApp");
+var app = angular.module('flexgetApp');
 
 app.service('modalService', ['$modal',
   function ($modal) {
@@ -14,7 +14,9 @@ app.service('modalService', ['$modal',
       headerText: 'Proceed?',
       bodyText: 'Perform this action?',
       okText: 'Ok',
-      closeText: 'Cancel'
+      okType: 'primary',
+      closeText: 'Cancel',
+      closeType: 'default'
     };
 
     this.showModal = function (options) {
@@ -27,10 +29,10 @@ app.service('modalService', ['$modal',
           $scope.modalOptions = tempOptions;
 
           $scope.ok = function(result) {
-            $modalInstance.close(result)
+            $modalInstance.close(result);
           };
           $scope.close = function(result) {
-            $modalInstance.close(result)
+            $modalInstance.dismiss('cancel');
           };
         }
       }
