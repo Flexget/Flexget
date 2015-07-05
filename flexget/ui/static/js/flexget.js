@@ -1,11 +1,8 @@
 'use strict';
 
+var app = angular.module("flexgetApp", ['ui.router', 'ui.bootstrap']);
 
-var app = angular.module("flexgetApp", ['ui.router']);
-
-fetchData().then(bootstrapApplication);
-
-function fetchData() {
+function getRoutes() {
   var initInjector = angular.injector(["ng"]);
   var $http = initInjector.get("$http");
 
@@ -37,30 +34,4 @@ app.config(function(appRoutes, $stateProvider, $urlRouterProvider) {
   }
 });
 
-
-function registerFlexModule(module) {
-  angular.module('flexgetApp').requires.push(module.name);
-}
-
-
-app.controller('serverCtrl', ['$scope', '$http', function($scope, $http) {
-  $scope.reload = function() {
-    $http.get('/api/server/reload/').
-    success(function(data, status, headers, config) {
-      alert('reloaded');
-    }).
-    error(function(data, status, headers, config) {
-      alert('reloaded failed');
-    });
-  };
-
-  $scope.shutdown = function() {
-    $http.get('/api/server/shutdown/').
-    success(function(data, status, headers, config) {
-      alert('shutdown');
-    }).
-    error(function(data, status, headers, config) {
-      alert('shutdown failed');
-    });
-  };
-}]);
+getRoutes().then(bootstrapApplication);

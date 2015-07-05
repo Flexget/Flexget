@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('flexgetApp');
+var app = angular.module("flexgetApp");
 
 app.directive('pageHeader', function() {
   return {
