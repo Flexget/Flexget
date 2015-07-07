@@ -344,6 +344,7 @@ class OutputDeluge(DelugePlugin):
                     'content_filename': {'type': 'string'},
                     'main_file_only': {'type': 'boolean'},
                     'main_file_ratio': {'type': 'number'},
+                    'magnetization_timeout' : {'type': 'integer'},
                     'keep_subs': {'type': 'boolean'},
                     'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
@@ -362,6 +363,7 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('movedone', '')
         config.setdefault('label', '')
         config.setdefault('main_file_ratio', 0.90)
+        config.setdefault('magnetization_timeout', 0)
         config.setdefault('keep_subs', True)  # does nothing without 'content_filename' or 'main_file_only' enabled
         config.setdefault('hide_sparse_files', False)  # does nothing without 'main_file_only' enabled
         return config
@@ -780,6 +782,25 @@ class OutputDeluge(DelugePlugin):
             # add the torrents
             for entry in task.accepted:
 
+                @defer.inlineCallbacks
+                def _wait_for_metadata(torrent_id, timeout):
+                    log.verbose('Waiting %d seconds for "%s" to magnetize' % (timeout, entry['title']))
+                    for i in xrange(timeout):
+                        time.sleep(1)
+                        try:
+                            status = yield client.core.get_torrent_status(torrent_id, ['files'])
+                        except Exception as err:
+                            log.error('wait_for_metadata Error: %s' % err)
+                            break
+                        if len(status['files']) > 0:
+                            log.info('"%s" magnetization successful' % (entry['title']))
+                            break
+                    else:
+                        log.warning('"%s" did not magnetize before the timeout elapsed, '
+                                    'file list unavailable for processing.' % entry['title'])
+
+                    defer.returnValue(torrent_id)
+
                 def add_entry(entry, opts):
                     """Adds an entry to the deluge session"""
                     magnet, filedump = None, None
@@ -795,7 +816,10 @@ class OutputDeluge(DelugePlugin):
 
                     log.verbose('Adding %s to deluge.' % entry['title'])
                     if magnet:
-                        return client.core.add_torrent_magnet(magnet, opts)
+                        d = client.core.add_torrent_magnet(magnet, opts)
+                        if config.get('magnetization_timeout'):
+                            d.addCallback(_wait_for_metadata, config['magnetization_timeout'])
+                        return d
                     else:
                         return client.core.add_torrent_file(entry['title'], filedump, opts)
 

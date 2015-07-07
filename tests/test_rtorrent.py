@@ -34,7 +34,7 @@ class Matcher(object):
 
 class TestRTorrentClient(object):
 
-    @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
+    @mock.patch('flexget.plugins.plugin_rtorrent.HTTPServerProxy')
     def test_version(self, mocked_proxy):
         mocked_client = mocked_proxy()
         mocked_client.system.client_version.return_value = '0.9.4'
@@ -43,7 +43,7 @@ class TestRTorrentClient(object):
         assert client.version == [0, 9, 4]
         assert mocked_client.system.client_version.called
 
-    @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
+    @mock.patch('flexget.plugins.plugin_rtorrent.HTTPServerProxy')
     def test_load(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
         mocked_proxy.execute.throw.return_value = 0
@@ -73,7 +73,7 @@ class TestRTorrentClient(object):
             'd.custom1.set=test\\_custom1'
         )
 
-    @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
+    @mock.patch('flexget.plugins.plugin_rtorrent.HTTPServerProxy')
     def test_torrent(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
         mocked_proxy.system.multicall.return_value = [
@@ -99,7 +99,7 @@ class TestRTorrentClient(object):
             {'params': (torrent_info_hash,), 'methodName': 'd.down.rate'},
         ]))
 
-    @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
+    @mock.patch('flexget.plugins.plugin_rtorrent.HTTPServerProxy')
     def test_torrents(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
         hash1 = '09977FE761AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
@@ -130,7 +130,7 @@ class TestRTorrentClient(object):
             ['main', 'd.directory_base=', 'd.name=', 'd.hash=', u'd.custom1='],
         ))
 
-    @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
+    @mock.patch('flexget.plugins.plugin_rtorrent.HTTPServerProxy')
     def test_update(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
         mocked_proxy.system.multicall.return_value = [[0]]
@@ -152,7 +152,7 @@ class TestRTorrentClient(object):
             {'params': (torrent_info_hash, '/data/downloads'), 'methodName': 'd.custom1'}
         ]))
 
-    @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
+    @mock.patch('flexget.plugins.plugin_rtorrent.HTTPServerProxy')
     def test_delete(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
         mocked_proxy.d.erase.return_value = 0
@@ -163,7 +163,7 @@ class TestRTorrentClient(object):
         assert resp == 0
         assert mocked_proxy.d.erase.called_with((torrent_info_hash,))
 
-    @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
+    @mock.patch('flexget.plugins.plugin_rtorrent.HTTPServerProxy')
     def test_move(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
         mocked_proxy.system.multicall.return_value = [
@@ -182,7 +182,7 @@ class TestRTorrentClient(object):
             mock.call('', 'mv', '-u', '/data/downloads', '/new/folder'),
         ])
 
-    @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
+    @mock.patch('flexget.plugins.plugin_rtorrent.HTTPServerProxy')
     def test_start(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
         mocked_proxy.d.start.return_value = 0
@@ -193,7 +193,7 @@ class TestRTorrentClient(object):
         assert resp == 0
         assert mocked_proxy.d.start.called_with((torrent_info_hash,))
 
-    @mock.patch('flexget.plugins.plugin_rtorrent.xmlrpclib.ServerProxy')
+    @mock.patch('flexget.plugins.plugin_rtorrent.HTTPServerProxy')
     def test_stop(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
         mocked_proxy.d.close.return_value = 0
