@@ -76,10 +76,10 @@
         </section>
     </aside>
 
-    {% block main %}
-        <div ui-view class="content-wrapper">
-        </div>
-    {% endblock %}
+    <div ui-view class="content-wrapper">
+        {% block main %}
+        {% endblock %}
+    </div>
 
     <footer class="main-footer">
         {% block footer %}

@@ -1,42 +1,9 @@
 'use strict';
 
-var executeModule = angular.module("executeModule", ['ngOboe']);
+var executeModule = angular.module("executeModule", ['ngOboe', 'ui.grid', 'ui.grid.autoResize']);
 
 registerFlexModule(executeModule);
 
-executeModule.filter('logclass', function () {
-  return function (log) {
-    var cssClass;
-    switch (log.levelname) {
-      case "CRITICAL":
-      case "ERROR":
-        cssClass = "danger";
-        break;
-      case "WARNING":
-        cssClass = "warning";
-        break;
-      case "DEBUG":
-        cssClass = "text-lightgrey";
-        break;
-      case "VERBOSE":
-        cssClass = "active text-muted";
-        break;
-      default:
-        cssClass = "default";
-    }
-
-    if (log.message.startsWith("Summary")) {
-      cssClass = "info";
-    }
-
-    if (log.message.startsWith("ACCEPTED")) {
-      cssClass = "success";
-    }
-
-
-    return cssClass;
-  }
-});
 
 executeModule.controller('ExecuteCtrl', ['$scope', 'Oboe', function($scope, Oboe) {
   $scope.title = 'Execution';
@@ -44,30 +11,95 @@ executeModule.controller('ExecuteCtrl', ['$scope', 'Oboe', function($scope, Oboe
 }]);
 
 
-executeModule.controller('ExecuteLogCtrl', ['$scope', 'Oboe', function($scope, Oboe) {
-  $scope.log = [];
-  var logStream;
+executeModule.controller('ExecuteLogCtrl',
+  ['$scope', '$filter', 'Oboe', 'uiGridConstants',
+    function($scope, $filter, Oboe, uiGridConstants) {
+      var logStream;
+      $scope.log = [];
 
-  Oboe({
-    url: '/api/server/log/',
-    pattern: '{message}',
-    start: function(stream) {
-      logStream = stream;
-    }
-  }).then(function() {
-    // finished loading
-  }, function(error) {
-    // handle errors
-  }, function(node) {
-    $scope.log.push(node);
-  });
+      Oboe({
+        url: '/api/server/log/?lines=400',
+        pattern: '{message}',
+        start: function(stream) {
+          logStream = stream;
+        }
+      }).then(function() {
+        // finished loading
+      }, function(error) {
+        // handle errors
+      }, function(node) {
+        $scope.log.push(node);
+      });
 
-  $scope.$on("$destroy", function() {
-    if (logStream) {
-      logStream.abort();
-    }
-  });
-}]);
+      $scope.$on("$destroy", function() {
+        if (logStream) {
+          logStream.abort();
+        }
+      });
+
+      var convertLogLevel = function (loglevel) {
+        var level = 20;
+        switch (loglevel) {
+          case "CRITICAL":
+            level = 50;
+            break;
+          case "ERROR":
+            level = 40;
+            break;
+          case "WARNING":
+            level = 30;
+            break;
+          case "VERBOSE":
+            level = 15;
+            break;
+          case "DEBUG":
+            level = 10;
+            break;
+        }
+        return level
+      };
+
+      var rowTemplate = function() {
+        return '<div class="{{ row.entity.levelname | lowercase }}"' +
+          'ng-class="{summary: row.entity.message.startsWith(\'Summary\'), accepted: row.entity.message.startsWith(\'ACCEPTED\')}"><div ' +
+          'ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.uid" ' +
+          'class="ui-grid-cell" ' +
+          'ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader }"  ui-grid-cell>' +
+          '</div></div>'
+      };
+
+      $scope.gridOptions = {
+        data: $scope.log,
+        enableSorting: true,
+        rowHeight: 20,
+        enableFiltering: true,
+        columnDefs: [
+          {field: 'asctime', name: 'Time', cellFilter: 'date', enableSorting: true, width: 100},
+          {field: 'levelname', name: 'Level', enableSorting: false, width: 100,
+            filter: {
+              type: uiGridConstants.filter.SELECT,
+              selectOptions: [
+                {value: 40, label: 'ERROR'},
+                {value: 30, label: 'WARNING'},
+                {value: 20, label: 'INFO'},
+                {value: 15, label: 'VERBOSE'},
+                {value: 10, label: 'DEBUG'}
+              ],
+              condition: function(level, cellValue) {
+                return convertLogLevel(cellValue) >= level;
+              }
+            }
+          },
+          {field: 'name', name: 'Name', enableSorting: false, width: 100, cellTooltip: true},
+          {field: 'task', name: 'Task', enableSorting: false, width: 60, cellTooltip: true},
+          {field: 'message', name: 'Message', enableSorting: false, width: '*', cellTooltip: true},
+
+        ],
+        rowTemplate: rowTemplate()
+
+      }
+
+    }]);
 
 
 executeModule.controller('ExecuteHistoryCtrl', ['$scope', 'Oboe', function($scope, Oboe) {

@@ -86,6 +86,7 @@ register_js('common-utils', 'js/common/utils.js', order=20)
 register_js('common-directives', 'js/common/directives.js', order=20)
 register_js('common-controllers', 'js/common/controllers.js', order=20)
 register_js('common-services', 'js/common/services.js', order=20)
+register_js('ui-grid', 'js/libs/ui-grid.js', order=20)
 register_js('tv4', 'js/libs/schema-form/tv4.js', order=25)
 register_js('ObjectPath', 'js/libs/schema-form/ObjectPath.js', order=25)
 register_js('schema-form', 'js/libs/schema-form/schema-form.js', order=25)
@@ -93,6 +94,7 @@ register_js('bootstrap-decorator', 'js/libs/schema-form/bootstrap-decorator.js',
 
 # Register core css files
 register_css('adminlte', 'css/libs/adminLTE/AdminLTE.css', order=2)
+register_css('ng-table', 'css/libs/ui-grid/ui-grid.css', order=2)
 register_css('skin-yellow', 'css/libs/adminLTE/skin-yellow.css', order=3)
 register_css('flexget', 'css/flexget.css', order=20)
 

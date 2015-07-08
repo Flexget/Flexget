@@ -3,52 +3,12 @@
         <div class="box">
             <div class="box-header with-border">
                 <h3 class="box-title">Server Log</h3>
-                <div class="box-tools pull-right">
-                    <button class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i></button>
-                    <div class="btn-group">
-                        <button class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown"><i class="fa fa-wrench"></i></button>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Refresh</a></li>
-                            <li><a href="#">Another action</a></li>
-                            <li><a href="#">Something else here</a></li>
-                            <li class="divider"></li>
-                            <li><a href="#">Separated link</a></li>
-                        </ul>
-                    </div>
-                    <button class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                </div>
             </div>
-            <div class="box-body table-responsive">
-                <table class="table table-condensed small">
-                    <colgroup>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col/>
-                        <col class="col-md-8"/>
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <td>Time</td>
-                        <td>Level</td>
-                        <td>From</td>
-                        <td>Task</td>
-                        <td>Message</td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <small>
-                        <tr ng-repeat="l in log" class="{{ l | logclass }}">
-                            <td>{{ l.asctime }}</td>
-                            <td>{{ l.levelname }}</td>
-                            <td>{{ l.name }}</td>
-                            <td>{{ l.task }}</td>
-                            <td>{{ l.message }}</td>
-                        </tr>
-                    </small>
-                    </tbody>
-                </table>
+
+            <div class="box-body">
+                <div id="log" ui-grid="gridOptions" class="log" ui-grid-auto-resize></div>
             </div>
         </div>
     </div>
 </div>
+
