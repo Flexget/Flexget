@@ -20,7 +20,7 @@ class TestMusicMetaInfo(FlexGetBase):
 
           disabling:
             mock:
-              - {title: 'Vitaa - Celle Que Je Vois - 320 Kbps - MP3 - 2009'}
+              - {title: 'Babar - Guide de la tromperie - 128 Kbps - MP3 - 1985'}
             music: no
     """
 
@@ -31,10 +31,6 @@ class TestMusicMetaInfo(FlexGetBase):
         assert self.task.find_entry(year=2009), "year is missing"
         assert self.task.find_entry(music_title='Celle Que Je Vois'), "music_title is missing"
         assert self.task.find_entry(music_artist='Vitaa'), "music_artist is missing"
-        mock = self.task.find_entry()
-        quality = mock.get('quality')
-        """ : type quality: flexget.plugins.parsers.parser_common.ParsedAudioQuality"""
-        assert quality, "audio quality is missing"
 
     def test_disabling(self):
         self.execute_task('disabling')
@@ -43,7 +39,3 @@ class TestMusicMetaInfo(FlexGetBase):
         assert self.task.find_entry(year=2009) is None, "year be found"
         assert self.task.find_entry(music_title='Celle Que Je Vois') is None, "music_title be found"
         assert self.task.find_entry(music_artist='Vitaa') is None, "music_artist be found"
-        mock = self.task.find_entry()
-        quality = mock.get('quality')
-        assert quality is None, "audio quality be found"
-
