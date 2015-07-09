@@ -414,11 +414,20 @@ class ServerLogAPI(APIResource):
                 return False
 
             for f, filter_str in fields.iteritems():
-                if filter_str.lower() and filter_str not in line.get(f, '').lower():
+                if not filter_str or f not in line:
+                    continue
+
+                if f == 'levelname':
+                    line_level = logging.getLevelName(line['levelname'])
+                    filter_level = logging.getLevelName(filter_str.upper())
+                    if line_level <= filter_level:
+                        return False
+
+                if filter_str not in line.get(f, '').lower():
                     return False
             return True
 
-        def follow(lines, filter={}):
+        def follow(lines, fields_filter={}):
             with open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'r') as fh:
 
                 # Before streaming return existing log lines
@@ -430,7 +439,7 @@ class ServerLogAPI(APIResource):
                 for line in reverse_readline(fh):
                     if len(lines_found) >= lines:
                         break
-                    if line_filter(line, filter):
+                    if line_filter(line, fields_filter):
                         lines_found.append(line)
 
                 for l in reversed(lines_found):
@@ -441,7 +450,7 @@ class ServerLogAPI(APIResource):
                     line = fh.readline()
 
                     # If a valid line is found and does not pass the filter then set it to none
-                    if line and not line_filter(line, filter):
+                    if line and not line_filter(line, fields_filter):
                         line = None
 
                     if not line:
@@ -450,10 +459,10 @@ class ServerLogAPI(APIResource):
                         sleep(0.5)
                     yield line
 
-        lines = args['lines']
+        max_lines = args['lines']
         del args['lines']
 
-        return Response(follow(lines, args), mimetype='text/event-stream')
+        return Response(follow(max_lines, args), mimetype='text/event-stream')
 
 
 # Execution API
