@@ -358,32 +358,44 @@ class ServerVersionAPI(APIResource):
 
 
 server_log_parser = api.parser()
-server_log_parser.add_argument('lines', type=int, required=False, default=30, help='How many lines to get')
+server_log_parser.add_argument(
+    'lines', type=int, required=False, default=200,
+    help='How many lines to find before streaming'
+)
+
+log_filter_fields = {'message', 'task', 'asctime', 'levelname', 'name'}
+for field in log_filter_fields:
+    server_log_parser.add_argument(field, type=str, required=False, help='Filter by %s' % field)
 
 
-def file_seek(f, lines):
-    # Increment by 1 so we can discard the first line in case it's partial
-    lines += 1
-
-    f.seek(0, 2)  # Seek to end of file
-    current_byte = f.tell()
-
-    block_size = 512  # bytes to read at a time
-    lines_found = 0
-
-    while lines_found < lines and current_byte > 0:
-        next_byte = current_byte - block_size
-        if next_byte > 0:
-            f.seek(next_byte)
-            data = f.read(block_size)
-            lines_found += data.count('\n')
-            current_byte = next_byte
-        else:
-            # Files does not contain enough lines, start from beginning
-            return 0
-
-    f.readline()  # Go to next new line (prevents partial lines)
-    return f.tell()
+def reverse_readline(fh, buf_size=8192):
+    """a generator that returns the lines of a file in reverse order"""
+    segment = None
+    offset = 0
+    fh.seek(0, os.SEEK_END)
+    total_size = remaining_size = fh.tell()
+    while remaining_size > 0:
+        offset = min(total_size, offset + buf_size)
+        fh.seek(-offset, os.SEEK_END)
+        buf = fh.read(min(remaining_size, buf_size))
+        remaining_size -= buf_size
+        lines = buf.split('\n')
+        # the first line of the buffer is probably not a complete line so
+        # we'll save it and append it to the last line of the next buffer
+        # we read
+        if segment is not None:
+            # if the previous chunk starts right from the beginning of line
+            # do not concact the segment to the last line of new chunk
+            # instead, yield the segment first
+            if buf[-1] is not '\n':
+                lines[-1] += segment
+            else:
+                yield segment
+        segment = lines[0]
+        for index in range(len(lines) - 1, 0, -1):
+            if len(lines[index]):
+                yield lines[index]
+    yield segment
 
 
 @server_api.route('/log/')
@@ -395,18 +407,53 @@ class ServerLogAPI(APIResource):
         """ Stream Flexget log Streams as line delimited JSON """
         args = server_log_parser.parse_args()
 
-        def follow(lines):
-            with open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'r') as f:
-                f.seek(file_seek(f, lines=lines))
+        def line_filter(line, fields):
+            try:
+                line = json.loads(line)
+            except ValueError:
+                return False
+
+            for f, filter_str in fields.iteritems():
+                if filter_str.lower() and filter_str not in line.get(f, '').lower():
+                    return False
+            return True
+
+        def follow(lines, filter={}):
+            with open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'r') as fh:
+
+                # Before streaming return existing log lines
+                fh.seek(0, 2)
+                stream_from_byte = fh.tell()
+
+                lines_found = []
+                # Read in reverse for efficiency
+                for line in reverse_readline(fh):
+                    if len(lines_found) >= lines:
+                        break
+                    if line_filter(line, filter):
+                        lines_found.append(line)
+
+                for l in reversed(lines_found):
+                    yield l
+
+                fh.seek(stream_from_byte)
                 while True:
-                    line = f.readline()
+                    line = fh.readline()
+
+                    # If a valid line is found and does not pass the filter then set it to none
+                    if line and not line_filter(line, filter):
+                        line = None
+
                     if not line:
                         # If line is empty then delay and send an empty line to flask can ensure the client is alive
                         line = '{}'
                         sleep(0.5)
                     yield line
 
-        return Response(follow(args['lines']), mimetype='text/event-stream')
+        lines = args['lines']
+        del args['lines']
+
+        return Response(follow(lines, args), mimetype='text/event-stream')
 
 
 # Execution API
