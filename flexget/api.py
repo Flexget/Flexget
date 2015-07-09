@@ -363,7 +363,7 @@ server_log_parser.add_argument(
     help='How many lines to find before streaming'
 )
 
-log_filter_fields = {'message', 'task', 'asctime', 'levelname', 'name'}
+log_filter_fields = ['message', 'task', 'asctime', 'levelname', 'name']
 for field in log_filter_fields:
     server_log_parser.add_argument(field, type=str, required=False, help='Filter by %s' % field)
 
