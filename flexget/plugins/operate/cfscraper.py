@@ -6,12 +6,6 @@ from flexget.event import event
  
 log = logging.getLogger('cfscraper')
  
-try:
-    import cfscrape
-except ImportError as e:
-    log.debug('Error importing cfscrape: %s' % e)
-    raise plugin.DependencyError('cfscraper', 'cfscrape', 'cfscrape module required. ImportError: %s' % e)
- 
  
 class CFScraper(object):
     """
@@ -26,6 +20,11 @@ class CFScraper(object):
  
     @plugin.priority(253)
     def on_task_start(self, task, config):
+        try:
+            import cfscrape
+        except ImportError as e:
+            log.debug('Error importing cfscrape: %s' % e)
+            raise plugin.DependencyError('cfscraper', 'cfscrape', 'cfscrape module required. ImportError: %s' % e)
         if config is True:
             task.requests = cfscrape.create_scraper(task.requests)
  
