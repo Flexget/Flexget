@@ -1,10 +1,10 @@
 # -*- coding: utf8 -*-
 from __future__ import unicode_literals, division, absolute_import
 import datetime
+
 from flexget import plugin
 from flexget.event import event
-
-from flexget.plugins.metainfo.charts import ChartsConnector, ChartsRelease, ChartsEntry, charts_connectors
+from flexget.plugins.filter.charts import ChartsConnector, ChartsRelease, ChartsEntry, charts_connectors
 from tests import FlexGetBase
 
 
