@@ -20,14 +20,14 @@ def process_secrets(manager):
         return
     secret_file = os.path.join(manager.config_base, manager.config['secrets'])
     if not os.path.exists(secret_file):
-        log.critical('Secrets\' config file \'%s\' does not exists or you have no read permission!' % secret_file)
+        log.critical('Secrets\' config file \'%s\' does not exist or you have no read permission!' % secret_file)
         raise IOError('%s' % secret_file)
     try:
         with codecs.open(secret_file, 'rb', 'utf-8') as f:
             raw_secrets = f.read()
         secrets = {'secrets': yaml.safe_load(raw_secrets) or {}}
     except Exception as e:
-        #TODO: check the secrets file,s and log the errors for the users, like in case of the config.yml
+        #TODO: check the secrets config file and log the errors for the users, like in case of the config.yml
         invsec = 'Invalid secrets file: \'%s\'.' % secret_file
         log.critical(invsec)
         raise ValueError(invsec)
