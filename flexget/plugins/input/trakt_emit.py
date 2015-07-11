@@ -101,12 +101,12 @@ class TraktEmit(object):
                             else:
                                 epn += 1
                         break
-                    else:
-                      if config['position'] == 'next':
-                        eps = epn = 1
-                      else:
-                        # There were no watched/collected episodes, nothing to emit in 'last' mode
-                        continue
+                else:
+                  if config['position'] == 'next':
+                    eps = epn = 1
+                  else:
+                    # There were no watched/collected episodes, nothing to emit in 'last' mode
+                    continue
             if eps and epn:
                 entry = self.make_entry(fields, eps, epn)
                 entries.append(entry)
