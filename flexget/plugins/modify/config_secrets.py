@@ -20,7 +20,7 @@ def process_secrets(manager):
         return
     secret_file = os.path.join(manager.config_base, manager.config['secrets'])
     if not os.path.exists(secret_file):
-        log.critical('Secrets\' file \`%s\` does not exists or you have no read permission!' % secret_file)
+        log.critical('Secrets\' config file \'%s\' does not exists or you have no read permission!' % secret_file)
         raise IOError('%s' % secret_file)
     try:
         with codecs.open(secret_file, 'rb', 'utf-8') as f:
