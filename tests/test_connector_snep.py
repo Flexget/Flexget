@@ -3,7 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 import datetime
 
 from flexget.plugins.api_snep import SnepChartsConnector
-from flexget.plugins.metainfo.charts import ChartsConnector, ChartsRelease, ChartsEntry
+from flexget.plugins.filter.charts import ChartsConnector, ChartsRelease, ChartsEntry
 from tests import use_vcr
 
 

@@ -2,14 +2,15 @@
 from __future__ import unicode_literals, division, absolute_import
 import datetime
 import logging
+
 from flexget import plugin
-from flexget.plugins.metainfo.charts import ChartsConnector, ChartsEntry, ChartsRelease
+from flexget.plugins.filter.charts import ChartsConnector, ChartsEntry, ChartsRelease
 from flexget.event import event
 import re
-
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session
 from flexget.utils.tools import str_to_int
+
 
 log = logging.getLogger('utils.charts_snep')
 
