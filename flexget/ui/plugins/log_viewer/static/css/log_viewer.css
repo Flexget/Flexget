@@ -1,32 +1,32 @@
-.log .ui-grid-row .ui-grid-cell {
+.log-grid .ui-grid-row .ui-grid-cell {
     background-color: inherit !important;
 }
 
-.log {
-    height:55vh;
+.log-grid {
+    height:65vh;
     font-size: 80%;
 }
 
-.log .error, .log .critical {
+.log-grid .error, .log-grid .critical {
     background-color: #f2dede;
 }
 
-.log .warning {
+.log-grid .warning {
     background-color: #fcf8e3;
 }
 
-.log .debug {
+.log-grid .debug {
     color: #B8B8B8;
 }
 
-.log .verbose {
+.log-grid .verbose {
     background-color: #f5f5f5;
 }
 
-.log .accepted {
+.log-grid .accepted {
     background-color: #dff0d8;
 }
 
-.log .summary {
+.log-grid .summary {
     background-color: #d9edf7;
 }

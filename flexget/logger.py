@@ -166,13 +166,15 @@ class FlexGetJsonFormatter(logging.Formatter):
     ]
 
     def __init__(self):
-        logging.Formatter.__init__(self, datefmt='%Y-%m-%d %H:%M')
+        logging.Formatter.__init__(self, datefmt='%Y-%m-%d %H:%M:%S')
 
     def format(self, record):
         if not hasattr(record, 'task'):
             record.task = ''
         if not hasattr(record, 'task_id'):
             record.task_id = ''
+
+        record.asctime = self.formatTime(record, self.datefmt)
 
         try:
             log_record = OrderedDict()

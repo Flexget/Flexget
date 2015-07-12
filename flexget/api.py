@@ -368,11 +368,14 @@ for field in log_filter_fields:
     server_log_parser.add_argument(field, type=str, required=False, help='Filter by %s' % field)
 
 
-def reverse_readline(fh, buf_size=8192):
+def reverse_readline(fh, start_byte=0, buf_size=8192):
     """a generator that returns the lines of a file in reverse order"""
     segment = None
     offset = 0
-    fh.seek(0, os.SEEK_END)
+    if start_byte:
+        fh.seek(start_byte)
+    else:
+        fh.seek(0, os.SEEK_END)
     total_size = remaining_size = fh.tell()
     while remaining_size > 0:
         offset = min(total_size, offset + buf_size)
@@ -408,9 +411,9 @@ class ServerLogAPI(APIResource):
         args = server_log_parser.parse_args()
 
         def line_filter(line, fields):
-            try:
-                line = json.loads(line)
-            except ValueError:
+            line = json.loads(line)
+
+            if not line:
                 return False
 
             for f, filter_str in fields.iteritems():
@@ -428,15 +431,14 @@ class ServerLogAPI(APIResource):
             return True
 
         def follow(lines, fields_filter={}):
-            with open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'r') as fh:
-
+            with open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'rb') as fh:
                 # Before streaming return existing log lines
                 fh.seek(0, 2)
                 stream_from_byte = fh.tell()
 
                 lines_found = []
                 # Read in reverse for efficiency
-                for line in reverse_readline(fh):
+                for line in reverse_readline(fh, start_byte=stream_from_byte):
                     if len(lines_found) >= lines:
                         break
                     if line_filter(line, fields_filter):

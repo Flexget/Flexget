@@ -122,6 +122,12 @@ def register_angular_route(name, url, template_url=None, controller=None):
 
 class Blueprint(FlaskBlueprint):
 
+    def register_js(self, name, f, order=128):
+        register_asset('js_all', name, f, order=order, bp=self)
+
+    def register_css(self, name, f, order=128):
+        register_asset('css_all', name, f, order=order, bp=self)
+
     def register_angular_route(self, name, url, template_url=None, controller=None):
         # Relative URLS
         if not template_url.startswith('/'):

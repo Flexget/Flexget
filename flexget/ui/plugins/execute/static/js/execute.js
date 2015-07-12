@@ -37,26 +37,13 @@ executeModule.controller('ExecuteLogCtrl',
         }
       });
 
-      var convertLogLevel = function (loglevel) {
-        var level = 20;
-        switch (loglevel) {
-          case "CRITICAL":
-            level = 50;
-            break;
-          case "ERROR":
-            level = 40;
-            break;
-          case "WARNING":
-            level = 30;
-            break;
-          case "VERBOSE":
-            level = 15;
-            break;
-          case "DEBUG":
-            level = 10;
-            break;
-        }
-        return level
+      var logLevels = {
+        CRITICAL: 50,
+        ERROR: 40,
+        WARNING: 30,
+        VERBOSE: 15,
+        DEBUG: 10,
+        INFO: 20
       };
 
       var rowTemplate = function() {
