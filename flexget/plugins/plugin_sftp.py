@@ -22,9 +22,7 @@ ConnectionConfig = namedtuple('ConnectionConfig', ['host', 'port', 'username', '
 CONNECT_TRIES = 3
 RETRY_INTERVAL = 15
 RETRY_STEP = 5
-
-# socket timeout
-SOCK_TIMEOUT = 15
+SOCKET_TIMEOUT = 15
 
 # make separate os.path instances for local vs remote path styles
 localpath = os.path
@@ -51,7 +49,7 @@ def sftp_connect(conf):
             sftp = pysftp.Connection(host=conf.host, username=conf.username,
                                      private_key=conf.private_key, password=conf.password, 
                                      port=conf.port, private_key_pass=conf.private_key_pass)
-            sftp.timeout=(SOCK_TIMEOUT)
+            sftp.timeout = SOCKET_TIMEOUT
             log.verbose('Connected to %s' % conf.host)
         except Exception as e:
             if not tries:
