@@ -57,7 +57,7 @@ class UrlRewriteExtraTorrent(object):
         torrent_name = match.group(2)
         entry['url'] = 'http://extratorrent.cc/download/%s/%s.torrent' % (torrent_id, torrent_name)
 
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         if not isinstance(config, dict):
             config = {}
 
