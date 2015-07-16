@@ -6,98 +6,66 @@
     <title>FlexGet Manager</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     {% assets "css_all" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
-    {% block head %}
-        {# UI plugin templates can insert content here #}
-    {% endblock %}
 </head>
 
-<body class="skin-yellow fixed sidebar-mini">
-<div class="wrapper">
-    <header class="main-header">
-        <a href="/ui/#/home" class="logo"></a>
-        <nav class="navbar navbar-static-top" role="navigation">
+<body layout="column">
+<div layout="row" ng-controller="flexgetCtrl" flex>
+    <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-z2 nav-menu" md-component-id="left" md-is-locked-open="$mdMedia('gt-lg')">
+        <md-toolbar class="logo"></md-toolbar>
+        <md-list>
+            <md-list-item class="header">Menu</md-list-item>
+            {%- for item in menu recursive -%}
+                <md-list-item>
+                    <md-button href="{{ item.href }}" flex>
+                        <md-icon class="{{ item.icon }}"></md-icon>
+                        {{ item.caption }}
+                    </md-button>
+                </md-list-item>
+            {% endfor %}
+        </md-list>
+    </md-sidenav>
 
-            <a href="#" class="sidebar-toggle" data-toggle="offcanvas" role="button">
-                <span class="sr-only">Toggle navigation</span>
-            </a>
+    <div layout="column" flex id="content">
+        <md-toolbar layout="row" class="admin-toolbar" flex>
+            <md-button class="md-icon-button" ng-click="toggleMenu()" style="width: 40px">
+                <md-icon class='fa fa-bars' aria-label="Menu"></md-icon>
+            </md-button>
+            <span flex></span>
+            <md-menu md-position-mode="target-right target">
+                <md-button aria-label="Open demo menu" class="md-icon-button" ng-click="$mdOpenMenu()">
+                    <md-icon md-menu-origin class="fa fa-gears"></md-icon>
+                </md-button>
+                <md-menu-content width="2">
+                    <md-menu-item>
+                        <md-button ng-click="reload()" aria-label="Reload">
+                            <p>Reload</p>
+                            <md-icon class="fa fa-refresh"></md-icon>
+                        </md-button>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <md-button ng-click="shutdown()" aria-label="Shutdown">
+                            <p>Shutdown</p>
+                            <md-icon class="fa fa-power-off"></md-icon>
+                        </md-button>
+                    </md-menu-item>
+                    <md-menu-item>
+                        <md-button ng-click="log_viewer()" aria-label="Log">
+                            <p>Log</p>
+                            <md-icon class="fa fa-file-text-o"></md-icon>
+                        </md-button>
+                    </md-menu-item>
+                </md-menu-content>
+            </md-menu>
+        </md-toolbar>
 
-            <div class="navbar-custom-menu" ng-controller="flexgetCtrl">
-                <ul class="nav navbar-nav">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="fa fa-bell-o"></i>
-                            <span class="label label-warning">10</span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li class="header">You have 10 notifications</li>
-                            <li>
-                                <!-- Inner Menu: contains the notifications -->
-                                <ul class="menu">
-                                    <li>
-                                        <a href="#">
-                                            <i class="fa fa-users text-aqua"></i> flexget notification 123
-                                        </a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li class="footer"><a href="#">View all</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown tasks-menu">
-                        <!-- Menu toggle button -->
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                            <i class="fa fa-gears"></i>
-                        </a>
-                        <ul class="dropdown-menu" style="width: auto;">
-                            <li>
-                                <ul class="menu">
-                                    <li><a href="#" ng-click="reload()"><h3><i class="fa fa-refresh"></i> Reload</h3></a></li>
-                                    <li><a href="#" ng-click="shutdown()"><h3><i class="fa fa-power-off"></i> Shutdown</h3></a></li>
-                                    <li><a href="/ui/#/execute/log"><h3><i class="fa fa-file-text-o"></i> Log</h3></a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </header>
-    <aside class="main-sidebar">
-        <section class="sidebar">
-            <ul class="sidebar-menu">
-                <li class="header">Menu</li>
-                {%- for item in menu recursive -%}
-                    <li><a href="{{ item.href }}"><i class="{{ item.icon }}"></i> <span>{{ item.caption }}</span></a></li>
-                {% endfor %}
-            </ul>
-        </section>
-    </aside>
-
-    <div ui-view class="content-wrapper">
-        {% block main %}
-        {% endblock %}
+        <md-content ui-view layout="column" flex></md-content>
     </div>
-
-    <footer class="main-footer">
-        {% block footer %}
-            <div class="pull-right hidden-xs">
-                v{{ version }}
-            </div>
-            <strong>Copyright &copy; 2015 <a href="#">Company</a>.</strong> All rights reserved.
-        {% endblock %}
-    </footer>
 </div>
+</body>
 
-<script>
-    var AdminLTEOptions = {
-    };
-</script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.5/js/bootstrap.min.js"></script>
 {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
-
 </body>
 </html>

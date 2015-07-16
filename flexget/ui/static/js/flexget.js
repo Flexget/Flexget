@@ -1,6 +1,6 @@
 'use strict';
 
-var app = angular.module('flexgetApp', ['ui.router', 'ui.bootstrap']);
+var app = angular.module('flexgetApp', ['ui.router', 'ngMaterial']);
 
 function getRoutes() {
   var initInjector = angular.injector(['ng']);
@@ -19,7 +19,11 @@ function bootstrapApplication() {
   });
 }
 
-app.config(function(appRoutes, $stateProvider, $urlRouterProvider) {
+app.config(function(appRoutes, $stateProvider, $urlRouterProvider, $mdThemingProvider, $mdIconProvider) {
+  $mdIconProvider.fontSet('fa', 'fa');
+  $mdThemingProvider.theme('default')
+    .primaryPalette('orange');
+
   $urlRouterProvider.otherwise('/home');
   var currentRoute;
   var j = 0;

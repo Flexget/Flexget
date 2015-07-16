@@ -75,12 +75,12 @@ def _load_assets():
 
 
 # Required core js files
-register_js('jquery-slimscroll', 'js/libs/jquery/jquery.slimscroll.js', order=1)
-register_js('adminlte', 'js/libs/adminlte.js', order=5)
 register_js('angular', 'js/libs/angular/angular.js', order=10)
+register_js('angular-material', 'js/libs/angular/angular-material.js', order=11)
 register_js('angular-ui-router', 'js/libs/angular/angular-ui-router.js', order=11)
 register_js('angular-sanitize', 'js/libs/angular/angular-sanitize.js', order=11)
-register_js('ui-bootstrap', 'js/libs/ui-bootstrap-tpls-0.13.0.js', order=11)
+register_js('angular-animate', 'js/libs/angular/angular-animate.js', order=11)
+register_js('angular-aria', 'js/libs/angular/angular-aria.js', order=11)
 register_js('flexget', 'js/flexget.js', order=20)
 register_js('common-utils', 'js/common/utils.js', order=20)
 register_js('common-directives', 'js/common/directives.js', order=20)
@@ -93,9 +93,8 @@ register_js('schema-form', 'js/libs/schema-form/schema-form.js', order=25)
 register_js('bootstrap-decorator', 'js/libs/schema-form/bootstrap-decorator.js', order=26)
 
 # Register core css files
-register_css('adminlte', 'css/libs/adminLTE/AdminLTE.css', order=2)
+register_css('angular-material', 'css/libs/angular-material.css', order=1)
 register_css('ng-table', 'css/libs/ui-grid/ui-grid.css', order=2)
-register_css('skin-yellow', 'css/libs/adminLTE/skin-yellow.css', order=3)
 register_css('flexget', 'css/flexget.css', order=20)
 
 

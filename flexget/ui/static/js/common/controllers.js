@@ -1,6 +1,14 @@
 'use strict';
 
-app.controller('flexgetCtrl', ['$scope', '$http', 'modalService', function($scope, $http, modalService) {
+app.controller('flexgetCtrl', function($scope, $http, $mdSidenav, $state) {
+  $scope.toggleMenu = function() {
+    $mdSidenav('left').toggle();
+  };
+
+  $scope.log_viewer = function() {
+    $state.go('log_viewer');
+  };
+
   $scope.reload = function() {
     var modalOptions = {
       headerText: 'Reload',
@@ -49,4 +57,4 @@ app.controller('flexgetCtrl', ['$scope', '$http', 'modalService', function($scop
         });
     })
   };
-}]);
+});

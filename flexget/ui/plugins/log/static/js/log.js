@@ -101,7 +101,7 @@ logViewModule.controller('LogViewCtrl',
         if (angular.isDefined($scope.filterTimeout)) {
           $timeout.cancel($scope.filterTimeout);
         }
-        if (logStream) {
+        if (typeof logStream !== 'undefined' && logStream) {
           logStream.abort();
         }
       });
