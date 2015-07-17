@@ -36,6 +36,9 @@ body {
 .admin-toolbar {
     max-height: 50px;
     min-height: 50px;
+    -webkit-transition: width 2s, height 4s !important; /* Safari */
+    transition: width 2s, height 4s;
+
 }
 
 .admin-toolbar md-menu {
@@ -44,10 +47,17 @@ body {
 
 
 /* Side Nav Menu */
+md-sidenav {
+}
+
 md-sidenav.nav-menu {
     min-width: 230px;
     max-width: 230px;
     background-color: #222d32;
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
 }
 
 .nav-menu md-list-item.header {
@@ -88,9 +98,21 @@ md-list-item {
     color: #b8c7ce;
 }
 
-/* Side Nav Collapsed */
-md-sidenav.nav-menu-collapsed {
+/* Side Nav Mini */
+md-sidenav.nav-menu-mini {
     width: 50px !important;
     min-width: 50px !important;
     max-width: 50px !important;
+}
+
+.nav-menu-mini md-list-item.header {
+    display: none;
+}
+
+.nav-menu-mini md-list-item span {
+    display: none;
+}
+
+.nav-menu-mini md-list-item span:hover {
+    display: block;
 }

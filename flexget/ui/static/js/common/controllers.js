@@ -1,12 +1,18 @@
 'use strict';
 
 app.controller('flexgetCtrl', function($scope, $http, $mdSidenav, $state) {
+
   $scope.toggleMenu = function() {
-    $mdSidenav('left').toggle();
+    if ($mdSidenav('left').isLockedOpen()) {
+      $scope.menuMini = !$scope.menuMini;
+    } else {
+      $scope.menuMini = false;
+      $mdSidenav('left').toggle();
+    }
   };
 
-  $scope.log_viewer = function() {
-    $state.go('log_viewer');
+  $scope.go = function(state) {
+    $state.go(state);
   };
 
   $scope.reload = function() {
