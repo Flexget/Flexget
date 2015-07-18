@@ -41,7 +41,7 @@ class History(Base):
             'filename': self.filename,
             'url': self.url,
             'title': self.title,
-            'time': self.time,
+            'time': self.time.isoformat(),
             'details': self.details,
         }
 
