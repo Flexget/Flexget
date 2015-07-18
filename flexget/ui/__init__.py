@@ -81,6 +81,7 @@ register_js('angular-ui-router', 'js/libs/angular/angular-ui-router.js', order=1
 register_js('angular-sanitize', 'js/libs/angular/angular-sanitize.js', order=11)
 register_js('angular-animate', 'js/libs/angular/angular-animate.js', order=11)
 register_js('angular-aria', 'js/libs/angular/angular-aria.js', order=11)
+register_js('angular-filter', 'js/libs/angular/angular-filter.js', order=11)
 register_js('flexget', 'js/flexget.js', order=20)
 register_js('common-utils', 'js/common/utils.js', order=20)
 register_js('common-directives', 'js/common/directives.js', order=20)
