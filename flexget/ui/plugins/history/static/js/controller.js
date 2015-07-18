@@ -1,6 +1,6 @@
 'use strict';
 
-var historyModule = angular.module("historyModule", []);
+var historyModule = angular.module("historyModule", ['angular.filter']);
 registerFlexModule(historyModule);
 
 historyModule.controller('HistoryCtrl', function($scope, $http) {

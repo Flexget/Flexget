@@ -1,14 +1,13 @@
-<page-header></page-header>
+<page-header xmlns="http://www.w3.org/1999/html"></page-header>
 
-<div class="row">
-    <div ng-repeat="entry in entries" class="col-md-6">
-        <div class="panel">
-            <div class="panel-heading" style="word-wrap: break-word"><h4>{{ entry.title }}</h4></div>
-            <div class="panel-body" style="overflow: auto">
-                URL: {{ entry.url }}<br>
-                Task: {{ entry.task }}<br>
-                Time: {{ entry.time }}
+<section ng-repeat="(key, value) in entries | groupBy: 'time | limitTo : 10'">
+    <md-subheader class="md-primary">{{ key }}</md-subheader>
+    <md-list layout-padding>
+        <md-list-item class="md-2-line" ng-repeat="entry in value">
+            <div class="md-list-item-text">
+                <h3>{{ entry.title }}</h3>
+                <p>{{ entry.task }}</p>
             </div>
-        </div>
-    </div>
-</div>
+        </md-list-item>
+    </md-list>
+</section>
