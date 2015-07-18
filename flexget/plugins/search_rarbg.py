@@ -145,9 +145,10 @@ class SearchRarBG(object):
                     e['torrent_leeches'] = int(result.get('leechers'))
                     e['content_size'] = int(result.get('size')) / 1024 / 1024
                     episode_info = result.get('episode_info')
-                    e['imdb_id'] = episode_info.get('imdb')
-                    e['tvdb_id'] = episode_info.get('tvdb')
-                    e['tvrage_id'] = episode_info.get('tvrage')
+                    if episode_info:
+                        e['imdb_id'] = episode_info.get('imdb')
+                        e['tvdb_id'] = episode_info.get('tvdb')
+                        e['tvrage_id'] = episode_info.get('tvrage')
 
                     entries.add(e)
 
