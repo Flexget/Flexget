@@ -26,7 +26,7 @@ logViewModule.controller('LogViewCtrl',
         if ($scope.logStream) {
           $scope.logStream.abort();
         }
-        console.log("getting log data")
+
         $scope.log = [];
         $scope.gridOptions.data = $scope.log
 
@@ -101,8 +101,8 @@ logViewModule.controller('LogViewCtrl',
         if (angular.isDefined($scope.filterTimeout)) {
           $timeout.cancel($scope.filterTimeout);
         }
-        if (typeof logStream !== 'undefined' && logStream) {
-          logStream.abort();
+        if (typeof $scope.logStream !== 'undefined' && $scope.logStream) {
+          $scope.logStream.abort();
         }
       });
     }]);

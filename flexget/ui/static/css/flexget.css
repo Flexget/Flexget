@@ -5,13 +5,6 @@ body {
     overflow-y: auto;
 }
 
-.logo {
-    background: #222D32 url(/ui/static/img/header.png) no-repeat center !important;
-    background-size: 220px !important;
-    max-height: 50px;
-    min-height: 50px;
-}
-
 .text-lightgrey {
     color: #B8B8B8;
 }
@@ -47,12 +40,9 @@ body {
 
 
 /* Side Nav Menu */
-md-sidenav {
-}
-
 md-sidenav.nav-menu {
-    min-width: 230px;
-    max-width: 230px;
+    min-width: 190px;
+    max-width: 190px;
     background-color: #222d32;
     -webkit-transition: all 0.5s ease-in-out;
     -moz-transition: all 0.5s ease-in-out;
@@ -98,6 +88,14 @@ md-list-item {
     color: #b8c7ce;
 }
 
+.nav-menu .logo {
+    background: #222D32 url(/ui/static/img/header.png) no-repeat center !important;
+    background-size: 175px !important;
+    max-height: 50px;
+    min-height: 50px;
+    padding: 5px;
+}
+
 /* Side Nav Mini */
 md-sidenav.nav-menu-mini {
     width: 50px !important;
@@ -115,4 +113,8 @@ md-sidenav.nav-menu-mini {
 
 .nav-menu-mini md-list-item span:hover {
     display: block;
+}
+
+.nav-menu-mini .logo {
+     background-size: 240px !important;
 }
