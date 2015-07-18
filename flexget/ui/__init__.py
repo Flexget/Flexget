@@ -10,7 +10,7 @@ from flexget import __version__
 from flexget.ui import plugins as ui_plugins_pkg
 from flexget.webserver import register_app, register_home
 from flask.ext.assets import Environment, Bundle
-
+from flask_compress import Compress
 
 log = logging.getLogger('webui')
 
@@ -23,6 +23,7 @@ manager = None
 assets = None
 
 webui_app = Flask(__name__)
+Compress(webui_app)
 webui_app.url_path = '/ui'
 webui_static_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static')
 

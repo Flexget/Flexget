@@ -14,6 +14,7 @@ from flask import Flask, request, jsonify, Response
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.resource import Resource
 from flask_restplus.model import ApiModel
+from flask_compress import Compress
 from jsonschema.exceptions import RefResolutionError
 from werkzeug.exceptions import HTTPException
 
@@ -167,6 +168,7 @@ class APIResource(Resource):
         super(APIResource, self).__init__()
 
 app = Flask(__name__)
+Compress(app)
 api = Api(app, catch_all_404s=True, title='Flexget API')
 
 
