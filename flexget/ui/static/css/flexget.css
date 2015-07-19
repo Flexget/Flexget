@@ -20,34 +20,61 @@ body {
 }
 
 
-/* Top Toolbar */
-.admin-toolbar md-icon {
+/* Header */
+.header {
+    overflow:hidden;
+}
+
+.header .logo {
+    background: #222D32 url(/ui/static/img/header.png) no-repeat center !important;
+    background-size: 175px !important;
+    float:left;
+    width:190px;
+    -webkit-transition: width 0.5s ease;
+    -moz-transition: width 0.5s ease;
+    -o-transition: width 0.5s ease;
+    transition: width 0.5s ease;
+}
+
+.header .logo a {
+    height: 50px;
+    display:block;
+    padding: 5px;
+}
+
+.header .admin-toolbar {
+    overflow:hidden;
+    max-height: 50px;
+    min-height: 50px;
+}
+
+.header .admin-toolbar md-icon {
     color: white;
     font-size: 20px;
 }
 
-.admin-toolbar {
-    max-height: 50px;
-    min-height: 50px;
-    -webkit-transition: width 2s, height 4s !important; /* Safari */
-    transition: width 2s, height 4s;
-
+.header .admin-toolbar md-menu {
+    padding: 0px;
 }
 
-.admin-toolbar md-menu {
-    padding: 0px;
+@media screen and (max-width: 1200px) {
+    .header .logo {
+        float: none;
+        width:auto;
+        border:0;
+    }
 }
 
 
 /* Side Nav Menu */
-md-sidenav.nav-menu {
-    min-width: 190px;
-    max-width: 190px;
+.nav-menu {
+    min-width: 190px !important;
+    max-width: 190px !important;
     background-color: #222d32;
-    -webkit-transition: all 0.5s ease-in-out;
-    -moz-transition: all 0.5s ease-in-out;
-    -o-transition: all 0.5s ease-in-out;
-    transition: all 0.5s ease-in-out;
+    -webkit-transition: min-width 0.5s ease, max-width 0.5s ease;
+    -moz-transition: min-width 0.5s ease, max-width 0.5s ease;
+    -o-transition: min-width 0.5s ease, max-width 0.5s ease;
+    transition: min-width 0.5s ease, max-width 0.5s ease;
 }
 
 .nav-menu md-list-item.header {
@@ -57,7 +84,7 @@ md-sidenav.nav-menu {
     background: #1a2226;
 }
 
-md-list-item {
+.nav-menu md-list-item {
     min-height: 20px;
 }
 
@@ -88,33 +115,26 @@ md-list-item {
     color: #b8c7ce;
 }
 
-.nav-menu .logo {
-    background: #222D32 url(/ui/static/img/header.png) no-repeat center !important;
-    background-size: 175px !important;
-    max-height: 50px;
-    min-height: 50px;
-    padding: 5px;
-}
 
 /* Side Nav Mini */
-md-sidenav.nav-menu-mini {
-    width: 50px !important;
+.nav-menu-mini .nav-menu {
     min-width: 50px !important;
     max-width: 50px !important;
 }
 
-.nav-menu-mini md-list-item.header {
+.nav-menu-mini .nav-menu md-list-item.header {
     display: none;
 }
 
-.nav-menu-mini md-list-item span {
+.nav-menu-mini .nav-menu md-list-item span {
     display: none;
 }
 
-.nav-menu-mini md-list-item span:hover {
+.nav-menu-mini .nav-menu md-list-item span:hover {
     display: block;
 }
 
-.nav-menu-mini .logo {
-     background-size: 240px !important;
+.nav-menu-mini .header .logo {
+    background-size: 240px !important;
+    width: 50px !important;
 }

@@ -1,0 +1,17 @@
+<md-dialog>
+    <md-dialog-content>
+        <h2>{{ title }}</h2>
+        <div layout="row" layout-align="center center">
+            <p ng-if="content">{{ content }}</p>
+            <md-progress-circular ng-if="showCircular" md-diameter="30" class="md-primary" md-mode="indeterminate"></md-progress-circular>
+        </div>
+    </md-dialog-content>
+    <div class="md-actions" ng-if="ok || cancel">
+        <md-button ng-if="cancel" ng-click="abort()" class="md-primary">
+            {{ cancel }}
+        </md-button>
+        <md-button ng-if="ok" ng-click="hide()" class="md-primary">
+            {{ ok }}
+        </md-button>
+    </div>
+</md-dialog>

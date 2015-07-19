@@ -1,6 +1,6 @@
 'use strict';
 
-app.controller('flexgetCtrl', function($scope, $http, $mdSidenav, $state, $mdDialog) {
+app.controller('flexgetCtrl', function($scope, $http, $mdSidenav, $state, $mdMedia, $mdDialog) {
 
   $scope.toggleMenu = function() {
     if ($mdSidenav('left').isLockedOpen()) {
@@ -11,6 +11,12 @@ app.controller('flexgetCtrl', function($scope, $http, $mdSidenav, $state, $mdDia
     }
   };
 
+  $scope.closeNav = function($event) {
+    if (!$mdMedia('gt-lg')) {
+      $mdSidenav('left').close();
+    }
+  };
+
   /* Shortcut to go a page (route) */
   $scope.go = function(state) {
     $state.go(state);
@@ -18,82 +24,87 @@ app.controller('flexgetCtrl', function($scope, $http, $mdSidenav, $state, $mdDia
 
   /* Reload Flexget config file */
   $scope.reload = function() {
-    $mdDialog.show({
-      template: '<md-dialog aria-label="Reloading Config">' +
-      '  <md-dialog-content>' +
-      ' <h2>Reloading Config</h2>' +
-      '    <div layout="row" layout-align="center center">' +
-      '      <md-progress-circular md-diameter="30" class="md-primary" md-mode="indeterminate"></md-progress-circular>' +
-      '     </div>' +
-      '  </md-dialog-content>' +
-      '</md-dialog>'
-    });
+    var reloadController = function($scope, $mdDialog) {
+      $scope.title = "Reload Config";
+      $scope.showCircular = true;
+      $scope.content = null;
+      $scope.buttons  = [];
+      $scope.ok = null;
 
-    $http.get('/api/server/reload/').
-      success(function(data, status, headers, config) {
+      $scope.hide = function () {
         $mdDialog.hide();
-        var alert = $mdDialog.alert()
-          .parent(angular.element(document.body))
-          .title('Reload')
-          .content('Flexget config file successfully reloaded.')
-          .ok('Ok');
-        $mdDialog.show(alert);
-      }).
-      error(function(data, status, headers, config) {
-        $mdDialog.hide();
-        $mdDialog.show(
-          $mdDialog.alert()
-            .parent(angular.element(document.body))
-            .title('Reload')
-            .clickOutsideToClose(true)
-            .content('Error reloading ' + data.error)
-            .ok('Ok')
-        )
-      });
+      };
+
+      var done = function(text) {
+        $scope.showCircular = false;
+        $scope.content = text;
+        $scope.ok = "Close";
+      };
+
+      $http.get('/api/server/reload/').
+        success(function (data, status, headers, config) {
+          done("Reload Success");
+        }).
+        error(function (data, status, headers, config) {
+          done("Reload failed: " + data.error);
+        });
+    };
+
+    $mdDialog.show({
+      templateUrl: 'static/partials/dialog_circular.html',
+      parent: angular.element(document.body),
+      controller: reloadController
+    });
   };
 
-  var do_shutdown = function() {
+  var doShutdown = function() {
     window.stop(); // Kill any http connection
+
+    var shutdownController = function($scope, $mdDialog) {
+      $scope.title = "Shutting Down";
+      $scope.showCircular = true;
+      $scope.content = null;
+      $scope.buttons  = [];
+      $scope.ok = null;
+
+      $scope.hide = function () {
+        $mdDialog.hide();
+      };
+
+      var done = function(text) {
+        $scope.title = "Shutdown";
+        $scope.showCircular = false;
+        $scope.content = text;
+        $scope.ok = "Close";
+      };
+
+      $http.get('/api/server/shutdown/').
+        success(function (data, status, headers, config) {
+          done("Flexget has been shutdown");
+        }).
+        error(function (data, status, headers, config) {
+          done("Flexget failed to shutdown failed: " + data.error);
+        });
+    };
     $mdDialog.show({
-      template: '<md-dialog aria-label="Shutting Down">' +
-      '  <md-dialog-content>' +
-      ' <h2>Shutting Down</h2>' +
-      '    <div layout="row" layout-align="center center">' +
-      '      <md-progress-circular md-diameter="30" class="md-primary" md-mode="indeterminate"></md-progress-circular>' +
-      '     </div>' +
-      '  </md-dialog-content>' +
-      '</md-dialog>'
+      templateUrl: 'static/partials/dialog_circular.html',
+      parent: angular.element(document.body),
+      controller: shutdownController
     });
 
-    var shutdownStatus = $mdDialog.alert()
-      .parent(angular.element(document.body))
-      .title('Shutdown')
-      .clickOutsideToClose(true)
-      .content('Flexget shutdown')
-      .ok('Ok');
-
-    $http.get('/api/server/shutdown/').
-      success(function(data, status, headers, config) {
-        $mdDialog.hide();
-        $mdDialog.show(shutdownStatus);
-      }).
-      error(function(data, status, headers, config) {
-        $mdDialog.hide();
-        shutdownStatus.content('Error shutting down ' + data.error)
-        $mdDialog.show(shutdownStatus);
-      });
   };
 
   $scope.shutdown = function() {
-    var confirm = $mdDialog.confirm()
-      .parent(angular.element(document.body))
-      .title('Shutdown')
-      .content('Are you sure you want to shutdown Flexget?')
-      .ok('Shutdown')
-      .cancel('Cancel');
-    $mdDialog.show(confirm).then(function() {
-      do_shutdown();
-    });
+    $mdDialog.show(
+      $mdDialog.confirm()
+        .parent(angular.element(document.body))
+        .title('Shutdown')
+        .content('Are you sure you want to shutdown Flexget?')
+        .ok('Shutdown')
+        .cancel('Cancel')
+    ).then(function() {
+        doShutdown();
+      });
 
   };
 

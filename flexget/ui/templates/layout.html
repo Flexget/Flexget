@@ -11,16 +11,52 @@
     {% assets "css_all" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
 </head>
 
-<body layout="column">
-<div layout="row" ng-controller="flexgetCtrl" flex>
-    <md-sidenav layout="column" class="md-sidenav-left md-whiteframe-z2 nav-menu" md-component-id="left"
-                ng-class="menuMini ? 'nav-menu-mini': 'nav-menu-full'" md-is-locked-open="$mdMedia('gt-lg')">
-        <md-toolbar class="logo"></md-toolbar>
+<body layout="column" ng-controller="flexgetCtrl" flex ng-class="menuMini ? 'nav-menu-mini': 'nav-menu-full'">
+<div class="header">
+    <div class="logo"><a href="/ui/#/home"></a></div>
+    <div class="admin-toolbar">
+        <md-toolbar class="admin-toolbar">
+            <div class="md-toolbar-tools">
+                <md-button class="md-icon-button" ng-click="toggleMenu()" style="width: 40px">
+                    <md-icon class='fa fa-bars' aria-label="Menu"></md-icon>
+                </md-button>
+                <span flex></span>
+                <md-menu md-position-mode="target-right target">
+                    <md-button aria-label="Open demo menu" class="md-icon-button" ng-click="$mdOpenMenu()">
+                        <md-icon md-menu-origin class="fa fa-gears"></md-icon>
+                    </md-button>
+                    <md-menu-content width="2">
+                        <md-menu-item>
+                            <md-button ng-click="reload()" aria-label="Reload">
+                                <p>Reload</p>
+                                <md-icon class="fa fa-refresh"></md-icon>
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button ng-click="shutdown()" aria-label="Shutdown">
+                                <p>Shutdown</p>
+                                <md-icon class="fa fa-power-off"></md-icon>
+                            </md-button>
+                        </md-menu-item>
+                        <md-menu-item>
+                            <md-button ng-click="go('log')" aria-label="Log">
+                                <p>Log</p>
+                                <md-icon class="fa fa-file-text-o"></md-icon>
+                            </md-button>
+                        </md-menu-item>
+                    </md-menu-content>
+                </md-menu>
+            </div>
+        </md-toolbar>
+    </div>
+</div>
+<md-content layout="row" flex>
+    <md-sidenav flex class="nav-menu md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-lg')">
         <md-list>
             <md-list-item class="header">Menu</md-list-item>
             {%- for item in menu recursive -%}
                 <md-list-item>
-                    <md-button href="{{ item.href }}" flex>
+                    <md-button href="{{ item.href }}" ng-click="closeNav()" flex>
                         <md-icon class="{{ item.icon }}"></md-icon>
                         {{ item.caption }}
                     </md-button>
@@ -28,43 +64,8 @@
             {% endfor %}
         </md-list>
     </md-sidenav>
-
-    <div layout="column" flex id="content">
-        <md-toolbar layout="row" class="admin-toolbar" flex>
-            <md-button class="md-icon-button" ng-click="toggleMenu()" style="width: 40px">
-                <md-icon class='fa fa-bars' aria-label="Menu"></md-icon>
-            </md-button>
-            <span flex></span>
-            <md-menu md-position-mode="target-right target">
-                <md-button aria-label="Open demo menu" class="md-icon-button" ng-click="$mdOpenMenu()">
-                    <md-icon md-menu-origin class="fa fa-gears"></md-icon>
-                </md-button>
-                <md-menu-content width="2">
-                    <md-menu-item>
-                        <md-button ng-click="reload()" aria-label="Reload">
-                            <p>Reload</p>
-                            <md-icon class="fa fa-refresh"></md-icon>
-                        </md-button>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <md-button ng-click="shutdown()" aria-label="Shutdown">
-                            <p>Shutdown</p>
-                            <md-icon class="fa fa-power-off"></md-icon>
-                        </md-button>
-                    </md-menu-item>
-                    <md-menu-item>
-                        <md-button ng-click="go('log')" aria-label="Log">
-                            <p>Log</p>
-                            <md-icon class="fa fa-file-text-o"></md-icon>
-                        </md-button>
-                    </md-menu-item>
-                </md-menu-content>
-            </md-menu>
-        </md-toolbar>
-
-        <md-content ui-view layout="column" flex></md-content>
-    </div>
-</div>
+    <div class="content" ui-view flex></div>
+</md-content>
 </body>
 {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
 </body>
