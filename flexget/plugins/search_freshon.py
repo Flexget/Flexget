@@ -44,6 +44,36 @@ class SearchFreshon(object):
     
     @plugin.internet(log)
     def search(self, task, entry, config):
+        """Freshon.tv search plugin
+
+        Config example:
+        tv_search_cpasbien:
+            discover:
+              what:
+                 - trakt_list:
+                     username: xxxxxxx
+                     password: xxxxxxx
+                     list: somelist
+                     type: shows
+                  from:
+                    - freshon:
+                        username: xxxxxx
+                        password: xxxxxx
+                        passkey: xxxxx
+                  interval: 1 day
+                  ignore_estimations: yes
+
+        Category is one of:
+            all
+            hd
+            webdl
+
+        Freeleech is one of:
+            all
+            free
+            half
+        """
+            
         config = self.prepare_config(config)
 
         base_url = 'https://freshon.tv'
