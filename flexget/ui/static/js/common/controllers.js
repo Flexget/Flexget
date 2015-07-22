@@ -55,6 +55,7 @@ app.controller('flexgetCtrl', function($scope, $http, $mdSidenav, $state, $mdMed
       parent: angular.element(document.body),
       controller: reloadController
     });
+
   };
 
   var doShutdown = function() {

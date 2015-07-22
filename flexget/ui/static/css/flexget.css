@@ -57,6 +57,10 @@ body {
     padding: 0px;
 }
 
+.header .admin-toolbar .md-button {
+    min-width: inherit;
+}
+
 @media screen and (max-width: 1200px) {
     .header .logo {
         float: none;

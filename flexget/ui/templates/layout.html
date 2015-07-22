@@ -21,31 +21,15 @@
                     <md-icon class='fa fa-bars' aria-label="Menu"></md-icon>
                 </md-button>
                 <span flex></span>
-                <md-menu md-position-mode="target-right target">
-                    <md-button aria-label="Open demo menu" class="md-icon-button" ng-click="$mdOpenMenu()">
-                        <md-icon md-menu-origin class="fa fa-gears"></md-icon>
-                    </md-button>
-                    <md-menu-content width="2">
-                        <md-menu-item>
-                            <md-button ng-click="reload()" aria-label="Reload">
-                                <p>Reload</p>
-                                <md-icon class="fa fa-refresh"></md-icon>
-                            </md-button>
-                        </md-menu-item>
-                        <md-menu-item>
-                            <md-button ng-click="shutdown()" aria-label="Shutdown">
-                                <p>Shutdown</p>
-                                <md-icon class="fa fa-power-off"></md-icon>
-                            </md-button>
-                        </md-menu-item>
-                        <md-menu-item>
-                            <md-button ng-click="go('log')" aria-label="Log">
-                                <p>Log</p>
-                                <md-icon class="fa fa-file-text-o"></md-icon>
-                            </md-button>
-                        </md-menu-item>
-                    </md-menu-content>
-                </md-menu>
+                <md-button ng-click="reload()" aria-label="Reload">
+                    <md-icon class="fa fa-refresh"></md-icon>
+                </md-button>
+                <md-button ng-click="shutdown()" aria-label="Shutdown">
+                    <md-icon class="fa fa-power-off"></md-icon>
+                </md-button>
+                <md-button ng-click="go('log')" aria-label="Log">
+                    <md-icon class="fa fa-file-text-o"></md-icon>
+                </md-button>
             </div>
         </md-toolbar>
     </div>

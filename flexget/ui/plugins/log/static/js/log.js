@@ -22,16 +22,22 @@ logViewModule.controller('LogViewCtrl',
         INFO: 20
       };
 
-      var getData = function() {
+      var getData = function(filter) {
         if ($scope.logStream) {
           $scope.logStream.abort();
         }
 
         $scope.log = [];
-        $scope.gridOptions.data = $scope.log
+        $scope.gridOptions.data = $scope.log;
+
+        var queryStr = '?lines=' + $scope.lines;
+
+        for (var field in filter) {
+          queryStr = queryStr + '&' + field + '=' + filter[field];
+        }
 
         Oboe({
-          url: '/api/server/log/?lines=' + $scope.lines,
+          url: '/api/server/log/' + queryStr,
           pattern: '{message}',
           start: function(stream) {
             $scope.logStream = stream;
@@ -90,7 +96,13 @@ logViewModule.controller('LogViewCtrl',
               $timeout.cancel($scope.filterTimeout);
             }
             $scope.filterTimeout = $timeout(function () {
-              getData()
+              var filter = {};
+              for (var i = 0; i < gridApi.grid.columns.length; i++) {
+                if (gridApi.grid.columns[i].filters[0].term) {
+                  filter[gridApi.grid.columns[i].field] = gridApi.grid.columns[i].filters[0].term;
+                }
+              }
+              getData(filter)
             }, 1000);
           });
         }

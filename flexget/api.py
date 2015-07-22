@@ -424,11 +424,17 @@ class ServerLogAPI(APIResource):
 
                 if f == 'levelname':
                     line_level = logging.getLevelName(line['levelname'])
-                    filter_level = logging.getLevelName(filter_str.upper())
-                    if line_level <= filter_level:
-                        return False
+                    try:
+                        filter_level = int(filter_str)
+                    except ValueError:
+                        filter_level = logging.getLevelName(filter_str.upper())
 
-                if filter_str not in line.get(f, '').lower():
+                    if line_level < filter_level:
+                        return False
+                    else:
+                        continue
+
+                if filter_str.lower() not in line.get(f, '').lower():
                     return False
             return True
 
