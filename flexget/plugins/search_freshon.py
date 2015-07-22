@@ -6,13 +6,10 @@ import urllib
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('search_freshon')
-
-session = requests.Session()
 
 
 class SearchFreshon(object):
@@ -26,21 +23,18 @@ class SearchFreshon(object):
             'passkey': {'type': 'string'},
             'category': {
                 'type': 'string',
+                'default': 'all',
                 'enum': ['hd', 'webdl', 'all']
             },
             'freeleech': {
                 'type': 'string',
+                'default': 'all',
                 'enum': ['free', 'half', 'all']
             },
         },
         'required': ['username', 'password', 'passkey'],
         'additionalProperties': False
     }
-
-    def prepare_config(self, config):
-        config.setdefault('freeleech', 'all')
-        config.setdefault('category', 'all')
-        return config
     
     @plugin.internet(log)
     def search(self, task, entry, config):
@@ -73,29 +67,27 @@ class SearchFreshon(object):
             free
             half
         """
-            
-        config = self.prepare_config(config)
 
         base_url = 'https://freshon.tv'
-        search_fragment = 'browse.php?search=%s&amp;tab=%s&amp;incldead=%s'
-        dl_fragment = 'download.php?type=rss&amp;id=%s&amp;passkey=%s'
+        search_fragment = 'browse.php?search=%s&tab=%s&incldead=%s'
+        dl_fragment = 'download.php?type=rss&id=%s&passkey=%s'
+        login_fragment = 'login.php?action=makelogin'
 
-        if not session.cookies:
+        if not task.requests.cookies:
             log.debug('Logging in to Freshon.tv...')
-            try:
-                login_params = {'username': config['username'],
-                                'password': config['password'],
-                                'login': 'Do it!'}
-                r = session.post(base_url + '/login.php?action=makelogin', data=login_params, verify=False)
-            except requests.RequestException as e:
-                log.error('Error while logging in to Freshon.tv: %s', e)
-
-            if re.search('/logout.php', r.text):
+            params = {'username': config['username'],
+                      'password': config['password'],
+                      'login': 'Do it!'}
+            urlstr = (base_url, login_fragment)
+            lsrc = task.requests.post('/'.join(urlstr), data=params, verify=False)
+            if str(config['username']) in lsrc.text:
                 log.debug('Login to FreshonTV was successful')
+            elif str('Username does not exist in the userbase') in lsrc.text:
+                log.error('Invalid username or password for FreshonTV; Check your settings')
+                raise plugin.PluginError("Invalid username or Password for FreshonTV.")
             else:
-                log.debug('Login to FreshonTV failed')
-                if re.search('Username does not exist in the userbase or the account is not confirmed yet.', r.text):
-                    log.debug('Invalid username or password for FreshonTV Check your settings')
+                log.error('Login to FreshonTV was NOT successful')
+                raise plugin.PluginError("Login to FreshonTV was NOT successful")
 
         if config['freeleech'] == 'all':
             freeleech = 0
@@ -103,21 +95,18 @@ class SearchFreshon(object):
             freeleech = 3
         elif config['freeleech'] == 'half': 
             freeleech = 4
-        entries = set()
 
+        entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            search_string = search_string.replace(' ', '-').lower()
-            search_string = search_string.replace('(', '')
-            search_string = search_string.replace(')', '')
-            query = normalize_unicode(search_string)
+            query = normalize_unicode(search_string.replace(' ', '+'))
             query_url_fragment = urllib.quote_plus(query.encode('utf-8'))
             str_url = (base_url, search_fragment)
             url = '/'.join(str_url) % (query_url_fragment, config['category'], str(freeleech))
             log.debug('Search url: %s' % url)
-            f = session.get(url).content
-            soup = get_soup(f)
+            page = task.requests.get(url).content
+            soup = get_soup(page)
             if soup.findAll(text=re.compile('Nothing found. Try again with a refined search string.')):
-                log.debug('search returned no results')
+                log.debug('Search returned no results')
             else:
                 max_page_number = 0
                 # Check to see if there is more than 1 page of results
@@ -146,7 +135,7 @@ class SearchFreshon(object):
                     if (nextpage > 0):
                         newurl = url + '&page=' + str(nextpage)
                         log.debug('-----> NEXT PAGE : %s' % newurl)
-                        f1 = session.get(newurl).content
+                        f1 = task.requests.get(newurl).content
                         soup = get_soup(f1)
                     for res in soup.findAll('tr', {'class': re.compile('torrent_[0-9]*')}):
                         entry = Entry()
