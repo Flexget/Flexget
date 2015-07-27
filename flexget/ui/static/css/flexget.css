@@ -72,13 +72,17 @@ body {
 
 /* Side Nav Menu */
 .nav-menu {
+    position: relative;
     min-width: 190px !important;
     max-width: 190px !important;
-    background-color: #222d32;
     -webkit-transition: min-width 0.5s ease, max-width 0.5s ease;
     -moz-transition: min-width 0.5s ease, max-width 0.5s ease;
     -o-transition: min-width 0.5s ease, max-width 0.5s ease;
     transition: min-width 0.5s ease, max-width 0.5s ease;
+}
+
+.nav-menu md-content {
+    background-color: #222d32 !important;
 }
 
 .nav-menu md-list-item.header {
@@ -109,14 +113,14 @@ body {
 
 .nav-menu .md-button:hover {
     color: #fff;
-    background: #1e282c;
+    background: #1e282c !important;
     border-left-color: #f39c12;
 }
 
 .nav-menu .md-button > md-icon {
     width: 20px;
     height: inherit;
-    color: #b8c7ce;
+    color: #b8c7ce !important;
 }
 
 

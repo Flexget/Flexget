@@ -34,23 +34,26 @@
         </md-toolbar>
     </div>
 </div>
-<md-content layout="row" flex>
-    <md-sidenav flex class="nav-menu md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-lg')">
-        <md-list>
-            <md-list-item class="header">Menu</md-list-item>
-            {%- for item in menu recursive -%}
-                <md-list-item>
-                    <md-button href="{{ item.href }}" ng-click="closeNav()" flex>
-                        <md-icon class="{{ item.icon }}"></md-icon>
-                        {{ item.caption }}
-                    </md-button>
-                </md-list-item>
-            {% endfor %}
-        </md-list>
+<div layout="row" flex>
+    <md-sidenav layout="column" class="nav-menu md-sidenav-left md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-lg')">
+        <md-content layout="column" flex>
+            <md-list>
+                <md-list-item class="header">Menu</md-list-item>
+                {%- for item in menu recursive -%}
+                    <md-list-item>
+                        <md-button href="{{ item.href }}" ng-click="closeNav()" flex>
+                            <md-icon class="{{ item.icon }}"></md-icon>
+                            {{ item.caption }}
+                        </md-button>
+                    </md-list-item>
+                {% endfor %}
+            </md-list>        </md-content>
     </md-sidenav>
-    <div class="content" ui-view flex></div>
-</md-content>
-</body>
+    <div layout="column" flex id="content">
+        <md-content ui-view layout="column" flex></md-content>
+    </div>
+</div>
+
 {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
 </body>
 </html>
