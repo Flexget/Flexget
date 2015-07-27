@@ -329,6 +329,15 @@ class InputRSS(object):
         # new entries to be created
         entries = []
 
+        # Dict with fields to grab mapping from rss field name to FlexGet field name
+        fields = {'guid': 'guid',
+                  'author': 'author',
+                  'description': 'description',
+                  'infohash': 'torrent_info_hash'}
+        # extend the dict of fields to grab with other_fields list in config
+        for field_map in config.get('other_fields', []):
+            fields.update(field_map)
+
         # field name for url can be configured by setting link.
         # default value is auto but for example guid is used in some feeds
         ignored = 0
@@ -355,15 +364,6 @@ class InputRSS(object):
             # remove annoying zero width spaces
             entry.title = entry.title.replace(u'\u200B', u'')
 
-            # Dict with fields to grab mapping from rss field name to FlexGet field name
-            fields = {'guid': 'guid',
-                      'author': 'author',
-                      'description': 'description',
-                      'infohash': 'torrent_info_hash'}
-            # extend the dict of fields to grab with other_fields list in config
-            for field_map in config.get('other_fields', []):
-                fields.update(field_map)
-
             # helper
             # TODO: confusing? refactor into class member ...
 
@@ -376,7 +376,7 @@ class InputRSS(object):
                             # Error if this field is not a string
                             log.error('Cannot grab non text field `%s` from rss.', rss_field)
                             # Remove field from list of fields to avoid repeated error
-                            config['other_fields'].remove(rss_field)
+                            del fields[rss_field]
                             continue
                         if not getattr(entry, rss_field):
                             log.debug('Not grabbing blank field %s from rss for %s.', rss_field, ea['title'])
