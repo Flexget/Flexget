@@ -1,17 +1,21 @@
-<h1>Server Log</h1><small></small>
-<section class="content">
-    <div class="row">
-        <div class="col-xs-12">
-            <div class="box">
-                <div class="box-body">
-                    <md-input-container>
-                        <label>Lines</label>
-                        <input type="text" ng-model="lines"/>
-                    </md-input-container>
-                    <md-switch class="md-primary" md-no-ink aria-label="Switch No Ink" ng-model="data.cb5">Auto Scroll</md-switch>
-                    <div id="log-grid" ui-grid="gridOptions" class="log-grid" ui-grid-auto-resize></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+<h1>Server Log
+    <small>
+        <span class="badge badge-success" ng-if="logStream">Streaming</span>
+        <span ng-if="logStream == false">
+            <span class="badge badge-danger">Disconnected</span>
+            <md-button class="md-icon-button md-primary" aria-label="Settings" ng-click="updateGrid();">
+                <md-icon class="fa fa-refresh"></md-icon>
+            </md-button>
+        </span>
+    </small>
+</h1>
+<div layout="row">
+    <md-input-container>
+        Lines<input type="text" aria-label="lines" ng-model="lines" ng-change="updateGrid();"/>
+    </md-input-container>
+    <md-switch class="md-primary" ng-model="autoScroll" ng-change="scrollBottom()">Auto Scroll</md-switch>
+</div>
+<div flex layout="row" class="log-grid">
+    <md-content id="log-grid" ui-grid="gridOptions" ui-grid-auto-resize flex></md-content>
+</div>
+
