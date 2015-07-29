@@ -1623,25 +1623,31 @@ angular.module('schemaForm')
         var lastDigest = {};
         var childScope;
 
-        // Common renderer function, can either be triggered by a watch or by an event.
-        var render = function(schema, form) {
-          // TODO: Custom FlexGet code, separate out from schema form
+        // TODO: Custom FlexGet code, separate out from schema form
+        var sanitizeSchema = function(schema) {
           // Pick a branch for anyOfs and oneOfs, since schema form doesn't support user picking yet
           // TODO: Pick branch based on type priority list, picking 'most advanced' branch
           // TODO: Also rewrite 'type' property in the form of arrays to be 'most advanced' type
           // TODO: Edit the model data as well if the existing data isn't the type the form is displaying?
-          schemaForm.traverseSchema(schema, function(prop, path) {
+          schemaForm.traverseSchema(schema, function (prop, path) {
             if (angular.isDefined(prop['oneOf'])) {
+              sanitizeSchema(prop['oneOf'][0]);
               angular.extend(prop, prop['oneOf'][0]);
               delete prop['oneOf']
             }
             if (angular.isDefined(prop['anyOf'])) {
-              // TODO: smarter pick than first
+              sanitizeSchema(prop['anyOf'][0]);
               angular.extend(prop, prop['anyOf'][0]);
               delete prop['anyOf']
             }
-          });
-          // End FlexGet custom code
+          }, undefined, false);
+        };
+        // End FlexGet custom code
+
+        // Common renderer function, can either be triggered by a watch or by an event.
+        var render = function(schema, form) {
+          // TODO: FlexGet custom code, move
+          sanitizeSchema(schema);
           var merged = schemaForm.merge(schema, form, ignore, scope.options);
           var frag = document.createDocumentFragment();
 
