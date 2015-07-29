@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 import os
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils import regex as re
 
 log = logging.getLogger('rtorrent_magnet')
 pat = re.compile('xt=urn:btih:([^&/]+)')

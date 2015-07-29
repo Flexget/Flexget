@@ -1,13 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
-import re
 import shutil
 import zipfile
 
 from flexget import plugin
-from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils.template import render_from_entry, RenderError
 
 try:

@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
-import re
 import logging
 
 from sqlalchemy import Column, Integer, Unicode
@@ -10,6 +9,7 @@ from flexget.db_schema import versioned_base
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
+from flexget.utils import regex as re
 
 log = logging.getLogger('tail')
 Base = versioned_base('tail', 0)

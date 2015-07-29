@@ -1,12 +1,12 @@
 from __future__ import absolute_import
 import logging
-import re
 import urllib
 import feedparser
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils.search import normalize_unicode
 
 log = logging.getLogger('extratorrent')

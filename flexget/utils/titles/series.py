@@ -5,7 +5,7 @@ from string import capwords
 
 from dateutil.parser import parse as parsedate
 
-import re
+from flexget.utils import regex as re
 from flexget.utils.titles.parser import TitleParser
 from flexget.plugins.parsers import ParseWarning
 from flexget.plugins.parsers.parser_common import default_ignore_prefixes, name_to_re

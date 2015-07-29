@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
-import re
 from abc import abstractproperty, abstractmethod, ABCMeta
 from string import capwords
 
+from flexget.utils import regex as re
 from flexget.utils.tools import ReList
 
 

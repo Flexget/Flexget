@@ -3,7 +3,6 @@ import urllib
 import urllib2
 import logging
 import json
-import re
 import cookielib
 
 from flexget import plugin
@@ -11,7 +10,7 @@ from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.utils import requests
+from flexget.utils import regex as re
 from flexget.utils.tools import arithmeticEval
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode

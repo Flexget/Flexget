@@ -1,8 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
-import re
-import sys
 from copy import copy
 from datetime import datetime, date, time
 import locale
@@ -13,6 +11,7 @@ from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader
                     TemplateNotFound, TemplateSyntaxError, Undefined)
 
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils.lazy_dict import LazyDict
 from flexget.utils.pathscrub import pathscrub
 

@@ -3,7 +3,6 @@ import urlparse
 import logging
 import urllib
 import zlib
-import re
 from jinja2 import Template
 
 from flexget import plugin
@@ -11,6 +10,7 @@ from flexget.event import event
 from flexget.entry import Entry
 from flexget.utils.soup import get_soup
 from flexget.utils.cached_input import cached
+from flexget.utils import regex as re
 
 log = logging.getLogger('html')
 

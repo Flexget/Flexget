@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import codecs
-import re
 import logging
 import os
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils.cached_input import cached
 
 log = logging.getLogger('regexp_parse')

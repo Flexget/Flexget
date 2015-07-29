@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from difflib import SequenceMatcher
 import logging
-import re
 import urllib
 
 import requests

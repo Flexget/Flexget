@@ -1,13 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-import os
 import logging
-import re
-import urlparse
 import xmlrpclib
 
 from flexget import plugin
 from flexget.event import event
-from flexget.entry import Entry
+from flexget.utils import regex as re
 from flexget.utils.template import RenderError
 from flexget.plugin import get_plugin_by_name
 

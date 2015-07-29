@@ -1,6 +1,5 @@
 """Plugin for plex media server (www.plexapp.com)."""
 from xml.dom.minidom import parseString
-import re
 import logging
 import os
 from os.path import basename
@@ -9,6 +8,7 @@ from socket import gethostbyname
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils import requests
 
 log = logging.getLogger('plex')

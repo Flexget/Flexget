@@ -1,12 +1,12 @@
 # coding=utf-8
 
 from __future__ import unicode_literals, division, absolute_import
-import re
 import logging
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
+from flexget.utils import regex as re
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 

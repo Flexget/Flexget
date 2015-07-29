@@ -1,7 +1,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import os
-import re
 import urlparse
 from collections import defaultdict
 from datetime import datetime
@@ -11,6 +10,7 @@ from jsonschema.compat import str_types, int_types
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
+from flexget.utils import regex as re
 from flexget.utils.tools import parse_timedelta
 
 schema_paths = {}

@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 
 from sqlalchemy import desc
 
@@ -8,6 +7,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.manager import Session
+from flexget.utils import regex as re
 
 log = logging.getLogger('emit_series')
 

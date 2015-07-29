@@ -7,7 +7,6 @@ import httplib
 import os
 import socket
 import time
-import re
 import sys
 import locale
 import Queue
@@ -18,6 +17,8 @@ from collections import MutableMapping
 from urlparse import urlparse
 from htmlentitydefs import name2codepoint
 from datetime import timedelta, datetime
+
+from flexget.utils import regex as re
 
 
 def str_to_boolean(string):

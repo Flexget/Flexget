@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import difflib
 import logging
-import re
 
 from bs4.element import Tag
 
+from flexget.utils import regex as re
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session
 from flexget.utils.tools import str_to_int

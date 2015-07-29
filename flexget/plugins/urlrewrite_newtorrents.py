@@ -2,13 +2,13 @@ from __future__ import unicode_literals, division, absolute_import
 import urllib
 import urllib2
 import logging
-import re
 import socket
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
+from flexget.utils import regex as re
 from flexget.utils.soup import get_soup
 from flexget.utils.tools import urlopener
 from flexget.utils.search import torrent_availability, normalize_unicode

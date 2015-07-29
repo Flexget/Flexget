@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 from datetime import datetime
 
 from sqlalchemy import Column, Unicode, Integer
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils import requests
 from flexget.utils.soup import get_soup
 from flexget.utils.titles.series import name_to_re

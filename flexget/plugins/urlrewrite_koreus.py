@@ -1,11 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 import urllib2
 
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
+from flexget.utils import regex as re
 from flexget.utils.tools import urlopener
 from flexget.utils.soup import get_soup
 

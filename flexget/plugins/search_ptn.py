@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils import requests
 from flexget.utils.imdb import extract_id
 from flexget.utils.soup import get_soup

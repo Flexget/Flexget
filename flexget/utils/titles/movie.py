@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 
+from flexget.utils import regex as re
 from flexget.utils.titles.parser import TitleParser
 from flexget.utils import qualities
 from flexget.utils.tools import str_to_int
