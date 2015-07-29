@@ -102,7 +102,7 @@ class Sonarr(object):
                                          % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
                                             parsedurl.path, e))
         for show in json:
-            fg_quality = '' # Initializes the quality parameter
+            fg_quality = ''  # Initializes the quality parameter
             if show['monitored'] or not config.get('only_monitored'):  # Checks if to retrieve just monitored shows
                 if config.get('include_ended') or show['status'] != 'ended':  # Checks if to retrieve ended shows
                     if config.get('include_data'):  # Check if to retrieve quality & path
@@ -120,7 +120,7 @@ class Sonarr(object):
                     if entry.isvalid():
                         entries.append(entry)
                     else:
-                        log.debug('Invalid entry created? %s' % entry)
+                        log.error('Invalid entry created? %s' % entry)
             # Test mode logging
             if task.options.test: 
                 log.info("Test mode. Entry includes:")
