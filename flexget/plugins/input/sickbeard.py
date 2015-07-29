@@ -71,8 +71,8 @@ class Sickbeard(object):
         try:
             json = task.requests.get(url).json()
         except RequestException as e:
-            raise plugin.PluginError('Unable to connect to Sonarr at %s://%s:%s%s. Error: %s' % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
-                                                                                                 parsedurl.path, e))
+            raise plugin.PluginError('Unable to connect to Sonarr at %s://%s:%s%s. Error: %s'
+                                     % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e))
         entries = []
         # Dictionary based on SB quality list.
         qualities = {'Any': '',
@@ -85,7 +85,8 @@ class Sickbeard(object):
             if not show['paused'] or not config.get('only_monitored'):
                 if config.get('include_ended') or show['status'] != 'Ended':
                     if config.get('include_data'):
-                        show_url = '%s:%s/api/%s/?cmd=show&tvdbid=%s' % (config['base_url'], config['port'], config['api_key'], show['tvdbid'])
+                        show_url = '%s:%s/api/%s/?cmd=show&tvdbid=%s' % (config['base_url'], config['port'],
+                                                                         config['api_key'], show['tvdbid'])
                         show_json = task.requests.get(show_url).json()
                         sb_quality = show_json['data']['quality']
                         fg_quality = qualities[sb_quality]
@@ -99,7 +100,7 @@ class Sickbeard(object):
             if entry.isvalid():
                 entries.append(entry)
             else:
-                log.debug('Invalid entry created? %s' % entry)
+                log.error('Invalid entry created? %s' % entry)
             # Test mode logging
             if task.options.test: 
                 log.info("Test mode. Entry includes:")
