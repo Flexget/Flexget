@@ -8,6 +8,8 @@ try:
     from regex import *
 except ImportError:
     from re import *
+    # This flag is not included in re.__all__
+    from re import DEBUG
     log.debug('Using stdlib `re` module for regex')
 else:
     log.debug('Using `regex` module for regex')
