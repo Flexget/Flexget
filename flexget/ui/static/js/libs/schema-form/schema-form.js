@@ -1624,21 +1624,27 @@ angular.module('schemaForm')
         var childScope;
 
         // TODO: Custom FlexGet code, separate out from schema form
+        var typePriority = ['object', 'array', 'string', 'number', 'integer', 'boolean', 'null'];
+        var bestSchema = function(schemaList) {
+          schemaList.sort(function(a, b) {
+            return typePriority.indexOf(a['type'] || 'null') - typePriority.indexOf(b['type'] || 'null');
+          });
+          return schemaList[0];
+        };
         var sanitizeSchema = function(schema) {
           // Pick a branch for anyOfs and oneOfs, since schema form doesn't support user picking yet
-          // TODO: Pick branch based on type priority list, picking 'most advanced' branch
           // TODO: Also rewrite 'type' property in the form of arrays to be 'most advanced' type
           // TODO: Edit the model data as well if the existing data isn't the type the form is displaying?
           schemaForm.traverseSchema(schema, function (prop, path) {
             if (angular.isDefined(prop['oneOf'])) {
-              sanitizeSchema(prop['oneOf'][0]);
-              angular.extend(prop, prop['oneOf'][0]);
-              delete prop['oneOf']
+              angular.forEach(prop['oneOf'], sanitizeSchema);
+              angular.extend(prop, bestSchema(prop['oneOf']));
+              delete prop['oneOf'];
             }
             if (angular.isDefined(prop['anyOf'])) {
-              sanitizeSchema(prop['anyOf'][0]);
-              angular.extend(prop, prop['anyOf'][0]);
-              delete prop['anyOf']
+              angular.forEach(prop['anyOf'], sanitizeSchema);
+              angular.extend(prop, bestSchema(prop['anyOf']));
+              delete prop['anyOf'];
             }
           }, undefined, false);
         };
