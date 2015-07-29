@@ -214,6 +214,8 @@ def is_regex(instance):
     try:
         return re.compile(instance)
     except re.error as e:
+        if re.regex_module == 're' and instance.startswith('(?'):
+            raise ValueError('Inline flags are only supported if `regex` module is installed. (pip install regex)')
         raise ValueError('Error parsing regex: %s' % e)
 
 
