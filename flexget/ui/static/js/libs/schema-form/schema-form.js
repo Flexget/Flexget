@@ -1636,16 +1636,13 @@ angular.module('schemaForm')
           // TODO: Also rewrite 'type' property in the form of arrays to be 'most advanced' type
           // TODO: Edit the model data as well if the existing data isn't the type the form is displaying?
           schemaForm.traverseSchema(schema, function (prop, path) {
-            if (angular.isDefined(prop['oneOf'])) {
-              angular.forEach(prop['oneOf'], sanitizeSchema);
-              angular.extend(prop, bestSchema(prop['oneOf']));
-              delete prop['oneOf'];
-            }
-            if (angular.isDefined(prop['anyOf'])) {
-              angular.forEach(prop['anyOf'], sanitizeSchema);
-              angular.extend(prop, bestSchema(prop['anyOf']));
-              delete prop['anyOf'];
-            }
+            angular.forEach(['oneOf', 'anyOf'], function(keyword){
+              if (angular.isDefined(prop[keyword])) {
+                angular.forEach(prop[keyword], sanitizeSchema);
+                angular.extend(prop, bestSchema(prop[keyword]));
+                delete prop[keyword];
+              }
+            });
           }, undefined, false);
         };
         // End FlexGet custom code
