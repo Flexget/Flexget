@@ -35,6 +35,7 @@ def is_cron_schedule(instance):
 UNITS = ['minutes', 'hours', 'days', 'weeks']
 interval_schema = {
     'type': 'object',
+    'title': 'Simple Interval',
     'properties': {
         'minutes': {'type': 'number'},
         'hours': {'type': 'number'},
@@ -49,6 +50,7 @@ interval_schema = {
 
 cron_schema = {
     'type': 'object',
+    'title': 'Advanced Cron Interval',
     'properties': {
         'year': {'type': ['integer', 'string']},
         'month': {'type': ['integer', 'string']},
@@ -62,6 +64,9 @@ cron_schema = {
 }
 
 schedule_schema = {
+    'type': 'object',
+    'title': 'Schedule',
+    'description': 'A schedule which runs specified tasks periodically.',
     'properties': {
         'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
         'interval': interval_schema,
