@@ -1625,21 +1625,27 @@ angular.module('schemaForm')
 
         // TODO: Custom FlexGet code, separate out from schema form
         var typePriority = ['object', 'array', 'string', 'number', 'integer', 'boolean', 'null'];
-        var bestSchema = function(schemaList) {
-          schemaList.sort(function(a, b) {
-            return typePriority.indexOf(a['type'] || 'null') - typePriority.indexOf(b['type'] || 'null');
-          });
-          return schemaList[0];
+        var typeComparator = function(typeA, typeB) {
+          return typePriority.indexOf(typeA || 'null') - typePriority.indexOf(typeB || 'null')
         };
+
         var sanitizeSchema = function(schema) {
-          // Pick a branch for anyOfs and oneOfs, since schema form doesn't support user picking yet
-          // TODO: Also rewrite 'type' property in the form of arrays to be 'most advanced' type
+          // Pick a branch for anyOfs and oneOfs and multi-types, since schema form doesn't support user picking yet
           // TODO: Edit the model data as well if the existing data isn't the type the form is displaying?
           schemaForm.traverseSchema(schema, function (prop, path) {
+            // Replace a list of types with the 'best' one
+            if (prop['type'] && prop['type'].constructor === Array) {
+              prop['type'].sort(typeComparator);
+              prop['type'] = prop['type'][0];
+            };
+            // Pick the 'best' branch of an anyOf or oneOf and merge it into this level
             angular.forEach(['oneOf', 'anyOf'], function(keyword){
               if (angular.isDefined(prop[keyword])) {
                 angular.forEach(prop[keyword], sanitizeSchema);
-                angular.extend(prop, bestSchema(prop[keyword]));
+                prop[keyword].sort(function(a, b) {
+                  return typeComparator(a['type'], b['type']);
+                });
+                angular.extend(prop, prop[keyword][0]);
                 delete prop[keyword];
               }
             });
