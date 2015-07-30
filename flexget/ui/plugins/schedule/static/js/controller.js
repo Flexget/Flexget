@@ -3,22 +3,9 @@
 var scheduleModule = angular.module("scheduleModule", ['schemaForm']);
 registerFlexModule(scheduleModule);
 
-scheduleModule.controller('SchedulesCtrl', function($scope) {
+scheduleModule.controller('SchedulesCtrl', function($scope, $http) {
   $scope.title = 'Schedules';
   $scope.description = 'Task execution';
-  $scope.schema = {
-    type: "object",
-    additionalProperties: false,
-    required: [
-      "tasks"
-    ],
-    properties: {
-      name: { type: "string", minLength: 2, title: "Name", description: "Name or alias" },
-      tasks: {'type': 'array', 'items': {'type': 'string'}}
-    }
-  };
-
-
 
   $scope.form = [
     "*",
@@ -39,8 +26,19 @@ scheduleModule.controller('SchedulesCtrl', function($scope) {
     }
   };
 
-  $scope.models = [
-    {name: 'test', bah: 'asasa'},
-    {}
-  ];
+  $http.get('/api/schema/config/schedules').
+    success(function(data, status, headers, config) {
+      // schema-form doesn't allow forms with an array at root level
+      $scope.schema = {type: 'object', 'properties': {'schedules': data}, required: ['schedules']};
+    }).
+    error(function(data, status, headers, config) {
+      // log error
+    });
+  $http.get('/api/schedules').
+    success(function(data, status, headers, config) {
+      $scope.models = [data];
+    }).
+    error(function(data, status, headers, config) {
+      // log error
+    });
 });
