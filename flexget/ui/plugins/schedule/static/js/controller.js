@@ -6,9 +6,41 @@ registerFlexModule(scheduleModule);
 scheduleModule.controller('SchedulesCtrl', function($scope, $http) {
   $scope.title = 'Schedules';
   $scope.description = 'Task execution';
+  $scope.type = "interval";
+  // TODO: this needs to be per array element instead of global (or have native oneOf support)
+  $scope.onTypeChange = function(key, form) {
+    $scope.type = key;
+  };
 
   $scope.form = [
-    "*",
+    {
+      key: "schedules",
+      add: "Add New Schedule!",
+      type: "array",
+      items: [
+        "schedules[].tasks",
+        {
+          type: "select",
+          title: "Interval Type",
+          onChange: $scope.onChange,
+          // TODO: This element should have something selected by default
+          titleMap: [
+            {name: "Simple", value: "interval"},
+            {name: "Cron Style", value: "schedule"}
+          ]
+
+        },
+        {
+          key: "schedules[].interval",
+          condition: "type == 'interval'"
+          // TODO: Should really be unit and value choice, rather than list all the units (proper oneOf would also do)
+        },
+        {
+          key: "schedules[].schedule",
+          condition: "type == 'schedule'"
+        }
+      ]
+    },
     {
       type: "submit",
       title: "Save"
