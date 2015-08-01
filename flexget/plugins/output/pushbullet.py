@@ -90,16 +90,16 @@ class OutputPushbullet(object):
 
             for apikey in apikeys:
                 if channel:
-                    self.send_push(task, apikey, title, body, url, channel)
+                    self.send_push(task, apikey, title, body, url, channel, 'channel_tag')
                 elif devices or emails:
                     for device in devices:
-                        self.send_push(task, apikey, title, body, url, None, device, 'device_iden')
+                        self.send_push(task, apikey, title, body, url, device, 'device_iden')
                     for email in emails:
-                        self.send_push(task, apikey, title, body, url, None, email, 'email')
+                        self.send_push(task, apikey, title, body, url, email, 'email')
                 else:
                     self.send_push(task, apikey, title, body, url)
 
-    def send_push(self, task, api_key, title, body, url=None, channel=None, destination=None, destination_type=None):
+    def send_push(self, task, api_key, title, body, url=None, destination=None, destination_type=None):
 
         if url:
             push_type = 'link'
@@ -109,8 +109,6 @@ class OutputPushbullet(object):
         data = {'type': push_type, 'title': title, 'body': body}
         if url:
             data['url'] = url
-        if channel: 
-            data['channel_tag'] = channel
         if destination:
             data[destination_type] = destination
 
@@ -125,8 +123,6 @@ class OutputPushbullet(object):
                 log.info('    Destination: %s (%s)' % (destination, destination_type))
             if url:
                 log.info('    URL: %s' % url)
-            if channel:
-                log.info('    Channel: %s' % channel)
             log.info('    Raw Data: %s' % json.dumps(data))
             # Test mode.  Skip remainder.
             return
