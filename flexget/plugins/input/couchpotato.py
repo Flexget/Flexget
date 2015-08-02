@@ -54,16 +54,16 @@ class CouchPotato(object):
         # TODO: Not all values have exact matches in flexget, need to update flexget qualities
 
         cp_to_flexget = {'BR-Disk': 'remux',  # Not a perfect match, but as close as currently possible
-                        '1080p': '1080p',
-                        '720p': '720p',
-                        'brrip': 'bluray',
-                        'dvdr': 'dvdrip',  # Not a perfect match, but as close as currently possible
-                        'dvdrip': 'dvdrip',
-                        'scr': 'dvdscr',
-                        'r5': 'r5',
-                        'tc': 'tc',
-                        'ts': 'ts',
-                        'cam': 'cam'}
+                         '1080p': '1080p',
+                         '720p': '720p',
+                         'brrip': 'bluray',
+                         'dvdr': 'dvdrip',  # Not a perfect match, but as close as currently possible
+                         'dvdrip': 'dvdrip',
+                         'scr': 'dvdscr',
+                         'r5': 'r5',
+                         'tc': 'tc',
+                         'ts': 'ts',
+                         'cam': 'cam'}
 
         # Gets profile and quality lists if include_data is TRUE
         if config.get('include_data'):
@@ -86,7 +86,7 @@ class CouchPotato(object):
                             # Creates a string of flexget qualities from CP's qualities list
                             converted_list = ', '.join([cp_to_flexget[quality] for quality in profile['qualities']])
                             try:
-                                quality = qualities.Quality (converted_list)  # Return the best components from the list
+                                quality = qualities.Quality(converted_list)  # Return the best components from the list
                             except ValueError as e:
                                 log.debug(e)
                 title = movie["title"]
