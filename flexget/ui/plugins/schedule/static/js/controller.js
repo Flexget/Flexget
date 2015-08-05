@@ -22,7 +22,7 @@ scheduleModule.controller('SchedulesCtrl', function($scope, $http) {
         {
           type: "select",
           title: "Interval Type",
-          onChange: $scope.onChange,
+          onChange: $scope.onTypeChange,
           // TODO: This element should have something selected by default
           titleMap: [
             {name: "Simple", value: "interval"},
