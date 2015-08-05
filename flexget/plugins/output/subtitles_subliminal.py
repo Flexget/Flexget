@@ -163,7 +163,9 @@ class PluginSubliminal(object):
                     entry.fail(msg)
         if downloaded_subtitles:
             # save subtitles to disk
-            subliminal.save_subtitles(downloaded_subtitles, single=single_mode)
+            for k, v in downloaded_subtitles.iteritems():
+                if v:
+                    subliminal.save_subtitles(k, v, single=single_mode)
 
 
 @event('plugin.register')
