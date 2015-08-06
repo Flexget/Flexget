@@ -757,8 +757,8 @@ class Manager(object):
                           file=sys.stderr)
                     sys.exit(1)
 
-                self.write_lock()
                 self._has_lock = True
+                self.write_lock()
                 acquired = True
                 if event:
                     fire_event('manager.lock_acquired', self)
