@@ -85,7 +85,6 @@ class PluginSubliminal(object):
         from babelfish import Language
         from dogpile.cache.exception import RegionAlreadyConfigured
         import subliminal
-        from subliminal import cli
         try:
             subliminal.region.configure('dogpile.cache.dbm', 
                                               arguments={'filename': os.path.join(tempfile.gettempdir(),
