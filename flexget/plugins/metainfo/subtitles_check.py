@@ -23,7 +23,6 @@ class MetainfoSubs(object):
     def on_task_start(self, task, config):
         try:
             import subliminal
-            from subliminal import cli
         except ImportError as e:
             log.debug('Error importing Subliminal: %s' % e)
             raise plugin.DependencyError('subliminal', 'subliminal', 
