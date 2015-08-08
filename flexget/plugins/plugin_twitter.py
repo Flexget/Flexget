@@ -21,6 +21,22 @@ def dependency_check():
 
 
 class OutputTwitter:
+    """Outputs accepted entries to Twitter
+
+    Example::
+
+      twitter:
+        template: 'Flexget: {{ title }} accepted'
+        consumer_key: <consumer_key>
+        consumer_secret: <consumer_secret>
+        access_key: <access_key>
+        access_secret: <access_secret>
+
+    Beware that Twitter only allows 300 requests during a 15 minutes
+    window.
+
+    The template option accepts the usual template format.
+    """
 
     schema = {
         'type': 'object',
@@ -62,6 +78,9 @@ class OutputTwitter:
 
 
 def twitter_auth(manager, cmd_options):
+    """
+    Authenticates with the Twitter API and produces a config snippet to use with the Twitter output plugin
+    """
     dependency_check()
 
     if cmd_options.queue_action == 'auth':
