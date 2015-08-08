@@ -44,7 +44,7 @@ class OutputNotifyXmpp(object):
             'title': {'type': 'string', 'default': '{{task.name}}'},
             'text': {'type': 'string', 'default': '{{title}}'}
         },
-        'required': ['sender', 'password', 'recipient'],
+        'required': ['sender', 'password', 'recipients'],
         'additionalProperties': False
     }
     
