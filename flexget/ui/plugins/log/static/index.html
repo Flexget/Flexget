@@ -14,6 +14,11 @@
         Lines<input type="text" aria-label="lines" ng-model="lines" ng-change="updateGrid();"/>
     </md-input-container>
     <md-switch class="md-primary" ng-model="autoScroll" ng-change="scrollBottom()">Auto Scroll</md-switch>
+    <md-input-container>
+        <md-select ng-model="logLevel" placeholder="Level">
+            <md-option ng-value="level" ng-repeat="level in logLevels">{{level}}</md-option>
+        </md-select>
+    </md-input-container>
 </div>
 <div flex layout="row" class="log-grid">
     <md-content id="log-grid" ui-grid="gridOptions" ui-grid-auto-resize flex></md-content>

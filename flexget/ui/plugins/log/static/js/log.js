@@ -11,17 +11,18 @@ logViewModule.controller('LogViewCtrl',
 
         $scope.log = [];
         $scope.logStream = false;
+
         $scope.lines = 400;
         $scope.autoScroll = true;
-
-        var logLevels = {
-          CRITICAL: 50,
-          ERROR: 40,
-          WARNING: 30,
-          VERBOSE: 15,
-          DEBUG: 10,
-          INFO: 20
-        };
+        $scope.logLevel = "INFO";
+        $scope.logLevels = [
+          'CRITICAL',
+          'ERROR',
+          'WARNING',
+          'VERBOSE',
+          'DEBUG',
+          'INFO'
+        ];
 
         $scope.scrollBottom = function() {
           // Delay for 1/2 second before scrolling
@@ -53,15 +54,7 @@ logViewModule.controller('LogViewCtrl',
           $scope.log = [];
           $scope.gridOptions.data = $scope.log;
 
-          var queryStr = '?lines=' + $scope.lines;
-
-          for (var i = 0; i < $scope.gridApi.grid.columns.length; i++) {
-            if ($scope.gridApi.grid.columns[i].filters[0].term) {
-              var filterField = $scope.gridApi.grid.columns[i].field;
-              var filterValue = $scope.gridApi.grid.columns[i].filters[0].term;
-              queryStr = queryStr + '&' + filterField + '=' + filterValue;
-            }
-          }
+          var queryStr = '?lines=' + $scope.lines + '&levelname=' + $scope.logLevel;
 
           Oboe({
             url: '/api/server/log/' + queryStr,
@@ -94,24 +87,9 @@ logViewModule.controller('LogViewCtrl',
           data: $scope.log,
           enableSorting: true,
           rowHeight: 20,
-          enableFiltering: true,
           columnDefs: [
             {field: 'asctime', name: 'Time', cellFilter: 'date', enableSorting: true, width: 120},
-            {field: 'levelname', name: 'Level', enableSorting: false, width: 65,
-              filter: {
-                type: uiGridConstants.filter.SELECT,
-                selectOptions: [
-                  {value: logLevels.ERROR, label: 'ERROR'},
-                  {value: logLevels.WARNING, label: 'WARNING'},
-                  {value: logLevels.INFO, label: 'INFO'},
-                  {value: logLevels.VERBOSE, label: 'VERBOSE'},
-                  {value: logLevels.DEBUG, label: 'DEBUG'}
-                ],
-                condition: function(level, cellValue) {
-                  return logLevels[cellValue] >= level;
-                }
-              }
-            },
+            {field: 'levelname', name: 'Level', enableSorting: false, width: 65},
             {field: 'name', name: 'Name', enableSorting: false, width: 80, cellTooltip: true},
             {field: 'task', name: 'Task', enableSorting: false, width: 65, cellTooltip: true},
             {field: 'message', name: 'Message', enableSorting: false, minWidth: 400, cellTooltip: true}
