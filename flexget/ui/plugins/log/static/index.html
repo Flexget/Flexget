@@ -11,11 +11,29 @@
 </h1>
 <div layout="row">
     <md-input-container>
-        Lines<input type="text" aria-label="lines" ng-model="lines" ng-change="updateGrid();"/>
+        <label>Lines</label>
+        <input type="number" aria-label="lines" ng-model="lines" ng-change="updateGrid();"/>
     </md-input-container>
+    <md-input-container>
+        <label>Message</label>
+        <input type="text" aria-label="message" ng-model="message" ng-change="updateGrid();"/>
+    </md-input-container>
+    <md-autocomplete required
+                     md-input-name="taskAutoComplete"
+                     md-selected-item="taskSelected"
+                     md-selected-item-change="filterTask(taskSelected)"
+                     md-search-text="taskSearch"
+                     md-search-text-change="filterTask(taskSearch)"
+                     md-items="task in tasks"
+                     md-item-text="task.name"
+                     md-floating-label="Task"
+    <md-item-template>
+        <span md-highlight-text="taskSearch">{{task.name}}</span>
+    </md-item-template>
+    </md-autocomplete>
     <md-switch class="md-primary" ng-model="autoScroll" ng-change="scrollBottom()">Auto Scroll</md-switch>
     <md-input-container>
-        <md-select ng-model="logLevel" placeholder="Level">
+        <md-select ng-model="logLevel" placeholder="Level" ng-change="updateGrid();">
             <md-option ng-value="level" ng-repeat="level in logLevels">{{level}}</md-option>
         </md-select>
     </md-input-container>

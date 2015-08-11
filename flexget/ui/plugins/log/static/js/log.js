@@ -5,24 +5,39 @@ var logViewModule = angular.module("logViewModule", ['ngOboe', 'ui.grid', 'ui.gr
 registerFlexModule(logViewModule);
 
 logViewModule.controller('LogViewCtrl',
-    ['$scope', '$timeout', '$filter', 'Oboe', 'uiGridConstants',
-      function($scope, $timeout, $filter, Oboe, uiGridConstants) {
+    ['$scope', '$timeout', '$filter', '$http', 'Oboe', 'uiGridConstants',
+      function($scope, $timeout, $filter, $http, Oboe, uiGridConstants) {
         $scope.title = 'Server Log';
 
         $scope.log = [];
         $scope.logStream = false;
 
         $scope.lines = 400;
+        $scope.message = "";
+        $scope.task = "";
+        $scope.taskSelected = "";
+        $scope.taskSearch = "";
         $scope.autoScroll = true;
         $scope.logLevel = "INFO";
         $scope.logLevels = [
           'CRITICAL',
           'ERROR',
           'WARNING',
+          'INFO',
           'VERBOSE',
-          'DEBUG',
-          'INFO'
+          'DEBUG'
         ];
+
+        $scope.filterTask = function(task) {
+          $scope.task = task;
+          $scope.updateGrid();
+        };
+
+        $http.get('/api/tasks/').
+            success(function(data, status, headers, config) {
+              // schema-form doesn't allow forms with an array at root level
+              $scope.tasks = data.tasks;
+            });
 
         $scope.scrollBottom = function() {
           // Delay for 1/2 second before scrolling
@@ -54,7 +69,10 @@ logViewModule.controller('LogViewCtrl',
           $scope.log = [];
           $scope.gridOptions.data = $scope.log;
 
-          var queryStr = '?lines=' + $scope.lines + '&levelname=' + $scope.logLevel;
+          var queryStr = '?lines=' + $scope.lines +
+              '&levelname=' + $scope.logLevel +
+              '&message=' + $scope.message +
+              '&task=' + $scope.taskSearch;
 
           Oboe({
             url: '/api/server/log/' + queryStr,
