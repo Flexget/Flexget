@@ -9,16 +9,20 @@ logViewModule.controller('LogViewCtrl',
       function($scope, $timeout, $filter, $http, Oboe, uiGridConstants) {
         $scope.title = 'Server Log';
 
-        $scope.log = [];
-        $scope.logStream = false;
+        var logItems = [];
+        var logStream = false;
 
-        $scope.lines = 400;
-        $scope.message = "";
-        $scope.task = "";
-        $scope.taskSelected = "";
-        $scope.taskSearch = "";
+        $scope.status = 2;
         $scope.autoScroll = true;
-        $scope.logLevel = "INFO";
+        $scope.filter = {
+          lines: 400,
+          message: "",
+          task: "",
+          levelname: "INFO"
+        };
+        $scope.taskSearch = "";
+        $scope.taskSelect = "";
+
         $scope.logLevels = [
           'CRITICAL',
           'ERROR',
@@ -28,25 +32,41 @@ logViewModule.controller('LogViewCtrl',
           'DEBUG'
         ];
 
+        /* Abort log stream */
+        $scope.abort = function() {
+          if (angular.isDefined($scope.filterTimeout)) {
+            $timeout.cancel($scope.filterTimeout);
+          }
+          if (typeof logStream !== 'undefined' && logStream) {
+            logStream.abort();
+            logStream = false;
+            $scope.status = 2;
+          }
+        };
+
+        /* Get a list of tasks for autocomplete filtering */
+        $http.get('/api/tasks/').
+            success(function(data, status, headers, config) {
+              $scope.tasks = [];
+              angular.forEach(data.tasks, function(value, key) {
+                $scope.tasks.push(value.name)
+              });
+
+            });
+
         $scope.filterTask = function(task) {
-          $scope.task = task;
+          $scope.filter.task = task;
           $scope.updateGrid();
         };
 
-        $http.get('/api/tasks/').
-            success(function(data, status, headers, config) {
-              // schema-form doesn't allow forms with an array at root level
-              $scope.tasks = data.tasks;
-            });
-
         $scope.scrollBottom = function() {
-          // Delay for 1/2 second before scrolling
+          // Delay for 500 ms before scrolling
           if (angular.isDefined($scope.scrollTimeout)) {
             $timeout.cancel($scope.scrollTimeout);
           }
           $scope.scrollTimeout = $timeout(function () {
             if ($scope.autoScroll) {
-              $scope.gridApi.core.scrollTo($scope.log[$scope.log.length - 1]);
+              $scope.gridApi.core.scrollTo(logItems[logItems.length - 1]);
             }
           }, 500);
         };
@@ -57,37 +77,47 @@ logViewModule.controller('LogViewCtrl',
             $timeout.cancel($scope.filterTimeout);
           }
           $scope.filterTimeout = $timeout(function () {
-            getData()
+            getLogData()
           }, 1000);
         };
 
-        var getData = function() {
-          if ($scope.logStream) {
-            $scope.logStream.abort();
+        var getLogData = function() {
+          if (logStream) {
+            logStream.abort();
           }
 
-          $scope.log = [];
-          $scope.gridOptions.data = $scope.log;
+          $scope.status = 1;
 
-          var queryStr = '?lines=' + $scope.lines +
-              '&levelname=' + $scope.logLevel +
-              '&message=' + $scope.message +
-              '&task=' + $scope.taskSearch;
+          logItems = [];
+          $scope.gridOptions.data = logItems;
+
+          var count = 0;
+          var queryStr;
+
+          angular.forEach($scope.filter, function(value, key) {
+            if (value) {
+              if (count == 0) {
+                queryStr = "?" + key + "=" + value
+              } else {
+                queryStr = queryStr + "&" + key + "=" + value
+              }
+              count++;
+            }
+          });
 
           Oboe({
             url: '/api/server/log/' + queryStr,
             pattern: '{message}',
             start: function(stream) {
-              $scope.logStream = stream;
+              logStream = stream;
             }
           }).then(function() {
-            // finished loading
-            $scope.logStream = false;
+            $scope.status = 2;
           }, function(error) {
-            // handle errors
-            $scope.logStream = false;
+            $scope.status = 2;
           }, function(node) {
-            $scope.log.push(node);
+            $scope.status = 0;
+            logItems.push(node);
             $scope.scrollBottom();
           });
         };
@@ -102,7 +132,7 @@ logViewModule.controller('LogViewCtrl',
         };
 
         $scope.gridOptions = {
-          data: $scope.log,
+          data: logItems,
           enableSorting: true,
           rowHeight: 20,
           columnDefs: [
@@ -118,17 +148,12 @@ logViewModule.controller('LogViewCtrl',
             $scope.gridApi.core.on.filterChanged($scope, function() {
               $scope.updateGrid();
             });
-            getData();
+            getLogData();
           }
         };
 
-        // Cancel timer and stop the stream
+        // Cancel timer and stop the stream when navigating away
         $scope.$on("$destroy", function() {
-          if (angular.isDefined($scope.filterTimeout)) {
-            $timeout.cancel($scope.filterTimeout);
-          }
-          if (typeof $scope.logStream !== 'undefined' && $scope.logStream) {
-            $scope.logStream.abort();
-          }
+          $scope.abort();
         });
       }]);

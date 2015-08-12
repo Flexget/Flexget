@@ -1,3 +1,15 @@
+.log md-input-container, .log md-autocomplete {
+    padding: 2px 2px 2px;
+}
+
+.log .md-button.md-icon-button {
+    margin: 0px !important;
+    padding: 0px !important;
+}
+.log md-switch {
+    margin: 2px 2px 2px;
+}
+
 .log-grid .ui-grid-row .ui-grid-cell {
     background-color: inherit !important;
 }
