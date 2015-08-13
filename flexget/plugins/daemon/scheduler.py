@@ -85,7 +85,7 @@ main_schema = {
             'type': 'array',
             'items': schedule_schema
         },
-        {'type': 'boolean', 'enum': [False]}
+        {'type': 'boolean'}
     ]
 }
 
@@ -148,8 +148,10 @@ def setup_jobs(manager):
 
     if 'schedules' not in manager.config:
         log.info('No schedules defined in config. Defaulting to run all tasks on a 1 hour interval.')
-    config = manager.config.get('schedules', [{'tasks': ['*'], 'interval': {'hours': 1}}])
-    if not config:  # Schedules are disabled with `schedules: no`
+    config = manager.config.get('schedules', True)
+    if config is True:
+        config = [{'tasks': ['*'], 'interval': {'hours': 1}}]
+    elif not config:  # Schedules are disabled with `schedules: no`
         if scheduler.running:
             log.info('Shutting down scheduler')
             scheduler.shutdown()
