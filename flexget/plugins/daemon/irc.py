@@ -30,7 +30,6 @@ schema = {
                         ]
                     },
                     'nickserv_password': {'type': 'string'},
-                    'nickserv_name': {'type': 'string', 'default': 'NickServ'},
                     'task': {'type': 'string'},
                     'queue_entries': {'type': 'integer', 'default': 1},
                     'multi_lines': {'type': 'integer', 'default': 1},
@@ -130,12 +129,17 @@ class IRCConnection(SingleServerIRCBot):
     def on_welcome(self, conn, event):
         log.info('IRC connected to %s' % self.connection_name)
 
-        # Identify with NickServ if configured
         nickserv_password = self.config.get('nickserv_password')
-        nickserv_name = self.config.get('nickserv_name')
         if nickserv_password:
-            log.info('Identifying with %s' % nickserv_name)
-            conn.privmsg(nickserv_name, 'IDENTIFY %s' % nickserv_password)
+        # If we've not got our peferred nickname and NickServ is configured, ghost the connection
+            if conn.get_nickname() != self._nickname:
+                log.info('Ghosting old connection')
+                conn.privmsg('NickServ', 'GHOST %s %s' % (self._nickname, nickserv_password))
+                conn.nick(self._nickname)
+        
+            # Identify with NickServ
+            log.info('Identifying with NickServ as %s' % self._nickname)
+            conn.privmsg('NickServ', 'IDENTIFY %s %s' % (self._nickname, nickserv_password))
 
         # Join Channels
         channels = self.config.get('channels', [])
