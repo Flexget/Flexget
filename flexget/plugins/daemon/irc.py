@@ -35,6 +35,8 @@ schema = {
                         ]
                     },
                     'nickserv_password': {'type': 'string'},
+                    'invite_nickname': {'type': 'string'},
+                    'invite_message': {'type': 'string'},
                     'task': {'type': 'string'},
                     'queue_entries': {'type': 'integer', 'default': 1},
                 },
@@ -154,7 +156,7 @@ class IRCConnection(SingleServerIRCBot):
     def queue_entry(self, entry):
         """
         Stores an entry in the connection entry queue, if the queue is over the size limit then submit them to the task
-        :param entry: Entry
+        :param entry: Entry to be queued
         :return:
         """
         self.entry_queue.append(entry)
@@ -166,11 +168,15 @@ class IRCConnection(SingleServerIRCBot):
     def parse_message(self, nickname, channel, message):
         """
         Parses a public message and generates an entry if needed
-        :param nickname: Nickname
-        :param channel: Channel
+        :param nickname: Nickname of who sent the message
+        :param channel: Channel where the message was receivied
         :param message: Message text
         :return:
         """
+
+        # Clean up the message
+        message = self.MESSAGE_CLEAN.sub('', message)
+
         # If we have announcers defined, ignore any messages not from them
         if len(self.announcer_list) and nickname not in self.announcer_list:
             log.debug('Ignoring message: from non-announcer %s' % nickname)
@@ -181,9 +187,6 @@ class IRCConnection(SingleServerIRCBot):
             if rx.match(message):
                 log.debug('Ignoring message: matched ignore line')
                 return
-
-        # Clean up the message
-        message = self.MESSAGE_CLEAN.sub('', message)
 
         # Create the entry
         entry = Entry(irc_raw_message=message)
@@ -203,7 +206,8 @@ class IRCConnection(SingleServerIRCBot):
                 entry.update(dict(zip(val_names, val_values)))
 
         # Generate the entry and process it through the linematched rules
-        entry = self.process_tracker_config_rules(entry)
+        if self.tracker_config is not None:
+            entry = self.process_tracker_config_rules(entry)
 
         # If we have a torrentname, use it as the title
         entry['title'] = entry.get('irc_torrentname', message)
@@ -223,14 +227,14 @@ class IRCConnection(SingleServerIRCBot):
                     'url': url,
                 })
 
-        print dict(entry)
+        log.debug('Entry after processing: %s' % dict(entry))
         return entry
 
     def process_tracker_config_rules(self, entry, rules=None):
         """
         Processes a Entry object with the linematched rules defined in a tracker config file
-        :param entry:
-        :param rules:
+        :param entry: Entry to be updated
+        :param rules: Ruleset to use.
         :return:
         """
 
@@ -241,6 +245,7 @@ class IRCConnection(SingleServerIRCBot):
             rules = self.tracker_config.find('parseinfo/linematched')
 
         for rule in rules:
+            log.debug('Processing rule %s' % rule.tag)
 
             # Var - concat a var from other vars
             if rule.tag == 'var':
@@ -283,11 +288,11 @@ class IRCConnection(SingleServerIRCBot):
                 if match:
                     entry.update(dict(zip(group_names, match.groups())))
 
-            # Extract Tag - split a var and match against a regex
+            # Extract Tag - set a var if a regex matches a tag in a var
             elif rule.tag == 'extracttags':
                 source_var = prefix_var(rule.get('srcvar'))
                 split = rule.get('split')
-                values = [x.strip() for x in source_var.split(split)]
+                values = [x.strip() for x in entry[source_var].split(split)]
                 for element in rule:
                     if element.tag == 'setvarif':
                         target_var = prefix_var(element.get('varName'))
@@ -295,7 +300,7 @@ class IRCConnection(SingleServerIRCBot):
                         for val in values:
                             match = re.match(regex, val)
                             if match:
-                                entry[target_var] = match.group(0)
+                                entry[target_var] = val
 
             # Set Regex - set a var if a regex matches
             elif rule.tag == 'setregex':
@@ -338,6 +343,20 @@ class IRCConnection(SingleServerIRCBot):
             # Identify with NickServ
             log.info('Identifying with NickServ as %s' % self._nickname)
             self.connection.privmsg('NickServ', 'IDENTIFY %s %s' % (self._nickname, nickserv_password))
+        if self.config.get('invite_nickname'):
+            self.connection.execute_delayed(5, self.request_channel_invite)
+        else:
+            self.connection.execute_delayed(5, self.join_channels)
+
+    def request_channel_invite(self):
+        """
+        Requests an invite from the configured invite user.
+        :return:
+        """
+        invite_nickname = self.config.get('invite_nickname')
+        invite_message = self.config.get('invite_message')
+        log.info('Requesting an invite to channels from %s' % invite_nickname)
+        self.connection.privmsg(invite_nickname, invite_message)
         self.connection.execute_delayed(5, self.join_channels)
 
     def join_channels(self):
@@ -366,8 +385,8 @@ class IRCConnection(SingleServerIRCBot):
     def process_message(self, nickname, channel):
         """
         Pops lines from the line cache and passes them to be parsed
-        :param nickname: Nickname
-        :param channel: Channel name
+        :param nickname: Nickname of who sent hte message
+        :param channel: Channel where the message originated from
         :return: None
         """
         lines = u'\n'.join(self.line_cache[channel][nickname])
