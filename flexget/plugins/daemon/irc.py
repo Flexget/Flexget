@@ -4,8 +4,9 @@ import re
 import threading
 import logging
 from random import choice
-from xml.etree import ElementTree as ET
+from xml.etree.ElementTree import fromstring
 import urllib
+from uuid import uuid4
 
 from irc.bot import SingleServerIRCBot
 
@@ -28,7 +29,7 @@ schema = {
                     'nick': {'type': 'string', 'default': 'Flexget'},
                     'channels': {
                         'oneOf': [
-                            {'type': 'list',
+                            {'type': 'array',
                              'items': {'type': 'string', 'format': 'irc_channel'},
                              },
                             {'type': 'string', 'format': 'irc_channel'},
@@ -60,7 +61,7 @@ def is_irc_channel(instance):
 
 class IRCConnection(SingleServerIRCBot):
     MESSAGE_CLEAN = re.compile("\x0f|\x1f|\x02|\x03(?:[\d]{1,2}(?:,[\d]{1,2})?)?", re.MULTILINE | re.UNICODE)
-    URL_MATCHER = re.compile(r'(https?:\/\/[\da-z\.-]+\.[a-z\.]{2,6}[\/\w\.-\?&]*\/?)', re.MULTILINE | re.UNICODE)
+    URL_MATCHER = re.compile(r'(https?://[\da-z\.-]+\.[a-z\.]{2,6}[/\w\.-\?&]*/?)', re.MULTILINE | re.UNICODE)
 
     def __init__(self, config, config_name):
         self.config = config
@@ -80,7 +81,7 @@ class IRCConnection(SingleServerIRCBot):
             else:
                 with open(tracker_config_file, 'r') as f:
                     try:
-                        tracker_config = ET.fromstring(f.read())
+                        tracker_config = fromstring(f.read())
                     except Exception, e:
                         log.error('Unable to parse tracker config file %s: %s' % (tracker_config_file, e))
                     else:
@@ -104,11 +105,11 @@ class IRCConnection(SingleServerIRCBot):
 
             # Parse line patterns
             patterns = list(self.tracker_config.findall('parseinfo/multilinepatterns/extract')) + \
-                       list(self.tracker_config.findall('parseinfo/linepatterns/extract'))
+                list(self.tracker_config.findall('parseinfo/linepatterns/extract'))
             for pattern in patterns:
                 rx = re.compile(pattern.find('regex').get('value'), re.UNICODE | re.MULTILINE)
-                vars = [var.get('name') for idx, var in enumerate(pattern.find('vars'))]
-                self.message_regex.append((rx, vars))
+                vals = [var.get('name') for idx, var in enumerate(pattern.find('vars'))]
+                self.message_regex.append((rx, vals))
 
         if not self.server_list or not self.channel_list:
             if self.tracker_config is not None:
@@ -123,12 +124,12 @@ class IRCConnection(SingleServerIRCBot):
         log.debug('Channels: %s' % self.channel_list)
         log.debug('Announcers: %s' % self.announcer_list)
         log.debug('Ignore Lines: %d' % len(self.ignore_lines))
-        log.debug('Message Regexps: %d' % len(self.message_regex))
+        log.debug('Message Regexs: %d' % len(self.message_regex))
 
         # Init the IRC Bot
         server = choice(self.server_list)
         port = config.get('port', 6667)
-        nickname = config.get('nickname', 'Flexget')
+        nickname = config.get('nickname', 'Flexget-%s' % str(uuid4()))
         SingleServerIRCBot.__init__(self, [(server, port)], nickname, nickname)
         self.stop_bot = False
 
@@ -136,7 +137,11 @@ class IRCConnection(SingleServerIRCBot):
         self.line_cache = {}
 
     def start_interruptable(self, timeout=0.2):
-        """Start the IRC connection in a interruptable state"""
+        """
+        Start the IRC bot
+        :param timeout: Maximum wait time between process cycles
+        :return:
+        """
         self._connect()
         while not self.stop_bot:
             self.reactor.process_once(timeout)
@@ -197,12 +202,12 @@ class IRCConnection(SingleServerIRCBot):
             if match:
                 val_names = ['irc_%s' % val.lower() for val in vals]
 
-                def clean_vals(x):
-                    if isinstance(x, basestring):
-                        return x.strip()
-                    return x
+                def clean_value(value):
+                    if isinstance(value, basestring):
+                        return value.strip()
+                    return value
 
-                val_values = [clean_vals(x) for x in match.groups()]
+                val_values = [clean_value(x) for x in match.groups()]
                 entry.update(dict(zip(val_names, val_values)))
 
         # Generate the entry and process it through the linematched rules
@@ -239,6 +244,11 @@ class IRCConnection(SingleServerIRCBot):
         """
 
         def prefix_var(var):
+            """
+            Prefix a variable name with the irc_ prefix
+            :param var: Variable name to prefix
+            :return: prefixed varible name
+            """
             return 'irc_%s' % var.lower()
 
         if rules is None:
@@ -323,7 +333,7 @@ class IRCConnection(SingleServerIRCBot):
 
         return entry
 
-    def on_welcome(self, conn, event):
+    def on_welcome(self, conn, irc_event):
         log.info('IRC connected to %s' % self.connection_name)
         self.connection.execute_delayed(1, self.identify_with_nickserv)
 
@@ -370,14 +380,14 @@ class IRCConnection(SingleServerIRCBot):
                 log.info('Joining channel %s' % channel)
                 self.connection.join(channel)
 
-    def on_pubmsg(self, conn, event):
-        nickname = event.source.split('!')[0]
-        channel = event.target
+    def on_pubmsg(self, conn, irc_event):
+        nickname = irc_event.source.split('!')[0]
+        channel = irc_event.target
         if channel not in self.line_cache:
             self.line_cache[channel] = {}
         if nickname not in self.line_cache[channel]:
             self.line_cache[channel][nickname] = []
-        self.line_cache[channel][nickname].append(event.arguments[0])
+        self.line_cache[channel][nickname].append(irc_event.arguments[0])
         if len(self.line_cache[channel][nickname]) == 1:
             # Schedule a parse of the message in 1 second (for multilines)
             conn.execute_delayed(1, self.process_message, (nickname, channel))
