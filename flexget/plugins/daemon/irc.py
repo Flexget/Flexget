@@ -4,9 +4,10 @@ import re
 import threading
 import logging
 from random import choice
+from xml.etree import ElementTree as ET
+import urllib
 
 from irc.bot import SingleServerIRCBot
-import xmltodict
 
 from flexget.entry import Entry
 from flexget.config_schema import register_config_key, format_checker
@@ -36,11 +37,9 @@ schema = {
                     'nickserv_password': {'type': 'string'},
                     'task': {'type': 'string'},
                     'queue_entries': {'type': 'integer', 'default': 1},
-                    'multi_lines': {'type': 'integer', 'default': 1},
-                    'title_regexp': {'type': 'string'},
                 },
                 'required': ['task', 'server'],
-                'additionalProperties': False,
+                'additionalProperties': {'type': 'string'},
             }
         },
         {'type': 'boolean', 'enum': [False]},
@@ -58,64 +57,72 @@ def is_irc_channel(instance):
 
 
 class IRCConnection(SingleServerIRCBot):
+    MESSAGE_CLEAN = re.compile("\x0f|\x1f|\x02|\x03(?:[\d]{1,2}(?:,[\d]{1,2})?)?", re.MULTILINE | re.UNICODE)
+    URL_MATCHER = re.compile(r'(https?:\/\/[\da-z\.-]+\.[a-z\.]{2,6}[\/\w\.-\?&]*\/?)', re.MULTILINE | re.UNICODE)
+
     def __init__(self, config, config_name):
         self.config = config
         self.connection_name = config_name
+        self.server_list = []
+        self.channel_list = []
+        self.announcer_list = []
+        self.ignore_lines = []
+        self.message_regex = []
 
         # If we have a tracker config file, load it
-        tracker_config = {}
         tracker_config_file = config.get('tracker_file')
-        if tracker_config_file:
+        if tracker_config_file is not None:
             tracker_config_file = os.path.abspath(os.path.expanduser(tracker_config_file))
             if not os.path.exists(tracker_config_file):
                 log.error('Unable to open tracker config file %s, ignoring' % tracker_config_file)
             else:
                 with open(tracker_config_file, 'r') as f:
-                    tracker_config = xmltodict.parse(f.read())
-        self.tracker_config = tracker_config
+                    try:
+                        tracker_config = ET.fromstring(f.read())
+                    except Exception, e:
+                        log.error('Unable to parse tracker config file %s: %s' % (tracker_config_file, e))
+                    else:
+                        self.tracker_config = tracker_config
 
-        if 'trackerinfo' in self.tracker_config:
-            tracker_info = self.tracker_config['trackerinfo']
+        if self.tracker_config is not None:
+
             # Get the tracker name, for use in the connection name
-            if 'longName' in tracker_info:
-                self.connection_name = tracker_info['longName']
-            
-            # Read the server information
-            if 'servers' in tracker_info:
-                server_list = []
-                channel_list = []
-                announcer_list = []
-                for server in tracker_info['servers']:
-                    server_list.extend(server['serverNames'].split('|'))
-                    channel_list.extend(server['channelNames'].split('|'))
-                    announcer_list.extend(server['announcerNames'].split('|'))
-                self.server_list = server_list
-                self.channel_list = channel_list
-                self.announcer_list = announcer_list
-            else:
-                self.server_list = [config.get('server')]
-                channels = config.get('channels')
-                if isinstance(channels, basestring):
-                    channels = [channels]
-                self.channel_list = channels
-                self.announcer_list = []
-                
-            # Load in ignore lines information
-            if 'parseinfo' in tracker_info and 'ignore' in tracker_info['parseinfo']:
-                ignore_lines = []
-                for regex_value in tracker_info['parseinfo']['ignore']:
-                    rx = re.compile(regex_value['value'])
-                    ignore_lines.append(rx)
-                self.ignore_lines = ignore_lines
-        else:
+            self.connection_name = self.tracker_config.get('longName', config_name)
+
+            # Extract the IRC server information
+            for server in self.tracker_config.find('servers'):
+                self.server_list.extend(server.get('serverNames').split('|'))
+                self.channel_list.extend(server.get('channelNames').split('|'))
+                self.announcer_list.extend(server.get('announcerNames').split('|'))
+
+            # Process ignore lines
+            for regex_values in self.tracker_config.findall('parseinfo/ignore/regex'):
+                rx = re.compile(regex_values.get('value'), re.UNICODE)
+                self.ignore_lines.append(rx)
+
+            # Parse line patterns
+            patterns = list(self.tracker_config.findall('parseinfo/multilinepatterns/extract')) + \
+                       list(self.tracker_config.findall('parseinfo/linepatterns/extract'))
+            for pattern in patterns:
+                rx = re.compile(pattern.find('regex').get('value'), re.UNICODE | re.MULTILINE)
+                vars = [var.get('name') for idx, var in enumerate(pattern.find('vars'))]
+                self.message_regex.append((rx, vars))
+
+        if not self.server_list or not self.channel_list:
+            if self.tracker_config is not None:
+                log.warning('No server or channel provided by tracker file, falling back to Flexget config options')
             self.server_list = [config.get('server')]
             channels = config.get('channels')
-            if isinstance(channels, basestring):
+            if not isinstance(channels, basestring):
                 channels = [channels]
             self.channel_list = channels
-            self.announcer_list = []
-            self.ignore_lines = []
-            
+
+        log.debug('Servers: %s' % self.server_list)
+        log.debug('Channels: %s' % self.channel_list)
+        log.debug('Announcers: %s' % self.announcer_list)
+        log.debug('Ignore Lines: %d' % len(self.ignore_lines))
+        log.debug('Message Regexps: %d' % len(self.message_regex))
+
         # Init the IRC Bot
         server = choice(self.server_list)
         port = config.get('port', 6667)
@@ -124,7 +131,7 @@ class IRCConnection(SingleServerIRCBot):
         self.stop_bot = False
 
         self.entry_queue = []
-        self.line_cache = []
+        self.line_cache = {}
 
     def start_interruptable(self, timeout=0.2):
         """Start the IRC connection in a interruptable state"""
@@ -135,7 +142,9 @@ class IRCConnection(SingleServerIRCBot):
 
     def run_tasks(self, entries):
         """
-        Passes entries to the target task
+        Passes entries to the target task configured for this connection
+        :param entries:
+        :return:
         """
         from flexget.manager import manager
 
@@ -145,6 +154,8 @@ class IRCConnection(SingleServerIRCBot):
     def queue_entry(self, entry):
         """
         Stores an entry in the connection entry queue, if the queue is over the size limit then submit them to the task
+        :param entry: Entry
+        :return:
         """
         self.entry_queue.append(entry)
         log.debug('Entry: %s', entry)
@@ -154,68 +165,120 @@ class IRCConnection(SingleServerIRCBot):
 
     def parse_message(self, nickname, channel, message):
         """
-        Parse the IRC message using either a tracker config or basic regexp
+        Parses a public message and generates an entry if needed
+        :param nickname: Nickname
+        :param channel: Channel
+        :param message: Message text
+        :return:
         """
         # If we have announcers defined, ignore any messages not from them
         if len(self.announcer_list) and nickname not in self.announcer_list:
+            log.debug('Ignoring message: from non-announcer %s' % nickname)
             return
-        
+
         # If its listed in ignore lines, skip it
         for rx in self.ignore_lines:
             if rx.match(message):
-                return 
-        
+                log.debug('Ignoring message: matched ignore line')
+                return
+
+        # Clean up the message
+        message = self.MESSAGE_CLEAN.sub('', message)
+
+        # Run the config regex patterns over the message
+        rx_vals = {}
+        for rx, vals in self.message_regex:
+            match = rx.search(message)
+            if match:
+                rx_vals.update(dict(zip(vals, match.groups())))
+
+        # Prefix all regex values with 'irc_'
+        entry_args = {}
+        for key in rx_vals.keys():
+            if rx_vals[key] is not None:
+                entry_args['irc_%s' % key.lower()] = rx_vals[key].strip()
+
         # find a url...
-        url_match = re.findall(r'(https?:\/\/[\da-z\.-]+\.[a-z\.]{2,6}[\/\w \.-\?&]*\/?)', message, re.MULTILINE)
+        url_match = self.URL_MATCHER.findall(message)
         if url_match:
             # We have a URL(s)!, generate an entry
             urls = list(url_match)
-            url = urls[0]
+            url = urls[-1]
+            entry_args.update({
+                'urls': urls,
+                'url': url,
+            })
 
-            # If we have a regexp for the title, attempt to match
-            title_regexp = self.config.get('title_regexp')
-            if title_regexp:
-                title_match = re.search(title_regexp, message)
-                if title_match:
-                    title = title_match.group(0)
-                else:
-                    title = message
-            else:
-                title = message
+        # If we have a torrentname, use it as the title
+        if 'irc_torrentname' in entry_args:
+            entry_args['title'] = entry_args['irc_torrentname']
+        else:
+            entry_args['title'] = message
 
-            # Return the entry object
-            return Entry(title=title, url=url, urls=urls)
+        log.debug('Entry arguments: %s' % entry_args)
+
+        # Return the entry object
+        entry = Entry(**entry_args)
+        return entry
 
     def on_welcome(self, conn, event):
         log.info('IRC connected to %s' % self.connection_name)
+        self.connection.execute_delayed(1, self.identify_with_nickserv)
 
+    def identify_with_nickserv(self):
+        """
+        Identifies the connection with Nickserv, ghosting to recover the nickname if required
+        :return:
+        """
         nickserv_password = self.config.get('nickserv_password')
         if nickserv_password:
             # If we've not got our peferred nickname and NickServ is configured, ghost the connection
-            if conn.get_nickname() != self._nickname:
+            if self.connection.get_nickname() != self._nickname:
                 log.info('Ghosting old connection')
-                conn.privmsg('NickServ', 'GHOST %s %s' % (self._nickname, nickserv_password))
-                conn.nick(self._nickname)
-        
+                self.connection.privmsg('NickServ', 'GHOST %s %s' % (self._nickname, nickserv_password))
+                self.connection.nick(self._nickname)
+
             # Identify with NickServ
             log.info('Identifying with NickServ as %s' % self._nickname)
-            conn.privmsg('NickServ', 'IDENTIFY %s %s' % (self._nickname, nickserv_password))
+            self.connection.privmsg('NickServ', 'IDENTIFY %s %s' % (self._nickname, nickserv_password))
+        self.connection.execute_delayed(5, self.join_channels)
 
-        # Join Channels
+    def join_channels(self):
+        """
+        Joins any channels configured if not already in them
+        :return:
+        """
+        # Queue to join channels, we want to wait for NickServ to work before joining
         for channel in self.channel_list:
-            # If the channel name doesn't start with a normal prefix, add hash
-            log.info('Joining channel %s' % channel)
-            conn.join(channel)
+            if channel not in self.channels:
+                log.info('Joining channel %s' % channel)
+                self.connection.join(channel)
 
     def on_pubmsg(self, conn, event):
-        # Cache upto multi_lines value then pass them all for parsing
-        multilines = self.config.get('multi_lines', 1)
-        self.line_cache.append(event.arguments[0])
-        if len(self.line_cache) >= multilines:
-            entry = self.parse_message(event.source, event.target, ' '.join(self.line_cache))
-            self.line_cache = []
-            if entry:
-                self.queue_entry(entry)
+        nickname = event.source.split('!')[0]
+        channel = event.target
+        if channel not in self.line_cache:
+            self.line_cache[channel] = {}
+        if nickname not in self.line_cache[channel]:
+            self.line_cache[channel][nickname] = []
+        self.line_cache[channel][nickname].append(event.arguments[0])
+        if len(self.line_cache[channel][nickname]) == 1:
+            # Schedule a parse of the message in 1 second (for multilines)
+            conn.execute_delayed(1, self.process_message, (nickname, channel))
+
+    def process_message(self, nickname, channel):
+        """
+        Pops lines from the line cache and passes them to be parsed
+        :param nickname: Nickname
+        :param channel: Channel name
+        :return: None
+        """
+        lines = u'\n'.join(self.line_cache[channel][nickname])
+        self.line_cache[channel][nickname] = []
+        entry = self.parse_message(nickname, channel, lines.encode('utf-8'))
+        if entry:
+            self.queue_entry(entry)
+
 
 @event('manager.daemon.started')
 def irc_start(manager):
