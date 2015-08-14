@@ -68,7 +68,8 @@ setup(
         'memusage': ['guppy'],
         'NZB': ['pynzb'],
         'TaskTray': ['pywin32'],
-        'webui': ['flask>=0.7', 'cherrypy']
+        'webui': ['flask>=0.7', 'cherrypy'],
+        'irc': ['irc'],
     },
     entry_points=entry_points,
     classifiers=[
