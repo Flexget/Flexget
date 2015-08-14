@@ -63,6 +63,7 @@ class UoccinEmit(object):
         
         The entries created will have a valid imdb/tvdb url and id.
         """
+        imdb_lookup = plugin.get_plugin_by_name('imdb_lookup').instance
         udata = load_uoccin_data(config['path'])
         section = udata['movies'] if config['type'] == 'movies' else udata['series']
         entries = []
@@ -81,7 +82,15 @@ class UoccinEmit(object):
             if config['type'] == 'movies':
                 entry['url'] = 'http://www.imdb.com/title/' + eid
                 entry['imdb_id'] = eid
-                entry['title'] = itm['name']  # TODO: lookup by imdb_id
+                if itm['name'] != 'N/A':
+                    entry['title'] = itm['name']
+                else:
+                    try:
+                        imdb_lookup.lookup(entry)
+                    except plugin.PluginError as e:
+                        self.log.trace('entry %s imdb failed (%s)' % (entry['imdb_id'], e.value))
+                        continue
+                    entry['title'] = entry.get('imdb_name')
             else:
                 entry['url'] = 'http://thetvdb.com/?tab=series&id=' + eid
                 entry['tvdb_id'] = eid
