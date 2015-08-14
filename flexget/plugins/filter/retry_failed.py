@@ -128,7 +128,8 @@ class PluginFailed(object):
 
     def add_failed(self, entry, reason=None, config=None, **kwargs):
         """Adds entry to internal failed list, displayed with --failed"""
-        reason = reason or 'Unknown'
+        # Make sure reason is a string, in case it is set to an exception instance
+        reason = unicode(reason) or 'Unknown'
         with Session() as session:
             # query item's existence
             item = session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
@@ -203,6 +204,7 @@ def clear_failed(manager):
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginFailed, 'retry_failed', builtin=True, api_ver=2)
+
 
 @event('options.register')
 def register_parser_arguments():

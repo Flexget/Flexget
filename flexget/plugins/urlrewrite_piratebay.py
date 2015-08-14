@@ -27,6 +27,7 @@ CATEGORIES = {
     'movies': 201,
     'tv': 205,
     'highres movies': 207,
+    'highres tv': 208,
     'comics': 602
 }
 
@@ -71,7 +72,7 @@ class UrlRewritePirateBay(object):
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        if not 'url' in entry:
+        if 'url' not in entry:
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
@@ -88,7 +89,7 @@ class UrlRewritePirateBay(object):
 
     @plugin.internet(log)
     def parse_download_page(self, url):
-        page = requests.get(url,verify=False).content
+        page = requests.get(url).content
         try:
             soup = get_soup(page)
             tag_div = soup.find('div', attrs={'class': 'download'})
@@ -127,7 +128,7 @@ class UrlRewritePirateBay(object):
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
             url = 'http://thepiratebay.%s/search/%s%s' % (CUR_TLD, urllib.quote(query.encode('utf-8')), filter_url)
             log.debug('Using %s as piratebay search url' % url)
-            page = requests.get(url,verify=False).content
+            page = requests.get(url).content
             soup = get_soup(page)
             for link in soup.find_all('a', attrs={'class': 'detLink'}):
                 entry = Entry()

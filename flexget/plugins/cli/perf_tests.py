@@ -52,8 +52,8 @@ def imdb_query(session):
     for index, url in enumerate(imdb_urls):
         bar.update(index)
 
-        #movie = session.query(Movie).filter(Movie.url == url).first()
-        #movie = session.query(Movie).options(subqueryload(Movie.genres)).filter(Movie.url == url).one()
+        # movie = session.query(Movie).filter(Movie.url == url).first()
+        # movie = session.query(Movie).options(subqueryload(Movie.genres)).filter(Movie.url == url).one()
 
         movie = session.query(Movie).\
             options(joinedload_all(Movie.genres, Movie.languages,

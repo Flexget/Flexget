@@ -62,6 +62,24 @@ class BaseAssumeQuality(FlexGetBase):
             series:
             - my show:
                 quality: 720p hdtv
+
+          test_with_series_target:
+            template: no_global
+            mock:
+            - title: my show S01E01 hdtv
+            assume_quality: 720p
+            series:
+            - my show:
+                target: 720p hdtv
+
+          test_with_series_qualities:
+            template: no_global
+            mock:
+            - title: my show S01E01 hdtv
+            assume_quality: 720p
+            series:
+            - my show:
+                qualities: [720p hdtv]
     """
 
     def test_matching(self):
@@ -109,6 +127,14 @@ class BaseAssumeQuality(FlexGetBase):
 
     def test_with_series(self):
         self.execute_task('test_with_series')
+        assert self.task.accepted, 'series plugin should have used assumed quality'
+
+    def test_with_series_target(self):
+        self.execute_task('test_with_series_target')
+        assert self.task.accepted, 'series plugin should have used assumed quality'
+
+    def test_with_series_qualities(self):
+        self.execute_task('test_with_series_qualities')
         assert self.task.accepted, 'series plugin should have used assumed quality'
 
 

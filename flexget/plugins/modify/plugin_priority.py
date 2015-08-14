@@ -52,6 +52,7 @@ class PluginPriority(object):
 
     on_task_abort = on_task_exit
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginPriority, 'plugin_priority', api_ver=2)

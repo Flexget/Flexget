@@ -102,7 +102,8 @@ class OutputPushover(object):
 
             for userkey in userkeys:
                 # Build the request
-                data = {"user": userkey, "token": apikey, "title": title, "message": message, "url": url, "url_title": urltitle}
+                data = {"user": userkey, "token": apikey, "title": title,
+                        "message": message, "url": url, "url_title": urltitle}
                 if device:
                     data["device"] = device
                 if priority:
@@ -140,7 +141,7 @@ class OutputPushover(object):
                     log.debug("Pushover notification sent")
                 elif request_status == 500:
                     log.debug("Pushover notification failed, Pushover API having issues")
-                    #TODO: Implement retrying. API requests 5 seconds between retries.
+                    # TODO: Implement retrying. API requests 5 seconds between retries.
                 elif request_status >= 400:
                     errors = json.loads(response.content)['errors']
                     log.error("Pushover API error: %s" % errors[0])

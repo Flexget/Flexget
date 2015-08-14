@@ -29,6 +29,7 @@ class ModifyExtension(object):
             entry['filename'] = '%s.%s' % (entry.get('filename', entry['title']), ext)
             log.debug('filename is now `%s`' % entry['filename'])
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(ModifyExtension, 'extension', api_ver=2)

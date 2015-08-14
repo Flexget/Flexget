@@ -19,7 +19,8 @@ class PluginDetails(object):
             if task.no_entries_ok:
                 log.verbose('Task didn\'t produce any entries.')
             else:
-                log.warning('Task didn\'t produce any entries. This is likely due to a mis-configured or non-functional input.')
+                log.warning('Task didn\'t produce any entries.\
+ This is likely due to a mis-configured or non-functional input.')
         else:
             log.verbose('Produced %s entries.' % (len(task.entries)))
 
@@ -40,6 +41,7 @@ class NoEntriesOk(object):
     @plugin.priority(127)
     def on_task_start(self, task, config):
         task.no_entries_ok = config
+
 
 @event('plugin.register')
 def register_plugin():

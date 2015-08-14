@@ -34,6 +34,7 @@ class FilterQuality(object):
             if not any(req.allows(entry['quality']) for req in reqs):
                 entry.reject('%s does not match quality requirement %s' % (entry['quality'], reqs))
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterQuality, 'quality', api_ver=2)

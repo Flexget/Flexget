@@ -84,7 +84,6 @@ class InputFind(object):
                                 (item.name, item.dirname(), sys.getfilesystemencoding()))
                     continue
 
-
                 e['title'] = item.namebase
                 # If mask fails continue
                 if not match(item.name):
@@ -100,6 +99,7 @@ class InputFind(object):
                 e['url'] = 'file://%s' % item
                 entries.append(e)
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

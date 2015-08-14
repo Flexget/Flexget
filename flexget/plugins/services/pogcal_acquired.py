@@ -96,6 +96,7 @@ class PogcalAcquired(object):
         else:
             log.verbose('Could not find pogdesign calendar id for show `%s`' % show_re)
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(PogcalAcquired, 'pogcal_acquired', api_ver=2)

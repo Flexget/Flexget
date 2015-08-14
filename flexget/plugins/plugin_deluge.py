@@ -19,7 +19,7 @@ log = logging.getLogger('deluge')
 
 
 def add_deluge_windows_install_dir_to_sys_path():
-# Deluge does not install to python system on Windows, add the install directory to sys.path if it is found
+    # Deluge does not install to python system on Windows, add the install directory to sys.path if it is found
     if not (sys.platform.startswith('win') or os.environ.get('ProgramFiles')):
         return
     deluge_dir = os.path.join(os.environ['ProgramFiles'], 'Deluge')
@@ -344,6 +344,7 @@ class OutputDeluge(DelugePlugin):
                     'content_filename': {'type': 'string'},
                     'main_file_only': {'type': 'boolean'},
                     'main_file_ratio': {'type': 'number'},
+                    'magnetization_timeout' : {'type': 'integer'},
                     'keep_subs': {'type': 'boolean'},
                     'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
@@ -362,6 +363,7 @@ class OutputDeluge(DelugePlugin):
         config.setdefault('movedone', '')
         config.setdefault('label', '')
         config.setdefault('main_file_ratio', 0.90)
+        config.setdefault('magnetization_timeout', 0)
         config.setdefault('keep_subs', True)  # does nothing without 'content_filename' or 'main_file_only' enabled
         config.setdefault('hide_sparse_files', False)  # does nothing without 'main_file_only' enabled
         return config
@@ -406,7 +408,7 @@ class OutputDeluge(DelugePlugin):
         if not config['enabled']:
             return
         # If the download plugin is not enabled, we need to call it to get our temp .torrent files
-        if not 'download' in task.config:
+        if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
             for entry in task.accepted:
                 if not entry.get('deluge_id'):
@@ -435,7 +437,7 @@ class OutputDeluge(DelugePlugin):
         add_to_deluge = self.connect if self.deluge12 else self.add_to_deluge11
         add_to_deluge(task, config)
         # Clean up temp file if download plugin is not configured for this task
-        if not 'download' in task.config:
+        if 'download' not in task.config:
             for entry in task.accepted + task.failed:
                 if os.path.exists(entry.get('file', '')):
                     os.remove(entry['file'])
@@ -472,7 +474,7 @@ class OutputDeluge(DelugePlugin):
                         opts['stop_at_ratio'] = True
 
             # check that file is downloaded
-            if not 'file' in entry:
+            if 'file' not in entry:
                 entry.fail('file missing?')
                 continue
 
@@ -496,7 +498,7 @@ class OutputDeluge(DelugePlugin):
             after = sclient.get_session_state()
             for item in after:
                 # find torrentid of just added torrent
-                if not item in before:
+                if item not in before:
                     try:
                         movedone = entry.render(movedone)
                     except RenderError as e:
@@ -511,9 +513,9 @@ class OutputDeluge(DelugePlugin):
                         sclient.set_torrent_move_on_completed(item, True)
                         sclient.set_torrent_move_on_completed_path(item, movedone)
                     if label:
-                        if not 'label' in sclient.get_enabled_plugins():
+                        if 'label' not in sclient.get_enabled_plugins():
                             sclient.enable_plugin('label')
-                        if not label in sclient.label_get_labels():
+                        if label not in sclient.label_get_labels():
                             sclient.label_add(label)
                         log.debug('%s label set to \'%s\'' % (entry['title'], label))
                         sclient.label_set_torrent(item, label)
@@ -703,7 +705,9 @@ class OutputDeluge(DelugePlugin):
                                                for f in sparse_files]
                                 main_file_dlist.append(client.core.rename_files(torrent_id, rename_pairs))
                     else:
-                        log.warning('No files in "%s" are > %d%% of content size, no files renamed.' % (entry['title'], opts.get('main_file_ratio') * 100))
+                        log.warning('No files in "%s" are > %d%% of content size, no files renamed.' % (
+                            entry['title'],
+                            opts.get('main_file_ratio') * 100))
 
                 return defer.DeferredList(main_file_dlist)
 
@@ -738,7 +742,7 @@ class OutputDeluge(DelugePlugin):
                         """Gets available labels from deluge, and adds any new labels we need."""
                         dlist = []
                         for label in labels:
-                            if not label in d_labels:
+                            if label not in d_labels:
                                 log.debug('Adding the label %s to deluge' % label)
                                 dlist.append(client.label.add(label))
                         return defer.DeferredList(dlist)
@@ -778,6 +782,25 @@ class OutputDeluge(DelugePlugin):
             # add the torrents
             for entry in task.accepted:
 
+                @defer.inlineCallbacks
+                def _wait_for_metadata(torrent_id, timeout):
+                    log.verbose('Waiting %d seconds for "%s" to magnetize' % (timeout, entry['title']))
+                    for i in xrange(timeout):
+                        time.sleep(1)
+                        try:
+                            status = yield client.core.get_torrent_status(torrent_id, ['files'])
+                        except Exception as err:
+                            log.error('wait_for_metadata Error: %s' % err)
+                            break
+                        if len(status['files']) > 0:
+                            log.info('"%s" magnetization successful' % (entry['title']))
+                            break
+                    else:
+                        log.warning('"%s" did not magnetize before the timeout elapsed, '
+                                    'file list unavailable for processing.' % entry['title'])
+
+                    defer.returnValue(torrent_id)
+
                 def add_entry(entry, opts):
                     """Adds an entry to the deluge session"""
                     magnet, filedump = None, None
@@ -793,7 +816,10 @@ class OutputDeluge(DelugePlugin):
 
                     log.verbose('Adding %s to deluge.' % entry['title'])
                     if magnet:
-                        return client.core.add_torrent_magnet(magnet, opts)
+                        d = client.core.add_torrent_magnet(magnet, opts)
+                        if config.get('magnetization_timeout'):
+                            d.addCallback(_wait_for_metadata, config['magnetization_timeout'])
+                        return d
                     else:
                         return client.core.add_torrent_file(entry['title'], filedump, opts)
 
@@ -812,12 +838,13 @@ class OutputDeluge(DelugePlugin):
                         if fopt == 'ratio':
                             add_opts['stop_at_ratio'] = True
                 # Make another set of options, that get set after the torrent has been added
-                modify_opts = {'label': format_label(entry.get('label', config['label'])),
-                               'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
-                               'main_file_only': entry.get('main_file_only', config.get('main_file_only', False)),
-                               'main_file_ratio': entry.get('main_file_ratio', config.get('main_file_ratio')),
-                               'hide_sparse_files': entry.get('hide_sparse_files', config.get('hide_sparse_files', True)),
-                               'keep_subs': entry.get('keep_subs', config.get('keep_subs', True))
+                modify_opts = {
+                    'label': format_label(entry.get('label', config['label'])),
+                    'queuetotop': entry.get('queuetotop', config.get('queuetotop')),
+                    'main_file_only': entry.get('main_file_only', config.get('main_file_only', False)),
+                    'main_file_ratio': entry.get('main_file_ratio', config.get('main_file_ratio')),
+                    'hide_sparse_files': entry.get('hide_sparse_files', config.get('hide_sparse_files', True)),
+                    'keep_subs': entry.get('keep_subs', config.get('keep_subs', True))
                 }
                 try:
                     movedone = entry.render(entry.get('movedone', config['movedone']))
@@ -864,7 +891,7 @@ class OutputDeluge(DelugePlugin):
     def on_task_exit(self, task, config):
         """Make sure all temp files are cleaned up when task exits"""
         # If download plugin is enabled, it will handle cleanup.
-        if not 'download' in task.config:
+        if 'download' not in task.config:
             download = plugin.get_plugin_by_name('download')
             download.instance.cleanup_temp_files(task)
 

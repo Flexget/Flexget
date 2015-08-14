@@ -181,13 +181,13 @@ class Archive(object):
             if ae:
                 # add (missing) sources
                 source = get_source(task.name, task.session)
-                if not source in ae.sources:
+                if source not in ae.sources:
                     log.debug('Adding `%s` into `%s` sources' % (task.name, ae))
                     ae.sources.append(source)
                 # add (missing) tags
                 for tag_name in tag_names:
                     atag = get_tag(tag_name, task.session)
-                    if not atag in ae.tags:
+                    if atag not in ae.tags:
                         log.debug('Adding tag %s into %s' % (tag_name, ae))
                         ae.tags.append(atag)
             else:
@@ -238,6 +238,8 @@ class UrlrewriteArchive(object):
         entries = set()
         try:
             for query in entry.get('search_strings', [entry['title']]):
+                # clean some characters out of the string for better results
+                query = re.sub(r'[ \(\)]+', ' ', query).strip()
                 log.debug('looking for `%s` config: %s' % (query, config))
                 for archive_entry in search(session, query, desc=True):
                     log.debug('rewrite search result: %s' % archive_entry)
@@ -288,7 +290,7 @@ def consolidate():
             # add legacy task to the sources list
             orig.sources.append(get_source(orig.task, session))
             # remove task, deprecated .. well, let's still keep it ..
-            #orig.task = None
+            # orig.task = None
 
             for dupe in session.query(ArchiveEntry).\
                 filter(ArchiveEntry.id != orig.id).\
@@ -340,7 +342,7 @@ def tag_source(source_name, tag_names=None):
         # tag 'em
         log.verbose('Please wait while adding tags %s ...' % (', '.join(tag_names)))
         for a in session.query(ArchiveEntry).\
-            filter(ArchiveEntry.sources.any(name=source_name)).yield_per(5):
+                filter(ArchiveEntry.sources.any(name=source_name)).yield_per(5):
             a.tags.extend(tags)
     finally:
         session.commit()

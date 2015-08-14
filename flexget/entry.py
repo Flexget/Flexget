@@ -214,9 +214,9 @@ class Entry(LazyDict):
         :return: True if entry is valid. Return False if this cannot be used.
         :rtype: bool
         """
-        if not 'title' in self:
+        if 'title' not in self:
             return False
-        if not 'url' in self:
+        if 'url' not in self:
             return False
         if not isinstance(self['url'], basestring):
             return False

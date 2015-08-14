@@ -103,8 +103,8 @@ class FilterRottenTomatoes(object):
                     log.verbose(msg)
                 continue
 
-            #for key, value in entry.iteritems():
-            #    log.debug('%s = %s (type: %s)' % (key, value, type(value)))
+            # for key, value in entry.iteritems():
+            #     log.debug('%s = %s (type: %s)' % (key, value, type(value)))
 
             # Check defined conditions, TODO: rewrite into functions?
             reasons = []
@@ -123,13 +123,17 @@ class FilterRottenTomatoes(object):
             if 'min_critics_rating' in config:
                 if not entry.get('rt_critics_rating'):
                     reasons.append('min_critics_rating (no rt_critics_rating)')
-                elif self.critics_ratings.get(entry.get('rt_critics_rating').lower(), 0) < self.critics_ratings[config['min_critics_rating']]:
-                    reasons.append('min_critics_rating (%s < %s)' % (entry.get('rt_critics_rating').lower(), config['min_critics_rating']))
+                elif self.critics_ratings.get(entry.get('rt_critics_rating').lower(),
+                                              0) < self.critics_ratings[config['min_critics_rating']]:
+                    reasons.append('min_critics_rating (%s < %s)' % (entry.get('rt_critics_rating').lower(),
+                                                                     config['min_critics_rating']))
             if 'min_audience_rating' in config:
                 if not entry.get('rt_audience_rating'):
                     reasons.append('min_audience_rating (no rt_audience_rating)')
-                elif self.audience_ratings.get(entry.get('rt_audience_rating').lower(), 0) < self.audience_ratings[config['min_audience_rating']]:
-                    reasons.append('min_audience_rating (%s < %s)' % (entry.get('rt_audience_rating').lower(), config['min_audience_rating']))
+                elif self.audience_ratings.get(entry.get('rt_audience_rating').lower(),
+                                               0) < self.audience_ratings[config['min_audience_rating']]:
+                    reasons.append('min_audience_rating (%s < %s)' % (entry.get('rt_audience_rating').lower(),
+                                                                      config['min_audience_rating']))
             if 'min_year' in config:
                 if entry.get('rt_year', 0) < config['min_year']:
                     reasons.append('min_year (%s < %s)' % (entry.get('rt_year'), config['min_year']))

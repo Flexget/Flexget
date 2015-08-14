@@ -465,8 +465,8 @@ def mark_expired(session=None):
     if not last_server:
         last_server = 0
 
-    #Need to figure out what type of update file to use
-    #Default of day
+    # Need to figure out what type of update file to use
+    # Default of day
     get_update = 'day'
     last_update_days = (datetime.now() - last_local).days
 
@@ -490,7 +490,7 @@ def mark_expired(session=None):
         new_server = int(updates.attrib['time'])
 
         if new_server <= last_server:
-            #nothing changed on the server, ignoring
+            # nothing changed on the server, ignoring
             log.debug("Not checking for expired as nothing has changed on server")
             return
 

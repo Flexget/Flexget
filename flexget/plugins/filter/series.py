@@ -42,7 +42,7 @@ def upgrade(ver, session):
             Base.metadata.create_all(bind=session.bind)
         # Upgrade episode_releases table to have a proper count and seed it with appropriate numbers
         columns = table_columns('episode_releases', session)
-        if not 'proper_count' in columns:
+        if 'proper_count' not in columns:
             log.info('Upgrading episode_releases table to have proper_count column')
             table_add_column('episode_releases', 'proper_count', Integer, session)
             release_table = table_schema('episode_releases', session)
@@ -500,7 +500,8 @@ def get_latest_release(series, downloaded=True, season=None):
     elif series.identified_by == 'date':
         latest_release = releases.order_by(desc(Episode.identifier)).first()
     else:
-        latest_release = releases.order_by(desc(Episode.first_seen)).first()
+        # We have to label the order_by clause to disambiguate from Release.first_seen #3055
+        latest_release = releases.order_by(desc(Episode.first_seen.label('ep_first_seen'))).first()
 
     if not latest_release:
         log.debug('get_latest_release returning None, no downloaded episodes found for: %s', series.name)
@@ -633,7 +634,7 @@ def set_series_begin(series, ep_id):
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
-                              (ep_id, series.identified_by))
+                (ep_id, series.identified_by))
     series.identified_by = identified_by
     episode = (session.query(Episode).filter(Episode.series_id == series.id).
                filter(Episode.identified_by == series.identified_by).
@@ -959,7 +960,7 @@ class FilterSeries(FilterSeriesBase):
             for name in all_series.keys():
                 if (name.lower().startswith(series_name.lower())) and \
                    (name.lower() != series_name.lower()):
-                    if not 'exact' in series_config:
+                    if 'exact' not in series_config:
                         log.verbose('Auto enabling exact matching for series %s (reason %s)', series_name, name)
                         series_config['exact'] = True
 
@@ -1010,7 +1011,7 @@ class FilterSeries(FilterSeriesBase):
                         alts = [alts]
                     for alt in alts:
                         _add_alt_name(alt, db_series, series_name, session)
-                if not series_name in found_series:
+                if series_name not in found_series:
                     continue
                 series_entries = {}
                 for entry in found_series[series_name]:
@@ -1113,7 +1114,9 @@ class FilterSeries(FilterSeriesBase):
             reason = None
 
             # sort episodes in order of quality
-            entries.sort(key=lambda e: e['series_parser'], reverse=True)
+            entries.sort(
+                key=lambda e: (e['quality'], e['series_parser'].episodes, e['series_parser'].proper_count),
+                reverse=True)
 
             log.debug('start with episodes: %s', [e['title'] for e in entries])
 
@@ -1151,7 +1154,7 @@ class FilterSeries(FilterSeriesBase):
 
             # Remove any eps we already have from the list
             for entry in reversed(entries):  # Iterate in reverse so we can safely remove from the list while iterating
-                if entry['series_parser'].quality in downloaded_qualities:
+                if entry['quality'] in downloaded_qualities:
                     entry.reject('quality already downloaded')
                     entries.remove(entry)
             if not entries:
@@ -1162,7 +1165,7 @@ class FilterSeries(FilterSeriesBase):
                 if config.get('upgrade'):
                     # Remove all the qualities lower than what we have
                     for entry in reversed(entries):
-                        if entry['series_parser'].quality < max(downloaded_qualities):
+                        if entry['quality'] < max(downloaded_qualities):
                             entry.reject('worse quality than already downloaded.')
                             entries.remove(entry)
                 if not entries:
@@ -1198,7 +1201,7 @@ class FilterSeries(FilterSeriesBase):
                     log.debug('-' * 20 + ' episode tracking -->')
                     # Grace is number of distinct eps in the task for this series + 2
                     backfill = config.get('tracking') == 'backfill'
-                    if self.process_episode_tracking(ep, entries, grace=len(series_entries)+2, backfill=backfill):
+                    if self.process_episode_tracking(ep, entries, grace=len(series_entries) + 2, backfill=backfill):
                         continue
 
             # quality
@@ -1236,8 +1239,8 @@ class FilterSeries(FilterSeriesBase):
         # Since eps is sorted by quality then proper_count we always see the highest proper for a quality first.
         (last_qual, best_proper) = (None, 0)
         for entry in entries:
-            if entry['series_parser'].quality != last_qual:
-                last_qual, best_proper = entry['series_parser'].quality, entry['series_parser'].proper_count
+            if entry['quality'] != last_qual:
+                last_qual, best_proper = entry['quality'], entry['series_parser'].proper_count
                 best_propers.append(entry)
             if entry['series_parser'].proper_count < best_proper:
                 # nuke qualities which there is a better proper available
@@ -1269,8 +1272,8 @@ class FilterSeries(FilterSeriesBase):
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
-            if (entry['series_parser'].quality in downloaded_qualities and
-                    entry['series_parser'].proper_count > downloaded_qualities[entry['series_parser'].quality]):
+            if (entry['quality'] in downloaded_qualities and
+                    entry['series_parser'].proper_count > downloaded_qualities[entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
@@ -1289,7 +1292,7 @@ class FilterSeries(FilterSeriesBase):
                 return True
         # scan for quality
         for entry in entries:
-            if req.allows(entry['series_parser'].quality):
+            if req.allows(entry['quality']):
                 log.debug('Series accepting. %s meets quality %s', entry['title'], req)
                 entry.accept('target quality')
                 return True
@@ -1423,7 +1426,7 @@ class FilterSeries(FilterSeriesBase):
             return wanted
 
         for entry in entries:
-            quality = entry['series_parser'].quality
+            quality = entry['quality']
             log.debug('ep: %s quality: %s', entry['title'], quality)
             if not wanted(quality):
                 log.debug('%s is unwanted quality', quality)
@@ -1499,6 +1502,7 @@ class SeriesDBManager(FilterSeriesBase):
                     except ValueError as e:
                         raise plugin.PluginError(e)
 
+
 def _add_alt_name(alt, db_series, series_name, session):
     alt = unicode(alt)
     db_series_alt = session.query(AlternateNames).filter(AlternateNames.alt_name == alt).first()
@@ -1507,14 +1511,20 @@ def _add_alt_name(alt, db_series, series_name, session):
         # TODO is checking the list for duplicates faster/better than querying the DB?
         db_series_alt.alt_name = alt
     elif db_series_alt:
-        # Alternate name already exists for another series. Not good.
-        raise plugin.PluginError('Error adding alternate name for %s. %s is already associated with %s. '
-                                 'Check your config.' % (series_name, alt, db_series_alt.series.name) )
+        if not db_series_alt.series:
+            # Not sure how this can happen
+            log.debug('Found an alternate name not attached to series. Re-attatching %s to %s' % (alt, series_name))
+            db_series.alternate_names.append(db_series_alt)
+        else:
+            # Alternate name already exists for another series. Not good.
+            raise plugin.PluginError('Error adding alternate name for %s. %s is already associated with %s. '
+                                     'Check your config.' % (series_name, alt, db_series_alt.series.name))
     else:
         log.debug('adding alternate name %s for %s into db' % (alt, series_name))
         db_series_alt = AlternateNames(alt)
         db_series.alternate_names.append(db_series_alt)
         log.debug('-> added %s' % db_series_alt)
+
 
 @event('plugin.register')
 def register_plugin():
