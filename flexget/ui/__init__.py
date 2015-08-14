@@ -91,8 +91,8 @@ register_js('common-services', 'js/common/services.js', order=20)
 register_js('ui-grid', 'js/libs/ui-grid.min.js', order=20)
 register_js('tv4', 'js/libs/tv4.min.js', order=25)
 register_js('ObjectPath', 'js/libs/schema-form/ObjectPath.js', order=25)
-register_js('schema-form', 'js/libs/schema-form/schema-form.min.js', order=25)
-register_js('bootstrap-decorator', 'js/libs/schema-form/bootstrap-decorator.min.js', order=26)
+register_js('schema-form', 'js/libs/schema-form/schema-form.js', order=25)
+register_js('bootstrap-decorator', 'js/libs/schema-form/bootstrap-decorator.js', order=26)
 
 # Register core css files
 register_css('angular-material', 'css/libs/angular-material.min.css', order=1)
