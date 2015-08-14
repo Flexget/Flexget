@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import, with_statement
+import os
 import re
 import threading
 import logging
@@ -59,6 +60,7 @@ def is_irc_channel(instance):
 class IRCConnection(SingleServerIRCBot):
     def __init__(self, config, config_name):
         self.config = config
+        self.connection_name = config_name
 
         # If we have a tracker config file, load it
         tracker_config = {}
@@ -68,17 +70,15 @@ class IRCConnection(SingleServerIRCBot):
             if not os.path.exists(tracker_config_file):
                 log.error('Unable to open tracker config file %s, ignoring' % tracker_config_file)
             else:
-                with open(, 'r') as f:
+                with open(tracker_config_file, 'r') as f:
                     tracker_config = xmltodict.parse(f.read())
         self.tracker_config = tracker_config
-        
+
         if 'trackerinfo' in self.tracker_config:
             tracker_info = self.tracker_config['trackerinfo']
             # Get the tracker name, for use in the connection name
             if 'longName' in tracker_info:
                 self.connection_name = tracker_info['longName']
-            else:
-                self.connection_name = config_name
             
             # Read the server information
             if 'servers' in tracker_info:
@@ -156,7 +156,6 @@ class IRCConnection(SingleServerIRCBot):
         """
         Parse the IRC message using either a tracker config or basic regexp
         """
-
         # If we have announcers defined, ignore any messages not from them
         if len(self.announcer_list) and nickname not in self.announcer_list:
             return
@@ -170,8 +169,8 @@ class IRCConnection(SingleServerIRCBot):
         url_match = re.findall(r'(https?:\/\/[\da-z\.-]+\.[a-z\.]{2,6}[\/\w \.-\?&]*\/?)', message, re.MULTILINE)
         if url_match:
             # We have a URL(s)!, generate an entry
-           urls = list(url_match)
-           url = urls[0]
+            urls = list(url_match)
+            url = urls[0]
 
             # If we have a regexp for the title, attempt to match
             title_regexp = self.config.get('title_regexp')
@@ -192,7 +191,7 @@ class IRCConnection(SingleServerIRCBot):
 
         nickserv_password = self.config.get('nickserv_password')
         if nickserv_password:
-        # If we've not got our peferred nickname and NickServ is configured, ghost the connection
+            # If we've not got our peferred nickname and NickServ is configured, ghost the connection
             if conn.get_nickname() != self._nickname:
                 log.info('Ghosting old connection')
                 conn.privmsg('NickServ', 'GHOST %s %s' % (self._nickname, nickserv_password))
@@ -209,7 +208,6 @@ class IRCConnection(SingleServerIRCBot):
             conn.join(channel)
 
     def on_pubmsg(self, conn, event):
-   
         # Cache upto multi_lines value then pass them all for parsing
         multilines = self.config.get('multi_lines', 1)
         self.line_cache.append(event.arguments[0])
@@ -218,7 +216,6 @@ class IRCConnection(SingleServerIRCBot):
             self.line_cache = []
             if entry:
                 self.queue_entry(entry)
-
 
 @event('manager.daemon.started')
 def irc_start(manager):
