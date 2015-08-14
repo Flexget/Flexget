@@ -97,7 +97,7 @@ class IRCConnection(SingleServerIRCBot):
 
             # Process ignore lines
             for regex_values in self.tracker_config.findall('parseinfo/ignore/regex'):
-                rx = re.compile(regex_values.get('value'), re.UNICODE)
+                rx = re.compile(regex_values.get('value'), re.UNICODE | re.MULTILINE)
                 self.ignore_lines.append(rx)
 
             # Parse line patterns
@@ -185,40 +185,137 @@ class IRCConnection(SingleServerIRCBot):
         # Clean up the message
         message = self.MESSAGE_CLEAN.sub('', message)
 
+        # Create the entry
+        entry = Entry(irc_raw_message=message)
+
         # Run the config regex patterns over the message
-        rx_vals = {}
         for rx, vals in self.message_regex:
             match = rx.search(message)
             if match:
-                rx_vals.update(dict(zip(vals, match.groups())))
+                val_names = ['irc_%s' % val.lower() for val in vals]
 
-        # Prefix all regex values with 'irc_'
-        entry_args = {}
-        for key in rx_vals.keys():
-            if rx_vals[key] is not None:
-                entry_args['irc_%s' % key.lower()] = rx_vals[key].strip()
+                def clean_vals(x):
+                    if isinstance(x, basestring):
+                        return x.strip()
+                    return x
 
-        # find a url...
-        url_match = self.URL_MATCHER.findall(message)
-        if url_match:
-            # We have a URL(s)!, generate an entry
-            urls = list(url_match)
-            url = urls[-1]
-            entry_args.update({
-                'urls': urls,
-                'url': url,
-            })
+                val_values = [clean_vals(x) for x in match.groups()]
+                entry.update(dict(zip(val_names, val_values)))
+
+        # Generate the entry and process it through the linematched rules
+        entry = self.process_tracker_config_rules(entry)
 
         # If we have a torrentname, use it as the title
-        if 'irc_torrentname' in entry_args:
-            entry_args['title'] = entry_args['irc_torrentname']
+        entry['title'] = entry.get('irc_torrentname', message)
+
+        # If we have a URL, use it
+        if 'irc_torrenturl' in entry:
+            entry['url'] = entry['irc_torrenturl']
         else:
-            entry_args['title'] = message
+            # find a url...
+            url_match = self.URL_MATCHER.findall(message)
+            if url_match:
+                # We have a URL(s)!, generate an entry
+                urls = list(url_match)
+                url = urls[-1]
+                entry.update({
+                    'urls': urls,
+                    'url': url,
+                })
 
-        log.debug('Entry arguments: %s' % entry_args)
+        print dict(entry)
+        return entry
 
-        # Return the entry object
-        entry = Entry(**entry_args)
+    def process_tracker_config_rules(self, entry, rules=None):
+        """
+        Processes a Entry object with the linematched rules defined in a tracker config file
+        :param entry:
+        :param rules:
+        :return:
+        """
+
+        def prefix_var(var):
+            return 'irc_%s' % var.lower()
+
+        if rules is None:
+            rules = self.tracker_config.find('parseinfo/linematched')
+
+        for rule in rules:
+
+            # Var - concat a var from other vars
+            if rule.tag == 'var':
+                result = ''
+                for element in rule:
+                    if element.tag == 'string':
+                        result += element.get('value')
+                    if element.tag in ['var', 'varenc']:
+                        varname = element.get('name')
+                        if prefix_var(varname) in entry:
+                            value = entry[prefix_var(varname)]
+                        elif self.config.get(varname):
+                            value = self.config.get(varname)
+                        else:
+                            log.error('Missing variable %s from config, skipping rule' % varname)
+                            break
+                        if element.tag == 'varenc':
+                            value = urllib.quote(value)
+                        result += value
+                entry[prefix_var(rule.get('name'))] = result
+
+            # Var Replace - replace text in a var
+            elif rule.tag == 'varreplace':
+                source_var = prefix_var(rule.get('srcvar'))
+                target_var = prefix_var(rule.get('name'))
+                regex = rule.get('regex')
+                replace = rule.get('replace')
+                entry[target_var] = re.sub(regex, replace, entry[source_var])
+
+            # Extract - create multiple vars from a single regex
+            elif rule.tag == 'extract':
+                source_var = prefix_var(rule.get('srcvar'))
+                if source_var not in entry:
+                    if rule.get('optional', 'false') == 'false':
+                        log.error('Error processing extract rule, non-optional value %s missing!' % source_var)
+                    continue
+                regex = rule.find('regex').get('value')
+                group_names = [prefix_var(x.get('name')) for x in rule.find('vars')]
+                match = re.search(regex, entry[source_var])
+                if match:
+                    entry.update(dict(zip(group_names, match.groups())))
+
+            # Extract Tag - split a var and match against a regex
+            elif rule.tag == 'extracttags':
+                source_var = prefix_var(rule.get('srcvar'))
+                split = rule.get('split')
+                values = [x.strip() for x in source_var.split(split)]
+                for element in rule:
+                    if element.tag == 'setvarif':
+                        target_var = prefix_var(element.get('varName'))
+                        regex = element.get('regex')
+                        for val in values:
+                            match = re.match(regex, val)
+                            if match:
+                                entry[target_var] = match.group(0)
+
+            # Set Regex - set a var if a regex matches
+            elif rule.tag == 'setregex':
+                source_var = prefix_var(rule.get('srcvar'))
+                regex = rule.get('regex')
+                target_var = prefix_var(rule.get('varName'))
+                target_val = rule.get('newValue')
+                if source_var in entry and re.match(regex, entry[source_var]):
+                    entry[target_var] = target_val
+
+            # If statement
+            elif rule.tag == 'if':
+                source_var = prefix_var(rule.get('srcvar'))
+                regex = rule.get('regex')
+                if source_var in entry and re.match(regex, entry[source_var]):
+                    entry = self.process_tracker_config_rules(entry, rule)
+
+            else:
+                log.warning('Unsupported linematched tag: %s' % rule.tag)
+
         return entry
 
     def on_welcome(self, conn, event):
