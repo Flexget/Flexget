@@ -66,6 +66,7 @@ class IRCConnection(SingleServerIRCBot):
     def __init__(self, config, config_name):
         self.config = config
         self.connection_name = config_name
+        self.tracker_config = None
         self.server_list = []
         self.channel_list = []
         self.announcer_list = []
@@ -249,7 +250,8 @@ class IRCConnection(SingleServerIRCBot):
             :param var: Variable name to prefix
             :return: prefixed varible name
             """
-            return 'irc_%s' % var.lower()
+            if isinstance(var, basestring):
+                return 'irc_%s' % var.lower()
 
         if rules is None:
             rules = self.tracker_config.find('parseinfo/linematched')
@@ -263,7 +265,7 @@ class IRCConnection(SingleServerIRCBot):
                 for element in rule:
                     if element.tag == 'string':
                         result += element.get('value')
-                    if element.tag in ['var', 'varenc']:
+                    elif element.tag in ['var', 'varenc']:
                         varname = element.get('name')
                         if prefix_var(varname) in entry:
                             value = entry[prefix_var(varname)]
@@ -275,7 +277,12 @@ class IRCConnection(SingleServerIRCBot):
                         if element.tag == 'varenc':
                             value = urllib.quote(value)
                         result += value
-                entry[prefix_var(rule.get('name'))] = result
+                    else:
+                        log.error('Unsupported var operation %s, skipping rule' % element.tag)
+                        break
+                else:
+                    # Only set the result if we processed all elements
+                    entry[prefix_var(rule.get('name'))] = result
 
             # Var Replace - replace text in a var
             elif rule.tag == 'varreplace':
@@ -283,7 +290,10 @@ class IRCConnection(SingleServerIRCBot):
                 target_var = prefix_var(rule.get('name'))
                 regex = rule.get('regex')
                 replace = rule.get('replace')
-                entry[target_var] = re.sub(regex, replace, entry[source_var])
+                if source_var and target_var and regex is not None and replace is not None:
+                    entry[target_var] = re.sub(regex, replace, entry[source_var])
+                else:
+                    log.error('Invalid varreplace options, skipping rule')
 
             # Extract - create multiple vars from a single regex
             elif rule.tag == 'extract':
@@ -292,8 +302,12 @@ class IRCConnection(SingleServerIRCBot):
                     if rule.get('optional', 'false') == 'false':
                         log.error('Error processing extract rule, non-optional value %s missing!' % source_var)
                     continue
-                regex = rule.find('regex').get('value')
-                group_names = [prefix_var(x.get('name')) for x in rule.find('vars')]
+                if rule.find('regex') is not None:
+                    regex = rule.find('regex').get('value')
+                else:
+                    log.error('Regex option missing on extract rule, skipping rule')
+                    continue
+                group_names = [prefix_var(x.get('name')) for x in rule.find('vars') if x.tag == 'var']
                 match = re.search(regex, entry[source_var])
                 if match:
                     entry.update(dict(zip(group_names, match.groups())))
@@ -307,10 +321,13 @@ class IRCConnection(SingleServerIRCBot):
                     if element.tag == 'setvarif':
                         target_var = prefix_var(element.get('varName'))
                         regex = element.get('regex')
-                        for val in values:
-                            match = re.match(regex, val)
-                            if match:
-                                entry[target_var] = val
+                        if regex is not None:
+                            for val in values:
+                                match = re.match(regex, val)
+                                if match:
+                                    entry[target_var] = val
+                        else:
+                            log.error('Missing regex for setvarif command, ignoring')
 
             # Set Regex - set a var if a regex matches
             elif rule.tag == 'setregex':
@@ -318,15 +335,22 @@ class IRCConnection(SingleServerIRCBot):
                 regex = rule.get('regex')
                 target_var = prefix_var(rule.get('varName'))
                 target_val = rule.get('newValue')
-                if source_var in entry and re.match(regex, entry[source_var]):
-                    entry[target_var] = target_val
+                if source_var and regex and target_var and target_val:
+                    if source_var in entry and re.match(regex, entry[source_var]):
+                        entry[target_var] = target_val
+                else:
+                    log.error('Option missing on setregex, skipping rule')
 
             # If statement
             elif rule.tag == 'if':
                 source_var = prefix_var(rule.get('srcvar'))
                 regex = rule.get('regex')
-                if source_var in entry and re.match(regex, entry[source_var]):
-                    entry = self.process_tracker_config_rules(entry, rule)
+
+                if source_var and regex:
+                    if source_var in entry and re.match(regex, entry[source_var]):
+                        entry = self.process_tracker_config_rules(entry, rule)
+                else:
+                    log.error('Option missing for if statement, skipping rule')
 
             else:
                 log.warning('Unsupported linematched tag: %s' % rule.tag)
