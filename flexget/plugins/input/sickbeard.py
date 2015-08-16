@@ -71,7 +71,7 @@ class Sickbeard(object):
         try:
             json = task.requests.get(url).json()
         except RequestException as e:
-            raise plugin.PluginError('Unable to connect to Sonarr at %s://%s:%s%s. Error: %s'
+            raise plugin.PluginError('Unable to connect to Sickbeard at %s://%s:%s%s. Error: %s'
                                      % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e))
         entries = []
         # Dictionary based on SB quality list.
