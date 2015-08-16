@@ -38,7 +38,15 @@ schema = {
                     'nickserv_password': {'type': 'string'},
                     'invite_nickname': {'type': 'string'},
                     'invite_message': {'type': 'string'},
-                    'task': {'type': 'string'},
+                    'task': {
+                        'oneOf': [
+                            {'type': 'string'},
+                            {'type': 'array',
+                             'items': {'type': 'string'}
+                            },
+
+                        ]
+                    },
                     'queue_entries': {'type': 'integer', 'default': 1},
                 },
                 'required': ['task', 'server'],
@@ -95,9 +103,9 @@ class IRCConnection(SingleServerIRCBot):
 
             # Extract the IRC server information
             for server in self.tracker_config.find('servers'):
-                self.server_list.extend(server.get('serverNames').split('|'))
-                self.channel_list.extend(server.get('channelNames').split('|'))
-                self.announcer_list.extend(server.get('announcerNames').split('|'))
+                self.server_list.extend(server.get('serverNames').split(','))
+                self.channel_list.extend(server.get('channelNames').split(','))
+                self.announcer_list.extend(server.get('announcerNames').split(','))
 
             # Process ignore lines
             for regex_values in self.tracker_config.findall('parseinfo/ignore/regex'):
@@ -156,8 +164,12 @@ class IRCConnection(SingleServerIRCBot):
         """
         from flexget.manager import manager
 
-        log.info('Injecting %d entries into task %s' % (len(entries), self.config.get('task')))
-        manager.execute(options={'tasks': [self.config.get('task')], 'cron': True, 'inject': entries}, priority=5)
+        tasks = self.config.get('task')
+        if isinstance(tasks, basestring):
+            tasks = [tasks]
+
+        log.info('Injecting %d entries into tasks %s' % (len(entries), ', '.join(tasks)))
+        manager.execute(options={'tasks': tasks, 'cron': True, 'inject': entries}, priority=5)
 
     def queue_entry(self, entry):
         """
