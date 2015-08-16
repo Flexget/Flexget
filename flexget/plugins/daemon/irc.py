@@ -26,7 +26,7 @@ schema = {
                     'tracker_file': {'type': 'string', 'format': 'file'},
                     'server': {'type': 'string'},
                     'port': {'type': 'integer', 'default': 6667},
-                    'nick': {'type': 'string', 'default': 'Flexget'},
+                    'nickname': {'type': 'string', 'default': 'Flexget'},
                     'channels': {
                         'oneOf': [
                             {'type': 'array',
