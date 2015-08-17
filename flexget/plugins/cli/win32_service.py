@@ -18,7 +18,6 @@ try:
     import win32service
     import win32serviceutil
 
-
     class AppServerSvc (win32serviceutil.ServiceFramework):
         _svc_name_ = 'FlexGet'
         _svc_display_name_ = 'FlexGet Daemon'
@@ -72,7 +71,7 @@ def register_parser_arguments():
     if not sys.platform.startswith('win'):
         return
     # Still not fully working. Hidden for now.
-    parser = options.register_command('service', do_cli,  #help='set up or control a windows service for the daemon',
+    parser = options.register_command('service', do_cli,  # help='set up or control a windows service for the daemon',
                                       add_help=False)
     parser.add_argument('--help', '-h', action='store_true')
     parser.add_argument('args', nargs=argparse.REMAINDER)

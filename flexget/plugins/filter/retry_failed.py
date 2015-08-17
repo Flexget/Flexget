@@ -205,6 +205,7 @@ def clear_failed(manager):
 def register_plugin():
     plugin.register(PluginFailed, 'retry_failed', builtin=True, api_ver=2)
 
+
 @event('options.register')
 def register_parser_arguments():
     parser = options.register_command('failed', do_cli, help='list or clear remembered failures')

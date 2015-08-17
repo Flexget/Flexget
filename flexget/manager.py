@@ -41,15 +41,6 @@ manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
-@sqlalchemy.event.listens_for(sqlalchemy.engine.Engine, 'connect')
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    # There were reported db problems with WAL mode on XFS filesystem, which is sticky and may have been turned
-    # on with certain FlexGet versions (e2c118e) #2749
-    cursor.execute('PRAGMA journal_mode=delete')
-    cursor.close()
-
-
 class Manager(object):
 
     """Manager class for FlexGet
@@ -386,6 +377,9 @@ class Manager(object):
             if self.is_daemon:
                 log.error('Daemon already running for this config.')
                 return
+            elif self.task_queue.is_alive():
+                log.error('Non-daemon execution of FlexGet is running. Cannot start daemon until it is finished.')
+                return
             if options.daemonize:
                 self.daemonize()
             try:
@@ -540,7 +534,6 @@ class Manager(object):
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
 
-
     def load_config(self):
         """
         Loads the config file from disk, validates and activates it.
@@ -568,7 +561,7 @@ class Manager(object):
             print(' o Indentation error')
             print(' o Missing : from end of the line')
             print(' o Non ASCII characters (use UTF8)')
-            print(' o If text contains any of :[]{}% characters it must be single-quoted ' \
+            print(' o If text contains any of :[]{}% characters it must be single-quoted '
                   '(eg. value{1} should be \'value{1}\')\n')
 
             # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
@@ -891,7 +884,7 @@ class Manager(object):
         self.engine.dispose()
         # remove temporary database used in test mode
         if self.options.test:
-            if not 'test' in self.db_filename:
+            if 'test' not in self.db_filename:
                 raise Exception('trying to delete non test database?')
             if self._has_lock:
                 os.remove(self.db_filename)

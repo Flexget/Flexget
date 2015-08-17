@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from urlparse import urlparse
 import logging
-import requests
+from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
@@ -39,7 +39,13 @@ class CouchPotato(object):
         url = '%s://%s:%s%s/api/%s/movie.list?status=active' \
               % (parsedurl.scheme, parsedurl.netloc,
                  config.get('port'), parsedurl.path, config.get('api_key'))
-        json = task.requests.get(url).json()
+        try:
+            json = task.requests.get(url).json()
+        except RequestException as e:
+            raise plugin.PluginError('Unable to connect to Couchpotato at %s://%s:%s%s. Error: %s'
+                                     % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
+                                        parsedurl.path, e))
+
         entries = []
         for movie in json['movies']:
             if movie['status'] == 'active':

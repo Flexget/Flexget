@@ -77,9 +77,10 @@ class InputSceper(object):
                     log.trace('<-- ignoring %s (non-resolvable)' % link_href)
 
             # reject if no torrent link
-            if not 'url' in release:
+            if 'url' not in release:
                 from flexget.utils.log import log_once
-                log_once('%s skipped due to missing or unsupported (unresolvable) download link' % (release['title']), log)
+                log_once('%s skipped due to missing or unsupported (unresolvable) download link' % (release['title']),
+                         log)
             else:
                 releases.append(release)
 

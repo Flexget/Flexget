@@ -22,6 +22,7 @@ CATEGORIES = {
     'tv': 8,
 }
 
+
 class UrlRewriteExtraTorrent(object):
     """
     ExtraTorrent search plugin.
@@ -56,7 +57,7 @@ class UrlRewriteExtraTorrent(object):
         torrent_name = match.group(2)
         entry['url'] = 'http://extratorrent.cc/download/%s/%s.torrent' % (torrent_id, torrent_name)
 
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         if not isinstance(config, dict):
             config = {}
 
@@ -97,6 +98,7 @@ class UrlRewriteExtraTorrent(object):
                 entries.add(entry)
 
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

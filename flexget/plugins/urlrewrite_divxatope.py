@@ -18,8 +18,7 @@ class UrlRewriteDivxATope(object):
     def url_rewritable(self, task, entry):
         url = entry['url']
         return (
-            url.startswith('http://www.divxatope.com/descargar')
-            or url.startswith('http://divxatope.com/descargar')
+            url.startswith('http://www.divxatope.com/descargar') or url.startswith('http://divxatope.com/descargar')
         )
 
     # urlrewriter API

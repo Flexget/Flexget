@@ -263,8 +263,8 @@ class TestSetPlugin(FlexGetBase):
         assert entry['otherfield'] == ''
         assert entry['alu'] == 'alu'
         entry = self.task.find_entry('entries', title='Entry 2')
-        assert 'field' not in entry,\
-                '`field` should not have been created when jinja rendering fails'
+        assert entry['field'] is None,\
+                '`field` should be None when jinja rendering fails'
         assert entry['otherfield'] == 'no series'
 
     def test_non_string(self):
@@ -283,4 +283,4 @@ class TestSetPlugin(FlexGetBase):
         self.execute_task('test_lazy_err')
         entry = self.task.find_entry('entries', title='Entry 1')
         assert entry['title'] == 'Entry 1', 'should fall back to original value when template fails'
-        assert 'other' not in entry
+        assert entry['other'] is None

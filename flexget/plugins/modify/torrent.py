@@ -21,7 +21,7 @@ class TorrentFilename(object):
         # Only scan through accepted entries, as the file must have been downloaded in order to parse anything
         for entry in task.accepted:
             # skip if entry does not have file assigned
-            if not 'file' in entry:
+            if 'file' not in entry:
                 log.trace('%s doesn\'t have a file associated' % entry['title'])
                 continue
             if not os.path.exists(entry['file']):

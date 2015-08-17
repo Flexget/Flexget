@@ -57,7 +57,7 @@ class PluginUtorrent(object):
                 download.instance.get_temp_files(task, handle_magnets=True, fail_html=True)
 
     @plugin.priority(135)
-    #@plugin.internet(log)
+    # @plugin.internet(log)
     def on_task_output(self, task, config):
         if not config.get('enabled', True):
             return
@@ -89,14 +89,16 @@ class PluginUtorrent(object):
             folder = 0
             path = entry.get('path', config.get('path', ''))
             try:
-                path = os.path.normcase(os.path.expanduser(entry.render(path)))
+                path = os.path.expanduser(entry.render(path))
             except RenderError as e:
                 log.error('Could not render path for `%s` downloading to default directory.' % entry['title'])
                 # Add to default folder
                 path = ''
             if path:
+                path_normcase = os.path.normcase(path)
+                
                 for dir in download_dirs:
-                    if path.startswith(dir):
+                    if path_normcase.startswith(dir):
                         folder = download_dirs[dir]
                         path = path[len(dir):].lstrip('\\')
                         break
@@ -152,7 +154,8 @@ class PluginUtorrent(object):
             download.instance.cleanup_temp_files(task)
             
     on_task_abort = on_task_exit
-            
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginUtorrent, 'utorrent', api_ver=2)

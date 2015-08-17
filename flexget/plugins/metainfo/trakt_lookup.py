@@ -62,7 +62,7 @@ class PluginTraktLookup(object):
 
   """
 
-  # Series info
+    # Series info
     series_map = {
         'trakt_series_name': 'title',
         'trakt_series_runtime': 'runtime',
@@ -86,7 +86,7 @@ class PluginTraktLookup(object):
         'trakt_series_status': 'status',
         'trakt_series_overview': 'overview'}
 
-  # Episode info
+    # Episode info
     episode_map = {
         'trakt_ep_name': 'episode_name',
         'trakt_ep_first_aired_epoch': 'first_aired',

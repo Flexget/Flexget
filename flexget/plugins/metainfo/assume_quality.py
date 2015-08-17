@@ -32,7 +32,7 @@ class AssumeQuality(object):
             {'title': 'simple config', 'type': 'string', 'format': 'quality'},
             {
                 'title': 'advanced config', 'type': 'object',
-                #Can't validate dict keys, so allow any
+                # Can't validate dict keys, so allow any
                 'additionalProperties': {'type': 'string', 'format': 'quality'}
             }
         ]
@@ -49,7 +49,7 @@ class AssumeQuality(object):
                 p += 4
             if component.none_of:
                 p += len(component.none_of)
-            #Still a long way from perfect, but probably good enough.
+            # Still a long way from perfect, but probably good enough.
         return p
 
     def assume(self, entry, quality):
@@ -71,7 +71,8 @@ class AssumeQuality(object):
         log.debug('Quality updated: %s', entry.get('quality'))
 
     def on_task_start(self, task, config):
-        if isinstance(config, basestring): config = {'any': config}
+        if isinstance(config, basestring):
+            config = {'any': config}
         assume = namedtuple('assume', ['target', 'quality'])
         self.assumptions = []
         for target, quality in config.items():

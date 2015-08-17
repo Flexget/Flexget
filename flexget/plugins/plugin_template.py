@@ -72,7 +72,7 @@ class PluginTemplate(object):
             config.remove('no_global')
             if 'global' in config:
                 config.remove('global')
-        elif not 'global' in config:
+        elif 'global' not in config:
             config.append('global')
 
         toplevel_templates = task.manager.config.get('templates', {})

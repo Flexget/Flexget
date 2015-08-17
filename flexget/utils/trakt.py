@@ -15,11 +15,11 @@ from flexget.utils.requests import RequestException, Session
 
 
 # Testing site
-#API_KEY = '980c477226b9c18c9a4982cddc1bdbcd747d14b006fe044a8bbbe29bfb640b5d'
-#API_URL = 'http://api.staging.trakt.tv/'
+# API_KEY = '980c477226b9c18c9a4982cddc1bdbcd747d14b006fe044a8bbbe29bfb640b5d'
+# API_URL = 'http://api.staging.trakt.tv/'
 # Production Site
 API_KEY = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
-#API_URL = 'https://api.trakt.tv/'
+# API_URL = 'https://api.trakt.tv/'
 API_URL = 'https://api-v2launch.trakt.tv/'
 
 

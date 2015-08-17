@@ -14,7 +14,7 @@ log = logging.getLogger('path_select')
 
 disk_stats_tuple = namedtuple(
     'disk_stats', [
-        'path', 'free_bytes', 'used_bytes', 'total_bytes', 'free_percent',  'used_percent'
+        'path', 'free_bytes', 'used_bytes', 'total_bytes', 'free_percent', 'used_percent'
     ]
 )
 

@@ -302,7 +302,7 @@ class OutputAria2(object):
                             log.error('Could not rename file %s: %s. Try enabling imdb_lookup in this task'
                                       ' to assist.' % (cur_filename, e))
                             continue
-                elif not 'torrent_info_hash' in entry: 
+                elif 'torrent_info_hash' not in entry: 
                     config['aria_config']['out'] = cur_filename
 
                 if config['do'] == 'add-new':
@@ -311,15 +311,17 @@ class OutputAria2(object):
                     if 'gid' in config['aria_config']:
                         try:
                             r = s.aria2.tellStatus(config['aria_config']['gid'], ['gid', 'status'])
-                            log.info('Download status for %s (gid %s): %s' % (config['aria_config'].get('out', config['uri']), r['gid'],
-                                     r['status']))
+                            log.info('Download status for %s (gid %s): %s' % (
+                                config['aria_config'].get('out', config['uri']), r['gid'],
+                                r['status']))
                             if r['status'] == 'paused':
                                 try:
                                     if not task.manager.options.test:
                                         s.aria2.unpause(r['gid'])
                                     log.info('  Unpaused download.')
                                 except xmlrpclib.Fault as err:
-                                    raise plugin.PluginError('aria2 response to unpause request: %s' % err.faultString, log)
+                                    raise plugin.PluginError(
+                                        'aria2 response to unpause request: %s' % err.faultString, log)
                             else:
                                 log.info('  Therefore, not re-adding.')
                         except xmlrpclib.Fault as err:
@@ -356,7 +358,9 @@ class OutputAria2(object):
                                     r = '1234567890123456'
                                 else:
                                     r = config['aria_config']['gid']
-                            log.info('%s successfully added to aria2 with gid %s.' % (config['aria_config'].get('out', config['uri']), r))
+                            log.info('%s successfully added to aria2 with gid %s.' % (
+                                config['aria_config'].get('out', config['uri']),
+                                r))
                         except xmlrpclib.Fault as err:
                             raise plugin.PluginError('aria2 response to add URI request: %s' % err.faultString, log)
                         except socket_error as (error, msg):

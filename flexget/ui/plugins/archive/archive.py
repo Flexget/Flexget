@@ -64,4 +64,4 @@ def inject(id):
 
 
 # TODO: Requires refactoring once archive plugin is refactored
-#register_plugin(archive, menu='Archive')
+# register_plugin(archive, menu='Archive')

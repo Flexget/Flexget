@@ -21,6 +21,7 @@ class EstimatesReleasedMovies(object):
                 pass
         log.debug('Unable to check release for %s, tmdb_release field is not defined' % entry['title'])
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(EstimatesReleasedMovies, 'est_released_movies', groups=['estimate_release'], api_ver=2)
