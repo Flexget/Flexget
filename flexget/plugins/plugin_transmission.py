@@ -20,7 +20,6 @@ from fnmatch import fnmatch
 
 log = logging.getLogger('transmission')
 
-
 def save_opener(f):
     """
         Transmissionrpc sets a new default opener for urllib2
@@ -77,6 +76,11 @@ class TransmissionBase(object):
         import transmissionrpc
         from transmissionrpc import TransmissionError
         from transmissionrpc import HTTPHandlerError
+
+        if not config['verify_ssl_certificates']:
+            import ssl
+            log.verbose('Setting unverified SSL context.')
+            ssl._create_default_https_context = ssl._create_unverified_context
 
         user, password = config.get('username'), config.get('password')
 
@@ -255,7 +259,8 @@ class PluginTransmission(TransmissionBase):
                     'honourlimits': {'type': 'boolean'},
                     'include_files': one_or_more({'type': 'string'}),
                     'skip_files': one_or_more({'type': 'string'}),
-                    'rename_like_files': {'type': 'boolean'}
+                    'rename_like_files': {'type': 'boolean'},
+                    'verify_ssl_certificates': {'type' : 'boolean'}
                 },
                 'additionalProperties': False
             }
@@ -270,6 +275,7 @@ class PluginTransmission(TransmissionBase):
         config.setdefault('include_subs', False)
         config.setdefault('rename_like_files', False)
         config.setdefault('include_files', [])
+        config.setdefault('verify_ssl_certificates', True)
         return config
         
     @plugin.priority(120)
