@@ -103,6 +103,7 @@ class Sonarr(object):
                                             parsedurl.path, e))
         for show in json:
             fg_quality = ''  # Initializes the quality parameter
+            entry = None
             if show['monitored'] or not config.get('only_monitored'):  # Checks if to retrieve just monitored shows
                 if config.get('include_ended') or show['status'] != 'ended':  # Checks if to retrieve ended shows
                     if config.get('include_data'):  # Check if to retrieve quality & path
@@ -122,7 +123,7 @@ class Sonarr(object):
                     else:
                         log.error('Invalid entry created? %s' % entry)
             # Test mode logging
-            if task.options.test: 
+            if entry and task.options.test:
                 log.info("Test mode. Entry includes:")
                 log.info("    Title: %s" % entry["title"])
                 log.info("    URL: %s" % entry["url"])
@@ -130,7 +131,7 @@ class Sonarr(object):
                 log.info("    TVDB ID: %s" % entry["tvdb_id"])
                 log.info("    TVRAGE ID: %s" % entry["tvrage_id"])
                 log.info("    Quality: %s" % entry["configure_series_quality"])
-            continue
+            # continue
         return entries
 
 
