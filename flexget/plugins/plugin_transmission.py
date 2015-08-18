@@ -77,11 +77,6 @@ class TransmissionBase(object):
         from transmissionrpc import TransmissionError
         from transmissionrpc import HTTPHandlerError
 
-        if not config['verify_ssl_certificates']:
-            import ssl
-            log.verbose('Setting unverified SSL context.')
-            ssl._create_default_https_context = ssl._create_unverified_context
-
         user, password = config.get('username'), config.get('password')
 
         try:
@@ -144,6 +139,12 @@ class TransmissionBase(object):
             raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required.', log)
         if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 11]:
             raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required, please upgrade', log)
+
+        if not task.requests.verify:
+            import ssl
+            log.verbose('Setting unverified SSL context.')
+            ssl._create_default_https_context = ssl._create_unverified_context
+
         """ 
         Mark rpc client for garbage collector so every task can start 
         a fresh new according its own config - fix to bug #2804
@@ -259,8 +260,7 @@ class PluginTransmission(TransmissionBase):
                     'honourlimits': {'type': 'boolean'},
                     'include_files': one_or_more({'type': 'string'}),
                     'skip_files': one_or_more({'type': 'string'}),
-                    'rename_like_files': {'type': 'boolean'},
-                    'verify_ssl_certificates': {'type' : 'boolean'}
+                    'rename_like_files': {'type': 'boolean'}
                 },
                 'additionalProperties': False
             }
@@ -275,7 +275,6 @@ class PluginTransmission(TransmissionBase):
         config.setdefault('include_subs', False)
         config.setdefault('rename_like_files', False)
         config.setdefault('include_files', [])
-        config.setdefault('verify_ssl_certificates', True)
         return config
         
     @plugin.priority(120)
