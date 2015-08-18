@@ -29,7 +29,7 @@ class MetainfoMusic(object):
         """
         Populates music_* fields for entries that are successfully parsed.
         """
-        if entry.get('music_parser') and entry['music_parser'].valid:
+        if entry.get('music_guessed') is not None:
             # Return true if we already parsed
             return entry.get('music_guessed')
 
