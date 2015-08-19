@@ -238,6 +238,8 @@ class UrlrewriteArchive(object):
         entries = set()
         try:
             for query in entry.get('search_strings', [entry['title']]):
+                # clean some characters out of the string for better results
+                query = re.sub(r'[ \(\)]+', ' ', query).strip()
                 log.debug('looking for `%s` config: %s' % (query, config))
                 for archive_entry in search(session, query, desc=True):
                     log.debug('rewrite search result: %s' % archive_entry)

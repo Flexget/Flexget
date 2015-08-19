@@ -21,6 +21,7 @@ class OutputPushbullet(object):
         apikey: <API_KEY>
         [device: <DEVICE_IDEN> (can also be a list of device idens, or don't specify any idens to send to all devices)]
         [email: <EMAIL_ADDRESS> (can also be a list of user email addresses)]
+        [channel: <CHANNEL_TAG> (you can only specify device / email or channel tag. cannot use both.)]
         [title: <MESSAGE_TITLE>] (default: "{{task}} - Download started" -- accepts Jinja2)
         [body: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}" -- accepts Jinja2)
 
@@ -38,6 +39,7 @@ class OutputPushbullet(object):
             'title': {'type': 'string', 'default': '{{task}} - Download started'},
             'body': {'type': 'string', 'default': default_body},
             'url': {'type': 'string'},
+            'channel': {'type': 'string'},
         },
         'required': ['apikey'],
         'additionalProperties': False
@@ -63,6 +65,7 @@ class OutputPushbullet(object):
             title = config['title']
             body = config['body']
             url = config.get('url')
+            channel = config.get('channel')
 
             # Attempt to render the title field
             try:
@@ -86,7 +89,9 @@ class OutputPushbullet(object):
                     log.warning('Problem rendering `url`: %s' % e)
 
             for apikey in apikeys:
-                if devices or emails:
+                if channel:
+                    self.send_push(task, apikey, title, body, url, channel, 'channel_tag')
+                elif devices or emails:
                     for device in devices:
                         self.send_push(task, apikey, title, body, url, device, 'device_iden')
                     for email in emails:

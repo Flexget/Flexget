@@ -85,7 +85,7 @@ class SearchCPASBIEN(object):
 # GET URL
             f = task.requests.get(url + '.html').content
             soup = get_soup(f)
-            if soup.findAll(text=re.compile('0 torrents')):
+            if soup.findAll(text=re.compile(' 0 torrents')):
                 log.debug('search returned no results')
             else:
                 nextpage = 0

@@ -86,10 +86,10 @@ class PluginSubliminal(object):
         from dogpile.cache.exception import RegionAlreadyConfigured
         import subliminal
         try:
-            subliminal.cache_region.configure('dogpile.cache.dbm', 
+            subliminal.region.configure('dogpile.cache.dbm', 
                                               arguments={'filename': os.path.join(tempfile.gettempdir(),
                                                                                   'cachefile.dbm'),
-                                              'lock_factory': subliminal.MutexLock})
+                                              'lock_factory': subliminal.cli.MutexLock})
         except RegionAlreadyConfigured:
             pass
         logging.getLogger("subliminal").setLevel(logging.CRITICAL)
@@ -162,7 +162,9 @@ class PluginSubliminal(object):
                     entry.fail(msg)
         if downloaded_subtitles:
             # save subtitles to disk
-            subliminal.save_subtitles(downloaded_subtitles, single=single_mode)
+            for k, v in downloaded_subtitles.iteritems():
+                if v:
+                    subliminal.save_subtitles(k, v, single=single_mode)
 
 
 @event('plugin.register')
