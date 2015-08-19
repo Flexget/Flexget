@@ -102,7 +102,7 @@ class CouchPotato(object):
                 else:
                     log.error('Invalid entry created? %s' % entry)
                 # Test mode logging
-                if entry.isvalid() and task.options.test:
+                if entry and task.options.test:
                     log.info("Test mode. Entry includes:")
                     log.info("    Title: %s" % entry["title"])
                     log.info("    URL: %s" % entry["url"])

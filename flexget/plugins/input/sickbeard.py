@@ -81,6 +81,7 @@ class Sickbeard(object):
                      'HD720p': '720p',
                      'SD': '<hr'}
         for id, show in json['data'].items():
+            entry = None
             fg_quality = ''  # Initializes the quality parameter
             if not show['paused'] or not config.get('only_monitored'):
                 if config.get('include_ended') or show['status'] != 'Ended':
@@ -102,7 +103,7 @@ class Sickbeard(object):
             else:
                 log.error('Invalid entry created? %s' % entry)
             # Test mode logging
-            if entry.isvalid() and task.options.test:
+            if entry and task.options.test:
                 log.info("Test mode. Entry includes:")
                 log.info("    Title: %s" % entry["title"])
                 log.info("    URL: %s" % entry["url"])
