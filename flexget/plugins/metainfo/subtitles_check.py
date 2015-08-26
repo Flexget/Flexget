@@ -23,11 +23,11 @@ class MetainfoSubs(object):
     def on_task_start(self, task, config):
         try:
             import subliminal
-            from subliminal.cli import MutexLock
         except ImportError as e:
             log.debug('Error importing Subliminal: %s' % e)
             raise plugin.DependencyError('subliminal', 'subliminal', 
                 'Subliminal module required. ImportError: %s' % e)
+        from subliminal.cli import MutexLock
         from dogpile.cache.exception import RegionAlreadyConfigured
         try:
             subliminal.region.configure('dogpile.cache.dbm', 
