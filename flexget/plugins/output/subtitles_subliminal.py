@@ -85,11 +85,12 @@ class PluginSubliminal(object):
         from babelfish import Language
         from dogpile.cache.exception import RegionAlreadyConfigured
         import subliminal
+        from subliminal.cli import MutexLock
         try:
             subliminal.region.configure('dogpile.cache.dbm', 
                                               arguments={'filename': os.path.join(tempfile.gettempdir(),
                                                                                   'cachefile.dbm'),
-                                              'lock_factory': subliminal.cli.MutexLock})
+                                              'lock_factory': MutexLock})
         except RegionAlreadyConfigured:
             pass
         logging.getLogger("subliminal").setLevel(logging.CRITICAL)
