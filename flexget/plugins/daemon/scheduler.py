@@ -43,8 +43,8 @@ interval_schema = {
         'weeks': {'type': 'number'}
     },
     # Only allow one unit to be specified
-    'oneOf': [{'required': [unit]} for unit in UNITS],
-    'error_oneOf': 'Interval must be specified as one of %s' % ', '.join(UNITS),
+    'maxProperties': 1,
+    'error_maxProperties': 'Interval must be specified as one of %s' % ', '.join(UNITS),
     'additionalProperties': False
 }
 
@@ -73,8 +73,10 @@ schedule_schema = {
         'schedule': cron_schema
     },
     'required': ['tasks'],
-    'oneOf': [{'required': ['schedule']}, {'required': ['interval']}],
-    'error_oneOf': 'Either `cron` or `interval` must be defined.',
+    'minProperties': 2,
+    'maxProperties': 2,
+    'error_minProperties': 'Either `cron` or `interval` must be defined.',
+    'error_maxProperties': 'Either `cron` or `interval` must be defined.',
     'additionalProperties': False
 }
 
