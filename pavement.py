@@ -26,11 +26,7 @@ options = environment.options
 install_requires = ['FeedParser>=5.1.3', 'SQLAlchemy >=0.7.5, !=0.9.0, <1.999', 'PyYAML',
                     'beautifulsoup4>=4.1, !=4.2.0, <4.4', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar', 'rpyc',
                     'jinja2', 'requests>=1.0, !=2.4.0, <2.99', 'python-dateutil!=2.0, !=2.2', 'jsonschema>=2.0',
-<<<<<<< HEAD
-                    'python-tvrage', 'tmdb3', 'path.py>=6.2', 'guessit>=0.9.3', 'apscheduler']
-=======
-                    'python-tvrage', 'tmdb3', 'path.py', 'guessit>=0.9.3, <0.10.4', 'apscheduler']
->>>>>>> f99a5a36dba4ab75e0500ef7b77a434377feb2e9
+                    'python-tvrage', 'tmdb3', 'path.py>=6.2', 'guessit>=0.9.3, <0.10.4', 'apscheduler']
 if sys.version_info < (2, 7):
     # argparse is part of the standard library in python 2.7+
     install_requires.append('argparse')
