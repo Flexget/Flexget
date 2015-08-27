@@ -3,7 +3,7 @@ import os
 import re
 import logging
 
-from path import path
+from path import Path
 
 from flexget import plugin
 from flexget.event import event

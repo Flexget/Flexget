@@ -11,7 +11,7 @@ import time
 import warnings
 from itertools import ifilter
 
-from path import path
+from path import Path
 from requests import RequestException
 
 from flexget import plugins as plugins_pkg

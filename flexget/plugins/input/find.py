@@ -4,7 +4,7 @@ import logging
 import re
 import sys
 
-from path import path
+from path import Path
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
