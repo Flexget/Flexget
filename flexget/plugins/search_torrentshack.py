@@ -47,7 +47,7 @@ CATEGORIES = {
     'Games Pack': 986
 }
 
-URL = 'http://www.torrentshack.eu/'
+URL = 'http://www.torrentshack.me/'
 
 
 class TorrentShackSearch(object):

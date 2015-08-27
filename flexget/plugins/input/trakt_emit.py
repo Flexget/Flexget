@@ -1,5 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import
-import hashlib
 import logging
 from urlparse import urljoin
 
@@ -8,7 +7,6 @@ from requests import RequestException
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils import json
 from flexget.utils.trakt import API_URL, get_session, make_list_slug, get_api_url
 
 log = logging.getLogger('trakt_emit')
@@ -103,6 +101,12 @@ class TraktEmit(object):
                             else:
                                 epn += 1
                         break
+                else:
+                  if config['position'] == 'next':
+                    eps = epn = 1
+                  else:
+                    # There were no watched/collected episodes, nothing to emit in 'last' mode
+                    continue
             if eps and epn:
                 entry = self.make_entry(fields, eps, epn)
                 entries.append(entry)

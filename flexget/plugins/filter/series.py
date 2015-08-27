@@ -500,7 +500,8 @@ def get_latest_release(series, downloaded=True, season=None):
     elif series.identified_by == 'date':
         latest_release = releases.order_by(desc(Episode.identifier)).first()
     else:
-        latest_release = releases.order_by(desc(Episode.first_seen)).first()
+        # We have to label the order_by clause to disambiguate from Release.first_seen #3055
+        latest_release = releases.order_by(desc(Episode.first_seen.label('ep_first_seen'))).first()
 
     if not latest_release:
         log.debug('get_latest_release returning None, no downloaded episodes found for: %s', series.name)

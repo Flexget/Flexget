@@ -41,15 +41,6 @@ manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
-@sqlalchemy.event.listens_for(sqlalchemy.engine.Engine, 'connect')
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    # There were reported db problems with WAL mode on XFS filesystem, which is sticky and may have been turned
-    # on with certain FlexGet versions (e2c118e) #2749
-    cursor.execute('PRAGMA journal_mode=delete')
-    cursor.close()
-
-
 class Manager(object):
 
     """Manager class for FlexGet
