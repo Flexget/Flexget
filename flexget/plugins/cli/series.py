@@ -33,8 +33,8 @@ def display_summary(options):
     Display series summary.
     :param options: argparse options from the CLI
     """
-    formatting = ' %-30s %-10s %-10s %-20s'
-    console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
+    ormatting = ' %-30s %-s %-10s %-s %-10s %-s %-20s'
+    console(formatting % ('Name', '|', 'Latest', '|', 'Age', '|', 'Downloaded'))
     console('-' * 79)
 
     session = Session()
@@ -74,7 +74,7 @@ def display_summary(options):
             if behind:
                 episode_id += ' +%s' % behind
 
-            console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
+            console(new_ep + formatting[1:] % (series_name, '|', episode_id, '|', age, '|', status))
             if behind >= 3:
                 console(' ! Latest download is %d episodes behind, this may require '
                         'manual intervention' % behind)

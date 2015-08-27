@@ -12,13 +12,13 @@ def do_cli(manager, options):
         num = clear_entries(options.task)
         console('%s entries cleared from backlog.' % num)
     else:
-        cols = '{:<65.64}{:<15.15}'
-        console(cols.format('Title', 'Task'))
+        cols = '{:<65.64}{:<1.1}{:<15.15}'
+        console(cols.format('Title', '|', 'Task'))
         console('-' * 80)
         with Session() as session:
             entries = get_entries(options.task, session=session)
             for entry in entries:
-                console(cols.format(entry.title, entry.task))
+                console(cols.format(entry.title, '|', entry.task))
             if not entries:
                 console('No items')
 

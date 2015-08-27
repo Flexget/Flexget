@@ -12,7 +12,7 @@ log = logging.getLogger('plugins')
 @event('manager.subcommand.plugins')
 def plugins_summary(manager, options):
     console('-' * 79)
-    console('%-20s%-30s%s' % ('Name', 'Roles (priority)', 'Info'))
+    console('%-30s%-s%-30s%-s%s' % ('Name', '|', 'Roles (priority)', '|', 'Info'))
     console('-' * 79)
 
     # print the list
@@ -29,7 +29,7 @@ def plugins_summary(manager, options):
             flags.append('debug')
         handlers = plugin.phase_handlers
         roles = ', '.join('%s(%s)' % (phase, handlers[phase].priority) for phase in handlers)
-        console('%-20s%-30s%s' % (plugin.name, roles, ', '.join(flags)))
+        console('%-30s%-s%-30s%-s%s' % (plugin.name, '|', roles, '|', ', '.join(flags)))
 
     console('-' * 79)
 
