@@ -44,21 +44,31 @@ def reset(manager):
 def reset_plugin(options):
     plugin = options.reset_plugin
     if not plugin:
-        console('%-20s Ver Tables' % 'Name')
-        console('-' * 79)
+        if options.porcelain:
+            console('%-20s | Ver | Tables' % 'Name')
+        else:
+            console('-' * 79)
+            console('%-20s Ver  Tables' % 'Name')
+            console('-' * 79)
         for k, v in sorted(plugin_schemas.iteritems()):
             tables = ''
             line_len = 0
             for name in v['tables']:
-                if line_len + len(name) + 2 >= 53:
-                    tables += '\n'
-                    tables += ' ' * 25
-                    line_len = len(name) + 2
+                if options.porcelain:
+                    pass
                 else:
-                    line_len += len(name) + 2
+                    if line_len + len(name) + 2 >= 53:
+                        tables += '\n'
+                        tables += ' ' * 26
+                        line_len = len(name) + 2
+                    else:
+                        line_len += len(name) + 2
                 tables += name + ', '
             tables = tables.rstrip(', ')
-            console('%-20s %s   %s' % (k, v['version'], tables))
+            if options.porcelain:
+                console('%-20s %s %-3s %s %s' % (k, '|', v['version'], '|', tables))
+            else:
+                console('%-20s %-2s   %s' % (k, v['version'], tables))
     else:
         try:
             reset_schema(plugin)
@@ -79,3 +89,4 @@ def register_parser_arguments():
     reset_plugin_parser = subparsers.add_parser('reset-plugin', help='reset the database for a specific plugin')
     reset_plugin_parser.add_argument('reset_plugin', metavar='<plugin>', nargs='?',
                                  help='name of plugin to reset (if omitted, known plugins will be listed)')
+    reset_plugin_parser.add_argument('--porcelain' , action='store_true', help='make the output parseable')

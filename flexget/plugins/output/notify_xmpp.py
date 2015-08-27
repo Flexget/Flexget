@@ -4,6 +4,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.template import RenderError, render_from_task
+from flexget.config_schema import one_or_more
 
 log = logging.getLogger('notify_xmpp')
 
@@ -13,17 +14,18 @@ try:
     
     class SendMsgBot(sleekxmpp.ClientXMPP):
     
-        def __init__(self, jid, password, recipient, message):
+        def __init__(self, jid, password, recipients, message):
             sleekxmpp.ClientXMPP.__init__(self, jid, password)
-            self.recipient = recipient
+            self.recipients = recipients
             self.msg = message
             self.add_event_handler("session_start", self.start, threaded=True)
-            self.register_plugin('xep_0030') # Service Discovery
-            self.register_plugin('xep_0199') # XMPP Ping
+            self.register_plugin('xep_0030')  # Service Discovery
+            self.register_plugin('xep_0199')  # XMPP Ping
     
-        def start(self, event):
-            self.send_presence(pto=self.recipient)
-            self.send_message(mto=self.recipient, mbody=self.msg, mtype='chat')
+        def start(self, xmpp_event):
+            for recipient in self.recipients:
+                self.send_presence(pto=recipient)
+                self.send_message(mto=recipient, mbody=self.msg, mtype='chat')
             self.disconnect(wait=True)
 
 except ImportError:
@@ -38,11 +40,11 @@ class OutputNotifyXmpp(object):
         'properties': {
             'sender': {'type': 'string', 'format': 'email'},
             'password': {'type': 'string'},
-            'recipient': {'type': 'string', 'format': 'email'},
+            'recipients': one_or_more({'type': 'string', 'format': 'email'}),
             'title': {'type': 'string', 'default': '{{task.name}}'},
             'text': {'type': 'string', 'default': '{{title}}'}
         },
-        'required': ['sender', 'password', 'recipient'],
+        'required': ['sender', 'password', 'recipients'],
         'additionalProperties': False
     }
     
@@ -56,7 +58,7 @@ class OutputNotifyXmpp(object):
             raise plugin.DependencyError('notify_xmpp', 'sleekxmpp', 'SleekXMPP module required. ImportError: %s' % e)
         try:
             import dns
-        except:
+        except ImportError:
             try:
                 import dnspython
             except ImportError as e:
@@ -91,8 +93,12 @@ class OutputNotifyXmpp(object):
         
         log.verbose('Send XMPP notification about: %s', ' - '.join(items))
         logging.getLogger('sleekxmpp').setLevel(logging.CRITICAL)
-        
-        xmpp = SendMsgBot(config['sender'], config['password'], config['recipient'], text)
+
+        recipients = config.get('recipients', [])
+        if not isinstance(recipients, list):
+            recipients = [recipients]
+
+        xmpp = SendMsgBot(config['sender'], config['password'], recipients, text)
         if xmpp.connect():
             xmpp.process(block=True)
 
