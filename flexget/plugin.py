@@ -11,7 +11,7 @@ import time
 import warnings
 from itertools import ifilter
 
-from path import path
+from path import Path
 from requests import RequestException
 
 from flexget import plugins as plugins_pkg
@@ -372,7 +372,7 @@ def _load_plugins_from_dirs(dirs):
     """
 
     log.debug('Trying to load plugins from: %s' % dirs)
-    dirs = [path(d) for d in dirs if os.path.isdir(d)]
+    dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
     plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
     for plugins_dir in dirs:
