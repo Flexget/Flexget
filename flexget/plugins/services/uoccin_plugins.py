@@ -13,8 +13,8 @@ from flexget.utils import json
 try:
     from flexget.plugins.api_tvdb import lookup_series
 except ImportError:
-    raise plugin.DependencyError(issued_by='myepisodes', missing='api_tvdb',
-                                 message='myepisodes requires the `api_tvdb` plugin')
+    raise plugin.DependencyError(issued_by='uoccin', missing='api_tvdb',
+                                 message='uoccin requires the `api_tvdb` plugin')
 
 
 def load_uoccin_data(path):
