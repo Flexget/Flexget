@@ -37,9 +37,10 @@ class UoccinEmit(object):
         'type': 'object',
         'properties': {
             'path': {'type': 'string', 'format': 'path'},
-            'type': {'type': 'string', 'enum': ['series', 'movies']},
+            'type': {'type': 'string', 'enum': ['movies', 'series', 'episodes']},
             'tags': {'type': 'array', 'items': {'type': 'string'}, 'minItems': 1},
             'check_tags': {'type': 'string', 'enum': ['any', 'all', 'none'], 'default': 'any'},
+            'ep_flags': {'type': 'string', 'enum': ['watched', 'collected'], 'default': 'watched'},
         },
         'required': ['path', 'type'],
         'additionalProperties': False
@@ -78,8 +79,8 @@ class UoccinEmit(object):
                     continue
                 if config['check_tags'] == 'none' and n > 0:
                     continue
-            entry = Entry()
             if config['type'] == 'movies':
+                entry = Entry()
                 entry['url'] = 'http://www.imdb.com/title/' + eid
                 entry['imdb_id'] = eid
                 if itm['name'] != 'N/A':
@@ -91,21 +92,55 @@ class UoccinEmit(object):
                         self.log.trace('entry %s imdb failed (%s)' % (entry['imdb_id'], e.value))
                         continue
                     entry['title'] = entry.get('imdb_name')
+                if 'tags' in itm:
+                    entry['uoccin_tags'] = itm['tags']
+                if entry.isvalid():
+                    entries.append(entry)
+                else:
+                    self.log.debug('Invalid entry created? %s' % entry)
             else:
-                entry['url'] = 'http://thetvdb.com/?tab=series&id=' + eid
-                entry['tvdb_id'] = eid
-                # series name could be unknown at this time
+                sname = itm['name']
                 try:
-                    series = lookup_series(tvdb_id=entry['tvdb_id'])
-                    entry['title'] = series.seriesname
+                    sname = lookup_series(tvdb_id=eid).seriesname
                 except LookupError:
-                    self.log.warning('Unable to lookup series %s from tvdb, using raw name.' % entry['tvdb_id'])
-            if 'tags' in itm:
-                entry['uoccin_tags'] = itm['tags']
-            if entry.isvalid():
-                entries.append(entry)
-            else:
-                self.log.debug('Invalid entry created? %s' % entry)
+                    self.log.warning('Unable to lookup series %s from tvdb, using raw name.' % eid)
+                surl = 'http://thetvdb.com/?tab=series&id=' + eid
+                if config['type'] == 'series':
+                    entry = Entry()
+                    entry['url'] = surl
+                    entry['title'] = sname
+                    entry['tvdb_id'] = eid
+                    if 'tags' in itm:
+                        entry['uoccin_tags'] = itm['tags']
+                    if entry.isvalid():
+                        entries.append(entry)
+                    else:
+                        self.log.debug('Invalid entry created? %s' % entry)
+                elif config['ep_flags'] == 'collected':
+                    slist = itm.get('collected', {})
+                    for sno in slist.keys():
+                        for eno in slist[sno]:
+                            entry = Entry()
+                            entry['url'] = surl
+                            entry['title'] = '%s S%02dE%02d' % (sname, int(sno), int(eno))
+                            entry['tvdb_id'] = eid
+                            if entry.isvalid():
+                                entries.append(entry)
+                            else:
+                                self.log.debug('Invalid entry created? %s' % entry)
+                else:
+                    slist = itm.get('watched', {})
+                    for sno in slist.keys():
+                        for eno in slist[sno]:
+                            entry = Entry()
+                            entry['url'] = surl
+                            entry['title'] = '%s S%02dE%02d' % (sname, int(sno), eno)
+                            entry['tvdb_id'] = eid
+                            if entry.isvalid():
+                                entries.append(entry)
+                            else:
+                                self.log.debug('Invalid entry created? %s' % entry)
+        entries.sort(key=lambda x: x['title'])
         return entries
 
 
