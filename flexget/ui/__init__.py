@@ -67,6 +67,11 @@ def register_css(name, f, order=128, bp=None):
     register_asset('css_all', name, f, order=order, bp=bp)
 
 
+def register_font(name, f, order=128, bp=None):
+    """ Shortcut to register font files. Calls register_asset """
+    register_asset('font_all', name, f, order=order, bp=bp)
+
+
 @webui_app.before_first_request
 def _load_assets():
     for name, asset_registry in _asset_registry.iteritems():
@@ -96,9 +101,7 @@ register_js('bootstrap-decorator', 'js/libs/schema-form/bootstrap-decorator.js',
 
 # Register core css files
 register_css('angular-material', 'css/libs/angular-material.min.css', order=1)
-register_css('font-awesome', 'css/libs/font-awesome.min.css', order=10)
-register_css('bootstrap', 'css/libs/bootstrap.min.css', order=10)
-register_css('ng-table', 'css/libs/ui-grid/ui-grid.min.css', order=20)
+register_css('ng-table', 'css/libs/ui-grid.min.css', order=20)
 register_css('flexget', 'css/flexget.css', order=30)
 
 
