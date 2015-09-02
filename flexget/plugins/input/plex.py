@@ -123,7 +123,7 @@ class InputPlex(object):
                                      "authentication-token: %s. (%s)" % (globalaccesstoken, e))
         dom = parseString(r.text)
         for node in dom.getElementsByTagName('Server'):
-            if node.getAttribute('address') == config['server']:
+            if config['server'] in (node.getAttribute('address'), node.getAttribute('localAddresses')):
                 accesstoken = node.getAttribute('accessToken')
                 log.debug("Got plextoken: %s" % accesstoken)
         if not accesstoken:
