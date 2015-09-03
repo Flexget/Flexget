@@ -46,13 +46,12 @@ if not __version__:
     print 'Could not find __version__ from flexget/_version.py'
     sys.exit(1)
 
-# Install Bash completion script only if platform is Linux, bash completion is installed & installation is run as root
 data_files = []
-
+# Install Bash completion script only if platform is Linux, bash completion is installed & installation is run as root
 if sys.platform.startswith('linux'):
     if os.path.isdir('/etc/bash_completion.d'):
         if hasattr(os, 'geteuid') and os.geteuid() == 0:
-            data_files = [('/etc/bash_completion.d', ['extras/completion/flexget'])]
+            data_files = [('/etc/bash_completion.d', ['extras/bash_completion/flexget'])]
 
 setup(
     name='FlexGet',
