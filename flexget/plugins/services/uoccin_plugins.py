@@ -623,6 +623,49 @@ class UoccinSeenDel(UoccinWatched):
     set_true = False
 
 
+class UoccinSubtitles(UoccinWriter):
+
+    schema = {
+        'type': 'object',
+        'properties': {
+            'uuid': {'type': 'string'},
+            'path': {'type': 'string', 'format': 'path'},
+        },
+        'required': ['uuid', 'path'],
+        'additionalProperties': False
+    }
+    
+    def on_task_output(self, task, config):
+        """Set subtitles info for accepted episodes and/or movies in the uoccin.json file.
+        Requires the subtitles field (set by subtitles_check plugin), plus tvdb_id, series_season and series_episode 
+        for episodes, or imdb_id for movies.
+        
+        Example::
+            
+            uoccin_subtitles:
+              uuid: flexget_server_home
+              path: /path/to/gdrive/uoccin
+        
+        Note::
+        - the uoccin.json file will be created if not exists.
+        - the uuid must be a filename-safe text.
+        """
+        for entry in task.accepted:
+            if not entry.get('subtitles'):
+                continue
+            tid = None
+            typ = None
+            if all(field in entry for field in ['tvdb_id', 'series_season', 'series_episode']):
+                tid = '%s.%d.%d' % (entry['tvdb_id'], entry['series_season'], entry['series_episode'])
+                typ = 'series'
+            elif entry.get('imdb_id'):
+                tid = entry['imdb_id']
+                typ = 'movie'
+            if tid is None:
+                continue
+            self.append_command(typ, tid, 'subtitles', ",".join(entry['subtitles']))
+
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(UoccinEmit, 'uoccin_emit', api_ver=2)
@@ -634,3 +677,4 @@ def register_plugin():
     plugin.register(UoccinCollDel, 'uoccin_collection_remove', api_ver=2)
     plugin.register(UoccinSeenAdd, 'uoccin_watched_true', api_ver=2)
     plugin.register(UoccinSeenDel, 'uoccin_watched_false', api_ver=2)
+    plugin.register(UoccinSubtitles, 'uoccin_subtitles', api_ver=2)
