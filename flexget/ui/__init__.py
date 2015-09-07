@@ -81,27 +81,27 @@ def _load_assets():
 
 
 # Required core js files
-register_js('angular', 'js/libs/angularjs/angular.min.js', order=10)
-register_js('angular-material', 'js/libs/angular-material.min.js', order=11)
-register_js('angular-ui-router', 'js/libs/angular-ui-router.min.js', order=11)
-register_js('angular-sanitize', 'js/libs/angularjs/angular-sanitize.min.js', order=11)
-register_js('angular-animate', 'js/libs/angularjs/angular-animate.min.js', order=11)
-register_js('angular-aria', 'js/libs/angularjs/angular-aria.min.js', order=11)
-register_js('angular-filter', 'js/libs/angular-filter.min.js', order=11)
+register_js('angular', 'js/angularjs/angular.min.js', order=10)
+register_js('angular-material', 'js/angular-material.min.js', order=11)
+register_js('angular-ui-router', 'js/angular-ui-router.min.js', order=11)
+register_js('angular-sanitize', 'js/angularjs/angular-sanitize.min.js', order=11)
+register_js('angular-animate', 'js/angularjs/angular-animate.min.js', order=11)
+register_js('angular-aria', 'js/angularjs/angular-aria.min.js', order=11)
+register_js('angular-filter', 'js/angular-filter.min.js', order=11)
 register_js('flexget', 'js/flexget.js', order=20)
 register_js('common-utils', 'js/common/utils.js', order=20)
 register_js('common-directives', 'js/common/directives.js', order=20)
 register_js('common-controllers', 'js/common/controllers.js', order=20)
 register_js('common-services', 'js/common/services.js', order=20)
-register_js('ui-grid', 'js/libs/ui-grid.min.js', order=20)
-register_js('tv4', 'js/libs/tv4.min.js', order=25)
-register_js('ObjectPath', 'js/libs/schema-form/ObjectPath.js', order=25)
-register_js('schema-form', 'js/libs/schema-form/schema-form.js', order=25)
-register_js('bootstrap-decorator', 'js/libs/schema-form/bootstrap-decorator.js', order=26)
+register_js('ui-grid', 'js/ui-grid.min.js', order=20)
+register_js('tv4', 'js/tv4.min.js', order=25)
+register_js('ObjectPath', 'js/schema-form/ObjectPath.js', order=25)
+register_js('schema-form', 'js/schema-form/schema-form.js', order=25)
+register_js('bootstrap-decorator', 'js/schema-form/bootstrap-decorator.js', order=26)
 
 # Register core css files
-register_css('angular-material', 'css/libs/angular-material.min.css', order=1)
-register_css('ng-table', 'css/libs/ui-grid.min.css', order=20)
+register_css('angular-material', 'css/angular-material.min.css', order=1)
+register_css('ng-table', 'css/ui-grid.min.css', order=20)
 register_css('flexget', 'css/flexget.css', order=30)
 
 
