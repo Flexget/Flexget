@@ -49,7 +49,7 @@ class FilterExists(object):
                 filenames[key] = p
         for entry in task.accepted:
             # priority is: filename, location (filename only), title
-            name = path(entry.get('filename', entry.get('location', entry['title']))).name
+            name = Path(entry.get('filename', entry.get('location', entry['title']))).name
             if platform.system() == 'Windows':
                 name = name.lower()
             if name in filenames:
