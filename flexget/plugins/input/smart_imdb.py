@@ -17,8 +17,11 @@ ia = IMDb()
 JOB_TYPES = ['actor', 'director', 'producer', 'writer', 'self',
              'editor', 'miscellaneous', 'editorial department', 'cinematographer',
              'visual effects', 'thanks', 'music department']
+
 CONTENT_TYPES = ['movie', 'tv series', 'tv mini series', 'video game', 'video movie', 'tv movie', 'episode']
+
 YEAR_FORMATS = [r'^((19|20)\d{2})$', r'^\-((19|20)\d{2})$', r'^((19|20)\d{2})\-$', r'^((19|20)\d{2})\-((19|20)\d{2}$)']
+
 ENTITIES_FORMATS = {
     'Person': r'nm(\d{7})',
     'Company': r'co(\d{7})',
@@ -93,14 +96,14 @@ class SmartIMDB(object):
     """
     genres_schema = {
         'oneOf': [
-            {
-                'type': 'object',
-                'properties': {
-                    'genres': {"type": "array", "items": {"type": "string"}},
-                    'match_type': {'type': 'string', 'enum': ['any', 'all', 'exact']}
-                },
-                'required': ['genres'],
-                'additionalProperties': False},
+            {'type': 'object',
+             'properties': {
+                 'genres': {"type": "array", "items": {"type": "string"}},
+                 'match_type': {'type': 'string', 'enum': ['any', 'all', 'exact']}
+             },
+             'required': ['genres'],
+             'additionalProperties': False
+             },
             {'type': 'string'}
         ]
     }
@@ -118,22 +121,26 @@ class SmartIMDB(object):
                      'oneOf': [
                          {'type': 'array', 'items': job_types},
                          job_types
-                     ]},
+                     ]
+                 },
                  'content_types': {
                      'oneOf': [
                          {'type': 'array', 'items': content_types},
                          content_types
-                     ]},
+                     ]
+                 },
                  'include_genres': genres_schema,
                  'exclude_genres': genres_schema,
                  'rating': {'type': 'number', 'minimum': 0, 'maximum': 10},
                  'votes': {'type': 'number'},
                  'years': {'type': ['string', 'number'], 'format': 'year_format'},
+                 'actor_position': {'type': 'number', 'minimum': 0},
                  'max_entries': {'type': 'number'},
                  'strict_mode': {'type': 'boolean'}
              },
              'required': ['id'],
-             'additionalProperties': False}
+             'additionalProperties': False
+             }
         ]
     }
 
@@ -185,7 +192,7 @@ class SmartIMDB(object):
                     if movies_by_job_type:
                         for movie in movies_by_job_type:
                             if movie not in movies:
-                                log.verbose('Found item: ' + movie.get('title') + ' ,adding to unfiltered list')
+                                log.verbose('Found item: ' + movie.get('title') + ', adding to unfiltered list')
                                 movies.append(movie)
                             else:
                                 log.debug('Movie ' + str(movie) + ' already found in list, skipping.')
@@ -341,7 +348,7 @@ class SmartIMDB(object):
                 log.error('An error has occurred, cannot get item data: %s' % e)
                 continue
 
-            log.debug(
+            log.verbose(
                 'Testing if item: ' + item.get('long imdb canonical title') + ' qualifies for adding to entries.')
 
             type_test = item.get('kind') in config.get('content_types')
@@ -416,7 +423,31 @@ class SmartIMDB(object):
                 log.debug('No genres include test required, skipping include list test.')
                 include_test = True
 
-            if type_test and rating_test and year_test and votes_test and exclude_test and include_test:
+            if config.get('actor_position'):
+                if entity_type != 'Person':
+                    log.info('Actor position value detected but entity type is not person. Passing test.')
+                    position_test = True
+                else:
+                    if 'actor' not in config.get('job_types'):
+                        log.info('Actor position value detected but job type "actor" is not in list. Passing test.')
+                        position_test = True
+                    else:
+                        actor_position = 0
+                        found = False
+                        while not found and actor_position <= len(item['cast']):
+                            log.info(actor_position)
+                            if item['cast'][actor_position].get('name') == item.get('name'):
+                                found = True
+                            actor_position += 1
+                        position_test = actor_position <= config.get('actor_position')
+                        log.info('Position test: Actor %s position in cast is %d and it higher or equal to %d. %s' % (
+                            entity_object.get('name'), item.get('cast').index(entity_object),
+                            config.get('actor_position'), str(position_test)))
+            else:
+                log.info('No position test required, passing test.')
+                position_test = True
+
+            if type_test and rating_test and year_test and votes_test and exclude_test and include_test and position_test:
                 entry = Entry(title=item['title'],
                               imdb_id='tt' + ia.get_imdbID(item),
                               url='')
