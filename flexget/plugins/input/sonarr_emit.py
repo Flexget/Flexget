@@ -105,8 +105,8 @@ class SonarrEmit(object):
                                   series_season=season,
                                   series_episode=episode,
                                   series_id='S%02dE%02d' % (season, episode),
-                                  tvdb_id=record['series']['tvdbId'],
-                                  tvrage_id=record['series']['tvRageId'],
+                                  tvdb_id=record['series'].get('tvdbId'),
+                                  tvrage_id=record['series'].get('tvRageId'),
                                   title=record['series']['title'] + ' ' + 'S%02dE%02d' % (season, episode))
                     if entry.isvalid():
                         entries.append(entry)

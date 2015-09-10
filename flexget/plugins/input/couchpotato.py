@@ -90,8 +90,8 @@ class CouchPotato(object):
                             except ValueError as e:
                                 log.debug(e)
                 title = movie["title"]
-                imdb = movie['info']['imdb']
-                tmdb = movie['info']['tmdb_id']
+                imdb = movie['info'].get('imdb')
+                tmdb = movie['info'].get('tmdb_id')
                 entry = Entry(title=title,
                               url='',
                               imdb_id=imdb,
