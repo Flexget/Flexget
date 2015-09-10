@@ -8,7 +8,7 @@ _flexget_execute()
   COMPREPLY=($(compgen -W "${opts}" -- ${1}))
 }
 
-_fexget_daemon()
+_flexget_daemon()
 {
   local opts="start stop status reload ${_flexget_common_opts}"
   COMPREPLY=($(compgen -W "${opts}" -- ${1}))
