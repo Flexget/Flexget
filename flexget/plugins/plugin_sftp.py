@@ -4,6 +4,7 @@ from collections import namedtuple
 from itertools import groupby
 import logging
 import os
+import posixpath
 from functools import partial
 import time
 
@@ -24,10 +25,9 @@ RETRY_INTERVAL = 15
 RETRY_STEP = 5
 SOCKET_TIMEOUT = 15
 
-# make separate os.path instances for local vs remote path styles
+# make separate path instances for local vs remote path styles
 localpath = os.path
-remotepath = os.path
-remotepath.sep = '/' # pysftp forces *nix style separators
+remotepath = posixpath #pysftp uses POSIX style paths
 
 try:
     import pysftp
