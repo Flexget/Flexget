@@ -33,10 +33,6 @@ def display_summary(options):
     Display series summary.
     :param options: argparse options from the CLI
     """
-    formatting = ' %-30s %-10s %-10s %-20s'
-    console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
-    console('-' * 79)
-
     session = Session()
     try:
         query = (session.query(Series).outerjoin(Series.episodes).outerjoin(Episode.releases).
@@ -52,6 +48,14 @@ def display_summary(options):
             query = query.having(func.max(Episode.first_seen) > datetime.now() - timedelta(days=options.new))
         if options.stale:
             query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=options.stale))
+        if options.porcelain:
+            formatting = '%-30s %s %-10s %s %-10s %s %-20s'
+            console(formatting % ('Name', '|', 'Latest', '|', 'Age', '|', 'Downloaded'))
+        else:
+            formatting = ' %-30s %-10s %-10s %-20s'
+            console('-' * 79)
+            console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
+            console('-' * 79)
         for series in query.order_by(Series.name).yield_per(10):
             series_name = series.name
             if len(series_name) > 30:
@@ -65,7 +69,10 @@ def display_summary(options):
             latest = get_latest_release(series)
             if latest:
                 if latest.first_seen > datetime.now() - timedelta(days=2):
-                    new_ep = '>'
+                    if options.porcelain:
+                        pass
+                    else:
+                         new_ep = '>'
                 behind = new_eps_after(latest)
                 status = get_latest_status(latest)
                 age = latest.age
@@ -74,14 +81,20 @@ def display_summary(options):
             if behind:
                 episode_id += ' +%s' % behind
 
-            console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
+            if options.porcelain:
+                console(formatting % (series_name, '|', episode_id, '|', age, '|', status))
+            else:
+                console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
             if behind >= 3:
                 console(' ! Latest download is %d episodes behind, this may require '
                         'manual intervention' % behind)
 
-        console('-' * 79)
-        console(' > = new episode ')
-        console(' Use `flexget series show NAME` to get detailed information')
+        if options.porcelain:
+            pass
+        else:
+            console('-' * 79)
+            console(' > = new episode ')
+            console(' Use `flexget series show NAME` to get detailed information')
     finally:
         session.close()
 
@@ -247,6 +260,7 @@ def register_parser_arguments():
     list_parser.add_argument('--stale', nargs='?', type=int, metavar='DAYS', const=365,
                              help='limit list to series which have not seen a release in %(const)s days. number of '
                                   'days can be overridden with %(metavar)s')
+    list_parser.add_argument('--porcelain' , action='store_true', help='make the output parseable')
     show_parser = subparsers.add_parser('show', parents=[series_parser],
                                         help='show the releases FlexGet has seen for a given series ')
     begin_parser = subparsers.add_parser('begin', parents=[series_parser],
