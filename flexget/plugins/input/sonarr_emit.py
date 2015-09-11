@@ -105,15 +105,15 @@ class SonarrEmit(object):
                                   series_season=season,
                                   series_episode=episode,
                                   series_id='S%02dE%02d' % (season, episode),
-                                  tvdb_id=record['series']['tvdbId'],
-                                  tvrage_id=record['series']['tvRageId'],
+                                  tvdb_id=record['series'].get('tvdbId'),
+                                  tvrage_id=record['series'].get('tvRageId'),
                                   title=record['series']['title'] + ' ' + 'S%02dE%02d' % (season, episode))
                     if entry.isvalid():
                         entries.append(entry)
                     else:
                         log.error('Invalid entry created? %s' % entry)
                     # Test mode logging
-                    if task.options.test:
+                    if entry and task.options.test:
                         log.info("Test mode. Entry includes:")
                         log.info("    Title: %s" % entry["title"])
                         log.info("    URL: %s" % entry["url"])

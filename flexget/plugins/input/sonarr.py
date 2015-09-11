@@ -114,8 +114,8 @@ class Sonarr(object):
                     entry = Entry(title=show['title'],
                                   url='',
                                   series_name=show['title'],
-                                  tvdb_id=show['tvdbId'],
-                                  tvrage_id=show['tvRageId'],
+                                  tvdb_id=show.get('tvdbId'),
+                                  tvrage_id=show.get('tvRageId'),
                                   # configure_series plugin requires that all settings will have the configure_series prefix
                                   configure_series_quality=fg_quality)
                     if entry.isvalid():
