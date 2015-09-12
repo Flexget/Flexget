@@ -4,7 +4,12 @@ _flexget_execute_opts="--tasks --learn --no-cache --template -v -s --try-regexp 
 
 _flexget_execute()
 {
+  if [[ ${2} == "--tasks" ]]
+  then
+  local opts="$(flexget history --limit 100000 | sed -n '/Task    : /s/ Task    : //p')"
+  else
   local opts="${_flexget_execute_opts} ${_flexget_common_opts}"
+  fi
   COMPREPLY=($(compgen -W "${opts}" -- ${1}))
 }
 
