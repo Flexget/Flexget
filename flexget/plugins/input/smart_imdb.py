@@ -66,6 +66,8 @@ class SmartIMDB(object):
         2004-: If movie year is 2004 and higher, it will pass filter.
         -2004: If movie year is before 2004, it will pass filter.
         2000-2004: If movie year is between 2000 and 2004, it will pass filter.
+    actor_position: A number great than 0 that specifies the minimum position that an actor must be listed in case in
+        order to pass filter. Relevant only when filtering for person and job_types include actor.
     max_entries: The maximum number of entries that can return. This value's purpose is basically flood protection
         against unruly configurations that will return too many results. Default is 200.
     strict_mode: A boolean value that determines what to do in case an item does not have year, rating or votes listed
@@ -132,7 +134,7 @@ class SmartIMDB(object):
                  'include_genres': genres_schema,
                  'exclude_genres': genres_schema,
                  'rating': {'type': 'number', 'minimum': 0, 'maximum': 10},
-                 'votes': {'type': 'number'},
+                 'votes': {'type': 'number', 'minimum': 1},
                  'years': {'type': ['string', 'number'], 'format': 'year_format'},
                  'actor_position': {'type': 'number', 'minimum': 1},
                  'max_entries': {'type': 'number'},
