@@ -134,7 +134,7 @@ class SmartIMDB(object):
                  'rating': {'type': 'number', 'minimum': 0, 'maximum': 10},
                  'votes': {'type': 'number'},
                  'years': {'type': ['string', 'number'], 'format': 'year_format'},
-                 'actor_position': {'type': 'number', 'minimum': 0},
+                 'actor_position': {'type': 'number', 'minimum': 1},
                  'max_entries': {'type': 'number'},
                  'strict_mode': {'type': 'boolean'}
              },
@@ -352,102 +352,102 @@ class SmartIMDB(object):
                 'Testing if item: ' + item.get('long imdb canonical title') + ' qualifies for adding to entries.')
 
             type_test = item.get('kind') in config.get('content_types')
-            log.debug('Item kind: ' + item.get('kind') + ' found in config types ' +
-                      ', '.join(config.get('content_types')) + ': ' + str(type_test))
+            log.verbose('Item kind: ' + item.get('kind') + ' found in config types ' +
+                        ', '.join(config.get('content_types')) + ': ' + str(type_test))
 
             if config.get('rating'):
                 if not item.get('rating'):
                     if config.get('strict_mode'):
-                        log.debug('Strict mode: Item does not have rating value, skipping movie.')
+                        log.verbose('Strict mode: Item does not have rating value, skipping movie.')
                         rating_test = False
                     else:
-                        log.debug('Item does not have rating listed, skipping test.')
+                        log.verbose('Item does not have rating listed, skipping test.')
                         rating_test = True
                 else:
                     rating_test = float(item.get('rating')) >= config.get('rating', 1)
-                    log.debug('Item rating: ' + str(item.get('rating')) +
-                              ' is higher or equal to: ' + str(config.get('rating', '1')) + ': ' + str(rating_test))
+                    log.verbose('Item rating: ' + str(item.get('rating')) +
+                                ' is higher or equal to: ' + str(config.get('rating', '1')) + ': ' + str(rating_test))
             else:
-                log.debug('No rating test required, skipping rating test.')
+                log.verbose('No rating test required, skipping rating test.')
                 rating_test = True
 
             if config.get('years'):
                 if not item.get('year'):
                     if config.get('strict_mode'):
-                        log.debug('Strict mode: Item does not have year value, skipping movie.')
+                        log.verbose('Strict mode: Item does not have year value, skipping movie.')
                         year_test = False
                     else:
-                        log.debug('Item does not have year listed, skipping test.')
+                        log.verbose('Item does not have year listed, skipping test.')
                         year_test = True
                 else:
                     year_test = (item.get('year') >= year_range[0] and (item.get('year') <= year_range[1]))
-                    log.debug(u'Item year: {0} is in given range of {1} and {2}: {3}'.format(str((item.get('year'))),
-                                                                                             str(year_range[0]),
-                                                                                             str(year_range[1]),
-                                                                                             str(year_test)))
+                    log.verbose(u'Item year: {0} is in given range of {1} and {2}: {3}'.format(str((item.get('year'))),
+                                                                                               str(year_range[0]),
+                                                                                               str(year_range[1]),
+                                                                                               str(year_test)))
             else:
-                log.debug('No years test required, skipping year test.')
+                log.verbose('No years test required, skipping year test.')
                 year_test = True
 
             if config.get('votes'):
                 if not item.get('votes'):
                     if config.get('strict_mode'):
-                        log.debug('Strict mode: Item does not have votes value, skipping movie.')
+                        log.verbose('Strict mode: Item does not have votes value, skipping movie.')
                         votes_test = False
                     else:
-                        log.debug('Item does not have votes listed, skipping test.')
+                        log.verbose('Item does not have votes listed, skipping test.')
                         votes_test = True
                 else:
                     votes_test = int(item.get('votes')) >= config.get('votes', 1)
-                    log.debug('Item votes: ' + str(item.get('votes')) +
-                              ' are higher or equal to: ' + str(config.get('votes', '1')) + ': ' + str(votes_test))
+                    log.verbose('Item votes: ' + str(item.get('votes')) +
+                                ' are higher or equal to: ' + str(config.get('votes', '1')) + ': ' + str(votes_test))
             else:
-                log.debug('No votes test required, skipping votes test.')
+                log.verbose('No votes test required, skipping votes test.')
                 votes_test = True
 
             if exclude_list:
                 exclude_test = not self.genres_match(exclude_list, item.get('genres', []))
-                log.debug('Exclude genres: ' + ', '.join(exclude_list.get('genres', [])) + ' with match type ' +
-                          exclude_list.get('match_type') + ' are not found in item genres: ' +
-                          ', '.join(item.get('genres', [])) + ': ' + str(exclude_test))
+                log.verbose('Exclude genres: ' + ', '.join(exclude_list.get('genres', [])) + ' with match type ' +
+                            exclude_list.get('match_type') + ' are not found in item genres: ' +
+                            ', '.join(item.get('genres', [])) + ': ' + str(exclude_test))
             else:
-                log.debug('No genres exclude test required, skipping exclude list test.')
+                log.verbose('No genres exclude test required, skipping exclude list test.')
                 exclude_test = True
 
             if include_list:
                 include_test = self.genres_match(include_list, item.get('genres', []))
-                log.debug('Include genres: ' + ', '.join(include_list.get('genres', [])) +
-                          ' with match type ' + include_list.get('match_type') + ' are found in item genres: ' +
-                          ', '.join(item.get('genres', [])) + ': ' + str(include_test))
+                log.verbose('Include genres: ' + ', '.join(include_list.get('genres', [])) +
+                            ' with match type ' + include_list.get('match_type') + ' are found in item genres: ' +
+                            ', '.join(item.get('genres', [])) + ': ' + str(include_test))
             else:
-                log.debug('No genres include test required, skipping include list test.')
+                log.verbose('No genres include test required, skipping include list test.')
                 include_test = True
 
             if config.get('actor_position'):
                 if entity_type != 'Person':
-                    log.info('Actor position value detected but entity type is not person. Passing test.')
+                    log.verbose('Actor position value detected but entity type is not person. Skipping test.')
                     position_test = True
                 else:
                     if 'actor' not in config.get('job_types'):
-                        log.info('Actor position value detected but job type "actor" is not in list. Passing test.')
+                        log.verbose('Actor position value detected but job type "actor" is not in list. Skipping test.')
                         position_test = True
                     else:
                         actor_position = 0
                         found = False
-                        while not found and actor_position <= len(item['cast']):
-                            log.info(actor_position)
-                            if item['cast'][actor_position].get('name') == item.get('name'):
+                        while not found and actor_position < len(item.get('cast', [])):
+                            if item['cast'][actor_position].get('name') == entity_object.get('name'):
                                 found = True
                             actor_position += 1
                         position_test = actor_position <= config.get('actor_position')
-                        log.info('Position test: Actor %s position in cast is %d and it higher or equal to %d. %s' % (
-                            entity_object.get('name'), item.get('cast').index(entity_object),
-                            config.get('actor_position'), str(position_test)))
+                        log.verbose('Position test: Actor %s position in cast is %d and it higher or equal to %d. %s' %
+                                    (entity_object.get('name'), actor_position, config.get('actor_position'),
+                                     str(position_test)))
             else:
-                log.info('No position test required, passing test.')
+                log.verbose('No position test required, passing test.')
                 position_test = True
 
-            if type_test and rating_test and year_test and votes_test and exclude_test and include_test and position_test:
+            if type_test and rating_test and year_test and votes_test and exclude_test and include_test and \
+                    position_test:
                 entry = Entry(title=item['title'],
                               imdb_id='tt' + ia.get_imdbID(item),
                               url='')
@@ -465,10 +465,9 @@ class SmartIMDB(object):
             return entries
         else:
             log.warning(
-                'Number of entries (%s) exceeds maximum allowed value %s. \
-                Edit your filters or raise the maximum value by entering a higher "max_entries"' % (
+                'Number of entries (%s) exceeds maximum allowed value %s. '
+                'Edit your filters or raise the maximum value by entering a higher "max_entries"' % (
                     len(entries), config.get('max_entries')))
-
             return
 
 
