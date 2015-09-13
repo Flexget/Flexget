@@ -94,8 +94,8 @@ class Sickbeard(object):
                     entry = Entry(title=show['show_name'],
                                   url='',
                                   series_name=show['show_name'],
-                                  tvdb_id=show['tvdbid'],
-                                  tvrage_id=show['tvrage_id'],
+                                  tvdb_id=show.get('tvdbid'),
+                                  tvrage_id=show.get('tvrage_id'),
                                   # configure_series plugin requires that all settings will have the configure_series prefix
                                   configure_series_quality=fg_quality)
             if entry.isvalid():
