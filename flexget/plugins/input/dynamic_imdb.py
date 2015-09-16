@@ -42,29 +42,8 @@ class DynamicIMDB(object):
     id: string that relates to a supported entity type. For example: 'nm0000375'. Required.
     job_types: a string or list with job types from JOB_TYPES. Default is 'actor'.
     content_types: A string or list with content types from CONTENT_TYPES. Default is 'movie'.
-    include_genres: A string or list with genres to include when matching a movie. Can also contain match_type,
-        which decided on the filter type.
-        If match_type is 'any', if ANY of the included genres are listed in the filtered movie, it will pass the filter.
-        If match_type is 'all, if ALL of the included genres are listed in the filtered movie, it will pass the filter.
-        If match_type is 'exact, if EXACTLY all of the included genres are listed in the filtered movie,
-        it will pass the filter. Default match_type is 'any'.
-    exclude_genres: Exactly like include_genres but relates to which genres the item should not hold.
-    rating: A number between 0 and 10 that will be matched against the rating of the movie. If movie rating is higher
-        or equal, it will pass the filter.
-    votes: A number that will be matched against the votes of the movie. If movie number of votes is higher
-        or equal, it will pass the filter.
-    years: A string that determines which years to filter. For example:
-        2004: If movie year is 2004, it will pass filter.
-        2004-: If movie year is 2004 and higher, it will pass filter.
-        -2004: If movie year is before 2004, it will pass filter.
-        2000-2004: If movie year is between 2000 and 2004, it will pass filter.
-    actor_position: A number great than 0 that specifies the minimum position that an actor must be listed in case in
-        order to pass filter. Relevant only when filtering for person and job_types include actor.
     max_entries: The maximum number of entries that can return. This value's purpose is basically flood protection
         against unruly configurations that will return too many results. Default is 200.
-    strict_mode: A boolean value that determines what to do in case an item does not have year, rating or votes listed
-        and the configuration holds any of those. If set to 'True', it will cause an item that does not hold one of
-        these properties to fail the filter. Default is 'False'.
 
     Advanced config example:
         smart_movie_queue:
@@ -75,15 +54,6 @@ class DynamicIMDB(object):
                 - director
               content_types:
                 - tv series
-              rating: 5.6
-              include_genres:
-                genres:
-                  - action
-                  - comedy
-                match_type: any
-              exclude_genres: animation
-              years: '2005-'
-              strict_mode: yes
             accept_all: yes
             movie_queue: add
 
