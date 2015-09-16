@@ -7,7 +7,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 
-from flexget.config_schema import format_checker
+from flexget.utils.cached_input import cached
 
 log = logging.getLogger('dynamic_imdb')
 
@@ -32,7 +32,7 @@ class DynamicIMDB(object):
 
     For example:
 
-        smart_imdb: 'http://www.imdb.com/character/ch0001354/?ref_=tt_cl_t1'
+        dynamic_imdb: 'http://www.imdb.com/character/ch0001354/?ref_=tt_cl_t1'
 
     ID format is not important as relevant ID is captured via regex.
 
@@ -46,8 +46,8 @@ class DynamicIMDB(object):
         against unruly configurations that will return too many results. Default is 200.
 
     Advanced config example:
-        smart_movie_queue:
-            smart_imdb:
+        dynamic_movie_queue:
+            dynamic_imdb:
               id: 'http://www.imdb.com/company/co0051941/?ref_=fn_al_co_2'
               job_types:
                 - actor
@@ -163,6 +163,7 @@ class DynamicIMDB(object):
 
         return config
 
+    @cached('dynamic_imdb', persist='2 hours')
     def on_task_input(self, task, config):
         try:
             from imdb import IMDb
