@@ -130,7 +130,7 @@ class PluginSubliminal(object):
                     else:
                         subtitle = subliminal.download_best_subtitles([video], entry_langs, providers=providers_list,
                                                                       min_score=msc)
-                        if subtitle:
+                        if subtitle and any(subtitle.values()):
                             downloaded_subtitles.update(subtitle)
                             log.info('Subtitles found for %s' % entry['location'])
                         else:
@@ -142,7 +142,7 @@ class PluginSubliminal(object):
                                 subtitle = subliminal.download_best_subtitles([video], remaining_alts,
                                                                               providers=providers_list, min_score=msc)
                             # this potentially just checks an already checked assignment bleh
-                            if subtitle:
+                            if subtitle and any(subtitle.values()):
                                 downloaded_subtitles.update(subtitle)
                                 entry.fail('subtitles found for a second-choice language.')
                             else:
