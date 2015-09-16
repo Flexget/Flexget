@@ -7,12 +7,9 @@ from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 
-from imdb import IMDb
 from flexget.config_schema import format_checker
 
 log = logging.getLogger('smart_imdb')
-
-ia = IMDb()
 
 JOB_TYPES = ['actor', 'director', 'producer', 'writer', 'self',
              'editor', 'miscellaneous', 'editorial department', 'cinematographer',
@@ -156,14 +153,14 @@ class SmartIMDB(object):
             m = re.search(imdb_entity_format, imdb_id)
             if m:
                 if imdb_entity_type == 'Person':
-                    log.info('Starting to retrieve items for person: %s' % ia.get_person(m.group(1)))
-                    return imdb_entity_type, ia.get_person(m.group(1))
+                    log.info('Starting to retrieve items for person: %s' % self.ia.get_person(m.group(1)))
+                    return imdb_entity_type, self.ia.get_person(m.group(1))
                 elif imdb_entity_type == 'Company':
-                    log.info('Starting to retrieve items for company: %s' % ia.get_company(m.group(1)))
-                    return imdb_entity_type, ia.get_company(m.group(1))
+                    log.info('Starting to retrieve items for company: %s' % self.ia.get_company(m.group(1)))
+                    return imdb_entity_type, self.ia.get_company(m.group(1))
                 elif imdb_entity_type == 'Character':
-                    log.info('Starting to retrieve items for Character: %s' % ia.get_character(m.group(1)))
-                    return imdb_entity_type, ia.get_character(m.group(1))
+                    log.info('Starting to retrieve items for Character: %s' % self.ia.get_character(m.group(1)))
+                    return imdb_entity_type, self.ia.get_character(m.group(1))
 
     def items_by_entity(self, entity_type, entity_object, content_types, job_types):
         """
@@ -320,6 +317,13 @@ class SmartIMDB(object):
         return config
 
     def on_task_input(self, task, config):
+        try:
+            from imdb import IMDb
+        except Exception:
+            log.error('IMDBPY is requires for this plugin. Please install using "pip install imdbpy"')
+            return
+
+        self.ia = IMDb()
         entries = []
 
         config = self.prepare_config(config)
@@ -345,7 +349,7 @@ class SmartIMDB(object):
 
         for item in items:
             try:
-                ia.update(item)
+                self.ia.update(item)
             except Exception as e:
                 log.error('An error has occurred, cannot get item data: %s' % e)
                 continue
@@ -451,7 +455,7 @@ class SmartIMDB(object):
             if type_test and rating_test and year_test and votes_test and exclude_test and include_test and \
                     position_test:
                 entry = Entry(title=item['title'],
-                              imdb_id='tt' + ia.get_imdbID(item),
+                              imdb_id='tt' + self.ia.get_imdbID(item),
                               url='')
                 if entry.isvalid():
                     if entry not in entries:
