@@ -31,12 +31,15 @@ class OutputPushalot(object):
     Configuration parameters are also supported from entries (eg. through set).
     """
     default_body = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} " \
-                   "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "\
+                   "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} " \
                    "{{imdb_year}}{% else %}{{title}}{% endif %}"
     schema = {
         'type': 'object',
         'properties': {
-            'token': one_or_more({'type': 'string'}),
+            'token': {'oneof': [
+                {'type': 'string'},
+                {'type': 'array', 'items': 'string'}
+            ]},
             'title': {'type': 'string', 'default': "Task {{task}}"},
             'body': {'type': 'string', 'default': default_body},
             'link': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
@@ -71,7 +74,7 @@ class OutputPushalot(object):
             silent = config["silent"]
             image = config["image"]
             source = config["source"]
-            timetolive = config["timetolive"]           
+            timetolive = config["timetolive"]
 
             # Attempt to render the title field
             try:
