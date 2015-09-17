@@ -104,7 +104,7 @@ class Sickbeard(object):
             else:
                 log.error('Invalid entry created? %s' % entry)
             # Test mode logging
-            if entry and task.options.test:
+            if task.options.test:
                 log.info("Test mode. Entry includes:")
                 log.info("    Title: %s" % entry["title"])
                 log.info("    URL: %s" % entry["url"])
@@ -112,7 +112,6 @@ class Sickbeard(object):
                 log.info("    TVDB ID: %s" % entry["tvdb_id"])
                 log.info("    TVRAGE ID: %s" % entry["tvrage_id"])
                 log.info("    Quality: %s" % entry["configure_series_quality"])
-                continue
         return entries
 
 
