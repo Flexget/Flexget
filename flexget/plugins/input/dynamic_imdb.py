@@ -4,6 +4,7 @@ import logging
 import re
 from jsonschema.compat import str_types
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.entry import Entry
 
@@ -11,7 +12,7 @@ from flexget.utils.cached_input import cached
 
 log = logging.getLogger('dynamic_imdb')
 
-JOB_TYPES = ['actor', 'director', 'producer', 'writer', 'self',
+JOB_TYPES = ['actor', 'actress', 'director', 'producer', 'writer', 'self',
              'editor', 'miscellaneous', 'editorial department', 'cinematographer',
              'visual effects', 'thanks', 'music department']
 
@@ -22,6 +23,18 @@ ENTITIES_FORMATS = {
     'Company': r'co(\d{7})',
     'Character': r'ch(\d{7})'
 }
+
+CONTENT_TYPE_CONVERSION = {
+    'movie': 'movie',
+    'tv series': 'tv',
+    'tv mini series': 'tv',
+    'tv movie': 'tv',
+    'episode': 'tv',
+    'video movie': 'video',
+    'video game': 'video game'
+}
+
+JOBS_WITHOUT_CONTENT_TYPE = ['actor', 'actress', 'self']
 
 
 class DynamicIMDB(object):
@@ -52,39 +65,33 @@ class DynamicIMDB(object):
               job_types:
                 - actor
                 - director
-              content_types:
-                - tv series
+              content_types: tv series
             accept_all: yes
             movie_queue: add
 
     """
+    imdb_pattern = {'type': 'string',
+                    'pattern': r'(nm|co|ch)\d{7}',
+                    'error_pattern': 'Get the id from the url of the person/company you want to use,'
+                                     ' e.g. http://imdb.com/person/<id here>/blah'}
     job_types = {'type': 'string', 'enum': JOB_TYPES}
     content_types = {'type': 'string', 'enum': CONTENT_TYPES}
 
     schema = {
         'oneOf': [
-            {'type': 'string'},
+            imdb_pattern,
             {'type': 'object',
              'properties': {
-                 'id': {'type': 'string'},
-                 'job_types': {
-                     'oneOf': [
-                         {'type': 'array', 'items': job_types},
-                         job_types
-                     ]
-                 },
-                 'content_types': {
-                     'oneOf': [
-                         {'type': 'array', 'items': content_types},
-                         content_types
-                     ]
-                 },
-                 'max_entries': {'type': 'number'}
+                 'id': imdb_pattern,
+                 'job_types': one_or_more(job_types),
+                 'content_types': one_or_more(content_types),
+                 'max_entries': {'type': 'integer'}
              },
              'required': ['id'],
              'additionalProperties': False
              }
-        ]
+        ],
+
     }
 
     def entity_type_and_object(self, imdb_id):
@@ -97,14 +104,17 @@ class DynamicIMDB(object):
             m = re.search(imdb_entity_format, imdb_id)
             if m:
                 if imdb_entity_type == 'Person':
-                    log.info('Starting to retrieve items for person: %s' % self.ia.get_person(m.group(1)))
-                    return imdb_entity_type, self.ia.get_person(m.group(1))
+                    person = self.ia.get_person(m.group(1))
+                    log.info('Starting to retrieve items for person: %s' % person)
+                    return imdb_entity_type, person
                 elif imdb_entity_type == 'Company':
-                    log.info('Starting to retrieve items for company: %s' % self.ia.get_company(m.group(1)))
-                    return imdb_entity_type, self.ia.get_company(m.group(1))
+                    company = self.ia.get_company(m.group(1))
+                    log.info('Starting to retrieve items for company: %s' % company)
+                    return imdb_entity_type, company
                 elif imdb_entity_type == 'Character':
-                    log.info('Starting to retrieve items for Character: %s' % self.ia.get_character(m.group(1)))
-                    return imdb_entity_type, self.ia.get_character(m.group(1))
+                    character = self.ia.get_character(m.group(1))
+                    log.info('Starting to retrieve items for Character: %s' % character)
+                    return imdb_entity_type, character
 
     def items_by_entity(self, entity_type, entity_object, content_types, job_types):
         """
@@ -125,21 +135,28 @@ class DynamicIMDB(object):
                    + entity_object.get('video-game', []) + entity_object.get('video', [])
 
         elif entity_type == 'Person':
-            if 'actor' in job_types:
-                job_types.append('actress')  # Special case: Actress are listed differently than actor
             for job_type in job_types:
-                for content_type in content_types:
-                    job_and_content = job_type + ' ' + content_type
-                    log.debug('Searching for movies that correlates to: ' + job_and_content)
-                    movies_by_job_type = entity_object.get(job_and_content, entity_object.get(job_type))
-                    if movies_by_job_type:
-                        for movie in movies_by_job_type:
-                            self.ia.update(movie)
-                            if movie not in movies and movie['kind'] in content_types:
-                                log.debug('Found item: ' + movie.get('title') + ', adding to unfiltered list')
-                                movies.append(movie)
-                            else:
-                                log.debug('Movie ' + str(movie) + ' already found in list, skipping.')
+                if job_type in JOBS_WITHOUT_CONTENT_TYPE:
+                    log.debug('Searching for movies that correlates to: ' + job_type)
+                    movies += entity_object.get(job_type)
+                    continue
+                else:
+                    for content_type in content_types:
+                        job_and_content = job_type + ' ' + CONTENT_TYPE_CONVERSION[content_type]
+                        log.debug('Searching for movies that correlates to: ' + job_and_content)
+                        movies_by_job_type = entity_object.get(job_and_content)
+                        if content_type == 'movie':
+                            log.debug('Searching for short movies and documentaries.')
+                            movies_by_job_type += entity_object.get(job_type + ' ' + 'documentary', [])
+                            movies_by_job_type += entity_object.get(job_type + ' ' + 'short', [])
+                        if movies_by_job_type:
+                            for movie in movies_by_job_type:
+                                self.ia.update(movie)
+                                if movie not in movies and movie['kind'] in content_types:
+                                    log.debug('Found item: ' + movie.get('title') + ', adding to unfiltered list')
+                                    movies.append(movie)
+                                else:
+                                    log.debug('Movie ' + str(movie) + ' already found in list, skipping.')
             return movies
 
     def prepare_config(self, config):
@@ -167,7 +184,7 @@ class DynamicIMDB(object):
     def on_task_input(self, task, config):
         try:
             from imdb import IMDb
-        except Exception:
+        except ImportError:
             log.error('IMDBPY is requires for this plugin. Please install using "pip install imdbpy"')
             return
 
