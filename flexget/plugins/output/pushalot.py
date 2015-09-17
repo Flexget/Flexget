@@ -33,25 +33,25 @@ class OutputPushalot(object):
     default_body = ("{% if series_name is defined %}{{tvdb_series_name|d(series_name)}}" +
                     "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}" +
                     "{{imdb_name}} {{imdb_year}}{% else %}{{title}}{% endif %}")
-    schema = {'oneof':
-                  [{'type': 'object',
-                    'properties': {
-                        'token': one_or_more({'type': 'string'}),
-                        'title': {'type': 'string'},
-                        'body': {'type': 'string'},
-                        'link': {'type': 'string'},
-                        'linktitle': {'type': 'string'},
-                        'important': {'type': 'boolean'},
-                        'silent': {'type': 'boolean'},
-                        'image': {'type': 'string'},
-                        'source': {'type': 'string'},
-                        'timetolive': {'type': 'integer'},
-                    },
-                    'required': ['token'],
-                    'additionalProperties': False},
-                   {'type': 'string'}
-                   ]
-              }
+    schema = {'oneof': [
+        {'type': 'object',
+         'properties': {
+             'token': one_or_more({'type': 'string'}),
+             'title': {'type': 'string'},
+             'body': {'type': 'string'},
+             'link': {'type': 'string'},
+             'linktitle': {'type': 'string'},
+             'important': {'type': 'boolean'},
+             'silent': {'type': 'boolean'},
+             'image': {'type': 'string'},
+             'source': {'type': 'string'},
+             'timetolive': {'type': 'integer'},
+         },
+         'required': ['token'],
+         'additionalProperties': False},
+        {'type': 'string'}
+    ]
+    }
 
     def prepare_config(self, config):
         if not isinstance(config, dict):
