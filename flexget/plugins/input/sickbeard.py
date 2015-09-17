@@ -81,29 +81,30 @@ class Sickbeard(object):
                      'HD720p': '720p',
                      'SD': '<hr'}
         for id, show in json['data'].items():
-            entry = None
             fg_quality = ''  # Initializes the quality parameter
-            if not show['paused'] or not config.get('only_monitored'):
-                if config.get('include_ended') or show['status'] != 'Ended':
-                    if config.get('include_data'):
-                        show_url = '%s:%s/api/%s/?cmd=show&tvdbid=%s' % (config['base_url'], config['port'],
-                                                                         config['api_key'], show['tvdbid'])
-                        show_json = task.requests.get(show_url).json()
-                        sb_quality = show_json['data']['quality']
-                        fg_quality = qualities[sb_quality]
-                    entry = Entry(title=show['show_name'],
-                                  url='',
-                                  series_name=show['show_name'],
-                                  tvdb_id=show.get('tvdbid'),
-                                  tvrage_id=show.get('tvrage_id'),
-                                  # configure_series plugin requires that all settings will have the configure_series prefix
-                                  configure_series_quality=fg_quality)
+            if show['paused'] and config.get('only_monitored'):
+                continue
+            if show['status'] == 'Ended' and not config.get('include_ended'):
+                continue
+            if config.get('include_data'):
+                show_url = '%s:%s/api/%s/?cmd=show&tvdbid=%s' % (config['base_url'], config['port'],
+                                                                 config['api_key'], show['tvdbid'])
+                show_json = task.requests.get(show_url).json()
+                sb_quality = show_json['data']['quality']
+                fg_quality = qualities[sb_quality]
+            entry = Entry(title=show['show_name'],
+                          url='',
+                          series_name=show['show_name'],
+                          tvdb_id=show.get('tvdbid'),
+                          tvrage_id=show.get('tvrage_id'),
+                          # configure_series plugin requires that all settings will have the configure_series prefix
+                          configure_series_quality=fg_quality)
             if entry.isvalid():
                 entries.append(entry)
             else:
                 log.error('Invalid entry created? %s' % entry)
             # Test mode logging
-            if entry and task.options.test:
+            if task.options.test:
                 log.info("Test mode. Entry includes:")
                 log.info("    Title: %s" % entry["title"])
                 log.info("    URL: %s" % entry["url"])
@@ -111,7 +112,6 @@ class Sickbeard(object):
                 log.info("    TVDB ID: %s" % entry["tvdb_id"])
                 log.info("    TVRAGE ID: %s" % entry["tvrage_id"])
                 log.info("    Quality: %s" % entry["configure_series_quality"])
-                continue
         return entries
 
 
