@@ -578,9 +578,10 @@ class SftpUpload(object):
 
         for entry in task.accepted:
             if sftp:
-                log.debug('SFTP connection failed; failing entry: %s' % entry)
+                log.debug('Uploading file: %s' % entry)
                 self.handle_entry(entry, sftp, config, url_prefix)
             else:
+                log.debug('SFTP connection failed; failing entry: %s' % entry)
                 entry.fail
 
 @event('plugin.register')
