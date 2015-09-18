@@ -542,7 +542,7 @@ class SftpUpload(object):
                 return
 
         if not sftp.isdir(to):
-            log.error('Not a directory: %s')
+            log.error('Not a directory: %s' % to)
             entry.fail
             return
 
