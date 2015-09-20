@@ -6,6 +6,19 @@ from tests import FlexGetBase, MockManager
 from flexget import __version__
 from flexget.manager import Manager
 from flexget.api import app, API_VERSION
+from flexget import api
+
+if 'api_key' not in api.api_config:
+    api.api_config['api_key'] = api.generate_key()
+
+api_key = api.api_config['api_key']
+
+
+def append_header(key, value, kwargs):
+    if 'headers' not in kwargs:
+        kwargs['headers'] = {}
+
+    kwargs['headers'][key] = value
 
 
 class APITest(FlexGetBase):
@@ -15,9 +28,22 @@ class APITest(FlexGetBase):
         FlexGetBase.__init__(self)
 
     def json_post(self, *args, **kwargs):
-        if 'header' not in kwargs:
-            kwargs['headers'] = [('Content-Type', 'application/json')]
+        append_header('Content-Type', 'application/json', kwargs)
+        if kwargs.get('auth', True):
+            append_header('Authorization', 'Token %s' % api_key, kwargs)
         return self.client.post(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        if kwargs.get('auth', True):
+            append_header('Authorization', 'Token %s' % api_key, kwargs)
+
+        return self.client.get(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if kwargs.get('auth', True):
+            append_header('Authorization', 'Token %s' % api_key, kwargs)
+
+        return self.client.delete(*args, **kwargs)
 
 
 class TestServerAPI(APITest):
@@ -32,23 +58,23 @@ class TestServerAPI(APITest):
         """
 
     def test_pid(self):
-        rsp = self.client.get('/server/pid/')
+        rsp = self.get('/server/pid/', headers={})
         assert rsp.status_code == 200
         assert json.loads(rsp.data) == {'pid': os.getpid()}
 
     @patch.object(MockManager, 'load_config')
     def test_reload(self, mocked_load_config):
-        rsp = self.client.get('/server/reload/')
+        rsp = self.get('/server/reload/')
         assert rsp.status_code == 200
         assert mocked_load_config.called
 
     @patch.object(Manager, 'shutdown')
     def test_shutdown(self, mocked_shutdown):
-        self.client.get('/server/shutdown/')
+        self.get('/server/shutdown/')
         assert mocked_shutdown.called
 
     def test_get_config(self):
-        rsp = self.client.get('/server/config/')
+        rsp = self.get('/server/config/')
         assert rsp.status_code == 200
         assert json.loads(rsp.data) == {
             'tasks': {
@@ -60,7 +86,7 @@ class TestServerAPI(APITest):
         }
 
     def test_version(self):
-        rsp = self.client.get('/server/version/')
+        rsp = self.get('/server/version/')
         assert rsp.status_code == 200
         assert json.loads(rsp.data) == {'flexget_version': __version__, 'api_version': API_VERSION}
 
@@ -77,7 +103,7 @@ class TestTaskAPI(APITest):
         """
 
     def test_list_tasks(self):
-        rsp = self.client.get('/tasks/')
+        rsp = self.get('/tasks/')
         data = json.loads(rsp.data)
         assert data == {
             'tasks': [
@@ -127,7 +153,7 @@ class TestTaskAPI(APITest):
         assert rsp.status_code == 409
 
     def test_get_task(self):
-        rsp = self.client.get('/tasks/test/')
+        rsp = self.get('/tasks/test/')
         data = json.loads(rsp.data)
         assert data == {
             'name': 'test',
@@ -189,7 +215,7 @@ class TestTaskAPI(APITest):
 
     @patch.object(Manager, 'save_config')
     def test_delete_task(self, mocked_save_config):
-        rsp = self.client.delete('/tasks/test/')
+        rsp = self.delete('/tasks/test/')
 
         assert rsp.status_code == 200
         assert mocked_save_config.called

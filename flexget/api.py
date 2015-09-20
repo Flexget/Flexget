@@ -37,7 +37,7 @@ def generate_key():
     """ Generate api key for use to authentication """
     return base64.b64encode(hashlib.sha256(str(random.getrandbits(256))).digest(),
                             random.choice(['rA', 'aZ', 'gQ', 'hH', 'hG', 'aR', 'DD'])).rstrip('==')
-
+api_config = {}
 
 api_config_schema = {
     'type': 'object',
