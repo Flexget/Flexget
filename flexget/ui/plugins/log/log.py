@@ -15,8 +15,8 @@ log.register_angular_route(
 
 log.register_css('log', 'css/log.css', order=99)
 log.register_js('log', 'js/log.js')
-log.register_js('angular-oboe', 'js/libs/angular-oboe.js')
-log.register_js('oboe-browser', 'js/libs/oboe-browser.js')
+log.register_js('angular-oboe', 'libs/oboe/js/angular-oboe.js')
+log.register_js('oboe-browser', 'libs/oboe/js/oboe-browser.js')
 
 
 register_menu(log.url_prefix, 'Log', icon='fa fa-file-text-o')
