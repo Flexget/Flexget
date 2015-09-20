@@ -270,7 +270,7 @@ def load_user(user_id):
 
 def validate_credentials(username, password):
     if api_config.get("username") == username and api_config.get("password") == password:
-        return User("flexget")
+        return User(username)
 
 
 login_api_schema = api.schema("login", {
@@ -283,16 +283,20 @@ login_api_schema = api.schema("login", {
 
 
 @login_api.route('/')
+# TODO: Should we return a token rather then using session cookie?
+@api.doc(description="Login to API with username and password")
 class LoginAPI(APIResource):
 
-    @api.validate(login_api_schema)
+    @api.expect(login_api_schema)
+    @api.response(400, 'Invalid username or Password')
+    @api.response(200, 'Login successful')
     def post(self, session=None):
         data = request.json
         if data and validate_credentials(data.get("username"), data.get("password")):
             login_user(User("flexget"))
-            return {"status": "login success"}
+            return {"status": "success"}
         else:
-            return current_app.login_manager.unauthorized()
+            return {"status": "failed", "message": "Invalid username or Password"}, 400
 
 
 @app.before_request
