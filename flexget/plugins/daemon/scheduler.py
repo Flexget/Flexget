@@ -85,9 +85,14 @@ main_schema = {
     'oneOf': [
         {
             'type': 'array',
+            'title': 'Enable',
             'items': schedule_schema
         },
-        {'type': 'boolean'}
+        {
+            'type': 'boolean',
+            'title': 'Disable',
+            'description': 'Disable task schedules',
+        }
     ]
 }
 
