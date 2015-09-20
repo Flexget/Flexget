@@ -47,14 +47,14 @@
                         </md-button>
                     </md-list-item>
                 {% endfor %}
-            </md-list>        </md-content>
+            </md-list>
+        </md-content>
     </md-sidenav>
     <div layout="column" flex id="content">
-        <div ng-controller="LoginController"/>
         <md-content ui-view layout="column" flex layout-padding></md-content>
     </div>
 </div>
-
+<div ng-controller="LoginController"/>
 {% assets "js_all" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
 </body>
 </html>
