@@ -1,0 +1,19 @@
+<div class="modal-header">
+    <h3>Login</h3>
+</div>
+<div class="modal-body">
+    <p class="text-danger">{{ error }}</p>
+    <form>
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" class="form-control" id="username" placeholder="Username" ng-model="credentials.username">
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" placeholder="Password" ng-model="credentials.password">
+        </div>
+    </form>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-success" data-ng-click="login()">Login</button>
+</div>
