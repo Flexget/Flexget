@@ -6,8 +6,8 @@
     <title>FlexGet Manager</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
-    <link rel="stylesheet" href="static/css/font-awesome.min.css">
-    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="static/libs/bootstrap/css/bootstrap.min.css">
     {% assets "css_all" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
 </head>
 
@@ -50,6 +50,7 @@
             </md-list>        </md-content>
     </md-sidenav>
     <div layout="column" flex id="content">
+        <div ng-controller="LoginController"/>
         <md-content ui-view layout="column" flex layout-padding></md-content>
     </div>
 </div>
