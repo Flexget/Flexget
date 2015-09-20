@@ -9,7 +9,7 @@ from time import sleep
 from functools import wraps
 from collections import deque
 
-
+from flask.ext.login import LoginManager, UserMixin, current_user, current_app, login_user
 from flask import Flask, request, jsonify, Response
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.resource import Resource
@@ -40,16 +40,12 @@ def generate_key():
 
 
 api_config_schema = {
-    'oneOf': [
-        {'type': 'boolean'},
-        {
-            'type': 'object',
-            'properties': {
-                'api_key': {'type': 'string', 'default': generate_key()}
-            },
-            'additionalProperties': False
-        }
-    ],
+    'type': 'object',
+    'properties': {
+        'api_key': {'type': 'string', 'minLength': 32, 'default': generate_key()},
+        'username': {'type': 'string'},
+        'password': {'type': 'string'},
+    },
     'additionalProperties': False
 }
 
@@ -168,6 +164,9 @@ class APIResource(Resource):
         super(APIResource, self).__init__()
 
 app = Flask(__name__)
+app.config['SESSION_TYPE'] = 'memcached'
+app.config['SECRET_KEY'] = generate_key()
+
 Compress(app)
 api = Api(app, catch_all_404s=True, title='Flexget API')
 
@@ -251,10 +250,91 @@ class ValidationError(ApiError):
 
 @event('manager.daemon.started')
 def register_api(mgr):
+    global api_config
     api_config = mgr.config.get('api')
 
     if api_config:
         register_app('/api', app)
+
+
+# API Authentication and Authorization
+login_api = api.namespace('login', description='API Authentication')
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User(user_id)
+
+
+def validate_credentials(username, password):
+    if api_config.get("username") == username and api_config.get("password") == password:
+        return User("flexget")
+
+
+login_api_schema = api.schema("login", {
+    "type": "object",
+    "properties": {
+        "username": {"type": "string"},
+        "password": {"type": "string"}
+    }
+})
+
+
+@login_api.route('/')
+class LoginAPI(APIResource):
+
+    @api.validate(login_api_schema)
+    def post(self, session=None):
+        data = request.json
+        if data and validate_credentials(data.get("username"), data.get("password")):
+            login_user(User("flexget"))
+            return {"status": "login success"}
+        else:
+            return current_app.login_manager.unauthorized()
+
+
+@app.before_request
+def check_valid_login():
+    # Allow access to root, login and swagger documentation without authentication
+    if request.path == "/" or request.path.startswith("/login") or request.path.startswith("/swagger"):
+        return
+
+    if not current_user.is_authenticated:
+        return current_app.login_manager.unauthorized()
+
+
+class User(UserMixin):
+    def __init__(self, username):
+        self.id = username
+
+
+@login_manager.request_loader
+def load_user_from_request(request):
+    auth_value = request.headers.get('Authorization')
+
+    if not auth_value:
+        return
+
+    # Login using api key
+    if auth_value.startswith('Token'):
+        try:
+            token = auth_value.replace('Token ', '', 1)
+            if api_config.get("api_key") == token:
+                return User("flexget")
+        except (TypeError, ValueError):
+            pass
+
+    # Login using basic auth
+    if auth_value.startswith('Basic'):
+        try:
+            credentials = base64.b64decode(auth_value.replace('Basic ', '', 1))
+            username, password = credentials.split(":")
+            if api_config.get("username") == username and api_config.get("password") == password:
+                return User("flexget")
+        except (TypeError, ValueError):
+            pass
 
 
 # Schema API
