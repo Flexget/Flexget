@@ -59,12 +59,15 @@ class SearchKAT(object):
 
                 log.debug('requesting: %s' % url)
                 try:
-                    r = task.requests.get(url, params=params)
+                    r = task.requests.get(url, params=params, raise_status=False)
                 except RequestException as e:
                     log.warning('Search resulted in: %s' % e)
                     continue
                 if not r.content:
                     log.debug('No content returned from search.')
+                    continue
+                elif r.status_code != 200:
+                    log.warning('Search returned %s response code' % r.status_code)
                     continue
                 rss = feedparser.parse(r.content)
 
