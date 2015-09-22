@@ -4,7 +4,7 @@ import logging
 import re
 import sys
 
-from path import path
+from path import Path
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -65,7 +65,7 @@ class InputFind(object):
         entries = []
         match = re.compile(config['regexp'], re.IGNORECASE).match
         for folder in config['path']:
-            folder = path(folder).expanduser()
+            folder = Path(folder).expanduser()
             log.debug('scanning %s' % folder)
             if config['recursive']:
                 files = folder.walk(errors='ignore')
@@ -84,7 +84,6 @@ class InputFind(object):
                                 (item.name, item.dirname(), sys.getfilesystemencoding()))
                     continue
 
-
                 e['title'] = item.namebase
                 # If mask fails continue
                 if not match(item.name):
@@ -100,6 +99,7 @@ class InputFind(object):
                 e['url'] = 'file://%s' % item
                 entries.append(e)
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

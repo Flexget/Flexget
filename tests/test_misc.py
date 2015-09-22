@@ -15,19 +15,19 @@ class TestDisableBuiltins(FlexGetBase):
 
     __yaml__ = """
         tasks:
-            test:
-                mock:
-                    - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5}
-                    - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
-                disable_builtins: true
+          test:
+            mock:
+              - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5}
+              - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
+            disable: builtins
 
             test2:
-                mock:
-                    - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5, description: 'http://www.imdb.com/title/tt0409459/'}
-                    - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
-                disable_builtins:
-                    - seen
-                    - cli_config
+              mock:
+                - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5, description: 'http://www.imdb.com/title/tt0409459/'}
+                - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
+              disable:
+                - seen
+                - cli_config
     """
 
     def test_disable_builtins(self):
@@ -231,6 +231,23 @@ class TestSetPlugin(FlexGetBase):
               field: 'The {{ series_name|upper }}'
               otherfield: '{% if series_name is not defined %}no series{% endif %}'
               alu: '{{ series_name|re_search(".l.") }}'
+          test_non_string:
+            mock:
+            - title: Entry 1
+            set:
+              bool: False
+              int: 42
+          test_lazy:
+            mock:
+            - title: Entry 1
+            set:
+              a: "the {{title}}"
+          test_lazy_err:
+            mock:
+            - title: Entry 1
+            set:
+              title: "{{ao"
+              other: "{{eaeou}"
     """
 
     def test_set(self):
@@ -246,6 +263,24 @@ class TestSetPlugin(FlexGetBase):
         assert entry['otherfield'] == ''
         assert entry['alu'] == 'alu'
         entry = self.task.find_entry('entries', title='Entry 2')
-        assert 'field' not in entry,\
-                '`field` should not have been created when jinja rendering fails'
+        assert entry['field'] is None,\
+                '`field` should be None when jinja rendering fails'
         assert entry['otherfield'] == 'no series'
+
+    def test_non_string(self):
+        self.execute_task('test_non_string')
+        entry = self.task.find_entry('entries', title='Entry 1')
+        assert entry['bool'] is False
+        assert entry['int'] == 42
+
+    def test_lazy(self):
+        self.execute_task('test_lazy')
+        entry = self.task.find_entry('entries', title='Entry 1')
+        assert entry.is_lazy('a')
+        assert entry['a'] == 'the Entry 1'
+
+    def test_lazy_err(self):
+        self.execute_task('test_lazy_err')
+        entry = self.task.find_entry('entries', title='Entry 1')
+        assert entry['title'] == 'Entry 1', 'should fall back to original value when template fails'
+        assert entry['other'] is None

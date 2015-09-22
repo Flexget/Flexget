@@ -48,10 +48,10 @@ def replace_in_item(replaces, item):
 
 
 @event('manager.before_config_validate')
-def substitute_cli_variables(manager):
+def substitute_cli_variables(config, manager):
     if not manager.options.execute.cli_config:
         return
-    manager.config = replace_in_item(dict(manager.options.execute.cli_config), manager.config)
+    return replace_in_item(dict(manager.options.execute.cli_config), config)
 
 
 def key_value_pair(text):
@@ -63,4 +63,4 @@ def key_value_pair(text):
 @event('options.register')
 def register_parser_arguments():
     options.get_parser('execute').add_argument('--cli-config', nargs='+', type=key_value_pair, metavar='VARIABLE=VALUE',
-                                               help='configuration parameters trough commandline')
+                                               help='configuration parameters through commandline')

@@ -77,7 +77,7 @@ class UrlRewriteGoogle(object):
             # import IPython; IPython.embed()
             # import sys
             # sys.exit(1)
-            #href = link['href'].lstrip('/url?q=').split('&')[0]
+            # href = link['href'].lstrip('/url?q=').split('&')[0]
 
             # Test if entry with this url would be recognized by some urlrewriter
             log.trace('Checking if %s is known by some rewriter' % href)

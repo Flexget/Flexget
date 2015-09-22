@@ -8,7 +8,8 @@ from sqlalchemy import Column, Integer, String, DateTime, PickleType, Index
 from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.database import safe_pickle_synonym
+from flexget.manager import Session
+from flexget.utils.database import safe_pickle_synonym, with_session
 from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.utils.tools import parse_timedelta
 
@@ -54,6 +55,31 @@ class BacklogEntry(Base):
 Index('ix_backlog_feed_expire', BacklogEntry.task, BacklogEntry.expire)
 
 
+@with_session
+def get_entries(task=None, session=None):
+    query = session.query(BacklogEntry)
+    if task:
+        query = query.filter(BacklogEntry.task == task)
+    return query.all()
+
+
+@with_session
+def clear_entries(task=None, all=False, session=None):
+    """
+    Clear entries from backlog.
+
+    :param task: If given, only entries from specified task will be cleared.
+    :param all: If True, all entries will be cleared, otherwise only expired entries will be cleared.
+    :returns: Number of entries cleared from backlog.
+    """
+    query = session.query(BacklogEntry)
+    if task:
+        query = query.filter(BacklogEntry.task == task)
+    if not all:
+        query = query.filter(BacklogEntry.expire < datetime.now())
+    return query.delete()
+
+
 class InputBacklog(object):
     """
     Keeps task history for given amount of time.
@@ -86,7 +112,8 @@ class InputBacklog(object):
             log.debug('Remembering all entries to backlog because of task abort.')
             self.learn_backlog(task)
 
-    def add_backlog(self, task, entry, amount=''):
+    @with_session
+    def add_backlog(self, task, entry, amount='', session=None):
         """Add single entry to task backlog
 
         If :amount: is not specified, entry will only be injected on next execution."""
@@ -97,7 +124,7 @@ class InputBacklog(object):
                 log.warning('No input snapshot available for `%s`, using current state' % entry['title'])
             snapshot = entry
         expire_time = datetime.now() + parse_timedelta(amount)
-        backlog_entry = task.session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
+        backlog_entry = session.query(BacklogEntry).filter(BacklogEntry.title == entry['title']).\
             filter(BacklogEntry.task == task.name).first()
         if backlog_entry:
             # If there is already a backlog entry for this, update the expiry time if necessary.
@@ -111,18 +138,19 @@ class InputBacklog(object):
             backlog_entry.entry = snapshot
             backlog_entry.task = task.name
             backlog_entry.expire = expire_time
-            task.session.add(backlog_entry)
+            session.add(backlog_entry)
 
     def learn_backlog(self, task, amount=''):
         """Learn current entries into backlog. All task inputs must have been executed."""
-        for entry in task.entries:
-            self.add_backlog(task, entry, amount)
+        with Session() as session:
+            for entry in task.entries:
+                self.add_backlog(task, entry, amount, session=session)
 
-    def get_injections(self, task):
+    @with_session
+    def get_injections(self, task, session=None):
         """Insert missing entries from backlog."""
         entries = []
-        task_backlog = task.session.query(BacklogEntry).filter(BacklogEntry.task == task.name)
-        for backlog_entry in task_backlog.all():
+        for backlog_entry in get_entries(task=task.name, session=session):
             entry = Entry(backlog_entry.entry)
 
             # this is already in the task
@@ -134,9 +162,8 @@ class InputBacklog(object):
             log.verbose('Added %s entries from backlog' % len(entries))
 
         # purge expired
-        for backlog_entry in task_backlog.filter(datetime.now() > BacklogEntry.expire).all():
-            log.debug('Purging %s' % backlog_entry.title)
-            task.session.delete(backlog_entry)
+        purged = clear_entries(task=task.name, all=False, session=session)
+        log.debug('%s entries purged from backlog' % purged)
 
         return entries
 

@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import functools
+from collections import Mapping
 from datetime import datetime
 
 from sqlalchemy import extract, func
@@ -38,7 +39,6 @@ def with_session(*args, **kwargs):
         # Arguments were specified, turn them into arguments for Session creation e.g. @with_session(autocommit=True)
         _Session = functools.partial(Session, *args, **kwargs)
         return decorator
-
 
 
 def pipe_list_synonym(name):
@@ -94,7 +94,7 @@ def safe_pickle_synonym(name):
 
         if type(item) in supported_types:
             return item
-        elif isinstance(item, dict):
+        elif isinstance(item, Mapping):
             result = {}
             for key, value in item.iteritems():
                 try:

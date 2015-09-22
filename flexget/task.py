@@ -12,12 +12,13 @@ from sqlalchemy import Column, Integer, String, Unicode
 from flexget import config_schema, db_schema
 from flexget.entry import EntryUnicodeError
 from flexget.event import event, fire_event
+from flexget.logger import capture_output
 from flexget.manager import Session
 from flexget.plugin import plugins as all_plugins
 from flexget.plugin import (
     DependencyError, get_plugins, phase_methods, plugin_schemas, PluginError, PluginWarning, task_phases)
 from flexget.utils import requests
-from flexget.utils.log import capture_output
+from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimpleTaskPersistence
 
 log = logging.getLogger('task')
@@ -37,40 +38,33 @@ class TaskConfigHash(Base):
         return '<TaskConfigHash(task=%s,hash=%s)>' % (self.task, self.hash)
 
 
-def config_changed(task):
-    """Forces config_modified flag to come out true on next run. Used when the db changes, and all
-    entries need to be reprocessed."""
-    log.debug('Marking config as changed.')
-    with Session() as session:
-        task_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == task).first()
-        if task_hash:
-            task_hash.hash = ''
+@with_session
+def config_changed(task=None, session=None):
+    """
+    Forces config_modified flag to come out true on next run of `task`. Used when the db changes, and all
+    entries need to be reprocessed.
+
+    :param task: Name of the task. If `None`, will be set for all tasks.
+    """
+    log.debug('Marking config for %s as changed.' % (task or 'all tasks'))
+    task_hash = session.query(TaskConfigHash)
+    if task:
+        task_hash = task_hash.filter(TaskConfigHash.task == task)
+    task_hash.delete()
 
 
 def use_task_logging(func):
 
     @wraps(func)
     def wrapper(self, *args, **kw):
-        # Set the task name in the logger
+        # Set the task name in the logger and capture output
         from flexget import logger
-        logger.set_task(self.name)
-        old_loglevel = logging.getLogger().getEffectiveLevel()
-        new_loglevel = logging.getLevelName(self.options.loglevel.upper())
-        if old_loglevel != new_loglevel:
-            log.info('Setting loglevel to `%s` for this execution.' % self.options.loglevel)
-            logging.getLogger().setLevel(new_loglevel)
-
-        try:
+        with logger.task_logging(self.name):
             if self.output:
-                with capture_output(self.output):
+                with capture_output(self.output, loglevel=self.loglevel):
                     return func(self, *args, **kw)
             else:
                 return func(self, *args, **kw)
-        finally:
-            logger.set_task('')
-            if old_loglevel != new_loglevel:
-                log.debug('Returning loglevel to `%s` after task execution.' % logging.getLevelName(old_loglevel))
-                logging.getLogger().setLevel(old_loglevel)
 
     return wrapper
 
@@ -170,6 +164,10 @@ class Task(object):
 
       ``parameters: task, keyword``
 
+    * task.execute.started
+
+      Before a task starts execution
+
     * task.execute.completed
 
       After task execution has been completed
@@ -182,13 +180,14 @@ class Task(object):
     # Used to determine task order, when priority is the same
     _counter = itertools.count()
 
-    def __init__(self, manager, name, config=None, options=None, output=None, priority=None):
+    def __init__(self, manager, name, config=None, options=None, output=None, loglevel=None, priority=None):
         """
         :param Manager manager: Manager instance.
         :param string name: Name of the task.
         :param dict config: Task configuration.
         :param options: dict or argparse namespace with options for this task
         :param output: A filelike that all logs and stdout will be sent to for this task.
+        :param loglevel: Custom loglevel, only log messages at this level will be sent to `output`
         :param priority: If multiple tasks are waiting to run, the task with the lowest priority will be run first.
             The default is 0, if the cron option is set though, the default is lowered to 10.
 
@@ -207,6 +206,7 @@ class Task(object):
             options = options_namespace
         self.options = options
         self.output = output
+        self.loglevel = loglevel
         if priority is None:
             self.priority = 10 if self.options.cron else 0
         else:
@@ -463,7 +463,8 @@ class Task(object):
             self.abort(msg)
         except Exception as e:
             msg = 'BUG: Unhandled error in plugin %s: %s' % (keyword, e)
-            log.exception(msg)
+            log.critical(msg)
+            self.manager.crash_report()
             self.abort(msg)
 
     def rerun(self):
@@ -472,10 +473,6 @@ class Task(object):
         msg = 'Plugin %s has requested task to be ran again after execution has completed.' % self.current_plugin
         # Only print the first request for a rerun to the info log
         log.debug(msg) if self._rerun else log.info(msg)
-        if self._rerun_count >= self.max_reruns:
-            self._rerun = False
-            log.info('Task has been re-run %s times already, stopping for now' % self._rerun_count)
-            return
         self._rerun = True
 
     def config_changed(self):
@@ -555,7 +552,6 @@ class Task(object):
         else:
             for entry in self.all_entries:
                 entry.complete()
-            fire_event('task.execute.completed', self)
 
     @use_task_logging
     def execute(self):
@@ -574,18 +570,22 @@ class Task(object):
         try:
             if self.options.cron:
                 self.manager.db_cleanup()
+            fire_event('task.execute.started', self)
             while True:
                 self._execute()
                 # rerun task
-                if self._rerun:
+                if self._rerun and self._rerun_count < self.max_reruns:
                     log.info('Rerunning the task in case better resolution can be achieved.')
                     self._rerun_count += 1
                     # TODO: Potential optimization is to take snapshots (maybe make the ones backlog uses built in
                     # instead of taking another one) after input and just inject the same entries for the rerun
                     self._all_entries = EntryContainer()
                     self._rerun = False
-                else:
-                    break
+                    continue
+                elif self._rerun:
+                    log.info('Task has been re-run %s times already, stopping for now' % self._rerun_count)
+                break
+            fire_event('task.execute.completed', self)
         finally:
             self.finished_event.set()
 

@@ -16,6 +16,7 @@ class UrlRewriteAniRena(object):
     def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('details', 'download')
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(UrlRewriteAniRena, 'anirena', groups=['urlrewriter'], api_ver=2)

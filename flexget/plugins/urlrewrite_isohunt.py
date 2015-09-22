@@ -48,14 +48,14 @@ class UrlRewriteIsoHunt(object):
         if url.startswith('http://isohunt.com/torrents/?ihq='):
             return False
         # not replaceable
-        if not 'torrent_details' in url:
+        if 'torrent_details' not in url:
             return False
         return url.startswith('http://isohunt.com') and url.find('download') == -1
 
     def url_rewrite(self, task, entry):
         entry['url'] = entry['url'].replace('torrent_details', 'download')
 
-    def search(self, entry, config):
+    def search(self, task, entry, config):
         # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
         optionlist = ['misc', 'movies', 'audio', 'tv', 'games', 'apps', 'pics', 'anime', 'comics', 'books',
                       'music video', 'unclassified', 'all']

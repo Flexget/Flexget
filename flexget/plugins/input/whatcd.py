@@ -248,10 +248,18 @@ class InputWhatCD(object):
         try:
             json_response = r.json()
             if json_response['status'] != "success":
-                raise PluginError("What.cd gave a 'failure' response: "
-                                  "'{0}'".format(json_response['error']))
+
+                # Try to deal with errors returned by the API
+                error = json_response.get('error', json_response.get('status'))
+                if not error or error == "failure":
+                    error = json_response.get('response')
+                if not error:
+                    error = str(json_response)
+
+                raise PluginError("What.cd gave a failure response: "
+                                  "'{0}'".format(error))
             return json_response['response']
-        except (ValueError, TypeError) as e:
+        except (ValueError, TypeError, KeyError) as e:
             raise PluginError("What.cd returned an invalid response")
 
     @cached('whatcd')
@@ -260,6 +268,10 @@ class InputWhatCD(object):
         """Search on What.cd"""
 
         self.session = Session()
+        user_agent = config.get('user_agent')
+        if user_agent:
+            # Using a custom user agent
+            self.session.headers.update({"User-Agent": user_agent})
 
         # From the API docs: "Refrain from making more than five (5) requests every ten (10) seconds"
         self.session.set_domain_delay('ssl.what.cd', '2 seconds')
@@ -304,7 +316,7 @@ class InputWhatCD(object):
                     torrent_seeds=tor['seeders'],
                     torrent_leeches=tor['leechers'],
                     # Size is given in bytes, convert it
-                    content_size=int(tor['size']/(1024**2)*100)/100
+                    content_size=int(tor['size'] / (1024**2) * 100) / 100
                 ))
 
         return entries

@@ -104,6 +104,7 @@ def edit(root, name):
     context['config'] = manager.config[root][name]
     return render_template('configure/edit.html', **context)
 
+
 @configure.route('/jsonary')
 def jsonary():
     return render_template('configure/edit_jsonary.html')

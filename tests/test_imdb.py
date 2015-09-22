@@ -278,14 +278,15 @@ class TestImdbLookup(FlexGetBase):
         assert self.task.entries[0]['imdb_year'], 'didn\'t get year'
         assert self.task.entries[0]['imdb_plot_outline'], 'didn\'t get plot'
 
-    @use_vcr
+    @use_vcr(inject_cassette=True)
     def test_cache(self, cassette=None):
         # Hmm, this test doesn't work so well when in vcr 'all' record mode. It records new requests/responses
         # to the cassette, but still keeps the old recorded ones, causing this to fail.
         # Delete old cassette instead of using all mode to re-record.
         self.execute_task('cached')
         assert all(e['imdb_name'] == 'The Matrix' for e in self.task.all_entries)
-        # Should have only been one call to the actual imdb page
+        # If this is called with vcr turned off we won't have a cassette
         if cassette:
+            # Should have only been one call to the actual imdb page
             imdb_calls = sum(1 for r in cassette.requests if 'title/tt0133093' in r.uri)
             assert imdb_calls == 1

@@ -11,7 +11,7 @@ import time
 import warnings
 from itertools import ifilter
 
-from path import path
+from path import Path
 from requests import RequestException
 
 from flexget import plugins as plugins_pkg
@@ -195,9 +195,9 @@ def register_task_phase(name, before=None, after=None):
         raise RegisterException('Phase %s already exists.' % name)
 
     def add_phase(phase_name, before, after):
-        if not before is None and not before in task_phases:
+        if before is not None and before not in task_phases:
             return False
-        if not after is None and not after in task_phases:
+        if after is not None and after not in task_phases:
             return False
         # add method name to phase -> method lookup table
         phase_methods[phase_name] = 'on_task_' + phase_name
@@ -356,14 +356,10 @@ def _get_standard_plugins_path():
     :returns: List of directories where plugins should be tried to load from.
     """
     # Get basic path from environment
+    paths = []
     env_path = os.environ.get('FLEXGET_PLUGIN_PATH')
     if env_path:
-        # Get rid of trailing slashes, since Python can't handle them when
-        # it tries to import modules.
-        paths = map(_strip_trailing_sep, env_path.split(os.pathsep))
-    else:
-        # Use standard default
-        paths = [os.path.join(os.path.expanduser('~'), '.flexget', 'plugins')]
+        paths = env_path.split(os.pathsep)
 
     # Add flexget.plugins directory (core plugins)
     paths.append(os.path.abspath(os.path.dirname(plugins_pkg.__file__)))
@@ -376,7 +372,7 @@ def _load_plugins_from_dirs(dirs):
     """
 
     log.debug('Trying to load plugins from: %s' % dirs)
-    dirs = [path(d) for d in dirs if os.path.isdir(d)]
+    dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
     plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
     for plugins_dir in dirs:
@@ -416,13 +412,22 @@ def _load_plugins_from_dirs(dirs):
                       'point (before, after). Plugin is not working properly.' % (args[0], phase))
 
 
-def load_plugins():
-    """Load plugins from the standard plugin paths."""
+def load_plugins(extra_dirs=None):
+    """
+    Load plugins from the standard plugin paths.
+    :param list extra_dirs: Extra directories from where plugins are loaded.
+    """
     global plugins_loaded
+
+    if not extra_dirs:
+        extra_dirs = []
+
+    # Add flexget.plugins directory (core plugins)
+    extra_dirs.extend(_get_standard_plugins_path())
 
     start_time = time.time()
     # Import all the plugins
-    _load_plugins_from_dirs(_get_standard_plugins_path())
+    _load_plugins_from_dirs(extra_dirs)
     # Register them
     fire_event('plugin.register')
     # Plugins should only be registered once, remove their handlers after
@@ -451,11 +456,11 @@ def get_plugins(phase=None, group=None, context=None, category=None, name=None, 
     def matches(plugin):
         if phase is not None and phase not in phase_methods:
             raise ValueError('Unknown phase %s' % phase)
-        if phase and not phase in plugin.phase_handlers:
+        if phase and phase not in plugin.phase_handlers:
             return False
-        if group and not group in plugin.groups:
+        if group and group not in plugin.groups:
             return False
-        if context and not context in plugin.contexts:
+        if context and context not in plugin.contexts:
             return False
         if category and not category == plugin.category:
             return False
@@ -487,7 +492,7 @@ def get_plugins_by_phase(phase):
     Return an iterator over all plugins that hook :phase:
     """
     warnings.warn('Deprecated API', DeprecationWarning, stacklevel=2)
-    if not phase in phase_methods:
+    if phase not in phase_methods:
         raise Exception('Unknown phase %s' % phase)
     return get_plugins(phase=phase)
 
@@ -515,6 +520,6 @@ def get_plugin_keywords():
 
 def get_plugin_by_name(name, issued_by='???'):
     """Get plugin by name, preferred way since this structure may be changed at some point."""
-    if not name in plugins:
+    if name not in plugins:
         raise DependencyError(issued_by=issued_by, missing=name, message='Unknown plugin %s' % name)
     return plugins[name]

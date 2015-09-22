@@ -180,13 +180,13 @@ log = logging.getLogger('imdb_lookup')
 def upgrade(ver, session):
     if ver is None:
         columns = table_columns('imdb_movies', session)
-        if not 'photo' in columns:
+        if 'photo' not in columns:
             log.info('Adding photo column to imdb_movies table.')
             table_add_column('imdb_movies', 'photo', String, session)
-        if not 'updated' in columns:
+        if 'updated' not in columns:
             log.info('Adding updated column to imdb_movies table.')
             table_add_column('imdb_movies', 'updated', DateTime, session)
-        if not 'mpaa_rating' in columns:
+        if 'mpaa_rating' not in columns:
             log.info('Adding mpaa_rating column to imdb_movies table.')
             table_add_column('imdb_movies', 'mpaa_rating', String, session)
         ver = 0
@@ -261,17 +261,14 @@ class ImdbLookup(object):
             self.register_lazy_fields(entry)
 
     def register_lazy_fields(self, entry):
-        entry.register_lazy_fields(self.field_map, self.lazy_loader)
+        entry.register_lazy_func(self.lazy_loader, self.field_map)
 
-    def lazy_loader(self, entry, field):
+    def lazy_loader(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
         try:
             self.lookup(entry)
         except plugin.PluginError as e:
             log_once(unicode(e.value).capitalize(), logger=log)
-            # Set all of our fields to None if the lookup failed
-            entry.unregister_lazy_fields(self.field_map, self.lazy_loader)
-        return entry[field]
 
     @with_session
     def imdb_id_lookup(self, movie_title=None, raw_title=None, session=None):
@@ -371,14 +368,13 @@ class ImdbLookup(object):
             search_result = search.smart_match(search_name)
             if search_result:
                 entry['imdb_url'] = search_result['url']
-                # store url for this movie, so we don't have to search on
-                # every run
+                # store url for this movie, so we don't have to search on every run
                 result = SearchResult(entry['title'], entry['imdb_url'])
                 session.add(result)
                 session.commit()
                 log.verbose('Found %s' % (entry['imdb_url']))
             else:
-                log_once('IMDB lookup failed for %s' % entry['title'], log, logging.WARN)
+                log_once('IMDB lookup failed for %s' % entry['title'], log, logging.WARN, session=session)
                 # store FAIL for this title
                 result = SearchResult(entry['title'])
                 result.fails = True
@@ -428,8 +424,7 @@ class ImdbLookup(object):
         for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'mpaa_rating']:
             log.trace('movie.%s: %s' % (att, getattr(movie, att)))
 
-        # store to cache and entry
-        session.commit()
+        # Update the entry fields
         entry.update_using_map(self.field_map, movie)
 
     def _parse_new_movie(self, imdb_url, session):
@@ -477,6 +472,7 @@ class ImdbLookup(object):
         movie.updated = datetime.now()
         session.add(movie)
         return movie
+
 
 @event('plugin.register')
 def register_plugin():

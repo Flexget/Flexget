@@ -59,7 +59,7 @@ class FilterSeriesPremiere(FilterSeriesBase):
         # Make a set of unique series according to series name normalization rules
         guessed_series = {}
         for entry in task.entries:
-            if guess_entry(entry, allow_seasonless=allow_seasonless):
+            if guess_entry(entry, allow_seasonless=allow_seasonless, config=group_settings):
                 if entry['series_season'] == 1 and entry['series_episode'] in desired_eps:
                     normalized_name = normalize_series_name(entry['series_name'])
                     db_series = task.session.query(Series).filter(Series.name == normalized_name).first()
@@ -70,8 +70,8 @@ class FilterSeriesPremiere(FilterSeriesBase):
         for entry in task.entries:
             for series in guessed_series.itervalues():
                 if entry.get('series_name') == series and not (
-                        entry.get('series_season') == 1
-                        and entry.get('series_episode') in desired_eps):
+                        entry.get('series_season') == 1 and
+                        entry.get('series_episode') in desired_eps):
                     entry.reject('Non premiere episode in a premiere series')
         # Since we are running after task start phase, make sure not to merge into the config multiple times on reruns
         if not task.is_rerun:

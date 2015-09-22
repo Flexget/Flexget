@@ -1,22 +1,22 @@
 from __future__ import unicode_literals, division, absolute_import
 from flexget.utils.log import log_once
 
-__author__ = 'paranoidi'
-
 import logging
 import sys
 
 from flexget.event import event
 from flexget.utils.simple_persistence import SimplePersistence
 
+__author__ = 'paranoidi'
+
 log = logging.getLogger('cron_env')
 
 
 @event('manager.execute.started')
-def check_env(manager):
+def check_env(manager, options):
     persistence = SimplePersistence(plugin='cron_env')
     encoding = sys.getfilesystemencoding()
-    if manager.options.execute.cron:
+    if options.cron:
         if 'terminal_encoding' in persistence:
             terminal_encoding = persistence['terminal_encoding']
             if terminal_encoding != encoding:

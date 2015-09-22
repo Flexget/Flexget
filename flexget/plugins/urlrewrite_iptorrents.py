@@ -32,7 +32,7 @@ CATEGORIES = {
     'Movie-Packs': 68,
     'Movie-XviD': 17,
 
-    #TV
+    # TV
     'TV-all': 73,
 
     'TV-Sports': 55,
@@ -47,6 +47,7 @@ CATEGORIES = {
 }
 
 BASE_URL = 'http://iptorrents.com'
+
 
 class UrlRewriteIPTorrents(object):
     """
@@ -94,20 +95,20 @@ class UrlRewriteIPTorrents(object):
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        if not 'url' in entry:
+        if 'url' not in entry:
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
         if entry['url'].startswith(BASE_URL + '/t?'):
             # use search
-            results = self.search(entry)
+            results = self.search(task, entry)
             if not results:
                 raise UrlRewritingError("No search results found")
             # TODO: Search doesn't enforce close match to title, be more picky
             entry['url'] = results[0]['url']
 
     @plugin.internet(log)
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         """
         Search for name from iptorrents
         """

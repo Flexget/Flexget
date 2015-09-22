@@ -7,15 +7,17 @@ from flexget.plugins.filter.seen import FilterSeen
 
 class FilterSeenInfoHash(FilterSeen):
     """Prevents the same torrent from being downloaded twice by remembering the infohash of all downloaded torrents."""
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {'type': 'string', 'enum': ['global', 'local']}
+        ]
+    }
 
     def __init__(self):
         # remember and filter by these fields
         self.fields = ['torrent_info_hash']
         self.keyword = 'seen_info_hash'
-
-    def validator(self):
-        from flexget import validator
-        return validator.factory('boolean')
 
     @plugin.priority(180)
     def on_task_filter(self, task, config):

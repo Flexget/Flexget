@@ -4,6 +4,7 @@ import logging
 
 import pytz
 import tzlocal
+import struct
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -110,6 +111,10 @@ def setup_scheduler(manager):
             timezone = None
     except pytz.UnknownTimeZoneError:
         timezone = None
+    except struct.error as e:
+        # Hiding exception that may occur in tzfile.py seen in entware
+        log.warning('Hiding exception from tzlocal: %s', e)
+        timezone = None
     if not timezone:
         # The default sqlalchemy jobstore does not work when there isn't a name for the local timezone.
         # Just fall back to utc in this case
@@ -129,9 +134,10 @@ def setup_jobs(manager):
     if 'schedules' not in manager.config:
         log.info('No schedules defined in config. Defaulting to run all tasks on a 1 hour interval.')
     config = manager.config.get('schedules', [{'tasks': ['*'], 'interval': {'hours': 1}}])
-    if not config and scheduler.running:
-        log.info('Shutting down scheduler')
-        scheduler.shutdown()
+    if not config:  # Schedules are disabled with `schedules: no`
+        if scheduler.running:
+            log.info('Shutting down scheduler')
+            scheduler.shutdown()
         return
     existing_job_ids = [job.id for job in scheduler.get_jobs()]
     configured_job_ids = []
@@ -158,9 +164,15 @@ def setup_jobs(manager):
         scheduler.start()
 
 
-@event('manager.daemon.completed')
+@event('manager.shutdown_requested')
+def shutdown_requested(manager):
+    if scheduler and scheduler.running:
+        scheduler.shutdown(wait=True)
+
+
+@event('manager.shutdown')
 def stop_scheduler(manager):
-    if scheduler.running:
+    if scheduler and scheduler.running:
         scheduler.shutdown(wait=False)
 
 

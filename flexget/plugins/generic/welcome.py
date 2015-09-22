@@ -1,13 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 
-__author__ = 'paranoidi'
-
 import logging
 import sys
 
 from flexget.event import event
 from flexget.utils.simple_persistence import SimplePersistence
+
+__author__ = 'paranoidi'
 
 log = logging.getLogger('welcome')
 
@@ -15,7 +15,7 @@ log = logging.getLogger('welcome')
 @event('manager.lock_acquired')
 def welcome_message(manager):
     # Only run for cli cron executions
-    if manager.options.cli_command != 'execute' or not manager.options.execute.cron:
+    if manager.options.cli_command != 'execute' or not manager.options.cron:
         return
     persistence = SimplePersistence(plugin='welcome')
     count = persistence.setdefault('count', 5)

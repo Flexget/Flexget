@@ -13,11 +13,11 @@ from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('piratebay')
 
-CUR_TLD = "se"
-TLDS = "com|org|sx|ac|pe|gy|%s" % CUR_TLD
+CUR_TLD = 'se'
+TLDS = 'com|org|sx|ac|pe|gy|se|%s' % CUR_TLD
 
-URL_MATCH = re.compile("^http://(?:torrents\.)?thepiratebay\.(?:%s)/.*$" % TLDS)
-URL_SEARCH = re.compile("^http://thepiratebay\.(?:%s)/search/.*$" % TLDS)
+URL_MATCH = re.compile('^http://(?:torrents\.)?thepiratebay\.(?:%s)/.*$' % TLDS)
+URL_SEARCH = re.compile('^http://thepiratebay\.(?:%s)/search/.*$' % TLDS)
 
 CATEGORIES = {
     'all': 0,
@@ -27,6 +27,7 @@ CATEGORIES = {
     'movies': 201,
     'tv': 205,
     'highres movies': 207,
+    'highres tv': 208,
     'comics': 602
 }
 
@@ -71,13 +72,13 @@ class UrlRewritePirateBay(object):
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        if not 'url' in entry:
+        if 'url' not in entry:
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
         if URL_SEARCH.match(entry['url']):
             # use search
-            results = self.search(entry)
+            results = self.search(task, entry)
             if not results:
                 raise UrlRewritingError("No search results found")
             # TODO: Close matching was taken out of search methods, this may need to be fixed to be more picky
@@ -104,7 +105,7 @@ class UrlRewritePirateBay(object):
             raise UrlRewritingError(e)
 
     @plugin.internet(log)
-    def search(self, arg_entry, config=None):
+    def search(self, task, entry, config=None):
         """
         Search for name from piratebay.
         """
@@ -120,7 +121,7 @@ class UrlRewritePirateBay(object):
         filter_url = '/0/%d/%d' % (sort, category)
 
         entries = set()
-        for search_string in arg_entry.get('search_string', [arg_entry['title']]):
+        for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
             # TPB search doesn't like dashes
             query = query.replace('-', ' ')

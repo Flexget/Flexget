@@ -9,7 +9,6 @@ forget (string)
 """
 
 from __future__ import unicode_literals, division, absolute_import
-import contextlib
 import logging
 from datetime import datetime, timedelta
 
@@ -19,10 +18,10 @@ from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema, options, plugin
 from flexget.event import event
+from flexget.logger import console
 from flexget.manager import Session
 from flexget.utils.imdb import is_imdb_url, extract_id
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
-from flexget.utils.tools import console
 
 log = logging.getLogger('seen')
 Base = db_schema.versioned_base('seen', 4)
@@ -139,22 +138,21 @@ class FilterSeen(object):
         This plugin is enabled on all tasks by default.
         See wiki for more information.
     """
+    schema = {
+        'oneOf': [
+            {'type': 'boolean'},
+            {'type': 'string', 'enum': ['global', 'local']}
+        ]
+    }
 
     def __init__(self):
         # remember and filter by these fields
         self.fields = ['title', 'url', 'original_url']
         self.keyword = 'seen'
 
-    def validator(self):
-        from flexget import validator
-        root = validator.factory()
-        root.accept('boolean')
-        root.accept('choice').accept_choices(['global', 'local'])
-        return root
-
     @plugin.priority(255)
     def on_task_filter(self, task, config, remember_rejected=False):
-        """Filter seen entries"""
+        """Filter entries already accepted on previous runs."""
         if config is False:
             log.debug('%s is disabled' % self.keyword)
             return
@@ -210,7 +208,7 @@ class FilterSeen(object):
         se = SeenEntry(entry['title'], unicode(task.name), reason, local)
         remembered = []
         for field in fields:
-            if not field in entry:
+            if field not in entry:
                 continue
             # removes duplicate values (eg. url, original_url are usually same)
             if entry[field] in remembered:
@@ -233,7 +231,7 @@ class FilterSeen(object):
 
 
 @event('manager.db_cleanup')
-def db_cleanup(session):
+def db_cleanup(manager, session):
     log.debug('TODO: Disabled because of ticket #1321')
     return
 

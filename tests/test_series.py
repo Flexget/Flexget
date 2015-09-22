@@ -1,4 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+
+from StringIO import StringIO
+
+from flexget.logger import capture_output
+from flexget.manager import get_parser
+from flexget.task import TaskAbort
 from tests import FlexGetBase, build_parser_function
 
 
@@ -605,7 +611,7 @@ class BasePropers(FlexGetBase):
           global:
             # prevents seen from rejecting on second execution,
             # we want to see that series is able to reject
-            disable_builtins: yes
+            disable: builtins
             series:
               - test
               - foobar
@@ -875,7 +881,7 @@ class BaseDuplicates(FlexGetBase):
 
         templates:
           global: # just cleans log a bit ..
-            disable_builtins:
+            disable:
               - seen
 
         tasks:
@@ -961,7 +967,7 @@ class BaseQualities(FlexGetBase):
     __yaml__ = """
         templates:
           global:
-            disable_builtins: yes
+            disable: builtins
             series:
               - FooBar:
                   qualities:
@@ -1154,7 +1160,7 @@ class BaseNormalization(FlexGetBase):
     __yaml__ = """
         tasks:
           global:
-            disable_builtins: [seen]
+            disable: [seen]
           test_1:
             mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
@@ -2133,6 +2139,75 @@ class BaseSpecials(FlexGetBase):
         assert not entry.accepted, 'Entry which should not have been accepted was.'
 
 
+class BaseAlternateNames(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          alternate_name:
+            series:
+              - Some Show:
+                  begin: S01E01
+                  alternate_name: Other Show
+          another_alternate_name:
+            series:
+              - Some Show:
+                  alternate_name: Good Show
+          set_other_alternate_name:
+            mock:
+              - title: Third.Show.S01E01
+              - title: Other.Show.S01E01
+            series:
+              - Some Show:
+                  alternate_name: Third Show
+            rerun: 0
+          duplicate_names_in_different_series:
+            series:
+              - First Show:
+                 begin: S01E01
+                 alternate_name: Third Show
+              - Second Show:
+                 begin: S01E01
+                 alternate_name: Third Show
+    """
+
+    def test_set_alternate_name(self):
+        # Tests that old alternate names are not kept in the database.
+        self.execute_task('alternate_name')
+        self.execute_task('set_other_alternate_name')
+        assert self.task.find_entry('accepted', title='Third.Show.S01E01'), \
+            'A new alternate name should have been associated with the series.'
+        assert self.task.find_entry('undecided', title='Other.Show.S01E01'), \
+            'The old alternate name for the series is still present.'
+
+    def test_duplicate_alternate_names_in_different_series(self):
+        try:
+            assert self.execute_task('duplicate_names_in_different_series')
+        except TaskAbort as ex:
+            # only test that the reason is about alternate names, not which names.
+            reason = 'Error adding alternate name'
+            assert ex.reason[:27] == reason, \
+                'Wrong reason for task abortion. Should be about duplicate alternate names.'
+        else:
+            assert False, 'Duplicate alternate names across series should cause a TaskAbort.'
+
+    # Test the DB behaves like we expect ie. alternate names cannot
+    def test_alternate_names_are_removed_from_db(self):
+        from flexget.manager import Session
+        from flexget.plugins.filter.series import AlternateNames
+        with Session() as session:
+            self.execute_task('alternate_name')
+            # test the current state of alternate names
+            assert len(session.query(AlternateNames).all()) == 1, 'There should be one alternate name present.'
+            assert session.query(AlternateNames).first().alt_name == 'Other Show', \
+                'Alternate name should have been Other Show.'
+
+            # run another task that overwrites the alternate names
+            self.execute_task('another_alternate_name')
+            assert len(session.query(AlternateNames).all()) == 1, \
+                'The old alternate name should have been removed from the database.'
+            assert session.query(AlternateNames).first().alt_name == 'Good Show', \
+                'The alternate name in the database should be the new one, Good Show.'
+
+
 class TestGuessitSpecials(BaseSpecials):
     def __init__(self):
         super(TestGuessitSpecials, self).__init__()
@@ -2143,3 +2218,58 @@ class TestInternalSpecials(BaseSpecials):
     def __init__(self):
         super(TestInternalSpecials, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
+
+
+class TestCLI(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          learn_series:
+            series:
+            - Some Show
+            - Other Show
+            mock:
+            - title: Some Series S01E01
+            - title: Other Series S01E02
+    """
+
+    def test_series_list(self):
+        """Very rudimentary test, mostly makes sure this doesn't crash."""
+        self.execute_task('learn_series')
+        options = get_parser().parse_args(['series', 'list'])
+        buffer = StringIO()
+        with capture_output(buffer, loglevel='error'):
+            self.manager.handle_cli(options=options)
+        lines = buffer.getvalue().split('\n')
+        assert all(any(line.lstrip().startswith(series) for line in lines) for series in ['Some Show', 'Other Show'])
+
+
+class TestSeriesForget(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          get_episode:
+            seen: local
+            series:
+            - My Show
+            mock:
+            - title: My Show S01E01 1080p
+            - title: My Show S01E01 720p
+          forget_episode:
+            seen: no
+            mock:
+            - title: My Show S01E01
+              series_name: My Show
+              series_id: S01E01
+            accept_all: yes
+            series_forget: yes
+    """
+
+    def test_forget_episode(self):
+        self.execute_task('get_episode')
+        assert len(self.task.accepted) == 1
+        first_rls = self.task.accepted[0]
+        self.execute_task('get_episode')
+        assert not self.task.accepted, 'series plugin duplicate blocking not working?'
+        self.execute_task('forget_episode')
+        self.execute_task('get_episode')
+        assert len(self.task.accepted) == 1, 'new release not accepted after forgetting ep'
+        assert self.task.accepted[0] != first_rls, 'same release accepted on second run'

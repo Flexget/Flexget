@@ -21,7 +21,7 @@ class UrlRewriteNewzleech(object):
 
     # Search API
     @plugin.internet(log)
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
 
         txheaders = {
             'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)',
@@ -36,8 +36,9 @@ class UrlRewriteNewzleech(object):
             query = entry['title']
             url = u'http://newzleech.com/?%s' % str(urllib.urlencode({'q': query.encode('latin1'),
                                                                       'm': 'search', 'group': '', 'min': 'min',
-                                                                      'max': 'max', 'age': '', 'minage': '', 'adv': ''}))
-            #log.debug('Search url: %s' % url)
+                                                                      'max': 'max', 'age': '', 'minage': '',
+                                                                      'adv': ''}))
+            # log.debug('Search url: %s' % url)
 
             req = urllib2.Request(url, headers=txheaders)
             page = urlopener(req, log)
@@ -56,7 +57,7 @@ class UrlRewriteNewzleech(object):
                 for wild in wildcardize:
                     regexp = regexp.replace(wild, '.')
                 regexp = '.*' + regexp + '.*'
-                #log.debug('Title regexp: %s' % regexp)
+                # log.debug('Title regexp: %s' % regexp)
 
                 if re.match(regexp, subject):
                     log.debug('%s matches to regexp' % subject)

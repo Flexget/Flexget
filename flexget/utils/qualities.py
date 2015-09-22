@@ -119,7 +119,7 @@ _resolutions = [
     QualityComponent('resolution', 40, '576p', '576p?'),
     QualityComponent('resolution', 45, 'hr'),
     QualityComponent('resolution', 50, '720i'),
-    QualityComponent('resolution', 60, '720p', '(1280x)?720p?x?'),
+    QualityComponent('resolution', 60, '720p', '(1280x)?720(p|hd)?x?(50)?'),
     QualityComponent('resolution', 70, '1080i'),
     QualityComponent('resolution', 80, '1080p', '(1920x)?1080p?')
 ]
@@ -148,14 +148,15 @@ _codecs = [
     QualityComponent('codec', 10, 'divx'),
     QualityComponent('codec', 20, 'xvid'),
     QualityComponent('codec', 30, 'h264', '[hx].?264'),
-    QualityComponent('codec', 40, '10bit', '10.?bit|hi10p')
+    QualityComponent('codec', 40, 'h265', '[hx].?265|hevc'),
+    QualityComponent('codec', 50, '10bit', '10.?bit|hi10p')
 ]
 channels = '(?:(?:[\W_]?5[\W_]?1)|(?:[\W_]?2[\W_]?(?:0|ch)))'
 _audios = [
     QualityComponent('audio', 10, 'mp3'),
     # TODO: No idea what order these should go in or if we need different regexps
-    QualityComponent('audio', 20, 'dd5.1', 'dd%s' % channels),
-    QualityComponent('audio', 30, 'aac', 'aac%s?' % channels),
+    QualityComponent('audio', 20, 'aac', 'aac%s?' % channels),
+    QualityComponent('audio', 30, 'dd5.1', 'dd%s' % channels),
     QualityComponent('audio', 40, 'ac3', 'ac3%s?' % channels),
     QualityComponent('audio', 50, 'flac', 'flac%s?' % channels),
     # The DTSs are a bit backwards, but the more specific one needs to be parsed first

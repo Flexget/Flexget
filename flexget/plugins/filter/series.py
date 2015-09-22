@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
-from sqlalchemy.orm import relation, backref
+from sqlalchemy.orm import relation, backref, object_session
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
 
@@ -18,14 +18,14 @@ from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import qualities
 from flexget.utils.log import log_once
-from flexget.plugins.parsers import ParseWarning, SERIES_ID_TYPES
+from flexget.plugins.parsers import SERIES_ID_TYPES
 from flexget.plugin import get_plugin_by_name
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
 from flexget.utils.database import quality_property
 
-SCHEMA_VER = 11
+SCHEMA_VER = 12
 
 log = logging.getLogger('series')
 Base = db_schema.versioned_base('series', SCHEMA_VER)
@@ -42,7 +42,7 @@ def upgrade(ver, session):
             Base.metadata.create_all(bind=session.bind)
         # Upgrade episode_releases table to have a proper count and seed it with appropriate numbers
         columns = table_columns('episode_releases', session)
-        if not 'proper_count' in columns:
+        if 'proper_count' not in columns:
             log.info('Upgrading episode_releases table to have proper_count column')
             table_add_column('episode_releases', 'proper_count', Integer, session)
             release_table = table_schema('episode_releases', session)
@@ -141,12 +141,17 @@ def upgrade(ver, session):
         log.verbose('Repairing series_tasks table data')
         session.execute(delete(series_tasks, ~series_tasks.c.series_id.in_(select([series_table.c.id]))))
         ver = 11
+    if ver == 11:
+        # SeriesTasks was cleared out due to a bug, make sure they get recalculated next run #2772
+        from flexget.task import config_changed
+        config_changed(session=session)
+        ver = 12
 
     return ver
 
 
 @event('manager.db_cleanup')
-def db_cleanup(session):
+def db_cleanup(manager, session):
     # Clean up old undownloaded releases
     result = session.query(Release).\
         filter(Release.downloaded == False).\
@@ -191,7 +196,7 @@ def clean_series(manager):
     with Session() as session:
         removed_tasks = session.query(SeriesTask)
         if manager.tasks:
-            removed_tasks.filter(not_(SeriesTask.name.in_(manager.tasks)))
+            removed_tasks = removed_tasks.filter(not_(SeriesTask.name.in_(manager.tasks)))
         deleted = removed_tasks.delete(synchronize_session=False)
         if deleted:
             session.commit()
@@ -218,6 +223,39 @@ class NormalizedComparator(Comparator):
         return op(self.__clause_element__(), normalize_series_name(other))
 
 
+class AlternateNames(Base):
+    """ Similar to Series. Name is handled case insensitively transparently.
+    """
+
+    __tablename__ = 'series_alternate_names'
+    id = Column(Integer, primary_key=True)
+    _alt_name = Column('alt_name', Unicode)
+    _alt_name_normalized = Column('alt_name_normalized', Unicode, index=True, unique=True)
+    series_id = Column(Integer, ForeignKey('series.id'), nullable=False)
+
+    def name_setter(self, value):
+        self._alt_name = value
+        self._alt_name_normalized = normalize_series_name(value)
+
+    def name_getter(self):
+        return self._alt_name
+
+    def name_comparator(self):
+        return NormalizedComparator(self._alt_name_normalized)
+
+    alt_name = hybrid_property(name_getter, name_setter)
+    alt_name.comparator(name_comparator)
+
+    def __init__(self, name):
+        self.alt_name = name
+
+    def __unicode__(self):
+        return '<SeriesAlternateName(series_id=%s, alt_name=%s)>' % (self.series_id, self.alt_name)
+
+    def __repr__(self):
+        return unicode(self).encode('ascii', 'replace')
+
+
 class Series(Base):
 
     """ Name is handled case insensitively transparently
@@ -235,6 +273,7 @@ class Series(Base):
     episodes = relation('Episode', backref='series', cascade='all, delete, delete-orphan',
                         primaryjoin='Series.id == Episode.series_id')
     in_tasks = relation('SeriesTask', backref=backref('series', uselist=False), cascade='all, delete, delete-orphan')
+    alternate_names = relation('AlternateNames', backref='series', cascade='all, delete, delete-orphan')
 
     # Make a special property that does indexed case insensitive lookups on name, but stores/returns specified case
     def name_getter(self):
@@ -461,7 +500,8 @@ def get_latest_release(series, downloaded=True, season=None):
     elif series.identified_by == 'date':
         latest_release = releases.order_by(desc(Episode.identifier)).first()
     else:
-        latest_release = releases.order_by(desc(Episode.first_seen)).first()
+        # We have to label the order_by clause to disambiguate from Release.first_seen #3055
+        latest_release = releases.order_by(desc(Episode.first_seen.label('ep_first_seen'))).first()
 
     if not latest_release:
         log.debug('get_latest_release returning None, no downloaded episodes found for: %s', series.name)
@@ -496,15 +536,18 @@ def new_eps_after(since_ep):
         return 0
 
 
-def store_parser(session, parser, series=None):
+def store_parser(session, parser, series=None, quality=None):
     """
     Push series information into database. Returns added/existing release.
 
     :param session: Database session to use
     :param parser: parser for release that should be added to database
     :param series: Series in database to add release to. Will be looked up if not provided.
+    :param quality: If supplied, this will override the quality from the series parser
     :return: List of Releases
     """
+    if quality is None:
+        quality = parser.quality
     if not series:
         # if series does not exist in database, add new
         series = session.query(Series).\
@@ -547,13 +590,13 @@ def store_parser(session, parser, series=None):
         # perhaps a bug in sqlalchemy?
         release = session.query(Release).filter(Release.episode_id == episode.id).\
             filter(Release.title == parser.data).\
-            filter(Release.quality == parser.quality).\
+            filter(Release.quality == quality).\
             filter(Release.proper_count == parser.proper_count).\
             filter(Release.episode_id != None).first()
         if not release:
             log.debug('adding release %s into episode', parser)
             release = Release()
-            release.quality = parser.quality
+            release.quality = quality
             release.proper_count = parser.proper_count
             release.title = parser.data
             episode.releases.append(release)  # pylint:disable=E1103
@@ -576,7 +619,7 @@ def set_series_begin(series, ep_id):
     session = Session.object_session(series)
     if isinstance(ep_id, int):
         identified_by = 'sequence'
-    elif re.match(r'(?i)^S\d{1,4}E\d{1,2}$', ep_id):
+    elif re.match(r'(?i)^S\d{1,4}E\d{1,3}$', ep_id):
         identified_by = 'ep'
         ep_id = ep_id.upper()
     elif re.match(r'\d{4}-\d{2}-\d{2}', ep_id):
@@ -591,7 +634,7 @@ def set_series_begin(series, ep_id):
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
-                              (ep_id, series.identified_by))
+                (ep_id, series.identified_by))
     series.identified_by = identified_by
     episode = (session.query(Episode).filter(Episode.series_id == series.id).
                filter(Episode.identified_by == series.identified_by).
@@ -639,7 +682,8 @@ def forget_series_episode(name, identifier):
             episode = session.query(Episode).filter(Episode.identifier == identifier).\
                 filter(Episode.series_id == series.id).first()
             if episode:
-                series.identified_by = ''  # reset identified_by flag so that it will be recalculated
+                if not series.begin:
+                    series.identified_by = ''  # reset identified_by flag so that it will be recalculated
                 session.delete(episode)
                 session.commit()
                 log.debug('Episode %s from series %s removed from database.', identifier, name)
@@ -651,7 +695,13 @@ def forget_series_episode(name, identifier):
         session.close()
 
 
-def populate_entry_fields(entry, parser):
+def populate_entry_fields(entry, parser, config):
+    """
+    Populates all series_fields for given entry based on parser.
+
+    :param parser: A valid result from a series parser used to populate the fields.
+    :config dict: If supplied, will use 'path' and 'set' options to populate specified fields.
+    """
     entry['series_parser'] = copy(parser)
     # add series, season and episode to entry
     entry['series_name'] = parser.name
@@ -672,6 +722,19 @@ def populate_entry_fields(entry, parser):
     entry['series_episodes'] = parser.episodes
     entry['series_id'] = parser.pack_identifier
     entry['series_id_type'] = parser.id_type
+
+    # If a config is passed in, also look for 'path' and 'set' options to set more fields
+    if config:
+        # set custom download path
+        if 'path' in config:
+            log.debug('setting %s custom path to %s', entry['title'], config.get('path'))
+            # Just add this to the 'set' dictionary, so that string replacement is done cleanly
+            config.setdefault('set', {}).update(path=config['path'])
+
+        # accept info from set: and place into the entry
+        if 'set' in config:
+            set = plugin.get_plugin_by_name('set')
+            set.instance.modify(entry, config.get('set'))
 
 
 class FilterSeriesBase(object):
@@ -897,7 +960,7 @@ class FilterSeries(FilterSeriesBase):
             for name in all_series.keys():
                 if (name.lower().startswith(series_name.lower())) and \
                    (name.lower() != series_name.lower()):
-                    if not 'exact' in series_config:
+                    if 'exact' not in series_config:
                         log.verbose('Auto enabling exact matching for series %s (reason %s)', series_name, name)
                         series_config['exact'] = True
 
@@ -942,28 +1005,21 @@ class FilterSeries(FilterSeriesBase):
                     db_series.identified_by = series_config.get('identified_by', 'auto')
                     session.add(db_series)
                     log.debug('-> added %s' % db_series)
-                if not series_name in found_series:
+                    session.flush()  # Flush to get an id on series before adding alternate names.
+                    alts = series_config.get('alternate_name', [])
+                    if not isinstance(alts, list):
+                        alts = [alts]
+                    for alt in alts:
+                        _add_alt_name(alt, db_series, series_name, session)
+                if series_name not in found_series:
                     continue
                 series_entries = {}
                 for entry in found_series[series_name]:
                     # store found episodes into database and save reference for later use
-                    releases = store_parser(session, entry['series_parser'], series=db_series)
+                    releases = store_parser(session, entry['series_parser'], series=db_series,
+                                            quality=entry.get('quality'))
                     entry['series_releases'] = [r.id for r in releases]
                     series_entries.setdefault(releases[0].episode, []).append(entry)
-
-                    # TODO: Unfortunately we are setting these again, even though they were set in metanifo. This is
-                    # for the benefit of all_series and series_premiere. Figure a better way.
-                    # set custom download path
-                    if 'path' in series_config:
-                        log.debug('setting %s custom path to %s', entry['title'], series_config.get('path'))
-                        # Just add this to the 'set' dictionary, so that string replacement is done cleanly
-                        series_config.setdefault('set', {}).update(path=series_config['path'])
-
-                    # accept info from set: and place into the entry
-                    if 'set' in series_config:
-                        set = plugin.get_plugin_by_name('set')
-                        # TODO: Could cause lazy lookups. We don't really want to have a transaction open during this.
-                        set.instance.modify(entry, series_config.get('set'))
 
                 # If we didn't find any episodes for this series, continue
                 if not series_entries:
@@ -1040,18 +1096,7 @@ class FilterSeries(FilterSeriesBase):
             parsed.field = 'title'
 
             log.debug('%s detected as %s, field: %s', entry['title'], parsed, parsed.field)
-            populate_entry_fields(entry, parsed)
-
-            # set custom download path
-            if 'path' in config:
-                log.debug('setting %s custom path to %s', entry['title'], config.get('path'))
-                # Just add this to the 'set' dictionary, so that string replacement is done cleanly
-                config.setdefault('set', {}).update(path=config['path'])
-
-            # accept info from set: and place into the entry
-            if 'set' in config:
-                set = plugin.get_plugin_by_name('set')
-                set.instance.modify(entry, config.get('set'))
+            populate_entry_fields(entry, parsed, config)
 
     def process_series(self, task, series_entries, config):
         """
@@ -1069,7 +1114,9 @@ class FilterSeries(FilterSeriesBase):
             reason = None
 
             # sort episodes in order of quality
-            entries.sort(key=lambda e: e['series_parser'], reverse=True)
+            entries.sort(
+                key=lambda e: (e['quality'], e['series_parser'].episodes, e['series_parser'].proper_count),
+                reverse=True)
 
             log.debug('start with episodes: %s', [e['title'] for e in entries])
 
@@ -1107,7 +1154,7 @@ class FilterSeries(FilterSeriesBase):
 
             # Remove any eps we already have from the list
             for entry in reversed(entries):  # Iterate in reverse so we can safely remove from the list while iterating
-                if entry['series_parser'].quality in downloaded_qualities:
+                if entry['quality'] in downloaded_qualities:
                     entry.reject('quality already downloaded')
                     entries.remove(entry)
             if not entries:
@@ -1118,7 +1165,7 @@ class FilterSeries(FilterSeriesBase):
                 if config.get('upgrade'):
                     # Remove all the qualities lower than what we have
                     for entry in reversed(entries):
-                        if entry['series_parser'].quality < max(downloaded_qualities):
+                        if entry['quality'] < max(downloaded_qualities):
                             entry.reject('worse quality than already downloaded.')
                             entries.remove(entry)
                 if not entries:
@@ -1154,7 +1201,7 @@ class FilterSeries(FilterSeriesBase):
                     log.debug('-' * 20 + ' episode tracking -->')
                     # Grace is number of distinct eps in the task for this series + 2
                     backfill = config.get('tracking') == 'backfill'
-                    if self.process_episode_tracking(ep, entries, grace=len(series_entries)+2, backfill=backfill):
+                    if self.process_episode_tracking(ep, entries, grace=len(series_entries) + 2, backfill=backfill):
                         continue
 
             # quality
@@ -1192,8 +1239,8 @@ class FilterSeries(FilterSeriesBase):
         # Since eps is sorted by quality then proper_count we always see the highest proper for a quality first.
         (last_qual, best_proper) = (None, 0)
         for entry in entries:
-            if entry['series_parser'].quality != last_qual:
-                last_qual, best_proper = entry['series_parser'].quality, entry['series_parser'].proper_count
+            if entry['quality'] != last_qual:
+                last_qual, best_proper = entry['quality'], entry['series_parser'].proper_count
                 best_propers.append(entry)
             if entry['series_parser'].proper_count < best_proper:
                 # nuke qualities which there is a better proper available
@@ -1225,8 +1272,8 @@ class FilterSeries(FilterSeriesBase):
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
-            if (entry['series_parser'].quality in downloaded_qualities and
-                    entry['series_parser'].proper_count > downloaded_qualities[entry['series_parser'].quality]):
+            if (entry['quality'] in downloaded_qualities and
+                    entry['series_parser'].proper_count > downloaded_qualities[entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
@@ -1245,7 +1292,7 @@ class FilterSeries(FilterSeriesBase):
                 return True
         # scan for quality
         for entry in entries:
-            if req.allows(entry['series_parser'].quality):
+            if req.allows(entry['quality']):
                 log.debug('Series accepting. %s meets quality %s', entry['title'], req)
                 entry.accept('target quality')
                 return True
@@ -1322,12 +1369,13 @@ class FilterSeries(FilterSeriesBase):
         log.debug('timeframe: %s', config['timeframe'])
         timeframe = parse_timedelta(config['timeframe'])
 
-        releases = episode.releases
         if config.get('quality'):
             req = qualities.Requirements(config['quality'])
-            first_seen = min(rls.first_seen for rls in releases if req.allows(rls.quality))
+            seen_times = [rls.first_seen for rls in episode.releases if req.allows(rls.quality)]
         else:
-            first_seen = min(rls.first_seen for rls in releases)
+            seen_times = [rls.first_seen for rls in episode.releases]
+        # Somehow we can get here without having qualifying releases (#2779) make sure min doesn't crash
+        first_seen = min(seen_times) if seen_times else datetime.now()
         expires = first_seen + timeframe
         log.debug('timeframe: %s, first_seen: %s, expires: %s', timeframe, first_seen, expires)
 
@@ -1349,7 +1397,7 @@ class FilterSeries(FilterSeriesBase):
 
             # add best entry to backlog (backlog is able to handle duplicate adds)
             if self.backlog:
-                self.backlog.instance.add_backlog(task, best)
+                self.backlog.instance.add_backlog(task, best, session=object_session(episode))
             return True
 
     def process_qualities(self, config, entries, downloaded):
@@ -1378,7 +1426,7 @@ class FilterSeries(FilterSeriesBase):
             return wanted
 
         for entry in entries:
-            quality = entry['series_parser'].quality
+            quality = entry['quality']
             log.debug('ep: %s quality: %s', entry['title'], quality)
             if not wanted(quality):
                 log.debug('%s is unwanted quality', quality)
@@ -1426,15 +1474,24 @@ class SeriesDBManager(FilterSeriesBase):
                 # Make sure number shows (e.g. 24) are turned into strings
                 series_name = unicode(series_name)
                 db_series = session.query(Series).filter(Series.name == series_name).first()
+                alts = series_config.get('alternate_name', [])
+                if not isinstance(alts, list):
+                    alts = [alts]
                 if db_series:
                     # Update database with capitalization from config
                     db_series.name = series_name
+                    # Remove the alternate names not present in current config
+                    db_series.alternate_names = [alt for alt in db_series.alternate_names if alt.alt_name in alts]
+                    # Add/update the possibly new alternate names
                 else:
                     log.debug('adding series %s into db', series_name)
                     db_series = Series()
                     db_series.name = series_name
                     session.add(db_series)
+                    session.flush()  # flush to get id on series before creating alternate names
                     log.debug('-> added %s' % db_series)
+                for alt in alts:
+                    _add_alt_name(alt, db_series, series_name, session)
                 db_series.in_tasks.append(SeriesTask(task.name))
                 if series_config.get('identified_by', 'auto') != 'auto':
                     db_series.identified_by = series_config['identified_by']
@@ -1444,6 +1501,29 @@ class SeriesDBManager(FilterSeriesBase):
                         set_series_begin(db_series, series_config['begin'])
                     except ValueError as e:
                         raise plugin.PluginError(e)
+
+
+def _add_alt_name(alt, db_series, series_name, session):
+    alt = unicode(alt)
+    db_series_alt = session.query(AlternateNames).filter(AlternateNames.alt_name == alt).first()
+    if db_series_alt and db_series_alt.series_id == db_series.id:
+        # Already exists, no need to create it then
+        # TODO is checking the list for duplicates faster/better than querying the DB?
+        db_series_alt.alt_name = alt
+    elif db_series_alt:
+        if not db_series_alt.series:
+            # Not sure how this can happen
+            log.debug('Found an alternate name not attached to series. Re-attatching %s to %s' % (alt, series_name))
+            db_series.alternate_names.append(db_series_alt)
+        else:
+            # Alternate name already exists for another series. Not good.
+            raise plugin.PluginError('Error adding alternate name for %s. %s is already associated with %s. '
+                                     'Check your config.' % (series_name, alt, db_series_alt.series.name))
+    else:
+        log.debug('adding alternate name %s for %s into db' % (alt, series_name))
+        db_series_alt = AlternateNames(alt)
+        db_series.alternate_names.append(db_series_alt)
+        log.debug('-> added %s' % db_series_alt)
 
 
 @event('plugin.register')

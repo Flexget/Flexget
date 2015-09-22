@@ -24,7 +24,7 @@ class PluginInclude(object):
 
     schema = one_or_more({'type': 'string'})
 
-    @plugin.priority(254)
+    @plugin.priority(256)
     def on_task_start(self, task, config):
         if not config:
             return
@@ -50,6 +50,7 @@ class PluginInclude(object):
                 merge_dict_from_to(include, task.config)
             except MergeException:
                 raise plugin.PluginError('Failed to merge include file to task %s, incompatible datatypes' % task.name)
+
 
 @event('plugin.register')
 def register_plugin():

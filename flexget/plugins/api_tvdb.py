@@ -26,7 +26,7 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
 
-SCHEMA_VER = 3
+SCHEMA_VER = 4
 
 log = logging.getLogger('api_tvdb')
 Base = db_schema.versioned_base('api_tvdb', SCHEMA_VER)
@@ -55,6 +55,9 @@ def upgrade(ver, session):
     if ver == 2:
         table_add_column('tvdb_series', 'overview', Unicode, session)
         ver = 3
+    if ver == 3:
+        table_add_column('tvdb_series', 'actors', Unicode, session)
+        ver = 4
 
     return ver
 
@@ -142,6 +145,8 @@ class TVDBSeries(TVDBContainer, Base):
     genre = pipe_list_synonym('_genre')
     _firstaired = Column('firstaired', DateTime)
     firstaired = text_date_synonym('_firstaired')
+    _actors = Column('actors', Unicode)
+    actors = pipe_list_synonym('_actors')
 
     episodes = relation('TVDBEpisode', backref='series', cascade='all, delete, delete-orphan')
 
@@ -180,11 +185,8 @@ class TVDBSeries(TVDBContainer, Base):
         self.poster_file = filename
         # If we are detached from a session, update the db
         if not Session.object_session(self):
-            session = Session()
-            try:
+            with Session() as session:
                 session.query(TVDBSeries).filter(TVDBSeries.id == self.id).update(values={'poster_file': filename})
-            finally:
-                session.close()
         return filename
 
     def __repr__(self):
@@ -463,8 +465,8 @@ def mark_expired(session=None):
     if not last_server:
         last_server = 0
 
-    #Need to figure out what type of update file to use
-    #Default of day
+    # Need to figure out what type of update file to use
+    # Default of day
     get_update = 'day'
     last_update_days = (datetime.now() - last_local).days
 
@@ -488,7 +490,7 @@ def mark_expired(session=None):
         new_server = int(updates.attrib['time'])
 
         if new_server <= last_server:
-            #nothing changed on the server, ignoring
+            # nothing changed on the server, ignoring
             log.debug("Not checking for expired as nothing has changed on server")
             return
 

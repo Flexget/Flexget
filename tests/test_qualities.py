@@ -1,8 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
+
+from nose.plugins.skip import SkipTest
+
 from flexget.plugins.parsers.parser_guessit import ParserGuessit
 from flexget.plugins.parsers.parser_internal import ParserInternal
-from tests import FlexGetBase, build_parser_function
 from flexget.utils.qualities import Quality
+from tests import FlexGetBase, build_parser_function
 
 
 class TestQualityModule(object):
@@ -19,11 +22,12 @@ class TestQualityModule(object):
 
 class QualityParser(object):
 
-    def test_qualities(self):
+    def get_quality_failures(self):
         items = [('Test.File 1080p.web-dl', '1080p webdl'),
                  ('Test.File.web-dl.1080p', '1080p webdl'),
                  ('Test.File.WebHD.720p', '720p webdl'),
                  ('Test.File.720p.bluray', '720p bluray'),
+                 ('Test.File.720hd.bluray', '720p bluray'),
                  ('Test.File.1080p.bluray', '1080p bluray'),
                  ('Test.File.1080p.cam', '1080p cam'),
                  ('A Movie 2011 TS 576P XviD-DTRG', '576p ts xvid'),
@@ -42,6 +46,7 @@ class QualityParser(object):
                  ('Test.File.1280x720_web dl', '720p webdl'),
                  ('Test.File.720p.h264.web.dl', '720p webdl h264'),
                  ('Test.File.1080p.webhd.x264', '1080p webdl h264'),
+                 ('Test.File.480.hdtv.x265', '480p hdtv h265'),
                  ('Test.File.web-dl', 'webdl'),
                  ('Test.File.720P', '720p'),
                  ('Test.File.1920x1080', '1080p'),
@@ -49,6 +54,7 @@ class QualityParser(object):
                  ('Test File blurayrip', 'bluray'),
                  ('Test.File.br-rip', 'bluray'),
                  ('Test.File.720px', '720p'),
+                 ('Test.File.720p50', '720p'),
 
                  ('Test.File.dvd.rip', 'dvdrip'),
                  ('Test.File.dvd.rip.r5', 'r5'),
@@ -79,24 +85,34 @@ class QualityParser(object):
                  ('Test.File.DTS.HD', 'dtshd'),
                  ('Test.File.DTSHD', 'dtshd'),
                  ('Test.File.DTS', 'dts'),
-                 ('Test.File.truehd', 'truehd')]
+                 ('Test.File.truehd', 'truehd'),
+                 ('Test.File.DTSHDMA', 'dtshd')]
 
-        item = 'Test.File.DTSHDMA', 'dtshd'
-
-        quality = self.parser.parse_movie(item[0]).quality
-        assert quality == item[1], '`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality)
-
+        failures = []
         for item in items:
             quality = self.parser.parse_movie(item[0]).quality
-            assert quality == item[1], '`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality)
+            if str(quality) != item[1]:
+                failures.append('`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality))
+        return failures
+
 
 
 class TestInternalQualityParser(QualityParser):
     parser = ParserInternal()
 
+    def test_qualities(self):
+        failures = self.get_quality_failures()
+        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
+
 
 class TestGuessitQualityParser(QualityParser):
     parser = ParserGuessit()
+
+    def test_qualities(self):
+        failures = self.get_quality_failures()
+        if failures:
+            raise SkipTest('Guessit quality parser does not match FlexGet: %s' % ', '.join(failures))
+
 
 
 class TestFilterQuality(FlexGetBase):

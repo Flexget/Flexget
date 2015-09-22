@@ -6,15 +6,16 @@ import socket
 import string
 import sys
 from argparse import ArgumentParser as ArgParser
-from argparse import _VersionAction, Action, ArgumentError, ArgumentTypeError, Namespace, PARSER, REMAINDER, SUPPRESS
+from argparse import (_VersionAction, Action, ArgumentError, ArgumentTypeError, Namespace, PARSER, REMAINDER, SUPPRESS,
+                      _SubParsersAction)
 
 import pkg_resources
 
 import flexget
 from flexget.entry import Entry
 from flexget.event import fire_event
+from flexget.logger import console
 from flexget.utils import requests
-from flexget.utils.tools import console
 
 _UNSET = object()
 
@@ -47,9 +48,7 @@ def register_command(command, callback, **kwargs):
     :param kwargs: Other keyword arguments will be passed to the :class:`arparse.ArgumentParser` constructor
     :returns: An :class:`argparse.ArgumentParser` instance ready to be configured with the options for this command.
     """
-    subparser = get_parser().add_subparser(command, **kwargs)
-    subparser.set_defaults(cli_command_callback=callback)
-    return subparser
+    return get_parser().add_subparser(command, parent_defaults={'cli_command_callback': callback}, **kwargs)
 
 
 def required_length(nmin, nmax):
@@ -115,7 +114,8 @@ class InjectAction(Action):
         entry = Entry(**kwargs)
         if 'accept' in [v.lower() for v in values]:
             entry.accept(reason='accepted by --inject')
-        setattr(namespace, self.dest, [entry])
+        existing = getattr(namespace, self.dest, None) or []
+        setattr(namespace, self.dest, existing + [entry])
 
 
 class ParseExtrasAction(Action):
@@ -174,6 +174,35 @@ class ScopedNamespace(Namespace):
         return new
 
 
+class NestedSubparserAction(_SubParsersAction):
+    def __init__(self, *args, **kwargs):
+        self.nested_namespaces = kwargs.pop('nested_namespaces', False)
+        self.parent_defaults = {}
+        super(NestedSubparserAction, self).__init__(*args, **kwargs)
+
+    def add_parser(self, name, parent_defaults=None, **kwargs):
+        if parent_defaults:
+            self.parent_defaults[name] = parent_defaults
+        return super(NestedSubparserAction, self).add_parser(name, **kwargs)
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        parser_name = values[0]
+        if parser_name in self.parent_defaults:
+            for dest in self.parent_defaults[parser_name]:
+                if not hasattr(namespace, dest):
+                    setattr(namespace, dest, self.parent_defaults[parser_name][dest])
+        if self.nested_namespaces:
+            subnamespace = ScopedNamespace()
+            super(NestedSubparserAction, self).__call__(parser, subnamespace, values, option_string)
+            # If dest is set, it should be set on the parent namespace, not subnamespace
+            if self.dest is not SUPPRESS:
+                setattr(namespace, self.dest, parser_name)
+                delattr(subnamespace, self.dest)
+            setattr(namespace, parser_name, subnamespace)
+        else:
+            super(NestedSubparserAction, self).__call__(parser, namespace, values, option_string)
+
+
 class ParserError(Exception):
     def __init__(self, message, parser):
         self.message = message
@@ -183,26 +212,32 @@ class ParserError(Exception):
         return self.message
 
     def __repr__(self):
-        return 'ParserError(%s, %s)' % self.message, self.parser
+        return 'ParserError(%s, %s)' % (self.message, self.parser)
 
 
 class ArgumentParser(ArgParser):
     """
     Mimics the default :class:`argparse.ArgumentParser` class, with a few distinctions, mostly to ease subparser usage:
 
+    - If `add_subparsers` is called with the `nested_namespaces` kwarg, all subcommand options will be stored in a
+      nested namespace based on the command name for the subparser
     - Adds the `add_subparser` method. After `add_subparsers` has been called, the `add_subparser` method can be used
       instead of the `add_parser` method of the object returned by the `add_subparsers` call.
-    - If `add_subparser` is called with the `scoped_namespace` kwarg, all subcommand options will be stored in a
-      nested namespace scope based on the command name for this subparser
+    - `add_subparser` takes takes the `parent_defaults` argument, which will set/change the defaults for the parent
+      parser when that subparser is selected.
     - The `get_subparser` method will get the :class:`ArgumentParser` instance for an existing subparser on this parser
     - For any arguments defined both in this parser and one of its subparsers, the selected subparser default will
       override the main one.
+    - Adds the `set_post_defaults` method. This works like the normal argparse `set_defaults` method, but all actions
+      and subparsers will be run before any of these defaults are set.
     - Command shortening: If the command for a subparser is abbreviated unambiguously, it will still be accepted.
     - The add_argument `nargs` keyword argument supports a range of arguments, e.g. `"2-4"
-    - If the `raise_errors` keyword argument to `parse_args` is True, a `ValueError` will be raised instead of sys.exit
+    - If the `raise_errors` keyword argument to `parse_args` is True, a `ParserError` will be raised instead of sys.exit
+    - If the `file` argument is given to `parse_args`, output will be printed there instead of sys.stdout or stderr
     """
+    file = None  # This is created as a class attribute so that we can set it for parser and all subparsers at once
 
-    def __init__(self, nested_namespace_name=None, **kwargs):
+    def __init__(self, **kwargs):
         """
         :param nested_namespace_name: When used as a subparser, options from this parser will be stored nested under
             this attribute name in the root parser's namespace
@@ -212,9 +247,16 @@ class ArgumentParser(ArgParser):
             self._debug_tb_callback()
 
         self.subparsers = None
-        self.nested_namespace_name = nested_namespace_name
         self.raise_errors = None
         ArgParser.__init__(self, **kwargs)
+        # Overwrite _SubparserAction with our custom one
+        self.register('action', 'parsers', NestedSubparserAction)
+
+        self.post_defaults = {}
+        if kwargs.get('parents'):
+            for parent in kwargs['parents']:
+                if hasattr(parent, 'post_defaults'):
+                    self.set_post_defaults(**parent.post_defaults)
 
     def add_argument(self, *args, **kwargs):
         if isinstance(kwargs.get('nargs'), basestring) and '-' in kwargs['nargs']:
@@ -227,73 +269,64 @@ class ArgumentParser(ArgParser):
                 kwargs['nargs'] = '*'
             else:
                 kwargs['nargs'] = '+'
-        result = super(ArgumentParser, self).add_argument(*args, **kwargs)
-        if self.nested_namespace_name:
-            # If metavar hasn't already been set, set it without the nested scope name
-            if not result.metavar:
-                result.metavar = result.dest
-                if result.option_strings and result.option_strings[0].startswith('-'):
-                    result.metavar = result.dest.upper()
-            result.dest = self.nested_namespace_name + '.' + result.dest
-        return result
+        return super(ArgumentParser, self).add_argument(*args, **kwargs)
 
-    def print_help(self, file=None):
-        self.restore_defaults()
-        super(ArgumentParser, self).print_help(file)
+    def _print_message(self, message, file=None):
+        """If a file argument was passed to `parse_args` make sure output goes there."""
+        if self.file:
+            file = self.file
+        super(ArgumentParser, self)._print_message(message, file)
 
-    def stash_defaults(self):
-        """Remove all the defaults and store them in a temporary location."""
-        self.real_defaults, self._defaults = self._defaults, {}
+    def set_post_defaults(self, **kwargs):
+        """Like set_defaults method, but these defaults will be defined after parsing instead of before."""
+        self.post_defaults.update(kwargs)
+
+        # if these defaults match any existing arguments, suppress
+        # the previous default so that it can be filled after parsing
         for action in self._actions:
-            action.real_default, action.default = action.default, SUPPRESS
-
-    def restore_defaults(self):
-        """Restore all stashed defaults."""
-        if hasattr(self, 'real_defaults'):
-            self._defaults = self.real_defaults
-            del self.real_defaults
-        for action in self._actions:
-            if hasattr(action, 'real_default'):
-                action.default = action.real_default
-                del action.real_default
+            if action.dest in kwargs:
+                action.default = SUPPRESS
 
     def error(self, msg):
         raise ParserError(msg, self)
 
-    def parse_args(self, args=None, namespace=None, raise_errors=False):
+    def parse_args(self, args=None, namespace=None, raise_errors=False, file=None):
         """
         :param raise_errors: If this is true, errors will be raised as `ParserError`s instead of calling sys.exit
         """
+        ArgumentParser.file = file
         try:
             return super(ArgumentParser, self).parse_args(args, namespace)
         except ParserError as e:
             if raise_errors:
                 raise
-            sys.stderr.write('error: %s\n' % e.message)
-            e.parser.print_help()
-            sys.exit(2)
+            super(ArgumentParser, e.parser).error(e.message)
+        finally:
+            ArgumentParser.file = None
 
     def parse_known_args(self, args=None, namespace=None):
         if args is None:
             # Decode all arguments to unicode before parsing
             args = unicode_argv()[1:]
-        # Remove all of our defaults, to give subparsers and custom actions first priority at setting them
-        self.stash_defaults()
-        try:
-            namespace, _ = super(ArgumentParser, self).parse_known_args(args, namespace or ScopedNamespace())
-        except ParserError:
-            pass
-        finally:
-            # Restore the defaults
-            self.restore_defaults()
-        # Parse again with subparser and custom action defaults already in the namespace
-        return super(ArgumentParser, self).parse_known_args(args, namespace)
+        if namespace is None:
+            namespace = ScopedNamespace()
+        namespace, args = super(ArgumentParser, self).parse_known_args(args, namespace)
 
-    def add_subparsers(self, scoped_namespaces=False, **kwargs):
+        # add any post defaults that aren't present
+        for dest in self.post_defaults:
+            if not hasattr(namespace, dest):
+                setattr(namespace, dest, self.post_defaults[dest])
+
+        return namespace, args
+
+    def add_subparsers(self, **kwargs):
+        """
+        :param nested_namespaces: If True, options from subparsers will appear in nested namespace under the subparser
+            name.
+        """
         # Set the parser class so subparsers don't end up being an instance of a subclass, like CoreArgumentParser
         kwargs.setdefault('parser_class', ArgumentParser)
         self.subparsers = super(ArgumentParser, self).add_subparsers(**kwargs)
-        self.subparsers.scoped_namespaces = scoped_namespaces
         return self.subparsers
 
     def add_subparser(self, name, **kwargs):
@@ -301,15 +334,12 @@ class ArgumentParser(ArgParser):
         Adds a parser for a new subcommand and returns it.
 
         :param name: Name of the subcommand
-        :param require_lock: Whether this subcommand should require a database lock
+        :param parent_defaults: Default argument values which should be supplied to the parent parser if this subparser
+            is selected.
         """
         if not self.subparsers:
             raise TypeError('This parser does not have subparsers')
-        if self.subparsers.scoped_namespaces:
-            kwargs.setdefault('nested_namespace_name', name)
         result = self.subparsers.add_parser(name, **kwargs)
-        if self.subparsers.scoped_namespaces:
-            result.set_defaults(**{name: ScopedNamespace()})
         return result
 
     def get_subparser(self, name, default=_UNSET):
@@ -347,9 +377,9 @@ manager_parser.add_argument('--logfile', '-l', default='flexget.log',
                             help='Specify a custom logfile name/location. '
                                  'Default: %(default)s in the config directory.')
 manager_parser.add_argument('--loglevel', '-L', metavar='LEVEL',
-                            default='verbose',
                             help='Set the verbosity of the logger. Levels: %(choices)s',
                             choices=['none', 'critical', 'error', 'warning', 'info', 'verbose', 'debug', 'trace'])
+manager_parser.set_post_defaults(loglevel='verbose')
 # This option is already handled above.
 manager_parser.add_argument('--bugreport', action='store_true', dest='debug_tb',
                             help='Use this option to create a detailed bug report, '
@@ -361,6 +391,9 @@ manager_parser.add_argument('--debug-trace', action=DebugTraceAction, nargs=0, h
 manager_parser.add_argument('--debug-sql', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--experimental', action='store_true', default=False, help=SUPPRESS)
 manager_parser.add_argument('--ipc-port', type=int, help=SUPPRESS)
+manager_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
+                            help='use when executing FlexGet non-interactively: allows background '
+                                 'maintenance to run, disables stdout and stderr output, reduces logging level')
 
 
 class CoreArgumentParser(ArgumentParser):
@@ -374,7 +407,7 @@ class CoreArgumentParser(ArgumentParser):
         kwargs.setdefault('parents', [manager_parser])
         kwargs.setdefault('prog', 'flexget')
         super(CoreArgumentParser, self).__init__(**kwargs)
-        self.add_subparsers(title='commands', metavar='<command>', dest='cli_command', scoped_namespaces=True)
+        self.add_subparsers(title='commands', metavar='<command>', dest='cli_command', nested_namespaces=True)
 
         # The parser for the execute command
         exec_parser = self.add_subparser('execute', help='execute tasks now')
@@ -383,9 +416,6 @@ class CoreArgumentParser(ArgumentParser):
                                       'matching is case-insensitive')
         exec_parser.add_argument('--learn', action='store_true', dest='learn', default=False,
                                  help='matches are not downloaded but will be skipped in the future')
-        exec_parser.add_argument('--cron', action=CronAction, default=False, nargs=0,
-                                 help='use when executing FlexGet non-interactively: allows background '
-                                      'maintenance to run, disables stdout and stderr output, reduces logging level')
         exec_parser.add_argument('--profile', action='store_true', default=False, help=SUPPRESS)
         exec_parser.add_argument('--disable-phases', nargs='*', help=SUPPRESS)
         exec_parser.add_argument('--inject', nargs='+', action=InjectAction, help=SUPPRESS)
@@ -399,8 +429,9 @@ class CoreArgumentParser(ArgumentParser):
             daemonize_help = 'causes process to daemonize after starting'
 
         # The parser for the daemon command
-        daemon_parser = self.add_subparser('daemon', help='run continuously, executing tasks according to schedules '
-                                                          'defined in config')
+        daemon_parser = self.add_subparser('daemon', parent_defaults={'loglevel': 'info'},
+                                           help='run continuously, executing tasks according to schedules defined '
+                                                'in config')
         daemon_parser.add_subparsers(title='actions', metavar='<action>', dest='action')
         start_parser = daemon_parser.add_subparser('start', help='start the daemon')
         start_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
@@ -409,7 +440,6 @@ class CoreArgumentParser(ArgumentParser):
                                  help='wait for all queued tasks to finish before stopping daemon')
         daemon_parser.add_subparser('status', help='check if a daemon is running')
         daemon_parser.add_subparser('reload', help='causes a running daemon to reload the config from disk')
-        daemon_parser.set_defaults(loglevel='info')
 
         # The parser for the webui
         # Hide the webui command if deps aren't available
@@ -455,7 +485,7 @@ class CoreArgumentParser(ArgumentParser):
         result = super(CoreArgumentParser, self).parse_args(*args, **kwargs)
         # Make sure we always have execute parser settings even when other commands called
         if not result.cli_command == 'execute':
-            exec_options = get_parser('execute').parse_args([]).execute
+            exec_options = get_parser('execute').parse_args([])
             if hasattr(result, 'execute'):
                 exec_options.__dict__.update(result.execute.__dict__)
             result.execute = exec_options

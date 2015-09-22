@@ -15,7 +15,7 @@ log = logging.getLogger('utils.imdb')
 # Spoof the old urllib user agent to keep results consistent
 requests = Session()
 requests.headers.update({'User-Agent': 'Python-urllib/2.6'})
-#requests.headers.update({'User-Agent': random.choice(USERAGENTS)})
+# requests.headers.update({'User-Agent': random.choice(USERAGENTS)})
 
 # this makes most of the titles to be returned in english translation, but not all of them
 requests.headers.update({'Accept-Language': 'en-US,en;q=0.8'})
@@ -87,7 +87,10 @@ class ImdbSearch(object):
         for movie in movies[:]:
             if year and movie.get('year'):
                 if movie['year'] != str(year):
-                    log.debug('best_match removing %s - %s (wrong year: %s)' % (movie['name'], movie['url'], str(movie['year'])))
+                    log.debug('best_match removing %s - %s (wrong year: %s)' % (
+                        movie['name'],
+                        movie['url'],
+                        str(movie['year'])))
                     movies.remove(movie)
                     continue
             if movie['match'] < self.min_match:
@@ -321,7 +324,7 @@ class ImdbParser(object):
             m = re.search('(?x) \( [^()]* \\b few \\b', link.next_sibling)
             if not m:
                 lang = link.text.lower()
-                if not lang in self.languages:
+                if lang not in self.languages:
                     self.languages.append(lang.strip())
 
         # get year

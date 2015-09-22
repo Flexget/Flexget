@@ -3,6 +3,7 @@ import urllib
 import urllib2
 import logging
 import re
+import socket
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -13,7 +14,6 @@ from flexget.utils.tools import urlopener
 from flexget.utils.search import torrent_availability, normalize_unicode
 
 timeout = 10
-import socket
 socket.setdefaulttimeout(timeout)
 
 log = logging.getLogger('newtorrents')
@@ -51,7 +51,7 @@ class NewTorrents:
             raise UrlRewritingError('Bug in newtorrents urlrewriter')
 
     # Search plugin API
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         entries = set()
         for search_string in entry.get('search_string', [entry['title']]):
             entries.update(self.entries_from_search(search_string))
@@ -104,7 +104,7 @@ class NewTorrents:
                     log.warning('Error converting seed value (%s) from newtorrents to integer.' % seed)
                     seed = 0
 
-            #TODO: also parse content_size and peers from results
+            # TODO: also parse content_size and peers from results
             torrents.append(Entry(title=release_name, url=torrent_url, torrent_seeds=seed,
                                   search_sort=torrent_availability(seed, 0)))
         # sort with seed number Reverse order

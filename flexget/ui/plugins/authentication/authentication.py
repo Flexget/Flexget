@@ -50,7 +50,7 @@ def enable_authentication():
         db_session.add(credentials)
 
     if manager.options.webui.username:
-        credentials.username = manager.options.username
+        credentials.username = manager.options.webui.username
     if manager.options.webui.password:
         credentials.password = manager.options.webui.password
     db_session.commit()

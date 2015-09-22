@@ -1,5 +1,3 @@
-__author__ = 'deksan'
-
 import logging
 import urllib
 
@@ -9,6 +7,8 @@ from flexget import plugin, validator
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugins.api_tvrage import lookup_series
+
+__author__ = 'deksan'
 
 log = logging.getLogger('newznab')
 
@@ -52,7 +52,7 @@ class Newznab(object):
                     'apikey': config['apikey'],
                     'extended': 1
                 }
-                config['url'] = config['website']+'/api?'+urllib.urlencode(params)
+                config['url'] = config['website'] + '/api?' + urllib.urlencode(params)
         return config
 
     def fill_entries_for_url(self, url, config):
@@ -71,10 +71,13 @@ class Newznab(object):
             for key in rss_entry.keys():
                 new_entry[key] = rss_entry[key]
             new_entry['url'] = new_entry['link']
+            if rss_entry.enclosures:
+                size = int(rss_entry.enclosures[0]['length'])  # B
+                new_entry['content_size'] = size / 2**20       # MB
             entries.append(new_entry)
         return entries
 
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         config = self.build_config(config)
         if config['category'] == 'movie':
             return self.do_search_movie(entry, config)
@@ -90,12 +93,14 @@ class Newznab(object):
         # normally this should be used with emit_series who has provided season and episodenumber
         if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
             return []
-        serie_info = lookup_series(arg_entry['series_name'])
-        if not serie_info:
-            return []
+        if 'tvrage_id' not in arg_entry:
+            serie_info = lookup_series(arg_entry['series_name'])
+            if not serie_info:
+                return []
+            arg_entry['tvrage_id'] = serie_info.showid
 
         url = (config['url'] + '&rid=%s&season=%s&ep=%s' %
-               (serie_info.showid, arg_entry['series_season'], arg_entry['series_episode']))
+               (arg_entry['tvrage_id'], arg_entry['series_season'], arg_entry['series_episode']))
         return self.fill_entries_for_url(url, config)
 
     def do_search_movie(self, arg_entry, config=None):

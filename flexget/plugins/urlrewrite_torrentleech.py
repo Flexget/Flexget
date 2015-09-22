@@ -28,7 +28,7 @@ CATEGORIES = {
     'Movie Boxsets': 15,
     'Documentaries': 29,
 
-    #TV
+    # TV
     'Episodes': 26,
     'TV Boxsets': 27,
     'Episodes HD': 32
@@ -60,7 +60,8 @@ class UrlRewriteTorrentleech(object):
                 'oneOf': [
                     {'type': 'integer'},
                     {'type': 'string', 'enum': list(CATEGORIES)},
-            ]}),
+                ]
+            }),
         },
         'required': ['rss_key', 'username', 'password'],
         'additionalProperties': False
@@ -77,20 +78,20 @@ class UrlRewriteTorrentleech(object):
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        if not 'url' in entry:
+        if 'url' not in entry:
             log.error("Didn't actually get a URL...")
         else:
             log.debug("Got the URL: %s" % entry['url'])
         if entry['url'].startswith('http://torrentleech.org/torrents/browse/index/query/'):
             # use search
-            results = self.search(entry)
+            results = self.search(task, entry)
             if not results:
                 raise UrlRewritingError("No search results found")
             # TODO: Search doesn't enforce close match to title, be more picky
             entry['url'] = results[0]['url']
 
     @plugin.internet(log)
-    def search(self, entry, config=None):
+    def search(self, task, entry, config=None):
         """
         Search for name from torrentleech.
         """
@@ -115,7 +116,7 @@ class UrlRewriteTorrentleech(object):
         filter_url = '/categories/%s' % ','.join(str(c) for c in categories)
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
-            query = normalize_unicode(search_string)
+            query = normalize_unicode(search_string).replace(":", "")
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
             url = ('http://torrentleech.org/torrents/browse/index/query/' +
                    urllib.quote(query.encode('utf-8')) + filter_url)
@@ -137,7 +138,8 @@ class UrlRewriteTorrentleech(object):
                 # parse link and split along /download/12345 and /name.torrent
                 download_url = re.search('(/download/\d+)/(.+\.torrent)', torrent_url)
                 # change link to rss and splice in rss_key
-                torrent_url = 'http://torrentleech.org/rss' + download_url.group(1) + '/' + rss_key + '/' + download_url.group(2)
+                torrent_url = 'http://torrentleech.org/rss' + download_url.group(1) + '/' \
+                              + rss_key + '/' + download_url.group(2)
                 log.debug('RSS-ified download link: %s' % torrent_url)
                 entry['url'] = torrent_url
 
@@ -164,6 +166,7 @@ class UrlRewriteTorrentleech(object):
                 entries.add(entry)
 
         return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
+
 
 @event('plugin.register')
 def register_plugin():

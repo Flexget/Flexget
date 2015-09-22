@@ -24,7 +24,8 @@ class OutputPushover(object):
         [message: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}" -- accepts Jinja2)
         [priority: <PRIORITY>] (default = 0 -- normal = 0, high = 1, silent = -1)
         [url: <URL>] (default: "{{imdb_url}}" -- accepts Jinja2)
-        [sound: <SOUND>] (default: pushover)
+        [urltitle: <URL_TITLE>] (default: (none) -- accepts Jinja2)
+        [sound: <SOUND>] (default: pushover default)
 
     Configuration parameters are also supported from entries (eg. through set).
     """
@@ -41,7 +42,8 @@ class OutputPushover(object):
             'message': {'type': 'string', 'default': default_message},
             'priority': {'type': 'integer', 'default': 0},
             'url': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
-            'sound': {'type': 'string', 'default': 'pushover'}
+            'urltitle': {'type': 'string', 'default': ''},
+            'sound': {'type': 'string', 'default': ''}
         },
         'required': ['userkey', 'apikey'],
         'additionalProperties': False
@@ -68,6 +70,7 @@ class OutputPushover(object):
             title = config["title"]
             message = config["message"]
             url = config["url"]
+            urltitle = config["urltitle"]
 
             # Attempt to render the title field
             try:
@@ -90,9 +93,17 @@ class OutputPushover(object):
                 log.warning("Problem rendering 'url': %s" % e)
                 url = entry.get("imdb_url", "")
 
+            # Attempt to render the urltitle field
+            try:
+                urltitle = entry.render(urltitle)
+            except RenderError as e:
+                log.warning("Problem rendering 'urltitle': %s" % e)
+                urltitle = ""
+
             for userkey in userkeys:
                 # Build the request
-                data = {"user": userkey, "token": apikey, "title": title, "message": message, "url": url}
+                data = {"user": userkey, "token": apikey, "title": title,
+                        "message": message, "url": url, "url_title": urltitle}
                 if device:
                     data["device"] = device
                 if priority:
@@ -110,6 +121,7 @@ class OutputPushover(object):
                     log.info("    Title: %s" % title)
                     log.info("    Message: %s" % message)
                     log.info("    URL: %s" % url)
+                    log.info("    URL Title: %s" % urltitle)
                     log.info("    Priority: %d" % priority)
                     log.info("    userkey: %s" % userkey)
                     log.info("    apikey: %s" % apikey)
@@ -129,7 +141,7 @@ class OutputPushover(object):
                     log.debug("Pushover notification sent")
                 elif request_status == 500:
                     log.debug("Pushover notification failed, Pushover API having issues")
-                    #TODO: Implement retrying. API requests 5 seconds between retries.
+                    # TODO: Implement retrying. API requests 5 seconds between retries.
                 elif request_status >= 400:
                     errors = json.loads(response.content)['errors']
                     log.error("Pushover API error: %s" % errors[0])

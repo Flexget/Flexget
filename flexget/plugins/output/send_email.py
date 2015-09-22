@@ -20,14 +20,16 @@ log = logging.getLogger('email')
 # A dict which stores the email content from each task when plugin is configured globally
 task_content = {}
 
+
 def prepare_config(config):
     if not isinstance(config['to'], list):
         config['to'] = [config['to']]
     return config
 
+
 @event('manager.execute.started')
-def setup(manager):
-    if not 'email' in manager.config:
+def setup(manager, options):
+    if 'email' not in manager.config:
         return
     config = prepare_config(manager.config['email'])
     config['global'] = True
@@ -43,8 +45,8 @@ def setup(manager):
 
 
 @event('manager.execute.completed')
-def global_send(manager):
-    if not 'email' in manager.config:
+def global_send(manager, options):
+    if 'email' not in manager.config:
         return
     config = prepare_config(manager.config['email'])
     content = ''
@@ -107,7 +109,8 @@ def send_email(subject, content, config):
         try:
 
             if config.get('smtp_username') and config.get('smtp_password'):
-                mailServer.login(config['smtp_username'], config['smtp_password'])
+                # Forcing to use `str` type
+                mailServer.login(str(config['smtp_username']), str(config['smtp_password']))
             mailServer.sendmail(message['From'], config['to'], message.as_string())
         except IOError as e:
             # Ticket #686

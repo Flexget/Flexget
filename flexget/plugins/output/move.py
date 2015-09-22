@@ -39,7 +39,7 @@ class BaseFileOps(object):
             sexts = [('.' + s).replace('..', '.').lower() for s in config['along']]
         
         for entry in task.accepted:
-            if not 'location' in entry:
+            if 'location' not in entry:
                 self.log.verbose('Cannot handle %s because it does not have the field location.' % entry['title'])
                 continue
             src = entry['location']
@@ -143,6 +143,7 @@ class TransformingOps(BaseFileOps):
     
     # Defined by subclasses
     move = None
+    destination_field = None
     
     def handle_entry(self, task, config, entry, siblings):
         src = entry['location']
@@ -150,7 +151,7 @@ class TransformingOps(BaseFileOps):
         src_path, src_name = os.path.split(src)
         
         # get proper value in order of: entry, config, above split
-        dst_path = entry.get('path', config.get('to', src_path))
+        dst_path = entry.get(self.destination_field, config.get('to', src_path))
         dst_name = entry.get('filename', config.get('filename', src_name))
         
         try:
@@ -262,6 +263,7 @@ class CopyFiles(TransformingOps):
     }
     
     move = False
+    destination_field = 'copy_to'
     log = logging.getLogger('copy')
 
 
@@ -288,6 +290,7 @@ class MoveFiles(TransformingOps):
     }
     
     move = True
+    destination_field = 'move_to'
     log = logging.getLogger('move')
 
 

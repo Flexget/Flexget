@@ -86,34 +86,26 @@ class FilterContentFilter(object):
                 for f in entry['torrent'].get_filelist():
                     if not best or f['size'] > best:
                         best = f['size']
-                if (100*float(best)/float(entry['torrent'].size)) < 90:
+                if (100 * float(best) / float(entry['torrent'].size)) < 90:
                     log.info('Entry %s does not have a main file, rejecting' % (entry['title']))
                     entry.reject('does not have a main file', remember=True)
                     return True
 
-    def parse_torrent_files(self, entry):
-        if 'torrent' in entry:
-            files = [posixpath.join(item['path'], item['name']) for item in entry['torrent'].get_filelist()]
-            if files:
-                # TODO: should not add this to entry, this is a filter plugin
-                entry['content_files'] = files
-
     @plugin.priority(150)
     def on_task_modify(self, task, config):
         if task.options.test or task.options.learn:
-            log.info('Plugin is partially disabled with --test and --learn because content filename information may not be available')
-            #return
+            log.info('Plugin is partially disabled with --test and --learn \
+because content filename information may not be available')
+            # return
 
         config = self.prepare_config(config)
         for entry in task.accepted:
-            # TODO: I don't know if we can parse filenames from nzbs, just do torrents for now
-            # possibly also do compressed files in the future
-            self.parse_torrent_files(entry)
             if self.process_entry(task, entry, config):
                 task.rerun()
-            elif not 'content_files' in entry and config.get('strict'):
+            elif 'content_files' not in entry and config.get('strict'):
                 entry.reject('no content files parsed for entry', remember=True)
                 task.rerun()
+
 
 @event('plugin.register')
 def register_plugin():

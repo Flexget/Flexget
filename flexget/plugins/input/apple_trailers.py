@@ -64,7 +64,7 @@ class AppleTrailers(InputRSS):
                 'additionalProperties': False
             },
             {'title': 'justquality', 'type': 'string', 'enum': qualities}
-            ]
+        ]
 
     }
 
@@ -110,7 +110,7 @@ class AppleTrailers(InputRSS):
                 genres.add(genre_name.contents[0].string)
                 log.debug('genre found: %s' % genre_name.contents[0].string)
 
-            #Turn simple config into full config
+            # Turn simple config into full config
             if isinstance(config, basestring):
                 config = {'quality': config}
 
@@ -127,7 +127,7 @@ class AppleTrailers(InputRSS):
                 log.debug('film detail not found')
             else:
                 release_c = film_detail.contents[1].string
-                release_year = release_c[(release_c.find(', 20')+2):(release_c.find(', 20')+6)]
+                release_year = release_c[(release_c.find(', 20') + 2):(release_c.find(', 20') + 6)]
                 log.debug('release year: %s' % release_year)
                 studio_c = film_detail.contents[5].string
                 studio = studio_c[7:]
@@ -156,7 +156,7 @@ class AppleTrailers(InputRSS):
                     log.debug('did not find trailer link tag')
                     continue
                 try:
-                    link = trailers_link['href'].replace('r640s', ''.join(['h',config.get('quality')]))
+                    link = trailers_link['href'].replace('r640s', ''.join(['h', config.get('quality')]))
                 except AttributeError:
                     log.debug('could not find download link')
                     continue
@@ -172,6 +172,7 @@ class AppleTrailers(InputRSS):
                 result.append(entry)
 
         return result
+
 
 @event('plugin.register')
 def register_plugin():

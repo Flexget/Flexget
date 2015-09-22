@@ -33,7 +33,7 @@ class OutputFtp(object):
         'properties': {
             'use-ssl': {'type': 'boolean', 'default': False},
             'ftp_tmp_path': {'type': 'string', 'format': 'path'},
-            'delete_origin': {'type': 'boolean', 'default' : False}
+            'delete_origin': {'type': 'boolean', 'default': False}
         },
         'additionalProperties': False
     }
@@ -96,6 +96,9 @@ class OutputFtp(object):
                 self.ftp_down(ftp, file_name, config['ftp_tmp_path'], config, ftp_url, current_path)
 
             ftp.close()
+
+    def on_task_output(self, task, config):
+        """Count this as an output plugin."""
 
     def ftp_walk(self, ftp, tmp_path, config, ftp_url, current_path):
         log.debug("DIR->" + ftp.pwd())
@@ -160,7 +163,7 @@ class OutputFtp(object):
                     ftp.retrbinary('RETR %s' % file_name, local_file.write)
             except Exception as error:
                 if max_attempts != 0:
-                    log.debug("Retrying download after error %s" % error);
+                    log.debug("Retrying download after error %s" % error)
                 else:
                     log.error("Too many errors downloading %s. Aborting." % file_name)
                     break

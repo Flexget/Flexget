@@ -16,6 +16,8 @@ log = logging.getLogger('requests')
 
 # Don't emit info level urllib3 log messages or below
 logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
+# same as above, but for systems where urllib3 isn't part of the requests pacakge (i.e., Ubuntu)
+logging.getLogger('urllib3').setLevel(logging.WARNING)
 
 # Time to wait before trying an unresponsive site again
 WAIT_TIME = timedelta(seconds=60)
@@ -126,6 +128,8 @@ class Session(requests.Session):
         """
         Does a request, but raises Timeout immediately if site is known to timeout, and records sites that timeout.
         Also raises errors getting the content by default.
+
+        :param bool raise_status: If True, non-success status code responses will be raised as errors (True by default)
         """
 
         # Raise Timeout right away if site is known to timeout

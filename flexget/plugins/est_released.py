@@ -31,6 +31,7 @@ class EstimateRelease(object):
             if estimate is not None:
                 return estimate
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(EstimateRelease, 'estimate_release', api_ver=2)

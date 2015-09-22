@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
+import urllib 
 
 from flexget import plugin, validator
 from flexget.entry import Entry
@@ -13,13 +14,17 @@ log = logging.getLogger('search_cpasbien')
 
 session = requests.Session()
 
+
 class SearchCPASBIEN(object):
     schema = {
         'type': 'object',
-        'properties': {
-            'category': {'type': 'string', 'enum': ['films', 'series', 'musique', 'films-french',
-                                                    '720p', 'series-francaise', 'films-dvdrip', 'all',
-                                                    'films-vostfr', '1080p', 'series-vostfr', 'ebook']
+        'properties':
+        {
+            'category': {
+                'type': 'string',
+                'enum': ['films', 'series', 'musique', 'films-french',
+                         '720p', 'series-francaise', 'films-dvdrip', 'all',
+                         'films-vostfr', '1080p', 'series-vostfr', 'ebook']
             },
         },
         'required': ['category'],
@@ -27,7 +32,7 @@ class SearchCPASBIEN(object):
     }
 
     @plugin.internet(log)
-    def search(self, entry, config):
+    def search(self, task, entry, config):
         """CPASBIEN search plugin
 
         Config example:
@@ -45,7 +50,7 @@ class SearchCPASBIEN(object):
                   interval: 1 day
                   ignore_estimations: yes
 
-        Category is ONE of: 
+        Category is ONE of:
             all
             films
             series
@@ -67,7 +72,7 @@ class SearchCPASBIEN(object):
             search_string = search_string.replace('(', '')
             search_string = search_string.replace(')', '')
             query = normalize_unicode(search_string)
-            query_url_fragment = query.encode('iso-8859-1')
+            query_url_fragment = urllib.quote_plus(query.encode('utf-8'))
 # http://www.cpasbien.pe/recherche/ncis.html
             if config['category'] == 'all':
                 str_url = (base_url, 'recherche', query_url_fragment)
@@ -78,9 +83,9 @@ class SearchCPASBIEN(object):
                 url = '/'.join(str_url)
             log.debug('search url: %s' % url + '.html')
 # GET URL
-            f = requests.get(url + '.html').content
+            f = task.requests.get(url + '.html').content
             soup = get_soup(f)
-            if soup.findAll(text=re.compile('0 torrents')):
+            if soup.findAll(text=re.compile(' 0 torrents')):
                 log.debug('search returned no results')
             else:
                 nextpage = 0
@@ -88,7 +93,7 @@ class SearchCPASBIEN(object):
                     if (nextpage > 0):
                         newurl = url + '/page-' + str(nextpage)
                         log.debug('-----> NEXT PAGE : %s' % newurl)
-                        f1 = requests.get(newurl).content
+                        f1 = task.requests.get(newurl).content
                         soup = get_soup(f1)
                     for result in soup.findAll('div', attrs={'class': re.compile('ligne')}):
                         entry = Entry()
@@ -110,11 +115,11 @@ class SearchCPASBIEN(object):
                         size = sizefull[:-3]
                         unit = sizefull[-2:]
                         if unit == 'GB':
-                            entry['content_size'] = int(float(size)*1024)
+                            entry['content_size'] = int(float(size) * 1024)
                         elif unit == 'MB':
                             entry['content_size'] = int(float(size))
                         elif unit == 'KB':
-                            entry['content_size'] = int(float(size)/1024)
+                            entry['content_size'] = int(float(size) / 1024)
                         if(entry['torrent_seeds'] > 0):
                             entries.add(entry)
                         else:
@@ -124,6 +129,7 @@ class SearchCPASBIEN(object):
                     else:
                         nextpage = -1
             return entries
+
 
 @event('plugin.register')
 def register_plugin():

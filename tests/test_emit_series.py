@@ -26,6 +26,11 @@ class BaseEmitSeries(FlexGetBase):
                 tracking: backfill
                 identified_by: ep
             rerun: 0
+          test_emit_series_no_backfill:
+            emit_series: yes
+            series:
+            - Test Series 1
+            rerun: 0
           test_emit_series_rejected:
             emit_series:
               backfill: yes
@@ -35,7 +40,8 @@ class BaseEmitSeries(FlexGetBase):
                 identified_by: ep
             rerun: 0
           test_emit_series_from_start:
-            emit_series: yes
+            emit_series:
+              backfill: yes
             series:
             - Test Series 3:
                 from_start: yes
@@ -53,15 +59,16 @@ class BaseEmitSeries(FlexGetBase):
               backfill: yes
             series:
             - Test Series 5:
-                begin: S02E02
+                begin: S03E02
                 tracking: backfill
             rerun: 0
           test_emit_series_begin_backfill_and_rerun:
+            accept_all: yes  # make sure mock output stores all created entries
             emit_series:
               backfill: yes
             series:
             - Test Series 6:
-                begin: S02E02
+                begin: S03E02
                 tracking: backfill
             mock_output: yes
             rerun: 1
@@ -83,10 +90,30 @@ class BaseEmitSeries(FlexGetBase):
             regexp:
               reject:
               - .
+          test_emit_series_alternate_name:
+            emit_series: yes
+            series:
+            - Test Series 8:
+               begin: S01E01
+               alternate_name:
+                 - Testing Series 8
+                 - Tests Series 8
+            rerun: 0
+            mock_output: yes
+          test_emit_series_alternate_name_duplicates:
+            emit_series: yes
+            series:
+            - Test Series 8:
+               begin: S01E01
+               alternate_name:
+                 - Testing Series 8
+                 - Testing SerieS 8
+            rerun: 0
+            mock_output: yes
     """
 
     def inject_series(self, release_name):
-        self.execute_task('inject_series', options = {'inject': [Entry(title=release_name, url='')]})
+        self.execute_task('inject_series', options = {'inject': [Entry(title=release_name, url='')], 'disable_tracking': True})
 
     def test_emit_series_backfill(self):
         self.inject_series('Test Series 1 S02E01')
@@ -103,6 +130,13 @@ class BaseEmitSeries(FlexGetBase):
         assert self.task.find_entry(title='Test Series 1 S02E05')
         assert self.task.find_entry(title='Test Series 1 S02E06')
         assert self.task.find_entry(title='Test Series 1 S02E07')
+
+    def test_emit_series_no_backfill(self):
+        self.inject_series('Test Series 1 S01E01')
+        self.inject_series('Test Series 1 S01E05')
+        self.execute_task('test_emit_series_no_backfill')
+        assert len(self.task.all_entries) == 1
+        assert self.task.find_entry(title='Test Series 1 S01E06')
 
     def test_emit_series_rejected(self):
         self.inject_series('Test Series 2 S01E03 720p')
@@ -125,14 +159,20 @@ class BaseEmitSeries(FlexGetBase):
         assert self.task.find_entry(title='Test Series 4 S03E03')
 
     def test_emit_series_begin_and_backfill(self):
+        self.inject_series('Test Series 5 S02E02')
         self.execute_task('test_emit_series_begin_and_backfill')
         # with backfill and begin, no backfilling should be done
-        assert self.task.find_entry(title='Test Series 5 S02E02')
+        assert self.task.find_entry(title='Test Series 5 S03E02')
+        assert len(self.task.all_entries) == 1
 
     def test_emit_series_begin_backfill_and_rerun(self):
+        self.inject_series('Test Series 6 S03E01')
         self.execute_task('test_emit_series_begin_backfill_and_rerun')
         # with backfill and begin, no backfilling should be done
-        assert len(self.task.mock_output) == 2 # Should have S02E02 and S02E03
+        assert self.task._rerun_count == 1
+        assert self.task.find_entry(title='Test Series 6 S03E03')
+        assert len(self.task.all_entries) == 1
+        assert len(self.task.mock_output) == 2 # Should have S03E02 and S03E03
 
     def test_emit_series_backfill_advancement(self):
         self.inject_series('Test Series 7 S02E01')
@@ -147,6 +187,29 @@ class BaseEmitSeries(FlexGetBase):
         assert self.task._rerun_count == 1
         assert len(self.task.all_entries) == 1
         assert self.task.find_entry('rejected', title='Test Series 8 S02E01')
+
+    def test_emit_series_alternate_name(self):
+        self.execute_task('test_emit_series_alternate_name')
+        assert len(self.task.mock_output) == 1
+        # There should be 2 alternate names
+        assert len(self.task.mock_output[0].get('series_alternate_names')) == 2
+        assert ['Testing Series 8', 'Tests Series 8'].sort() == \
+               self.task.mock_output[0].get('series_alternate_names').sort(), 'Alternate names do not match (how?).'
+
+    def test_emit_series_alternate_name_duplicates(self):
+        self.execute_task('test_emit_series_alternate_name_duplicates')
+        assert len(self.task.mock_output) == 1
+        # duplicate alternate names should only result in 1
+        # even if it is not a 'complete match' (eg. My Show == My SHOW)
+        assert len(self.task.mock_output[0].get('series_alternate_names')) == 1, 'Duplicate alternate names.'
+
+    def test_emit_series_search_strings(self):
+        # This test makes sure that the number of search strings increases when the amount of alt names increases.
+        self.execute_task('test_emit_series_alternate_name_duplicates')
+        s1 = len(self.task.mock_output[0].get('search_strings'))
+        self.execute_task('test_emit_series_alternate_name')
+        s2 = len(self.task.mock_output[0].get('search_strings'))
+        assert s2 > s1, 'Alternate names did not create sufficient search strings.'
 
 class TestGuessitEmitSeries(BaseEmitSeries):
     def __init__(self):

@@ -10,6 +10,8 @@ from flexget.utils.soup import get_soup
 
 log = logging.getLogger('imdb_list')
 USER_ID_RE = r'^ur\d{7,8}$'
+CUSTOM_LIST_RE = r'^ls\d{7,10}$'
+USER_LISTS = ['watchlist', 'ratings', 'checkins']
 
 
 class ImdbList(object):
@@ -23,10 +25,22 @@ class ImdbList(object):
                 'pattern': USER_ID_RE,
                 'error_pattern': 'user_id must be in the form urXXXXXXX'
             },
-            'list': {'type': 'string'}
+            'list': {
+                'type': 'string',
+                'oneOf': [
+                    {'enum': USER_LISTS},
+                    {'pattern': CUSTOM_LIST_RE}
+                ],
+                'error_oneOf': 'list must be either %s, or a custom list name (lsXXXXXXXXX)' % ', '.join(USER_LISTS)
+            }
         },
-        'required': ['list', 'user_id'],
-        'additionalProperties': False
+        'additionalProperties': False,
+        'required': ['list'],
+        'anyOf': [
+            {'required': ['user_id']},
+            {'properties': {'list': {'pattern': CUSTOM_LIST_RE}}}
+        ],
+        'error_anyOf': 'user_id is required if not using a custom list (lsXXXXXXXXX format)'
     }
 
     @cached('imdb_list', persist='2 hours')
@@ -76,6 +90,9 @@ class ImdbList(object):
 
             for tr in trs:
                 a = tr.find('td', class_='title').find('a')
+                if not a:
+                    log.debug('no title link found for row, skipping')
+                    continue
                 link = ('http://www.imdb.com' + a.get('href')).rstrip('/')
                 entry = Entry()
                 entry['title'] = a.string
@@ -93,6 +110,7 @@ class ImdbList(object):
             start = len(entries) + 1
 
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

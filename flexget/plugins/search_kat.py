@@ -3,6 +3,7 @@ import logging
 import urllib
 
 import feedparser
+from requests import RequestException
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -39,37 +40,41 @@ class SearchKAT(object):
         'additionalProperties': False
     }
 
-    def search(self, entry, config):
+    def search(self, task, entry, config):
         search_strings = [normalize_unicode(s).lower() for s in entry.get('search_strings', [entry['title']])]
         entries = set()
         for search_string in search_strings:
             search_string_url_fragment = search_string
-
+            params = {'rss': 1}
             if config.get('verified'):
                 search_string_url_fragment += ' verified:1'
-            url = 'http://kickass.to/search/%s/?rss=1' % urllib.quote(search_string_url_fragment.encode('utf-8'))
+            url = 'https://kat.cr/usearch/%s/' % urllib.quote(search_string_url_fragment.encode('utf-8'))
             if config.get('category', 'all') != 'all':
-                url += '&category=%s' % config['category']
+                params['category'] = config['category']
 
             sorters = [{'field': 'time_add', 'sorder': 'desc'},
                        {'field': 'seeders', 'sorder': 'desc'}]
             for sort in sorters:
-                url += '&field=%(field)s&sorder=%(sorder)s' % sort
+                params.update(sort)
 
                 log.debug('requesting: %s' % url)
-                rss = feedparser.parse(url)
-
-                status = rss.get('status', False)
-                if status == 404:
-                    # Kat returns status code 404 when no results found for some reason...
-                    log.debug('No results found for search query: %s' % search_string)
+                try:
+                    r = task.requests.get(url, params=params, raise_status=False)
+                except RequestException as e:
+                    log.warning('Search resulted in: %s' % e)
                     continue
-                elif status not in [200, 301]:
-                    raise plugin.PluginWarning('Search result not 200 (OK), received %s' % status)
+                if not r.content:
+                    log.debug('No content returned from search.')
+                    continue
+                elif r.status_code != 200:
+                    log.warning('Search returned %s response code' % r.status_code)
+                    continue
+                rss = feedparser.parse(r.content)
 
                 ex = rss.get('bozo_exception', False)
                 if ex:
-                    raise plugin.PluginWarning('Got bozo_exception (bad feed)')
+                    log.warning('Got bozo_exception (bad feed)')
+                    continue
 
                 for item in rss.entries:
                     entry = Entry()

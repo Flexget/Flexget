@@ -5,6 +5,7 @@ from flexget.event import event
 
 log = logging.getLogger('mock_output')
 
+
 class MockOutput(object):
     """
     Debugging plugin which records a copy of all accepted entries into a list stored in `mock_output` attribute

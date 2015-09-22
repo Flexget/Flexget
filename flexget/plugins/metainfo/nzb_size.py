@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import mimetypes
 
 from flexget import plugin
 from flexget.event import event
@@ -7,7 +8,6 @@ from flexget.event import event
 log = logging.getLogger('nzb_size')
 
 # a bit hacky, add nzb as a known mimetype
-import mimetypes
 mimetypes.add_type('application/x-nzb', '.nzb')
 
 

@@ -38,12 +38,9 @@ class Mock(object):
         entries = []
         for line in config:
             entry = Entry(line)
-            # no url specified, add random one (ie. test)
-            if not 'url' in entry:
-                import string
-                import random
-                entry['url'] = 'http://localhost/mock/%s' % \
-                               ''.join([random.choice(string.letters + string.digits) for x in range(1, 30)])
+            # no url specified, add random one based on title (ie. test)
+            if 'url' not in entry:
+                entry['url'] = 'mock://localhost/mock/%s' % hash(entry['title'])
             entries.append(entry)
         return entries
 

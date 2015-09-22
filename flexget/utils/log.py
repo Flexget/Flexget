@@ -3,18 +3,15 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import hashlib
-import sys
-from contextlib import contextmanager
 from datetime import datetime, timedelta
+from flexget.utils.database import with_session
 
 from sqlalchemy import Column, Integer, String, DateTime, Index
-
 from flexget import db_schema
 from flexget import logger as f_logger
 from flexget.utils.sqlalchemy_utils import table_schema
 from flexget.manager import Session
 from flexget.event import event
-from flexget.utils.tools import Tee
 
 log = logging.getLogger('util.log')
 Base = db_schema.versioned_base('log_once', 0)
@@ -47,7 +44,7 @@ class LogMessage(Base):
 
 
 @event('manager.db_cleanup')
-def purge(session):
+def purge(manager, session):
     """Purge old messages from database"""
     old = datetime.now() - timedelta(days=365)
 
@@ -56,7 +53,9 @@ def purge(session):
         log.verbose('Purged %s entries from log_once table.' % result)
 
 
-def log_once(message, logger=logging.getLogger('log_once'), once_level=logging.INFO, suppressed_level=f_logger.VERBOSE):
+@with_session
+def log_once(message, logger=logging.getLogger('log_once'), once_level=logging.INFO, suppressed_level=f_logger.VERBOSE,
+             session=None):
     """
     Log message only once using given logger`. Returns False if suppressed logging.
     When suppressed, `suppressed_level` level is still logged.
@@ -72,33 +71,13 @@ def log_once(message, logger=logging.getLogger('log_once'), once_level=logging.I
     digest.update(message.encode('latin1', 'replace')) # ticket:250
     md5sum = digest.hexdigest()
 
-    session = Session()
-    try:
-        # abort if this has already been logged
-        if session.query(LogMessage).filter_by(md5sum=md5sum).first():
-            logger.log(suppressed_level, message)
-            return False
+    # abort if this has already been logged
+    if session.query(LogMessage).filter_by(md5sum=md5sum).first():
+        logger.log(suppressed_level, message)
+        return False
 
-        row = LogMessage(md5sum)
-        session.add(row)
-        session.commit()
-    finally:
-        session.close()
+    row = LogMessage(md5sum)
+    session.add(row)
 
     logger.log(once_level, message)
     return True
-
-
-@contextmanager
-def capture_output(stream):
-    """Context manager which captures all log and std output to given `stream` while in scope."""
-    old_stdout, old_stderr = sys.stdout, sys.stderr
-    sys.stdout, sys.stderr = Tee(stream, sys.stdout), Tee(stream, sys.stderr)
-    streamhandler = logging.StreamHandler(stream)
-    streamhandler.setFormatter(f_logger.FlexGetFormatter())
-    logging.getLogger().addHandler(streamhandler)
-    try:
-        yield
-    finally:
-        sys.stdout, sys.stderr = old_stdout, old_stderr
-        logging.getLogger().removeHandler(streamhandler)

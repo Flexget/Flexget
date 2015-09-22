@@ -3,7 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
 
-from path import path
+from path import Path
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -30,8 +30,13 @@ class Listdir(object):
             config = [config]
         entries = []
         for folder in config:
-            folder = path(folder).expanduser()
-            for filepath in folder.listdir():
+            folder = Path(folder).expanduser()
+            try:
+                dir_files = folder.listdir()
+            except OSError as e:
+                log.error('Path %s could not be accessed: %s' % (folder, e.strerror))
+                continue
+            for filepath in dir_files:
                 try:
                     filepath.exists()
                 except UnicodeError:

@@ -44,7 +44,6 @@ class GuessRegexpId(Transformer):
 
 
 add_transformer('guess_regexp_id = flexget.plugins.parsers.parser_guessit:GuessRegexpId')
-guessit.default_options = {'name_only': True, 'clean_function': clean_value, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
 
 
 class GuessitParsedEntry(ParsedEntry):
@@ -232,7 +231,8 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
 
     @property
     def special(self):
-        return self.episode_details and len(self.episode_details) > 0 or (self.title and self.title.lower().strip() == 'special')
+        return (self.episode_details and len(self.episode_details) > 0 or
+                (self.title and self.title.lower().strip() == 'special'))
 
     @property
     def episode_details(self):
@@ -282,6 +282,8 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
 
 class ParserGuessit(object):
     def _guessit_options(self, options):
+        settings = {'name_only': True, 'clean_function': clean_value, 'allowed_languages': ['en', 'fr'],
+                    'allowed_countries': ['us', 'uk', 'gb']}
         options['episode_prefer_number'] = not options.get('identified_by') == 'ep'
         if options.get('allow_groups'):
             options['expected_group'] = options['allow_groups']
@@ -289,7 +291,8 @@ class ParserGuessit(object):
             options['date_year_first'] = options['date_yearfirst']
         if 'date_dayfirst' in options:
             options['date_day_first'] = options['date_dayfirst']
-        return options
+        settings.update(options)
+        return settings
 
     # movie_parser API
     def parse_movie(self, data, **kwargs):

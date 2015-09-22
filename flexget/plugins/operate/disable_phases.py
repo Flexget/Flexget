@@ -25,6 +25,7 @@ class PluginDisablePhases(object):
     def on_task_start(self, task, config):
         map(task.disable_phase, config)
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginDisablePhases, 'disable_phases', api_ver=2)

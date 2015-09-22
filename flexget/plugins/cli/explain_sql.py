@@ -38,14 +38,14 @@ class ExplainQuery(Query):
 
 
 @event('manager.execute.started')
-def register_sql_explain(man):
-    if man.options.execute.explain_sql:
+def register_sql_explain(man, options):
+    if options.explain_sql:
         manager.Session.kw['query_cls'] = ExplainQuery
 
 
 @event('manager.execute.completed')
-def deregister_sql_explain(man):
-    if man.options.execute.explain_sql:
+def deregister_sql_explain(man, options):
+    if options.explain_sql:
         manager.Session.kw.pop('query_cls', None)
 
 

@@ -3,8 +3,8 @@ import logging
 
 from flexget import options
 from flexget.event import event
+from flexget.logger import console
 from flexget.manager import Session
-from flexget.utils.tools import console
 
 log = logging.getLogger('perftests')
 
@@ -52,8 +52,8 @@ def imdb_query(session):
     for index, url in enumerate(imdb_urls):
         bar.update(index)
 
-        #movie = session.query(Movie).filter(Movie.url == url).first()
-        #movie = session.query(Movie).options(subqueryload(Movie.genres)).filter(Movie.url == url).one()
+        # movie = session.query(Movie).filter(Movie.url == url).first()
+        # movie = session.query(Movie).options(subqueryload(Movie.genres)).filter(Movie.url == url).one()
 
         movie = session.query(Movie).\
             options(joinedload_all(Movie.genres, Movie.languages,
