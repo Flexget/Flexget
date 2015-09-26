@@ -132,7 +132,8 @@ class Session(requests.Session):
 
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
-            raise requests.Timeout('Requests to this site have timed out recently. Waiting before trying again.')
+            raise requests.Timeout('Requests to this site (%s) have timed out recently. Waiting before trying again.',
+                urlparse(url).hostname)
 
         # Delay, if needed, before another request to this site
         wait_for_domain(url, self.domain_delay)
