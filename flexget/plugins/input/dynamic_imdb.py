@@ -153,10 +153,8 @@ class DynamicIMDB(object):
         :return:
         """
         items = []
-        log.info(content_types)
         for content_type in content_types:
             items += character.get(CHARACTER_CONTENT_TYPE_CONVERSION[content_type], [])
-            log.info(items)
         return items
 
     def get_items_by_company(self, company):
