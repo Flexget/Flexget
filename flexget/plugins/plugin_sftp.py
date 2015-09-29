@@ -188,7 +188,7 @@ class SftpList(object):
         if not isinstance(dirs, list):
             dirs = [dirs]
         
-        log.debug('Connecting to %s' % host)
+        log.debug('Connecting to %s' % config['host'])
 
         sftp = sftp_from_config(config)
         url_prefix = sftp_prefix(config)
