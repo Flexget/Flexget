@@ -22,12 +22,9 @@ class UrlRewriteArchetorrent(object):
         else:
             url = entry['url']
             log.debug("Got the URL: %s" % entry['url'])
-            try:
-                entry['url'] = entry['url'].replace('torrents-details', 'download')
-                entry['url'] = entry['url'].replace('&hit=1', '')
-                log.debug("New URL: %s" % entry['url'])
-            except Exception as e:
-                raise UrlRewritingError("Connection Error for %s : %s" % (url, e))
+            entry['url'] = entry['url'].replace('torrents-details', 'download')
+            entry['url'] = entry['url'].replace('&hit=1', '')
+            log.debug("New URL: %s" % entry['url'])
 
 @event('plugin.register')
 def register_plugin():
