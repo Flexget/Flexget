@@ -1,23 +1,21 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
+import json
+import fnmatch
 
-from flask import send_from_directory, Flask, jsonify
-from flask import Blueprint as FlaskBlueprint
+from flask import send_from_directory, Flask, abort, render_template
 
-from flexget.plugin import DependencyError
-from flexget import __version__
-from flexget.ui import plugins as ui_plugins_pkg
 from flexget.webserver import register_app, register_home
 from flask.ext.assets import Environment, Bundle
 from flask_compress import Compress
 
+
 log = logging.getLogger('webui')
 
 _home = None
-_menu = []
-_angular_routes = []
 _asset_registry = {}
+_plugins = {}
 
 manager = None
 assets = None
@@ -32,223 +30,131 @@ def register_asset_type(name, output_file, filters=None):
     _asset_registry[name] = {'out': output_file, 'filters': filters, 'items': []}
 
 
-register_asset_type('js_all', 'js/flexget.min.js', filters='rjsmin')
-register_asset_type('css_all', 'css/flexget.min.css', filters='cssmin')
+# TODO: dont minify if debug
+register_asset_type('plugins_js', 'js/plugins.min.js', filters='rjsmin')
+register_asset_type('plugins_css', 'css/plugins.min.css', filters='cssmin')
 
 
-def register_asset(asset_type, name, f, order=128, bp=None):
+def register_asset(asset_type, asset):
     global _asset_registry
-    name = name.lower()
 
     if asset_type not in _asset_registry:
         raise KeyError('asset registry %s does not exist' % asset_type)
 
     registry = _asset_registry[asset_type]
-
-    for item in registry['items']:
-        if item['name'] == name:
-            log.error('%s is already registered to %s' % registry['items'][name]['file'])
-            return
-
-    if bp:
-        f = '%s/%s' % (bp.name, f)
-
-    registry['items'].append({'name': name, 'file': f, 'order': order})
-    registry['items'] = sorted(registry['items'], key=lambda item: item['order'])
-
-
-def register_js(name, f, order=128, bp=None):
-    """ Shortcut to register javascript files. Calls register_asset """
-    register_asset('js_all', name, f, order=order, bp=bp)
-
-
-def register_css(name, f, order=128, bp=None):
-    """ Shortcut to register javascript files. Calls register_asset """
-    register_asset('css_all', name, f, order=order, bp=bp)
-
-
-def register_font(name, f, order=128, bp=None):
-    """ Shortcut to register font files. Calls register_asset """
-    register_asset('font_all', name, f, order=order, bp=bp)
+    registry['items'].append(asset)
 
 
 @webui_app.before_first_request
 def _load_assets():
     for name, asset_registry in _asset_registry.iteritems():
-        asset_files = [item['file'] for item in asset_registry['items']]
+        asset_files = [item for item in asset_registry['items']]
         asset_bundle = Bundle(*asset_files, filters=asset_registry['filters'], output=asset_registry['out'])
         assets.register(name, asset_bundle)
 
 
-# Required core js files
-register_js('angular', 'libs/angularjs/js/angular.min.js', order=10)
-register_js('angular-material', 'libs/angular-material/js/angular-material.min.js', order=11)
-register_js('angular-ui-router', 'libs/angular-ui-router/js/angular-ui-router.min.js', order=11)
-register_js('angular-sanitize', 'libs/angularjs/js/angular-sanitize.min.js', order=11)
-register_js('angular-animate', 'libs/angularjs/js/angular-animate.min.js', order=11)
-register_js('angular-aria', 'libs/angularjs/js/angular-aria.min.js', order=11)
-register_js('angular-filter', 'libs/angular-filter/js/angular-filter.min.js', order=11)
-register_js('flexget', 'js/flexget.js', order=20)
-register_js('common-utils', 'js/common/utils.js', order=20)
-register_js('common-directives', 'js/common/directives.js', order=20)
-register_js('common-controllers', 'js/common/controllers.js', order=20)
-register_js('common-services', 'js/common/services.js', order=20)
-register_js('ui-grid', 'libs/ui-grid/js/ui-grid.min.js', order=20)
-register_js('tv4', 'libs/schema-form/js/tv4.min.js', order=25)
-register_js('ObjectPath', 'libs/schema-form/js/ObjectPath.js', order=25)
-register_js('schema-form', 'libs/schema-form/js/schema-form.js', order=25)
-register_js('bootstrap-decorator', 'libs/schema-form/js/bootstrap-decorator.js', order=26)
-
-# Register core css files
-register_css('angular-material', 'libs/angular-material/css/angular-material.min.css', order=1)
-register_css('ui-grid', 'libs/ui-grid/css/ui-grid.min.css', order=20)
-register_css('flexget', 'css/flexget.css', order=30)
-
-
-def register_menu(href, caption, icon='fa fa-link', order=128, angular=True):
-    global _menu
-
-    if angular:
-        href = '%s/#%s' % (webui_app.url_path, href)
-    elif href.startswith('/'):
-        href = '%s%s' % (webui_app.url_path, href)
-
-    _menu.append({'href': href, 'caption': caption, 'icon': icon, 'order': order})
-    _menu = sorted(_menu, key=lambda item: item['order'])
-
-
-def register_angular_route(name, url, template_url=None, controller=None):
-    _angular_routes.append({
-        'name': name,
-        'url': url,
-        'template_url': template_url,
-        'controller': controller,
-    })
-
-
-class Blueprint(FlaskBlueprint):
-
-    def register_js(self, name, f, order=128):
-        register_asset('js_all', name, f, order=order, bp=self)
-
-    def register_css(self, name, f, order=128):
-        register_asset('css_all', name, f, order=order, bp=self)
-
-    def register_angular_route(self, name, url, template_url=None, controller=None):
-        # Relative URLS
-        if not template_url.startswith('/'):
-            template_url = "%s/static/%s/%s" % (webui_app.url_path, self.name, template_url)
-
-        # Append blueprint name to create nested states
-        name = '%s.%s' % (self.name, name) if name else self.name
-
-        register_angular_route(name, url, template_url=template_url, controller=controller)
-
-
-@webui_app.context_processor
-def flexget_variables():
-    return {
-        'version': __version__,
-        'menu': _menu,
-    }
-
-
-@webui_app.route('/static/<plugin>/<path:path>')
-def static_server(plugin, path):
-    bp = webui_app.blueprints.get(plugin)
-    if bp:
-        return send_from_directory(bp.static_folder, path)
-    else:
-        return send_from_directory(webui_static_path, '%s/%s' % (plugin, path))
-
+@webui_app.route('/plugin/<plugin>/<path:path>')
+def plugin_static_server(plugin, path):
+    if plugin in _plugins:
+        return send_from_directory(os.path.join(_plugins[plugin]['path'], 'static'), path)
+    return abort(404)
 
 @webui_app.route('/userstatic/<path:filename>')
 def user_static_server(filename):
     return send_from_directory(os.path.join(manager.config_base, 'userstatic'), filename)
 
 
-@webui_app.route('/routes')
-def routes():
-    return jsonify({'routes': _angular_routes})
+@webui_app.route('/')
+def index():
+    return render_template('index.html')
+
+
+def _find(path, f):
+    matches = []
+    for root, dir_names, file_names in os.walk(path):
+        for filename in fnmatch.filter(file_names, f):
+            matches.append(os.path.join(root, filename))
+    return matches
 
 
 def _strip_trailing_sep(path):
-    return path.rstrip("\\/")
+    return path.rstrip('\\/')
 
 
-def _get_standard_ui_plugins_path():
-    """
-    :returns: List of directories where ui plugins should be tried to load from.
-    """
+def _get_plugin_paths():
+    # Standard plugins
+    plugins_paths = [os.path.join(os.path.dirname(os.path.realpath(__file__)), 'plugins')]
 
-    # Get basic path from environment
-    paths = []
+    # Additional plugin paths
+    if os.environ.get('FLEXGET_UI_PLUGIN_PATH'):
+        for path in os.environ.get('FLEXGET_UI_PLUGIN_PATH').split(os.pathsep):
+            if os.path.isdir(path):
+                plugins_paths.append(path)
 
-    env_path = os.environ.get('FLEXGET_UI_PLUGIN_PATH')
-    if env_path:
-        paths = [path for path in env_path.split(os.pathsep) if os.path.isdir(path)]
+    user_plugin_dir = os.path.join(manager.config_base, 'plugins', 'ui')
+    if os.path.isdir(user_plugin_dir):
+        plugins_paths.append(user_plugin_dir)
 
-    # Add flexget.ui.plugins directory (core ui plugins)
-    import flexget.ui.plugins
-    paths.append(flexget.ui.plugins.__path__[0])
-    return paths
+    return plugins_paths
 
 
-def _load_ui_plugins_from_dirs(dirs):
+def _register_plugin(plugin_path):
+    plugin_config = os.path.join(plugin_path, 'plugin.json')
 
-    # Ensure plugins can be loaded via flexget.ui.plugins
-    ui_plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
+    if not os.path.isfile(plugin_config):
+        log.warn('Unable to load plugin %s missing' % plugin_config)
+        return
+    try:
+        with open(plugin_config, 'r') as f:
+            config = json.load(f)
+    except IOError as e:
+        log.error('Error loading plugin config %s as %s' % (plugin_config, str(e)))
+        return
+    except ValueError as e:
+        log.error('Invalid plugin config %s as %s' % (plugin_config, str(e)))
+        return
 
-    plugins = set()
-    for d in dirs:
-        for f in os.listdir(d):
-            path = os.path.join(d, f, '__init__.py')
-            if os.path.isfile(path):
-                plugins.add(f)
+    name = config.get('name')
+    if not name:
+        log.error('Error loading plugin missing name in ' % plugin_config)
+        return
 
-    for plugin in plugins:
-        name = plugin.split(".")[-1]
-        try:
-            log.debug('Loading UI plugin %s' % name)
-            exec "import flexget.ui.plugins.%s" % plugin
-        except DependencyError as e:
-            # plugin depends on another plugin that was not imported successfully
-            log.error(e.message)
-        except EnvironmentError as e:
-            log.info('Plugin %s: %s' % (name, str(e)))
-        except Exception as e:
-            log.critical('Exception while loading plugin %s' % name)
-            log.exception(e)
-            raise
+    if name in _plugins:
+        log.error('Error loading plugin %s with name %s as it\'s already registered ' % (plugin_config, name))
+        return
+
+    version = config.get('version', '1.0')
+    _plugins[name] = {'path': plugin_path, 'config': config, version: version}
+
+    # Register CSS assets
+    css_path = os.path.join(plugin_path, 'css')
+    if os.path.isdir(css_path):
+        for css_file in _find(css_path, "*.css"):
+            register_asset('plugins_css', css_file)
+
+    # Register JS assets
+    if config.get('js'):
+        for js_file in config['js']:
+            js_file = '%s.js' % os.path.normpath(os.path.join(plugin_path, 'js', js_file))
+            register_asset('plugins_js', js_file)
+    else:
+        js_path = os.path.join(plugin_path, 'js')
+        if os.path.isdir(js_path):
+            # Register JS assets
+            for js_file in _find(js_path, "*.js"):
+                register_asset('plugins_js', js_file)
+
+
+def _load_ui_plugins_from_dir(path):
+    for plugin in os.listdir(path):
+        _register_plugin(os.path.join(path, plugin))
 
 
 def load_ui_plugins():
+    plugin_paths = _get_plugin_paths()
 
-    # Add flexget.plugins directory (core plugins)
-    ui_plugin_dirs = _get_standard_ui_plugins_path()
-
-    user_plugin_dir = os.path.join(manager.config_base, 'ui_plugins')
-    if os.path.isdir(user_plugin_dir):
-        ui_plugin_dirs.append(user_plugin_dir)
-
-    _load_ui_plugins_from_dirs(ui_plugin_dirs)
-
-
-def register_plugin(blueprint):
-    """
-    Registers UI plugin.
-
-    :plugin: :class:`flask.Blueprint` object for this plugin.
-    """
-    # Set up some defaults if the plugin did not already specify them
-    if blueprint.url_prefix is None:
-        blueprint.url_prefix = '/' + blueprint.name
-    if not blueprint.template_folder and os.path.isdir(os.path.join(blueprint.root_path, 'templates')):
-        blueprint.template_folder = 'templates'
-    if not blueprint.static_folder and os.path.isdir(os.path.join(blueprint.root_path, 'static')):
-        blueprint.static_folder = 'static'
-    log.verbose('Registering UI plugin %s' % blueprint.name)
-    webui_app.register_blueprint(blueprint)
+    for path in plugin_paths:
+        _load_ui_plugins_from_dir(path)
 
 
 def register_web_ui(mgr):
@@ -266,10 +172,6 @@ def register_web_ui(mgr):
     assets.directory = user_static_folder
     assets.cache = assets_cache
     assets.url = '%s/userstatic' % webui_app.url_path
-
-    # TODO: Better way to do this?
-    if 'debug' in manager.args:
-        assets.debug = True
 
     load_ui_plugins()
 
