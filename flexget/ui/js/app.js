@@ -14,6 +14,7 @@ app.config(function($stateProvider, $urlRouterProvider, $mdThemingProvider, $mdI
     .primaryPalette('orange');
 
   $urlRouterProvider.otherwise('/home');
+
   var currentRoute;
   var j = 0;
 

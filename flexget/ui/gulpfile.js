@@ -45,7 +45,7 @@ gulp.task('fonts', function() {
 gulp.task('css', function () {
   gulp.src('./sass/flexget.scss')
     .pipe(sass({includePaths: config.sass_includes, outputStyle: 'compressed'}).on('error', sass.logError))
-    // Fix for angular-ui-grid fonts (does not support sassat
+    // Fix for font paths in angular-ui-grid (does not support sass)
     .pipe(urlAdjuster({
       prependRelative: '../fonts/',
       append: '?version=1',
