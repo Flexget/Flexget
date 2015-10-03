@@ -24,6 +24,8 @@ class HTTPHeadersProcessor(urllib2.BaseHandler):
             if not request.has_header(name):
                 log.debug('Adding %s: %s' % (name, value))
                 request.add_unredirected_header(name.capitalize(), value.strip())
+            else:
+                log.debug('Header "%s" exists with value "%s"' % (name, request.get_header(name)))
         return request
 
     def http_response(self, request, response):
@@ -48,6 +50,7 @@ class PluginHeaders(object):
     def on_task_start(self, task, config):
         """Task starting"""
         # Set the headers for this task's request session
+        log.debug('headers to add: %s' % config)
         if task.requests.headers:
             task.requests.headers.update(config)
         else:
