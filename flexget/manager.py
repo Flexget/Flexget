@@ -26,13 +26,13 @@ from flexget.utils.sqlalchemy_utils import ContextSession
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)
 
-from flexget import config_schema, db_schema, logger, plugin
-from flexget.event import fire_event
-from flexget.ipc import IPCClient, IPCServer
-from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv
-from flexget.task import Task
-from flexget.task_queue import TaskQueue
-from flexget.utils.tools import pid_exists, console
+from flexget import config_schema, db_schema, logger, plugin # noqa
+from flexget.event import fire_event # noqa
+from flexget.ipc import IPCClient, IPCServer # noqa
+from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv # noqa
+from flexget.task import Task # noqa
+from flexget.task_queue import TaskQueue # noqa
+from flexget.utils.tools import pid_exists, console # noqa
 
 
 log = logging.getLogger('manager')

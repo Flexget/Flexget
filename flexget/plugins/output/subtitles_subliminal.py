@@ -88,9 +88,10 @@ class PluginSubliminal(object):
         from subliminal.cli import MutexLock
         try:
             subliminal.region.configure('dogpile.cache.dbm', 
-                                              arguments={'filename': os.path.join(tempfile.gettempdir(),
-                                                                                  'cachefile.dbm'),
-                                              'lock_factory': MutexLock})
+                                        arguments={
+                                            'filename': os.path.join(tempfile.gettempdir(), 'cachefile.dbm'),
+                                            'lock_factory': MutexLock,
+                                        })
         except RegionAlreadyConfigured:
             pass
         logging.getLogger("subliminal").setLevel(logging.CRITICAL)
