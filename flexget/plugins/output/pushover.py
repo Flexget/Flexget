@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from requests.exceptions import ConnectionError
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
@@ -134,7 +134,7 @@ class OutputPushover(object):
                 # Make the request
                 try:
                     response = task.requests.post(pushover_url, data=data, raise_status=False)
-                except ConnectionError as e:
+                except RequestException as e:
                     log.warning('Could not get response from Pushover: {}'.format(e))
                     return
 
