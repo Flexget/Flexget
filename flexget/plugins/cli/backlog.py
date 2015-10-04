@@ -36,4 +36,4 @@ def register_options():
     parser = options.register_command('backlog', do_cli, help='view or clear entries from backlog plugin')
     parser.add_argument('action', choices=['list', 'clear'], help='choose to show items in backlog, or clear them')
     parser.add_argument('task', nargs='?', help='limit to specific task (if supplied)')
-    parser.add_argument('--porcelain' , action='store_true', help='make the output parseable')
+    parser.add_argument('--porcelain', action='store_true', help='make the output parseable')

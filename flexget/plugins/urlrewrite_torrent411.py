@@ -60,8 +60,8 @@ SUB_CATEGORIES = {
     'VOASTA': [51, 1217], # new
     'VOSTFR': [51, 1216],
 
-# deprecated    'NTSC': [8, 20], 
-# deprecated    'PAL': [8, 21],
+    # deprecated    'NTSC': [8, 20],
+    # deprecated    'PAL': [8, 21],
 
     'BDrip-BRrip-SD': [7, 8], # new: replaces BDrip-SD and BRrip-SD
     'BDrip-SD': [7, 8], # deprecated: replaced by 'BDrip-BRrip-SD'
