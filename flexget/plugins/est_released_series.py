@@ -79,6 +79,9 @@ class EstimatesReleasedSeries(object):
                 # If last two eps were not contiguous, don't guess
                 if episodes[0].number != episodes[1].number + 1:
                     return
+                # If first_seen in None, return
+                if episodes[0].first_seen is None or episodes[1].first_seen is None:
+                    return
                 last_diff = episodes[0].first_seen - episodes[1].first_seen
                 # If last eps were grabbed close together, we might be catching up, don't guess
                 # Or, if last eps were too far apart, don't guess
