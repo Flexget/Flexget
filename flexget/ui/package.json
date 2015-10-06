@@ -6,9 +6,9 @@
     "test": "test"
   },
   "devDependencies": {
+    "del": "^2.0.2",
     "gulp": "^3.9.0",
     "gulp-bower": "0.0.10",
-    "gulp-clean": "^0.3.1",
     "gulp-concat": "^2.6.0",
     "gulp-concat-vendor": "0.0.4",
     "gulp-css-url-adjuster": "^0.2.3",
