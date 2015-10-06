@@ -32,3 +32,9 @@ pip-*.tar.gz
 *.noseids
 .coverage
 tests/cover/
+flexget/plugins/input/imdb_poc.py
+*.txt
+doc/imdbpy.cfg
+*.ico
+doc/imdbpywin.bmp
+*.png

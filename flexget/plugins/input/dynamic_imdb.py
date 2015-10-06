@@ -111,6 +111,7 @@ class DynamicIMDB(object):
             character = self.ia.get_character(imdb_id[2:])
             log.info('Starting to retrieve items for Character: %s' % character)
             return 'Character', character
+        # TODO fallback
 
     def get_items_by_person(self, person, job_types, content_types):
         """
@@ -120,6 +121,7 @@ class DynamicIMDB(object):
         :param content_types: Relevant content types as inputted in config
         :return: Person item list
         """
+        # TODO refactor some more
         items = []
         for job_type in job_types:
             if job_type in JOBS_WITHOUT_CONTENT_TYPE:
