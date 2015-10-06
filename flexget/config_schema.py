@@ -57,7 +57,7 @@ def get_schema():
     return _root_config_schema
 
 
-def one_or_more(schema):
+def one_or_more(schema, unique_items=False):
     """
     Helper function to construct a schema that validates items matching `schema` or an array
     containing items matching `schema`.
@@ -67,7 +67,7 @@ def one_or_more(schema):
     schema.setdefault('title', 'single value')
     return {
         'oneOf': [
-            {'title': 'multiple values', 'type': 'array', 'items': schema, 'minItems': 1},
+            {'title': 'multiple values', 'type': 'array', 'items': schema, 'minItems': 1, 'uniqueItems': unique_items},
             schema
         ]
     }
@@ -335,7 +335,6 @@ def select_child_errors(validator, errors):
 
 
 def validate_properties_w_defaults(validator, properties, instance, schema):
-
     if not validator.is_type(instance, 'object'):
         return
     for key, subschema in properties.iteritems():
