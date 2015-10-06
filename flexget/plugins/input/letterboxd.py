@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging, re
+import logging
+import re
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -68,7 +69,6 @@ class Letterboxd(object):
         'additionalProperties': False
     }
 
-
     def build_config(self, config):
         config['list'] = config['list'].lower().replace(' ', '-')
         list_key = config['list']
@@ -79,7 +79,6 @@ class Letterboxd(object):
         config['sort_by'] = SORT_BY[config['sort_by']]
 
         return config
-
 
     def tmdb_lookup(self, search):
         tmdb = plugin.get_plugin_by_name('api_tmdb').instance.lookup(tmdb_id=search)
@@ -92,7 +91,6 @@ class Letterboxd(object):
         }
 
         return result
-
 
     def parse_film(self, film, config):
         url = base_url + film.get(config['f_slug'])
@@ -112,7 +110,6 @@ class Letterboxd(object):
             entry['letterboxd_uscore'] = int(film.find_next(itemprop='rating').get('content'))
 
         return entry
-
 
     @cached('letterboxd', persist='2 hours')
     def on_task_input(self, task, config=None):

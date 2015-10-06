@@ -26,6 +26,7 @@ class EscapingEntry(Entry):
             value = value.replace('"', '\\"')
         return value
 
+
 class PluginExec(object):
     """
     Execute commands

@@ -145,11 +145,13 @@ class Session(requests.Session):
 
         # If we do not have an adapter for this url, pass it off to urllib
         if not any(url.startswith(adapter) for adapter in self.adapters):
+            log.debug('No adaptor, passing off to urllib')
             return _wrap_urlopen(url, timeout=kwargs['timeout'])
 
         try:
+            log.debug('Fetching %s' % url)
             result = requests.Session.request(self, method, url, *args, **kwargs)
-        except (requests.Timeout, requests.ConnectionError):
+        except requests.Timeout:
             # Mark this site in known unresponsive list
             set_unresponsive(url)
             raise

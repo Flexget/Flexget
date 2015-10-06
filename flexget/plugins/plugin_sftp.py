@@ -27,7 +27,7 @@ SOCKET_TIMEOUT = 15
 
 # make separate path instances for local vs remote path styles
 localpath = os.path
-remotepath = posixpath #pysftp uses POSIX style paths
+remotepath = posixpath # pysftp uses POSIX style paths
 
 try:
     import pysftp
@@ -64,6 +64,7 @@ def sftp_connect(conf):
     
     return sftp
 
+
 def sftp_from_config(config):
     """
     Creates an SFTP connection from a Flexget config object 
@@ -84,6 +85,7 @@ def sftp_from_config(config):
 
     return sftp
 
+
 def sftp_prefix(config):
     """
     Generate SFTP URL prefix
@@ -101,6 +103,7 @@ def sftp_prefix(config):
 
     return 'sftp://%s%s%s/' % (login_str, config['host'], port_str)
 
+
 def dependency_check():
     """
     Check if pysftp module is present
@@ -109,6 +112,7 @@ def dependency_check():
         raise plugin.DependencyError(issued_by='sftp', 
                                      missing='pysftp', 
                                      message='sftp plugin requires the pysftp Python module.')
+
 
 class SftpList(object):
     """
@@ -458,6 +462,7 @@ class SftpDownload(object):
             if sftp:
                 sftp.close()
 
+
 class SftpUpload(object):
     """
     Upload files to a SFTP server. This plugin requires the pysftp Python module and its 
@@ -567,7 +572,6 @@ class SftpUpload(object):
             except Exception as e:
                 log.error('Failed to delete file %s (%s)')
 
-
     def on_task_output(self, task, config):
         """Uploads accepted entries to the specified SFTP server."""
 
@@ -583,6 +587,7 @@ class SftpUpload(object):
             else:
                 log.debug('SFTP connection failed; failing entry: %s' % entry)
                 entry.fail
+
 
 @event('plugin.register')
 def register_plugin():

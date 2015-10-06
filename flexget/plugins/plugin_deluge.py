@@ -344,7 +344,7 @@ class OutputDeluge(DelugePlugin):
                     'content_filename': {'type': 'string'},
                     'main_file_only': {'type': 'boolean'},
                     'main_file_ratio': {'type': 'number'},
-                    'magnetization_timeout' : {'type': 'integer'},
+                    'magnetization_timeout': {'type': 'integer'},
                     'keep_subs': {'type': 'boolean'},
                     'hide_sparse_files': {'type': 'boolean'},
                     'enabled': {'type': 'boolean'},
