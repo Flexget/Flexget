@@ -119,11 +119,10 @@ class InputFind(object):
                                 entries.append(entry)
                 if get_dirs:
                     for dir in dirs:
-                        if match(dir):
-                            fullpath = str(root) + os.path.sep + str(dir)
-                            entry = self.create_entry(fullpath, test_mode, type='dir')
-                            if entry:
-                                entries.append(entry)
+                        fullpath = str(root) + os.path.sep + str(dir)
+                        entry = self.create_entry(fullpath, test_mode, type='dir')
+                        if entry:
+                            entries.append(entry)
         return entries
 
     def get_entries_from_dir(self, folder, match, test_mode, get_files, get_dirs, get_symlinks):
@@ -142,15 +141,16 @@ class InputFind(object):
             except UnicodeError:
                 log.error('File %s not decodable with filesystem encoding' % filepath)
                 continue
-            if match(filepath):
-                if filepath.isdir() and get_dirs:
-                    entry = self.create_entry(filepath, test_mode, type='dir')
-                elif filepath.islink() and get_symlinks:
-                    entry = self.create_entry(filepath, test_mode, type='dir')
-                elif filepath.isfile() and get_files:
+            if filepath.isdir() and get_dirs:
+                entry = self.create_entry(filepath, test_mode, type='dir')
+            elif filepath.islink() and get_symlinks:
+                entry = self.create_entry(filepath, test_mode, type='dir')
+            elif filepath.isfile() and get_files:
+                if match(filepath):
+                    print 'hit'
                     entry = self.create_entry(filepath, test_mode)
-                if entry:
-                    entries.append(entry)
+            if entry:
+                entries.append(entry)
 
         return entries
 
