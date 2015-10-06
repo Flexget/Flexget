@@ -3,7 +3,7 @@
 var historyModule = angular.module("historyModule", ['angular.filter']);
 registerFlexModule(historyModule);
 
-register_route('history', '/history', 'HistoryCtrl', '/ui/plugin/history/index.html');
+register_route('history', '/history', 'HistoryCtrl', 'plugin/history/static/index.html');
 register_menu('/history', 'History', 'fa fa-history', 128);
 
 historyModule.controller('HistoryCtrl', function($scope, $http) {

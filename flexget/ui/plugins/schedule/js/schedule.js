@@ -3,7 +3,7 @@
 var scheduleModule = angular.module('scheduleModule', ['schemaForm']);
 registerFlexModule(scheduleModule);
 
-register_route('schedule', '/schedule', 'SchedulesCtrl', 'plugin/schedule/index.html');
+register_route('schedule', '/schedule', 'SchedulesCtrl', 'plugin/schedule/static/index.html');
 register_menu('/schedule', 'Schedule', 'fa fa-calendar', 128);
 
 scheduleModule.controller('SchedulesCtrl', function($scope, $http) {

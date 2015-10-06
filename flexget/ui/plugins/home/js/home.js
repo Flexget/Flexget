@@ -1,1 +1,1 @@
-register_route('home', '/home', null, '/ui/plugin/home/index.html');
+register_route('home', '/home', null, 'plugin/home/static/index.html');

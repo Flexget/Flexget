@@ -4,7 +4,7 @@ var executeModule = angular.module("executeModule", ['ngOboe', 'ui.grid', 'ui.gr
 
 registerFlexModule(executeModule);
 
-register_route('execute', '/execute', 'ExecuteCtrl', 'plugin/execute/index.html');
+register_route('execute', '/execute', 'ExecuteCtrl', 'plugin/execute/static/index.html');
 register_menu('/execute', 'Execute', 'fa fa-cog', 128);
 
 

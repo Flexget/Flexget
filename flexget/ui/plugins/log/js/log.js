@@ -4,7 +4,7 @@ var logViewModule = angular.module('logViewModule', ['ngOboe', 'ui.grid', 'ui.gr
 
 registerFlexModule(logViewModule);
 
-register_route('log', '/log', 'LogViewCtrl', 'plugin/log/index.html');
+register_route('log', '/log', 'LogViewCtrl', 'plugin/log/static/index.html');
 register_menu('/log', 'Log', 'fa fa-file-text-o', 128);
 
 logViewModule.controller('LogViewCtrl',

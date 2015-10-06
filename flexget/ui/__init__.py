@@ -30,7 +30,6 @@ def register_asset_type(name, output_file, filters=None):
     _asset_registry[name] = {'out': output_file, 'filters': filters, 'items': []}
 
 
-# TODO: dont minify if debug
 register_asset_type('plugins_js', 'js/plugins.min.js', filters='rjsmin')
 register_asset_type('plugins_css', 'css/plugins.min.css', filters='cssmin')
 
@@ -55,13 +54,9 @@ def _load_assets():
 
 @webui_app.route('/plugin/<plugin>/<path:path>')
 def plugin_static_server(plugin, path):
-    if plugin in _plugins:
-        return send_from_directory(os.path.join(_plugins[plugin]['path'], 'static'), path)
+    if plugin in _plugins and path.split("/")[0] in ['static', 'js', 'css']:
+        return send_from_directory(os.path.join(_plugins[plugin]['path']), path)
     return abort(404)
-
-@webui_app.route('/userstatic/<path:filename>')
-def user_static_server(filename):
-    return send_from_directory(os.path.join(manager.config_base, 'userstatic'), filename)
 
 
 @webui_app.route('/')
@@ -162,16 +157,20 @@ def register_web_ui(mgr):
     manager = mgr
 
     assets_cache = os.path.join(manager.config_base, '.webassets-cache')
-    user_static_folder = os.path.join(manager.config_base, 'userstatic')
 
-    for folder in [assets_cache, user_static_folder]:
-        if not os.path.isdir(folder):
-            os.mkdir(folder)
+    if not os.path.isdir(assets_cache):
+        os.mkdir(assets_cache)
 
     assets = Environment(webui_app)
-    assets.directory = user_static_folder
+    assets.directory = assets_cache
+
+    for p in _get_plugin_paths():
+        assets.append_path(p, url="%s/plugin" % webui_app.url_path)
+
     assets.cache = assets_cache
-    assets.url = '%s/userstatic' % webui_app.url_path
+
+    if 'debug' in manager.args:
+        assets.debug = True
 
     load_ui_plugins()
 
