@@ -36,6 +36,7 @@ class InputFind(object):
         regexp: .*\.(avi|mkv)$
 
     """
+    retrieval_options = ['files', 'dirs', 'symlinks']
 
     schema = {
         'type': 'object',
@@ -45,7 +46,7 @@ class InputFind(object):
             'regexp': {'type': 'string', 'format': 'regex'},
             'recursive': {'type': 'boolean'},
             'recursion_depth': {'type': 'number'},
-            'retrieve': one_or_more({'type': 'string', 'enum': ['files', 'dirs', 'symlinks']}, unique_items=True)
+            'retrieve': one_or_more({'type': 'string', 'enum': retrieval_options}, unique_items=True)
         },
         'required': ['path'],
         'additionalProperties': False
@@ -96,7 +97,7 @@ class InputFind(object):
         # If no mask or regexp specified, accept all files
         config.setdefault('regexp', '.')
         # Sets the default retrieval option to files
-        config.setdefault('retrieve', ['files'])
+        config.setdefault('retrieve', self.retrieval_options)
         # Sets default recursion level to all levels
         config.setdefault('recursion_depth', -1)
 
