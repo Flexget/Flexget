@@ -60,8 +60,8 @@ SUB_CATEGORIES = {
     'VOASTA': [51, 1217], # new
     'VOSTFR': [51, 1216],
 
-# deprecated    'NTSC': [8, 20], 
-# deprecated    'PAL': [8, 21],
+    # deprecated    'NTSC': [8, 20],
+    # deprecated    'PAL': [8, 21],
 
     'BDrip-BRrip-SD': [7, 8], # new: replaces BDrip-SD and BRrip-SD
     'BDrip-SD': [7, 8], # deprecated: replaced by 'BDrip-BRrip-SD'
@@ -129,7 +129,7 @@ class t411Auth(AuthBase):
 
 #   RETREIVING LOGIN COOKIES ONLY ONCE A DAY
     def get_login_cookies(self, username, password):
-        url_auth = 'http://www.t411.io/users/login'
+        url_auth = 'http://www.t411.in/users/login'
         db_session = Session()
         account = db_session.query(torrent411Account).filter(
             torrent411Account.username == username).first()
@@ -243,16 +243,16 @@ class UrlRewriteTorrent411(object):
 
             -- RSS DOWNLOAD WITH LOGIN
             rss:
-              url: http://www.t411.io/rss/?cat=210
+              url: http://www.t411.in/rss/?cat=210
               username: ****
               password: ****
 
             - OR -
 
-            -- RSS NORMAL URL REWRITE (i.e.: http://www.t411.io/torrents/download/?id=12345678)
+            -- RSS NORMAL URL REWRITE (i.e.: http://www.t411.in/torrents/download/?id=12345678)
             -- WARNING: NEED CUSTOM COOKIES NOT HANDLE BY THIS PLUGIN
             rss:
-              url: http://www.t411.io/rss/?cat=210
+              url: http://www.t411.in/rss/?cat=210
 
         ---
             SEARCH WITHIN SITE
@@ -305,7 +305,7 @@ class UrlRewriteTorrent411(object):
 #   urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        if re.match(r'^(https?://)?(www\.)?t411\.io/torrents/(?!download/)[-A-Za-z0-9+&@#/%|?=~_|!:,.;]+', url):
+        if re.match(r'^(https?://)?(www\.)?t411\.in/torrents/(?!download/)[-A-Za-z0-9+&@#/%|?=~_|!:,.;]+', url):
             return True
         return False
 
@@ -328,7 +328,7 @@ class UrlRewriteTorrent411(object):
             if match:
                 torrent_id = match.group(1)
                 log.debug("Got the Torrent ID: %s" % torrent_id)
-                entry['url'] = 'http://www.t411.io/torrents/download/?id=' + torrent_id
+                entry['url'] = 'http://www.t411.in/torrents/download/?id=' + torrent_id
                 if 'download_auth' in entry:
                     auth_handler = t411Auth(*entry['download_auth'])
                     entry['download_auth'] = auth_handler
@@ -340,7 +340,7 @@ class UrlRewriteTorrent411(object):
         """
         Search for name from torrent411.
         """
-        url_base = 'http://www.t411.io'
+        url_base = 'http://www.t411.in'
 
         if not isinstance(config, dict):
             config = {}
@@ -384,12 +384,12 @@ class UrlRewriteTorrent411(object):
                 if nfo_link_res is not None:
                     tid = nfo_link_res.group(1)
                 title_res = re.search(
-                    '<a href=\"//www.t411.io/torrents/([-A-Za-z0-9+&@#/%|?=~_|!:,.;]+)\" title="([^"]*)">',
+                    '<a href=\"//www.t411.in/torrents/([-A-Za-z0-9+&@#/%|?=~_|!:,.;]+)\" title="([^"]*)">',
                     str(tr))
                 if title_res is not None:
                     entry['title'] = title_res.group(2).decode('utf-8')
                 size = tr('td')[5].contents[0]
-                entry['url'] = 'http://www.t411.io/torrents/download/?id=%s' % tid
+                entry['url'] = 'http://www.t411.in/torrents/download/?id=%s' % tid
                 entry['torrent_seeds'] = tr('td')[7].contents[0]
                 entry['torrent_leeches'] = tr('td')[8].contents[0]
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'],

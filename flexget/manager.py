@@ -27,14 +27,13 @@ from flexget.utils.sqlalchemy_utils import ContextSession
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)
 
-
-from flexget import config_schema, db_schema, logger, plugin, webserver
-from flexget.event import fire_event
-from flexget.ipc import IPCClient, IPCServer
-from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv
-from flexget.task import Task
-from flexget.task_queue import TaskQueue
-from flexget.utils.tools import pid_exists, console
+from flexget import config_schema, db_schema, logger, plugin # noqa
+from flexget.event import fire_event # noqa
+from flexget.ipc import IPCClient, IPCServer # noqa
+from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv # noqa
+from flexget.task import Task # noqa
+from flexget.task_queue import TaskQueue # noqa
+from flexget.utils.tools import pid_exists, console # noqa
 
 
 log = logging.getLogger('manager')
@@ -127,7 +126,6 @@ class Manager(object):
         self.initialized = False
 
         self.config = {}
-        self.user_config = {}  # Reflects user config without default set
 
         if '--help' in args or '-h' in args:
             # TODO: This is a bit hacky, but we can't call parse on real arguments when --help is used because it will
@@ -257,12 +255,12 @@ class Manager(object):
         # TODO: 1.2 This is a hack to make task priorities work still, not sure if it's the best one
         task_names = sorted(task_names, key=lambda t: self.config['tasks'][t].get('priority', 65535))
 
-        tasks = []
+        finished_events = []
         for task_name in task_names:
             task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority)
             self.task_queue.put(task)
-            tasks.append((task.id, task.finished_event))
-        return tasks
+            finished_events.append(task.finished_event)
+        return finished_events
 
     def start(self):
         """
@@ -350,11 +348,11 @@ class Manager(object):
         if self.task_queue.is_alive():
             if len(self.task_queue):
                 log.verbose('There is a task already running, execution queued.')
-            tasks = self.execute(options, output=logger.get_capture_stream(),
+            finished_events = self.execute(options, output=logger.get_capture_stream(),
                                            loglevel=logger.get_capture_loglevel())
             if not options.cron:
                 # Wait until execution of all tasks has finished
-                for task_id, event in tasks:
+                for event in finished_events:
                     event.wait()
         else:
             self.task_queue.start()

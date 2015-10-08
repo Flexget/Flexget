@@ -27,7 +27,7 @@ SOCKET_TIMEOUT = 15
 
 # make separate path instances for local vs remote path styles
 localpath = os.path
-remotepath = posixpath #pysftp uses POSIX style paths
+remotepath = posixpath # pysftp uses POSIX style paths
 
 try:
     import pysftp
@@ -65,6 +65,45 @@ def sftp_connect(conf):
     return sftp
 
 
+def sftp_from_config(config):
+    """
+    Creates an SFTP connection from a Flexget config object 
+    """
+    host = config['host']
+    port = config['port']
+    username = config['username']
+    password = config['password']
+    private_key = config['private_key']
+    private_key_pass = config['private_key_pass']
+
+    conn_conf = ConnectionConfig(host, port, username, password, private_key, private_key_pass)
+        
+    try:
+        sftp = sftp_connect(conn_conf)
+    except Exception as e:
+        raise plugin.PluginError('Failed to connect to %s (%s)' % (host, e))
+
+    return sftp
+
+
+def sftp_prefix(config):
+    """
+    Generate SFTP URL prefix
+    """
+    login_str = ''
+    port_str = ''
+    
+    if config['username'] and config['password']:
+        login_str = '%s:%s@' % (config['username'], config['password'])
+    elif config['username']:
+        login_str = '%s@' % config['username']
+
+    if config['port'] and config['port'] != 22:
+        port_str = ':%d' % config['port']
+
+    return 'sftp://%s%s%s/' % (login_str, config['host'], port_str)
+
+
 def dependency_check():
     """
     Check if pysftp module is present
@@ -73,6 +112,7 @@ def dependency_check():
         raise plugin.DependencyError(issued_by='sftp', 
                                      missing='pysftp', 
                                      message='sftp plugin requires the pysftp Python module.')
+
 
 class SftpList(object):
     """
@@ -145,40 +185,17 @@ class SftpList(object):
 
         config = self.prepare_config(config)
 
-        host = config['host']
-        port = config['port']
-        username = config['username']
-        password = config['password']
-        private_key = config['private_key']
-        private_key_pass = config['private_key_pass']
         files_only = config['files_only']
         recursive = config['recursive']
         get_size = config['get_size']
         dirs = config['dirs']
         if not isinstance(dirs, list):
             dirs = [dirs]
-
-        login_str = ''
-        port_str = ''
         
-        if username and password:
-            login_str = '%s:%s@' % (username, password)
-        elif username:
-            login_str = '%s@' % username
+        log.debug('Connecting to %s' % config['host'])
 
-        if port and port != 22:
-            port_str = ':%d' % port
-
-        url_prefix = 'sftp://%s%s%s/' % (login_str, host, port_str)
-        
-        log.debug('Connecting to %s' % host)
-
-        conn_conf = ConnectionConfig(host, port, username, password, private_key, private_key_pass)
-        
-        try:
-            sftp = sftp_connect(conn_conf)
-        except Exception as e:
-            raise plugin.PluginError('Failed to connect to %s (%s)' % (host, e))
+        sftp = sftp_from_config(config)
+        url_prefix = sftp_prefix(config)
 
         entries = []
 
@@ -445,11 +462,135 @@ class SftpDownload(object):
             if sftp:
                 sftp.close()
 
+
+class SftpUpload(object):
+    """
+    Upload files to a SFTP server. This plugin requires the pysftp Python module and its 
+    dependencies.
+
+    host:                 Host to connect to
+    port:                 Port the remote SSH server is listening on. Defaults to port 22.
+    username:             Username to log in as
+    password:             The password to use. Optional if a private key is provided.
+    private_key:          Path to the private key (if any) to log into the SSH server
+    private_key_pass:     Password for the private key (if needed)
+    to:                   Path to upload the file to; supports Jinja2 templating on the input entry. Fields such
+                          as series_name must be populated prior to input into this plugin using
+                          metainfo_series or similar.
+    delete_origin:        Indicates wheter to delete the original file after a successful
+                          upload.
+
+    Example:
+
+      sftp_list:
+          host: example.com
+          username: Username
+          private_key: /Users/username/.ssh/id_rsa
+          to: /TV/{{series_name}}/Series {{series_season}}
+          delete_origin: False
+    """
+
+    schema = {
+        'type': 'object',
+        'properties': {
+            'host': {'type': 'string'},
+            'username': {'type': 'string'},
+            'password': {'type': 'string'},
+            'port': {'type': 'integer', 'default': 22},
+            'private_key': {'type': 'string'},
+            'private_key_pass': {'type': 'string'},
+            'to': {'type': 'string'},
+            'delete_origin': {'type': 'boolean', 'default': False}
+        },
+        'additionProperties': False,
+        'required': ['host', 'username']
+    }
+
+    def prepare_config(self, config):
+        """
+        Sets defaults for the provided configuration
+        """
+        config.setdefault('password', None)
+        config.setdefault('private_key', None)
+        config.setdefault('private_key_pass', None)
+        config.setdefault('to', None)
+
+        return config
+
+    def handle_entry(self, entry, sftp, config, url_prefix):
+
+        location = entry['location']
+        filename = localpath.basename(location)
+
+        to = config['to']
+        if to:
+            try:
+                to = render_from_entry(to, entry)
+            except RenderError as e:
+                log.error('Could not render path: %s', to)
+                entry.fail(e)
+                return
+        
+        destination = remotepath.join(to, filename)
+        destination_url = urljoin(url_prefix, destination)
+
+        if not os.path.exists(location):
+            log.warn('File no longer exists: %s', location)
+            return
+
+        if not sftp.lexists(to):
+            try:
+                sftp.makedirs(to)
+            except Exception as e:
+                log.error('Failed to create remote directory %s (%s)' % (to, e))
+                entry.fail(e)
+                return
+
+        if not sftp.isdir(to):
+            log.error('Not a directory: %s' % to)
+            entry.fail
+            return
+
+        try:
+            sftp.put(localpath=location, remotepath=destination)
+            log.verbose('Successfully uploaded %s to %s' % (location, destination_url))
+        except OSError as e:
+            log.warn('File no longer exists: %s', location)
+            return
+        except IOError as e:
+            log.error('Remote directory does not exist: %s (%s)' % to)
+            entry.fail
+            return
+        except Exception as e:
+            log.error('Failed to upload %s (%s)' % (location, e))
+            entry.fail
+            return
+
+        if config['delete_origin']:
+            try:
+                os.remove(location)
+            except Exception as e:
+                log.error('Failed to delete file %s (%s)')
+
     def on_task_output(self, task, config):
-        """Count this as an output plugin."""
+        """Uploads accepted entries to the specified SFTP server."""
+
+        config = self.prepare_config(config)
+        
+        sftp = sftp_from_config(config)
+        url_prefix = sftp_prefix(config)
+
+        for entry in task.accepted:
+            if sftp:
+                log.debug('Uploading file: %s' % entry)
+                self.handle_entry(entry, sftp, config, url_prefix)
+            else:
+                log.debug('SFTP connection failed; failing entry: %s' % entry)
+                entry.fail
 
 
 @event('plugin.register')
 def register_plugin():
     plugin.register(SftpList, 'sftp_list', api_ver=2)
     plugin.register(SftpDownload, 'sftp_download', api_ver=2)
+    plugin.register(SftpUpload, 'sftp_upload', api_ver=2)

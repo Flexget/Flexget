@@ -13,6 +13,7 @@ log = logging.getLogger('myepisodes')
 
 URL = 'http://www.myepisodes.com/'
 
+
 class MyEpisodesList(object):
     """Creates an entry for each item in your myepisodes.com show list.
 
@@ -47,7 +48,7 @@ class MyEpisodesList(object):
             password = config['password']
 
             log.debug("Logging in to %s ..." % URL)
-            params={
+            params = {
                 'username': username,
                 'password': password,
                 'action': 'Login'
@@ -56,7 +57,6 @@ class MyEpisodesList(object):
             if str(username) not in loginsrc:
                 raise plugin.PluginWarning(('Login to myepisodes.com failed, please check '
                                  'your account data or see if the site is down.'), log)
-
 
         page = task.requests.get(URL + "shows.php?type=manage").content
         try:
@@ -95,6 +95,7 @@ class MyEpisodesList(object):
             log.warn("No shows found on myepisodes.com list. Maybe you need to add some first?")
 
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

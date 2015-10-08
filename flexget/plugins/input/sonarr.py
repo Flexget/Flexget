@@ -110,13 +110,15 @@ class Sonarr(object):
                         for profile in profiles_json:
                             if profile['id'] == show['profileId']:  # Get show's profile data from all possible profiles
                                 current_profile = profile    
-                        fg_quality = qualities[current_profile['cutoff']['id']]  # Sets profile cutoff quality as show's quality
+                        # Sets profile cutoff quality as show's quality
+                        fg_quality = qualities[current_profile['cutoff']['id']]
                     entry = Entry(title=show['title'],
                                   url='',
                                   series_name=show['title'],
                                   tvdb_id=show.get('tvdbId'),
                                   tvrage_id=show.get('tvRageId'),
-                                  # configure_series plugin requires that all settings will have the configure_series prefix
+                                  # configure_series plugin requires that all settings will have the configure_series
+                                  # prefix
                                   configure_series_quality=fg_quality)
                     if entry.isvalid():
                         entries.append(entry)

@@ -48,4 +48,4 @@ def register_parser_arguments():
     plugins_subparser = options.register_command('plugins', plugins_summary, help='print registered plugin summaries')
     plugins_subparser.add_argument('--group', help='show plugins belonging to this group')
     plugins_subparser.add_argument('--phase', help='show plugins that act on this phase')
-    plugins_subparser.add_argument('--porcelain' , action='store_true', help='make the output parseable')
+    plugins_subparser.add_argument('--porcelain', action='store_true', help='make the output parseable')

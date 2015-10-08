@@ -72,7 +72,7 @@ def display_summary(options):
                     if options.porcelain:
                         pass
                     else:
-                         new_ep = '>'
+                        new_ep = '>'
                 behind = new_eps_after(latest)
                 status = get_latest_status(latest)
                 age = latest.age
@@ -260,7 +260,7 @@ def register_parser_arguments():
     list_parser.add_argument('--stale', nargs='?', type=int, metavar='DAYS', const=365,
                              help='limit list to series which have not seen a release in %(const)s days. number of '
                                   'days can be overridden with %(metavar)s')
-    list_parser.add_argument('--porcelain' , action='store_true', help='make the output parseable')
+    list_parser.add_argument('--porcelain', action='store_true', help='make the output parseable')
     show_parser = subparsers.add_parser('show', parents=[series_parser],
                                         help='show the releases FlexGet has seen for a given series ')
     begin_parser = subparsers.add_parser('begin', parents=[series_parser],

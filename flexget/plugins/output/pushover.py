@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+from requests.exceptions import RequestException
 
 from flexget import plugin
 from flexget.event import event
@@ -131,7 +132,11 @@ class OutputPushover(object):
                     continue
 
                 # Make the request
-                response = task.requests.post(pushover_url, data=data, raise_status=False)
+                try:
+                    response = task.requests.post(pushover_url, data=data, raise_status=False)
+                except RequestException as e:
+                    log.warning('Could not get response from Pushover: {}'.format(e))
+                    return
 
                 # Check if it succeeded
                 request_status = response.status_code
