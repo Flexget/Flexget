@@ -1,0 +1,77 @@
+
+/* Side Nav Menu */
+.nav-menu {
+    position: relative;
+    min-width: 190px !important;
+    max-width: 190px !important;
+    -webkit-transition: min-width 0.5s ease, max-width 0.5s ease;
+    -moz-transition: min-width 0.5s ease, max-width 0.5s ease;
+    -o-transition: min-width 0.5s ease, max-width 0.5s ease;
+    transition: min-width 0.5s ease, max-width 0.5s ease;
+}
+
+.nav-menu md-content {
+    background-color: #222d32 !important;
+}
+
+.nav-menu md-list-item.header {
+    padding: 10px 25px 10px 15px;
+    font-size: 12px;
+    color: #4b646f;
+    background: #1a2226;
+}
+
+.nav-menu md-list-item {
+    min-height: 20px;
+}
+
+.nav-menu md-list {
+    padding-top: 0;
+}
+
+.nav-menu .md-button {
+    border-left: 3px solid transparent;
+    color: #b8c7ce;
+    padding: 12px 5px 12px 15px;
+    margin: 0;
+    text-align: left;
+    line-height: 20px;
+    text-transform: none;
+    border-radius: 0;
+}
+
+.nav-menu .md-button:hover {
+    color: #fff;
+    background: #1e282c !important;
+    border-left-color: #f39c12;
+}
+
+.nav-menu .md-button > md-icon {
+    width: 20px;
+    height: inherit;
+    color: #b8c7ce !important;
+}
+
+
+/* Side Nav Mini */
+.nav-menu-mini .nav-menu {
+    min-width: 50px !important;
+    max-width: 50px !important;
+}
+
+.nav-menu-mini .nav-menu md-list-item.header {
+    display: none;
+}
+
+.nav-menu-mini .nav-menu md-list-item span {
+    display: none;
+}
+
+.nav-menu-mini .nav-menu md-list-item span:hover {
+    display: block;
+}
+
+.nav-menu-mini .header .logo {
+    background-size: 240px !important;
+    width: 50px !important;
+}

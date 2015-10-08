@@ -23,6 +23,7 @@ from sqlalchemy.orm import sessionmaker
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 from flexget.utils.sqlalchemy_utils import ContextSession
+
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)
 
@@ -147,7 +148,9 @@ class Manager(object):
             # If an absolute path is not specified, use the config directory.
             if not os.path.isabs(log_file):
                 log_file = os.path.join(self.config_base, log_file)
-            logger.start(log_file, self.options.loglevel.upper(), to_console=not self.options.cron)
+            json_log = os.path.join(self.config_base, 'log-%s.json' % self.config_name)
+
+            logger.start(log_file, json_log, self.options.loglevel.upper(), to_console=not self.options.cron)
 
         manager = self
 
@@ -307,7 +310,6 @@ class Manager(object):
 
         * :meth:`.execute_command`
         * :meth:`.daemon_command`
-        * :meth:`.webui_command`
         * CLI plugin callback function
 
         The manager should have a lock and be initialized before calling this method.
@@ -319,13 +321,11 @@ class Manager(object):
         command = options.cli_command
         command_options = getattr(options, command)
         # First check for built-in commands
-        if command in ['execute', 'daemon', 'webui']:
+        if command in ['execute', 'daemon']:
             if command == 'execute':
                 self.execute_command(command_options)
             elif command == 'daemon':
                 self.daemon_command(command_options)
-            elif command == 'webui':
-                self.webui_command(command_options)
         else:
             # Otherwise dispatch the command to the callback function
             options.cli_command_callback(self, command_options)
@@ -373,6 +373,8 @@ class Manager(object):
 
         :param options: argparse options
         """
+
+        # Import API so it can register to daemon.started event
         if options.action == 'start':
             if self.is_daemon:
                 log.error('Daemon already running for this config.')
@@ -412,32 +414,6 @@ class Manager(object):
                     log.error('Error loading config: %s' % e.args[0])
                 else:
                     log.info('Config successfully reloaded from disk.')
-
-    def webui_command(self, options):
-        """
-        Handles the 'webui' CLI command.
-
-        :param options: argparse options
-        """
-        if self.is_daemon:
-            log.error('Webui or daemon is already running.')
-            return
-        # TODO: make webui an enablable plugin in regular daemon mode
-        try:
-            pkg_resources.require('flexget[webui]')
-        except pkg_resources.DistributionNotFound as e:
-            log.error('Dependency not met. %s' % e)
-            log.error('Webui dependencies not installed. You can use `pip install flexget[webui]` to install them.')
-            self.shutdown()
-            return
-        if options.daemonize:
-            self.daemonize()
-        self.is_daemon = True
-        from flexget.ui import webui
-        self.task_queue.start()
-        self.ipc_server.start()
-        webui.start(self)
-        self.task_queue.wait()
 
     def _handle_sigterm(self, signum, frame):
         log.info('Got SIGTERM. Shutting down.')
@@ -603,6 +579,7 @@ class Manager(object):
 
         :raises: `ValueError` and rolls back to previous config if the provided config is not valid.
         """
+        new_user_config = config
         old_config = self.config
         try:
             self.config = self.validate_config(config)
@@ -613,17 +590,20 @@ class Manager(object):
             self.config = old_config
             raise
         log.debug('New config data loaded.')
+        self.user_config = new_user_config
         fire_event('manager.config_updated', self)
 
     def save_config(self):
         """Dumps current config to yaml config file"""
+        # TODO: Only keep x number of backups..
+
         # Back up the user's current config before overwriting
         backup_path = os.path.join(self.config_base,
                                    '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')))
         log.debug('backing up old config to %s before new save' % backup_path)
         shutil.copy(self.config_path, backup_path)
         with open(self.config_path, 'w') as config_file:
-            config_file.write(yaml.dump(self.config, default_flow_style=False))
+            config_file.write(yaml.dump(self.user_config, default_flow_style=False))
 
     def config_changed(self):
         """Makes sure that all tasks will have the config_modified flag come out true on the next run.
@@ -631,6 +611,7 @@ class Manager(object):
         from flexget.task import config_changed
         for task in self.tasks:
             config_changed(task)
+        fire_event('manager.config_updated', self)
 
     def validate_config(self, config=None):
         """

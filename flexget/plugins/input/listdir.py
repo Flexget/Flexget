@@ -3,7 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import logging
 
-from path import Path
+from path import path
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -30,7 +30,7 @@ class Listdir(object):
             config = [config]
         entries = []
         for folder in config:
-            folder = Path(folder).expanduser()
+            folder = path(folder).expanduser()
             try:
                 dir_files = folder.listdir()
             except OSError as e:

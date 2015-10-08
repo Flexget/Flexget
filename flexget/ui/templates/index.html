@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>FlexGet Manager</title>
+    <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
+    <link rel="stylesheet" href="static/css/flexget.min.css">
+    {% assets "plugins_css" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
+</head>
+
+<body layout="column" ng-controller="flexgetController" flex ng-class="menuMini ? 'nav-menu-mini': 'nav-menu-full'">
+<div class="header">
+    <div class="logo"><a href="/ui/#/home"></a></div>
+    <div class="admin-toolbar">
+        <md-toolbar class="admin-toolbar">
+            <div class="md-toolbar-tools">
+                <md-button class="md-icon-button" ng-click="toggleMenu()" style="width: 40px">
+                    <md-icon class='fa fa-bars' aria-label="Menu"></md-icon>
+                </md-button>
+                <span flex></span>
+                <md-button ng-click="reload()" aria-label="Reload">
+                    <md-icon class="fa fa-refresh"></md-icon>
+                </md-button>
+                <md-button ng-click="shutdown()" aria-label="Shutdown">
+                    <md-icon class="fa fa-power-off"></md-icon>
+                </md-button>
+                <md-button ng-click="go('log')" aria-label="Log">
+                    <md-icon class="fa fa-file-text-o"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+    </div>
+</div>
+<div layout="row" flex>
+    <md-sidenav layout="column" class="nav-menu md-sidenav-left md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('gt-lg')">
+        <md-content layout="column" flex>
+            <md-list>
+                <md-list-item class="header">Menu</md-list-item>
+                {% raw %}
+                <md-list-item ng-repeat="item in menuItems">
+                    <md-button href="{{ item.href }}" ng-click="closeNav()" flex>
+                        <md-icon class="{{ item.icon }}"></md-icon>
+                        {{ item.caption }}
+                    </md-button>
+                </md-list-item>
+                {% endraw %}
+            </md-list>
+        </md-content>
+    </md-sidenav>
+    <div layout="column" flex id="content">
+        <md-content ui-view layout="column" flex layout-padding></md-content>
+    </div>
+</div>
+
+<script type="text/javascript" src="static/js/vendor.min.js"></script>
+<script type="text/javascript" src="static/js/flexget.min.js"></script>
+{% assets "plugins_js" %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+</body>
+</html>

@@ -4,7 +4,7 @@ import logging
 import re
 import sys
 
-from path import Path
+from path import path
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -65,7 +65,7 @@ class InputFind(object):
         entries = []
         match = re.compile(config['regexp'], re.IGNORECASE).match
         for folder in config['path']:
-            folder = Path(folder).expanduser()
+            folder = path(folder).expanduser()
             log.debug('scanning %s' % folder)
             if config['recursive']:
                 files = folder.walk(errors='ignore')

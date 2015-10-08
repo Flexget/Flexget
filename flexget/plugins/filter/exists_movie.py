@@ -3,7 +3,7 @@ import os
 import re
 import logging
 
-from path import Path
+from path import path
 
 from flexget import plugin
 from flexget.event import event
@@ -81,7 +81,7 @@ class FilterExistsMovie(object):
         qualities = {}
 
         for folder in config['path']:
-            folder = Path(folder).expanduser()
+            folder = path(folder).expanduser()
             # see if this path has already been scanned
             if folder in self.cache:
                 log.verbose('Using cached scan for %s ...' % folder)

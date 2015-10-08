@@ -4,6 +4,8 @@ import logging
 import Queue
 import threading
 import time
+from datetime import datetime
+
 
 from sqlalchemy.exc import ProgrammingError, OperationalError
 
@@ -12,12 +14,45 @@ from flexget.task import TaskAbort
 log = logging.getLogger('task_queue')
 
 
+class TaskInfo(object):
+
+    def __init__(self, task):
+        self.id = task.id
+        self.name = task.name
+        self.status = 'pending'
+        self.created = datetime.now()
+        self.started = None
+        self.finished = None
+        self.message = ''
+
+    @property
+    def running(self):
+        return self.status == 'running'
+
+    def start(self):
+        self.status = 'running'
+        self.started = datetime.now()
+
+    def finish(self, entries):
+        self.status = "finished"
+        self.finished = datetime.now()
+
+        stats = (len(entries.accepted), len(entries.rejected), len(entries.undecided), len(entries.failed))
+        self.message = 'Accepted: %s Rejected: %s Undecided: %s Failed: %s' % stats
+
+    def aborted(self, reason):
+        self.status = "aborted"
+        self.finished = datetime.now()
+        self.message = reason
+
+
 class TaskQueue(object):
     """
     Task processing thread.
     Only executes one task at a time, if more are requested they are queued up and run in turn.
     """
     def __init__(self):
+        self.tasks_info = {}
         self.run_queue = Queue.PriorityQueue()
         self._shutdown_now = False
         self._shutdown_when_finished = False
@@ -35,13 +70,17 @@ class TaskQueue(object):
             # Grab the first job from the run queue and do it
             try:
                 task = self.run_queue.get(timeout=0.5)
+                task_info = self.tasks_info[task.id]
             except Queue.Empty:
                 if self._shutdown_when_finished:
                     self._shutdown_now = True
                 continue
             try:
+                task_info.start()
                 task.execute()
+                task_info.finish(task.all_entries)
             except TaskAbort as e:
+                task_info.aborted(e.reason)
                 log.debug('task %s aborted: %r' % (task.name, e))
             except (ProgrammingError, OperationalError):
                 log.critical('Database error while running a task. Attempting to recover.')
@@ -62,6 +101,18 @@ class TaskQueue(object):
 
     def put(self, task):
         """Adds a task to be executed to the queue."""
+        if len(self.tasks_info) >= 15:
+            # Delete tasks older then 1 hr
+            clear = len(self.tasks_info) - 15
+            now = datetime.now()
+            for i, task_id in enumerate(self.tasks_info.keys()):
+                task_info = self.tasks_info[task_id]
+                if i >= clear:
+                    break
+                if task_info.status == 'finished' and (now - task_info.finished).seconds >= 3600:
+                    del self.tasks_info[task_id]
+
+        self.tasks_info[task.id] = TaskInfo(task)
         self.run_queue.put(task)
 
     def __len__(self):

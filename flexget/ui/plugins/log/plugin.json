@@ -1,0 +1,9 @@
+{
+  "name": "log",
+  "version": "0.1",
+  "js": [
+    "libs/oboe-browser",
+    "libs/angular-oboe",
+    "log"
+  ]
+}

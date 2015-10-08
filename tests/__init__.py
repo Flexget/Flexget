@@ -9,6 +9,7 @@ import yaml
 import logging
 import warnings
 from contextlib import contextmanager
+from copy import deepcopy
 
 import mock
 from nose.plugins.attrib import attr
@@ -114,6 +115,7 @@ class MockManager(Manager):
         """
         try:
             self.config = yaml.safe_load(self.config_text) or {}
+            self.user_config = deepcopy(self.config)
             self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))
         except Exception:
             print 'Invalid configuration'

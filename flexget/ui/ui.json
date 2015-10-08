@@ -1,0 +1,21 @@
+{
+  "js": [
+    "js/app.js",
+    "js/utils.js",
+    "js/services/**/*.js",
+    "js/directives/**/*.js",
+    "js/controllers/**/*.js"
+  ],
+  "fonts": [
+    "bower_components/font-awesome/fonts/**.*",
+    "bower_components/bootstrap-sass/assets/fonts/bootstrap/**.*",
+    "bower_components/angular-material/fonts/**.*",
+    "bower_components/angular-ui-grid/*.{woff,ttf,svg,eot}"
+  ],
+  "sass_includes": [
+    "bower_components/bootstrap-sass/assets/stylesheets/",
+    "bower_components/font-awesome/scss/",
+    "bower_components/angular-material/",
+    "bower_components/angular-ui-grid/"
+  ]
+}
