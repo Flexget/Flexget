@@ -23,3 +23,8 @@ gulp.task('css',['clean:css'], function () {
     }))
     .pipe(gulp.dest(staticPath + '/css'));
 });
+
+
+gulp.task('watch:css', function() {
+  gulp.watch('./sass/**/*.scss', ['css']);
+});

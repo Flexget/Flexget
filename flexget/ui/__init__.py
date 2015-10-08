@@ -10,6 +10,7 @@ from flexget.webserver import register_app, register_home
 from flask.ext.assets import Environment, Bundle
 from flask_compress import Compress
 
+from webassets.filter import get_filter
 
 log = logging.getLogger('webui')
 
@@ -23,6 +24,7 @@ assets = None
 webui_app = Flask(__name__)
 Compress(webui_app)
 webui_app.url_path = '/ui'
+webui_path = os.path.dirname(os.path.realpath(__file__))
 webui_static_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static')
 
 
@@ -30,8 +32,8 @@ def register_asset_type(name, output_file, filters=None):
     _asset_registry[name] = {'out': output_file, 'filters': filters, 'items': []}
 
 
-register_asset_type('plugins_js', 'js/plugins.min.js', filters='rjsmin')
-register_asset_type('plugins_css', 'css/plugins.min.css', filters='cssmin')
+register_asset_type('plugins_js', 'js/plugins.js', filters='rjsmin')
+register_asset_type('plugins_css', 'css/plugins.css', filters='cssmin')
 
 
 def register_asset(asset_type, asset):
@@ -57,6 +59,11 @@ def plugin_static_server(plugin, path):
     if plugin in _plugins and path.split("/")[0] in ['static', 'js', 'css']:
         return send_from_directory(os.path.join(_plugins[plugin]['path']), path)
     return abort(404)
+
+
+@webui_app.route('/cache/<path:filename>')
+def user_static_server(filename):
+    return send_from_directory(os.path.join(manager.config_base, '.webassets-cache'), filename)
 
 
 @webui_app.route('/')
@@ -121,7 +128,13 @@ def _register_plugin(plugin_path):
     version = config.get('version', '1.0')
     _plugins[name] = {'path': plugin_path, 'config': config, version: version}
 
-    # Register CSS assets
+    # Register CSS/SASS assets
+    if config.get('sass'):
+        sass_path = os.path.normpath(os.path.join(plugin_path, 'sass'))
+        sass_file = os.path.join(sass_path, config['sass'])
+        libsass = get_filter('libsass', includes=[os.path.join(webui_path, 'sass'), sass_path])
+        register_asset('plugins_css', Bundle(sass_file, output='css/%s.css' % name, filters=(libsass,)))
+
     css_path = os.path.join(plugin_path, 'css')
     if os.path.isdir(css_path):
         for css_file in _find(css_path, "*.css"):
@@ -168,7 +181,7 @@ def register_web_ui(mgr):
         assets.append_path(p, url="%s/plugin" % webui_app.url_path)
 
     assets.cache = assets_cache
-
+    assets.url = '%s/cache' % webui_app.url_path
     if 'debug' in manager.args:
         assets.debug = True
 

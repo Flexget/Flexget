@@ -8,7 +8,6 @@
     "angular-schema-form": "~0.8.11",
     "font-awesome": "~4.4.0",
     "angular-ui-grid": "~3.0.6",
-    "angular-http-auth": "~1.2.2",
     "bootstrap-sass": "bootstrap-sass-official#~3.3.5"
   },
   "devDependencies": {}

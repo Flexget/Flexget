@@ -2,7 +2,9 @@
   "js": [
     "js/app.js",
     "js/utils.js",
-    "js/**/*.js"
+    "js/services/**/*.js",
+    "js/directives/**/*.js",
+    "js/controllers/**/*.js"
   ],
   "fonts": [
     "bower_components/font-awesome/fonts/**.*",
