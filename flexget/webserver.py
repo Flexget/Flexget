@@ -25,7 +25,6 @@ web_config_schema = {
             'properties': {
                 'bind': {'type': 'string', 'format': 'ipv4', 'default': '0.0.0.0'},
                 'port': {'type': 'integer', 'default': 5050},
-                'autoreload': {'type': 'boolean', 'default': False},
             },
             'additionalProperties': False
         }
@@ -65,6 +64,9 @@ def setup_server(manager):
         return
 
     web_server_config = manager.config.get('web_server')
+
+    if not web_server_config:
+        return
 
     web_server = WebServer(
         bind=web_server_config['bind'],
