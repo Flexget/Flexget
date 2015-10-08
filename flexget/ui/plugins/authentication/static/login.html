@@ -1,0 +1,22 @@
+<div class="overlay" layout="row" layout-align="center start">
+    <div class="login" flex-sm>
+        <div class="header">
+        </div>
+        <div layout="column">
+            <p class="text-success text-center" ng-if="timeout == 'true'">Your session timed out</p>
+            <p class="text-danger">{{ error }}</p>
+            <form>
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" class="form-control" id="username" placeholder="Username" ng-model="credentials.username">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" placeholder="Password" ng-model="credentials.password">
+                </div>
+                <md-checkbox md-no-ink aria-label="Remember Me" ng-model="remember" class="md-primary">Remember Me</md-checkbox>
+                <button type="submit" class="btn btn-primary" data-ng-click="login()">Login</button>
+            </form>
+        </div>
+    </div>
+</div>

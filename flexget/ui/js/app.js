@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var app = angular.module('flexget', ['ui.router', 'ngMaterial', 'flexget.services']);
+  var app = angular.module('flexget', ['ui.router', 'ngMaterial', 'ngCookies', 'flexget.services']);
 
   function bootstrapApplication() {
     angular.element(document).ready(function () {
