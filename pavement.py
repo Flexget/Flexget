@@ -66,6 +66,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget',
         exclude=['FlexGet.egg-info', '*.pyc'],
+        exclude_directories=['node_modules', 'bower_components'],
         only_in_packages=False),  # NOTE: the exclude does not seem to work
     zip_safe=False,
     test_suite='nose.collector',
