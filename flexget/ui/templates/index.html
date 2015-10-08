@@ -6,11 +6,11 @@
     <title>FlexGet Manager</title>
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}" />
-    <link rel="stylesheet" href="static/css/flexget.css">
+    <link rel="stylesheet" href="static/css/flexget.min.css">
     {% assets "plugins_css" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
 </head>
 
-<body layout="column" ng-controller="flexgetCtrl" flex ng-class="menuMini ? 'nav-menu-mini': 'nav-menu-full'">
+<body layout="column" ng-controller="flexgetController" flex ng-class="menuMini ? 'nav-menu-mini': 'nav-menu-full'">
 <div class="header">
     <div class="logo"><a href="/ui/#/home"></a></div>
     <div class="admin-toolbar">
@@ -53,7 +53,6 @@
         <md-content ui-view layout="column" flex layout-padding></md-content>
     </div>
 </div>
-<div ng-controller="LoginController"/>
 
 <script type="text/javascript" src="static/js/vendor.min.js"></script>
 <script type="text/javascript" src="static/js/flexget.min.js"></script>

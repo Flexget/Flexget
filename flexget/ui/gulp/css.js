@@ -2,6 +2,9 @@ var del = require('del');
 var sass = require('gulp-sass');
 var urlAdjuster = require('gulp-css-url-adjuster');
 var gulp = require('gulp');
+var minifyCSS = require('gulp-minify-css');
+var sourcemaps = require('gulp-sourcemaps');
+var rename = require('gulp-rename');
 
 var staticPath = './static';
 var config = require('../ui.json');
@@ -21,6 +24,10 @@ gulp.task('css',['clean:css'], function () {
       prependRelative: '../fonts/',
       append: '?version=1'
     }))
+    .pipe(sourcemaps.init())
+    .pipe(minifyCSS())
+    .pipe(rename('flexget.min.css'))
+    .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(staticPath + '/css'));
 });
 
