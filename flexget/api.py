@@ -281,6 +281,9 @@ login_api_schema = api.schema("login", {
     }
 })
 
+login_parser = api.parser()
+login_parser.add_argument('remember', type=bool, required=False, default=False, help='Remember for next time')
+
 
 @login_api.route('/')
 # TODO: Should we return a token rather then using session cookie?
@@ -290,10 +293,12 @@ class LoginAPI(APIResource):
     @api.expect(login_api_schema)
     @api.response(400, 'Invalid username or Password')
     @api.response(200, 'Login successful')
+    @api.doc(parser=login_parser)
     def post(self, session=None):
         data = request.json
         if data and validate_credentials(data.get("username"), data.get("password")):
-            login_user(User("flexget"))
+            args = login_parser.parse_args()
+            login_user(User("flexget"), remember=args['remember'])
             return {"status": "success"}
         else:
             return {"status": "failed", "message": "Invalid username or Password"}, 400
