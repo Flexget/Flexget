@@ -259,7 +259,7 @@ class Manager(object):
         for task_name in task_names:
             task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority)
             self.task_queue.put(task)
-            finished_events.append(task.finished_event)
+            finished_events.append((task.id, task.finished_event))
         return finished_events
 
     def start(self):
