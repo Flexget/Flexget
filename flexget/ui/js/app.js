@@ -7,6 +7,7 @@
     angular.element(document).ready(function () {
       angular.bootstrap(document, ['flexget']);
     });
+    window.loading_screen.finish();
   }
 
   app.config(function ($mdThemingProvider, $mdIconProvider) {

@@ -9,7 +9,14 @@
     "font-awesome": "~4.4.0",
     "angular-ui-grid": "~3.0.6",
     "bootstrap-sass": "bootstrap-sass-official#~3.3.5",
-    "angular-cookies": "~1.4.7"
+    "angular-cookies": "~1.4.7",
+    "please-wait": "~0.0.5",
+    "SpinKit": "spinkit#~1.2.2"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "overrides": {
+    "please-wait": {
+      "ignore": true
+    }
+  }
 }

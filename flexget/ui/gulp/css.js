@@ -11,7 +11,8 @@ var config = require('../ui.json');
 
 gulp.task('clean:css', function () {
   return del([
-    staticPath + '/css'
+    staticPath + '/css/flexget.min.css',
+    staticPath + '/css/flexget.min.map'
   ]);
 });
 

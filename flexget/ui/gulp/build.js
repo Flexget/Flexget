@@ -10,4 +10,4 @@ gulp.task('bower', function() {
 });
 
 
-gulp.task('default', ['bower', 'fonts', 'css', 'js']);
+gulp.task('default', ['bower', 'fonts', 'css', 'js', 'splash']);

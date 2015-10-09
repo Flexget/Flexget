@@ -14,13 +14,14 @@ var bowerDir = './bower_components';
 
 gulp.task('clean:js:vendor', function () {
   return del([
-    staticPath + '/js'
+    staticPath + '/js/vendor.min.js'
   ]);
 });
 
 gulp.task('clean:js:flexget', function () {
   return del([
-    staticPath + '/js'
+    staticPath + '/js/flexget.min.js',
+    staticPath + '/js/flexget.min.map'
   ]);
 });
 
