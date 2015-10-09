@@ -28,7 +28,7 @@ from flexget.utils.database import with_session
 from flexget.options import get_parser
 
 
-API_VERSION = 1
+API_VERSION = "0.1-alpha"
 
 log = logging.getLogger('api')
 
@@ -168,7 +168,13 @@ app.config['SESSION_TYPE'] = 'memcached'
 app.config['SECRET_KEY'] = generate_key()
 
 Compress(app)
-api = Api(app, catch_all_404s=True, title='Flexget API')
+api = Api(
+    app,
+    catch_all_404s=True,
+    title='API',
+    version=API_VERSION,
+    description='<font color="red"><b>Warning: under development, subject to change without notice.<b/></font>'
+)
 
 
 class ApiError(Exception):
