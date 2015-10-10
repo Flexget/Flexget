@@ -352,7 +352,7 @@ class Manager(object):
                                            loglevel=logger.get_capture_loglevel())
             if not options.cron:
                 # Wait until execution of all tasks has finished
-                for event in finished_events:
+                for task_id, event in finished_events:
                     event.wait()
         else:
             self.task_queue.start()
