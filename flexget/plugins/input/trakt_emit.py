@@ -59,7 +59,7 @@ class TraktEmit(object):
                 log.warning('The list "%s" is empty.' % config['list'])
                 return
             for item in data:
-                if getattr(data, 'show'):
+                if getattr(item, 'show'):
                     if item['show'] is not None:
                         if not item['show']['title']:
                             # Seems we can get entries with a blank show title sometimes
