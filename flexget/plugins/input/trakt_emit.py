@@ -59,8 +59,7 @@ class TraktEmit(object):
                 log.warning('The list "%s" is empty.' % config['list'])
                 return
             for item in data:
-                if getattr(item, 'show'):
-                    if item['show'] is not None:
+                    if getattr(item, 'show'):
                         if not item['show']['title']:
                             # Seems we can get entries with a blank show title sometimes
                             log.warning('Found trakt list show with no series name.')
@@ -70,8 +69,6 @@ class TraktEmit(object):
                             'series_name': item['show']['title'],
                             'trakt_id': trakt_id,
                             'tvdb_id': item['show']['ids']['tvdb']}
-                    else:
-                        log.error('Trakt input returned invalid Data for trakt list')
         context = config['context']
         if context == 'collected':
             context = 'collection'
