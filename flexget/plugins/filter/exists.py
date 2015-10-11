@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import platform
 
-from path import Path
+from path import path
 
 from flexget import plugin
 from flexget.event import event
@@ -38,7 +38,7 @@ class FilterExists(object):
         config = self.prepare_config(config)
         filenames = {}
         for folder in config:
-            folder = Path(folder).expanduser()
+            folder = path(folder).expanduser()
             if not folder.exists():
                 raise plugin.PluginWarning('Path %s does not exist' % folder, log)
             for p in folder.walk(errors='ignore'):

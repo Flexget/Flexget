@@ -1,0 +1,9 @@
+<page-header></page-header>
+
+<div class="row">
+    <div ng-repeat="model in models">
+        <div ng-controller="SchedulesCtrl" class="col-xs-3">
+            <form name="myForm" sf-schema="schema" sf-form="form" sf-model="model" ng-submit="onSubmit(myForm)"></form>
+        </div>
+    </div>
+</div>

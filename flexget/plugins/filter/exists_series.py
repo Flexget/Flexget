@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import copy
 import logging
 
-from path import Path
+from path import path
 
 from flexget import plugin
 from flexget.event import event
@@ -77,7 +77,7 @@ class FilterExistsSeries(object):
             # make new parser from parser in entry
             series_parser = accepted_series[series][0]['series_parser']
             for folder in paths:
-                folder = Path(folder).expanduser()
+                folder = path(folder).expanduser()
                 if not folder.isdir():
                     log.warning('Directory %s does not exist', folder)
                     continue

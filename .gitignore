@@ -32,3 +32,5 @@ pip-*.tar.gz
 *.noseids
 .coverage
 tests/cover/
+node_modules/
+bower_components/

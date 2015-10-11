@@ -18,6 +18,8 @@ from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from requests import RequestException
 
+from flask import Blueprint, request, jsonify
+
 from flexget import db_schema
 from flexget.utils.tools import decode_html
 from flexget.utils.requests import Session as ReqSession
@@ -25,12 +27,14 @@ from flexget.utils.database import with_session, pipe_list_synonym, text_date_sy
 from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
+from flexget.api import api, APIResource
 
 SCHEMA_VER = 4
 
 log = logging.getLogger('api_tvdb')
 Base = db_schema.versioned_base('api_tvdb', SCHEMA_VER)
 requests = ReqSession(timeout=25)
+
 
 # This is a FlexGet API key
 api_key = '4D297D8CFDE0E105'
@@ -521,3 +525,34 @@ def mark_expired(session=None):
         session.commit()
         persist['last_local'] = datetime.now()
         persist['last_server'] = new_server
+
+
+tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
+
+tvdb_api_parser = api.parser()
+tvdb_api_parser.add_argument('search', type=str, required=True, help='TV Show name or tvdbid')
+
+
+@tvdb_api.route('/search/')
+class TVDBSearchApi(APIResource):
+
+    @api.doc(parser=tvdb_api_parser)
+    @api.response(400, 'missing search parameter')
+    def get(self, session=None):
+        args = tvdb_api_parser.parse_args()
+        search = args['search']
+
+        if not search:
+            return {'detail': 'missing query parameter'}, 400
+
+        try:
+            tvdb_id = int(search)
+        except ValueError:
+            tvdb_id = None
+
+        if tvdb_id:
+            result = lookup_series(tvdb_id=tvdb_id, session=session)
+        else:
+            result = lookup_series(name=search, session=session)
+
+        return jsonify(result)

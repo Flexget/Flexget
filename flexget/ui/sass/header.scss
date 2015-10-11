@@ -1,0 +1,49 @@
+
+/* Header */
+.header {
+    overflow:hidden;
+}
+
+.header .logo {
+    background: #222D32 url(/ui/static/images/header.png) no-repeat center !important;
+    background-size: 175px !important;
+    float:left;
+    width:190px;
+    -webkit-transition: width 0.5s ease;
+    -moz-transition: width 0.5s ease;
+    -o-transition: width 0.5s ease;
+    transition: width 0.5s ease;
+}
+
+.header .logo a {
+    height: 50px;
+    display:block;
+    padding: 5px;
+}
+
+.header .admin-toolbar {
+    overflow:hidden;
+    max-height: 50px;
+    min-height: 50px;
+}
+
+.header .admin-toolbar md-icon {
+    color: white;
+    font-size: 20px;
+}
+
+.header .admin-toolbar md-menu {
+    padding: 0px;
+}
+
+.header .admin-toolbar .md-button {
+    min-width: inherit;
+}
+
+@media screen and (max-width: 1200px) {
+    .header .logo {
+        float: none;
+        width:auto;
+        border:0;
+    }
+}

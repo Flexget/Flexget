@@ -1,0 +1,56 @@
+<h1 class="log">Server Log
+    <small>
+        <span ng-if="status == 0">
+            <span class="badge badge-success">Streaming</span>
+            <md-button class="md-icon-button md-primary" aria-label="Settings" ng-click="abort()">
+                <md-icon class="fa fa-pause"></md-icon>
+            </md-button>
+        </span>
+        <span ng-if="status == 1">
+            <span class="badge badge-warning">Connecting</span>
+            <md-button class="md-icon-button md-primary" aria-label="Settings" ng-click="abort()">
+                <md-icon class="fa fa-stop"></md-icon>
+            </md-button>
+        </span>
+        <span ng-if="status == 2">
+            <span class="badge badge-danger">Disconnected</span>
+            <md-button class="md-icon-button md-primary" aria-label="Settings" ng-click="updateGrid()">
+                <md-icon class="fa fa-refresh"></md-icon>
+            </md-button>
+        </span>
+    </small>
+</h1>
+<div layout="row" class="log">
+    <md-input-container style="max-width: 57px;">
+        <label>Lines</label>
+        <input type="number" aria-label="lines" ng-model="filter.lines" ng-change="updateGrid();"/>
+    </md-input-container>
+    <md-input-container>
+        <md-select ng-model="filter.levelname" placeholder="Level" ng-change="updateGrid()">
+            <md-option ng-value="level" ng-repeat="level in logLevels">{{level}}</md-option>
+        </md-select>
+    </md-input-container>
+    <md-input-container>
+        <label>Message</label>
+        <input type="text" aria-label="message" ng-model="filter.message" ng-change="updateGrid()"/>
+    </md-input-container>
+    <md-autocomplete
+            md-input-name="taskAutoComplete"
+            md-selected-item="taskSelect"
+            md-selected-item-change="filterTask(taskSelect)"
+            md-search-text="taskSearch"
+            md-search-text-change="filterTask(taskSearch)"
+            md-items="task in tasks"
+            md-item-text="task"
+            md-floating-label="Task"
+    <md-item-template>
+        <span md-highlight-text="taskSearch">{{ task }}</span>
+    </md-item-template>
+    </md-autocomplete>
+    <span flex></span>
+    <small><md-switch class="md-primary" ng-model="autoScroll" ng-change="scrollBottom()">Auto Scroll</md-switch></small>
+</div>
+<div flex layout="row" class="log-grid">
+    <md-content id="log-grid" ui-grid="gridOptions" ui-grid-auto-resize flex></md-content>
+</div>
+

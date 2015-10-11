@@ -1,0 +1,66 @@
+@import "variables";
+
+// Import third party
+@import "bootstrap";
+@import "font-awesome";
+@import "angular-material";
+@import "ui-grid";
+@import '../bower_components/spinkit/scss/spinners/3-wave';
+
+// Flexget includes
+@import "header";
+@import "sidenav";
+
+body {
+    font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.text-lightgrey {
+    color: #B8B8B8;
+}
+
+.text-white {
+    color: white;
+}
+
+@font-face {
+    font-family: 'FontAwesome';
+    font-style: normal;
+    font-weight: 400;
+}
+
+
+/* Badges */
+
+.badge-danger {
+  background-color: #d43f3a;
+}
+
+.badge-warning {
+  background-color: #d58512;
+}
+
+.badge-success {
+  background-color: #398439;
+}
+
+.badge-info {
+  background-color: #269abc;
+}
+
+.badge-inverse {
+  background-color: #333333;
+}
+
+.overlay{
+  background-color: white;
+  position:fixed;
+  width:100%;
+  height:100%;
+  top:0px;
+  left:0px;
+  z-index:1000;
+}
