@@ -59,7 +59,7 @@ class TraktEmit(object):
                 log.warning('The list "%s" is empty.' % config['list'])
                 return
             for item in data:
-                if item['show'] is not None:
+                if item.get('show'):
                     if not item['show']['title']:
                         # Seems we can get entries with a blank show title sometimes
                         log.warning('Found trakt list show with no series name.')
