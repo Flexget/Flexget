@@ -32,11 +32,7 @@ log = logging.getLogger('api')
 
 api_config = {}
 api_config_schema = {
-    'type': 'object',
-    'properties': {
-        'username': {'type': 'string'},
-        'password': {'type': 'string'},
-    },
+    'type': 'boolean',
     'additionalProperties': False
 }
 
