@@ -3,9 +3,9 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import re
 import urlparse
+import logging
 from collections import defaultdict
 from datetime import datetime
-from warnings import warn
 
 import jsonschema
 from jsonschema.compat import str_types, int_types
@@ -15,6 +15,8 @@ from flexget.utils import qualities, template
 from flexget.utils.tools import parse_timedelta
 
 schema_paths = {}
+
+log = logging.getLogger('config_schema')
 
 
 # TODO: Rethink how config key and schema registration work
@@ -359,7 +361,7 @@ def validate_oneOf(validator, oneOf, instance, schema):
 
 def validate_deprecated(validator, message, instance, schema):
     """Not really a validator, just warns if deprecated section of config is being used."""
-    warn(message, category=DeprecationWarning)
+    log.warning(message)
 
 
 validators = {
