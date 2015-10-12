@@ -1,16 +1,43 @@
 from __future__ import unicode_literals, division, absolute_import
-import collections
+
 import logging
-
 from jsonschema.compat import str_types
-
 from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.entry import Entry
+
 from flexget.utils.cached_input import cached
 
 log = logging.getLogger('dynamic_imdb')
+
+JOB_TYPES = ['actor', 'actress', 'director', 'producer', 'writer', 'self',
+             'editor', 'miscellaneous', 'editorial department', 'cinematographer',
+             'visual effects', 'thanks', 'music department', 'in development', 'archive footage', 'soundtrack']
+
+CONTENT_TYPES = ['movie', 'tv series', 'tv mini series', 'video game', 'video movie', 'tv movie', 'episode']
+
+CONTENT_TYPE_CONVERSION = {
+    'movie': 'movie',
+    'tv series': 'tv',
+    'tv mini series': 'tv',
+    'tv movie': 'tv',
+    'episode': 'tv',
+    'video movie': 'video',
+    'video game': 'video game'
+}
+
+CHARACTER_CONTENT_TYPE_CONVERSION = {
+    'movie': 'feature',
+    'tv series': 'tv',
+    'tv mini series': 'tv',
+    'tv movie': 'tv',
+    'episode': 'tv',
+    'video movie': 'video',
+    'video game': 'video-game',
+}
+
+JOBS_WITHOUT_CONTENT_TYPE = ['actor', 'actress', 'self', 'in development', 'archive footage']
 
 
 class DynamicIMDB(object):
@@ -27,8 +54,8 @@ class DynamicIMDB(object):
     Other than ID, all other properties are meant to filter the full list that the entity generates.
 
     id: string that relates to a supported entity type. For example: 'nm0000375'. Required.
-    job_types: a string or list with job types from job_types. Default is 'actor'.
-    content_types: A string or list with content types from content_types. Default is 'movie'.
+    job_types: a string or list with job types from JOB_TYPES. Default is 'actor'.
+    content_types: A string or list with content types from CONTENT_TYPES. Default is 'movie'.
     max_entries: The maximum number of entries that can return. This value's purpose is basically flood protection
         against unruly configurations that will return too many results. Default is 200.
 
@@ -44,38 +71,10 @@ class DynamicIMDB(object):
             movie_queue: add
 
     """
-    job_types = ['actor', 'actress', 'director', 'producer', 'writer', 'self', 'editor', 'miscellaneous',
-                 'editorial department', 'cinematographer', 'visual effects', 'thanks', 'music department',
-                 'in development', 'archive footage', 'soundtrack']
-
-    content_types = ['movie', 'tv series', 'tv mini series', 'video game', 'video movie', 'tv movie', 'episode']
-
-    content_type_conversion = {
-        'movie': 'movie',
-        'tv series': 'tv',
-        'tv mini series': 'tv',
-        'tv movie': 'tv',
-        'episode': 'tv',
-        'video movie': 'video',
-        'video game': 'video game'
-    }
-
-    character_content_type_conversion = {
-        'movie': 'feature',
-        'tv series': 'tv',
-        'tv mini series': 'tv',
-        'tv movie': 'tv',
-        'episode': 'tv',
-        'video movie': 'video',
-        'video game': 'video-game',
-    }
-
-    jobs_without_content_type = ['actor', 'actress', 'self', 'in development', 'archive footage']
-
     imdb_pattern = {'type': 'string',
                     'pattern': r'(nm|co|ch)\d{7}',
                     'error_pattern': 'Get the id from the url of the person/company you want to use,'
-                                     ' e.g. http://imdb.com/text/<id here>/blah'}
+                                     ' e.g. http://imdb.com/person/<id here>/blah'}
 
     schema = {
         'oneOf': [
@@ -83,8 +82,8 @@ class DynamicIMDB(object):
             {'type': 'object',
              'properties': {
                  'id': imdb_pattern,
-                 'job_types': one_or_more({'type': 'string', 'enum': job_types}, unique_items=True),
-                 'content_types': one_or_more({'type': 'string', 'enum': content_types}, unique_items=True),
+                 'job_types': one_or_more({'type': 'string', 'enum': JOB_TYPES}),
+                 'content_types': one_or_more({'type': 'string', 'enum': CONTENT_TYPES}),
                  'max_entries': {'type': 'integer'}
              },
              'required': ['id'],
@@ -93,38 +92,6 @@ class DynamicIMDB(object):
         ],
 
     }
-
-    def __init__(self):
-        try:
-            from imdb import IMDb
-        except ImportError:
-            log.error('IMDBPY is requires for this plugin. Please install using "pip install imdbpy"')
-            return
-        self.ia = IMDb()
-
-    def prepare_config(self, config):
-        """
-        Converts config to dict form and sets defaults if needed
-        """
-        if not isinstance(config, dict):
-            config = {'id': config}
-
-        config.setdefault('content_types', [self.content_types[0]])
-        config.setdefault('job_types', [self.job_types[0]])
-        config.setdefault('max_entries', 200)
-
-        if isinstance(config.get('content_types'), str_types):
-            log.debug('Converted content type from string to list.')
-            config['content_types'] = [config['content_types']]
-
-        if isinstance(config['job_types'], str_types):
-            log.debug('Converted job type from string to list.')
-            config['job_types'] = [config['job_types']]
-        # Special case in case user meant to add actress instead of actor (different job types in IMDB)
-        if 'actor' in config['job_types'] and not 'actress' in config['job_types']:
-            config['job_types'].append('actress')
-
-        return config
 
     def get_entity_type_and_object(self, imdb_id):
         """
@@ -145,93 +112,52 @@ class DynamicIMDB(object):
             log.info('Starting to retrieve items for Character: %s' % character)
             return 'Character', character
 
-    def get_items_by_entity(self, entity_type, entity_object, content_types, job_types):
-        """
-        Gets entity object and return movie list using relevant method
-        """
-        if entity_type == 'Company':
-            return self.items_by_company(entity_object)
-
-        if entity_type == 'Character':
-            return self.items_by_character(entity_object, content_types)
-
-        elif entity_type == 'Person':
-            return self.items_by_person(entity_object, job_types, content_types)
-
-    def flatten_list(self, _list):
-        """
-        Gets a list of lists and returns a flat list
-        """
-        for el in _list:
-            if isinstance(el, collections.Iterable) and not isinstance(el, basestring):
-                for sub in self.flatten_list(el):
-                    yield sub
-            else:
-                yield el
-
-    def no_empty_objects(self, _list):
-        """
-        Returns list without None objects
-        """
-        return [item for item in _list if item is not None]
-
-    def flat_list(self, non_flat_list, remove_none=False):
-        flat_list = self.flatten_list(non_flat_list)
-        if remove_none:
-            flat_list = self.no_empty_objects(flat_list)
-        return flat_list
-
-    def filtered_items(self, unfiltered_items, content_types):
-        items = []
-        unfiltered_items = list(set(unfiltered_items))
-        for item in sorted(unfiltered_items):
-            self.ia.update(item)
-            if item['kind'] in content_types:
-                log.verbose('Adding item "{}" to list. Item kind is "{}"'.format(item, item['kind']))
-                items.append(item)
-            else:
-                log.verbose('Rejecting item "{}". Item kind is "{}'.format(item, item['kind']))
-        return items
-
-    def items_by_person(self, person, job_types, content_types):
+    def get_items_by_person(self, person, job_types, content_types):
         """
         Return item list for a person object
+        :param person: Person object
+        :param job_types: Relevant job types as inputted in config
+        :param content_types: Relevant content types as inputted in config
+        :return: Person item list
         """
-        unfiltered_items = self.flat_list(
-            [self.items_by_job_type(person, job_type, content_types) for job_type in job_types],
-            remove_none=True)
+        items = []
+        for job_type in job_types:
+            if job_type in JOBS_WITHOUT_CONTENT_TYPE:
+                log.debug('Searching for movies that correlates to: ' + job_type)
+                items += person.get(job_type)
+                continue
+            else:
+                for content_type in content_types:
+                    job_and_content = job_type + ' ' + CONTENT_TYPE_CONVERSION[content_type]
+                    log.debug('Searching for movies that correlates to: ' + job_and_content)
+                    movies_by_job_type = person.get(job_and_content)
+                    if content_type == 'movie':
+                        log.debug('Searching for short movies and documentaries.')
+                        movies_by_job_type += person.get(job_type + ' ' + 'documentary', [])
+                        movies_by_job_type += person.get(job_type + ' ' + 'short', [])
+                    if movies_by_job_type:
+                        for item in movies_by_job_type:
+                            self.ia.update(item)
+                            if item not in items and item['kind'] in content_types:
+                                log.debug('Found item: ' + item.get('title') + ', adding to unfiltered list')
+                                items.append(item)
+                            else:
+                                log.debug('Item ' + str(item) + ' already found in list, skipping.')
+        return items
 
-        return self.filtered_items(unfiltered_items, content_types)
-
-    def items_by_content_type(self, person, job_type, content_type):
-        return self.no_empty_objects(person.get(job_type + ' ' + self.content_type_conversion[content_type], []))
-
-    def items_by_job_type(self, person, job_type, content_types):
-        items = person.get(job_type, []) if job_type in self.jobs_without_content_type else [
-            person.get(job_type + ' ' + 'documentary', []) and
-            person.get(job_type + ' ' + 'short', []) and
-            self.items_by_content_type(person, job_type, content_type)
-            if content_type == 'movie'
-            else
-            self.items_by_content_type(person, job_type, content_type)
-            for content_type in content_types
-            ]
-        return self.no_empty_objects(items)
-
-    def items_by_character(self, character, content_types):
+    def get_items_by_character(self, character, content_types):
         """
         Return items list for a character object
         :param character: character object
         :param content_types: content types as defined in config
         :return:
         """
-        unfiltered_items = self.flat_list(
-            [character.get(self.character_content_type_conversion[content_type])
-             for content_type in content_types], remove_none=True)
+        items = []
+        for content_type in content_types:
+            items += character.get(CHARACTER_CONTENT_TYPE_CONVERSION[content_type], [])
+        return items
 
-        return self.filtered_items(unfiltered_items, content_types)
-
-    def items_by_company(self, company):
+    def get_items_by_company(self, company):
         """
         Return items list for a company object
         :param company: company object
@@ -239,25 +165,77 @@ class DynamicIMDB(object):
         """
         return company.get('production companies')
 
+    def get_items_by_entity(self, entity_type, entity_object, content_types, job_types):
+        """
+        Gets entity object and return movie list using relevant method
+        :param entity_type: Person, company, etc.
+        :param entity_object: The object itself
+        :param content_types: content types as defined in config
+        :param job_types: job types s defined in config
+        :return:
+        """
+        if entity_type == 'Company':
+            return self.get_items_by_company(entity_object)
+
+        if entity_type == 'Character':
+            return self.get_items_by_character(entity_object, content_types)
+
+        elif entity_type == 'Person':
+            return self.get_items_by_person(entity_object, job_types, content_types)
+
+    def prepare_config(self, config):
+        """
+        Converts config to dict form and sets defaults if needed
+        """
+        if not isinstance(config, dict):
+            config = {'id': config}
+
+        config.setdefault('content_types', [CONTENT_TYPES[0]])
+        config.setdefault('job_types', [JOB_TYPES[0]])
+        config.setdefault('max_entries', 200)
+
+        if isinstance(config.get('content_types'), str_types):
+            log.debug('Converted content type from string to list.')
+            config['content_types'] = [config['content_types']]
+
+        if isinstance(config['job_types'], str_types):
+            log.debug('Converted job type from string to list.')
+            config['job_types'] = [config['job_types']]
+
+        return config
+
     @cached('dynamic_imdb', persist='2 hours')
     def on_task_input(self, task, config):
+        try:
+            from imdb import IMDb
+        except ImportError:
+            log.error('IMDBPY is requires for this plugin. Please install using "pip install imdbpy"')
+            return
+
+        self.ia = IMDb()
         entries = []
+
         config = self.prepare_config(config)
+
         try:
             entity_type, entity_object = self.get_entity_type_and_object(config.get('id'))
         except Exception as e:
             log.error('Could not resolve entity via ID. Either error in config or unsupported entity: %s' % e)
             return
+
         items = self.get_items_by_entity(entity_type, entity_object,
-                                         config.get('content_types'), config.get('job_types'))
+                                     config.get('content_types'), config.get('job_types'))
+
         if not items:
             log.error('Could not get IMDB item list, check your configuration.')
             return
+
+        log.info('Retrieved %d items.' % len(items))
+
         for item in items:
             entry = Entry(title=item['title'],
                           imdb_id='tt' + self.ia.get_imdbID(item),
                           url='')
-
             if entry.isvalid():
                 if entry not in entries:
                     entries.append(entry)
@@ -267,6 +245,7 @@ class DynamicIMDB(object):
                         log.info("    IMDB ID: %s" % entry["imdb_id"])
             else:
                 log.error('Invalid entry created? %s' % entry)
+
         if len(entries) <= config.get('max_entries'):
             return entries
         else:
