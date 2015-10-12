@@ -47,6 +47,7 @@ def register_config_key(key, schema, required=False):
         _root_config_schema.setdefault('required', []).append(key)
     register_schema('/schema/config/%s' % key, schema)
 
+
 def get_schema():
     global _root_config_schema
     if _root_config_schema is None:
