@@ -41,8 +41,7 @@ web_config_schema = {
 
 def generate_key():
     """ Generate key for use to authentication """
-    return base64.b64encode(hashlib.sha256(str(random.getrandbits(256))).digest(),
-                            random.choice(['rA', 'aZ', 'gQ', 'hH', 'hG', 'aR', 'DD'])).rstrip('==')
+    return hashlib.sha224(str(random.getrandbits(128))).hexdigest()
 
 
 def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
