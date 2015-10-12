@@ -17,23 +17,48 @@ log = logging.getLogger('filesystem')
 
 class Filesystem(object):
     """
-    Uses local path content as an input, recurses through directories and creates entries for files that match mask.
+    Uses local path content as an input. Can use recursion if configured.
+    Recursion is False by default. Can be configured to true or get integer that will specify max depth in relation to
+        base folder.
+    All files/dir/symlinks are retrieved by default. Can be changed by using the 'retrieve' property.
 
-    You can specify either the mask key, in shell file matching format, (see python fnmatch module,) or regexp key.
+    Example 1:: Single path
 
-    Example::
+      filesystem: /storage/movies/
 
-      find:
-        path: /storage/movies/
-        mask: *.avi
+    Example 2:: List of paths
 
-    Example::
+      filesystem:
+         - /storage/movies/
+         - /storage/tv/
 
-      find:
+    Example 3:: Object with list of paths
+
+      filesystem:
         path:
           - /storage/movies/
           - /storage/tv/
-        regexp: .*\.(avi|mkv)$
+        mask: '*.mkv'
+
+    Example 4::
+
+      filesystem:
+        path:
+          - /storage/movies/
+          - /storage/tv/
+        recursion: 4  # 4 levels deep from each base folder
+        retrieve: files  # Only files will be retrieved
+
+    Example 5::
+
+      filesystem:
+        path:
+          - /storage/movies/
+          - /storage/tv/
+        recursion: yes  # No limit to depth, all sub dirs will be accessed
+        retrieve:  # Only files and dirs will be retrieved
+          - files
+          - dirs
 
     """
     retrieval_options = ['files', 'dirs', 'symlinks']
