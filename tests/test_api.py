@@ -6,12 +6,20 @@ from tests import FlexGetBase, MockManager
 from flexget import __version__
 from flexget.manager import Manager
 from flexget.api import app, API_VERSION
-from flexget import api
 
-if 'api_key' not in api.api_config:
-    api.api_config['api_key'] = api.generate_key()
+from flexget.webserver import User
+from flexget.utils.database import with_session
 
-api_key = api.api_config['api_key']
+
+@with_session
+def api_key(session=None):
+    user = session.query(User).first()
+    if not user:
+        user = User(name='flexget', password='flexget')
+        session.add(user)
+        session.commit()
+
+    return user.token
 
 
 def append_header(key, value, kwargs):
@@ -30,18 +38,18 @@ class APITest(FlexGetBase):
     def json_post(self, *args, **kwargs):
         append_header('Content-Type', 'application/json', kwargs)
         if kwargs.get('auth', True):
-            append_header('Authorization', 'Token %s' % api_key, kwargs)
+            append_header('Authorization', 'Token %s' % api_key(), kwargs)
         return self.client.post(*args, **kwargs)
 
     def get(self, *args, **kwargs):
         if kwargs.get('auth', True):
-            append_header('Authorization', 'Token %s' % api_key, kwargs)
+            append_header('Authorization', 'Token %s' % api_key(), kwargs)
 
         return self.client.get(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         if kwargs.get('auth', True):
-            append_header('Authorization', 'Token %s' % api_key, kwargs)
+            append_header('Authorization', 'Token %s' % api_key(), kwargs)
 
         return self.client.delete(*args, **kwargs)
 
