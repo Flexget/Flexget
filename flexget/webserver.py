@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import threading
-import base64
 import hashlib
 import random
 
@@ -41,7 +40,7 @@ web_config_schema = {
 
 def generate_key():
     """ Generate key for use to authentication """
-    return hashlib.sha224(str(random.getrandbits(128))).hexdigest()
+    return unicode(hashlib.sha224(str(random.getrandbits(128))).hexdigest())
 
 
 def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
