@@ -45,7 +45,7 @@ class InputFind(object):
         },
         'required': ['path'],
         'additionalProperties': False,
-        'deprecated': 'The find/listdir plugins have been replaced by the filesystem plugin'
+        'deprecated': '"find" plugin has been replaced by the "filesystem" plugin.'
     }
 
     def prepare_config(self, config):
