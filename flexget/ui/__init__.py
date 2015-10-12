@@ -10,7 +10,6 @@ from flexget.webserver import register_app, register_home
 from flask.ext.assets import Environment, Bundle
 from flask_compress import Compress
 
-from webassets.filter import get_filter
 
 log = logging.getLogger('webui')
 
@@ -129,11 +128,14 @@ def _register_plugin(plugin_path):
     _plugins[name] = {'path': plugin_path, 'config': config, version: version}
 
     # Register CSS/SASS assets
+    # NOTE: Disabled until required
+    """
     if config.get('sass'):
         sass_path = os.path.normpath(os.path.join(plugin_path, 'sass'))
         sass_file = os.path.join(sass_path, config['sass'])
         libsass = get_filter('libsass', includes=[os.path.join(webui_path, 'sass'), sass_path])
         register_asset('plugins_css', Bundle(sass_file, output='css/%s.css' % name, filters=(libsass,)))
+    """
 
     css_path = os.path.join(plugin_path, 'css')
     if os.path.isdir(css_path):

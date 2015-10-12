@@ -1,13 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import os
 import threading
+import base64
+import hashlib
+import random
+
+from sqlalchemy import Column, Integer, Unicode
 
 from flask import Flask, abort, redirect
+from flask.ext.login import UserMixin
 
 from flexget.event import event
 from flexget.config_schema import register_config_key
 from flexget.utils.tools import singleton
+from flexget.manager import Base
+from flexget.utils.database import with_session
 
 log = logging.getLogger('web_server')
 
@@ -15,7 +22,7 @@ _home = None
 _app_register = {}
 _default_app = Flask(__name__)
 
-app = None
+random = random.SystemRandom()
 
 web_config_schema = {
     'oneOf': [
@@ -24,12 +31,67 @@ web_config_schema = {
             'type': 'object',
             'properties': {
                 'bind': {'type': 'string', 'format': 'ipv4', 'default': '0.0.0.0'},
-                'port': {'type': 'integer', 'default': 5050},
+                'port': {'type': 'integer', 'default': 3539},
             },
             'additionalProperties': False
         }
     ]
 }
+
+
+def generate_key():
+    """ Generate key for use to authentication """
+    return base64.b64encode(hashlib.sha256(str(random.getrandbits(256))).digest(),
+                            random.choice(['rA', 'aZ', 'gQ', 'hH', 'hG', 'aR', 'DD'])).rstrip('==')
+
+
+def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):
+    """
+    Returns a securely generated random string.
+
+    The default length of 12 with the a-z, A-Z, 0-9 character set returns
+    a 71-bit value. log_2((26+26+10)^12) =~ 71 bits.
+
+    Taken from the django.utils.crypto module.
+    """
+    return ''.join(random.choice(allowed_chars) for __ in range(length))
+
+
+@with_session
+def get_secret(session=None):
+    pass
+    """ Generate a secret key for flask applications and store it in the database. """
+    web_secret = session.query(WebSecret).first()
+    if not web_secret:
+        web_secret = WebSecret(id=1, value=get_random_string(50, 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'))
+        session.add(web_secret)
+        session.commit()
+
+    return web_secret.value
+
+
+class User(Base, UserMixin):
+    """ User class avaliable for flask apps to handle authentication using flask_login """
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(Unicode(50), unique=True)
+    token = Column(Unicode, default=generate_key)
+    password = Column(Unicode)
+
+    def __repr__(self):
+        return '<User %r>' % self.name
+
+    def get_id(self):
+        return self.name
+
+
+class WebSecret(Base):
+    """ Store flask secret in the database """
+    __tablename__ = 'secret'
+
+    id = Column(Unicode, primary_key=True)
+    value = Column(Unicode)
 
 
 @event('config.register')
@@ -58,7 +120,8 @@ def start_page():
 
 
 @event('manager.daemon.started', -255)  # Low priority so plugins can register apps
-def setup_server(manager):
+@with_session
+def setup_server(manager, session=None):
     """ Sets up and starts/restarts the web service. """
     if not manager.is_daemon:
         return
@@ -72,6 +135,13 @@ def setup_server(manager):
         bind=web_server_config['bind'],
         port=web_server_config['port'],
     )
+
+    _default_app.secret_key = get_secret()
+
+    # Create default flexget user
+    if session.query(User).count() == 0:
+        session.add(User(name="flexget", password="flexget"))
+        session.commit()
 
     if web_server.is_alive():
         web_server.stop()
@@ -119,8 +189,6 @@ class WebServer(threading.Thread):
         self.server.start()
 
     def run(self):
-        _default_app.secret_key = os.urandom(24)
-
         log.info('Starting web server on port %s' % self.port)
         self._start_server()
 

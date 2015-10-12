@@ -4,14 +4,15 @@
   var services = angular.module('flexget.services');
 
   services.factory('auth', function($state, $cookies, $http){
-    var loggedIn, prevState, prevParams, timeout;
+    var loggedIn, prevState, prevParams;
 
     loggedIn = false;
 
     return {
       isLoggedIn: function () {
         if (!loggedIn) {
-          var token = $cookies.get("remember_token");
+          //TODO: Check if token still valid
+          var token = $cookies.get("flexget_token");
           if (token) {
             loggedIn = true;
           }
@@ -20,7 +21,6 @@
       },
       loginConfirmed: function () {
         loggedIn = true;
-        timeout = false;
         if (prevState) {
           $state.go(prevState, prevParams);
         } else {
@@ -38,7 +38,8 @@
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
       if (!authService.isLoggedIn() && toState.name != "login") {
         event.preventDefault();
-        $rootScope.$broadcast('event:auth-loginRequired', toState, toParams);
+        authService.state(toState, toParams);
+        $rootScope.$broadcast('event:auth-loginRequired', false);
       }
     });
   }]);
@@ -49,6 +50,7 @@
         var stateService = $injector.get('$state');
         var authService = $injector.get('auth');
         authService.state(stateService.current, stateService.params);
+        console.log("TEST");
         $rootScope.$broadcast('event:auth-loginRequired', true);
       };
 
