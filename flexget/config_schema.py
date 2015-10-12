@@ -5,11 +5,12 @@ import re
 import urlparse
 from collections import defaultdict
 from datetime import datetime
+from warnings import warn
 
 import jsonschema
 from jsonschema.compat import str_types, int_types
 
-from flexget.event import fire_event, event
+from flexget.event import fire_event
 from flexget.utils import qualities, template
 from flexget.utils.tools import parse_timedelta
 
@@ -356,9 +357,15 @@ def validate_oneOf(validator, oneOf, instance, schema):
         yield e
 
 
+def validate_deprecated(validator, message, instance, schema):
+    """Not really a validator, just warns if deprecated section of config is being used."""
+    warn(message, category=DeprecationWarning)
+
+
 validators = {
     'anyOf': validate_anyOf,
-    'oneOf': validate_oneOf
+    'oneOf': validate_oneOf,
+    'deprecated': validate_deprecated
 }
 
 SchemaValidator = jsonschema.validators.extend(jsonschema.Draft4Validator, validators)
