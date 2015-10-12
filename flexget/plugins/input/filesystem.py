@@ -92,7 +92,7 @@ class Filesystem(object):
         try:
             entry['timestamp'] = os.path.getmtime(filepath)
         except Exception as e:
-            log.debug('Error setting timestamp for %s: %s' % (filepath, e))
+            log.warning('Error setting timestamp for %s: %s' % (filepath, e))
             entry['timestamp'] = None
         if entry.isvalid():
             if test_mode:
@@ -107,22 +107,31 @@ class Filesystem(object):
             log.error('Non valid entry created: {}'.format(entry))
             return
 
+    def get_max_depth(self, recursion, base_depth):
+        if recursion is False:
+            return base_depth + 1
+        elif recursion is True:
+            return float('inf')
+        else:
+            return base_depth + recursion
+
+    def get_folder_objects(self, folder, recursion):
+        if recursion is False:
+            return folder.listdir()
+        else:
+            return folder.walk(errors='ignore')
+
     def get_entries_from_path(self, path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks):
         entries = []
 
         for folder in path_list:
             folder = path(folder).expanduser()
-            log.debug('Scanning %s' % path)
+            log.debug('Scanning %s' % folder)
             base_depth = len(folder.splitall())
-            if recursion is False:
-                max_depth = base_depth
-            elif recursion is True:
-                max_depth = float('inf')
-            else:
-                max_depth = base_depth + recursion
-
-            folder_objects = folder.walk(errors='ignore')
+            max_depth = self.get_max_depth(recursion, base_depth)
+            folder_objects = self.get_folder_objects(folder, recursion)
             for path_object in folder_objects:
+                log.verbose('Checking if {} qualifies to be added as an entry.'.format(path_object))
                 try:
                     path_object.exists()
                 except UnicodeError:
@@ -130,15 +139,16 @@ class Filesystem(object):
                     continue
                 entry = None
                 object_depth = len(path_object.splitall())
-                if object_depth <= max_depth and match(path_object):
-                    if (path_object.isdir() and get_dirs) or (path_object.islink() and get_symlinks):
-                        entry = self.create_entry(path_object, test_mode, type='dir')
-                    elif path_object.isfile() and get_files:
-                        entry = self.create_entry(path_object, test_mode)
-                    else:
-                        log.error('An error has occurred with path: {}'.format(path_object))
-                    if entry:
-                        entries.append(entry)
+                if object_depth <= max_depth:
+                    if match(path_object):
+                        if (path_object.isdir() and get_dirs) or (path_object.islink() and get_symlinks):
+                            entry = self.create_entry(path_object, test_mode, type='dir')
+                        elif path_object.isfile() and get_files:
+                            entry = self.create_entry(path_object, test_mode)
+                        else:
+                            log.debug("Path object's {} type doesn't match requested object types.".format(path_object))
+                        if entry:
+                            entries.append(entry)
 
         return entries
 
@@ -153,8 +163,8 @@ class Filesystem(object):
         get_dirs = 'dirs' in config['retrieve']
         get_symlinks = 'symlinks' in config['retrieve']
 
+        log.info('Starting to scan folders.')
         return self.get_entries_from_path(path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks)
-
 
 
 @event('plugin.register')
