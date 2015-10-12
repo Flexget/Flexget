@@ -1,15 +1,13 @@
 import logging
 import os
 import base64
-import hashlib
-import random
 import copy
 
 from time import sleep
 from functools import wraps
 from collections import deque
 
-from flask.ext.login import LoginManager, UserMixin, current_user, current_app, login_user
+from flask.ext.login import login_user, current_user, current_app, LoginManager
 from flask import Flask, request, jsonify, Response
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.resource import Resource
@@ -20,7 +18,7 @@ from werkzeug.exceptions import HTTPException
 
 from flexget import __version__
 from flexget.event import event
-from flexget.webserver import register_app
+from flexget.webserver import register_app, get_secret, User
 from flexget.config_schema import process_config, register_config_key, schema_paths
 from flexget import manager
 from flexget.utils import json
@@ -32,20 +30,9 @@ API_VERSION = "0.1-alpha"
 
 log = logging.getLogger('api')
 
-
-def generate_key():
-    """ Generate api key for use to authentication """
-    return base64.b64encode(hashlib.sha256(str(random.getrandbits(256))).digest(),
-                            random.choice(['rA', 'aZ', 'gQ', 'hH', 'hG', 'aR', 'DD'])).rstrip('==')
 api_config = {}
-
 api_config_schema = {
-    'type': 'object',
-    'properties': {
-        'api_key': {'type': 'string', 'minLength': 32, 'default': generate_key()},
-        'username': {'type': 'string'},
-        'password': {'type': 'string'},
-    },
+    'type': 'boolean',
     'additionalProperties': False
 }
 
@@ -163,9 +150,9 @@ class APIResource(Resource):
         self.manager = manager.manager
         super(APIResource, self).__init__()
 
+
 app = Flask(__name__)
-app.config['SESSION_TYPE'] = 'memcached'
-app.config['SECRET_KEY'] = generate_key()
+app.config['REMEMBER_COOKIE_NAME'] = 'flexget_token'
 
 Compress(app)
 api = Api(
@@ -175,6 +162,51 @@ api = Api(
     version=API_VERSION,
     description='<font color="red"><b>Warning: under development, subject to change without notice.<b/></font>'
 )
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+
+@login_manager.request_loader
+@with_session
+def load_user_from_request(request, session=None):
+    auth_value = request.headers.get('Authorization')
+
+    if not auth_value:
+        return
+
+    # Login using api key
+    if auth_value.startswith('Token'):
+        try:
+            token = auth_value.replace('Token ', '', 1)
+            return session.query(User).filter(User.token == token).first()
+        except (TypeError, ValueError):
+            pass
+
+    # Login using basic auth
+    if auth_value.startswith('Basic'):
+        try:
+            credentials = base64.b64decode(auth_value.replace('Basic ', '', 1))
+            username, password = credentials.split(":")
+            return session.query(User).filter(User.name == username, User.password == password).first()
+        except (TypeError, ValueError):
+            pass
+
+
+@login_manager.user_loader
+@with_session
+def load_user(username, session=None):
+    return session.query(User).filter(User.name == username).first()
+
+
+@app.before_request
+def check_valid_login():
+    # Allow access to root, login and swagger documentation without authentication
+    if request.path == "/" or request.path.startswith("/login") or request.path.startswith("/swagger"):
+        return
+
+    if not current_user.is_authenticated:
+        return current_app.login_manager.unauthorized()
 
 
 class ApiError(Exception):
@@ -259,25 +291,14 @@ def register_api(mgr):
     global api_config
     api_config = mgr.config.get('api')
 
+    app.secret_key = get_secret()
+
     if api_config:
         register_app('/api', app)
 
 
 # API Authentication and Authorization
 login_api = api.namespace('login', description='API Authentication')
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User(user_id)
-
-
-def validate_credentials(username, password):
-    if api_config.get("username") == username and api_config.get("password") == password:
-        return User(username)
-
 
 login_api_schema = api.schema("login", {
     "type": "object",
@@ -292,64 +313,27 @@ login_parser.add_argument('remember', type=bool, required=False, default=False, 
 
 
 @login_api.route('/')
-# TODO: Should we return a token rather then using session cookie?
 @api.doc(description="Login to API with username and password")
 class LoginAPI(APIResource):
 
     @api.expect(login_api_schema)
-    @api.response(400, 'Invalid username or Password')
+    @api.response(400, 'Invalid username or password')
     @api.response(200, 'Login successful')
     @api.doc(parser=login_parser)
     def post(self, session=None):
         data = request.json
-        if data and validate_credentials(data.get("username"), data.get("password")):
-            args = login_parser.parse_args()
-            login_user(User("flexget"), remember=args['remember'])
-            return {"status": "success"}
-        else:
-            return {"status": "failed", "message": "Invalid username or Password"}, 400
 
+        if data:
+            user = session.query(User)\
+                .filter(User.name == data.get("username"), User.password == data.get("password"))\
+                .first()
 
-@app.before_request
-def check_valid_login():
-    # Allow access to root, login and swagger documentation without authentication
-    if request.path == "/" or request.path.startswith("/login") or request.path.startswith("/swagger"):
-        return
+            if user:
+                args = login_parser.parse_args()
+                login_user(user, remember=args['remember'])
+                return {"status": "success"}
 
-    if not current_user.is_authenticated:
-        return current_app.login_manager.unauthorized()
-
-
-class User(UserMixin):
-    def __init__(self, username):
-        self.id = username
-
-
-@login_manager.request_loader
-def load_user_from_request(request):
-    auth_value = request.headers.get('Authorization')
-
-    if not auth_value:
-        return
-
-    # Login using api key
-    if auth_value.startswith('Token'):
-        try:
-            token = auth_value.replace('Token ', '', 1)
-            if api_config.get("api_key") == token:
-                return User("flexget")
-        except (TypeError, ValueError):
-            pass
-
-    # Login using basic auth
-    if auth_value.startswith('Basic'):
-        try:
-            credentials = base64.b64decode(auth_value.replace('Basic ', '', 1))
-            username, password = credentials.split(":")
-            if api_config.get("username") == username and api_config.get("password") == password:
-                return User("flexget")
-        except (TypeError, ValueError):
-            pass
+        return {"status": "failed", "message": "Invalid username or password"}, 400
 
 
 # Schema API
