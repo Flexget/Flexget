@@ -46,7 +46,7 @@ class Filesystem(object):
         path:
           - /storage/movies/
           - /storage/tv/
-        recursion: 4  # 4 levels deep from each base folder
+        recursive: 4  # 4 levels deep from each base folder
         retrieve: files  # Only files will be retrieved
 
     Example 5::
@@ -55,7 +55,7 @@ class Filesystem(object):
         path:
           - /storage/movies/
           - /storage/tv/
-        recursion: yes  # No limit to depth, all sub dirs will be accessed
+        recursive: yes  # No limit to depth, all sub dirs will be accessed
         retrieve:  # Only files and dirs will be retrieved
           - files
           - dirs
@@ -72,7 +72,7 @@ class Filesystem(object):
                  'path': paths,
                  'mask': {'type': 'string'},
                  'regexp': {'type': 'string', 'format': 'regex'},
-                 'recursion': {'oneOf': [{'type': 'integer'}, {'type': 'boolean'}]},
+                 'recursive': {'oneOf': [{'type': 'integer'}, {'type': 'boolean'}]},
                  'retrieve': one_or_more({'type': 'string', 'enum': retrieval_options}, unique_items=True)
              },
              'required': ['path'],
@@ -89,7 +89,7 @@ class Filesystem(object):
         if not isinstance(config['path'], list):
             config['path'] = [config['path']]
 
-        config.setdefault('recursion', False)
+        config.setdefault('recursive', False)
         # If mask was specified, turn it in to a regexp
         if config.get('mask'):
             config['regexp'] = translate(config['mask'])
@@ -182,13 +182,13 @@ class Filesystem(object):
         path_list = config['path']
         test_mode = task.options.test
         match = re.compile(config['regexp'], re.IGNORECASE).match
-        recursion = config['recursion']
+        recursive = config['recursive']
         get_files = 'files' in config['retrieve']
         get_dirs = 'dirs' in config['retrieve']
         get_symlinks = 'symlinks' in config['retrieve']
 
         log.info('Starting to scan folders.')
-        return self.get_entries_from_path(path_list, match, recursion, test_mode, get_files, get_dirs, get_symlinks)
+        return self.get_entries_from_path(path_list, match, recursive, test_mode, get_files, get_dirs, get_symlinks)
 
 
 @event('plugin.register')
