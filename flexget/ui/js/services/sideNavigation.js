@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  angular.module('flexget').run(function($rootScope, $mdSidenav) {
+  angular.module('flexget').run(function($rootScope, $mdSidenav, $mdMedia) {
     $rootScope.toggleNav = function () {
       if ($mdSidenav('left').isLockedOpen()) {
         $rootScope.menuMini = !$rootScope.menuMini;

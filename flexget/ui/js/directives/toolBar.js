@@ -10,7 +10,7 @@
                     '<md-icon class="fa fa-bars" aria-label="Menu"></md-icon>' +
                 '</md-button>' +
                 '<span flex></span>' +
-                '<md-button ng-repeat="item in toolBarItem" ng-click="item.action()" aria-label="{{ item.label }}">' +
+                '<md-button ng-repeat="item in toolBarItem | orderBy:\'order\'" ng-click="item.action()" aria-label="{{ item.label }}">' +
                     '<md-icon class="{{ item.cssClass }}"></md-icon>' +
                 '</md-button>' +
                 '<md-menu md-offset="0 -7">' +
@@ -25,7 +25,7 @@
                 '</md-menu>' +
             '</div>' +
         '</md-toolbar>' +
-    '</div>'
+    '</div>';
 
     return {
       restrict: 'E',
