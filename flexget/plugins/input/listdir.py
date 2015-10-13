@@ -22,7 +22,8 @@ class Listdir(object):
       listdir: /storage/movies/
     """
 
-    schema = one_or_more({'type': 'string', 'format': 'path'})
+    schema = one_or_more({'type': 'string', 'format': 'path',
+                         'deprecated': '"listdir" plugin has been replaced by the "filesystem" plugin.'})
 
     def on_task_input(self, task, config):
         # If only a single path is passed turn it into a 1 element list
