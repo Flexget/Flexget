@@ -1,31 +1,23 @@
 (function () {
   'use strict';
 
-  angular.module('flexget').controller('flexgetController', function ($scope, $http, $mdSidenav, $state, $mdMedia, $mdDialog, sideNav) {
+  angular.module('flexget.services')
+    .service('server', function($http) {
+      this.reload = function() {
+        return $http.get('/api/server/reload/');
+      };
 
-    $scope.menuItems = sideNav.items;
-    $scope.toggleMenu = function () {
-      if ($mdSidenav('left').isLockedOpen()) {
-        $scope.menuMini = !$scope.menuMini;
-      } else {
-        $scope.menuMini = false;
-        $mdSidenav('left').toggle();
-      }
-    };
+      this.shutdown = function() {
+        return $http.get('/api/server/shutdown/')
+      };
+    });
 
-    $scope.closeNav = function ($event) {
-      if (!$mdMedia('gt-lg')) {
-        $mdSidenav('left').close();
-      }
-    };
+  var serverPlugin = angular.module("serverPlugin", []);
+  registerModule(serverPlugin);
 
-    /* Shortcut to go a page (route) */
-    $scope.go = function (state) {
-      $state.go(state);
-    };
+  serverPlugin.run(function(toolBar, server, $mdDialog) {
 
-    /* Reload Flexget config file */
-    $scope.reload = function () {
+    var reload = function () {
       var reloadController = function ($scope, $mdDialog) {
         $scope.title = 'Reload Config';
         $scope.showCircular = true;
@@ -43,11 +35,11 @@
           $scope.ok = 'Close';
         };
 
-        $http.get('/api/server/reload/').
-          success(function (data, status, headers, config) {
+        server.reload()
+          .success(function () {
             done('Reload Success');
-          }).
-          error(function (data, status, headers, config) {
+          })
+          . error(function (data, status, headers, config) {
             done('Reload failed: ' + data.error);
           });
       };
@@ -57,7 +49,6 @@
         parent: angular.element(document.body),
         controller: reloadController
       });
-
     };
 
     var doShutdown = function () {
@@ -81,12 +72,12 @@
           $scope.ok = 'Close';
         };
 
-        $http.get('/api/server/shutdown/').
-          success(function (data, status, headers, config) {
+        server.shutdown().
+          success(function () {
             done('Flexget has been shutdown');
           }).
-          error(function (data, status, headers, config) {
-            done('Flexget failed to shutdown failed: ' + data.error);
+          error(function (error) {
+            done('Flexget failed to shutdown failed: ' + error.message);
           });
       };
       $mdDialog.show({
@@ -97,7 +88,7 @@
 
     };
 
-    $scope.shutdown = function () {
+    var shutdown = function () {
       $mdDialog.show(
         $mdDialog.confirm()
           .parent(angular.element(document.body))
@@ -111,5 +102,10 @@
 
     };
 
+    toolBar.register('Reload', 'fa fa-refresh', reload);
+    toolBar.register('Shutdown', 'fa fa-power-off', shutdown);
+
   });
 })();
+
+

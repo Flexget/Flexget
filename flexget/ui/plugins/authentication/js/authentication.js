@@ -50,7 +50,6 @@
         var stateService = $injector.get('$state');
         var authService = $injector.get('auth');
         authService.state(stateService.current, stateService.params);
-        console.log("TEST");
         $rootScope.$broadcast('event:auth-loginRequired', true);
       };
 

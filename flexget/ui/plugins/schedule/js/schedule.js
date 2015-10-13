@@ -4,9 +4,9 @@
   var scheduleModule = angular.module('scheduleModule', ['schemaForm']);
   registerModule(scheduleModule);
 
-  scheduleModule.config(function(routeProvider, sideNavProvider) {
-    routeProvider.register('schedule', '/schedule', 'SchedulesCtrl', 'plugin/schedule/static/index.html');
-    sideNavProvider.register('/schedule', 'Schedule', 'fa fa-calendar', 128);
+  scheduleModule.run(function(route, sideNav) {
+    route.register('schedule', '/schedule', 'SchedulesCtrl', 'plugin/schedule/static/index.html');
+    sideNav.register('/schedule', 'Schedule', 'fa fa-calendar', 128);
   });
 
   scheduleModule.controller('SchedulesCtrl', function ($scope, $http) {

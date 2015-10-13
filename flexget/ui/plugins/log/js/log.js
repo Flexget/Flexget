@@ -5,9 +5,10 @@
 
   registerModule(logViewModule);
 
-  logViewModule.config(function(routeProvider, sideNavProvider) {
-    routeProvider.register('log', '/log', 'LogViewCtrl', 'plugin/log/static/index.html');
-    sideNavProvider.register('/log', 'Log', 'fa fa-file-text-o', 128);
+  logViewModule.run(function(route, sideNav, toolBar) {
+    route.register('log', '/log', 'LogViewCtrl', 'plugin/log/static/index.html');
+    sideNav.register('/log', 'Log', 'fa fa-file-text-o', 128);
+    toolBar.register('Log', 'fa fa-file-text-o', function(){$scope.go('log')});
   });
 
   logViewModule.controller('LogViewCtrl',

@@ -4,8 +4,8 @@
   var login = angular.module('login', ['flexget.services']);
   registerModule(login);
 
-  login.config(function(routeProvider) {
-    routeProvider.register('login', '/login?timeout', 'LoginController', 'plugin/authentication/static/login.html');
+  login.run(function(route) {
+    route.register('login', '/login?timeout', 'LoginController', 'plugin/authentication/static/login.html');
   });
 
   login.controller('LoginController', function ($scope, $http, $mdDialog, auth, $stateParams) {

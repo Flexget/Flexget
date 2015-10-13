@@ -5,9 +5,9 @@
 
   registerModule(executeModule);
 
-  executeModule.config(function(routeProvider, sideNavProvider) {
-    routeProvider.register('execute', '/execute', 'ExecuteCtrl', 'plugin/execute/static/index.html');
-    sideNavProvider.register('/execute', 'Execute', 'fa fa-cog', 128);
+  executeModule.run(function(route, sideNav) {
+    route.register('execute', '/execute', 'ExecuteCtrl', 'plugin/execute/static/index.html');
+    sideNav.register('/execute', 'Execute', 'fa fa-cog', 128);
   });
 
   executeModule.controller('ExecuteCtrl', ['$scope', 'Oboe', function ($scope, Oboe) {

@@ -4,9 +4,9 @@
   var historyModule = angular.module("historyModule", ['angular.filter']);
   registerModule(historyModule);
 
-  historyModule.config(function(routeProvider, sideNavProvider) {
-    routeProvider.register('history', '/history', 'HistoryCtrl', 'plugin/history/static/index.html');
-    sideNavProvider.register('/history', 'History', 'fa fa-history', 128);
+  historyModule.run(function(route, sideNav) {
+    route.register('history', '/history', 'HistoryCtrl', 'plugin/history/static/index.html');
+    sideNav.register('/history', 'History', 'fa fa-history', 128);
   });
 
   historyModule.controller('HistoryCtrl', function ($scope, $http) {

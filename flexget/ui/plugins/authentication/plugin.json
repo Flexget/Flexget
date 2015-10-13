@@ -1,5 +1,4 @@
 {
   "name": "authentication",
-  "version": "0.1",
-  "sass": "authentication.scss"
+  "version": "0.1"
 }
