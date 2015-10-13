@@ -100,17 +100,15 @@ class Filesystem(object):
 
         return config
 
-    def create_entry(self, filepath, test_mode, type=None):
+    def create_entry(self, filepath, test_mode):
         """
         Creates a single entry using a filepath and a type (file/dir)
         """
         entry = Entry()
-        filepath = path(filepath)
-
         entry['location'] = filepath
         entry['url'] = 'file://{}'.format(filepath)
         entry['filename'] = filepath.name
-        if not type:
+        if filepath.isfile():
             entry['title'] = filepath.namebase
         else:
             entry['title'] = filepath.name
@@ -150,13 +148,14 @@ class Filesystem(object):
         entries = []
 
         for folder in path_list:
+            log.verbose('Scanning folder {}. Recursion is set to {}.'.format(folder, recursion))
             folder = path(folder).expanduser()
             log.debug('Scanning %s' % folder)
             base_depth = len(folder.splitall())
             max_depth = self.get_max_depth(recursion, base_depth)
             folder_objects = self.get_folder_objects(folder, recursion)
             for path_object in folder_objects:
-                log.verbose('Checking if {} qualifies to be added as an entry.'.format(path_object))
+                log.debug('Checking if {} qualifies to be added as an entry.'.format(path_object))
                 try:
                     path_object.exists()
                 except UnicodeError:
@@ -166,13 +165,13 @@ class Filesystem(object):
                 object_depth = len(path_object.splitall())
                 if object_depth <= max_depth:
                     if match(path_object):
-                        if (path_object.isdir() and get_dirs) or (path_object.islink() and get_symlinks):
-                            entry = self.create_entry(path_object, test_mode, type='dir')
-                        elif path_object.isfile() and get_files:
+                        if (path_object.isdir() and get_dirs) or (
+                            path_object.islink() and get_symlinks) or (
+                            path_object.isfile() and get_files):
                             entry = self.create_entry(path_object, test_mode)
                         else:
                             log.debug("Path object's {} type doesn't match requested object types.".format(path_object))
-                        if entry:
+                        if entry and entry not in entries:
                             entries.append(entry)
 
         return entries
