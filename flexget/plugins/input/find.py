@@ -44,7 +44,8 @@ class InputFind(object):
             'recursive': {'type': 'boolean'}
         },
         'required': ['path'],
-        'additionalProperties': False
+        'additionalProperties': False,
+        'deprecated': '"find" plugin has been replaced by the "filesystem" plugin.'
     }
 
     def prepare_config(self, config):

@@ -3,9 +3,9 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import re
 import urlparse
+import logging
 from collections import defaultdict
 from datetime import datetime
-from warnings import warn
 
 import jsonschema
 from jsonschema.compat import str_types, int_types
@@ -15,6 +15,8 @@ from flexget.utils import qualities, template
 from flexget.utils.tools import parse_timedelta
 
 schema_paths = {}
+
+log = logging.getLogger('config_schema')
 
 
 # TODO: Rethink how config key and schema registration work
@@ -58,7 +60,7 @@ def get_schema():
     return _root_config_schema
 
 
-def one_or_more(schema):
+def one_or_more(schema, unique_items=False):
     """
     Helper function to construct a schema that validates items matching `schema` or an array
     containing items matching `schema`.
@@ -68,7 +70,7 @@ def one_or_more(schema):
     schema.setdefault('title', 'single value')
     return {
         'oneOf': [
-            {'title': 'multiple values', 'type': 'array', 'items': schema, 'minItems': 1},
+            {'title': 'multiple values', 'type': 'array', 'items': schema, 'minItems': 1, 'uniqueItems': unique_items},
             schema
         ]
     }
@@ -336,7 +338,6 @@ def select_child_errors(validator, errors):
 
 
 def validate_properties_w_defaults(validator, properties, instance, schema):
-
     if not validator.is_type(instance, 'object'):
         return
     for key, subschema in properties.iteritems():
@@ -360,7 +361,7 @@ def validate_oneOf(validator, oneOf, instance, schema):
 
 def validate_deprecated(validator, message, instance, schema):
     """Not really a validator, just warns if deprecated section of config is being used."""
-    warn(message, category=DeprecationWarning)
+    log.warning(message)
 
 
 validators = {
