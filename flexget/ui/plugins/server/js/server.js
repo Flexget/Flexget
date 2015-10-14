@@ -102,8 +102,8 @@
 
     };
 
-    toolBar.register('Reload', 'fa fa-refresh', reload);
-    toolBar.register('Shutdown', 'fa fa-power-off', shutdown);
+    toolBar.registerButton('Reload', 'fa fa-refresh', reload);
+    toolBar.registerButton('Shutdown', 'fa fa-power-off', shutdown);
 
   });
 })();

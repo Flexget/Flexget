@@ -32,8 +32,7 @@
 
   login.run(['$rootScope', '$state', function ($rootScope, $state) {
     $rootScope.$on('event:auth-loginRequired', function (event, timeout) {
-      console.log(timeout);
-        $state.go('login', {'timeout': timeout});
+      $state.go('login', {'timeout': timeout});
     });
   }]);
 

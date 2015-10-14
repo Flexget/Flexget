@@ -10,19 +10,21 @@
                     '<md-icon class="fa fa-bars" aria-label="Menu"></md-icon>' +
                 '</md-button>' +
                 '<span flex></span>' +
-                '<md-button ng-repeat="item in toolBarItem | orderBy:\'order\'" ng-click="item.action()" aria-label="{{ item.label }}">' +
-                    '<md-icon class="{{ item.cssClass }}"></md-icon>' +
-                '</md-button>' +
-                '<md-menu md-offset="0 -7">' +
-                    '<md-button aria-label="Open demo menu" class="md-icon-button" ng-click="$mdOpenMenu($event)">' +
-                        '<md-icon md-menu-origin md-svg-icon="call:chat"></md-icon>' +
+                '<div ng-repeat="item in toolBarItems | orderBy:\'order\'">' +
+                  '<md-button aria-label="{{ item.label }}" class="md-icon-button" ng-click="item.action()" ng-if="item.type == \'button\'">' +
+                      '<md-icon md-menu-origin class="{{ item.cssClass }}"></md-icon>' +
+                  '</md-button>' +
+                  '<md-menu ng-if="item.type == \'menu\'">' +
+                    '<md-button aria-label="{{ item.label }}" class="md-icon-button" ng-click="$mdOpenMenu($event)">' +
+                        '<md-icon md-menu-origin class="{{ item.cssClass }}"></md-icon>' +
                     '</md-button>' +
-                    '<md-menu-content width="2">' +
-                        '<md-menu-item ng-repeat="item in [1, 2, 3]">' +
-                            '<md-button ng-click="ctrl.announceClick($index)"> <span md-menu-align-target>Option</span> {{item}} </md-button>' +
-                        '</md-menu-item>' +
+                    '<md-menu-content width="{{ item.menu.width }}">' +
+                      '<md-menu-item ng-repeat="menuItem in item.menu.items">' +
+                        '<md-button ng-click="menuItem.action()"><md-icon md-menu-origin class="{{ menuItem.cssClass }}"></md-icon>{{ menuItem.label }}</md-button>' +
+                      '</md-menu-item>' +
                     '</md-menu-content>' +
-                '</md-menu>' +
+                  '</md-menu>' +
+                '</div>' +
             '</div>' +
         '</md-toolbar>' +
     '</div>';
@@ -32,7 +34,7 @@
       replace: 'true',
       template: template,
       link: function (scope, element, attrs) {
-        scope.toolBarItem = toolBar.items;
+        scope.toolBarItems = toolBar.items;
       }
     };
   });
