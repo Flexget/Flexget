@@ -4,9 +4,12 @@
   var userPlugin = angular.module('userPlugin', ['ngCookies']);
   registerModule(userPlugin);
 
-  userPlugin.run(function($state, toolBar) {
+  userPlugin.run(function($state, toolBar, $http) {
     var logout = function() {
-      $state.go('login');
+      $http.get('/api/logout/')
+        .success(function (data, status, headers, config) {
+          $state.go('login');
+        });
     };
 
     var menu = {

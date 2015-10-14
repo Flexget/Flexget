@@ -8,7 +8,7 @@ from functools import wraps
 from collections import deque
 
 from flask.ext.login import login_user, current_user, current_app, LoginManager
-from flask import Flask, request, jsonify, Response
+from flask import Flask, request, jsonify, Response, session as flask_session
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.resource import Resource
 from flask_restplus.model import ApiModel
@@ -152,7 +152,7 @@ class APIResource(Resource):
 
 
 app = Flask(__name__)
-app.config['REMEMBER_COOKIE_NAME'] = 'flexget_token'
+app.config['REMEMBER_COOKIE_NAME'] = 'flexgetToken'
 
 Compress(app)
 api = Api(
@@ -165,6 +165,7 @@ api = Api(
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.session_protection = "strong"
 
 
 @login_manager.request_loader
@@ -202,7 +203,8 @@ def load_user(username, session=None):
 @app.before_request
 def check_valid_login():
     # Allow access to root, login and swagger documentation without authentication
-    if request.path == "/" or request.path.startswith("/login") or request.path.startswith("/swagger"):
+    if request.path == "/" or request.path.startswith("/login") or \
+            request.path.startswith("/logout") or request.path.startswith("/swagger"):
         return
 
     if not current_user.is_authenticated:
@@ -334,6 +336,21 @@ class LoginAPI(APIResource):
                 return {"status": "success"}
 
         return {"status": "failed", "message": "Invalid username or password"}, 400
+
+
+logout_api = api.namespace('logout', description='API Authentication')
+
+
+@logout_api.route('/')
+@api.doc(description="Logout and clear session cookies")
+class LogoutAPI(APIResource):
+
+    @api.response(200, 'Logout successful')
+    def get(self, session=None):
+        flask_session.clear()
+        resp = jsonify({"status": "success"})
+        resp.set_cookie('flexgetToken', '', expires=0)
+        return resp
 
 
 # Schema API

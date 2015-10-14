@@ -12,7 +12,7 @@
       isLoggedIn: function () {
         if (!loggedIn) {
           //TODO: Check if token still valid
-          var token = $cookies.get("flexget_token");
+          var token = $cookies.get("flexgetToken");
           if (token) {
             loggedIn = true;
           }
