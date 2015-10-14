@@ -4,9 +4,8 @@
   var userPlugin = angular.module('userPlugin', ['ngCookies']);
   registerModule(userPlugin);
 
-  userPlugin.run(function($state, $cookieStore, $cookies, toolBar) {
+  userPlugin.run(function($state, toolBar) {
     var logout = function() {
-      $cookieStore.remove('flexgetToken');
       $state.go('login');
     };
 
