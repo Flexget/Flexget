@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var userPlugin = angular.modle('userPlugin', ['ngCookies']);
+  var userPlugin = angular.module('userPlugin', ['ngCookies']);
   registerModule(userPlugin);
 
   userPlugin.run(function($state, toolBar, $http) {
