@@ -72,4 +72,46 @@
     }]);
   }]);
 
+  var authentication = angular.module('authentication', ['flexget.services']);
+  registerModule(authentication);
+
+  authentication.run(function ($rootScope, $state, $http, route, toolBar) {
+    route.register('login', '/login?timeout', 'LoginController', 'plugin/authentication/static/login.html');
+
+    $rootScope.$on('event:auth-loginRequired', function (event, timeout) {
+      $state.go('login', {'timeout': timeout});
+    });
+
+    var logout = function() {
+      $http.get('/api/logout/')
+        .success(function (data, status, headers, config) {
+          $state.go('login');
+        });
+    };
+
+    toolBar.registerMenuItem('Manage', 'Logout', 'fa fa-sign-out', logout, 255);
+  });
+
+  authentication.controller('LoginController', function ($scope, $http, $mdDialog, auth, $stateParams) {
+    $scope.timeout = $stateParams.timeout;
+    $scope.remember = false;
+    $scope.error = '';
+    $scope.credentials = {
+      username: '',
+      password: ''
+    };
+    $scope.login = function () {
+      $http.post('/api/login/?remember=' + $scope.remember, $scope.credentials).success(function() {
+        auth.loginConfirmed();
+      }).error(function(data) {
+        $scope.credentials.password = '';
+        if ('message' in data) {
+          $scope.error = data.message;
+        } else {
+          $scope.error = 'Error during authentication';
+        }
+      });
+    };
+  });
+
 })();

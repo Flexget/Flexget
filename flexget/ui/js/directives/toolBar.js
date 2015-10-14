@@ -18,8 +18,8 @@
                     '<md-button aria-label="{{ item.label }}" class="md-icon-button" ng-click="$mdOpenMenu($event)">' +
                         '<md-icon md-menu-origin class="{{ item.cssClass }}"></md-icon>' +
                     '</md-button>' +
-                    '<md-menu-content width="{{ item.menu.width }}">' +
-                      '<md-menu-item ng-repeat="menuItem in item.menu.items">' +
+                    '<md-menu-content width="{{ item.width }}">' +
+                      '<md-menu-item ng-repeat="menuItem in item.items | orderBy:\'order\'">' +
                         '<md-button ng-click="menuItem.action()"><md-icon md-menu-origin class="{{ menuItem.cssClass }}"></md-icon>{{ menuItem.label }}</md-button>' +
                       '</md-menu-item>' +
                     '</md-menu-content>' +
