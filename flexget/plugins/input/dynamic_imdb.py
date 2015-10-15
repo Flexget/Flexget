@@ -72,10 +72,10 @@ class DynamicIMDB(object):
 
     jobs_without_content_type = ['actor', 'actress', 'self', 'in development', 'archive footage']
 
-    imdb_pattern = {'type': 'string',
-                    'pattern': r'(nm|co|ch)\d{7}',
-                    'error_pattern': 'Get the id from the url of the person/company you want to use,'
-                                     ' e.g. http://imdb.com/text/<id here>/blah'}
+    imdb_pattern = one_or_more({'type': 'string',
+                                'pattern': r'(nm|co|ch)\d{7}',
+                                'error_pattern': 'Get the id from the url of the person/company you want to use,'
+                                                 ' e.g. http://imdb.com/text/<id here>/blah'}, unique_items=True)
 
     schema = {
         'oneOf': [
@@ -94,13 +94,17 @@ class DynamicIMDB(object):
 
     }
 
-
     def prepare_config(self, config):
         """
         Converts config to dict form and sets defaults if needed
         """
-        if not isinstance(config, dict):
+        config = config
+        if isinstance(config, basestring):
+            config = {'id': [config]}
+        elif isinstance(config, list):
             config = {'id': config}
+        if isinstance(config, dict) and not isinstance(config['id'], list):
+            config['id'] = [config['id']]
 
         config.setdefault('content_types', [self.content_types[0]])
         config.setdefault('job_types', [self.job_types[0]])
@@ -118,6 +122,20 @@ class DynamicIMDB(object):
             config['job_types'].append('actress')
 
         return config
+
+    def get_items(self, config):
+        items = []
+        for id in config['id']:
+            try:
+                entity_type, entity_object = self.get_entity_type_and_object(id)
+            except Exception as e:
+                log.error(
+                    'Could not resolve entity via ID: {}. Either error in config or unsupported entity. Error:'.format(
+                        id, e))
+                continue
+            items += self.get_items_by_entity(entity_type, entity_object, config.get('content_types'),
+                                              config.get('job_types'))
+        return set(items)
 
     def get_entity_type_and_object(self, imdb_id):
         """
@@ -237,13 +255,7 @@ class DynamicIMDB(object):
 
         entries = []
         config = self.prepare_config(config)
-        try:
-            entity_type, entity_object = self.get_entity_type_and_object(config.get('id'))
-        except Exception as e:
-            log.error('Could not resolve entity via ID. Either error in config or unsupported entity: %s' % e)
-            return
-        items = self.get_items_by_entity(entity_type, entity_object,
-                                         config.get('content_types'), config.get('job_types'))
+        items = self.get_items(config)
         if not items:
             log.error('Could not get IMDB item list, check your configuration.')
             return
