@@ -162,16 +162,10 @@ class DynamicIMDB(object):
             else:
                 yield el
 
-    def no_empty_objects(self, _list):
-        """
-        Returns list without None objects
-        """
-        return [item for item in _list if item is not None]
-
     def flat_list(self, non_flat_list, remove_none=False):
         flat_list = self.flatten_list(non_flat_list)
         if remove_none:
-            flat_list = self.no_empty_objects(flat_list)
+            flat_list = filter(None, flat_list)
         return flat_list
 
     def filtered_items(self, unfiltered_items, content_types):
@@ -197,7 +191,7 @@ class DynamicIMDB(object):
         return self.filtered_items(unfiltered_items, content_types)
 
     def items_by_content_type(self, person, job_type, content_type):
-        return self.no_empty_objects(person.get(job_type + ' ' + self.content_type_conversion[content_type], []))
+        return filter(None, (person.get(job_type + ' ' + self.content_type_conversion[content_type], [])))
 
     def items_by_job_type(self, person, job_type, content_types):
         items = person.get(job_type, []) if job_type in self.jobs_without_content_type else [
@@ -209,7 +203,7 @@ class DynamicIMDB(object):
             self.items_by_content_type(person, job_type, content_type)
             for content_type in content_types
             ]
-        return self.no_empty_objects(items)
+        return filter(None, items)
 
     def items_by_character(self, character, content_types):
         """
