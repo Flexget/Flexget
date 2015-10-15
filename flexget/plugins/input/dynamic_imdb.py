@@ -170,7 +170,7 @@ class DynamicIMDB(object):
 
     def filtered_items(self, unfiltered_items, content_types):
         items = []
-        unfiltered_items = list(set(unfiltered_items))
+        unfiltered_items = set(unfiltered_items)
         for item in sorted(unfiltered_items):
             self.ia.update(item)
             if item['kind'] in content_types:
