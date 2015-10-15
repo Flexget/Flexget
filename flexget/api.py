@@ -2,6 +2,7 @@ import logging
 import os
 import base64
 import copy
+import json
 
 from time import sleep
 from functools import wraps
@@ -21,7 +22,6 @@ from flexget.event import event
 from flexget.webserver import register_app, get_secret, User
 from flexget.config_schema import process_config, register_config_key, schema_paths, resolve_ref
 from flexget import manager
-from flexget.utils import json
 from flexget.utils.database import with_session
 from flexget.options import get_parser
 
