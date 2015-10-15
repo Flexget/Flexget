@@ -62,6 +62,7 @@ def _empty_unicode_decoder(dict_):
         if value == b'':
             dict_[key] = ''
             continue
+    return dict_
 
 
 def dumps(*args, **kwargs):
