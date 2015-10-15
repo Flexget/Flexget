@@ -270,7 +270,7 @@ def register_parser_arguments():
     del_parser = subparsers.add_parser('delete', help='delete a new user')
     del_parser.add_argument('user', metavar='<username>', help='Login to delete')
 
-    pwd_parser = subparsers.add_parser('passwd', help='delete a new user')
+    pwd_parser = subparsers.add_parser('passwd', help='change password for user')
     pwd_parser.add_argument('user', metavar='<username>', help='User to change password')
     pwd_parser.add_argument('password', metavar='<new password>', help='New Password')
 
