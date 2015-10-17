@@ -100,7 +100,7 @@ class UrlRewriteTorrentleech(object):
         # build the form request:
         data = {'username': config['username'], 'password': config['password'], 'remember_me': 'on', 'submit': 'submit'}
         # POST the login form:
-        login = requests.post('http://torrentleech.org/', data=data)
+        login = requests.post('https://torrentleech.org/', data=data)
 
         if not isinstance(config, dict):
             config = {}
