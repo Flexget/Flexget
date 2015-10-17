@@ -44,6 +44,8 @@ class EstimatesReleasedSeries(object):
                         # before 1970. We can safely assume the episode has been released. See #2739
                         log.debug('tvrage library crash due to date before 1970, assuming released')
                         return datetime(1970, 1, 1)
+                    except ParseError:
+                        log.debug('tvrage parse error: %s' % e)
                     else:
                         if series_info:
                             try:
