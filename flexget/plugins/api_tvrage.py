@@ -222,6 +222,12 @@ def lookup_series(name=None, session=None):
         session.commit()
 
     log.debug('Fetching tvrage info for %s' % name)
+    
+    try:
+        import xml.etree.cElementTree as et
+    except ImportError:
+        import xml.etree.ElementTree as et
+
     try:
         fetched = tvrage.api.Show(name.encode('utf-8'))
     except tvrage.exceptions.ShowNotFound:
@@ -235,7 +241,7 @@ def lookup_series(name=None, session=None):
         # and search directly for tvrage id. This is problematic, because 3rd party TVRage API does not support this.
         raise LookupError('Returned invalid data for "%s". This is often caused when TVRage is missing episode info'
                           % name)
-    except TvrageError as e:
+    except (TvrageError, et.ParseError) as e:
         raise LookupError('Error while accessing tvrage: %s' % e.msg)
 
     # Make sure the result is close enough to the search
