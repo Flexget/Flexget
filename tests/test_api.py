@@ -5,7 +5,7 @@ from mock import patch
 from tests import FlexGetBase, MockManager
 from flexget import __version__
 from flexget.manager import Manager
-from flexget.api import app, API_VERSION
+from flexget.api import app, __version__
 
 from flexget.webserver import User
 from flexget.utils.database import with_session
@@ -96,7 +96,7 @@ class TestServerAPI(APITest):
     def test_version(self):
         rsp = self.get('/server/version/')
         assert rsp.status_code == 200
-        assert json.loads(rsp.data) == {'flexget_version': __version__, 'api_version': API_VERSION}
+        assert json.loads(rsp.data) == {'flexget_version': __version__, 'api_version': __version__}
 
 
 class TestTaskAPI(APITest):
