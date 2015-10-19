@@ -28,7 +28,7 @@ install_requires = [
     'jinja2', 'requests>=1.0, !=2.4.0, <2.99', 'python-dateutil!=2.0, !=2.2', 'jsonschema>=2.0',
     'python-tvrage', 'tmdb3', 'path.py', 'guessit>=0.9.3, <0.10.4', 'apscheduler',
     'flask>=0.7', 'flask-restful>=0.3.3', 'ordereddict>=1.1', 'flask-restplus==0.7.2', 'cherrypy>=3.7.0',
-    'flask-assets>=0.11', 'cssmin>=0.2.0', 'flask-compress>=1.2.1', 'flask-login>=0.3.2'
+    'flask-assets>=0.11', 'cssmin>=0.2.0', 'flask-compress>=1.2.1', 'flask-login>=0.3.2', 'pyparsing>=2.0.3'
 ]
 
 if sys.version_info < (2, 7):
