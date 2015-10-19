@@ -42,9 +42,7 @@ gulp.task('flexget-js', function() {
     .pipe(gulp.dest(staticPath + '/js/'));
 });
 
-gulp.task('js', ['flexget-js', 'vendor-js'], function() {
-  gulp.watch(config.js, ['flexget-js']);
-});
+gulp.task('js', ['flexget-js', 'vendor-js'], function() {});
 
 
 gulp.task('watch:js', function() {
