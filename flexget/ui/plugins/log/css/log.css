@@ -1,13 +1,11 @@
 .log md-input-container, .log md-autocomplete {
-    padding: 2px 2px 2px;
+    padding: 2px 2px 10px;
+    margin-right: 20px;
 }
 
 .log .md-button.md-icon-button {
     margin: 0px !important;
     padding: 0px !important;
-}
-.log md-switch {
-    margin: 2px 2px 2px;
 }
 
 .log-grid .ui-grid-row .ui-grid-cell {
@@ -41,3 +39,21 @@
 .log-grid .summary {
     background-color: #d9edf7;
 }
+
+.log .streaming {
+    color: #78df6a;
+}
+
+.log .connecting {
+    color: rgba(255, 163, 0, 0.75);
+}
+
+.log .disconnected {
+    color: rgba(255, 0, 0, 0.56);
+}
+
+
+.log .stream .md-icon-button md-icon {
+    color: white !important;
+}
+

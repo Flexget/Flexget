@@ -4,8 +4,9 @@ from time import sleep
 
 from flask import Response
 
+from pyparsing import Word, alphanums, Keyword, Group, Forward, Suppress, OneOrMore, oneOf
+
 from flexget.api import api, APIResource, ApiError, __version__ as __api_version__
-from flexget.utils import json
 from flexget._version import __version__
 
 log = logging.getLogger('api.server')
@@ -93,10 +94,7 @@ server_log_parser.add_argument(
     'lines', type=int, required=False, default=200,
     help='How many lines to find before streaming'
 )
-
-log_filter_fields = ['message', 'task', 'asctime', 'levelname', 'name']
-for field in log_filter_fields:
-    server_log_parser.add_argument(field, type=str, required=False, help='Filter by %s' % field)
+server_log_parser.add_argument('search', type=str, required=False, help='Search filter support google like syntax')
 
 
 def reverse_readline(fh, start_byte=0, buf_size=8192):
@@ -141,33 +139,9 @@ class ServerLogAPI(APIResource):
         """ Stream Flexget log Streams as line delimited JSON """
         args = server_log_parser.parse_args()
 
-        def line_filter(line, fields):
-            line = json.loads(line)
+        def follow(lines, search):
+            log_filter = LogFilter(search)
 
-            if not line:
-                return False
-
-            for f, filter_str in fields.iteritems():
-                if not filter_str or f not in line:
-                    continue
-
-                if f == 'levelname':
-                    line_level = logging.getLevelName(line['levelname'])
-                    try:
-                        filter_level = int(filter_str)
-                    except ValueError:
-                        filter_level = logging.getLevelName(filter_str.upper())
-
-                    if line_level < filter_level:
-                        return False
-                    else:
-                        continue
-
-                if filter_str.lower() not in line.get(f, '').lower():
-                    return False
-            return True
-
-        def follow(lines, fields_filter={}):
             with open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'rb') as fh:
                 # Before streaming return existing log lines
                 fh.seek(0, 2)
@@ -178,7 +152,7 @@ class ServerLogAPI(APIResource):
                 for line in reverse_readline(fh, start_byte=stream_from_byte):
                     if len(lines_found) >= lines:
                         break
-                    if line_filter(line, fields_filter):
+                    if log_filter.matches(line):
                         lines_found.append(line)
 
                 for l in reversed(lines_found):
@@ -189,7 +163,7 @@ class ServerLogAPI(APIResource):
                     line = fh.readline()
 
                     # If a valid line is found and does not pass the filter then set it to none
-                    if line and not line_filter(line, fields_filter):
+                    if line and not log_filter.matches(line):
                         line = None
 
                     if not line:
@@ -198,7 +172,95 @@ class ServerLogAPI(APIResource):
                         sleep(0.5)
                     yield line
 
-        max_lines = args['lines']
-        del args['lines']
+        return Response(follow(args['lines'], args['search']), mimetype='text/event-stream')
 
-        return Response(follow(max_lines, args), mimetype='text/event-stream')
+
+class LogFilter:
+    """
+    Filter while parsing log file.
+
+    Supports
+      * 'and', 'or' and implicit 'and' operators;
+      * parentheses;
+      * quoted strings;
+    """
+
+    def __init__(self, query):
+        self._methods = {
+            'and': self.evaluate_and,
+            'or': self.evaluate_or,
+            'not': self.evaluate_not,
+            'parenthesis': self.evaluate_parenthesis,
+            'quotes': self.evaluate_quotes,
+            'word': self.evaluate_word,
+        }
+
+        self.line = ''
+        self.query = query.lower() if query else ''
+
+        if self.query:
+            operator_or = Forward()
+            operator_word = Group(Word(alphanums)).setResultsName('word')
+
+            operator_quotes_content = Forward()
+            operator_quotes_content << (
+                (operator_word + operator_quotes_content) | operator_word
+            )
+
+            operator_quotes = Group(
+                Suppress('"') + operator_quotes_content + Suppress('"')
+            ).setResultsName("quotes") | operator_word
+
+            operator_parenthesis = Group(
+                (Suppress("(") + operator_or + Suppress(")"))
+            ).setResultsName("parenthesis") | operator_quotes
+
+            operator_not = Forward()
+            operator_not << (Group(
+                Suppress(Keyword("not", caseless=True)) + operator_not
+            ).setResultsName("not") | operator_parenthesis)
+
+            operator_and = Forward()
+            operator_and << (Group(
+                operator_not + Suppress(Keyword("and", caseless=True)) + operator_and
+            ).setResultsName("and") | Group(
+                operator_not + OneOrMore(~oneOf("and or") + operator_and)
+            ).setResultsName("and") | operator_not)
+
+            operator_or << (Group(
+                operator_and + Suppress(Keyword("or", caseless=True)) + operator_or
+            ).setResultsName("or") | operator_and)
+
+            self._parser = operator_or.parseString(self.query)[0]
+        else:
+            self._parser = False
+
+    def evaluate_and(self, argument):
+        return self.evaluate(argument[0]) and self.evaluate(argument[1])
+
+    def evaluate_or(self, argument):
+        return self.evaluate(argument[0]) or self.evaluate(argument[1])
+
+    def evaluate_not(self, argument):
+        return not self.evaluate(argument[0])
+
+    def evaluate_parenthesis(self, argument):
+        return self.evaluate(argument[0])
+
+    def evaluate_quotes(self, argument):
+        search_terms = [term[0] for term in argument]
+        return ' '.join(search_terms) in ' '.join(self.line.split())
+
+    def evaluate_word(self, argument):
+        return argument[0] in self.line
+
+    def evaluate(self, argument):
+        return self._methods[argument.getName()](argument)
+
+    def matches(self, line):
+        self.line = line.lower()
+
+        if not self._parser:
+            return True
+        else:
+            return self.evaluate(self._parser)

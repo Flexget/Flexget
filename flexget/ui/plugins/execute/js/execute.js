@@ -1,7 +1,7 @@
 (function () {
   'use strict';
 
-  var executeModule = angular.module("executeModule", ['ngOboe', 'ui.grid', 'ui.grid.autoResize', 'flexget.services']);
+  var executeModule = angular.module("executeModule", ['ui.grid', 'ui.grid.autoResize', 'flexget.services']);
 
   registerModule(executeModule);
 
@@ -10,13 +10,13 @@
     sideNav.register('/execute', 'Execute', 'fa fa-cog', 128);
   });
 
-  executeModule.controller('ExecuteCtrl', ['$scope', 'Oboe', function ($scope, Oboe) {
+  executeModule.controller('ExecuteCtrl', ['$scope', function ($scope) {
     $scope.title = 'Execution';
     $scope.description = 'test123';
   }]);
 
   executeModule.controller('ExecuteLogCtrl',
-    ['$scope', '$filter', 'Oboe', 'uiGridConstants',
+    ['$scope', '$filter', 'uiGridConstants',
       function ($scope, $filter, Oboe, uiGridConstants) {
         var logStream;
         $scope.log = [];
