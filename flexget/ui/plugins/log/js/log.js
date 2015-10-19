@@ -15,7 +15,7 @@
     var logStream = false;
 
     $scope.status = 'Connecting';
-    $scope.lines = 10;
+    $scope.lines = 400;
     $scope.search = '';
 
     $scope.toggleStream = function() {
