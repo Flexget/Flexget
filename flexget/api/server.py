@@ -142,22 +142,37 @@ class ServerLogAPI(APIResource):
         def follow(lines, search):
             log_filter = LogFilter(search)
 
-            with open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'rb') as fh:
-                # Before streaming return existing log lines
-                fh.seek(0, 2)
-                stream_from_byte = fh.tell()
+            lines_found = []
 
-                lines_found = []
-                # Read in reverse for efficiency
-                for line in reverse_readline(fh, start_byte=stream_from_byte):
+            # Read back in the logs until we find enough lines
+            for i in range(0, 2):
+                log_file = ('log-%s.json.%s' % (self.manager.config_name, i)).rstrip(".0")  # 1st log file has no number
+                log_file = os.path.join(self.manager.config_base, log_file)
+
+                if not os.path.isfile(log_file):
+                    break
+
+                with open(os.path.join(self.manager.config_base, log_file), 'rb') as fh:
+                    fh.seek(0, 2)  # Seek to bottom of file
+                    end_byte = fh.tell()
+                    if i == 0:
+                        stream_from_byte = end_byte  # Stream from this point later on
+
                     if len(lines_found) >= lines:
                         break
-                    if log_filter.matches(line):
-                        lines_found.append(line)
 
-                for l in reversed(lines_found):
-                    yield l
+                    # Read in reverse for efficiency
+                    for line in reverse_readline(fh, start_byte=end_byte):
+                        if len(lines_found) >= lines:
+                            break
+                        if log_filter.matches(line):
+                            lines_found.append(line)
 
+                    for l in reversed(lines_found):
+                        yield l
+
+            # Stream log starting where we first read from
+            with open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'rb') as fh:
                 fh.seek(stream_from_byte)
                 while True:
                     line = fh.readline()
@@ -258,6 +273,9 @@ class LogFilter:
         return self._methods[argument.getName()](argument)
 
     def matches(self, line):
+        if not line:
+            return False
+
         self.line = line.lower()
 
         if not self._parser:

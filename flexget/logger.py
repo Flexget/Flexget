@@ -249,7 +249,7 @@ def start(filename=None, filename_json=None, level=logging.INFO, to_console=True
         logger.addHandler(file_handler)
 
         # Additional log in machine readable format for streaming via API
-        json_file_handler = logging.handlers.RotatingFileHandler(filename_json, maxBytes=1000 * 1024, backupCount=0)
+        json_file_handler = logging.handlers.RotatingFileHandler(filename_json, maxBytes=10 * 1024000, backupCount=2)
         json_file_handler.setFormatter(FlexGetJsonFormatter())
         json_file_handler.setLevel(level)
         logger.addHandler(json_file_handler)
