@@ -12,14 +12,16 @@
                 '<span flex></span>' +
                 '<div ng-repeat="item in toolBarItems | orderBy:\'order\'">' +
                   '<md-button aria-label="{{ item.label }}" class="md-icon-button" ng-click="item.action()" ng-if="item.type == \'button\'">' +
+                      '<md-tooltip>{{ item.label }}</md-tooltip>' +
                       '<md-icon md-menu-origin class="{{ item.cssClass }}"></md-icon>' +
                   '</md-button>' +
                   '<md-menu ng-if="item.type == \'menu\'">' +
                     '<md-button aria-label="{{ item.label }}" class="md-icon-button" ng-click="$mdOpenMenu($event)">' +
+                        '<md-tooltip>{{ item.label }}</md-tooltip>' +
                         '<md-icon md-menu-origin class="{{ item.cssClass }}"></md-icon>' +
                     '</md-button>' +
-                    '<md-menu-content width="{{ item.menu.width }}">' +
-                      '<md-menu-item ng-repeat="menuItem in item.menu.items">' +
+                    '<md-menu-content width="{{ item.width }}">' +
+                      '<md-menu-item ng-repeat="menuItem in item.items | orderBy:\'order\'">' +
                         '<md-button ng-click="menuItem.action()"><md-icon md-menu-origin class="{{ menuItem.cssClass }}"></md-icon>{{ menuItem.label }}</md-button>' +
                       '</md-menu-item>' +
                     '</md-menu-content>' +
