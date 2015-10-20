@@ -112,25 +112,26 @@ class Sonarr(object):
         for show in json:
             fg_qualities = ''  # Initializes the quality parameter
             fg_cutoff = ''
-            entry = None
-            if show['monitored'] or not config.get('only_monitored'):  # Checks if to retrieve just monitored shows
-                if config.get('include_ended') or show['status'] != 'ended':  # Checks if to retrieve ended shows
-                    if config.get('include_data') and profiles_json:  # Check if to retrieve quality & path
-                        for profile in profiles_json:
-                            if profile['id'] == show['profileId']:  # Get show's profile data from all possible profiles
-                                fg_qualities, fg_cutoff = self.quality_requirement_builder(profile)
-                    entry = Entry(title=show['title'],
-                                  url='',
-                                  series_name=show['title'],
-                                  tvdb_id=show.get('tvdbId'),
-                                  tvrage_id=show.get('tvRageId'),
-                                  configure_series_qualities=fg_qualities,
-                                  configure_series_target=fg_cutoff)
-                    if entry.isvalid():
-                        entries.append(entry)
-                    else:
-                        log.error('Invalid entry created? %s' % entry)
-                        continue
+            if not show['monitored'] and config.get('only_monitored'):  # Checks if to retrieve just monitored shows
+                continue
+            if show['status'] == 'ended' and not config.get('include_ended'):  # Checks if to retrieve ended shows
+                continue
+            if config.get('include_data') and profiles_json:  # Check if to retrieve quality & path
+                for profile in profiles_json:
+                    if profile['id'] == show['profileId']:  # Get show's profile data from all possible profiles
+                        fg_qualities, fg_cutoff = self.quality_requirement_builder(profile)
+            entry = Entry(title=show['title'],
+                          url='',
+                          series_name=show['title'],
+                          tvdb_id=show.get('tvdbId'),
+                          tvrage_id=show.get('tvRageId'),
+                          configure_series_qualities=fg_qualities,
+                          configure_series_target=fg_cutoff)
+            if entry.isvalid():
+                entries.append(entry)
+            else:
+                log.error('Invalid entry created? %s' % entry)
+                continue
             # Test mode logging
             if entry and task.options.test:
                 log.info("Test mode. Entry includes:")
