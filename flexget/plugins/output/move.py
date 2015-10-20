@@ -150,9 +150,14 @@ class TransformingOps(BaseFileOps):
         src_isdir = os.path.isdir(src)
         src_path, src_name = os.path.split(src)
         
-        # get proper value in order of: entry, config, above split
+        # get the proper path and name in order of: entry, config, above split
         dst_path = entry.get(self.destination_field, config.get('to', src_path))
-        dst_name = entry.get('filename', config.get('filename', src_name))
+        if entry.get('filename') and entry['filename'] != src_name:
+            # entry specifies different filename than what was split from the path
+            # since some inputs fill in filename it must be different in order to be used
+            dst_name = entry['filename']
+        else:
+            dst_name = config.get('filename', src_name)
         
         try:
             dst_path = entry.render(dst_path)
