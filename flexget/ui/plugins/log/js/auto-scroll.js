@@ -15,7 +15,7 @@
   var module = angular.module('ui.grid.autoScroll', ['ui.grid']);
   /**
    *  @ngdoc service
-   *  @name ui.grid.autoScroll.service:uiGridautoScrollService
+   *  @name ui.grid.autoScroll.service:uiGridAutoScrollService
    *
    *  @description Service for auto scroll features
    */
@@ -74,7 +74,6 @@
       handleScroll:  function (args) {
         if (args.y) {
           args.grid.autoScroll.prevScrollPercent = args.y.percentage;
-          console.log('setting to ' +  args.y.percentage);
         }
       },
 
@@ -88,16 +87,18 @@
        * @param {object} args the args from the event
        */
       autoScroll:  function (args) {
-        // Delay to allow new data items to be added to the grid before scrolling
+        // If autoScroll timer is running then cancel and scroll to the bottom
         if (angular.isDefined(args.api.grid.autoScroll.scrollTimeout)) {
           $timeout.cancel(args.api.grid.autoScroll.scrollTimeout);
+          args.api.core.scrollTo(args.api.grid.options.data[args.api.grid.options.data.length - 1]);
         }
-
+        
+        // Delay to allow new data items to be added to the grid before scrolling
         args.api.grid.autoScroll.scrollTimeout = $timeout(function () {
           if (args.api.grid.autoScroll.prevScrollPercent > 0.98) {
             args.api.core.scrollTo(args.api.grid.options.data[args.api.grid.options.data.length - 1]);
           }
-        }, 500);
+        }, 50);
       }
     };
     return service;
@@ -117,15 +118,28 @@
    var app = angular.module('app', ['ui.grid', 'ui.grid.autoScroll']);
 
    app.controller('MainCtrl', ['$scope', function ($scope) {
-      $scope.data = [
-        { name: 'Alex', car: 'Toyota' },
-            { name: 'Sam', car: 'Lexus' }
-      ];
+      var logCount = 1;
 
-      $scope.columnDefs = [
-        {name: 'name'},
-        {name: 'car'}
-      ];
+      $scope.gridOptions = {
+        columnDefs: [
+          {name: 'message'}
+        ],
+        data: []
+      };
+
+      var loadData = function(lines) {
+        for (var i = 0; i < lines; i++) {
+          $scope.gridOptions.data.push({'message': 'log message ' + logCount});
+          logCount++;
+        }
+      };
+
+      $scope.addData = function() {
+        loadData(100);
+      };
+
+      loadData(30);
+
     }]);
    </file>
    <file name="index.html">
