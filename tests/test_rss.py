@@ -27,6 +27,9 @@ class TestInputRSS(object):
             rss:
               <<: *rss
               group_links: yes
+          test_alternate_links:
+            rss:
+              <<: *rss
           test_multiple_links:
             rss:
               <<: *rss
@@ -116,6 +119,12 @@ class TestInputRSS(object):
         for url in urls:
             assert not task.find_entry(title='Multiple enclosures', url=url), \
                 'Should not have created an entry for each enclosure'
+
+    def test_alternate_links(self, execute_task):
+        task = execute_task('test_alternate_links')
+        # Test the link with the preferred type was chosen
+        entry = task.find_entry(title='Alternate links', url='http://localhost/alternate_3_bittorrent')
+        assert entry, 'Link with preferred type was not selected'
 
     def test_multiple_links(self, execute_task):
         task = execute_task('test_multiple_links')
