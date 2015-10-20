@@ -11,7 +11,6 @@ log = logging.getLogger('sickbeard')
 
 
 class Sickbeard(object):
-
     schema = {
         'type': 'object',
         'properties': {
@@ -25,6 +24,23 @@ class Sickbeard(object):
         'required': ['api_key', 'base_url'],
         'additionalProperties': False
     }
+
+    def quality_requirement_builder(self, quality_list):
+        """
+        Translates sickbeards' qualities into format used by Flexget
+        """
+        sb_to_fg = {'sdtv': 'sdtv',
+                    'sddvd': 'dvdrip',
+                    'hdtv': '720p hdtv',
+                    'rawhdtv': '1080p hdtv',
+                    'fullhdtv': '1080p hdtv',
+                    'hdwebdl': '720p webdl',
+                    'fullhdwebdl': '1080p webdl',
+                    'hdbluray': '720p bluray',
+                    'fullhdbluray': '1080p bluray',
+                    'unknown': 'any'}
+
+        return [sb_to_fg[quality] for quality in quality_list]
 
     def on_task_input(self, task, config):
         """
@@ -74,12 +90,6 @@ class Sickbeard(object):
             raise plugin.PluginError('Unable to connect to Sickbeard at %s://%s:%s%s. Error: %s'
                                      % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e))
         entries = []
-        # Dictionary based on SB quality list.
-        qualities = {'Any': '',
-                     'HD': '720p-1080p',
-                     'HD1080p': '1080p',
-                     'HD720p': '720p',
-                     'SD': '<hr'}
         for id, show in json['data'].items():
             fg_quality = ''  # Initializes the quality parameter
             if show['paused'] and config.get('only_monitored'):
@@ -90,15 +100,14 @@ class Sickbeard(object):
                 show_url = '%s:%s/api/%s/?cmd=show&tvdbid=%s' % (config['base_url'], config['port'],
                                                                  config['api_key'], show['tvdbid'])
                 show_json = task.requests.get(show_url).json()
-                sb_quality = show_json['data']['quality']
-                fg_quality = qualities[sb_quality]
+                fg_quality = self.quality_requirement_builder(show_json['data']['quality_details']['initial'])
             entry = Entry(title=show['show_name'],
                           url='',
                           series_name=show['show_name'],
                           tvdb_id=show.get('tvdbid'),
                           tvrage_id=show.get('tvrage_id'),
                           # configure_series plugin requires that all settings will have the configure_series prefix
-                          configure_series_quality=fg_quality)
+                          configure_series_qualities=fg_quality)
             if entry.isvalid():
                 entries.append(entry)
             else:
@@ -111,7 +120,7 @@ class Sickbeard(object):
                 log.info("    Show name: %s" % entry["series_name"])
                 log.info("    TVDB ID: %s" % entry["tvdb_id"])
                 log.info("    TVRAGE ID: %s" % entry["tvrage_id"])
-                log.info("    Quality: %s" % entry["configure_series_quality"])
+                log.info("    Qualities: %s" % entry["configure_series_qualities"])
         return entries
 
 
