@@ -5,12 +5,12 @@ from datetime import timedelta
 from netrc import netrc, NetrcParseError
 import logging
 import base64
-import re
 from urlparse import urlparse
 
 from flexget import plugin, validator
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
 from flexget.utils.tools import parse_timedelta

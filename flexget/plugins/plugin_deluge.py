@@ -4,7 +4,6 @@ import glob
 import logging
 import pkg_resources
 import os
-import re
 import sys
 import time
 import warnings
@@ -12,6 +11,7 @@ import warnings
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils.template import RenderError
 from flexget.utils.pathscrub import pathscrub
 

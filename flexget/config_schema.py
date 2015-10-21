@@ -1,7 +1,6 @@
 from __future__ import absolute_import, division, unicode_literals
 
 import os
-import re
 import urlparse
 import logging
 from collections import defaultdict
@@ -12,6 +11,7 @@ from jsonschema.compat import str_types, int_types
 
 from flexget.event import fire_event
 from flexget.utils import qualities, template
+from flexget.utils import regex as re
 from flexget.utils.tools import parse_timedelta
 
 schema_paths = {}
@@ -217,6 +217,8 @@ def is_regex(instance):
     try:
         return re.compile(instance)
     except re.error as e:
+        if re.regex_module == 're' and instance.startswith('(?'):
+            raise ValueError('Inline flags are only supported if `regex` module is installed. (pip install regex)')
         raise ValueError('Error parsing regex: %s' % e)
 
 

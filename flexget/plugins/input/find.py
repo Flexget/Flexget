@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime
 import logging
-import re
 import sys
 
 from path import path
@@ -10,6 +9,7 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.entry import Entry
+from flexget.utils import regex as re
 
 log = logging.getLogger('find')
 

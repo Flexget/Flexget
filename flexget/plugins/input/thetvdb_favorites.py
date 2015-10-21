@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import urllib2
-import re
 from datetime import datetime, timedelta
 
 from xml.etree import ElementTree
@@ -11,6 +10,7 @@ from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
+from flexget.utils import regex as re
 from flexget.utils.cached_input import cached
 from flexget.utils.database import pipe_list_synonym
 from flexget.utils.sqlalchemy_utils import drop_tables, table_columns

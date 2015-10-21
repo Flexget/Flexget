@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-import re
+from flexget.utils import regex as re
 
 
 class TitleParser(object):

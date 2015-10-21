@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from collections import defaultdict
 import logging
-import re
 from datetime import datetime
 
 from sqlalchemy.orm import relationship
@@ -14,6 +13,7 @@ from flexget.event import event
 from flexget.entry import Entry
 from flexget.logger import console
 from flexget.options import ParseExtrasAction, get_parser
+from flexget.utils import regex as re
 from flexget.utils.sqlalchemy_utils import table_schema, get_index_by_name
 from flexget.utils.tools import strip_html
 from flexget.manager import Session

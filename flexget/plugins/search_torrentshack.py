@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 
 from urllib import quote
 
@@ -8,6 +7,7 @@ from flexget import plugin
 from flexget import validator
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils.soup import get_soup
 from flexget.utils.search import torrent_availability, normalize_unicode, clean_title
 from flexget.utils.requests import Session

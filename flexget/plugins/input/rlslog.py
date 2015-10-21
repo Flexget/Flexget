@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 import time
 
 from requests import RequestException
@@ -8,6 +7,7 @@ from requests import RequestException
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils.imdb import extract_id
 from flexget.utils.log import log_once
 from flexget.utils.soup import get_soup

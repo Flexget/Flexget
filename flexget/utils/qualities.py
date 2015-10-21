@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-import re
 import copy
 import logging
+
+from flexget.utils import regex as re
 
 log = logging.getLogger('utils.qualities')
 

@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import urllib
 import urllib2
-import re
 import cookielib
 from datetime import datetime
 
@@ -10,6 +9,7 @@ from sqlalchemy import Column, Integer, String, DateTime
 
 from flexget import db_schema, plugin
 from flexget.event import event
+from flexget.utils import regex as re
 
 try:
     from flexget.plugins.api_tvdb import lookup_series

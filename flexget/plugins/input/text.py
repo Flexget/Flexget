@@ -1,11 +1,11 @@
 """Plugin for text file or URL feeds via regex."""
 from __future__ import unicode_literals, division, absolute_import
-import re
 import logging
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils.cached_input import cached
 
 log = logging.getLogger('text')

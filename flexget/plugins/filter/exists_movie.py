@@ -1,6 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import
-import os
-import re
 import logging
 
 from path import path
@@ -9,6 +7,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.plugin import get_plugin_by_name
+from flexget.utils import regex as re
 from flexget.utils.tools import TimedDict
 
 log = logging.getLogger('exists_movie')

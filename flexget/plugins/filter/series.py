@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import argparse
 import logging
-import re
 import time
 from copy import copy
 from datetime import datetime, timedelta
@@ -20,6 +19,7 @@ from flexget.utils import qualities
 from flexget.utils.log import log_once
 from flexget.plugins.parsers import SERIES_ID_TYPES
 from flexget.plugin import get_plugin_by_name
+from flexget.utils import regex as re
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta

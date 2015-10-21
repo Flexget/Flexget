@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 import urllib
 
 import feedparser
@@ -9,6 +8,7 @@ import requests
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import regex as re
 from flexget.utils.search import torrent_availability, normalize_unicode
 
 log = logging.getLogger('torrentz')

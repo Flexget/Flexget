@@ -1,12 +1,12 @@
 import logging
 import ftplib
 import os
-import re
 
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.config_schema import one_or_more
+from flexget.utils import regex as re
 
 log = logging.getLogger('ftp_list')
 

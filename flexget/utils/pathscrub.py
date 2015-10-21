@@ -1,7 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import ntpath
 import sys
-import re
+
+from flexget.utils import regex as re
 
 os_mode = None  # Can be 'windows', 'mac', 'linux' or None. None will auto-detect os.
 # Replacement order is important, don't use dicts to store

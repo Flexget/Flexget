@@ -3,7 +3,6 @@ import logging
 import sys
 import os
 import socket
-import re
 import xmlrpclib
 import httplib
 from time import sleep
@@ -15,6 +14,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
 from flexget.config_schema import one_or_more
+from flexget.utils import regex as re
 from flexget.utils.bittorrent import Torrent, is_torrent_file
 
 

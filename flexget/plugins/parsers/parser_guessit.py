@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 
 import datetime
 import logging
-import re
 import time
 
 import guessit
@@ -13,6 +12,7 @@ from guessit.plugins.transformers import Transformer, add_transformer
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
+from flexget.utils import regex as re
 from .parser_common import clean_value, old_assume_quality
 from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie
 

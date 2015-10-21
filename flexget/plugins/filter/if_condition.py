@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import __builtin__
 import logging
-import re
 import datetime
 from copy import copy
 
@@ -9,6 +8,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.task import Task
 from flexget.entry import Entry
+from flexget.utils import regex as re
 
 log = logging.getLogger('if')
 
