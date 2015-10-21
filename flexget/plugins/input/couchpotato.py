@@ -27,8 +27,6 @@ class CouchPotato(object):
         """
         Converts CP's quality profile to a format that can be converted to FlexGet QualityRequirement
         """
-
-        # Converts quality from CP format to Flexget format
         # TODO: Not all values have exact matches in flexget, need to update flexget qualities
         sources = {'BR-Disk': 'remux',  # Not a perfect match, but as close as currently possible
                    'brrip': 'bluray',
@@ -47,9 +45,9 @@ class CouchPotato(object):
         # TODO list is converted to set because if a quality has 3d type in CP, it gets duplicated during the conversion
         # TODO when (and if) 3d is supported in flexget this will be needed to removed
         res_string = '|'.join(
-            set([resolutions[quality] for quality in quality_profile['qualities'] if quality in resolutions.keys()]))
+            set([resolutions[quality] for quality in quality_profile['qualities'] if quality in resolutions]))
         source_string = '|'.join(
-            set([sources[quality] for quality in quality_profile['qualities'] if quality in sources.keys()]))
+            set([sources[quality] for quality in quality_profile['qualities'] if quality in sources]))
 
         return res_string + ' ' + source_string
 
@@ -70,8 +68,8 @@ class CouchPotato(object):
 
         parsedurl = urlparse(config.get('base_url'))
         url = '{}://{}:{}{}/api/{}/movie.list?status=active'.format(parsedurl.scheme, parsedurl.netloc,
-                                                                   config.get('port'), parsedurl.path,
-                                                                   config.get('api_key'))
+                                                                    config.get('port'), parsedurl.path,
+                                                                    config.get('api_key'))
         try:
             json = task.requests.get(url).json()
         except RequestException:
