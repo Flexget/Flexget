@@ -28,8 +28,6 @@ class Sonarr(object):
     def transalte_quality(self, quality_name):
         """
         Translate Sonnar's qualities to ones recognize by Flexget
-        :param quality:
-        :return:
         """
         if quality_name == 'Raw-HD':  # No better match yet in Flexget
             return 'remux'
