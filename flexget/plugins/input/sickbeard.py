@@ -105,9 +105,11 @@ class Sickbeard(object):
                           url='',
                           series_name=show['show_name'],
                           tvdb_id=show.get('tvdbid'),
-                          tvrage_id=show.get('tvrage_id'),
-                          # configure_series plugin requires that all settings will have the configure_series prefix
-                          configure_series_qualities=fg_quality)
+                          tvrage_id=show.get('tvrage_id'))
+            if len(fg_quality) > 1:
+                entry['configure_series_qualities'] = fg_quality
+            else:
+                entry['configure_series_quality'] = fg_quality
             if entry.isvalid():
                 entries.append(entry)
             else:
@@ -120,7 +122,9 @@ class Sickbeard(object):
                 log.info("    Show name: %s" % entry["series_name"])
                 log.info("    TVDB ID: %s" % entry["tvdb_id"])
                 log.info("    TVRAGE ID: %s" % entry["tvrage_id"])
-                log.info("    Qualities: %s" % entry["configure_series_qualities"])
+                log.info("    Quality: {}".format(
+                    entry.get("configure_series_qualities", entry.get("configure_series_quality"))))
+
         return entries
 
 

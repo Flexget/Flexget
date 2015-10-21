@@ -125,8 +125,11 @@ class Sonarr(object):
                           series_name=show['title'],
                           tvdb_id=show.get('tvdbId'),
                           tvrage_id=show.get('tvRageId'),
-                          configure_series_qualities=fg_qualities,
                           configure_series_target=fg_cutoff)
+            if len(fg_qualities) > 1:
+                entry['configure_series_qualities'] = fg_qualities
+            else:
+                entry['configure_series_quality'] = fg_qualities
             if entry.isvalid():
                 entries.append(entry)
             else:
@@ -140,7 +143,8 @@ class Sonarr(object):
                 log.info("    Show name: %s" % entry["series_name"])
                 log.info("    TVDB ID: %s" % entry["tvdb_id"])
                 log.info("    TVRAGE ID: %s" % entry["tvrage_id"])
-                log.info("    Qualities: %s" % entry["configure_series_qualities"])
+                log.info("    Quality: {}".format(
+                    entry.get("configure_series_qualities", entry.get("configure_series_quality"))))
                 log.info("    Target: %s" % entry["configure_series_target"])
         return entries
 
