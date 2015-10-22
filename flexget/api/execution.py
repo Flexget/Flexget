@@ -1,84 +1,101 @@
+import logging
 import os
+from Queue import Queue
+from Queue import Empty
 from time import sleep
 
 from flask import request, jsonify, Response
 
 from flexget.options import get_parser
-from flexget.api import api, APIResource, NotFoundError
+from flexget.api import api, APIResource
 from flexget.utils import json
+from flexget import plugin
+from flexget.event import event
 
 execution_api = api.namespace('execution', description='Execute tasks')
 
 
-def _task_info_dict(task_info):
+log = logging.getLogger('execute_api')
+
+def _task_info_dict(task):
     return {
-        'id': int(task_info.id),
-        'name': task_info.name,
-        'status': task_info.status,
-        'created': task_info.created,
-        'started': task_info.started,
-        'finished': task_info.finished,
-        'message': task_info.message,
-        'log': {'href': '/execution/%s/log/' % task_info.id},
+        'id': int(task.id),
+        'name': task.name,
+        'current_phase': task.current_phase,
+        'current_plugin': task.current_plugin,
     }
 
 
-task_execution_api_schema = {
+task_info_schema = {
     "type": "object",
     "properties": {
-        "created": {"type": "string"},
-        "finished": {"type": "string"},
         "id": {"type": "integer"},
-        "log": {
-            "type": "object",
-            "properties": {
-                "href": {
-                    "type": "string"
-                }
-            }
-        },
-        "message": {"type": "string"},
         "name": {"type": "string"},
-        "started": {"type": "string"},
-        "status": {"type": "string"}
+        "current_phase": {"type": "string"},
+        "current_plugin": {"type": "string"},
     }
 }
 
-tasks_execution_api_schema = {
+execution_results_schema = {
     "type": "object",
     "properties": {
         "tasks": {
             "type": "array",
-            "items": task_execution_api_schema
+            "items": task_info_schema,
         }
     }
 }
 
 
-task_execution_api_schema = api.schema('task_execution', task_execution_api_schema)
-tasks_execution_api_schema = api.schema('tasks_execution', tasks_execution_api_schema)
+execute_task_schema = {
+    "type": "object",
+    "properties": {
+        "tasks": {
+            "type": "array",
+            "items": {"type": "string"}
+        },
+        "opt": {"type": "string"},
+    }
+}
 
 
-@execution_api.route('/')
-@api.doc(description='Execution ID are held in memory, they will be lost upon daemon restart')
-class ExecutionAPI(APIResource):
+execution_api_result_schema = api.schema('execution_result', execution_results_schema)
+execute_api_task_schema = api.schema('execute_task', execute_task_schema)
 
-    @api.response(200, 'list of task executions', tasks_execution_api_schema)
+
+@execution_api.route('/queue/')
+class ExecutionQueueAPI(APIResource):
+
+    @api.response(200, 'Show tasks in queue for execution', execution_api_result_schema)
     def get(self, session=None):
-        """ List task executions
-        List current, pending and previous(hr max) executions
-        """
-        tasks = [_task_info_dict(task_info) for task_info in self.manager.task_queue.tasks_info.itervalues()]
+        """ List task executions """
+        tasks = [_task_info_dict(task) for task in self.manager.task_queue.run_queue.queue]
+
+        if self.manager.task_queue.current_task:
+            tasks.insert(0, _task_info_dict(self.manager.task_queue.current_task))
+
         return jsonify({"tasks": tasks})
 
-    @api.validate(tasks_execution_api_schema)
+
+stream_parser = api.parser()
+stream_parser.add_argument('progress', type=bool, required=False, default=False, help='Stream log data')
+stream_parser.add_argument('log', type=bool, required=False, default=False, help='Stream task log')
+
+_streams = {}
+
+
+@execution_api.route('/execute/')
+@api.doc(description='Execution ID\'s are only valid for the life of the task')
+class ExecutionAPI(APIResource):
+    @api.validate(execute_api_task_schema)
     @api.response(400, 'invalid options specified')
-    @api.response(200, 'list of tasks queued for execution')
+    @api.response(200, 'List of tasks queued for execution')
+    @api.response(200, 'Execution stream with task progress and/or log')
+    @api.doc(parser=stream_parser)
     def post(self, session=None):
-        """ Execute task
-        Return a unique execution ID for tracking and log streaming
-        """
+        """ Execute task(s) """
         kwargs = request.json or {}
+        args = stream_parser.parse_args()
 
         options_string = kwargs.pop('options_string', '')
         if options_string:
@@ -87,44 +104,41 @@ class ExecutionAPI(APIResource):
             except ValueError as e:
                 return {'error': 'invalid options_string specified: %s' % e.message}, 400
 
-        tasks = self.manager.execute(**kwargs)
+        tasks_queued = {'tasks': []}
+        tasks = {}
+        for task_id, task_event in self.manager.execute(options=kwargs):
+            tasks[task_id] = task_event
 
-        return {"tasks": [_task_info_dict(self.manager.task_queue.tasks_info[task_id]) for task_id, event in tasks]}
+        for queued_task in self.manager.task_queue.run_queue.queue:
+            if queued_task.id in tasks.keys():
+                tasks_queued['tasks'].append({'id': queued_task.id, 'name': queued_task.name})
 
+        if not args['progress'] and not args['log']:
+            return tasks_queued
 
-@api.doc(params={'exec_id': 'Execution ID of the Task'})
-@api.doc(description='Execution ID are held in memory, they will be lost upon daemon restart')
-@execution_api.route('/<exec_id>/')
-class ExecutionTaskAPI(APIResource):
+        # Insert streams for each task
+        for task_id in tasks.keys():
+            _streams[task_id] = Queue()
 
-    @api.response(NotFoundError, 'task execution not found')
-    @api.response(200, 'list of tasks queued for execution', task_execution_api_schema)
-    def get(self, exec_id, session=None):
-        """ Status of existing task execution """
-        task_info = self.manager.task_queue.tasks_info.get(exec_id)
+        def execute_stream():
 
-        if not task_info:
-            raise NotFoundError('%s not found' % exec_id)
+            # First return the tasks to execute
+            yield json.dumps(tasks_queued)
 
-        return _task_info_dict(task_info)
+            for task_id, task_event in tasks.iteritems():
+                stream = _streams[task_id]
 
+                while True:
+                    try:
+                        update = stream.get(timeout=1)
+                        yield json.dumps({'progress': {task_id: update}}) + '\n'
+                    except Empty:
+                        continue
 
-@api.doc(params={'exec_id': 'Execution ID of the Task'})
-@api.doc(description='Execution ID are held in memory, they will be lost upon daemon restart')
-@execution_api.route('/<exec_id>/log/')
-class ExecutionTaskLogAPI(APIResource):
-    @api.response(200, 'Streams as line delimited JSON')
-    @api.response(NotFoundError, 'task log not found')
-    def get(self, exec_id, session=None):
-        """ Log stream of executed task
-        Streams as line delimited JSON
-        """
-        task_info = self.manager.task_queue.tasks_info.get(exec_id)
+                    if not task_event.is_set() and stream.empty():
+                        break
 
-        if not task_info:
-            raise NotFoundError('%s not found' % exec_id)
-
-        def follow():
+            """
             f = open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'r')
             while True:
                 if not task_info.started:
@@ -144,5 +158,36 @@ class ExecutionTaskLogAPI(APIResource):
                 if record.get('task_id') != exec_id:
                     continue
                 yield line
+            """
 
-        return Response(follow(), mimetype='text/event-stream')
+        return Response(execute_stream(), mimetype='text/event-stream')
+
+
+def queue_update(task):
+    stream = _streams[task.id]
+
+    progress = {
+        'entries': {
+            'accepted': [entry for entry in task.accepted],
+            'rejected': [entry for entry in task.rejected],
+            'failed': [entry for entry in task.failed],
+        },
+        'phase': task.current_phase,
+        'plugin': task.current_plugin,
+    }
+
+    stream.put({'progress': progress})
+
+
+@event('task.execute.completed')
+def finish_progress(task):
+    if task.id not in _streams:
+        return
+    queue_update(task)
+
+
+@event('task.execute.before_plugin')
+def track_progress(task, plugin_name):
+    if task.id not in _streams:
+        return
+    queue_update(task)
