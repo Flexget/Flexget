@@ -123,7 +123,7 @@ class ExecutionAPI(APIResource):
         def execute_stream():
 
             # First return the tasks to execute
-            yield json.dumps(tasks_queued)
+            yield json.dumps(tasks_queued) + '\n'
 
             for task_id, task_event in tasks.iteritems():
                 stream = _streams[task_id]
@@ -133,9 +133,9 @@ class ExecutionAPI(APIResource):
                         update = stream.get(timeout=1)
                         yield json.dumps({'progress': {task_id: update}}) + '\n'
                     except Empty:
-                        continue
+                        pass
 
-                    if not task_event.is_set() and stream.empty():
+                    if task_event.is_set() and stream.empty():
                         break
 
             """
@@ -168,9 +168,9 @@ def queue_update(task):
 
     progress = {
         'entries': {
-            'accepted': [entry for entry in task.accepted],
-            'rejected': [entry for entry in task.rejected],
-            'failed': [entry for entry in task.failed],
+            'accepted': [entry['title'] for entry in task.accepted],
+            'rejected': [entry['title'] for entry in task.rejected],
+            'failed': [entry['title'] for entry in task.failed],
         },
         'phase': task.current_phase,
         'plugin': task.current_plugin,
