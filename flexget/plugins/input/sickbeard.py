@@ -109,21 +109,17 @@ class Sickbeard(object):
             if len(fg_quality) > 1:
                 entry['configure_series_qualities'] = fg_quality
             else:
-                entry['configure_series_quality'] = fg_quality
+                entry['configure_series_quality'] = fg_quality[0]
             if entry.isvalid():
                 entries.append(entry)
             else:
                 log.error('Invalid entry created? %s' % entry)
+                continue
             # Test mode logging
             if task.options.test:
                 log.info("Test mode. Entry includes:")
-                log.info("    Title: %s" % entry["title"])
-                log.info("    URL: %s" % entry["url"])
-                log.info("    Show name: %s" % entry["series_name"])
-                log.info("    TVDB ID: %s" % entry["tvdb_id"])
-                log.info("    TVRAGE ID: %s" % entry["tvrage_id"])
-                log.info("    Quality: {}".format(
-                    entry.get("configure_series_qualities", entry.get("configure_series_quality"))))
+                for key, value in entry.items():
+                    log.info('     {}: {}'.format(key.capitalize(), value))
 
         return entries
 

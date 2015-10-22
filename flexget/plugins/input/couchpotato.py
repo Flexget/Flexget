@@ -114,11 +114,8 @@ class CouchPotato(object):
                 # Test mode logging
                 if entry and task.options.test:
                     log.info("Test mode. Entry includes:")
-                    log.info("    Title: {}".format(entry["title"]))
-                    log.info("    URL: {}".format(entry["url"]))
-                    log.info("    IMDB ID: {}".format(entry["imdb_id"]))
-                    log.info("    TMDB ID: {}".format(entry["tmdb_id"]))
-                    log.info("    Quality: {}".format(entry["quality_req"]))
+                    for key, value in entry.items():
+                        log.info('     {}: {}'.format(key.capitalize(), value))
 
         return entries
 
