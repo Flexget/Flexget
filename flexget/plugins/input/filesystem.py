@@ -72,7 +72,7 @@ class Filesystem(object):
                  'path': paths,
                  'mask': {'type': 'string'},
                  'regexp': {'type': 'string', 'format': 'regex'},
-                 'recursive': {'oneOf': [{'type': 'integer'}, {'type': 'boolean'}]},
+                 'recursive': {'oneOf': [{'type': 'integer', 'minimum': 2}, {'type': 'boolean'}]},
                  'retrieve': one_or_more({'type': 'string', 'enum': retrieval_options}, unique_items=True)
              },
              'required': ['path'],
