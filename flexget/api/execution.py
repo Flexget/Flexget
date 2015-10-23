@@ -84,6 +84,11 @@ stream_parser.add_argument('log', type=bool, required=False, default=False, help
 _streams = {}
 
 
+class ExecStream(Queue):
+    def write(self, s):
+        self.put(json.dumps({'log': s}))
+
+
 @execution_api.route('/execute/')
 @api.doc(description='Execution ID\'s are only valid for the life of the task')
 class ExecutionAPI(APIResource):
@@ -94,19 +99,24 @@ class ExecutionAPI(APIResource):
     @api.doc(parser=stream_parser)
     def post(self, session=None):
         """ Execute task(s) """
-        kwargs = request.json or {}
+        options = request.json or {}
         args = stream_parser.parse_args()
 
-        options_string = kwargs.pop('options_string', '')
+        options_string = options.pop('options_string', '')
         if options_string:
             try:
-                kwargs['options'] = get_parser('execute').parse_args(options_string, raise_errors=True)
+                options['options'] = get_parser('execute').parse_args(options_string, raise_errors=True)
             except ValueError as e:
                 return {'error': 'invalid options_string specified: %s' % e.message}, 400
 
+        if args['progress'] or args['log']:
+            stream = ExecStream()
+
+        output = stream if args['log'] else None
+
         tasks_queued = {'tasks': []}
         tasks = {}
-        for task_id, task_event in self.manager.execute(options=kwargs):
+        for task_id, task_event in self.manager.execute(options=options, output=output):
             tasks[task_id] = task_event
 
         for queued_task in self.manager.task_queue.run_queue.queue:
@@ -116,54 +126,30 @@ class ExecutionAPI(APIResource):
         if not args['progress'] and not args['log']:
             return tasks_queued
 
-        # Insert streams for each task
+        # Insert stream for each task
         for task_id in tasks.keys():
-            _streams[task_id] = Queue()
+            _streams[task_id] = stream
 
-        def execute_stream():
-
+        def stream_response():
             # First return the tasks to execute
             yield json.dumps(tasks_queued) + '\n'
 
-            for task_id, task_event in tasks.iteritems():
-                stream = _streams[task_id]
-
-                while True:
-                    try:
-                        update = stream.get(timeout=1)
-                        yield json.dumps({'progress': {task_id: update}}) + '\n'
-                    except Empty:
-                        pass
-
-                    if task_event.is_set() and stream.empty():
-                        break
-
-            """
-            f = open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'r')
             while True:
-                if not task_info.started:
+                try:
+                    yield stream.get(timeout=1) + '\n'
                     continue
+                except Empty:
+                    pass
 
-                # First check if it has finished, if there is no new lines then we can return
-                finished = task_info.finished is not None
-                line = f.readline()
-                if not line:
-                    if finished:
-                        return
-                    sleep(0.5)
-                    line = '{}'
-                    yield line
+                if stream.empty() and all([e.is_set() for e in tasks.itervalues()]):
+                    for task_id in tasks.keys():
+                        del _streams[task_id]
+                    break
 
-                record = json.loads(line)
-                if record.get('task_id') != exec_id:
-                    continue
-                yield line
-            """
-
-        return Response(execute_stream(), mimetype='text/event-stream')
+        return Response(stream_response(), mimetype='text/event-stream')
 
 
-def queue_update(task):
+def update_stream(task):
     stream = _streams[task.id]
 
     progress = {
@@ -176,18 +162,18 @@ def queue_update(task):
         'plugin': task.current_plugin,
     }
 
-    stream.put({'progress': progress})
+    stream.put(json.dumps({'progress': {task.id: progress}}))
 
 
 @event('task.execute.completed')
 def finish_progress(task):
     if task.id not in _streams:
         return
-    queue_update(task)
+    update_stream(task)
 
 
 @event('task.execute.before_plugin')
 def track_progress(task, plugin_name):
     if task.id not in _streams:
         return
-    queue_update(task)
+    update_stream(task)
