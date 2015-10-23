@@ -1,11 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from datetime import datetime
 import logging
 import re
-import sys
 import os
 
-from path import path
+from path import Path
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -149,7 +147,7 @@ class Filesystem(object):
 
         for folder in path_list:
             log.verbose('Scanning folder {}. Recursion is set to {}.'.format(folder, recursion))
-            folder = path(folder).expanduser()
+            folder = Path(folder).expanduser()
             log.debug('Scanning %s' % folder)
             base_depth = len(folder.splitall())
             max_depth = self.get_max_depth(recursion, base_depth)
