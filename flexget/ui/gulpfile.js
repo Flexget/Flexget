@@ -1,7 +1,1 @@
-require('./gulp/gulpFile.js');
-
-
-
-
-
-
+require('./gulp/gulpfile.js');
