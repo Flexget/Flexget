@@ -126,8 +126,10 @@ class Sonarr(object):
                           configure_series_target=fg_cutoff)
             if len(fg_qualities) > 1:
                 entry['configure_series_qualities'] = fg_qualities
-            else:
+            elif len(fg_qualities) == 1:
                 entry['configure_series_quality'] = fg_qualities[0]
+            else:
+                entry['configure_series_quality'] = fg_qualities
             if entry.isvalid():
                 entries.append(entry)
             else:

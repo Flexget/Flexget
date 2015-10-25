@@ -91,7 +91,7 @@ class Sickbeard(object):
                                      % (parsedurl.scheme, parsedurl.netloc, config.get('port'), parsedurl.path, e))
         entries = []
         for id, show in json['data'].items():
-            fg_quality = ''  # Initializes the quality parameter
+            fg_qualities = ''  # Initializes the quality parameter
             if show['paused'] and config.get('only_monitored'):
                 continue
             if show['status'] == 'Ended' and not config.get('include_ended'):
@@ -100,16 +100,18 @@ class Sickbeard(object):
                 show_url = '%s:%s/api/%s/?cmd=show&tvdbid=%s' % (config['base_url'], config['port'],
                                                                  config['api_key'], show['tvdbid'])
                 show_json = task.requests.get(show_url).json()
-                fg_quality = self.quality_requirement_builder(show_json['data']['quality_details']['initial'])
+                fg_qualities = self.quality_requirement_builder(show_json['data']['quality_details']['initial'])
             entry = Entry(title=show['show_name'],
                           url='',
                           series_name=show['show_name'],
                           tvdb_id=show.get('tvdbid'),
                           tvrage_id=show.get('tvrage_id'))
-            if len(fg_quality) > 1:
-                entry['configure_series_qualities'] = fg_quality
+            if len(fg_qualities) > 1:
+                entry['configure_series_qualities'] = fg_qualities
+            elif len(fg_qualities) == 1:
+                entry['configure_series_quality'] = fg_qualities[0]
             else:
-                entry['configure_series_quality'] = fg_quality[0]
+                entry['configure_series_quality'] = fg_qualities
             if entry.isvalid():
                 entries.append(entry)
             else:
