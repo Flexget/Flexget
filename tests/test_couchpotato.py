@@ -22,7 +22,7 @@ class TestCouchpotato(FlexGetBase):
     def test_couchpotato(self, mock_get):
 
         mock_response = mock.Mock()
-        mock_response.json.return_value = movie_list_response
+        mock_response.return_value = movie_list_response
         mock_get.return_value = mock_response
 
         self.execute_task('couch')
