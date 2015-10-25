@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
-import os
+from datetime import datetime
 
 from path import Path
 
@@ -111,7 +111,7 @@ class Filesystem(object):
         else:
             entry['title'] = filepath.name
         try:
-            entry['timestamp'] = os.path.getmtime(filepath)
+            entry['timestamp'] = datetime.fromtimestamp(filepath.getmtime())
         except Exception as e:
             log.warning('Error setting timestamp for %s: %s' % (filepath, e))
             entry['timestamp'] = None
