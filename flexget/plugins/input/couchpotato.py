@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 from urlparse import urlparse
 import logging
+import requests
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
@@ -23,6 +24,53 @@ class CouchPotato(object):
         'additionalProperties': False
     }
 
+    @staticmethod
+    def build_url(base_url, request_type, port, api_key):
+        parsedurl = urlparse(base_url)
+        if request_type == 'active':
+            return '{}://{}:{}{}/api/{}/movie.list?status=active'.format(parsedurl.scheme, parsedurl.netloc, port,
+                                                                         parsedurl.path, api_key)
+        elif request_type == 'profiles':
+            return '{}://{}:{}{}/api/{}/profile.list'.format(parsedurl.scheme, parsedurl.netloc, port, parsedurl.path,
+                                                             api_key)
+        else:
+            raise plugin.PluginError('Invalid API request')
+
+    @staticmethod
+    def get_json(url):
+        try:
+            return requests.get(url).json()
+        except RequestException as e:
+            raise plugin.PluginError('Unable to connect to Couchpotato at {}. Error: {}'.format(url, e))
+
+    def quality_requirement_builder(self, quality_profile):
+        """
+        Converts CP's quality profile to a format that can be converted to FlexGet QualityRequirement
+        """
+        # TODO: Not all values have exact matches in flexget, need to update flexget qualities
+        sources = {'BR-Disk': 'remux',  # Not a perfect match, but as close as currently possible
+                   'brrip': 'bluray',
+                   'dvdr': 'dvdrip',  # Not a perfect match, but as close as currently possible
+                   'dvdrip': 'dvdrip',
+                   'scr': 'dvdscr',
+                   'r5': 'r5',
+                   'tc': 'tc',
+                   'ts': 'ts',
+                   'cam': 'cam'}
+
+        resolutions = {'1080p': '1080p',
+                       '720p': '720p'}
+
+        # Separate strings are needed for each QualityComponent
+        # TODO list is converted to set because if a quality has 3d type in CP, it gets duplicated during the conversion
+        # TODO when (and if) 3d is supported in flexget this will be needed to removed
+        res_string = '|'.join(
+            set([resolutions[quality] for quality in quality_profile['qualities'] if quality in resolutions]))
+        source_string = '|'.join(
+            set([sources[quality] for quality in quality_profile['qualities'] if quality in sources]))
+
+        return res_string + ' ' + source_string
+
     def on_task_input(self, task, config):
         """Creates an entry for each item in your couchpotato wanted list.
 
@@ -37,79 +85,40 @@ class CouchPotato(object):
         Options base_url and api_key are required.
         When the include_data property is set to true, the
         """
-
-        parsedurl = urlparse(config.get('base_url'))
-        url = '%s://%s:%s%s/api/%s/movie.list?status=active' \
-              % (parsedurl.scheme, parsedurl.netloc,
-                 config.get('port'), parsedurl.path, config.get('api_key'))
-        try:
-            json = task.requests.get(url).json()
-        except RequestException:
-            raise plugin.PluginError('Unable to connect to Couchpotato at %s://%s:%s%s.'
-                                     % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
-                                        parsedurl.path))
-        entries = []
-
-        # Converts quality from CP format to Flexget format
-        # TODO: Not all values have exact matches in flexget, need to update flexget qualities
-
-        cp_to_flexget = {'BR-Disk': 'remux',  # Not a perfect match, but as close as currently possible
-                         '1080p': '1080p',
-                         '720p': '720p',
-                         'brrip': 'bluray',
-                         'dvdr': 'dvdrip',  # Not a perfect match, but as close as currently possible
-                         'dvdrip': 'dvdrip',
-                         'scr': 'dvdscr',
-                         'r5': 'r5',
-                         'tc': 'tc',
-                         'ts': 'ts',
-                         'cam': 'cam'}
-
+        active_movies_url = self.build_url(config.get('base_url'), 'active', config.get('port'), config.get('api_key'))
+        active_movies_json = self.get_json(active_movies_url)
         # Gets profile and quality lists if include_data is TRUE
         if config.get('include_data'):
-            profile_url = '%s://%s:%s%s/api/%s/profile.list' \
-                          % (parsedurl.scheme, parsedurl.netloc,
-                             config.get('port'), parsedurl.path, config.get('api_key'))
-            try:
-                profile_json = task.requests.get(profile_url).json()
-            except RequestException as e:
-                raise plugin.PluginError('Unable to connect to Couchpotato at %s://%s:%s%s. Error: %s'
-                                         % (parsedurl.scheme, parsedurl.netloc, config.get('port'),
-                                            parsedurl.path, e))
+            profile_url = self.build_url(config.get('base_url'), 'profiles', config.get('port'), config.get('api_key'))
+            profile_json = self.get_json(profile_url)
 
-        for movie in json['movies']:
-            quality = ''
+        entries = []
+        for movie in active_movies_json['movies']:
+            quality_req = ''
             if movie['status'] == 'active':
-                if config.get('include_data'):
+                if config.get('include_data') and profile_json:
                     for profile in profile_json['list']:
                         if profile['_id'] == movie['profile_id']:  # Matches movie profile with profile JSON
-                            # Creates a string of flexget qualities from CP's qualities list
-                            converted_list = ', '.join([cp_to_flexget[quality] for quality in profile['qualities']])
-                            try:
-                                quality = qualities.Quality(converted_list)  # Return the best components from the list
-                            except ValueError as e:
-                                log.debug(e)
-                title = movie["title"]
-                imdb = movie['info'].get('imdb')
-                tmdb = movie['info'].get('tmdb_id')
-                entry = Entry(title=title,
+                            quality_req = self.quality_requirement_builder(profile)
+                entry = Entry(title=movie["title"],
                               url='',
-                              imdb_id=imdb,
-                              tmdb_id=tmdb,
-                              quality=quality)
+                              imdb_id=movie['info'].get('imdb'),
+                              tmdb_id=movie['info'].get('tmdb_id'),
+                              quality_req=quality_req)
                 if entry.isvalid():
                     entries.append(entry)
                 else:
-                    log.error('Invalid entry created? %s' % entry)
+                    log.error('Invalid entry created? {}' % entry)
+                    continue
                 # Test mode logging
                 if entry and task.options.test:
                     log.info("Test mode. Entry includes:")
-                    log.info("    Title: %s" % entry["title"])
-                    log.info("    URL: %s" % entry["url"])
-                    log.info("    IMDB ID: %s" % entry["imdb_id"])
-                    log.info("    TMDB ID: %s" % entry["tmdb_id"])
-                    log.info("    Quality: %s" % entry["quality"])
-                    continue
+                    log.info("    Title: {}".format(entry["title"]))
+                    log.info("    URL: {}".format(entry["url"]))
+                    log.info("    IMDB ID: {}".format(entry["imdb_id"]))
+                    log.info("    TMDB ID: {}".format(entry["tmdb_id"]))
+                    log.info("    Quality: {}".format(entry["quality_req"]))
+
         return entries
 
 
