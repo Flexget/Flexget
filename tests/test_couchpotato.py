@@ -1,9 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import json
 import mock
-from tests import FlexGetBase, use_vcr
-
-from flexget.plugins.input.couchpotato import CouchPotato
+from tests import FlexGetBase
 
 movie_list_file = 'couchpotoato_test_reponse.json'
 with open(movie_list_file, "r") as data:
@@ -20,10 +18,16 @@ class TestCouchpotato(FlexGetBase):
             api_key: '123abc'
         """
 
-    @mock.patch('flexget.plugins.input.couchpotato.get_json')
+    @mock.patch('flexget.plugins.input.couchpotato.CouchPotato.get_json')
     def test_couchpotato(self, mock_get):
 
-        mock_get.return_value = movie_list_response
-        mock_get.assert_call_once_with(url='http://test.url.com')
+        mock_response = mock.Mock()
+        mock_response.json.return_value = movie_list_response
+        mock_get.return_value = mock_response
+
+        self.execute_task('couch')
+
+        assert mock_get.called
+
 
 

@@ -5,7 +5,6 @@ import requests
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
-from flexget.utils import qualities
 from requests import RequestException
 
 log = logging.getLogger('couchpotato')
@@ -33,8 +32,6 @@ class CouchPotato(object):
         elif request_type == 'profiles':
             return '{}://{}:{}{}/api/{}/profile.list'.format(parsedurl.scheme, parsedurl.netloc, port, parsedurl.path,
                                                              api_key)
-        else:
-            raise plugin.PluginError('Invalid API request')
 
     @staticmethod
     def get_json(url):
