@@ -38,10 +38,11 @@
                             <div ng-if="task.status != 'complete'">{{ task.status }} ({{ task.phase }}| {{ task.plugin }})</div>
                         </div>
                         <div ng-repeat="entry in task.entries" ng-class="entry.state">
-                            {{ entry.title }}
                             <span class="fa fa-check-circle" ng-if="entry.state == 'accepted'"></span>
                             <span class="fa fa-check-warning" ng-if="entry.state == 'failed'"></span>
                             <span class="fa fa-times-circle" ng-if="entry.state == 'rejected'"></span>
+                            {{ entry.title }}
+                            <span ng-if="entry.reason">({{ entry.reason }})</span>
                         </div>
                     </div>
                     <div></div>

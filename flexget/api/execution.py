@@ -1,8 +1,5 @@
-import logging
-import os
 from Queue import Queue
 from Queue import Empty
-from time import sleep
 
 from flask import request, jsonify, Response
 
@@ -15,8 +12,6 @@ from flexget.event import event
 execution_api = api.namespace('execution', description='Execute tasks')
 
 
-log = logging.getLogger('execute_api')
-
 def _task_info_dict(task):
     return {
         'id': int(task.id),
@@ -27,34 +22,34 @@ def _task_info_dict(task):
 
 
 task_info_schema = {
-    "type": "object",
-    "properties": {
-        "id": {"type": "integer"},
-        "name": {"type": "string"},
-        "current_phase": {"type": "string"},
-        "current_plugin": {"type": "string"},
+    'type': 'object',
+    'properties': {
+        'id': {'type': 'integer'},
+        'name': {'type': 'string'},
+        'current_phase': {'type': 'string'},
+        'current_plugin': {'type': 'string'},
     }
 }
 
 execution_results_schema = {
-    "type": "object",
-    "properties": {
-        "tasks": {
-            "type": "array",
-            "items": task_info_schema,
+    'type': 'object',
+    'properties': {
+        'tasks': {
+            'type': 'array',
+            'items': task_info_schema,
         }
     }
 }
 
 
 execute_task_schema = {
-    "type": "object",
-    "properties": {
-        "tasks": {
-            "type": "array",
-            "items": {"type": "string"}
+    'type': 'object',
+    'properties': {
+        'tasks': {
+            'type': 'array',
+            'items': {'type': 'string'}
         },
-        "opt": {"type": "string"},
+        'opt': {'type': 'string'},
     }
 }
 
@@ -74,7 +69,7 @@ class ExecutionQueueAPI(APIResource):
         if self.manager.task_queue.current_task:
             tasks.insert(0, _task_info_dict(self.manager.task_queue.current_task))
 
-        return jsonify({"tasks": tasks})
+        return jsonify({'tasks': tasks})
 
 
 @execution_api.route('/execute/')
@@ -197,13 +192,16 @@ def track_progress(task, plugin_name):
 
 
 def on_entry_action(entry, act=None, reason=None, **kwargs):
+    if not reason and entry.get('%s_by' % act):
+        reason = '%s by %s' % (act, entry['%s_by' % act])
+
     entry.task.stream.put(json.dumps({
         'entry': {
             entry.task.id: {
                 'title': entry['title'],
                 'url': entry['url'],
                 'state': act,
-                'reason': reason if reason else entry.get('Accepted by %s_by' % act),
+                'reason': reason,
             }
         }
     }))
