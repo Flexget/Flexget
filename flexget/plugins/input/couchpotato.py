@@ -66,7 +66,7 @@ class CouchPotato(object):
         source_string = '|'.join(
             set([sources[quality] for quality in quality_profile['qualities'] if quality in sources]))
 
-        return res_string + ' ' + source_string
+        return (res_string + ' ' + source_string).rstrip()
 
     def on_task_input(self, task, config):
         """Creates an entry for each item in your couchpotato wanted list.
