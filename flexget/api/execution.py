@@ -77,24 +77,48 @@ class ExecutionQueueAPI(APIResource):
         return jsonify({"tasks": tasks})
 
 
-stream_parser = api.parser()
-stream_parser.add_argument('progress', type=bool, required=False, default=False, help='Stream log data')
-stream_parser.add_argument('log', type=bool, required=False, default=False, help='Stream task log')
-
-_streams = {}
-
-
-class ExecStream(Queue):
-    def write(self, s):
-        self.put(json.dumps({'log': s}))
-
-
 @execution_api.route('/execute/')
 @api.doc(description='Execution ID\'s are only valid for the life of the task')
 class ExecutionAPI(APIResource):
     @api.validate(execute_api_task_schema)
     @api.response(400, 'invalid options specified')
     @api.response(200, 'List of tasks queued for execution')
+    def post(self, session=None):
+        """ Execute task(s) """
+        options = request.json or {}
+        args = stream_parser.parse_args()
+
+        options_string = options.pop('options_string', '')
+        if options_string:
+            try:
+                options['options'] = get_parser('execute').parse_args(options_string, raise_errors=True)
+            except ValueError as e:
+                return {'error': 'invalid options_string specified: %s' % e.message}, 400
+
+        tasks = [{'id': task_id, 'name': task_name}
+                 for task_id, task_name, task_event
+                 in self.manager.execute(options=options)]
+
+        return {'tasks': tasks}
+
+
+class LogStream(Queue):
+    def write(self, s):
+        self.put(json.dumps({'log': s}))
+
+
+stream_parser = api.parser()
+stream_parser.add_argument('progress', type=bool, required=False, default=True, help='Stream log data')
+stream_parser.add_argument('log', type=bool, required=False, default=True, help='Stream task log')
+
+_streams = {}
+
+
+@execution_api.route('/stream/')
+@api.doc(description='Execution ID\'s are only valid for the life of the task')
+class ExecutionAPIStream(APIResource):
+    @api.validate(execute_api_task_schema)
+    @api.response(400, 'invalid options specified')
     @api.response(200, 'Execution stream with task progress and/or log')
     @api.doc(parser=stream_parser)
     def post(self, session=None):
@@ -110,54 +134,41 @@ class ExecutionAPI(APIResource):
                 return {'error': 'invalid options_string specified: %s' % e.message}, 400
 
         if args['progress'] or args['log']:
-            stream = ExecStream()
+            stream = LogStream()
 
         output = stream if args['log'] else None
 
-        tasks_queued = {'tasks': []}
-        tasks = {}
-        for task_id, task_event in self.manager.execute(options=options, output=output):
-            tasks[task_id] = task_event
+        tasks_queued = []
 
-        for queued_task in self.manager.task_queue.run_queue.queue:
-            if queued_task.id in tasks.keys():
-                tasks_queued['tasks'].append({'id': queued_task.id, 'name': queued_task.name})
-
-        if not args['progress'] and not args['log']:
-            return tasks_queued
-
-        # Insert stream for each task
-        for task_id in tasks.keys():
+        for task_id, task_name, task_event in self.manager.execute(options=options, output=output):
+            tasks_queued.append({'id': task_id, 'name': task_name, 'event': task_event})
             _streams[task_id] = stream
 
         def stream_response():
             # First return the tasks to execute
-            yield json.dumps(tasks_queued) + '\n'
+            yield '{"stream": ['
+            yield json.dumps({'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}) + ','
 
             while True:
                 try:
-                    yield stream.get(timeout=1) + '\n'
+                    yield stream.get(timeout=1) + ','
                     continue
                 except Empty:
                     pass
 
-                if stream.empty() and all([e.is_set() for e in tasks.itervalues()]):
-                    for task_id in tasks.keys():
-                        del _streams[task_id]
+                if stream.empty() and all([task['event'].is_set() for task in tasks_queued]):
+                    for task in tasks_queued:
+                        del _streams[task['id']]
                     break
-
+            yield '{}]}'
         return Response(stream_response(), mimetype='text/event-stream')
 
 
-def update_stream(task):
+def update_stream(task, status='pending'):
     stream = _streams[task.id]
 
     progress = {
-        'entries': {
-            'accepted': [entry['title'] for entry in task.accepted],
-            'rejected': [entry['title'] for entry in task.rejected],
-            'failed': [entry['title'] for entry in task.failed],
-        },
+        'status': status,
         'phase': task.current_phase,
         'plugin': task.current_plugin,
     }
@@ -165,15 +176,64 @@ def update_stream(task):
     stream.put(json.dumps({'progress': {task.id: progress}}))
 
 
+@event('task.execute.started')
+def start_progress(task):
+    task.stream = _streams.get(task.id)
+
+    if task.stream:
+        update_stream(task, status='running')
+
+
 @event('task.execute.completed')
 def finish_progress(task):
-    if task.id not in _streams:
-        return
-    update_stream(task)
+    if task.stream:
+        update_stream(task, status='complete')
 
 
 @event('task.execute.before_plugin')
 def track_progress(task, plugin_name):
-    if task.id not in _streams:
-        return
-    update_stream(task)
+    if task.stream:
+        update_stream(task, status='running')
+
+
+def on_entry_action(entry, act=None, reason=None, **kwargs):
+    entry.task.stream.put(json.dumps({
+        'entry': {
+            entry.task.id: {
+                'title': entry['title'],
+                'url': entry['url'],
+                'state': act,
+                'reason': reason if reason else entry.get('Accepted by %s_by' % act),
+            }
+        }
+    }))
+
+
+class EntryTracker(object):
+
+    @plugin.priority(-255)
+    def on_task_abort(self, task, config):
+        if not task.stream:
+            return
+
+        update_stream(task, status='aborted')
+
+    @plugin.priority(-255)
+    def on_task_input(self, task, config):
+        if not task.stream:
+            return
+
+        # TODO: Cleanup old streams
+
+        # Register callbacks to update the status of an entry and send initial entry list
+        for entry in task.all_entries:
+            entry.on_accept(on_entry_action, act='accepted')
+            entry.on_reject(on_entry_action, act='rejected')
+            entry.on_fail(on_entry_action, act='failed')
+
+            on_entry_action(entry, act='undecided')
+
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(EntryTracker, 'entry_tracker', builtin=True, api_ver=2)

@@ -13,9 +13,6 @@
     "bower_components/angular-ui-grid/*.{woff,ttf,svg,eot}"
   ],
   "sass_includes": [
-    "bower_components/bootstrap-sass/assets/stylesheets/",
-    "bower_components/font-awesome/scss/",
-    "bower_components/angular-material/",
-    "bower_components/angular-ui-grid/"
+    "bower_components/"
   ]
 }
