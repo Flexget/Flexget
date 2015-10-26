@@ -82,7 +82,7 @@ class LoginAPI(APIResource):
 
         if data:
             user = session.query(User)\
-                .filter(User.name == data.get('username'), User.password == data.get('password'))\
+                .filter(User.name == data.get('username').lower(), User.password == data.get('password'))\
                 .first()
 
             if user:
