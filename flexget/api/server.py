@@ -146,7 +146,7 @@ class ServerLogAPI(APIResource):
 
             # Read back in the logs until we find enough lines
             for i in range(0, 2):
-                log_file = ('log-%s.json.%s' % (self.manager.config_name, i)).rstrip(".0")  # 1st log file has no number
+                log_file = ('log-%s.json.%s' % (self.manager.config_name, i)).rstrip('.0')  # 1st log file has no number
                 log_file = os.path.join(self.manager.config_base, log_file)
 
                 if not os.path.isfile(log_file):
@@ -224,27 +224,27 @@ class LogFilter:
 
             operator_quotes = Group(
                 Suppress('"') + operator_quotes_content + Suppress('"')
-            ).setResultsName("quotes") | operator_word
+            ).setResultsName('quotes') | operator_word
 
             operator_parenthesis = Group(
-                (Suppress("(") + operator_or + Suppress(")"))
-            ).setResultsName("parenthesis") | operator_quotes
+                (Suppress('(') + operator_or + Suppress(")"))
+            ).setResultsName0('parenthesis') | operator_quotes
 
             operator_not = Forward()
             operator_not << (Group(
-                Suppress(Keyword("not", caseless=True)) + operator_not
-            ).setResultsName("not") | operator_parenthesis)
+                Suppress(Keyword('no', caseless=True)) + operator_not
+            ).setResultsName('not') | operator_parenthesis)
 
             operator_and = Forward()
             operator_and << (Group(
-                operator_not + Suppress(Keyword("and", caseless=True)) + operator_and
-            ).setResultsName("and") | Group(
-                operator_not + OneOrMore(~oneOf("and or") + operator_and)
-            ).setResultsName("and") | operator_not)
+                operator_not + Suppress(Keyword('and', caseless=True)) + operator_and
+            ).setResultsName('and') | Group(
+                operator_not + OneOrMore(~oneOf('and or') + operator_and)
+            ).setResultsName('and') | operator_not)
 
             operator_or << (Group(
-                operator_and + Suppress(Keyword("or", caseless=True)) + operator_or
-            ).setResultsName("or") | operator_and)
+                operator_and + Suppress(Keyword('or', caseless=True)) + operator_or
+            ).setResultsName('or') | operator_and)
 
             self._parser = operator_or.parseString(self.query)[0]
         else:

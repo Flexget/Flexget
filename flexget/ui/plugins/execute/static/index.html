@@ -1,9 +1,58 @@
-<page-header></page-header>
-<section class="content">
-    <div class="row text-center">
-        <a class="btn btn-app" ui-sref="execute"><i class="fa fa-cog"></i> Execute Task</a>
-        <a class="btn btn-app" ui-sref=".history"><i class="fa fa-history"></i> History</a>
+<div ng-hide="stream">
+    <h3 class="text-center">Live Execution</h3>
+    <div layout="row" layout-align="space-around center">
+        <div></div>
+        <div flex-gt-sm="40" flex-sm="100" class="text-center">
+            <md-chips ng-model="executeTasks" md-autocomplete-snap md-require-match="false">
+                <md-autocomplete
+                        md-items="task in queryTasks(searchText)"
+                        md-item-text="task"
+                        placeholder="Enter task"
+                        md-selected-item="selectedItem"
+                        md-search-text="searchText">
+                    <span md-highlight-text="searchText">{{task}}</span>
+                </md-autocomplete>
+            </md-chips>
+            <md-button class="md-raised md-primary" ng-click="run()">Execute</md-button>
+        </div>
+        <div></div>
     </div>
-
-    <div ui-view>test</div>
-</section>
+</div>
+<div ng-show="stream" class="execute">
+    <h3 class="text-center">Executing</h3>
+    <md-progress-linear md-mode="determinate" value="{{ stream.percentComplete }}"></md-progress-linear>
+    <md-tabs md-selected="selectedIndex" md-center-tabs>
+        <md-tab ng-repeat="task in stream.tasks">
+            <md-tab-label>
+                <div layout="column" layout-fill layout-padding layout-align="center">
+                    <div>{{ task.name }}</div>
+                    <div><wave-spinner ng-show="task.status == 'running'" class="text-primary"></wave-spinner></div>
+                </div>
+            </md-tab-label>
+            <md-tab-body>
+                <div layout="row" layout-align="space-around center">
+                    <div></div>
+                    <div flex-gt-sm="40" flex-sm="100">
+                        <div class="text-center">
+                            <div ng-if="task.status == 'complete'">Finished</div>
+                            <div ng-if="task.status != 'complete'">{{ task.status }} ({{ task.phase }}| {{ task.plugin }})</div>
+                        </div>
+                        <div ng-repeat="entry in task.entries" ng-class="entry.state">
+                            <span class="fa fa-check-circle" ng-if="entry.state == 'accepted'"></span>
+                            <span class="fa fa-check-warning" ng-if="entry.state == 'failed'"></span>
+                            <span class="fa fa-times-circle" ng-if="entry.state == 'rejected'"></span>
+                            {{ entry.title }}
+                            <span ng-if="entry.reason">({{ entry.reason }})</span>
+                        </div>
+                    </div>
+                    <div></div>
+                </div>
+            </md-tab-body>
+        </md-tab>
+    </md-tabs>
+    <div layout="row" layout-align="space-around center">
+        <div></div>
+        <md-button class="md-raised md-primary" ng-click="clear()">Clear</md-button>
+        <div></div>
+    </div>
+</div>

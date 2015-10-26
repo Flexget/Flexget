@@ -45,6 +45,6 @@ gulp.task('flexget-js', function() {
 gulp.task('js', ['flexget-js', 'vendor-js'], function() {});
 
 
-gulp.task('watch:js', function() {
+gulp.task('watch:js', ['flexget-js'], function() {
   gulp.watch(config.js, ['flexget-js']);
 });
