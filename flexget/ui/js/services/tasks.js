@@ -22,7 +22,7 @@
       // Execute task(s), return stream log etc
       this.executeStream = function(tasks) {
         var stream = oboe({
-          url: '/api/execution/stream/?progress=true&log=true',
+          url: '/api/execution/execute/stream/?progress=true&log=true&summary=true&entry_dump=true',
           method: 'POST',
           body: {tasks: tasks}
         });
@@ -62,12 +62,19 @@
             };
             return on('node', 'progress', wrappedCallback);
           },
-          entry: function (callback) {
+          summary: function (callback) {
             var wrappedCallback = function (data) {
               var taskId = Object.keys(data)[0];
               return callback(taskId, data[taskId])
             };
-            return on('node', 'entry', wrappedCallback);
+            return on('node', 'summary', wrappedCallback);
+          },
+          entry_dump: function (callback) {
+            var wrappedCallback = function (data) {
+              var taskId = Object.keys(data)[0];
+              return callback(taskId, data[taskId])
+            };
+            return on('node', 'entry_dump', wrappedCallback);
           },
           done: function (callback) {
             return on('done', null, callback);

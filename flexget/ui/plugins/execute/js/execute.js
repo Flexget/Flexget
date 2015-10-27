@@ -10,17 +10,27 @@
     sideNav.register('/execute', 'Execute', 'fa fa-cog', 128);
   });
 
-  executeModule.controller('ExecuteCtrl', function ($scope, $log, tasks) {
-
-    // Used to calculate the precent complete of a running task
-    var phasePercents = {
-      input: 5,
-      metainfo: 10,
-      filter: 30,
-      download: 50,
-      modify: 65,
-      output: 95
+  executeModule.filter('executePhaseFilter', function() {
+    var phaseDescriptions = {
+      input: "Gathering Entries",
+      metainfo: "Figuring out meta data",
+      filter: "Filtering Entries",
+      download: "Downloading Accepted Entries",
+      modify: "Modifying Entries",
+      output: "Executing Outputs",
+      exit: "Finished"
     };
+
+    return function(phase) {
+      if (phase in phaseDescriptions) {
+        return phaseDescriptions[phase]
+      } else {
+        return "Processing"
+      }
+    };
+  });
+
+  executeModule.controller('ExecuteCtrl', function ($scope, $log, tasks) {
 
     var allTasks = [];
     tasks.list()
@@ -37,8 +47,7 @@
           return (angular.lowercase(task).indexOf(lowercaseQuery) > -1);
         };
       };
-      var result = query ? allTasks.filter(taskFilter()) : [];
-      return result
+      return query ? allTasks.filter(taskFilter()) : [];
     };
 
     $scope.clear = function() {
@@ -48,8 +57,7 @@
     $scope.run = function() {
       $scope.stream = {
         tasks: [],
-        log: [],
-        percentComplete: 0
+        log: []
       };
 
       var stream = tasks.executeStream($scope.executeTasks)
@@ -57,15 +65,16 @@
           //
         })
         .done(function() {
-          $scope.stream.percentComplete = 100;
+          $scope.stream.percent = 100;
         })
         .tasks(function(tasks) {
           angular.forEach(tasks, function(task) {
             $scope.stream.tasks.push({
               id: task.id,
+              status: 'pending',
               name: task.name,
-              percentComplete: 0,
-              entries: {}
+              entries: {},
+              percent: 0
             });
           });
         })
@@ -75,19 +84,16 @@
         .progress(function(taskId, update) {
           var task = getTask(taskId);
           angular.extend(task, update);
-
-          if (task['phase'] in phasePercents) {
-            task.percentComplete = phasePercents[task['phase']];
-          }
-          if(['complete', 'aborted'].indexOf(task.status) >= 0) {
-            task.percentComplete = 100;
-          }
-
           updateProgress();
         })
-        .entry(function(taskId, entry) {
+        .summary(function(taskId, update) {
           var task = getTask(taskId);
-          task.entries[entry.url] = entry;
+          angular.extend(task, update);
+          updateProgress();
+        })
+        .entry_dump(function(taskId, entries) {
+          var task = getTask(taskId);
+          task.entries = entries;
         });
 
       var getTask = function(taskId) {
@@ -100,12 +106,11 @@
       };
 
       var updateProgress = function() {
-        var totalPercent = 0, totalTasks = 0;
-        angular.forEach($scope.stream.tasks, function(task) {
-          totalPercent = totalPercent + task.percentComplete;
-          totalTasks++;
-        });
-        $scope.stream.percentComplete = totalPercent / totalTasks;
+        var totalPercent = 0;
+        for (var i = 0; i < $scope.stream.tasks.length; i++) {
+          totalPercent = totalPercent + $scope.stream.tasks[i].percent;
+        }
+        $scope.stream.percent = totalPercent / $scope.stream.tasks.length;
       }
     };
 

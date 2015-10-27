@@ -1,13 +1,14 @@
-from Queue import Queue
-from Queue import Empty
+from datetime import datetime
+from Queue import Queue, Empty
 
 from flask import request, jsonify, Response
 
 from flexget.options import get_parser
 from flexget.api import api, APIResource
 from flexget.utils import json
-from flexget import plugin
+from json import JSONEncoder
 from flexget.event import event
+from flexget.utils.lazy_dict import LazyLookup
 
 execution_api = api.namespace('execution', description='Execute tasks')
 
@@ -73,7 +74,7 @@ class ExecutionQueueAPI(APIResource):
 
 
 @execution_api.route('/execute/')
-@api.doc(description='Execution ID\'s are only valid for the life of the task')
+@api.doc(description='Wildcards supported ie: TV* will execute all tasks with TV in the name')
 class ExecutionAPI(APIResource):
     @api.validate(execute_api_task_schema)
     @api.response(400, 'invalid options specified')
@@ -81,7 +82,6 @@ class ExecutionAPI(APIResource):
     def post(self, session=None):
         """ Execute task(s) """
         options = request.json or {}
-        args = stream_parser.parse_args()
 
         options_string = options.pop('options_string', '')
         if options_string:
@@ -97,27 +97,31 @@ class ExecutionAPI(APIResource):
         return {'tasks': tasks}
 
 
-class LogStream(Queue):
+class ExecuteQueue(Queue):
+    """ Supports task log streaming by acting like a file object """
     def write(self, s):
         self.put(json.dumps({'log': s}))
 
 
 stream_parser = api.parser()
-stream_parser.add_argument('progress', type=bool, required=False, default=True, help='Stream log data')
-stream_parser.add_argument('log', type=bool, required=False, default=True, help='Stream task log')
+
+stream_parser.add_argument('progress', type=bool, required=False, default=True, help='Include task progress updates')
+stream_parser.add_argument('summary', type=bool, required=False, default=True, help='Include task summary')
+stream_parser.add_argument('log', type=bool, required=False, default=False, help='Include execution log')
+stream_parser.add_argument('entry_dump', type=bool, required=False, default=False, help='Include dump of entries including fields')
 
 _streams = {}
 
 
-@execution_api.route('/stream/')
-@api.doc(description='Execution ID\'s are only valid for the life of the task')
+@execution_api.route('/execute/stream/')
+@api.doc(description='Wildcards supported ie: TV* will execute all tasks with TV in the name')
 class ExecutionAPIStream(APIResource):
     @api.validate(execute_api_task_schema)
     @api.response(400, 'invalid options specified')
     @api.response(200, 'Execution stream with task progress and/or log')
     @api.doc(parser=stream_parser)
     def post(self, session=None):
-        """ Execute task(s) """
+        """ Execute task(s) and stream results """
         options = request.json or {}
         args = stream_parser.parse_args()
 
@@ -128,30 +132,32 @@ class ExecutionAPIStream(APIResource):
             except ValueError as e:
                 return {'error': 'invalid options_string specified: %s' % e.message}, 400
 
-        if args['progress'] or args['log']:
-            stream = LogStream()
-
-        output = stream if args['log'] else None
+        queue = ExecuteQueue()
+        output = queue if args['log'] else None
 
         tasks_queued = []
 
         for task_id, task_name, task_event in self.manager.execute(options=options, output=output):
             tasks_queued.append({'id': task_id, 'name': task_name, 'event': task_event})
-            _streams[task_id] = stream
+            _streams[task_id] = {
+                'queue': queue,
+                'last_update': datetime.now(),
+                'args': args
+            }
 
         def stream_response():
             # First return the tasks to execute
             yield '{"stream": ['
-            yield json.dumps({'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}) + ','
+            yield json.dumps({'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}) + ',\n'
 
             while True:
                 try:
-                    yield stream.get(timeout=1) + ','
+                    yield queue.get(timeout=1) + ',\n'
                     continue
                 except Empty:
                     pass
 
-                if stream.empty() and all([task['event'].is_set() for task in tasks_queued]):
+                if queue.empty() and all([task['event'].is_set() for task in tasks_queued]):
                     for task in tasks_queued:
                         del _streams[task['id']]
                     break
@@ -159,20 +165,44 @@ class ExecutionAPIStream(APIResource):
         return Response(stream_response(), mimetype='text/event-stream')
 
 
+class EntryDecoder(JSONEncoder):
+    def default(self, o):
+        if isinstance(o, LazyLookup):
+            return '<LazyField>'
+
+        try:
+            return JSONEncoder.default(self, o)
+        except TypeError:
+            return str(o)
+
+_phase_percents = {
+    'input': 5,
+    'metainfo': 10,
+    'filter': 30,
+    'download': 40,
+    'modify': 65,
+    'output': 75,
+    'exit': 100,
+}
+
+
 def update_stream(task, status='pending'):
-    stream = _streams[task.id]
+
+    if task.current_phase in _phase_percents:
+        task.stream['percent'] = _phase_percents[task.current_phase]
 
     progress = {
         'status': status,
         'phase': task.current_phase,
         'plugin': task.current_plugin,
+        'percent': task.stream.get('percent', 0)
     }
 
-    stream.put(json.dumps({'progress': {task.id: progress}}))
+    task.stream['queue'].put(json.dumps({'progress': {task.id: progress}}))
 
 
 @event('task.execute.started')
-def start_progress(task):
+def start_task(task):
     task.stream = _streams.get(task.id)
 
     if task.stream:
@@ -180,58 +210,30 @@ def start_progress(task):
 
 
 @event('task.execute.completed')
-def finish_progress(task):
+def finish_task(task):
     if task.stream:
         update_stream(task, status='complete')
+
+        if task.stream['args']['entry_dump']:
+            entries = [entry.store for entry in task.entries]
+            task.stream['queue'].put(EntryDecoder().encode({'entry_dump': {task.id: entries}}))
+
+        if task.stream['args']['summary']:
+            task.stream['queue'].put(json.dumps({
+                'summary': {
+                    task.id: {
+                        'accepted': len(task.accepted),
+                        'rejected': len(task.rejected),
+                        'failed': len(task.failed),
+                        'undecided': len(task.undecided),
+                        'aborted': task.aborted,
+                        'abort_reason': task.abort_reason,
+                    }
+                }
+            }))
 
 
 @event('task.execute.before_plugin')
 def track_progress(task, plugin_name):
     if task.stream:
         update_stream(task, status='running')
-
-
-def on_entry_action(entry, act=None, reason=None, **kwargs):
-    if not reason and entry.get('%s_by' % act):
-        reason = '%s by %s' % (act, entry['%s_by' % act])
-
-    entry.task.stream.put(json.dumps({
-        'entry': {
-            entry.task.id: {
-                'title': entry['title'],
-                'url': entry['url'],
-                'state': act,
-                'reason': reason,
-            }
-        }
-    }))
-
-
-class EntryTracker(object):
-
-    @plugin.priority(-255)
-    def on_task_abort(self, task, config):
-        if not task.stream:
-            return
-
-        update_stream(task, status='aborted')
-
-    @plugin.priority(-255)
-    def on_task_input(self, task, config):
-        if not task.stream:
-            return
-
-        # TODO: Cleanup old streams
-
-        # Register callbacks to update the status of an entry and send initial entry list
-        for entry in task.all_entries:
-            entry.on_accept(on_entry_action, act='accepted')
-            entry.on_reject(on_entry_action, act='rejected')
-            entry.on_fail(on_entry_action, act='failed')
-
-            on_entry_action(entry, act='undecided')
-
-
-@event('plugin.register')
-def register_plugin():
-    plugin.register(EntryTracker, 'entry_tracker', builtin=True, api_ver=2)
