@@ -74,7 +74,7 @@ class TestFilesystem(FlexGetBase):
         """
 
     item_list = ['file1.mkv', 'file2.txt', 'file10.mkv', 'file11.txt', 'file4.avi', 'file3.xlsx', 'file5.mkv', 'dir1',
-                 'dir2', 'dir3', 'dir4', 'dir6', 'dir7', 'dir8']
+                 'dir2', 'dir4', 'dir6', 'dir7', 'dir8']
 
     def assert_check(self, task_name, test_type, filenames):
         for file in filenames:
@@ -88,7 +88,7 @@ class TestFilesystem(FlexGetBase):
 
     def test_string(self):
         task_name = 'string'
-        should_exist = 'dir1', 'dir2', 'dir3', 'file1.mkv', 'file2.txt'
+        should_exist = 'dir1', 'dir2', 'file1.mkv', 'file2.txt'
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         self.execute_task(task_name)
 
@@ -97,7 +97,7 @@ class TestFilesystem(FlexGetBase):
 
     def test_list(self):
         task_name = 'list'
-        should_exist = ['dir1', 'dir2', 'dir3', 'file1.mkv', 'file2.txt', 'file10.mkv']
+        should_exist = ['dir1', 'dir2', 'file1.mkv', 'file2.txt', 'file10.mkv']
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         self.execute_task(task_name)
 
@@ -106,7 +106,7 @@ class TestFilesystem(FlexGetBase):
 
     def test_object_string(self):
         task_name = 'object_string'
-        should_exist = ['dir1', 'dir2', 'dir3', 'file1.mkv', 'file2.txt']
+        should_exist = ['dir1', 'dir2', 'file1.mkv', 'file2.txt']
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         self.execute_task(task_name)
 
@@ -115,7 +115,7 @@ class TestFilesystem(FlexGetBase):
 
     def test_object_list(self):
         task_name = 'object_list'
-        should_exist = ['dir1', 'dir2', 'dir3', 'file1.mkv', 'file2.txt', 'file10.mkv']
+        should_exist = ['dir1', 'dir2', 'file1.mkv', 'file2.txt', 'file10.mkv']
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         self.execute_task(task_name)
 
@@ -143,7 +143,7 @@ class TestFilesystem(FlexGetBase):
     def test_recursive_true(self):
         task_name = 'recursive_true'
         should_exist = ['dir1', 'dir4', 'dir6', 'dir7', 'dir8', 'file11.txt', 'file4.avi', 'file3.xlsx', 'dir2',
-                        'file5.mkv', 'dir3', 'file1.mkv', 'file2.txt']
+                        'file5.mkv', 'file1.mkv', 'file2.txt']
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         self.execute_task(task_name)
 
@@ -152,7 +152,7 @@ class TestFilesystem(FlexGetBase):
 
     def test_recursive_2_levels(self):
         task_name = 'recursive_2_levels'
-        should_exist = ['dir1', 'dir4', 'file3.xlsx', 'dir2', 'file5.mkv', 'dir3', 'file1.mkv', 'file2.txt']
+        should_exist = ['dir1', 'dir4', 'file3.xlsx', 'dir2', 'file5.mkv', 'file1.mkv', 'file2.txt']
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         self.execute_task(task_name)
 
@@ -170,7 +170,7 @@ class TestFilesystem(FlexGetBase):
 
     def test_retrieve_files_and_dirs(self):
         task_name = 'retrieve_files_and_dirs'
-        should_exist = ['dir1', 'dir2', 'dir3', 'file1.mkv', 'file2.txt']
+        should_exist = ['dir1', 'dir2', 'file1.mkv', 'file2.txt']
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         self.execute_task(task_name)
 
@@ -188,7 +188,7 @@ class TestFilesystem(FlexGetBase):
 
     def test_combine_2(self):
         task_name = 'combine_2'
-        should_exist = ['dir1', 'dir4', 'dir2', 'dir6', 'dir7', 'dir8', 'dir3']
+        should_exist = ['dir1', 'dir4', 'dir2', 'dir6', 'dir7', 'dir8']
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         self.execute_task(task_name)
 
