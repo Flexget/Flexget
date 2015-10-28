@@ -16,11 +16,57 @@
     .pg-loading-screen .pg-loading-center-middle {
         vertical-align: top;
     }
-    .pg-loading-screen .sk-wave {
+    .pg-loading-screen .spinner {
+        width: 50px;
+        height: 40px;
+        text-align: center;
+        font-size: 10px;
         margin: 0 auto;
     }
-    .pg-loading-screen .sk-rect {
+
+    .pg-loading-screen .spinner > div {
         margin: 0 3px 0 0;
+        background-color: #F6A52F;
+        height: 100%;
+        width: 6px;
+        display: inline-block;
+        -webkit-animation: sk-stretchdelay 1.2s infinite ease-in-out;
+        animation: sk-stretchdelay 1.2s infinite ease-in-out;
+    }
+
+    .pg-loading-screen .spinner .rect2 {
+        -webkit-animation-delay: -1.1s;
+        animation-delay: -1.1s;
+    }
+
+    .pg-loading-screen .spinner .rect3 {
+        -webkit-animation-delay: -1.0s;
+        animation-delay: -1.0s;
+    }
+
+    .pg-loading-screen .spinner .rect4 {
+        -webkit-animation-delay: -0.9s;
+        animation-delay: -0.9s;
+    }
+
+    .pg-loading-screen .spinner .rect5 {
+        -webkit-animation-delay: -0.8s;
+        animation-delay: -0.8s;
+    }
+
+    @-webkit-keyframes sk-stretchdelay {
+        0%, 40%, 100% { -webkit-transform: scaleY(0.4) }
+        20% { -webkit-transform: scaleY(1.0) }
+    }
+
+    @keyframes sk-stretchdelay {
+        0%, 40%, 100% {
+            transform: scaleY(0.4);
+            -webkit-transform: scaleY(0.4);
+        }  20% {
+               transform: scaleY(1.0);
+               -webkit-transform: scaleY(1.0);
+           }
     }
 </style>
 <script type="text/javascript" src="static/js/splash.min.js"></script>
@@ -30,9 +76,9 @@
         backgroundColor: '#FFFFFF',
         loadingHtml: '' +
         '<p class="text-primary text-bold">Loading</p>' +
-        '<div class="sk-wave">' +
-        '<div class="sk-rect sk-rect1"></div><div class="sk-rect sk-rect2"></div><div class="sk-rect sk-rect3"></div>' +
-        '<div class="sk-rect sk-rect4"></div><div class="sk-rect sk-rect5"></div>' +
+        '<div class="spinner">' +
+        '<div class="rect1"></div><div class="rect2"></div><div class="rect3"></div>' +
+        '<div class="rect4"></div><div class="rect5"></div>' +
         '</div>'
     });
 </script>

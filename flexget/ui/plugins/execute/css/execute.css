@@ -1,0 +1,10 @@
+.execute .wave-spinner {
+    margin: -15px;
+    width: auto;
+    height: auto;
+}
+.execute .wave-spinner>div {
+    width: 2px;
+    height: 2px;
+    background-color: #F6A52F;
+}

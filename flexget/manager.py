@@ -259,7 +259,7 @@ class Manager(object):
         for task_name in task_names:
             task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority)
             self.task_queue.put(task)
-            finished_events.append((task.id, task.finished_event))
+            finished_events.append((task.id, task.name, task.finished_event))
         return finished_events
 
     def start(self):
@@ -352,7 +352,7 @@ class Manager(object):
                                            loglevel=logger.get_capture_loglevel())
             if not options.cron:
                 # Wait until execution of all tasks has finished
-                for task_id, event in finished_events:
+                for task_id, task_name, event in finished_events:
                     event.wait()
         else:
             self.task_queue.start()

@@ -20,7 +20,7 @@ from flexget.config_schema import process_config, register_config_key
 from flexget import manager
 from flexget.utils.database import with_session
 
-__version__ = "0.1-alpha"
+__version__ = '0.1-alpha'
 
 log = logging.getLogger('api')
 

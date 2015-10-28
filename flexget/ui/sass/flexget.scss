@@ -1,11 +1,11 @@
 @import "variables";
 
 // Import third party
-@import "bootstrap";
-@import "font-awesome";
-@import "angular-material";
-@import "ui-grid";
-@import '../bower_components/SpinKit/scss/spinners/3-wave';
+@import "bootstrap-sass/assets/stylesheets/bootstrap";
+@import "font-awesome/scss/font-awesome";
+@import "angular-material/angular-material";
+@import "angular-ui-grid/ui-grid";
+@import "angular-spinkit/build/angular-spinkit.min";
 
 // Flexget includes
 @import "header";

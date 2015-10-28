@@ -201,6 +201,9 @@ class WebServer(threading.Thread):
 @with_session
 def do_cli(manager, options, session=None):
     try:
+        if hasattr(options, 'user'):
+            options.user = options.user.lower()
+
         if options.action == 'list':
             users = session.query(User).all()
             if users:
