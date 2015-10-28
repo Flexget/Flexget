@@ -24,21 +24,33 @@ class CouchPotato(object):
     }
 
     @staticmethod
-    def build_url(base_url, request_type, port, api_key):
+    def movie_list_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
+        log.debug('Received movie list request')
+        return '%s://%s:%s%s/api/%s/movie.list?status=active' % (
+            parsedurl.scheme, parsedurl.netloc, port, parsedurl.path, api_key)
+
+    @staticmethod
+    def profile_list_request(base_url, port, api_key):
+        parsedurl = urlparse(base_url)
+        log.debug('Received profile list request')
+        return '%s://%s:%s%s/api/%s/profile.list' % (
+            parsedurl.scheme, parsedurl.netloc, port, parsedurl.path, api_key)
+
+    def build_url(self, base_url, request_type, port, api_key):
         if request_type == 'active':
-            return '{}://{}:{}{}/api/{}/movie.list?status=active'.format(parsedurl.scheme, parsedurl.netloc, port,
-                                                                         parsedurl.path, api_key)
+            return self.movie_list_request(base_url, port, api_key)
         elif request_type == 'profiles':
-            return '{}://{}:{}{}/api/{}/profile.list'.format(parsedurl.scheme, parsedurl.netloc, port, parsedurl.path,
-                                                             api_key)
+            return self.profile_list_request(base_url, port, api_key)
+        else:
+            raise plugin.PluginError('Received unknown API request, aborting.')
 
     @staticmethod
     def get_json(url):
         try:
             return requests.get(url).json()
         except RequestException as e:
-            raise plugin.PluginError('Unable to connect to Couchpotato at {}. Error: {}'.format(url, e))
+            raise plugin.PluginError('Unable to connect to Couchpotato at %s. Error: %s' % (url, e))
 
     def quality_requirement_builder(self, quality_profile):
         """
@@ -66,7 +78,9 @@ class CouchPotato(object):
         source_string = '|'.join(
             set([sources[quality] for quality in quality_profile['qualities'] if quality in sources]))
 
-        return (res_string + ' ' + source_string).rstrip()
+        quality_requirement = (res_string + ' ' + source_string).rstrip()
+        log.debug('quality requirement is %s' % quality_requirement)
+        return quality_requirement
 
     def on_task_input(self, task, config):
         """Creates an entry for each item in your couchpotato wanted list.
@@ -105,13 +119,13 @@ class CouchPotato(object):
                 if entry.isvalid():
                     entries.append(entry)
                 else:
-                    log.error('Invalid entry created? {}' % entry)
+                    log.error('Invalid entry created? %s' % entry)
                     continue
                 # Test mode logging
                 if entry and task.options.test:
                     log.info("Test mode. Entry includes:")
                     for key, value in entry.items():
-                        log.info('     {}: {}'.format(key.capitalize(), value))
+                        log.info('     %s: %s' % (key.capitalize(), value))
 
         return entries
 
