@@ -96,10 +96,12 @@ class CouchPotato(object):
         Options base_url and api_key are required.
         When the include_data property is set to true, the
         """
+        log.verbose('Connection to CouchPotato to retrieve movie list.')
         active_movies_url = self.build_url(config.get('base_url'), 'active', config.get('port'), config.get('api_key'))
         active_movies_json = self.get_json(active_movies_url)
         # Gets profile and quality lists if include_data is TRUE
         if config.get('include_data'):
+            log.verbose('Connection to CouchPotato to retrieve movie data.')
             profile_url = self.build_url(config.get('base_url'), 'profiles', config.get('port'), config.get('api_key'))
             profile_json = self.get_json(profile_url)
 
@@ -117,6 +119,7 @@ class CouchPotato(object):
                               tmdb_id=movie['info'].get('tmdb_id'),
                               quality_req=quality_req)
                 if entry.isvalid():
+                    log.debug('adding entry %s' % entry)
                     entries.append(entry)
                 else:
                     log.error('Invalid entry created? %s' % entry)
