@@ -35,3 +35,6 @@ tests/cover/
 flexget/ui/node_modules/
 flexget/ui/bower_components/
 flexget/ui/vendor/
+node_modules/
+bower_components/
+pip-selfcheck.json
