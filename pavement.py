@@ -343,7 +343,7 @@ def requirements(options):
 
 
 @task
-def webui():
+def build_webui():
 
     cwd = os.path.join('flexget', 'ui')
 
