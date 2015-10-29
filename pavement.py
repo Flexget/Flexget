@@ -8,6 +8,7 @@ import sys
 from paver.easy import *
 import paver.virtual
 import paver.setuputils
+from paver.shell import sh
 from paver.setuputils import setup, find_package_data, find_packages
 
 sphinxcontrib = False
@@ -344,25 +345,10 @@ def webui():
     cwd = os.path.join('flexget', 'ui')
 
     # Install npm packages
-    print('Installing npm packages for WebUI')
-    process = subprocess.Popen(['npm', 'install'], cwd=cwd, shell=True)
-    process.communicate()
-    if process.wait() > 0:
-        print('FATAL: Problems installing npm packages!')
-        sys.exit(1)
+    sh(['npm', 'install'], cwd=cwd)
 
     # Build the ui
-    print('Installing bower packages WebUI')
-    process = subprocess.Popen(['bower', 'install'], cwd=cwd, shell=True)
-    process.communicate()
-    if process.wait() > 0:
-        print('FATAL: Problems during WebUI build!')
-        sys.exit(1)
+    sh(['bower', 'install'], cwd=cwd)
 
     # Build the ui
-    print('Building WebUI')
-    process = subprocess.Popen(['gulp'], cwd=cwd, shell=True)
-    process.communicate()
-    if process.wait() > 0:
-        print('FATAL: Problems during WebUI build!')
-        sys.exit(1)
+    sh('gulp', cwd=cwd)
