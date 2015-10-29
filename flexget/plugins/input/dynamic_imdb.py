@@ -120,7 +120,7 @@ class DynamicIMDB(object):
             log.debug('Converted job type from string to list.')
             config['job_types'] = [config['job_types']]
         # Special case in case user meant to add actress instead of actor (different job types in IMDB)
-        if 'actor' in config['job_types'] and not 'actress' in config['job_types']:
+        if 'actor' in config['job_types'] and 'actress' not in config['job_types']:
             config['job_types'].append('actress')
 
         return config
@@ -267,15 +267,16 @@ class DynamicIMDB(object):
         for item in items:
             entry = Entry(title=item['title'],
                           imdb_id='tt' + self.ia.get_imdbID(item),
-                          url='')
+                          url='',
+                          imdb_url=self.ia.get_imdbURL(item))
 
             if entry.isvalid():
                 if entry not in entries:
                     entries.append(entry)
                     if entry and task.options.test:
                         log.info("Test mode. Entry includes:")
-                        log.info("    Title: %s" % entry["title"])
-                        log.info("    IMDB ID: %s" % entry["imdb_id"])
+                        for key, value in entry.items():
+                            log.info('     {}: {}'.format(key.capitalize(), value))
             else:
                 log.error('Invalid entry created? %s' % entry)
         if len(entries) <= config.get('max_entries'):
