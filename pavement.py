@@ -4,12 +4,14 @@ FlexGet build and development utilities - unfortunately this file is somewhat me
 from __future__ import print_function
 import os
 import subprocess
+import shutil
 import sys
 from paver.easy import *
 import paver.virtual
 import paver.setuputils
 from paver.shell import sh
 from paver.setuputils import setup, find_package_data, find_packages
+
 
 sphinxcontrib = False
 try:
@@ -338,3 +340,24 @@ def requirements(options):
     filename = options.requirements.get('file', 'requirements.txt')
     with open(filename, mode='w') as req_file:
         req_file.write('\n'.join(options.install_requires))
+
+
+@task
+def webui():
+
+    cwd = os.path.join('flexget', 'ui')
+
+    # Cleanup previous builds
+    for folder in ['bower_components' 'node_modules']:
+        folder = os.path.join(cwd, folder)
+        if os.path.exists(folder):
+            shutil.rmtree(folder)
+
+    # Install npm packages
+    sh(['npm', 'install'], cwd=cwd)
+
+    # Build the ui
+    sh(['bower', 'install'], cwd=cwd)
+
+    # Build the ui
+    sh('gulp', cwd=cwd)
