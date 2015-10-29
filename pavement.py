@@ -3,6 +3,7 @@ FlexGet build and development utilities - unfortunately this file is somewhat me
 """
 from __future__ import print_function
 import os
+import subprocess
 import sys
 from paver.easy import *
 import paver.virtual
@@ -28,7 +29,8 @@ install_requires = [
     'jinja2', 'requests>=1.0, !=2.4.0, <2.99', 'python-dateutil!=2.0, !=2.2', 'jsonschema>=2.0',
     'python-tvrage', 'tmdb3', 'path.py', 'guessit>=0.9.3, <0.10.4', 'apscheduler',
     'flask>=0.7', 'flask-restful>=0.3.3', 'ordereddict>=1.1', 'flask-restplus==0.7.2', 'cherrypy>=3.7.0',
-    'flask-assets>=0.11', 'cssmin>=0.2.0', 'flask-compress>=1.2.1', 'flask-login>=0.3.2', 'pyparsing>=2.0.3'
+    'flask-assets>=0.11', 'cssmin>=0.2.0', 'flask-compress>=1.2.1', 'flask-login>=0.3.2', 'pyparsing>=2.0.3',
+    'pyScss>=1.3.4',
 ]
 
 if sys.version_info < (2, 7):
@@ -65,9 +67,9 @@ setup(
     install_requires=install_requires,
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget',
-        exclude=['FlexGet.egg-info', '*.pyc'],
-        exclude_directories=['node_modules', 'bower_components'],
-        only_in_packages=False),  # NOTE: the exclude does not seem to work
+                                   exclude=['FlexGet.egg-info', '*.pyc'],
+                                   exclude_directories=['node_modules', 'bower_components'],
+                                   only_in_packages=False),  # NOTE: the exclude does not seem to work
     zip_safe=False,
     test_suite='nose.collector',
     extras_require={
@@ -223,7 +225,7 @@ def sdist(options):
     for pyc in path('tests/').files('*.pyc'):
         pyc.remove()
 
-    for t in ['minilib', 'generate_setup', 'setuptools.command.sdist']:
+    for t in ['webui', 'minilib', 'generate_setup', 'setuptools.command.sdist']:
         call_task(t)
 
 
@@ -335,3 +337,32 @@ def requirements(options):
     filename = options.requirements.get('file', 'requirements.txt')
     with open(filename, mode='w') as req_file:
         req_file.write('\n'.join(options.install_requires))
+
+
+@task
+def webui():
+    cwd = os.path.join('flexget', 'ui')
+
+    # Install npm packages
+    print('Installing npm packages for WebUI')
+    process = subprocess.Popen(['npm', 'install'], cwd=cwd, shell=True)
+    process.communicate()
+    if process.wait() > 0:
+        print('FATAL: Problems installing npm packages!')
+        sys.exit(1)
+
+    # Build the ui
+    print('Installing bower packages WebUI')
+    process = subprocess.Popen(['bower', 'install'], cwd=cwd, shell=True)
+    process.communicate()
+    if process.wait() > 0:
+        print('FATAL: Problems during WebUI build!')
+        sys.exit(1)
+
+    # Build the ui
+    print('Building WebUI')
+    process = subprocess.Popen(['gulp'], cwd=cwd, shell=True)
+    process.communicate()
+    if process.wait() > 0:
+        print('FATAL: Problems during WebUI build!')
+        sys.exit(1)
