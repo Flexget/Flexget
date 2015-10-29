@@ -85,7 +85,8 @@ class DynamicIMDB(object):
                  'id': imdb_pattern,
                  'job_types': one_or_more({'type': 'string', 'enum': job_types}, unique_items=True),
                  'content_types': one_or_more({'type': 'string', 'enum': content_types}, unique_items=True),
-                 'max_entries': {'type': 'integer'}
+                 'max_entries': {'type': 'integer'},
+                 'match_type': {'type': 'string', 'enum': ['strict', 'loose']}
              },
              'required': ['id'],
              'additionalProperties': False
@@ -109,6 +110,7 @@ class DynamicIMDB(object):
         config.setdefault('content_types', [self.content_types[0]])
         config.setdefault('job_types', [self.job_types[0]])
         config.setdefault('max_entries', 200)
+        config.setdefault('match_type', 'strict')
 
         if isinstance(config.get('content_types'), str_types):
             log.debug('Converted content type from string to list.')
@@ -130,11 +132,11 @@ class DynamicIMDB(object):
                 entity_type, entity_object = self.get_entity_type_and_object(id)
             except Exception as e:
                 log.error(
-                    'Could not resolve entity via ID: {}. Either error in config or unsupported entity. Error:'.format(
-                        id, e))
+                    'Could not resolve entity via ID: {}. '
+                    'Either error in config or unsupported entity. Error:{}'.format(id, e))
                 continue
             items += self.get_items_by_entity(entity_type, entity_object, config.get('content_types'),
-                                              config.get('job_types'))
+                                              config.get('job_types'), config.get('match_type'))
         return set(items)
 
     def get_entity_type_and_object(self, imdb_id):
@@ -156,7 +158,7 @@ class DynamicIMDB(object):
             log.info('Starting to retrieve items for Character: %s' % character)
             return 'Character', character
 
-    def get_items_by_entity(self, entity_type, entity_object, content_types, job_types):
+    def get_items_by_entity(self, entity_type, entity_object, content_types, job_types, match_type):
         """
         Gets entity object and return movie list using relevant method
         """
@@ -164,10 +166,10 @@ class DynamicIMDB(object):
             return self.items_by_company(entity_object)
 
         if entity_type == 'Character':
-            return self.items_by_character(entity_object, content_types)
+            return self.items_by_character(entity_object, content_types, match_type)
 
         elif entity_type == 'Person':
-            return self.items_by_person(entity_object, job_types, content_types)
+            return self.items_by_person(entity_object, job_types, content_types, match_type)
 
     def flatten_list(self, _list):
         """
@@ -186,19 +188,22 @@ class DynamicIMDB(object):
             flat_list = filter(None, flat_list)
         return flat_list
 
-    def filtered_items(self, unfiltered_items, content_types):
+    def filtered_items(self, unfiltered_items, content_types, match_type):
         items = []
         unfiltered_items = set(unfiltered_items)
         for item in sorted(unfiltered_items):
-            self.ia.update(item)
-            if item['kind'] in content_types:
-                log.verbose('Adding item "{}" to list. Item kind is "{}"'.format(item, item['kind']))
-                items.append(item)
+            if match_type == 'strict':
+                self.ia.update(item)
+                if item['kind'] in content_types:
+                    log.verbose('Adding item "{}" to list. Item kind is "{}"'.format(item, item['kind']))
+                    items.append(item)
+                else:
+                    log.verbose('Rejecting item "{}". Item kind is "{}'.format(item, item['kind']))
             else:
-                log.verbose('Rejecting item "{}". Item kind is "{}'.format(item, item['kind']))
+                items.append(item)
         return items
 
-    def items_by_person(self, person, job_types, content_types):
+    def items_by_person(self, person, job_types, content_types, match_type):
         """
         Return item list for a person object
         """
@@ -206,7 +211,7 @@ class DynamicIMDB(object):
             [self.items_by_job_type(person, job_type, content_types) for job_type in job_types],
             remove_none=True)
 
-        return self.filtered_items(unfiltered_items, content_types)
+        return self.filtered_items(unfiltered_items, content_types, match_type)
 
     def items_by_content_type(self, person, job_type, content_type):
         return filter(None, (person.get(job_type + ' ' + self.content_type_conversion[content_type], [])))
@@ -223,7 +228,7 @@ class DynamicIMDB(object):
             ]
         return filter(None, items)
 
-    def items_by_character(self, character, content_types):
+    def items_by_character(self, character, content_types, match_type):
         """
         Return items list for a character object
         :param character: character object
@@ -234,7 +239,7 @@ class DynamicIMDB(object):
             [character.get(self.character_content_type_conversion[content_type])
              for content_type in content_types], remove_none=True)
 
-        return self.filtered_items(unfiltered_items, content_types)
+        return self.filtered_items(unfiltered_items, content_types, match_type)
 
     def items_by_company(self, company):
         """
