@@ -1,0 +1,40 @@
+{
+  "flexget_js": [
+    "js/app.js",
+    "js/utils.js",
+    "js/services/**.js",
+    "js/directives/**.js",
+    "js/controllers/**.js"
+  ],
+  "vendor_js": [
+    "vendor/js/angular.min.js",
+    "vendor/js/angular-animate.min.js",
+    "vendor/js/angular-aria.min.js",
+    "vendor/js/angular-ui-router.min.js",
+    "vendor/js/angular-filter.min.min.js",
+    "vendor/js/tv4.min.js",
+    "vendor/js/angular-sanitize.min.js",
+    "vendor/js/ObjectPath.min.js",
+    "vendor/js/ui-grid.min.js",
+    "vendor/js/jquery.min.js",
+    "vendor/js/angular-cookies.min.js",
+    "vendor/js/oboe-browser.min.js",
+    "vendor/js/angular-spinkit.min.js",
+    "vendor/js/angular-material.min.js",
+    "vendor/js/schema-form.min.js",
+    "vendor/js/bootstrap-decorator.min.js"
+  ],
+  "vendor_css": [
+    "vendor/css/bootstrap.min.css",
+    "vendor/css/angular-material.min.css",
+    "vendor/css/angular-spinkit.min.css",
+    "vendor/css/font-awesome.min.css",
+    "vendor/css/ui-grid.min.css"
+  ],
+  "fonts": [
+    "bower_components/font-awesome/fonts/**.*",
+    "bower_components/bootstrap-sass/assets/fonts/bootstrap/**.*",
+    "bower_components/angular-material/fonts/**.*",
+    "bower_components/angular-ui-grid/*.{woff,ttf,svg,eot}"
+  ]
+}
