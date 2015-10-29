@@ -29,8 +29,10 @@ gulp.task('js:clean', function () {
 gulp.task('js', ['js:clean'], function() {
   gulp.src(mainBowerFiles('**/*.js'), { base: bowerDir })
     .pipe(flatten())
+    .pipe(sourcemaps.init())
     .pipe(uglify({'preserveComments': 'license'}))
     .pipe(rename({extname: '.min.js'}))
+    .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(distPath + '/js'));
 
   gulp.src(bowerDir + '/please-wait/build/please-wait.min.js')
