@@ -226,7 +226,7 @@ def sdist(options):
     for pyc in path('tests/').files('*.pyc'):
         pyc.remove()
 
-    for t in ['webui', 'minilib', 'generate_setup', 'setuptools.command.sdist']:
+    for t in ['minilib', 'generate_setup', 'setuptools.command.sdist']:
         call_task(t)
 
 
@@ -338,17 +338,3 @@ def requirements(options):
     filename = options.requirements.get('file', 'requirements.txt')
     with open(filename, mode='w') as req_file:
         req_file.write('\n'.join(options.install_requires))
-
-
-@task
-def webui():
-    cwd = os.path.join('flexget', 'ui')
-
-    # Install npm packages
-    sh(['npm', 'install'], cwd=cwd)
-
-    # Build the ui
-    sh(['bower', 'install'], cwd=cwd)
-
-    # Build the ui
-    sh('gulp', cwd=cwd)
