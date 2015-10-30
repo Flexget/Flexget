@@ -231,7 +231,7 @@ class InputWhatCD(object):
         params = {}
 
         # Filter params and map config values -> api values
-        for k, v in kwargs.iteritems():
+        for k, v in kwargs.items():
             key = self._key(k)
             if key is not None:
                 params[key] = self._getval(k, v)
