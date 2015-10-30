@@ -133,35 +133,25 @@ class InputWhatCD(object):
         """Gets the API key name from the entered key"""
         if key in self.ALIASES:
             return self.ALIASES[key]
-        elif key in self.PARAMS:
-            return key
-        return None
+        return key
 
     def _opts(self, key):
         """Gets the options for the specified key"""
-        temp = self._key(key)
-        return self.PARAMS.get(temp)
+        return self.PARAMS[self._key(key)]
 
     def _getval(self, key, val):
         """Gets the value for the specified key based on a config option"""
-        # No alias or param by that name
-        if self._key(key) is None:
-            return None
 
         opts = self._opts(key)
-        if opts is None:
-            if isinstance(val, list):
-                return ",".join(val)
-            return val
-        elif isinstance(opts, dict):
+        if isinstance(opts, dict):
             # Translate the input value to the What.CD API value
             # The str cast converts bools to 'True'/'False' for use as keys
             # This allows for options that have True/False/Other values
             return opts[str(val)]
+        elif isinstance(val, list):
+            # Fix yaml parser making a list out of a string
+            return ",".join(val)
 
-        # Should be one of a list of options, check it's valid
-        if val not in opts:
-            return None
         return val
 
     def __init__(self):
@@ -193,15 +183,15 @@ class InputWhatCD(object):
             'additionalProperties': False
         }
 
-    def _login(self, config):
+    def _login(self, user, passwd):
         """
         Log in and store auth data from the server
         Adapted from https://github.com/isaaczafuta/whatapi
         """
 
         data = {
-            'username': config['username'],
-            'password': config['password'],
+            'username': user,
+            'password': passwd,
             'keeplogged': 1,
         }
 
@@ -228,9 +218,7 @@ class InputWhatCD(object):
 
         # Filter params and map config values -> api values
         for k, v in kwargs.items():
-            key = self._key(k)
-            if key is not None:
-                params[key] = self._getval(k, v)
+            params[self._key(k)] = self._getval(k, v)
 
         # Params other than the searching ones
         params['action'] = action
@@ -275,9 +263,9 @@ class InputWhatCD(object):
             pages = result.get('pages', pages)
             page += 1
 
-    def _get_entries(self, config):
-        """Genertor that yields Entry objects"""
-        for result in self._search_results(config):
+    def _get_entries(self, search_results):
+        """Genertor that yields Entry objects from search results"""
+        for result in search_results:
             # Get basic information on the release
             info = dict((k, result[k]) for k in ('artist', 'groupName', 'groupYear'))
 
@@ -303,24 +291,26 @@ class InputWhatCD(object):
         """Search on What.cd"""
 
         self.session = Session()
-        user_agent = config.get('user_agent')
-        if user_agent:
-            # Using a custom user agent
-            self.session.headers.update({"User-Agent": user_agent})
 
         # From the API docs: "Refrain from making more than five (5) requests every ten (10) seconds"
         self.session.set_domain_delay('ssl.what.cd', '2 seconds')
 
-        # Login and remove userinfo from config (so it isn't sent later)
-        self._login(config)
-        del config['username']
-        del config['password']
+        # Custom user agent
+        user_agent = config.pop('user_agent')
+        if user_agent:
+            self.session.headers.update({"User-Agent": user_agent})
 
-        # Logged in and made a request successfully, it's ok if nothing matches
+        # Login
+        self._login(config.pop('username'), config.pop('password'))
+
+        # Logged in successfully, it's ok if nothing matches
         task.no_entries_ok = True
 
+        # NOTE: Any values still in config at this point MUST be valid search parameters
+
         # Perform the search and parse the needed information out of the response
-        return list(self._get_entries(config))
+        results = self._search_results(config)
+        return list(self._get_entries(results))
 
 
 @event('plugin.register')
