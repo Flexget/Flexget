@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import math
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -130,25 +131,19 @@ class InputWhatCD(object):
 
     def _key(self, key):
         """Gets the API key name from the entered key"""
-        try:
-            if key in self.ALIASES:
-                return self.ALIASES[key]
-            elif key in self.PARAMS:
-                return key
-            return None
-        except KeyError:
-            return None
+        if key in self.ALIASES:
+            return self.ALIASES[key]
+        elif key in self.PARAMS:
+            return key
+        return None
 
     def _opts(self, key):
         """Gets the options for the specified key"""
         temp = self._key(key)
-        try:
-            return self.PARAMS[temp]
-        except KeyError:
-            return None
+        return self.PARAMS.get(temp)
 
     def _getval(self, key, val):
-        """Gets the value for the specified key"""
+        """Gets the value for the specified key based on a config option"""
         # No alias or param by that name
         if self._key(key) is None:
             return None
@@ -159,14 +154,15 @@ class InputWhatCD(object):
                 return ",".join(val)
             return val
         elif isinstance(opts, dict):
-            # Options, translate the input to output
+            # Translate the input value to the What.CD API value
             # The str cast converts bools to 'True'/'False' for use as keys
+            # This allows for options that have True/False/Other values
             return opts[str(val)]
-        else:
-            # List of options, check it's in the list
-            if val not in opts:
-                return None
-            return val
+
+        # Should be one of a list of options, check it's valid
+        if val not in opts:
+            return None
+        return val
 
     def __init__(self):
         """Set up the schema"""
@@ -214,19 +210,19 @@ class InputWhatCD(object):
         if r.status_code != 302 or r.headers.get('location') != "index.php":
             raise PluginError("Failed to log in to What.cd")
 
-        accountinfo = self._request("index")
+        accountinfo = self._request('index')
 
-        self.authkey = accountinfo["authkey"]
-        self.passkey = accountinfo["passkey"]
+        self.authkey = accountinfo['authkey']
+        self.passkey = accountinfo['passkey']
         log.info("Logged in to What.cd")
 
-    def _request(self, action, **kwargs):
+    def _request(self, action, page=None, **kwargs):
         """
         Make an AJAX request to a given action page
         Adapted from https://github.com/isaaczafuta/whatapi
         """
 
-        ajaxpage = 'https://ssl.what.cd/ajax.php'
+        ajaxpage = "https://ssl.what.cd/ajax.php"
 
         params = {}
 
@@ -238,8 +234,8 @@ class InputWhatCD(object):
 
         # Params other than the searching ones
         params['action'] = action
-        if 'page' in kwargs:
-            params['page'] = kwargs['page']
+        if page:
+            params['page'] = page
 
         r = self.session.get(ajaxpage, params=params, allow_redirects=False)
         if r.status_code != 200:
@@ -252,15 +248,54 @@ class InputWhatCD(object):
                 # Try to deal with errors returned by the API
                 error = json_response.get('error', json_response.get('status'))
                 if not error or error == "failure":
-                    error = json_response.get('response')
-                if not error:
-                    error = str(json_response)
+                    error = json_response.get('response', str(json_response))
 
                 raise PluginError("What.cd gave a failure response: "
-                                  "'{0}'".format(error))
+                                  "'{}'".format(error))
             return json_response['response']
         except (ValueError, TypeError, KeyError) as e:
             raise PluginError("What.cd returned an invalid response")
+
+
+    def _search_results(self, config):
+        """Generator that yields search results"""
+        page = 1
+        pages = None
+        while True:
+            if pages and page >= pages:
+                break
+
+            log.debug("Attempting to get page {} of search results".format(page, pages))
+            result = self._request('browse', page=page, **config)
+            if not result['results']:
+                break
+            for x in result['results']:
+                yield x
+
+            pages = result.get('pages', pages)
+            page += 1
+
+    def _get_entries(self, config):
+        """Genertor that yields Entry objects"""
+        for result in self._search_results(config):
+            # Get basic information on the release
+            info = dict((k, result[k]) for k in ('artist', 'groupName', 'groupYear'))
+
+            # Releases can have multiple download options
+            for tor in result['torrents']:
+                temp = info.copy()
+                temp.update(dict((k, tor[k]) for k in ('media', 'encoding', 'format', 'torrentId')))
+
+                yield Entry(
+                    title="{artist} - {groupName} - {groupYear} "
+                          "({media} - {format} - {encoding})-{torrentId}.torrent".format(**temp),
+                    url="https://what.cd/torrents.php?action=download&"
+                        "id={}&authkey={}&torrent_pass={}".format(temp['torrentId'], self.authkey, self.passkey),
+                    torrent_seeds=tor['seeders'],
+                    torrent_leeches=tor['leechers'],
+                    # Size is returned in bytes, convert to MB for compat with the content_size plugin
+                    content_size=math.floor(tor['size'] / (1024**2))
+                )
 
     @cached('whatcd')
     @plugin.internet(log)
@@ -276,50 +311,16 @@ class InputWhatCD(object):
         # From the API docs: "Refrain from making more than five (5) requests every ten (10) seconds"
         self.session.set_domain_delay('ssl.what.cd', '2 seconds')
 
-        # Login
+        # Login and remove userinfo from config (so it isn't sent later)
         self._login(config)
-
-        # Perform the query
-        results = []
-        page = 1
-        while True:
-            result = self._request("browse", page=page, **config)
-            if not result['results']:
-                break
-            results.extend(result["results"])
-            pages = result['pages']
-            page = result['currentPage']
-            log.info("Got {0} of {1} pages".format(page, pages))
-            if page >= pages:
-                break
-            page += 1
+        del config['username']
+        del config['password']
 
         # Logged in and made a request successfully, it's ok if nothing matches
         task.no_entries_ok = True
 
-        # Parse the needed information out of the response
-        entries = []
-        for result in results:
-            # Get basic information on the release
-            info = dict((k, result[k]) for k in ('artist', 'groupName', 'groupYear'))
-
-            # Releases can have multiple download options
-            for tor in result['torrents']:
-                temp = info.copy()
-                temp.update(dict((k, tor[k]) for k in ('media', 'encoding', 'format', 'torrentId')))
-
-                entries.append(Entry(
-                    title="{artist} - {groupName} - {groupYear} "
-                          "({media} - {format} - {encoding})-{torrentId}.torrent".format(**temp),
-                    url="https://what.cd/torrents.php?action=download&"
-                        "id={0}&authkey={1}&torrent_pass={2}".format(temp['torrentId'], self.authkey, self.passkey),
-                    torrent_seeds=tor['seeders'],
-                    torrent_leeches=tor['leechers'],
-                    # Size is given in bytes, convert it
-                    content_size=int(tor['size'] / (1024**2) * 100) / 100
-                ))
-
-        return entries
+        # Perform the search and parse the needed information out of the response
+        return list(self._get_entries(config))
 
 
 @event('plugin.register')
