@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 from urlparse import urlparse
 import logging
+import requests
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
-from flexget.utils import qualities
 from requests import RequestException
 
 log = logging.getLogger('couchpotato')
@@ -22,6 +22,35 @@ class CouchPotato(object):
         'required': ['api_key', 'base_url'],
         'additionalProperties': False
     }
+
+
+    def movie_list_request(self, base_url, port, api_key):
+        parsedurl = urlparse(base_url)
+        log.debug('Received movie list request')
+        return '%s://%s:%s%s/api/%s/movie.list?status=active' % (
+            parsedurl.scheme, parsedurl.netloc, port, parsedurl.path, api_key)
+
+
+    def profile_list_request(self, base_url, port, api_key):
+        parsedurl = urlparse(base_url)
+        log.debug('Received profile list request')
+        return '%s://%s:%s%s/api/%s/profile.list' % (
+            parsedurl.scheme, parsedurl.netloc, port, parsedurl.path, api_key)
+
+    def build_url(self, base_url, request_type, port, api_key):
+        if request_type == 'active':
+            return self.movie_list_request(base_url, port, api_key)
+        elif request_type == 'profiles':
+            return self.profile_list_request(base_url, port, api_key)
+        else:
+            raise plugin.PluginError('Received unknown API request, aborting.')
+
+    @staticmethod
+    def get_json(url):
+        try:
+            return requests.get(url).json()
+        except RequestException as e:
+            raise plugin.PluginError('Unable to connect to Couchpotato at %s. Error: %s' % (url, e))
 
     def quality_requirement_builder(self, quality_profile):
         """
@@ -49,7 +78,9 @@ class CouchPotato(object):
         source_string = '|'.join(
             set([sources[quality] for quality in quality_profile['qualities'] if quality in sources]))
 
-        return res_string + ' ' + source_string
+        quality_requirement = (res_string + ' ' + source_string).rstrip()
+        log.debug('quality requirement is %s' % quality_requirement)
+        return quality_requirement
 
     def on_task_input(self, task, config):
         """Creates an entry for each item in your couchpotato wanted list.
@@ -65,57 +96,39 @@ class CouchPotato(object):
         Options base_url and api_key are required.
         When the include_data property is set to true, the
         """
-
-        parsedurl = urlparse(config.get('base_url'))
-        url = '{}://{}:{}{}/api/{}/movie.list?status=active'.format(parsedurl.scheme, parsedurl.netloc,
-                                                                    config.get('port'), parsedurl.path,
-                                                                    config.get('api_key'))
-        try:
-            json = task.requests.get(url).json()
-        except RequestException:
-            raise plugin.PluginError(
-                'Unable to connect to Couchpotato at {}://{}:{}{}.'.format(parsedurl.scheme, parsedurl.netloc,
-                                                                           config.get('port'), parsedurl.path))
-
+        log.verbose('Connection to CouchPotato to retrieve movie list.')
+        active_movies_url = self.build_url(config.get('base_url'), 'active', config.get('port'), config.get('api_key'))
+        active_movies_json = self.get_json(active_movies_url)
         # Gets profile and quality lists if include_data is TRUE
         if config.get('include_data'):
-            profile_url = '{}://{}:{}{}/api/{}/profile.list'.format(parsedurl.scheme, parsedurl.netloc,
-                                                                    config.get('port'), parsedurl.path,
-                                                                    config.get('api_key'))
-            try:
-                profile_json = task.requests.get(profile_url).json()
-            except RequestException as e:
-                raise plugin.PluginError(
-                    'Unable to connect to Couchpotato at {}://{}:{}{}. Error: {}'.format(parsedurl.scheme,
-                                                                                         parsedurl.netloc,
-                                                                                         config.get('port'),
-                                                                                         parsedurl.path, e))
+            log.verbose('Connection to CouchPotato to retrieve movie data.')
+            profile_url = self.build_url(config.get('base_url'), 'profiles', config.get('port'), config.get('api_key'))
+            profile_json = self.get_json(profile_url)
+
         entries = []
-        for movie in json['movies']:
+        for movie in active_movies_json['movies']:
             quality_req = ''
             if movie['status'] == 'active':
-                if config.get('include_data'):
+                if config.get('include_data') and profile_json:
                     for profile in profile_json['list']:
                         if profile['_id'] == movie['profile_id']:  # Matches movie profile with profile JSON
                             quality_req = self.quality_requirement_builder(profile)
-                title = movie["title"]
-                imdb = movie['info'].get('imdb')
-                tmdb = movie['info'].get('tmdb_id')
-                entry = Entry(title=title,
+                entry = Entry(title=movie["title"],
                               url='',
-                              imdb_id=imdb,
-                              tmdb_id=tmdb,
+                              imdb_id=movie['info'].get('imdb'),
+                              tmdb_id=movie['info'].get('tmdb_id'),
                               quality_req=quality_req)
                 if entry.isvalid():
+                    log.debug('adding entry %s' % entry)
                     entries.append(entry)
                 else:
-                    log.error('Invalid entry created? {}' % entry)
+                    log.error('Invalid entry created? %s' % entry)
                     continue
                 # Test mode logging
                 if entry and task.options.test:
                     log.info("Test mode. Entry includes:")
                     for key, value in entry.items():
-                        log.info('     {}: {}'.format(key.capitalize(), value))
+                        log.info('     %s: %s' % (key.capitalize(), value))
 
         return entries
 
