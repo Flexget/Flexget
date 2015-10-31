@@ -32,7 +32,10 @@ class ImdbList(object):
                     {'pattern': CUSTOM_LIST_RE}
                 ],
                 'error_oneOf': 'list must be either %s, or a custom list name (lsXXXXXXXXX)' % ', '.join(USER_LISTS)
-            }
+            },
+            'force_language':
+                {'type': 'string',
+                 'default': 'en-us'}
         },
         'additionalProperties': False,
         'required': ['list'],
@@ -54,8 +57,9 @@ class ImdbList(object):
         else:
             url = 'http://www.imdb.com/list/%s' % config['list']
 
-        log.debug('Requesting: %s' % url)
-        page = task.requests.get(url, params=params)
+        headers = {'Accept-Language': config.get('force_language')}
+        log.debug('Requesting: %s %s' % (url, headers))
+        page = task.requests.get(url, params=params, headers=headers)
         if page.status_code != 200:
             raise plugin.PluginError('Unable to get imdb list. Either list is private or does not exist.')
 
