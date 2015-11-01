@@ -38,13 +38,22 @@ updated = SimplePersistence('api_trakt')
 class TraktUserAuth(Base):
     __tablename__ = 'trakt_user_auth'
 
-    account = Column(Unicode)
+    account = Column(Unicode, primary_key=True)
     access_token = Column(Unicode)
     refresh_token = Column(Unicode)
     expires = Column(DateTime)
 
+    def __init__(self, account, access_token, refresh_token, expires):
+        self.account = account
+        self.access_token = access_token
+        self.refresh_token = refresh_token
+        self.expires = token_expire_date(expires)
 
-def account_auth(token, refresh=False):
+
+def token_expire_date(expires):
+    return datetime.datetime.now() + datetime.timedelta(days=expires)
+
+def get_access_token(account, token=None, refresh=False):
     """
     Gets authorization info from a pin or refresh token.
 
@@ -58,14 +67,33 @@ def account_auth(token, refresh=False):
         'client_secret': CLIENT_SECRET,
         'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob'
     }
-    if refresh:
-        data['refresh_token'] = token
-        data['grant_type'] = 'refresh_token'
-    else:
-        data['code'] = token
-        data['grant_type'] = 'authorization_code'
-
-    return get_session().post(get_api_url('oauth/token'), data=data).json()
+    with Session() as session:
+        item = session.query(TraktUserAuth).filter(TraktUserAuth.account == account).first()
+        if item and datetime.datetime.now() < item.expires and not refresh:
+            return item.access_token
+        elif item:
+            data['refresh_token'] = item.refresh_token
+            data['grant_type'] = 'refresh_token'
+            try:
+                r = session.post(get_api_url('oauth/token'), data=data).json()
+                item.access_token = r.get('access_token')
+                item.refresh_token = r.get('refresh_token')
+                item.expires = token_expire_date(r.get('expires'))
+                return r.get('access_token')
+            except requests.RequestException as e:
+                raise plugin.PluginError('Token exchange with trakt failed: %s' % e.args[0])
+        elif token:
+            data['code'] = token
+            data['grant_type'] = 'authorization_code'
+            try:
+                r = session.post(get_api_url('oauth/token'), data=data).json()
+                item = TraktUserAuth(account, r.get('access_token'), r.get('refresh_token'), r.get('expires'))
+                session.add(item)
+                return r.get('access_token')
+            except requests.RequestException as e:
+                raise plugin.PluginError('Token exchange with trakt failed: %s' % e.args[0])
+        else:
+            raise plugin.PluginError('Account not recognized and no token specified')
 
 
 def make_list_slug(name):
@@ -80,29 +108,30 @@ def make_list_slug(name):
     return slug
 
 
-def get_session(username=None, password=None):
+def get_session(username=None, password=None, token=None):
     """Creates a requests session which is authenticated to trakt."""
     session = requests.Session()
     session.headers = {
         'Content-Type': 'application/json',
         'trakt-api-version': 2,
-        'trakt-api-key': CLIENT_ID
+        'trakt-api-key': CLIENT_ID,
+        'Authorization': 'Bearer %s' % get_access_token(token),
     }
-    if username:
-        session.headers['trakt-user-login'] = username
-    if username and password:
-        auth = {'login': username, 'password': password}
-        try:
-            r = session.post(urljoin(API_URL, 'auth/login'), data=json.dumps(auth))
-        except requests.RequestException as e:
-            if e.response and e.response.status_code in [401, 403]:
-                raise plugin.PluginError('Authentication to trakt failed, check your username/password: %s' % e.args[0])
-            else:
-                raise plugin.PluginError('Authentication to trakt failed: %s' % e.args[0])
-        try:
-            session.headers['trakt-user-token'] = r.json()['token']
-        except (ValueError, KeyError):
-            raise plugin.PluginError('Got unexpected response content while authorizing to trakt: %s' % r.text)
+    # if username:
+    #     session.headers['trakt-user-login'] = username
+    # if username and password:
+    #     auth = {'login': username, 'password': password}
+    #     try:
+    #         r = session.post(urljoin(API_URL, 'auth/login'), data=json.dumps(auth))
+    #     except requests.RequestException as e:
+    #         if e.response and e.response.status_code in [401, 403]:
+    #             raise plugin.PluginError('Authentication to trakt failed, check your username/password: %s' % e.args[0])
+    #         else:
+    #             raise plugin.PluginError('Authentication to trakt failed: %s' % e.args[0])
+    #     try:
+    #         session.headers['trakt-user-token'] = r.json()['token']
+    #     except (ValueError, KeyError):
+    #         raise plugin.PluginError('Got unexpected response content while authorizing to trakt: %s' % r.text)
     return session
 
 

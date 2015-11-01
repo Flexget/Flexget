@@ -87,7 +87,7 @@ class TraktList(object):
 
     @cached('trakt_list', persist='2 hours')
     def on_task_input(self, task, config):
-        session = get_session(config['username'], config.get('password'))
+        session = get_session(config['username'], config.get('password'), 'A4D3F5DC')
         endpoint = ['users', config['username']]
         if config['list'] in ['collection', 'watchlist', 'watched']:
             endpoint += (config['list'], config['type'])

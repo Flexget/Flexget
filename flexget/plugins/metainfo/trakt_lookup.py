@@ -171,13 +171,13 @@ class PluginTraktLookup(object):
         for entry in task.entries:
 
             if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False):
-                entry.register_lazy_fields(self.series_map, self.lazy_series_lookup)
+                entry.register_lazy_func(self.lazy_series_lookup, self.series_map)
 
                 if 'series_season' in entry and 'series_episode' in entry:
-                    entry.register_lazy_fields(self.episode_map, self.lazy_episode_lookup)
-            else:
-                entry.register_lazy_fields(self.movie_map, self.lazy_movie_lookup)
                     entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
+            #else:
+            #    entry.register_lazy_fields(self.movie_map, self.lazy_movie_lookup)
+
 
 
 @event('plugin.register')
