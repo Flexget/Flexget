@@ -5,7 +5,7 @@
 }
 
 .login .header {
-  background: white url("/ui/static/images/header.png") no-repeat center !important;
+  background: white url("/ui/images/header.png") no-repeat center !important;
   height: 90px;
   border-bottom: 1px solid #e5e5e5;
 }
