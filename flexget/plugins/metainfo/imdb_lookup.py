@@ -23,23 +23,22 @@ Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
 # association tables
 genres_table = Table('imdb_movie_genres', Base.metadata,
-    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
-    Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'))
+                     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+                     Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
+                     Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'))
 
 actors_table = Table('imdb_movie_actors', Base.metadata,
-    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('actor_id', Integer, ForeignKey('imdb_actors.id')),
-    Index('ix_imdb_movie_actors', 'movie_id', 'actor_id'))
+                     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+                     Column('actor_id', Integer, ForeignKey('imdb_actors.id')),
+                     Index('ix_imdb_movie_actors', 'movie_id', 'actor_id'))
 
 directors_table = Table('imdb_movie_directors', Base.metadata,
-    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('director_id', Integer, ForeignKey('imdb_directors.id')),
-    Index('ix_imdb_movie_directors', 'movie_id', 'director_id'))
+                        Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+                        Column('director_id', Integer, ForeignKey('imdb_directors.id')),
+                        Index('ix_imdb_movie_directors', 'movie_id', 'director_id'))
 
 
 class Movie(Base):
-
     __tablename__ = 'imdb_movies'
 
     id = Column(Integer, primary_key=True)
@@ -89,7 +88,6 @@ class Movie(Base):
 
 
 class MovieLanguage(Base):
-
     __tablename__ = 'imdb_movie_languages'
 
     movie_id = Column(Integer, ForeignKey('imdb_movies.id'), primary_key=True)
@@ -104,7 +102,6 @@ class MovieLanguage(Base):
 
 
 class Language(Base):
-
     __tablename__ = 'imdb_languages'
 
     id = Column(Integer, primary_key=True)
@@ -115,7 +112,6 @@ class Language(Base):
 
 
 class Genre(Base):
-
     __tablename__ = 'imdb_genres'
 
     id = Column(Integer, primary_key=True)
@@ -126,7 +122,6 @@ class Genre(Base):
 
 
 class Actor(Base):
-
     __tablename__ = 'imdb_actors'
 
     id = Column(Integer, primary_key=True)
@@ -139,7 +134,6 @@ class Actor(Base):
 
 
 class Director(Base):
-
     __tablename__ = 'imdb_directors'
 
     id = Column(Integer, primary_key=True)
@@ -152,7 +146,6 @@ class Director(Base):
 
 
 class SearchResult(Base):
-
     __tablename__ = 'imdb_search'
 
     id = Column(Integer, primary_key=True)
@@ -172,6 +165,7 @@ class SearchResult(Base):
 
     def __repr__(self):
         return '<SearchResult(title=%s,url=%s,fails=%s)>' % (self.title, self.url, self.fails)
+
 
 log = logging.getLogger('imdb_lookup')
 
@@ -251,22 +245,25 @@ class ImdbLookup(object):
         'movie_name': 'title',
         'movie_year': 'year'}
 
-    schema = {'type': 'boolean'}
+    schema = {'oneOf': [
+        {'type': 'boolean'},
+        {'type': 'string'}]
+    }
 
     @plugin.priority(130)
     def on_task_metainfo(self, task, config):
         if not config:
             return
         for entry in task.entries:
-            self.register_lazy_fields(entry)
+            self.register_lazy_fields(entry, config)
 
-    def register_lazy_fields(self, entry):
+    def register_lazy_fields(self, entry, headers=None):
         entry.register_lazy_func(self.lazy_loader, self.field_map)
 
-    def lazy_loader(self, entry):
+    def lazy_loader(self, entry, config):
         """Does the lookup for this entry and populates the entry fields."""
         try:
-            self.lookup(entry)
+            self.lookup(entry, headers=config)
         except plugin.PluginError as e:
             log_once(unicode(e.value).capitalize(), logger=log)
 
@@ -309,7 +306,7 @@ class ImdbLookup(object):
 
     @plugin.internet(log)
     @with_session
-    def lookup(self, entry, search_allowed=True, session=None):
+    def lookup(self, entry, search_allowed=True, session=None, headers=None):
         """
         Perform imdb lookup for entry.
 
@@ -340,7 +337,7 @@ class ImdbLookup(object):
                 entry['imdb_url'] = make_url(imdb_id)
             else:
                 log.debug('imdb url %s is invalid, removing it' % entry['imdb_url'])
-                del(entry['imdb_url'])
+                del (entry['imdb_url'])
 
         # no imdb_url, check if there is cached result for it or if the
         # search is known to fail
@@ -365,7 +362,7 @@ class ImdbLookup(object):
             log.verbose('Searching from imdb `%s`' % entry['title'])
             search = ImdbSearch()
             search_name = entry.get('movie_name', entry['title'], eval_lazy=False)
-            search_result = search.smart_match(search_name)
+            search_result = search.smart_match(search_name, headers)
             if search_result:
                 entry['imdb_url'] = search_result['url']
                 # store url for this movie, so we don't have to search on every run

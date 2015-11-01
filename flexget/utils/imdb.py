@@ -64,7 +64,7 @@ class ImdbSearch(object):
         pattern = re.compile(re.escape(old), re.I)
         return re.sub(pattern, new, text, count)
 
-    def smart_match(self, raw_name):
+    def smart_match(self, raw_name, headers=None):
         """Accepts messy name, cleans it and uses information available to make smartest and best match"""
         parser = get_plugin_by_name('parsing').instance.parse_movie(raw_name)
         name = parser.name
@@ -73,11 +73,11 @@ class ImdbSearch(object):
             log.critical('Failed to parse name from %s' % raw_name)
             return None
         log.debug('smart_match name=%s year=%s' % (name, str(year)))
-        return self.best_match(name, year)
+        return self.best_match(name, year, headers)
 
-    def best_match(self, name, year=None):
+    def best_match(self, name, year=None, headers=None):
         """Return single movie that best matches name criteria or None"""
-        movies = self.search(name)
+        movies = self.search(name, headers)
 
         if not movies:
             log.debug('search did not return any movies')
@@ -118,15 +118,16 @@ class ImdbSearch(object):
         else:
             return movies[0]
 
-    def search(self, name):
+    def search(self, name, headers=None):
         """Return array of movie details (dict)"""
         log.debug('Searching: %s' % name)
         url = u'http://www.imdb.com/find'
         # This will only include movies searched by title in the results
         params = {'q': name, 's': 'tt', 'ttype': 'ft'}
-
+        #  This will add language parameter if passed from config
+        headers= {'Accept-Language': headers}
         log.debug('Serch query: %s' % repr(url))
-        page = requests.get(url, params=params)
+        page = requests.get(url, params=params, headers=headers)
         actual_url = page.url
 
         movies = []
