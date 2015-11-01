@@ -61,22 +61,19 @@
 
       logStream = oboe({url: '/api/server/log/' + queryParams})
         .start(function () {
-          $scope.status = "Streaming";
+          $scope.$applyAsync(function () {
+            $scope.status = "Streaming";
+          });
         })
         .node('{message}', function(node) {
-          $scope.gridOptions.data.push(node);
-
-          // Workaround as notifyDateChange is not triggered when streaming data from Oboe
-          // Bug: https://github.com/angular-ui/ui-grid/issues/4538
-          if (angular.isDefined(newDataTimeout)) {
-            $timeout.cancel(newDataTimeout);
-          }
-          newDataTimeout = $timeout(function () {
-            $scope.gridApi.core.notifyDataChange(uiGridConstants.dataChange.ROW)
-          }, 1000);
+          $scope.$applyAsync(function () {
+            $scope.gridOptions.data.push(node);
+          });
         })
-        .fail(function (){
-          $scope.status = "Disconnected";
+        .fail(function (test){
+          $scope.$applyAsync(function () {
+            $scope.status = "Disconnected";
+          });
         })
     };
 
@@ -92,9 +89,9 @@
       enableSorting: true,
       rowHeight: 20,
       columnDefs: [
-        {field: 'asctime', name: 'Time', cellFilter: 'date', enableSorting: true, width: 120},
-        {field: 'levelname', name: 'Level', enableSorting: false, width: 65},
-        {field: 'name', name: 'Name', enableSorting: false, width: 80, cellTooltip: true},
+        {field: 'timestamp', name: 'Time', cellFilter: 'date', enableSorting: true, width: 120},
+        {field: 'log_level', name: 'Level', enableSorting: false, width: 65},
+        {field: 'plugin', name: 'Plugin', enableSorting: false, width: 80, cellTooltip: true},
         {field: 'task', name: 'Task', enableSorting: false, width: 65, cellTooltip: true},
         {field: 'message', name: 'Message', enableSorting: false, minWidth: 400, cellTooltip: true}
       ],

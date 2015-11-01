@@ -61,7 +61,7 @@ def use_task_logging(func):
     def wrapper(self, *args, **kw):
         # Set the task name in the logger and capture output
         from flexget import logger
-        with logger.task_logging(self.name, self.id):
+        with logger.task_logging(self.name):
             if self.output:
                 with capture_output(self.output, loglevel=self.loglevel):
                     return func(self, *args, **kw)
