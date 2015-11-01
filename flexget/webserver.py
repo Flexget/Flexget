@@ -3,6 +3,7 @@ import logging
 import threading
 import hashlib
 import random
+import socket
 
 from sqlalchemy import Column, Integer, Unicode
 
@@ -186,10 +187,14 @@ class WebServer(threading.Thread):
 
         d = wsgiserver.WSGIPathInfoDispatcher(apps)
         self.server = wsgiserver.CherryPyWSGIServer((self.bind, self.port), d)
+
+        host = self.bind if self.bind != "0.0.0.0" else socket.gethostbyname(socket.gethostname())
+
+        log.info('Web interface avaliable at http://%s:%s' % (host, self.port))
+
         self.server.start()
 
     def run(self):
-        log.info('Starting web server on port %s' % self.port)
         self._start_server()
 
     def stop(self):
