@@ -318,8 +318,9 @@ class UrlRewriteTorrent411(object):
             log.debug("Got the URL: %s" % entry['url'])
             rawdata = ""
             try:
-                request = urllib2.Request(url)
-                response = urllib2.urlopen(request)
+                opener = urllib2.build_opener()
+                opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+                response = opener.open(url)
             except Exception as e:
                 raise UrlRewritingError("Connection Error for %s : %s" % (url, e))
             rawdata = response.read()
@@ -370,8 +371,10 @@ class UrlRewriteTorrent411(object):
                           urllib.quote_plus(query.encode('utf-8')) +
                           filter_url)
 
-            req = urllib2.Request(url_base + url_search)
-            response = urllib2.urlopen(req)
+            opener = urllib2.build_opener()
+            opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+            response = opener.open(url_base + url_search)
+
             data = response.read()
             soup = get_soup(data)
             tb = soup.find("table", class_="results")
