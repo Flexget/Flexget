@@ -7,7 +7,6 @@ log = logging.getLogger('est_released')
 
 
 class EstimateRelease(object):
-
     """
     Front-end for estimator plugins that estimate release times
     for various things (series, movies).
