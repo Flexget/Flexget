@@ -255,7 +255,7 @@ class DynamicIMDB(object):
             from imdb import IMDb
             self.ia = IMDb()
         except ImportError:
-            log.error('IMDBPY is requires for this plugin. Please install using "pip install imdbpy"')
+            log.error('IMDBPY is required for this plugin. Please install using "pip install imdbpy"')
             return
 
         entries = []
