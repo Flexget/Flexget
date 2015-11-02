@@ -1,5 +1,3 @@
-
-/* Side Nav Menu */
 .nav-menu {
     position: relative;
     min-width: 190px !important;
@@ -43,7 +41,7 @@
 .nav-menu .md-button:hover {
     color: #fff;
     background: #1e282c !important;
-    border-left-color: #f39c12;
+    border-left-color: $flexget-orange;
 }
 
 .nav-menu .md-button > md-icon {
