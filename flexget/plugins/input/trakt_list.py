@@ -8,7 +8,7 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.cached_input import cached
-from flexget.utils.trakt import get_api_url, get_session, make_list_slug
+from flexget.plugins.api_trakt import get_api_url, get_session, make_list_slug
 
 log = logging.getLogger('trakt_list')
 
@@ -68,8 +68,9 @@ class TraktList(object):
     schema = {
         'type': 'object',
         'properties': {
+            'account': {'type': 'string'},
             'username': {'type': 'string'},
-            'password': {'type': 'string'},
+            'pin': {'type': 'string'},
             'type': {'type': 'string', 'enum': ['shows', 'movies', 'episodes']},
             'list': {'type': 'string'},
             'strip_dates': {'type': 'boolean', 'default': False}
@@ -87,7 +88,7 @@ class TraktList(object):
 
     @cached('trakt_list', persist='2 hours')
     def on_task_input(self, task, config):
-        session = get_session(config['username'], config.get('password'), 'A4D3F5DC')
+        session = get_session(config['username'], config.get('pin'), account=config.get('account'))
         endpoint = ['users', config['username']]
         if config['list'] in ['collection', 'watchlist', 'watched']:
             endpoint += (config['list'], config['type'])

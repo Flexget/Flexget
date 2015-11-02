@@ -11,6 +11,7 @@ from sqlalchemy.schema import ForeignKey
 
 from flexget import db_schema
 from flexget import plugin
+from flexget import options
 from flexget.db_schema import upgrade
 from flexget.event import event
 from flexget.manager import Session
@@ -18,6 +19,7 @@ from flexget.plugins.filter.series import normalize_series_name
 from flexget.utils import json, requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimplePersistence
+from flexget.logger import console
 
 api_key = '6c228565a45a302e49fb7d2dab066c9ab948b7be/'
 search_show = 'http://api.trakt.tv/search/shows.json/'
@@ -29,7 +31,8 @@ log = logging.getLogger('api_trakt')
 CLIENT_ID = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
 CLIENT_SECRET = 'db4af7531e8df678b134dbc22445a2c04ebdbdd7213be7f5b6d17dfdfabfcdc2'
 API_URL = 'https://api-v2launch.trakt.tv/'
-
+PIN_URL = 'https://trakt.tv/oauth/authorize?response_type=code&client_id=' \
+          '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af&redirect_uri=urn:ietf:wg:oauth:2.0:oob'
 # Stores the last time we checked for updates for shows/movies
 updated = SimplePersistence('api_trakt')
 
@@ -41,19 +44,24 @@ class TraktUserAuth(Base):
     account = Column(Unicode, primary_key=True)
     access_token = Column(Unicode)
     refresh_token = Column(Unicode)
+    created = Column(DateTime)
     expires = Column(DateTime)
 
-    def __init__(self, account, access_token, refresh_token, expires):
+    def __init__(self, account, access_token, refresh_token, created, expires):
         self.account = account
         self.access_token = access_token
         self.refresh_token = refresh_token
         self.expires = token_expire_date(expires)
+        self.created = token_created_date(created)
 
 
 def token_expire_date(expires):
-    return datetime.datetime.now() + datetime.timedelta(days=expires)
+    return datetime.now() + timedelta(seconds=expires)
 
-def get_access_token(account, token=None, refresh=False):
+def token_created_date(created):
+    return datetime.fromtimestamp(created)
+
+def get_access_token(account, token=None, refresh=False, re_auth=False):
     """
     Gets authorization info from a pin or refresh token.
 
@@ -68,32 +76,32 @@ def get_access_token(account, token=None, refresh=False):
         'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob'
     }
     with Session() as session:
-        item = session.query(TraktUserAuth).filter(TraktUserAuth.account == account).first()
-        if item and datetime.datetime.now() < item.expires and not refresh:
-            return item.access_token
-        elif item:
-            data['refresh_token'] = item.refresh_token
-            data['grant_type'] = 'refresh_token'
-            try:
-                r = session.post(get_api_url('oauth/token'), data=data).json()
-                item.access_token = r.get('access_token')
-                item.refresh_token = r.get('refresh_token')
-                item.expires = token_expire_date(r.get('expires'))
-                return r.get('access_token')
-            except requests.RequestException as e:
-                raise plugin.PluginError('Token exchange with trakt failed: %s' % e.args[0])
-        elif token:
-            data['code'] = token
-            data['grant_type'] = 'authorization_code'
-            try:
-                r = session.post(get_api_url('oauth/token'), data=data).json()
-                item = TraktUserAuth(account, r.get('access_token'), r.get('refresh_token'), r.get('expires'))
-                session.add(item)
-                return r.get('access_token')
-            except requests.RequestException as e:
-                raise plugin.PluginError('Token exchange with trakt failed: %s' % e.args[0])
+        acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == account).first()
+        if acc and datetime.now() < acc.expires and not refresh and not re_auth:
+            return acc.access_token
         else:
-            raise plugin.PluginError('Account not recognized and no token specified')
+            if acc and refresh and not re_auth:
+                data['refresh_token'] = acc.refresh_token
+                data['grant_type'] = 'refresh_token'
+            elif token:
+                data['code'] = token
+                data['grant_type'] = 'authorization_code'
+            else:
+                raise plugin.PluginError('Account not recognized and no token specified. Check your config.')
+            try:
+                r = requests.post(get_api_url('oauth/token'), data=data).json()
+                if acc:
+                    acc.access_token = r.get('access_token')
+                    acc.refresh_token = r.get('refresh_token')
+                    acc.expires = token_expire_date(r.get('expires_in'))
+                    acc.created = token_created_date(r.get('created_at'))
+                else:
+                    acc = TraktUserAuth(account, r.get('access_token'), r.get('refresh_token'), r.get('created_at'),
+                                        r.get('expires_in'))
+                    session.add(acc)
+                return r.get('access_token')
+            except requests.RequestException as e:
+                raise plugin.PluginError('Token exchange with trakt failed: %s' % e.args[0])
 
 
 def make_list_slug(name):
@@ -108,30 +116,17 @@ def make_list_slug(name):
     return slug
 
 
-def get_session(username=None, password=None, token=None):
+def get_session(username=None, token=None, account=None):
     """Creates a requests session which is authenticated to trakt."""
+    if not account:
+        account = username
     session = requests.Session()
     session.headers = {
         'Content-Type': 'application/json',
         'trakt-api-version': 2,
         'trakt-api-key': CLIENT_ID,
-        'Authorization': 'Bearer %s' % get_access_token(token),
+        'Authorization': 'Bearer %s' % get_access_token(account, token),
     }
-    # if username:
-    #     session.headers['trakt-user-login'] = username
-    # if username and password:
-    #     auth = {'login': username, 'password': password}
-    #     try:
-    #         r = session.post(urljoin(API_URL, 'auth/login'), data=json.dumps(auth))
-    #     except requests.RequestException as e:
-    #         if e.response and e.response.status_code in [401, 403]:
-    #             raise plugin.PluginError('Authentication to trakt failed, check your username/password: %s' % e.args[0])
-    #         else:
-    #             raise plugin.PluginError('Authentication to trakt failed: %s' % e.args[0])
-    #     try:
-    #         session.headers['trakt-user-token'] = r.json()['token']
-    #     except (ValueError, KeyError):
-    #         raise plugin.PluginError('Got unexpected response content while authorizing to trakt: %s' % r.text)
     return session
 
 
@@ -556,6 +551,56 @@ class ApiTrakt(object):
             session.add(movie)
         return movie
 
+
+def do_cli(manager, options):
+    if options.action == 'auth':
+        try:
+            get_access_token(options.account, options.pin, re_auth=True)
+            console('Successfully authorized Flexget app on Trakt.tv. Enjoy!')
+            return
+        except plugin.PluginError as e:
+            console('Authorization failed: %s' % e)
+    elif options.action == 'show':
+        if not options.account:
+            console('Please specify an account')
+            return
+        with Session() as session:
+            acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == options.account).first()
+            if acc:
+                console('Authorization expires on %s' % acc.expires)
+            else:
+                console('Flexget has not been authorized to access your account.')
+    elif options.action == 'refresh':
+        if not options.account:
+            console('Please specify an account')
+            return
+        try:
+            get_access_token(options.account, refresh=True)
+            console('Successfully refreshed your access token.')
+            return
+        except plugin.PluginError as e:
+            console('Authorization failed: %s' % e)
+
+
+@event('options.register')
+def register_parser_arguments():
+    # Register subcommand
+    parser = options.register_command('trakt', do_cli, help='view and manage trakt authentication.'
+                                                            'Please visit %s to retrieve your pin code.' % PIN_URL)
+    # Set up our subparsers
+    subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='action')
+    auth_parser = subparsers.add_parser('auth', help='authorize Flexget to access your Trakt.tv account')
+
+    auth_parser.add_argument('--account', metavar='<account>', help='local identifier')
+    auth_parser.add_argument('--pin', metavar='<pin>', help='pin code')
+
+    show_parser = subparsers.add_parser('show', help='show expiration date for Flexget authorization')
+
+    show_parser.add_argument('--account', metavar='<account>', help='local identifier')
+
+    refresh_parser = subparsers.add_parser('refresh', help='refresh access token')
+
+    refresh_parser.add_argument('--account', metavar='<account>', help='local identifier')
 
 @event('plugin.register')
 def register_plugin():
