@@ -37,12 +37,12 @@ class PluginTraktLookup(object):
     trakt_series_air_time
     trakt_series_content_rating
     trakt_series_genres
-    trakt_sereis_banner_url
-    trakt_sereis_fanart_url
+    trakt_series_banner_url
+    trakt_series_fanart_url
     trakt_series_imdb_url
     trakt_series_trakt_url
-    trakt_series_imdb_id
-    trakt_series_tvdb_id
+    imdb_id
+    tvdb_id
     trakt_series_actors
     trakt_series_country
     trakt_series_year
@@ -141,9 +141,6 @@ class PluginTraktLookup(object):
                 series = lookup_series(**lookupargs)
             except LookupError as e:
                 log.debug(e.message)
-                #entry.unregister_lazy_fields(self.series_map, self.lazy_series_lookup)
-                # Also clear episode fields, since episode lookup cannot succeed without series lookup
-                #entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
             else:
                 entry.update_using_map(self.series_map, series)
         return entry
@@ -158,7 +155,6 @@ class PluginTraktLookup(object):
                 episode = series.get_episode(entry['series_season'], entry['series_episode'])
             except LookupError as e:
                 log.debug('Error looking up trakt episode information for %s: %s' % (entry['title'], e.args[0]))
-                #entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
             else:
                 entry.update_using_map(self.episode_map, episode)
         return entry#[field]
@@ -177,9 +173,6 @@ class PluginTraktLookup(object):
                 movie = lookup_movie(**lookupargs)
             except LookupError as e:
                 log.debug(e.message)
-                #entry.unregister_lazy_fields(self.series_map, self.lazy_series_lookup)
-                # Also clear episode fields, since episode lookup cannot succeed without series lookup
-                #entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
             else:
                 entry.update_using_map(self.movie_map, movie)
         return entry
@@ -199,8 +192,6 @@ class PluginTraktLookup(object):
                     entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
             else:
                 entry.register_lazy_func(self.lazy_movie_lookup, self.movie_map)
-                #entry.register_lazy_fields(self.movie_map, self.lazy_movie_lookup)
-
 
 
 @event('plugin.register')
