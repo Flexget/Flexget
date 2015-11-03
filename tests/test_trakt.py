@@ -57,7 +57,6 @@ class TestTraktShowLookup(FlexGetBase):
         entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['trakt_ep_name'] == 'Paternity', \
             '%s trakt_ep_name should be Paternity' % entry['title']
-        print entry['trakt_series_status']
         assert entry['trakt_series_status'] == 'ended', \
             'runtime for %s is %s, should be "ended"' % (entry['title'], entry['trakt_series_status'])
         assert entry['afield'] == '73255Paternity', 'afield was not set correctly'

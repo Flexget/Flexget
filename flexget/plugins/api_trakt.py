@@ -227,8 +227,9 @@ class TraktEpisode(Base):
     number_abs = Column(Integer)
     overview = Column(Unicode)
     first_aired = Column(DateTime)
-    expired = Column(Boolean)
+    #expired = Column(Boolean)
     updated_at = Column(DateTime)
+    cached_at = Column(DateTime)
 
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=False)
 
@@ -248,11 +249,16 @@ class TraktEpisode(Base):
         self.tvdb_id = trakt_episode['ids']['tvdb']
         self.first_aired = dateutil_parse(trakt_episode.get('first_aired'))
         self.updated_at = dateutil_parse(trakt_episode.get('updated_at'))
+        self.cached_at = datetime.now()
 
         for col in ['title', 'season', 'number', 'number_abs', 'overview']:
             setattr(self, col, trakt_episode.get(col))
 
-        self.expired = False
+
+    @property
+    def expired(self):
+        # TODO should episode have its own expiration function?
+        pass
 
 
 class TraktShow(Base):
@@ -283,7 +289,8 @@ class TraktShow(Base):
     genres = relation(TraktGenre, secondary=show_genres_table)
     #actors = relation(TraktActor, secondary=show_actors_table)
     updated_at = Column(DateTime)
-    expired = Column(Boolean)
+    cached_at = Column(DateTime)
+    #expired = Column(Boolean)
 
     def __init__(self, trakt_show, session):
         super(TraktShow, self).__init__()
@@ -315,13 +322,13 @@ class TraktShow(Base):
             setattr(self, col, trakt_show.get(col))
 
         self.genres[:] = get_db_genres(trakt_show.get('genres', []), session)
-        self.expired = False
+        self.cached_at = datetime.now()
 
     def get_episode(self, season, number, only_cached=False):
         # TODO: Does series data being expired mean all episode data should be refreshed?
         episode = self.episodes.filter(TraktEpisode.season == season).filter(TraktEpisode.number == number).first()
-        if not episode:
-            url = get_api_url('shows', self.id, 'seasons', season, 'episodes', number, '?extended=full') # 'https://api.trakt.tv/shows/%s/seasons/%s/episodes/%s?extended=full' % (self.id, season, number)
+        if not episode or self.expired:
+            url = get_api_url('shows', self.id, 'seasons', season, 'episodes', number, '?extended=full')
             if only_cached:
                 raise LookupError('Episode %s %s not found in cache' % (season, number))
             log.debug('Episode %s %s not found in cache, looking up from trakt.' % (season, number))
@@ -339,6 +346,24 @@ class TraktShow(Base):
                 episode = TraktEpisode(data)
                 self.episodes.append(episode)
         return episode
+
+    @property
+    def expired(self):
+        """
+        :return: True if show details are considered to be expired, ie. need of update
+        """
+        # TODO stolen from imdb plugin, maybe there's a better way?
+        if self.cached_at is None:
+            log.debug('cached_at is None: %s' % self)
+            return True
+        refresh_interval = 2
+        # if show has been cancelled or ended, then it is unlikely to be updated often
+        if self.year and (self.status == 'ended' or self.status == 'canceled'):
+            # Make sure age is not negative
+            age = max((datetime.now().year - self.year), 0)
+            refresh_interval += age * 5
+            log.debug('show `%s` age %i expires in %i days' % (self.title, age, refresh_interval))
+        return self.cached_at < datetime.now() - timedelta(days=refresh_interval)
 
     def __repr__(self):
         return '<name=%s, id=%s>' % (self.title, self.id)
@@ -360,8 +385,9 @@ class TraktMovie(Base):
     rating = Column(Integer)
     votes = Column(Integer)
     language = Column(Unicode)
-    expired = Column(Boolean)
+    #expired = Column(Boolean)
     updated_at = Column(DateTime)
+    cached_at = Column(DateTime)
     genres = relation(TraktGenre, secondary=movie_genres_table)
     _actors = relation(TraktActor, secondary=movie_actors_table)
 
@@ -384,7 +410,24 @@ class TraktMovie(Base):
             self.released = dateutil_parse(trakt_movie.get('released'))
         self.updated_at = dateutil_parse(trakt_movie.get('updated_at'))
         self.genres[:] = get_db_genres(trakt_movie.get('genres', []), session)
-        self.expired = False
+        self.cached_at = datetime.now()
+
+    @property
+    def expired(self):
+        """
+        :return: True if movie details are considered to be expired, ie. need of update
+        """
+        # TODO stolen from imdb plugin, maybe there's a better way?
+        if self.updated_at is None:
+            log.debug('updated_at is None: %s' % self)
+            return True
+        refresh_interval = 2
+        if self.year:
+            # Make sure age is not negative
+            age = max((datetime.now().year - self.year), 0)
+            refresh_interval += age * 5
+            log.debug('movie `%s` age %i expires in %i days' % (self.title, age, refresh_interval))
+        return self.cached_at < datetime.now() - timedelta(days=refresh_interval)
 
     @property
     def actors(self):
