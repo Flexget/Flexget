@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api.trakt.tv:443/search?query=house&type=show
+      uri: https://api-v2launch.trakt.tv/search?query=house&type=show
     response:
       body: {string: "[{\"type\":\"show\",\"score\":14.836059,\"show\":{\"title\"\
           :\"House\",\"overview\":\"Go deeper into the medical mysteries of House,\
@@ -151,7 +151,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api.trakt.tv:443/shows/1399?extended=full
+      uri: https://api-v2launch.trakt.tv/shows/1399?extended=full
     response:
       body: {string: '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
           deeper into the medical mysteries of House, TV''s most compelling drama.
@@ -188,7 +188,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api.trakt.tv:443/shows/1399/seasons/1/episodes/2?extended=full
+      uri: https://api-v2launch.trakt.tv/shows/1399/seasons/1/episodes/2?extended=full
     response:
       body: {string: '{"season":1,"number":2,"title":"Paternity","ids":{"trakt":74344,"tvdb":110995,"imdb":"tt0606034","tmdb":63739,"tvrage":84700},"number_abs":null,"overview":"When
           a teenage lacrosse player is stricken with an unidentifiable brain disease,
@@ -227,7 +227,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api.trakt.tv:443/search?query=doctor+who&type=show
+      uri: https://api-v2launch.trakt.tv/search?query=doctor+who&type=show
     response:
       body: {string: "[{\"type\":\"show\",\"score\":18.864084,\"show\":{\"title\"\
           :\"Doctor Who\",\"overview\":\"Doctor Who is the longest-running science\
@@ -377,7 +377,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api.trakt.tv:443/shows/56872?extended=full
+      uri: https://api-v2launch.trakt.tv/shows/56872?extended=full
     response:
       body: {string: "{\"title\":\"Doctor Who\",\"year\":2005,\"ids\":{\"trakt\":56872,\"\
           slug\":\"doctor-who-2005\",\"tvdb\":78804,\"imdb\":\"tt0436992\",\"tmdb\"\
@@ -424,7 +424,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api.trakt.tv:443/shows/56872/seasons/2/episodes/3?extended=full
+      uri: https://api-v2launch.trakt.tv/shows/56872/seasons/2/episodes/3?extended=full
     response:
       body: {string: "{\"season\":2,\"number\":3,\"title\":\"School Reunion\",\"ids\"\
           :{\"trakt\":951447,\"tvdb\":302431,\"imdb\":\"\",\"tmdb\":941480,\"tvrage\"\
@@ -465,7 +465,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api.trakt.tv:443/search?query=castle&type=show
+      uri: https://api-v2launch.trakt.tv/search?query=castle&type=show
     response:
       body: {string: "[{\"type\":\"show\",\"score\":23.245121,\"show\":{\"title\"\
           :\"Castle\",\"overview\":\"Castle presenter and historian Marc Morris introduces\
@@ -601,7 +601,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api.trakt.tv:443/shows/1410?extended=full
+      uri: https://api-v2launch.trakt.tv/shows/1410?extended=full
     response:
       body: {string: '{"title":"Castle","year":2009,"ids":{"trakt":1410,"slug":"castle","tvdb":83462,"imdb":"tt1219024","tmdb":1419,"tvrage":19267},"overview":"Rick
           Castle is one of the world''s most successful crime authors. But when his

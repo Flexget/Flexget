@@ -8,6 +8,7 @@ from flexget.manager import Session
 try:
     from flexget.plugins.api_trakt import ApiTrakt
     lookup_series = ApiTrakt.lookup_series
+    lookup_movie = ApiTrakt.lookup_movie
 except ImportError:
     raise plugin.DependencyError(issued_by='trakt_lookup', missing='api_trakt',
                                  message='trakt_lookup requires the `api_trakt` plugin')
@@ -127,7 +128,7 @@ class PluginTraktLookup(object):
 
     schema = {'type': 'boolean'}
 
-    def lazy_series_lookup(self, entry, field):
+    def lazy_series_lookup(self, entry):
         """Does the lookup for this entry and populates the entry fields."""
         with Session() as session:
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
@@ -140,14 +141,14 @@ class PluginTraktLookup(object):
                 series = lookup_series(**lookupargs)
             except LookupError as e:
                 log.debug(e.message)
-                entry.unregister_lazy_fields(self.series_map, self.lazy_series_lookup)
+                #entry.unregister_lazy_fields(self.series_map, self.lazy_series_lookup)
                 # Also clear episode fields, since episode lookup cannot succeed without series lookup
-                entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
+                #entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
             else:
                 entry.update_using_map(self.series_map, series)
-        return entry[field]
+        return entry
 
-    def lazy_episode_lookup(self, entry, field):
+    def lazy_episode_lookup(self, entry):
         with Session(expire_on_commit=False) as session:
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
                           'trakt_id': entry.get('trakt_show_id', eval_lazy=False),
@@ -157,10 +158,31 @@ class PluginTraktLookup(object):
                 episode = series.get_episode(entry['series_season'], entry['series_episode'])
             except LookupError as e:
                 log.debug('Error looking up trakt episode information for %s: %s' % (entry['title'], e.args[0]))
-                entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
+                #entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
             else:
                 entry.update_using_map(self.episode_map, episode)
-        return entry[field]
+        return entry#[field]
+
+    def lazy_movie_lookup(self, entry):
+        """Does the lookup for this entry and populates the entry fields."""
+        with Session() as session:
+            lookupargs = {'title': entry.get('title', eval_lazy=False),
+                          #'year': entry.get('year', eval_lazy=False),
+                          'trakt_id': entry.get('trakt_movie_id', eval_lazy=False),
+                          'trakt_slug': entry.get('trakt_movie_slug', eval_lazy=False),
+                          'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
+                          'imdb_id': entry.get('imdb_id', eval_lazy=False),
+                          'session': session}
+            try:
+                movie = lookup_movie(**lookupargs)
+            except LookupError as e:
+                log.debug(e.message)
+                #entry.unregister_lazy_fields(self.series_map, self.lazy_series_lookup)
+                # Also clear episode fields, since episode lookup cannot succeed without series lookup
+                #entry.unregister_lazy_fields(self.episode_map, self.lazy_episode_lookup)
+            else:
+                entry.update_using_map(self.movie_map, movie)
+        return entry
 
     # Run after series and metainfo series
     @plugin.priority(110)
@@ -176,7 +198,8 @@ class PluginTraktLookup(object):
                 if 'series_season' in entry and 'series_episode' in entry:
                     entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
             else:
-                entry.register_lazy_fields(self.movie_map, self.lazy_movie_lookup)
+                entry.register_lazy_func(self.lazy_movie_lookup, self.movie_map)
+                #entry.register_lazy_fields(self.movie_map, self.lazy_movie_lookup)
 
 
 

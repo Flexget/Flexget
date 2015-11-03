@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api.trakt.tv:443/search?query=aoeu+htns&type=show
+      uri: https://api-v2launch.trakt.tv/search?query=aoeu+htns&type=show
     response:
       body: {string: '[]'}
       headers:

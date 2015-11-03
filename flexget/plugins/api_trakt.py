@@ -67,7 +67,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
 
     :param account: Arbitrary account name to attach authorization to.
     :param unicode token: The pin or refresh token, as supplied by the trakt website.
-    :param bool refresh: If True, `token` should be a refresh token rather than a pin.
+    :param bool refresh: If True, refresh the access token using refresh_token from db.
     :raises RequestException: If there is a network error while authorizing.
     """
     data = {
@@ -87,7 +87,8 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
                 data['code'] = token
                 data['grant_type'] = 'authorization_code'
             else:
-                raise plugin.PluginError('Account not recognized and no token specified. Check your config.')
+                log.debug('Account %s not found in db and no pin specified.' % account)
+                return
             try:
                 r = requests.post(get_api_url('oauth/token'), data=data).json()
                 if acc:
@@ -118,6 +119,7 @@ def make_list_slug(name):
 
 def get_session(username=None, token=None, account=None):
     """Creates a requests session which is authenticated to trakt."""
+    # default to username if account name is not specified
     if not account:
         account = username
     session = requests.Session()
@@ -125,8 +127,10 @@ def get_session(username=None, token=None, account=None):
         'Content-Type': 'application/json',
         'trakt-api-version': 2,
         'trakt-api-key': CLIENT_ID,
-        'Authorization': 'Bearer %s' % get_access_token(account, token),
     }
+    access_token = get_access_token(account, token) if token else None
+    if access_token:
+        session.headers.update({'Authorization':  'Bearer %s' % access_token})
     return session
 
 
@@ -160,6 +164,7 @@ def mark_expired(type, session=None):
     :param type: Either 'shows' or 'movies'
     """
     # TODO: Implement
+    pass
 
 
 class TraktGenre(Base):
@@ -316,7 +321,7 @@ class TraktShow(Base):
         # TODO: Does series data being expired mean all episode data should be refreshed?
         episode = self.episodes.filter(TraktEpisode.season == season).filter(TraktEpisode.number == number).first()
         if not episode:
-            url = 'https://api.trakt.tv/shows/%s/seasons/%s/episodes/%s?extended=full' % (self.id, season, number)
+            url = get_api_url('shows', self.id, 'seasons', season, 'episodes', number, '?extended=full') # 'https://api.trakt.tv/shows/%s/seasons/%s/episodes/%s?extended=full' % (self.id, season, number)
             if only_cached:
                 raise LookupError('Episode %s %s not found in cache' % (season, number))
             log.debug('Episode %s %s not found in cache, looking up from trakt.' % (season, number))

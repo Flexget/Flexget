@@ -6,7 +6,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api.trakt.tv:443/search?query=the+daily+show+with+jon+stewart&type=show
+      uri: https://api-v2launch.trakt.tv/search?query=the+daily+show+with+jon+stewart&type=show
     response:
       body: {string: '[{"type":"show","score":17.342175,"show":{"title":"The Daily
           Show with Jon Stewart","overview":"Forget trying to keep pace with 24 hour
@@ -62,7 +62,7 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api.trakt.tv:443/shows/2211?extended=full
+      uri: https://api-v2launch.trakt.tv/shows/2211?extended=full
     response:
       body: {string: '{"title":"The Daily Show with Jon Stewart","year":1996,"ids":{"trakt":2211,"slug":"the-daily-show-with-jon-stewart","tvdb":71256,"imdb":"tt0115147","tmdb":2224,"tvrage":5714},"overview":"Forget
           trying to keep pace with 24 hour news networks- the best fake news show
