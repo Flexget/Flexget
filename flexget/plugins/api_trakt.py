@@ -128,7 +128,7 @@ def get_session(username=None, token=None, account=None):
         'trakt-api-version': 2,
         'trakt-api-key': CLIENT_ID,
     }
-    access_token = get_access_token(account, token) if token else None
+    access_token = get_access_token(account, token) if account else None
     if access_token:
         session.headers.update({'Authorization':  'Bearer %s' % access_token})
     return session
