@@ -56,4 +56,4 @@ class EstimatesSeriesTVRage(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(EstimatesSeriesTVRage, 'est_series_tvrage', groups=['estimate_release_series'], api_ver=2)
+    plugin.register(EstimatesSeriesTVRage, 'est_series_tvrage', groups=['estimate_release'], api_ver=2)
