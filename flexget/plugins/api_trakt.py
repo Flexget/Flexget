@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from urlparse import urljoin
 
 from dateutil.parser import parse as dateutil_parse
-from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, Date, DateTime, Time, or_
+from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, Date, DateTime, Time, or_, func
 from sqlalchemy.orm import relation, object_session
 from sqlalchemy.schema import ForeignKey
 
@@ -201,7 +201,16 @@ class TraktActor(Base):
     __tablename__ = 'trakt_actors'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String, nullable=False)
+    name = Column(Unicode, nullable=False)
+    imdb_id = Column(Unicode)
+    trakt_id = Column(Unicode)
+    tmdb_id = Column(Unicode)
+
+    def __init__(self, name, trakt_id, imdb_id=None, tmdb_id=None):
+        self.name = name
+        self.trakt_id = trakt_id
+        self.imdb_id = imdb_id
+        self.tmdb_id = tmdb_id
 
 
 show_actors_table = Table('trakt_show_actors', Base.metadata,
@@ -211,6 +220,28 @@ show_actors_table = Table('trakt_show_actors', Base.metadata,
 movie_actors_table = Table('trakt_movie_actors', Base.metadata,
                      Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
                      Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
+
+def get_db_actors(id, style, session):
+    actors = []
+    url = get_api_url(style + 's', id, 'people')
+    req_session = get_session()
+    try:
+        results = req_session.get(url).json()
+        for result in results.get('cast'):
+            name = result.get('person').get('name')
+            trakt_id = result.get('person').get('trakt')
+            imdb_id = result.get('person').get('imdb')
+            tmdb_id = result.get('person').get('tmdb')
+            actor = session.query(TraktActor).filter(TraktActor.name == name).first()
+            if not actor:
+                actor = TraktActor(name, trakt_id, imdb_id, tmdb_id)
+                session.add(actor)
+            actors.append(actor)
+        session.commit()
+        return actors
+    except requests.RequestException as e:
+        log.debug('Error searching for actors for trakt id %s' % e)
+        return
 
 
 class TraktEpisode(Base):
@@ -287,7 +318,7 @@ class TraktShow(Base):
     aired_episodes = Column(Integer)
     episodes = relation(TraktEpisode, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic')
     genres = relation(TraktGenre, secondary=show_genres_table)
-    #actors = relation(TraktActor, secondary=show_actors_table)
+    actors = relation(TraktActor, secondary=show_actors_table)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
     #expired = Column(Boolean)
@@ -322,6 +353,7 @@ class TraktShow(Base):
             setattr(self, col, trakt_show.get(col))
 
         self.genres[:] = get_db_genres(trakt_show.get('genres', []), session)
+        #self.actors[:] = get_db_actors(self.id, 'show', session)
         self.cached_at = datetime.now()
 
     def get_episode(self, season, number, only_cached=False):
@@ -411,6 +443,7 @@ class TraktMovie(Base):
         self.updated_at = dateutil_parse(trakt_movie.get('updated_at'))
         self.genres[:] = get_db_genres(trakt_movie.get('genres', []), session)
         self.cached_at = datetime.now()
+        #self._actors[:] = get_db_actors(self.id, 'movie', session)
 
     @property
     def expired(self):
@@ -431,9 +464,8 @@ class TraktMovie(Base):
 
     @property
     def actors(self):
-        if not self._actors:
-            # TODO: Update the stuff from trakt
-            pass
+        #if not self._actors:
+        #    get_db_actors(self.id, 'movie', self._actors)
         return self._actors
 
 

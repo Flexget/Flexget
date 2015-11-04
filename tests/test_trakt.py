@@ -126,6 +126,9 @@ class TestTraktMovieLookup(FlexGetBase):
               movie_name: The Matrix
               movie_year: 1999
             - title: The Matrix (1999)
+          test_lookup_actors:
+            mock:
+            - title: The Matrix (1999)
     """
 
     @use_vcr
@@ -133,3 +136,48 @@ class TestTraktMovieLookup(FlexGetBase):
         self.execute_task('test_lookup_sources')
         for e in self.task.all_entries:
             assert e['movie_name'] == 'The Matrix', 'looking up based on %s failed' % e['title']
+
+    #@use_vcr
+    # def test_lookup_actors(self):
+    #     self.execute_task('test_lookup_actors')
+    #     assert len(self.task.entries) == 1
+    #     entry = self.task.entries[0]
+    #     actors = ['Keanu Reeves',
+    #               'Laurence Fishburne',
+    #               'Carrie-Anne Moss',
+    #               'Hugo Weaving',
+    #               'Gloria Foster',
+    #               'Joe Pantoliano',
+    #               'Marcus Chong',
+    #               'Julian Arahanga',
+    #               'Matt Doran',
+    #               'Belinda McClory',
+    #               'Anthony Ray Parker',
+    #               'Paul Goddard',
+    #               'Robert Taylor',
+    #               'David Aston',
+    #               'Marc Aden',
+    #               'Ada Nicodemou',
+    #               'Deni Gordon',
+    #               'Rowan Witt',
+    #               'Bill Young',
+    #               'Eleanor Witt',
+    #               'Tamara Brown',
+    #               'Janaya Pender',
+    #               'Adryn White',
+    #               'Natalie Tjen',
+    #               'David O\'Connor',
+    #               'Jeremy Ball',
+    #               'Fiona Johnson',
+    #               'Harry Lawrence',
+    #               'Steve Dodd',
+    #               'Luke Quinton',
+    #               'Lawrence Woodward',
+    #               'Michael Butcher',
+    #               'Bernard Ledger',
+    #               'Robert Simper',
+    #               'Chris Pattinson',
+    #               'Nigel Harbach',
+    #               'Rana Morrison']
+    #     print entry['trakt_movie_actors']
+    #     assert set(entry['trakt_movie_actors']) == set(actors), 'looking up actors for %s failed' % entry.get('title')
