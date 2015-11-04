@@ -7,7 +7,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.requests import Session, get
-from flexget.utils.search import normalize_unicode
+from flexget.utils.search import normalize_scene
 
 log = logging.getLogger('rarbg')
 
@@ -117,7 +117,7 @@ class SearchRarBG(object):
             if entry.get('movie_name'):
                 params['search_imdb'] = entry.get('imdb_id')
             else:
-                query = normalize_unicode(search_string)
+                query = normalize_scene(search_string)
                 query_url_fragment = query.encode('utf8')
                 params['search_string'] = query_url_fragment
                 if config['use_tvdb']:

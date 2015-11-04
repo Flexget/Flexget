@@ -30,6 +30,24 @@ def normalize_unicode(text):
     return text
 
 
+def normalize_scene(text):
+    """Normalize string according to scene standard.
+    Mainly, it replace accented chars by their 'normal' couterparts
+    and removes special chars.
+    https://en.wikipedia.org/wiki/Standard_(warez)#Naming for more information
+    """
+    if not isinstance(text, unicode):
+        text = unicode(text, "unicode-escape")
+
+    # Allowed chars in scene releases are:
+    #     ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    #     abcdefghijklmnopqrstuvwxyz
+    #     0123456789-._()
+    return re.sub(r'[^a-zA-Z0-1 \-._()]',
+                  "",
+                  normalize('NFKD', text).encode('ASCII', 'ignore'))
+
+
 def torrent_availability(seeds, leeches):
     """Returns a rating based on seeds and leeches for a given torrent.
 
