@@ -139,6 +139,30 @@ class TestTraktList(FlexGetBase):
         assert entry['imdb_id'] == 'tt0050083'
 
 
+class TestTraktWatched(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          test_trakt_watched:
+            metainfo_series: yes
+            mock:
+              - {title: 'Hawaii.Five-0.S04E13.HDTV-FlexGet'}
+            if:
+              - trakt_watched: accept
+            trakt_watched_lookup:
+              username: flexgettest
+              type: shows
+    """
+
+    @use_vcr
+    def test_trakt_watched_lookup(self):
+        self.execute_task('test_trakt_watched')
+        assert len(self.task.accepted) == 1
+        entry = self.task.accepted[0]
+        assert entry['title'] == 'Hawaii.Five-0.S04E13.HDTV-FlexGet', 'title was not accepted?'
+        assert entry['series_name'] == 'Hawaii Five-0', 'wrong series was accepted'
+        assert entry['trakt_watched'] == True, 'episode should be marked as watched'
+
+
 class TestTraktMovieLookup(FlexGetBase):
     __yaml__ = """
         templates:
