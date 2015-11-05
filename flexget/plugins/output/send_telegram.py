@@ -41,7 +41,7 @@ class SendTelegram(object):
 
     * Install 'python-telegram-bot' python pkg
     * Create a bot & obtain a token for it (see https://core.telegram.org/bots#botfather).
-    * For direct messages (not to a group), start a conversation with the boot and click "START" in the Telegram app.
+    * For direct messages (not to a group), start a conversation with the bot and click "START" in the Telegram app.
     * For group messages, add the bot to the desired group and send a start message to the bot: "/start" (mind the
       leading '/').
 
