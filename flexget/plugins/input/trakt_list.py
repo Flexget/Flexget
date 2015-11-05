@@ -57,12 +57,11 @@ class TraktList(object):
 
     trakt_list:
       username: <value>
-      password: <value>
       type: <shows|movies|episodes>
       list: <collection|watchlist|watched|custom list name>
       strip_dates: <yes|no>
 
-    Options username, type and list are required. password is required for private lists.
+    Options username, type and list are required.
     """
 
     schema = {
@@ -70,7 +69,6 @@ class TraktList(object):
         'properties': {
             'account': {'type': 'string'},
             'username': {'type': 'string'},
-            'pin': {'type': 'string'},
             'type': {'type': 'string', 'enum': ['shows', 'movies', 'episodes']},
             'list': {'type': 'string'},
             'strip_dates': {'type': 'boolean', 'default': False}
@@ -88,7 +86,7 @@ class TraktList(object):
 
     @cached('trakt_list', persist='2 hours')
     def on_task_input(self, task, config):
-        session = get_session(config['username'], config.get('pin'), account=config.get('account'))
+        session = get_session(config['username'], account=config.get('account'))
         endpoint = ['users', config['username']]
         if config['list'] in ['collection', 'watchlist', 'watched']:
             endpoint += (config['list'], config['type'])
