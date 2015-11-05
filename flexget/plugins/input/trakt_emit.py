@@ -7,7 +7,7 @@ from requests import RequestException
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils.trakt import API_URL, get_session, make_list_slug, get_api_url
+from flexget.plugins.api_trakt import get_session, make_list_slug, get_api_url
 
 log = logging.getLogger('trakt_emit')
 
@@ -20,12 +20,13 @@ class TraktEmit(object):
     Syntax:
 
     trakt_emit:
+      account: <value>
       username: <value>
       position: <last|next>
       context: <collect|collected|watch|watched>
       list: <value>
 
-    Options username, password and api_key are required.
+    Options username is required. Account defaults to username if not specified.
 
     """
 
@@ -33,7 +34,7 @@ class TraktEmit(object):
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
-            'password': {'type': 'string'},
+            'account': {'type': 'string'},
             'position': {'type': 'string', 'enum': ['last', 'next'], 'default': 'next'},
             'context': {'type': 'string', 'enum': ['watched', 'collected'], 'default': 'watched'},
             'list': {'type': 'string'}
@@ -43,16 +44,17 @@ class TraktEmit(object):
     }
 
     def on_task_input(self, task, config):
-        session = get_session(config['username'], config.get('password'))
+
+        session = get_session(config['username'], account=config.get('account'))
         listed_series = {}
         if config.get('list'):
-            url = urljoin(API_URL, 'users/%s/' % config['username'])
+            args = ('users' , config['username'])
             if config['list'] in ['collection', 'watchlist', 'watched']:
-                url = urljoin(url, '%s/shows' % config['list'])
+                args += (config['list'], 'shows')
             else:
-                url = urljoin(url, 'lists/%s/items' % make_list_slug(config['list']))
+                args += ('lists', make_list_slug(config['list']), 'items')
             try:
-                data = session.get(url).json()
+                data = session.get(get_api_url(args)).json()
             except RequestException as e:
                 raise plugin.PluginError('Unable to get trakt list `%s`: %s' % (config['list'], e))
             if not data:
