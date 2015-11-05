@@ -31,8 +31,7 @@ log = logging.getLogger('api_trakt')
 CLIENT_ID = '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af'
 CLIENT_SECRET = 'db4af7531e8df678b134dbc22445a2c04ebdbdd7213be7f5b6d17dfdfabfcdc2'
 API_URL = 'https://api-v2launch.trakt.tv/'
-PIN_URL = 'https://trakt.tv/oauth/authorize?response_type=code&client_id=' \
-          '57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af&redirect_uri=urn:ietf:wg:oauth:2.0:oob'
+PIN_URL = 'http://trakt.tv/pin/346'
 # Stores the last time we checked for updates for shows/movies
 updated = SimplePersistence('api_trakt')
 
@@ -221,28 +220,37 @@ movie_actors_table = Table('trakt_movie_actors', Base.metadata,
                      Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
                      Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
 
-def get_db_actors(id, style, session):
+def get_db_actors(id, style):
     actors = []
     url = get_api_url(style + 's', id, 'people')
     req_session = get_session()
     try:
         results = req_session.get(url).json()
-        for result in results.get('cast'):
-            name = result.get('person').get('name')
-            trakt_id = result.get('person').get('trakt')
-            imdb_id = result.get('person').get('imdb')
-            tmdb_id = result.get('person').get('tmdb')
-            actor = session.query(TraktActor).filter(TraktActor.name == name).first()
-            if not actor:
-                actor = TraktActor(name, trakt_id, imdb_id, tmdb_id)
-                session.add(actor)
-            actors.append(actor)
-        session.commit()
+        with Session() as session:
+            for result in results.get('cast'):
+                name = result.get('person').get('name')
+                ids = result.get('person').get('ids')
+                trakt_id = ids.get('trakt')
+                imdb_id = ids.get('imdb')
+                tmdb_id = ids.get('tmdb')
+                actor = session.query(TraktActor).filter(func.lower(TraktActor.name) == name.lower()).first()
+                if not actor:
+                    actor = TraktActor(name, trakt_id, imdb_id, tmdb_id)
+                actors.append(actor)
         return actors
     except requests.RequestException as e:
         log.debug('Error searching for actors for trakt id %s' % e)
         return
 
+def list_actors(actors):
+    res = {}
+    for actor in actors:
+        info = {}
+        info['name'] = actor.name
+        info['imdb_id'] = str(actor.imdb_id)
+        info['tmdb_id'] = str(actor.tmdb_id)
+        res[str(actor.trakt_id)] = info
+    return res
 
 class TraktEpisode(Base):
     __tablename__ = 'trakt_episodes'
@@ -318,7 +326,7 @@ class TraktShow(Base):
     aired_episodes = Column(Integer)
     episodes = relation(TraktEpisode, backref='show', cascade='all, delete, delete-orphan', lazy='dynamic')
     genres = relation(TraktGenre, secondary=show_genres_table)
-    actors = relation(TraktActor, secondary=show_actors_table)
+    _actors = relation(TraktActor, secondary=show_actors_table)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
     #expired = Column(Boolean)
@@ -353,7 +361,6 @@ class TraktShow(Base):
             setattr(self, col, trakt_show.get(col))
 
         self.genres[:] = get_db_genres(trakt_show.get('genres', []), session)
-        #self.actors[:] = get_db_actors(self.id, 'show', session)
         self.cached_at = datetime.now()
 
     def get_episode(self, season, number, only_cached=False):
@@ -396,6 +403,12 @@ class TraktShow(Base):
             refresh_interval += age * 5
             log.debug('show `%s` age %i expires in %i days' % (self.title, age, refresh_interval))
         return self.cached_at < datetime.now() - timedelta(days=refresh_interval)
+
+    @property
+    def actors(self):
+        if not self._actors:
+            self._actors[:] = get_db_actors(self.id, 'show')
+        return self._actors
 
     def __repr__(self):
         return '<name=%s, id=%s>' % (self.title, self.id)
@@ -443,7 +456,6 @@ class TraktMovie(Base):
         self.updated_at = dateutil_parse(trakt_movie.get('updated_at'))
         self.genres[:] = get_db_genres(trakt_movie.get('genres', []), session)
         self.cached_at = datetime.now()
-        #self._actors[:] = get_db_actors(self.id, 'movie', session)
 
     @property
     def expired(self):
@@ -464,8 +476,8 @@ class TraktMovie(Base):
 
     @property
     def actors(self):
-        #if not self._actors:
-        #    get_db_actors(self.id, 'movie', self._actors)
+        if not self._actors:
+            self._actors[:] = get_db_actors(self.id, 'movie')
         return self._actors
 
 
@@ -634,6 +646,9 @@ class ApiTrakt(object):
 
 def do_cli(manager, options):
     if options.action == 'auth':
+        if not options.account and options.pin:
+            console('You must specify an account (local identifier) so we know where to save your access token! '
+                    'Visit %s to get a pin code and authorize flexget to access your trakt account.' % PIN_URL)
         try:
             get_access_token(options.account, options.pin, re_auth=True)
             console('Successfully authorized Flexget app on Trakt.tv. Enjoy!')
@@ -664,6 +679,7 @@ def do_cli(manager, options):
 
 @event('options.register')
 def register_parser_arguments():
+    acc_text = 'local identifier which should be used in your config to refer these credentials'
     # Register subcommand
     parser = options.register_command('trakt', do_cli, help='view and manage trakt authentication.'
                                                             'Please visit %s to retrieve your pin code.' % PIN_URL)
@@ -671,16 +687,19 @@ def register_parser_arguments():
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='action')
     auth_parser = subparsers.add_parser('auth', help='authorize Flexget to access your Trakt.tv account')
 
-    auth_parser.add_argument('--account', metavar='<account>', help='local identifier')
-    auth_parser.add_argument('--pin', metavar='<pin>', help='pin code')
+    auth_parser.add_argument('--account', metavar='<account>', help=acc_text)
+    auth_parser.add_argument('--pin', metavar='<pin>', help='get this by authorizing FlexGet to use your trakt account '
+                                                            'at http://trakt.tv/pin/346')
 
-    show_parser = subparsers.add_parser('show', help='show expiration date for Flexget authorization')
+    show_parser = subparsers.add_parser('show', help='show expiration date for Flexget authorization (don\'t worry, '
+                                                     'it will manually refresh when it expires)')
 
-    show_parser.add_argument('--account', metavar='<account>', help='local identifier')
+    show_parser.add_argument('--account', metavar='<account>', help=acc_text)
 
-    refresh_parser = subparsers.add_parser('refresh', help='refresh access token')
+    refresh_parser = subparsers.add_parser('refresh', help='manually refresh your access token associated with your'
+                                                           ' --account <name>')
 
-    refresh_parser.add_argument('--account', metavar='<account>', help='local identifier')
+    refresh_parser.add_argument('--account', metavar='<account>', help=acc_text)
 
 @event('plugin.register')
 def register_plugin():

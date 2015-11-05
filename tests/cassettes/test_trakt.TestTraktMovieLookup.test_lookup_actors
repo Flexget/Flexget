@@ -1,0 +1,217 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=the+matrix&type=movie
+  response:
+    body: {string: "[{\"type\":\"movie\",\"score\":73.667435,\"movie\":{\"title\":\"The
+        Matrix\",\"overview\":\"Thomas A. Anderson is a man living two lives. By day
+        he is an average computer programmer and by night a malevolent hacker known
+        as Neo, who finds himself targeted by the police when he is contacted by Morpheus,
+        a legendary computer hacker, who reveals the shocking truth about our reality.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/6c353577dd.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/6c353577dd.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/6c353577dd.jpg\"}},\"ids\":{\"trakt\":481,\"slug\":\"the-matrix-1999\",\"imdb\":\"tt0133093\",\"tmdb\":603}}},{\"type\":\"movie\",\"score\":68.55802,\"movie\":{\"title\":\"Dot
+        Matrix\",\"overview\":\"In 2012, Richard Tuohy made \\\"Screen Tone\\\" using
+        patterns of dots printed straight to 16mm film. By doubling this principle
+        in \\\"Dot Matrix\\\", a third, dizzying moire pattern and a deafening noise
+        develops in the flicker (alternating black and white frames) because the dots
+        also pass by the sound head.\",\"year\":2013,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/182/633/posters/original/8d9c360cc9.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/182/633/posters/medium/8d9c360cc9.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/182/633/posters/thumb/8d9c360cc9.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":182633,\"slug\":\"dot-matrix-2013\",\"imdb\":\"tt3829928\",\"tmdb\":285435}}},{\"type\":\"movie\",\"score\":68.54305,\"movie\":{\"title\":\"Sexual
+        Matrix\",\"overview\":\"\\\"Sexual Matrix\\\" is about a matrix that is sexual.
+        A horny professor decides to ask his students all about their sexual fantasies.
+        Of course he does. So while they're describing their wildest dreams, he plugs
+        them into his matrix machine and it lets them live out their fantasies. It
+        seems so real! Mia Zottoli shows up to assist the professor in his quest to
+        know what turns the whole campus on\",\"year\":2000,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/036/357/posters/original/765eaebdcf.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/036/357/posters/medium/765eaebdcf.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/036/357/posters/thumb/765eaebdcf.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":36357,\"slug\":\"sexual-matrix-2000\",\"imdb\":\"tt0224086\",\"tmdb\":51767}}},{\"type\":\"movie\",\"score\":58.933945,\"movie\":{\"title\":\"The
+        Matrix Reloaded\",\"overview\":\"Six months after the events depicted in The
+        Matrix, Neo has proved to be a good omen for the free humans, as more and
+        more humans are being freed from the matrix and brought to Zion, the one and
+        only stronghold of the Resistance.  Neo himself has discovered his superpowers
+        including super speed, ability to see the codes of the things inside the matrix
+        and a certain degree of pre-cognition. But a nasty piece of news hits the
+        human resistance: 250,000 machine sentinels are digging to Zion and would
+        reach them in 72 hours. As Zion prepares for the ultimate war, Neo, Morpheus
+        and Trinity are advised by the Oracle to find the Keymaker who would help
+        them reach the Source.  Meanwhile Neo's recurrent dreams depicting Trinity's
+        death have got him worried and as if it was not enough, Agent Smith has somehow
+        escaped deletion, has become more powerful than before and has fixed Neo as
+        his next target.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/posters/original/b908a87fb1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/posters/medium/b908a87fb1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/posters/thumb/b908a87fb1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/original/4928db3308.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/medium/4928db3308.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/482/fanarts/thumb/4928db3308.jpg\"}},\"ids\":{\"trakt\":482,\"slug\":\"the-matrix-reloaded-2003\",\"imdb\":\"tt0234215\",\"tmdb\":604}}},{\"type\":\"movie\",\"score\":58.933945,\"movie\":{\"title\":\"The
+        Matrix Revolutions\",\"overview\":\"The human city of Zion defends itself
+        against the massive invasion of the machines as Neo fights to end the war
+        at another front while also opposing the rogue Agent Smith.\",\"year\":2003,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/posters/original/2483b4ee5c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/posters/medium/2483b4ee5c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/posters/thumb/2483b4ee5c.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/original/b3f7b1ce55.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/medium/b3f7b1ce55.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/000/483/fanarts/thumb/b3f7b1ce55.jpg\"}},\"ids\":{\"trakt\":483,\"slug\":\"the-matrix-revolutions-2003\",\"imdb\":\"tt0242653\",\"tmdb\":605}}},{\"type\":\"movie\",\"score\":58.933945,\"movie\":{\"title\":\"The
+        Matrix Revisited\",\"overview\":\"The film goes behind the scenes of the 1999
+        sci-fi movie The Matrix.\",\"year\":2001,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/posters/original/8a925c5800.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/posters/medium/8a925c5800.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/posters/thumb/8a925c5800.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/original/355e89fdac.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/medium/355e89fdac.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/008/760/fanarts/thumb/355e89fdac.jpg\"}},\"ids\":{\"trakt\":8760,\"slug\":\"the-matrix-revisited-2001\",\"imdb\":\"tt0295432\",\"tmdb\":14543}}},{\"type\":\"movie\",\"score\":58.933945,\"movie\":{\"title\":\"The
+        Matrix DeZionized\",\"overview\":\"After the fantastic movie \u201CThe Matrix\u201D
+        everyone was awaiting the sequels, but somehow the writer/directors were not
+        able to continue the epic they started in the way they began. In our humble
+        opinion they lost themselves in detail, wanted to much and definetly to show
+        off with effect orgies. We tried to continue the Matrix withing the Matrix
+        wherever possible. Leaving out the Zion scenes was a major improvement of
+        pace and plot development and the most interesting thing about it is that
+        these scenes are not missed when left out. We tried to be smart and reduced
+        the Matrix sequels to the max. Also we cut out several scenes that just did
+        not feel right or felt to be unnecessary, e.G. when Morpheus talks to Link
+        about trust, it just feels wrong and Morpheus seems to become a stereotype
+        of himself.\",\"year\":2005,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/posters/original/d59fdf29f1.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/posters/medium/d59fdf29f1.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/posters/thumb/d59fdf29f1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/original/a13abcfc1c.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/medium/a13abcfc1c.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/186/958/fanarts/thumb/a13abcfc1c.jpg\"}},\"ids\":{\"trakt\":186958,\"slug\":\"the-matrix-dezionized-2005\",\"imdb\":\"\",\"tmdb\":290029}}},{\"type\":\"movie\",\"score\":58.933945,\"movie\":{\"title\":\"The
+        Matrix Recalibrated\",\"overview\":\"The making of Matrix Revolutions, The
+        (2003) is briefly touched on here in this documentary. Interviews with various
+        cast and crew members inform us how they were affected by the deaths of Gloria
+        Foster and Aaliyah, and also delve into the making of the visual effects that
+        takes up a lot of screen time. Written by Rhyl Donnelly\",\"year\":2004,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":136173,\"slug\":\"the-matrix-recalibrated-2004\",\"imdb\":\"tt0410519\",\"tmdb\":221495}}},{\"type\":\"movie\",\"score\":58.933945,\"movie\":{\"title\":\"Making
+        The Matrix\",\"overview\":\"A promotional making-of documentary for the film
+        Matrix, The (1999) that devotes its time to explaining the digital and practical
+        effects contained in the film. This is very interesting, seeing as how they're
+        giving away the cinematic secrets that they created solely for the this movie,
+        that have now been spoofed and referenced in countless other films.\",\"year\":1999,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/205/793/posters/original/9680ca459a.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":205793,\"slug\":\"making-the-matrix-1999\",\"imdb\":\"tt0365467\",\"tmdb\":325251}}},{\"type\":\"movie\",\"score\":58.933945,\"movie\":{\"title\":\"The
+        Living Matrix\",\"overview\":\"Becker's documentary presents the arguments
+        of the new-age practice of \\\"bio-energetic medicine.\\\"  Presented as a
+        medical documentary, The Living Matrix, promotes healing through energy reading
+        and manipulation.  Director Greg Becker presents his arguments through anecdotal
+        patient stories, and interviews with parapsychology professionals.\",\"year\":2009,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/movies/000/083/197/posters/original/14b70abab2.jpg\",\"medium\":\"https://walter.trakt.us/images/movies/000/083/197/posters/medium/14b70abab2.jpg\",\"thumb\":\"https://walter.trakt.us/images/movies/000/083/197/posters/thumb/14b70abab2.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":83197,\"slug\":\"the-living-matrix-2009\",\"imdb\":\"tt1499960\",\"tmdb\":119742}}}]"}
+    headers:
+      cache-control: ['public, max-age=14400']
+      cf-cache-status: [HIT]
+      cf-ray: [24074496322716c4-ARN]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 05 Nov 2015 08:42:53 GMT']
+      etag: [W/"50873379f49451cb217e3ae72c97209c"]
+      expires: ['Thu, 05 Nov 2015 12:42:53 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=dfdffdf6a492f682e6e3304499a1466881446712973; expires=Fri,
+          04-Nov-16 08:42:53 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['55']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['6']
+      x-request-id: [e5f78a85-8fa3-41c8-9e15-2a09df0f280a]
+      x-runtime: ['0.019624']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=dfdffdf6a492f682e6e3304499a1466881446712973]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/movies/481?extended=full
+  response:
+    body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
+        to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
+        By day he is an average computer programmer and by night a malevolent hacker
+        known as Neo, who finds himself targeted by the police when he is contacted
+        by Morpheus, a legendary computer hacker, who reveals the shocking truth about
+        our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.98181,"votes":17425,"updated_at":"2015-11-01T15:09:57.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R"}'}
+    headers:
+      cache-control: ['public, max-age=14400']
+      cf-cache-status: [HIT]
+      cf-ray: [24074496923016c4-ARN]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 05 Nov 2015 08:42:53 GMT']
+      etag: [W/"34da56e7db7efb7bff992fcd685ab584"]
+      expires: ['Thu, 05 Nov 2015 12:42:53 GMT']
+      last-modified: ['Sun, 01 Nov 2015 15:09:57 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [76835df9-ce9f-4c6c-a71c-40992fb5650b]
+      x-runtime: ['0.013182']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/movies/481/people
+  response:
+    body: {string: !!python/unicode '{"cast":[{"character":"Neo","person":{"name":"Keanu
+        Reeves","ids":{"trakt":7134,"slug":"keanu-reeves","imdb":"nm0000206","tmdb":6384,"tvrage":19449}}},{"character":"Morpheus","person":{"name":"Laurence
+        Fishburne","ids":{"trakt":551,"slug":"laurence-fishburne","imdb":"nm0000401","tmdb":2975,"tvrage":58899}}},{"character":"Trinity","person":{"name":"Carrie-Anne
+        Moss","ids":{"trakt":5274,"slug":"carrie-anne-moss","imdb":"nm0005251","tmdb":530,"tvrage":30031}}},{"character":"Agent
+        Smith","person":{"name":"Hugo Weaving","ids":{"trakt":16499,"slug":"hugo-weaving","imdb":"nm0915989","tmdb":1331,"tvrage":165660}}},{"character":"Oracle","person":{"name":"Gloria
+        Foster","ids":{"trakt":413616,"slug":"gloria-foster","imdb":"nm0287825","tmdb":9364,"tvrage":33201}}},{"character":"Cypher","person":{"name":"Joe
+        Pantoliano","ids":{"trakt":294554,"slug":"joe-pantoliano","imdb":"nm0001592","tmdb":532,"tvrage":10693}}},{"character":"Tank","person":{"name":"Marcus
+        Chong","ids":{"trakt":413619,"slug":"marcus-chong","imdb":"nm0159059","tmdb":9372,"tvrage":33610}}},{"character":"Apoc","person":{"name":"Julian
+        Arahanga","ids":{"trakt":413207,"slug":"julian-arahanga","imdb":"nm0032810","tmdb":7244,"tvrage":null}}},{"character":"Mouse","person":{"name":"Matt
+        Doran","ids":{"trakt":413621,"slug":"matt-doran","imdb":"nm0233391","tmdb":9374,"tvrage":30260}}},{"character":"Switch","person":{"name":"Belinda
+        McClory","ids":{"trakt":413623,"slug":"belinda-mcclory","imdb":"nm0565883","tmdb":9376,"tvrage":9741}}},{"character":"Dozer","person":{"name":"Anthony
+        Ray Parker","ids":{"trakt":413625,"slug":"anthony-ray-parker","imdb":"nm0662562","tmdb":9378,"tvrage":null}}},{"character":"Agent
+        Brown","person":{"name":"Paul Goddard","ids":{"trakt":413628,"slug":"paul-goddard-12bfb257-984b-4e2d-a582-578481a07a9d","imdb":"nm0323822","tmdb":9380,"tvrage":null}}},{"character":"Agent
+        Jones","person":{"name":"Robert Taylor","ids":{"trakt":413633,"slug":"robert-taylor-dd49859a-edc3-4e88-8dc1-551d8053242d","imdb":"nm0853079","tmdb":39545,"tvrage":null}}},{"character":"Rhineheart","person":{"name":"David
+        Aston","ids":{"trakt":413636,"slug":"david-aston","imdb":"nm0040058","tmdb":9383,"tvrage":null}}},{"character":"Choi","person":{"name":"Marc
+        Aden","ids":{"trakt":413639,"slug":"marc-aden","imdb":"nm0336802","tmdb":9384,"tvrage":null}}},{"character":"White
+        Rabbit Girl","person":{"name":"Ada Nicodemou","ids":{"trakt":413643,"slug":"ada-nicodemou","imdb":"nm0630124","tmdb":181214,"tvrage":24685}}},{"character":"Priestess","person":{"name":"Deni
+        Gordon","ids":{"trakt":413646,"slug":"deni-gordon","imdb":"nm0330139","tmdb":1090466,"tvrage":null}}},{"character":"Spoon
+        Boy","person":{"name":"Rowan Witt","ids":{"trakt":413649,"slug":"rowan-witt","imdb":"nm0936894","tmdb":218366,"tvrage":null}}},{"character":"Lieutenant","person":{"name":"Bill
+        Young","ids":{"trakt":413652,"slug":"bill-young","imdb":"nm0949303","tmdb":57799,"tvrage":null}}},{"character":"Potential","person":{"name":"Eleanor
+        Witt","ids":{"trakt":413655,"slug":"eleanor-witt","imdb":"nm0936860","tmdb":1209244,"tvrage":null}}},{"character":"Potential","person":{"name":"Tamara
+        Brown","ids":{"trakt":413659,"slug":"tamara-brown","imdb":"nm0114756","tmdb":1209245,"tvrage":null}}},{"character":"Potential","person":{"name":"Janaya
+        Pender","ids":{"trakt":6816,"slug":"janaya-pender","imdb":"nm0671665","tmdb":1209246,"tvrage":null}}},{"character":"Potential","person":{"name":"Adryn
+        White","ids":{"trakt":6817,"slug":"adryn-white","imdb":"nm0924423","tmdb":1209247,"tvrage":null}}},{"character":"Potential","person":{"name":"Natalie
+        Tjen","ids":{"trakt":6819,"slug":"natalie-tjen","imdb":"nm0864666","tmdb":1209248,"tvrage":null}}},{"character":"FedEx
+        Man","person":{"name":"David O''Connor","ids":{"trakt":6821,"slug":"david-o-connor","imdb":"nm0640292","tmdb":1209249,"tvrage":null}}},{"character":"Businessman","person":{"name":"Jeremy
+        Ball","ids":{"trakt":413664,"slug":"jeremy-ball-7545f463-cee6-4be7-83f6-5a029d7ff1a2","imdb":"nm0050390","tmdb":1209250,"tvrage":null}}},{"character":"Woman
+        in Red","person":{"name":"Fiona Johnson","ids":{"trakt":413668,"slug":"fiona-johnson","imdb":"nm0425087","tmdb":1209251,"tvrage":null}}},{"character":"Old
+        Man","person":{"name":"Harry Lawrence","ids":{"trakt":6826,"slug":"harry-lawrence","imdb":"nm0492790","tmdb":110411,"tvrage":null}}},{"character":"Blind
+        Man","person":{"name":"Steve Dodd","ids":{"trakt":413670,"slug":"steve-dodd","imdb":"nm0230117","tmdb":212562,"tvrage":null}}},{"character":"Security
+        Guard","person":{"name":"Luke Quinton","ids":{"trakt":413673,"slug":"luke-quinton","imdb":"nm0704280","tmdb":1209252,"tvrage":null}}},{"character":"Guard","person":{"name":"Lawrence
+        Woodward","ids":{"trakt":413675,"slug":"lawrence-woodward","imdb":"nm0940959","tmdb":75715,"tvrage":null}}},{"character":"Cop
+        Who Captures Neo","person":{"name":"Michael Butcher","ids":{"trakt":6833,"slug":"michael-butcher","imdb":"nm0124697","tmdb":1209253,"tvrage":null}}},{"character":"Big
+        Cop","person":{"name":"Bernard Ledger","ids":{"trakt":6835,"slug":"bernard-ledger","imdb":"nm0496567","tmdb":1209254,"tvrage":null}}},{"character":"Cop","person":{"name":"Robert
+        Simper","ids":{"trakt":413679,"slug":"robert-simper","imdb":"nm0800854","tmdb":26753,"tvrage":null}}},{"character":"Cop","person":{"name":"Chris
+        Pattinson","ids":{"trakt":413683,"slug":"chris-pattinson","imdb":"nm0778966","tmdb":1209255,"tvrage":null}}},{"character":"Parking
+        Cop","person":{"name":"Nigel Harbach","ids":{"trakt":413685,"slug":"nigel-harbach","imdb":"nm0361876","tmdb":1209256,"tvrage":null}}},{"character":"Shaylae
+        - Woman in Office (uncredited)","person":{"name":"Rana Morrison","ids":{"trakt":413688,"slug":"rana-morrison","imdb":"nm3269395","tmdb":1209257,"tvrage":null}}}],"crew":{"directing":[{"job":"Director","person":{"name":"Andy
+        Wachowski","ids":{"trakt":413676,"slug":"andy-wachowski","imdb":"nm0905152","tmdb":9339,"tvrage":null}}},{"job":"Director","person":{"name":"Lana
+        Wachowski","ids":{"trakt":413681,"slug":"lana-wachowski","imdb":"nm0905154","tmdb":9340,"tvrage":null}}},{"job":"Assistant
+        Director","person":{"name":"James McTeigue","ids":{"trakt":414381,"slug":"james-mcteigue","imdb":"nm0574625","tmdb":11266,"tvrage":null}}}],"writing":[{"job":"Screenplay","person":{"name":"Andy
+        Wachowski","ids":{"trakt":413676,"slug":"andy-wachowski","imdb":"nm0905152","tmdb":9339,"tvrage":null}}},{"job":"Screenplay","person":{"name":"Lana
+        Wachowski","ids":{"trakt":413681,"slug":"lana-wachowski","imdb":"nm0905154","tmdb":9340,"tvrage":null}}}],"production":[{"job":"Producer","person":{"name":"Joel
+        Silver","ids":{"trakt":11366,"slug":"joel-silver","imdb":"nm0005428","tmdb":1091,"tvrage":92573}}},{"job":"Casting","person":{"name":"Mali
+        Finn","ids":{"trakt":1363,"slug":"mali-finn","imdb":null,"tmdb":1262,"tvrage":null}}},{"job":"Casting","person":{"name":"Shauna
+        Wolifson","ids":{"trakt":6865,"slug":"shauna-wolifson","imdb":"nm0938441","tmdb":9342,"tvrage":null}}}],"sound":[{"job":"Original
+        Music Composer","person":{"name":"Don Davis","ids":{"trakt":3615,"slug":"don-davis","imdb":"nm0204485","tmdb":4949,"tvrage":null}}},{"job":"Supervising
+        Sound Effects Editor","person":{"name":"Dane A. Davis","ids":{"trakt":6873,"slug":"dane-a-davis","imdb":"nm0204424","tmdb":9349,"tvrage":null}}},{"job":"Sound
+        Editor","person":{"name":"Zigmund Gron","ids":{"trakt":6876,"slug":"zigmund-gron","imdb":"nm0343065","tmdb":9351,"tvrage":null}}}],"camera":[{"job":"Director
+        of Photography","person":{"name":"Bill Pope","ids":{"trakt":5936,"slug":"bill-pope","imdb":"nm0691084","tmdb":9341,"tvrage":null}}}],"editing":[{"job":"Editor","person":{"name":"Zach
+        Staenberg","ids":{"trakt":3454,"slug":"zach-staenberg","imdb":"nm0821205","tmdb":4671,"tvrage":null}}}],"art":[{"job":"Production
+        Design","person":{"name":"Owen Paterson","ids":{"trakt":6866,"slug":"owen-paterson","imdb":"nm0665517","tmdb":9343,"tvrage":null}}},{"job":"Art
+        Direction","person":{"name":"Hugh Bateup","ids":{"trakt":6867,"slug":"hugh-bateup","imdb":"nm0061064","tmdb":9344,"tvrage":null}}},{"job":"Art
+        Direction","person":{"name":"Michelle McGahey","ids":{"trakt":6870,"slug":"michelle-mcgahey","imdb":"nm0568894","tmdb":9345,"tvrage":null}}},{"job":"Set
+        Decoration","person":{"name":"Lisa Brennan","ids":{"trakt":6872,"slug":"lisa-brennan","imdb":"nm0107345","tmdb":9346,"tvrage":null}}}],"costume
+        & make-up":[{"job":"Costume Design","person":{"name":"Kym Barrett","ids":{"trakt":4764,"slug":"kym-barrett","imdb":"nm0057199","tmdb":6209,"tvrage":null}}}],"crew":[{"job":"Special
+        Effects","person":{"name":"Richard Alexander","ids":{"trakt":6877,"slug":"richard-alexander","imdb":"nm0018688","tmdb":9354,"tvrage":null}}},{"job":"Special
+        Effects","person":{"name":"Brian Belcher","ids":{"trakt":6878,"slug":"brian-belcher","imdb":"nm0067633","tmdb":9355,"tvrage":null}}},{"job":"Stunts","person":{"name":"Glenn
+        Boswell","ids":{"trakt":6879,"slug":"glenn-boswell","imdb":"nm0098342","tmdb":9357,"tvrage":null}}},{"job":"Special
+        Effects Coordinator","person":{"name":"Steve Courtley","ids":{"trakt":6880,"slug":"steve-courtley","imdb":"nm0183871","tmdb":9593,"tvrage":null}}}]}}'}
+    headers:
+      cache-control: ['public, max-age=14400']
+      cf-cache-status: [HIT]
+      cf-ray: [24074497b24116c4-ARN]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Thu, 05 Nov 2015 08:42:54 GMT']
+      etag: [W/"a8c0035e5c1835c012baba193da035af"]
+      expires: ['Thu, 05 Nov 2015 12:42:54 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d192d357326c307b6fe13640ca0772eb21446712974; expires=Fri,
+          04-Nov-16 08:42:54 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [afa87fcf-bfb8-4090-b93f-d08120f16f82]
+      x-runtime: ['0.042993']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

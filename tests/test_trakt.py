@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from flexget.plugins.api_trakt import ApiTrakt
+from flexget.manager import Session
+from flexget.plugins.api_trakt import ApiTrakt, TraktActor
 from tests import FlexGetBase, use_vcr
 
 
@@ -84,6 +85,38 @@ class TestTraktShowLookup(FlexGetBase):
         entry = self.task.find_entry(title='naruto 128')
         #assert entry.get('tvdb_id') is None, 'should not have populated trakt data'
 
+    @use_vcr
+    def test_lookup_actors(self):
+        self.execute_task('test')
+        actors = ['Hugh Laurie',
+                  'Jesse Spencer',
+                  'Jennifer Morrison',
+                  'Omar Epps',
+                  'Robert Sean Leonard',
+                  'Peter Jacobson',
+                  'Olivia Wilde',
+                  'Odette Annable',
+                  'Charlyne Yi',
+                  'Anne Dudek',
+                  'Kal Penn',
+                  'Jennifer Crystal Foley',
+                  'Bobbin Bergstrom',
+                  'Sela Ward']
+        entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
+        trakt_actors = entry['trakt_series_actors'].values()
+        trakt_actors = [trakt_actor['name'] for trakt_actor in trakt_actors]
+        assert entry['series_name'] == 'House', 'series lookup failed'
+        assert set(trakt_actors) == set(actors), 'looking up actors for %s failed' % entry.get('title')
+        assert entry['trakt_series_actors']['297390']['name'] == 'Hugh Laurie', 'trakt id mapping failed'
+        assert entry['trakt_series_actors']['297390']['imdb_id'] == 'nm0491402', 'fetching imdb id for actor failed'
+        assert entry['trakt_series_actors']['297390']['tmdb_id'] == '41419', 'fetching tmdb id for actor failed'
+        with Session() as session:
+            actor = session.query(TraktActor).filter(TraktActor.name == 'Hugh Laurie').first()
+            assert actor != None, 'adding actor to actors table failed'
+            assert actor.imdb_id == 'nm0491402', 'saving imdb_id for actors in table failed'
+            assert actor.trakt_id == '297390', 'saving trakt_id for actors in table failed'
+            assert actor.tmdb_id == '41419', 'saving tmdb_id for actors table failed'
+
 
 class TestTraktList(FlexGetBase):
     __yaml__ = """
@@ -137,47 +170,58 @@ class TestTraktMovieLookup(FlexGetBase):
         for e in self.task.all_entries:
             assert e['movie_name'] == 'The Matrix', 'looking up based on %s failed' % e['title']
 
-    #@use_vcr
-    # def test_lookup_actors(self):
-    #     self.execute_task('test_lookup_actors')
-    #     assert len(self.task.entries) == 1
-    #     entry = self.task.entries[0]
-    #     actors = ['Keanu Reeves',
-    #               'Laurence Fishburne',
-    #               'Carrie-Anne Moss',
-    #               'Hugo Weaving',
-    #               'Gloria Foster',
-    #               'Joe Pantoliano',
-    #               'Marcus Chong',
-    #               'Julian Arahanga',
-    #               'Matt Doran',
-    #               'Belinda McClory',
-    #               'Anthony Ray Parker',
-    #               'Paul Goddard',
-    #               'Robert Taylor',
-    #               'David Aston',
-    #               'Marc Aden',
-    #               'Ada Nicodemou',
-    #               'Deni Gordon',
-    #               'Rowan Witt',
-    #               'Bill Young',
-    #               'Eleanor Witt',
-    #               'Tamara Brown',
-    #               'Janaya Pender',
-    #               'Adryn White',
-    #               'Natalie Tjen',
-    #               'David O\'Connor',
-    #               'Jeremy Ball',
-    #               'Fiona Johnson',
-    #               'Harry Lawrence',
-    #               'Steve Dodd',
-    #               'Luke Quinton',
-    #               'Lawrence Woodward',
-    #               'Michael Butcher',
-    #               'Bernard Ledger',
-    #               'Robert Simper',
-    #               'Chris Pattinson',
-    #               'Nigel Harbach',
-    #               'Rana Morrison']
-    #     print entry['trakt_movie_actors']
-    #     assert set(entry['trakt_movie_actors']) == set(actors), 'looking up actors for %s failed' % entry.get('title')
+    @use_vcr
+    def test_lookup_actors(self):
+        self.execute_task('test_lookup_actors')
+        assert len(self.task.entries) == 1
+        entry = self.task.entries[0]
+        actors = ['Keanu Reeves',
+                  'Laurence Fishburne',
+                  'Carrie-Anne Moss',
+                  'Hugo Weaving',
+                  'Gloria Foster',
+                  'Joe Pantoliano',
+                  'Marcus Chong',
+                  'Julian Arahanga',
+                  'Matt Doran',
+                  'Belinda McClory',
+                  'Anthony Ray Parker',
+                  'Paul Goddard',
+                  'Robert Taylor',
+                  'David Aston',
+                  'Marc Aden',
+                  'Ada Nicodemou',
+                  'Deni Gordon',
+                  'Rowan Witt',
+                  'Bill Young',
+                  'Eleanor Witt',
+                  'Tamara Brown',
+                  'Janaya Pender',
+                  'Adryn White',
+                  'Natalie Tjen',
+                  'David O\'Connor',
+                  'Jeremy Ball',
+                  'Fiona Johnson',
+                  'Harry Lawrence',
+                  'Steve Dodd',
+                  'Luke Quinton',
+                  'Lawrence Woodward',
+                  'Michael Butcher',
+                  'Bernard Ledger',
+                  'Robert Simper',
+                  'Chris Pattinson',
+                  'Nigel Harbach',
+                  'Rana Morrison']
+        trakt_actors = entry['trakt_movie_actors'].values()
+        trakt_actors = [trakt_actor['name'] for trakt_actor in trakt_actors]
+        assert entry['movie_name'] == 'The Matrix', 'movie lookup failed'
+        assert set(trakt_actors) == set(actors), 'looking up actors for %s failed' % entry.get('title')
+        assert entry['trakt_movie_actors']['7134']['name'] == 'Keanu Reeves', 'trakt id mapping failed'
+        assert entry['trakt_movie_actors']['7134']['imdb_id'] == 'nm0000206', 'fetching imdb id for actor failed'
+        assert entry['trakt_movie_actors']['7134']['tmdb_id'] == '6384', 'fetching tmdb id for actor failed'
+        with Session() as session:
+            actor = session.query(TraktActor).filter(TraktActor.name == 'Keanu Reeves').first()
+            assert actor != None, 'adding actor to actors table failed'
+            assert actor.imdb_id == 'nm0000206', 'saving imdb_id for actors in table failed'
+            assert actor.trakt_id == '7134', 'saving trakt_id for actors in table failed'
+            assert actor.tmdb_id == '6384', 'saving tmdb_id for actors table failed'
