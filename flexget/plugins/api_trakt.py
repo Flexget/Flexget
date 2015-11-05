@@ -57,8 +57,10 @@ class TraktUserAuth(Base):
 def token_expire_date(expires):
     return datetime.now() + timedelta(seconds=expires)
 
+
 def token_created_date(created):
     return datetime.fromtimestamp(created)
+
 
 def get_access_token(account, token=None, refresh=False, re_auth=False):
     """
@@ -182,12 +184,12 @@ class TraktGenre(Base):
     name = Column(Unicode)
 
 show_genres_table = Table('trakt_show_genres', Base.metadata,
-                         Column('show_id', Integer, ForeignKey('trakt_shows.id')),
-                         Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
+                          Column('show_id', Integer, ForeignKey('trakt_shows.id')),
+                          Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
 
 movie_genres_table = Table('trakt_movie_genres', Base.metadata,
-                          Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
-                          Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
+                           Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
+                           Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
 
 
 def get_db_genres(genres, session):
@@ -221,12 +223,13 @@ class TraktActor(Base):
 
 
 show_actors_table = Table('trakt_show_actors', Base.metadata,
-                     Column('show_id', Integer, ForeignKey('trakt_shows.id')),
-                     Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
+                          Column('show_id', Integer, ForeignKey('trakt_shows.id')),
+                          Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
 
 movie_actors_table = Table('trakt_movie_actors', Base.metadata,
-                     Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
-                     Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
+                           Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
+                           Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
+
 
 def get_db_actors(id, style):
     actors = []
@@ -250,6 +253,7 @@ def get_db_actors(id, style):
         log.debug('Error searching for actors for trakt id %s' % e)
         return
 
+
 def list_actors(actors):
     res = {}
     for actor in actors:
@@ -259,6 +263,7 @@ def list_actors(actors):
         info['tmdb_id'] = str(actor.tmdb_id)
         res[str(actor.trakt_id)] = info
     return res
+
 
 class TraktEpisode(Base):
     __tablename__ = 'trakt_episodes'
@@ -274,7 +279,7 @@ class TraktEpisode(Base):
     number_abs = Column(Integer)
     overview = Column(Unicode)
     first_aired = Column(DateTime)
-    #expired = Column(Boolean)
+    # expired = Column(Boolean)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
 
@@ -300,7 +305,6 @@ class TraktEpisode(Base):
 
         for col in ['title', 'season', 'number', 'number_abs', 'overview']:
             setattr(self, col, trakt_episode.get(col))
-
 
     @property
     def expired(self):
@@ -337,7 +341,7 @@ class TraktShow(Base):
     _actors = relation(TraktActor, secondary=show_actors_table)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
-    #expired = Column(Boolean)
+    # expired = Column(Boolean)
 
     def __init__(self, trakt_show, session):
         super(TraktShow, self).__init__()
@@ -438,7 +442,7 @@ class TraktMovie(Base):
     rating = Column(Integer)
     votes = Column(Integer)
     language = Column(Unicode)
-    #expired = Column(Boolean)
+    # expired = Column(Boolean)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
     genres = relation(TraktGenre, secondary=movie_genres_table)
@@ -708,6 +712,7 @@ def register_parser_arguments():
                                                            ' --account <name>')
 
     refresh_parser.add_argument('--account', metavar='<account>', help=acc_text)
+
 
 @event('plugin.register')
 def register_plugin():
