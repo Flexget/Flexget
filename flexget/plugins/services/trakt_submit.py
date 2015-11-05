@@ -6,7 +6,7 @@ from requests import RequestException
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
-from flexget.utils.trakt import API_URL, get_entry_ids, get_session, make_list_slug
+from flexget.plugins.api_trakt import get_api_url, get_entry_ids, get_session, make_list_slug
 
 
 class TraktSubmit(object):
@@ -15,10 +15,10 @@ class TraktSubmit(object):
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
-            'password': {'type': 'string'},
+            'account': {'type': 'string'},
             'list': {'type': 'string'}
         },
-        'required': ['username', 'password', 'list'],
+        'required': ['username', 'list'],
         'additionalProperties': False
     }
 
@@ -51,17 +51,17 @@ class TraktSubmit(object):
             return
 
         if config['list'] in ['collection', 'watchlist', 'watched']:
-            endpoint = 'sync/%s' % ('history' if config['list'] == 'watched' else config['list'])
+            args = ('sync', 'history' if config['list'] == 'watched' else config['list'])
         else:
-            endpoint = 'users/%s/lists/%s/items' % (config['username'], make_list_slug(config['list']))
+            args = ('users', config['username'], 'lists', make_list_slug(config['list']), 'items')
         if self.remove:
-            endpoint += '/remove'
-        url = API_URL + endpoint
+            args += ('remove', )
+        url = get_api_url(args)
 
         if task.manager.options.test:
             self.log.info('Not submitting to trakt.tv because of test mode.')
             return
-        session = get_session(config['username'], config['password'])
+        session = get_session(config['username'], account=config.get('account'))
         self.log.debug('Submitting data to trakt.tv (%s): %s' % (url, found))
         try:
             result = session.post(url, data=json.dumps(found), raise_status=False)
@@ -75,7 +75,7 @@ class TraktSubmit(object):
         elif result.status_code == 404:
             self.log.error('List does not appear to exist on trakt: %s' % config['list'])
         elif result.status_code == 401:
-            self.log.error('Authentication error: check your trakt.tv username/password')
+            self.log.error('Authentication error: have you authorized Flexget on Trakt.tv?')
             self.log.debug('trakt response: ' + result.text)
         else:
             self.log.error('Unknown error submitting data to trakt.tv: %s' % result.text)

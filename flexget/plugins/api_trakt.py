@@ -155,15 +155,23 @@ def upgrade_database(ver, session):
     return ver
 
 
-@with_session
-def mark_expired(type, session=None):
-    """
-    Mark which cached shows/movies have updated information on trakt.
-
-    :param type: Either 'shows' or 'movies'
-    """
-    # TODO: Implement
-    pass
+def get_entry_ids(entry):
+    """Creates a trakt ids dict from id fields on an entry. Prefers already populated info over lazy lookups."""
+    ids = {}
+    for lazy in [False, True]:
+        if entry.get('trakt_id', eval_lazy=lazy):
+            ids['trakt'] = entry['trakt_id']
+        if entry.get('tmdb_id', eval_lazy=lazy):
+            ids['tmdb'] = entry['tmdb_id']
+        if entry.get('tvdb_id', eval_lazy=lazy):
+            ids['tvdb'] = entry['tvdb_id']
+        if entry.get('imdb_id', eval_lazy=lazy):
+            ids['imdb'] = entry['imdb_id']
+        if entry.get('tvrage_id', eval_lazy=lazy):
+            ids['tvrage'] = entry['tvrage_id']
+        if ids:
+            break
+    return ids
 
 
 class TraktGenre(Base):
