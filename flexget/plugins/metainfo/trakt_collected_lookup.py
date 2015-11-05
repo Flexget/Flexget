@@ -10,12 +10,25 @@ from flexget.plugins.api_trakt import get_api_url, get_session
 
 log = logging.getLogger('trakt_collected')
 
+MOVIE_IDS = [
+    'tmdb_id',
+    'imdb_id',
+    'movie_name'
+]
+
+SHOW_IDS = [
+    'tvdb_id',
+    'tmdb_id',
+    'imdb_id',
+    'series_name'
+]
+
 
 class TraktCollected(object):
     """
-    Query trakt.tv for episodes in the user collection to set the trakt_in_collection flag on entries.
-    Uses tvdb_id or imdb_id or series_name, plus series_season and series_episode fields (metainfo_series and 
-    thetvdb_lookup or trakt_lookup plugins will do).
+    Query trakt.tv for episodes or movies in the user collection to set the trakt_in_collection flag on entries.
+    Uses tmdb_id, tvdb_id or imdb_id or series_name or movie_name, plus series_season and series_episode fields
+    (metainfo_series and thetvdb_lookup or trakt_lookup or imdb_lookup or tmdb_lookup plugins will do).
     """
 
     schema = {
@@ -51,18 +64,16 @@ class TraktCollected(object):
         if config['type'] == 'shows':
             for idx, val in enumerate(data):
                 v = val.get('show')
-                index[v['title']] = index[int(v['ids']['tvdb'])] = index[v['ids']['imdb']] = idx
+                index[v['title']] = index[int(v['ids']['tvdb'])] = \
+                    index[v['ids']['imdb']] = index[v['ids']['tmdb']] = idx
             for entry in task.entries:
                 if not (entry.get('series_name') and entry.get('series_season') and entry.get('series_episode')):
                     continue
                 entry['trakt_in_collection'] = False
-                if 'tvdb_id' in entry and entry['tvdb_id'] in index:
-                    series = data[index[entry['tvdb_id']]]
-                elif 'imdb_id' in entry and entry['imdb_id'] in index:
-                    series = data[index[entry['imdb_id']]]
-                elif entry['series_name'] in index:
-                    series = data[index[entry['series_name']]]
-                else:
+                for id in SHOW_IDS:
+                    if id in entry and entry[id] in index:
+                        series = data[index[entry[id]]]
+                if not series:
                     continue
                 for s in series['seasons']:
                     if s['number'] == entry['series_season']:
@@ -71,7 +82,7 @@ class TraktCollected(object):
                         entry['trakt_in_collection'] = entry['series_episode'] in episodes
                         break
                 log.debug('The result for entry "%s" is: %s' % (entry['title'],
-                    'Owned' if entry['trakt_in_collection'] else 'Not owned'))
+                          'Owned' if entry['trakt_in_collection'] else 'Not owned'))
         else:
             for idx, val in enumerate(data):
                 v = val.get('movie')
@@ -79,17 +90,13 @@ class TraktCollected(object):
             for entry in task.entries:
                 if not (entry.get('movie_name') or entry.get('imdb_id') or entry.get('tmdb_id')):
                     continue
-                if 'tmdb_id' in entry and entry['tmdb_id'] in index:
-                    movie = data[index[entry['tmdb_id']]]
-                elif 'imdb_id' in entry and entry['imdb_id'] in index:
-                    movie = data[index[entry['imdb_id']]]
-                elif 'movie_name' in entry and entry['movie_name'] in index:
-                    movie = data[index[entry['movie_name']]]
-                else:
-                    continue
+                movie = None
+                for id in MOVIE_IDS:
+                    if id in entry and entry[id] in index:
+                        movie = data[index[entry[id]]]
                 entry['trakt_in_collection'] = True if movie else False
                 log.debug('The result for entry "%s" is: %s' % (entry['title'],
-                    'Owned' if entry['trakt_in_collection'] else 'Not owned'))
+                          'Owned' if entry['trakt_in_collection'] else 'Not owned'))
 
 
 @event('plugin.register')
