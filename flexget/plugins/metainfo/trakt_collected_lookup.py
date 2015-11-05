@@ -1,5 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import
-import hashlib
 import logging
 
 from requests import RequestException
