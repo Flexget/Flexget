@@ -148,7 +148,8 @@ class InputFtpList(object):
                                   recursive, get_size, encoding)
 
             if not files_only or mlst.get('type') == 'file':
-                url = baseurl + urllib.quote_plus(path) + '/' + urllib.quote_plus(p)
+                url = baseurl + urllib.quote(path) + '/' + urllib.quote(p)
+                log.debug("Encoded URL: " + url)
                 title = os.path.basename(p)
                 log.info('Accepting entry "%s" [%s]' % (path + '/' + p, mlst.get('type') or "unknown",))
                 entry = Entry(title, url)
