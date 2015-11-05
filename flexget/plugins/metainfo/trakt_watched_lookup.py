@@ -41,8 +41,8 @@ class TraktWatched(object):
         thetvdb_lookup: yes
         trakt_watched_lookup:
           username: xxx
-          password: xxx
-          api_key: xxx
+          account: something_made_up
+          type: shows
         if:
           - trakt_watched: accept
         move:
@@ -89,6 +89,7 @@ class TraktWatched(object):
                 if not (entry.get('series_name') and entry.get('series_season') and entry.get('series_episode')):
                     continue
                 entry['trakt_watched'] = False
+                series = None
                 for id in SHOW_IDS:
                     if id in entry and entry[id] in index:
                         series = data[index[entry[id]]]
