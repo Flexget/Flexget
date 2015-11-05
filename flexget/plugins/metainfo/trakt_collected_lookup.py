@@ -6,7 +6,7 @@ from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
-from flexget.utils import json
+from flexget.plugins.api_trakt import get_api_url, get_session
 
 log = logging.getLogger('trakt_collected')
 
@@ -22,10 +22,10 @@ class TraktCollected(object):
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'api_key': {'type': 'string'}
+            'account': {'type': 'string'},
+            'type': {'type': 'string', 'enum': ['movies', 'shows'], 'default': 'shows'}
         },
-        'required': ['username', 'api_key'],
+        'required': ['username'],
         'additionalProperties': False
     }
     
@@ -34,53 +34,62 @@ class TraktCollected(object):
     def on_task_metainfo(self, task, config):
         if not task.entries:
             return
-        url = 'http://api.trakt.tv/user/library/shows/collection.json/%s/%s' % \
-            (config['api_key'], config['username'])
-        auth = None
-        if 'password' in config:
-            auth = {'username': config['username'],
-                    'password': hashlib.sha1(config['password']).hexdigest()}
+        url = get_api_url('users', config['username'], 'collection', config['type'])
+        session = get_session(config['username'], account=config.get('account'))
         try:
             log.debug('Opening %s' % url)
-            data = task.requests.get(url, data=json.dumps(auth)).json()
+            data = session.get(url).json()
         except RequestException as e:
             raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
 
-        def check_auth():
-            if task.requests.post('http://api.trakt.tv/account/test/' + config['api_key'],
-                                  data=json.dumps(auth), raise_status=False).status_code != 200:
-                raise plugin.PluginError('Authentication to trakt failed.')
-
         if not data:
-            check_auth()
-            self.log.warning('No data returned from trakt.')
+            log.warning('No data returned from trakt.')
             return
-        if 'error' in data:
-            check_auth()
-            raise plugin.PluginError('Error getting trakt list: %s' % data['error'])
         log.verbose('Received %d series records from trakt.tv' % len(data))
         # the index will speed the work if we have a lot of entries to check
         index = {}
-        for idx, val in enumerate(data):
-            index[val['title']] = index[int(val['tvdb_id'])] = index[val['imdb_id']] = idx
-        for entry in task.entries:
-            if not (entry.get('series_name') and entry.get('series_season') and entry.get('series_episode')):
-                continue
-            entry['trakt_in_collection'] = False
-            if 'tvdb_id' in entry and entry['tvdb_id'] in index:
-                series = data[index[entry['tvdb_id']]]
-            elif 'imdb_id' in entry and entry['imdb_id'] in index:
-                series = data[index[entry['imdb_id']]]
-            elif 'series_name' in entry and entry['series_name'] in index:
-                series = data[index[entry['series_name']]]
-            else:
-                continue
-            for s in series['seasons']:
-                if s['season'] == entry['series_season']:
-                    entry['trakt_in_collection'] = entry['series_episode'] in s['episodes']
-                    break
-            log.debug('The result for entry "%s" is: %s' % (entry['title'], 
-                'Owned' if entry['trakt_in_collection'] else 'Not owned'))
+        if config['type'] == 'shows':
+            for idx, val in enumerate(data):
+                v = val.get('show')
+                index[v['title']] = index[int(v['ids']['tvdb'])] = index[v['ids']['imdb']] = idx
+            for entry in task.entries:
+                if not (entry.get('series_name') and entry.get('series_season') and entry.get('series_episode')):
+                    continue
+                entry['trakt_in_collection'] = False
+                if 'tvdb_id' in entry and entry['tvdb_id'] in index:
+                    series = data[index[entry['tvdb_id']]]
+                elif 'imdb_id' in entry and entry['imdb_id'] in index:
+                    series = data[index[entry['imdb_id']]]
+                elif entry['series_name'] in index:
+                    series = data[index[entry['series_name']]]
+                else:
+                    continue
+                for s in series['seasons']:
+                    if s['number'] == entry['series_season']:
+                        # extract all episode numbers currently in collection for the season number
+                        episodes = [ep['number'] for ep in s['episodes']]
+                        entry['trakt_in_collection'] = entry['series_episode'] in episodes
+                        break
+                log.debug('The result for entry "%s" is: %s' % (entry['title'],
+                    'Owned' if entry['trakt_in_collection'] else 'Not owned'))
+        else:
+            for idx, val in enumerate(data):
+                v = val.get('movie')
+                index[v['title']] = index[int(v['ids']['tmdb'])] = index[v['ids']['imdb']] = idx
+            for entry in task.entries:
+                if not (entry.get('movie_name') or entry.get('imdb_id') or entry.get('tmdb_id')):
+                    continue
+                if 'tmdb_id' in entry and entry['tmdb_id'] in index:
+                    movie = data[index[entry['tmdb_id']]]
+                elif 'imdb_id' in entry and entry['imdb_id'] in index:
+                    movie = data[index[entry['imdb_id']]]
+                elif 'movie_name' in entry and entry['movie_name'] in index:
+                    movie = data[index[entry['movie_name']]]
+                else:
+                    continue
+                entry['trakt_in_collection'] = True if movie else False
+                log.debug('The result for entry "%s" is: %s' % (entry['title'],
+                    'Owned' if entry['trakt_in_collection'] else 'Not owned'))
 
 
 @event('plugin.register')
