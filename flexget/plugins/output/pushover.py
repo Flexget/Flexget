@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from requests.exceptions import RequestException
-
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
@@ -31,7 +30,7 @@ class OutputPushover(object):
     Configuration parameters are also supported from entries (eg. through set).
     """
     default_message = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} " \
-                      "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "\
+                      "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} " \
                       "{{imdb_year}}{% else %}{{title}}{% endif %}"
     schema = {
         'type': 'object',
@@ -41,7 +40,7 @@ class OutputPushover(object):
             'device': {'type': 'string', 'default': ''},
             'title': {'type': 'string', 'default': "{{task}}"},
             'message': {'type': 'string', 'default': default_message},
-            'priority': {'type': 'integer', 'default': 0},
+            'priority': {'oneOf': [{'type': 'integer'}, {'type': 'string'}]},
             'url': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
             'urltitle': {'type': 'string', 'default': ''},
             'sound': {'type': 'string', 'default': ''}
@@ -100,6 +99,23 @@ class OutputPushover(object):
             except RenderError as e:
                 log.warning("Problem rendering 'urltitle': %s" % e)
                 urltitle = ""
+
+            # Attempt to render the priority field
+            try:
+                priority = entry.render(priority)
+            except RenderError:
+                try:
+                    priority = int(priority)
+                except ValueError as e:
+                    log.warning("Problem rendering 'priority': %s" % e)
+                    priority = 0
+
+            # Attempt to render the sound field
+            try:
+                sound = entry.render(sound)
+            except RenderError as e:
+                log.warning("Problem rendering 'sound': %s" % e)
+                sound = ''
 
             for userkey in userkeys:
                 # Build the request
