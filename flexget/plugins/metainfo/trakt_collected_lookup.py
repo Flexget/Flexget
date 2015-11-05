@@ -69,6 +69,7 @@ class TraktCollected(object):
                 if not (entry.get('series_name') and entry.get('series_season') and entry.get('series_episode')):
                     continue
                 entry['trakt_in_collection'] = False
+                series = None
                 for id in SHOW_IDS:
                     if id in entry and entry[id] in index:
                         series = data[index[entry[id]]]
