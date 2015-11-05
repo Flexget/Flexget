@@ -159,7 +159,7 @@ class SendTelegram(object):
         if not accepted_tasks:
             return
         token, usernames, fullnames, groups = self._parse_config(config)
-        self.log.debug('token={} usernames={} fullnames={} groups={}'.format(token, usernames, fullnames, groups))
+        self.log.debug('token={0} usernames={1} fullnames={2} groups={3}'.format(token, usernames, fullnames, groups))
 
         bot = telegram.Bot(token)
         session = task.session
@@ -185,17 +185,17 @@ class SendTelegram(object):
 
         """
         chat_ids, has_new_chat_ids = self._get_chat_ids(session, bot, usernames, fullnames, groups)
-        self.log.debug('chat_ids={}'.format(chat_ids))
+        self.log.debug('chat_ids={0}'.format(chat_ids))
 
         if not chat_ids:
             self.log.warning('no chat id found')
         else:
             if usernames:
-                self.log.warning('no chat id found for usernames: {}'.format(usernames))
+                self.log.warning('no chat id found for usernames: {0}'.format(usernames))
             if fullnames:
-                self.log.warning('no chat id found for fullnames: {}'.format(fullnames))
+                self.log.warning('no chat id found for fullnames: {0}'.format(fullnames))
             if groups:
-                self.log.warning('no chat id found for groups: {}'.format(groups))
+                self.log.warning('no chat id found for groups: {0}'.format(groups))
             if has_new_chat_ids:
                 self._update_db(session, chat_ids)
 
@@ -225,7 +225,7 @@ class SendTelegram(object):
 
         self.log.debug('loading new chat ids')
         new_chat_ids = list(self._get_new_chat_ids(bot, usernames, fullnames, groups))
-        self.log.debug('found {} new chat ids'.format(len(new_chat_ids)))
+        self.log.debug('found {0} new chat ids'.format(len(new_chat_ids)))
 
         chat_ids.extend(new_chat_ids)
         return chat_ids, bool(new_chat_ids)
@@ -328,7 +328,7 @@ class SendTelegram(object):
             elif isinstance(chat, telegram.GroupChat):
                 groups[chat.title] = chat
             else:
-                self.log.warn('unknown chat type: {}'.format(type(chat)))
+                self.log.warn('unknown chat type: {0}'.format(type(chat)))
 
         return usernames, fullnames, groups
 
