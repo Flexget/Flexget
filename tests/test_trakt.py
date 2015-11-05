@@ -156,7 +156,7 @@ class TestTraktWatched(FlexGetBase):
     @use_vcr
     def test_trakt_watched_lookup(self):
         self.execute_task('test_trakt_watched')
-        assert len(self.task.accepted) == 1
+        assert len(self.task.accepted) == 1, 'Episode should have been marked as watched and accepted'
         entry = self.task.accepted[0]
         assert entry['title'] == 'Hawaii.Five-0.S04E13.HDTV-FlexGet', 'title was not accepted?'
         assert entry['series_name'] == 'Hawaii Five-0', 'wrong series was accepted'
