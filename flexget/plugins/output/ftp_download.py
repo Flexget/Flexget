@@ -52,7 +52,7 @@ class OutputFtp(object):
         else:
             ftp = ftplib.FTP()
 
-	ftp.set_debuglevel(2)
+	# ftp.set_debuglevel(2)
         log.debug("Connecting to " + ftp_url.hostname)
         ftp.connect(ftp_url.hostname, ftp_url.port)
         ftp.login(ftp_url.username, ftp_url.password)
