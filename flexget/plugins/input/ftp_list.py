@@ -73,8 +73,6 @@ class InputFtpList(object):
         try:
             ftp.connect(connection_config['host'], connection_config['port'])
             ftp.login(connection_config['username'], connection_config['password'])
-            if connection_config['use-ssl']:
-                ftp.prot_p()
         except ftplib.all_errors as e:
             raise plugin.PluginError(e)
 
@@ -112,8 +110,6 @@ class InputFtpList(object):
                                               connection_config['host'], connection_config['port'])
 
             self._handle_path(entries, ftp, baseurl, path, mlst_supported, files_only, recursive, get_size, encoding)
-
-	ftp.close()
 
         return entries
 

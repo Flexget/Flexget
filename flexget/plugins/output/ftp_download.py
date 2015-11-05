@@ -1,7 +1,6 @@
 import logging
 import os
 import ftplib
-import urllib
 from urlparse import urlparse
 
 from flexget import plugin
@@ -19,9 +18,8 @@ class OutputFtp(object):
 
         config:
             ftp_download:
-              use-ssl: <True/False>
-              ftp_tmp_path: <path>
-              delete_origin: <True/False>
+              tls: False
+              ftp_tmp_path: /tmp
 
         TODO:
           - Resume downloads
@@ -51,16 +49,11 @@ class OutputFtp(object):
             ftp = ftplib.FTP_TLS()
         else:
             ftp = ftplib.FTP()
-
-	ftp.set_debuglevel(2)
         log.debug("Connecting to " + ftp_url.hostname)
         ftp.connect(ftp_url.hostname, ftp_url.port)
         ftp.login(ftp_url.username, ftp_url.password)
-	if config['use-ssl']:
-            ftp.prot_p()
         ftp.sendcmd('TYPE I')
         ftp.set_pasv(True)
-        log.debug("Changing directory to: " + current_path)
         ftp.cwd(current_path)
 
         return ftp
@@ -76,12 +69,11 @@ class OutputFtp(object):
         config = self.prepare_config(config, task)
         for entry in task.accepted:
             ftp_url = urlparse(entry.get('url'))
-            ftp_url = ftp_url._replace(path = urllib.unquote_plus(ftp_url.path))
             current_path = os.path.dirname(ftp_url.path)
             try:
                 ftp = self.ftp_connect(config, ftp_url, current_path)
-            except ftplib.all_errors as e:
-                entry.fail("Unable to connect to server : %s" % (e))
+            except:
+                entry.failed("Unable to connect to server")
                 break
 
             if not os.path.isdir(config['ftp_tmp_path']):
