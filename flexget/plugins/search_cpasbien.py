@@ -128,7 +128,7 @@ class SearchCPASBIEN(object):
                         nextpage += 1
                     else:
                         nextpage = -1
-            return entries
+                return entries
 
 
 @event('plugin.register')
