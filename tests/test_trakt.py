@@ -51,7 +51,7 @@ class TestTraktShowLookup(FlexGetBase):
         assert entry['trakt_series_status'] == 'ended', 'Series Status should be "ENDED" returned %s' \
                                                         % (entry['trakt_series_status'])
 
-    #@use_vcr
+    @use_vcr
     def test_lookup(self):
         """trakt: Test Lookup (ONLINE)"""
         self.execute_task('test')
@@ -72,18 +72,18 @@ class TestTraktShowLookup(FlexGetBase):
         entry = self.task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
-    @use_vcr
-    def test_date(self):
-        self.execute_task('test_date')
-        entry = self.task.find_entry(title='the daily show 2012-6-6')
-        # TODO what is the point of this test?
-        #assert entry.get('tvdb_id') is None, 'should not have populated trakt data'
-
-    @use_vcr
-    def test_absolute(self):
-        self.execute_task('test_absolute')
-        entry = self.task.find_entry(title='naruto 128')
-        #assert entry.get('tvdb_id') is None, 'should not have populated trakt data'
+    # @use_vcr
+    # def test_date(self):
+    #     self.execute_task('test_date')
+    #     entry = self.task.find_entry(title='the daily show 2012-6-6')
+    #     # TODO what is the point of this test?
+    #     # assert entry.get('tvdb_id') is None, 'should not have populated trakt data'
+    #
+    # @use_vcr
+    # def test_absolute(self):
+    #     self.execute_task('test_absolute')
+    #     entry = self.task.find_entry(title='naruto 128')
+    #     # assert entry.get('tvdb_id') is None, 'should not have populated trakt data'
 
     @use_vcr
     def test_lookup_actors(self):
@@ -112,7 +112,7 @@ class TestTraktShowLookup(FlexGetBase):
         assert entry['trakt_series_actors']['297390']['tmdb_id'] == '41419', 'fetching tmdb id for actor failed'
         with Session() as session:
             actor = session.query(TraktActor).filter(TraktActor.name == 'Hugh Laurie').first()
-            assert actor != None, 'adding actor to actors table failed'
+            assert actor is not None, 'adding actor to actors table failed'
             assert actor.imdb_id == 'nm0491402', 'saving imdb_id for actors in table failed'
             assert actor.trakt_id == '297390', 'saving trakt_id for actors in table failed'
             assert actor.tmdb_id == '41419', 'saving tmdb_id for actors table failed'
@@ -221,7 +221,7 @@ class TestTraktMovieLookup(FlexGetBase):
         assert entry['trakt_movie_actors']['7134']['tmdb_id'] == '6384', 'fetching tmdb id for actor failed'
         with Session() as session:
             actor = session.query(TraktActor).filter(TraktActor.name == 'Keanu Reeves').first()
-            assert actor != None, 'adding actor to actors table failed'
+            assert actor is not None, 'adding actor to actors table failed'
             assert actor.imdb_id == 'nm0000206', 'saving imdb_id for actors in table failed'
             assert actor.trakt_id == '7134', 'saving trakt_id for actors in table failed'
             assert actor.tmdb_id == '6384', 'saving tmdb_id for actors table failed'
