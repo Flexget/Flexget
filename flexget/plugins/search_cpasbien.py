@@ -65,7 +65,7 @@ class SearchCPASBIEN(object):
             ebook
         """
 
-        base_url = 'http://www.cpasbien.pe'
+        base_url = 'http://www.cpasbien.io'
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             search_string = search_string.replace(' ', '-').lower()
