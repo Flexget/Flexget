@@ -76,7 +76,7 @@ class OutputFtp(object):
         config = self.prepare_config(config, task)
         for entry in task.accepted:
             ftp_url = urlparse(entry.get('url'))
-            ftp_url = ftp_url._replace(path = urllib.unquote_plus(ftp_url.path))
+            ftp_url = ftp_url._replace(path = urllib.unquote(ftp_url.path))
             current_path = os.path.dirname(ftp_url.path)
             try:
                 ftp = self.ftp_connect(config, ftp_url, current_path)
