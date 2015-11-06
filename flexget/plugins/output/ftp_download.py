@@ -22,6 +22,7 @@ class OutputFtp(object):
               use-ssl: <True/False>
               ftp_tmp_path: <path>
               delete_origin: <True/False>
+              download_empty_dirs: <True/False>
 
         TODO:
           - Resume downloads
@@ -35,7 +36,8 @@ class OutputFtp(object):
         'properties': {
             'use-ssl': {'type': 'boolean', 'default': False},
             'ftp_tmp_path': {'type': 'string', 'format': 'path'},
-            'delete_origin': {'type': 'boolean', 'default': False}
+            'delete_origin': {'type': 'boolean', 'default': False},
+            'download_empty_dirs': {'type': 'boolean', 'default': False}
         },
         'additionalProperties': False
     }
@@ -44,6 +46,7 @@ class OutputFtp(object):
         config.setdefault('use-ssl', False)
         config.setdefault('delete_origin', False)
         config.setdefault('ftp_tmp_path', os.path.join(task.manager.config_base, 'temp'))
+        config.setdefault('download_empty_dirs', False)
         return config
 
     def ftp_connect(self, config, ftp_url, current_path):
@@ -119,6 +122,10 @@ class OutputFtp(object):
             return ftp
 
         if not dirs:
+            if config['download_empty_dirs']:
+                os.mkdir(tmp_path)
+            else:
+                log.debug("Empty directory, skipping.")
             return ftp
 
         for file_name in (path for path in dirs if path not in ('.', '..')):
