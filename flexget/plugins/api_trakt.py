@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 from datetime import datetime, timedelta
-from urlparse import urljoin
 
 from dateutil.parser import parse as dateutil_parse
 from sqlalchemy import Table, Column, Integer, String, Unicode, Boolean, Date, DateTime, Time, or_, func
@@ -16,7 +15,7 @@ from flexget.db_schema import upgrade
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugins.filter.series import normalize_series_name
-from flexget.utils import json, requests
+from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.logger import console
@@ -152,8 +151,8 @@ def get_api_url(*endpoint):
 
 @upgrade('api_trakt')
 def upgrade_database(ver, session):
-    if ver <=2:
-        pass  # TODO: Clear out all old db
+    if ver <= 2:
+        raise db_schema.UpgradeImpossible
     return ver
 
 
@@ -515,8 +514,8 @@ def split_title_year(title):
 
 
 @with_session
-def get_cached(style=None, title=None, year=None, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None, tvdb_id=None,
-               tvrage_id=None, session=None):
+def get_cached(style=None, title=None, year=None, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None,
+               tvdb_id=None, tvrage_id=None, session=None):
     """
     Get the cached info for a given show/movie from the database.
 
@@ -548,8 +547,8 @@ def get_cached(style=None, title=None, year=None, trakt_id=None, trakt_slug=None
     return result
 
 
-def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None, tvdb_id=None,
-              tvrage_id=None):
+def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None, tmdb_id=None, imdb_id=None,
+              tvdb_id=None, tvrage_id=None):
     """Returns the matching media object from trakt api."""
     # TODO: Better error messages
     # Trakt api accepts either id or slug (there is a rare possibility for conflict though, e.g. 24)
@@ -658,9 +657,10 @@ class ApiTrakt(object):
 
 def do_cli(manager, options):
     if options.action == 'auth':
-        if not options.account and options.pin:
+        if not options.account and not options.pin:
             console('You must specify an account (local identifier) so we know where to save your access token! '
                     'Visit %s to get a pin code and authorize flexget to access your trakt account.' % PIN_URL)
+            return
         try:
             get_access_token(options.account, options.pin, re_auth=True)
             console('Successfully authorized Flexget app on Trakt.tv. Enjoy!')
