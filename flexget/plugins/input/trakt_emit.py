@@ -48,7 +48,7 @@ class TraktEmit(object):
         session = get_session(config['username'], account=config.get('account'))
         listed_series = {}
         if config.get('list'):
-            args = ('users' , config['username'])
+            args = ('users', config['username'])
             if config['list'] in ['collection', 'watchlist', 'watched']:
                 args += (config['list'], 'shows')
             else:

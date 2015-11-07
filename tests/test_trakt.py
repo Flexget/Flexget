@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
 from flexget.manager import Session
-from flexget.plugins.api_trakt import ApiTrakt, TraktActor
+from flexget.plugins.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow
 from tests import FlexGetBase, use_vcr
 
 
@@ -39,6 +39,12 @@ class TestTraktShowLookup(FlexGetBase):
               - title: naruto 128
             series:
               - naruto
+          test_search_result:
+            mock:
+              - {title: 'Shameless.2011.S01E02.HDTV.XViD-FlexGet'}
+              - {title: 'Shameless.2011.S03E02.HDTV.XViD-FlexGet'}
+            series:
+              - Shameless (2011)
     """
 
     @use_vcr
@@ -71,6 +77,20 @@ class TestTraktShowLookup(FlexGetBase):
         # Make sure it didn't make a false match
         entry = self.task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
+
+    @use_vcr
+    def test_search_results(self):
+        self.execute_task('test_search_result')
+        entry = self.task.entries[0]
+        assert entry['trakt_series_name'].lower() == 'Shameless (US)'.lower(), 'lookup failed'
+        with Session() as session:
+            assert self.task.entries[1]['trakt_series_name'].lower() == 'Shameless (US)'.lower(), 'second lookup failed'
+
+            assert len(session.query(TraktShowSearchResult).all()) == 1, 'should have added 1 show to search result'
+
+            assert len(session.query(TraktShow).all()) == 1, 'should only have added one show to show table'
+            assert session.query(TraktShow).first().title == 'Shameless (US)', 'should have added Shameless (US) and' \
+                                                                               'not Shameless (2011)'
 
     # @use_vcr
     # def test_date(self):
@@ -186,6 +206,12 @@ class TestTraktMovieLookup(FlexGetBase):
           test_lookup_actors:
             mock:
             - title: The Matrix (1999)
+          test_search_results:
+            mock:
+            - title: harry.potter.and.the.philosopher's.stone.720p.hdtv-flexget
+          test_search_results2:
+            mock:
+            - title: harry.potter.and.the.philosopher's.stone
     """
 
     @use_vcr
@@ -193,6 +219,24 @@ class TestTraktMovieLookup(FlexGetBase):
         self.execute_task('test_lookup_sources')
         for e in self.task.all_entries:
             assert e['movie_name'] == 'The Matrix', 'looking up based on %s failed' % e['title']
+
+    @use_vcr
+    def test_search_results(self):
+        self.execute_task('test_search_results')
+        entry = self.task.entries[0]
+        assert entry['movie_name'].lower() == 'Harry Potter and The Philosopher\'s Stone'.lower(), 'lookup failed'
+        with Session() as session:
+            assert len(session.query(TraktMovieSearchResult).all()) == 1, 'should have added one movie to search result'
+
+            # change the search query
+            session.query(TraktMovieSearchResult).update({'search': "harry.potter.and.the.philosopher's"})
+            session.commit()
+
+            lookupargs = {'title': "harry.potter.and.the.philosopher's"}
+            movie = ApiTrakt.lookup_movie(**lookupargs)
+
+            assert movie.imdb_id == entry['imdb_id']
+            assert movie.title.lower() == entry['movie_name'].lower()
 
     @use_vcr
     def test_lookup_actors(self):

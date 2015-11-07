@@ -6,16 +6,16 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=house&type=show
+    uri: https://api-v2launch.trakt.tv/search?query=House&type=show
   response:
-    body: {string: "[{\"type\":\"show\",\"score\":48.4101,\"show\":{\"title\":\"House\",\"overview\":\"Go
+    body: {string: "[{\"type\":\"show\",\"score\":47.935055,\"show\":{\"title\":\"House\",\"overview\":\"Go
         deeper into the medical mysteries of House, TV's most compelling drama. Hugh
         Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
         physician who is devoid of bedside manner. While his behavior can border on
         antisocial, Dr. House thrives on the challenge of solving the medical puzzles
         that other doctors give up on. Together with his hand-picked team of young
         medical experts, he'll do whatever it takes in the race against the clock
-        to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/399/posters/original/76fae8b69b.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/399/posters/medium/76fae8b69b.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/posters/thumb/76fae8b69b.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/original/c628f24771.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/medium/c628f24771.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg\"}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":39.12127,\"show\":{\"title\":\"House
+        to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/399/posters/original/76fae8b69b.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/399/posters/medium/76fae8b69b.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/posters/thumb/76fae8b69b.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/original/c628f24771.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/medium/c628f24771.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg\"}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":38.737373,\"show\":{\"title\":\"House
         vs. House\",\"overview\":\"House vs. House is a new home makeover competition
         series where amateur and experienced renovation teams compete for the chance
         to win $10,000 by proving they can create the better DIY projects in their
@@ -23,77 +23,77 @@ interactions:
         each episode features two teams will go head-to-head in grueling challenges.
         Tanya McQueen, a DIY design expert, and David Brian Sanders, an architect
         and designer, will determine which team completes the most impressive transformation
-        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.578644,\"show\":{\"title\":\"Full
+        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.239326,\"show\":{\"title\":\"Full
         House\",\"overview\":\"Full House is an American sitcom created by Jeff Franklin
         for ABC. The show chronicles a widowed father, who enlists his best friend
         and his brother-in-law to help raise his three daughters. It aired from September
-        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/posters/original/d58e9ca81f.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/289/posters/medium/d58e9ca81f.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/posters/thumb/d58e9ca81f.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/original/9f83d4ba78.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/medium/9f83d4ba78.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/thumb/9f83d4ba78.jpg\"}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":34.578644,\"show\":{\"title\":\"House
+        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/posters/original/d58e9ca81f.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/289/posters/medium/d58e9ca81f.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/posters/thumb/d58e9ca81f.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/original/9f83d4ba78.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/medium/9f83d4ba78.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/thumb/9f83d4ba78.jpg\"}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":34.239326,\"show\":{\"title\":\"House
         Hunters\",\"overview\":\"House Hunters takes viewers behind the scenes as
         individuals, couples and families learn what to look for and decide whether
         or not a home is meant for them. Focusing on the emotional experience of finding
         and purchasing a new home, each episode follows a prospective buyer and real
         estate agent through the home-buying process, from start to finish.\",\"year\":1999,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/441/posters/original/d9d5f542d4.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/006/441/posters/medium/d9d5f542d4.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/posters/thumb/d9d5f542d4.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/original/36bdbe2817.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/medium/36bdbe2817.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/thumb/36bdbe2817.jpg\"}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.578644,\"show\":{\"title\":\"Alpha
+        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/441/posters/original/d9d5f542d4.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/006/441/posters/medium/d9d5f542d4.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/posters/thumb/d9d5f542d4.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/original/36bdbe2817.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/medium/36bdbe2817.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/thumb/36bdbe2817.jpg\"}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.239326,\"show\":{\"title\":\"Alpha
         House\",\"overview\":\"Alpha House follows four senators who live together
         in a rented house in Washington DC.Re-election battles, looming indictments,
         parties, their Party... these senators need a drink. And a new housemate.\",\"year\":2013,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/285/posters/original/5637f1fe65.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/285/posters/medium/5637f1fe65.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/posters/thumb/5637f1fe65.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/original/e477e76c44.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/medium/e477e76c44.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/thumb/e477e76c44.jpg\"}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":34.578644,\"show\":{\"title\":\"Playing
+        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/285/posters/original/5637f1fe65.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/285/posters/medium/5637f1fe65.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/posters/thumb/5637f1fe65.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/original/e477e76c44.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/medium/e477e76c44.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/thumb/e477e76c44.jpg\"}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":34.239326,\"show\":{\"title\":\"Playing
         House\",\"overview\":\"A single-camera buddy comedy about what happens when
         two best friends come back together, just when they need each other most.Inspired
         by the ultra-close friendship between the series' creators and stars, \\\"Playing
         House\\\" centers on mother to-be Maggie who asks her single and career-driven
         best friend Emma to return home from her job overseas to attend her baby shower,
         having no idea what\u2019s truly in store.\",\"year\":2014,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/073/385/posters/original/43003e74db.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/073/385/posters/medium/43003e74db.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/posters/thumb/43003e74db.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/original/49c78c5d22.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/medium/49c78c5d22.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/thumb/49c78c5d22.jpg\"}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.578644,\"show\":{\"title\":\"House
+        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/073/385/posters/original/43003e74db.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/073/385/posters/medium/43003e74db.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/posters/thumb/43003e74db.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/original/49c78c5d22.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/medium/49c78c5d22.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/thumb/49c78c5d22.jpg\"}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.239326,\"show\":{\"title\":\"House
         Husbands\",\"overview\":\"House Husbands centres around four families with
         one thing in common, the husbands stay home to raise the children.Firass Dirani
         plays a fallen AFL hero, struggling with the burden of family life. In the
         midst of losing the ability to see his two twin boys (primary school age)
         and his eight month daughter, he is offered a contract to play football again
         in Perth. He rejects the offer made by his former manager (who is in a relationship
-        with his ex wife)\",\"year\":2012,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/posters/original/8d6ef762b1.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/043/830/posters/medium/8d6ef762b1.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/posters/thumb/8d6ef762b1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/original/632ffeb8be.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/medium/632ffeb8be.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/thumb/632ffeb8be.jpg\"}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.578644,\"show\":{\"title\":\"Grandma's
+        with his ex wife)\",\"year\":2012,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/posters/original/8d6ef762b1.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/043/830/posters/medium/8d6ef762b1.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/posters/thumb/8d6ef762b1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/original/632ffeb8be.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/medium/632ffeb8be.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/thumb/632ffeb8be.jpg\"}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.239326,\"show\":{\"title\":\"Grandma's
         House\",\"overview\":\"TV presenter Simon Amstell plays a version of himself
         in Grandma's House, a new six-part comedy written by Simon and his long-term
         collaborator Dan Swimer.The series stars Simon Amstell as a TV presenter who
         is quitting his job to try to do something more meaningful with his life.Each
         episode is set at Grandma's house, where Simon's family regularly congregate
         to catch up. Everything happens under the watchful eye of Grandma, who is
-        desperate to see everything going well.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/033/144/posters/original/8eace1ae32.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/033/144/posters/medium/8eace1ae32.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/posters/thumb/8eace1ae32.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/original/72aecb12bc.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/medium/72aecb12bc.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/thumb/72aecb12bc.jpg\"}},\"ids\":{\"trakt\":33144,\"slug\":\"grandma-s-house\",\"tvdb\":181551,\"imdb\":\"tt1706532\",\"tmdb\":33289,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.578644,\"show\":{\"title\":\"Safe
+        desperate to see everything going well.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/033/144/posters/original/8eace1ae32.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/033/144/posters/medium/8eace1ae32.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/posters/thumb/8eace1ae32.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/original/72aecb12bc.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/medium/72aecb12bc.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/thumb/72aecb12bc.jpg\"}},\"ids\":{\"trakt\":33144,\"slug\":\"grandma-s-house\",\"tvdb\":181551,\"imdb\":\"tt1706532\",\"tmdb\":33289,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.239326,\"show\":{\"title\":\"Safe
         House\",\"overview\":\"A married couple, former detective Robert and teacher
         Katy, are asked by close friend and police officer Mark, to turn their remote
-        Guest House into a Safe House.\",\"year\":2015,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/097/962/posters/original/c8c7453fb3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/097/962/posters/medium/c8c7453fb3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/097/962/posters/thumb/c8c7453fb3.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/097/962/fanarts/original/c5e28cf152.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/097/962/fanarts/medium/c5e28cf152.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/097/962/fanarts/thumb/c5e28cf152.jpg\"}},\"ids\":{\"trakt\":97962,\"slug\":\"safe-house\",\"tvdb\":294195,\"imdb\":\"tt4567314\",\"tmdb\":62452,\"tvrage\":42379}}},{\"type\":\"show\",\"score\":34.578644,\"show\":{\"title\":\"Bleak
+        Guest House into a Safe House.\",\"year\":2015,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/097/962/posters/original/c8c7453fb3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/097/962/posters/medium/c8c7453fb3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/097/962/posters/thumb/c8c7453fb3.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/097/962/fanarts/original/c5e28cf152.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/097/962/fanarts/medium/c5e28cf152.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/097/962/fanarts/thumb/c5e28cf152.jpg\"}},\"ids\":{\"trakt\":97962,\"slug\":\"safe-house\",\"tvdb\":294195,\"imdb\":\"tt4567314\",\"tmdb\":62452,\"tvrage\":42379}}},{\"type\":\"show\",\"score\":34.239326,\"show\":{\"title\":\"Bleak
         House\",\"overview\":\"This stunning BBC production, starring Diana Rigg and
         Denholm Elliott, brings to life one of Dicken's finest works, an unflinching
         look at the absurdity of the legal profession, whose sole purpose seems to
         be lining the pockets of lawyers.\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/267/posters/original/6842fea1eb.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/006/267/posters/medium/6842fea1eb.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/006/267/posters/thumb/6842fea1eb.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/267/fanarts/original/18c0132206.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/006/267/fanarts/medium/18c0132206.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/006/267/fanarts/thumb/18c0132206.jpg\"}},\"ids\":{\"trakt\":6267,\"slug\":\"bleak-house-1969\",\"tvdb\":217321,\"imdb\":\"tt0088485\",\"tmdb\":6305,\"tvrage\":null}}}]"}
     headers:
       cache-control: ['public, max-age=14400']
-      cf-cache-status: [EXPIRED]
-      cf-ray: [2408d1d027550a42-ARN]
+      cf-cache-status: [HIT]
+      cf-ray: [241c6b3450fc16e2-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Thu, 05 Nov 2015 13:14:04 GMT']
-      etag: [W/"e24241e4635f8429ec89823c5ea27b3b"]
-      expires: ['Thu, 05 Nov 2015 17:14:04 GMT']
+      date: ['Sat, 07 Nov 2015 22:19:16 GMT']
+      etag: [W/"8d640db15d49d9fbe7988b193951a893"]
+      expires: ['Sun, 08 Nov 2015 02:19:16 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d07419b48e6ac458d2d53c5ab35b47f5e1446729244; expires=Fri,
-          04-Nov-16 13:14:04 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=dd5909c9c0586f7e3ce4b4e2d1580ce531446934756; expires=Sun,
+          06-Nov-16 22:19:16 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
-      x-pagination-item-count: ['1472']
+      x-pagination-item-count: ['1474']
       x-pagination-limit: ['10']
       x-pagination-page: ['1']
       x-pagination-page-count: ['148']
-      x-request-id: [fbfc7788-3a49-41bc-902c-5c0586e2061e]
-      x-runtime: ['0.033763']
+      x-request-id: [e31f3fdc-c750-4edd-b81d-d8da27953c74]
+      x-runtime: ['0.023538']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=d07419b48e6ac458d2d53c5ab35b47f5e1446729244]
+      Cookie: [__cfduid=dd5909c9c0586f7e3ce4b4e2d1580ce531446934756]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
@@ -111,12 +111,12 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2408d1d447850a42-ARN]
+      cf-ray: [241c6b34c10116e2-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Thu, 05 Nov 2015 13:14:04 GMT']
+      date: ['Sat, 07 Nov 2015 22:19:16 GMT']
       etag: [W/"7d770f6ac647928ba53b0880c059a536"]
-      expires: ['Thu, 05 Nov 2015 17:14:04 GMT']
+      expires: ['Sun, 08 Nov 2015 02:19:16 GMT']
       last-modified: ['Fri, 23 Oct 2015 10:31:03 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]
@@ -141,24 +141,24 @@ interactions:
         bad news, the kid has MS, but the boy''s night-terror hallucinations disprove
         the diagnosis and send House and his team back to square one. As the boy''s
         health deteriorates. House''s side-bet on the paternity of the patient infuriates
-        Dr. Cuddy and the teenager''s parents, but may just pay off in spades.","rating":8.12329,"votes":365,"first_aired":"2004-11-23T05:00:00.000Z","updated_at":"2015-11-02T18:23:10.000Z","available_translations":[]}'}
+        Dr. Cuddy and the teenager''s parents, but may just pay off in spades.","rating":8.12534,"votes":367,"first_aired":"2004-11-23T05:00:00.000Z","updated_at":"2015-11-07T11:12:54.000Z","available_translations":[]}'}
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2408d1d57b9736ea-ARN]
+      cf-ray: [241c6b36263337b0-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Thu, 05 Nov 2015 13:14:05 GMT']
-      expires: ['Thu, 05 Nov 2015 17:14:05 GMT']
-      last-modified: ['Mon, 02 Nov 2015 18:23:10 GMT']
+      date: ['Sat, 07 Nov 2015 22:19:16 GMT']
+      expires: ['Sun, 08 Nov 2015 02:19:16 GMT']
+      last-modified: ['Sat, 07 Nov 2015 11:12:54 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d29d1c28dcf0f97ac71656ee90e8451641446729245; expires=Fri,
-          04-Nov-16 13:14:05 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d9318eab1ed98bfb7168b93ff92e2a7d71446934756; expires=Sun,
+          06-Nov-16 22:19:16 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
-      x-request-id: [50f02725-fafe-4606-8a0e-c77798525c24]
-      x-runtime: ['0.008589']
+      x-request-id: [66ad59d0-9eb5-40ef-92c1-cf9a5d4487f4]
+      x-runtime: ['0.016755']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
@@ -168,22 +168,16 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=doctor+who&type=show
+    uri: https://api-v2launch.trakt.tv/search?query=Doctor+Who&type=show&year=2005
   response:
-    body: {string: "[{\"type\":\"show\",\"score\":61.56026,\"show\":{\"title\":\"Doctor
+    body: {string: "[{\"type\":\"show\",\"score\":61.136936,\"show\":{\"title\":\"Doctor
         Who\",\"overview\":\"The Doctor is an alien Time Lord from the planet Gallifrey
         who travels through all of time and space in his TARDIS. His current travel
         companion is Clara Oswald, though he has a long list of friends and companions
         who have shared journeys with him. Instead of dying, the Doctor is able to
         \u201Cregenerate\u201D into a new body, taking on a new personality with each
         regeneration. Twelve actors, plus John Hurt, have played The Doctor thus far.\",\"year\":2005,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/posters/original/8c421e339d.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/posters/medium/8c421e339d.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/posters/thumb/8c421e339d.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/original/f5b14363ae.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/medium/f5b14363ae.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/thumb/f5b14363ae.jpg\"}},\"ids\":{\"trakt\":56872,\"slug\":\"doctor-who-2005\",\"tvdb\":78804,\"imdb\":\"tt0436992\",\"tmdb\":57243,\"tvrage\":3332}}},{\"type\":\"show\",\"score\":61.56026,\"show\":{\"title\":\"Doctor
-        Who\",\"overview\":\"Doctor Who is the longest-running science fiction TV
-        series in history, airing initially from 1963 to 1989.  Doctor Who is about
-        ideas.  It pioneered sophisticated mixed-level storytelling. Its format was
-        the key to its longevity: the Doctor, a mysterious traveller in space and
-        time, travels in his ship, the TARDIS.  The TARDIS can take him and his companions
-        anywhere in time and space. Inevitably he finds evil at work wherever he goes...\",\"year\":1963,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/000/120/posters/original/ad9718d1d8.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/000/120/posters/medium/ad9718d1d8.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/000/120/posters/thumb/ad9718d1d8.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/000/120/fanarts/original/e4f4d0c970.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/000/120/fanarts/medium/e4f4d0c970.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/000/120/fanarts/thumb/e4f4d0c970.jpg\"}},\"ids\":{\"trakt\":120,\"slug\":\"doctor-who\",\"tvdb\":76107,\"imdb\":\"tt0056751\",\"tmdb\":121,\"tvrage\":null}}},{\"type\":\"show\",\"score\":49.248207,\"show\":{\"title\":\"Doctor
+        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/posters/original/8c421e339d.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/posters/medium/8c421e339d.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/posters/thumb/8c421e339d.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/original/f5b14363ae.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/medium/f5b14363ae.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/056/872/fanarts/thumb/f5b14363ae.jpg\"}},\"ids\":{\"trakt\":56872,\"slug\":\"doctor-who-2005\",\"tvdb\":78804,\"imdb\":\"tt0436992\",\"tmdb\":57243,\"tvrage\":3332}}},{\"type\":\"show\",\"score\":48.90955,\"show\":{\"title\":\"Doctor
         Who Confidential\",\"overview\":\"Specially filmed for BBC Three as a companion
         piece to Doctor Who, Doctor Who Confidential aims to give a taste of the excitement
         and the energy that surrounds the show. The programme includes behind-the-scenes
@@ -191,66 +185,90 @@ interactions:
         bring our favourite Time Lord back to our screens.An abbreviated 15-minute
         version, concentrating on the production of the new series and without reference
         to the original show, is also broadcast on BBC Three as Doctor Who Confidential
-        Cutdown.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/051/posters/original/de98e274d3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/051/posters/medium/de98e274d3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/051/posters/thumb/de98e274d3.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/original/3b9938962b.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/medium/3b9938962b.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/thumb/3b9938962b.jpg\"}},\"ids\":{\"trakt\":1051,\"slug\":\"doctor-who-confidential\",\"tvdb\":79298,\"imdb\":\"tt0453422\",\"tmdb\":1056,\"tvrage\":null}}},{\"type\":\"show\",\"score\":49.248207,\"show\":{\"title\":\"Doctor
-        Who Extra\",\"overview\":\"Doctor Who Extra brings you unprecedented access
-        to the making of Doctor Who... Featuring interviews with Peter Capaldi and
-        Jenna Coleman, it's the ultimate backstage pass!\",\"year\":2014,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/094/434/posters/original/4f35484261.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/094/434/posters/medium/4f35484261.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/094/434/posters/thumb/4f35484261.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/094/434/fanarts/original/3d44482626.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/094/434/fanarts/medium/3d44482626.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/094/434/fanarts/thumb/3d44482626.jpg\"}},\"ids\":{\"trakt\":94434,\"slug\":\"doctor-who-extra\",\"tvdb\":287530,\"imdb\":\"tt4147332\",\"tmdb\":61643,\"tvrage\":null}}},{\"type\":\"show\",\"score\":49.248207,\"show\":{\"title\":\"Doctor
-        Who 2009\",\"overview\":\"Doctor Who 2009 is a non-profit making series of
-        short fan films celebrating the BBC TV series Doctor Who.  Join the adventure,
-        with a brand new series of 13 episodes for the Doctor, in this exciting new
-        fan project.\",\"year\":null,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/018/418/posters/original/697288ab37.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/018/418/posters/medium/697288ab37.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/018/418/posters/thumb/697288ab37.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":18418,\"slug\":\"doctor-who-2009\",\"tvdb\":112671,\"imdb\":\"\",\"tmdb\":18502,\"tvrage\":null}}},{\"type\":\"show\",\"score\":49.248207,\"show\":{\"title\":\"Totally
-        Doctor Who\",\"overview\":\"Following up on the success of Doctor Who for
-        the BBC is this special show for younger fans. Hosted by Liz Barker and Barney
-        Harwood, the show features interviews with the cast and crew, behind the scenes
-        footage, and clips from upcoming Doctor Who shows.\",\"year\":2006,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/000/453/posters/original/0cb9377d5d.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/000/453/posters/medium/0cb9377d5d.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/000/453/posters/thumb/0cb9377d5d.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":453,\"slug\":\"totally-doctor-who\",\"tvdb\":80160,\"imdb\":\"tt0795296\",\"tmdb\":454,\"tvrage\":null}}},{\"type\":\"show\",\"score\":49.248207,\"show\":{\"title\":\"Doctor
-        Who - WhoFlix\",\"overview\":\"FanEdit series detailing the trimmed adventures
-        of an eccentric yet compassionate extraterrestrial Time Lord zips through
-        time and space to solve problems and battle injustice across the universe,
-        travelling via the TARDIS (Time and Relative Dimensions in Space), which is
-        his old and occasionally unreliable spaceship that resembles a blue police
-        phone box (but changes its appearance depending on its surroundings) and is
-        much, much larger inside than outside.\",\"year\":1963,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":96086,\"slug\":\"doctor-who-whoflix\",\"tvdb\":291997,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":45.807243,\"show\":{\"title\":\"Doctor
-        Who: The Doctors Revisited\",\"overview\":\"As the Doctor's newest companion,
-        Clara Oswald, steps into the TARDIS, take a look back at previous companions
-        that have won over The Doctor's hearts in Doctor Who: The Companions. Along
-        the way, companions past and present talk about how the show has changed their
-        lives, and how they've never quite managed to leave the TARDIS behind. \",\"year\":2013,\"status\":\"returning
-        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/095/362/posters/original/08592b4239.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/095/362/posters/medium/08592b4239.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/095/362/posters/thumb/08592b4239.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":95362,\"slug\":\"doctor-who-the-doctors-revisited\",\"tvdb\":null,\"imdb\":\"tt2795780\",\"tmdb\":53071,\"tvrage\":null}}},{\"type\":\"show\",\"score\":43.092186,\"show\":{\"title\":\"Doctor
-        Who Greatest Moments\",\"overview\":\"Series taking viewers on a journey through
-        time and space to relive all the action from the sci-fi show, featuring exclusive
-        interviews with key actors offering unique insights on the classic moments.\",\"year\":2009,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/194/posters/original/60b4b2f8fd.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/061/194/posters/medium/60b4b2f8fd.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/061/194/posters/thumb/60b4b2f8fd.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/194/fanarts/original/60b4b2f8fd.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/061/194/fanarts/medium/60b4b2f8fd.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/061/194/fanarts/thumb/60b4b2f8fd.jpg\"}},\"ids\":{\"trakt\":61194,\"slug\":\"doctor-who-greatest-moments\",\"tvdb\":110141,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":36.936157,\"show\":{\"title\":\"Doctor
-        Who: The Fan Show\",\"overview\":\"The weekly show from the Official Doctor
-        Who YouTube channel.\",\"year\":2015,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/102/207/posters/original/fa885ed255.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/102/207/posters/medium/fa885ed255.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/102/207/posters/thumb/fa885ed255.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/102/207/fanarts/original/fa885ed255.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/102/207/fanarts/medium/fa885ed255.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/102/207/fanarts/thumb/fa885ed255.jpg\"}},\"ids\":{\"trakt\":102207,\"slug\":\"doctor-who-the-fan-show\",\"tvdb\":300845,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+        Cutdown.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/051/posters/original/de98e274d3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/051/posters/medium/de98e274d3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/051/posters/thumb/de98e274d3.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/original/3b9938962b.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/medium/3b9938962b.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/051/fanarts/thumb/3b9938962b.jpg\"}},\"ids\":{\"trakt\":1051,\"slug\":\"doctor-who-confidential\",\"tvdb\":79298,\"imdb\":\"tt0453422\",\"tmdb\":1056,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.33526492,\"show\":{\"title\":\"Inconceivable\",\"overview\":\"Marco
+        Pennette (\\\"All About the Andersons\\\") and Oliver Goldstick (\\\"Desperate
+        Housewives\\\") are set to team on a new comedy pilot at the Peacock, about
+        doctors, shrinks and lawyers who work in a fertility clinic. The project,
+        which has a green light to produce a pilot, is set up at the Touchstone Television-based
+        Tollin/Robbins Productions.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":2748,\"slug\":\"inconceivable\",\"tvdb\":75645,\"imdb\":null,\"tmdb\":2766,\"tvrage\":3954}}},{\"type\":\"show\",\"score\":0.24735652,\"show\":{\"title\":\"H2\",\"overview\":\"Kunimi
+        Hiro was an ace pitcher in junior high school,until he was diagnosed by a
+        doctor as having a \\\"glass elbow\\\". He gave up baseball and joined Senkawa
+        Senior High School's soccer team. But then something happens that reignites
+        his passion for baseball and he joins a baseball team managed by Koga Haruka.
+        And he finds himself in a match against his old friend/rival Tachibana Hideo
+        who has advanced to Meiwa No.1 High School. The meeting of the two is observed
+        by Hideo's girlfriend Amamiya Hikari, who is also Hiro's childhood friend.
+        Meanwhile, Haruka finds herself increasingly drawn towards Hiro, despite his
+        being interested only in baseball. It's a story about high school students
+        who dream of appearing at Koushien baseball tournament and young love. --TBS\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/726/posters/original/851cb6cfb4.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/061/726/posters/medium/851cb6cfb4.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/061/726/posters/thumb/851cb6cfb4.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/061/726/fanarts/original/76afe70672.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/061/726/fanarts/medium/76afe70672.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/061/726/fanarts/thumb/76afe70672.jpg\"}},\"ids\":{\"trakt\":61726,\"slug\":\"h2-2005\",\"tvdb\":84824,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.24735652,\"show\":{\"title\":\"Kimi
+        to Itahibi\",\"overview\":\"Kunimi Hiro was an ace pitcher in junior high
+        school,until he was diagnosed by a doctor as having a \\\"glass elbow\\\".
+        He gave up baseball and joined Senkawa Senior High School's soccer team. But
+        then something happens that reignites his passion for baseball and he joins
+        a baseball team managed by Koga Haruka. And he finds himself in a match against
+        his old friend/rival Tachibana Hideo who has advanced to Meiwa No.1 High School.
+        The meeting of the two is observed by Hideo's girlfriend Amamiya Hikari, who
+        is also Hiro's childhood friend. Meanwhile, Haruka finds herself increasingly
+        drawn towards Hiro, despite his being interested only in baseball. It's a
+        story about high school students who dream of appearing at Koushien baseball
+        tournament and young love.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/079/747/fanarts/original/60bfcf99be.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/079/747/fanarts/medium/60bfcf99be.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/079/747/fanarts/thumb/60bfcf99be.jpg\"}},\"ids\":{\"trakt\":79747,\"slug\":\"kimi-to-itahibi\",\"tvdb\":259209,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.23706809,\"show\":{\"title\":\"Hanoi
+        Bride\",\"overview\":\"Park Eun Woo (Lee Dong Wook) worked as a doctor in
+        a clinic in Hanoi where he fell in love with a Vietnamese girl Ly Thi Vu (Kim
+        Ok Bin). Due to the sudden death of his father, he had to return to Korea
+        in a hurry but the message wasn't related to Ly Thi Vu. His elder brother
+        Park Sok Woo (Lee Won Jong) who worked as a farmer in the field was hard pressed
+        by his mother to go to Vietnam to find a wife and he ended up bringing Ly
+        Thi Vu to Korea with the intention to marry her. Song Il Lan (Yoo Hye Jung)
+        was Park Sok Woo's childhood friend and she realized that she was in love
+        with him and he had similar feeling for her too. When the misunderstanding
+        between Park Sok Woo and Ly Thi Vu got clarified and all truth were out in
+        the open, his mother who thought Ly Thi Vu was going to be her first son's
+        wife and liked her didn't think she was good enough for her second son as
+        he was a doctor. Ly Thi Vu was hurt and returned to Hanoi. Later the mother
+        came to realize her folly and relented. Park Eun Woo didn't want to give up
+        Ly Thi Vu and so he went back to work in Hanoi and search for her.\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":99658,\"slug\":\"hanoi-bride\",\"tvdb\":256432,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.16763246,\"show\":{\"title\":\"Out
+        of Practice\",\"overview\":\"The half-hour sitcom Out of Practice will air
+        on CBS at 9:30 PM on Mondays, beginning September 2005. The show is about
+        a family of physicians who share the same profession but have little else
+        in common. Ben Barnes  (Christopher Gorham (Medical Investigation, Jake 2.0)
+        is an earnest young couples' counselor whose family doesn't consider him to
+        be a \\\"real\\\" doctor because he doesn't have \\\"M.D.\\\" after his name.
+        But despite their lofty credentials, Ben might be the best prescription for
+        the future of this family. Stockard Channing (The West Wing), Henry Winkler
+        (Happy Days), Ty Burrell (In Good Company) and Paula Marshall (Spin City)
+        also star. Ben's just a psychologist, but older brother Oliver (Ty Burrell)
+        is a successful plastic surgeon, sister Regina (Paula Marshall) is an ER-action
+        junkie, Mom (Stockard Channing) is a prominent surgeon whose career eclipsed
+        Dad's long before their divorce, and Dad (Henry Winkler) is dating his receptionist.
+        But all the real docs look as though t\",\"year\":2005,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/450/fanarts/original/c04de71997.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/450/fanarts/medium/c04de71997.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/450/fanarts/thumb/c04de71997.jpg\"}},\"ids\":{\"trakt\":4450,\"slug\":\"out-of-practice\",\"tvdb\":75722,\"imdb\":\"tt0460666\",\"tmdb\":4474,\"tvrage\":null}}}]"}
     headers:
       cache-control: ['public, max-age=14400']
-      cf-cache-status: [HIT]
-      cf-ray: [2408d1d6ca600a60-ARN]
+      cf-cache-status: [MISS]
+      cf-ray: [241c6b37459e3744-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Thu, 05 Nov 2015 13:14:05 GMT']
-      etag: [W/"b90196762eb7a4f5761c9621cd611a1d"]
-      expires: ['Thu, 05 Nov 2015 17:14:05 GMT']
+      date: ['Sat, 07 Nov 2015 22:19:17 GMT']
+      etag: [W/"10177c6aeff8e3a3f3ff5c638948fe9f"]
+      expires: ['Sun, 08 Nov 2015 02:19:17 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=dcb41f3b96934efdb9b4ead886ad709d61446729245; expires=Fri,
-          04-Nov-16 13:14:05 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=dd9932a7e92ce02f2e3b4ab3483ac02ac1446934757; expires=Sun,
+          06-Nov-16 22:19:17 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
-      x-pagination-item-count: ['269']
+      x-pagination-item-count: ['7']
       x-pagination-limit: ['10']
       x-pagination-page: ['1']
-      x-pagination-page-count: ['27']
-      x-request-id: [bed7f55e-5efd-4d3c-9837-386abd7663b7]
-      x-runtime: ['0.022618']
+      x-pagination-page-count: ['1']
+      x-request-id: [ec87c010-7fa9-4a3b-8f9c-75a245509e18]
+      x-runtime: ['0.024177']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=dcb41f3b96934efdb9b4ead886ad709d61446729245]
+      Cookie: [__cfduid=dd9932a7e92ce02f2e3b4ab3483ac02ac1446934757]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
@@ -264,23 +282,23 @@ interactions:
         into a new body, taking on a new personality with each regeneration. Twelve
         actors, plus John Hurt, have played The Doctor thus far.\",\"first_aired\":\"2005-03-26T00:00:00.000Z\",\"airs\":{\"day\":\"Saturday\",\"time\":\"20:30\",\"timezone\":\"Europe/London\"},\"runtime\":45,\"certification\":\"TV-PG\",\"network\":\"BBC
         One\",\"country\":\"gb\",\"trailer\":null,\"homepage\":null,\"status\":\"returning
-        series\",\"rating\":9.08372,\"votes\":11705,\"updated_at\":\"2015-11-05T10:30:27.000Z\",\"language\":\"en\",\"available_translations\":[\"da\",\"en\",\"hu\",\"ru\",\"nl\",\"pt\",\"pl\",\"de\",\"bg\",\"es\",\"fr\",\"zh\",\"tr\",\"cs\",\"it\",\"el\",\"no\",\"he\",\"sv\",\"bs\",\"hr\",\"ko\",\"uk\",\"fa\"],\"genres\":[\"drama\",\"action\",\"adventure\",\"science-fiction\"],\"aired_episodes\":110}"}
+        series\",\"rating\":9.08332,\"votes\":11714,\"updated_at\":\"2015-11-07T08:30:54.000Z\",\"language\":\"en\",\"available_translations\":[\"da\",\"en\",\"hu\",\"ru\",\"nl\",\"pt\",\"pl\",\"de\",\"bg\",\"es\",\"fr\",\"zh\",\"tr\",\"cs\",\"it\",\"el\",\"no\",\"he\",\"sv\",\"bs\",\"hr\",\"ko\",\"uk\",\"fa\"],\"genres\":[\"drama\",\"action\",\"adventure\",\"science-fiction\"],\"aired_episodes\":110}"}
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [2408d1d73a670a60-ARN]
+      cf-ray: [241c6b38a5af3744-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Thu, 05 Nov 2015 13:14:05 GMT']
-      etag: [W/"bfef829bf09efd556bb395d0fc4dff17"]
-      expires: ['Thu, 05 Nov 2015 17:14:05 GMT']
-      last-modified: ['Thu, 05 Nov 2015 10:30:27 GMT']
+      date: ['Sat, 07 Nov 2015 22:19:17 GMT']
+      etag: [W/"ae6c501b19b305a59de81ebb5c5fb718"]
+      expires: ['Sun, 08 Nov 2015 02:19:17 GMT']
+      last-modified: ['Sat, 07 Nov 2015 08:30:54 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
-      x-request-id: [b465b0ec-67e0-4132-8c29-5e8fb154b3fb]
-      x-runtime: ['0.011341']
+      x-request-id: [8c895c65-33d2-4cb6-b435-fa810fa475ef]
+      x-runtime: ['0.011021']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
@@ -297,24 +315,24 @@ interactions:
         The Krillitanes \\n\\nThere are strange goings-on at a comprehensive school
         - UFOs, over-intelligent children, and odd-tasting school dinners. This attracts
         the attention of the Tenth Doctor, Rose and Mickey Smith, as well as a couple
-        of old friends\u2026\",\"rating\":8.12014,\"votes\":566,\"first_aired\":\"2006-04-29T19:30:00.000Z\",\"updated_at\":\"2015-11-04T13:40:21.000Z\",\"available_translations\":[]}"}
+        of old friends\u2026\",\"rating\":8.12014,\"votes\":566,\"first_aired\":\"2006-04-29T19:30:00.000Z\",\"updated_at\":\"2015-11-07T17:17:23.000Z\",\"available_translations\":[]}"}
     headers:
       cache-control: ['public, max-age=14400']
-      cf-cache-status: [HIT]
-      cf-ray: [2408d1d863e516dc-ARN]
+      cf-cache-status: [MISS]
+      cf-ray: [241c6b39f6703726-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Thu, 05 Nov 2015 13:14:05 GMT']
-      expires: ['Thu, 05 Nov 2015 17:14:05 GMT']
-      last-modified: ['Wed, 04 Nov 2015 13:40:21 GMT']
+      date: ['Sat, 07 Nov 2015 22:19:17 GMT']
+      expires: ['Sun, 08 Nov 2015 02:19:17 GMT']
+      last-modified: ['Sat, 07 Nov 2015 17:17:23 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=ddf73ab5bc53b9e305e388d49bbfedb151446729245; expires=Fri,
-          04-Nov-16 13:14:05 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=de231986d56131a07ce9314b3b3314b131446934757; expires=Sun,
+          06-Nov-16 22:19:17 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
-      x-request-id: [4f30a18f-7a47-499c-bc04-af2658b3b064]
-      x-runtime: ['0.017225']
+      x-request-id: [852606e9-e35b-48c0-adf0-95b3d8a55c03]
+      x-runtime: ['0.010436']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 version: 1

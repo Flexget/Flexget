@@ -15,6 +15,7 @@ from flexget.db_schema import upgrade
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugins.filter.series import normalize_series_name
+from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimplePersistence
@@ -492,14 +493,24 @@ class TraktMovie(Base):
         return self._actors
 
 
-class TraktSearchResult(Base):
+class TraktShowSearchResult(Base):
 
-    __tablename__ = 'trakt_search_results'
+    __tablename__ = 'trakt_show_search_results'
 
     id = Column(Integer, primary_key=True)
-    search = Column(Unicode, nullable=False)
+    search = Column(Unicode, unique=True, nullable=False)
     series_id = Column(Integer, ForeignKey('trakt_shows.id'), nullable=True)
     series = relation(TraktShow, backref='search_strings')
+
+
+class TraktMovieSearchResult(Base):
+
+    __tablename__ = 'trakt_movie_search_results'
+
+    id = Column(Integer, primary_key=True)
+    search = Column(Unicode, unique=True, nullable=False)
+    movie_id = Column(Integer, ForeignKey('trakt_movies.id'), nullable=True)
+    movie = relation(TraktMovie, backref='search_strings')
 
 
 def split_title_year(title):
@@ -580,19 +591,27 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
                 break
         if not trakt_id and title:
             # Try finding trakt id based on title and year
-            title, y = split_title_year(title)
-            year = year or y
-            clean_title = normalize_series_name(title)
+            if style == 'show':
+                # title_parser = get_plugin_by_name('parsing').instance.parse_series(title)
+                parsed_title, y = split_title_year(title)
+                y = year or y
+            else:
+                title_parser = get_plugin_by_name('parsing').instance.parse_movie(title)
+                y = year or title_parser.year
+                parsed_title = title_parser.name
             try:
-                results = req_session.get(get_api_url('search'), params={'query': clean_title, 'type': style}).json()
+                results = req_session.get(get_api_url('search'), params={'query': parsed_title, 'type': style,
+                                                                         'year': y}).json()
             except requests.RequestException as e:
                 raise LookupError('Searching trakt for %s failed with error: %s' % (title, e))
             for result in results:
                 if year and result[style]['year'] != year:
                     continue
-                if clean_title == normalize_series_name(result[style]['title']):
+                if parsed_title.lower() == result[style]['title'].lower():
                     trakt_id = result[style]['ids']['trakt']
                     break
+            if not trakt_id and results:
+                trakt_id = results[0][style]['ids']['trakt']
     if not trakt_id:
         raise LookupError('Unable to find %s on trakt.' % type)
     # Get actual data from trakt
@@ -614,6 +633,13 @@ class ApiTrakt(object):
             raise LookupError('Series %s not found from cache' % lookup_params)
         if series and not series.expired:
             return series
+        title = lookup_params.get('title')
+        if title:
+            found = session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
+                                                                title.lower()).first()
+            if found and found.series:
+                log.debug('Found %s in previous search results' % title)
+                return found.series
         try:
             trakt_show = get_trakt('show', **lookup_params)
         except LookupError as e:
@@ -624,14 +650,17 @@ class ApiTrakt(object):
         if series:
             series.update(trakt_show)
         else:
-            # TODO: Check if show with trakt id exists, update it and store to TraktSearchResult
             series = TraktShow(trakt_show, session)
             session.add(series)
+            log.critical(title)
+            if title.lower() != series.title.lower():
+                session.add(TraktShowSearchResult(search=title, series=series))
         return series
 
     @staticmethod
     @with_session
     def lookup_movie(session=None, only_cached=None, **lookup_params):
+        log.critical("pls")
         movie = get_cached('movie', session=session, **lookup_params)
         if only_cached:
             if movie:
@@ -639,19 +668,27 @@ class ApiTrakt(object):
             raise LookupError('Movie %s not found from cache' % lookup_params)
         if movie and not movie.expired:
             return movie
+        title = lookup_params.get('title')
+        if title:
+            found = session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
+                                                                 title.lower()).first()
+            if found and found.movie:
+                log.debug('Found %s in previous search results' % title)
+                return found.movie
         try:
             trakt_movie = get_trakt('movie', **lookup_params)
         except LookupError as e:
             if movie:
-                log.debug('Error refreshing show data from trakt, using cached. %s' % e)
+                log.debug('Error refreshing movie data from trakt, using cached. %s' % e)
                 return movie
             raise
         if movie:
             movie.update(trakt_movie, session)
         else:
-            # TODO: Check if movie with trakt id exists store to search results
             movie = TraktMovie(trakt_movie, session)
             session.add(movie)
+            if title.lower() != movie.title.lower():
+                session.add(TraktMovieSearchResult(search=title, movie=movie))
         return movie
 
 

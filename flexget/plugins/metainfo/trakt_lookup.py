@@ -62,7 +62,7 @@ class PluginTraktLookup(object):
 
   """
 
-  # Series info
+    # Series info
     series_map = {
         'trakt_series_name': 'title',
         'trakt_series_year': 'year',
@@ -93,7 +93,7 @@ class PluginTraktLookup(object):
         'trakt_series_actors': lambda show: list_actors(show.actors),
     }
 
-  # Episode info
+    # Episode info
     episode_map = {
         'trakt_ep_name': 'title',
         'trakt_ep_imdb_id': 'imdb_id',
