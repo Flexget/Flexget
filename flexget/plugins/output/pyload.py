@@ -56,6 +56,7 @@ class PluginPyLoad(object):
         password: my_password
         folder: desired_folder
         package: desired_package_name (jinja2 supported)
+        packagePassword: desired_package_password
         hoster:
           - YoutubeCom
         parse_url: no
@@ -95,6 +96,7 @@ class PluginPyLoad(object):
                     'password': {'type': 'string'},
                     'folder': {'type': 'string'},
                     'package': {'type': 'string'},
+                    'packagePassword': {'type': 'string'},
                     'queue': {'type': 'boolean'},
                     'parse_url': {'type': 'boolean'},
                     'multiple_hoster': {'type': 'boolean'},
@@ -210,6 +212,12 @@ class PluginPyLoad(object):
                         log.error('Error rendering jinja event: %s' % e)
                     # set folder with api
                     data = json.dumps({'folder': folder})
+                    api.query("setPackageData", {'pid': pid, 'data': data, 'session': session})
+                
+                # Set Package Password
+                packagePassword = config.get('packagePassword')
+                if packagePassword:
+                    data = json.dumps({'password': packagePassword})
                     api.query("setPackageData", {'pid': pid, 'data': data, 'session': session})
 
             except Exception as e:
