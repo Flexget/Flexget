@@ -8,22 +8,22 @@ interactions:
     method: GET
     uri: https://api-v2launch.trakt.tv/search?query=The+Matrix&type=movie&year=1999
   response:
-    body: {string: !!python/unicode '[{"type":"movie","score":73.25011,"movie":{"title":"The
+    body: {string: !!python/unicode '[{"type":"movie","score":74.22861,"movie":{"title":"The
         Matrix","overview":"Thomas A. Anderson is a man living two lives. By day he
         is an average computer programmer and by night a malevolent hacker known as
         Neo, who finds himself targeted by the police when he is contacted by Morpheus,
-        a legendary computer hacker, who reveals the shocking truth about our reality.","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/6c353577dd.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/6c353577dd.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/6c353577dd.jpg"}},"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603}}},{"type":"movie","score":58.600082,"movie":{"title":"Making
+        a legendary computer hacker, who reveals the shocking truth about our reality.","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/6c353577dd.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/6c353577dd.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/6c353577dd.jpg"}},"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603}}},{"type":"movie","score":59.382885,"movie":{"title":"Making
         The Matrix","overview":"A promotional making-of documentary for the film Matrix,
         The (1999) that devotes its time to explaining the digital and practical effects
         contained in the film. This is very interesting, seeing as how they''re giving
         away the cinematic secrets that they created solely for the this movie, that
-        have now been spoofed and referenced in countless other films.","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/205/793/posters/original/9680ca459a.jpg","medium":"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg","thumb":"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":205793,"slug":"making-the-matrix-1999","imdb":"tt0365467","tmdb":325251}}},{"type":"movie","score":54.547962,"movie":{"title":"V-World
+        have now been spoofed and referenced in countless other films.","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/205/793/posters/original/9680ca459a.jpg","medium":"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg","thumb":"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":205793,"slug":"making-the-matrix-1999","imdb":"tt0365467","tmdb":325251}}},{"type":"movie","score":55.26656,"movie":{"title":"V-World
         Matrix","overview":"Two friends take a cyber vacation to experience a world
         where they can act out their virtual fantasies! They soon realize they''ve
         entered a virtual free-for-all. Forbidden fantasies and desires suddenly appear
         in the form of the even deadlier \"dark woman\". All the players now end up
         in a cyber battle for their lives, and sanity, against a beautiful virtual
-        hunter who has one killer fixation - winning the deadly game they started!","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/158/764/posters/original/b5bd19302a.jpg","medium":"https://walter.trakt.us/images/movies/000/158/764/posters/medium/b5bd19302a.jpg","thumb":"https://walter.trakt.us/images/movies/000/158/764/posters/thumb/b5bd19302a.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":158764,"slug":"v-world-matrix-1969","imdb":"tt0211096","tmdb":259464}}},{"type":"movie","score":4.7475414,"movie":{"title":"The
+        hunter who has one killer fixation - winning the deadly game they started!","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/158/764/posters/original/b5bd19302a.jpg","medium":"https://walter.trakt.us/images/movies/000/158/764/posters/medium/b5bd19302a.jpg","thumb":"https://walter.trakt.us/images/movies/000/158/764/posters/thumb/b5bd19302a.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":158764,"slug":"v-world-matrix-1969","imdb":"tt0211096","tmdb":259464}}},{"type":"movie","score":4.821948,"movie":{"title":"The
         Tricky Master","overview":"Undercover cop Leung Foon (Nick Cheung) is having
         trouble taking down the illegal trading operation headed by crime boss Ferrari
         (Wong Jing). So to accomplish his mission, he asks for help from the re...
@@ -33,16 +33,16 @@ interactions:
         Enter the Dragon and The Matrix.","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/037/624/posters/original/c5c0cb76f8.jpg","medium":"https://walter.trakt.us/images/movies/000/037/624/posters/medium/c5c0cb76f8.jpg","thumb":"https://walter.trakt.us/images/movies/000/037/624/posters/thumb/c5c0cb76f8.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/037/624/fanarts/original/de31c092f7.jpg","medium":"https://walter.trakt.us/images/movies/000/037/624/fanarts/medium/de31c092f7.jpg","thumb":"https://walter.trakt.us/images/movies/000/037/624/fanarts/thumb/de31c092f7.jpg"}},"ids":{"trakt":37624,"slug":"the-tricky-master-1999","imdb":"tt0212864","tmdb":53281}}}]'}
     headers:
       cache-control: ['public, max-age=14400']
-      cf-cache-status: [MISS]
-      cf-ray: [241c6b25f75d0a48-ARN]
+      cf-cache-status: [HIT]
+      cf-ray: [242481d8472016e2-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Sat, 07 Nov 2015 22:19:14 GMT']
-      etag: [W/"e093633ec9a04bc657f4a20ab8806308"]
-      expires: ['Sun, 08 Nov 2015 02:19:14 GMT']
+      date: ['Sun, 08 Nov 2015 21:52:49 GMT']
+      etag: [W/"e4e8148883abcba5d5fa9f51a8df6101"]
+      expires: ['Mon, 09 Nov 2015 01:52:49 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d74b7fcf43db6618f54ccc63b6d56298e1446934754; expires=Sun,
-          06-Nov-16 22:19:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=da4b21bdaf55f0f74ad8a2c78cdbdfaed1447019569; expires=Mon,
+          07-Nov-16 21:52:49 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
@@ -50,15 +50,15 @@ interactions:
       x-pagination-limit: ['10']
       x-pagination-page: ['1']
       x-pagination-page-count: ['1']
-      x-request-id: [c5a0acf7-56ed-4cef-ace7-4f5e598c3d1e]
-      x-runtime: ['0.021522']
+      x-request-id: [114f3c61-3b0b-488e-8b4f-701f3a7461db]
+      x-runtime: ['0.016442']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=d74b7fcf43db6618f54ccc63b6d56298e1446934754]
+      Cookie: [__cfduid=da4b21bdaf55f0f74ad8a2c78cdbdfaed1447019569]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
@@ -73,12 +73,12 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [241c6b2947610a48-ARN]
+      cf-ray: [242481d8a72b16e2-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Sat, 07 Nov 2015 22:19:14 GMT']
+      date: ['Sun, 08 Nov 2015 21:52:50 GMT']
       etag: [W/"34da56e7db7efb7bff992fcd685ab584"]
-      expires: ['Sun, 08 Nov 2015 02:19:14 GMT']
+      expires: ['Mon, 09 Nov 2015 01:52:50 GMT']
       last-modified: ['Sun, 01 Nov 2015 15:09:57 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]
@@ -160,15 +160,15 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [241c6b2a70400a48-ARN]
+      cf-ray: [242481d9ea5316ac-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Sat, 07 Nov 2015 22:19:14 GMT']
+      date: ['Sun, 08 Nov 2015 21:52:50 GMT']
       etag: [W/"a8c0035e5c1835c012baba193da035af"]
-      expires: ['Sun, 08 Nov 2015 02:19:14 GMT']
+      expires: ['Mon, 09 Nov 2015 01:52:50 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d74b7fcf43db6618f54ccc63b6d56298e1446934754; expires=Sun,
-          06-Nov-16 22:19:14 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=dd43c4cfc3f4095bd99b46f9eb0aac7be1447019570; expires=Mon,
+          07-Nov-16 21:52:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]

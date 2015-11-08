@@ -82,15 +82,16 @@ class TestTraktShowLookup(FlexGetBase):
     def test_search_results(self):
         self.execute_task('test_search_result')
         entry = self.task.entries[0]
-        assert entry['trakt_series_name'].lower() == 'Shameless (US)'.lower(), 'lookup failed'
+        print entry['trakt_series_name'].lower()
+        assert entry['trakt_series_name'].lower() == 'Shameless'.lower(), 'lookup failed'
         with Session() as session:
-            assert self.task.entries[1]['trakt_series_name'].lower() == 'Shameless (US)'.lower(), 'second lookup failed'
+            assert self.task.entries[1]['trakt_series_name'].lower() == 'Shameless'.lower(), 'second lookup failed'
 
             assert len(session.query(TraktShowSearchResult).all()) == 1, 'should have added 1 show to search result'
 
             assert len(session.query(TraktShow).all()) == 1, 'should only have added one show to show table'
-            assert session.query(TraktShow).first().title == 'Shameless (US)', 'should have added Shameless (US) and' \
-                                                                               'not Shameless (2011)'
+            assert session.query(TraktShow).first().title == 'Shameless', 'should have added Shameless and' \
+                                                                          'not Shameless (2011)'
 
     # @use_vcr
     # def test_date(self):
@@ -159,18 +160,39 @@ class TestTraktList(FlexGetBase):
         assert entry['imdb_id'] == 'tt0050083'
 
 
-class TestTraktWatched(FlexGetBase):
+class TestTraktWatchedAndCollected(FlexGetBase):
     __yaml__ = """
         tasks:
           test_trakt_watched:
             metainfo_series: yes
+            trakt_lookup:
+                username: flexgettest
             mock:
               - {title: 'Hawaii.Five-0.S04E13.HDTV-FlexGet'}
             if:
               - trakt_watched: accept
-            trakt_watched_lookup:
+          test_trakt_collected:
+            metainfo_series: yes
+            trakt_lookup:
+               username: flexgettest
+            mock:
+              - {title: 'Homeland.2011.S02E01.HDTV-FlexGet'}
+            if:
+              - trakt_collected: accept
+          test_trakt_watched_movie:
+            trakt_lookup:
+                username: flexgettest
+            mock:
+              - {title: 'Inside.Out.2015.1080p.BDRip-FlexGet'}
+            if:
+              - trakt_watched: accept
+          test_trakt_collected_movie:
+            trakt_lookup:
               username: flexgettest
-              type: shows
+            mock:
+              - {title: 'Inside.Out.2015.1080p.BDRip-FlexGet'}
+            if:
+              - trakt_collected: accept
     """
 
     @use_vcr
@@ -179,8 +201,35 @@ class TestTraktWatched(FlexGetBase):
         assert len(self.task.accepted) == 1, 'Episode should have been marked as watched and accepted'
         entry = self.task.accepted[0]
         assert entry['title'] == 'Hawaii.Five-0.S04E13.HDTV-FlexGet', 'title was not accepted?'
-        assert entry['series_name'] == 'Hawaii Five-0', 'wrong series was accepted'
+        assert entry['series_name'] == 'Hawaii Five-0', 'wrong series was returned by lookup'
         assert entry['trakt_watched'] == True, 'episode should be marked as watched'
+
+    #@use_vcr
+    def test_trakt_collected_lookup(self):
+        self.execute_task('test_trakt_collected')
+        assert len(self.task.accepted) == 1, 'Episode should have been marked as collected and accepted'
+        entry = self.task.accepted[0]
+        assert entry['title'] == 'Homeland.2011.S02E01.HDTV-FlexGet', 'title was not accepted?'
+        assert entry['series_name'] == 'Homeland 2011', 'wrong series was returned by lookup'
+        assert entry['trakt_collected'] == True, 'episode should be marked as collected'
+
+    @use_vcr
+    def test_trakt_watched_movie_lookup(self):
+        self.execute_task('test_trakt_watched_movie')
+        assert len(self.task.accepted) == 1, 'Movie should have been accepted as it is watched on Trakt profile'
+        entry = self.task.accepted[0]
+        assert entry['title'] == 'Inside.Out.2015.1080p.BDRip-FlexGet', 'title was not accepted?'
+        assert entry['movie_name'] == 'Inside Out', 'wrong movie name'
+        assert entry['trakt_watched'] == True, 'movie should be marked as watched'
+
+    #@use_vcr
+    def test_trakt_collected_movie_lookup(self):
+        self.execute_task('test_trakt_collected_movie')
+        assert len(self.task.accepted) == 1, 'Movie should have been accepted as it is collected on Trakt profile'
+        entry = self.task.accepted[0]
+        assert entry['title'] == 'Inside.Out.2015.1080p.BDRip-FlexGet', 'title was not accepted?'
+        assert entry['movie_name'] == 'Inside Out', 'wrong movie name'
+        assert entry['trakt_collected'] == True, 'movie should be marked as collected'
 
 
 class TestTraktMovieLookup(FlexGetBase):

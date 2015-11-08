@@ -8,25 +8,25 @@ interactions:
     method: GET
     uri: https://api-v2launch.trakt.tv/search?query=Shameless&type=show&year=2011
   response:
-    body: {string: !!python/unicode '[{"type":"show","score":90.840836,"show":{"title":"Shameless
-        (US)","overview":"Chicagoan Frank Gallagher is the proud single dad of six
-        smart, industrious, independent kids, who without him would be... perhaps
-        better off. When Frank''s not at the bar spending what little money they have,
-        he''s passed out on the floor. But the kids have found ways to grow up in
-        spite of him. They may not be like any family you know, but they make no apologies
-        for being exactly who they are.","year":2011,"status":"returning series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/034/160/posters/original/0fed195982.jpg","medium":"https://walter.trakt.us/images/shows/000/034/160/posters/medium/0fed195982.jpg","thumb":"https://walter.trakt.us/images/shows/000/034/160/posters/thumb/0fed195982.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/034/160/fanarts/original/4f8b2fdbd4.jpg","medium":"https://walter.trakt.us/images/shows/000/034/160/fanarts/medium/4f8b2fdbd4.jpg","thumb":"https://walter.trakt.us/images/shows/000/034/160/fanarts/thumb/4f8b2fdbd4.jpg"}},"ids":{"trakt":34160,"slug":"shameless-us","tvdb":161511,"imdb":"tt1586680","tmdb":34307,"tvrage":25117}}}]'}
+    body: {string: !!python/unicode '[{"type":"show","score":126.12242,"show":{"title":"Shameless","overview":"Chicagoan
+        Frank Gallagher is the proud single dad of six smart, industrious, independent
+        kids, who without him would be... perhaps better off. When Frank''s not at
+        the bar spending what little money they have, he''s passed out on the floor.
+        But the kids have found ways to grow up in spite of him. They may not be like
+        any family you know, but they make no apologies for being exactly who they
+        are.","year":2011,"status":"returning series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/034/160/posters/original/0fed195982.jpg","medium":"https://walter.trakt.us/images/shows/000/034/160/posters/medium/0fed195982.jpg","thumb":"https://walter.trakt.us/images/shows/000/034/160/posters/thumb/0fed195982.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/034/160/fanarts/original/4f8b2fdbd4.jpg","medium":"https://walter.trakt.us/images/shows/000/034/160/fanarts/medium/4f8b2fdbd4.jpg","thumb":"https://walter.trakt.us/images/shows/000/034/160/fanarts/thumb/4f8b2fdbd4.jpg"}},"ids":{"trakt":34160,"slug":"shameless-2011","tvdb":161511,"imdb":"tt1586680","tmdb":34307,"tvrage":25117}}}]'}
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [241c6c0599c60a48-ARN]
+      cf-ray: [24247c8ee6a6370e-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Sat, 07 Nov 2015 22:19:50 GMT']
-      etag: [W/"394e80bad3ffbce8bed76f5397482fae"]
-      expires: ['Sun, 08 Nov 2015 02:19:50 GMT']
+      date: ['Sun, 08 Nov 2015 21:49:13 GMT']
+      etag: [W/"d283dbb383072805ad5925acf9f41e42"]
+      expires: ['Mon, 09 Nov 2015 01:49:13 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d4ee881de9b450f391d66ee3a6e97ff2f1446934790; expires=Sun,
-          06-Nov-16 22:19:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d2a37b2d0d1a04fcc7d0653a0feedf21e1447019353; expires=Mon,
+          07-Nov-16 21:49:13 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
@@ -34,44 +34,44 @@ interactions:
       x-pagination-limit: ['10']
       x-pagination-page: ['1']
       x-pagination-page-count: ['1']
-      x-request-id: [ff1ed5b5-ce94-40d9-b248-efaccbac3180]
-      x-runtime: ['0.020033']
+      x-request-id: [a61518ab-456c-4483-b68f-310d26bb0585]
+      x-runtime: ['0.021511']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=d4ee881de9b450f391d66ee3a6e97ff2f1446934790]
+      Cookie: [__cfduid=d2a37b2d0d1a04fcc7d0653a0feedf21e1447019353]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
     uri: https://api-v2launch.trakt.tv/shows/34160?extended=full
   response:
-    body: {string: !!python/unicode '{"title":"Shameless (US)","year":2011,"ids":{"trakt":34160,"slug":"shameless-us","tvdb":161511,"imdb":"tt1586680","tmdb":34307,"tvrage":25117},"overview":"Chicagoan
+    body: {string: !!python/unicode '{"title":"Shameless","year":2011,"ids":{"trakt":34160,"slug":"shameless-2011","tvdb":161511,"imdb":"tt1586680","tmdb":34307,"tvrage":25117},"overview":"Chicagoan
         Frank Gallagher is the proud single dad of six smart, industrious, independent
         kids, who without him would be... perhaps better off. When Frank''s not at
         the bar spending what little money they have, he''s passed out on the floor.
         But the kids have found ways to grow up in spite of him. They may not be like
         any family you know, but they make no apologies for being exactly who they
-        are.","first_aired":"2011-01-09T00:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":55,"certification":"TV-MA","network":"Showtime","country":"us","trailer":"http://youtube.com/watch?v=CHstRRD_8LE","homepage":null,"status":"returning
-        series","rating":8.85824,"votes":5834,"updated_at":"2015-11-06T10:30:08.000Z","language":"en","available_translations":["en","it","ru","fr","de","zh","pt","hu","ro","sv","es","bs"],"genres":["comedy","drama"],"aired_episodes":60}'}
+        are.","first_aired":"2011-01-10T02:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":60,"certification":"TV-MA","network":"Showtime","country":"us","trailer":"http://youtube.com/watch?v=CHstRRD_8LE","homepage":null,"status":"returning
+        series","rating":8.85849,"votes":5837,"updated_at":"2015-11-08T10:31:24.000Z","language":"en","available_translations":["en","it","ru","fr","de","zh","pt","hu","ro","sv","es","bs"],"genres":["comedy","drama"],"aired_episodes":60}'}
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [241c6c05f9cb0a48-ARN]
+      cf-ray: [24247c8f46a8370e-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Sat, 07 Nov 2015 22:19:50 GMT']
-      etag: [W/"ab04a5e6ad516155cee2aabdabf34953"]
-      expires: ['Sun, 08 Nov 2015 02:19:50 GMT']
-      last-modified: ['Fri, 06 Nov 2015 10:30:08 GMT']
+      date: ['Sun, 08 Nov 2015 21:49:13 GMT']
+      etag: [W/"7bbdf6c146e337c73b1fee0dc99a5eba"]
+      expires: ['Mon, 09 Nov 2015 01:49:13 GMT']
+      last-modified: ['Sun, 08 Nov 2015 10:31:24 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
-      x-request-id: [43522249-79fd-4e46-a365-75fafa2d2b88]
-      x-runtime: ['0.010526']
+      x-request-id: [8febc2e2-5b21-40a5-b856-18fb1a1b83af]
+      x-runtime: ['0.010692']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 version: 1

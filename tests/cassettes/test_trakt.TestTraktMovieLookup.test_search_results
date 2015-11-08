@@ -8,14 +8,14 @@ interactions:
     method: GET
     uri: https://api-v2launch.trakt.tv/search?query=harry+potter+and+the+philosopher%27s+stone&type=movie
   response:
-    body: {string: !!python/unicode '[{"type":"movie","score":92.305305,"movie":{"title":"Harry
+    body: {string: !!python/unicode '[{"type":"movie","score":92.49502,"movie":{"title":"Harry
         Potter and the Philosopher''s Stone","overview":"Harry Potter has lived under
         the stairs at his aunt and uncle''s house his whole life. But on his 11th
         birthday, he learns he''s a powerful wizard -- with a place waiting for him
         at the Hogwarts School of Witchcraft and Wizardry. As he learns to harness
         his newfound powers with the help of the school''s kindly headmaster, Harry
         uncovers the truth about his parents'' deaths -- and about the villain who''s
-        to blame.","year":2001,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/545/posters/original/c8779ab3c4.jpg","medium":"https://walter.trakt.us/images/movies/000/000/545/posters/medium/c8779ab3c4.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/545/posters/thumb/c8779ab3c4.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/545/fanarts/original/8446d03b80.jpg","medium":"https://walter.trakt.us/images/movies/000/000/545/fanarts/medium/8446d03b80.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/545/fanarts/thumb/8446d03b80.jpg"}},"ids":{"trakt":545,"slug":"harry-potter-and-the-philosopher-s-stone-2001","imdb":"tt0241527","tmdb":671}}},{"type":"movie","score":2.3403502,"movie":{"title":"Magic
+        to blame.","year":2001,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/545/posters/original/c8779ab3c4.jpg","medium":"https://walter.trakt.us/images/movies/000/000/545/posters/medium/c8779ab3c4.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/545/posters/thumb/c8779ab3c4.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/545/fanarts/original/8446d03b80.jpg","medium":"https://walter.trakt.us/images/movies/000/000/545/fanarts/medium/8446d03b80.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/545/fanarts/thumb/8446d03b80.jpg"}},"ids":{"trakt":545,"slug":"harry-potter-and-the-philosopher-s-stone-2001","imdb":"tt0241527","tmdb":671}}},{"type":"movie","score":2.3372517,"movie":{"title":"Magic
         Beyond Words: The JK Rowling Story","overview":"Magic Beyond Words: The J.K.
         Rowling Story is a made-for-TV film starring Australian actress Poppy Montgomery.
         The film, which was shot in B.C. Canada locations altered to look like British
@@ -33,15 +33,15 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [241c6b2ff0ce16e2-ARN]
+      cf-ray: [242481df9314168e-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Sat, 07 Nov 2015 22:19:15 GMT']
-      etag: [W/"5c4fbfdf257e2d460ddc9dcfdc2b1f1e"]
-      expires: ['Sun, 08 Nov 2015 02:19:15 GMT']
+      date: ['Sun, 08 Nov 2015 21:52:51 GMT']
+      etag: [W/"561d9d71c4fc40b61ef70af4a8f8154e"]
+      expires: ['Mon, 09 Nov 2015 01:52:51 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d5f8fb6132e4089f9fc19065becb871351446934755; expires=Sun,
-          06-Nov-16 22:19:15 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d0cd48be3da3ba72c8118532275c779391447019571; expires=Mon,
+          07-Nov-16 21:52:51 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
@@ -49,15 +49,15 @@ interactions:
       x-pagination-limit: ['10']
       x-pagination-page: ['1']
       x-pagination-page-count: ['1']
-      x-request-id: [9f051bcb-89d1-44a1-a94c-972a6bccf9f2]
-      x-runtime: ['0.022070']
+      x-request-id: [5292b581-b75d-48a1-876c-2b342ad02017]
+      x-runtime: ['0.018117']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=d5f8fb6132e4089f9fc19065becb871351446934755]
+      Cookie: [__cfduid=d0cd48be3da3ba72c8118532275c779391447019571]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
@@ -73,13 +73,13 @@ interactions:
         his parents'' deaths -- and about the villain who''s to blame.","released":"2001-11-15","runtime":152,"trailer":null,"homepage":"http://harrypotter.warnerbros.com/harrypotterandthedeathlyhallows/mainsite/index.html","rating":7.98179,"votes":9718,"updated_at":"2015-05-19T08:42:13.000Z","language":"en","available_translations":["en","de","it","fr","nl","hu","sk","pt","ru","sv","cs","zh","tr","es","fa","fi","el","da","pl","th","he","sr","ja","no","et","ko","lv","ro"],"genres":["adventure","fantasy","family"],"certification":"PG"}'}
     headers:
       cache-control: ['public, max-age=14400']
-      cf-cache-status: [REVALIDATED]
-      cf-ray: [241c6b3060d516e2-ARN]
+      cf-cache-status: [HIT]
+      cf-ray: [242481dfe316168e-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Sat, 07 Nov 2015 22:19:16 GMT']
+      date: ['Sun, 08 Nov 2015 21:52:51 GMT']
       etag: [W/"4c7f447cee229d03a38517cfe7d6910d"]
-      expires: ['Sun, 08 Nov 2015 02:19:16 GMT']
+      expires: ['Mon, 09 Nov 2015 01:52:51 GMT']
       last-modified: ['Tue, 19 May 2015 08:42:13 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]

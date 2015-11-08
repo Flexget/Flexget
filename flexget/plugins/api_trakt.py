@@ -667,7 +667,6 @@ class ApiTrakt(object):
     @staticmethod
     @with_session
     def lookup_movie(session=None, only_cached=None, **lookup_params):
-        log.critical("pls")
         movie = get_cached('movie', session=session, **lookup_params)
         if only_cached:
             if movie:
@@ -698,6 +697,46 @@ class ApiTrakt(object):
                 log.debug('Adding search result to db')
                 session.add(TraktMovieSearchResult(search=title, movie=movie))
         return movie
+
+    @staticmethod
+    def collected(username, style, trakt_data, title, account=None):
+        url = get_api_url('users', username, 'collection', style)
+        session = get_session(username, account=account)
+        try:
+            log.debug('Opening %s' % url)
+            data = session.get(url).json()
+        except requests.RequestException as e:
+            raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
+
+        if not data:
+            log.warning('No collection data returned from trakt.')
+            return
+        log.verbose('Received %d records from trakt.tv %s\'s collection' % (len(data), username))
+        in_collection = False
+        if style == 'shows':
+            for series in data:
+                if trakt_data.show.id == series['show']['ids']['trakt']:
+                    for s in series['seasons']:
+                        if s['number'] == trakt_data.season:
+                            # extract all episode numbers currently in collection for the season number
+                            episodes = [ep['number'] for ep in s['episodes']]
+                            in_collection = trakt_data.number in episodes
+                            break
+                    log.debug('The result for entry "%s" is: %s' % (title,
+                              'Owned' if in_collection else 'Not owned'))
+        else:
+            for movie in data:
+                if trakt_data.id == movie['movie']['ids']['trakt']:
+                    in_collection = True
+                    break
+            log.debug('The result for entry "%s" is: %s' % (title,
+                      'Owned' if in_collection else 'Not owned'))
+        return in_collection
+
+    @staticmethod
+    def watched(username, style, trakt_data, title, account=None):
+        # TODO write the damn thing
+        return True
 
 
 def do_cli(manager, options):
