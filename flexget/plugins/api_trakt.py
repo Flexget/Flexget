@@ -656,8 +656,8 @@ class ApiTrakt(object):
         else:
             series = TraktShow(trakt_show, session)
             session.add(series)
-            log.critical(title)
             if title.lower() != series.title.lower():
+                log.debug('Adding search result to db')
                 session.add(TraktShowSearchResult(search=title, series=series))
         return series
 
@@ -692,6 +692,7 @@ class ApiTrakt(object):
             movie = TraktMovie(trakt_movie, session)
             session.add(movie)
             if title.lower() != movie.title.lower():
+                log.debug('Adding search result to db')
                 session.add(TraktMovieSearchResult(search=title, movie=movie))
         return movie
 
