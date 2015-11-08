@@ -566,6 +566,7 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
     trakt_id = trakt_id or trakt_slug
     req_session = get_session()
     last_search_query = None  # used if no results are found
+    last_search_type = None
     if not trakt_id:
         # Try finding trakt_id based on other ids
         ids = {
@@ -580,6 +581,7 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
                 continue
             try:
                 last_search_query = identifier
+                last_search_type = id_type
                 results = req_session.get(get_api_url('search'), params={'id_type': id_type, 'id': identifier}).json()
             except requests.RequestException as e:
                 log.debug('Error searching for trakt id %s' % e)
@@ -593,6 +595,7 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
                 break
         if not trakt_id and title:
             last_search_query = title
+            last_search_type = 'title'
             # Try finding trakt id based on title and year
             if style == 'show':
                 # title_parser = get_plugin_by_name('parsing').instance.parse_series(title)
@@ -617,7 +620,7 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
             if not trakt_id and results:
                 trakt_id = results[0][style]['ids']['trakt']
     if not trakt_id:
-        raise LookupError('Unable to find "%s" on trakt.' % last_search_query)
+        raise LookupError('Unable to find %s="%s" on trakt.' % (last_search_type, last_search_query))
     # Get actual data from trakt
     try:
         return req_session.get(get_api_url(style + 's', trakt_id), params={'extended': 'full'}).json()
