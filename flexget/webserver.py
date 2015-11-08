@@ -188,7 +188,10 @@ class WebServer(threading.Thread):
         d = wsgiserver.WSGIPathInfoDispatcher(apps)
         self.server = wsgiserver.CherryPyWSGIServer((self.bind, self.port), d)
 
-        host = self.bind if self.bind != "0.0.0.0" else socket.gethostbyname(socket.gethostname())
+        try:
+            host = self.bind if self.bind != "0.0.0.0" else socket.gethostbyname(socket.gethostname())
+        except socket.gaierror:
+            host = '127.0.0.1'
 
         log.info('Web interface available at http://%s:%s' % (host, self.port))
 
