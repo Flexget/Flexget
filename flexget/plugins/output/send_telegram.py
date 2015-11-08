@@ -69,7 +69,7 @@ class SendTelegram(object):
 
     """
     log = None  # initialized during plugin.register
-    """:type: logging.Logger"""
+    """:type: flexget.logger.FlexGetLogger"""
 
     schema = {
         'type': 'object',
@@ -162,6 +162,11 @@ class SendTelegram(object):
         self.log.debug('token={0} usernames={1} fullnames={2} groups={3}'.format(token, usernames, fullnames, groups))
 
         bot = telegram.Bot(token)
+        try:
+            bot.getMe()
+        except UnicodeDecodeError as e:
+            self.log.trace('bot.getMe() raised: {!r}'.format(e))
+            raise plugin.PluginWarning('invalid bot token')
         session = task.session
 
         chat_ids = self._get_chat_ids_n_update_db(bot, session, usernames, fullnames, groups)
