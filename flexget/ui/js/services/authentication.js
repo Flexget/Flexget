@@ -4,41 +4,45 @@
   var services = angular.module('flexget.services');
 
   /* Authentication Service */
-  services.factory('auth', function($state, $cookies, $http, $q){
+  services.factory('authService', function($state, $cookies, $http, $q){
     var loggedIn, prevState, prevParams;
 
     loggedIn = false;
 
     return {
-      isLoggedIn: function () {
-        /*
-         Call login api to check if authentication is still valid unless
-         loggedIn is true which means it's already been checked
-         */
-
-        var deferred = $q.defer();
+      loggedIn: function() {
+        var def = $q.defer();
 
         if (loggedIn) {
-          deferred.deferred.resolve(true)
+          def.resolve(loggedIn);
         } else {
-          $http.get('/api/login/')
-            .success(function () {
-              deferred.resolve(true);
-            }).error(function (msg) {
-              deferred.reject(msg);
-            });
+          $http.get("/api/server/version/")
+              .success(function() {
+                def.resolve();
+              })
+              .error(function(data) {
+                def.reject()
+              })
         }
-        return deferred.promise;
-      },
-      loginConfirmed: function () {
-        /* Call to go back to previous page after authentication */
-        loggedIn = true;
 
-        if (prevState) {
-          $state.go(prevState, prevParams);
-        } else {
-          $state.go('home');
+        return def.promise;
+      },
+      login: function (username, password, remember) {
+        if (!remember) {
+          remember = false;
         }
+
+        return $http.post('/api/login/?remember=' + remember, {username: username, password: password})
+            .success(function() {
+              loggedIn = true;
+
+              if (prevState) {
+                $state.go(prevState, prevParams);
+              } else {
+                $state.go('home');
+              }
+
+            })
       },
       state: function(state, params) {
         prevState = state;
@@ -48,17 +52,21 @@
   });
 
   /* Ensure user is authenticated when changing states (pages) unless we are on the login page */
-  services.run(['$rootScope', '$state', 'auth', function ($rootScope, $state, authService) {
+  services.run(['$rootScope', '$state', 'authService', function ($rootScope, $state, authService) {
     $rootScope.$on('$stateChangeStart', function(event, toState, toParams) {
       if (toState.name == "login") {
         return
       }
-      authService.isLoggedIn()
-        .error(function() {
-          event.preventDefault();
-          authService.state(toState, toParams);
-          $rootScope.$broadcast('event:auth-loginRequired', false);
-        });
+
+      authService.loggedIn()
+          .then(function(loggedIn){
+            // already logged in
+          }, function() {
+            // Not logged in
+            event.preventDefault();
+            authService.state(toState, toParams);
+            $rootScope.$broadcast('event:auth-loginRequired', false);
+          });
     });
   }]);
 
@@ -67,7 +75,7 @@
     $httpProvider.interceptors.push(['$rootScope', '$q', '$injector', function($rootScope, $q, $injector) {
       var loginRequired = function() {
         var stateService = $injector.get('$state');
-        var authService = $injector.get('auth');
+        var authService = $injector.get('authService');
         authService.state(stateService.current, stateService.params);
         $rootScope.$broadcast('event:auth-loginRequired', true);
       };
