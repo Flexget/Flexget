@@ -139,7 +139,7 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         with Session() as session:
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
-                          #'year': entry.get('year', eval_lazy=False),
+                          'year': entry.get('year', eval_lazy=False),
                           'trakt_id': entry.get('trakt_show_id', eval_lazy=False),
                           'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
                           'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
@@ -156,7 +156,7 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         with Session() as session:
             lookupargs = {'title': entry.get('series_name', eval_lazy=False),
-                          #'year': entry.get('year', eval_lazy=False),
+                          'year': entry.get('year', eval_lazy=False),
                           'trakt_id': entry.get('trakt_show_id', eval_lazy=False),
                           'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
                           'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
@@ -187,7 +187,7 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         with Session() as session:
             lookupargs = {'title': entry.get('title', eval_lazy=False),
-                          #'year': entry.get('year', eval_lazy=False),
+                          'year': entry.get('year', eval_lazy=False),
                           'trakt_id': entry.get('trakt_movie_id', eval_lazy=False),
                           'trakt_slug': entry.get('trakt_movie_slug', eval_lazy=False),
                           'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
@@ -205,7 +205,7 @@ class PluginTraktLookup(object):
         """Does the lookup for this entry and populates the entry fields."""
         with Session() as session:
             lookupargs = {'title': entry.get('title', eval_lazy=False),
-                          #'year': entry.get('year', eval_lazy=False),
+                          'year': entry.get('year', eval_lazy=False),
                           'trakt_id': entry.get('trakt_movie_id', eval_lazy=False),
                           'trakt_slug': entry.get('trakt_movie_slug', eval_lazy=False),
                           'tmdb_id': entry.get('tmdb_id', eval_lazy=False),
