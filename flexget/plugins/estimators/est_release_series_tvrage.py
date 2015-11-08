@@ -18,6 +18,8 @@ log = logging.getLogger('est_series_tvrage')
 class EstimatesSeriesTVRage(object):
     @plugin.priority(1)
     def estimate(self, entry):
+        if not all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
+            return
         season = entry['series_season']
         if entry.get('series_id_type') == 'sequence':
             # Tvrage has absolute numbered shows under season 1
