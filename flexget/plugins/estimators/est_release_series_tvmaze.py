@@ -24,10 +24,12 @@ class EstimatesSeriesTVMaze(object):
         season = entry['series_season']
         episode_number = entry['series_episode']
         log.debug('Search TVMaze for show %s' % series_name)
-        if entry.get('tvdb_id'):
-            tvmaze_show = lookup_tvdb(entry.get('tvdb_id'))
+        if entry.get('maze_id'):
+            tvmaze_show = get_show(int(entry.get('maze_id')))
+        elif entry.get('tvdb_id'):
+            tvmaze_show = get_show(int(lookup_tvdb(entry.get('tvdb_id'))['id']))
         elif entry.get('tvrage_id'):
-            tvmaze_show = lookup_tvdb(entry.get('tvrage_id'))
+            tvmaze_show = get_show(int(lookup_tvdb(entry.get('tvrage_id'))['id']))
         else:
             tvmaze_show = get_show(series_name)
         if not tvmaze_show:
