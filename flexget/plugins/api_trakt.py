@@ -746,7 +746,7 @@ class ApiTrakt(object):
         if not data:
             log.warning('No data returned from trakt.')
             return
-        log.verbose('Received %d series records from trakt.tv' % len(data))
+        log.verbose('Received %d records from trakt.tv %s\'s history' % (len(data), username))
         watched = False
         if style == 'episodes':
             for ep in data:

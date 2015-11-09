@@ -82,7 +82,6 @@ class TestTraktShowLookup(FlexGetBase):
     def test_search_results(self):
         self.execute_task('test_search_result')
         entry = self.task.entries[0]
-        print entry['trakt_series_name'].lower()
         assert entry['trakt_series_name'].lower() == 'Shameless'.lower(), 'lookup failed'
         with Session() as session:
             assert self.task.entries[1]['trakt_series_name'].lower() == 'Shameless'.lower(), 'second lookup failed'
