@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime
 import re
-
 from flexget import plugin
 from flexget.event import event
 
@@ -23,14 +22,18 @@ class EstimatesSeriesTVMaze(object):
         series_name = re.sub('[()]', '', entry['series_name'])  # Remove parenthesis from year if present
         season = entry['series_season']
         episode_number = entry['series_episode']
-        log.debug('Search TVMaze for show %s' % series_name)
+        log.verbose('Search TVMaze for airdate of %s season %s episode %s' % (series_name, season, episode_number))
         if entry.get('tvmaze_id'):
+            log.debug('Searching via TVMaze ID')
             tvmaze_show = get_show(int(entry.get('tvmaze_id')))
         elif entry.get('tvdb_id'):
+            log.debug('Searching via TVDB ID')
             tvmaze_show = get_show(int(lookup_tvdb(entry.get('tvdb_id'))['id']))
         elif entry.get('tvrage_id'):
+            log.debug('Searching via TVRage ID')
             tvmaze_show = get_show(int(lookup_tvdb(entry.get('tvrage_id'))['id']))
         else:
+            log.debug('Searching via show name')
             tvmaze_show = get_show(series_name)
         if not tvmaze_show:
             log.debug('TVMaze did not find match for %s' % series_name)
