@@ -116,8 +116,8 @@ class SonarrEmit(object):
                     # Test mode logging
                     if entry and task.options.test:
                         log.info("Test mode. Entry includes:")
-                    for key, value in entry.items():
-                        log.info('     %s: %s' % (key.capitalize(), value))
+                        for key, value in entry.items():
+                            log.info('     %s: %s' % (key.capitalize(), value))
             json = self.get_page(task, config, page)
         return entries
 
