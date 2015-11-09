@@ -1,9 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
-
 from flexget import db_schema, plugin
 from flexget.entry import Entry
 from flexget.event import event
@@ -160,7 +158,8 @@ class MovieQueue(queue_base.FilterQueueBase):
             # Provide movie title if it is already available, to avoid movie_queue doing a lookup
             kwargs['title'] = (entry.get('imdb_name', eval_lazy=False) or
                                entry.get('tmdb_name', eval_lazy=False) or
-                               entry.get('movie_name', eval_lazy=False))
+                               entry.get('movie_name', eval_lazy=False) or
+                               entry.get('title', eval_lazy=False))
             log.debug('movie_queue kwargs: %s' % kwargs)
             try:
                 action = config.get('action')

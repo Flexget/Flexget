@@ -1,25 +1,25 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import functools
 import logging
 from datetime import datetime, timedelta
 
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, delete
+from sqlalchemy.orm import relation
 from sqlalchemy.schema import ForeignKey, Index
-from sqlalchemy.orm import relation, joinedload
 
 from flexget import db_schema, plugin
-from flexget.event import event
 from flexget.entry import Entry
-from flexget.manager import Session
-from flexget.utils.log import log_once
-from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
-from flexget.utils.sqlalchemy_utils import table_add_column
+from flexget.event import event
 from flexget.utils.database import with_session
+from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
+from flexget.utils.log import log_once
+from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.sqlalchemy_utils import table_columns, get_index_by_name, table_schema
 
 SCHEMA_VER = 4
 
 Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
-
 
 # association tables
 genres_table = Table('imdb_movie_genres', Base.metadata,
@@ -257,8 +257,9 @@ class ImdbLookup(object):
         for entry in task.entries:
             self.register_lazy_fields(entry, config)
 
-    def register_lazy_fields(self, entry, headers=None):
-        entry.register_lazy_func(self.lazy_loader, self.field_map)
+    def register_lazy_fields(self, entry, config=None):
+        lazy_modified = functools.partial(self.lazy_loader, config=config)
+        entry.register_lazy_func(lazy_modified, self.field_map)
 
     def lazy_loader(self, entry, config):
         """Does the lookup for this entry and populates the entry fields."""
