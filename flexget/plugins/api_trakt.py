@@ -14,17 +14,12 @@ from flexget import options
 from flexget.db_schema import upgrade
 from flexget.event import event
 from flexget.manager import Session
-from flexget.plugins.filter.series import normalize_series_name
 from flexget.plugin import get_plugin_by_name
 from flexget.utils import requests
 from flexget.utils.database import with_session
 from flexget.utils.simple_persistence import SimplePersistence
 from flexget.logger import console
 
-api_key = '6c228565a45a302e49fb7d2dab066c9ab948b7be/'
-search_show = 'http://api.trakt.tv/search/shows.json/'
-episode_summary = 'http://api.trakt.tv/show/episode/summary.json/'
-show_summary = 'http://api.trakt.tv/show/summary.json/'
 Base = db_schema.versioned_base('api_trakt', 3)
 log = logging.getLogger('api_trakt')
 # Production Site
@@ -244,7 +239,7 @@ def get_db_actors(id, style):
                 trakt_id = ids.get('trakt')
                 imdb_id = ids.get('imdb')
                 tmdb_id = ids.get('tmdb')
-                actor = session.query(TraktActor).filter(func.lower(TraktActor.name) == name.lower()).first()
+                actor = session.query(TraktActor).filter(TraktActor.trakt_id == trakt_id).first()
                 if not actor:
                     actor = TraktActor(name, trakt_id, imdb_id, tmdb_id)
                 actors.append(actor)
@@ -279,7 +274,6 @@ class TraktEpisode(Base):
     number_abs = Column(Integer)
     overview = Column(Unicode)
     first_aired = Column(DateTime)
-    # expired = Column(Boolean)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
 
@@ -309,7 +303,7 @@ class TraktEpisode(Base):
     @property
     def expired(self):
         # TODO should episode have its own expiration function?
-        pass
+        return False
 
 
 class TraktShow(Base):
@@ -341,7 +335,6 @@ class TraktShow(Base):
     _actors = relation(TraktActor, secondary=show_actors_table)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
-    # expired = Column(Boolean)
 
     def __init__(self, trakt_show, session):
         super(TraktShow, self).__init__()
@@ -350,7 +343,7 @@ class TraktShow(Base):
     def update(self, trakt_show, session):
         """Updates this record from the trakt media object `trakt_show` returned by the trakt api."""
         if self.id and self.id != trakt_show['ids']['trakt']:
-            raise Exception('Tried to update db movie with different movie data')
+            raise Exception('Tried to update db show with different show data')
         elif not self.id:
             self.id = trakt_show['ids']['trakt']
         self.slug = trakt_show['ids']['slug']
@@ -442,7 +435,6 @@ class TraktMovie(Base):
     rating = Column(Integer)
     votes = Column(Integer)
     language = Column(Unicode)
-    # expired = Column(Boolean)
     updated_at = Column(DateTime)
     cached_at = Column(DateTime)
     genres = relation(TraktGenre, secondary=movie_genres_table)
@@ -598,7 +590,6 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
             last_search_type = 'title'
             # Try finding trakt id based on title and year
             if style == 'show':
-                # title_parser = get_plugin_by_name('parsing').instance.parse_series(title)
                 parsed_title, y = split_title_year(title)
                 y = year or y
             else:
@@ -700,7 +691,7 @@ class ApiTrakt(object):
 
     @staticmethod
     def collected(username, style, trakt_data, title, account=None):
-        url = get_api_url('users', username, 'collection', style)
+        url = get_api_url('users', username, 'collection', style + 's')
         session = get_session(username, account=account)
         try:
             log.debug('Opening %s' % url)
@@ -713,7 +704,7 @@ class ApiTrakt(object):
             return
         log.verbose('Received %d records from trakt.tv %s\'s collection' % (len(data), username))
         in_collection = False
-        if style == 'shows':
+        if style == 'show':
             for series in data:
                 if trakt_data.show.id == series['show']['ids']['trakt']:
                     for s in series['seasons']:
@@ -735,7 +726,7 @@ class ApiTrakt(object):
 
     @staticmethod
     def watched(username, style, trakt_data, title, account=None):
-        url = get_api_url('users', username, 'history', style, trakt_data.id)
+        url = get_api_url('users', username, 'history', style + 's', trakt_data.id)
         session = get_session(username, account=account)
         try:
             log.debug('Opening %s' % url)
@@ -748,7 +739,7 @@ class ApiTrakt(object):
             return
         log.verbose('Received %d records from trakt.tv %s\'s history' % (len(data), username))
         watched = False
-        if style == 'episodes':
+        if style == 'episode':
             for ep in data:
                 if trakt_data.show.id == ep['show']['ids']['trakt']:
                     ep_data = ep['episode']
