@@ -123,6 +123,7 @@ class Sonarr(object):
                           series_name=show['title'],
                           tvdb_id=show.get('tvdbId'),
                           tvrage_id=show.get('tvRageId'),
+                          tvmaze_id=show.get('tvMazeId'),
                           configure_series_target=fg_cutoff)
             if len(fg_qualities) > 1:
                 entry['configure_series_qualities'] = fg_qualities
