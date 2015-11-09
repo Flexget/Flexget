@@ -8,23 +8,23 @@ interactions:
     method: GET
     uri: https://api-v2launch.trakt.tv/search?query=Hawaii+Five-0&type=show
   response:
-    body: {string: !!python/unicode '[{"type":"show","score":96.104294,"show":{"title":"Hawaii
+    body: {string: !!python/unicode '[{"type":"show","score":96.72345,"show":{"title":"Hawaii
         Five-0","overview":"Steve McGarrett returns home to Oahu, in order to find
         his father''s killer. The governor offers him the chance to run his own task
         force (Five-0). Steve''s team is joined by Chin Ho Kelly, Danny \"Danno\"
         Williams, and Kono Kalakaua.","year":2010,"status":"returning series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/032/657/posters/original/ff94033565.jpg","medium":"https://walter.trakt.us/images/shows/000/032/657/posters/medium/ff94033565.jpg","thumb":"https://walter.trakt.us/images/shows/000/032/657/posters/thumb/ff94033565.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/032/657/fanarts/original/03ff15aa9c.jpg","medium":"https://walter.trakt.us/images/shows/000/032/657/fanarts/medium/03ff15aa9c.jpg","thumb":"https://walter.trakt.us/images/shows/000/032/657/fanarts/thumb/03ff15aa9c.jpg"}},"ids":{"trakt":32657,"slug":"hawaii-five-0","tvdb":164541,"imdb":"tt1600194","tmdb":32798,"tvrage":24840}}}]'}
     headers:
       cache-control: ['public, max-age=14400']
-      cf-cache-status: [MISS]
-      cf-ray: [242493bac22316ac-ARN]
+      cf-cache-status: [HIT]
+      cf-ray: [24280cf176db37b0-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Sun, 08 Nov 2015 22:05:02 GMT']
-      etag: [W/"e36b9e6782fbbbaeb3a06d820d87c1d8"]
-      expires: ['Mon, 09 Nov 2015 02:05:02 GMT']
+      date: ['Mon, 09 Nov 2015 08:12:04 GMT']
+      etag: [W/"34d72cc453d55d788de84fb1b062b820"]
+      expires: ['Mon, 09 Nov 2015 12:12:04 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d0f0ebce35c34a830916e2965414d410d1447020302; expires=Mon,
-          07-Nov-16 22:05:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d87744b41c147e58d7f1995e19d7bf40f1447056724; expires=Tue,
+          08-Nov-16 08:12:04 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
@@ -32,15 +32,15 @@ interactions:
       x-pagination-limit: ['10']
       x-pagination-page: ['1']
       x-pagination-page-count: ['1']
-      x-request-id: [6a776a3b-9a14-4758-88d1-8f836850afe3]
-      x-runtime: ['0.019667']
+      x-request-id: [7dcf1c24-db40-4218-b61a-db1ba2ffaf62]
+      x-runtime: ['0.018900']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 - request:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=d0f0ebce35c34a830916e2965414d410d1447020302]
+      Cookie: [__cfduid=d87744b41c147e58d7f1995e19d7bf40f1447056724]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
@@ -54,12 +54,12 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [242493be125516ac-ARN]
+      cf-ray: [24280cf1d6dc37b0-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Sun, 08 Nov 2015 22:05:03 GMT']
+      date: ['Mon, 09 Nov 2015 08:12:04 GMT']
       etag: [W/"60a8114241d9fdf25865f16edd2ebf4e"]
-      expires: ['Mon, 09 Nov 2015 02:05:03 GMT']
+      expires: ['Mon, 09 Nov 2015 12:12:04 GMT']
       last-modified: ['Sun, 08 Nov 2015 10:30:59 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]
@@ -84,21 +84,55 @@ interactions:
         investigation.\",\"rating\":7.82292,\"votes\":384,\"first_aired\":\"2014-01-18T02:00:00.000Z\",\"updated_at\":\"2015-10-24T06:55:47.000Z\",\"available_translations\":[]}"}
     headers:
       cache-control: ['public, max-age=14400']
-      cf-cache-status: [MISS]
-      cf-ray: [242493bf793616c4-ARN]
+      cf-cache-status: [HIT]
+      cf-ray: [24280cf3089d168e-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Sun, 08 Nov 2015 22:05:03 GMT']
-      expires: ['Mon, 09 Nov 2015 02:05:03 GMT']
+      date: ['Mon, 09 Nov 2015 08:12:04 GMT']
+      expires: ['Mon, 09 Nov 2015 12:12:04 GMT']
       last-modified: ['Sat, 24 Oct 2015 06:55:47 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=dc31287da5687a3ab472e5d3953e129621447020303; expires=Mon,
-          07-Nov-16 22:05:03 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=dbddc557cbee96e3e9943387787847ff91447056724; expires=Tue,
+          08-Nov-16 08:12:04 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
       x-request-id: [fc5cda59-1049-4987-b141-9bb4f6f9be96]
       x-runtime: ['0.012639']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/flexgettest/history/episodes/776972
+  response:
+    body: {string: !!python/unicode '[{"id":558103917,"watched_at":"2015-01-02T03:46:38.000Z","action":"watch","type":"episode","episode":{"season":4,"number":13,"title":"Hana
+        Lokomaika''i","ids":{"trakt":776972,"tvdb":4749328,"imdb":null,"tmdb":0,"tvrage":0}},"show":{"title":"Hawaii
+        Five-0","year":2010,"ids":{"trakt":32657,"slug":"hawaii-five-0","tvdb":164541,"imdb":"tt1600194","tmdb":32798,"tvrage":24840}}}]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [24280cf43313370e-ARN]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 09 Nov 2015 08:12:05 GMT']
+      etag: [W/"dc960ea558337ef7e73bd29cf2e5e67f"]
+      last-modified: ['Mon, 09 Nov 2015 07:43:00 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d86ac4e117209fe34a26a1ca3ab6809c91447056725; expires=Tue,
+          08-Nov-16 08:12:05 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['1']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['1']
+      x-request-id: [3817ce55-41d5-4d5f-a79a-19246155ec6d]
+      x-runtime: ['0.010733']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 version: 1

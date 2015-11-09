@@ -292,7 +292,7 @@ class TraktEpisode(Base):
     def update(self, trakt_episode):
         """Updates this record from the trakt media object `trakt_movie` returned by the trakt api."""
         if self.id and self.id != trakt_episode['ids']['trakt']:
-            raise Exception('Tried to update db movie with different movie data')
+            raise Exception('Tried to update db ep with different ep data')
         elif not self.id:
             self.id = trakt_episode['ids']['trakt']
         self.imdb_id = trakt_episode['ids']['imdb']
@@ -735,8 +735,36 @@ class ApiTrakt(object):
 
     @staticmethod
     def watched(username, style, trakt_data, title, account=None):
-        # TODO write the damn thing
-        return True
+        url = get_api_url('users', username, 'history', style, trakt_data.id)
+        session = get_session(username, account=account)
+        try:
+            log.debug('Opening %s' % url)
+            data = session.get(url).json()
+        except requests.RequestException as e:
+            raise plugin.PluginError('Unable to get data from trakt.tv: %s' % e)
+
+        if not data:
+            log.warning('No data returned from trakt.')
+            return
+        log.verbose('Received %d series records from trakt.tv' % len(data))
+        watched = False
+        if style == 'episodes':
+            for ep in data:
+                if trakt_data.show.id == ep['show']['ids']['trakt']:
+                    ep_data = ep['episode']
+                    if ep_data['season'] == trakt_data.season and ep_data['number'] == trakt_data.number:
+                        watched = True
+                        break
+                    log.debug('The result for entry "%s" is: %s' % (title,
+                              'Watched' if watched else 'Not watched'))
+        else:
+            for movie in data:
+                if trakt_data.id == movie['movie']['ids']['trakt']:
+                    watched = True
+                    break
+            log.debug('The result for entry "%s" is: %s' % (title,
+                      'Watched' if watched else 'Not watched'))
+        return watched
 
 
 def do_cli(manager, options):

@@ -204,7 +204,7 @@ class TestTraktWatchedAndCollected(FlexGetBase):
         assert entry['series_name'] == 'Hawaii Five-0', 'wrong series was returned by lookup'
         assert entry['trakt_watched'] == True, 'episode should be marked as watched'
 
-    #@use_vcr
+    @use_vcr
     def test_trakt_collected_lookup(self):
         self.execute_task('test_trakt_collected')
         assert len(self.task.accepted) == 1, 'Episode should have been marked as collected and accepted'
@@ -222,7 +222,7 @@ class TestTraktWatchedAndCollected(FlexGetBase):
         assert entry['movie_name'] == 'Inside Out', 'wrong movie name'
         assert entry['trakt_watched'] == True, 'movie should be marked as watched'
 
-    #@use_vcr
+    @use_vcr
     def test_trakt_collected_movie_lookup(self):
         self.execute_task('test_trakt_collected_movie')
         assert len(self.task.accepted) == 1, 'Movie should have been accepted as it is collected on Trakt profile'

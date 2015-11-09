@@ -72,15 +72,15 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [24280cf9f06e3798-ARN]
+      cf-ray: [24280cebff583744-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Mon, 09 Nov 2015 08:12:06 GMT']
+      date: ['Mon, 09 Nov 2015 08:12:03 GMT']
       etag: [W/"942fff7afe5a3eea341494bb95ced293"]
-      expires: ['Mon, 09 Nov 2015 12:12:06 GMT']
+      expires: ['Mon, 09 Nov 2015 12:12:03 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d88ecee41ff2ea2d41d546331e69b326b1447056726; expires=Tue,
-          08-Nov-16 08:12:06 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=d7ea6222ade19d53627258f09a5daa9e91447056723; expires=Tue,
+          08-Nov-16 08:12:03 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
@@ -96,7 +96,7 @@ interactions:
     body: null
     headers:
       Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=d88ecee41ff2ea2d41d546331e69b326b1447056726]
+      Cookie: [__cfduid=d7ea6222ade19d53627258f09a5daa9e91447056723]
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
@@ -116,12 +116,12 @@ interactions:
     headers:
       cache-control: ['public, max-age=14400']
       cf-cache-status: [HIT]
-      cf-ray: [24280cfb20843798-ARN]
+      cf-ray: [24280cec5f5c3744-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Mon, 09 Nov 2015 08:12:06 GMT']
+      date: ['Mon, 09 Nov 2015 08:12:03 GMT']
       etag: [W/"463e093b2aee1fec4453d9674dfd9f34"]
-      expires: ['Mon, 09 Nov 2015 12:12:06 GMT']
+      expires: ['Mon, 09 Nov 2015 12:12:03 GMT']
       last-modified: ['Sun, 25 Oct 2015 08:32:15 GMT']
       server: [cloudflare-nginx]
       vary: [Accept-Encoding]
@@ -138,30 +138,26 @@ interactions:
       trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
       trakt-api-version: [2]
     method: GET
-    uri: https://api-v2launch.trakt.tv/users/flexgettest/history/movies/98998
+    uri: https://api-v2launch.trakt.tv/users/flexgettest/collection/movies
   response:
-    body: {string: !!python/unicode '[{"id":1658888041,"watched_at":"2015-06-19T00:00:00.000Z","action":"watch","type":"movie","movie":{"title":"Inside
+    body: {string: !!python/unicode '[{"collected_at":"2015-06-19T00:00:00.000Z","movie":{"title":"Inside
         Out","year":2015,"ids":{"trakt":98998,"slug":"inside-out-2015","imdb":"tt2096673","tmdb":150540}}}]'}
     headers:
       cache-control: ['max-age=0, private, must-revalidate']
-      cf-ray: [24280cfcacd316c4-ARN]
+      cf-ray: [24280cee0d7f36f0-ARN]
       connection: [keep-alive]
       content-type: [application/json; charset=utf-8]
-      date: ['Mon, 09 Nov 2015 08:12:06 GMT']
-      etag: [W/"a3de1b1aa5c52c0f8fab3ad1340dd07e"]
+      date: ['Mon, 09 Nov 2015 08:12:04 GMT']
+      etag: [W/"23ece474acbd407d8765725009e19355"]
       last-modified: ['Mon, 09 Nov 2015 07:43:00 GMT']
       server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d47fa564611752713f98d3dbd424f91501447056726; expires=Tue,
-          08-Nov-16 08:12:06 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      set-cookie: ['__cfduid=da633046fbfdc0caf22460d66f5cabe5d1447056724; expires=Tue,
+          08-Nov-16 08:12:04 GMT; path=/; domain=.trakt.tv; HttpOnly']
       vary: [Accept-Encoding]
       x-content-type-options: [nosniff]
       x-frame-options: [SAMEORIGIN]
-      x-pagination-item-count: ['1']
-      x-pagination-limit: ['10']
-      x-pagination-page: ['1']
-      x-pagination-page-count: ['1']
-      x-request-id: [f4fa1bb5-0038-4f45-9d53-71532dd03aae]
-      x-runtime: ['0.011174']
+      x-request-id: [d4394d93-fd61-44c1-ba8c-1b9ba484e0cb]
+      x-runtime: ['0.010095']
       x-xss-protection: [1; mode=block]
     status: {code: 200, message: OK}
 version: 1
