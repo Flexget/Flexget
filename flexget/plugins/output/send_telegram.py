@@ -273,7 +273,7 @@ class SendTelegram(object):
         chat_ids = list()
         cached_usernames = dict((x.username, x)
                                 for x in session.query(ChatIdEntry).filter(ChatIdEntry.username != None).all())
-        cached_fullnames = dict((x.firstname, x.surname)
+        cached_fullnames = dict(((x.firstname, x.surname), x)
                                 for x in session.query(ChatIdEntry).filter(ChatIdEntry.firstname != None).all())
         cached_groups = dict((x.group, x)
                              for x in session.query(ChatIdEntry).filter(ChatIdEntry.group != None).all())
