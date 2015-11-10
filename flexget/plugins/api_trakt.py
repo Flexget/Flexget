@@ -83,8 +83,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
                 data['code'] = token
                 data['grant_type'] = 'authorization_code'
             else:
-                log.debug('Account %s not found in db and no pin specified.' % account)
-                return
+                raise plugin.PluginError('Account %s not found in db and no pin specified.' % account)
             try:
                 r = requests.post(get_api_url('oauth/token'), data=data).json()
                 if acc:
@@ -113,20 +112,25 @@ def make_list_slug(name):
     return slug
 
 
-def get_session(username=None, token=None, account=None):
-    """Creates a requests session which is authenticated to trakt."""
+def get_session(account=None, token=None):
+    """
+    Creates a requests session ready to talk to trakt API with FlexGet's api key.
+    Can also add user level authentication if `account` parameter is given.
+
+    :param account: An account authorized via `flexget trakt auth` CLI command. If given, returned session will be
+        authenticated for that account.
+    """
     # default to username if account name is not specified
-    if not account:
-        account = username
     session = requests.Session()
     session.headers = {
         'Content-Type': 'application/json',
         'trakt-api-version': 2,
         'trakt-api-key': CLIENT_ID,
     }
-    access_token = get_access_token(account, token) if account else None
-    if access_token:
-        session.headers.update({'Authorization':  'Bearer %s' % access_token})
+    if account:
+        access_token = get_access_token(account, token) if account else None
+        if access_token:
+            session.headers.update({'Authorization': 'Bearer %s' % access_token})
     return session
 
 
@@ -692,7 +696,7 @@ class ApiTrakt(object):
     @staticmethod
     def collected(username, style, trakt_data, title, account=None):
         url = get_api_url('users', username, 'collection', style + 's')
-        session = get_session(username, account=account)
+        session = get_session(account=account)
         try:
             log.debug('Opening %s' % url)
             data = session.get(url).json()
@@ -727,7 +731,7 @@ class ApiTrakt(object):
     @staticmethod
     def watched(username, style, trakt_data, title, account=None):
         url = get_api_url('users', username, 'history', style + 's', trakt_data.id)
-        session = get_session(username, account=account)
+        session = get_session(account=account)
         try:
             log.debug('Opening %s' % url)
             data = session.get(url).json()
@@ -760,7 +764,7 @@ class ApiTrakt(object):
 
 def do_cli(manager, options):
     if options.action == 'auth':
-        if not options.account and not options.pin:
+        if not (options.account and options.pin):
             console('You must specify an account (local identifier) so we know where to save your access token! '
                     'Visit %s to get a pin code and authorize flexget to access your trakt account.' % PIN_URL)
             return
@@ -771,10 +775,19 @@ def do_cli(manager, options):
         except plugin.PluginError as e:
             console('Authorization failed: %s' % e)
     elif options.action == 'show':
-        if not options.account:
-            console('Please specify an account')
-            return
         with Session() as session:
+            if not options.account:
+                # Print all accounts
+                accounts = session.query(TraktUserAuth).all()
+                if not accounts:
+                    console('No trakt authorizations stored in database.')
+                    return
+                console('{:-^21}|{:-^28}|{:-^28}'.format('Account', 'Created', 'Expires'))
+                for auth in accounts:
+                    console('{:<21}|{:>28}|{:>28}'.format(
+                        auth.account, auth.created.strftime('%Y-%m-%d'), auth.expires.strftime('%Y-%m-%d')))
+                return
+            # Show a specific account
             acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == options.account).first()
             if acc:
                 console('Authorization expires on %s' % acc.expires)
@@ -802,19 +815,19 @@ def register_parser_arguments():
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='action')
     auth_parser = subparsers.add_parser('auth', help='authorize Flexget to access your Trakt.tv account')
 
-    auth_parser.add_argument('--account', metavar='<account>', help=acc_text)
-    auth_parser.add_argument('--pin', metavar='<pin>', help='get this by authorizing FlexGet to use your trakt account '
-                                                            'at http://trakt.tv/pin/346')
+    auth_parser.add_argument('account', metavar='<account>', help=acc_text)
+    auth_parser.add_argument('pin', metavar='<pin>', help='get this by authorizing FlexGet to use your trakt account '
+                                                          'at http://trakt.tv/pin/346')
 
-    show_parser = subparsers.add_parser('show', help='show expiration date for Flexget authorization (don\'t worry, '
-                                                     'it will manually refresh when it expires)')
+    show_parser = subparsers.add_parser('show', help='show expiration date for Flexget authorization(s) (don\'t worry, '
+                                                     'they will automatically refresh when expired)')
 
-    show_parser.add_argument('--account', metavar='<account>', help=acc_text)
+    show_parser.add_argument('account', metavar='<account>', nargs='?', help=acc_text)
 
     refresh_parser = subparsers.add_parser('refresh', help='manually refresh your access token associated with your'
                                                            ' --account <name>')
 
-    refresh_parser.add_argument('--account', metavar='<account>', help=acc_text)
+    refresh_parser.add_argument('account', metavar='<account>', help=acc_text)
 
 
 @event('plugin.register')

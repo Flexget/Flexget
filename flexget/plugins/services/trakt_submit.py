@@ -18,7 +18,9 @@ class TraktSubmit(object):
             'account': {'type': 'string'},
             'list': {'type': 'string'}
         },
-        'required': ['username', 'list'],
+        'required': ['list'],
+        'anyOf': [{'required': ['username']}, {'required': ['account']}],
+        'error_anyOf': 'At least one of `username` or `account` options are needed.',
         'additionalProperties': False
     }
 
@@ -29,6 +31,8 @@ class TraktSubmit(object):
     @plugin.priority(-255)
     def on_task_output(self, task, config):
         """Submits accepted movies or episodes to trakt api."""
+        if config.get('account') and not config.get('username'):
+            config['username'] = 'me'
         found = {'shows': [], 'movies': []}
         for entry in task.accepted:
             if 'series_name' in entry:
@@ -61,7 +65,7 @@ class TraktSubmit(object):
         if task.manager.options.test:
             self.log.info('Not submitting to trakt.tv because of test mode.')
             return
-        session = get_session(config['username'], account=config.get('account'))
+        session = get_session(account=config.get('account'))
         self.log.debug('Submitting data to trakt.tv (%s): %s' % (url, found))
         try:
             result = session.post(url, data=json.dumps(found), raise_status=False)
