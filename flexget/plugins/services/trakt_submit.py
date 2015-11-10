@@ -73,8 +73,17 @@ class TraktSubmit(object):
             self.log.error('Error submitting data to trakt.tv: %s' % e)
             return
         if 200 <= result.status_code < 300:
-            self.log.info('Data successfully sent to trakt.tv')
-            self.log.debug('trakt response: ' + result.text)
+            action = 'added'
+            if self.remove:
+                action = 'deleted'
+            res = result.json()
+            movies = res[action].get('movies', 0)
+            eps = res[action].get('episodes', 0)
+            self.log.info('Successfully %s to/from list %s: %s movie(s), %s episode(s).' % (action, config['list'],
+                                                                                            movies, eps))
+            for k, r in res['not_found'].iteritems():
+                if r:
+                    self.log.debug('not found %s: %s' % (k, r))
             # TODO: Improve messages about existing and unknown results
         elif result.status_code == 404:
             self.log.error('List does not appear to exist on trakt: %s' % config['list'])
