@@ -12,7 +12,7 @@ from flexget.utils.search import normalize_scene
 log = logging.getLogger('rarbg')
 
 requests = Session()
-requests.set_domain_delay('torrentapi.org', '2.1 seconds')  # they only allow 1 request per 2 seconds
+requests.set_domain_delay('torrentapi.org', '2.3 seconds')  # they only allow 1 request per 2 seconds
 
 CATEGORIES = {
     'all': 0,

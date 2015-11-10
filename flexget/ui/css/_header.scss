@@ -1,11 +1,9 @@
-
-/* Header */
 .header {
     overflow:hidden;
 }
 
 .header .logo {
-    background: #222D32 url(/ui/images/header.png) no-repeat center !important;
+    background: #222D32 url($header-image) no-repeat center !important;
     background-size: 175px !important;
     float:left;
     width:190px;
