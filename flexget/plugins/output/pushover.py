@@ -1,11 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
+
 from requests.exceptions import RequestException
+
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
-from flexget.config_schema import one_or_more
 
 log = logging.getLogger("pushover")
 
@@ -40,7 +43,9 @@ class OutputPushover(object):
             'device': {'type': 'string', 'default': ''},
             'title': {'type': 'string', 'default': "{{task}}"},
             'message': {'type': 'string', 'default': default_message},
-            'priority': {'oneOf': [{'type': 'integer'}, {'type': 'string'}]},
+            'priority': {'oneOf': [
+                {'type': 'number', 'minimum': -2, 'maximum': 1},
+                {'type': 'string'}]},
             'url': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
             'urltitle': {'type': 'string', 'default': ''},
             'sound': {'type': 'string', 'default': ''}
@@ -101,13 +106,11 @@ class OutputPushover(object):
                 urltitle = ""
 
             # Attempt to render the priority field
-            try:
-                priority = entry.render(priority)
-            except RenderError:
+            if isinstance(priority, basestring):
                 try:
-                    priority = int(priority)
+                    priority = entry.render(priority)
                 except ValueError as e:
-                    log.warning("Problem rendering 'priority': %s" % e)
+                    log.warning('Problem rendering "priority": %s' % e)
                     priority = 0
 
             # Attempt to render the sound field
@@ -131,19 +134,8 @@ class OutputPushover(object):
                 # Check for test mode
                 if task.options.test:
                     log.info("Test mode.  Pushover notification would be:")
-                    if device:
-                        log.info("    Device: %s" % device)
-                    else:
-                        log.info("    Device: [broadcast]")
-                    log.info("    Title: %s" % title)
-                    log.info("    Message: %s" % message)
-                    log.info("    URL: %s" % url)
-                    log.info("    URL Title: %s" % urltitle)
-                    log.info("    Priority: %d" % priority)
-                    log.info("    userkey: %s" % userkey)
-                    log.info("    apikey: %s" % apikey)
-                    log.info("    sound: %s" % sound)
-
+                    for key, value in data.items():
+                        log.verbose('{0:>5}{1}: {2}'.format('', key.capitalize(), value))
                     # Test mode.  Skip remainder.
                     continue
 
