@@ -1,10 +1,13 @@
 import os
 import logging
+import json
+from datetime import datetime
 from time import sleep
 
 from flask import Response
 
-from pyparsing import Word, alphanums, Keyword, Group, Forward, Suppress, OneOrMore, oneOf
+from pyparsing import Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, Combine
+from pyparsing import nums, alphanums, printables
 
 from flexget.api import api, APIResource, ApiError, __version__ as __api_version__
 from flexget._version import __version__
@@ -130,6 +133,18 @@ def reverse_readline(fh, start_byte=0, buf_size=8192):
     yield segment
 
 
+def file_inode(filename):
+    try:
+        fd = os.open(filename, os.O_RDONLY)
+        inode = os.fstat(fd).st_ino
+        return inode
+    except OSError:
+        return 0
+    finally:
+        if fd:
+            os.close(fd)
+
+
 @server_api.route('/log/')
 class ServerLogAPI(APIResource):
 
@@ -140,19 +155,26 @@ class ServerLogAPI(APIResource):
         args = server_log_parser.parse_args()
 
         def follow(lines, search):
-            log_filter = LogFilter(search)
+            log_parser = LogParser(search)
+            stream_from_byte = 0
 
             lines_found = []
 
+            if os.path.isabs(self.manager.options.logfile):
+                base_log_file = self.manager.options.logfile
+            else:
+                base_log_file = os.path.join(self.manager.config_base, self.manager.options.logfile)
+
+            yield '{"stream": ['  # Start of the json stream
+
             # Read back in the logs until we find enough lines
-            for i in range(0, 2):
-                log_file = ('log-%s.json.%s' % (self.manager.config_name, i)).rstrip('.0')  # 1st log file has no number
-                log_file = os.path.join(self.manager.config_base, log_file)
+            for i in range(0, 9):
+                log_file = ('%s.%s' % (base_log_file, i)).rstrip('.0')  # 1st log file has no number
 
                 if not os.path.isfile(log_file):
                     break
 
-                with open(os.path.join(self.manager.config_base, log_file), 'rb') as fh:
+                with open(log_file, 'rb') as fh:
                     fh.seek(0, 2)  # Seek to bottom of file
                     end_byte = fh.tell()
                     if i == 0:
@@ -165,34 +187,47 @@ class ServerLogAPI(APIResource):
                     for line in reverse_readline(fh, start_byte=end_byte):
                         if len(lines_found) >= lines:
                             break
-                        if log_filter.matches(line):
-                            lines_found.append(line)
+                        if log_parser.matches(line):
+                            lines_found.append(log_parser.json_string(line))
 
                     for l in reversed(lines_found):
-                        yield l
+                        yield l + ',\n'
 
-            # Stream log starting where we first read from
-            with open(os.path.join(self.manager.config_base, 'log-%s.json' % self.manager.config_name), 'rb') as fh:
-                fh.seek(stream_from_byte)
-                while True:
-                    line = fh.readline()
+            # We need to track the inode in case the log file is rotated
+            current_inode = file_inode(base_log_file)
 
-                    # If a valid line is found and does not pass the filter then set it to none
-                    if line and not log_filter.matches(line):
-                        line = None
+            while True:
+                new_inode = file_inode(base_log_file)
+                if current_inode != new_inode:
+                    # File updated/rotated. Read from beginning
+                    stream_from_byte = 0
+                    current_inode = new_inode
 
-                    if not line:
-                        # If line is empty then delay and send an empty line to flask can ensure the client is alive
-                        line = '{}'
-                        sleep(0.5)
-                    yield line
+                try:
+                    with open(base_log_file, 'rb') as fh:
+                        fh.seek(stream_from_byte)
+                        line = fh.readline()
+                        stream_from_byte = fh.tell()
+                except IOError:
+                    yield '{}'
+
+                # If a valid line is found and does not pass the filter then set it to none
+                line = log_parser.json_string(line) if log_parser.matches(line) else '{}'
+
+                if line == '{}':
+                    # If no match then delay to prevent many read hits on the file
+                    sleep(2)
+
+                yield line + ',\n'
+
+            yield '{}]}'  # End of stream
 
         return Response(follow(args['lines'], args['search']), mimetype='text/event-stream')
 
 
-class LogFilter:
+class LogParser:
     """
-    Filter while parsing log file.
+    Filter log file.
 
     Supports
       * 'and', 'or' and implicit 'and' operators;
@@ -214,6 +249,7 @@ class LogFilter:
         self.query = query.lower() if query else ''
 
         if self.query:
+            # TODO: Cleanup
             operator_or = Forward()
             operator_word = Group(Word(alphanums)).setResultsName('word')
 
@@ -246,9 +282,24 @@ class LogFilter:
                 operator_and + Suppress(Keyword('or', caseless=True)) + operator_or
             ).setResultsName('or') | operator_and)
 
-            self._parser = operator_or.parseString(self.query)[0]
+            self._query_parser = operator_or.parseString(self.query)[0]
         else:
-            self._parser = False
+            self._query_parser = False
+
+        integer = Word(nums).setParseAction(lambda t: int(t[0]))
+        date = Combine((integer + '-' + integer + '-' + integer) + ' ' + integer + ':' + integer)
+        word = Word(printables)
+
+        self._log_parser = (
+            date.setResultsName('timestamp') +
+            word.setResultsName('log_level') +
+            word.setResultsName('plugin') +
+            (
+                White(min=16).setParseAction(lambda s, l, t: [t[0].strip()]).setResultsName('task') |
+                (White(min=1).suppress() & word.setResultsName('task'))
+            ) +
+            restOfLine.setResultsName('message')
+        )
 
     def evaluate_and(self, argument):
         return self.evaluate(argument[0]) and self.evaluate(argument[1])
@@ -278,7 +329,13 @@ class LogFilter:
 
         self.line = line.lower()
 
-        if not self._parser:
+        if not self._query_parser:
             return True
         else:
-            return self.evaluate(self._parser)
+            return self.evaluate(self._query_parser)
+
+    def json_string(self, line):
+        try:
+            return json.dumps(self._log_parser().parseString(line).asDict())
+        except ParseException:
+            return '{}'

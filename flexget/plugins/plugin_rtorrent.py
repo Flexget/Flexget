@@ -274,11 +274,22 @@ class RTorrent(object):
             if result != 0:
                 raise xmlrpclib.Error('Failed creating directory %s' % fields['directory'])
 
+        # by default rtorrent won't allow calls over 512kb in size.
+        xmlrpc_size = len(xmlrpclib.dumps(tuple(params), 'raw_start')) + 71680  # Add 70kb for buffer
+        if xmlrpc_size > 524288:
+            prev_size = self._server.network.xmlrpc.size_limit()
+            self._server.network.xmlrpc.size_limit.set('', xmlrpc_size)
+
         # Call load method and return the response
         if start:
-            return self._server.load.raw_start(*params)
+            result = self._server.load.raw_start(*params)
         else:
-            return self._server.load.raw(*params)
+            result = self._server.load.raw(*params)
+
+        if xmlrpc_size > 524288:
+            self._server.network.xmlrpc.size_limit.set('', prev_size)
+
+        return result
 
     def torrent(self, info_hash, fields=default_fields):
         """ Get the details of a torrent """
@@ -390,6 +401,7 @@ class RTorrentPluginBase(object):
             client = RTorrent(config['uri'], username=config.get('username'),
                               password=config.get('password'), timeout=config.get('timeout'))
             if client.version < [0, 9, 4]:
+                log.error('rtorrent version >=0.9.4 required, found {0}'.format('.'.join(map(str, client.version))))
                 task.abort('rtorrent version >=0.9.4 required, found {0}'.format('.'.join(map(str, client.version))))
         except (IOError, xmlrpclib.Error) as e:
             raise plugin.PluginError("Couldn't connect to rTorrent: %s" % str(e))
@@ -570,6 +582,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             if resp != 0:
                 entry.fail('Failed to add to rTorrent invalid return value %s' % resp)
         except (IOError, xmlrpclib.Error) as e:
+            log.exception(e)
             entry.fail('Failed to add to rTorrent %s' % str(e))
             return
 

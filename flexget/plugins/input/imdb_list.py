@@ -58,7 +58,7 @@ class ImdbList(object):
             url = 'http://www.imdb.com/list/%s' % config['list']
 
         headers = {'Accept-Language': config.get('force_language')}
-        log.debug('Requesting: %s' % url, headers=headers)
+        log.debug('Requesting: %s %s' % (url, headers))
         page = task.requests.get(url, params=params, headers=headers)
         if page.status_code != 200:
             raise plugin.PluginError('Unable to get imdb list. Either list is private or does not exist.')

@@ -3,11 +3,15 @@ FlexGet build and development utilities - unfortunately this file is somewhat me
 """
 from __future__ import print_function
 import os
+import subprocess
+import shutil
 import sys
 from paver.easy import *
 import paver.virtual
 import paver.setuputils
+from paver.shell import sh
 from paver.setuputils import setup, find_package_data, find_packages
+
 
 sphinxcontrib = False
 try:
@@ -23,12 +27,13 @@ options = environment.options
 # There is a bug in beautifulsoup 4.2.0 that breaks imdb parsing, see http://flexget.com/ticket/2091
 # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
 install_requires = [
-    'FeedParser>=5.1.3', 'SQLAlchemy >=0.7.5, !=0.9.0, <1.999', 'PyYAML',
+    'FeedParser>=5.2.1', 'SQLAlchemy >=0.7.5, !=0.9.0, <1.999', 'PyYAML',
     'beautifulsoup4>=4.1, !=4.2.0, <4.4', 'html5lib>=0.11', 'PyRSS2Gen', 'pynzb', 'progressbar', 'rpyc',
     'jinja2', 'requests>=1.0, !=2.4.0, <2.99', 'python-dateutil!=2.0, !=2.2', 'jsonschema>=2.0',
     'python-tvrage', 'tmdb3', 'path.py', 'guessit>=0.9.3, <0.10.4', 'apscheduler',
     'flask>=0.7', 'flask-restful>=0.3.3', 'ordereddict>=1.1', 'flask-restplus==0.7.2', 'cherrypy>=3.7.0',
-    'flask-assets>=0.11', 'cssmin>=0.2.0', 'flask-compress>=1.2.1', 'flask-login>=0.3.2', 'pyparsing>=2.0.3'
+    'flask-assets>=0.11', 'cssmin>=0.2.0', 'flask-compress>=1.2.1', 'flask-login>=0.3.2', 'pyparsing>=2.0.3',
+    'pyScss>=1.3.4',
 ]
 
 if sys.version_info < (2, 7):
@@ -65,9 +70,9 @@ setup(
     install_requires=install_requires,
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget',
-        exclude=['FlexGet.egg-info', '*.pyc'],
-        exclude_directories=['node_modules', 'bower_components'],
-        only_in_packages=False),  # NOTE: the exclude does not seem to work
+                                   exclude=['FlexGet.egg-info', '*.pyc'],
+                                   exclude_directories=['node_modules', 'bower_components'],
+                                   only_in_packages=False),  # NOTE: the exclude does not seem to work
     zip_safe=False,
     test_suite='nose.collector',
     extras_require={
@@ -335,3 +340,24 @@ def requirements(options):
     filename = options.requirements.get('file', 'requirements.txt')
     with open(filename, mode='w') as req_file:
         req_file.write('\n'.join(options.install_requires))
+
+
+@task
+def build_webui():
+
+    cwd = os.path.join('flexget', 'ui')
+
+    # Cleanup previous builds
+    for folder in ['bower_components' 'node_modules']:
+        folder = os.path.join(cwd, folder)
+        if os.path.exists(folder):
+            shutil.rmtree(folder)
+
+    # Install npm packages
+    sh(['npm', 'install'], cwd=cwd)
+
+    # Build the ui
+    sh(['bower', 'install'], cwd=cwd)
+
+    # Build the ui
+    sh('gulp', cwd=cwd)

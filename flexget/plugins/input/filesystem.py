@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
-import os
+from datetime import datetime
 
 from path import Path
 
@@ -104,14 +104,14 @@ class Filesystem(object):
         """
         entry = Entry()
         entry['location'] = filepath
-        entry['url'] = 'file://{}'.format(filepath)
+        entry['url'] = 'file://%s' % filepath
         entry['filename'] = filepath.name
         if filepath.isfile():
             entry['title'] = filepath.namebase
         else:
             entry['title'] = filepath.name
         try:
-            entry['timestamp'] = os.path.getmtime(filepath)
+            entry['timestamp'] = datetime.fromtimestamp(filepath.getmtime())
         except Exception as e:
             log.warning('Error setting timestamp for %s: %s' % (filepath, e))
             entry['timestamp'] = None
@@ -125,7 +125,7 @@ class Filesystem(object):
                 log.info("    Timestamp: %s" % entry["timestamp"])
             return entry
         else:
-            log.error('Non valid entry created: {}'.format(entry))
+            log.error('Non valid entry created: %s '% entry)
             return
 
     def get_max_depth(self, recursion, base_depth):
@@ -146,18 +146,18 @@ class Filesystem(object):
         entries = []
 
         for folder in path_list:
-            log.verbose('Scanning folder {}. Recursion is set to {}.'.format(folder, recursion))
+            log.verbose('Scanning folder %s. Recursion is set to %s.' % (folder, recursion))
             folder = Path(folder).expanduser()
             log.debug('Scanning %s' % folder)
             base_depth = len(folder.splitall())
             max_depth = self.get_max_depth(recursion, base_depth)
             folder_objects = self.get_folder_objects(folder, recursion)
             for path_object in folder_objects:
-                log.debug('Checking if {} qualifies to be added as an entry.'.format(path_object))
+                log.debug('Checking if %s qualifies to be added as an entry.' % path_object)
                 try:
                     path_object.exists()
                 except UnicodeError:
-                    log.error('File %s not decodable with filesystem encoding: {}'.format(path_object))
+                    log.error('File %s not decodable with filesystem encoding: %s' % path_object)
                     continue
                 entry = None
                 object_depth = len(path_object.splitall())
@@ -168,7 +168,7 @@ class Filesystem(object):
                             path_object.isfile() and get_files):
                             entry = self.create_entry(path_object, test_mode)
                         else:
-                            log.debug("Path object's {} type doesn't match requested object types.".format(path_object))
+                            log.debug("Path object's %s type doesn't match requested object types." % path_object)
                         if entry and entry not in entries:
                             entries.append(entry)
 

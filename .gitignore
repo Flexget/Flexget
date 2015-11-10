@@ -32,5 +32,6 @@ pip-*.tar.gz
 *.noseids
 .coverage
 tests/cover/
-node_modules/
-bower_components/
+flexget/ui/node_modules/
+flexget/ui/bower_components/
+flexget/ui/vendor/

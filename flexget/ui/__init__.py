@@ -3,6 +3,7 @@ import logging
 import os
 import json
 import fnmatch
+import glob
 
 from flask import send_from_directory, Flask, abort, render_template
 
@@ -24,15 +25,20 @@ webui_app = Flask(__name__)
 Compress(webui_app)
 webui_app.url_path = '/ui'
 webui_path = os.path.dirname(os.path.realpath(__file__))
-webui_static_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'static')
 
 
 def register_asset_type(name, output_file, filters=None):
     _asset_registry[name] = {'out': output_file, 'filters': filters, 'items': []}
 
 
-register_asset_type('plugins_js', 'js/plugins.js', filters='rjsmin')
-register_asset_type('plugins_css', 'css/plugins.css', filters='cssmin')
+register_asset_type('vendor_js', 'js/vendor.min.js', filters='rjsmin')
+register_asset_type('vendor_css', 'css/vendor.min.css')
+
+register_asset_type('flexget_js', 'js/flexget.min.js', filters='rjsmin')
+register_asset_type('flexget_css', 'css/flexget.min.css', filters='cssmin')
+
+register_asset_type('plugins_js', 'js/plugins.min.js', filters='rjsmin')
+register_asset_type('plugins_css', 'css/plugins.min.css', filters='cssmin')
 
 
 def register_asset(asset_type, asset):
@@ -51,6 +57,21 @@ def _load_assets():
         asset_files = [item for item in asset_registry['items']]
         asset_bundle = Bundle(*asset_files, filters=asset_registry['filters'], output=asset_registry['out'])
         assets.register(name, asset_bundle)
+
+
+@webui_app.route('/templates/<path:filename>')
+def templates_server(filename):
+    return send_from_directory(os.path.join(webui_path, 'templates'), filename)
+
+
+@webui_app.route('/images/<path:filename>')
+def images_server(filename):
+    return send_from_directory(os.path.join(webui_path, 'images'), filename)
+
+
+@webui_app.route('/vendor/<path:filename>')
+def vendor_server(filename):
+    return send_from_directory(os.path.join(webui_path, 'vendor'), filename)
 
 
 @webui_app.route('/plugin/<plugin>/<path:path>')
@@ -128,7 +149,6 @@ def _register_plugin(plugin_path):
     _plugins[name] = {'path': plugin_path, 'config': config, version: version}
 
     # Register CSS/SASS assets
-    # NOTE: Disabled until required
     """
     if config.get('sass'):
         sass_path = os.path.normpath(os.path.join(plugin_path, 'sass'))
@@ -167,6 +187,27 @@ def load_ui_plugins():
         _load_ui_plugins_from_dir(path)
 
 
+def load_assets():
+
+    with open(os.path.join(webui_path, 'config.json'), 'r') as f:
+        config = json.load(f)
+
+    # Register JS assets
+    for js_glob in config['flexget_js']:
+        for js_file in glob.glob(os.path.join(webui_path, os.path.normpath(js_glob))):
+            register_asset('flexget_js', js_file)
+
+    for js_file in config['vendor_js']:
+        register_asset('vendor_js', os.path.normpath(os.path.join(webui_path, js_file)))
+
+    # Register CSS/SCSS
+    for css_file in config['vendor_css']:
+        register_asset('vendor_css', os.path.normpath(os.path.join(webui_path, css_file)))
+
+    sass_file = os.path.join(webui_path, 'css', 'flexget.scss')
+    register_asset('flexget_css', Bundle(sass_file, output='css/flexget.css', filters='pyscss'))
+
+
 def register_web_ui(mgr):
     global manager, assets
     manager = mgr
@@ -187,6 +228,7 @@ def register_web_ui(mgr):
     if 'debug' in manager.args:
         assets.debug = True
 
+    load_assets()
     load_ui_plugins()
 
     register_app(webui_app.url_path, webui_app)

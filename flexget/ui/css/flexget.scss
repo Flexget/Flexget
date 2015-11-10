@@ -1,0 +1,24 @@
+@import "variables";
+@import "header";
+@import "sidenav";
+
+body {
+    font-family: 'Source Sans Pro','Helvetica Neue',Helvetica,Arial,sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+.text-lightgrey {
+    color: #B8B8B8;
+}
+
+.text-white {
+    color: white;
+}
+
+@font-face {
+    font-family: 'FontAwesome';
+    font-style: normal;
+    font-weight: 400;
+}

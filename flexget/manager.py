@@ -148,9 +148,8 @@ class Manager(object):
             # If an absolute path is not specified, use the config directory.
             if not os.path.isabs(log_file):
                 log_file = os.path.join(self.config_base, log_file)
-            json_log = os.path.join(self.config_base, 'log-%s.json' % self.config_name)
 
-            logger.start(log_file, json_log, self.options.loglevel.upper(), to_console=not self.options.cron)
+            logger.start(log_file, self.options.loglevel.upper(), to_console=not self.options.cron)
 
         manager = self
 
