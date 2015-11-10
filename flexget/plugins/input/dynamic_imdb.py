@@ -193,6 +193,7 @@ class DynamicIMDB(object):
         unfiltered_items = set(unfiltered_items)
         for item in sorted(unfiltered_items):
             if match_type == 'strict':
+                log.debug('Match type is strict, verifying item type to requested content types')
                 self.ia.update(item)
                 if item['kind'] in content_types:
                     log.verbose('Adding item "{}" to list. Item kind is "{}"'.format(item, item['kind']))
@@ -200,6 +201,7 @@ class DynamicIMDB(object):
                 else:
                     log.verbose('Rejecting item "{}". Item kind is "{}'.format(item, item['kind']))
             else:
+                log.debug('Match type is loose, all items are being added')
                 items.append(item)
         return items
 
