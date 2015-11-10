@@ -115,9 +115,9 @@ class SonarrEmit(object):
                         log.error('Invalid entry created? %s' % entry)
                     # Test mode logging
                     if entry and task.options.test:
-                        log.info("Test mode. Entry includes:")
+                        log.verbose("Test mode. Entry includes:")
                         for key, value in entry.items():
-                            log.info('     %s: %s' % (key.capitalize(), value))
+                            log.verbose('     %s: %s' % (key.capitalize(), value))
             json = self.get_page(task, config, page)
         return entries
 

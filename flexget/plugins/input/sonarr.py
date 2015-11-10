@@ -138,9 +138,9 @@ class Sonarr(object):
                 continue
             # Test mode logging
             if entry and task.options.test:
-                log.info("Test mode. Entry includes:")
+                log.verbose("Test mode. Entry includes:")
                 for key, value in entry.items():
-                    log.info('     {}: {}'.format(key.capitalize(), value))
+                    log.verbose('     {}: {}'.format(key.capitalize(), value))
 
         return entries
 
