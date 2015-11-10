@@ -73,7 +73,9 @@ class TraktList(object):
             'list': {'type': 'string'},
             'strip_dates': {'type': 'boolean', 'default': False}
         },
-        'required': ['username', 'type', 'list'],
+        'required': ['type', 'list'],
+        'anyOf': [{'required': ['username']}, {'required': ['account']}],
+        'error_anyOf': 'At least one of `username` or `account` options are needed.',
         'additionalProperties': False,
         'not': {
             'properties': {
@@ -86,7 +88,9 @@ class TraktList(object):
 
     @cached('trakt_list', persist='2 hours')
     def on_task_input(self, task, config):
-        session = get_session(config['username'], account=config.get('account'))
+        if config.get('account') and not config.get('username'):
+            config['username'] = 'me'
+        session = get_session(account=config.get('account'))
         endpoint = ['users', config['username']]
         if config['list'] in ['collection', 'watchlist', 'watched']:
             endpoint += (config['list'], config['type'])

@@ -39,13 +39,15 @@ class TraktEmit(object):
             'context': {'type': 'string', 'enum': ['watched', 'collected'], 'default': 'watched'},
             'list': {'type': 'string'}
         },
-        'required': ['username'],
+        'anyOf': [{'required': ['username']}, {'required': ['account']}],
+        'error_anyOf': 'At least one of `username` or `account` options are needed.',
         'additionalProperties': False
     }
 
     def on_task_input(self, task, config):
-
-        session = get_session(config['username'], account=config.get('account'))
+        if config.get('account') and not config.get('username'):
+            config['username'] = 'me'
+        session = get_session(account=config.get('account'))
         listed_series = {}
         if config.get('list'):
             args = ('users', config['username'])

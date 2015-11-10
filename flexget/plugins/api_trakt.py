@@ -112,20 +112,25 @@ def make_list_slug(name):
     return slug
 
 
-def get_session(username=None, token=None, account=None):
-    """Creates a requests session which is authenticated to trakt."""
+def get_session(account=None, token=None):
+    """
+    Creates a requests session ready to talk to trakt API with FlexGet's api key.
+    Can also add user level authentication if `account` parameter is given.
+
+    :param account: An account authorized via `flexget trakt auth` CLI command. If given, returned session will be
+        authenticated for that account.
+    """
     # default to username if account name is not specified
-    if not account:
-        account = username
     session = requests.Session()
     session.headers = {
         'Content-Type': 'application/json',
         'trakt-api-version': 2,
         'trakt-api-key': CLIENT_ID,
     }
-    access_token = get_access_token(account, token) if account else None
-    if access_token:
-        session.headers.update({'Authorization':  'Bearer %s' % access_token})
+    if account:
+        access_token = get_access_token(account, token) if account else None
+        if access_token:
+            session.headers.update({'Authorization': 'Bearer %s' % access_token})
     return session
 
 
@@ -691,7 +696,7 @@ class ApiTrakt(object):
     @staticmethod
     def collected(username, style, trakt_data, title, account=None):
         url = get_api_url('users', username, 'collection', style + 's')
-        session = get_session(username, account=account)
+        session = get_session(account=account)
         try:
             log.debug('Opening %s' % url)
             data = session.get(url).json()
@@ -726,7 +731,7 @@ class ApiTrakt(object):
     @staticmethod
     def watched(username, style, trakt_data, title, account=None):
         url = get_api_url('users', username, 'history', style + 's', trakt_data.id)
-        session = get_session(username, account=account)
+        session = get_session(account=account)
         try:
             log.debug('Opening %s' % url)
             data = session.get(url).json()
