@@ -649,14 +649,15 @@ class ApiTrakt(object):
                 log.debug('Error refreshing show data from trakt, using cached. %s' % e)
                 return series
             raise
+        series = session.query(TraktShow).filter(TraktShow.id == trakt_show['ids']['trakt']).first()
         if series:
             series.update(trakt_show)
         else:
             series = TraktShow(trakt_show, session)
             session.add(series)
-            if title.lower() != series.title.lower():
-                log.debug('Adding search result to db')
-                session.add(TraktShowSearchResult(search=title, series=series))
+        if series and title.lower() != series.title.lower():
+            log.debug('Adding search result to db')
+            session.add(TraktShowSearchResult(search=title, series=series))
         return series
 
     @staticmethod
@@ -683,14 +684,15 @@ class ApiTrakt(object):
                 log.debug('Error refreshing movie data from trakt, using cached. %s' % e)
                 return movie
             raise
+        movie = session.query(TraktMovie).filter(TraktMovie.id == trakt_movie['ids']['trakt']).first()
         if movie:
             movie.update(trakt_movie, session)
         else:
             movie = TraktMovie(trakt_movie, session)
             session.add(movie)
-            if title.lower() != movie.title.lower():
-                log.debug('Adding search result to db')
-                session.add(TraktMovieSearchResult(search=title, movie=movie))
+        if movie and title.lower() != movie.title.lower():
+            log.debug('Adding search result to db')
+            session.add(TraktMovieSearchResult(search=title, movie=movie))
         return movie
 
     @staticmethod
