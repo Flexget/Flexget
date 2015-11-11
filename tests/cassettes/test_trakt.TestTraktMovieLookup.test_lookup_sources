@@ -1,0 +1,37 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/movies/481?extended=full
+  response:
+    body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
+        to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
+        By day he is an average computer programmer and by night a malevolent hacker
+        known as Neo, who finds himself targeted by the police when he is contacted
+        by Morpheus, a legendary computer hacker, who reveals the shocking truth about
+        our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.98181,"votes":17425,"updated_at":"2015-11-01T15:09:57.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R"}'}
+    headers:
+      cache-control: ['public, max-age=14400']
+      cf-cache-status: [HIT]
+      cf-ray: [242481dcbea337b0-ARN]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Sun, 08 Nov 2015 21:52:50 GMT']
+      etag: [W/"34da56e7db7efb7bff992fcd685ab584"]
+      expires: ['Mon, 09 Nov 2015 01:52:50 GMT']
+      last-modified: ['Sun, 01 Nov 2015 15:09:57 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=dea7d24c51c46489293e5c351588566601447019570; expires=Mon,
+          07-Nov-16 21:52:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [76835df9-ce9f-4c6c-a71c-40992fb5650b]
+      x-runtime: ['0.013182']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

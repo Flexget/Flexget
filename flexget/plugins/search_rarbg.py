@@ -7,12 +7,12 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.requests import Session, get
-from flexget.utils.search import normalize_unicode
+from flexget.utils.search import normalize_scene
 
 log = logging.getLogger('rarbg')
 
 requests = Session()
-requests.set_domain_delay('torrentapi.org', '2.1 seconds')  # they only allow 1 request per 2 seconds
+requests.set_domain_delay('torrentapi.org', '2.3 seconds')  # they only allow 1 request per 2 seconds
 
 CATEGORIES = {
     'all': 0,
@@ -117,7 +117,7 @@ class SearchRarBG(object):
             if entry.get('movie_name'):
                 params['search_imdb'] = entry.get('imdb_id')
             else:
-                query = normalize_unicode(search_string)
+                query = normalize_scene(search_string)
                 query_url_fragment = query.encode('utf8')
                 params['search_string'] = query_url_fragment
                 if config['use_tvdb']:

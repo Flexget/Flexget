@@ -1,8 +1,14 @@
+// Overrides
+$icon-font-path: "/ui/vendor/fonts";
+$fa-font-path: "/ui/vendor/fonts";  // Font-awesome override
+
+// Flexget Variables
 $header-image: "/ui/images/header.png";
 
-$icon-font-path: "/ui/vendor/fonts";
-$fa-font-path: "/ui/vendor/fonts";
+// Colors
+$flexget-orange: #FF9800 !default;
+$flexget-blue: #0091EA !default;
+$flexget-red: #F44336 !default;
 
-$brand-primary: #F6A52F !default;
-
-$spinkit-spinner-color: $brand-primary;
+$brand-primary: $flexget-orange;
+$spinkit-spinner-color: $flexget-orange;

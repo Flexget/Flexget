@@ -1,0 +1,165 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=Homeland&type=show&year=2011
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":108.583984,\"show\":{\"title\":\"Homeland\",\"overview\":\"It
+        has been 2 years since the events in Pakistan. Carrie Mathison has left the
+        CIA and is working as head of security for the philantrophic D\xFCring Foundation
+        and residing in Berlin, Germany. Two hackers from Berlin accidentally gain
+        access to the CIA network and get their hands on sensitive documents regarding
+        Germany allowing the CIA to snoop on German citizens.\",\"year\":2011,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/398/posters/original/c16513fcf1.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/398/posters/medium/c16513fcf1.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/398/posters/thumb/c16513fcf1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/398/fanarts/original/701b0475bf.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/398/fanarts/medium/701b0475bf.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/398/fanarts/thumb/701b0475bf.jpg\"}},\"ids\":{\"trakt\":1398,\"slug\":\"homeland\",\"tvdb\":247897,\"imdb\":\"tt1796960\",\"tmdb\":1407,\"tvrage\":27811}}},{\"type\":\"show\",\"score\":0.9020655,\"show\":{\"title\":\"To
+        Catch a Smuggler\",\"overview\":\"This NatGeo series follows Homeland Security
+        officers at New York City's John F. Kennedy International Airport as they
+        deal with cases ranging from fraudulent visas to human trafficking.\",\"year\":2011,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/068/989/posters/original/d81847a5ab.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/068/989/posters/medium/d81847a5ab.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/068/989/posters/thumb/d81847a5ab.jpg\"},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":68989,\"slug\":\"to-catch-a-smuggler\",\"tvdb\":264244,\"imdb\":\"tt2562174\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.26310244,\"show\":{\"title\":\"Return
+        to Tuscany\",\"overview\":\"Join Giancarlo Caldesi as he sets out to fulfil
+        his dream - a cookery school in his Tuscan homeland. But there\u2019s a lot
+        of hard work to do before he gets there\u2026After 30 years in the UK, successful
+        restaurateur Giancarlo Caldesi has decided to take a break from wet and windy
+        London for the stunning vistas and sun-drenched vineyards of the land of his
+        birth, Tuscany.But with his wedding to organise, a new cookery school in Tuscany
+        to set up and business interests to look after back in London, has he bitten
+        off more than he can chew? Plus, there\u2019s the hotel for the school to
+        renovate, a sous chef who likes a drink to deal with and staff who can\u2019t
+        even make a decent cappuccino to train.Giancarlo, a passionate and charismatic
+        native of Tuscany, and his partner Katie, a calm and elegant English rose,
+        need much more than just a hotel to offer their guests the complete Tuscan
+        experience. A good food market needs to be found, the local shops need to
+        be visited, the best ingredients sourced and there\u2019s the region\u2019s
+        vintners and pasta makers to meet. Giancarlo will have to use all the experience
+        he\u2019s built up running his London restaurants to make it work.Set against
+        a stunning landscape, there\u2019s bound to be trouble in paradise. Will Giancarlo\u2019s
+        flamboyance turn up the temperature? Can the cool breath of fresh air Katie
+        take the heat?Return to Tuscany is an endearing story of emotion, a celebration
+        and feast of Italian food, and a humorous account of a chaotic summer in Tuscany.
+        Prepare to meet the Caldesi\u2019s!\",\"year\":2011,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61349,\"slug\":\"return-to-tuscany\",\"tvdb\":222661,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}}]"}
+    headers:
+      cache-control: ['public, max-age=14400']
+      cf-cache-status: [HIT]
+      cf-ray: [24280ce317bc37b0-ARN]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 09 Nov 2015 08:12:02 GMT']
+      etag: [W/"e1f5251899759978f323886c08764df9"]
+      expires: ['Mon, 09 Nov 2015 12:12:02 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d7858467c5617c04438e6fa1e6516c3eb1447056722; expires=Tue,
+          08-Nov-16 08:12:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['3']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['1']
+      x-request-id: [16310724-a4f4-46f0-a563-84eec1e9df3a]
+      x-runtime: ['0.018365']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=d7858467c5617c04438e6fa1e6516c3eb1447056722]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/1398?extended=full
+  response:
+    body: {string: "{\"title\":\"Homeland\",\"year\":2011,\"ids\":{\"trakt\":1398,\"slug\":\"homeland\",\"tvdb\":247897,\"imdb\":\"tt1796960\",\"tmdb\":1407,\"tvrage\":27811},\"overview\":\"It
+        has been 2 years since the events in Pakistan. Carrie Mathison has left the
+        CIA and is working as head of security for the philantrophic D\xFCring Foundation
+        and residing in Berlin, Germany. Two hackers from Berlin accidentally gain
+        access to the CIA network and get their hands on sensitive documents regarding
+        Germany allowing the CIA to snoop on German citizens.\\n\",\"first_aired\":\"2011-10-02T00:00:00.000Z\",\"airs\":{\"day\":\"Sunday\",\"time\":\"21:00\",\"timezone\":\"America/New_York\"},\"runtime\":60,\"certification\":\"TV-MA\",\"network\":\"Showtime\",\"country\":\"us\",\"trailer\":\"http://youtube.com/watch?v=KyFmS3wRPCQ\",\"homepage\":null,\"status\":\"returning
+        series\",\"rating\":8.50321,\"votes\":15912,\"updated_at\":\"2015-11-08T10:31:19.000Z\",\"language\":\"en\",\"available_translations\":[\"en\",\"fr\",\"es\",\"nl\",\"pt\",\"el\",\"it\",\"de\",\"he\",\"da\",\"tr\",\"zh\",\"pl\",\"ru\",\"cs\",\"hu\",\"hr\",\"bs\",\"lt\",\"sr\"],\"genres\":[\"drama\",\"mystery\",\"thriller\",\"crime\",\"suspense\"],\"aired_episodes\":53}"}
+    headers:
+      cache-control: ['public, max-age=14400']
+      cf-cache-status: [HIT]
+      cf-ray: [24280ce377c037b0-ARN]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 09 Nov 2015 08:12:02 GMT']
+      etag: [W/"887fca1674ada755904a703d58233c4d"]
+      expires: ['Mon, 09 Nov 2015 12:12:02 GMT']
+      last-modified: ['Sun, 08 Nov 2015 10:31:19 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [051c054d-1b2a-4343-a14e-473b51fcf12a]
+      x-runtime: ['0.010374']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/1398/seasons/2/episodes/1/?extended=full
+  response:
+    body: {string: !!python/unicode '{"season":2,"number":1,"title":"The Smile","ids":{"trakt":74308,"tvdb":4303747,"imdb":null,"tmdb":63712,"tvrage":0},"number_abs":null,"overview":"Months
+        after undergoing Electroconvulsive Therapy, former CIA case officer Carrie
+        Mathison has found a modicum of peace in her family''s suburban embrace. But
+        the strides she''s made towards mental health are threatened when an asset
+        from her former life comes in from the cold. Meanwhile, freshman Congressman
+        Nick Brody discovers that Abu Nazir may not be content with his nonviolent
+        approach to affecting change in American foreign policy. Brody''s daughter
+        Dana lets a vital secret slip.","rating":8.11889,"votes":1329,"first_aired":"2012-10-01T01:00:00.000Z","updated_at":"2015-11-09T07:41:34.000Z","available_translations":[]}'}
+    headers:
+      cache-control: ['public, max-age=14400']
+      cf-cache-status: [HIT]
+      cf-ray: [24280ce4b0c005b5-ARN]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 09 Nov 2015 08:12:02 GMT']
+      expires: ['Mon, 09 Nov 2015 12:12:02 GMT']
+      last-modified: ['Mon, 09 Nov 2015 07:41:34 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=de92627ed00fa8e7a8f5ac2bfe2c2c3ed1447056722; expires=Tue,
+          08-Nov-16 08:12:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [d61fa37c-6bdc-4735-a6bf-5cb56fa708ef]
+      x-runtime: ['0.010095']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/users/flexgettest/collection/shows
+  response:
+    body: {string: !!python/unicode '[{"last_collected_at":"2012-10-01T02:00:00.000Z","show":{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811}},"seasons":[{"number":2,"episodes":[{"number":1,"collected_at":"2012-10-01T02:00:00.000Z"}]}]}]'}
+    headers:
+      cache-control: ['max-age=0, private, must-revalidate']
+      cf-ray: [24280ce6136437b0-ARN]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Mon, 09 Nov 2015 08:12:03 GMT']
+      etag: [W/"23ece474acbd407d8765725009e19355"]
+      last-modified: ['Mon, 09 Nov 2015 07:43:00 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d7858467c5617c04438e6fa1e6516c3eb1447056722; expires=Tue,
+          08-Nov-16 08:12:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [b0153749-e35f-4307-9161-222b8bc0a9eb]
+      x-runtime: ['0.008694']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

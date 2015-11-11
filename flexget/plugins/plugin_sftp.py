@@ -7,7 +7,6 @@ import os
 import posixpath
 from functools import partial
 import time
-
 from flexget import plugin
 from flexget.event import event
 from flexget.entry import Entry
@@ -17,7 +16,7 @@ from flexget.utils.template import render_from_entry, RenderError
 log = logging.getLogger('sftp')
 
 ConnectionConfig = namedtuple('ConnectionConfig', ['host', 'port', 'username', 'password',
-                              'private_key', 'private_key_pass'])
+                                                   'private_key', 'private_key_pass'])
 
 # retry configuration contants
 CONNECT_TRIES = 3
@@ -27,10 +26,11 @@ SOCKET_TIMEOUT = 15
 
 # make separate path instances for local vs remote path styles
 localpath = os.path
-remotepath = posixpath # pysftp uses POSIX style paths
+remotepath = posixpath  # pysftp uses POSIX style paths
 
 try:
     import pysftp
+
     logging.getLogger("paramiko").setLevel(logging.ERROR)
 except:
     pysftp = None
@@ -47,7 +47,7 @@ def sftp_connect(conf):
     while not sftp:
         try:
             sftp = pysftp.Connection(host=conf.host, username=conf.username,
-                                     private_key=conf.private_key, password=conf.password, 
+                                     private_key=conf.private_key, password=conf.password,
                                      port=conf.port, private_key_pass=conf.private_key_pass)
             sftp.timeout = SOCKET_TIMEOUT
             log.verbose('Connected to %s' % conf.host)
@@ -56,12 +56,12 @@ def sftp_connect(conf):
                 raise e
             else:
                 log.debug('Caught exception: %s' % e)
-                log.warn('Failed to connect to %s; waiting %d seconds before retrying.' % 
+                log.warn('Failed to connect to %s; waiting %d seconds before retrying.' %
                          (conf.host, retry_interval))
                 time.sleep(retry_interval)
                 tries -= 1
                 retry_interval += RETRY_STEP
-    
+
     return sftp
 
 
@@ -77,7 +77,7 @@ def sftp_from_config(config):
     private_key_pass = config['private_key_pass']
 
     conn_conf = ConnectionConfig(host, port, username, password, private_key, private_key_pass)
-        
+
     try:
         sftp = sftp_connect(conn_conf)
     except Exception as e:
@@ -92,7 +92,7 @@ def sftp_prefix(config):
     """
     login_str = ''
     port_str = ''
-    
+
     if config['username'] and config['password']:
         login_str = '%s:%s@' % (config['username'], config['password'])
     elif config['username']:
@@ -109,8 +109,8 @@ def dependency_check():
     Check if pysftp module is present
     """
     if not pysftp:
-        raise plugin.DependencyError(issued_by='sftp', 
-                                     missing='pysftp', 
+        raise plugin.DependencyError(issued_by='sftp',
+                                     missing='pysftp',
                                      message='sftp plugin requires the pysftp Python module.')
 
 
@@ -172,7 +172,7 @@ class SftpList(object):
         config.setdefault('password', None)
         config.setdefault('private_key', None)
         config.setdefault('private_key_pass', None)
-        config.setdefault('dirs', ['.'])    
+        config.setdefault('dirs', ['.'])
 
         return config
 
@@ -188,10 +188,12 @@ class SftpList(object):
         files_only = config['files_only']
         recursive = config['recursive']
         get_size = config['get_size']
+        private_key = config['private_key']
+        private_key_pass = config['private_key_pass']
         dirs = config['dirs']
         if not isinstance(dirs, list):
             dirs = [dirs]
-        
+
         log.debug('Connecting to %s' % config['host'])
 
         sftp = sftp_from_config(config)
@@ -211,7 +213,7 @@ class SftpList(object):
             """
             sizes = []
 
-            def node_size(f): 
+            def node_size(f):
                 sizes.append(file_size(f))
 
             sftp.walktree(path, node_size, node_size, node_size, True)
@@ -328,14 +330,14 @@ class SftpDownload(object):
         Download a file from path to dest
         """
         dir_name = remotepath.dirname(path)
-        dest_relpath = localpath.join(*remotepath.split(path)) # convert remote path style to local style
+        dest_relpath = localpath.join(*remotepath.split(path))  # convert remote path style to local style
         destination = localpath.join(dest, dest_relpath)
         dest_dir = localpath.dirname(destination)
 
         if localpath.exists(destination):
             log.verbose('Destination file already exists. Skipping %s' % path)
             return
-        
+
         if not localpath.exists(dest_dir):
             os.makedirs(dest_dir)
 
@@ -427,7 +429,7 @@ class SftpDownload(object):
                 error = 'Failed to download directory %s (%s)' % (path, e)
                 log.error(error)
                 entry.fail(error)
-                
+
                 return
 
             if delete_origin:
@@ -530,7 +532,7 @@ class SftpUpload(object):
                 log.error('Could not render path: %s', to)
                 entry.fail(e)
                 return
-        
+
         destination = remotepath.join(to, filename)
         destination_url = urljoin(url_prefix, destination)
 
@@ -576,7 +578,7 @@ class SftpUpload(object):
         """Uploads accepted entries to the specified SFTP server."""
 
         config = self.prepare_config(config)
-        
+
         sftp = sftp_from_config(config)
         url_prefix = sftp_prefix(config)
 

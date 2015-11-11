@@ -32,7 +32,9 @@
 
   executeModule.controller('ExecuteCtrl', function ($scope, $log, tasks) {
 
-    var allTasks = [];
+    var stream, allTasks = [];
+
+    // Get a list of tasks for auto complete
     tasks.list()
       .then(function(tasks) {
         allTasks = tasks
@@ -60,7 +62,7 @@
         log: []
       };
 
-      var stream = tasks.executeStream($scope.executeTasks)
+      stream = tasks.executeStream($scope.executeTasks)
         .start(function() {
           //
         })
@@ -114,6 +116,11 @@
       }
     };
 
+    // Cancel timer and stop the stream when navigating away
+    $scope.$on("$destroy", function () {
+      if (angular.isDefined(stream)) {
+        stream.abort();
+      }
+    });
   });
-
 })();

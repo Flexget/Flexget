@@ -1,0 +1,202 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/search?query=House&type=show
+  response:
+    body: {string: "[{\"type\":\"show\",\"score\":48.116776,\"show\":{\"title\":\"House\",\"overview\":\"Go
+        deeper into the medical mysteries of House, TV's most compelling drama. Hugh
+        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
+        physician who is devoid of bedside manner. While his behavior can border on
+        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
+        that other doctors give up on. Together with his hand-picked team of young
+        medical experts, he'll do whatever it takes in the race against the clock
+        to solve the case.\",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/399/posters/original/76fae8b69b.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/399/posters/medium/76fae8b69b.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/posters/thumb/76fae8b69b.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/original/c628f24771.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/medium/c628f24771.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg\"}},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\":38.884228,\"show\":{\"title\":\"House
+        vs. House\",\"overview\":\"House vs. House is a new home makeover competition
+        series where amateur and experienced renovation teams compete for the chance
+        to win $10,000 by proving they can create the better DIY projects in their
+        home. From painting and decorating, to one-of-a-kind, imaginative projects,
+        each episode features two teams will go head-to-head in grueling challenges.
+        Tanya McQueen, a DIY design expert, and David Brian Sanders, an architect
+        and designer, will determine which team completes the most impressive transformation
+        and award the cash prize.\",\"year\":1969,\"status\":\"\",\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\":\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.369125,\"show\":{\"title\":\"Full
+        House\",\"overview\":\"Full House is an American sitcom created by Jeff Franklin
+        for ABC. The show chronicles a widowed father, who enlists his best friend
+        and his brother-in-law to help raise his three daughters. It aired from September
+        22, 1987, to May 23, 1995, broadcasting eight seasons and 192 episodes.\",\"year\":1987,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/posters/original/d58e9ca81f.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/289/posters/medium/d58e9ca81f.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/posters/thumb/d58e9ca81f.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/original/9f83d4ba78.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/medium/9f83d4ba78.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/thumb/9f83d4ba78.jpg\"}},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\",\"score\":34.369125,\"show\":{\"title\":\"House
+        Hunters\",\"overview\":\"House Hunters takes viewers behind the scenes as
+        individuals, couples and families learn what to look for and decide whether
+        or not a home is meant for them. Focusing on the emotional experience of finding
+        and purchasing a new home, each episode follows a prospective buyer and real
+        estate agent through the home-buying process, from start to finish.\",\"year\":1999,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/441/posters/original/d9d5f542d4.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/006/441/posters/medium/d9d5f542d4.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/posters/thumb/d9d5f542d4.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/original/36bdbe2817.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/medium/36bdbe2817.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/thumb/36bdbe2817.jpg\"}},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.369125,\"show\":{\"title\":\"Alpha
+        House\",\"overview\":\"Alpha House follows four senators who live together
+        in a rented house in Washington DC.Re-election battles, looming indictments,
+        parties, their Party... these senators need a drink. And a new housemate.\",\"year\":2013,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/285/posters/original/5637f1fe65.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/285/posters/medium/5637f1fe65.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/posters/thumb/5637f1fe65.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/original/e477e76c44.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/medium/e477e76c44.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/thumb/e477e76c44.jpg\"}},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\",\"score\":34.369125,\"show\":{\"title\":\"Playing
+        House\",\"overview\":\"A single-camera buddy comedy about what happens when
+        two best friends come back together, just when they need each other most.Inspired
+        by the ultra-close friendship between the series' creators and stars, \\\"Playing
+        House\\\" centers on mother to-be Maggie who asks her single and career-driven
+        best friend Emma to return home from her job overseas to attend her baby shower,
+        having no idea what\u2019s truly in store.\",\"year\":2014,\"status\":\"returning
+        series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/073/385/posters/original/43003e74db.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/073/385/posters/medium/43003e74db.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/posters/thumb/43003e74db.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/original/49c78c5d22.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/medium/49c78c5d22.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/thumb/49c78c5d22.jpg\"}},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.369125,\"show\":{\"title\":\"House
+        Husbands\",\"overview\":\"House Husbands centres around four families with
+        one thing in common, the husbands stay home to raise the children.Firass Dirani
+        plays a fallen AFL hero, struggling with the burden of family life. In the
+        midst of losing the ability to see his two twin boys (primary school age)
+        and his eight month daughter, he is offered a contract to play football again
+        in Perth. He rejects the offer made by his former manager (who is in a relationship
+        with his ex wife)\",\"year\":2012,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/posters/original/8d6ef762b1.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/043/830/posters/medium/8d6ef762b1.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/posters/thumb/8d6ef762b1.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/original/632ffeb8be.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/medium/632ffeb8be.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/thumb/632ffeb8be.jpg\"}},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.369125,\"show\":{\"title\":\"Grandma's
+        House\",\"overview\":\"TV presenter Simon Amstell plays a version of himself
+        in Grandma's House, a new six-part comedy written by Simon and his long-term
+        collaborator Dan Swimer.The series stars Simon Amstell as a TV presenter who
+        is quitting his job to try to do something more meaningful with his life.Each
+        episode is set at Grandma's house, where Simon's family regularly congregate
+        to catch up. Everything happens under the watchful eye of Grandma, who is
+        desperate to see everything going well.\",\"year\":2010,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/033/144/posters/original/8eace1ae32.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/033/144/posters/medium/8eace1ae32.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/posters/thumb/8eace1ae32.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/original/72aecb12bc.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/medium/72aecb12bc.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/thumb/72aecb12bc.jpg\"}},\"ids\":{\"trakt\":33144,\"slug\":\"grandma-s-house\",\"tvdb\":181551,\"imdb\":\"tt1706532\",\"tmdb\":33289,\"tvrage\":null}}},{\"type\":\"show\",\"score\":34.369125,\"show\":{\"title\":\"Safe
+        House\",\"overview\":\"A married couple, former detective Robert and teacher
+        Katy, are asked by close friend and police officer Mark, to turn their remote
+        Guest House into a Safe House.\",\"year\":2015,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/097/962/posters/original/c8c7453fb3.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/097/962/posters/medium/c8c7453fb3.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/097/962/posters/thumb/c8c7453fb3.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/097/962/fanarts/original/c5e28cf152.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/097/962/fanarts/medium/c5e28cf152.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/097/962/fanarts/thumb/c5e28cf152.jpg\"}},\"ids\":{\"trakt\":97962,\"slug\":\"safe-house\",\"tvdb\":294195,\"imdb\":\"tt4567314\",\"tmdb\":62452,\"tvrage\":42379}}},{\"type\":\"show\",\"score\":34.369125,\"show\":{\"title\":\"Bleak
+        House\",\"overview\":\"This stunning BBC production, starring Diana Rigg and
+        Denholm Elliott, brings to life one of Dicken's finest works, an unflinching
+        look at the absurdity of the legal profession, whose sole purpose seems to
+        be lining the pockets of lawyers.\",\"year\":null,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/267/posters/original/6842fea1eb.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/006/267/posters/medium/6842fea1eb.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/006/267/posters/thumb/6842fea1eb.jpg\"},\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/267/fanarts/original/18c0132206.jpg\",\"medium\":\"https://walter.trakt.us/images/shows/000/006/267/fanarts/medium/18c0132206.jpg\",\"thumb\":\"https://walter.trakt.us/images/shows/000/006/267/fanarts/thumb/18c0132206.jpg\"}},\"ids\":{\"trakt\":6267,\"slug\":\"bleak-house-1969\",\"tvdb\":217321,\"imdb\":\"tt0088485\",\"tmdb\":6305,\"tvrage\":null}}}]"}
+    headers:
+      cache-control: ['public, max-age=14400']
+      cf-cache-status: [HIT]
+      cf-ray: [24248190bd033798-ARN]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Sun, 08 Nov 2015 21:52:38 GMT']
+      etag: [W/"dd2da05eb5a1cafa716bbfed7d53e11b"]
+      expires: ['Mon, 09 Nov 2015 01:52:38 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=de41661ea8d75b4c09bb7fe020d195b2d1447019558; expires=Mon,
+          07-Nov-16 21:52:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-pagination-item-count: ['1476']
+      x-pagination-limit: ['10']
+      x-pagination-page: ['1']
+      x-pagination-page-count: ['148']
+      x-request-id: [8848d3b8-4c72-45e9-9beb-92ad3863d3df]
+      x-runtime: ['0.370106']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      Cookie: [__cfduid=de41661ea8d75b4c09bb7fe020d195b2d1447019558]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/1399?extended=full
+  response:
+    body: {string: !!python/unicode '{"title":"House","year":2004,"ids":{"trakt":1399,"slug":"house","tvdb":73255,"imdb":"tt0412142","tmdb":1408,"tvrage":3908},"overview":"Go
+        deeper into the medical mysteries of House, TV''s most compelling drama. Hugh
+        Laurie stars as the brilliant but sarcastic Dr. Gregory House, a maverick
+        physician who is devoid of bedside manner. While his behavior can border on
+        antisocial, Dr. House thrives on the challenge of solving the medical puzzles
+        that other doctors give up on. Together with his hand-picked team of young
+        medical experts, he''ll do whatever it takes in the race against the clock
+        to solve the case.","first_aired":"2004-11-16T00:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
+        (US)","country":"us","trailer":null,"homepage":null,"status":"ended","rating":8.8159,"votes":15182,"updated_at":"2015-10-23T10:31:03.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es","ro","cs","bs","lt"],"genres":["comedy","drama","mystery","action"],"aired_episodes":176}'}
+    headers:
+      cache-control: ['public, max-age=14400']
+      cf-cache-status: [HIT]
+      cf-ray: [242481913d0b3798-ARN]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Sun, 08 Nov 2015 21:52:38 GMT']
+      etag: [W/"7d770f6ac647928ba53b0880c059a536"]
+      expires: ['Mon, 09 Nov 2015 01:52:38 GMT']
+      last-modified: ['Fri, 23 Oct 2015 10:31:03 GMT']
+      server: [cloudflare-nginx]
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [0ed8691c-3b39-4617-bd97-2f3f415da363]
+      x-runtime: ['0.017012']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Content-Type: [!!python/unicode application/json]
+      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+      trakt-api-version: [2]
+    method: GET
+    uri: https://api-v2launch.trakt.tv/shows/1399/people
+  response:
+    body: {string: !!python/unicode '{"cast":[{"character":"Dr. Gregory House","person":{"name":"Hugh
+        Laurie","ids":{"trakt":297390,"slug":"hugh-laurie","imdb":"nm0491402","tmdb":41419,"tvrage":30836}}},{"character":"Robert
+        Chase","person":{"name":"Jesse Spencer","ids":{"trakt":429766,"slug":"jesse-spencer-5ede7178-b889-4092-bdc8-08a1e57de572","imdb":"nm0817980","tmdb":41422,"tvrage":31685}}},{"character":"Allison
+        Cameron","person":{"name":"Jennifer Morrison","ids":{"trakt":414513,"slug":"jennifer-morrison","imdb":"nm0607185","tmdb":41421,"tvrage":28684}}},{"character":"Eric
+        Foreman","person":{"name":"Omar Epps","ids":{"trakt":412476,"slug":"omar-epps","imdb":"nm0004898","tmdb":4987,"tvrage":null}}},{"character":"James
+        Wilson","person":{"name":"Robert Sean Leonard","ids":{"trakt":411888,"slug":"robert-sean-leonard","imdb":"nm0000494","tmdb":2692,"tvrage":31687}}},{"character":"Chris
+        Taub","person":{"name":"Peter Jacobson","ids":{"trakt":418546,"slug":"peter-jacobson","imdb":"nm0414907","tmdb":31514,"tvrage":4259}}},{"character":"Thirteen","person":{"name":"Olivia
+        Wilde","ids":{"trakt":421662,"slug":"olivia-wilde","imdb":"nm1312575","tmdb":59315,"tvrage":51856}}},{"character":"Jessica
+        Adams","person":{"name":"Odette Annable","ids":{"trakt":421384,"slug":"odette-annable","imdb":"nm0951148","tmdb":51992,"tvrage":57233}}},{"character":"Chi
+        Park","person":{"name":"Charlyne Yi","ids":{"trakt":419887,"slug":"charlyne-yi","imdb":"nm2304722","tmdb":93285,"tvrage":182394}}},{"character":"Dr.
+        Amber Volakis","person":{"name":"Anne Dudek","ids":{"trakt":417236,"slug":"anne-dudek","imdb":"nm0240043","tmdb":24198,"tvrage":29000}}},{"character":"Lawrence
+        Kutner","person":{"name":"Kal Penn","ids":{"trakt":415949,"slug":"kal-penn","imdb":"nm0671980","tmdb":53493,"tvrage":11806}}},{"character":"Rachel
+        Taub","person":{"name":"Jennifer Crystal Foley","ids":{"trakt":79432,"slug":"jennifer-crystal-foley","imdb":"nm0190571","tmdb":532890,"tvrage":18075}}},{"character":"Nurse","person":{"name":"Bobbin
+        Bergstrom","ids":{"trakt":399343,"slug":"bobbin-bergstrom","imdb":null,"tmdb":1224001,"tvrage":null}}},{"character":"Stacy
+        Warner","person":{"name":"Sela Ward","ids":{"trakt":296025,"slug":"sela-ward","imdb":"nm0000688","tmdb":6068,"tvrage":31765}}}],"crew":{"production":[{"job":"Producer","person":{"name":"Leonard
+        Dick","ids":{"trakt":399350,"slug":"leonard-dick","imdb":"nm0225272","tmdb":1223984,"tvrage":null}}},{"job":"Executive
+        Producer","person":{"name":"Bryan Singer","ids":{"trakt":413922,"slug":"bryan-singer","imdb":"nm0001741","tmdb":9032,"tvrage":31688}}},{"job":"Executive
+        Producer","person":{"name":"Gerrit van der Meer","ids":{"trakt":9787,"slug":"gerrit-van-der-meer","imdb":"nm0576182","tmdb":12256,"tvrage":null}}},{"job":"Executive
+        Producer","person":{"name":"Katie Jacobs","ids":{"trakt":436235,"slug":"katie-jacobs","imdb":"nm0414498","tmdb":41424,"tvrage":null}}},{"job":"Producer","person":{"name":"Marcy
+        Kaplan","ids":{"trakt":399351,"slug":"marcy-kaplan","imdb":"nm0438310","tmdb":1218759,"tvrage":null}}},{"job":"Executive
+        Producer","person":{"name":"Garrett Lerner","ids":{"trakt":106206,"slug":"garrett-lerner","imdb":"nm1068424","tmdb":114407,"tvrage":null}}},{"job":"Producer","person":{"name":"David
+        Hoselton","ids":{"trakt":36334,"slug":"david-hoselton","imdb":"nm0395924","tmdb":52873,"tvrage":null}}},{"job":"Producer","person":{"name":"Heel
+        and Toe Films","ids":{"trakt":399352,"slug":"heel-and-toe-films","imdb":null,"tmdb":1224005,"tvrage":null}}},{"job":"Producer","person":{"name":"Shore
+        Z Productions","ids":{"trakt":399353,"slug":"shore-z-productions","imdb":null,"tmdb":1224006,"tvrage":null}}},{"job":"Producer","person":{"name":"Bad
+        Hat Harry Productions","ids":{"trakt":399354,"slug":"bad-hat-harry-productions","imdb":null,"tmdb":1224007,"tvrage":null}}},{"job":"Executive
+        Producer","person":{"name":"Hugh Laurie","ids":{"trakt":297390,"slug":"hugh-laurie","imdb":"nm0491402","tmdb":41419,"tvrage":30836}}},{"job":"Producer","person":{"name":"John
+        Mankiewicz","ids":{"trakt":399129,"slug":"john-mankiewicz","imdb":"nm0542535","tmdb":1222278,"tvrage":31715}}},{"job":"Producer","person":{"name":"Greg
+        Yaitanes","ids":{"trakt":399355,"slug":"greg-yaitanes","imdb":"nm0944981","tmdb":1216738,"tvrage":8433}}},{"job":"Executive
+        Producer","person":{"name":"Lawrence Kaplow","ids":{"trakt":399356,"slug":"lawrence-kaplow","imdb":"nm0438432","tmdb":1223963,"tvrage":31697}}},{"job":"Producer","person":{"name":"David
+        Semel","ids":{"trakt":431170,"slug":"david-semel","imdb":"nm0783751","tmdb":17272,"tvrage":2478}}},{"job":"Producer","person":{"name":"Marcy
+        G. Kaplan","ids":{"trakt":399357,"slug":"marcy-g-kaplan","imdb":"nm0438309","tmdb":1224008,"tvrage":null}}},{"job":"Producer","person":{"name":"Liz
+        Friedman","ids":{"trakt":436909,"slug":"liz-friedman","imdb":"nm0295286","tmdb":1218783,"tvrage":null}}},{"job":"Producer","person":{"name":"Matt
+        Witten","ids":{"trakt":399358,"slug":"matt-witten","imdb":"nm0936976","tmdb":1212236,"tvrage":null}}},{"job":"Executive
+        Producer","person":{"name":"Daniel Sackheim","ids":{"trakt":414782,"slug":"daniel-sackheim","imdb":"nm0755261","tmdb":12632,"tvrage":null}}},{"job":"Executive
+        Producer","person":{"name":"David Shore","ids":{"trakt":434876,"slug":"david-shore","imdb":"nm0794914","tmdb":169061,"tvrage":17176}}},{"job":"Producer","person":{"name":"Peter
+        Blake","ids":{"trakt":399346,"slug":"peter-blake-5cd380a9-d696-46d4-84cc-b862c5b2e6b3","imdb":"nm0086694","tmdb":1223964,"tvrage":null}}},{"job":"Executive
+        Producer","person":{"name":"Eli Attie","ids":{"trakt":398540,"slug":"eli-attie","imdb":"nm1108368","tmdb":1219508,"tvrage":48322}}},{"job":"Executive
+        Producer","person":{"name":"Thomas L. Moran","ids":{"trakt":399347,"slug":"thomas-l-moran","imdb":"nm0602981","tmdb":1223966,"tvrage":31719}}},{"job":"Executive
+        Producer","person":{"name":"Russel Friend","ids":{"trakt":399348,"slug":"russel-friend","imdb":"nm1068423","tmdb":1213567,"tvrage":null}}},{"job":"Executive
+        Producer","person":{"name":"Doris Egan","ids":{"trakt":92689,"slug":"doris-egan","imdb":"nm0250668","tmdb":169466,"tvrage":null}}},{"job":"Executive
+        Producer","person":{"name":"Paul Attanasio","ids":{"trakt":2009,"slug":"paul-attanasio","imdb":"nm0001921","tmdb":45543,"tvrage":71428}}},{"job":"Executive
+        Producer","person":{"name":"Deran Sarafian","ids":{"trakt":423098,"slug":"deran-sarafian","imdb":"nm0764776","tmdb":45645,"tvrage":25344}}}],"writing":[{"job":"Writer","person":{"name":"Kath
+        Lingenfelter","ids":{"trakt":399359,"slug":"kath-lingenfelter","imdb":null,"tmdb":1224003,"tvrage":null}}},{"job":"Writer","person":{"name":"Pam
+        Davis","ids":{"trakt":155851,"slug":"pam-davis","imdb":"nm0205247","tmdb":1224002,"tvrage":null}}},{"job":"Writer","person":{"name":"Marqui
+        Jackson","ids":{"trakt":399345,"slug":"marqui-jackson","imdb":null,"tmdb":1224004,"tvrage":null}}}]}}'}
+    headers:
+      cache-control: ['public, max-age=14400']
+      cf-cache-status: [REVALIDATED]
+      cf-ray: [242481926a800a48-ARN]
+      connection: [keep-alive]
+      content-type: [application/json; charset=utf-8]
+      date: ['Sun, 08 Nov 2015 21:52:38 GMT']
+      etag: [W/"831cbad32726f8d77184a261d9906741"]
+      expires: ['Mon, 09 Nov 2015 01:52:38 GMT']
+      server: [cloudflare-nginx]
+      set-cookie: ['__cfduid=d75ea0741a32cc77d412a8c36318a8e461447019558; expires=Mon,
+          07-Nov-16 21:52:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
+      vary: [Accept-Encoding]
+      x-content-type-options: [nosniff]
+      x-frame-options: [SAMEORIGIN]
+      x-request-id: [ede9f7e5-0848-4400-b351-871307a2a430]
+      x-runtime: ['0.028663']
+      x-xss-protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1

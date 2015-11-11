@@ -3,6 +3,7 @@ import logging
 import threading
 import hashlib
 import random
+import socket
 
 from sqlalchemy import Column, Integer, Unicode
 
@@ -71,7 +72,7 @@ def get_secret(session=None):
 
 
 class User(Base, UserMixin):
-    """ User class avaliable for flask apps to handle authentication using flask_login """
+    """ User class available for flask apps to handle authentication using flask_login """
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
@@ -186,10 +187,17 @@ class WebServer(threading.Thread):
 
         d = wsgiserver.WSGIPathInfoDispatcher(apps)
         self.server = wsgiserver.CherryPyWSGIServer((self.bind, self.port), d)
+
+        try:
+            host = self.bind if self.bind != "0.0.0.0" else socket.gethostbyname(socket.gethostname())
+        except socket.gaierror:
+            host = '127.0.0.1'
+
+        log.info('Web interface available at http://%s:%s' % (host, self.port))
+
         self.server.start()
 
     def run(self):
-        log.info('Starting web server on port %s' % self.port)
         self._start_server()
 
     def stop(self):
