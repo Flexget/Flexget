@@ -254,17 +254,21 @@ class ImdbLookup(object):
     def on_task_metainfo(self, task, config):
         if not config:
             return
+        elif isinstance(config, bool):
+            headers = '' #  Do not change default user headers unless specified by user
+        else:
+            headers = config
         for entry in task.entries:
-            self.register_lazy_fields(entry, config)
+            self.register_lazy_fields(entry, headers)
 
-    def register_lazy_fields(self, entry, config=None):
-        lazy_modified = functools.partial(self.lazy_loader, config=config)
+    def register_lazy_fields(self, entry, headers=None):
+        lazy_modified = functools.partial(self.lazy_loader, headers=headers)
         entry.register_lazy_func(lazy_modified, self.field_map)
 
-    def lazy_loader(self, entry, config):
+    def lazy_loader(self, entry, headers):
         """Does the lookup for this entry and populates the entry fields."""
         try:
-            self.lookup(entry, headers=config)
+            self.lookup(entry, headers=headers)
         except plugin.PluginError as e:
             log_once(unicode(e.value).capitalize(), logger=log)
 
