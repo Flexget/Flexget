@@ -92,18 +92,31 @@ class TestTraktShowLookup(FlexGetBase):
             assert session.query(TraktShow).first().title == 'Shameless', 'should have added Shameless and' \
                                                                           'not Shameless (2011)'
 
-    # @use_vcr
-    # def test_date(self):
-    #     self.execute_task('test_date')
-    #     entry = self.task.find_entry(title='the daily show 2012-6-6')
-    #     # TODO what is the point of this test?
-    #     # assert entry.get('tvdb_id') is None, 'should not have populated trakt data'
-    #
-    # @use_vcr
-    # def test_absolute(self):
-    #     self.execute_task('test_absolute')
-    #     entry = self.task.find_entry(title='naruto 128')
-    #     # assert entry.get('tvdb_id') is None, 'should not have populated trakt data'
+    @use_vcr
+    def test_date(self):
+        self.execute_task('test_date')
+        entry = self.task.find_entry(title='the daily show 2012-6-6')
+        # Make sure show data got populated
+        assert entry.get('trakt_show_id') == 2211, 'should have populated trakt show data'
+        # We don't support lookup by date at the moment, make sure there isn't a false positive
+        if entry.get('trakt_episode_id') == 173423:
+            assert False, 'We support trakt episode lookup by date now? Great! Change this test.'
+        else:
+            assert entry.get('trakt_episode_id') is None, 'false positive for episode match, we don\'t ' \
+                                                          'support lookup by date'
+
+    @use_vcr
+    def test_absolute(self):
+        self.execute_task('test_absolute')
+        entry = self.task.find_entry(title='naruto 128')
+        # Make sure show data got populated
+        assert entry.get('trakt_show_id') == 46003, 'should have populated trakt show data'
+        # We don't support lookup by absolute number at the moment, make sure there isn't a false positive
+        if entry.get('trakt_episode_id') == 916040:
+            assert False, 'We support trakt episode lookup by absolute number now? Great! Change this test.'
+        else:
+            assert entry.get('trakt_episode_id') is None, 'false positive for episode match, we don\'t ' \
+                                                          'support lookup by absolute number'
 
     @use_vcr
     def test_lookup_actors(self):
