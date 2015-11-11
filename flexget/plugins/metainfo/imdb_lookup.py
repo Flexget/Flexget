@@ -265,8 +265,7 @@ class ImdbLookup(object):
             self.register_lazy_fields(entry, headers)
 
     def register_lazy_fields(self, entry, headers=None):
-        lazy_modified = functools.partial(self.lazy_loader, headers=headers)
-        entry.register_lazy_func(lazy_modified, self.field_map)
+        entry.register_lazy_func(self.lazy_loader, self.field_map)
 
     def lazy_loader(self, entry, headers):
         """Does the lookup for this entry and populates the entry fields."""
