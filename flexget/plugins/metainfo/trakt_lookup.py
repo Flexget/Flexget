@@ -162,7 +162,7 @@ class PluginTraktLookup(object):
             try:
                 series = lookup_series(**lookupargs)
             except LookupError as e:
-                log.debug(e.message)
+                log.debug(e.args[0])
             else:
                 entry.update_using_map(self.series_map, series)
         return entry
@@ -175,7 +175,7 @@ class PluginTraktLookup(object):
             try:
                 series = lookup_series(**lookupargs)
             except LookupError as e:
-                log.debug(e.message)
+                log.debug(e.args[0])
             else:
                 entry.update_using_map(self.series_actor_map, series)
         return entry
@@ -207,7 +207,7 @@ class PluginTraktLookup(object):
             try:
                 movie = lookup_movie(**lookupargs)
             except LookupError as e:
-                log.debug(e.message)
+                log.debug(e.args[0])
             else:
                 entry.update_using_map(self.movie_map, movie)
         return entry
@@ -220,7 +220,7 @@ class PluginTraktLookup(object):
             try:
                 movie = lookup_movie(**lookupargs)
             except LookupError as e:
-                log.debug(e.message)
+                log.debug(e.args[0])
             else:
                 entry.update_using_map(self.movie_actor_map, movie)
         return entry
@@ -243,7 +243,7 @@ class PluginTraktLookup(object):
                 collected = ApiTrakt.collected(config['username'], style, item, entry.get('title'),
                                                account=config.get('account'))
             except LookupError as e:
-                log.debug(e.message)
+                log.debug(e.args[0])
             else:
                 entry['trakt_collected'] = collected
         return entry
@@ -266,7 +266,7 @@ class PluginTraktLookup(object):
                 watched = ApiTrakt.watched(config['username'], style, item, entry.get('title'),
                                            account=config.get('account'))
             except LookupError as e:
-                log.debug(e.message)
+                log.debug(e.args[0])
             else:
                 entry['trakt_watched'] = watched
         return entry
