@@ -1,14 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import difflib
 import logging
 import re
 
 from bs4.element import Tag
 
-from flexget.utils.soup import get_soup
-from flexget.utils.requests import Session
-from flexget.utils.tools import str_to_int
 from flexget.plugin import get_plugin_by_name
+from flexget.utils.requests import Session
+from flexget.utils.soup import get_soup
+from flexget.utils.tools import str_to_int
 
 log = logging.getLogger('utils.imdb')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
@@ -47,7 +48,6 @@ def make_url(imdb_id):
 
 
 class ImdbSearch(object):
-
     def __init__(self):
         # de-prioritize aka matches a bit
         self.aka_weight = 0.95
@@ -226,11 +226,11 @@ class ImdbParser(object):
     def __str__(self):
         return '<ImdbParser(name=%s,imdb_id=%s)>' % (self.name, self.imdb_id)
 
-    def parse(self, imdb_id):
+    def parse(self, imdb_id, headers):
         self.imdb_id = extract_id(imdb_id)
         url = make_url(self.imdb_id)
         self.url = url
-        page = requests.get(url)
+        page = requests.get(url, headers=headers)
         soup = get_soup(page.text)
 
         # get photo
