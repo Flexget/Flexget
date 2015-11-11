@@ -297,8 +297,8 @@ class TraktEpisode(Base):
         self.tmdb_id = trakt_episode['ids']['tmdb']
         self.tvrage_id = trakt_episode['ids']['tvrage']
         self.tvdb_id = trakt_episode['ids']['tvdb']
-        self.first_aired = dateutil_parse(trakt_episode.get('first_aired'))
-        self.updated_at = dateutil_parse(trakt_episode.get('updated_at'))
+        self.first_aired = dateutil_parse(trakt_episode.get('first_aired'), ignoretz=True)
+        self.updated_at = dateutil_parse(trakt_episode.get('updated_at'), ignoretz=True)
         self.cached_at = datetime.now()
 
         for col in ['title', 'season', 'number', 'number_abs', 'overview']:
@@ -356,14 +356,14 @@ class TraktShow(Base):
         self.tvrage_id = trakt_show['ids']['tvrage']
         self.tvdb_id = trakt_show['ids']['tvdb']
         if trakt_show.get('air_time'):
-            self.air_time = dateutil_parse(trakt_show.get('air_time'))
+            self.air_time = dateutil_parse(trakt_show.get('air_time'), ignoretz=True)
         else:
             self.air_time = None
         if trakt_show.get('first_aired'):
-            self.first_aired = dateutil_parse(trakt_show.get('first_aired'))
+            self.first_aired = dateutil_parse(trakt_show.get('first_aired'), ignoretz=True)
         else:
             self.first_aired = None
-        self.updated_at = dateutil_parse(trakt_show.get('updated_at'))
+        self.updated_at = dateutil_parse(trakt_show.get('updated_at'), ignoretz=True)
 
         for col in ['overview', 'runtime', 'rating', 'votes', 'language', 'title', 'year', 'air_day',
                     'runtime', 'certification', 'network', 'country', 'status', 'aired_episodes']:
@@ -460,8 +460,8 @@ class TraktMovie(Base):
         for col in ['title', 'overview', 'runtime', 'rating', 'votes', 'language', 'tagline', 'year']:
             setattr(self, col, trakt_movie.get(col))
         if self.released:
-            self.released = dateutil_parse(trakt_movie.get('released'))
-        self.updated_at = dateutil_parse(trakt_movie.get('updated_at'))
+            self.released = dateutil_parse(trakt_movie.get('released'), ignoretz=True)
+        self.updated_at = dateutil_parse(trakt_movie.get('updated_at'), ignoretz=True)
         self.genres[:] = get_db_genres(trakt_movie.get('genres', []), session)
         self.cached_at = datetime.now()
 
