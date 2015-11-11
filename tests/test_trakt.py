@@ -180,7 +180,8 @@ class TestTraktWatchedAndCollected(FlexGetBase):
             trakt_lookup:
                 username: flexgettest
             mock:
-              - {title: 'Hawaii.Five-0.S04E13.HDTV-FlexGet'}
+              - title: Hawaii.Five-0.S04E13.HDTV-FlexGet
+              - title: The.Flash.2014.S01E10.HDTV-FlexGet
             if:
               - trakt_watched: accept
           test_trakt_collected:
@@ -188,21 +189,24 @@ class TestTraktWatchedAndCollected(FlexGetBase):
             trakt_lookup:
                username: flexgettest
             mock:
-              - {title: 'Homeland.2011.S02E01.HDTV-FlexGet'}
+              - title: Homeland.2011.S02E01.HDTV-FlexGet
+              - title: The.Flash.2014.S01E10.HDTV-FlexGet
             if:
               - trakt_collected: accept
           test_trakt_watched_movie:
             trakt_lookup:
                 username: flexgettest
             mock:
-              - {title: 'Inside.Out.2015.1080p.BDRip-FlexGet'}
+              - title: Inside.Out.2015.1080p.BDRip-FlexGet
+              - title: The.Matrix.1999.1080p.BDRip-FlexGet
             if:
               - trakt_watched: accept
           test_trakt_collected_movie:
             trakt_lookup:
               username: flexgettest
             mock:
-              - {title: 'Inside.Out.2015.1080p.BDRip-FlexGet'}
+              - title: Inside.Out.2015.1080p.BDRip-FlexGet
+              - title: The.Matrix.1999.1080p.BDRip-FlexGet
             if:
               - trakt_collected: accept
     """
