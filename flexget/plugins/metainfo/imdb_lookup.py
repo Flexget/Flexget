@@ -23,23 +23,22 @@ Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
 # association tables
 genres_table = Table('imdb_movie_genres', Base.metadata,
-    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
-    Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'))
+                     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+                     Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
+                     Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'))
 
 actors_table = Table('imdb_movie_actors', Base.metadata,
-    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('actor_id', Integer, ForeignKey('imdb_actors.id')),
-    Index('ix_imdb_movie_actors', 'movie_id', 'actor_id'))
+                     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+                     Column('actor_id', Integer, ForeignKey('imdb_actors.id')),
+                     Index('ix_imdb_movie_actors', 'movie_id', 'actor_id'))
 
 directors_table = Table('imdb_movie_directors', Base.metadata,
-    Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
-    Column('director_id', Integer, ForeignKey('imdb_directors.id')),
-    Index('ix_imdb_movie_directors', 'movie_id', 'director_id'))
+                        Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
+                        Column('director_id', Integer, ForeignKey('imdb_directors.id')),
+                        Index('ix_imdb_movie_directors', 'movie_id', 'director_id'))
 
 
 class Movie(Base):
-
     __tablename__ = 'imdb_movies'
 
     id = Column(Integer, primary_key=True)
@@ -89,7 +88,6 @@ class Movie(Base):
 
 
 class MovieLanguage(Base):
-
     __tablename__ = 'imdb_movie_languages'
 
     movie_id = Column(Integer, ForeignKey('imdb_movies.id'), primary_key=True)
@@ -104,7 +102,6 @@ class MovieLanguage(Base):
 
 
 class Language(Base):
-
     __tablename__ = 'imdb_languages'
 
     id = Column(Integer, primary_key=True)
@@ -115,7 +112,6 @@ class Language(Base):
 
 
 class Genre(Base):
-
     __tablename__ = 'imdb_genres'
 
     id = Column(Integer, primary_key=True)
@@ -126,7 +122,6 @@ class Genre(Base):
 
 
 class Actor(Base):
-
     __tablename__ = 'imdb_actors'
 
     id = Column(Integer, primary_key=True)
@@ -139,7 +134,6 @@ class Actor(Base):
 
 
 class Director(Base):
-
     __tablename__ = 'imdb_directors'
 
     id = Column(Integer, primary_key=True)
@@ -152,7 +146,6 @@ class Director(Base):
 
 
 class SearchResult(Base):
-
     __tablename__ = 'imdb_search'
 
     id = Column(Integer, primary_key=True)
@@ -172,6 +165,7 @@ class SearchResult(Base):
 
     def __repr__(self):
         return '<SearchResult(title=%s,url=%s,fails=%s)>' % (self.title, self.url, self.fails)
+
 
 log = logging.getLogger('imdb_lookup')
 
@@ -251,21 +245,22 @@ class ImdbLookup(object):
         'movie_name': 'title',
         'movie_year': 'year'}
 
-    schema = {'type': 'boolean'}
+    schema = {'oneof': [{'type': 'boolean'}, {'type': 'string'}]}
 
     @plugin.priority(130)
     def on_task_metainfo(self, task, config):
         if not config:
             return
         elif isinstance(config, bool):
-            headers = '' #  Do not change default user headers unless specified by user
+            headers = ''  # Do not change default user headers unless specified by user
         else:
-            headers = config
+            headers = {'Accept-Language': config}
         for entry in task.entries:
             self.register_lazy_fields(entry, headers)
 
-    def register_lazy_fields(self, entry, headers=None):
-        entry.register_lazy_func(self.lazy_loader, self.field_map)
+    def register_lazy_fields(self, entry, headers):
+        lazy_modified = functools.partial(self.lazy_loader, headers=headers)
+        entry.register_lazy_func(lazy_modified, self.field_map)
 
     def lazy_loader(self, entry, headers):
         """Does the lookup for this entry and populates the entry fields."""
@@ -313,7 +308,7 @@ class ImdbLookup(object):
 
     @plugin.internet(log)
     @with_session
-    def lookup(self, entry, search_allowed=True, session=None):
+    def lookup(self, entry, search_allowed=True, session=None, headers=None):
         """
         Perform imdb lookup for entry.
 
@@ -344,7 +339,7 @@ class ImdbLookup(object):
                 entry['imdb_url'] = make_url(imdb_id)
             else:
                 log.debug('imdb url %s is invalid, removing it' % entry['imdb_url'])
-                del(entry['imdb_url'])
+                del (entry['imdb_url'])
 
         # no imdb_url, check if there is cached result for it or if the
         # search is known to fail
@@ -409,7 +404,7 @@ class ImdbLookup(object):
         else:
             log.verbose('Parsing imdb for `%s`' % entry['imdb_id'])
         try:
-            movie = self._parse_new_movie(entry['imdb_url'], session)
+            movie = self._parse_new_movie(entry['imdb_url'], session, headers)
         except UnicodeDecodeError:
             log.error('Unable to determine encoding for %s. Installing chardet library may help.' %
                       entry['imdb_url'])
@@ -431,7 +426,7 @@ class ImdbLookup(object):
         # Update the entry fields
         entry.update_using_map(self.field_map, movie)
 
-    def _parse_new_movie(self, imdb_url, session):
+    def _parse_new_movie(self, imdb_url, session, headers):
         """
         Get Movie object by parsing imdb page and save movie into the database.
 
@@ -440,7 +435,7 @@ class ImdbLookup(object):
         :return: Newly added Movie
         """
         parser = ImdbParser()
-        parser.parse(imdb_url)
+        parser.parse(imdb_url, headers)
         # store to database
         movie = Movie()
         movie.photo = parser.photo
