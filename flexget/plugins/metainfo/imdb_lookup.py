@@ -253,19 +253,21 @@ class ImdbLookup(object):
             return
         elif isinstance(config, bool):
             headers = ''  # Do not change default user headers unless specified by user
+            force_name = False
         else:
             headers = {'Accept-Language': config}
+            force_name = True
         for entry in task.entries:
-            self.register_lazy_fields(entry, headers)
+            self.register_lazy_fields(entry, headers, force_name)
 
-    def register_lazy_fields(self, entry, headers):
-        lazy_modified = functools.partial(self.lazy_loader, headers=headers)
+    def register_lazy_fields(self, entry, headers, force_name):
+        lazy_modified = functools.partial(self.lazy_loader, headers=headers, force_name=force_name)
         entry.register_lazy_func(lazy_modified, self.field_map)
 
-    def lazy_loader(self, entry, headers):
+    def lazy_loader(self, entry, headers, force_name):
         """Does the lookup for this entry and populates the entry fields."""
         try:
-            self.lookup(entry, headers=headers)
+            self.lookup(entry, headers=headers, force_name=force_name)
         except plugin.PluginError as e:
             log_once(unicode(e.value).capitalize(), logger=log)
 
@@ -308,7 +310,7 @@ class ImdbLookup(object):
 
     @plugin.internet(log)
     @with_session
-    def lookup(self, entry, search_allowed=True, session=None, headers=None):
+    def lookup(self, entry, search_allowed=True, session=None, headers=None, force_name=False):
         """
         Perform imdb lookup for entry.
 
@@ -425,6 +427,8 @@ class ImdbLookup(object):
 
         # Update the entry fields
         entry.update_using_map(self.field_map, movie)
+        if force_name and entry.get('imdb_original_name'):
+            entry['title'] = entry['movie_name']
 
     def _parse_new_movie(self, imdb_url, session, headers):
         """
