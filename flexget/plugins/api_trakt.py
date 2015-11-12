@@ -651,7 +651,7 @@ class ApiTrakt(object):
             raise
         series = session.query(TraktShow).filter(TraktShow.id == trakt_show['ids']['trakt']).first()
         if series:
-            series.update(trakt_show)
+            series.update(trakt_show, session)
         else:
             series = TraktShow(trakt_show, session)
             session.add(series)
