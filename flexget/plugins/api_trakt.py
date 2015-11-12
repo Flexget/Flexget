@@ -764,6 +764,14 @@ class ApiTrakt(object):
         return watched
 
 
+def delete_account(account):
+    with Session() as session:
+        acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == account).first()
+        if not acc:
+            raise plugin.PluginError('Account %s not found.' % account)
+        session.delete(acc)
+
+
 def do_cli(manager, options):
     if options.action == 'auth':
         if not (options.account and options.pin):
@@ -805,6 +813,16 @@ def do_cli(manager, options):
             return
         except plugin.PluginError as e:
             console('Authorization failed: %s' % e)
+    elif options.action == 'delete':
+        if not options.account:
+            console('Please specify an account')
+            return
+        try:
+            delete_account(options.account)
+            console('Successfully deleted your access token.')
+            return
+        except plugin.PluginError as e:
+            console('Deletion failed: %s' % e)
 
 
 @event('options.register')
@@ -830,6 +848,10 @@ def register_parser_arguments():
                                                            ' --account <name>')
 
     refresh_parser.add_argument('account', metavar='<account>', help=acc_text)
+
+    delete_parser = subparsers.add_parser('delete', help='delete the specified <account> name from local database')
+
+    delete_parser.add_argument('account', metavar='<account>', help=acc_text)
 
 
 @event('plugin.register')
