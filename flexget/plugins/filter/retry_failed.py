@@ -75,7 +75,7 @@ def db_cleanup(manager, session):
         query = session.query(FailedEntry)
         query = query.filter(FailedEntry.id.notin_(keep_ids))
         query = query.filter(FailedEntry.tof < datetime.now() - timedelta(days=7))
-        query.delete()
+        query.delete(synchronize_session=False)
 
 
 class PluginFailed(object):
