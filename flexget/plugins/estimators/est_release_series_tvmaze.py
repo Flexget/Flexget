@@ -41,7 +41,7 @@ class EstimatesSeriesTVMaze(object):
         kwargs['show_language'] = entry.get('language')
 
         log.debug('Searching TVMaze for airdate of {0} season {1} episode {2}'.format(kwargs['show_name'], season,
-                                                                                       episode_number))
+                                                                                      episode_number))
         for k, v in kwargs.items():
             if v:
                 log.debug('{0}: {1}'.format(k, v))
@@ -56,7 +56,7 @@ class EstimatesSeriesTVMaze(object):
             log.debug('received airdate: {0}'.format(airdate))
             return airdate
         else:
-            log.debug('No episode info obtained from TVMaze for %s season %s episode %s' % (
+            log.debug('No episode info obtained from TVMaze for {0} season {1} episode {2}'.format(
                 entry['series_name'], entry['series_season'], entry['series_episode']))
         return
 
