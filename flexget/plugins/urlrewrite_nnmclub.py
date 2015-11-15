@@ -5,6 +5,7 @@ from bs4 import BeautifulSoup
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils import requests
 
 log = logging.getLogger('nnm-club')
 
@@ -16,11 +17,21 @@ class UrlRewriteNnmClub(object):
         return entry['url'].startswith('http://nnm-club.me/forum/viewtopic.php?t=')
 
     def url_rewrite(self, task, entry):
-        html = task.requests.get(entry['url']).content
+        try:
+            r = task.requests.get(entry['url'])
+        except requests.RequestException as e:
+            log.error('Error while fetching page: %s' % e)
+            entry['url'] = None
+            return
+        html = r.content
         soup = BeautifulSoup(html)
         links = soup.findAll('a', href=True)
         magnets = filter(lambda x: x.get('href').startswith('magnet'), links)
-        entry['url'] = magnets[0] if magnets else None
+        if not magnets:
+            log.error('There is no magnet links on page (%s)' % entry['url'])
+            entry['url'] = None
+            return
+        entry['url'] = magnets[0]
 
 
 
