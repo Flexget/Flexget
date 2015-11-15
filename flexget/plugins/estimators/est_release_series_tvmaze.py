@@ -40,7 +40,7 @@ class EstimatesSeriesTVMaze(object):
         kwargs['show_country'] = entry.get('country') or entry.get('trakt_series_country')
         kwargs['show_language'] = entry.get('language')
 
-        log.debug('Searching  TVMaze for airdate of {0} season {1} episode {2}'.format(kwargs['show_name'], season,
+        log.debug('Searching TVMaze for airdate of {0} season {1} episode {2}'.format(kwargs['show_name'], season,
                                                                                        episode_number))
         for k, v in kwargs.items():
             if v:
