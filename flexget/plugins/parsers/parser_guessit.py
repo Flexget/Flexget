@@ -5,10 +5,11 @@ import logging
 import re
 import time
 
-import guessit
-from guessit.containers import PropertiesContainer, NoValidator
-from guessit.matcher import GuessFinder
-from guessit.plugins.transformers import Transformer, add_transformer
+from guessit.rules import rebulk_builder
+from guessit.api import GuessItApi
+
+from rebulk import Rebulk
+from rebulk.pattern import RePattern
 
 from flexget import plugin
 from flexget.event import event
@@ -18,32 +19,9 @@ from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedS
 
 
 log = logging.getLogger('parser_guessit')
-# Guessit debug log is a bit too verbose
-logging.getLogger('guessit').setLevel(logging.INFO)
 
-
-class GuessRegexpId(Transformer):
-    def __init__(self):
-        Transformer.__init__(self, 21)
-
-    def supported_properties(self):
-        return ['regexpId']
-
-    def guess_regexps_id(self, string, node=None, options=None):
-        container = PropertiesContainer(enhance=False, canonical_from_pattern=False)
-        for regexp in options.get("id_regexps"):
-            container.register_property('regexpId', regexp, confidence=1.0, validator=NoValidator())
-        found = container.find_properties(string, node, options)
-        return container.as_guess(found, string)
-
-    def should_process(self, mtree, options=None):
-        return options and options.get("id_regexps")
-
-    def process(self, mtree, options=None):
-        GuessFinder(self.guess_regexps_id, None, self.log, options).process_nodes(mtree.unidentified_leaves())
-
-
-add_transformer('guess_regexp_id = flexget.plugins.parsers.parser_guessit:GuessRegexpId')
+logging.getLogger('rebulk').setLevel(logging.WARNING)
+logging.getLogger('guessit').setLevel(logging.WARNING)
 
 
 class GuessitParsedEntry(ParsedEntry):
@@ -53,7 +31,7 @@ class GuessitParsedEntry(ParsedEntry):
 
     @property
     def parsed_group(self):
-        return self._guess_result.get('releaseGroup')
+        return self._guess_result.get('release_group')
 
     @property
     def parsed_type(self):
@@ -72,7 +50,7 @@ class GuessitParsedEntry(ParsedEntry):
             version = -1
         else:
             version = version - 1
-        proper_count = self._guess_result.get('properCount', 0)
+        proper_count = self._guess_result.get('proper_count', 0)
         fastsub = 'Fastsub' in self._guess_result.get('other', [])
         return version + proper_count - (5 if fastsub else 0)
 
@@ -87,7 +65,7 @@ class GuessitParsedVideoQuality(ParsedVideoQuality):
 
     @property
     def video_codec(self):
-        return self._guess_result.get('videoCodec')
+        return self._guess_result.get('video_codec')
 
     @property
     def source(self):
@@ -99,23 +77,23 @@ class GuessitParsedVideoQuality(ParsedVideoQuality):
 
     @property
     def audio_codec(self):
-        return self._guess_result.get('audioCodec')
+        return self._guess_result.get('audio_codec')
 
     @property
     def video_profile(self):
-        return self._guess_result.get('videoProfile')
+        return self._guess_result.get('video_profile')
 
     @property
     def screen_size(self):
-        return self._guess_result.get('screenSize')
+        return self._guess_result.get('screen_size')
 
     @property
     def audio_channels(self):
-        return self._guess_result.get('audioChannels')
+        return self._guess_result.get('audio_channels')
 
     @property
     def audio_profile(self):
-        return self._guess_result.get('audioProfile')
+        return self._guess_result.get('audio_profile')
 
     @property
     def old_resolution(self):
@@ -179,11 +157,11 @@ class GuessitParsedVideo(GuessitParsedEntry, ParsedVideo):
 
     @property
     def subtitle_languages(self):
-        return self._guess_result.get('subtitleLanguage')
+        return self._guess_result.get('subtitle_language')
 
     @property
     def languages(self):
-        return self._guess_result.get('Language')
+        return self._guess_result.get('language')
 
     @property
     def year(self):
@@ -207,7 +185,7 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
 
     @property
     def series(self):
-        return self._guess_result.get('series')
+        return self._guess_result.get('title')
 
     @property
     def country(self):
@@ -219,7 +197,7 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
 
     @property
     def regexp_id(self):
-        regexp_id = self._guess_result.get('regexpId')
+        regexp_id = [match.value for match in self._guess_result.matches['regexpId']]
         if isinstance(regexp_id, list):
             return '-'.join(regexp_id)
         else:
@@ -227,7 +205,7 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
 
     @property
     def title(self):
-        return self._guess_result.get('title')
+        return self._guess_result.get('episode_title')
 
     @property
     def special(self):
@@ -236,11 +214,11 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
 
     @property
     def episode_details(self):
-        return self._guess_result.get('episodeDetails')
+        return self._guess_result.get('episode_details')
 
     @property
     def episode(self):
-        episode = self._guess_result.get('episodeNumber')
+        episode = self._guess_result.get('episode')
         if episode is None and 'part' in self._guess_result and not self.date:
             return self._guess_result.get('part')
         if episode is None and self.title:
@@ -251,7 +229,7 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
 
     @property
     def episodes(self):
-        return len(self._guess_result.get('episodeList', filter(lambda x: x is not None, [self.episode])))
+        return len(self._guess_result.values_list.get('episode', []))
 
     @property
     def date(self):
@@ -270,7 +248,7 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
         if season is None and self.episode and not self.allow_seasonless:
             if 'part' in self._guess_result:
                 return 1
-            episode_raw = self._guess_result.metadata('episodeNumber').raw
+            episode_raw = self._guess_result.matches['episode'][0].initiator.raw
             if episode_raw and any(c.isalpha() and c.lower() != 'v' for c in episode_raw):
                 return 1
         return season
@@ -279,11 +257,21 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
     def valid_strict(self):
         return True
 
+def _id_regexps_function(input_string, context):
+    ret = []
+    for regexp in context.get('id_regexps'):
+        for match in RePattern(regexp, children=True).matches(input_string, context):
+            ret.append(match.span)
+    return ret
+
+_id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId', disabled=lambda context: not context.get('id_regexps'))
+
+guessit_api = GuessItApi(rebulk_builder().rebulk(_id_regexps))
 
 class ParserGuessit(object):
     def _guessit_options(self, options):
-        settings = {'name_only': True, 'clean_function': clean_value, 'allowed_languages': ['en', 'fr'],
-                    'allowed_countries': ['us', 'uk', 'gb']}
+        settings = {'name_only': True, 'allowed_languages': ['en', 'fr'], 'allowed_countries': ['us', 'uk', 'gb']}
+        # 'clean_function': clean_value
         options['episode_prefer_number'] = not options.get('identified_by') == 'ep'
         if options.get('allow_groups'):
             options['expected_group'] = options['allow_groups']
@@ -299,7 +287,8 @@ class ParserGuessit(object):
         log.debug('Parsing movie: `%s` [options: %s]', data, kwargs)
         start = time.clock()
         guessit_options = self._guessit_options(kwargs)
-        guess_result = guessit.guess_file_info(data, options=guessit_options, type='movie')
+        guessit_options['type'] = 'movie'
+        guess_result = guessit_api.guessit(data, options=guessit_options)
         parsed = GuessitParsedMovie(data, kwargs.pop('name', None), guess_result, **kwargs)
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)
@@ -310,17 +299,18 @@ class ParserGuessit(object):
         log.debug('Parsing series: `%s` [options: %s]', data, kwargs)
         guessit_options = self._guessit_options(kwargs)
         if kwargs.get('name') and not guessit_options.get('strict_name'):
-            guessit_options['expected_series'] = [kwargs['name']]
+            expected_title = kwargs['name']
+            expected_title = expected_title.replace('\'', '(?:\'|\\\'|\\\\\'|-|)?')  # apostrophe support
+            guessit_options['expected_title'] = ['re:' + expected_title]
+        if kwargs.get('id_regexps'):
+            guessit_options['id_regexps'] = kwargs.get('id_regexps')
         start = time.clock()
         # If no series name is provided, we don't tell guessit what kind of match we are looking for
         # This prevents guessit from determining that too general of matches are series
         parse_type = 'episode' if kwargs.get('name') else None
-        guess_result = guessit.guess_file_info(data, options=guessit_options, type=parse_type)
-        if guess_result.get('type') != 'episode':
-            # TODO: All other failures return an invalid parser. This is just a hack to match. Maybe exception instead?
-            class InvalidParser(object):
-                valid = False
-            return InvalidParser()
+        if parse_type:
+            guessit_options['type'] = parse_type
+        guess_result = guessit_api.guessit(data, options=guessit_options)
         parsed = GuessitParsedSerie(data, kwargs.pop('name', None), guess_result, **kwargs)
         end = time.clock()
         log.debug('Parsing result: %s (in %s ms)', parsed, (end - start) * 1000)

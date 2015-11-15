@@ -44,7 +44,7 @@ install_requires = [
     'jsonschema>=2.0',
     'tmdb3',
     'path.py',
-    'guessit>=0.9.3, <0.10.4',
+    'guessit>=2.0rc5',
     'apscheduler',
     'flask>=0.7',
     'flask-restful>=0.3.3',

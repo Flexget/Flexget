@@ -541,8 +541,8 @@ class ParserTests(object):
         assert s.episode == 5, 'failed to parse episode'
         assert s.episodes == 2, 'failed to parse episode range'
         # Test that too large a range is not accepted
-        s = self.parse(name='Something', data='Something.S04E05E09')
-        assert s.valid == False, 'large episode range should not be valid'
+        s = self.parse(name='Something', data='Something.S04E05-09')
+        assert not s.valid, 'large episode range should not be valid'
         # Make sure regular identifier doesn't have end_episode
         s = self.parse(name='Something', data='Something.S04E05')
         assert s.episodes == 1, 'should not have detected end_episode'
@@ -605,7 +605,7 @@ class ParserTests(object):
         assert s.valid
 
     def test_alternate_names(self):
-        name='The Show'
+        name = 'The Show'
         alternate_names = ['Show', 'Completely Different']
         s = self.parse('The Show S01E01', name=name, alternate_names=alternate_names)
         assert s.valid
