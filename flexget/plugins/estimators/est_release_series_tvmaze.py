@@ -48,7 +48,7 @@ class EstimatesSeriesTVMaze(object):
         try:
             tvmaze_show = get_show(**kwargs)
         except ShowNotFound as e:
-            log.warning('Could not found show on TVMaze: %s' % e)
+            log.warning('Could not found show on TVMaze: {0}'.format(e))
             return
         episode = tvmaze_show[season][episode_number]
         if episode:
