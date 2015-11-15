@@ -1,13 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
-from datetime import datetime
 import re
+from datetime import datetime
+
 from flexget import plugin
 from flexget.event import event
 
 try:
     # TODO implement TVMaze API internally
     from pytvmaze import get_show, lookup_tvrage, lookup_tvdb
+    from pytvmaze.exceptions import ShowNotFound
 except ImportError as e:
     raise plugin.PluginError('Could not import from pytvmaze')
 
@@ -19,28 +22,39 @@ class EstimatesSeriesTVMaze(object):
     def estimate(self, entry):
         if not all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
             return
-        series_name = re.sub('[()]', '', entry['series_name'])  # Remove parenthesis from year if present
+        series_name = entry['series_name']
         season = entry['series_season']
         episode_number = entry['series_episode']
-        log.verbose('Search TVMaze for airdate of %s season %s episode %s' % (series_name, season, episode_number))
-        if entry.get('tvmaze_id'):
-            log.debug('Searching via TVMaze ID')
-            tvmaze_show = get_show(int(entry.get('tvmaze_id')))
-        elif entry.get('tvdb_id'):
-            log.debug('Searching via TVDB ID')
-            tvmaze_show = get_show(int(lookup_tvdb(entry.get('tvdb_id'))['id']))
-        elif entry.get('tvrage_id'):
-            log.debug('Searching via TVRage ID')
-            tvmaze_show = get_show(int(lookup_tvdb(entry.get('tvrage_id'))['id']))
-        else:
-            log.debug('Searching via show name')
-            tvmaze_show = get_show(series_name)
-        if not tvmaze_show:
-            log.debug('TVMaze did not find match for %s' % series_name)
+        year_match = re.search('\(([\d]{4})\)', series_name)  # Gets year from title if present
+        if year_match:
+            year_match = year_match.group(1)
+
+        kwargs = {}
+        kwargs['maze_id'] = entry.get('tvmaze_id')
+        kwargs['tvdb_id'] = entry.get('tvdb_id') or entry.get('trakt_series_tvdb_id')
+        kwargs['tvrage_id'] = entry.get('tvrage_id') or entry.get('trakt_series_tvrage_id')
+        kwargs['show_name'] = re.sub('\(([\d]{4})\)', '', series_name).rstrip()  # Remove year from name if present
+        kwargs['show_year'] = entry.get('trakt_series_year') or entry.get('year') or entry.get(
+            'imdb_year') or year_match
+        kwargs['show_network'] = entry.get('network') or entry.get('trakt_series_network')
+        kwargs['show_country'] = entry.get('country') or entry.get('trakt_series_country')
+        kwargs['show_language'] = entry.get('language')
+
+        log.debug('Searching  TVMaze for airdate of {0} season {1} episode {2}'.format(kwargs['show_name'], season,
+                                                                                       episode_number))
+        for k, v in kwargs.items():
+            if v:
+                log.debug('{0}: {1}'.format(k, v))
+        try:
+            tvmaze_show = get_show(**kwargs)
+        except ShowNotFound as e:
+            log.warning('Could not found show on TVMaze: %s' % e)
             return
         episode = tvmaze_show[season][episode_number]
         if episode:
-            return datetime.strptime(episode.airdate, '%Y-%m-%d')
+            airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
+            log.debug('received airdate: {0}'.format(airdate))
+            return airdate
         else:
             log.debug('No episode info obtained from TVMaze for %s season %s episode %s' % (
                 entry['series_name'], entry['series_season'], entry['series_episode']))
