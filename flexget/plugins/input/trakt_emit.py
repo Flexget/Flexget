@@ -26,7 +26,8 @@ class TraktEmit(object):
       context: <collect|collected|watch|watched>
       list: <value>
 
-    Options username is required. Account defaults to username if not specified.
+    `account` option is required if the profile is private. `username` will default to account owner if `account` is
+    specified.
 
     """
 
