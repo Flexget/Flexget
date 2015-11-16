@@ -1,16 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
 from datetime import datetime
-
-from abc import abstractmethod, abstractproperty
-from abc import ABCMeta
-from flexget.utils.database import with_session
-from flexget.utils.log import log_once
-from sqlalchemy import (Table, Column, Integer, String, Unicode, DateTime, desc, ForeignKey)
-from sqlalchemy.orm import relation, backref
-import flexget.manager
-from flexget import db_schema, plugin
+import logging
+import urllib
 from flexget.event import event
+
+from sqlalchemy import (Table, Column, Integer, String, ForeignKey)
+from sqlalchemy.orm import relation, backref
+from flexget import db_schema
 from flexget.utils.requests import Session
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
@@ -24,7 +20,7 @@ category_term_types = Table('category_term_types', Base.metadata,
                             Column('term_type_id', Integer, ForeignKey('term_types.id')))
 
 
-@db_schema.upgrade('t411')
+@db_schema.upgrade('api_t411')
 def upgrade(ver, session):
     if ver is None:
         log.debug('Creating T411 database.')
@@ -49,6 +45,9 @@ class TermType(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     mode = Column(String)
+    terms = relation('Term',
+                     backref='type',
+                     cascade='all, delete, delete-orphan')
 
 
 class Term(Base):
@@ -56,8 +55,33 @@ class Term(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String)
     type_id = Column(Integer, ForeignKey('term_types.id'))
-    type = relation('TermType',
-                    backref='terms')
+
+
+class FriendlySearchQuery(object):
+    def __init__(self):
+        self.expression = None
+        self.category_name = None
+        self.term_names = []
+        self.max_results = 10
+
+
+class AbstractTorrentEntry(object):
+    def __init__(self):
+        self.id = None,
+        self.name = None
+        self.category_id = None
+        self.seeders = None
+        self.leechers = None
+        self.comments = None
+        self.isVerified = None
+        self.added = None
+        self.size = None
+        self.times_completed = None
+        self.owner = None
+        self.category_name = None
+        self.category_image = None
+        self.username = None
+        self.privacy = None
 
 
 T411API_DOMAIN_URL = "api.t411.in"
@@ -92,6 +116,7 @@ class T411RestClient(object):
         return self.api_token is not None
 
     def get_json(self, path):
+        log.debug(path)
         assert self.is_authenticated()
         url = self.api_template_url % path
         result = self.web_session.get(url).json()
@@ -101,7 +126,7 @@ class T411RestClient(object):
         """
         Request T411 API for retrieving categories and them
         subcategories
-        :return: **kwargs
+        :return**kwargs:
         """
         return self.get_json(T411API_CATEGORY_TREE_PATH)
 
@@ -109,12 +134,34 @@ class T411RestClient(object):
         """
         Request T411 API for retrieving term types
         and terms
-        :return: **kwargs
+        :return **kwargs:
         """
         return self.get_json(T411API_TERMS_PATH)
 
+    def search(self, query):
+        url = T411API_SEARCH_PATH
+        if query.get('expression') is not None:
+            url += query['expression']
+        url += '?'
+
+        url_params = []
+        if query.get('category_id') is not None:
+            url_params.append(('cat', query['category_id']))
+        if query.get('result_per_page') is not None:
+            url_params.append(('limit', query['result_per_page']))
+        if query.get('page_index') is not None:
+            url_params.append(('offset', query['page_index']))
+        if query.get('terms') is not None:
+            url_params.extend([('term[' + str(term_type_id) + '][]', term_id)
+                               for (term_id, term_type_id) in query['terms']])
+
+        url += urllib.urlencode(url_params)
+        return self.get_json(url)
+
 
 class T411ObjectMapper(object):
+    date_format = "%Y-%m-%d %H:%M:%S"
+
     """
     Tool class to convert JSON object from the REST client
     into object for ORM
@@ -198,6 +245,26 @@ class T411ObjectMapper(object):
 
         return category_to_term_type, term_types
 
+    def map_search_result_entry(self, json_entry):
+        result = AbstractTorrentEntry()
+        result.id = json_entry['id']
+        result.name = json_entry['name']
+        result.category_id = int(json_entry['category'])
+        result.seeders = int(json_entry['seeders'])
+        result.leechers = int(json_entry['leechers'])
+        result.comments = int(json_entry['comments'])
+        result.isVerified = json_entry['isVerified'] is '1'
+        result.added = datetime.strptime(json_entry['added'], self.date_format)
+        result.size = int(json_entry['size'])
+        result.times_completed = int(json_entry['times_completed'])
+        result.category_name = json_entry['categoryname']
+        result.category_image = json_entry['categoryimage']
+        result.privacy = json_entry['privacy']
+        if result.privacy is 'normal':
+            result.owner = int(json_entry['owner'])
+            result.username = json_entry['username']
+        return result
+
 
 class T411Proxy(object):
     """
@@ -205,7 +272,7 @@ class T411Proxy(object):
     T411 Rest Client and T411 local database.
     """
 
-    def __init__(self, username, password, session):
+    def __init__(self, session, username=None, password=None):
         """
         :param username: String
         :param password: String
@@ -214,6 +281,22 @@ class T411Proxy(object):
         self.rest_client = T411RestClient(username, password)
         self.mapper = T411ObjectMapper()
         self.session = session
+        self.__has_cached_criterias = None
+
+    def set_credentials(self, username, password):
+        self.rest_client.api_token = None
+        self.rest_client.credentials = {
+            'username': username,
+            'password': password
+        }
+
+    def has_cached_criterias(self):
+        """
+        :return: True if database contains previous version of criterias
+        """
+        if self.__has_cached_criterias is None:
+            self.__has_cached_criterias = self.session.query(Category).count() > 0
+        return self.__has_cached_criterias
 
     def synchronize_database(self):
         """
@@ -236,12 +319,10 @@ class T411Proxy(object):
         for (category_id, term_type_id) in category_to_term_type:
             category = indexed_categories.get(category_id)
             term_type = term_types.get(term_type_id)
-            if category is not None and term_type is not None:
-                category.term_types.append(term_type)
-            else:
-                log.warning('Zapp')
+            category.term_types.append(term_type)
 
         self.session.add_all(main_categories)
+        self.__has_cached_criterias = None
 
     def find_category_by_name(self, category_name):
         query = self.session.query(Category).filter(Category.name == category_name)
@@ -255,6 +336,17 @@ class T411Proxy(object):
             log.warning('None result found for a category named "%s"' % category_name)
             return None
         return category
+
+    def all_categories(self):
+        return self.session.query(Category).all()
+
+    def all_category_names(self):
+        name_query = self.session.query(Category.name).all()
+        return [name for (name,) in name_query]
+
+    def all_term_names(self):
+        name_query = self.session.query(Term.name).all()
+        return [name for (name,) in name_query]
 
     def print_categories(self):
         categories = self.session.query(Category).filter(Category.parent_id == None).all()
@@ -280,3 +372,44 @@ class T411Proxy(object):
             log.debug(formatting_main % (term_type.name, term_type.mode, term_type.id))
             for term in term_type.terms:
                 log.debug(formatting_sub % (term.name, '', term.id))
+
+    def friendly_query_to_client_query(self, friendly_query):
+        """
+        :param FriendlySearchQuery query:
+        :return (,)[]: T411RestClient.search compatible
+        """
+        client_query = {'expression': friendly_query.expression}
+
+        if friendly_query.category_name is not None:
+            (category_id,) = self.session \
+                .query(Category.id) \
+                .filter(Category.name == friendly_query.category_name) \
+                .one()
+            client_query['category_id'] = category_id
+
+            client_query['terms'] = self.session \
+                .query(Term.type_id, Term.id) \
+                .filter(Term.name.in_(friendly_query.term_names)) \
+                .filter(TermType.categories.any(Category.id == category_id)) \
+                .filter(Term.type_id == TermType.id).all()
+
+        if friendly_query.max_results is not None:
+            client_query['result_per_page'] = friendly_query.max_results
+            client_query['page_index'] = 0
+
+        return client_query
+
+    def search(self, query):
+        """
+        :param FriendlySearchQuery query:
+        :return:
+        """
+        client_query = self.friendly_query_to_client_query(query)
+        json_results = self.rest_client.search(client_query)
+        return map(self.mapper.map_search_result_entry, json_results['torrents'])
+
+
+@event('manager.db_cleanup')
+def db_cleanup(manager, session):
+    session.query(Category).delete(synchronize_session=False)
+    session.query(TermType).delete(synchronize_session=False)

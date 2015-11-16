@@ -2,10 +2,15 @@
 from __future__ import unicode_literals, division, absolute_import
 import datetime
 from __builtin__ import object
+import logging
+from flexget.manager import Session
 
-from flexget.plugins.api_t411 import T411RestClient, T411ObjectMapper
+from flexget.plugins.api_t411 import T411RestClient, T411ObjectMapper, T411Proxy, FriendlySearchQuery
+from flexget.utils.database import with_session
 from tests import use_vcr, FlexGetBase
 from flexget.plugins.cli import t411
+
+log = logging.getLogger('test_t411')
 
 
 class TestRestClient(object):
@@ -81,7 +86,7 @@ class TestObjectMapper(object):
         assert category.parent_id is None
         assert category.name == u'Film/Vidéo'
         assert len(category.sub_categories) == 10
-    
+
     def test_map_term_type_tree(self):
         tree = {
             "234": {
@@ -120,3 +125,78 @@ class TestObjectMapper(object):
             'Expected "Application - Genre", found "%s"' % term_types.get(11).name
         assert len(term_types.get(11).terms) == 7
         assert term_types.get(11).terms[0].name == "Edition multimédia"
+
+
+class MockRestClient(object):
+    def auth(self):
+        return
+
+    def is_authenticated(self):
+        return True
+
+    def retrieve_category_tree(self):
+        return {
+            "12": {  # Category ID index
+                     "id": "12",  # Category ID
+                     "pid": "0",  # Parent's catogory ID
+                     "name": "video",
+                     "cats": {  # Subcategories
+                                "13": {"id": "13", "pid": "12", "name": "films"},
+                                "14": {"id": "14", "pid": "12", "name": "cartoons"}
+                     }
+            }
+        }
+
+    def retrieve_terms_tree(self):
+        return {
+            "14": {  # Category ID
+                     "11": {  # Term type ID
+                              "type": "Application - Genre",  # Term type definition
+                              "mode": "single",
+                              "terms": {  # Terms of the term type
+                                          "123": "Antivirus",
+                                          "345": "Torrent clients"
+                              }
+                     }
+            }
+        }
+
+    def search(self, query):
+        return {
+            "query": "Mickey",
+            "total": 1,
+            "offset": 0,
+            "limit": 10,
+            "torrents": [{
+                 "id": 123123,
+                 "name": "Mickey vs Donald",
+                 "category": "14",
+                 "seeders": "11",
+                 "leechers": "2",
+                 "comments": "8",
+                 "isVerified": "1",
+                 "added": "2013-01-15 16:14:14",
+                 "size": "2670809119",
+                 "times_completed": "1256",
+                 "owner": "7589510",
+                 "categoryname": "Animation",
+                 "categoryimage": "t411-animation.png",
+                 "username": "MegaUsername",
+                 "privacy": "normal"
+             }]
+        }
+
+
+class TestProxy(FlexGetBase):
+    def test_lolcat(self):
+        proxy = T411Proxy(session=Session())
+        proxy.rest_client = MockRestClient()
+        assert not proxy.has_cached_criterias()
+        proxy.synchronize_database()
+        assert proxy.has_cached_criterias()
+        assert 'cartoons' in proxy.all_category_names()
+        query = FriendlySearchQuery()
+        query.expression = "Mickey"
+        query.category_name = "cartoons"
+        query.term_names.append("Antivirus")
+        assert proxy.search(query)[0].category_id == 14
