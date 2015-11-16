@@ -1,29 +1,24 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
+
 import datetime
-import difflib
-from socket import timeout
-from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, select, update, func
+from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType
 from sqlalchemy.orm import relation
-import tvrage.api
-import tvrage.feeds
-from tvrage.util import TvrageError
-from flexget.event import event
-from flexget.utils.database import with_session
+
 from flexget import db_schema
-from flexget.utils.database import pipe_list_synonym
-from flexget.utils.sqlalchemy_utils import table_schema
-from flexget.utils.tools import parse_timedelta
 
 log = logging.getLogger('api_tvmaze')
 
-Base = db_schema.versioned_base('tvmaze', 0)
+DB_Version = 0
+Base = db_schema.versioned_base('tvmaze', DB_Version)
 UPDATE_INTERVAL = '7 days'
 
 
 # TODO genres table?
-# todo convert 'updated' to time stamp
+# todo convert 'updated' to time stamp from epoch
 # todo when to use unicode and wehn to use string
+
 
 
 class TVMazeLookup(Base):
@@ -42,29 +37,64 @@ class TVMazeLookup(Base):
 
 class TVMazeSeries(Base):
     __tablename__ = 'tvmaze_series'
-    id = Column(Integer, primary_key=True, autoincrement=False)
-    name = Column(String)
-    episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season, TVMazeEpisodes.episode',
-                        cascade='all, delete, delete-orphan')
-    mazeid = Column(String)
-    rating = Column(String)
+
+    id = Column(Integer, primary_key=True)
+    status = Column(Unicode)
+    rating = Column(Numeric)
     genres = Column(String)
     weight = Column(Integer)
-    seasons = relation('TVMazeSeasons', order_by='TVMazeSeasons.number', cascade='all, delete, delete-orphan',
-                       backref='show')
     updated = Column(DateTime)  # last time show was updated at tvmaze
+    name = Column(String)
     language = Column(Unicode)
-    schedule = Column(String)
+    schedule = Column(PickleType)
     url = Column(String)
-    image = Column(String)
-    tvdbID = Column(Integer)
-    tvrageID = Column(Integer)
+    image = Column(PickleType)
+    externals = Column(PickleType) # Dict to tvdb & tvrage IDs
     premiered = Column(DateTime)
     summary = Column(Unicode)
-    previous_episode = relation('TVMazeEpisode', backref='show')
-    next_episode = relation('TVMazeEpisode', backref='show')
+    _links = Column(PickleType) # links to previous and next episode
     webChannel = Column(String)
     runtime = Column(Integer)
     type = Column(String)
+    maze_id = Column(String)
     network = Column(Unicode)
+    seasons = relation('TVMazeSeasons', order_by='TVMazeSeasons.number', cascade='all, delete, delete-orphan',
+                       backref='show')
+    episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season, TVMazeEpisodes.episode',
+                        cascade='all, delete, delete-orphan')
     last_update = Column(DateTime)  # last time we updated the db for the show
+
+    def __init__(self, series):
+        self.update(series)
+
+    def update(self, series):
+        self.status = series.status
+        self.rating =series.rating['average']
+        self.genres = series.genres
+        self.weight = series.weight
+        self.updated = datetime.datetime.fromtimestamp(series.updated).strftime('%Y-%m-%d %H:%M:%S')
+        self.name = series.name
+        self.language = series.language
+        self.schedule = series.scheduele
+        self.url = series.url
+        self.image = series.image
+        self.externals = series.externals
+        self.premiered = series.premiered
+        self.summary = series.summary
+        self._links = series._links
+        self.webChannel = series.webChannel
+        self.runtime = series.runtime
+        self.type = series.type
+        self.maze_id = series.maze_id
+        self.last_update = datetime.datetime.now()
+
+    def __repr__(self):
+        return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.id, self.last_update)
+
+    def __str__(self):
+        return self.name
+
+
+
+
+
