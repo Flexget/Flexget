@@ -9,8 +9,8 @@ from flexget.event import event
 
 try:
     # TODO implement TVMaze API internally
-    from pytvmaze import get_show, lookup_tvrage, lookup_tvdb
-    from pytvmaze.exceptions import ShowNotFound
+    from pytvmaze import get_show
+    from pytvmaze.exceptions import ShowNotFound, SeasonNotFound, EpisodeNotFound
 except ImportError as e:
     raise plugin.PluginError('Could not import from pytvmaze')
 
@@ -50,14 +50,17 @@ class EstimatesSeriesTVMaze(object):
         except ShowNotFound as e:
             log.warning('Could not found show on TVMaze: {0}'.format(e))
             return
-        episode = tvmaze_show[season][episode_number]
-        if episode:
+        try:
+            episode = tvmaze_show[season][episode_number]
             airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
             log.debug('received airdate: {0}'.format(airdate))
             return airdate
-        else:
-            log.debug('No episode info obtained from TVMaze for {0} season {1} episode {2}'.format(
-                entry['series_name'], entry['series_season'], entry['series_episode']))
+        except SeasonNotFound as e:
+            log.warning('Show {0} does not appear to have a season {1}: {2}'.format(series_name, season, e))
+        except EpisodeNotFound as e:
+            log.warning(
+                'Show {0} does not appear to have a season {1} and episode {2}: {3}'.format(series_name, season, e,
+                                                                                            episode_number))
         return
 
 
