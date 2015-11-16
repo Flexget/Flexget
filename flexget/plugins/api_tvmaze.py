@@ -60,8 +60,6 @@ class TVMazeSeries(Base):
     network = Column(Unicode)
     seasons = relation('TVMazeSeasons', order_by='TVMazeSeasons.number', cascade='all, delete, delete-orphan',
                        backref='show')
-    episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season, TVMazeEpisodes.episode',
-                        cascade='all, delete, delete-orphan')
     last_update = Column(DateTime)  # last time we updated the db for the show
 
     def __init__(self, series):
@@ -86,6 +84,7 @@ class TVMazeSeries(Base):
         self.runtime = series.runtime
         self.type = series.type
         self.maze_id = series.maze_id
+        self.network = series.network['name']
         self.last_update = datetime.datetime.now()
 
     def __repr__(self):
@@ -94,7 +93,21 @@ class TVMazeSeries(Base):
     def __str__(self):
         return self.name
 
+class TVMazeSeasons(Base):
+    __tablename__ = 'tvmaze_season'
+    id = Column(Integer, primary_key=True)
+    tvmaze_series_id = Column(Integer, ForeignKey('tvmaze_series.id'), nullable=False)
+    number = Column(Integer)
+    episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season, TVMazeEpisodes.episode',
+                        cascade='all, delete, delete-orphan')
+    last_update = Column(DateTime)
 
+    def __init__(self, season):
+        self.update(season)
 
+    def update(self, season):
+        self.number = season.season_number
 
-
+class TVMazeEpisodes(Base):
+    __tablename__ = 'tvmaze_epiosde'
+    id = Column(Integer, primary_key=True)
