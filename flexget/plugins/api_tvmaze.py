@@ -15,8 +15,8 @@ from flexget.utils.database import with_session
 
 log = logging.getLogger('api_tvmaze')
 
-DB_Version = 0
-Base = db_schema.versioned_base('tvmaze', DB_Version)
+DB_VERSION = 0
+Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 
 
@@ -24,7 +24,7 @@ class TVMazeGenre(Base):
     __tablename__ = 'tvmaze_genres'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(Unicode)
+    name = Column(Unicode, unique=True)
 
 
 genres_table = Table('tvmaze_series_genres', Base.metadata,
@@ -44,7 +44,7 @@ class TVMazeLookup(Base):
 class TVMazeSeries(Base):
     __tablename__ = 'tvmaze_series'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    maze_id = Column(Integer, primary_key=True)
     status = Column(Unicode)
     rating = Column(Numeric)
     genres = relation(TVMazeGenre, secondary=genres_table)
@@ -63,19 +63,17 @@ class TVMazeSeries(Base):
     webChannel = Column(String)
     runtime = Column(Integer)
     type = Column(String)
-    maze_id = Column(String)
     network = Column(Unicode)
     seasons = relation('TVMazeSeasons', order_by='TVMazeSeasons.number', cascade='all, delete, delete-orphan',
                        backref='series')
     last_update = Column(DateTime)  # last time we updated the db for the show
 
-    def __init__(self, series):
-        self.update(series)
+    def __init__(self, series, session):
+        self.update(series, session)
 
-    def update(self, series):
+    def update(self, series, session):
         self.status = series.status
         self.rating = series.rating['average']
-        self.genres = series.genres
         self.weight = series.weight
         self.updated = datetime.fromtimestamp(series.updated).strftime('%Y-%m-%d %H:%M:%S')
         self.original_name = series.name
@@ -90,7 +88,7 @@ class TVMazeSeries(Base):
         self.summary = series.summary
         self.webChannel = series.webChannel
         self.runtime = series.runtime
-        self.type = series.type
+        self.show_type = series.type
         self.maze_id = series.maze_id
         self.network = series.network['name']
         self.last_update = datetime.now()
@@ -102,8 +100,11 @@ class TVMazeSeries(Base):
 
         del self.genres[:]
         for genre in series.genres:
-            genre = TVMazeGenre(name=genre)
-            self.genres.append(genre)
+            db_genre = session.query(TVMazeGenre).filter(TVMazeGenre.name == genre).first()
+            if not db_genre:
+                db_genre = TVMazeGenre(name=genre)
+                session.add(db_genre)
+            self.genres.append(db_genre)
 
     def __repr__(self):
         return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.id, self.last_update)
