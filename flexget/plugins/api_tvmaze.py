@@ -1,12 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
+import re
 from datetime import datetime
 
-from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType
-from sqlalchemy.orm import relation
 from pytvmaze import get_show
-from pytvmaze.exceptions import *
+from pytvmaze.exceptions import ShowNotFound
+from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func
+from sqlalchemy.orm import relation
 
 from flexget import db_schema, plugin
 from flexget.event import event
@@ -16,7 +17,8 @@ log = logging.getLogger('api_tvmaze')
 
 DB_Version = 0
 Base = db_schema.versioned_base('tvmaze', DB_Version)
-UPDATE_INTERVAL = '7 days'
+UPDATE_INTERVAL = 7  # Used for expiration, number is in days
+
 
 # TODO Genres table
 
@@ -24,15 +26,9 @@ class TVMazeLookup(Base):
     __tablename__ = 'tvmaze_lookup'
 
     id = Column(Integer, primary_key=True)
-    name = Column(Unicode, index=True)
-    failed_time = Column(DateTime)
+    search_name = Column(Unicode, index=True, unique=True)
     series_id = Column(Integer, ForeignKey('tvmaze_series.id'))
-    series = relation('TVMazeSeries', uselist=False, cascade='all, delete')
-
-    def __init__(self, name, series, **kwargs):
-        super(TVMazeLookup, self).__init__(**kwargs)
-        self.name = name.lower()
-        self.series = series
+    series = relation('TVMazeSeries', backref='search_strings')
 
 
 class TVMazeSeries(Base):
@@ -44,7 +40,8 @@ class TVMazeSeries(Base):
     genres = Column(String)
     weight = Column(Integer)
     updated = Column(DateTime)  # last time show was updated at tvmaze
-    name = Column(String)
+    original_name = Column(Unicode)
+    name = Column(Unicode)
     language = Column(Unicode)
     schedule = Column(PickleType)
     url = Column(String)
@@ -53,7 +50,6 @@ class TVMazeSeries(Base):
     tvrage_id = Column(Integer)
     premiered = Column(DateTime)
     summary = Column(Unicode)
-    _links = Column(PickleType)  # links to previous and next episode
     webChannel = Column(String)
     runtime = Column(Integer)
     type = Column(String)
@@ -72,7 +68,8 @@ class TVMazeSeries(Base):
         self.genres = series.genres
         self.weight = series.weight
         self.updated = datetime.fromtimestamp(series.updated).strftime('%Y-%m-%d %H:%M:%S')
-        self.name = series.name
+        self.original_name = series.name
+        self.name = series.name.lower()
         self.language = series.language
         self.schedule = series.scheduele
         self.url = series.url
@@ -81,7 +78,6 @@ class TVMazeSeries(Base):
         self.tvrage_id = series.externals.get('tvrage')
         self.premiered = series.premiered
         self.summary = series.summary
-        self._links = series._links
         self.webChannel = series.webChannel
         self.runtime = series.runtime
         self.type = series.type
@@ -99,6 +95,13 @@ class TVMazeSeries(Base):
 
     def __str__(self):
         return self.name
+
+    @property
+    def expired(self):
+        if not self.last_update:
+            return True
+        time_dif = datetime.now() - self.last_update
+        return time_dif.days > UPDATE_INTERVAL
 
 
 class TVMazeSeasons(Base):
@@ -156,23 +159,50 @@ class TVMazeEpisodes(Base):
         self.last_update = datetime.now()
 
 
-class APITVMaze(object):
+@with_session
+def from_cache(maze_id=None, tvdb_id=None, tvrage_id=None, title=None, session=None):
+    if not any([maze_id, tvdb_id, tvrage_id, title]):
+        raise LookupError('No parameters sent for TVMaze series lookup')
+    series = None
+    if maze_id:
+        series = session.query(TVMazeSeries).filter(TVMazeSeries.maze_id == maze_id).first()
+    elif tvdb_id:
+        series = session.query(TVMazeSeries).filter(TVMazeSeries.tvdb_id == tvdb_id).first()
+    elif tvrage_id:
+        series = session.query(TVMazeSeries).filter(TVMazeSeries.tvrage_id == tvrage_id).first()
+    if not series and title:
+        series = session.query(TVMazeSeries).filter(TVMazeSeries.name == title.lower()).first()
+    if series and not series.expired:
+        return series
 
+
+@with_session
+def from_search(session=None, title=None):
+    return session.query(TVMazeLookup).filter(func.lower(TVMazeLookup.search_name) == title.lower()).first()
+
+
+class APITVMaze(object):
     @staticmethod
     @with_session
-    def series_lookup(maze_id=None, tvdb_id=None, tvrage_id=None, title=None, session=None):
-        if not any([maze_id, tvdb_id, tvrage_id, title]):
-            raise LookupError('No parameters sent for TVMaze series lookup')
-        show = None
-        if maze_id:
-            show = session.query(TVMazeSeries).filter(TVMazeSeries.maze_id == maze_id).first()
-        elif tvdb_id:
-            show = session.query(TVMazeSeries).filter(TVMazeSeries.tvdb_id == tvdb_id).first()
-        elif tvrage_id:
-            show = session.query(TVMazeSeries).filter(TVMazeSeries.tvrage_id == tvrage_id).first()
-        if not show and title:
-            show = session.query(TVMazeSeries).filter(TVMazeSeries.name == title.lower()).first()
-
+    def series_lookup(session=None, only_cached=False, **lookup_params):
+        series = from_cache(session=session, **lookup_params)
+        if series:
+            return series
+        if not series and only_cached:
+            raise LookupError('Series %s not found from cache' % lookup_params)
+        search = from_search(session=session, title=lookup_params['title'])
+        if search:
+            return search.series
+        title = lookup_params['show_name']
+        lookup_params['show_name'] = re.sub('\(([\d]{4})\)', '', title).rstrip()  # Remove year from name if present
+        try:
+            series = get_show(**lookup_params)
+        except ShowNotFound:
+            raise LookupError('Show was not found on TVMaze')
+        series = TVMazeSeries(series)
+        session.add(series)
+        session.add(TVMazeLookup(from_search=title, series=series))
+        return series
 
 
 @event('plugin.register')
