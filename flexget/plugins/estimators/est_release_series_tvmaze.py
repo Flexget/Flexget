@@ -22,7 +22,7 @@ class EstimatesSeriesTVMaze(object):
     def estimate(self, entry):
         if not all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
             return
-        series_name = entry['series_name']
+        series_name = entry['series_name'].encode('utf-8')
         season = entry['series_season']
         episode_number = entry['series_episode']
         year_match = re.search('\(([\d]{4})\)', series_name)  # Gets year from title if present
@@ -41,8 +41,8 @@ class EstimatesSeriesTVMaze(object):
         kwargs['show_language'] = entry.get('language')
 
         log.debug(
-            'Searching TVMaze for airdate of {0} season {1} episode {2}'.format(kwargs['show_name'].encode('utf-8'),
-                                                                                season, episode_number))
+            'Searching TVMaze for airdate of {0} season {1} episode {2}'.format(kwargs['show_name'], season,
+                                                                                episode_number))
         for k, v in kwargs.items():
             if v:
                 log.debug('{0}: {1}'.format(k, v))
@@ -58,11 +58,10 @@ class EstimatesSeriesTVMaze(object):
             return airdate
         except SeasonNotFound as e:
             log.debug(
-                'Show {0} does not appear to have a season {1}: {2}'.format(series_name.encode('utf-8'), season, e))
+                'Show {0} does not appear to have a season {1}: {2}'.format(series_name, season, e))
         except EpisodeNotFound as e:
             log.debug(
-                'Show {0} does not appear to have a season {1} and episode {2}: {3}'.format(series_name.encode('utf-8'),
-                                                                                            season, e,
+                'Show {0} does not appear to have a season {1} and episode {2}: {3}'.format(series_name, season, e,
                                                                                             episode_number))
         return
 
