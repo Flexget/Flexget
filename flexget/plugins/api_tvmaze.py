@@ -1,8 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import datetime
 import logging
 
-import datetime
 from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType
 from sqlalchemy.orm import relation
 
@@ -13,12 +13,6 @@ log = logging.getLogger('api_tvmaze')
 DB_Version = 0
 Base = db_schema.versioned_base('tvmaze', DB_Version)
 UPDATE_INTERVAL = '7 days'
-
-
-# TODO genres table?
-# todo convert 'updated' to time stamp from epoch
-# todo when to use unicode and wehn to use string
-
 
 
 class TVMazeLookup(Base):
@@ -49,17 +43,17 @@ class TVMazeSeries(Base):
     schedule = Column(PickleType)
     url = Column(String)
     image = Column(PickleType)
-    externals = Column(PickleType) # Dict to tvdb & tvrage IDs
+    externals = Column(PickleType)  # Dict to tvdb & tvrage IDs
     premiered = Column(DateTime)
     summary = Column(Unicode)
-    _links = Column(PickleType) # links to previous and next episode
+    _links = Column(PickleType)  # links to previous and next episode
     webChannel = Column(String)
     runtime = Column(Integer)
     type = Column(String)
     maze_id = Column(String)
     network = Column(Unicode)
     seasons = relation('TVMazeSeasons', order_by='TVMazeSeasons.number', cascade='all, delete, delete-orphan',
-                       backref='show')
+                       backref='series')
     last_update = Column(DateTime)  # last time we updated the db for the show
 
     def __init__(self, series):
@@ -67,7 +61,7 @@ class TVMazeSeries(Base):
 
     def update(self, series):
         self.status = series.status
-        self.rating =series.rating['average']
+        self.rating = series.rating['average']
         self.genres = series.genres
         self.weight = series.weight
         self.updated = datetime.datetime.fromtimestamp(series.updated).strftime('%Y-%m-%d %H:%M:%S')
@@ -93,13 +87,15 @@ class TVMazeSeries(Base):
     def __str__(self):
         return self.name
 
+
 class TVMazeSeasons(Base):
     __tablename__ = 'tvmaze_season'
+
     id = Column(Integer, primary_key=True)
     tvmaze_series_id = Column(Integer, ForeignKey('tvmaze_series.id'), nullable=False)
     number = Column(Integer)
-    episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season, TVMazeEpisodes.episode',
-                        cascade='all, delete, delete-orphan')
+    episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season', cascade='all, delete, delete-orphan',
+                        backref='season')
     last_update = Column(DateTime)
 
     def __init__(self, season):
@@ -107,7 +103,38 @@ class TVMazeSeasons(Base):
 
     def update(self, season):
         self.number = season.season_number
+        self.last_update = datetime.datetime.now()
+
 
 class TVMazeEpisodes(Base):
     __tablename__ = 'tvmaze_epiosde'
+
     id = Column(Integer, primary_key=True)
+    tvmaze_season_id = Column(Integer, ForeignKey('tvmaze_season.id'), nullable=False)
+    name = Column(Unicode)
+    airdate = Column(DateTime)
+    url = Column(String)
+    number = Column(Integer)
+    season_number = Column(Integer)
+    image = Column(String)
+    airstamp = Column(DateTime)
+    runtime = Column(Integer)
+    maze_id = Column(Integer)
+    last_update = Column(DateTime)
+
+    def __init__(self, episode):
+        self.update(episode)
+
+    def update(self, episode):
+        self.name = episode.name
+        self.airdate = datetime.datetime.strptime(episode.airdate, '%Y-%m-%d')
+        self.url = episode.url
+        self.number = episode.episode_number
+        self.season_number = episode.season_number
+        self.image = episode.image
+        self.airstamp = datetime.datetime.strptime(episode.airstamp, '%Y-%m-%dT%H:%M:%S%z')
+        self.runtime = episode.runtime
+        self.maze_id = episode.maze_id
+        self.last_update = datetime.datetime.now()
+
+
