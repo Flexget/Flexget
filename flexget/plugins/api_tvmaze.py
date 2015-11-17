@@ -18,6 +18,7 @@ DB_Version = 0
 Base = db_schema.versioned_base('tvmaze', DB_Version)
 UPDATE_INTERVAL = '7 days'
 
+# TODO Genres table
 
 class TVMazeLookup(Base):
     __tablename__ = 'tvmaze_lookup'
@@ -48,7 +49,8 @@ class TVMazeSeries(Base):
     schedule = Column(PickleType)
     url = Column(String)
     image = Column(PickleType)
-    externals = Column(PickleType)  # Dict to tvdb & tvrage IDs
+    tvdb_id = Column(Integer)
+    tvrage_id = Column(Integer)
     premiered = Column(DateTime)
     summary = Column(Unicode)
     _links = Column(PickleType)  # links to previous and next episode
@@ -75,7 +77,8 @@ class TVMazeSeries(Base):
         self.schedule = series.scheduele
         self.url = series.url
         self.image = series.image
-        self.externals = series.externals
+        self.tvdb_id = series.externals.get('thetvdb')
+        self.tvrage_id = series.externals.get('tvrage')
         self.premiered = series.premiered
         self.summary = series.summary
         self._links = series._links
@@ -161,6 +164,14 @@ class APITVMaze(object):
         if not any([maze_id, tvdb_id, tvrage_id, title]):
             raise LookupError('No parameters sent for TVMaze series lookup')
         show = None
+        if maze_id:
+            show = session.query(TVMazeSeries).filter(TVMazeSeries.maze_id == maze_id).first()
+        elif tvdb_id:
+            show = session.query(TVMazeSeries).filter(TVMazeSeries.tvdb_id == tvdb_id).first()
+        elif tvrage_id:
+            show = session.query(TVMazeSeries).filter(TVMazeSeries.tvrage_id == tvrage_id).first()
+        if not show and title:
+            show = session.query(TVMazeSeries).filter(TVMazeSeries.name == title.lower()).first()
 
 
 
