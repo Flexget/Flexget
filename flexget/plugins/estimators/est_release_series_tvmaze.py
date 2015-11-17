@@ -40,12 +40,11 @@ class EstimatesSeriesTVMaze(object):
         kwargs['show_country'] = entry.get('country') or entry.get('trakt_series_country')
         kwargs['show_language'] = entry.get('language')
 
-        log.debug(
-            'Searching TVMaze for airdate of {0} season {1} episode {2}'.format(kwargs['show_name'], season,
-                                                                                episode_number))
-        for k, v in kwargs.items():
-            if v:
-                log.debug('{0}: {1}'.format(k, v))
+        log.debug('Searching TVMaze for airdate of {0} season {1} episode {2}'.format(kwargs['show_name'],
+                                                                                      season, episode_number))
+        for key, value in kwargs.items():
+            if value:
+                log.debug('{0}: {1}'.format(key, value))
         try:
             tvmaze_show = get_show(**kwargs)
         except ShowNotFound as e:
@@ -57,12 +56,11 @@ class EstimatesSeriesTVMaze(object):
             log.debug('received airdate: {0}'.format(airdate))
             return airdate
         except SeasonNotFound as e:
-            log.debug(
-                'Show {0} does not appear to have a season {1}: {2}'.format(series_name, season, e))
+            log.debug('Show {0} does not appear to have a season {1}: {2}'.format(series_name, season,
+                                                                                  e))
         except EpisodeNotFound as e:
-            log.debug(
-                'Show {0} does not appear to have a season {1} and episode {2}: {3}'.format(series_name, season, e,
-                                                                                            episode_number))
+            log.debug('Show {0} does not appear to have a season {1} and episode {2}: {3}'.format(series_name, season,
+                                                                                                  e, episode_number))
         return
 
 
