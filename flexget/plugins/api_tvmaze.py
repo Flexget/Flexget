@@ -1,12 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
 
-import datetime
 import logging
+from datetime import datetime
 
 from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType
 from sqlalchemy.orm import relation
+from pytvmaze import get_show
+from pytvmaze.exceptions import *
 
-from flexget import db_schema
+from flexget import db_schema, plugin
+from flexget.event import event
+from flexget.utils.database import with_session
 
 log = logging.getLogger('api_tvmaze')
 
@@ -17,6 +21,7 @@ UPDATE_INTERVAL = '7 days'
 
 class TVMazeLookup(Base):
     __tablename__ = 'tvmaze_lookup'
+
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, index=True)
     failed_time = Column(DateTime)
@@ -64,7 +69,7 @@ class TVMazeSeries(Base):
         self.rating = series.rating['average']
         self.genres = series.genres
         self.weight = series.weight
-        self.updated = datetime.datetime.fromtimestamp(series.updated).strftime('%Y-%m-%d %H:%M:%S')
+        self.updated = datetime.fromtimestamp(series.updated).strftime('%Y-%m-%d %H:%M:%S')
         self.name = series.name
         self.language = series.language
         self.schedule = series.scheduele
@@ -79,7 +84,12 @@ class TVMazeSeries(Base):
         self.type = series.type
         self.maze_id = series.maze_id
         self.network = series.network['name']
-        self.last_update = datetime.datetime.now()
+        self.last_update = datetime.now()
+
+        del self.seasons[:]
+        for season in series:
+            season = TVMazeSeasons(season)
+            self.seasons.append(season)
 
     def __repr__(self):
         return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.id, self.last_update)
@@ -103,7 +113,12 @@ class TVMazeSeasons(Base):
 
     def update(self, season):
         self.number = season.season_number
-        self.last_update = datetime.datetime.now()
+        self.last_update = datetime.now()
+
+        del self.episodes[:]
+        for episode in season:
+            episode = TVMazeEpisodes(episode)
+            self.episodes.append(episode)
 
 
 class TVMazeEpisodes(Base):
@@ -127,14 +142,28 @@ class TVMazeEpisodes(Base):
 
     def update(self, episode):
         self.name = episode.name
-        self.airdate = datetime.datetime.strptime(episode.airdate, '%Y-%m-%d')
+        self.airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
         self.url = episode.url
         self.number = episode.episode_number
         self.season_number = episode.season_number
         self.image = episode.image
-        self.airstamp = datetime.datetime.strptime(episode.airstamp, '%Y-%m-%dT%H:%M:%S%z')
+        self.airstamp = datetime.strptime(episode.airstamp, '%Y-%m-%dT%H:%M:%S%z')
         self.runtime = episode.runtime
         self.maze_id = episode.maze_id
-        self.last_update = datetime.datetime.now()
+        self.last_update = datetime.now()
 
 
+class APITVMaze(object):
+
+    @staticmethod
+    @with_session
+    def series_lookup(maze_id=None, tvdb_id=None, tvrage_id=None, title=None, session=None):
+        if not any([maze_id, tvdb_id, tvrage_id, title]):
+            raise LookupError('No parameters sent for TVMaze series lookup')
+        show = None
+
+
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(APITVMaze, 'api_tvmaze', api_ver=2)
