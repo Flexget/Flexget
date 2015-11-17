@@ -43,7 +43,7 @@ def normalize_scene(text):
     #     ABCDEFGHIJKLMNOPQRSTUVWXYZ
     #     abcdefghijklmnopqrstuvwxyz
     #     0123456789-._()
-    return re.sub(r'[^a-zA-Z0-1 \-._()]',
+    return re.sub(r'[^a-zA-Z0-9 \-._()]',
                   "",
                   normalize('NFKD', text).encode('ASCII', 'ignore'))
 

@@ -20,6 +20,8 @@ log = logging.getLogger('est_series_internal')
 class EstimatesSeriesInternal(object):
     @plugin.priority(0)  # Should always be last priority
     def estimate(self, entry):
+        if not all(field in entry for field in ['series_name', 'series_season', 'series_episode']):
+            return
         with Session() as session:
             series = session.query(Series).filter(Series.name == entry['series_name']).first()
             if not series:

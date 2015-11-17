@@ -12,7 +12,10 @@
 
   app.config(function ($mdThemingProvider, $mdIconProvider) {
     $mdIconProvider.fontSet('fa', 'fa');
-    $mdThemingProvider.theme('default').primaryPalette('orange');
+    $mdThemingProvider.theme('default')
+      .primaryPalette('orange')
+      .accentPalette('light-blue')
+      .warnPalette('red');
   });
 
   // flexget.services can be used by plugins to access flexget services in module.config and module.run

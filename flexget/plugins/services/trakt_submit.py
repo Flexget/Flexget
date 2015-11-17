@@ -6,7 +6,7 @@ from requests import RequestException
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
-from flexget.utils.trakt import API_URL, get_entry_ids, get_session, make_list_slug
+from flexget.plugins.api_trakt import get_api_url, get_entry_ids, get_session, make_list_slug
 
 
 class TraktSubmit(object):
@@ -15,10 +15,12 @@ class TraktSubmit(object):
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
-            'password': {'type': 'string'},
+            'account': {'type': 'string'},
             'list': {'type': 'string'}
         },
-        'required': ['username', 'password', 'list'],
+        'required': ['list'],
+        'anyOf': [{'required': ['username']}, {'required': ['account']}],
+        'error_anyOf': 'At least one of `username` or `account` options are needed.',
         'additionalProperties': False
     }
 
@@ -29,6 +31,8 @@ class TraktSubmit(object):
     @plugin.priority(-255)
     def on_task_output(self, task, config):
         """Submits accepted movies or episodes to trakt api."""
+        if config.get('account') and not config.get('username'):
+            config['username'] = 'me'
         found = {'shows': [], 'movies': []}
         for entry in task.accepted:
             if 'series_name' in entry:
@@ -51,17 +55,17 @@ class TraktSubmit(object):
             return
 
         if config['list'] in ['collection', 'watchlist', 'watched']:
-            endpoint = 'sync/%s' % ('history' if config['list'] == 'watched' else config['list'])
+            args = ('sync', 'history' if config['list'] == 'watched' else config['list'])
         else:
-            endpoint = 'users/%s/lists/%s/items' % (config['username'], make_list_slug(config['list']))
+            args = ('users', config['username'], 'lists', make_list_slug(config['list']), 'items')
         if self.remove:
-            endpoint += '/remove'
-        url = API_URL + endpoint
+            args += ('remove', )
+        url = get_api_url(args)
 
         if task.manager.options.test:
             self.log.info('Not submitting to trakt.tv because of test mode.')
             return
-        session = get_session(config['username'], config['password'])
+        session = get_session(account=config.get('account'))
         self.log.debug('Submitting data to trakt.tv (%s): %s' % (url, found))
         try:
             result = session.post(url, data=json.dumps(found), raise_status=False)
@@ -69,13 +73,22 @@ class TraktSubmit(object):
             self.log.error('Error submitting data to trakt.tv: %s' % e)
             return
         if 200 <= result.status_code < 300:
-            self.log.info('Data successfully sent to trakt.tv')
-            self.log.debug('trakt response: ' + result.text)
+            action = 'added'
+            if self.remove:
+                action = 'deleted'
+            res = result.json()
+            movies = res[action].get('movies', 0)
+            eps = res[action].get('episodes', 0)
+            self.log.info('Successfully %s to/from list %s: %s movie(s), %s episode(s).' % (action, config['list'],
+                                                                                            movies, eps))
+            for k, r in res['not_found'].iteritems():
+                if r:
+                    self.log.debug('not found %s: %s' % (k, r))
             # TODO: Improve messages about existing and unknown results
         elif result.status_code == 404:
             self.log.error('List does not appear to exist on trakt: %s' % config['list'])
         elif result.status_code == 401:
-            self.log.error('Authentication error: check your trakt.tv username/password')
+            self.log.error('Authentication error: have you authorized Flexget on Trakt.tv?')
             self.log.debug('trakt response: ' + result.text)
         else:
             self.log.error('Unknown error submitting data to trakt.tv: %s' % result.text)

@@ -1,12 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
+
 from requests.exceptions import RequestException
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
-from flexget.config_schema import one_or_more
 
 log = logging.getLogger("pushover")
 
@@ -31,7 +33,7 @@ class OutputPushover(object):
     Configuration parameters are also supported from entries (eg. through set).
     """
     default_message = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} " \
-                      "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "\
+                      "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} " \
                       "{{imdb_year}}{% else %}{{title}}{% endif %}"
     schema = {
         'type': 'object',
@@ -41,7 +43,9 @@ class OutputPushover(object):
             'device': {'type': 'string', 'default': ''},
             'title': {'type': 'string', 'default': "{{task}}"},
             'message': {'type': 'string', 'default': default_message},
-            'priority': {'type': 'integer', 'default': 0},
+            'priority': {'oneOf': [
+                {'type': 'number', 'minimum': -2, 'maximum': 1},
+                {'type': 'string'}]},
             'url': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
             'urltitle': {'type': 'string', 'default': ''},
             'sound': {'type': 'string', 'default': ''}
@@ -101,6 +105,21 @@ class OutputPushover(object):
                 log.warning("Problem rendering 'urltitle': %s" % e)
                 urltitle = ""
 
+            # Attempt to render the priority field
+            if isinstance(priority, basestring):
+                try:
+                    priority = entry.render(priority)
+                except ValueError as e:
+                    log.warning('Problem rendering "priority": %s' % e)
+                    priority = 0
+
+            # Attempt to render the sound field
+            try:
+                sound = entry.render(sound)
+            except RenderError as e:
+                log.warning("Problem rendering 'sound': %s" % e)
+                sound = ''
+
             for userkey in userkeys:
                 # Build the request
                 data = {"user": userkey, "token": apikey, "title": title,
@@ -115,19 +134,8 @@ class OutputPushover(object):
                 # Check for test mode
                 if task.options.test:
                     log.info("Test mode.  Pushover notification would be:")
-                    if device:
-                        log.info("    Device: %s" % device)
-                    else:
-                        log.info("    Device: [broadcast]")
-                    log.info("    Title: %s" % title)
-                    log.info("    Message: %s" % message)
-                    log.info("    URL: %s" % url)
-                    log.info("    URL Title: %s" % urltitle)
-                    log.info("    Priority: %d" % priority)
-                    log.info("    userkey: %s" % userkey)
-                    log.info("    apikey: %s" % apikey)
-                    log.info("    sound: %s" % sound)
-
+                    for key, value in data.items():
+                        log.verbose('{0:>5}{1}: {2}'.format('', key.capitalize(), value))
                     # Test mode.  Skip remainder.
                     continue
 

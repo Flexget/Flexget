@@ -3,10 +3,9 @@ import urllib
 
 import feedparser
 
-from flexget import plugin, validator
+from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugins.api_tvrage import lookup_series
 
 __author__ = 'deksan'
 
@@ -94,10 +93,9 @@ class Newznab(object):
         if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
             return []
         if 'tvrage_id' not in arg_entry:
-            serie_info = lookup_series(arg_entry['series_name'])
-            if not serie_info:
-                return []
-            arg_entry['tvrage_id'] = serie_info.showid
+            # TODO: Is newznab replacing tvrage with something else? Update this.
+            log.warning('tvrage lookup support is gone, someone needs to update this plugin!')
+            return []
 
         url = (config['url'] + '&rid=%s&season=%s&ep=%s' %
                (arg_entry['tvrage_id'], arg_entry['series_season'], arg_entry['series_episode']))
