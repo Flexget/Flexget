@@ -6,7 +6,7 @@ from datetime import datetime
 
 from pytvmaze import get_show
 from pytvmaze.exceptions import ShowNotFound
-from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func
+from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table
 from sqlalchemy.orm import relation
 
 from flexget import db_schema, plugin
@@ -20,12 +20,22 @@ Base = db_schema.versioned_base('tvmaze', DB_Version)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 
 
-# TODO Genres table
+class TVMazeGenre(Base):
+    __tablename__ = 'tvmaze_genres'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(Unicode)
+
+
+genres_table = Table('tvmaze_series_genres', Base.metadata,
+                     Column('series_id', Integer, ForeignKey('tvmaze_series.id')),
+                     Column('genre_id', Integer, ForeignKey('tvmaze_genres.id')))
+
 
 class TVMazeLookup(Base):
     __tablename__ = 'tvmaze_lookup'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     search_name = Column(Unicode, index=True, unique=True)
     series_id = Column(Integer, ForeignKey('tvmaze_series.id'))
     series = relation('TVMazeSeries', backref='search_strings')
@@ -34,10 +44,10 @@ class TVMazeLookup(Base):
 class TVMazeSeries(Base):
     __tablename__ = 'tvmaze_series'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     status = Column(Unicode)
     rating = Column(Numeric)
-    genres = Column(String)
+    genres = relation(TVMazeGenre, secondary=genres_table)
     weight = Column(Integer)
     updated = Column(DateTime)  # last time show was updated at tvmaze
     original_name = Column(Unicode)
@@ -90,6 +100,11 @@ class TVMazeSeries(Base):
             season = TVMazeSeasons(season)
             self.seasons.append(season)
 
+        del self.genres[:]
+        for genre in series.genres:
+            genre = TVMazeGenre(name=genre)
+            self.genres.append(genre)
+
     def __repr__(self):
         return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.id, self.last_update)
 
@@ -107,7 +122,7 @@ class TVMazeSeries(Base):
 class TVMazeSeasons(Base):
     __tablename__ = 'tvmaze_season'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     tvmaze_series_id = Column(Integer, ForeignKey('tvmaze_series.id'), nullable=False)
     number = Column(Integer)
     episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season', cascade='all, delete, delete-orphan',
@@ -130,7 +145,7 @@ class TVMazeSeasons(Base):
 class TVMazeEpisodes(Base):
     __tablename__ = 'tvmaze_epiosde'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     tvmaze_season_id = Column(Integer, ForeignKey('tvmaze_season.id'), nullable=False)
     name = Column(Unicode)
     airdate = Column(DateTime)
