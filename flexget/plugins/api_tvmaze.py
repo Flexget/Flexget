@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
 from datetime import datetime
+from dateutil import parser
 
 from pytvmaze import get_show
 from pytvmaze.exceptions import ShowNotFound
@@ -29,7 +30,7 @@ class TVMazeGenre(Base):
 
 
 genres_table = Table('tvmaze_series_genres', Base.metadata,
-                     Column('series_id', Integer, ForeignKey('tvmaze_series.id')),
+                     Column('series_id', Integer, ForeignKey('tvmaze_series.maze_id')),
                      Column('genre_id', Integer, ForeignKey('tvmaze_genres.id')))
 
 
@@ -38,7 +39,7 @@ class TVMazeLookup(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     search_name = Column(Unicode, index=True, unique=True)
-    series_id = Column(Integer, ForeignKey('tvmaze_series.id'))
+    series_id = Column(Integer, ForeignKey('tvmaze_series.maze_id'))
     series = relation('TVMazeSeries', backref='search_strings')
 
 
@@ -72,28 +73,28 @@ class TVMazeSeries(Base):
         self.update(series, session)
 
     def update(self, series, session):
-        self.status = series['status']
-        self.rating = series['rating']['average']
-        self.weight = series['weight']
-        self.updated = datetime.fromtimestamp(series['updated']).strftime('%Y-%m-%d %H:%M:%S')
-        self.name = series['name']
-        self.language = series['language']
-        self.schedule = series['scheduele']
-        self.url = series['url']
-        self.image = series['image']
-        self.tvdb_id = series['externals'].get('thetvdb')
-        self.tvrage_id = series['externals'].get('tvrage')
-        self.premiered = series['premiered']
-        self.summary = series['summary']
-        self.webChannel = series.get('webChannel')
-        self.runtime = series['runtime']
-        self.show_type = series['type']
-        self.maze_id = series['maze_id']
+        self.status = series.status
+        self.rating = series.rating['average']
+        self.weight = series.weight
+        self.updated = datetime.fromtimestamp(series.updated).strftime('%Y-%m-%d %H:%M:%S')
+        self.name = series.name
+        self.language = series.language
+        self.schedule = series.schedule
+        self.url = series.url
+        self.image = series.image
+        self.tvdb_id = series.externals.get('thetvdb')
+        self.tvrage_id = series.externals.get('tvrage')
+        self.premiered = series.premiered
+        self.summary = series.summary
+        self.webChannel = series.webChannel
+        self.runtime = series.runtime
+        self.show_type = series.type
+        self.maze_id = series.maze_id
         self.network = series.network['name']
         self.last_update = datetime.now()
 
-        self.seasons[:] = get_db_season(self.maze_id, series['seasons'], session)
-        self.genres[:] = get_db_genres(series.get('genres', []), session)
+        self.seasons[:] = get_db_season(self.maze_id, series.seasons, session)
+        self.genres[:] = get_db_genres(series.genres, session)
 
     def __repr__(self):
         return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.id, self.last_update)
@@ -123,11 +124,11 @@ class TVMazeSeasons(Base):
         self.update(season, maze_id, session)
 
     def update(self, season, maze_id, session):
-        self.number = season['season_number']
+        self.number = season.season_number
         self.series_maze_id = maze_id
         self.last_update = datetime.now()
 
-        self.episodes[:] = get_db_episodes(self.id, season['episodes'], session)
+        self.episodes[:] = get_db_episodes(self.id, season.episodes, session)
 
 
 class TVMazeEpisodes(Base):
@@ -135,7 +136,7 @@ class TVMazeEpisodes(Base):
 
     maze_id = Column(Integer, primary_key=True)
     tvmaze_season_id = Column(Integer, ForeignKey('tvmaze_season.id'), nullable=False)
-    name = Column(Unicode)
+    title = Column(Unicode)
     airdate = Column(DateTime)
     url = Column(String)
     number = Column(Integer)
@@ -149,25 +150,25 @@ class TVMazeEpisodes(Base):
         self.update(episode, season_id)
 
     def update(self, episode, season_id):
-        self.maze_id = episode['maze_id']
+        self.maze_id = episode.maze_id
         self.tvmaze_season_id = season_id
-        self.name = episode['name']
+        self.title = episode.title
         self.airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
-        self.url = episode['url']
-        self.number = episode['episode_number']
-        self.season_number = episode['season_number']
-        self.image = episode['image']
-        self.airstamp = datetime.strptime(episode.airstamp, '%Y-%m-%dT%H:%M:%S%z')
-        self.runtime = episode['runtime']
+        self.url = episode.url
+        self.number = episode.episode_number
+        self.season_number = episode.season_number
+        self.image = episode.image
+        self.airstamp = parser.parse(episode.airstamp)
+        self.runtime = episode.runtime
         self.last_update = datetime.now()
 
 
 def get_db_episodes(season_id, episodes, session):
     db_episodes = []
-    for episode in episodes:
-        db_episode = session.query(TVMazeEpisodes).filter(TVMazeEpisodes.maze_id == episode['maze_id']).first()
+    for episode_num, episode in episodes.items():
+        db_episode = session.query(TVMazeEpisodes).filter(TVMazeEpisodes.maze_id == episode.maze_id).first()
         if not db_episode:
-            db_episode = TVMazeEpisodes(episode, season_id)
+            db_episode = TVMazeEpisodes(episode=episode, season_id=season_id)
             session.add(db_episode)
         db_episodes.append(db_episode)
     return db_episodes
@@ -175,12 +176,12 @@ def get_db_episodes(season_id, episodes, session):
 
 def get_db_season(maze_id, seasons, session):
     db_seasons = []
-    for season in seasons:
+    for season_num, season in seasons.items():
         db_season = session.query(TVMazeSeasons).filter(and_(
-            TVMazeSeasons.tvmaze_series_id == maze_id,
-            TVMazeSeasons.number == season['season_number'])).first()
+            TVMazeSeasons.series_maze_id == maze_id,
+            TVMazeSeasons.number == season_num)).first()
         if not db_season:
-            db_season = TVMazeSeasons(maze_id, season, session)
+            db_season = TVMazeSeasons(maze_id=maze_id, season=season, session=session)
             session.add(db_season)
         db_seasons.append(db_season)
     return db_seasons
@@ -200,7 +201,7 @@ def get_db_genres(genres, session):
 
 def search_params_for_series(**lookup_params):
     search_params = {
-        'maze_id': lookup_params.get('tvmaze_id'),
+        'maze_id': lookup_params.get('maze_id'),
         'tvdb_id': lookup_params.get('tvdb_id'),
         'tvrage_id': lookup_params.get('tvrage_id'),
         'name': lookup_params.get('title')
@@ -218,11 +219,11 @@ def from_cache(session=None, search_params=None, cache_type=None):
     :return: Query result
     """
     result = None
-    if not any(search_params):
+    if not any(search_params.values()):
         raise LookupError('No parameters sent for lookup')
     else:
         result = session.query(cache_type).filter(
-            or_(getattr(cache_type, col) == val for col, val in search_params.items() if val)).first()
+            or_(getattr(cache_type, col) == val for col, val in search_params.iteritems() if val)).first()
     return result
 
 
@@ -236,9 +237,7 @@ def prepare_lookup(**lookup_params):
     Return a dict of params which is valid with pytvmaze get_show method
     """
     prepared_params = {}
-    series_name = lookup_params['series_name']
-    season = lookup_params['series_season']
-    episode_number = lookup_params['series_episode']
+    series_name = lookup_params.get('series_name', lookup_params.get('show_name'))
     year_match = re.search('\(([\d]{4})\)', series_name)  # Gets year from title if present
     if year_match:
         year_match = year_match.group(1)
@@ -262,7 +261,7 @@ class APITVMaze(object):
     def series_lookup(session=None, force_cache=False, **lookup_params):
         search_params = search_params_for_series(**lookup_params)
         # Searching cache first
-        series = from_cache(session=session, cache_type='TVMazeSeries', search_params=search_params)
+        series = from_cache(session=session, cache_type=TVMazeSeries, search_params=search_params)
 
         # Preparing search from lookup table
         title = lookup_params.get('title')
@@ -285,7 +284,7 @@ class APITVMaze(object):
             raise
 
         # See if series already exist in cache
-        series = session.query(TVMazeSeries).filter(TVMazeSeries.maze_id == show['maze_id']).first()
+        series = session.query(TVMazeSeries).filter(TVMazeSeries.maze_id == show.maze_id).first()
         if series:
             series.update(show, session)
         else:
