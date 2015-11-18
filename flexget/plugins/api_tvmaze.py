@@ -6,7 +6,8 @@ from datetime import datetime
 
 from pytvmaze import get_show
 from pytvmaze.exceptions import ShowNotFound
-from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table, and_
+from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table, and_, \
+    or_
 from sqlalchemy.orm import relation
 
 from flexget import db_schema, plugin
@@ -114,7 +115,7 @@ class TVMazeSeasons(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     series_maze_id = Column(Integer, ForeignKey('tvmaze_series.maze_id'), nullable=False)
     number = Column(Integer)
-    episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season', cascade='all, delete, delete-orphan',
+    episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season_number', cascade='all, delete, delete-orphan',
                         backref='season')
     last_update = Column(DateTime)
 
@@ -171,6 +172,7 @@ def get_db_episodes(season_id, episodes, session):
         db_episodes.append(db_episode)
     return db_episodes
 
+
 def get_db_season(maze_id, seasons, session):
     db_seasons = []
     for season in seasons:
@@ -178,7 +180,7 @@ def get_db_season(maze_id, seasons, session):
             TVMazeSeasons.tvmaze_series_id == maze_id,
             TVMazeSeasons.number == season['season_number'])).first()
         if not db_season:
-            db_season = TVMazeSeasons(maze_id, season)
+            db_season = TVMazeSeasons(maze_id, season, session)
             session.add(db_season)
         db_seasons.append(db_season)
     return db_seasons
@@ -196,30 +198,43 @@ def get_db_genres(genres, session):
     return db_genres
 
 
-@with_session
-def from_cache(session=None, **lookup_params):
-    if not any(
-            [lookup_params['maze_id'], lookup_params['tvdb_id'], lookup_params['tvrage_id'], lookup_params['title']]):
-        raise LookupError('No parameters sent for TVMaze series lookup')
-    series = None
-    if lookup_params['maze_id']:
-        series = session.query(TVMazeSeries).filter(TVMazeSeries.maze_id == lookup_params['maze_id']).first()
-    elif lookup_params['tvdb_id']:
-        series = session.query(TVMazeSeries).filter(TVMazeSeries.tvdb_id == lookup_params['tvdb_id']).first()
-    elif lookup_params['tvrage_id']:
-        series = session.query(TVMazeSeries).filter(TVMazeSeries.tvrage_id == lookup_params['tvrage_id']).first()
-    if not series and lookup_params['title']:
-        series = session.query(TVMazeSeries).filter(TVMazeSeries.name == lookup_params['title'].lower()).first()
-    if series:
-        return series
+def search_params_for_series(**lookup_params):
+    search_params = {
+        'maze_id': lookup_params.get('tvmaze_id'),
+        'tvdb_id': lookup_params.get('tvdb_id'),
+        'tvrage_id': lookup_params.get('tvrage_id'),
+        'name': lookup_params.get('title')
+    }
+    return search_params
 
 
 @with_session
-def from_search(session=None, title=None):
+def from_cache(session=None, search_params=None, cache_type=None):
+    """
+    Returns a result from requested table based on search params
+    :param session: Current session
+    :param search_params: Relevant search params. Should match table column names
+    :param cache_type: Object for search
+    :return: Query result
+    """
+    result = None
+    if not any(search_params):
+        raise LookupError('No parameters sent for lookup')
+    else:
+        result = session.query(cache_type).filter(
+            or_(getattr(cache_type, col) == val for col, val in search_params.items() if val)).first()
+    return result
+
+
+@with_session
+def from_lookup(session=None, title=None):
     return session.query(TVMazeLookup).filter(func.lower(TVMazeLookup.search_name) == title.lower()).first()
 
 
 def prepare_lookup(**lookup_params):
+    """
+    Return a dict of params which is valid with pytvmaze get_show method
+    """
     prepared_params = {}
     series_name = lookup_params['series_name']
     season = lookup_params['series_season']
@@ -245,26 +260,42 @@ class APITVMaze(object):
     @staticmethod
     @with_session
     def series_lookup(session=None, force_cache=False, **lookup_params):
-        series = from_cache(session=session, **lookup_params)
+        search_params = search_params_for_series(**lookup_params)
+        # Searching cache first
+        series = from_cache(session=session, cache_type='TVMazeSeries', search_params=search_params)
+
+        # Preparing search from lookup table
+        title = lookup_params.get('title')
+        if not series and title:
+            search = from_lookup(session=session, title=title)
+            if search and search.series:
+                series = search.series
+
         if force_cache:
-            if series:
+            if series:  # If force_cache is True, return series even if it expired
                 return series
             raise LookupError('Series %s not found from cache' % lookup_params)
         if series and not series.expired:
             return series
-        title = lookup_params.get('title')
-        if title:
-            search = from_search(session=session, title=title)
-            if search and search.series:
-                return search.series
+
         prepared_params = prepare_lookup(**lookup_params)
         try:
-            series = get_show(**prepared_params)
+            show = get_show(**prepared_params)
         except ShowNotFound:
-            raise LookupError('Show was not found on TVMaze')
-        series = TVMazeSeries(series, session)
-        session.add(series)
-        session.add(TVMazeLookup(from_search=title, series=series))
+            raise
+
+        # See if series already exist in cache
+        series = session.query(TVMazeSeries).filter(TVMazeSeries.maze_id == show['maze_id']).first()
+        if series:
+            series.update(show, session)
+        else:
+            series = TVMazeSeries(show, session)
+            session.add(series)
+
+        # If there's a mismatch between actual series name and requested title,
+        # add it to lookup table for future lookups
+        if series and title.lower() != series.name.lower():
+            session.add(TVMazeLookup(from_search=title, series=series))
         return series
 
 
