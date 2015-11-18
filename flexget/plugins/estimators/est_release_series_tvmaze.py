@@ -6,6 +6,12 @@ from datetime import datetime
 
 from flexget import plugin
 from flexget.event import event
+try:
+    from flexget.plugins.api_tvmaze import APITVMaze
+    lookup = APITVMaze.series_lookup
+except ImportError:
+    raise plugin.DependencyError(issued_by='est_series_tvmaze', missing='api_tvmaze',
+                             message='est_series_tvmaze requires the `api_tvmaze` plugin')
 
 try:
     # TODO implement TVMaze API internally
@@ -45,11 +51,9 @@ class EstimatesSeriesTVMaze(object):
         for k, v in kwargs.items():
             if v:
                 log.debug('{0}: {1}'.format(k, v))
-        try:
-            tvmaze_show = get_show(**kwargs)
-        except ShowNotFound as e:
-            log.warning('Could not found show on TVMaze: {0}'.format(e))
-            return
+
+        tvmaze_show = lookup(**kwargs)
+
         try:
             episode = tvmaze_show[season][episode_number]
             airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
