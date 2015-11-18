@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
-import re
 from datetime import datetime
-from dateutil import parser
 
+from dateutil import parser
 from pytvmaze import get_show
 from pytvmaze.exceptions import ShowNotFound
 from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table, and_, \
@@ -62,7 +61,7 @@ class TVMazeSeries(Base):
     tvrage_id = Column(Integer)
     premiered = Column(DateTime)
     summary = Column(Unicode)
-    webChannel = Column(String)
+    webchannel = Column(String)
     runtime = Column(Integer)
     show_type = Column(String)
     network = Column(Unicode)
@@ -77,7 +76,7 @@ class TVMazeSeries(Base):
         self.status = series.status
         self.rating = series.rating['average']
         self.weight = series.weight
-        self.updated = datetime.fromtimestamp(series.updated).strftime('%Y-%m-%d %H:%M:%S')
+        self.updated = datetime.fromtimestamp(series.updated)
         self.name = series.name
         self.language = series.language
         self.schedule = series.schedule
@@ -85,9 +84,9 @@ class TVMazeSeries(Base):
         self.image = series.image
         self.tvdb_id = series.externals.get('thetvdb')
         self.tvrage_id = series.externals.get('tvrage')
-        self.premiered = series.premiered
+        self.premiered = parser.parse(series.premiered)
         self.summary = series.summary
-        self.webChannel = series.webChannel
+        self.webchannel = series.webChannel
         self.runtime = series.runtime
         self.show_type = series.type
         self.maze_id = series.maze_id
@@ -264,7 +263,7 @@ class APITVMaze(object):
         series = from_cache(session=session, cache_type=TVMazeSeries, search_params=search_params)
 
         # Preparing search from lookup table
-        title = lookup_params.get('title')
+        title = lookup_params.get('show_name')
         if not series and title:
             search = from_lookup(session=session, title=title)
             if search and search.series:
