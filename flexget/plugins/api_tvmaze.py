@@ -14,6 +14,7 @@ from sqlalchemy.orm import relation
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.utils.database import with_session
+from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')
 
@@ -121,6 +122,7 @@ class TVMazeSeasons(Base):
     last_update = Column(DateTime)
 
     def __init__(self, season, maze_id, session):
+        super(TVMazeSeasons, self).__init__()
         self.update(season, maze_id, session)
 
     def update(self, season, maze_id, session):
@@ -132,7 +134,7 @@ class TVMazeSeasons(Base):
 
 
 class TVMazeEpisodes(Base):
-    __tablename__ = 'tvmaze_epiosde'
+    __tablename__ = 'tvmaze_episode'
 
     maze_id = Column(Integer, primary_key=True)
     tvmaze_season_id = Column(Integer, ForeignKey('tvmaze_season.id'), nullable=False)
@@ -157,7 +159,7 @@ class TVMazeEpisodes(Base):
         self.url = episode.url
         self.number = episode.episode_number
         self.season_number = episode.season_number
-        self.image = episode.image
+        self.image = episode.image.get('original', episode.image.get('medium'))
         self.airstamp = parser.parse(episode.airstamp)
         self.runtime = episode.runtime
         self.last_update = datetime.now()
@@ -238,14 +240,12 @@ def prepare_lookup(**lookup_params):
     """
     prepared_params = {}
     series_name = lookup_params.get('series_name', lookup_params.get('show_name'))
-    year_match = re.search('\(([\d]{4})\)', series_name)  # Gets year from title if present
-    if year_match:
-        year_match = year_match.group(1)
+    title, year_match = split_title_year(series_name)
 
     prepared_params['maze_id'] = lookup_params.get('tvmaze_id')
     prepared_params['tvdb_id'] = lookup_params.get('tvdb_id') or lookup_params.get('trakt_series_tvdb_id')
     prepared_params['tvrage_id'] = lookup_params.get('tvrage_id') or lookup_params.get('trakt_series_tvrage_id')
-    prepared_params['show_name'] = re.sub('\(([\d]{4})\)', '', series_name).rstrip()  # Remove year from name if present
+    prepared_params['show_name'] = title
     prepared_params['show_year'] = lookup_params.get('trakt_series_year') or lookup_params.get('year') or \
                                    lookup_params.get('imdb_year') or year_match
     prepared_params['show_network'] = lookup_params.get('network') or lookup_params.get('trakt_series_network')
