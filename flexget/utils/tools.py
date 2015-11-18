@@ -457,3 +457,13 @@ def singleton(cls):
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
     return getinstance
+
+def split_title_year(title):
+    """Splits title containing a year into a title, year pair."""
+    match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
+    title = match.group(1).strip()
+    if match.group(2):
+        year = int(match.group(2))
+    else:
+        year = None
+    return title, year
