@@ -41,6 +41,7 @@ class EstimatesSeriesTVMaze(object):
         kwargs['show_language'] = entry.get('language')
         kwargs['series_season'] = season
         kwargs['series_episode'] = episode_number
+        kwargs['series_name'] = series_name
 
         log.debug(
             'Searching TVMaze for airdate of {0} season {1} episode {2}'.format(series_name, season, episode_number))
@@ -52,9 +53,8 @@ class EstimatesSeriesTVMaze(object):
             airdate = episode_airdate(**kwargs)
             log.debug('received airdate: {0}'.format(airdate))
             return airdate
-        except LookupError:
-            log.debug('could not retrieve airdate for show {0} season: {1} episode {2}'.format(series_name, season,
-                                                                                               episode_number))
+        except LookupError as e:
+            log.debug(e)
         return
 
 
