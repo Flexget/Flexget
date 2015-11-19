@@ -320,7 +320,7 @@ class APITVMaze(object):
             series = populate_episodes(series_object=series, show_data=pytvmaze_show, session=session)
             session.flush()
         else:
-            log.debug('creating new series {0} in tvmaze_series db'.format(series.name))
+            log.debug('creating new series {0} in tvmaze_series db'.format(title))
             series = TVMazeSeries(pytvmaze_show, session)
             series = populate_episodes(series_object=series, show_data=pytvmaze_show, session=session)
             session.add(series)
