@@ -22,6 +22,13 @@ Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 
 
+class TVMazePerson(Base):
+    __tablename__ = 'tvmaze_person'
+
+    maze_id = Column(Integer, primary_key=True)
+    url = Column(String)
+
+
 class TVMazeGenre(Base):
     __tablename__ = 'tvmaze_genres'
 
