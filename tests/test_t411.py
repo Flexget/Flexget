@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 import datetime
 from __builtin__ import object
 import logging
+import mock
 from flexget.manager import Session
 
 from flexget.plugins.api_t411 import T411RestClient, T411ObjectMapper, T411Proxy, FriendlySearchQuery
@@ -13,19 +14,88 @@ from flexget.plugins.cli import t411
 log = logging.getLogger('test_t411')
 
 
+
+class MockRestClient(object):
+    search_result = {
+        "query": "Mickey",
+        "total": 1,
+        "offset": 0,
+        "limit": 10,
+        "torrents": [{
+                         "id": 123123,
+                         "name": "Mickey vs Donald",
+                         "category": "14",
+                         "seeders": "11",
+                         "leechers": "2",
+                         "comments": "8",
+                         "isVerified": "1",
+                         "added": "2013-01-15 16:14:14",
+                         "size": "2670809119",
+                         "times_completed": "1256",
+                         "owner": "7589510",
+                         "categoryname": "Animation",
+                         "categoryimage": "t411-animation.png",
+                         "username": "MegaUsername",
+                         "privacy": "normal"
+                     }]
+    }
+
+    cat_result = {
+        "12": {  # Category ID index
+                 "id": "12",  # Category ID
+                 "pid": "0",  # Parent's catogory ID
+                 "name": "video",
+                 "cats": {  # Subcategories
+                            "13": {"id": "13", "pid": "12", "name": "films"},
+                            "14": {"id": "14", "pid": "12", "name": "cartoons"}
+                 }
+        }
+    }
+
+    term_result = {
+        "14": {  # Category ID
+                 "11": {  # Term type ID
+                          "type": "Application - Genre",  # Term type definition
+                          "mode": "single",
+                          "terms": {  # Terms of the term type
+                                      "123": "Antivirus",
+                                      "345": "Torrent clients"
+                          }
+                 }
+        }
+    }
+
+    def auth(self):
+        return
+
+    def is_authenticated(self):
+        return True
+
+    def retrieve_category_tree(self):
+        return MockRestClient.cat_result
+
+    def retrieve_terms_tree(self):
+        return MockRestClient.term_result
+
+    def search(self, query):
+        self.last_query = query
+        return MockRestClient.search_result
+
+
 class TestRestClient(object):
     def __init__(self):
         self.credentials = {'username': '', 'password': ''}
         self.api_token = ''
 
     def build_unauthenticated_client(self):
-        client = T411RestClient(self.credentials)
+        client = T411RestClient()
+        client.credentials = self.credentials
         del client.web_session.headers['Accept-Encoding']
         return client
 
     def build_authenticated_client(self):
         client = T411RestClient()
-        client.api_token = self.api_token
+        client.set_api_token(self.api_token)
         del client.web_session.headers['Accept-Encoding']
         return client
 
@@ -57,7 +127,25 @@ class TestRestClient(object):
     @use_vcr
     def test_retrieve_terms(self):
         client = self.build_authenticated_client()
-        json_terms = client
+        json_terms = client.retrieve_category_tree()
+        assert json_terms is not None
+        term_type = json_terms.get('234').get('11')
+        assert term_type is not None
+        assert term_type.get('type') == 'Application'
+        assert term_type.get('mode') == 'single'
+
+    @use_vcr
+    def test_malformed_search_response(self):
+        """
+        Search without expression produces server response
+        that contains some error messages. This test check
+        if this case is properly handled
+        :return:
+        """
+        client = self.build_authenticated_client()
+        search_result = client.search({})
+        assert search_result['query'] == None
+        assert search_result['limit'] == 10
 
 
 class TestObjectMapper(object):
@@ -127,69 +215,9 @@ class TestObjectMapper(object):
         assert term_types.get(11).terms[0].name == "Edition multimédia"
 
 
-class MockRestClient(object):
-    def auth(self):
-        return
-
-    def is_authenticated(self):
-        return True
-
-    def retrieve_category_tree(self):
-        return {
-            "12": {  # Category ID index
-                     "id": "12",  # Category ID
-                     "pid": "0",  # Parent's catogory ID
-                     "name": "video",
-                     "cats": {  # Subcategories
-                                "13": {"id": "13", "pid": "12", "name": "films"},
-                                "14": {"id": "14", "pid": "12", "name": "cartoons"}
-                     }
-            }
-        }
-
-    def retrieve_terms_tree(self):
-        return {
-            "14": {  # Category ID
-                     "11": {  # Term type ID
-                              "type": "Application - Genre",  # Term type definition
-                              "mode": "single",
-                              "terms": {  # Terms of the term type
-                                          "123": "Antivirus",
-                                          "345": "Torrent clients"
-                              }
-                     }
-            }
-        }
-
-    def search(self, query):
-        return {
-            "query": "Mickey",
-            "total": 1,
-            "offset": 0,
-            "limit": 10,
-            "torrents": [{
-                 "id": 123123,
-                 "name": "Mickey vs Donald",
-                 "category": "14",
-                 "seeders": "11",
-                 "leechers": "2",
-                 "comments": "8",
-                 "isVerified": "1",
-                 "added": "2013-01-15 16:14:14",
-                 "size": "2670809119",
-                 "times_completed": "1256",
-                 "owner": "7589510",
-                 "categoryname": "Animation",
-                 "categoryimage": "t411-animation.png",
-                 "username": "MegaUsername",
-                 "privacy": "normal"
-             }]
-        }
-
-
 class TestProxy(FlexGetBase):
-    def test_lolcat(self):
-        proxy = T411Proxy(session=Session())
+    def test_offline_proxy(self):
+        proxy = T411Proxy()
         proxy.rest_client = MockRestClient()
         assert not proxy.has_cached_criterias()
         proxy.synchronize_database()
@@ -199,4 +227,32 @@ class TestProxy(FlexGetBase):
         query.expression = "Mickey"
         query.category_name = "cartoons"
         query.term_names.append("Antivirus")
-        assert proxy.search(query)[0].category_id == 14
+        assert proxy.search(query)[0]['t411_torrent_id'] == 123123
+        assert (11,123) in proxy.rest_client.last_query['terms']
+        assert proxy.rest_client.last_query['category_id'] == 14
+        assert proxy.rest_client.last_query['expression'] == 'Mickey'
+
+
+class TestInputPlugin(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          uncached_db:
+            t411:
+              username: 'lildadou'
+              password: ''
+              category: cartoons
+              terms:
+                - Antivirus
+    """
+
+
+    @mock.patch('flexget.plugins.api_t411.T411RestClient.search')
+    @mock.patch('flexget.plugins.api_t411.T411RestClient.retrieve_terms_tree')
+    @mock.patch('flexget.plugins.api_t411.T411RestClient.retrieve_category_tree')
+    def test_schema(self, mock_cat, mock_term, mock_search):
+        mock_cat.return_value = MockRestClient.cat_result
+        mock_term.return_value = MockRestClient.term_result
+        mock_search.return_value = MockRestClient.search_result
+        self.execute_task('uncached_db')
+        log.debug(self.task.all_entries)
+        assert len(self.task.all_entries) == 1
