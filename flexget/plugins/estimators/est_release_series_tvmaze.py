@@ -2,23 +2,17 @@ from __future__ import unicode_literals, division, absolute_import
 
 import logging
 import re
-from datetime import datetime
 
 from flexget import plugin
 from flexget.event import event
-try:
-    from flexget.plugins.api_tvmaze import APITVMaze
-    lookup = APITVMaze.series_lookup
-except ImportError:
-    raise plugin.DependencyError(issued_by='est_series_tvmaze', missing='api_tvmaze',
-                             message='est_series_tvmaze requires the `api_tvmaze` plugin')
 
 try:
-    # TODO implement TVMaze API internally
-    from pytvmaze import get_show
-    from pytvmaze.exceptions import ShowNotFound, SeasonNotFound, EpisodeNotFound
-except ImportError as e:
-    raise plugin.PluginError('Could not import from pytvmaze')
+    from flexget.plugins.api_tvmaze import APITVMaze
+
+    episode_airdate = APITVMaze.episode_airdate
+except ImportError:
+    raise plugin.DependencyError(issued_by='est_series_tvmaze', missing='api_tvmaze',
+                                 message='est_series_tvmaze requires the `api_tvmaze` plugin')
 
 log = logging.getLogger('est_series_tvmaze')
 
@@ -45,27 +39,18 @@ class EstimatesSeriesTVMaze(object):
         kwargs['show_network'] = entry.get('network') or entry.get('trakt_series_network')
         kwargs['show_country'] = entry.get('country') or entry.get('trakt_series_country')
         kwargs['show_language'] = entry.get('language')
+        kwargs['series_season'] = season
+        kwargs['series_episode'] = episode_number
 
         log.debug('Searching TVMaze for airdate of {0} season {1} episode {2}'.format(kwargs['show_name'], season,
                                                                                       episode_number))
         for k, v in kwargs.items():
             if v:
                 log.debug('{0}: {1}'.format(k, v))
-
-        tvmaze_show = lookup(**kwargs)
-
-        try:
-            episode = tvmaze_show[season][episode_number]
-            airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
-            log.debug('received airdate: {0}'.format(airdate))
-            return airdate
-        except SeasonNotFound as e:
-            log.warning('Show {0} does not appear to have a season {1}: {2}'.format(series_name, season, e))
-        except EpisodeNotFound as e:
-            log.warning(
-                'Show {0} does not appear to have a season {1} and episode {2}: {3}'.format(series_name, season, e,
-                                                                                            episode_number))
-        return
+        # TODO add relevant try catch block
+        airdate = episode_airdate(**kwargs)
+        log.debug('received airdate: {0}'.format(airdate))
+        return airdate
 
 
 @event('plugin.register')
