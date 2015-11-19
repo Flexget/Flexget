@@ -219,7 +219,7 @@ def search_params_for_series(**lookup_params):
         'maze_id': lookup_params.get('maze_id'),
         'tvdb_id': lookup_params.get('tvdb_id'),
         'tvrage_id': lookup_params.get('tvrage_id'),
-        'name': lookup_params.get('title')
+        'name': lookup_params.get('title') or lookup_params.get('series_name')
     }
     return search_params
 
@@ -235,8 +235,9 @@ def from_cache(session=None, search_params=None, cache_type=None):
     """
     result = None
     if not any(search_params.values()):
-        raise LookupError('No parameters sent for lookup')
+        raise LookupError('No parameters sent for cache lookup')
     else:
+        log.debug('searching db {0} for the values {1}'.format(cache_type.__tablename__, search_params.items()))
         result = session.query(cache_type).filter(
             or_(getattr(cache_type, col) == val for col, val in search_params.iteritems() if val)).first()
     return result
@@ -244,6 +245,7 @@ def from_cache(session=None, search_params=None, cache_type=None):
 
 @with_session
 def from_lookup(session=None, title=None):
+    log.debug('searching lookup table suing title {0}'.format(title))
     return session.query(TVMazeLookup).filter(func.lower(TVMazeLookup.search_name) == title.lower()).first()
 
 
@@ -295,30 +297,37 @@ class APITVMaze(object):
 
         if force_cache:
             if series:  # If force_cache is True, return series even if it expired
+                log.debug('forcing cache for series {0}'.format(series.name))
                 return series
             raise LookupError('Series %s not found from cache' % lookup_params)
         if series and not series.expired:
+            log.debug('returning series {0} from cache'.format(series.name))
             return series
 
         prepared_params = prepare_lookup(**lookup_params)
         try:
+            log.debug('trying to fetch series {0} from pytvmaze'.format(title))
             pytvmaze_show = get_show(**prepared_params)
         except ShowNotFound:
-            raise
+            log.debug('could not find series {0} in pytvmaze'.format(title))
+            return
 
         # See if series already exist in cache
         series = session.query(TVMazeSeries).filter(TVMazeSeries.maze_id == pytvmaze_show.maze_id).first()
         if series:
+            log.debug('found expired series {0}, refreshing data.'.format(series.name))
             series.update(pytvmaze_show, session)
             series = populate_episodes(series_object=series, show_data=pytvmaze_show, session=session)
             session.flush()
         else:
+            log.debug('creating new series {0} in tvmaze_series db'.format(series.name))
             series = TVMazeSeries(pytvmaze_show, session)
             series = populate_episodes(series_object=series, show_data=pytvmaze_show, session=session)
             session.add(series)
         # If there's a mismatch between actual series name and requested title,
         # add it to lookup table for future lookups
         if series and title.lower() != series.name.lower():
+            log.debug('mismatch between series title and search title. saving in lookup table')
             session.add(TVMazeLookup(search_name=title, series=series))
         return series
 
