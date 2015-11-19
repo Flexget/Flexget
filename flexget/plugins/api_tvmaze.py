@@ -319,8 +319,40 @@ class APITVMaze(object):
         # If there's a mismatch between actual series name and requested title,
         # add it to lookup table for future lookups
         if series and title.lower() != series.name.lower():
-            session.add(TVMazeLookup(from_search=title, series=series))
+            session.add(TVMazeLookup(search_name=title, series=series))
         return series
+
+    @staticmethod
+    @with_session
+    def episode_lookup(session=None, force_cache=False, **lookup_params):
+        series_name = lookup_params.get('series_name')
+        season_number = lookup_params.get('series_season')
+        episode_number = lookup_params.get('series_episode')
+        if not all([season_number, episode_number, series_name]):
+            raise LookupError('Not enough parameter to lookup episode')
+        series = APITVMaze.series_lookup(session=session, force_cache=force_cache, **lookup_params)
+        if not series:
+            raise LookupError('Could not find series with the following parameters: {0}'.format(**lookup_params))
+        try:
+            episode = series.seasons[season_number - 1].episodes[episode_number - 1]
+        except IndexError:
+            raise LookupError(
+                'Could not find episode {0}, season {1} for show{2}'.format(episode_number, season_number, series_name))
+        return episode
+
+    @staticmethod
+    @with_session
+    def episode_airdate(session=None, force_cache=False, **lookup_params):
+        series_name = lookup_params.get('series_name')
+        season_number = lookup_params.get('series_season')
+        episode_number = lookup_params.get('series_episode')
+        if not all([season_number, episode_number, series_name]):
+            raise LookupError('Not enough parameter to lookup episode')
+        episode = APITVMaze.episode_lookup(session=session, force_cache=force_cache, **lookup_params)
+        if not episode:
+            raise LookupError(
+                'Could not find episode {0}, season {1} for show{2}'.format(episode_number, season_number, series_name))
+        return episode.airdate
 
 
 @event('plugin.register')
