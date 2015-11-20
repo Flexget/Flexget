@@ -56,11 +56,11 @@ class EstimatesSeriesTVMaze(object):
             log.debug('received airdate: {0}'.format(airdate))
             return airdate
         except SeasonNotFound as e:
-            log.warning('Show {0} does not appear to have a season {1}: {2}'.format(series_name, season, e))
+            log.debug('Show {0} does not appear to have a season {1}: {2}'.format(series_name, season, e))
         except EpisodeNotFound as e:
-            log.warning(
-                'Show {0} does not appear to have a season {1} and episode {2}: {3}'.format(series_name, season, e,
-                                                                                            episode_number))
+            log.debug(
+                'Show {0} does not appear to have a season {1} and episode {2}: {3}'.format(series_name, season,
+                                                                                            episode_number, e))
         return
 
 
