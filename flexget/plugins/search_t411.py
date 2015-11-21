@@ -101,31 +101,52 @@ class t411Auth(AuthBase):
 
     """ Attaches HTTP Token Authentication to the given Request object."""
 
-    def get_token(self, username, password):
+    def get_auth(self):
         url_auth = T411_BASE_URL + "/auth"
-        db_session = Session()
-        account = db_session.query(t411Account).filter(
-            t411Account.username == username).first()
-        if account:
-            if account.expiry_time < datetime.now():
-                db_session.delete(account)
-                db_session.commit()
-            log.debug("Token found in db!")
-            return account.token
-        else:
-            log.debug("Getting token from : %s ", url_auth)
-            params = {'username': username, 'password': password}
-            res = requests.post(url_auth, data=params).json()
-            if 'error' in res.keys():
-                raise plugin.PluginError(res['error'])
-            db_session.add(t411Account(username=username,
-                                       token=res['token'],
-                                       expiry_time=datetime.now() + timedelta(days=45)))
-            db_session.commit()
-            return res['token']
+        log.debug("Getting token from : %s ", url_auth)
+        params = {'username': self.username, 'password': self.password}
+        res = requests.post(url_auth, data=params).json()
+        if 'error' in res.keys():
+            raise plugin.PluginError(res['error'])
 
-    def __init__(self, username, password):
-        self.token = self.get_token(username, password)
+        if 'token' not in res.keys():
+            raise plugin.PluginError("Unable to get token ! (%s)" % res)
+
+        return res['token']
+
+    def update_token(self, db_session, token):
+        db_session.token = token
+        db_session.expiry_time = datetime.now() + timedelta(days=90)
+
+    def get_token(self):
+        db_session = Session()
+        account = db_session.query(t411Account).filter(t411Account.username == self.username).first()
+
+        if self.force_auth:
+            log.debug("Token force mode !")
+            token = self.get_auth()
+            self.update_token(db_session, token)
+        elif account:
+            if account.expiry_time < datetime.now():
+                log.debug("Token expired, take a new one !")
+                token = self.get_auth()
+                self.update_token(db_session, token)
+            else:
+                log.debug("Token found in db!")
+                token = account.token
+        else:
+            token = self.get_auth()
+            expiry_time = datetime.now() + timedelta(days=90)
+            db_session.add(t411Account(username=self.username, token=token, expiry_time=expiry_time))
+        db_session.commit()
+        self.token = token
+        return self.token
+
+    def __init__(self, username, password, force_auth=False):
+        self.username = username
+        self.password = password
+        self.force_auth = force_auth
+        self.get_token()
 
     def __call__(self, r):
         r.headers['authorization'] = self.token
@@ -224,21 +245,27 @@ class SearchT411(object):
             response = requests.get(T411_BASE_URL + url_search, auth=auth_handler)
             res_json = response.json()
 
+            if 'errors' in res_json.keys():
+                auth_handler = t411Auth(config.get('username'), config.get('password'), force_auth=True)
+                res_json = requests.get(T411_BASE_URL + url_search, auth=auth_handler).json()
+
+                if 'errors' in res_json.keys():
+                    raise plugin.PluginError(res['error'])
+
             for torrent in res_json['torrents']:
-                entry = Entry()
-                entry['title'] = torrent['name']
-                entry['url'] = T411_BASE_URL + '/torrents/download/%s' % torrent['id']
-                entry['torrent_seeds'] = torrent['seeders']
-                entry['torrent_leeches'] = torrent['leechers']
-                entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
-                                                            entry['torrent_leeches'])
-                entry['content_size'] = torrent['size']
-                entry['download_auth'] = auth_handler
-                entries.add(entry)
+                new_entry = Entry()
+                new_entry['title'] = torrent['name']
+                new_entry['url'] = T411_BASE_URL + '/torrents/download/%s' % torrent['id']
+                new_entry['torrent_seeds'] = torrent['seeders']
+                new_entry['torrent_leeches'] = torrent['leechers']
+                new_entry['search_sort'] = torrent_availability(new_entry['torrent_seeds'],
+                                                                new_entry['torrent_leeches'])
+                new_entry['content_size'] = torrent['size']
+                new_entry['download_auth'] = auth_handler
+                entries.add(new_entry)
 
 
-            return sorted(entries, reverse=True,
-                          key=lambda x: x.get('search_sort'))
+        return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
 
 
 @event('plugin.register')
