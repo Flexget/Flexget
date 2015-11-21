@@ -61,6 +61,8 @@ class EstimatesSeriesTVMaze(object):
             log.debug(
                 'Show {0} does not appear to have a season {1} and episode {2}: {3}'.format(series_name, season,
                                                                                             episode_number, e))
+        except ValueError:
+            log.debug('empty airdate received from episode, probably TBA')
         return
 
 
