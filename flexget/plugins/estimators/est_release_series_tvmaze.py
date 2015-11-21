@@ -48,7 +48,6 @@ class EstimatesSeriesTVMaze(object):
         for k, v in kwargs.items():
             if v:
                 log.debug('{0}: {1}'.format(k, v))
-        # TODO add relevant try catch block
         try:
             airdate = episode_airdate(**kwargs)
             log.debug('received airdate: {0}'.format(airdate))

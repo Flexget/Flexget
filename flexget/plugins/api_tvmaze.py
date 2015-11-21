@@ -168,7 +168,10 @@ class TVMazeEpisodes(Base):
         self.tvmaze_season_id = season_id
         self.maze_id = episode.maze_id
         self.title = episode.title
-        self.airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
+        try:
+            self.airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
+        except ValueError:
+            self.airdate = None
         self.url = episode.url
         self.number = episode.episode_number
         self.season_number = episode.season_number
