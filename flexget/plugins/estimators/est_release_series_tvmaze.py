@@ -52,16 +52,20 @@ class EstimatesSeriesTVMaze(object):
             return
         try:
             episode = tvmaze_show[season][episode_number]
-            airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
-            log.debug('received airdate: {0}'.format(airdate))
-            return airdate
         except SeasonNotFound as e:
             log.debug('Show {0} does not appear to have a season {1}: {2}'.format(series_name, season, e))
+            return
         except EpisodeNotFound as e:
             log.debug(
                 'Show {0} does not appear to have a season {1} and episode {2}: {3}'.format(series_name, season,
                                                                                             episode_number, e))
-        return
+            return
+        if not episode.airdate:
+            log.debug('empty airdate received from episode, probably TBA')
+            return
+        airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
+        log.debug('received airdate: {0}'.format(airdate))
+        return airdate
 
 
 @event('plugin.register')
