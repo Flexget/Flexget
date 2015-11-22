@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import logging
 import re
+from datetime import datetime
 
 from flexget import plugin
 from flexget.event import event
@@ -49,6 +50,26 @@ class EstimatesSeriesTVMaze(object):
             if v:
                 log.debug('{0}: {1}'.format(k, v))
         try:
+            tvmaze_show = get_show(**kwargs)
+        except ShowNotFound as e:
+            log.warning('Could not found show on TVMaze: {0}'.format(e))
+            return
+        try:
+            episode = tvmaze_show[season][episode_number]
+        except SeasonNotFound as e:
+            log.debug('Show {0} does not appear to have a season {1}: {2}'.format(series_name, season, e))
+            return
+        except EpisodeNotFound as e:
+            log.debug(
+                'Show {0} does not appear to have a season {1} and episode {2}: {3}'.format(series_name, season,
+                                                                                            episode_number, e))
+            return
+        if not episode.airdate:
+            log.debug('empty airdate received from episode, probably TBA')
+            return
+        airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
+        log.debug('received airdate: {0}'.format(airdate))
+        return airdate
             airdate = episode_airdate(**kwargs)
             log.debug('received airdate: {0}'.format(airdate))
             return airdate

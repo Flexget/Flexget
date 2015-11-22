@@ -629,19 +629,19 @@ class ApiTrakt(object):
     @with_session
     def lookup_series(session=None, only_cached=None, **lookup_params):
         series = get_cached('show', session=session, **lookup_params)
+        title = lookup_params.get('title')
+        if not series and title:
+            found = session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
+                                                                title.lower()).first()
+            if found and found.series:
+                log.debug('Found %s in previous search results as %s' % (title, found.series.title))
+                series = found.series
         if only_cached:
             if series:
                 return series
             raise LookupError('Series %s not found from cache' % lookup_params)
         if series and not series.expired:
             return series
-        title = lookup_params.get('title')
-        if title:
-            found = session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
-                                                                title.lower()).first()
-            if found and found.series:
-                log.debug('Found %s in previous search results' % title)
-                return found.series
         try:
             trakt_show = get_trakt('show', **lookup_params)
         except LookupError as e:
@@ -664,19 +664,19 @@ class ApiTrakt(object):
     @with_session
     def lookup_movie(session=None, only_cached=None, **lookup_params):
         movie = get_cached('movie', session=session, **lookup_params)
+        title = lookup_params.get('title')
+        if not movie and title:
+            found = session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
+                                                                 title.lower()).first()
+            if found and found.movie:
+                log.debug('Found %s in previous search results as %s' % (title, found.movie.title))
+                movie = found.movie
         if only_cached:
             if movie:
                 return movie
             raise LookupError('Movie %s not found from cache' % lookup_params)
         if movie and not movie.expired:
             return movie
-        title = lookup_params.get('title')
-        if title:
-            found = session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
-                                                                 title.lower()).first()
-            if found and found.movie:
-                log.debug('Found %s in previous search results' % title)
-                return found.movie
         try:
             trakt_movie = get_trakt('movie', **lookup_params)
         except LookupError as e:
