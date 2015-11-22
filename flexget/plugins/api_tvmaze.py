@@ -21,12 +21,31 @@ DB_VERSION = 0
 Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 
-
+# TODO Person and character classes are not yet implemented in pytvmaze v.1.3.4
 class TVMazePerson(Base):
-    __tablename__ = 'tvmaze_person'
+    __tablename__ = 'tvmaze_persons'
 
     maze_id = Column(Integer, primary_key=True)
     url = Column(String)
+    medium_image= Column(String)
+    original_image = Column(String)
+    name = Column(Unicode)
+    characters = relation(TVMazeCharacter, secondary=persons_characters_table)
+
+class TVMazeCharacter(Base):
+    __tablename__ = 'tvmaze_characters'
+
+    maze_id = Column(Integer, primary_key=True)
+    url = Column(String)
+    medium_image= Column(String)
+    original_image = Column(String)
+    name = Column(Unicode)
+    persons = relation(TVMazePerson, secondary=persons_characters_table)
+
+persons_characters_table = Table('tvmaze_series_persons_characters', Base.metadata,
+                      Column('series_id', Integer, ForeignKey('tvmaze_series.maze_id')),
+                      Column('person_id', Integer, ForeignKey('tvmaze_persons.maze_id')),
+                      Column('person_id', Integer, ForeignKey('tvmaze_characters.maze_id')))
 
 
 class TVMazeGenre(Base):
