@@ -1,3 +1,6 @@
+"""
+    Search plugin for torrent411 french tracker.
+"""
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
@@ -5,7 +8,6 @@ from flexget import plugin
 from flexget.config_schema import one_or_more
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils import requests
 from flexget.utils.search import torrent_availability, normalize_unicode
 
 from flexget.manager import Session
@@ -16,14 +18,14 @@ from requests.compat import quote_plus
 
 from datetime import datetime, timedelta
 
-from sqlalchemy import Column, Unicode, Integer, DateTime
+from sqlalchemy import Column, Unicode, DateTime
 
 log = logging.getLogger('t411')
 Base = versioned_base('t411', 0)
 
 __author__ = 'blAStcodeM & gregaou'
 
-T411_BASE_URL = "http://api.t411.in"
+BASE_URL = "http://api.t411.in"
 
 CATEGORIES = {
     'Animation': 455,
@@ -89,23 +91,37 @@ SUB_CATEGORIES_SERIES = {
 }
 
 
-class t411Account(Base):
+class T411Account(Base):
+    """t411Account"""
+
     __tablename__ = 't411_account'
-    id = Column(Integer, primary_key=True, autoincrement=True, nullable=False)
-    username = Column(Unicode, index=True)
+
+    username = Column(Unicode, primary_key=True)
     token = Column(Unicode)
     expiry_time = Column(DateTime)
 
+    def __init__(self, username, token, expiry_time):
+        super(T411Account, self).__init__()
+        self.username = username
+        self.token = token
+        self.expiry_time = expiry_time
 
-class t411Auth(AuthBase):
 
+class T411Auth(AuthBase):
     """ Attaches HTTP Token Authentication to the given Request object."""
 
     def get_auth(self):
-        url_auth = T411_BASE_URL + "/auth"
+        """get_auth"""
+
+        url_auth = BASE_URL + "/auth"
         log.debug("Getting token from : %s ", url_auth)
         params = {'username': self.username, 'password': self.password}
-        res = requests.post(url_auth, data=params).json()
+
+        try:
+            res = self.requests.post(url_auth, data=params).json()
+        except self.requests.exceptions.RequestException as exc:
+            raise plugin.PluginError(exc)
+
         if 'error' in res.keys():
             raise plugin.PluginError(res['error'])
 
@@ -114,41 +130,68 @@ class t411Auth(AuthBase):
 
         return res['token']
 
-    def update_token(self, db_session, token):
+    @classmethod
+    def update_token(cls, db_session, token):
+        """update_token
+
+        :param db_session:
+        :param token:
+        """
+
         db_session.token = token
         db_session.expiry_time = datetime.now() + timedelta(days=90)
 
     def get_token(self):
-        db_session = Session()
-        account = db_session.query(t411Account).filter(t411Account.username == self.username).first()
+        """get_token"""
 
-        if self.force_auth:
-            log.debug("Token force mode !")
-            token = self.get_auth()
-            self.update_token(db_session, token)
-        elif account:
-            if account.expiry_time < datetime.now():
-                log.debug("Token expired, take a new one !")
+        if self.token is not None and not self.force_auth:
+            log.debug("Token already return one time, returning the same !")
+            return self.token
+
+        with Session() as db_session:
+            account = db_session.query(T411Account).filter(
+                T411Account.username == self.username).first()
+
+            if self.force_auth:
+                log.debug("Token force mode !")
                 token = self.get_auth()
                 self.update_token(db_session, token)
+            elif account:
+                if account.expiry_time < datetime.now():
+                    log.debug("Token expired, take a new one !")
+                    token = self.get_auth()
+                    self.update_token(db_session, token)
+                else:
+                    log.debug("Token found in db!")
+                    token = account.token
             else:
-                log.debug("Token found in db!")
-                token = account.token
-        else:
-            token = self.get_auth()
-            expiry_time = datetime.now() + timedelta(days=90)
-            db_session.add(t411Account(username=self.username, token=token, expiry_time=expiry_time))
-        db_session.commit()
-        self.token = token
-        return self.token
+                token = self.get_auth()
+                expiry_time = datetime.now() + timedelta(days=90)
+                db_session.add(T411Account(self.username, token, expiry_time))
+            self.token = token
+            return self.token
 
-    def __init__(self, username, password, force_auth=False):
+    def __init__(self, task_requests, username, password, force_auth=False):
+        """__init__
+
+        :param task_requests:
+        :param username:
+        :param password:
+        :param force_auth:
+        """
+
+        self.requests = task_requests
         self.username = username
         self.password = password
+        self.token = None
         self.force_auth = force_auth
         self.get_token()
 
     def __call__(self, r):
+        """__call__
+
+        :param r:
+        """
         r.headers['authorization'] = self.token
         return r
 
@@ -203,16 +246,32 @@ class SearchT411(object):
         'additionalProperties': False
     }
 
-    @plugin.internet(log)
-    def search(self, task, entry, config=None):
-        """
-        Search torrent in private torrent tracker t411
+    @classmethod
+    def get_entry(cls, json, auth_handler):
+        """get_entry
+
+        :param json:
+        :param auth_handler:
         """
 
-        if not isinstance(config, dict):
-            config = {}
+        entry = Entry()
+        entry['title'] = json['name']
+        entry['url'] = (BASE_URL + '/torrents/download/%s' % json['id'])
+        entry['torrent_seeds'] = json['seeders']
+        entry['torrent_leeches'] = json['leechers']
+        entry['search_sort'] = torrent_availability(json['torrent_seeds'],
+                                                    json['torrent_leeches'])
+        entry['content_size'] = json['size']
+        entry['download_auth'] = auth_handler
+        return entry
 
-        category = config.get('category')
+    @classmethod
+    def get_filter_url(cls, category, sub_categories):
+        """get_filter_url
+
+        :param category:
+        :param sub_categories:
+        """
 
         if category == 'Serie-TV':
             sub_categories_dict = SUB_CATEGORIES.copy()
@@ -221,7 +280,6 @@ class SearchT411(object):
         if category in list(CATEGORIES):
             category = CATEGORIES[category]
 
-        sub_categories = config.get('sub_category')
         if not isinstance(sub_categories, list):
             sub_categories = [sub_categories]
 
@@ -230,46 +288,82 @@ class SearchT411(object):
             filter_url = '?cat=%s' % str(category)
 
             if sub_categories[0] is not None:
-                sub_categories = [sub_categories_dict[c] for c in sub_categories]
-                filter_url = filter_url + '&' + '&'.join([quote_plus('term[%s][]' % c[0]).
-                                                          encode('utf-8') + '=' + str(c[1])
-                                                          for c in sub_categories if c != 0])
-        entries = set()
-        auth_handler = t411Auth(config.get('username'), config.get('password'))
-        for search_string in entry.get('search_strings', [entry['title']]):
-            query = normalize_unicode(search_string)
-            url_search = ('/torrents/search/' +
-                          quote_plus(query.encode('utf-8')) +
-                          filter_url)
+                sub_categories = [sub_categories_dict[c]
+                                  for c in sub_categories]
+                filter_url = (filter_url + '&' +
+                              '&'.join([quote_plus('term[%s][]' % c[0]).
+                                        encode('utf-8') + '=' + str(c[1])
+                                        for c in sub_categories if c != 0]))
+        return filter_url
 
-            response = requests.get(T411_BASE_URL + url_search, auth=auth_handler)
-            res_json = response.json()
+    @classmethod
+    def get_response_json(cls, requests, search_string, auth_handler, config):
+        """get_response_json
+
+        :param requests:
+        :param search_string:
+        :param auth_handler:
+        :param config:
+        """
+
+        filter_url = cls.get_filter_url(config.get('category'),
+                                        config.get('sub_category'))
+
+        query = normalize_unicode(search_string)
+        url_search = ('/torrents/search/' + quote_plus(query.encode('utf-8')) +
+                      filter_url)
+
+        try:
+            response = requests.get(BASE_URL + url_search, auth=auth_handler)
+        except requests.exceptions.RequestException as exc:
+            raise plugin.PluginError(exc)
+
+        res_json = response.json()
+
+        if 'errors' in res_json.keys():
+            auth_handler = T411Auth(requests, config.get('username'),
+                                    config.get('password'), force_auth=True)
+            try:
+                res_json = requests.get(BASE_URL + url_search,
+                                        auth=auth_handler).json()
+            except requests.exceptions.RequestException as exc:
+                raise plugin.PluginError(exc)
 
             if 'errors' in res_json.keys():
-                auth_handler = t411Auth(config.get('username'), config.get('password'), force_auth=True)
-                res_json = requests.get(T411_BASE_URL + url_search, auth=auth_handler).json()
+                raise plugin.PluginError(res_json['error'])
 
-                if 'errors' in res_json.keys():
-                    raise plugin.PluginError(res['error'])
+        return res_json
+
+    @classmethod
+    @plugin.internet(log)
+    def search(cls, task, entry, config=None):
+        """search
+
+        :param task:
+        :param entry:
+        :param config:
+        """
+
+        entries = set()
+
+        for search_string in entry.get('search_strings', [entry['title']]):
+            auth_handler = T411Auth(task.requests,
+                                    config.get('username'),
+                                    config.get('password'))
+
+            res_json = cls.get_response_json(task.requests, search_string,
+                                             auth_handler, config)
 
             for torrent in res_json['torrents']:
-                new_entry = Entry()
-                new_entry['title'] = torrent['name']
-                new_entry['url'] = T411_BASE_URL + '/torrents/download/%s' % torrent['id']
-                new_entry['torrent_seeds'] = torrent['seeders']
-                new_entry['torrent_leeches'] = torrent['leechers']
-                new_entry['search_sort'] = torrent_availability(new_entry['torrent_seeds'],
-                                                                new_entry['torrent_leeches'])
-                new_entry['content_size'] = torrent['size']
-                new_entry['download_auth'] = auth_handler
-                entries.add(new_entry)
+                entries.add(cls.get_entry(torrent, auth_handler))
 
-
-        return sorted(entries, reverse=True, key=lambda x: x.get('search_sort'))
+        return sorted(entries, reverse=True,
+                      key=lambda x: x.get('search_sort'))
 
 
 @event('plugin.register')
 def register_plugin():
+    """register_plugin"""
     plugin.register(SearchT411, 't411',
                     groups=['search'],
                     api_ver=2)
