@@ -139,9 +139,12 @@ class TVMazeSeries(Base):
     @property
     def expired(self):
         if not self.last_update:
+            log.debug('no last update attribute, series set for update')
             return True
         time_dif = datetime.now() - self.last_update
-        return time_dif.days > UPDATE_INTERVAL
+        expiration = time_dif.days > UPDATE_INTERVAL
+        log.debug('series {0} is expired: {1}'.format(self.name, expiration))
+        return expiration
 
 
 class TVMazeSeasons(Base):
