@@ -65,7 +65,7 @@ class TVMazeSeries(Base):
     runtime = Column(Integer)
     show_type = Column(String)
     network = Column(Unicode)
-    episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season', cascade='all, delete, delete-orphan',
+    episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season_number', cascade='all, delete, delete-orphan',
                         backref='series')
     last_update = Column(DateTime)  # last time we updated the db for the show
 
@@ -124,22 +124,23 @@ class TVMazeEpisodes(Base):
 
     tvmaze_id = Column(Integer, primary_key=True)
     series_id = Column(Integer, ForeignKey('tvmaze_series.tvmaze_id'), nullable=False)
+    number = Column(Integer, nullable=False)
+    season_number = Column(Integer, nullable=False)
+
     title = Column(Unicode)
     airdate = Column(DateTime)
     url = Column(String)
-    number = Column(Integer)
-    season_number = Column(Integer)
     original_image = Column(String)
     medium_image = Column(String)
     airstamp = Column(DateTime)
     runtime = Column(Integer)
-    season = Column(Integer)
     last_update = Column(DateTime)
 
     def __init__(self, episode, season_num, series_id):
         self.series_id = series_id
         self.tvmaze_id = episode.maze_id
-        self.season = season_num
+        self.season_number = season_num
+        self.number = episode.episode_number
         self.update(episode)
 
     def update(self, episode):
@@ -149,8 +150,6 @@ class TVMazeEpisodes(Base):
         except ValueError:
             self.airdate = None
         self.url = episode.url
-        self.number = episode.episode_number
-        self.season_number = episode.season_number
         try:
             self.original_image = episode.image.get('original')
         except AttributeError:
@@ -163,13 +162,29 @@ class TVMazeEpisodes(Base):
         self.runtime = episode.runtime
         self.last_update = datetime.now()
 
+    @property
+    def expired(self):
+        if not self.last_update:
+            log.debug('no last update attribute, series set for update')
+            return True
+        time_dif = datetime.now() - self.last_update
+        expiration = time_dif.days > UPDATE_INTERVAL
+        log.debug('episode {0}, season {1} for series {2} is expired. days overdue for update: {3}'.format(self.number,
+                                                                                                           self.season_number,
+                                                                                                           self.series_id,
+                                                                                                           expiration))
+        return expiration
+
 
 def get_db_episodes(seasons, session, series_id):
     db_episodes = []
     for season_num, seas in seasons.items():
         for episode_num, ep in seas.episodes.items():
             db_episode = session.query(TVMazeEpisodes).filter(TVMazeEpisodes.tvmaze_id == ep.maze_id).first()
-            if not db_episode:
+            if db_episode and db_episode.expired:
+                log.debug('episode {0} data expired, refreshing.'.format(db_episode.tvmaze_id))
+                db_episode.update(ep)
+            elif not db_episode:
                 log.debug('creating new episode in db. ep_num:{0} season_num:{1} series_id:{2}'.format(episode_num,
                                                                                                        season_num,
                                                                                                        series_id))
@@ -312,7 +327,7 @@ class APITVMaze(object):
         season_number = lookup_params.get('series_season')
         episode_number = lookup_params.get('series_episode')
         if not all([season_number, episode_number, series_name]):
-            raise LookupError('Not enough parameter to lookup episode')
+            raise LookupError('Not enough parameters to lookup episode')
         series = APITVMaze.series_lookup(session=session, force_cache=force_cache, **lookup_params)
         if not series:
             raise LookupError('Could not find series with the following parameters: {0}'.format(**lookup_params))
