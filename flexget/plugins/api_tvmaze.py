@@ -329,16 +329,26 @@ class APITVMaze(object):
     @with_session
     def episode_lookup(session=None, force_cache=False, **lookup_params):
         series_name = lookup_params.get('series_name') or lookup_params.get('title')
+        lookup_type = lookup_params.get('series_id_type')
+
         season_number = lookup_params.get('series_season')
         episode_number = lookup_params.get('series_episode')
-        if not all([season_number, episode_number, series_name]):
+
+        episode_date = lookup_params.get('series_date')
+        if lookup_type == 'ep' and not all([season_number, episode_number, series_name]):
+            raise LookupError('Not enough parameters to lookup episode')
+        elif lookup_type == 'date' and not all([series_name, episode_date]):
             raise LookupError('Not enough parameters to lookup episode')
         series = APITVMaze.series_lookup(session=session, force_cache=force_cache, **lookup_params)
         if not series:
             raise LookupError('Could not find series with the following parameters: {0}'.format(**lookup_params))
         for episode in series.episodes:
-            if episode.season_number == season_number and episode.number == episode_number:
-                return episode
+            if lookup_type == 'ep':
+                if episode.season_number == season_number and episode.number == episode_number:
+                    return episode
+            elif lookup_type == 'date':
+                if episode.airdate == episode_date:
+                    return episode
         return
 
 

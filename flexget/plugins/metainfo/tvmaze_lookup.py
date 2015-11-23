@@ -8,6 +8,7 @@ from flexget.manager import Session
 
 try:
     from flexget.plugins.api_tvmaze import APITVMaze
+
     series_lookup = APITVMaze.series_lookup
     episode_lookup = APITVMaze.episode_lookup
 except ImportError:
@@ -138,9 +139,11 @@ class PluginTVMazeLookup(object):
                           'year': entry.get('year', eval_lazy=False),
                           'tvmaze_id': entry.get('tvmaze_id', eval_lazy=False),
                           'tvdb_id': entry.get('tvdb_id', eval_lazy=False),
-                          'tvrage_id': entry.get('tvrage_idk', eval_lazy=False),
-                          'series_season': entry.get('series_season'),
-                          'series_episode': entry.get('series_episode'),
+                          'tvrage_id': entry.get('tvrage_id', eval_lazy=False),
+                          'series_season': entry.get('series_season', eval_lazy=False),
+                          'series_episode': entry.get('series_episode', eval_lazy=False),
+                          'series_date': entry.get('series_date', eval_lazy=False),
+                          'series_id_type': entry.get('series_id_type', eval_lazy=False),
                           'session': session}
             try:
                 episode = episode_lookup(**lookupargs)
@@ -159,7 +162,7 @@ class PluginTVMazeLookup(object):
         for entry in task.entries:
             if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False):
                 entry.register_lazy_func(self.lazy_series_lookup, self.series_map)
-                if 'series_season' in entry and 'series_episode' in entry:
+                if ('series_season' in entry and 'series_episode' in entry) or ('series_date' in entry):
                     entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
 
 
