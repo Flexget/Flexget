@@ -9,7 +9,7 @@ from flexget.event import event
 try:
     from flexget.plugins.api_tvmaze import APITVMaze
 
-    episode_airdate = APITVMaze.episode_airdate
+    lookup = APITVMaze.episode_lookup
 except ImportError:
     raise plugin.DependencyError(issued_by='est_series_tvmaze', missing='api_tvmaze',
                                  message='est_series_tvmaze requires the `api_tvmaze` plugin')
@@ -49,13 +49,13 @@ class EstimatesSeriesTVMaze(object):
             if v:
                 log.debug('{0}: {1}'.format(k, v))
         try:
-            airdate = episode_airdate(**kwargs)
+            episode = lookup(**kwargs)
         except LookupError as e:
             log.debug(e)
             return
-        if airdate:
-            log.debug('received airdate: {0}'.format(airdate))
-            return airdate
+        if episode.airdate:
+            log.debug('received airdate: {0}'.format(episode.airdate))
+            return episode.airdate
         return
 
 
