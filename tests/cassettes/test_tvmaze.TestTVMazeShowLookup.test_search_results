@@ -1,0 +1,584 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/search/shows?q=Shameless
+  response:
+    body: {string: !!python/unicode '[{"score":2.7135434,"show":{"id":150,"url":"http://www.tvmaze.com/shows/150/shameless","name":"Shameless","type":"Scripted","language":"English","genres":["Drama","Comedy"],"status":"Running","runtime":60,"premiered":"2011-01-09","schedule":{"time":"21:00","days":["Sunday"]},"rating":{"average":9},"weight":8,"network":{"id":9,"name":"Showtime","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":25117,"thetvdb":161511},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/28/70721.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/28/70721.jpg"},"summary":"<p>Oscar-nominated
+        William H. Macy and Emmy Rossum star in this fiercely engaging and fearlessly
+        twisted series. Chicagoan Frank Gallagher is the proud single dad of six smart,
+        industrious, independent kids, who without him would be... perhaps better
+        off. When Frank''s not at the bar spending what little money they have, he''s
+        passed out on the floor. But the kids have found ways to grow up in spite
+        of him. They may not be like any family you know, but they make no apologies
+        for being exactly who they are.</p>","updated":1446824631,"_links":{"self":{"href":"http://api.tvmaze.com/shows/150"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/116529"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/203656"}}}},{"score":2.6683302,"show":{"id":746,"url":"http://www.tvmaze.com/shows/746/shameless","name":"Shameless","type":"Scripted","language":"English","genres":["Drama","Comedy"],"status":"Ended","runtime":60,"premiered":"2004-01-13","schedule":{"time":"22:00","days":["Tuesday"]},"rating":{"average":8.2},"weight":0,"network":{"id":45,"name":"Channel
+        4","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":5162,"thetvdb":78846},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/6/15159.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/6/15159.jpg"},"summary":"<p>Paul
+        Abbott''s critically acclaimed, offbeat drama about the rollercoaster lives
+        and loves of the dysfunctional Gallagher clan.</p>","updated":1448119580,"_links":{"self":{"href":"http://api.tvmaze.com/shows/746"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/65928"}}}},{"score":1.4848593,"show":{"id":2626,"url":"http://www.tvmaze.com/shows/2626/fameless","name":"Fameless","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"2015-07-29","schedule":{"time":"22:30","days":["Thursday"]},"rating":{"average":7},"weight":0,"network":{"id":84,"name":"truTV","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":50171,"thetvdb":298445},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/13/34907.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/13/34907.jpg"},"summary":"<p>From
+        the mischievous mind of comedian and actor David Spade comes <strong><em>\"</em></strong><em><strong>Fameless\"</strong></em>,
+        a genre-busting prank show about how far real people will go for a moment
+        in the spotlight. Each week, the series features a group of unsuspecting desperate-to-be-famous
+        individuals who believe they''ve been cast on a reality show. However, unbeknownst
+        to them, they are really filming a parody with improv actors creating over-the-top
+        scenarios that steadily increase the absurdity and ridiculousness of each
+        situation - testing the patience of everyone NOT in on the joke. <em>TV-14</em></p>","updated":1445428337,"_links":{"self":{"href":"http://api.tvmaze.com/shows/2626"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/201365"}}}}]'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Mon, 23 Nov 2015 14:09:06 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [!!python/unicode api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/shows/150?embed=episodes
+  response:
+    body: {string: "{\"id\":150,\"url\":\"http://www.tvmaze.com/shows/150/shameless\",\"name\":\"Shameless\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Drama\",\"Comedy\"],\"status\":\"Running\",\"runtime\":60,\"premiered\":\"2011-01-09\",\"schedule\":{\"time\":\"21:00\",\"days\":[\"Sunday\"]},\"rating\":{\"average\":9},\"weight\":8,\"network\":{\"id\":9,\"name\":\"Showtime\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":25117,\"thetvdb\":161511},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/28/70721.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/28/70721.jpg\"},\"summary\":\"<p>Oscar-nominated
+        William H. Macy and Emmy Rossum star in this fiercely engaging and fearlessly
+        twisted series. Chicagoan Frank Gallagher is the proud single dad of six smart,
+        industrious, independent kids, who without him would be... perhaps better
+        off. When Frank's not at the bar spending what little money they have, he's
+        passed out on the floor. But the kids have found ways to grow up in spite
+        of him. They may not be like any family you know, but they make no apologies
+        for being exactly who they are.</p>\",\"updated\":1446824631,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/150\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/116529\"},\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/203656\"}},\"_embedded\":{\"episodes\":[{\"id\":11109,\"url\":\"http://www.tvmaze.com/episodes/11109/shameless-1x01-pilot\",\"name\":\"Pilot\",\"season\":1,\"number\":1,\"airdate\":\"2011-01-09\",\"airtime\":\"22:00\",\"airstamp\":\"2011-01-09T22:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>The
+        premiere of a series following the escapades of a hard-partying Chicago father
+        (William H. Macy) who provides no guidance to his dysfunctional brood of six.
+        First up: daughter Fiona has her purse snatched but manages to make the acquaintance
+        of a handsome young man, and Lip discovers an unsettling secret about younger
+        brother Ian.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11109\"}}},{\"id\":11110,\"url\":\"http://www.tvmaze.com/episodes/11110/shameless-1x02-frank-the-plank\",\"name\":\"Frank
+        the Plank\",\"season\":1,\"number\":2,\"airdate\":\"2011-01-16\",\"airtime\":\"22:00\",\"airstamp\":\"2011-01-16T22:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>A
+        manhunt goes out for Frank after he heads off on a Friday bender and uncharacteristically
+        fails to show up to cash his disability check. Later, he turns up in Toronto
+        with no memory of how he got there.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11110\"}}},{\"id\":11111,\"url\":\"http://www.tvmaze.com/episodes/11111/shameless-1x03-aunt-ginger\",\"name\":\"Aunt
+        Ginger\",\"season\":1,\"number\":3,\"airdate\":\"2011-01-23\",\"airtime\":\"22:00\",\"airstamp\":\"2011-01-23T22:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        contemplates romance with a policeman who has had a lifelong crush on her,
+        but Steve isn't about to remove himself from the picture. Meanwhile, Ian spurns
+        a girl's attentions and her brothers come looking for him; and elderly Aunt
+        Ginger, who actually owns the Gallagher house, goes missing and the whole
+        family joins in the search.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11111\"}}},{\"id\":11112,\"url\":\"http://www.tvmaze.com/episodes/11112/shameless-1x04-casey-casden\",\"name\":\"Casey
+        Casden\",\"season\":1,\"number\":4,\"airdate\":\"2011-01-30\",\"airtime\":\"22:00\",\"airstamp\":\"2011-01-30T22:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>When
+        Aunt Ginger takes her leave, little Debbie is left sad and lonely, so to ease
+        the hurt she kidnaps a toddler from a birthday party, leaving the Gallaghers
+        scrambling to come up with a plan to return the child before the Chicago Police
+        Department fingers them for the crime. Meanwhile, Frank parries sexual advances
+        from Karen, while Kevin's white lie involving his noninvolvement with an attractive
+        young lady leads to a surprising conclusion.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11112\"}}},{\"id\":11113,\"url\":\"http://www.tvmaze.com/episodes/11113/shameless-1x05-three-boys\",\"name\":\"Three
+        Boys\",\"season\":1,\"number\":5,\"airdate\":\"2011-02-06\",\"airtime\":\"22:00\",\"airstamp\":\"2011-02-06T22:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>The
+        family attempts to pull off a fake wedding when it is revealed that Veronica
+        comes from a wealthy family; Frank is given bad medical news and doesn't do
+        such a good job of handling it; and Steve goes cruising for a new car, with
+        Fiona along for the ride.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11113\"}}},{\"id\":11114,\"url\":\"http://www.tvmaze.com/episodes/11114/shameless-1x06-killer-carl\",\"name\":\"Killer
+        Carl\",\"season\":1,\"number\":6,\"airdate\":\"2011-02-13\",\"airtime\":\"22:00\",\"airstamp\":\"2011-02-13T22:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        scrambles to spruce up the house for an impending visit from Carl's teacher;
+        Lip makes some extra cash by taking tests for his less-intelligent classmates;
+        the Kash and Grab is repeatedly robbed by a local punk; and Frank's lack of
+        business acumen costs him.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11114\"}}},{\"id\":11115,\"url\":\"http://www.tvmaze.com/episodes/11115/shameless-1x07-frank-gallagher-loving-husband-devoted-father\",\"name\":\"Frank
+        Gallagher: Loving Husband, Devoted Father\",\"season\":1,\"number\":7,\"airdate\":\"2011-02-20\",\"airtime\":\"22:00\",\"airstamp\":\"2011-02-20T22:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>To
+        come up with $6000 Frank owes to two thugs, he entertains the notion of a
+        risky business that's going to require some big-time help from the family.
+        Elsewhere, Ian stands up to a bully, and Fiona agrees to go away with Steve,
+        leaving Liam with agoraphobe Sheila.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11115\"}}},{\"id\":11116,\"url\":\"http://www.tvmaze.com/episodes/11116/shameless-1x08-its-time-to-kill-the-turtle\",\"name\":\"It's
+        Time to Kill the Turtle\",\"season\":1,\"number\":8,\"airdate\":\"2011-02-27\",\"airtime\":\"22:00\",\"airstamp\":\"2011-02-27T22:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Frank
+        goes on the wagon, which pleases Carl and Debbie, but a skeptical Lip doesn't
+        believe their father's newfound temperance will keep him from the bottle for
+        long. Elsewhere, Fiona scrambles to find a better-paying job, which leads
+        her to overlook some suspicious behavior of Steve's; Kev and Veronica open
+        their house to a foster child and get quite a surprise when they learn her
+        family history; Ian pursues Mickey; and Sheila worries Frank has lost interest
+        in her.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11116\"}}},{\"id\":11117,\"url\":\"http://www.tvmaze.com/episodes/11117/shameless-1x09-but-at-last-came-a-knock\",\"name\":\"But
+        at Last Came a Knock\",\"season\":1,\"number\":9,\"airdate\":\"2011-03-06\",\"airtime\":\"22:00\",\"airstamp\":\"2011-03-06T22:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Frank
+        is in line for some settlement money, but there's a catch: he needs his ex-wife's
+        signature on the paperwork. Elsewhere, Debbie discovers a secret about Steve;
+        Monica turns up and announces she's taking baby Liam with her; and an angry
+        Fiona moves out of the house and in with Steve.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11117\"}}},{\"id\":11118,\"url\":\"http://www.tvmaze.com/episodes/11118/shameless-1x10-nana-gallagher-had-an-affair\",\"name\":\"Nana
+        Gallagher Had an Affair\",\"season\":1,\"number\":10,\"airdate\":\"2011-03-13\",\"airtime\":\"22:00\",\"airstamp\":\"2011-03-13T22:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Monica
+        returns and the Gallagher clan are in a tizzy as they try to determine if
+        Frank is their real father. And Fiona, who is thoroughly disgusted with Monica,
+        decides to move in next door with Steve. Meanwhile, Eddie invites Karen to
+        a Purity Ball; and Frank uses Carl in an effort to thwart a disability worker's
+        attempt to pull the plug on the state funds he receives.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11118\"}}},{\"id\":11119,\"url\":\"http://www.tvmaze.com/episodes/11119/shameless-1x11-daddyz-girl\",\"name\":\"Daddyz
+        Girl\",\"season\":1,\"number\":11,\"airdate\":\"2011-03-20\",\"airtime\":\"22:00\",\"airstamp\":\"2011-03-20T22:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        befriends an alluring young lady after Debbie talks her into joining a mothers'
+        group. Elsewhere, Tony suspects he knows the truth behind Steve's car-stealing
+        business; Lip and Ian try to learn which of their uncles is Ian's dad; and
+        Frank sees his workman's compensation benefits come to an end, so he sends
+        the kids on a mission to find him a job, preferably one that is highly dangerous.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11119\"}}},{\"id\":11120,\"url\":\"http://www.tvmaze.com/episodes/11120/shameless-1x12-father-frank-full-of-grace\",\"name\":\"Father
+        Frank, Full of Grace\",\"season\":1,\"number\":12,\"airdate\":\"2011-03-27\",\"airtime\":\"22:00\",\"airstamp\":\"2011-03-27T22:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>In
+        the Season 1 finale, Steve's actual occupation is revealed and he tries to
+        persuade Fiona to leave town with him. Meanwhile, Frank goes into hiding when
+        his and Karen's secret is spilled; and car thieves Lip and Ian get caught
+        and locked up, and it's up to Fiona to figure out how to spring them.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11120\"}}},{\"id\":11121,\"url\":\"http://www.tvmaze.com/episodes/11121/shameless-2x01-summertime\",\"name\":\"Summertime\",\"season\":2,\"number\":1,\"airdate\":\"2012-01-08\",\"airtime\":\"21:00\",\"airstamp\":\"2012-01-08T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>In
+        the second-season premiere, following her breakup with Steve, Fiona lands
+        a job tending bar at a popular local joint and makes a new acquaintance in
+        an enterprising young businessman. Meanwhile, Frank uses Liam as collateral
+        for a gambling debt; Lip takes bets on Little League games; and Kash leaves
+        town, so Ian decides to take over the Kash and Grab.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11121\"}}},{\"id\":11122,\"url\":\"http://www.tvmaze.com/episodes/11122/shameless-2x02-summer-loving\",\"name\":\"Summer
+        Loving\",\"season\":2,\"number\":2,\"airdate\":\"2012-01-15\",\"airtime\":\"21:00\",\"airstamp\":\"2012-01-15T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Frank
+        spots a potential sugar momma in a bar patron named Dottie, whose health is
+        failing fast but is living well on a city pension. Meanwhile, Fiona has her
+        hands full with a new job tending bar, the kids and the new man in her life;
+        and at home, Debbie wants a room of her own while Carl beds down in a van.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11122\"}}},{\"id\":11123,\"url\":\"http://www.tvmaze.com/episodes/11123/shameless-2x03-ill-light-a-candle-for-you-every-day\",\"name\":\"I'll
+        Light a Candle for You Every Day\",\"season\":2,\"number\":3,\"airdate\":\"2012-01-22\",\"airtime\":\"21:00\",\"airstamp\":\"2012-01-22T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        ponders the morality of getting involved with a high-school crush who's now
+        married; Frank pulls out all the stops in an effort to stay in the good graces
+        of his meal ticket, Dottie; and Harry's health issues leave Debbie obsessing
+        over death. Meanwhile, Kevin considers buying the Alibi; Lip takes a meeting
+        with an Army officer to see about getting Ian into West Point; Jody asks for
+        Frank's permission to marry Karen.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11123\"}}},{\"id\":11124,\"url\":\"http://www.tvmaze.com/episodes/11124/shameless-2x04-a-beautiful-mess\",\"name\":\"A
+        Beautiful Mess\",\"season\":2,\"number\":4,\"airdate\":\"2012-01-29\",\"airtime\":\"21:00\",\"airstamp\":\"2012-01-29T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>After
+        sleeping with Craig, Fiona is unprepared for the arrival of his irate wife.
+        And on the family front, Fiona is concerned that she is dumping too much responsibility
+        on the Gallagher children when stress causes Debbie to break out in a rash.
+        Meanwhile, Frank begins to suspect his days in the Jackson household are coming
+        to an end; Ian marches forward in his efforts to get into West Point; and
+        Lip attempts to dig up dirt on Jody.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11124\"}}},{\"id\":11125,\"url\":\"http://www.tvmaze.com/episodes/11125/shameless-2x05-fathers-day\",\"name\":\"Father's
+        Day\",\"season\":2,\"number\":5,\"airdate\":\"2012-02-05\",\"airtime\":\"21:00\",\"airstamp\":\"2012-02-05T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>When
+        Eddie Jackson's body turns up, Frank thinks he should be in line to claim
+        his pension and insurance benefits. Meanwhile, Fiona attends a high-class
+        wedding with her sugar daddy; Lip discovers startling news about Karen and
+        Jody; Frank's room is rented to a hooker; Veronica suspects Kev of cheating;
+        and Sheila uncovers the truth about what transpired between Frank and Karen
+        last year.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11125\"}}},{\"id\":11126,\"url\":\"http://www.tvmaze.com/episodes/11126/shameless-2x06-can-i-have-a-mother\",\"name\":\"Can
+        I Have a Mother\",\"season\":2,\"number\":6,\"airdate\":\"2012-02-12\",\"airtime\":\"21:00\",\"airstamp\":\"2012-02-12T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Debbie's
+        day at day care takes a wild turn with the arrival of Grammy Gallagher, who's
+        been released on a medical furlough. She seeks Frank's help in tracking down
+        her old meth-lab pal who owes her a big debt. Meanwhile, Steve invites Fiona
+        and Adam on a double date with him and his Brazilian bombshell; and when Frank
+        finds out the beneficiary of Eddie's life-insurance policy, he hits the roof.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11126\"}}},{\"id\":11127,\"url\":\"http://www.tvmaze.com/episodes/11127/shameless-2x07-a-bottle-of-jean-nate\",\"name\":\"A
+        Bottle of Jean Nate\",\"season\":2,\"number\":7,\"airdate\":\"2012-02-19\",\"airtime\":\"21:00\",\"airstamp\":\"2012-02-19T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Jasmine
+        throws an end-of-summer blowout and invites Fiona down to David's boat but
+        neglects to inform her that Steve and Estefania will also be on board; Lip
+        tries to get back into Karen's good graces and prepares a prenup for her and
+        Jody. Meanwhile, the Ian and Lip impasse heats up into a physical confrontation;
+        Frank tires of doing Grammy's bidding and wants her out, but Fiona is enjoying
+        the old girl's company.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11127\"}}},{\"id\":11128,\"url\":\"http://www.tvmaze.com/episodes/11128/shameless-2x08-parenthood\",\"name\":\"Parenthood\",\"season\":2,\"number\":8,\"airdate\":\"2012-03-04\",\"airtime\":\"21:00\",\"airstamp\":\"2012-03-04T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>While
+        Jody and Sheila comfort a dying Grammy, Frank steps out and stops at the Kash
+        and Grab, where he walks in on Ian and Mickey in a compromising position.
+        Meanwhile, Lip wants to quit school, but Fiona tells him that if he reconsiders,
+        she'll go back and get her GED; Lip takes Karen to a number of adoption agencies
+        and doesn't like what she has planned; Steve decides to coach Carl's football
+        team.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11128\"}}},{\"id\":11129,\"url\":\"http://www.tvmaze.com/episodes/11129/shameless-2x09-hurricane-monica\",\"name\":\"Hurricane
+        Monica\",\"season\":2,\"number\":9,\"airdate\":\"2012-03-11\",\"airtime\":\"21:00\",\"airstamp\":\"2012-03-11T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Monica
+        blows back into town and immediately hooks up with Frank for more shenanigans,
+        but the kids are left wondering if she's finally here to stay, and Frank is
+        eager to pick up the ashes of his late mother and reclaim the cash he believes
+        she's hidden. Meanwhile, after Fiona kicks out Lip, he kicks around with stops
+        at Karen's and Steve's. Later, Sheila and Jody think the house is haunted
+        by Eddie's ghost.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11129\"}}},{\"id\":11130,\"url\":\"http://www.tvmaze.com/episodes/11130/shameless-2x10-a-great-cause\",\"name\":\"A
+        Great Cause\",\"season\":2,\"number\":10,\"airdate\":\"2012-03-18\",\"airtime\":\"21:00\",\"airstamp\":\"2012-03-18T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>With
+        Monica around and pitching in, Fiona is able to devote more time to pursuing
+        her GED and seek a promotion at the club; Steve learns Estefania is still
+        in love with her ex-boyfriend, so he and Lip conspire to sneak her beau back
+        into the country. Meanwhile, Ian is busy dodging a vengeful Terry Milkovich;
+        and Lip ponders the possibility that he might be poppa to Mandy's impending
+        arrival.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11130\"}}},{\"id\":11131,\"url\":\"http://www.tvmaze.com/episodes/11131/shameless-2x11-just-like-the-pilgrims-intended\",\"name\":\"Just
+        Like The Pilgrims Intended\",\"season\":2,\"number\":11,\"airdate\":\"2012-03-25\",\"airtime\":\"21:00\",\"airstamp\":\"2012-03-25T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona's
+        Thanksgiving plans get put on the back burner when Frank tries to get Monica
+        out of bed and help her out of her depression. Meanwhile, Estefania and Marco's
+        rocky reunion takes a turn for the better when Steve offers to surrender his
+        identity so Marco can stay in the country and marry. Later, Karen goes into
+        labor; and Debbie worries that depression may run in the Gallagher family.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11131\"}}},{\"id\":11132,\"url\":\"http://www.tvmaze.com/episodes/11132/shameless-2x12-fiona-interrupted\",\"name\":\"Fiona
+        Interrupted\",\"season\":2,\"number\":12,\"airdate\":\"2012-04-01\",\"airtime\":\"21:00\",\"airstamp\":\"2012-04-01T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Jimmy
+        gets back into Fiona's good graces and decides to have her meet his family;
+        Frank plots to free Monica from the psychiatric institution; and Jody and
+        Sheila attempt to hide Karen's newborn in the second-season finale. Later,
+        Ian runs into the guy he slept with; and the late Eddie's long-awaited insurance
+        check arrives.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11132\"}}},{\"id\":11133,\"url\":\"http://www.tvmaze.com/episodes/11133/shameless-3x01-el-gran-canon\",\"name\":\"El
+        Gran Ca\xF1on\",\"season\":3,\"number\":1,\"airdate\":\"2013-01-13\",\"airtime\":\"21:00\",\"airstamp\":\"2013-01-13T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>In
+        the Season 3 premiere, Fiona adapts to living with Jimmy; Frank awakens in
+        a strange place; and Lip gets sentenced to community service. Meanwhile, Jody
+        and Sheila are losing sleep over Baby Hymie's nocturnal restlessness.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11133\"}}},{\"id\":11134,\"url\":\"http://www.tvmaze.com/episodes/11134/shameless-3x02-the-american-dream\",\"name\":\"The
+        American Dream\",\"season\":3,\"number\":2,\"airdate\":\"2013-01-20\",\"airtime\":\"21:00\",\"airstamp\":\"2013-01-20T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        has second thoughts about loaning money to Meg; and a drunken Frank staggers
+        home, where no one wants him, until he proves to be the only one who can quiet
+        fussy Baby Hymie. Meanwhile, Lip's community-service encounter with a North
+        Side youth group gives him a moneymaking idea, while Kev's wife returns with
+        her son Kyle and Frank puts in a call to child services.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11134\"}}},{\"id\":11135,\"url\":\"http://www.tvmaze.com/episodes/11135/shameless-3x03-may-i-trim-your-hedges\",\"name\":\"May
+        I Trim Your Hedges?\",\"season\":3,\"number\":3,\"airdate\":\"2013-01-27\",\"airtime\":\"21:00\",\"airstamp\":\"2013-01-27T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Frank
+        works a scam on a cancer foundation; and Fiona is shocked to learn what she
+        must do for a job as a grocery-store cashier and teams with Veronica to get
+        back at the manager. Meanwhile, crusader Lip hunts down sex offenders in the
+        neighborhood.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11135\"}}},{\"id\":11136,\"url\":\"http://www.tvmaze.com/episodes/11136/shameless-3x04-the-helpful-gallaghers\",\"name\":\"The
+        Helpful Gallaghers\",\"season\":3,\"number\":4,\"airdate\":\"2013-02-10\",\"airtime\":\"21:00\",\"airstamp\":\"2013-02-10T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Carl
+        heads to cancer camp, where the facility's activities leave a lot to be desired,
+        while Frank goes on babysitting duty and Sheila plans to introduce Jody to
+        \\\"toy time.\\\" Later, Fiona rallies coworkers against the boss; Lip and
+        Mandy rescue her half sister from foster care; and Jimmy gets bad news about
+        his parents.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11136\"}}},{\"id\":11137,\"url\":\"http://www.tvmaze.com/episodes/11137/shameless-3x05-the-sins-of-my-caretaker\",\"name\":\"The
+        Sins Of My Caretaker\",\"season\":3,\"number\":5,\"airdate\":\"2013-02-17\",\"airtime\":\"21:00\",\"airstamp\":\"2013-02-17T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Frank
+        has a major problem on his hands when the city announces it will be doing
+        work on the main sewer and they'll be digging up his yard, where Aunt Ginger's
+        remains are located. Meanwhile, Fiona's boss finds her work unsatisfactory;
+        Molly uncovers a startling secret; and Ned wants Ian to break into his wife's
+        house.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11137\"}}},{\"id\":11138,\"url\":\"http://www.tvmaze.com/episodes/11138/shameless-3x06-cascading-failures\",\"name\":\"Cascading
+        Failures\",\"season\":3,\"number\":6,\"airdate\":\"2013-02-24\",\"airtime\":\"21:00\",\"airstamp\":\"2013-02-24T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>The
+        Department of Family Services takes away the Gallagher children, and Fiona
+        is desperate to get them back, so much so that she must round up Frank, get
+        him to act responsibly and make a court appearance. Meanwhile, Kev and Veronica
+        decide to use her mother as a surrogate; and Terry catches Mickey and Ian
+        in flagrante.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11138\"}}},{\"id\":11139,\"url\":\"http://www.tvmaze.com/episodes/11139/shameless-3x07-a-long-way-from-home\",\"name\":\"A
+        Long Way From Home\",\"season\":3,\"number\":7,\"airdate\":\"2013-03-03\",\"airtime\":\"21:00\",\"airstamp\":\"2013-03-03T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        makes a fateful decision about the future of her and her siblings, and recruits
+        Lip for a plan to forge Aunt Ginger's will, but first they need a dead body.
+        Meanwhile, Carl and Debbie deal with life in their foster homes; Frank sobers
+        up in preparation for a court date; and Timmy Wong and his mother come to
+        Sheila's for Hymie.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11139\"}}},{\"id\":11140,\"url\":\"http://www.tvmaze.com/episodes/11140/shameless-3x08-where-theres-a-will\",\"name\":\"Where
+        There's a Will\",\"season\":3,\"number\":8,\"airdate\":\"2013-03-10\",\"airtime\":\"21:00\",\"airstamp\":\"2013-03-10T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>At
+        the gathering for Aunt Ginger's fake funeral, the family meet Frank's wily
+        cousin Patrick, who might just be devious enough to \\\"out-Gallagher\\\"
+        the Gallaghers.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11140\"}}},{\"id\":11141,\"url\":\"http://www.tvmaze.com/episodes/11141/shameless-3x09-frank-the-plumber\",\"name\":\"Frank
+        the Plumber\",\"season\":3,\"number\":9,\"airdate\":\"2013-03-17\",\"airtime\":\"21:00\",\"airstamp\":\"2013-03-17T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        has a difficult time dealing with the corporate culture in her new office
+        job, while Frank, needing medical coverage, somehow gets mixed up in a gay-rights
+        event, where he rubs elbows with a powerful activist.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11141\"}}},{\"id\":11142,\"url\":\"http://www.tvmaze.com/episodes/11142/shameless-3x10-civil-wrongs\",\"name\":\"Civil
+        Wrongs\",\"season\":3,\"number\":10,\"airdate\":\"2013-03-24\",\"airtime\":\"21:00\",\"airstamp\":\"2013-03-24T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Just
+        when Fiona has settled into her job and found some structure to her life,
+        Jimmy drops a bomb on her, while Frank revels in being the face of the gay-rights
+        movement, and sees a way to make even more money out of his newfound celebrity.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11142\"}}},{\"id\":11143,\"url\":\"http://www.tvmaze.com/episodes/11143/shameless-3x11-order-room-service\",\"name\":\"Order
+        Room Service\",\"season\":3,\"number\":11,\"airdate\":\"2013-03-31\",\"airtime\":\"21:00\",\"airstamp\":\"2013-03-31T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        takes the kids camping, while homeless Frank tries to get Carl to sneak him
+        into the Gallagher van for the night.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11143\"}}},{\"id\":11144,\"url\":\"http://www.tvmaze.com/episodes/11144/shameless-3x12-survival-of-the-fittest\",\"name\":\"Survival
+        of the Fittest\",\"season\":3,\"number\":12,\"airdate\":\"2013-04-07\",\"airtime\":\"21:00\",\"airstamp\":\"2013-04-07T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>In
+        the Season 3 finale, Fiona and the family throw a surprise party for Lip's
+        high-school graduation; and Frank uses his gambling winnings to take Lip out
+        for a nice dad-lad dinner.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11144\"}}},{\"id\":11145,\"url\":\"http://www.tvmaze.com/episodes/11145/shameless-4x01-simple-pleasures\",\"name\":\"Simple
+        Pleasures\",\"season\":4,\"number\":1,\"airdate\":\"2014-01-12\",\"airtime\":\"21:00\",\"airstamp\":\"2014-01-12T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Season
+        4 begins with a drug-addled and deathly ill Frank reappearing. Meanwhile,
+        Fiona cares for the household and works at Worldwide Cup with her boyfriend
+        boss Mike Pratt, and attempts to connect with Debbie and Carl, who are dealing
+        with the upheaval of their adolescent hormones.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11145\"}}},{\"id\":11146,\"url\":\"http://www.tvmaze.com/episodes/11146/shameless-4x02-my-oldest-daughter\",\"name\":\"My
+        Oldest Daughter\",\"season\":4,\"number\":2,\"airdate\":\"2014-01-19\",\"airtime\":\"21:00\",\"airstamp\":\"2014-01-19T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        is involved in a road rage incident that damages a company car and leads her
+        to tell a lie about how it happened. Meanwhile, Lip struggles in school and
+        with the ladies.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11146\"}}},{\"id\":11147,\"url\":\"http://www.tvmaze.com/episodes/11147/shameless-4x03-like-father-like-daughter\",\"name\":\"Like
+        Father, Like Daughter\",\"season\":4,\"number\":3,\"airdate\":\"2014-01-26\",\"airtime\":\"21:00\",\"airstamp\":\"2014-01-26T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Frank
+        stalks his previously unseen daughter Sammi and is surprised to learn that
+        she has a son. Meanwhile, Fiona and Mike get serious; and Carl steals dogs
+        and holds them for ransom, so he can earn some drug money for Frank. Also:
+        Sheila has her first successful online date with a Native American cowboy
+        named Roger Running Tree.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11147\"}}},{\"id\":11148,\"url\":\"http://www.tvmaze.com/episodes/11148/shameless-4x04-strangers-on-a-train\",\"name\":\"Strangers
+        on a Train\",\"season\":4,\"number\":4,\"airdate\":\"2014-02-02\",\"airtime\":\"21:00\",\"airstamp\":\"2014-02-02T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        continues her secret affair with Robbie, but her infidelity is threatened
+        to be exposed when Mike shows up at Robbie's apartment while Fiona is there.
+        Meanwhile, Frank tries to contrive an \\\"accident\\\" that will net him a
+        big insurance payout, so he can afford a potential liver transplant.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11148\"}}},{\"id\":11149,\"url\":\"http://www.tvmaze.com/episodes/11149/shameless-4x05-theres-the-rub\",\"name\":\"There's
+        the Rub\",\"season\":4,\"number\":5,\"airdate\":\"2014-02-09\",\"airtime\":\"21:00\",\"airstamp\":\"2014-02-09T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona's
+        series of bad decisions involving Robbie finally boil over. Meanwhile, Frank
+        and Sammi pursue a cure for Frank's liver trouble and try to catch up on missed
+        father-daughter time; and Lip gets a surprise visit at college from Army investigators.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11149\"}}},{\"id\":11150,\"url\":\"http://www.tvmaze.com/episodes/11150/shameless-4x06-iron-city\",\"name\":\"Iron
+        City\",\"season\":4,\"number\":6,\"airdate\":\"2014-02-16\",\"airtime\":\"21:00\",\"airstamp\":\"2014-02-16T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>The
+        aftermath of Liam's accident lands Fiona in county jail, unsure of Liam's
+        condition or her future. The family, minus Frank, wait nervously for any update
+        on Liam's status at the hospital. Meanwhile, after almost being killed by
+        the sweat lodge, Frank wakes up in the emergency room and gets some sobering
+        news about his declining health.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11150\"}}},{\"id\":11151,\"url\":\"http://www.tvmaze.com/episodes/11151/shameless-4x07-a-jailbird-invalid-martyr-cutter-retard-and-parasitic-twin\",\"name\":\"A
+        Jailbird, Invalid, Martyr, Cutter, Retard, and Parasitic Twin\",\"season\":4,\"number\":7,\"airdate\":\"2014-02-23\",\"airtime\":\"21:00\",\"airstamp\":\"2014-02-23T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Lip
+        is faced with being the Gallagher's guardian when Fiona is released from jail
+        and ordered by the court to remain inside the house, and Frank continues to
+        be out of commission due to his illness. Fortunately, he gets some unexpected
+        assistance from Amanda, his roommate's girlfriend.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11151\"}}},{\"id\":11152,\"url\":\"http://www.tvmaze.com/episodes/11152/shameless-4x08-hope-springs-paternal\",\"name\":\"Hope
+        Springs Paternal\",\"season\":4,\"number\":8,\"airdate\":\"2014-03-09\",\"airtime\":\"21:00\",\"airstamp\":\"2014-03-09T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        rids the house of all suspicious items to prepare for a visit from her probation
+        officer, but her efforts aren't appreciated by Debbie and Carl. Meanwhile,
+        Ian gets kicked out of Mickey's house by a hammer-wielding Svetlana and makes
+        a long-awaited return to the Gallagher house.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11152\"}}},{\"id\":11153,\"url\":\"http://www.tvmaze.com/episodes/11153/shameless-4x09-the-legend-of-bonnie-and-carl\",\"name\":\"The
+        Legend of Bonnie and Carl\",\"season\":4,\"number\":9,\"airdate\":\"2014-03-16\",\"airtime\":\"21:00\",\"airstamp\":\"2014-03-16T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Carl
+        connects with a troubled girl in detention; Lip grows close to his roommate's
+        ex-girlfriend; Debbie tries to make life miserable for the new girl in Matty's
+        life; Fiona struggles to get a job now that she has a criminal record; Sheila
+        returns from her trip to the reservation with plans to adopt Native American
+        kids; Mickey ignores the birth of his son to spend time with an erratic-behaving
+        Ian.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11153\"}}},{\"id\":11154,\"url\":\"http://www.tvmaze.com/episodes/11154/shameless-4x10-liver-i-hardly-know-her\",\"name\":\"Liver,
+        I Hardly Know Her\",\"season\":4,\"number\":10,\"airdate\":\"2014-03-23\",\"airtime\":\"21:00\",\"airstamp\":\"2014-03-23T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        goes wild and violates multiple terms of her probation by partying with Robbie's
+        degenerate friends. A search for her gets underway when she fails to contact
+        anyone.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11154\"}}},{\"id\":11155,\"url\":\"http://www.tvmaze.com/episodes/11155/shameless-4x11-emily\",\"name\":\"Emily\",\"season\":4,\"number\":11,\"airdate\":\"2014-03-30\",\"airtime\":\"21:00\",\"airstamp\":\"2014-03-30T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Fiona
+        is taken to a correctional facility; Frank wakes up from his operation suffering
+        from post-operative delirium; Ian crashes the christening for Mickey's son;
+        Amanda's parents bribe Lip to stay away from their daughter; Debbie meets
+        an older student with a dark ulterior motive.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11155\"}}},{\"id\":11156,\"url\":\"http://www.tvmaze.com/episodes/11156/shameless-4x12-lazarus\",\"name\":\"Lazarus\",\"season\":4,\"number\":12,\"airdate\":\"2014-04-06\",\"airtime\":\"21:00\",\"airstamp\":\"2014-04-06T21:00:00-04:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Season
+        4 ends with Sheila fighting for custody of the Native American kids and clashing
+        with Sammi over where they will all live once Frank is released. Meanwhile,
+        Fiona passes a drug test, gets released from jail and lands a job at Patsy's
+        Pies with the help of her parole officer; and Frank begins to feel again like
+        his old, troubled self.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11156\"}}},{\"id\":11157,\"url\":\"http://www.tvmaze.com/episodes/11157/shameless-5x01-milk-of-the-gods\",\"name\":\"Milk
+        of the Gods\",\"season\":5,\"number\":1,\"airdate\":\"2015-01-11\",\"airtime\":\"21:00\",\"airstamp\":\"2015-01-11T21:00:00-05:00\",\"runtime\":60,\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_landscape/7/19029.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/7/19029.jpg\"},\"summary\":\"<p>Season
+        5 begins with Fiona balancing her job and a crush on her older boss. Meanwhile,
+        Lip leaves college and heads back home to work a demolition job; Frank unveils
+        the secret project he's been working on; Ian helps a pregnant Svetlana take
+        care of baby Yevgeny; and Kevin plays stay-at-home dad when Veronica goes
+        to work at the Alibi.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11157\"}}},{\"id\":11158,\"url\":\"http://www.tvmaze.com/episodes/11158/shameless-5x02-im-the-liver\",\"name\":\"I'm
+        the Liver\",\"season\":5,\"number\":2,\"airdate\":\"2015-01-18\",\"airtime\":\"21:00\",\"airstamp\":\"2015-01-18T21:00:00-05:00\",\"runtime\":60,\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_landscape/7/19530.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/7/19530.jpg\"},\"summary\":\"<span>Frank
+        tries to talk Sheila out of an offer from two lesbians who want to buy her
+        home and begins warning everyone of the neighborhood's impending gentrification.
+        Meanwhile, Lip starts his first day of work; Kev bonds with Svetlana; Ian
+        plots revenge with Mickey and Mandy against a homophobic military funeral
+        protest; and Fiona officially comes off house arrest.</span><p><br /></p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11158\"}}},{\"id\":11159,\"url\":\"http://www.tvmaze.com/episodes/11159/shameless-5x03-the-two-lisas\",\"name\":\"The
+        Two Lisas\",\"season\":5,\"number\":3,\"airdate\":\"2015-01-25\",\"airtime\":\"21:00\",\"airstamp\":\"2015-01-25T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Frank
+        tries to scare off the two lesbians who are buying up property in the neighborhood;
+        Debbie throws a wild party; Fiona agrees to go to a concert with Davis; Carl
+        discovers a hidden talent; Ian goes on a crazed cleaning spree and asks Lip
+        to help convince Mandy not to move to Indiana with her abusive boyfriend.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/11159\"}}},{\"id\":109518,\"url\":\"http://www.tvmaze.com/episodes/109518/shameless-5x04-a-night-to-remem-wait-what\",\"name\":\"A
+        Night to Remem... Wait, What?\",\"season\":5,\"number\":4,\"airdate\":\"2015-02-01\",\"airtime\":\"21:00\",\"airstamp\":\"2015-02-01T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Frank
+        tries to retrace his steps after an epic bender to find what he did with his
+        six-figure insurance settlement; Gus admits he is falling in love with Fiona;
+        Lip visits Amanda in Miami; Carl starts a new job as a drug dealer; Debbie
+        develops a new crush; Debbie begins training at Derek's boxing gym; Kev blows
+        off a date because he doesn't want to leave the girls with a sitter.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/109518\"}}},{\"id\":109519,\"url\":\"http://www.tvmaze.com/episodes/109519/shameless-5x05-rite-of-passage\",\"name\":\"Rite
+        of Passage\",\"season\":5,\"number\":5,\"airdate\":\"2015-02-08\",\"airtime\":\"21:00\",\"airstamp\":\"2015-02-08T21:00:00-05:00\",\"runtime\":60,\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_landscape/8/21350.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/8/21350.jpg\"},\"summary\":\"<p>Fiona
+        and Gus navigate the awkwardness of their quickie wedding, but her plans to
+        announce the marriage at a family dinner unravels when a coworker overdoses
+        on heroin. Meanwhile, Frank avoids an irate Sammi; Debbie trains at Derek's
+        gym; Mickey grows more concerned with Ian's erratic behavior; and Lip decides
+        to head back to school early.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/109519\"}}},{\"id\":109520,\"url\":\"http://www.tvmaze.com/episodes/109520/shameless-5x06-crazy-love\",\"name\":\"Crazy
+        Love\",\"season\":5,\"number\":6,\"airdate\":\"2015-02-15\",\"airtime\":\"21:00\",\"airstamp\":\"2015-02-15T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"<p>Newlywed
+        Fiona struggles to remain faithful when Jimmy returns and relentlessly pursues
+        her; Ian steals Mickey and Svetlana's baby; Sammi takes over the Gallagher
+        house and enforces strict curfews; Debbie starts high school; Veronica grapples
+        with her decision to separate from Kev.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/109520\"}}},{\"id\":116524,\"url\":\"http://www.tvmaze.com/episodes/116524/shameless-5x07-tell-me-you-fucking-need-me\",\"name\":\"Tell
+        Me You Fucking Need Me\",\"season\":5,\"number\":7,\"airdate\":\"2015-03-01\",\"airtime\":\"21:00\",\"airstamp\":\"2015-03-01T21:00:00-05:00\",\"runtime\":60,\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_landscape/9/22752.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/9/22752.jpg\"},\"summary\":\"<p>Ian
+        gets upset when he learns he is under a mandatory 72-hour hold at the psych
+        ward; Frank returns home from the hospital and refuses to apologize to Sammi;
+        Jimmy and Gus have a face-to-face meeting about their futures with Fiona;
+        Lip discovers he never filled out his financial aid forms and now owes thousands
+        in tuition; Debbie tries to get out of the \\\"friend zone\\\" with Derek.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/116524\"}}},{\"id\":116525,\"url\":\"http://www.tvmaze.com/episodes/116525/shameless-5x08-uncle-carl\",\"name\":\"Uncle
+        Carl\",\"season\":5,\"number\":8,\"airdate\":\"2015-03-08\",\"airtime\":\"21:00\",\"airstamp\":\"2015-03-08T21:00:00-04:00\",\"runtime\":60,\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_landscape/9/23237.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/9/23237.jpg\"},\"summary\":\"<p>Ian
+        returns home from the psych ward but refuses to accept his bipolar diagnosis
+        or take his medication; Gus tells Fiona he is going on tour and that they
+        need time apart; Frank recovers from his gunshot wound and plots revenge against
+        Sammi; Carl is asked by his boss to run drugs to Indiana; Lip convinces Kev
+        to sell drugs in the dorms.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/116525\"}}},{\"id\":116526,\"url\":\"http://www.tvmaze.com/episodes/116526/shameless-5x09-carls-first-sentencing\",\"name\":\"Carl's
+        First Sentencing\",\"season\":5,\"number\":9,\"airdate\":\"2015-03-15\",\"airtime\":\"21:00\",\"airstamp\":\"2015-03-15T21:00:00-04:00\",\"runtime\":60,\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_landscape/9/23940.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/9/23940.jpg\"},\"summary\":\"<p>Frank
+        plays tour guide to the seedier side of life for his doctor after she is diagnosed
+        with terminal cancer; Fiona prepares Carl for his sentencing hearing; Lip
+        sleeps with a professor; Ian realizes he needs to get back on his meds.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/116526\"}}},{\"id\":116527,\"url\":\"http://www.tvmaze.com/episodes/116527/shameless-5x10-south-side-rules\",\"name\":\"South
+        Side Rules\",\"season\":5,\"number\":10,\"airdate\":\"2015-03-22\",\"airtime\":\"21:00\",\"airstamp\":\"2015-03-22T21:00:00-04:00\",\"runtime\":60,\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_landscape/9/24324.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/9/24324.jpg\"},\"summary\":\"<p>Frank
+        starts to enjoy the company of his new sick friend and formerly uptight doctor,
+        but she dumps him when she suspects he is developing feelings for her.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/116527\"}}},{\"id\":116528,\"url\":\"http://www.tvmaze.com/episodes/116528/shameless-5x11-drugs-actually\",\"name\":\"Drugs
+        Actually\",\"season\":5,\"number\":11,\"airdate\":\"2015-03-29\",\"airtime\":\"21:00\",\"airstamp\":\"2015-03-29T21:00:00-04:00\",\"runtime\":60,\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_landscape/9/24654.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/9/24654.jpg\"},\"summary\":\"<p>Frank
+        becomes concerned about Bianca's increasingly erratic and dangerous behavior.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/116528\"}}},{\"id\":116529,\"url\":\"http://www.tvmaze.com/episodes/116529/shameless-5x12-love-songs\",\"name\":\"Love
+        Songs\",\"season\":5,\"number\":12,\"airdate\":\"2015-04-05\",\"airtime\":\"21:00\",\"airstamp\":\"2015-04-05T21:00:00-04:00\",\"runtime\":60,\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_landscape/10/25049.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/10/25049.jpg\"},\"summary\":\"<p>Season
+        5 ends with Fiona reuniting with Gus after he returns from his tour, but she
+        struggles with the fact that her feelings for Sean have turned into love.
+        In Costa Rica, Frank has love struggles of his own while he works to keep
+        Bianca happy.</p>\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/116529\"}}},{\"id\":203656,\"url\":\"http://www.tvmaze.com/episodes/203656/shameless-6x01-i-only-miss-her-when-im-breathing\",\"name\":\"I
+        Only Miss Her When I'm Breathing\",\"season\":6,\"number\":1,\"airdate\":\"2016-01-10\",\"airtime\":\"21:00\",\"airstamp\":\"2016-01-10T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/203656\"}}},{\"id\":432076,\"url\":\"http://www.tvmaze.com/episodes/432076/shameless-6x07-pimps-paradise\",\"name\":\"Pimp's
+        Paradise\",\"season\":6,\"number\":7,\"airdate\":\"2016-02-28\",\"airtime\":\"21:00\",\"airstamp\":\"2016-02-28T21:00:00-05:00\",\"runtime\":60,\"image\":null,\"summary\":\"\",\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/episodes/432076\"}}}]}}"}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Mon, 23 Nov 2015 14:09:06 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [!!python/unicode api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/shows/746?embed=episodes
+  response:
+    body: {string: !!python/unicode '{"id":746,"url":"http://www.tvmaze.com/shows/746/shameless","name":"Shameless","type":"Scripted","language":"English","genres":["Drama","Comedy"],"status":"Ended","runtime":60,"premiered":"2004-01-13","schedule":{"time":"22:00","days":["Tuesday"]},"rating":{"average":8.2},"weight":0,"network":{"id":45,"name":"Channel
+        4","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":5162,"thetvdb":78846},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/6/15159.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/6/15159.jpg"},"summary":"<p>Paul
+        Abbott''s critically acclaimed, offbeat drama about the rollercoaster lives
+        and loves of the dysfunctional Gallagher clan.</p>","updated":1448119580,"_links":{"self":{"href":"http://api.tvmaze.com/shows/746"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/65928"}},"_embedded":{"episodes":[{"id":65791,"url":"http://www.tvmaze.com/episodes/65791/shameless-1x01-meet-the-gallaghers","name":"Meet
+        the Gallaghers","season":1,"number":1,"airdate":"2004-01-13","airtime":"22:00","airstamp":"2004-01-13T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65791"}}},{"id":65792,"url":"http://www.tvmaze.com/episodes/65792/shameless-1x02-were-going-to-the-moon","name":"We''re
+        Going to the Moon","season":1,"number":2,"airdate":"2004-01-20","airtime":"22:00","airstamp":"2004-01-20T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65792"}}},{"id":65793,"url":"http://www.tvmaze.com/episodes/65793/shameless-1x03-were-getting-married","name":"We''re
+        Getting Married","season":1,"number":3,"airdate":"2004-01-27","airtime":"22:00","airstamp":"2004-01-27T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65793"}}},{"id":65794,"url":"http://www.tvmaze.com/episodes/65794/shameless-1x04-abduction","name":"Abduction","season":1,"number":4,"airdate":"2004-02-03","airtime":"22:00","airstamp":"2004-02-03T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65794"}}},{"id":65795,"url":"http://www.tvmaze.com/episodes/65795/shameless-1x05-affairs","name":"Affairs","season":1,"number":5,"airdate":"2004-02-10","airtime":"22:00","airstamp":"2004-02-10T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65795"}}},{"id":65796,"url":"http://www.tvmaze.com/episodes/65796/shameless-1x06-monica-comes-home-1","name":"Monica
+        Comes Home (1)","season":1,"number":6,"airdate":"2004-02-17","airtime":"22:00","airstamp":"2004-02-17T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65796"}}},{"id":65797,"url":"http://www.tvmaze.com/episodes/65797/shameless-1x07-dead-2","name":"Dead
+        (2)","season":1,"number":7,"airdate":"2004-02-24","airtime":"22:00","airstamp":"2004-02-24T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65797"}}},{"id":65798,"url":"http://www.tvmaze.com/episodes/65798/shameless-2x01-grandad","name":"Grandad","season":2,"number":1,"airdate":"2005-01-04","airtime":"22:00","airstamp":"2005-01-04T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65798"}}},{"id":65799,"url":"http://www.tvmaze.com/episodes/65799/shameless-2x02-eric","name":"Eric","season":2,"number":2,"airdate":"2005-01-11","airtime":"22:00","airstamp":"2005-01-11T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65799"}}},{"id":65800,"url":"http://www.tvmaze.com/episodes/65800/shameless-2x03-the-garden-competition","name":"The
+        Garden Competition","season":2,"number":3,"airdate":"2005-01-18","airtime":"22:00","airstamp":"2005-01-18T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65800"}}},{"id":65801,"url":"http://www.tvmaze.com/episodes/65801/shameless-2x04-the-big-day","name":"The
+        Big Day","season":2,"number":4,"airdate":"2005-01-25","airtime":"22:00","airstamp":"2005-01-25T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65801"}}},{"id":65802,"url":"http://www.tvmaze.com/episodes/65802/shameless-2x05-crooks-and-robbers","name":"Crooks
+        and Robbers","season":2,"number":5,"airdate":"2005-02-01","airtime":"22:00","airstamp":"2005-02-01T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65802"}}},{"id":65803,"url":"http://www.tvmaze.com/episodes/65803/shameless-2x06-welcome-to-the-family","name":"Welcome
+        to the Family","season":2,"number":6,"airdate":"2005-02-08","airtime":"22:00","airstamp":"2005-02-08T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65803"}}},{"id":65804,"url":"http://www.tvmaze.com/episodes/65804/shameless-2x07-joey-dawson","name":"Joey
+        Dawson","season":2,"number":7,"airdate":"2005-02-15","airtime":"22:00","airstamp":"2005-02-15T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65804"}}},{"id":65805,"url":"http://www.tvmaze.com/episodes/65805/shameless-2x08-against-the-odds","name":"Against
+        The Odds","season":2,"number":8,"airdate":"2005-02-22","airtime":"22:00","airstamp":"2005-02-22T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65805"}}},{"id":65806,"url":"http://www.tvmaze.com/episodes/65806/shameless-2x09-sister-sister","name":"Sister,
+        Sister","season":2,"number":9,"airdate":"2005-03-01","airtime":"22:00","airstamp":"2005-03-01T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65806"}}},{"id":65807,"url":"http://www.tvmaze.com/episodes/65807/shameless-2x10-true-love","name":"True
+        Love","season":2,"number":10,"airdate":"2005-03-08","airtime":"22:00","airstamp":"2005-03-08T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65807"}}},{"id":65808,"url":"http://www.tvmaze.com/episodes/65808/shameless-3x01-liamday","name":"Liamday","season":3,"number":1,"airdate":"2006-01-03","airtime":"22:00","airstamp":"2006-01-03T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65808"}}},{"id":65809,"url":"http://www.tvmaze.com/episodes/65809/shameless-3x02-dark-friends","name":"Dark
+        Friends","season":3,"number":2,"airdate":"2006-01-10","airtime":"22:00","airstamp":"2006-01-10T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65809"}}},{"id":65810,"url":"http://www.tvmaze.com/episodes/65810/shameless-3x03-baby","name":"Baby","season":3,"number":3,"airdate":"2006-01-17","airtime":"22:00","airstamp":"2006-01-17T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65810"}}},{"id":65811,"url":"http://www.tvmaze.com/episodes/65811/shameless-3x04-benefit-fraud","name":"Benefit
+        Fraud","season":3,"number":4,"airdate":"2006-01-24","airtime":"22:00","airstamp":"2006-01-24T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65811"}}},{"id":65812,"url":"http://www.tvmaze.com/episodes/65812/shameless-3x05-old-flame","name":"Old
+        Flame","season":3,"number":5,"airdate":"2006-01-31","airtime":"22:00","airstamp":"2006-01-31T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65812"}}},{"id":65813,"url":"http://www.tvmaze.com/episodes/65813/shameless-3x06-in-with-the-maguires","name":"In
+        With the Maguire''s","season":3,"number":6,"airdate":"2006-02-07","airtime":"22:00","airstamp":"2006-02-07T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65813"}}},{"id":65814,"url":"http://www.tvmaze.com/episodes/65814/shameless-3x07-act-your-age","name":"Act
+        Your Age","season":3,"number":7,"airdate":"2006-02-14","airtime":"22:00","airstamp":"2006-02-14T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65814"}}},{"id":65815,"url":"http://www.tvmaze.com/episodes/65815/shameless-3x08-the-wedding","name":"The
+        Wedding","season":3,"number":8,"airdate":"2006-02-21","airtime":"22:00","airstamp":"2006-02-21T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65815"}}},{"id":65816,"url":"http://www.tvmaze.com/episodes/65816/shameless-4x01-new-beginnings","name":"New
+        Beginnings","season":4,"number":1,"airdate":"2007-01-09","airtime":"22:00","airstamp":"2007-01-09T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65816"}}},{"id":65817,"url":"http://www.tvmaze.com/episodes/65817/shameless-4x02-new-romances","name":"New
+        Romances","season":4,"number":2,"airdate":"2007-01-16","airtime":"22:00","airstamp":"2007-01-16T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65817"}}},{"id":65818,"url":"http://www.tvmaze.com/episodes/65818/shameless-4x03-you-decide","name":"You
+        Decide","season":4,"number":3,"airdate":"2007-01-23","airtime":"22:00","airstamp":"2007-01-23T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65818"}}},{"id":65819,"url":"http://www.tvmaze.com/episodes/65819/shameless-4x04-the-runaway","name":"The
+        Runaway","season":4,"number":4,"airdate":"2007-01-30","airtime":"22:00","airstamp":"2007-01-30T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65819"}}},{"id":65820,"url":"http://www.tvmaze.com/episodes/65820/shameless-4x05-boys-boys-boys","name":"Boys,
+        Boys, Boys","season":4,"number":5,"airdate":"2007-02-06","airtime":"22:00","airstamp":"2007-02-06T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65820"}}},{"id":65821,"url":"http://www.tvmaze.com/episodes/65821/shameless-4x06-dangerous-situation","name":"Dangerous
+        Situation","season":4,"number":6,"airdate":"2007-02-13","airtime":"22:00","airstamp":"2007-02-13T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65821"}}},{"id":65822,"url":"http://www.tvmaze.com/episodes/65822/shameless-4x07-terrorist-target","name":"Terrorist
+        Target","season":4,"number":7,"airdate":"2007-02-20","airtime":"22:00","airstamp":"2007-02-20T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65822"}}},{"id":65823,"url":"http://www.tvmaze.com/episodes/65823/shameless-4x08-revelations","name":"Revelations","season":4,"number":8,"airdate":"2007-02-27","airtime":"22:00","airstamp":"2007-02-27T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65823"}}},{"id":65824,"url":"http://www.tvmaze.com/episodes/65824/shameless-5x01-the-countdown","name":"The
+        Countdown","season":5,"number":1,"airdate":"2008-01-01","airtime":"22:00","airstamp":"2008-01-01T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65824"}}},{"id":65825,"url":"http://www.tvmaze.com/episodes/65825/shameless-5x02-other-paddy","name":"Other
+        Paddy","season":5,"number":2,"airdate":"2008-01-01","airtime":"22:00","airstamp":"2008-01-01T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65825"}}},{"id":65826,"url":"http://www.tvmaze.com/episodes/65826/shameless-5x03-happy-birthday-ma-maguire","name":"Happy
+        Birthday, Ma Maguire","season":5,"number":3,"airdate":"2008-01-15","airtime":"22:00","airstamp":"2008-01-15T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65826"}}},{"id":65827,"url":"http://www.tvmaze.com/episodes/65827/shameless-5x04-franks-big-win","name":"Frank''s
+        Big Win","season":5,"number":4,"airdate":"2008-01-22","airtime":"22:00","airstamp":"2008-01-22T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65827"}}},{"id":65828,"url":"http://www.tvmaze.com/episodes/65828/shameless-5x05-beach-party","name":"Beach
+        Party","season":5,"number":5,"airdate":"2008-01-29","airtime":"22:00","airstamp":"2008-01-29T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65828"}}},{"id":65829,"url":"http://www.tvmaze.com/episodes/65829/shameless-5x06-nowhere-to-go","name":"Nowhere
+        To Go","season":5,"number":6,"airdate":"2008-02-05","airtime":"22:00","airstamp":"2008-02-05T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65829"}}},{"id":65830,"url":"http://www.tvmaze.com/episodes/65830/shameless-5x07-brothers-and-boyfriends","name":"Brothers
+        and Boyfriends","season":5,"number":7,"airdate":"2008-02-12","airtime":"22:00","airstamp":"2008-02-12T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65830"}}},{"id":65831,"url":"http://www.tvmaze.com/episodes/65831/shameless-5x08-i-love-frank","name":"I
+        Love Frank","season":5,"number":8,"airdate":"2008-02-19","airtime":"22:00","airstamp":"2008-02-19T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65831"}}},{"id":65832,"url":"http://www.tvmaze.com/episodes/65832/shameless-5x09-absent-parents","name":"Absent
+        Parents","season":5,"number":9,"airdate":"2008-02-26","airtime":"22:00","airstamp":"2008-02-26T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65832"}}},{"id":65833,"url":"http://www.tvmaze.com/episodes/65833/shameless-5x10-old-friends-new-enemies","name":"Old
+        Friends, New Enemies","season":5,"number":10,"airdate":"2008-03-04","airtime":"22:00","airstamp":"2008-03-04T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65833"}}},{"id":65834,"url":"http://www.tvmaze.com/episodes/65834/shameless-5x11-twin","name":"Twin","season":5,"number":11,"airdate":"2008-03-11","airtime":"22:00","airstamp":"2008-03-11T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65834"}}},{"id":65835,"url":"http://www.tvmaze.com/episodes/65835/shameless-5x12-family-at-war","name":"Family
+        At War","season":5,"number":12,"airdate":"2008-03-18","airtime":"22:00","airstamp":"2008-03-18T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65835"}}},{"id":65836,"url":"http://www.tvmaze.com/episodes/65836/shameless-5x13-date-a-death","name":"Date
+        A Death","season":5,"number":13,"airdate":"2008-03-25","airtime":"22:00","airstamp":"2008-03-25T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65836"}}},{"id":65837,"url":"http://www.tvmaze.com/episodes/65837/shameless-5x14-the-ties-that-blind-us","name":"The
+        Ties That Blind Us","season":5,"number":14,"airdate":"2008-04-01","airtime":"22:00","airstamp":"2008-04-01T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65837"}}},{"id":65838,"url":"http://www.tvmaze.com/episodes/65838/shameless-5x15-assault","name":"Assault","season":5,"number":15,"airdate":"2008-04-08","airtime":"22:00","airstamp":"2008-04-08T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65838"}}},{"id":65839,"url":"http://www.tvmaze.com/episodes/65839/shameless-5x16-the-ninth-time-around","name":"The
+        Ninth Time Around","season":5,"number":16,"airdate":"2008-04-15","airtime":"22:00","airstamp":"2008-04-15T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65839"}}},{"id":65840,"url":"http://www.tvmaze.com/episodes/65840/shameless-6x01-remember-me","name":"Remember
+        Me","season":6,"number":1,"airdate":"2009-01-27","airtime":"22:00","airstamp":"2009-01-27T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65840"}}},{"id":65841,"url":"http://www.tvmaze.com/episodes/65841/shameless-6x02-trouble-in-paradise","name":"Trouble
+        in Paradise","season":6,"number":2,"airdate":"2009-01-27","airtime":"22:00","airstamp":"2009-01-27T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65841"}}},{"id":65842,"url":"http://www.tvmaze.com/episodes/65842/shameless-6x03-all-rise","name":"All
+        Rise","season":6,"number":3,"airdate":"2009-02-03","airtime":"22:00","airstamp":"2009-02-03T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65842"}}},{"id":65843,"url":"http://www.tvmaze.com/episodes/65843/shameless-6x04-loving-wife","name":"Loving
+        Wife","season":6,"number":4,"airdate":"2009-02-10","airtime":"22:00","airstamp":"2009-02-10T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65843"}}},{"id":65844,"url":"http://www.tvmaze.com/episodes/65844/shameless-6x05-miscarriage-of-marriage","name":"Miscarriage
+        of Marriage","season":6,"number":5,"airdate":"2009-02-17","airtime":"22:00","airstamp":"2009-02-17T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65844"}}},{"id":65845,"url":"http://www.tvmaze.com/episodes/65845/shameless-6x06-breaking-point","name":"Breaking
+        Point","season":6,"number":6,"airdate":"2009-02-27","airtime":"22:00","airstamp":"2009-02-27T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65845"}}},{"id":65846,"url":"http://www.tvmaze.com/episodes/65846/shameless-6x07-always-leave-them-wanting-more","name":"Always
+        Leave Them Wanting More","season":6,"number":7,"airdate":"2009-03-03","airtime":"22:00","airstamp":"2009-03-03T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65846"}}},{"id":65847,"url":"http://www.tvmaze.com/episodes/65847/shameless-6x08-damaged","name":"Damaged","season":6,"number":8,"airdate":"2009-03-10","airtime":"22:00","airstamp":"2009-03-10T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65847"}}},{"id":65848,"url":"http://www.tvmaze.com/episodes/65848/shameless-6x09-the-darkest-hour","name":"The
+        Darkest Hour","season":6,"number":9,"airdate":"2009-03-17","airtime":"22:00","airstamp":"2009-03-17T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65848"}}},{"id":65849,"url":"http://www.tvmaze.com/episodes/65849/shameless-6x10-to-the-future","name":"To
+        The Future","season":6,"number":10,"airdate":"2009-03-24","airtime":"22:00","airstamp":"2009-03-24T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65849"}}},{"id":65850,"url":"http://www.tvmaze.com/episodes/65850/shameless-6x11-powerless","name":"Powerless","season":6,"number":11,"airdate":"2009-03-31","airtime":"22:00","airstamp":"2009-03-31T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65850"}}},{"id":65851,"url":"http://www.tvmaze.com/episodes/65851/shameless-6x12-cold-turkey","name":"Cold
+        Turkey","season":6,"number":12,"airdate":"2009-04-07","airtime":"22:00","airstamp":"2009-04-07T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65851"}}},{"id":65852,"url":"http://www.tvmaze.com/episodes/65852/shameless-6x13-what-about-me","name":"What
+        About Me?","season":6,"number":13,"airdate":"2009-04-14","airtime":"22:00","airstamp":"2009-04-14T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65852"}}},{"id":65853,"url":"http://www.tvmaze.com/episodes/65853/shameless-6x14-haunted-by-the-past","name":"Haunted
+        by the Past","season":6,"number":14,"airdate":"2009-04-21","airtime":"22:00","airstamp":"2009-04-21T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65853"}}},{"id":65854,"url":"http://www.tvmaze.com/episodes/65854/shameless-6x15-confession","name":"Confession","season":6,"number":15,"airdate":"2009-04-28","airtime":"22:00","airstamp":"2009-04-28T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65854"}}},{"id":65855,"url":"http://www.tvmaze.com/episodes/65855/shameless-6x16-its-over","name":"It''s
+        Over","season":6,"number":16,"airdate":"2009-05-05","airtime":"22:00","airstamp":"2009-05-05T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65855"}}},{"id":65856,"url":"http://www.tvmaze.com/episodes/65856/shameless-7x01-perfectly-frank","name":"Perfectly
+        Frank","season":7,"number":1,"airdate":"2010-01-26","airtime":"22:00","airstamp":"2010-01-26T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65856"}}},{"id":65857,"url":"http://www.tvmaze.com/episodes/65857/shameless-7x02-gunshot","name":"Gunshot","season":7,"number":2,"airdate":"2010-01-26","airtime":"22:00","airstamp":"2010-01-26T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65857"}}},{"id":65858,"url":"http://www.tvmaze.com/episodes/65858/shameless-7x03-out-of-control","name":"Out
+        of Control","season":7,"number":3,"airdate":"2010-02-02","airtime":"22:00","airstamp":"2010-02-02T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65858"}}},{"id":65859,"url":"http://www.tvmaze.com/episodes/65859/shameless-7x04-toyboy","name":"Toyboy","season":7,"number":4,"airdate":"2010-02-09","airtime":"22:00","airstamp":"2010-02-09T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65859"}}},{"id":65860,"url":"http://www.tvmaze.com/episodes/65860/shameless-7x05-the-things-you-do-for-love","name":"The
+        Things You Do For Love","season":7,"number":5,"airdate":"2010-02-16","airtime":"22:00","airstamp":"2010-02-16T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65860"}}},{"id":65861,"url":"http://www.tvmaze.com/episodes/65861/shameless-7x06-from-chatsworth-to-cuba","name":"From
+        Chatsworth to Cuba","season":7,"number":6,"airdate":"2010-02-23","airtime":"22:00","airstamp":"2010-02-23T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65861"}}},{"id":65862,"url":"http://www.tvmaze.com/episodes/65862/shameless-7x07-reunited","name":"Reunited","season":7,"number":7,"airdate":"2010-03-02","airtime":"22:00","airstamp":"2010-03-02T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65862"}}},{"id":65863,"url":"http://www.tvmaze.com/episodes/65863/shameless-7x08-marry-me-1","name":"Marry
+        Me (1)","season":7,"number":8,"airdate":"2010-03-09","airtime":"22:00","airstamp":"2010-03-09T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65863"}}},{"id":65864,"url":"http://www.tvmaze.com/episodes/65864/shameless-7x09-the-wild-wales-2","name":"The
+        Wild Wales (2)","season":7,"number":9,"airdate":"2010-03-16","airtime":"22:00","airstamp":"2010-03-16T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65864"}}},{"id":65865,"url":"http://www.tvmaze.com/episodes/65865/shameless-7x10-great-dangers-3","name":"Great
+        Dangers (3)","season":7,"number":10,"airdate":"2010-03-23","airtime":"22:00","airstamp":"2010-03-23T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65865"}}},{"id":65866,"url":"http://www.tvmaze.com/episodes/65866/shameless-7x11-fallen-heroes","name":"Fallen
+        Heroes","season":7,"number":11,"airdate":"2010-03-30","airtime":"22:00","airstamp":"2010-03-30T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65866"}}},{"id":65867,"url":"http://www.tvmaze.com/episodes/65867/shameless-7x12-boxer","name":"Boxer","season":7,"number":12,"airdate":"2010-04-06","airtime":"22:00","airstamp":"2010-04-06T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65867"}}},{"id":65868,"url":"http://www.tvmaze.com/episodes/65868/shameless-7x13-keep-it-in-the-family","name":"Keep
+        It In The Family","season":7,"number":13,"airdate":"2010-04-13","airtime":"22:00","airstamp":"2010-04-13T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65868"}}},{"id":65869,"url":"http://www.tvmaze.com/episodes/65869/shameless-7x14-secret-relations","name":"Secret
+        Relations","season":7,"number":14,"airdate":"2010-04-20","airtime":"22:00","airstamp":"2010-04-20T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65869"}}},{"id":65870,"url":"http://www.tvmaze.com/episodes/65870/shameless-7x15-the-end-of-the-affair","name":"The
+        End of the Affair","season":7,"number":15,"airdate":"2010-04-27","airtime":"22:00","airstamp":"2010-04-27T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65870"}}},{"id":65871,"url":"http://www.tvmaze.com/episodes/65871/shameless-7x16-gang-wars","name":"Gang
+        Wars","season":7,"number":16,"airdate":"2010-05-04","airtime":"22:00","airstamp":"2010-05-04T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65871"}}},{"id":65872,"url":"http://www.tvmaze.com/episodes/65872/shameless-8x01-the-night-before","name":"The
+        Night Before","season":8,"number":1,"airdate":"2011-01-10","airtime":"22:00","airstamp":"2011-01-10T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65872"}}},{"id":65873,"url":"http://www.tvmaze.com/episodes/65873/shameless-8x02-missing","name":"Missing","season":8,"number":2,"airdate":"2011-01-11","airtime":"22:00","airstamp":"2011-01-11T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65873"}}},{"id":65874,"url":"http://www.tvmaze.com/episodes/65874/shameless-8x03-wheres-frank","name":"Where''s
+        Frank?","season":8,"number":3,"airdate":"2011-01-12","airtime":"22:00","airstamp":"2011-01-12T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65874"}}},{"id":65875,"url":"http://www.tvmaze.com/episodes/65875/shameless-8x04-back-home","name":"Back
+        Home","season":8,"number":4,"airdate":"2011-01-13","airtime":"22:00","airstamp":"2011-01-13T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65875"}}},{"id":65876,"url":"http://www.tvmaze.com/episodes/65876/shameless-8x05-wedding-of-disaster","name":"Wedding
+        of Disaster","season":8,"number":5,"airdate":"2011-01-14","airtime":"22:00","airstamp":"2011-01-14T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65876"}}},{"id":65877,"url":"http://www.tvmaze.com/episodes/65877/shameless-8x06-gangster-gallagher","name":"Gangster
+        Gallagher","season":8,"number":6,"airdate":"2011-01-18","airtime":"22:00","airstamp":"2011-01-18T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65877"}}},{"id":65878,"url":"http://www.tvmaze.com/episodes/65878/shameless-8x07-kidnap-and-ransom","name":"Kidnap
+        and Ransom","season":8,"number":7,"airdate":"2011-01-25","airtime":"22:00","airstamp":"2011-01-25T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65878"}}},{"id":65879,"url":"http://www.tvmaze.com/episodes/65879/shameless-8x08-together-in-heaven","name":"Together
+        In Heaven","season":8,"number":8,"airdate":"2011-02-01","airtime":"22:00","airstamp":"2011-02-01T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65879"}}},{"id":65880,"url":"http://www.tvmaze.com/episodes/65880/shameless-8x09-maguire-meltdown","name":"Maguire
+        Meltdown","season":8,"number":9,"airdate":"2011-02-08","airtime":"22:00","airstamp":"2011-02-08T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65880"}}},{"id":65881,"url":"http://www.tvmaze.com/episodes/65881/shameless-8x10-sickness-and-health","name":"Sickness
+        and Health","season":8,"number":10,"airdate":"2011-02-15","airtime":"22:00","airstamp":"2011-02-15T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65881"}}},{"id":65882,"url":"http://www.tvmaze.com/episodes/65882/shameless-8x11-takeover","name":"Takeover","season":8,"number":11,"airdate":"2011-02-22","airtime":"22:00","airstamp":"2011-02-22T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65882"}}},{"id":65883,"url":"http://www.tvmaze.com/episodes/65883/shameless-8x12-sibling-rivalry","name":"Sibling
+        Rivalry","season":8,"number":12,"airdate":"2011-03-01","airtime":"22:00","airstamp":"2011-03-01T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65883"}}},{"id":65884,"url":"http://www.tvmaze.com/episodes/65884/shameless-8x13-beginnings-and-ends","name":"Beginnings
+        and Ends","season":8,"number":13,"airdate":"2011-03-08","airtime":"22:00","airstamp":"2011-03-08T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65884"}}},{"id":65885,"url":"http://www.tvmaze.com/episodes/65885/shameless-8x14-the-not-so-deceased","name":"The
+        Not-So Deceased","season":8,"number":14,"airdate":"2011-08-30","airtime":"22:00","airstamp":"2011-08-30T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65885"}}},{"id":65886,"url":"http://www.tvmaze.com/episodes/65886/shameless-8x15-my-name-is-avril","name":"My
+        Name Is Avril","season":8,"number":15,"airdate":"2011-09-06","airtime":"22:00","airstamp":"2011-09-06T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65886"}}},{"id":65887,"url":"http://www.tvmaze.com/episodes/65887/shameless-8x16-frank-gallagher-sent-by-god","name":"Frank
+        Gallagher: Sent by God","season":8,"number":16,"airdate":"2011-09-13","airtime":"22:00","airstamp":"2011-09-13T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65887"}}},{"id":65888,"url":"http://www.tvmaze.com/episodes/65888/shameless-8x17-comebacks","name":"Comebacks","season":8,"number":17,"airdate":"2011-09-20","airtime":"22:00","airstamp":"2011-09-20T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65888"}}},{"id":65889,"url":"http://www.tvmaze.com/episodes/65889/shameless-8x18-frank-in-the-frame","name":"Frank
+        In The Frame","season":8,"number":18,"airdate":"2011-09-27","airtime":"22:00","airstamp":"2011-09-27T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65889"}}},{"id":65890,"url":"http://www.tvmaze.com/episodes/65890/shameless-8x19-moving-back","name":"Moving
+        Back","season":8,"number":19,"airdate":"2011-10-04","airtime":"22:00","airstamp":"2011-10-04T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65890"}}},{"id":65891,"url":"http://www.tvmaze.com/episodes/65891/shameless-8x20-career-criminal","name":"Career
+        Criminal","season":8,"number":20,"airdate":"2011-10-11","airtime":"22:00","airstamp":"2011-10-11T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65891"}}},{"id":65892,"url":"http://www.tvmaze.com/episodes/65892/shameless-8x21-the-maguire-motto","name":"The
+        Maguire Motto","season":8,"number":21,"airdate":"2011-10-18","airtime":"22:00","airstamp":"2011-10-18T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65892"}}},{"id":65893,"url":"http://www.tvmaze.com/episodes/65893/shameless-8x22-pc-gallagher","name":"PC
+        Gallagher","season":8,"number":22,"airdate":"2011-10-25","airtime":"22:00","airstamp":"2011-10-25T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65893"}}},{"id":65894,"url":"http://www.tvmaze.com/episodes/65894/shameless-9x01-the-end-of-an-era-1","name":"The
+        End of an Era (1)","season":9,"number":1,"airdate":"2012-01-09","airtime":"22:00","airstamp":"2012-01-09T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65894"}}},{"id":65895,"url":"http://www.tvmaze.com/episodes/65895/shameless-9x02-save-chatsworth-2","name":"Save
+        Chatsworth (2)","season":9,"number":2,"airdate":"2012-01-10","airtime":"22:00","airstamp":"2012-01-10T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65895"}}},{"id":65896,"url":"http://www.tvmaze.com/episodes/65896/shameless-9x03-open-to-all","name":"Open
+        To All","season":9,"number":3,"airdate":"2012-01-17","airtime":"22:00","airstamp":"2012-01-17T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65896"}}},{"id":65897,"url":"http://www.tvmaze.com/episodes/65897/shameless-9x04-vendetta","name":"Vendetta","season":9,"number":4,"airdate":"2012-01-24","airtime":"22:00","airstamp":"2012-01-24T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65897"}}},{"id":65898,"url":"http://www.tvmaze.com/episodes/65898/shameless-9x05-cop-killer","name":"Cop
+        Killer","season":9,"number":5,"airdate":"2012-01-31","airtime":"22:00","airstamp":"2012-01-31T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65898"}}},{"id":65899,"url":"http://www.tvmaze.com/episodes/65899/shameless-9x06-last-man-standing","name":"Last
+        Man Standing","season":9,"number":6,"airdate":"2012-02-07","airtime":"22:00","airstamp":"2012-02-07T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65899"}}},{"id":65900,"url":"http://www.tvmaze.com/episodes/65900/shameless-9x07-all-fall-down","name":"All
+        Fall Down","season":9,"number":7,"airdate":"2012-02-14","airtime":"22:00","airstamp":"2012-02-14T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65900"}}},{"id":65901,"url":"http://www.tvmaze.com/episodes/65901/shameless-9x08-blackout","name":"Blackout","season":9,"number":8,"airdate":"2012-02-21","airtime":"22:00","airstamp":"2012-02-21T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65901"}}},{"id":65902,"url":"http://www.tvmaze.com/episodes/65902/shameless-9x09-decision-time","name":"Decision
+        Time","season":9,"number":9,"airdate":"2012-02-28","airtime":"22:00","airstamp":"2012-02-28T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65902"}}},{"id":65903,"url":"http://www.tvmaze.com/episodes/65903/shameless-9x10-million-dollar-maguire-1","name":"Million
+        Dollar Maguire (1)","season":9,"number":10,"airdate":"2012-03-06","airtime":"22:00","airstamp":"2012-03-06T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65903"}}},{"id":65904,"url":"http://www.tvmaze.com/episodes/65904/shameless-9x11-rescue-me-2","name":"Rescue
+        Me (2)","season":9,"number":11,"airdate":"2012-03-13","airtime":"22:00","airstamp":"2012-03-13T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65904"}}},{"id":65905,"url":"http://www.tvmaze.com/episodes/65905/shameless-10x01-the-working-man-1","name":"The
+        Working Man (1)","season":10,"number":1,"airdate":"2012-09-12","airtime":"22:00","airstamp":"2012-09-12T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65905"}}},{"id":65906,"url":"http://www.tvmaze.com/episodes/65906/shameless-10x02-the-world-of-burger-2","name":"The
+        World of Burger (2)","season":10,"number":2,"airdate":"2012-09-13","airtime":"22:00","airstamp":"2012-09-13T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65906"}}},{"id":65907,"url":"http://www.tvmaze.com/episodes/65907/shameless-10x03-the-brazilian-effect","name":"The
+        Brazilian Effect","season":10,"number":3,"airdate":"2012-09-19","airtime":"22:00","airstamp":"2012-09-19T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65907"}}},{"id":65908,"url":"http://www.tvmaze.com/episodes/65908/shameless-10x04-whos-the-mummy","name":"Who''s
+        The Mummy?","season":10,"number":4,"airdate":"2012-09-26","airtime":"22:00","airstamp":"2012-09-26T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65908"}}},{"id":65909,"url":"http://www.tvmaze.com/episodes/65909/shameless-10x05-the-truth-will-out","name":"The
+        Truth Will Out","season":10,"number":5,"airdate":"2012-10-03","airtime":"22:00","airstamp":"2012-10-03T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65909"}}},{"id":65910,"url":"http://www.tvmaze.com/episodes/65910/shameless-10x06-secrets-and-wives","name":"Secrets
+        and Wives","season":10,"number":6,"airdate":"2012-10-10","airtime":"22:00","airstamp":"2012-10-10T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65910"}}},{"id":65911,"url":"http://www.tvmaze.com/episodes/65911/shameless-10x07-business-as-usual","name":"Business
+        as Usual","season":10,"number":7,"airdate":"2012-10-17","airtime":"22:00","airstamp":"2012-10-17T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65911"}}},{"id":65912,"url":"http://www.tvmaze.com/episodes/65912/shameless-10x08-what-are-friends-for","name":"What
+        Are Friends For?","season":10,"number":8,"airdate":"2012-10-24","airtime":"22:00","airstamp":"2012-10-24T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65912"}}},{"id":65913,"url":"http://www.tvmaze.com/episodes/65913/shameless-10x09-great-rivalry","name":"Great
+        Rivalry","season":10,"number":9,"airdate":"2012-10-31","airtime":"22:00","airstamp":"2012-10-31T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65913"}}},{"id":65914,"url":"http://www.tvmaze.com/episodes/65914/shameless-10x10-one-year-on","name":"One
+        Year On","season":10,"number":10,"airdate":"2012-11-01","airtime":"22:00","airstamp":"2012-11-01T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65914"}}},{"id":65915,"url":"http://www.tvmaze.com/episodes/65915/shameless-11x01-the-golden-empire","name":"The
+        Golden Empire","season":11,"number":1,"airdate":"2013-02-26","airtime":"22:00","airstamp":"2013-02-26T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65915"}}},{"id":65916,"url":"http://www.tvmaze.com/episodes/65916/shameless-11x02-an-inspector-calls","name":"An
+        Inspector Calls","season":11,"number":2,"airdate":"2013-03-05","airtime":"22:00","airstamp":"2013-03-05T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65916"}}},{"id":65917,"url":"http://www.tvmaze.com/episodes/65917/shameless-11x03-money-in-mind","name":"Money
+        In Mind","season":11,"number":3,"airdate":"2013-03-12","airtime":"22:00","airstamp":"2013-03-12T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65917"}}},{"id":65918,"url":"http://www.tvmaze.com/episodes/65918/shameless-11x04-no-ones-perfect","name":"No-One''s
+        Perfect","season":11,"number":4,"airdate":"2013-03-19","airtime":"22:00","airstamp":"2013-03-19T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65918"}}},{"id":65919,"url":"http://www.tvmaze.com/episodes/65919/shameless-11x05-risky-business","name":"Risky
+        Business","season":11,"number":5,"airdate":"2013-03-26","airtime":"22:00","airstamp":"2013-03-26T22:00:00+00:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65919"}}},{"id":65920,"url":"http://www.tvmaze.com/episodes/65920/shameless-11x06-death-and-erasures","name":"Death
+        and Erasures","season":11,"number":6,"airdate":"2013-04-02","airtime":"22:00","airstamp":"2013-04-02T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65920"}}},{"id":65921,"url":"http://www.tvmaze.com/episodes/65921/shameless-11x07-crime-and-punishment","name":"Crime
+        and Punishment","season":11,"number":7,"airdate":"2013-04-09","airtime":"22:00","airstamp":"2013-04-09T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65921"}}},{"id":65922,"url":"http://www.tvmaze.com/episodes/65922/shameless-11x08-grandaddy-gallagher","name":"Grandaddy
+        Gallagher","season":11,"number":8,"airdate":"2013-04-16","airtime":"22:00","airstamp":"2013-04-16T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65922"}}},{"id":65923,"url":"http://www.tvmaze.com/episodes/65923/shameless-11x09-domesticated-specialist","name":"Domesticated
+        Specialist","season":11,"number":9,"airdate":"2013-04-23","airtime":"22:00","airstamp":"2013-04-23T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65923"}}},{"id":65924,"url":"http://www.tvmaze.com/episodes/65924/shameless-11x10-crossing-the-line","name":"Crossing
+        the Line","season":11,"number":10,"airdate":"2013-04-30","airtime":"22:00","airstamp":"2013-04-30T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65924"}}},{"id":65925,"url":"http://www.tvmaze.com/episodes/65925/shameless-11x11-the-p-factor","name":"The
+        P Factor","season":11,"number":11,"airdate":"2013-05-07","airtime":"22:00","airstamp":"2013-05-07T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65925"}}},{"id":65926,"url":"http://www.tvmaze.com/episodes/65926/shameless-11x12-early-retirement","name":"Early
+        Retirement","season":11,"number":12,"airdate":"2013-05-14","airtime":"22:00","airstamp":"2013-05-14T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65926"}}},{"id":65927,"url":"http://www.tvmaze.com/episodes/65927/shameless-11x13-kiss-kiss-bang-bang","name":"Kiss
+        Kiss, Bang Bang","season":11,"number":13,"airdate":"2013-05-21","airtime":"22:00","airstamp":"2013-05-21T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65927"}}},{"id":65928,"url":"http://www.tvmaze.com/episodes/65928/shameless-11x14-end-of-the-line","name":"End
+        of the Line","season":11,"number":14,"airdate":"2013-05-28","airtime":"22:00","airstamp":"2013-05-28T22:00:00+01:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/65928"}}}]}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Mon, 23 Nov 2015 14:09:06 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [!!python/unicode api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/shows/2626?embed=episodes
+  response:
+    body: {string: !!python/unicode '{"id":2626,"url":"http://www.tvmaze.com/shows/2626/fameless","name":"Fameless","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"2015-07-29","schedule":{"time":"22:30","days":["Thursday"]},"rating":{"average":7},"weight":0,"network":{"id":84,"name":"truTV","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":50171,"thetvdb":298445},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/13/34907.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/13/34907.jpg"},"summary":"<p>From
+        the mischievous mind of comedian and actor David Spade comes <strong><em>\"</em></strong><em><strong>Fameless\"</strong></em>,
+        a genre-busting prank show about how far real people will go for a moment
+        in the spotlight. Each week, the series features a group of unsuspecting desperate-to-be-famous
+        individuals who believe they''ve been cast on a reality show. However, unbeknownst
+        to them, they are really filming a parody with improv actors creating over-the-top
+        scenarios that steadily increase the absurdity and ridiculousness of each
+        situation - testing the patience of everyone NOT in on the joke. <em>TV-14</em></p>","updated":1445428337,"_links":{"self":{"href":"http://api.tvmaze.com/shows/2626"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/201365"}},"_embedded":{"episodes":[{"id":201358,"url":"http://www.tvmaze.com/episodes/201358/fameless-1x01-naked-and-annoyed-pilot","name":"Naked
+        and Annoyed (Pilot)","season":1,"number":1,"airdate":"2015-07-29","airtime":"22:30","airstamp":"2015-07-29T22:30:00-04:00","runtime":30,"image":null,"summary":"<p>In
+        the series\npremiere, a guitarist and karate master nearly come to blows at
+        an audition, a\nwannabe cop gets lured into a high-speed chase, and a fierce
+        competitor learns\nthe naked truth: that this is actually a prank show.</p><br
+        />","_links":{"self":{"href":"http://api.tvmaze.com/episodes/201358"}}},{"id":201359,"url":"http://www.tvmaze.com/episodes/201359/fameless-1x02-say-goodbye-to-hollywood","name":"Say
+        Goodbye to Hollywood","season":1,"number":2,"airdate":"2015-08-05","airtime":"22:30","airstamp":"2015-08-05T22:30:00-04:00","runtime":30,"image":null,"summary":"<p>A
+        wannabe producer''s pitch gets slammed by a star-studded Hollywood panel,
+        a rookie host brings life-changing news to the wrong family and the tables
+        are turned on a prankster when he realizes that he''s the one being played.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/201359"}}},{"id":201360,"url":"http://www.tvmaze.com/episodes/201360/fameless-1x03-to-catfish-a-predator","name":"To
+        Catfish a Predator","season":1,"number":3,"airdate":"2015-08-12","airtime":"22:30","airstamp":"2015-08-12T22:30:00-04:00","runtime":30,"image":null,"summary":"<p>A
+        self-proclaimed playboy panics after a kiss goes viral; a cocky food buff
+        can''t stomach the main course; when a wannabe reality star tries to expose
+        a catfish, he''s the one caught on the hook.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/201360"}}},{"id":201361,"url":"http://www.tvmaze.com/episodes/201361/fameless-1x04-revenge-ink","name":"Revenge
+        Ink","season":1,"number":4,"airdate":"2015-08-20","airtime":"22:30","airstamp":"2015-08-20T22:30:00-04:00","runtime":30,"image":null,"summary":"<p>A
+        nature lover falls prey to a ferocious prank; a cocky host crumbles live on
+        the air; an aspiring rapper gets the shaft when Kat Von D inks him with a
+        humiliating tattoo.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/201361"}}},{"id":201362,"url":"http://www.tvmaze.com/episodes/201362/fameless-1x05-speed-trap","name":"Speed
+        Trap","season":1,"number":5,"airdate":"2015-08-27","airtime":"22:30","airstamp":"2015-08-27T22:30:00-04:00","runtime":30,"image":null,"summary":"<p>A
+        wannabe cop becomes the suspect during a traffic stop, a rookie host gets
+        more than he bargained for at a car auction, and a prankster''s antics push
+        a pregnant woman to her breaking point.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/201362"}}},{"id":201363,"url":"http://www.tvmaze.com/episodes/201363/fameless-1x06-funky-monk","name":"Funky
+        Monk","season":1,"number":6,"airdate":"2015-09-10","airtime":"22:30","airstamp":"2015-09-10T22:30:00-04:00","runtime":30,"image":null,"summary":"<p>A
+        \"cop for a day\" goes from fighting crime to fighting off kidnappers, a wannabe
+        reality star is speechless after confronting a cheater in action, and David
+        Spade, Michael Bolton and Gina Gershon return to corrupt another Hollywood
+        pitch.</p><br />","_links":{"self":{"href":"http://api.tvmaze.com/episodes/201363"}}},{"id":201364,"url":"http://www.tvmaze.com/episodes/201364/fameless-1x07-match-maid-in-heaven","name":"Match
+        Maid in Heaven","season":1,"number":7,"airdate":"2015-09-17","airtime":"22:30","airstamp":"2015-09-17T22:30:00-04:00","runtime":30,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/201364"}}},{"id":201365,"url":"http://www.tvmaze.com/episodes/201365/fameless-1x08-wheels-of-misfortune","name":"Wheels
+        Of Misfortune","season":1,"number":8,"airdate":"2015-09-24","airtime":"22:30","airstamp":"2015-09-24T22:30:00-04:00","runtime":30,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/201365"}}}]}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Mon, 23 Nov 2015 14:09:07 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+version: 1
