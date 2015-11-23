@@ -174,10 +174,8 @@ class TVMazeEpisodes(Base):
             return True
         time_dif = datetime.now() - self.last_update
         expiration = time_dif.days > UPDATE_INTERVAL
-        log.debug('episode {0}, season {1} for series {2} is expired. days overdue for update: {3}'.format(self.number,
-                                                                                                           self.season_number,
-                                                                                                           self.series_id,
-                                                                                                           expiration))
+        log.debug('episode {0}, season {1} for series {2} is expired.'
+                  'days overdue for update: {3}'.format(self.number, self.season_number, self.series_id, expiration))
         return expiration
 
 
@@ -200,7 +198,6 @@ def get_db_episodes(seasons, session, series_id):
 
 
 def get_db_genres(genres, session):
-    """Takes a list of genres as strings, returns the database instances for them."""
     db_genres = []
     for genre in genres:
         db_genre = session.query(TVMazeGenre).filter(TVMazeGenre.name == genre).first()
@@ -230,7 +227,6 @@ def from_cache(session=None, search_params=None, cache_type=None):
     :param cache_type: Object for search
     :return: Query result
     """
-    result = None
     if not any(search_params.values()):
         raise LookupError('No parameters sent for cache lookup')
     else:
@@ -249,6 +245,8 @@ def from_lookup(session=None, title=None):
 def prepare_lookup(**lookup_params):
     """
     Return a dict of params which is valid with pytvmaze get_show method
+    :param lookup_params: Search parameters
+    :return: Dict of pytvmaze recognizable key words
     """
     prepared_params = {}
     series_name = lookup_params.get('series_name') or lookup_params.get('show_name') or lookup_params.get('title')
@@ -258,8 +256,8 @@ def prepare_lookup(**lookup_params):
     prepared_params['tvdb_id'] = lookup_params.get('tvdb_id') or lookup_params.get('trakt_series_tvdb_id')
     prepared_params['tvrage_id'] = lookup_params.get('tvrage_id') or lookup_params.get('trakt_series_tvrage_id')
     prepared_params['show_name'] = title
-    prepared_params['show_year'] = lookup_params.get('trakt_series_year') or lookup_params.get('year') or \
-                                   lookup_params.get('imdb_year') or year_match
+    prepared_params['show_year'] = lookup_params.get('trakt_series_year') or lookup_params.get(
+        'year') or lookup_params.get('imdb_year') or year_match
     prepared_params['show_network'] = lookup_params.get('network') or lookup_params.get('trakt_series_network')
     prepared_params['show_country'] = lookup_params.get('country') or lookup_params.get('trakt_series_country')
     prepared_params['show_language'] = lookup_params.get('language')
