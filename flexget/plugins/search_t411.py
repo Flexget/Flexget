@@ -1,6 +1,4 @@
-"""
-    Search plugin for torrent411 french tracker.
-"""
+"""Search plugin for torrent411 french tracker."""
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
@@ -92,7 +90,8 @@ SUB_CATEGORIES_SERIES = {
 
 
 class T411Account(Base):
-    """t411Account"""
+
+    """T411Account, database class."""
 
     __tablename__ = 't411_account'
 
@@ -101,6 +100,12 @@ class T411Account(Base):
     expiry_time = Column(DateTime)
 
     def __init__(self, username, token, expiry_time):
+        """__init__.
+
+        :param username: string User login
+        :param token: string User token
+        :param expiry_time: date User token expire date
+        """
         super(T411Account, self).__init__()
         self.username = username
         self.token = token
@@ -108,11 +113,14 @@ class T411Account(Base):
 
 
 class T411Auth(AuthBase):
-    """ Attaches HTTP Token Authentication to the given Request object."""
+
+    """Attaches HTTP Token Authentication to the given Request object."""
 
     def get_auth(self):
-        """get_auth"""
+        """get_auth.
 
+        :returns: token string
+        """
         url_auth = BASE_URL + "/auth"
         log.debug("Getting token from : %s ", url_auth)
         params = {'username': self.username, 'password': self.password}
@@ -132,18 +140,23 @@ class T411Auth(AuthBase):
 
     @classmethod
     def update_token(cls, db_session, token):
-        """update_token
+        """update_token.
 
-        :param db_session:
-        :param token:
+        Update token and expiration time in database.
+
+        :param db_session: Database session
+        :param token: token string
         """
-
         db_session.token = token
         db_session.expiry_time = datetime.now() + timedelta(days=90)
 
     def get_token(self):
-        """get_token"""
+        """get_token.
 
+        Set token string from database, or get a new one if necessary.
+
+        :returns: token string
+        """
         if self.token is not None and not self.force_auth:
             log.debug("Token already return one time, returning the same !")
             return self.token
@@ -172,14 +185,13 @@ class T411Auth(AuthBase):
             return self.token
 
     def __init__(self, task_requests, username, password, force_auth=False):
-        """__init__
+        """__init__.
 
-        :param task_requests:
-        :param username:
-        :param password:
-        :param force_auth:
+        :param task_requests: requests objects given to the task
+        :param username: user login
+        :param password: user password
+        :param force_auth: boolean to force or not new token and authorization
         """
-
         self.requests = task_requests
         self.username = username
         self.password = password
@@ -188,24 +200,26 @@ class T411Auth(AuthBase):
         self.get_token()
 
     def __call__(self, r):
-        """__call__
+        """__call__.
 
-        :param r:
+        Set requests headers for each call.
+
+        :param r: requests object
         """
         r.headers['authorization'] = self.token
         return r
 
 
 class SearchT411(object):
-    """
-        torrent411 Urlrewriter and search Plugin.
 
-        ---
-            -- SEARCH WITHIN SITE
-            discover:
-              what:
-                - emit_movie_queue: yes
-              from:
+    """torrent411 Urlrewriter and search Plugin.
+
+    ---
+    -- SEARCH WITHIN SITE
+    discover:
+        what:
+            - emit_movie_queue: yes
+            from:
                 - torrent411:
                     username: xxxxxxxx  (required)
                     password: xxxxxxxx  (required)
@@ -213,25 +227,26 @@ class SearchT411(object):
                     sub_category: Multi-Francais
 
 
-            ---
-              Category is one of these:
+        ---
+        Category is one of these:
 
-              Animation, Animation-Serie, Concert, Documentaire, Emission-TV,
-              Film, Serie-TV, Series, Spectacle, Sport, Video-clips
+            Animation, Animation-Serie, Concert, Documentaire, Emission-TV,
+            Film, Serie-TV, Series, Spectacle, Sport, Video-clips
 
-            ---
-              Sub-Category is any combination of:
+        ---
+        Sub-Category is any combination of:
 
-              Anglais, VFF, Muet, Multi-Francais, Multi-Quebecois,
-              VFQ, VFSTFR, VOSTFR, VOASTA
+            Anglais, VFF, Muet, Multi-Francais, Multi-Quebecois,
+            VFQ, VFSTFR, VOSTFR, VOASTA
 
-              BDrip-BRrip-SD, Bluray-4K, Bluray-Full-Remux, DVD-R-5,
-              DVD-R-9, DVDrip, HDrip-1080p, HDrip-720p, HDlight-1080p,
-              HDlight-720p, TVrip-SD, TVripHD-1080p, TVripHD-720p,
-              VCD-SVCD-VHSrip, WEBrip, WEBripHD-1080p, WEBripHD-1080p
+            BDrip-BRrip-SD, Bluray-4K, Bluray-Full-Remux, DVD-R-5,
+            DVD-R-9, DVDrip, HDrip-1080p, HDrip-720p, HDlight-1080p,
+            HDlight-720p, TVrip-SD, TVripHD-1080p, TVripHD-720p,
+            VCD-SVCD-VHSrip, WEBrip, WEBripHD-1080p, WEBripHD-1080p
 
-              2D, 3D-Converti-Amateur, 3D-Converti-Pro, 3D-Natif
+            2D, 3D-Converti-Amateur, 3D-Converti-Pro, 3D-Natif
     """
+
     schema = {
         'type': 'object',
         'properties': {
@@ -248,12 +263,12 @@ class SearchT411(object):
 
     @classmethod
     def get_entry(cls, json, auth_handler):
-        """get_entry
+        """get_entry.
 
-        :param json:
-        :param auth_handler:
+        :param json: json coming from t411 search request
+        :param auth_handler: request AuthBase object
+        :returns: Entry object created from json object
         """
-
         entry = Entry()
         entry['title'] = json['name']
         entry['url'] = (BASE_URL + '/torrents/download/%s' % json['id'])
@@ -267,12 +282,14 @@ class SearchT411(object):
 
     @classmethod
     def get_filter_url(cls, category, sub_categories):
-        """get_filter_url
+        """get_filter_url.
 
-        :param category:
-        :param sub_categories:
+        Return filter url for search with filters
+
+        :param category: string category set in params
+        :param sub_categories: array subcategores set in params
+        :returns: string url to call with filters
         """
-
         if category == 'Serie-TV':
             sub_categories_dict = SUB_CATEGORIES.copy()
             sub_categories_dict.update(SUB_CATEGORIES_SERIES)
@@ -298,14 +315,16 @@ class SearchT411(object):
 
     @classmethod
     def get_response_json(cls, requests, search_string, auth_handler, config):
-        """get_response_json
+        """get_response_json.
 
-        :param requests:
-        :param search_string:
-        :param auth_handler:
-        :param config:
+        Return json object from request on torrent411 api
+
+        :param requests: requests object
+        :param search_string: string to search
+        :param auth_handler: request AuthBase object
+        :param config: dict config from params
+        :returns: json object, search result with t411 api
         """
-
         filter_url = cls.get_filter_url(config.get('category'),
                                         config.get('sub_category'))
 
@@ -337,13 +356,13 @@ class SearchT411(object):
     @classmethod
     @plugin.internet(log)
     def search(cls, task, entry, config=None):
-        """search
+        """search.
 
-        :param task:
-        :param entry:
-        :param config:
+        :param task: task object
+        :param entry: entry object
+        :param config: dict from params
+        :returns: set of entry
         """
-
         entries = set()
 
         for search_string in entry.get('search_strings', [entry['title']]):
@@ -363,7 +382,7 @@ class SearchT411(object):
 
 @event('plugin.register')
 def register_plugin():
-    """register_plugin"""
+    """register_plugin."""
     plugin.register(SearchT411, 't411',
                     groups=['search'],
                     api_ver=2)
