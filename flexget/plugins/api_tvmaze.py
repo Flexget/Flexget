@@ -54,7 +54,6 @@ class TVMazeSeries(Base):
     name = Column(Unicode)
     language = Column(Unicode)
     schedule = Column(PickleType)
-    airdays = Column(String)
     url = Column(String)
     original_image = Column(String)
     medium_image = Column(String)
@@ -105,7 +104,6 @@ class TVMazeSeries(Base):
         except TypeError:
             self.year = None
         self.last_update = datetime.now()
-        self.airdays = series.scheduele.get('days')
 
         self.genres[:] = get_db_genres(series.genres, session)
 
@@ -253,7 +251,7 @@ def prepare_lookup(**lookup_params):
     Return a dict of params which is valid with pytvmaze get_show method
     """
     prepared_params = {}
-    series_name = lookup_params.get('series_name', lookup_params.get('show_name'))
+    series_name = lookup_params.get('series_name') or lookup_params.get('show_name') or lookup_params.get('title')
     title, year_match = split_title_year(series_name)
 
     prepared_params['maze_id'] = lookup_params.get('tvmaze_id')
@@ -330,7 +328,7 @@ class APITVMaze(object):
     @staticmethod
     @with_session
     def episode_lookup(session=None, force_cache=False, **lookup_params):
-        series_name = lookup_params.get('series_name')
+        series_name = lookup_params.get('series_name') or lookup_params.get('title')
         season_number = lookup_params.get('series_season')
         episode_number = lookup_params.get('series_episode')
         if not all([season_number, episode_number, series_name]):
