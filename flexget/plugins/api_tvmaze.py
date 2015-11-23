@@ -54,12 +54,14 @@ class TVMazeSeries(Base):
     name = Column(Unicode)
     language = Column(Unicode)
     schedule = Column(PickleType)
+    airdays = Column(String)
     url = Column(String)
     original_image = Column(String)
     medium_image = Column(String)
     tvdb_id = Column(Integer)
     tvrage_id = Column(Integer)
     premiered = Column(DateTime)
+    year = Column(Integer)
     summary = Column(Unicode)
     webchannel = Column(String)
     runtime = Column(Integer)
@@ -98,7 +100,12 @@ class TVMazeSeries(Base):
         self.runtime = series.runtime
         self.show_type = series.type
         self.network = series.network['name']
+        try:
+            self.year = series.premiered[:4]
+        except TypeError:
+            self.year = None
         self.last_update = datetime.now()
+        self.airdays = series.scheduele.get('days')
 
         self.genres[:] = get_db_genres(series.genres, session)
 
