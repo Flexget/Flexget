@@ -460,6 +460,8 @@ def singleton(cls):
 
 def split_title_year(title):
     """Splits title containing a year into a title, year pair."""
+    if not title:
+        return
     match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
     title = match.group(1).strip()
     if match.group(2):
