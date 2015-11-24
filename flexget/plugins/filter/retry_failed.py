@@ -64,6 +64,20 @@ columns = Base.metadata.tables['failed'].c
 Index('failed_title_url', columns.title, columns.url, columns.count)
 
 
+@event('manager.db_cleanup')
+def db_cleanup(manager, session):
+    # Delete everything older than 30 days
+    session.query(FailedEntry).filter(FailedEntry.tof < datetime.now() - timedelta(days=30)).delete()
+    # Of the remaining, always keep latest 25. Drop any after that if fail was more than a week ago.
+    keep_num = 25
+    keep_ids = [fe.id for fe in session.query(FailedEntry).order_by(FailedEntry.tof.desc())[:keep_num]]
+    if len(keep_ids) == keep_num:
+        query = session.query(FailedEntry)
+        query = query.filter(FailedEntry.id.notin_(keep_ids))
+        query = query.filter(FailedEntry.tof < datetime.now() - timedelta(days=7))
+        query.delete(synchronize_session=False)
+
+
 class PluginFailed(object):
     """
     Records entry failures and stores them for trying again after a certain interval.
@@ -132,7 +146,7 @@ class PluginFailed(object):
         reason = unicode(reason) or 'Unknown'
         with Session() as session:
             # query item's existence
-            item = session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
+            item = session.query(FailedEntry).filter(FailedEntry.title == entry['title']). \
                 filter(FailedEntry.url == entry['original_url']).first()
             if not item:
                 item = FailedEntry(entry['title'], entry['original_url'], reason)
@@ -147,9 +161,6 @@ class PluginFailed(object):
             if self.backlog and item.count <= config['max_retries']:
                 self.backlog.instance.add_backlog(entry.task, entry, amount=retry_time, session=session)
             entry.task.rerun()
-            # limit item number to 25
-            for row in session.query(FailedEntry).order_by(FailedEntry.tof.desc())[25:]:
-                session.delete(row)
 
     @plugin.priority(255)
     def on_task_filter(self, task, config):
@@ -158,7 +169,7 @@ class PluginFailed(object):
         config = self.prepare_config(config)
         max_count = config['max_retries']
         for entry in task.entries:
-            item = task.session.query(FailedEntry).filter(FailedEntry.title == entry['title']).\
+            item = task.session.query(FailedEntry).filter(FailedEntry.title == entry['title']). \
                 filter(FailedEntry.url == entry['original_url']).first()
             if item:
                 if item.count > max_count:

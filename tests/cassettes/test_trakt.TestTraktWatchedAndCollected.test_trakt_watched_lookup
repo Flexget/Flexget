@@ -1,0 +1,351 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/search?query=Hawaii+Five-0&type=show
+    response:
+      body: {string: '[{"type":"show","score":96.68861,"show":{"title":"Hawaii Five-0","overview":"Steve
+          McGarrett returns home to Oahu, in order to find his father''s killer. The
+          governor offers him the chance to run his own task force (Five-0). Steve''s
+          team is joined by Chin Ho Kelly, Danny \"Danno\" Williams, and Kono Kalakaua.","year":2010,"status":"returning
+          series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/032/657/posters/original/ff94033565.jpg","medium":"https://walter.trakt.us/images/shows/000/032/657/posters/medium/ff94033565.jpg","thumb":"https://walter.trakt.us/images/shows/000/032/657/posters/thumb/ff94033565.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/032/657/fanarts/original/03ff15aa9c.jpg","medium":"https://walter.trakt.us/images/shows/000/032/657/fanarts/medium/03ff15aa9c.jpg","thumb":"https://walter.trakt.us/images/shows/000/032/657/fanarts/thumb/03ff15aa9c.jpg"}},"ids":{"trakt":32657,"slug":"hawaii-five-0","tvdb":164541,"imdb":"tt1600194","tmdb":32798,"tvrage":24840}}}]'}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [243d836d1b9623fc-IAD]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Wed, 11 Nov 2015 22:42:58 GMT']
+        etag: [W/"98d2070491b079b7413bdc4f6663a56e"]
+        expires: ['Thu, 12 Nov 2015 02:42:58 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d5d3eb4624553e9beb9898f8112eb1a381447281778; expires=Thu,
+            10-Nov-16 22:42:58 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-pagination-item-count: ['1']
+        x-pagination-limit: ['10']
+        x-pagination-page: ['1']
+        x-pagination-page-count: ['1']
+        x-request-id: [d1e01afe-6a26-40ce-9005-844574147f53]
+        x-runtime: ['0.020653']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        Cookie: [__cfduid=d5d3eb4624553e9beb9898f8112eb1a381447281778]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/shows/32657?extended=full
+    response:
+      body: {string: '{"title":"Hawaii Five-0","year":2010,"ids":{"trakt":32657,"slug":"hawaii-five-0","tvdb":164541,"imdb":"tt1600194","tmdb":32798,"tvrage":24840},"overview":"Steve
+          McGarrett returns home to Oahu, in order to find his father''s killer. The
+          governor offers him the chance to run his own task force (Five-0). Steve''s
+          team is joined by Chin Ho Kelly, Danny \"Danno\" Williams, and Kono Kalakaua.","first_aired":"2010-09-20T00:00:00.000Z","airs":{"day":"Friday","time":"21:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"CBS","country":"us","trailer":"http://youtube.com/watch?v=EN6LMV4-Dfs","homepage":null,"status":"returning
+          series","rating":7.78418,"votes":3021,"updated_at":"2015-11-11T10:35:13.000Z","language":"en","available_translations":["en","de","pl","bg","it","fr","el","es","zh","ru","hu","nl","sv","pt","he","bs","da","lt"],"genres":["drama","action","crime"],"aired_episodes":125}'}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [243d836d4b9f23fc-IAD]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Wed, 11 Nov 2015 22:42:58 GMT']
+        etag: [W/"7207cf7093b3f1462a799fccab740cf8"]
+        expires: ['Thu, 12 Nov 2015 02:42:58 GMT']
+        last-modified: ['Wed, 11 Nov 2015 10:35:13 GMT']
+        server: [cloudflare-nginx]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-request-id: [04795485-2c0c-4f09-82bc-05e0afc488ef]
+        x-runtime: ['0.011467']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/shows/32657/seasons/4/episodes/13/?extended=full
+    response:
+      body: {string: "{\"season\":4,\"number\":13,\"title\":\"Hana Lokomaika'i\",\"\
+          ids\":{\"trakt\":776972,\"tvdb\":4749328,\"imdb\":null,\"tmdb\":0,\"tvrage\"\
+          :0},\"number_abs\":null,\"overview\":\"Internal Affairs questions Chin about\
+          \ his father\u2019s murder 15 years earlier and how his then-new relationship\
+          \ with Malia and her family might have hurt the investigation.\",\"rating\"\
+          :7.82292,\"votes\":384,\"first_aired\":\"2014-01-18T02:00:00.000Z\",\"updated_at\"\
+          :\"2015-10-24T06:55:47.000Z\",\"available_translations\":[]}"}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [243d836df4b40f21-IAD]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Wed, 11 Nov 2015 22:42:58 GMT']
+        expires: ['Thu, 12 Nov 2015 02:42:58 GMT']
+        last-modified: ['Sat, 24 Oct 2015 06:55:47 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d55f5d2938617abe06ddce2e1dbcab2171447281778; expires=Thu,
+            10-Nov-16 22:42:58 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-request-id: [09cae124-77c7-43da-ba54-5c456f0daa29]
+        x-runtime: ['0.009653']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/users/flexgettest/history/episodes/776972
+    response:
+      body: {string: '[{"id":558103917,"watched_at":"2015-01-02T03:46:38.000Z","action":"watch","type":"episode","episode":{"season":4,"number":13,"title":"Hana
+          Lokomaika''i","ids":{"trakt":776972,"tvdb":4749328,"imdb":null,"tmdb":0,"tvrage":0}},"show":{"title":"Hawaii
+          Five-0","year":2010,"ids":{"trakt":32657,"slug":"hawaii-five-0","tvdb":164541,"imdb":"tt1600194","tmdb":32798,"tvrage":24840}}}]'}
+      headers:
+        cache-control: ['max-age=0, private, must-revalidate']
+        cf-ray: [243d836e9cdf0f09-IAD]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Wed, 11 Nov 2015 22:42:58 GMT']
+        etag: [W/"5271644ca995eeeb958aab274948027d"]
+        last-modified: ['Wed, 11 Nov 2015 08:23:41 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d9b9e7e4c2c78a7c6c15a967421973d571447281778; expires=Thu,
+            10-Nov-16 22:42:58 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-pagination-item-count: ['1']
+        x-pagination-limit: ['10']
+        x-pagination-page: ['1']
+        x-pagination-page-count: ['1']
+        x-request-id: [85ddd3d5-ad65-49ac-99d3-a631f0f11545]
+        x-runtime: ['0.011649']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/search?query=The+Flash&type=show&year=2014
+    response:
+      body: {string: "[{\"type\":\"show\",\"score\":59.645515,\"show\":{\"title\"\
+          :\"The Flash\",\"overview\":\"After a particle accelerator causes a freak\
+          \ storm, CSI Investigator Barry Allen is struck by lightning and falls into\
+          \ a coma. Months later he awakens with the power of super speed, granting\
+          \ him the ability to move through Central City like an unseen guardian angel.\
+          \ Though initially excited by his newfound powers, Barry is shocked to discover\
+          \ he is not the only \\\"meta-human\\\" who was created in the wake of the\
+          \ accelerator explosion \u2013 and not everyone is using their new powers\
+          \ for good. Barry partners with S.T.A.R. Labs and dedicates his life to\
+          \ protect the innocent. For now, only a few close friends and associates\
+          \ know that Barry is literally the fastest man alive, but it won't be long\
+          \ before the world learns what Barry Allen has become... The Flash.\",\"\
+          year\":2014,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\"\
+          :\"https://walter.trakt.us/images/shows/000/060/300/posters/original/79bd96a4d3.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/posters/medium/79bd96a4d3.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/posters/thumb/79bd96a4d3.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/original/df36c9a731.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/medium/df36c9a731.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"\
+          }},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"\
+          imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}},{\"type\":\"show\"\
+          ,\"score\":0.44915,\"show\":{\"title\":\"Tornado Hunters\",\"overview\"\
+          :\"Greg Johnson, Chris Chittick, and Ricky Forbes are the Tornado Hunters.Outfitted\
+          \ with their truck Flash and the best equipment money can buy, they target\
+          \ the biggest tornadoes in North America. From Regina to Mexico, there\u2019\
+          s nowhere they won\u2019t go as they risk life, limb and a lot of windshields\
+          \ to chase their passion for the world\u2019s worst weather. - See more\
+          \ at: http://www.cmt.ca/show/tornado-hunters/#sthash.FtuhY0T3.dpuf\",\"\
+          year\":2014,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\"\
+          :\"https://walter.trakt.us/images/shows/000/081/448/posters/original/ecede5e037.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/081/448/posters/medium/ecede5e037.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/081/448/posters/thumb/ecede5e037.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
+          trakt\":81448,\"slug\":\"tornado-hunters\",\"tvdb\":287638,\"imdb\":null,\"\
+          tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.32920346,\"\
+          show\":{\"title\":\"Stop Skeletons From Fighting\",\"overview\":\"Hello,\
+          \ I'm Derek Alexander, and I've been producing video reviews of retro (and\
+          \ sometimes modern) video games for over 7 years.When I started producing\
+          \ reviews in 2007, I was known as the Happy Video Game Nerd (HVGN). In late-2014\
+          \ I dropped the HVGN name and established Stop Skeletons From Fighting,\
+          \ a new outlet for video reviews (and other future projects). Even though\
+          \ I\u2019ve dropped the HVGN name, I still strive to set myself apart from\
+          \ the typical review show by using a positive spin to highlight lesser-known\
+          \ or underrated games and occasionally entire series. Some of the titles\
+          \ I've covered include:-Earthbound-Jumping Flash!-Gargoyle's Quest-Splatterhouse-Parasite\
+          \ Eve-Sweet Home-Wild Guns-IllbleedHaven't heard of some of these games?\
+          \ That's the point! \",\"year\":2014,\"status\":\"returning series\",\"\
+          images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":101605,\"\
+          slug\":\"stop-skeletons-from-fighting\",\"tvdb\":300088,\"imdb\":null,\"\
+          tmdb\":null,\"tvrage\":null}}}]"}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [243d836f60c1086e-IAD]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Wed, 11 Nov 2015 22:42:59 GMT']
+        etag: [W/"e8760f56d4a78f575ec9ecae4d7113af"]
+        expires: ['Thu, 12 Nov 2015 02:42:59 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d0e86a5c0efe75e817d4d925ae245e5ce1447281779; expires=Thu,
+            10-Nov-16 22:42:59 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-pagination-item-count: ['3']
+        x-pagination-limit: ['10']
+        x-pagination-page: ['1']
+        x-pagination-page-count: ['1']
+        x-request-id: [1ea5a951-2552-4a0f-b99a-e41d6e3cf56e]
+        x-runtime: ['0.020001']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        Cookie: [__cfduid=d0e86a5c0efe75e817d4d925ae245e5ce1447281779]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/shows/60300?extended=full
+    response:
+      body: {string: "{\"title\":\"The Flash\",\"year\":2014,\"ids\":{\"trakt\":60300,\"\
+          slug\":\"the-flash-2014\",\"tvdb\":279121,\"imdb\":\"tt3107288\",\"tmdb\"\
+          :60735,\"tvrage\":36939},\"overview\":\"After a particle accelerator causes\
+          \ a freak storm, CSI Investigator Barry Allen is struck by lightning and\
+          \ falls into a coma. Months later he awakens with the power of super speed,\
+          \ granting him the ability to move through Central City like an unseen guardian\
+          \ angel. Though initially excited by his newfound powers, Barry is shocked\
+          \ to discover he is not the only \\\"meta-human\\\" who was created in the\
+          \ wake of the accelerator explosion \u2013 and not everyone is using their\
+          \ new powers for good. Barry partners with S.T.A.R. Labs and dedicates his\
+          \ life to protect the innocent. For now, only a few close friends and associates\
+          \ know that Barry is literally the fastest man alive, but it won't be long\
+          \ before the world learns what Barry Allen has become... The Flash.\",\"\
+          first_aired\":\"2014-10-07T00:00:00.000Z\",\"airs\":{\"day\":\"Tuesday\"\
+          ,\"time\":\"20:00\",\"timezone\":\"America/New_York\"},\"runtime\":45,\"\
+          certification\":\"TV-14\",\"network\":\"The CW\",\"country\":\"us\",\"trailer\"\
+          :\"http://youtube.com/watch?v=aZxhA_Jihmw\",\"homepage\":null,\"status\"\
+          :\"returning series\",\"rating\":8.29557,\"votes\":7318,\"updated_at\":\"\
+          2015-11-11T10:35:53.000Z\",\"language\":\"en\",\"available_translations\"\
+          :[\"pl\",\"sv\",\"fr\",\"en\",\"zh\",\"da\",\"pt\",\"el\",\"de\",\"es\"\
+          ,\"bg\",\"it\",\"tr\",\"ru\",\"nl\",\"hu\",\"ko\",\"lt\",\"cs\",\"hr\",\"\
+          bs\",\"za\",\"he\",\"id\"],\"genres\":[\"action\",\"adventure\",\"drama\"\
+          ,\"science-fiction\"],\"aired_episodes\":29}"}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [243d836f90c3086e-IAD]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Wed, 11 Nov 2015 22:42:59 GMT']
+        etag: [W/"de0bb6c0cfec35ca46139e2758f7227e"]
+        expires: ['Thu, 12 Nov 2015 02:42:59 GMT']
+        last-modified: ['Wed, 11 Nov 2015 10:35:53 GMT']
+        server: [cloudflare-nginx]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-request-id: [aafe066d-4a44-408a-896e-eb6531a6e755]
+        x-runtime: ['0.009806']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/shows/60300/seasons/1/episodes/10/?extended=full
+    response:
+      body: {string: "{\"season\":1,\"number\":10,\"title\":\"Revenge of the Rogues\"\
+          ,\"ids\":{\"trakt\":999431,\"tvdb\":5052260,\"imdb\":\"tt4016102\",\"tmdb\"\
+          :1018355,\"tvrage\":1065644215},\"number_abs\":null,\"overview\":\"Leonard\
+          \ Snart AKA Captain Cold returns to Central City with a new hotheaded partner\
+          \ in tow \u2013 Mick Rory AKA Heat Wave. The duo plan to steal a multi-million\
+          \ dollar painting, but Cold has another agenda while in town \u2013 to set\
+          \ a trap for The Flash. Snart and Mick kidnap someone close to The Flash\
+          \ and threaten to kill them unless The Flash shows up for a battle of fire\
+          \ and ice. Barry tells Joe he isn\u2019t sure he should take on Snart again\
+          \ after the casualties that happened the last time they fought. Meanwhile,\
+          \ Barry asks Dr. Wells, Caitlin and Cisco to help him double his training\
+          \ efforts so he\u2019s ready for the Reverse Flash when he returns to Central\
+          \ City. Iris deals with the aftermath of Barry\u2019s confession, and Cisco\
+          \ makes the CCPD a new shield.\",\"rating\":7.67502,\"votes\":1317,\"first_aired\"\
+          :\"2015-01-21T01:00:00.000Z\",\"updated_at\":\"2015-11-11T20:30:41.000Z\"\
+          ,\"available_translations\":[]}"}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [243d8370659302b7-IAD]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Wed, 11 Nov 2015 22:42:59 GMT']
+        expires: ['Thu, 12 Nov 2015 02:42:59 GMT']
+        last-modified: ['Wed, 11 Nov 2015 20:30:41 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d9f0738c0f91681d771e26e187a0111ad1447281779; expires=Thu,
+            10-Nov-16 22:42:59 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-request-id: [3207595c-37a2-4d68-a6aa-0cc38cb3fc1b]
+        x-runtime: ['0.013634']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/users/flexgettest/history/episodes/999431
+    response:
+      body: {string: '[]'}
+      headers:
+        cache-control: ['max-age=0, private, must-revalidate']
+        cf-ray: [243d83711e090f09-IAD]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Wed, 11 Nov 2015 22:42:59 GMT']
+        etag: [W/"aa8cc59c0c7ec691869fa0717050b4d5"]
+        last-modified: ['Wed, 11 Nov 2015 08:23:41 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d774bd6d9b58553e57798a0ed4ec04ab11447281779; expires=Thu,
+            10-Nov-16 22:42:59 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-pagination-item-count: ['0']
+        x-pagination-limit: ['10']
+        x-pagination-page: ['1']
+        x-pagination-page-count: ['0']
+        x-request-id: [34388188-3286-4f4b-a2ff-254071538844]
+        x-runtime: ['0.021836']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1

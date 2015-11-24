@@ -123,6 +123,7 @@ class Sonarr(object):
                           series_name=show['title'],
                           tvdb_id=show.get('tvdbId'),
                           tvrage_id=show.get('tvRageId'),
+                          tvmaze_id=show.get('tvMazeId'),
                           configure_series_target=fg_cutoff)
             if len(fg_qualities) > 1:
                 entry['configure_series_qualities'] = fg_qualities
@@ -137,9 +138,9 @@ class Sonarr(object):
                 continue
             # Test mode logging
             if entry and task.options.test:
-                log.info("Test mode. Entry includes:")
+                log.verbose("Test mode. Entry includes:")
                 for key, value in entry.items():
-                    log.info('     {}: {}'.format(key.capitalize(), value))
+                    log.verbose('     {}: {}'.format(key.capitalize(), value))
 
         return entries
 

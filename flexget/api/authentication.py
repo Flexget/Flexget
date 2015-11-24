@@ -9,7 +9,6 @@ from flexget.utils.database import with_session
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.session_protection = 'strong'
 
 
 @login_manager.request_loader

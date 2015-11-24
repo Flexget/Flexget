@@ -72,7 +72,7 @@ def get_secret(session=None):
 
 
 class User(Base, UserMixin):
-    """ User class avaliable for flask apps to handle authentication using flask_login """
+    """ User class available for flask apps to handle authentication using flask_login """
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
@@ -188,9 +188,12 @@ class WebServer(threading.Thread):
         d = wsgiserver.WSGIPathInfoDispatcher(apps)
         self.server = wsgiserver.CherryPyWSGIServer((self.bind, self.port), d)
 
-        host = self.bind if self.bind != "0.0.0.0" else socket.gethostbyname(socket.gethostname())
+        try:
+            host = self.bind if self.bind != "0.0.0.0" else socket.gethostbyname(socket.gethostname())
+        except socket.gaierror:
+            host = '127.0.0.1'
 
-        log.info('Web interface avaliable at http://%s:%s' % (host, self.port))
+        log.info('Web interface available at http://%s:%s' % (host, self.port))
 
         self.server.start()
 
