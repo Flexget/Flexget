@@ -45,7 +45,7 @@ class OutputPushover(object):
             'message': {'type': 'string', 'default': default_message},
             'priority': {'oneOf': [
                 {'type': 'number', 'minimum': -2, 'maximum': 1},
-                {'type': 'string'}]},
+                {'type': 'string'}], 'default': ''},
             'url': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
             'urltitle': {'type': 'string', 'default': ''},
             'sound': {'type': 'string', 'default': ''}
