@@ -14,7 +14,6 @@ from flexget.plugins.cli import t411
 log = logging.getLogger('test_t411')
 
 
-
 class MockRestClient(object):
     search_result = {
         "query": "Mickey",
@@ -65,6 +64,18 @@ class MockRestClient(object):
         }
     }
 
+    details_result = {
+        "id": 123123,
+        "name": "Mock Title 720p",
+        "category": 14,
+        "terms": {
+            "Application - Genre": "Antivirus"
+        }
+    }
+
+    def __init__(self):
+        self.details_called = False
+
     def auth(self):
         return
 
@@ -81,11 +92,16 @@ class MockRestClient(object):
         self.last_query = query
         return MockRestClient.search_result
 
+    def details(self, torrent_id):
+        assert torrent_id == 123123
+        self.details_called = True
+        return MockRestClient.details_result
+
 
 class TestRestClient(object):
     def __init__(self):
-        self.credentials = {'username': '', 'password': ''}
-        self.api_token = ''
+        self.credentials = {'username': 'set', 'password': 'this'}
+        self.api_token = 'you must set this value for online test'
 
     def build_unauthenticated_client(self):
         client = T411RestClient()
@@ -127,11 +143,12 @@ class TestRestClient(object):
     @use_vcr
     def test_retrieve_terms(self):
         client = self.build_authenticated_client()
-        json_terms = client.retrieve_category_tree()
+        json_terms = client.retrieve_terms_tree()
         assert json_terms is not None
+        assert json_terms.get('234') is not None
         term_type = json_terms.get('234').get('11')
         assert term_type is not None
-        assert term_type.get('type') == 'Application'
+        assert term_type.get('type') == 'Application - Genre'
         assert term_type.get('mode') == 'single'
 
     @use_vcr
@@ -144,8 +161,8 @@ class TestRestClient(object):
         """
         client = self.build_authenticated_client()
         search_result = client.search({})
-        assert search_result['query'] == None
-        assert search_result['limit'] == 10
+        assert search_result.get('query') is None
+        assert search_result.get('limit') == 10
 
 
 class TestObjectMapper(object):
@@ -231,6 +248,19 @@ class TestProxy(FlexGetBase):
         assert (11,123) in proxy.rest_client.last_query['terms']
         assert proxy.rest_client.last_query['category_id'] == 14
         assert proxy.rest_client.last_query['expression'] == 'Mickey'
+
+    def test_details(self):
+        proxy = T411Proxy()
+        proxy.rest_client = MockRestClient()
+        details = proxy.details(123123)
+        assert proxy.rest_client.details_called == True
+        assert details.name == "Mock Title 720p"
+        assert details.terms[0].type.id == 11
+        assert details.terms[0].id == 123
+
+        proxy.rest_client.details_called = False
+        proxy.details(123123)
+        assert proxy.rest_client.details_called == False, 'Proxy not used the cache'
 
 
 class TestInputPlugin(FlexGetBase):

@@ -22,6 +22,9 @@ category_term_types = Table('category_term_types', Base.metadata,
                             Column('category_id', Integer, ForeignKey('categories.id')),
                             Column('term_type_id', Integer, ForeignKey('term_types.id')))
 
+torrent_terms = Table('torrent_terms', Base.metadata,
+                      Column('torrent_id', Integer, ForeignKey('torrent.id')),
+                      Column('term_id', Integer, ForeignKey('term.id')))
 
 @db_schema.upgrade('api_t411')
 def upgrade(ver, session):
@@ -41,6 +44,9 @@ class Category(Base):
     term_types = relation('TermType',
                           secondary=category_term_types,
                           backref='categories')
+    torrents = relation('Torrent',
+                        backref='category',
+                        cascade='all, delete, delete-orphan')
 
 
 class TermType(Base):
@@ -60,6 +66,17 @@ class Term(Base):
     type_id = Column(Integer, ForeignKey('term_types.id'))
 
 
+class Torrent(Base):
+    __tablename__ = 'torrent'
+    id = Column(Integer, primary_key=True)
+    name = Column(String)
+    rewrite_name = Column(String)
+    category_id = Column(Integer, ForeignKey('categories.id'))
+    terms = relation('Term',
+                     secondary='torrent_terms',
+                     backref='torrents')
+
+
 class FriendlySearchQuery(object):
     def __init__(self):
         self.expression = None
@@ -72,7 +89,9 @@ T411API_CATEGORY_TREE_PATH = "/categories/tree/"
 T411API_AUTH_PATH = "/auth"
 T411API_TERMS_PATH = "/terms/tree/"
 T411API_SEARCH_PATH = "/torrents/search/"
-T411API_DOWNLOAD_PATH = "/torrents/search/"
+T411API_DOWNLOAD_PATH = "/torrents/download/"
+T411API_DETAILS_PATH = "/torrents/details/"
+T411_VIDEO_QUALITY_TERM_TYPE = 7
 
 
 def auth_required(func):
@@ -180,6 +199,11 @@ class T411RestClient(object):
         url += urllib.urlencode(url_params)
         return self.get_json(url)
 
+    @auth_required
+    def details(self, torrent_id):
+        url = T411API_DETAILS_PATH + torrent_id
+        return self.get_json(url)
+
 
 class T411ObjectMapper(object):
     date_format = "%Y-%m-%d %H:%M:%S"
@@ -188,7 +212,6 @@ class T411ObjectMapper(object):
     Tool class to convert JSON object from the REST client
     into object for ORM
     """
-
     def map_category(self, json_category):
         # Some categories are empty, so we reject them
         if json_category.get('id') is None \
@@ -287,6 +310,20 @@ class T411ObjectMapper(object):
         result['t411_owner_username'] = json_entry['username']
         return result
 
+    def map_details(self, json_details, resolver):
+        result = Torrent()
+        result.id = json_details.get('id')
+        result.name = json_details.get('name')
+        result.category_id = json_details.get('category')
+
+        for (term_type_name, terms_candidat) in json_details.get('terms').iteritems():
+            if isinstance(terms_candidat, list):
+                for term_name in terms_candidat:
+                    result.terms.append(resolver(result.category_id, term_type_name, term_name))
+            else:
+                result.terms.append(resolver(result.category_id, term_type_name, terms_candidat))
+
+        return result
 
 def cache_required(func):
     """
@@ -373,6 +410,28 @@ class T411Proxy(object):
         return category
 
     @cache_required
+    def find_term_type_by_name(self, category_id, term_type_name):
+        query = self.session.query(TermType)\
+            .filter(TermType.name == term_type_name) \
+            .filter(TermType.categories.any(Category.id == category_id))
+        return query.one()
+
+    @cache_required
+    def find_term_by_name(self, term_type_id, term_name):
+        return self.session.query(Term)\
+            .filter(Term.type_id == term_type_id)\
+            .filter(Term.name == term_name)\
+            .one()
+
+    @cache_required
+    def find_term(self, category_id, term_type_name, term_name):
+        return self.session.query(Term) \
+            .filter(TermType.name == term_type_name) \
+            .filter(TermType.categories.any(Category.id == category_id)) \
+            .filter(TermType.terms.any(Term.name == term_name)) \
+            .first()
+
+    @cache_required
     def all_categories(self):
         return self.session.query(Category).all()
 
@@ -398,15 +457,29 @@ class T411Proxy(object):
                 log.debug(formatting_sub % (sub_category.name, sub_category.parent_id, sub_category.id))
 
     @cache_required
+    def print_all_terms(self):
+        formatting_main = '%-50s %-10s %-5s'
+        formatting_sub = '     %-45s %-10s %-5s'
+        term_types = self.session.query(TermType).all()
+        log.debug(formatting_main % ('Name', 'Mode', 'Id'))
+        for term_type in term_types:
+            log.debug(formatting_main % (term_type.name, term_type.mode, term_type.id))
+            for term in term_type.terms:
+                log.debug(formatting_sub % (term.name, '', term.id))
+
+    @cache_required
     def print_terms(self, category_id=None, category_name=None):
-        if category_id is None:
+        if category_id is not None:
+            category = self.session.query(Category).filter(Category.id == category_id).one()
+        elif category_name is not None:
             category = self.find_category_by_name(category_name)
         else:
-            category = self.session.query(Category).filter(Category.id == category_id).one()
+            self.print_all_terms()
+            return
 
         log.debug('Terms for the category %s' % category.name)
-        formatting_main = '%-32s %-10s %-5s'
-        formatting_sub = '     %-27s %-10s %-5s'
+        formatting_main = '%-50s %-10s %-5s'
+        formatting_sub = '     %-45s %-10s %-5s'
         log.debug(formatting_main % ('Name', 'Mode', 'Id'))
         for term_type in category.term_types:
             log.debug(formatting_main % (term_type.name, term_type.mode, term_type.id))
@@ -449,11 +522,28 @@ class T411Proxy(object):
         :param FriendlySearchQuery query:
         :return:
         """
-        log.debug(query)
         client_query = self.friendly_query_to_client_query(query)
         json_results = self.rest_client.search(client_query)
         return map(self.mapper.map_search_result_entry, json_results['torrents'])
 
+    @cache_required
+    def details(self, torrent_id):
+        details = self.session \
+                    .query(Torrent) \
+                    .filter(Torrent.id == torrent_id) \
+                    .first()
+        if details:
+            return details
+        else:
+            json_details = self.rest_client.details(torrent_id)
+
+            def resolver(category_id, term_type_name, term_name):
+                return self.find_term(category_id, term_type_name, term_name)
+
+            details = self.mapper.map_details(json_details, resolver)
+            self.session.add(details)
+            self.session.commit()
+            return details
 
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
