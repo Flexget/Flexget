@@ -68,7 +68,7 @@ class OutputPushover(object):
         try:
             response = task.requests.post(PUSHOVER_URL, data=data, raise_status=False)
         except RequestException as e:
-            log.warning('Could not get response from Pushover: {}'.format(e))
+            log.warning('Could not get response from Pushover: {0}'.format(e))
             return
         return response
 
@@ -105,7 +105,7 @@ class OutputPushover(object):
                 try:
                     data[key] = entry.render(value)
                 except RenderError as e:
-                    log.warning('Problem rendering %s: %s ' % (key, e))
+                    log.warning('Problem rendering {0}: {1}'.format(key, e))
                 except ValueError:
                     pass
 
@@ -142,12 +142,12 @@ class OutputPushover(object):
                         log.debug("Pushover notification sent")
                         break
                     elif request_status == 500:
-                        log.debug("Pushover notification failed, Pushover API having issues. Try %s out of %s" % (
+                        log.debug("Pushover notification failed, Pushover API having issues. Try {0} out of {1}".format(
                             retry + 1, NUMBER_OF_RETRIES))
                         continue
                     elif request_status >= 400:
                         errors = json.loads(response.content)['errors']
-                        log.error("Pushover API error: %s" % errors[0])
+                        log.error("Pushover API error: {0}".format(errors[0]))
                         break
                     else:
                         log.error("Unknown error when sending Pushover notification")
