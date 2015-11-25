@@ -67,9 +67,8 @@ class OutputPushover(object):
     def pushover_request(task, data):
         try:
             response = task.requests.post(PUSHOVER_URL, data=data, raise_status=False)
-        except RequestException as e:
-            log.warning('Could not get response from Pushover: {0}'.format(e))
-            return
+        except RequestException:
+            raise
         return response
 
     def prepare_config(self, config):
@@ -135,7 +134,12 @@ class OutputPushover(object):
                     continue
 
                 for retry in range(NUMBER_OF_RETRIES):
-                    response = self.pushover_request(task, data)
+                    try:
+                        response = self.pushover_request(task, data)
+                    except RequestException as e:
+                        log.warning('Could not get response from Pushover: {0}.'
+                                    ' Try {1} out of {2}'.format(e, retry + 1, NUMBER_OF_RETRIES))
+                        continue
                     request_status = response.status_code
                     # error codes and messages from Pushover API
                     if request_status == 200:
@@ -152,6 +156,9 @@ class OutputPushover(object):
                     else:
                         log.error("Unknown error when sending Pushover notification")
                         break
+                else:
+                    log.error(
+                        'Could not get response from Pushover after {0} retries, aborting.'.format(NUMBER_OF_RETRIES))
 
 
 @event('plugin.register')
