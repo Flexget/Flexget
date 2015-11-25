@@ -340,7 +340,7 @@ class SearchT411(object):
 
         res_json = response.json()
 
-        if 'errors' in res_json.keys():
+        if 'error' in res_json.keys():
             auth_handler = T411Auth(requests, config.get('username'),
                                     config.get('password'), force_auth=True)
             try:
@@ -349,7 +349,7 @@ class SearchT411(object):
             except requests.exceptions.RequestException as exc:
                 raise plugin.PluginError(exc)
 
-            if 'errors' in res_json.keys():
+            if 'error' in res_json.keys():
                 raise plugin.PluginError(res_json['error'])
 
         return res_json
