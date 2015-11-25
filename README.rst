@@ -25,7 +25,9 @@ directory support or provide interface for external utilities like FlexGet.
 
 
 **Help:** http://discuss.flexget.com/
+
 **Chat:** http://webchat.freenode.net/?channels=#flexget
+
 **Bugs:** https://github.com/Flexget/Flexget/issues
 
 Install
