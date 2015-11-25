@@ -68,7 +68,6 @@ class OutputPushover(object):
             return
         return response
 
-
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
@@ -127,6 +126,12 @@ class OutputPushover(object):
                     if value.get('value'):
                         data[key] = value['value']
 
+                # Special case, verify certain fields exists if priority is 2
+                if data.get('priority') == 2 and not all([data.get('expire'), data.get('retry')]):
+                    log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.'
+                                ' Lowering priority to 1')
+                    data['priority'] = 1
+
                 # Check for test mode
                 if task.options.test:
                     log.info("Test mode.  Pushover notification would be:")
@@ -134,12 +139,6 @@ class OutputPushover(object):
                         log.verbose('{0:>5}{1}: {2}'.format('', key.capitalize(), value))
                     # Test mode.  Skip remainder.
                     continue
-
-                # Special case, verify certain fields exists if priority is 2
-                if data.get('priority') == 2 and not all([data.get('expire'), data.get('retry')]):
-                    log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.'
-                                'Lowering priority to 1')
-                    data['priority'] = 1
 
                 # Make the request
                 response = self.pushover_request(task, data)
