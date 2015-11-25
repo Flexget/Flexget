@@ -1,17 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-from urlparse import urlparse
 import logging
-import math
 from flexget.config_schema import one_or_more
-from flexget.manager import Session
 from flexget.plugins.api_t411 import T411Proxy, FriendlySearchQuery, Category, TermType, Term
 from flexget.utils.cached_input import cached
-from flexget.utils.database import with_session
-from requests import RequestException
 
 from flexget import plugin
 from flexget.event import event
-from flexget.entry import Entry
 
 log = logging.getLogger('t411_input')
 

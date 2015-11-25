@@ -7,7 +7,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.database import with_session
 
-from sqlalchemy import (Table, Column, Integer, String, ForeignKey)
+from sqlalchemy import (Table, Column, Integer, String, ForeignKey, DateTime)
 from sqlalchemy.orm import relation, backref
 from flexget import db_schema
 from flexget.utils.requests import Session
@@ -67,6 +67,9 @@ class Term(Base):
 
 
 class Torrent(Base):
+    """
+    Immutable torrent informations
+    """
     __tablename__ = 'torrent'
     id = Column(Integer, primary_key=True)
     name = Column(String)
@@ -75,6 +78,16 @@ class Torrent(Base):
     terms = relation('Term',
                      secondary='torrent_terms',
                      backref='torrents')
+    owner = Column(Integer)
+    username = Column(String)
+
+
+class TorrentStatus(Base):
+    __tablename__ = 'torrent_status'
+    id = Column(Integer, primary_key=True)
+    torrent_id = Column(Integer, ForeignKey('torrent.id'))
+    timestamp = Column(DateTime)
+# endregion ORM definition
 
 
 class FriendlySearchQuery(object):
@@ -96,8 +109,8 @@ T411_VIDEO_QUALITY_TERM_TYPE = 7
 
 def auth_required(func):
     """
-    Decorator for ensuring cached data into db.
-    Ifnot a synchronize will be launched
+    Decorator for ensuring rest client is authenticated
+    or will doing it before execute the command
     :param func:
     :return:
     """
@@ -105,6 +118,7 @@ def auth_required(func):
         if not self.is_authenticated():
             log.debug('None API token. Authenticating...')
             self.auth()
+            assert self.is_authenticated()
         return func(self, *args, **kwargs)
     return wrapper
 
@@ -139,12 +153,16 @@ class T411RestClient(object):
     def set_api_token(self, api_token):
         self.api_token = api_token
         self.web_session.headers.update({'Authorization': self.api_token})
-        log.debug("API token set : %s" % api_token)
 
     def is_authenticated(self):
         return self.api_token is not None
 
     def get_json(self, path):
+        """
+        Common method for requesting JSON response
+        :param path:
+        :return:
+        """
         url = self.api_template_url % path
         request = self.web_session.get(url)
         try:
@@ -324,6 +342,7 @@ class T411ObjectMapper(object):
                 result.terms.append(resolver(result.category_id, term_type_name, terms_candidat))
 
         return result
+
 
 def cache_required(func):
     """

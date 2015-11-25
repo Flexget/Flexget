@@ -1,15 +1,11 @@
 # -*- coding: utf8 -*-
 from __future__ import unicode_literals, division, absolute_import
-import datetime
 from __builtin__ import object
 import logging
 import mock
-from flexget.manager import Session
 
 from flexget.plugins.api_t411 import T411RestClient, T411ObjectMapper, T411Proxy, FriendlySearchQuery
-from flexget.utils.database import with_session
 from tests import use_vcr, FlexGetBase
-from flexget.plugins.cli import t411
 
 log = logging.getLogger('test_t411')
 
