@@ -58,30 +58,13 @@ class OutputPushover(object):
         'additionalProperties': False
     }
 
-    def prepare_config(self, config):
-        """
-        Return configure with default Flexget values. These are not values that are mandatory by Pushover API,
-        but values set by FlexGet to make default message appear nice
-        :param config: User Config
-        :return: Prepared config
-        """
-        config = config
-
-        # Support for multiple user keys
-        if not isinstance(config['userkey'], list):
-            config['userkey'] = [config['userkey']]
-
-        config.setdefault('title', self.default_title)
-        config.setdefault('message', self.default_message)
-        config.setdefault('url', self.default_url)
-
-        return config
-
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
 
-        config = self.prepare_config(config)
+        if not isinstance(config['userkey'], list):
+            config['userkey'] = [config['userkey']]
+
         apikey = config["apikey"]
         userkeys = config['userkey']
 
@@ -94,7 +77,7 @@ class OutputPushover(object):
                                'default': self.default_title},
                           'message':
                               {'value': config.get("message"),
-                               'default': self.default_title},
+                               'default': self.default_message},
                           'url':
                               {'value': config.get("url"),
                                'default': self.default_url},
@@ -109,24 +92,26 @@ class OutputPushover(object):
                           }
 
             for key, value in parameters.items():
+                # Tried to render data in field
                 try:
-                    # Tried to render value in key
                     parameters[key]['value'] = entry.render(value.get('value'))
-                except (RenderError, ValueError) as e:
+                except RenderError as e:
                     log.warning('Problem rendering %s: %s ' % (key, e))
-                    try:
-                        # If rendering fails, or if key has no value, try to render default key value
-                        parameters[key]['value'] = entry.render(value.get('default'))
-                    except ValueError:
-                        # If no default exist for specific key, do not assign it any value
-                        continue
+                except ValueError:
+                    pass
+
+                # If field is empty or rendering fails, try to render field default if exists
+                try:
+                    parameters[key]['value'] = entry.render(value.get('default'))
+                except ValueError:
+                    pass
 
             for userkey in userkeys:
                 # Build the request
                 data = {"user": userkey,
                         "token": apikey
                         }
-
+                # Get only filled values to send request
                 for key, value in parameters.items():
                     if value.get('value'):
                         data[key] = value['value']
