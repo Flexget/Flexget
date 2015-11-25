@@ -13,6 +13,7 @@ from flexget.utils.template import RenderError
 log = logging.getLogger("pushover")
 
 PUSHOVER_URL = "https://api.pushover.net/1/messages.json"
+NUMBER_OF_RETRIES = 3
 
 
 class OutputPushover(object):
@@ -25,19 +26,20 @@ class OutputPushover(object):
         [device: <DEVICE_STRING>] (default: (none))
         [title: <MESSAGE_TITLE>] (default: "Download started" -- accepts Jinja2)
         [message: <MESSAGE_BODY>] (default: "{{series_name}} {{series_id}}" -- accepts Jinja2)
-        [priority: <PRIORITY>] (default = 0 -- normal = 0, high = 1, silent = -1)
+        [priority: <PRIORITY>] (default = 0 -- normal = 0, high = 1, silent = -1, emergency = 2)
         [url: <URL>] (default: "{{imdb_url}}" -- accepts Jinja2)
         [urltitle: <URL_TITLE>] (default: (none) -- accepts Jinja2)
         [sound: <SOUND>] (default: pushover default)
+        [retry]: <RETRY>]
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-    default_message = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} " \
-                      "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} " \
-                      "{{imdb_year}}{% else %}{{title}}{% endif %}"
-
-    default_url = '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'
-    default_title = '{{task}}'
+    defaults = {'message': "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}}"
+                           "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}}"
+                           "{{imdb_year}}{% else %}{{title}}{% endif %}",
+                'url': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}',
+                'title': '{{task}}'
+                }
 
     schema = {
         'type': 'object',
@@ -54,13 +56,15 @@ class OutputPushover(object):
             'urltitle': {'type': 'string'},
             'sound': {'type': 'string'},
             'retry': {'type': 'integer', 'minimum': 30},
-            'expire': {'type': 'interger', 'maximum': 86400}
+            'expire': {'type': 'integer', 'maximum': 86400},
+            'callback': {'type': 'string', 'format': 'url'}
         },
         'required': ['userkey', 'apikey'],
         'additionalProperties': False
     }
 
-    def pushover_request(self, task, data):
+    @staticmethod
+    def pushover_request(task, data):
         try:
             response = task.requests.post(PUSHOVER_URL, data=data, raise_status=False)
         except RequestException as e:
@@ -68,12 +72,26 @@ class OutputPushover(object):
             return
         return response
 
+    def prepare_config(self, config):
+        """
+        Returns prepared config with Flexget default values
+        :param config: User config
+        :return: Config with defaults
+        """
+        config = config
+        if not isinstance(config['userkey'], list):
+            config['userkey'] = [config['userkey']]
+        config.setdefault('message', self.defaults['message'])
+        config.setdefault('title', self.defaults['title'])
+        config.setdefault('url', self.defaults['url'])
+
+        return config
+
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
 
-        if not isinstance(config['userkey'], list):
-            config['userkey'] = [config['userkey']]
+        config = self.prepare_config(config)
 
         apikey = config["apikey"]
         userkeys = config['userkey']
@@ -81,30 +99,14 @@ class OutputPushover(object):
         # Loop through the provided entries
         for entry in task.accepted:
 
-            # A Dict that hold parameters and their optional defaults. Used to set default if rendering fails
-            parameters = {'title':
-                              {'value': config.get("title"),
-                               'default': self.default_title},
-                          'message':
-                              {'value': config.get("message"),
-                               'default': self.default_message},
-                          'url':
-                              {'value': config.get("url"),
-                               'default': self.default_url},
-                          'urltitle':
-                              {'value': config.get("urltitle")},
-                          'priority':
-                              {'value': config.get("priority")},
-                          'sound':
-                              {'value': config.get("sound")},
-                          'device':
-                              {'value': config.get("device")}
-                          }
+            data = {}
 
-            for key, value in parameters.items():
+            for key, value in config.items():
+                if key in ['apikey', 'userkey']:
+                    continue
                 # Tried to render data in field
                 try:
-                    parameters[key]['value'] = entry.render(value.get('value'))
+                    data[key] = entry.render(value)
                 except RenderError as e:
                     log.warning('Problem rendering %s: %s ' % (key, e))
                 except ValueError:
@@ -112,25 +114,21 @@ class OutputPushover(object):
 
                 # If field is empty or rendering fails, try to render field default if exists
                 try:
-                    parameters[key]['value'] = entry.render(value.get('default'))
+                    data[key] = entry.render(self.defaults.get(key))
                 except ValueError:
-                    pass
-
-            for userkey in userkeys:
-                # Build the request
-                data = {"user": userkey,
-                        "token": apikey
-                        }
-                # Get only filled values to send request
-                for key, value in parameters.items():
-                    if value.get('value'):
-                        data[key] = value['value']
+                    if value:
+                        data[key] = value
 
                 # Special case, verify certain fields exists if priority is 2
                 if data.get('priority') == 2 and not all([data.get('expire'), data.get('retry')]):
                     log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.'
                                 ' Lowering priority to 1')
                     data['priority'] = 1
+
+            for userkey in userkeys:
+                # Build the request
+                data["user"] = userkey
+                data["token"] = apikey
 
                 # Check for test mode
                 if task.options.test:
@@ -140,23 +138,24 @@ class OutputPushover(object):
                     # Test mode.  Skip remainder.
                     continue
 
-                # Make the request
-                response = self.pushover_request(task, data)
-
-                # Check if it succeeded
-                request_status = response.status_code
-
-                # error codes and messages from Pushover API
-                if request_status == 200:
-                    log.debug("Pushover notification sent")
-                elif request_status == 500:
-                    log.debug("Pushover notification failed, Pushover API having issues")
-                    # TODO: Implement retrying. API requests 5 seconds between retries.
-                elif request_status >= 400:
-                    errors = json.loads(response.content)['errors']
-                    log.error("Pushover API error: %s" % errors[0])
-                else:
-                    log.error("Unknown error when sending Pushover notification")
+                for retry in range(NUMBER_OF_RETRIES):
+                    response = self.pushover_request(task, data)
+                    request_status = response.status_code
+                    # error codes and messages from Pushover API
+                    if request_status == 200:
+                        log.debug("Pushover notification sent")
+                        break
+                    elif request_status == 500:
+                        log.debug("Pushover notification failed, Pushover API having issues. Try %s out of %s" % (
+                        retry + 1, NUMBER_OF_RETRIES))
+                        continue
+                    elif request_status >= 400:
+                        errors = json.loads(response.content)['errors']
+                        log.error("Pushover API error: %s" % errors[0])
+                        break
+                    else:
+                        log.error("Unknown error when sending Pushover notification")
+                        break
 
 
 @event('plugin.register')
