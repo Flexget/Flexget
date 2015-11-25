@@ -32,6 +32,13 @@ class OutputPushover(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
+    default_message = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} " \
+                      "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} " \
+                      "{{imdb_year}}{% else %}{{title}}{% endif %}"
+
+    default_url = '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'
+    default_title = '{{task}}'
+
     schema = {
         'type': 'object',
         'properties': {
@@ -52,99 +59,82 @@ class OutputPushover(object):
     }
 
     def prepare_config(self, config):
+        """
+        Return configure with default Flexget values. These are not values that are mandatory by Pushover API,
+        but values set by FlexGet to make default message appear nice
+        :param config: User Config
+        :return: Prepared config
+        """
         config = config
-        default_message = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} " \
-                          "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} " \
-                          "{{imdb_year}}{% else %}{{title}}{% endif %}"
-
-        default_url = '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'
 
         # Support for multiple user keys
         if not isinstance(config['userkey'], list):
             config['userkey'] = [config['userkey']]
-        config.setdefault('device', '')
-        config.setdefault('title', '{{task}}')
-        config.setdefault('message', default_message)
-        config.setdefault('priority', 0)
-        config.setdefault('url', default_url)
-        config.setdefault('urltitle', '')
-        config.setdefault('sound', '')
+        config.setdefault('title', self.default_title)
+        config.setdefault('message', self.default_message)
+        config.setdefault('url', self.default_url)
 
         return config
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
-        config = self.prepare_config(config)
 
-        # Set a bunch of local variables from the config
+        if not isinstance(config['userkey'], list):
+            config['userkey'] = [config['userkey']]
         apikey = config["apikey"]
         userkeys = config['userkey']
+
+        # Sets some non-mandatory Flexget defaults
+        config.setdefault('title', self.default_title)
+        config.setdefault('message', self.default_message)
+        config.setdefault('url', self.default_url)
 
         # Loop through the provided entries
         for entry in task.accepted:
 
-            title = config["title"]
-            message = config["message"]
-            url = config["url"]
-            urltitle = config["urltitle"]
-            priority = config["priority"]
-            sound = config["sound"]
-            device = config["device"]
+            # A Dict that hold parameters and their optional defaults. Used to set default if rendering fails
+            parameters = {'title':
+                              {'value': config.get("title"),
+                               'default': self.default_title},
+                          'message':
+                              {'value': config.get("message"),
+                               'default': self.default_title},
+                          'url':
+                              {'value': config.get("url"),
+                               'default': self.default_url},
+                          'urltitle':
+                              {'value': config.get("urltitle")},
+                          'priority':
+                              {'value': config.get("priority")},
+                          'sound':
+                              {'value': config.get("sound")},
+                          'device':
+                              {'value': config.get("device")}
+                          }
 
-            # Attempt to render the title field
-            try:
-                title = entry.render(title)
-            except RenderError as e:
-                log.warning("Problem rendering 'title': %s" % e)
-                title = "Download started"
-
-            # Attempt to render the message field
-            try:
-                message = entry.render(message)
-            except RenderError as e:
-                log.warning("Problem rendering 'message': %s" % e)
-                message = entry["title"]
-
-            # Attempt to render the url field
-            try:
-                url = entry.render(url)
-            except RenderError as e:
-                log.warning("Problem rendering 'url': %s" % e)
-                url = entry.get("imdb_url", "")
-
-            # Attempt to render the urltitle field
-            try:
-                urltitle = entry.render(urltitle)
-            except RenderError as e:
-                log.warning("Problem rendering 'urltitle': %s" % e)
-                urltitle = ""
-
-            # Attempt to render the priority field
-            if isinstance(priority, basestring):
+            for key, value in parameters.items():
                 try:
-                    priority = entry.render(priority)
-                except ValueError as e:
-                    log.warning('Problem rendering "priority": %s' % e)
-                    priority = 0
-
-            # Attempt to render the sound field
-            try:
-                sound = entry.render(sound)
-            except RenderError as e:
-                log.warning("Problem rendering 'sound': %s" % e)
-                sound = ''
+                    # Tried to render value in key
+                    parameters[key]['value'] = entry.render(value.get('value'))
+                except (RenderError, ValueError) as e:
+                    log.warning('Problem rendering %s: %s ' % (key, e))
+                    try:
+                        # If rendering fails, or if key has no value, try to render default key value
+                        parameters[key]['value'] = entry.render(value.get('default'))
+                    except ValueError:
+                        # If no default exist for specific key, do not assign it any value
+                        continue
 
             for userkey in userkeys:
                 # Build the request
-                data = {"user": userkey, "token": apikey, "title": title,
-                        "message": message, "url": url, "url_title": urltitle}
-                if device:
-                    data["device"] = device
-                if priority:
-                    data["priority"] = priority
-                if sound:
-                    data["sound"] = sound
+                data = {"user": userkey,
+                        "token": apikey
+                        }
+
+                for key, value in parameters.items():
+                    if value.get('value'):
+                        data[key] = value['value']
 
                 # Check for test mode
                 if task.options.test:
