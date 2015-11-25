@@ -147,7 +147,7 @@ class OutputPushover(object):
                         break
                     elif request_status == 500:
                         log.debug("Pushover notification failed, Pushover API having issues. Try %s out of %s" % (
-                        retry + 1, NUMBER_OF_RETRIES))
+                            retry + 1, NUMBER_OF_RETRIES))
                         continue
                     elif request_status >= 400:
                         errors = json.loads(response.content)['errors']
