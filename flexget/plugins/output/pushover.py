@@ -70,6 +70,7 @@ class OutputPushover(object):
         # Support for multiple user keys
         if not isinstance(config['userkey'], list):
             config['userkey'] = [config['userkey']]
+
         config.setdefault('title', self.default_title)
         config.setdefault('message', self.default_message)
         config.setdefault('url', self.default_url)
@@ -80,15 +81,9 @@ class OutputPushover(object):
     @plugin.priority(0)
     def on_task_output(self, task, config):
 
-        if not isinstance(config['userkey'], list):
-            config['userkey'] = [config['userkey']]
+        config = self.prepare_config(config)
         apikey = config["apikey"]
         userkeys = config['userkey']
-
-        # Sets some non-mandatory Flexget defaults
-        config.setdefault('title', self.default_title)
-        config.setdefault('message', self.default_message)
-        config.setdefault('url', self.default_url)
 
         # Loop through the provided entries
         for entry in task.accepted:
