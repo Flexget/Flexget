@@ -269,13 +269,14 @@ class SearchT411(object):
         :param auth_handler: request AuthBase object
         :returns: Entry object created from json object
         """
+        log.verbose(json)
         entry = Entry()
         entry['title'] = json['name']
         entry['url'] = (BASE_URL + '/torrents/download/%s' % json['id'])
         entry['torrent_seeds'] = json['seeders']
         entry['torrent_leeches'] = json['leechers']
-        entry['search_sort'] = torrent_availability(json['torrent_seeds'],
-                                                    json['torrent_leeches'])
+        entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
+                                                    entry['torrent_leeches'])
         entry['content_size'] = json['size']
         entry['download_auth'] = auth_handler
         return entry
