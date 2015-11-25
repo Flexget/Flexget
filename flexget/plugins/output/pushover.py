@@ -12,7 +12,7 @@ from flexget.utils.template import RenderError
 
 log = logging.getLogger("pushover")
 
-pushover_url = "https://api.pushover.net/1/messages.json"
+PUSHOVER_URL = "https://api.pushover.net/1/messages.json"
 
 
 class OutputPushover(object):
@@ -57,6 +57,15 @@ class OutputPushover(object):
         'required': ['userkey', 'apikey'],
         'additionalProperties': False
     }
+
+    def pushover_request(self, task, data):
+        try:
+            response = task.requests.post(PUSHOVER_URL, data=data, raise_status=False)
+        except RequestException as e:
+            log.warning('Could not get response from Pushover: {}'.format(e))
+            return
+        return response
+
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
@@ -125,11 +134,7 @@ class OutputPushover(object):
                     continue
 
                 # Make the request
-                try:
-                    response = task.requests.post(pushover_url, data=data, raise_status=False)
-                except RequestException as e:
-                    log.warning('Could not get response from Pushover: {}'.format(e))
-                    return
+                response = self.pushover_request(task, data)
 
                 # Check if it succeeded
                 request_status = response.status_code
