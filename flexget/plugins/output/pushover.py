@@ -48,11 +48,13 @@ class OutputPushover(object):
             'title': {'type': 'string'},
             'message': {'type': 'string'},
             'priority': {'oneOf': [
-                {'type': 'number', 'minimum': -2, 'maximum': 1},
+                {'type': 'number', 'minimum': -2, 'maximum': 2},
                 {'type': 'string'}]},
             'url': {'type': 'string'},
             'urltitle': {'type': 'string'},
-            'sound': {'type': 'string'}
+            'sound': {'type': 'string'},
+            'retry': {'type': 'integer', 'minimum': 30},
+            'expire': {'type': 'interger', 'maximum': 86400}
         },
         'required': ['userkey', 'apikey'],
         'additionalProperties': False
@@ -132,6 +134,12 @@ class OutputPushover(object):
                         log.verbose('{0:>5}{1}: {2}'.format('', key.capitalize(), value))
                     # Test mode.  Skip remainder.
                     continue
+
+                # Special case, verify certain fields exists if priority is 2
+                if data.get('priority') == 2 and not all([data.get('expire'), data.get('retry')]):
+                    log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.'
+                                'Lowering priority to 1')
+                    data['priority'] = 1
 
                 # Make the request
                 response = self.pushover_request(task, data)
