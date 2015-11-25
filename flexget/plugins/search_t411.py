@@ -269,7 +269,6 @@ class SearchT411(object):
         :param auth_handler: request AuthBase object
         :returns: Entry object created from json object
         """
-        log.verbose(json)
         entry = Entry()
         entry['title'] = json['name']
         entry['url'] = (BASE_URL + '/torrents/download/%s' % json['id'])
