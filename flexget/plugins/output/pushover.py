@@ -119,11 +119,11 @@ class OutputPushover(object):
                     if value:
                         data[key] = value
 
-                # Special case, verify certain fields exists if priority is 2
-                if data.get('priority') == 2 and not all([data.get('expire'), data.get('retry')]):
-                    log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.'
-                                ' Lowering priority to 1')
-                    data['priority'] = 1
+            # Special case, verify certain fields exists if priority is 2
+            if data.get('priority') == 2 and not all([data.get('expire'), data.get('retry')]):
+                log.warning('Priority set to 2 but fields "expire" and "retry" are not both present.'
+                            ' Lowering priority to 1')
+                data['priority'] = 1
 
             for userkey in userkeys:
                 # Build the request
