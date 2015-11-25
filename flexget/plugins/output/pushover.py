@@ -32,42 +32,54 @@ class OutputPushover(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-    default_message = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} " \
-                      "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} " \
-                      "{{imdb_year}}{% else %}{{title}}{% endif %}"
     schema = {
         'type': 'object',
         'properties': {
             'userkey': one_or_more({'type': 'string'}),
             'apikey': {'type': 'string'},
-            'device': {'type': 'string', 'default': ''},
-            'title': {'type': 'string', 'default': "{{task}}"},
-            'message': {'type': 'string', 'default': default_message},
+            'device': {'type': 'string'},
+            'title': {'type': 'string'},
+            'message': {'type': 'string'},
             'priority': {'oneOf': [
                 {'type': 'number', 'minimum': -2, 'maximum': 1},
-                {'type': 'string'}], 'default': ''},
-            'url': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
-            'urltitle': {'type': 'string', 'default': ''},
-            'sound': {'type': 'string', 'default': ''}
+                {'type': 'string'}]},
+            'url': {'type': 'string'},
+            'urltitle': {'type': 'string'},
+            'sound': {'type': 'string'}
         },
         'required': ['userkey', 'apikey'],
         'additionalProperties': False
     }
 
+    def prepare_config(self, config):
+        config = config
+        default_message = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} " \
+                          "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} " \
+                          "{{imdb_year}}{% else %}{{title}}{% endif %}"
+
+        default_url = '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'
+
+        # Support for multiple user keys
+        if not isinstance(config['userkey'], list):
+            config['userkey'] = [config['userkey']]
+        config.setdefault('device', '')
+        config.setdefault('title', '{{task}}')
+        config.setdefault('message', default_message)
+        config.setdefault('priority', 0)
+        config.setdefault('url', default_url)
+        config.setdefault('urltitle', '')
+        config.setdefault('sound', '')
+
+        return config
+
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
-
-        # Support for multiple userkeys
-        userkeys = config["userkey"]
-        if not isinstance(userkeys, list):
-            userkeys = [userkeys]
+        config = self.prepare_config(config)
 
         # Set a bunch of local variables from the config
         apikey = config["apikey"]
-        device = config["device"]
-        priority = config["priority"]
-        sound = config["sound"]
+        userkeys = config['userkey']
 
         # Loop through the provided entries
         for entry in task.accepted:
@@ -76,6 +88,9 @@ class OutputPushover(object):
             message = config["message"]
             url = config["url"]
             urltitle = config["urltitle"]
+            priority = config["priority"]
+            sound = config["sound"]
+            device = config["device"]
 
             # Attempt to render the title field
             try:
