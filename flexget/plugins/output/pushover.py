@@ -93,13 +93,10 @@ class OutputPushover(object):
 
         config = self.prepare_config(config)
 
-        apikey = config["apikey"]
-        userkeys = config['userkey']
+        data = {"token": config["apikey"]}
 
         # Loop through the provided entries
         for entry in task.accepted:
-
-            data = {}
 
             for key, value in config.items():
                 if key in ['apikey', 'userkey']:
@@ -125,10 +122,9 @@ class OutputPushover(object):
                             ' Lowering priority to 1')
                 data['priority'] = 1
 
-            for userkey in userkeys:
+            for userkey in config['userkey']:
                 # Build the request
                 data["user"] = userkey
-                data["token"] = apikey
 
                 # Check for test mode
                 if task.options.test:
