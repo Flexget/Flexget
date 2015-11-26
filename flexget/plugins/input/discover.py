@@ -1,12 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import datetime
 import logging
 import random
 
 from sqlalchemy import Column, Integer, DateTime, Unicode, Index
 
-from flexget import options, plugin
 from flexget import db_schema
+from flexget import options, plugin
 from flexget.event import event
 from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name, PluginError, PluginWarning
@@ -31,6 +32,7 @@ class DiscoverEntry(Base):
 
     def __str__(self):
         return '<DiscoverEntry(title=%s,task=%s,added=%s)>' % (self.title, self.task, self.last_execution)
+
 
 Index('ix_discover_entry_title_task', DiscoverEntry.title, DiscoverEntry.task)
 
@@ -57,6 +59,7 @@ class Discover(object):
         interval: [1 hours|days|weeks]
         ignore_estimations: [yes|no]
     """
+    estimator_list = ['est_released_movies', 'est_series_tvmaze', 'est_series_internal']
 
     schema = {
         'type': 'object',
@@ -69,7 +72,8 @@ class Discover(object):
             }},
             'interval': {'type': 'string', 'format': 'interval', 'default': '5 hours'},
             'ignore_estimations': {'type': 'boolean', 'default': False},
-            'limit': {'type': 'integer', 'minimum': 1}
+            'limit': {'type': 'integer', 'minimum': 1},
+            'preferred_estimator': {'type': 'string', 'enum': estimator_list}
         },
         'required': ['what', 'from'],
         'additionalProperties': False
@@ -107,7 +111,7 @@ class Discover(object):
                         continue
 
                     if entry['title'] in entry_titles:
-                        log.verbose('Ignored duplicate title `%s`' % entry['title'])    # TODO: should combine?
+                        log.verbose('Ignored duplicate title `%s`' % entry['title'])  # TODO: should combine?
                         continue
 
                     entries.append(entry)
@@ -180,14 +184,14 @@ class Discover(object):
         if not search_results:
             query.complete()
 
-    def estimated(self, entries):
+    def estimated(self, entries, preferred_estimator=None):
         """
         :return: Entries that we have estimated to be available
         """
         estimator = get_plugin_by_name('estimate_release').instance
         result = []
         for entry in entries:
-            est_date = estimator.estimate(entry)
+            est_date = estimator.estimate(entry, preferred_estimator)
             if est_date is None:
                 log.debug('No release date could be determined for %s' % entry['title'])
                 result.append(entry)
@@ -225,8 +229,8 @@ class Discover(object):
         interval_count = 0
         with Session() as session:
             for entry in entries:
-                de = session.query(DiscoverEntry).\
-                    filter(DiscoverEntry.title == entry['title']).\
+                de = session.query(DiscoverEntry). \
+                    filter(DiscoverEntry.title == entry['title']). \
                     filter(DiscoverEntry.task == task.name).first()
 
                 if not de:
@@ -265,7 +269,7 @@ class Discover(object):
         # TODO: the entries that are estimated should be given priority over expiration
         entries = self.interval_expired(config, task, entries)
         if not config.get('ignore_estimations', False):
-            entries = self.estimated(entries)
+            entries = self.estimated(entries, preferred_estimator=config.get('preferred_estimator'))
         return self.execute_searches(config, entries, task)
 
 
