@@ -164,8 +164,6 @@ class SendTelegram(object):
 
         accepted_tasks = list(task.accepted)
         """:type: list[flexget.entry.Entry]"""
-        if not accepted_tasks:
-            return
         token, tmpl, usernames, fullnames, groups = self._parse_config(config)
         self.log.debug('token={0} tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
             token, usernames, fullnames, groups, tmpl))
