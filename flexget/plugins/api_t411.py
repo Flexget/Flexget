@@ -28,9 +28,8 @@ torrent_terms = Table('torrent_terms', Base.metadata,
 
 @db_schema.upgrade('api_t411')
 def upgrade(ver, session):
-    if ver is None:
-        log.debug('Creating T411 database.')
-    return 0
+    assert ver is None or ver <= SCHEMA_VER
+    return ver
 
 
 class Category(Base):
