@@ -547,8 +547,10 @@ class T411Proxy(object):
         client_query = self.friendly_query_to_client_query(query)
         json_results = self.rest_client.search(client_query)
         json_torrents = json_results.get('torrents', [])
-        log.debug("Search produces %d results." % len(json_torrents))
-        return map(self.mapper.map_search_result_entry, json_torrents)
+        json_not_pending_torrents = filter(lambda x: not isinstance(x, int), json_torrents)
+        log.debug("Search produces %d results including %d 'on pending' (the latter will not produces entries)"
+                  % (len(json_torrents), len(json_torrents) - len(json_not_pending_torrents)))
+        return map(self.mapper.map_search_result_entry, json_not_pending_torrents)
 
     @cache_required
     def details(self, torrent_id):
