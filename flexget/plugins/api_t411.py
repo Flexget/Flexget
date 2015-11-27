@@ -211,7 +211,7 @@ class T411RestClient(object):
             url_params.append(('offset', query['page_index']))
         if query.get('terms') is not None:
             url_params.extend([('term[' + str(term_type_id) + '][]', term_id)
-                               for (term_id, term_type_id) in query['terms']])
+                               for (term_type_id, term_id) in query['terms']])
 
         url += urllib.urlencode(url_params)
         return self.get_json(url)
@@ -519,6 +519,7 @@ class T411Proxy(object):
                     .filter(Category.name == friendly_query.category_name) \
                     .one()
                 client_query['category_id'] = category_id
+                log.debug('Category named "%s" resolved by id %d' % (friendly_query.category_name, category_id))
 
                 client_query['terms'] = self.session \
                     .query(Term.type_id, Term.id) \
@@ -542,7 +543,9 @@ class T411Proxy(object):
         """
         client_query = self.friendly_query_to_client_query(query)
         json_results = self.rest_client.search(client_query)
-        return map(self.mapper.map_search_result_entry, json_results['torrents'])
+        json_torrents = json_results.get('torrents', [])
+        log.debug("Search produces %d results." % len(json_torrents))
+        return map(self.mapper.map_search_result_entry, json_torrents)
 
     @cache_required
     def details(self, torrent_id):
