@@ -204,7 +204,10 @@ class T411RestClient(object):
 
         url_params = []
         if query.get('category_id') is not None:
-            url_params.append(('cat', query['category_id']))
+            # using cat or cid will do the same result
+            # but using cid without query expression will not broke
+            # results
+            url_params.append(('cid', query['category_id']))
         if query.get('result_per_page') is not None:
             url_params.append(('limit', query['result_per_page']))
         if query.get('page_index') is not None:
