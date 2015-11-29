@@ -524,11 +524,16 @@ class T411Proxy(object):
                 client_query['category_id'] = category_id
                 log.debug('Category named "%s" resolved by id %d' % (friendly_query.category_name, category_id))
 
-                client_query['terms'] = self.session \
-                    .query(Term.type_id, Term.id) \
-                    .filter(Term.name.in_(friendly_query.term_names)) \
-                    .filter(TermType.categories.any(Category.id == category_id)) \
-                    .filter(Term.type_id == TermType.id).all()
+                if len(friendly_query.term_names) > 0:
+                    or_like = (Term.name.like(friendly_query.term_names[0] + '%'))
+                    for term_name in friendly_query.term_names[1:]:
+                        or_like |= (Term.name.like(term_name + '%'))
+
+                    client_query['terms'] = self.session \
+                        .query(Term.type_id, Term.id) \
+                        .filter(or_like) \
+                        .filter(TermType.categories.any(Category.id == category_id)) \
+                        .filter(Term.type_id == TermType.id).all()
             except NoResultFound:
                 log.warning('Unable to resolve category named %s', friendly_query.category_name)
                 log.warning('Terms filter will be passed')
