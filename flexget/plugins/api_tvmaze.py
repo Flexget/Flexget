@@ -201,16 +201,6 @@ def search_params_for_series(**lookup_params):
     return search_params
 
 
-def search_params_for_episode(**lookup_params):
-    search_params = {
-        'series_id': lookup_params.get('series_id'),
-        'number': lookup_params.get('episode_number'),
-        'season_number': lookup_params.get('season_number'),
-        'airdate': lookup_params.get('airdate')
-    }
-    return search_params
-
-
 @with_session
 def from_cache(session=None, search_params=None, cache_type=None):
     """
@@ -235,7 +225,7 @@ def from_lookup(session=None, title=None):
     return session.query(TVMazeLookup).filter(func.lower(TVMazeLookup.search_name) == title.lower()).first()
 
 
-def prepare_lookup(**lookup_params):
+def prepare_lookup_for_pytvmaze(**lookup_params):
     """
     Return a dict of params which is valid with pytvmaze get_show method
     :param lookup_params: Search parameters
@@ -282,7 +272,7 @@ class APITVMaze(object):
             log.debug('returning series {0} from cache'.format(series.name))
             return series
 
-        prepared_params = prepare_lookup(**lookup_params)
+        prepared_params = prepare_lookup_for_pytvmaze(**lookup_params)
         try:
             log.debug('trying to fetch series {0} from pytvmaze'.format(title))
             pytvmaze_show = get_show(**prepared_params)
