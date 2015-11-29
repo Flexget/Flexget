@@ -4,9 +4,10 @@ import logging
 from datetime import datetime
 
 from dateutil import parser
-from pytvmaze import get_show
-from pytvmaze.exceptions import ShowNotFound
-from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table, or_
+from pytvmaze import get_show, episode_by_number, episodes_by_date
+from pytvmaze.exceptions import ShowNotFound, EpisodeNotFound, NoEpisodesForAirdate, IllegalAirDate
+from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table, or_, \
+    and_
 from sqlalchemy.orm import relation
 
 from flexget import db_schema, plugin
@@ -141,10 +142,10 @@ class TVMazeEpisodes(Base):
     runtime = Column(Integer)
     last_update = Column(DateTime)
 
-    def __init__(self, episode, season_num, series_id):
+    def __init__(self, episode, series_id):
         self.series_id = series_id
         self.tvmaze_id = episode.maze_id
-        self.season_number = season_num
+        self.season_number = episode.season_number
         self.number = episode.episode_number
         self.update(episode)
 
@@ -179,24 +180,6 @@ class TVMazeEpisodes(Base):
         return expiration
 
 
-def get_db_episodes(seasons, session, series_id):
-    db_episodes = []
-    for season_num, seas in seasons.items():
-        for episode_num, ep in seas.episodes.items():
-            db_episode = session.query(TVMazeEpisodes).filter(TVMazeEpisodes.tvmaze_id == ep.maze_id).first()
-            if db_episode and db_episode.expired:
-                log.debug('episode {0} data expired, refreshing.'.format(db_episode.tvmaze_id))
-                db_episode.update(ep)
-            elif not db_episode:
-                log.debug('creating new episode in db. ep_num:{0} season_num:{1} series_id:{2}'.format(episode_num,
-                                                                                                       season_num,
-                                                                                                       series_id))
-                db_episode = TVMazeEpisodes(episode=ep, season_num=season_num, series_id=series_id)
-                session.add(db_episode)
-            db_episodes.append(db_episode)
-    return db_episodes
-
-
 def get_db_genres(genres, session):
     db_genres = []
     for genre in genres:
@@ -214,6 +197,16 @@ def search_params_for_series(**lookup_params):
         'tvdb_id': lookup_params.get('tvdb_id'),
         'tvrage_id': lookup_params.get('tvrage_id'),
         'name': lookup_params.get('title') or lookup_params.get('series_name')
+    }
+    return search_params
+
+
+def search_params_for_episode(**lookup_params):
+    search_params = {
+        'series_id': lookup_params.get('series_id'),
+        'number': lookup_params.get('episode_number'),
+        'season_number': lookup_params.get('season_number'),
+        'airdate': lookup_params.get('airdate')
     }
     return search_params
 
@@ -265,13 +258,6 @@ def prepare_lookup(**lookup_params):
     return prepared_params
 
 
-@with_session
-def populate_episodes(series_object=None, show_data=None, session=None):
-    series = series_object
-    series.episodes = get_db_episodes(show_data.seasons, session, series.tvmaze_id)
-    return series
-
-
 class APITVMaze(object):
     @staticmethod
     @with_session
@@ -309,12 +295,9 @@ class APITVMaze(object):
         if series:
             log.debug('found expired series {0}, refreshing data.'.format(series.name))
             series.update(pytvmaze_show, session)
-            series = populate_episodes(series_object=series, show_data=pytvmaze_show, session=session)
-            session.flush()
         else:
             log.debug('creating new series {0} in tvmaze_series db'.format(title))
             series = TVMazeSeries(pytvmaze_show, session)
-            series = populate_episodes(series_object=series, show_data=pytvmaze_show, session=session)
             session.add(series)
         # If there's a mismatch between actual series name and requested title,
         # add it to lookup table for future lookups
@@ -333,21 +316,84 @@ class APITVMaze(object):
         episode_number = lookup_params.get('series_episode')
 
         episode_date = lookup_params.get('series_date')
+
+        # Verify we have enough parameters for search
         if lookup_type == 'ep' and not all([season_number, episode_number, series_name]):
             raise LookupError('Not enough parameters to lookup episode')
         elif lookup_type == 'date' and not all([series_name, episode_date]):
             raise LookupError('Not enough parameters to lookup episode')
+
+        # Get series
         series = APITVMaze.series_lookup(session=session, force_cache=force_cache, **lookup_params)
         if not series:
             raise LookupError('Could not find series with the following parameters: {0}'.format(**lookup_params))
-        for episode in series.episodes:
-            if lookup_type == 'ep':
-                if episode.season_number == season_number and episode.number == episode_number:
-                    return episode
-            elif lookup_type == 'date':
-                if episode.airdate == episode_date:
-                    return episode
-        return
+
+        # See if episode already exists in cache
+        log.debug('searching for episode of show {0} in cache'.format(series.name))
+        episode = session.query(TVMazeEpisodes).filter(
+            or_(
+                and_(TVMazeEpisodes.series_id == series.tvmaze_id,
+                     TVMazeEpisodes.season_number == season_number,
+                     TVMazeEpisodes.number == episode_number),
+                and_(TVMazeEpisodes.series_id == series.tvmaze_id,
+                     TVMazeEpisodes.airdate == episode_date)
+            )
+        ).first()
+
+        # Logic for cache only mode
+        if force_cache:
+            if episode:
+                log.debug('forcing cache for episode {0}, season {1} for show {2}'.format(episode.number,
+                                                                                          episode.season_number,
+                                                                                          series.name))
+                return episode
+        if episode and not episode.expired:
+            log.debug('found episode {0}, season {1} for show {2} in cache'.format(episode.number,
+                                                                                   episode.season_number,
+                                                                                   series.name))
+
+            return episode
+
+        # Lookup episode via its type (number or airdate)
+        if lookup_type == 'date':
+            try:
+                episode_date = datetime.strftime(episode_date, '%Y-%m-%d')
+                pytvmaze_episode = episodes_by_date(maze_id=series.tvmaze_id, airdate=episode_date)[0]
+            except IllegalAirDate as e:
+                log.debug('episode airdate was received in a wrong format: {0}'.format(e))
+                return
+            except NoEpisodesForAirdate as e:
+                log.debug(
+                    'could not find episode for series {0} with airdate {1}'.format(series.tvmaze_id, episode_date))
+                return
+        else:
+            # TODO will this match all series_id types?
+            try:
+                log.debug(
+                    'fetching episode {0} season {1} for series_id {2} for tvmaze'.format(episode_number, season_number,
+                                                                                          series.tvmaze_id))
+                pytvmaze_episode = episode_by_number(maze_id=series.tvmaze_id, season_number=season_number,
+                                                     episode_number=episode_number)
+            except EpisodeNotFound as e:
+                log.debug('could not find episode in tvmaze: {0}'.format(e))
+                return
+        # See if episode exists in DB
+        episode = session.query(TVMazeEpisodes).filter(
+            and_(
+                TVMazeEpisodes.tvmaze_id == pytvmaze_episode.maze_id,
+                TVMazeEpisodes.number == pytvmaze_episode.episode_number,
+                TVMazeEpisodes.season_number == pytvmaze_episode.season_number)
+        ).first()
+
+        if episode:
+            log.debug('found expired episode {0} in cache, refreshing data.'.format(episode.tvmaze_id))
+            episode.update(pytvmaze_episode)
+        else:
+            log.debug('creating new episode for show {0}'.format(series.name))
+            episode = TVMazeEpisodes(pytvmaze_episode, series.tvmaze_id)
+            session.add(episode)
+
+        return episode
 
 
 @event('plugin.register')
