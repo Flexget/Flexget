@@ -14,7 +14,7 @@ class TestTVMazeShowLookup(FlexGetBase):
             tvmaze_lookup: yes
             # Access a tvdb field to cause lazy loading to occur
             set:
-              afield: "{{tvdb_id}}{{tvmaze_episode_name}}"
+              afield: "{{tvdb_id}}{{tvmaze_episode_name}}{{tvmaze_series_name}}"
         tasks:
           test:
             mock:
@@ -39,6 +39,11 @@ class TestTVMazeShowLookup(FlexGetBase):
               - {title: 'Shameless.2011.S03E02.HDTV.XViD-FlexGet'}
             series:
               - Shameless (2011)
+          test_title_with_year:
+            mock:
+              - {title: 'The.Flash.2014.S02E06.HDTV.x264-LOL'}
+            series:
+              - The Flash (2014)
     """
 
     @use_vcr
@@ -61,7 +66,9 @@ class TestTVMazeShowLookup(FlexGetBase):
                 entry['title'], entry['tvmaze_episode_name'])
         assert entry['tvmaze_series_status'] == 'Ended', \
             'status for %s is %s, should be "ended"' % (entry['title'], entry['tvmaze_series_status'])
-        assert entry['afield'] == '73255Paternity', 'afield was not set correctly'
+        assert entry[
+                   'afield'] == '73255PaternityHouse', 'afield was not set correctly, expected 73255PaternityHouse, got %s' % \
+                                                       entry['afield']
         assert self.task.find_entry(tvmaze_episode_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
 
@@ -102,8 +109,16 @@ class TestTVMazeShowLookup(FlexGetBase):
     def test_date(self):
         self.execute_task('test_date')
         entry = self.task.find_entry(title='the daily show 2012-6-6')
-        # Make sure show data got populated
         assert entry.get('tvmaze_series_id') == 249, 'expected tvmaze_series_id 249, got %s' % entry.get(
             'tvmaze_series_id')
         assert entry.get('tvmaze_episode_id') == 20471, 'episode id should be 20471, is actually %s' % entry.get(
             'tvmaze_episode_id')
+
+    @use_vcr
+    def test_title_with_year(self):
+        self.execute_task('test_title_with_year')
+        entry = self.task.find_entry(title='The.Flash.2014.S02E06.HDTV.x264-LOL')
+        assert entry.get('tvmaze_series_id') == 13, 'expected tvmaze_series_id 13, got %s' % entry.get(
+            'tvmaze_series_id')
+        assert entry.get('tvmaze_series_year') == 2014, 'expected tvmaze_series_year 2014, got %s' % entry.get(
+            'tvmaze_series_year')
