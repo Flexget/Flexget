@@ -101,8 +101,8 @@ class TVMazeSeries(Base):
         self.show_type = series.type
         self.network = series.network['name']
         try:
-            self.year = series.premiered[:4]
-        except TypeError:
+            self.year = int(series.premiered[:4])
+        except (TypeError, ValueError):
             self.year = None
         self.last_update = datetime.now()
 
