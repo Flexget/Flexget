@@ -297,7 +297,9 @@ class TraktEpisode(Base):
         self.tmdb_id = trakt_episode['ids']['tmdb']
         self.tvrage_id = trakt_episode['ids']['tvrage']
         self.tvdb_id = trakt_episode['ids']['tvdb']
-        self.first_aired = dateutil_parse(trakt_episode.get('first_aired'), ignoretz=True)
+        self.first_aired = None
+        if trakt_episode.get('first_aired'):
+            self.first_aired = dateutil_parse(trakt_episode['first_aired'], ignoretz=True)
         self.updated_at = dateutil_parse(trakt_episode.get('updated_at'), ignoretz=True)
         self.cached_at = datetime.now()
 
