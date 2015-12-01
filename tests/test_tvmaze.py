@@ -133,6 +133,7 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry.get('tvmaze_series_year') == 2014, 'expected tvmaze_series_year 2014, got %s' % entry.get(
             'tvmaze_series_year')
 
+    @use_vcr()
     def test_from_filesystem(self):
         self.execute_task('test_from_filesystem')
         entry = self.task.find_entry(title='Marvels.Jessica.Jones.S01E02.PROPER.720p.WEBRiP.x264-QCF')
