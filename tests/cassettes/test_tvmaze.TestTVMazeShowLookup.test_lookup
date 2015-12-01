@@ -8,11 +8,11 @@ interactions:
     method: GET
     uri: http://api.tvmaze.com/search/shows?q=House
   response:
-    body: {string: !!python/unicode '[{"score":1.8004293,"show":{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":3,"network":{"id":4,"name":"FOX","country":{"name":"United
+    body: {string: !!python/unicode '[{"score":1.7931384,"show":{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":3,"network":{"id":4,"name":"FOX","country":{"name":"United
         States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1347.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1347.jpg"},"summary":"<p>Sink
         your teeth into meaty drama and intrigue with <em>House</em>, FOX''s take
         on mystery, where the villain is a medical malady and the hero is an irreverent,
-        controversial doctor who trusts no one, least of all his patients.</p>","updated":1447137393,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}}}},{"score":1.6673417,"show":{"id":3819,"url":"http://www.tvmaze.com/shows/3819/house-vs-house","name":"House
+        controversial doctor who trusts no one, least of all his patients.</p>","updated":1447137393,"_links":{"self":{"href":"http://api.tvmaze.com/shows/118"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/9206"}}}},{"score":1.6559881,"show":{"id":3819,"url":"http://www.tvmaze.com/shows/3819/house-vs-house","name":"House
         vs. House","type":"Reality","language":"English","genres":[],"status":"Running","runtime":60,"premiered":"2014-07-22","schedule":{"time":"10:00","days":["Friday"]},"rating":{"average":null},"weight":0,"network":{"id":125,"name":"fyi,","country":{"name":"United
         States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":287378},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/19/48008.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/19/48008.jpg"},"summary":"<p><strong><em>\"House
         vs. House\"</em></strong> is a new home makeover competition series where
@@ -22,38 +22,22 @@ interactions:
         two teams will go head-to-head in grueling challenges. Tanya McQueen, a DIY
         design expert, and David Brian Sanders, an architect and designer, will determine
         which team completes the most impressive transformation and award the cash
-        prize.</p>","updated":1442545142,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3819"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/245354"}}}},{"score":1.2798402,"show":{"id":5104,"url":"http://www.tvmaze.com/shows/5104/danger-mouse","name":"Danger
+        prize.</p>","updated":1442545142,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3819"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/245354"}}}},{"score":1.3350832,"show":{"id":5104,"url":"http://www.tvmaze.com/shows/5104/danger-mouse","name":"Danger
         Mouse","type":"Animation","language":"English","genres":[],"status":"Running","runtime":12,"premiered":"2015-09-28","schedule":{"time":"18:00","days":["Monday","Tuesday","Wednesday","Thursday","Friday"]},"rating":{"average":10},"weight":0,"network":{"id":60,"name":"CBBC","country":{"name":"United
         Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":300969},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/54509.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/54509.jpg"},"summary":"<p>Danger
         Mouse is back saving London, saving the World and, most \nimportantly, saving
-        Penfold in brand new and fantastically absurd, \nenergetic adventures.</p>","updated":1444432987,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5104"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/362003"}}}},{"score":1.1789887,"show":{"id":3961,"url":"http://www.tvmaze.com/shows/3961/boarding-house-no-24","name":"Boarding
+        Penfold in brand new and fantastically absurd, \nenergetic adventures.</p>","updated":1444432987,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5104"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/362003"}}}},{"score":1.1709604,"show":{"id":3961,"url":"http://www.tvmaze.com/shows/3961/boarding-house-no-24","name":"Boarding
         House No. 24","type":"Scripted","language":"Korean","genres":["Comedy","Romance"],"status":"Ended","runtime":60,"premiered":"2014-09-23","schedule":{"time":"18:00","days":["Tuesday"]},"rating":{"average":null},"weight":0,"network":{"id":166,"name":"MBC","country":{"name":"Korea,
         Republic of","code":"KR","timezone":"Asia/Seoul"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":286314},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/19/49094.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/19/49094.jpg"},"summary":"<p>A
         sitcom about seven boarders who have different personalities and situations.
         It is depicting dreams, careers, love and friendship of young people in their
         20s who live under the same roof due to the plot of the house owner Kim Kwang
-        Kyu.</p>","updated":1442776727,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3961"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/253527"}}}},{"score":1.1789887,"show":{"id":2231,"url":"http://www.tvmaze.com/shows/2231/waterfront-house-hunting","name":"Waterfront
-        House Hunting","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"2015-05-25","schedule":{"time":"22:00","days":["Wednesday"]},"rating":{"average":null},"weight":0,"network":{"id":125,"name":"fyi,","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":49274,"thetvdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/14/35880.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/14/35880.jpg"},"summary":"<p>Real
-        estate expert Nick Waldner helps people find a new home in a more desirable,
-        waterfront location that will better suit their lifestyle. From homes on the
-        Gulf Shore of Alabama, to Lake Havasu in Arizona and Oceanside in Marathon,
-        Florida, Nick will unearth one-of-a-kind properties with an enviable view
-        worth moving for. Each episode of the series features a family or couple in
-        different parts of the country looking for a new home with one requirement
-        in common: close proximity to the water.</p><p>Every buyer has their own set
-        of preferences--whether it''s a high-rise condo or a home large enough to
-        fit an expanding family, Nick will guide them in the right direction and help
-        prioritize their needs. After seeing three different options, buyers must
-        choose which home will finally make their dream of living near the water come
-        true.</p>","updated":1438873642,"_links":{"self":{"href":"http://api.tvmaze.com/shows/2231"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/182504"}}}},{"score":1.1187091,"show":{"id":4987,"url":"http://www.tvmaze.com/shows/4987/house-hunters","name":"House
-        Hunters","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"1999-09-30","schedule":{"time":"22:00","days":["Monday","Tuesday","Wednesday","Thursday","Friday"]},"rating":{"average":null},"weight":1,"network":{"id":192,"name":"HGTV","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":73182},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/54158.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/54158.jpg"},"summary":"<p><strong><em>\"</em></strong><i><strong><em>House
-        Hunters\"</em></strong></i> takes viewers behind the scenes as individuals,
-        \ncouples and families learn what to look for and decide whether or not a
-        \nhome is meant for them. Focusing on the emotional experience of finding
-        \nand purchasing a new home, each episode shows the process as buyers \nsearch
-        for a home.</p>","updated":1445665373,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4987"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/399331"}}}},{"score":1.1183224,"show":{"id":332,"url":"http://www.tvmaze.com/shows/332/alpha-house","name":"Alpha
+        Kyu.</p>","updated":1442776727,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3961"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/253527"}}}},{"score":1.1109725,"show":{"id":3081,"url":"http://www.tvmaze.com/shows/3081/fuller-house","name":"Fuller
+        House","type":"Scripted","language":"English","genres":["Comedy","Family"],"status":"In
+        Development","runtime":30,"premiered":null,"schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":null,"webChannel":{"id":1,"name":"Netflix","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":null,"thetvdb":null},"image":null,"summary":"<p>D.J.
+        Tanner-Fuller is a widow and mother of three. Things become too much to handle,
+        so she asks for help from her sister Stephanie and her best-friend Kimmy.</p>","updated":1441675620,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3081"}}}},{"score":1.1109725,"show":{"id":332,"url":"http://www.tvmaze.com/shows/332/alpha-house","name":"Alpha
         House","type":"Scripted","language":null,"genres":["Drama","Comedy"],"status":"To
         Be Determined","runtime":30,"premiered":"2013-04-19","schedule":{"time":"00:00","days":["Friday"]},"rating":{"average":5.4},"weight":1,"network":null,"webChannel":{"id":3,"name":"Amazon","country":{"name":"United
         States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":34454,"thetvdb":269008},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/5300.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/5300.jpg"},"summary":"<p>Delivering
@@ -64,29 +48,33 @@ interactions:
         survived bruising primaries, are facing strong Democratic challengers and
         will use every trick in the book to woo voters on the road to re-election.
         Meanwhile, Senator Guzman (Consuelos) prepares for a 2016 bid for the presidency,
-        a pursuit that will bring him into possible competition with one of his roommates.</p>","updated":1435245697,"_links":{"self":{"href":"http://api.tvmaze.com/shows/332"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/32030"}}}},{"score":1.1175487,"show":{"id":3081,"url":"http://www.tvmaze.com/shows/3081/fuller-house","name":"Fuller
-        House","type":"Scripted","language":"English","genres":["Comedy","Family"],"status":"In
-        Development","runtime":30,"premiered":null,"schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":null,"webChannel":{"id":1,"name":"Netflix","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":null,"thetvdb":null},"image":null,"summary":"<p>D.J.
-        Tanner-Fuller is a widow and mother of three. Things become too much to handle,
-        so she asks for help from her sister Stephanie and her best-friend Kimmy.</p>","updated":1441675620,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3081"}}}},{"score":1.1171618,"show":{"id":4603,"url":"http://www.tvmaze.com/shows/4603/safe-house","name":"Safe
+        a pursuit that will bring him into possible competition with one of his roommates.</p>","updated":1435245697,"_links":{"self":{"href":"http://api.tvmaze.com/shows/332"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/32030"}}}},{"score":1.1100419,"show":{"id":4987,"url":"http://www.tvmaze.com/shows/4987/house-hunters","name":"House
+        Hunters","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"1999-09-30","schedule":{"time":"22:00","days":["Monday","Tuesday","Wednesday","Thursday","Friday"]},"rating":{"average":null},"weight":0,"network":{"id":192,"name":"HGTV","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":73182},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/54158.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/54158.jpg"},"summary":"<p><strong><em>\"</em></strong><i><strong><em>House
+        Hunters\"</em></strong></i> takes viewers behind the scenes as individuals,
+        \ncouples and families learn what to look for and decide whether or not a
+        \nhome is meant for them. Focusing on the emotional experience of finding
+        \nand purchasing a new home, each episode shows the process as buyers \nsearch
+        for a home.</p>","updated":1448892489,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4987"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/502730"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/502731"}}}},{"score":1.1095763,"show":{"id":4603,"url":"http://www.tvmaze.com/shows/4603/safe-house","name":"Safe
         House","type":"Scripted","language":"English","genres":[],"status":"Running","runtime":45,"premiered":"2015-04-20","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":7},"weight":0,"network":{"id":35,"name":"ITV","country":{"name":"United
         Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":42379,"thetvdb":294195},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/20/52404.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/20/52404.jpg"},"summary":"<p>A
         married couple, former detective Robert and teacher Katy, are asked by\n close
         friend and police officer Mark, to turn their remote Guest House \ninto a
-        Safe House.</p>","updated":1445786851,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4603"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/296046"}}}},{"score":1.1163876,"show":{"id":2710,"url":"http://www.tvmaze.com/shows/2710/playing-house","name":"Playing
+        Safe House.</p>","updated":1445786851,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4603"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/296046"}}}},{"score":1.108645,"show":{"id":2710,"url":"http://www.tvmaze.com/shows/2710/playing-house","name":"Playing
         House","type":"Scripted","language":"English","genres":["Comedy","Family"],"status":"Running","runtime":30,"premiered":"2014-04-29","schedule":{"time":"22:00","days":["Tuesday"]},"rating":{"average":9},"weight":1,"network":{"id":30,"name":"USA
         Network","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":35945,"thetvdb":269898},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/14/36561.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/14/36561.jpg"},"summary":"<p>In
         <em><strong>\"PLAYING HOUSE\"</strong></em>, when pregnant Maggie discovers
         her husband cheating, her BFF Emma gives up her career to help Maggie raise
         the baby. Now the lifelong friends must navigate their biggest and most hilarious
-        adventure yet, in the best way they know how - together.</p>","updated":1443956185,"_links":{"self":{"href":"http://api.tvmaze.com/shows/2710"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/203575"}}}}]'}
+        adventure yet, in the best way they know how - together.</p>","updated":1443956185,"_links":{"self":{"href":"http://api.tvmaze.com/shows/2710"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/203575"}}}},{"score":1.108179,"show":{"id":8391,"url":"http://www.tvmaze.com/shows/8391/grandmas-house","name":"Grandma''s
+        House","type":"Animation","language":"English","genres":[],"status":"Ended","runtime":22,"premiered":"2010-08-09","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":{"id":37,"name":"BBC
+        Two","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":181551},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/30/75268.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/30/75268.jpg"},"summary":"","updated":1447513024,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8391"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/462154"}}}}]'}
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:00 GMT']
+      date: ['Tue, 01 Dec 2015 09:26:59 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -109,7 +97,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:00 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:00 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -138,7 +126,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:00 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:00 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -161,7 +149,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:00 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:00 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -186,7 +174,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:01 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:00 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -197,55 +185,20 @@ interactions:
       Host: [api.tvmaze.com]
       User-Agent: [Python-urllib/2.7]
     method: GET
-    uri: http://api.tvmaze.com/shows/2231
+    uri: http://api.tvmaze.com/shows/3081
   response:
-    body: {string: !!python/unicode '{"id":2231,"url":"http://www.tvmaze.com/shows/2231/waterfront-house-hunting","name":"Waterfront
-        House Hunting","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"2015-05-25","schedule":{"time":"22:00","days":["Wednesday"]},"rating":{"average":null},"weight":0,"network":{"id":125,"name":"fyi,","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":49274,"thetvdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/14/35880.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/14/35880.jpg"},"summary":"<p>Real
-        estate expert Nick Waldner helps people find a new home in a more desirable,
-        waterfront location that will better suit their lifestyle. From homes on the
-        Gulf Shore of Alabama, to Lake Havasu in Arizona and Oceanside in Marathon,
-        Florida, Nick will unearth one-of-a-kind properties with an enviable view
-        worth moving for. Each episode of the series features a family or couple in
-        different parts of the country looking for a new home with one requirement
-        in common: close proximity to the water.</p><p>Every buyer has their own set
-        of preferences--whether it''s a high-rise condo or a home large enough to
-        fit an expanding family, Nick will guide them in the right direction and help
-        prioritize their needs. After seeing three different options, buyers must
-        choose which home will finally make their dream of living near the water come
-        true.</p>","updated":1438873642,"_links":{"self":{"href":"http://api.tvmaze.com/shows/2231"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/182504"}}}'}
+    body: {string: !!python/unicode '{"id":3081,"url":"http://www.tvmaze.com/shows/3081/fuller-house","name":"Fuller
+        House","type":"Scripted","language":"English","genres":["Comedy","Family"],"status":"In
+        Development","runtime":30,"premiered":null,"schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":null,"webChannel":{"id":1,"name":"Netflix","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":null,"thetvdb":null},"image":null,"summary":"<p>D.J.
+        Tanner-Fuller is a widow and mother of three. Things become too much to handle,
+        so she asks for help from her sister Stephanie and her best-friend Kimmy.</p>","updated":1441675620,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3081"}}}'}
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:01 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Connection: [close]
-      Host: [api.tvmaze.com]
-      User-Agent: [Python-urllib/2.7]
-    method: GET
-    uri: http://api.tvmaze.com/shows/4987
-  response:
-    body: {string: !!python/unicode '{"id":4987,"url":"http://www.tvmaze.com/shows/4987/house-hunters","name":"House
-        Hunters","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"1999-09-30","schedule":{"time":"22:00","days":["Monday","Tuesday","Wednesday","Thursday","Friday"]},"rating":{"average":null},"weight":1,"network":{"id":192,"name":"HGTV","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":73182},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/54158.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/54158.jpg"},"summary":"<p><strong><em>\"</em></strong><i><strong><em>House
-        Hunters\"</em></strong></i> takes viewers behind the scenes as individuals,
-        \ncouples and families learn what to look for and decide whether or not a
-        \nhome is meant for them. Focusing on the emotional experience of finding
-        \nand purchasing a new home, each episode shows the process as buyers \nsearch
-        for a home.</p>","updated":1445665373,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4987"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/399331"}}}'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [close]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:01 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:00 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -275,7 +228,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:01 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:01 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -286,20 +239,22 @@ interactions:
       Host: [api.tvmaze.com]
       User-Agent: [Python-urllib/2.7]
     method: GET
-    uri: http://api.tvmaze.com/shows/3081
+    uri: http://api.tvmaze.com/shows/4987
   response:
-    body: {string: !!python/unicode '{"id":3081,"url":"http://www.tvmaze.com/shows/3081/fuller-house","name":"Fuller
-        House","type":"Scripted","language":"English","genres":["Comedy","Family"],"status":"In
-        Development","runtime":30,"premiered":null,"schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":null,"webChannel":{"id":1,"name":"Netflix","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":null,"thetvdb":null},"image":null,"summary":"<p>D.J.
-        Tanner-Fuller is a widow and mother of three. Things become too much to handle,
-        so she asks for help from her sister Stephanie and her best-friend Kimmy.</p>","updated":1441675620,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3081"}}}'}
+    body: {string: !!python/unicode '{"id":4987,"url":"http://www.tvmaze.com/shows/4987/house-hunters","name":"House
+        Hunters","type":"Reality","language":"English","genres":[],"status":"Running","runtime":30,"premiered":"1999-09-30","schedule":{"time":"22:00","days":["Monday","Tuesday","Wednesday","Thursday","Friday"]},"rating":{"average":null},"weight":0,"network":{"id":192,"name":"HGTV","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":73182},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/54158.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/54158.jpg"},"summary":"<p><strong><em>\"</em></strong><i><strong><em>House
+        Hunters\"</em></strong></i> takes viewers behind the scenes as individuals,
+        \ncouples and families learn what to look for and decide whether or not a
+        \nhome is meant for them. Focusing on the emotional experience of finding
+        \nand purchasing a new home, each episode shows the process as buyers \nsearch
+        for a home.</p>","updated":1448892489,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4987"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/502730"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/502731"}}}'}
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:01 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:01 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -323,7 +278,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:02 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:01 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -348,7 +303,28 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:02 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:02 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/shows/8391
+  response:
+    body: {string: !!python/unicode '{"id":8391,"url":"http://www.tvmaze.com/shows/8391/grandmas-house","name":"Grandma''s
+        House","type":"Animation","language":"English","genres":[],"status":"Ended","runtime":22,"premiered":"2010-08-09","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":{"id":37,"name":"BBC
+        Two","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":181551},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/30/75268.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/30/75268.jpg"},"summary":"","updated":1447513024,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8391"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/462154"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 01 Dec 2015 09:27:02 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -367,7 +343,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:02 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:02 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -380,10 +356,10 @@ interactions:
     method: GET
     uri: http://api.tvmaze.com/search/shows?q=Doctor%20Who
   response:
-    body: {string: !!python/unicode '[{"score":2.0832276,"show":{"id":210,"url":"http://www.tvmaze.com/shows/210/doctor-who","name":"Doctor
+    body: {string: !!python/unicode '[{"score":2.1478827,"show":{"id":210,"url":"http://www.tvmaze.com/shows/210/doctor-who","name":"Doctor
         Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Running","runtime":45,"premiered":"2005-03-26","schedule":{"time":"21:00","days":["Saturday"]},"rating":{"average":9.2},"weight":12,"network":{"id":12,"name":"BBC
         One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":3332,"thetvdb":78804},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3179.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3179.jpg"},"summary":"<p>Adventures
-        across time and space with the time travelling alien and his companions.</p>","updated":1448775795,"_links":{"self":{"href":"http://api.tvmaze.com/shows/210"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228571"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/228572"}}}},{"score":1.9328351,"show":{"id":766,"url":"http://www.tvmaze.com/shows/766/doctor-who","name":"Doctor
+        across time and space with the time travelling alien and his companions.</p>","updated":1448816837,"_links":{"self":{"href":"http://api.tvmaze.com/shows/210"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228571"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/228572"}}}},{"score":1.931163,"show":{"id":766,"url":"http://www.tvmaze.com/shows/766/doctor-who","name":"Doctor
         Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":25,"premiered":"1963-11-23","schedule":{"time":"17:15","days":[]},"rating":{"average":8.4},"weight":1,"network":{"id":12,"name":"BBC
         One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":3331,"thetvdb":76107},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/6/15291.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/6/15291.jpg"},"summary":"<p><em>Doctor
         Who</em> is the longest-running science fiction TV series in history, airing
@@ -391,16 +367,21 @@ interactions:
         sophisticated mixed-level storytelling. Its format was the key to its longevity:
         the Doctor, a mysterious traveller in space and time, travels in his ship,
         the TARDIS. The TARDIS can take him and his companions anywhere in time and
-        space. Inevitably he finds evil at work wherever he goes..</p>","updated":1447948684,"_links":{"self":{"href":"http://api.tvmaze.com/shows/766"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/325662"}}}},{"score":1.5361625,"show":{"id":8430,"url":"http://www.tvmaze.com/shows/8430/doctor-who-confidential","name":"Doctor
+        space. Inevitably he finds evil at work wherever he goes..</p>","updated":1447948684,"_links":{"self":{"href":"http://api.tvmaze.com/shows/766"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/325662"}}}},{"score":1.5314578,"show":{"id":8430,"url":"http://www.tvmaze.com/shows/8430/doctor-who-confidential","name":"Doctor
         Who Confidential","type":"Documentary","language":"English","genres":["Science-Fiction"],"status":"Ended","runtime":45,"premiered":"2005-03-26","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":{"id":49,"name":"BBC
         Three","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":79298},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/30/75328.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/30/75328.jpg"},"summary":"<p>Specially
         filmed for BBC Three as a companion piece to Doctor Who, \nDoctor Who Confidential
         aims to give a taste of the excitement and the \nenergy that surrounds the
         show. The programme includes behind-the-scenes\n filming and interviews with
         the cast, writers and production team as \nthey bring our favourite Time Lord
-        back to our screens.</p>","updated":1447538892,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/463156"}}}},{"score":1.5356294,"show":{"id":8433,"url":"http://www.tvmaze.com/shows/8433/doctor-who-extra","name":"Doctor
+        back to our screens.</p>","updated":1447538892,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8430"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/463156"}}}},{"score":1.5314578,"show":{"id":8433,"url":"http://www.tvmaze.com/shows/8433/doctor-who-extra","name":"Doctor
         Who Extra","type":"Scripted","language":"English","genres":[],"status":"Ended","runtime":11,"premiered":"2014-08-23","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":{"id":12,"name":"BBC
-        One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":null},"image":null,"summary":"","updated":1447605495,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8433"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/466781"}}}},{"score":1.1525217,"show":{"id":8432,"url":"http://www.tvmaze.com/shows/8432/doctor-who-scream-of-the-shalka","name":"Doctor
+        One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":null},"image":null,"summary":"","updated":1447605495,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8433"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/466781"}}}},{"score":1.3450866,"show":{"id":9272,"url":"http://www.tvmaze.com/shows/9272/doctor-who-the-fan-show","name":"Doctor
+        Who: The Fan Show","type":"Talk Show","language":"English","genres":[],"status":"Running","runtime":null,"premiered":"2015-05-08","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":1,"network":null,"webChannel":{"id":21,"name":"YouTube","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":null,"thetvdb":300845},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/32/81575.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/32/81575.jpg"},"summary":"<p>The
+        weekly show from the Official Doctor Who YouTube channel. Friends of The Doctor
+        and curators of Doctor Who news, here you will see all of our un-seen bonus
+        videos and lots of extra stuff from our presenter Christel Dee.</p>","updated":1448843551,"_links":{"self":{"href":"http://api.tvmaze.com/shows/9272"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/501798"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/501799"}}}},{"score":1.1490759,"show":{"id":8432,"url":"http://www.tvmaze.com/shows/8432/doctor-who-scream-of-the-shalka","name":"Doctor
         Who: Scream of the Shalka","type":"Animation","language":"English","genres":[],"status":"Ended","runtime":15,"premiered":"2011-11-13","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":{"id":353,"name":"BBC
         Two Wales","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":null},"image":null,"summary":"","updated":1447605169,"_links":{"self":{"href":"http://api.tvmaze.com/shows/8432"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/466769"}}}}]'}
     headers:
@@ -408,7 +389,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:02 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:02 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -424,13 +405,13 @@ interactions:
     body: {string: !!python/unicode '{"id":210,"url":"http://www.tvmaze.com/shows/210/doctor-who","name":"Doctor
         Who","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Running","runtime":45,"premiered":"2005-03-26","schedule":{"time":"21:00","days":["Saturday"]},"rating":{"average":9.2},"weight":12,"network":{"id":12,"name":"BBC
         One","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":3332,"thetvdb":78804},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3179.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3179.jpg"},"summary":"<p>Adventures
-        across time and space with the time travelling alien and his companions.</p>","updated":1448775795,"_links":{"self":{"href":"http://api.tvmaze.com/shows/210"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228571"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/228572"}}}'}
+        across time and space with the time travelling alien and his companions.</p>","updated":1448816837,"_links":{"self":{"href":"http://api.tvmaze.com/shows/210"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/228571"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/228572"}}}'}
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:02 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:02 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -457,7 +438,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:03 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:03 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -483,7 +464,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:03 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:03 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -504,7 +485,31 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:03 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:03 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/shows/9272
+  response:
+    body: {string: !!python/unicode '{"id":9272,"url":"http://www.tvmaze.com/shows/9272/doctor-who-the-fan-show","name":"Doctor
+        Who: The Fan Show","type":"Talk Show","language":"English","genres":[],"status":"Running","runtime":null,"premiered":"2015-05-08","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":1,"network":null,"webChannel":{"id":21,"name":"YouTube","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":null,"thetvdb":300845},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/32/81575.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/32/81575.jpg"},"summary":"<p>The
+        weekly show from the Official Doctor Who YouTube channel. Friends of The Doctor
+        and curators of Doctor Who news, here you will see all of our un-seen bonus
+        videos and lots of extra stuff from our presenter Christel Dee.</p>","updated":1448843551,"_links":{"self":{"href":"http://api.tvmaze.com/shows/9272"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/501798"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/501799"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Tue, 01 Dec 2015 09:27:03 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -525,7 +530,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:03 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:03 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -547,7 +552,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 29 Nov 2015 10:35:03 GMT']
+      date: ['Tue, 01 Dec 2015 09:27:04 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}

@@ -314,7 +314,7 @@ class APITVMaze(object):
             raise LookupError('Not enough parameters to lookup episode')
 
         # Get series
-        series = APITVMaze.series_lookup(session=session, only_cached=only_cached)
+        series = APITVMaze.series_lookup(session=session, only_cached=only_cached, **lookup_params)
         if not series:
             raise LookupError('Could not find series with the following parameters: {0}'.format(**lookup_params))
 
@@ -350,11 +350,10 @@ class APITVMaze(object):
                 episode_date = datetime.strftime(episode_date, '%Y-%m-%d')
                 pytvmaze_episode = episodes_by_date(maze_id=series.tvmaze_id, airdate=episode_date)[0]
             except IllegalAirDate as e:
-                log.debug('episode airdate was received in a wrong format: {0}'.format(e))
+                log.debug(e)
                 return
             except NoEpisodesForAirdate as e:
-                log.debug(
-                    'could not find episode for series {0} with airdate {1}'.format(series.tvmaze_id, episode_date))
+                log.debug(e)
                 return
         else:
             # TODO will this match all series_id types?

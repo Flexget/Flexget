@@ -44,6 +44,16 @@ class TestTVMazeShowLookup(FlexGetBase):
               - {title: 'The.Flash.2014.S02E06.HDTV.x264-LOL'}
             series:
               - The Flash (2014)
+          test_from_filesystem:
+            filesystem:
+              path: tvmaze_test_dir/
+              recursive: yes
+            series:
+              - The Walking Dead
+              - The Big Bang Theory
+              - Marvels Jessica Jones
+              - The Flash (2014)
+
     """
 
     @use_vcr
@@ -105,7 +115,7 @@ class TestTVMazeShowLookup(FlexGetBase):
             assert series.tvmaze_id == entry['tvmaze_series_id'], 'tvmaze id should be the same as the first entry'
             assert series.name.lower() == entry['tvmaze_series_name'].lower(), 'series name should match first entry'
 
-    @use_vcr
+    @use_vcr()
     def test_date(self):
         self.execute_task('test_date')
         entry = self.task.find_entry(title='the daily show 2012-6-6')
@@ -122,3 +132,32 @@ class TestTVMazeShowLookup(FlexGetBase):
             'tvmaze_series_id')
         assert entry.get('tvmaze_series_year') == 2014, 'expected tvmaze_series_year 2014, got %s' % entry.get(
             'tvmaze_series_year')
+
+    def test_from_filesystem(self):
+        self.execute_task('test_from_filesystem')
+        entry = self.task.find_entry(title='Marvels.Jessica.Jones.S01E02.PROPER.720p.WEBRiP.x264-QCF')
+        assert entry.get('tvmaze_series_id') == 1370, 'expected tvmaze_series_id 1370, got %s' % entry.get(
+            'tvmaze_series_id')
+        assert entry.get('tvmaze_episode_id') == 206178, 'episode id should be 206178, is actually %s' % entry.get(
+            'tvmaze_episode_id')
+        entry = self.task.find_entry(title='Marvels.Jessica.Jones.S01E03.720p.WEBRiP.x264-QCF')
+        assert entry.get('tvmaze_series_id') == 1370, 'expected tvmaze_series_id 1370, got %s' % entry.get(
+            'tvmaze_series_id')
+        assert entry.get('tvmaze_episode_id') == 206177, 'episode id should be 206177, is actually %s' % entry.get(
+            'tvmaze_episode_id')
+        entry = self.task.find_entry(title='The.Big.Bang.Theory.S09E09.720p.HDTV.X264-DIMENSION')
+        assert entry.get('tvmaze_series_id') == 66, 'expected tvmaze_series_id 66, got %s' % entry.get(
+            'tvmaze_series_id')
+        assert entry.get('tvmaze_episode_id') == 409180, 'episode id should be 409180, is actually %s' % entry.get(
+            'tvmaze_episode_id')
+        entry = self.task.find_entry(title='The.Flash.S02E04.1080p.WEB-DL.DD5.1.H.264-KiNGS')
+        assert entry.get('tvmaze_series_id') == 13, 'expected tvmaze_series_id 13, got %s' % entry.get(
+            'tvmaze_series_id')
+        assert entry.get('tvmaze_episode_id') == 284974, 'episode id should be 284974, is actually %s' % entry.get(
+            'tvmaze_episode_id')
+        entry = self.task.find_entry(title='The.Walking.Dead.S06E08.Start.to.Finish-SiCKBEARD')
+        assert entry.get('tvmaze_series_id') == 73, 'expected tvmaze_series_id 73, got %s' % entry.get(
+            'tvmaze_series_id')
+        assert entry.get('tvmaze_episode_id') == 185073, 'episode id should be 185073, is actually %s' % entry.get(
+            'tvmaze_episode_id')
+
