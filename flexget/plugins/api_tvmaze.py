@@ -96,10 +96,16 @@ class TVMazeSeries(Base):
         self.tvrage_id = series.externals.get('tvrage')
         self.premiered = parser.parse(series.premiered)
         self.summary = series.summary
-        self.webchannel = series.webChannel
+        try:
+            self.webchannel = series.webChannel.get('name')
+        except AttributeError:
+            self.webchannel = None
         self.runtime = series.runtime
         self.show_type = series.type
-        self.network = series.network['name']
+        try:
+            self.network = series.network.get('name')
+        except AttributeError:
+            self.network = None
         try:
             self.year = int(series.premiered[:4])
         except (TypeError, ValueError):
