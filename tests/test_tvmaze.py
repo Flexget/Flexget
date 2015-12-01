@@ -76,9 +76,8 @@ class TestTVMazeShowLookup(FlexGetBase):
                 entry['title'], entry['tvmaze_episode_name'])
         assert entry['tvmaze_series_status'] == 'Ended', \
             'status for %s is %s, should be "ended"' % (entry['title'], entry['tvmaze_series_status'])
-        assert entry[
-                   'afield'] == '73255PaternityHouse', 'afield was not set correctly, expected 73255PaternityHouse, got %s' % \
-                                                       entry['afield']
+        assert entry['afield'] == '73255PaternityHouse', \
+            'afield was not set correctly, expected 73255PaternityHouse, got %s' % entry['afield']
         assert self.task.find_entry(tvmaze_episode_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
 
@@ -161,4 +160,3 @@ class TestTVMazeShowLookup(FlexGetBase):
             'tvmaze_series_id')
         assert entry.get('tvmaze_episode_id') == 185073, 'episode id should be 185073, is actually %s' % entry.get(
             'tvmaze_episode_id')
-
