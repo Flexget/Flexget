@@ -251,7 +251,7 @@ def prepare_lookup_for_pytvmaze(**lookup_params):
 class APITVMaze(object):
     @staticmethod
     @with_session
-    def series_lookup(session=None, force_cache=False, **lookup_params):
+    def series_lookup(session=None, only_cached=False, **lookup_params):
         search_params = search_params_for_series(**lookup_params)
         # Searching cache first
         series = from_cache(session=session, cache_type=TVMazeSeries, search_params=search_params)
@@ -263,7 +263,7 @@ class APITVMaze(object):
             if search and search.series:
                 series = search.series
 
-        if force_cache:
+        if only_cached:
             if series:  # If force_cache is True, return series even if it expired
                 log.debug('forcing cache for series {0}'.format(series.name))
                 return series
@@ -298,7 +298,7 @@ class APITVMaze(object):
 
     @staticmethod
     @with_session
-    def episode_lookup(session=None, force_cache=False, **lookup_params):
+    def episode_lookup(session=None, only_cached=False, **lookup_params):
         series_name = lookup_params.get('series_name') or lookup_params.get('title')
         lookup_type = lookup_params.get('series_id_type')
 
@@ -314,7 +314,7 @@ class APITVMaze(object):
             raise LookupError('Not enough parameters to lookup episode')
 
         # Get series
-        series = APITVMaze.series_lookup(session=session, force_cache=force_cache, **lookup_params)
+        series = APITVMaze.series_lookup(session=session, only_cached=only_cached)
         if not series:
             raise LookupError('Could not find series with the following parameters: {0}'.format(**lookup_params))
 
@@ -331,7 +331,7 @@ class APITVMaze(object):
         ).first()
 
         # Logic for cache only mode
-        if force_cache:
+        if only_cached:
             if episode:
                 log.debug('forcing cache for episode {0}, season {1} for show {2}'.format(episode.number,
                                                                                           episode.season_number,
