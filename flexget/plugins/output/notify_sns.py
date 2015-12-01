@@ -52,10 +52,7 @@ class SNSNotification(object):
         'additionalProperties': False,
     }
 
-    # this has to run near the end of the plugin chain, because we
-    # should notify after all other outputs.
-    @plugin.priority(0)
-    def on_task_output(self, task, config):
+    def on_task_start(self, task ,config):
         # verify that we actually support Boto 3
         try:
             import boto3
@@ -63,6 +60,10 @@ class SNSNotification(object):
             log.debug("Error importing boto3: %s", e)
             raise plugin.DependencyError("sns", "boto3", "Boto3 module required. ImportError: %s" % e)
 
+    # this has to run near the end of the plugin chain, because we
+    # should notify after all other outputs.
+    @plugin.priority(0)
+    def on_task_output(self, task, config):
         sender = SNSNotificationEmitter(config)
         sender.send_notifications(task)
 
