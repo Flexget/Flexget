@@ -374,7 +374,8 @@ class SearchT411(object):
                                              auth_handler, config)
 
             for torrent in res_json['torrents']:
-                entries.add(cls.get_entry(torrent, auth_handler))
+                if isinstance(torrent, dict):
+                    entries.add(cls.get_entry(torrent, auth_handler))
 
         return sorted(entries, reverse=True,
                       key=lambda x: x.get('search_sort'))
