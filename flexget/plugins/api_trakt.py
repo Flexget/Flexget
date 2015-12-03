@@ -513,10 +513,11 @@ class TraktMovieSearchResult(Base):
 
 def split_title_year(title):
     """Splits title containing a year into a title, year pair."""
-    match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
-    title = match.group(1).strip()
-    if match.group(2):
-        year = int(match.group(2))
+    # We only recognize years from the 2nd and 3rd millennium, FlexGetters from the year 3000 be damned!
+    match = re.search(r'[\s(]([12]\d{3})\)?$', title)
+    if match:
+        title = title[:match.start()].strip()
+        year = int(match.group(1))
     else:
         year = None
     return title, year
@@ -614,12 +615,8 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
                     trakt_id = result[style]['ids']['trakt']
                     break
             # grab the first result if there is no exact match
-            if not trakt_id and results:
-                for result in results:
-                    if result['score'] >= 34:
-                        trakt_id = result[style]['ids']['trakt']
-
-                 #trakt_id = results[0][style]['ids']['trakt']
+            if not trakt_id and results and results[0]['score'] >= 34:
+                trakt_id = results[0][style]['ids']['trakt']
     if not trakt_id:
         raise LookupError('Unable to find %s="%s" on trakt.' % (last_search_type, last_search_query))
     # Get actual data from trakt
