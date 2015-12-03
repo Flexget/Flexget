@@ -839,7 +839,7 @@ def register_parser_arguments():
 
     auth_parser.add_argument('account', metavar='<account>', help=acc_text)
     auth_parser.add_argument('pin', metavar='<pin>', help='get this by authorizing FlexGet to use your trakt account '
-                                                          'at http://trakt.tv/pin/346')
+                                                          'at %s' % PIN_URL)
 
     show_parser = subparsers.add_parser('show', help='show expiration date for Flexget authorization(s) (don\'t worry, '
                                                      'they will automatically refresh when expired)')
