@@ -5,7 +5,7 @@ from datetime import datetime
 
 from dateutil import parser
 from pytvmaze import get_show, episode_by_number, episodes_by_date
-from pytvmaze.exceptions import ShowNotFound, EpisodeNotFound, NoEpisodesForAirdate, IllegalAirDate
+from pytvmaze.exceptions import ShowNotFound, EpisodeNotFound, NoEpisodesForAirdate, IllegalAirDate, ConnectionError
 from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table, or_, \
     and_
 from sqlalchemy.orm import relation
@@ -285,6 +285,9 @@ class APITVMaze(object):
         except ShowNotFound:
             log.debug('could not find series {0} in pytvmaze'.format(title))
             return
+        except ConnectionError as e:
+            log.warning(e)
+            return
 
         # See if series already exist in cache
         series = session.query(TVMazeSeries).filter(TVMazeSeries.tvmaze_id == pytvmaze_show.maze_id).first()
@@ -355,11 +358,11 @@ class APITVMaze(object):
             try:
                 episode_date = datetime.strftime(episode_date, '%Y-%m-%d')
                 pytvmaze_episode = episodes_by_date(maze_id=series.tvmaze_id, airdate=episode_date)[0]
-            except IllegalAirDate as e:
+            except (IllegalAirDate, NoEpisodesForAirdate) as e:
                 log.debug(e)
                 return
-            except NoEpisodesForAirdate as e:
-                log.debug(e)
+            except ConnectionError as e:
+                log.warning(e)
                 return
         else:
             # TODO will this match all series_id types?
@@ -371,6 +374,9 @@ class APITVMaze(object):
                                                      episode_number=episode_number)
             except EpisodeNotFound as e:
                 log.debug('could not find episode in tvmaze: {0}'.format(e))
+                return
+            except ConnectionError as e:
+                log.warning(e)
                 return
         # See if episode exists in DB
         episode = session.query(TVMazeEpisodes).filter(
