@@ -1,179 +1,179 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=The+Matrix&type=movie&year=1999
-  response:
-    body: {string: !!python/unicode '[{"type":"movie","score":74.22861,"movie":{"title":"The
-        Matrix","overview":"Thomas A. Anderson is a man living two lives. By day he
-        is an average computer programmer and by night a malevolent hacker known as
-        Neo, who finds himself targeted by the police when he is contacted by Morpheus,
-        a legendary computer hacker, who reveals the shocking truth about our reality.","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/6c353577dd.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/6c353577dd.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/6c353577dd.jpg"}},"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603}}},{"type":"movie","score":59.382885,"movie":{"title":"Making
-        The Matrix","overview":"A promotional making-of documentary for the film Matrix,
-        The (1999) that devotes its time to explaining the digital and practical effects
-        contained in the film. This is very interesting, seeing as how they''re giving
-        away the cinematic secrets that they created solely for the this movie, that
-        have now been spoofed and referenced in countless other films.","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/205/793/posters/original/9680ca459a.jpg","medium":"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg","thumb":"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":205793,"slug":"making-the-matrix-1999","imdb":"tt0365467","tmdb":325251}}},{"type":"movie","score":55.26656,"movie":{"title":"V-World
-        Matrix","overview":"Two friends take a cyber vacation to experience a world
-        where they can act out their virtual fantasies! They soon realize they''ve
-        entered a virtual free-for-all. Forbidden fantasies and desires suddenly appear
-        in the form of the even deadlier \"dark woman\". All the players now end up
-        in a cyber battle for their lives, and sanity, against a beautiful virtual
-        hunter who has one killer fixation - winning the deadly game they started!","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/158/764/posters/original/b5bd19302a.jpg","medium":"https://walter.trakt.us/images/movies/000/158/764/posters/medium/b5bd19302a.jpg","thumb":"https://walter.trakt.us/images/movies/000/158/764/posters/thumb/b5bd19302a.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":158764,"slug":"v-world-matrix-1969","imdb":"tt0211096","tmdb":259464}}},{"type":"movie","score":4.821948,"movie":{"title":"The
-        Tricky Master","overview":"Undercover cop Leung Foon (Nick Cheung) is having
-        trouble taking down the illegal trading operation headed by crime boss Ferrari
-        (Wong Jing). So to accomplish his mission, he asks for help from the re...
-        read more read more...nowned Master Wong (Stephen Chow), an expert in gambling
-        tricks. Although the \"Tricky Master\" is opposed to getting involved, Foon
-        convinces him to help bring down the swindler in a zany comedy that spoofs
-        Enter the Dragon and The Matrix.","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/037/624/posters/original/c5c0cb76f8.jpg","medium":"https://walter.trakt.us/images/movies/000/037/624/posters/medium/c5c0cb76f8.jpg","thumb":"https://walter.trakt.us/images/movies/000/037/624/posters/thumb/c5c0cb76f8.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/037/624/fanarts/original/de31c092f7.jpg","medium":"https://walter.trakt.us/images/movies/000/037/624/fanarts/medium/de31c092f7.jpg","thumb":"https://walter.trakt.us/images/movies/000/037/624/fanarts/thumb/de31c092f7.jpg"}},"ids":{"trakt":37624,"slug":"the-tricky-master-1999","imdb":"tt0212864","tmdb":53281}}}]'}
-    headers:
-      cache-control: ['public, max-age=14400']
-      cf-cache-status: [HIT]
-      cf-ray: [242481d8472016e2-ARN]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Sun, 08 Nov 2015 21:52:49 GMT']
-      etag: [W/"e4e8148883abcba5d5fa9f51a8df6101"]
-      expires: ['Mon, 09 Nov 2015 01:52:49 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=da4b21bdaf55f0f74ad8a2c78cdbdfaed1447019569; expires=Mon,
-          07-Nov-16 21:52:49 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-pagination-item-count: ['4']
-      x-pagination-limit: ['10']
-      x-pagination-page: ['1']
-      x-pagination-page-count: ['1']
-      x-request-id: [114f3c61-3b0b-488e-8b4f-701f3a7461db]
-      x-runtime: ['0.016442']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      Cookie: [__cfduid=da4b21bdaf55f0f74ad8a2c78cdbdfaed1447019569]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481?extended=full
-  response:
-    body: {string: !!python/unicode '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
-        to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
-        By day he is an average computer programmer and by night a malevolent hacker
-        known as Neo, who finds himself targeted by the police when he is contacted
-        by Morpheus, a legendary computer hacker, who reveals the shocking truth about
-        our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.98181,"votes":17425,"updated_at":"2015-11-01T15:09:57.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R"}'}
-    headers:
-      cache-control: ['public, max-age=14400']
-      cf-cache-status: [HIT]
-      cf-ray: [242481d8a72b16e2-ARN]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Sun, 08 Nov 2015 21:52:50 GMT']
-      etag: [W/"34da56e7db7efb7bff992fcd685ab584"]
-      expires: ['Mon, 09 Nov 2015 01:52:50 GMT']
-      last-modified: ['Sun, 01 Nov 2015 15:09:57 GMT']
-      server: [cloudflare-nginx]
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-request-id: [76835df9-ce9f-4c6c-a71c-40992fb5650b]
-      x-runtime: ['0.013182']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/movies/481/people
-  response:
-    body: {string: !!python/unicode '{"cast":[{"character":"Neo","person":{"name":"Keanu
-        Reeves","ids":{"trakt":7134,"slug":"keanu-reeves","imdb":"nm0000206","tmdb":6384,"tvrage":19449}}},{"character":"Morpheus","person":{"name":"Laurence
-        Fishburne","ids":{"trakt":551,"slug":"laurence-fishburne","imdb":"nm0000401","tmdb":2975,"tvrage":58899}}},{"character":"Trinity","person":{"name":"Carrie-Anne
-        Moss","ids":{"trakt":5274,"slug":"carrie-anne-moss","imdb":"nm0005251","tmdb":530,"tvrage":30031}}},{"character":"Agent
-        Smith","person":{"name":"Hugo Weaving","ids":{"trakt":16499,"slug":"hugo-weaving","imdb":"nm0915989","tmdb":1331,"tvrage":165660}}},{"character":"Oracle","person":{"name":"Gloria
-        Foster","ids":{"trakt":413616,"slug":"gloria-foster","imdb":"nm0287825","tmdb":9364,"tvrage":33201}}},{"character":"Cypher","person":{"name":"Joe
-        Pantoliano","ids":{"trakt":294554,"slug":"joe-pantoliano","imdb":"nm0001592","tmdb":532,"tvrage":10693}}},{"character":"Tank","person":{"name":"Marcus
-        Chong","ids":{"trakt":413619,"slug":"marcus-chong","imdb":"nm0159059","tmdb":9372,"tvrage":33610}}},{"character":"Apoc","person":{"name":"Julian
-        Arahanga","ids":{"trakt":413207,"slug":"julian-arahanga","imdb":"nm0032810","tmdb":7244,"tvrage":null}}},{"character":"Mouse","person":{"name":"Matt
-        Doran","ids":{"trakt":413621,"slug":"matt-doran","imdb":"nm0233391","tmdb":9374,"tvrage":30260}}},{"character":"Switch","person":{"name":"Belinda
-        McClory","ids":{"trakt":413623,"slug":"belinda-mcclory","imdb":"nm0565883","tmdb":9376,"tvrage":9741}}},{"character":"Dozer","person":{"name":"Anthony
-        Ray Parker","ids":{"trakt":413625,"slug":"anthony-ray-parker","imdb":"nm0662562","tmdb":9378,"tvrage":null}}},{"character":"Agent
-        Brown","person":{"name":"Paul Goddard","ids":{"trakt":413628,"slug":"paul-goddard-12bfb257-984b-4e2d-a582-578481a07a9d","imdb":"nm0323822","tmdb":9380,"tvrage":null}}},{"character":"Agent
-        Jones","person":{"name":"Robert Taylor","ids":{"trakt":413633,"slug":"robert-taylor-dd49859a-edc3-4e88-8dc1-551d8053242d","imdb":"nm0853079","tmdb":39545,"tvrage":null}}},{"character":"Rhineheart","person":{"name":"David
-        Aston","ids":{"trakt":413636,"slug":"david-aston","imdb":"nm0040058","tmdb":9383,"tvrage":null}}},{"character":"Choi","person":{"name":"Marc
-        Aden","ids":{"trakt":413639,"slug":"marc-aden","imdb":"nm0336802","tmdb":9384,"tvrage":null}}},{"character":"White
-        Rabbit Girl","person":{"name":"Ada Nicodemou","ids":{"trakt":413643,"slug":"ada-nicodemou","imdb":"nm0630124","tmdb":181214,"tvrage":24685}}},{"character":"Priestess","person":{"name":"Deni
-        Gordon","ids":{"trakt":413646,"slug":"deni-gordon","imdb":"nm0330139","tmdb":1090466,"tvrage":null}}},{"character":"Spoon
-        Boy","person":{"name":"Rowan Witt","ids":{"trakt":413649,"slug":"rowan-witt","imdb":"nm0936894","tmdb":218366,"tvrage":null}}},{"character":"Lieutenant","person":{"name":"Bill
-        Young","ids":{"trakt":413652,"slug":"bill-young","imdb":"nm0949303","tmdb":57799,"tvrage":null}}},{"character":"Potential","person":{"name":"Eleanor
-        Witt","ids":{"trakt":413655,"slug":"eleanor-witt","imdb":"nm0936860","tmdb":1209244,"tvrage":null}}},{"character":"Potential","person":{"name":"Tamara
-        Brown","ids":{"trakt":413659,"slug":"tamara-brown","imdb":"nm0114756","tmdb":1209245,"tvrage":null}}},{"character":"Potential","person":{"name":"Janaya
-        Pender","ids":{"trakt":6816,"slug":"janaya-pender","imdb":"nm0671665","tmdb":1209246,"tvrage":null}}},{"character":"Potential","person":{"name":"Adryn
-        White","ids":{"trakt":6817,"slug":"adryn-white","imdb":"nm0924423","tmdb":1209247,"tvrage":null}}},{"character":"Potential","person":{"name":"Natalie
-        Tjen","ids":{"trakt":6819,"slug":"natalie-tjen","imdb":"nm0864666","tmdb":1209248,"tvrage":null}}},{"character":"FedEx
-        Man","person":{"name":"David O''Connor","ids":{"trakt":6821,"slug":"david-o-connor","imdb":"nm0640292","tmdb":1209249,"tvrage":null}}},{"character":"Businessman","person":{"name":"Jeremy
-        Ball","ids":{"trakt":413664,"slug":"jeremy-ball-7545f463-cee6-4be7-83f6-5a029d7ff1a2","imdb":"nm0050390","tmdb":1209250,"tvrage":null}}},{"character":"Woman
-        in Red","person":{"name":"Fiona Johnson","ids":{"trakt":413668,"slug":"fiona-johnson","imdb":"nm0425087","tmdb":1209251,"tvrage":null}}},{"character":"Old
-        Man","person":{"name":"Harry Lawrence","ids":{"trakt":6826,"slug":"harry-lawrence","imdb":"nm0492790","tmdb":110411,"tvrage":null}}},{"character":"Blind
-        Man","person":{"name":"Steve Dodd","ids":{"trakt":413670,"slug":"steve-dodd","imdb":"nm0230117","tmdb":212562,"tvrage":null}}},{"character":"Security
-        Guard","person":{"name":"Luke Quinton","ids":{"trakt":413673,"slug":"luke-quinton","imdb":"nm0704280","tmdb":1209252,"tvrage":null}}},{"character":"Guard","person":{"name":"Lawrence
-        Woodward","ids":{"trakt":413675,"slug":"lawrence-woodward","imdb":"nm0940959","tmdb":75715,"tvrage":null}}},{"character":"Cop
-        Who Captures Neo","person":{"name":"Michael Butcher","ids":{"trakt":6833,"slug":"michael-butcher","imdb":"nm0124697","tmdb":1209253,"tvrage":null}}},{"character":"Big
-        Cop","person":{"name":"Bernard Ledger","ids":{"trakt":6835,"slug":"bernard-ledger","imdb":"nm0496567","tmdb":1209254,"tvrage":null}}},{"character":"Cop","person":{"name":"Robert
-        Simper","ids":{"trakt":413679,"slug":"robert-simper","imdb":"nm0800854","tmdb":26753,"tvrage":null}}},{"character":"Cop","person":{"name":"Chris
-        Pattinson","ids":{"trakt":413683,"slug":"chris-pattinson","imdb":"nm0778966","tmdb":1209255,"tvrage":null}}},{"character":"Parking
-        Cop","person":{"name":"Nigel Harbach","ids":{"trakt":413685,"slug":"nigel-harbach","imdb":"nm0361876","tmdb":1209256,"tvrage":null}}},{"character":"Shaylae
-        - Woman in Office (uncredited)","person":{"name":"Rana Morrison","ids":{"trakt":413688,"slug":"rana-morrison","imdb":"nm3269395","tmdb":1209257,"tvrage":null}}}],"crew":{"directing":[{"job":"Director","person":{"name":"Andy
-        Wachowski","ids":{"trakt":413676,"slug":"andy-wachowski","imdb":"nm0905152","tmdb":9339,"tvrage":null}}},{"job":"Director","person":{"name":"Lana
-        Wachowski","ids":{"trakt":413681,"slug":"lana-wachowski","imdb":"nm0905154","tmdb":9340,"tvrage":null}}},{"job":"Assistant
-        Director","person":{"name":"James McTeigue","ids":{"trakt":414381,"slug":"james-mcteigue","imdb":"nm0574625","tmdb":11266,"tvrage":null}}}],"writing":[{"job":"Screenplay","person":{"name":"Andy
-        Wachowski","ids":{"trakt":413676,"slug":"andy-wachowski","imdb":"nm0905152","tmdb":9339,"tvrage":null}}},{"job":"Screenplay","person":{"name":"Lana
-        Wachowski","ids":{"trakt":413681,"slug":"lana-wachowski","imdb":"nm0905154","tmdb":9340,"tvrage":null}}}],"production":[{"job":"Producer","person":{"name":"Joel
-        Silver","ids":{"trakt":11366,"slug":"joel-silver","imdb":"nm0005428","tmdb":1091,"tvrage":92573}}},{"job":"Casting","person":{"name":"Mali
-        Finn","ids":{"trakt":1363,"slug":"mali-finn","imdb":null,"tmdb":1262,"tvrage":null}}},{"job":"Casting","person":{"name":"Shauna
-        Wolifson","ids":{"trakt":6865,"slug":"shauna-wolifson","imdb":"nm0938441","tmdb":9342,"tvrage":null}}}],"sound":[{"job":"Original
-        Music Composer","person":{"name":"Don Davis","ids":{"trakt":3615,"slug":"don-davis","imdb":"nm0204485","tmdb":4949,"tvrage":null}}},{"job":"Supervising
-        Sound Effects Editor","person":{"name":"Dane A. Davis","ids":{"trakt":6873,"slug":"dane-a-davis","imdb":"nm0204424","tmdb":9349,"tvrage":null}}},{"job":"Sound
-        Editor","person":{"name":"Zigmund Gron","ids":{"trakt":6876,"slug":"zigmund-gron","imdb":"nm0343065","tmdb":9351,"tvrage":null}}}],"camera":[{"job":"Director
-        of Photography","person":{"name":"Bill Pope","ids":{"trakt":5936,"slug":"bill-pope","imdb":"nm0691084","tmdb":9341,"tvrage":null}}}],"editing":[{"job":"Editor","person":{"name":"Zach
-        Staenberg","ids":{"trakt":3454,"slug":"zach-staenberg","imdb":"nm0821205","tmdb":4671,"tvrage":null}}}],"art":[{"job":"Production
-        Design","person":{"name":"Owen Paterson","ids":{"trakt":6866,"slug":"owen-paterson","imdb":"nm0665517","tmdb":9343,"tvrage":null}}},{"job":"Art
-        Direction","person":{"name":"Hugh Bateup","ids":{"trakt":6867,"slug":"hugh-bateup","imdb":"nm0061064","tmdb":9344,"tvrage":null}}},{"job":"Art
-        Direction","person":{"name":"Michelle McGahey","ids":{"trakt":6870,"slug":"michelle-mcgahey","imdb":"nm0568894","tmdb":9345,"tvrage":null}}},{"job":"Set
-        Decoration","person":{"name":"Lisa Brennan","ids":{"trakt":6872,"slug":"lisa-brennan","imdb":"nm0107345","tmdb":9346,"tvrage":null}}}],"costume
-        & make-up":[{"job":"Costume Design","person":{"name":"Kym Barrett","ids":{"trakt":4764,"slug":"kym-barrett","imdb":"nm0057199","tmdb":6209,"tvrage":null}}}],"crew":[{"job":"Special
-        Effects","person":{"name":"Richard Alexander","ids":{"trakt":6877,"slug":"richard-alexander","imdb":"nm0018688","tmdb":9354,"tvrage":null}}},{"job":"Special
-        Effects","person":{"name":"Brian Belcher","ids":{"trakt":6878,"slug":"brian-belcher","imdb":"nm0067633","tmdb":9355,"tvrage":null}}},{"job":"Stunts","person":{"name":"Glenn
-        Boswell","ids":{"trakt":6879,"slug":"glenn-boswell","imdb":"nm0098342","tmdb":9357,"tvrage":null}}},{"job":"Special
-        Effects Coordinator","person":{"name":"Steve Courtley","ids":{"trakt":6880,"slug":"steve-courtley","imdb":"nm0183871","tmdb":9593,"tvrage":null}}}]}}'}
-    headers:
-      cache-control: ['public, max-age=14400']
-      cf-cache-status: [HIT]
-      cf-ray: [242481d9ea5316ac-ARN]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Sun, 08 Nov 2015 21:52:50 GMT']
-      etag: [W/"a8c0035e5c1835c012baba193da035af"]
-      expires: ['Mon, 09 Nov 2015 01:52:50 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=dd43c4cfc3f4095bd99b46f9eb0aac7be1447019570; expires=Mon,
-          07-Nov-16 21:52:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-request-id: [afa87fcf-bfb8-4090-b93f-d08120f16f82]
-      x-runtime: ['0.042993']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/search?query=The+Matrix&type=movie&year=1999
+    response:
+      body: {string: '[{"type":"movie","score":74.91832,"movie":{"title":"The Matrix","overview":"Thomas
+          A. Anderson is a man living two lives. By day he is an average computer
+          programmer and by night a malevolent hacker known as Neo, who finds himself
+          targeted by the police when he is contacted by Morpheus, a legendary computer
+          hacker, who reveals the shocking truth about our reality.","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/481/posters/original/373310d2ee.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/posters/medium/373310d2ee.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/posters/thumb/373310d2ee.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/481/fanarts/original/6c353577dd.jpg","medium":"https://walter.trakt.us/images/movies/000/000/481/fanarts/medium/6c353577dd.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/481/fanarts/thumb/6c353577dd.jpg"}},"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603}}},{"type":"movie","score":59.934654,"movie":{"title":"Making
+          The Matrix","overview":"A promotional making-of documentary for the film
+          Matrix, The (1999) that devotes its time to explaining the digital and practical
+          effects contained in the film. This is very interesting, seeing as how they''re
+          giving away the cinematic secrets that they created solely for the this
+          movie, that have now been spoofed and referenced in countless other films.","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/205/793/posters/original/9680ca459a.jpg","medium":"https://walter.trakt.us/images/movies/000/205/793/posters/medium/9680ca459a.jpg","thumb":"https://walter.trakt.us/images/movies/000/205/793/posters/thumb/9680ca459a.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":205793,"slug":"making-the-matrix-1999","imdb":"tt0365467","tmdb":325251}}},{"type":"movie","score":55.812252,"movie":{"title":"V-World
+          Matrix","overview":"Two friends take a cyber vacation to experience a world
+          where they can act out their virtual fantasies! They soon realize they''ve
+          entered a virtual free-for-all. Forbidden fantasies and desires suddenly
+          appear in the form of the even deadlier \"dark woman\". All the players
+          now end up in a cyber battle for their lives, and sanity, against a beautiful
+          virtual hunter who has one killer fixation - winning the deadly game they
+          started!","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/158/764/posters/original/b5bd19302a.jpg","medium":"https://walter.trakt.us/images/movies/000/158/764/posters/medium/b5bd19302a.jpg","thumb":"https://walter.trakt.us/images/movies/000/158/764/posters/thumb/b5bd19302a.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":158764,"slug":"v-world-matrix-1969","imdb":"tt0211096","tmdb":259464}}},{"type":"movie","score":4.8292875,"movie":{"title":"The
+          Tricky Master","overview":"Undercover cop Leung Foon (Nick Cheung) is having
+          trouble taking down the illegal trading operation headed by crime boss Ferrari
+          (Wong Jing). So to accomplish his mission, he asks for help from the re...
+          read more read more...nowned Master Wong (Stephen Chow), an expert in gambling
+          tricks. Although the \"Tricky Master\" is opposed to getting involved, Foon
+          convinces him to help bring down the swindler in a zany comedy that spoofs
+          Enter the Dragon and The Matrix.","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/037/624/posters/original/c5c0cb76f8.jpg","medium":"https://walter.trakt.us/images/movies/000/037/624/posters/medium/c5c0cb76f8.jpg","thumb":"https://walter.trakt.us/images/movies/000/037/624/posters/thumb/c5c0cb76f8.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/037/624/fanarts/original/de31c092f7.jpg","medium":"https://walter.trakt.us/images/movies/000/037/624/fanarts/medium/de31c092f7.jpg","thumb":"https://walter.trakt.us/images/movies/000/037/624/fanarts/thumb/de31c092f7.jpg"}},"ids":{"trakt":37624,"slug":"the-tricky-master-1999","imdb":"tt0212864","tmdb":53281}}}]'}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [24ec6535b5d6095c-DFW]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Thu, 03 Dec 2015 04:05:49 GMT']
+        etag: [W/"0c4d5bc6bfa48a412958eaf43765b83a"]
+        expires: ['Thu, 03 Dec 2015 08:05:49 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d475e1fa3cf2fd3e1b7849c458a25cce91449115549; expires=Fri,
+            02-Dec-16 04:05:49 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-pagination-item-count: ['4']
+        x-pagination-limit: ['10']
+        x-pagination-page: ['1']
+        x-pagination-page-count: ['1']
+        x-request-id: [b31b05cb-743b-4239-a2fe-41a7af575f4d]
+        x-runtime: ['0.019596']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        Cookie: [__cfduid=d475e1fa3cf2fd3e1b7849c458a25cce91449115549]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/movies/481?extended=full
+    response:
+      body: {string: '{"title":"The Matrix","year":1999,"ids":{"trakt":481,"slug":"the-matrix-1999","imdb":"tt0133093","tmdb":603},"tagline":"Welcome
+          to the Real World.","overview":"Thomas A. Anderson is a man living two lives.
+          By day he is an average computer programmer and by night a malevolent hacker
+          known as Neo, who finds himself targeted by the police when he is contacted
+          by Morpheus, a legendary computer hacker, who reveals the shocking truth
+          about our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.97934,"votes":17574,"updated_at":"2015-11-01T15:09:57.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R"}'}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [24ec653615dd095c-DFW]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Thu, 03 Dec 2015 04:05:49 GMT']
+        etag: [W/"34da56e7db7efb7bff992fcd685ab584"]
+        expires: ['Thu, 03 Dec 2015 08:05:49 GMT']
+        last-modified: ['Sun, 01 Nov 2015 15:09:57 GMT']
+        server: [cloudflare-nginx]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-request-id: [8be6a662-cbb5-428e-a445-e8f99c8e0dca]
+        x-runtime: ['0.016991']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/movies/481/people
+    response:
+      body: {string: '{"cast":[{"character":"Neo","person":{"name":"Keanu Reeves","ids":{"trakt":7134,"slug":"keanu-reeves","imdb":"nm0000206","tmdb":6384,"tvrage":19449}}},{"character":"Morpheus","person":{"name":"Laurence
+          Fishburne","ids":{"trakt":551,"slug":"laurence-fishburne","imdb":"nm0000401","tmdb":2975,"tvrage":58899}}},{"character":"Trinity","person":{"name":"Carrie-Anne
+          Moss","ids":{"trakt":5274,"slug":"carrie-anne-moss","imdb":"nm0005251","tmdb":530,"tvrage":30031}}},{"character":"Agent
+          Smith","person":{"name":"Hugo Weaving","ids":{"trakt":16499,"slug":"hugo-weaving","imdb":"nm0915989","tmdb":1331,"tvrage":165660}}},{"character":"Oracle","person":{"name":"Gloria
+          Foster","ids":{"trakt":413616,"slug":"gloria-foster","imdb":"nm0287825","tmdb":9364,"tvrage":33201}}},{"character":"Cypher","person":{"name":"Joe
+          Pantoliano","ids":{"trakt":294554,"slug":"joe-pantoliano","imdb":"nm0001592","tmdb":532,"tvrage":10693}}},{"character":"Tank","person":{"name":"Marcus
+          Chong","ids":{"trakt":413619,"slug":"marcus-chong","imdb":"nm0159059","tmdb":9372,"tvrage":33610}}},{"character":"Apoc","person":{"name":"Julian
+          Arahanga","ids":{"trakt":413207,"slug":"julian-arahanga","imdb":"nm0032810","tmdb":7244,"tvrage":null}}},{"character":"Mouse","person":{"name":"Matt
+          Doran","ids":{"trakt":413621,"slug":"matt-doran","imdb":"nm0233391","tmdb":9374,"tvrage":30260}}},{"character":"Switch","person":{"name":"Belinda
+          McClory","ids":{"trakt":413623,"slug":"belinda-mcclory","imdb":"nm0565883","tmdb":9376,"tvrage":9741}}},{"character":"Dozer","person":{"name":"Anthony
+          Ray Parker","ids":{"trakt":413625,"slug":"anthony-ray-parker","imdb":"nm0662562","tmdb":9378,"tvrage":null}}},{"character":"Agent
+          Brown","person":{"name":"Paul Goddard","ids":{"trakt":413628,"slug":"paul-goddard-12bfb257-984b-4e2d-a582-578481a07a9d","imdb":"nm0323822","tmdb":9380,"tvrage":null}}},{"character":"Agent
+          Jones","person":{"name":"Robert Taylor","ids":{"trakt":413633,"slug":"robert-taylor-dd49859a-edc3-4e88-8dc1-551d8053242d","imdb":"nm0853079","tmdb":39545,"tvrage":null}}},{"character":"Rhineheart","person":{"name":"David
+          Aston","ids":{"trakt":413636,"slug":"david-aston","imdb":"nm0040058","tmdb":9383,"tvrage":null}}},{"character":"Choi","person":{"name":"Marc
+          Aden","ids":{"trakt":413639,"slug":"marc-aden","imdb":"nm0336802","tmdb":9384,"tvrage":null}}},{"character":"White
+          Rabbit Girl","person":{"name":"Ada Nicodemou","ids":{"trakt":413643,"slug":"ada-nicodemou","imdb":"nm0630124","tmdb":181214,"tvrage":24685}}},{"character":"Priestess","person":{"name":"Deni
+          Gordon","ids":{"trakt":413646,"slug":"deni-gordon","imdb":"nm0330139","tmdb":1090466,"tvrage":null}}},{"character":"Spoon
+          Boy","person":{"name":"Rowan Witt","ids":{"trakt":413649,"slug":"rowan-witt","imdb":"nm0936894","tmdb":218366,"tvrage":null}}},{"character":"Lieutenant","person":{"name":"Bill
+          Young","ids":{"trakt":413652,"slug":"bill-young","imdb":"nm0949303","tmdb":57799,"tvrage":null}}},{"character":"Potential","person":{"name":"Eleanor
+          Witt","ids":{"trakt":413655,"slug":"eleanor-witt","imdb":"nm0936860","tmdb":1209244,"tvrage":null}}},{"character":"Potential","person":{"name":"Tamara
+          Brown","ids":{"trakt":413659,"slug":"tamara-brown","imdb":"nm0114756","tmdb":1209245,"tvrage":null}}},{"character":"Potential","person":{"name":"Janaya
+          Pender","ids":{"trakt":6816,"slug":"janaya-pender","imdb":"nm0671665","tmdb":1209246,"tvrage":null}}},{"character":"Potential","person":{"name":"Adryn
+          White","ids":{"trakt":6817,"slug":"adryn-white","imdb":"nm0924423","tmdb":1209247,"tvrage":null}}},{"character":"Potential","person":{"name":"Natalie
+          Tjen","ids":{"trakt":6819,"slug":"natalie-tjen","imdb":"nm0864666","tmdb":1209248,"tvrage":null}}},{"character":"FedEx
+          Man","person":{"name":"David O''Connor","ids":{"trakt":6821,"slug":"david-o-connor","imdb":"nm0640292","tmdb":1209249,"tvrage":null}}},{"character":"Businessman","person":{"name":"Jeremy
+          Ball","ids":{"trakt":413664,"slug":"jeremy-ball-7545f463-cee6-4be7-83f6-5a029d7ff1a2","imdb":"nm0050390","tmdb":1209250,"tvrage":null}}},{"character":"Woman
+          in Red","person":{"name":"Fiona Johnson","ids":{"trakt":413668,"slug":"fiona-johnson","imdb":"nm0425087","tmdb":1209251,"tvrage":null}}},{"character":"Old
+          Man","person":{"name":"Harry Lawrence","ids":{"trakt":6826,"slug":"harry-lawrence","imdb":"nm0492790","tmdb":110411,"tvrage":null}}},{"character":"Blind
+          Man","person":{"name":"Steve Dodd","ids":{"trakt":413670,"slug":"steve-dodd","imdb":"nm0230117","tmdb":212562,"tvrage":null}}},{"character":"Security
+          Guard","person":{"name":"Luke Quinton","ids":{"trakt":413673,"slug":"luke-quinton","imdb":"nm0704280","tmdb":1209252,"tvrage":null}}},{"character":"Guard","person":{"name":"Lawrence
+          Woodward","ids":{"trakt":413675,"slug":"lawrence-woodward","imdb":"nm0940959","tmdb":75715,"tvrage":null}}},{"character":"Cop
+          Who Captures Neo","person":{"name":"Michael Butcher","ids":{"trakt":6833,"slug":"michael-butcher","imdb":"nm0124697","tmdb":1209253,"tvrage":null}}},{"character":"Big
+          Cop","person":{"name":"Bernard Ledger","ids":{"trakt":6835,"slug":"bernard-ledger","imdb":"nm0496567","tmdb":1209254,"tvrage":null}}},{"character":"Cop","person":{"name":"Robert
+          Simper","ids":{"trakt":413679,"slug":"robert-simper","imdb":"nm0800854","tmdb":26753,"tvrage":null}}},{"character":"Cop","person":{"name":"Chris
+          Pattinson","ids":{"trakt":413683,"slug":"chris-pattinson","imdb":"nm0778966","tmdb":1209255,"tvrage":null}}},{"character":"Parking
+          Cop","person":{"name":"Nigel Harbach","ids":{"trakt":413685,"slug":"nigel-harbach","imdb":"nm0361876","tmdb":1209256,"tvrage":null}}},{"character":"Shaylae
+          - Woman in Office (uncredited)","person":{"name":"Rana Morrison","ids":{"trakt":413688,"slug":"rana-morrison","imdb":"nm3269395","tmdb":1209257,"tvrage":null}}}],"crew":{"directing":[{"job":"Director","person":{"name":"Andy
+          Wachowski","ids":{"trakt":413676,"slug":"andy-wachowski","imdb":"nm0905152","tmdb":9339,"tvrage":null}}},{"job":"Director","person":{"name":"Lana
+          Wachowski","ids":{"trakt":413681,"slug":"lana-wachowski","imdb":"nm0905154","tmdb":9340,"tvrage":null}}},{"job":"Assistant
+          Director","person":{"name":"James McTeigue","ids":{"trakt":414381,"slug":"james-mcteigue","imdb":"nm0574625","tmdb":11266,"tvrage":null}}}],"writing":[{"job":"Screenplay","person":{"name":"Andy
+          Wachowski","ids":{"trakt":413676,"slug":"andy-wachowski","imdb":"nm0905152","tmdb":9339,"tvrage":null}}},{"job":"Screenplay","person":{"name":"Lana
+          Wachowski","ids":{"trakt":413681,"slug":"lana-wachowski","imdb":"nm0905154","tmdb":9340,"tvrage":null}}}],"production":[{"job":"Producer","person":{"name":"Joel
+          Silver","ids":{"trakt":11366,"slug":"joel-silver","imdb":"nm0005428","tmdb":1091,"tvrage":92573}}},{"job":"Casting","person":{"name":"Mali
+          Finn","ids":{"trakt":1363,"slug":"mali-finn","imdb":null,"tmdb":1262,"tvrage":null}}},{"job":"Casting","person":{"name":"Shauna
+          Wolifson","ids":{"trakt":6865,"slug":"shauna-wolifson","imdb":"nm0938441","tmdb":9342,"tvrage":null}}}],"sound":[{"job":"Original
+          Music Composer","person":{"name":"Don Davis","ids":{"trakt":3615,"slug":"don-davis","imdb":"nm0204485","tmdb":4949,"tvrage":null}}},{"job":"Supervising
+          Sound Effects Editor","person":{"name":"Dane A. Davis","ids":{"trakt":6873,"slug":"dane-a-davis","imdb":"nm0204424","tmdb":9349,"tvrage":null}}},{"job":"Sound
+          Editor","person":{"name":"Zigmund Gron","ids":{"trakt":6876,"slug":"zigmund-gron","imdb":"nm0343065","tmdb":9351,"tvrage":null}}}],"camera":[{"job":"Director
+          of Photography","person":{"name":"Bill Pope","ids":{"trakt":5936,"slug":"bill-pope","imdb":"nm0691084","tmdb":9341,"tvrage":null}}}],"editing":[{"job":"Editor","person":{"name":"Zach
+          Staenberg","ids":{"trakt":3454,"slug":"zach-staenberg","imdb":"nm0821205","tmdb":4671,"tvrage":null}}}],"art":[{"job":"Production
+          Design","person":{"name":"Owen Paterson","ids":{"trakt":6866,"slug":"owen-paterson","imdb":"nm0665517","tmdb":9343,"tvrage":null}}},{"job":"Art
+          Direction","person":{"name":"Hugh Bateup","ids":{"trakt":6867,"slug":"hugh-bateup","imdb":"nm0061064","tmdb":9344,"tvrage":null}}},{"job":"Art
+          Direction","person":{"name":"Michelle McGahey","ids":{"trakt":6870,"slug":"michelle-mcgahey","imdb":"nm0568894","tmdb":9345,"tvrage":null}}},{"job":"Set
+          Decoration","person":{"name":"Lisa Brennan","ids":{"trakt":6872,"slug":"lisa-brennan","imdb":"nm0107345","tmdb":9346,"tvrage":null}}}],"costume
+          & make-up":[{"job":"Costume Design","person":{"name":"Kym Barrett","ids":{"trakt":4764,"slug":"kym-barrett","imdb":"nm0057199","tmdb":6209,"tvrage":null}}}],"crew":[{"job":"Special
+          Effects","person":{"name":"Richard Alexander","ids":{"trakt":6877,"slug":"richard-alexander","imdb":"nm0018688","tmdb":9354,"tvrage":null}}},{"job":"Special
+          Effects","person":{"name":"Brian Belcher","ids":{"trakt":6878,"slug":"brian-belcher","imdb":"nm0067633","tmdb":9355,"tvrage":null}}},{"job":"Stunts","person":{"name":"Glenn
+          Boswell","ids":{"trakt":6879,"slug":"glenn-boswell","imdb":"nm0098342","tmdb":9357,"tvrage":null}}},{"job":"Special
+          Effects Coordinator","person":{"name":"Steve Courtley","ids":{"trakt":6880,"slug":"steve-courtley","imdb":"nm0183871","tmdb":9593,"tvrage":null}}}]}}'}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [24ec653794871ffa-DFW]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Thu, 03 Dec 2015 04:05:49 GMT']
+        etag: [W/"55b1ccf7e257530cf397162eb8549153"]
+        expires: ['Thu, 03 Dec 2015 08:05:49 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=dc4bd72a94496fe5f4dccfd3dde3d0a081449115549; expires=Fri,
+            02-Dec-16 04:05:49 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-request-id: [740114f6-0f4a-478d-a6e4-419334fb5596]
+        x-runtime: ['0.046401']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
 version: 1
