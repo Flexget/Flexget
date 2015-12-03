@@ -616,7 +616,7 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
             # grab the first result if there is no exact match
             if not trakt_id and results:
                 for result in results:
-                    if result['score'] >= 40:
+                    if result['score'] >= 34:
                         trakt_id = result[style]['ids']['trakt']
 
                  #trakt_id = results[0][style]['ids']['trakt']
