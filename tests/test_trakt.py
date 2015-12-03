@@ -144,8 +144,7 @@ class TestTraktShowLookup(FlexGetBase):
                   'Anne Dudek',
                   'Kal Penn',
                   'Jennifer Crystal Foley',
-                  'Bobbin Bergstrom',
-                  'Sela Ward']
+                  'Bobbin Bergstrom']
         entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         trakt_actors = entry['trakt_series_actors'].values()
         trakt_actors = [trakt_actor['name'] for trakt_actor in trakt_actors]
