@@ -513,10 +513,11 @@ class TraktMovieSearchResult(Base):
 
 def split_title_year(title):
     """Splits title containing a year into a title, year pair."""
-    match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
-    title = match.group(1).strip()
-    if match.group(2):
-        year = int(match.group(2))
+    # We only recognize years from the 2nd and 3rd millennium, FlexGetters from the year 3000 be damned!
+    match = re.search(r'[\s(]([12]\d{3})\)?$', title)
+    if match:
+        title = title[:match.start()].strip()
+        year = int(match.group(1))
     else:
         year = None
     return title, year
