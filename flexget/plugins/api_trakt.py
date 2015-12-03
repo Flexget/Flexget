@@ -615,7 +615,11 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
                     break
             # grab the first result if there is no exact match
             if not trakt_id and results:
-                trakt_id = results[0][style]['ids']['trakt']
+                for result in results:
+                    if result['score'] >= 40:
+                        trakt_id = result[style]['ids']['trakt']
+
+                 #trakt_id = results[0][style]['ids']['trakt']
     if not trakt_id:
         raise LookupError('Unable to find %s="%s" on trakt.' % (last_search_type, last_search_query))
     # Get actual data from trakt
