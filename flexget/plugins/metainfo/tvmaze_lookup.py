@@ -160,7 +160,8 @@ class PluginTVMazeLookup(object):
             return
 
         for entry in task.entries:
-            if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False):
+            if entry.get('series_name') or entry.get('tvdb_id', eval_lazy=False) \
+                    or entry.get('tvmaze_id', eval_lazy=False) or entry.get('tvrage_id', eval_lazy=False):
                 entry.register_lazy_func(self.lazy_series_lookup, self.series_map)
                 if ('series_season' in entry and 'series_episode' in entry) or ('series_date' in entry):
                     entry.register_lazy_func(self.lazy_episode_lookup, self.episode_map)
