@@ -159,12 +159,7 @@ class ParserTests(object):
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
 
         s = self.parse(name='Something', data='Something - Ep VIII')
-        try:
-            assert (s.season == 1 and s.episode == 8), 'failed to parse %s' % s
-        except AssertionError:
-            if isinstance(self, TestGuessit):
-                raise SkipTest('Guessit parser does not seem to support this anymore.')
-            raise
+        assert (s.season == 1 and s.episode == 8), 'failed to parse %s' % s
 
     def test_season_episode_of_total(self):
         """SeriesParser: season X YofZ"""
