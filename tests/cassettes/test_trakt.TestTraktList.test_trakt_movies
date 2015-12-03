@@ -1,31 +1,31 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/users/flexgettest/watchlist/movies
-  response:
-    body: {string: !!python/unicode '[{"listed_at":"2015-01-02T02:37:24.000Z","type":"movie","movie":{"title":"12
-        Angry Men","year":1957,"ids":{"trakt":309,"slug":"12-angry-men-1957","imdb":"tt0050083","tmdb":389}}}]'}
-    headers:
-      cache-control: ['max-age=0, private, must-revalidate']
-      cf-ray: [242481d3fa243744-ARN]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Sun, 08 Nov 2015 21:52:49 GMT']
-      etag: [W/"e9c66c8b261f4aea3bedbf34d21ca344"]
-      last-modified: ['Sat, 07 Nov 2015 22:19:15 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d2faa85bde2aeee4bf0438d14980b23e31447019569; expires=Mon,
-          07-Nov-16 21:52:49 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-request-id: [ceb3dfca-38a2-47aa-b657-4a1b08c90de8]
-      x-runtime: ['0.017293']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/users/flexgettest/watchlist/movies
+    response:
+      body: {string: '[{"listed_at":"2015-01-02T02:37:24.000Z","type":"movie","movie":{"title":"12
+          Angry Men","year":1957,"ids":{"trakt":309,"slug":"12-angry-men-1957","imdb":"tt0050083","tmdb":389}}}]'}
+      headers:
+        cache-control: ['max-age=0, private, must-revalidate']
+        cf-ray: [24ec652eaa6203ee-DFW]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Thu, 03 Dec 2015 04:05:48 GMT']
+        etag: [W/"40f1d15a8c92e65f45d924515676e57f"]
+        last-modified: ['Thu, 03 Dec 2015 01:09:57 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d1c2a326ad9bbfbc6119b0bf4afc7b2181449115547; expires=Fri,
+            02-Dec-16 04:05:47 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-request-id: [3109d79d-daff-4379-97a7-1ec3ce2e2d10]
+        x-runtime: ['0.017875']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
 version: 1
