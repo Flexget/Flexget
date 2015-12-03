@@ -297,7 +297,9 @@ class TraktEpisode(Base):
         self.tmdb_id = trakt_episode['ids']['tmdb']
         self.tvrage_id = trakt_episode['ids']['tvrage']
         self.tvdb_id = trakt_episode['ids']['tvdb']
-        self.first_aired = dateutil_parse(trakt_episode.get('first_aired'), ignoretz=True)
+        self.first_aired = None
+        if trakt_episode.get('first_aired'):
+            self.first_aired = dateutil_parse(trakt_episode['first_aired'], ignoretz=True)
         self.updated_at = dateutil_parse(trakt_episode.get('updated_at'), ignoretz=True)
         self.cached_at = datetime.now()
 
@@ -511,10 +513,11 @@ class TraktMovieSearchResult(Base):
 
 def split_title_year(title):
     """Splits title containing a year into a title, year pair."""
-    match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
-    title = match.group(1).strip()
-    if match.group(2):
-        year = int(match.group(2))
+    # We only recognize years from the 2nd and 3rd millennium, FlexGetters from the year 3000 be damned!
+    match = re.search(r'[\s(]([12]\d{3})\)?$', title)
+    if match:
+        title = title[:match.start()].strip()
+        year = int(match.group(1))
     else:
         year = None
     return title, year
@@ -612,7 +615,7 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
                     trakt_id = result[style]['ids']['trakt']
                     break
             # grab the first result if there is no exact match
-            if not trakt_id and results:
+            if not trakt_id and results and results[0]['score'] >= 34:
                 trakt_id = results[0][style]['ids']['trakt']
     if not trakt_id:
         raise LookupError('Unable to find %s="%s" on trakt.' % (last_search_type, last_search_query))
@@ -837,7 +840,7 @@ def register_parser_arguments():
 
     auth_parser.add_argument('account', metavar='<account>', help=acc_text)
     auth_parser.add_argument('pin', metavar='<pin>', help='get this by authorizing FlexGet to use your trakt account '
-                                                          'at http://trakt.tv/pin/346')
+                                                          'at %s' % PIN_URL)
 
     show_parser = subparsers.add_parser('show', help='show expiration date for Flexget authorization(s) (don\'t worry, '
                                                      'they will automatically refresh when expired)')

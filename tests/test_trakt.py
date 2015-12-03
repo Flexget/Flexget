@@ -45,6 +45,11 @@ class TestTraktShowLookup(FlexGetBase):
               - {title: 'Shameless.2011.S03E02.HDTV.XViD-FlexGet'}
             series:
               - Shameless (2011)
+          test_search_fail:
+            mock:
+              - {title: 'Baking.Around.S01E01.HDTV.XViD-FlexGet'}
+            series:
+              - Baking Around
     """
 
     @use_vcr
@@ -102,6 +107,11 @@ class TestTraktShowLookup(FlexGetBase):
             assert series.tvdb_id == entry['tvdb_id'], 'tvdb id should be the same as the first entry'
             assert series.id == entry['trakt_show_id'], 'trakt id should be the same as the first entry'
             assert series.title.lower() == entry['trakt_series_name'].lower(), 'series name should match first entry'
+    @use_vcr
+    def test_search_fail(self):
+        self.execute_task('test_search_fail')
+        entry = self.task.find_entry('accepted', title='Baking.Around.S01E01.HDTV.XViD-FlexGet')
+        assert entry.get('trakt_show_id') is None, 'Should not have returned trakt id'
 
     @use_vcr
     def test_date(self):
@@ -144,8 +154,7 @@ class TestTraktShowLookup(FlexGetBase):
                   'Anne Dudek',
                   'Kal Penn',
                   'Jennifer Crystal Foley',
-                  'Bobbin Bergstrom',
-                  'Sela Ward']
+                  'Bobbin Bergstrom']
         entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         trakt_actors = entry['trakt_series_actors'].values()
         trakt_actors = [trakt_actor['name'] for trakt_actor in trakt_actors]

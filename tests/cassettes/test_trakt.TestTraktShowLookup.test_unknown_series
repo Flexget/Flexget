@@ -1,35 +1,35 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Content-Type: [!!python/unicode application/json]
-      trakt-api-key: [!!python/unicode 57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-      trakt-api-version: [2]
-    method: GET
-    uri: https://api-v2launch.trakt.tv/search?query=Aoeu+Htns&type=show
-  response:
-    body: {string: !!python/unicode '[]'}
-    headers:
-      cache-control: ['public, max-age=14400']
-      cf-cache-status: [HIT]
-      cf-ray: [242481a5805e3744-ARN]
-      connection: [keep-alive]
-      content-type: [application/json; charset=utf-8]
-      date: ['Sun, 08 Nov 2015 21:52:41 GMT']
-      etag: [W/"561da5885fbc3575b727fa0efd3bb0eb"]
-      expires: ['Mon, 09 Nov 2015 01:52:41 GMT']
-      server: [cloudflare-nginx]
-      set-cookie: ['__cfduid=d6b967ebd5aaa3541057adb4d2ff97cd51447019561; expires=Mon,
-          07-Nov-16 21:52:41 GMT; path=/; domain=.trakt.tv; HttpOnly']
-      vary: [Accept-Encoding]
-      x-content-type-options: [nosniff]
-      x-frame-options: [SAMEORIGIN]
-      x-pagination-item-count: ['0']
-      x-pagination-limit: ['10']
-      x-pagination-page: ['1']
-      x-pagination-page-count: ['0']
-      x-request-id: [38991117-2979-44d9-b896-e8b430220d0b]
-      x-runtime: ['0.015806']
-      x-xss-protection: [1; mode=block]
-    status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/search?query=Aoeu+Htns&type=show
+    response:
+      body: {string: '[]'}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [24ec6588d3b31ffa-DFW]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Thu, 03 Dec 2015 04:06:02 GMT']
+        etag: [W/"1fd9ada31cbe85b716b9d17e038d6ad1"]
+        expires: ['Thu, 03 Dec 2015 08:06:02 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d6d903e961e0cf821af87c135889c67fa1449115562; expires=Fri,
+            02-Dec-16 04:06:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-pagination-item-count: ['0']
+        x-pagination-limit: ['10']
+        x-pagination-page: ['1']
+        x-pagination-page-count: ['0']
+        x-request-id: [f5406b06-e4e3-4366-a09e-7f8267b8c7e6]
+        x-runtime: ['0.014493']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
 version: 1
