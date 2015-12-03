@@ -10,7 +10,7 @@ from flexget.event import event
 try:
     # TODO implement TVMaze API internally
     from pytvmaze import get_show
-    from pytvmaze.exceptions import ShowNotFound, SeasonNotFound, EpisodeNotFound
+    from pytvmaze.exceptions import ShowNotFound, SeasonNotFound, EpisodeNotFound, ConnectionError
 except ImportError as e:
     raise plugin.PluginError('Could not import from pytvmaze')
 
@@ -49,6 +49,9 @@ class EstimatesSeriesTVMaze(object):
             tvmaze_show = get_show(**kwargs)
         except ShowNotFound as e:
             log.warning('Could not found show on TVMaze: {0}'.format(e))
+            return
+        except ConnectionError as e:
+            log.warning(e)
             return
         try:
             episode = tvmaze_show[season][episode_number]
