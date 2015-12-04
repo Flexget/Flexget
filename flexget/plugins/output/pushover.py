@@ -68,15 +68,15 @@ class OutputPushover(object):
 
     @staticmethod
     def pushover_request(task, data):
-        global last_request
-        time_dif = (datetime.datetime.now() - last_request).seconds
+        time_dif = (datetime.datetime.now() - OutputPushover.last_request).seconds
 
         # Require at least 5 seconds of waiting between API calls
         while time_dif < 5:
+            time_dif = (datetime.datetime.now() - OutputPushover.last_request).seconds
             pass
         try:
             response = task.requests.post(PUSHOVER_URL, data=data, raise_status=False)
-            last_request = datetime.datetime.now()
+            OutputPushover.last_request = datetime.datetime.now()
         except RequestException:
             raise
         return response
