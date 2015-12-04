@@ -94,7 +94,10 @@ class TVMazeSeries(Base):
             self.medium_image = None
         self.tvdb_id = series.externals.get('thetvdb')
         self.tvrage_id = series.externals.get('tvrage')
-        self.premiered = parser.parse(series.premiered)
+        try:
+            self.premiered = parser.parse(series.premiered)
+        except AttributeError:
+            self.premiered = None
         self.summary = series.summary
         try:
             self.webchannel = series.webChannel.get('name')
