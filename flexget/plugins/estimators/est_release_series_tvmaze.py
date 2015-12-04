@@ -53,7 +53,7 @@ class EstimatesSeriesTVMaze(object):
         except LookupError as e:
             log.debug(e)
             return
-        if episode.airdate:
+        if episode and episode.airdate:
             log.debug('received airdate: {0}'.format(episode.airdate))
             return episode.airdate
         return
