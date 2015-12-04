@@ -164,8 +164,6 @@ class SendTelegram(object):
 
         accepted_tasks = list(task.accepted)
         """:type: list[flexget.entry.Entry]"""
-        if not accepted_tasks:
-            return
         token, tmpl, usernames, fullnames, groups = self._parse_config(config)
         self.log.debug('token={0} tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
             token, usernames, fullnames, groups, tmpl))
@@ -273,7 +271,7 @@ class SendTelegram(object):
         chat_ids = list()
         cached_usernames = dict((x.username, x)
                                 for x in session.query(ChatIdEntry).filter(ChatIdEntry.username != None).all())
-        cached_fullnames = dict((x.firstname, x.surname)
+        cached_fullnames = dict(((x.firstname, x.surname), x)
                                 for x in session.query(ChatIdEntry).filter(ChatIdEntry.firstname != None).all())
         cached_groups = dict((x.group, x)
                              for x in session.query(ChatIdEntry).filter(ChatIdEntry.group != None).all())
