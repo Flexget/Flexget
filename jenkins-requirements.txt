@@ -7,3 +7,4 @@ mock
 requests
 vcrpy>=1.5
 virtualenv
+boto3

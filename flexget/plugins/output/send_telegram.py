@@ -4,6 +4,7 @@ from sqlalchemy import Column, Integer, String
 
 from flexget import db_schema, plugin
 from flexget.event import event
+from flexget.utils.template import RenderError
 
 try:
     import telegram
@@ -13,6 +14,7 @@ except ImportError:
 _PLUGIN_NAME = 'send_telegram'
 
 _TOKEN_ATTR = 'bot_token'
+_TMPL_ATTR = 'template'
 _RCPTS_ATTR = 'recipients'
 _USERNAME_ATTR = 'username'
 _FULLNAME_ATTR = 'fullname'
@@ -51,16 +53,19 @@ class SendTelegram(object):
     my-task:
       send_telegram:
         bot_token: token
-          recipients:
-            - username: my-user-name
-            - group: my-group-name
-            - fullname:
-                first: my-first-name
-                sur: my-sur-name
+        template: {{title}}
+        recipients:
+          - username: my-user-name
+          - group: my-group-name
+          - fullname:
+              first: my-first-name
+              sur: my-sur-name
 
     You may use any combination of recipients types (`username`, `group` or `fullname`) - 0 or more of each (but you
     need at least one total...).
 
+    `template`::
+    Optional. The template from the example is the default.
 
     `username` vs. `fullname`::
 
@@ -69,12 +74,13 @@ class SendTelegram(object):
 
     """
     log = None  # initialized during plugin.register
-    """:type: logging.Logger"""
+    """:type: flexget.logger.FlexGetLogger"""
 
     schema = {
         'type': 'object',
         'properties': {
             _TOKEN_ATTR: {'type': 'string'},
+            _TMPL_ATTR: {'type': 'string', 'default': '{{title}}'},
             _RCPTS_ATTR: {
                 'type': 'array',
                 'minItems': 1,
@@ -124,11 +130,12 @@ class SendTelegram(object):
     def _parse_config(config):
         """
         :type config: dict
-        :returns: token, usernames, fullnames, groups
-        :rtype: str, tuple[list[str], list[tuple[str, str]], list[str]]
+        :returns: token, tmpl, usernames, fullnames, groups
+        :rtype: str, str, tuple[list[str], list[tuple[str, str]], list[str]]
 
         """
         token = config[_TOKEN_ATTR]
+        tmpl = config[_TMPL_ATTR]
         usernames = []
         fullnames = []
         groups = []
@@ -144,7 +151,7 @@ class SendTelegram(object):
             elif _GROUP_ATTR in i:
                 groups.append(i[_GROUP_ATTR])
 
-        return token, usernames, fullnames, groups
+        return token, tmpl, usernames, fullnames, groups
 
     def on_task_output(self, task, config):
         """makes this plugin count as output (stops warnings about missing outputs)"""
@@ -156,12 +163,17 @@ class SendTelegram(object):
             raise plugin.PluginWarning('missing telegram python pkg')
 
         accepted_tasks = list(task.accepted)
-        if not accepted_tasks:
-            return
-        token, usernames, fullnames, groups = self._parse_config(config)
-        self.log.debug('token={0} usernames={1} fullnames={2} groups={3}'.format(token, usernames, fullnames, groups))
+        """:type: list[flexget.entry.Entry]"""
+        token, tmpl, usernames, fullnames, groups = self._parse_config(config)
+        self.log.debug('token={0} tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
+            token, usernames, fullnames, groups, tmpl))
 
         bot = telegram.Bot(token)
+        try:
+            bot.getMe()
+        except UnicodeDecodeError as e:
+            self.log.trace('bot.getMe() raised: {!r}'.format(e))
+            raise plugin.PluginWarning('invalid bot token')
         session = task.session
 
         chat_ids = self._get_chat_ids_n_update_db(bot, session, usernames, fullnames, groups)
@@ -170,9 +182,24 @@ class SendTelegram(object):
             return
 
         for entry in accepted_tasks:
-            title = entry.get('title')
+            msg = self._render_msg(entry, tmpl)
             for chat_id in (x.id for x in chat_ids):
-                bot.sendMessage(chat_id=chat_id, text=str(title))
+                bot.sendMessage(chat_id=chat_id, text=msg)
+
+    def _render_msg(self, entry, tmpl):
+        """
+        :type entry: flexget.entry.Entry
+        :type tmpl: str
+        :rtype: str
+
+        """
+        try:
+            msg = entry.render(tmpl)
+        except RenderError as e:
+            title = entry.get('title')
+            self.log.error('render error; title={0} err={1}'.format(title, e))
+            msg = title
+        return msg
 
     def _get_chat_ids_n_update_db(self, bot, session, usernames, fullnames, groups):
         """
@@ -244,7 +271,7 @@ class SendTelegram(object):
         chat_ids = list()
         cached_usernames = dict((x.username, x)
                                 for x in session.query(ChatIdEntry).filter(ChatIdEntry.username != None).all())
-        cached_fullnames = dict((x.firstname, x.surname)
+        cached_fullnames = dict(((x.firstname, x.surname), x)
                                 for x in session.query(ChatIdEntry).filter(ChatIdEntry.firstname != None).all())
         cached_groups = dict((x.group, x)
                              for x in session.query(ChatIdEntry).filter(ChatIdEntry.group != None).all())
