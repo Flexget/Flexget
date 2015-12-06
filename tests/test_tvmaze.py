@@ -67,7 +67,17 @@ class TestTVMazeShowLookup(FlexGetBase):
             series:
               - 1992
               - 24
-
+          test_show_contain_number:
+            mock:
+              - {title: 'Tosh.0 S07E30 HDTV x264-MiNDTHEGAP'}
+              - {title: 'Unwrapped 2.0 S02E06 HDTV x264-MiNDTHEGAP'}
+              - {title: 'Detroit 1-8-7 S01E16 HDTV x264-MiNDTHEGAP'}
+              - {title: 'Jake 2.0 S01E10 HDTV x264-MiNDTHEGAP'}
+            series:
+              - Detroit 1-8-7
+              - Jake 2.0
+              - Unwrapped 2.0
+              - Tosh.0
     """
 
     @use_vcr
@@ -225,3 +235,34 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry['tvmaze_episode_id'] == 12094, 'episode id should be 12094, instead its %s' % entry[
             'tvmaze_episode_id']
 
+    @use_vcr()
+    def test_show_contain_number(self):
+        self.execute_task('test_show_contain_number')
+        entry = self.task.find_entry(series_name='Detroit 1-8-7')
+        assert entry['tvmaze_series_name'] == 'Detroit 1-8-7', \
+            'tvmaze_series_name should be Detroit 1-8-7, instead its %s' % entry['tvmaze_series_name']
+        assert entry['tvmaze_series_id'] == 998, 'series id should be 998, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 98765, 'episode id should be 98765, instead its %s' % entry[
+            'tvmaze_episode_id']
+        entry = self.task.find_entry(series_name='Tosh.0')
+        assert entry['tvmaze_series_name'] == 'Tosh.0', \
+            'tvmaze_series_name should be Tosh.0, instead its %s' % entry['tvmaze_series_name']
+        assert entry['tvmaze_series_id'] == 260, 'series id should be 260, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 457679, 'episode id should be 457679, instead its %s' % entry[
+            'tvmaze_episode_id']
+        entry = self.task.find_entry(series_name='Unwrapped 2.0')
+        assert entry['tvmaze_series_name'] == 'Unwrapped 2.0', \
+            'tvmaze_series_name should be Unwrapped 2.0, instead its %s' % entry['tvmaze_series_name']
+        assert entry['tvmaze_series_id'] == 5736, 'series id should be 5736, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 387214, 'episode id should be 387214, instead its %s' % entry[
+            'tvmaze_episode_id']
+        entry = self.task.find_entry(series_name='Jake 2.0')
+        assert entry['tvmaze_series_name'] == 'Jake 2.0',  \
+            'tvmaze_series_name should be Jake 2.0, instead its %s' % entry['tvmaze_series_name']
+        assert entry['tvmaze_series_id'] == 2381, 'series id should be 2381, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 184265, 'episode id should be 184265, instead its %s' % entry[
+            'tvmaze_episode_id']
