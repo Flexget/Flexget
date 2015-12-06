@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
+from datetime import timedelta, datetime
+
 from flexget.manager import Session
 from flexget.plugins.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries
 from tests import FlexGetBase, use_vcr
@@ -53,6 +55,11 @@ class TestTVMazeShowLookup(FlexGetBase):
               - The Big Bang Theory
               - Marvels Jessica Jones
               - The Flash (2014)
+          test_series_expiration:
+            mock:
+              - {title: 'Shameless.2011.S03E02.HDTV.XViD-FlexGet'}
+            series:
+              - Shameless (2011)
 
     """
 
@@ -160,3 +167,37 @@ class TestTVMazeShowLookup(FlexGetBase):
             'tvmaze_series_id')
         assert entry.get('tvmaze_episode_id') == 185073, 'episode id should be 185073, is actually %s' % entry.get(
             'tvmaze_episode_id')
+
+    @use_vcr()
+    def test_series_expiration(self):
+        self.execute_task('test_series_expiration')
+        entry = self.task.entries[0]
+        assert entry['tvmaze_series_name'].lower() == 'Shameless'.lower(), 'lookup failed'
+        assert entry['tvmaze_episode_id'] == 11134, 'episode id should be 11134, instead its %s' % entry[
+            'tvmaze_episode_id']
+        with Session() as session:
+            # Manually change a value of the series to differ from actual value
+            assert session.query(
+                TVMazeSeries).first().name == 'Shameless', 'should have added Shameless and not Shameless (2011)'
+            session.query(TVMazeSeries).update({'weight': 99})
+            session.commit()
+
+            # Verify value has changed successfully and series expiration status is still False
+            assert session.query(TVMazeSeries).first().expired == False, 'expired status should be False'
+            assert session.query(TVMazeSeries).first().weight == 99, 'should be updated to 99'
+
+            # Set series last_update time to 8 days ago, to trigger a show refresh upon request.
+            last_week = datetime.now() - timedelta(days=8)  # Assuming max days between refreshes is 7
+            session.query(TVMazeSeries).update({'last_update': last_week})
+            session.commit()
+
+            # Verify series expiration flag is now True
+            assert session.query(TVMazeSeries).first().expired == True, 'expired status should be True'
+
+            lookupargs = {'title': "Shameless"}
+            series = APITVMaze.series_lookup(**lookupargs)
+
+            # Verify series data has been refreshed with actual values upon 2nd call, and series expiration flag
+            # is set to False
+            assert series.weight == 2, 'weight should have been updated back to 2 from 99'
+            assert session.query(TVMazeSeries).first().expired == False, 'expired status should be False'
