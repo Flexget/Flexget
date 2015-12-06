@@ -207,6 +207,7 @@ def search_params_for_series(**lookup_params):
         'tvrage_id': lookup_params.get('tvrage_id'),
         'name': lookup_params.get('title') or lookup_params.get('series_name')
     }
+    log.debug('returning search params for series lookup: {0}'.format(search_params))
     return search_params
 
 
@@ -268,9 +269,12 @@ class APITVMaze(object):
         # Preparing search from lookup table
         title = lookup_params.get('series_name') or lookup_params.get('show_name') or lookup_params.get('title')
         if not series and title:
+            log.debug('did not find exact match for series {0} in cache, looking in search table'.format(
+                search_params['name']))
             search = from_lookup(session=session, title=title)
             if search and search.series:
                 series = search.series
+                log.debug('found series {0} from search table'.format(series.name))
 
         if only_cached:
             if series:  # If force_cache is True, return series even if it expired
@@ -295,16 +299,18 @@ class APITVMaze(object):
         # See if series already exist in cache
         series = session.query(TVMazeSeries).filter(TVMazeSeries.tvmaze_id == pytvmaze_show.maze_id).first()
         if series:
-            log.debug('found expired series {0}, refreshing data.'.format(series.name))
-            series.update(pytvmaze_show, session)
+            log.debug('series {0} is already in cache, checking for expiration'.format(series.name))
+            if series.expired:
+                series.update(pytvmaze_show, session)
         else:
-            log.debug('creating new series {0} in tvmaze_series db'.format(title))
+            log.debug('creating new series {0} in tvmaze_series db'.format(pytvmaze_show.name))
             series = TVMazeSeries(pytvmaze_show, session)
             session.add(series)
         # If there's a mismatch between actual series name and requested title,
         # add it to lookup table for future lookups
         if series and title.lower() != series.name.lower():
-            log.debug('mismatch between series title and search title. saving in lookup table')
+            log.debug('mismatch between series title {0} and search title {1}. '
+                      'saving in lookup table'.format(title, series.name))
             session.add(TVMazeLookup(search_name=title, series=series))
         return series
 
