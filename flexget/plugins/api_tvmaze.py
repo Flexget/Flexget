@@ -285,12 +285,12 @@ class APITVMaze(object):
         try:
             log.debug('trying to fetch series {0} from pytvmaze'.format(title))
             pytvmaze_show = get_show(**prepared_params)
-        except ShowNotFound:
+        except ShowNotFound as e:
             log.debug('could not find series {0} in pytvmaze'.format(title))
-            return
+            raise LookupError(e)
         except ConnectionError as e:
             log.warning(e)
-            return
+            raise LookupError(e)
 
         # See if series already exist in cache
         series = session.query(TVMazeSeries).filter(TVMazeSeries.tvmaze_id == pytvmaze_show.maze_id).first()
@@ -363,10 +363,10 @@ class APITVMaze(object):
                 pytvmaze_episode = episodes_by_date(maze_id=series.tvmaze_id, airdate=episode_date)[0]
             except (IllegalAirDate, NoEpisodesForAirdate) as e:
                 log.debug(e)
-                return
+                raise LookupError(e)
             except ConnectionError as e:
                 log.warning(e)
-                return
+                raise LookupError(e)
         else:
             # TODO will this match all series_id types?
             try:
@@ -377,10 +377,10 @@ class APITVMaze(object):
                                                      episode_number=episode_number)
             except EpisodeNotFound as e:
                 log.debug('could not find episode in tvmaze: {0}'.format(e))
-                return
+                raise LookupError(e)
             except ConnectionError as e:
                 log.warning(e)
-                return
+                raise LookupError(e)
         # See if episode exists in DB
         episode = session.query(TVMazeEpisodes).filter(
             and_(
