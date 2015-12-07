@@ -102,8 +102,8 @@ class PluginTVMazeLookup(object):
     # Episode info
     episode_map = {
         'tvmaze_episode_name': 'title',
-        'tvmaze_season': 'season_number',
-        'tvmaze_episode': 'number',
+        'tvmaze_episode_season': 'season_number',
+        'tvmaze_episode_number': 'number',
         'tvmaze_episode_id': 'tvmaze_id',
         'tvmaze_episode_airdate': 'airdate',
         'tvmaze_episode_url': 'url',
