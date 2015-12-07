@@ -110,16 +110,19 @@ class Sonarr(object):
         for show in json:
             fg_qualities = ''  # Initializes the quality parameter
             fg_cutoff = ''
+            path = None
             if not show['monitored'] and config.get('only_monitored'):  # Checks if to retrieve just monitored shows
                 continue
             if show['status'] == 'ended' and not config.get('include_ended'):  # Checks if to retrieve ended shows
                 continue
             if config.get('include_data') and profiles_json:  # Check if to retrieve quality & path
+                path = show.get('path')
                 for profile in profiles_json:
                     if profile['id'] == show['profileId']:  # Get show's profile data from all possible profiles
                         fg_qualities, fg_cutoff = self.quality_requirement_builder(profile)
             entry = Entry(title=show['title'],
                           url='',
+                          sonarr_show_path=path,
                           series_name=show['title'],
                           tvdb_id=show.get('tvdbId'),
                           tvrage_id=show.get('tvRageId'),
