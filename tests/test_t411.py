@@ -264,21 +264,20 @@ class TestInputPlugin(FlexGetBase):
         tasks:
           uncached_db:
             t411:
-              username: 'lildadou'
-              password: ''
               category: cartoons
               terms:
                 - Antivirus
     """
 
-
+    @mock.patch('flexget.plugins.api_t411.T411Proxy.set_credential')
     @mock.patch('flexget.plugins.api_t411.T411RestClient.search')
     @mock.patch('flexget.plugins.api_t411.T411RestClient.retrieve_terms_tree')
     @mock.patch('flexget.plugins.api_t411.T411RestClient.retrieve_category_tree')
-    def test_schema(self, mock_cat, mock_term, mock_search):
+    def test_schema(self, mock_cat, mock_term, mock_search, mock_auth):
         mock_cat.return_value = MockRestClient.cat_result
         mock_term.return_value = MockRestClient.term_result
         mock_search.return_value = MockRestClient.search_result
+        mock_auth.return_value = None
         self.execute_task('uncached_db')
         log.debug(self.task.all_entries)
         assert len(self.task.all_entries) == 1

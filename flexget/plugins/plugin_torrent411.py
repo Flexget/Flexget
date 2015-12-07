@@ -26,20 +26,18 @@ class T411InputPlugin(object):
         self.schema = {
             'type': 'object',
             'properties': {
-                'username': {'type': 'string'},
-                'password': {'type': 'string'},
                 'category': category_constraint,
                 'terms': one_or_more(terms_contraints),
                 'max_results': {'type': 'number', 'default': 100}
                 },
-            'required': ['username', 'password'],
+            'required': [],
             'additionalProperties': False
         }
 
-    @cached('t411')
     @plugin.internet(log)
     def on_task_input(self, task, config):
-        proxy = T411Proxy(username=config['username'], password=config['password'])
+        proxy = T411Proxy()
+        proxy.set_credential()
         query = FriendlySearchQuery()
         query.category_name = config.get('category')
         query.term_names = config.get('terms', [])

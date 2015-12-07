@@ -7,7 +7,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.database import with_session
 
-from sqlalchemy import (Table, Column, Integer, String, ForeignKey, DateTime)
+from sqlalchemy import (Table, Column, Integer, String, ForeignKey, DateTime, Boolean)
 from sqlalchemy.orm import relation, backref
 from flexget import db_schema
 from flexget.utils.requests import Session
@@ -28,8 +28,7 @@ torrent_terms = Table('torrent_terms', Base.metadata,
 
 @db_schema.upgrade('api_t411')
 def upgrade(ver, session):
-    assert ver is None or ver <= SCHEMA_VER
-    return ver
+    return SCHEMA_VER
 
 
 class Category(Base):
@@ -86,6 +85,14 @@ class TorrentStatus(Base):
     id = Column(Integer, primary_key=True)
     torrent_id = Column(Integer, ForeignKey('torrent.id'))
     timestamp = Column(DateTime)
+
+
+class Credential(Base):
+    __tablename__ = 'credential'
+    username = Column(String, primary_key=True)
+    password = Column(String, nullable=False)
+    api_token = Column(String)
+    default = Column(Boolean, nullable=False, default=False)
 # endregion ORM definition
 
 
@@ -95,6 +102,7 @@ class FriendlySearchQuery(object):
         self.category_name = None
         self.term_names = []
         self.max_results = 10
+
 
 T411API_DOMAIN_URL = "api.t411.in"
 T411API_CATEGORY_TREE_PATH = "/categories/tree/"
@@ -115,7 +123,7 @@ def auth_required(func):
     """
     def wrapper(self, *args, **kwargs):
         if not self.is_authenticated():
-            log.debug('None API token. Authenticating...')
+            log.debug('None API token. Authenticating with "%d" account...' % self.credentials.get('username'))
             self.auth()
             assert self.is_authenticated()
         return func(self, *args, **kwargs)
@@ -273,23 +281,8 @@ class T411ObjectMapper(object):
 
         return main_categories, indexed_categories
 
-    def map_term_type(self, term_type_id, json_term_type):
-        """
-        Parse to TermType a json Term type
-        :param term_type_id: int
-        :param json_term_type: dict
-        :return:
-        """
-        term_type = TermType()
-        term_type.id = term_type_id
-        term_type.name = json_term_type.get('type')
-        term_type.mode = json_term_type.get('mode')
-        for term_id, term_name in json_term_type.get('terms').iteritems():
-            term = Term(id=int(term_id), name=term_name)
-            term_type.terms.append(term)
-        return term_type
-
-    def map_term_type_tree(self, json_tree):
+    @staticmethod
+    def map_term_type_tree(json_tree):
         """
         :param json_tree: dict
         :return: (array of tupple, dict of TermType)
@@ -297,6 +290,7 @@ class T411ObjectMapper(object):
         # term type definition can appears multiple times
         category_to_term_type = []  # relations category-term type
         term_types = {}  # term types, indexed by termtype id
+        terms = {} # terms, indexed by id
         for category_key, json_term_types in json_tree.iteritems():
             for term_type_key, term_type_content in json_term_types.iteritems():
                 term_type_id = int(term_type_key)
@@ -305,8 +299,16 @@ class T411ObjectMapper(object):
                 # if a term type has already parsed
                 # then we just record the category-term type relation
                 if term_type_id not in term_types:
-                    term_type = self.map_term_type(term_type_id, term_type_content)
-                    term_types[term_type.id] = term_type
+                    term_type = TermType()
+                    term_type.id = term_type_id
+                    term_type.name = term_type_content.get('type')
+                    term_type.mode = term_type_content.get('mode')
+                    term_types[term_type.id] = term_type # index term type
+                    for term_id, term_name in term_type_content.get('terms').iteritems():
+                        # Parsing & indexing terms
+                        if term_id not in terms:
+                            term = Term(id=int(term_id), name=term_name)
+                            term_type.terms.append(term)
 
         return category_to_term_type, term_types
 
@@ -354,6 +356,7 @@ def cache_required(func):
     :return:
     """
     def wrapper(self, *args, **kwargs):
+        log.debug("Checking database...")
         if not self.has_cached_criterias():
             log.debug('None cached data. Synchronizing...')
             self.synchronize_database()
@@ -367,23 +370,34 @@ class T411Proxy(object):
     T411 Rest Client and T411 local database.
     """
     @with_session
-    def __init__(self, username=None, password=None, session=None):
+    def __init__(self, session=None):
         """
-        :param username: String
-        :param password: String
         :param session: flexget.manager.Session
         """
         self.session = session
-        self.rest_client = T411RestClient(username, password)
+        self.rest_client = T411RestClient()
         self.mapper = T411ObjectMapper()
         self.__has_cached_criterias = None
 
-    def set_credentials(self, username, password):
-        self.rest_client.api_token = None
+    def __set_credential(self, username=None, password=None, api_token=None):
+        self.rest_client.api_token = api_token
         self.rest_client.credentials = {
             'username': username,
             'password': password
         }
+
+    def set_credential(self, username=None):
+        """
+        Set REST client credential from database
+        :param username: if set, account's credential will be used.
+        :return:
+        """
+        query = self.session.query(Credential)
+        if username:
+            query = query.filter(Credential.username == username)
+        credential = query.first()
+        assert credential is not None, 'No credential for username "%s"' % username
+        self.__set_credential(credential.username, credential.password, credential.api_token)
 
     def has_cached_criterias(self):
         """
@@ -417,21 +431,16 @@ class T411Proxy(object):
         self.__has_cached_criterias = None
 
     @cache_required
-    def find_category_by_name(self, category_name):
-        query = self.session.query(Category).filter(Category.name == category_name)
-        try:
-            category = query.one()
-        except MultipleResultsFound:
-            log.warning('The category "%s" has more than one id ; first will be use. '
-                        'Please report this incident on Flexget.com' % category_name)
-            category = query.first()
-        except NoResultFound:
-            log.warning('None result found for a category named "%s"' % category_name)
-            return None
-        return category
+    def find_categories(self, category_name=None, is_sub_category=False):
+        query = self.session.query(Category)
+        if category_name is not None:
+            query = query.filter(Category.name == category_name)
+        if is_sub_category:
+            query = query.filter(Category.parent_id.isnot(None))
+        return query.all()
 
     @cache_required
-    def find_term_type_by_name(self, category_id, term_type_name):
+    def find_term_types(self, category_id=None, category_name=None, term_type_name=None):
         query = self.session.query(TermType)\
             .filter(TermType.name == term_type_name) \
             .filter(TermType.categories.any(Category.id == category_id))
@@ -453,13 +462,19 @@ class T411Proxy(object):
             .first()
 
     @cache_required
-    def all_categories(self):
-        return self.session.query(Category).all()
+    def main_categories(self):
+        query = self.session.query(Category).filter(Category.parent_id.is_(None))
+        return query.all()
 
     @cache_required
-    def all_category_names(self):
-        name_query = self.session.query(Category.name).all()
-        return [name for (name,) in name_query]
+    def all_category_names(self, categories_filter='all'):
+        name_query = self.session.query(Category.name)
+        if categories_filter == 'sub':
+            name_query.filter(Category.parent_id is not None)
+        elif categories_filter == 'main':
+            name_query.filter(Category.parent_id is None)
+
+        return [name for (name,) in name_query.all()]
 
     @cache_required
     def all_term_names(self):
@@ -468,7 +483,7 @@ class T411Proxy(object):
 
     @cache_required
     def print_categories(self):
-        categories = self.session.query(Category).filter(Category.parent_id == None).all()
+        categories = self.session.query(Category).filter(Category.parent_id.is_(None)).all()
         formatting_main = '%-30s %-5s %-5s'
         formatting_sub = '     %-25s %-5s %-5s'
         log.debug(formatting_main % ('Name', 'PID', 'ID'))
@@ -493,7 +508,7 @@ class T411Proxy(object):
         if category_id is not None:
             category = self.session.query(Category).filter(Category.id == category_id).one()
         elif category_name is not None:
-            category = self.find_category_by_name(category_name)
+            category = self.find_categories(category_name)
         else:
             self.print_all_terms()
             return
@@ -576,7 +591,28 @@ class T411Proxy(object):
             self.session.commit()
             return details
 
+    def add_credential(self, username, password):
+        """
+        Add a credential
+        :param username:    T411 username
+        :param password:    T411 password
+        :return:    False if username still has an entry (password has been updated)
+        """
+        credential = self.session.query(Credential).filter(Credential.username == username).first()
+        if credential:
+            credential.password = password
+            credential.api_token = None
+            result = False
+        else:
+            credential = Credential(username=username, password=password)
+            self.session.add(credential)
+            result = True
+        self.session.commit()
+        return result
+
+
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     session.query(Category).delete(synchronize_session=False)
     session.query(TermType).delete(synchronize_session=False)
+    session.query(Term).delete(synchronize_session=False)
