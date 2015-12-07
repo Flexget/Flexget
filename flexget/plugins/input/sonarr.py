@@ -122,7 +122,6 @@ class Sonarr(object):
                         fg_qualities, fg_cutoff = self.quality_requirement_builder(profile)
             entry = Entry(title=show['title'],
                           url='',
-                          sonarr_show_path=path,
                           series_name=show['title'],
                           tvdb_id=show.get('tvdbId'),
                           tvrage_id=show.get('tvRageId'),
@@ -134,6 +133,8 @@ class Sonarr(object):
                 entry['configure_series_quality'] = fg_qualities[0]
             else:
                 entry['configure_series_quality'] = fg_qualities
+            if path:
+                entry['configure_series_path'] = path
             if entry.isvalid():
                 entries.append(entry)
             else:
