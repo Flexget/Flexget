@@ -124,7 +124,7 @@ def auth_required(func):
     """
     def wrapper(self, *args, **kwargs):
         if not self.is_authenticated():
-            log.debug('None API token. Authenticating with "%d" account...' % self.credentials.get('username'))
+            log.debug('None API token. Authenticating with "%s" account...' % self.credentials.get('username'))
             self.auth()
             assert self.is_authenticated()
         return func(self, *args, **kwargs)
@@ -573,7 +573,7 @@ class T411Proxy(object):
         log.debug("Search produces %d results including %d 'on pending' (the latter will not produces entries)"
                   % (len(json_torrents), len(json_torrents) - len(json_not_pending_torrents)))
         download_auth = T411BindAuth(self.rest_client.api_token)
-        
+
         def bind_map_function(json):
             return self.mapper.map_search_result_entry(json, download_auth)
         return map(bind_map_function, json_not_pending_torrents)
