@@ -30,7 +30,6 @@ class T411InputPlugin(object):
                 'terms': one_or_more(terms_contraints),
                 'max_results': {'type': 'number', 'default': 100}
                 },
-            'required': [],
             'additionalProperties': False
         }
 
