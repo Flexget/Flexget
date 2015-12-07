@@ -5,6 +5,7 @@ import logging
 import urllib
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.plugin import PluginError
 from flexget.utils.database import with_session
 from requests.auth import AuthBase
 
@@ -398,10 +399,10 @@ class T411Proxy(object):
         if username:
             query = query.filter(Credential.username == username)
         credential = query.first()
+
         if credential is None:
-            log.error('You cannot use t411 plugin without credentials. '
+            raise PluginError('You cannot use t411 plugin without credentials. '
                       'Please set credential with "flexget t411 add-auth <username> <password>".')
-            assert credential is not None, 'No credential for username "%s"' % username
         self.__set_credential(credential.username, credential.password, credential.api_token)
 
     def has_cached_criterias(self):
