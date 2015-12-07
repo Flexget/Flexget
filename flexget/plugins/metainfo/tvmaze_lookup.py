@@ -107,6 +107,7 @@ class PluginTVMazeLookup(object):
         'tvmaze_episode_id': 'tvmaze_id',
         'tvmaze_episode_airdate': 'airdate',
         'tvmaze_episode_url': 'url',
+        'tvmaze_episode_summary': 'summary',
         'tvmaze_episode_original_image': 'original_image',
         'tvmaze_episode_medium_image': 'medium_image',
         'tvmaze_episode_airstamp': 'airstamp',
