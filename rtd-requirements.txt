@@ -22,4 +22,4 @@ flask-restful>=0.3.3
 ordereddict>=1.1
 flask-restplus>=0.7.2
 cherrypy
-pytvmaze>=1.3.3
+pytvmaze>=1.3.7

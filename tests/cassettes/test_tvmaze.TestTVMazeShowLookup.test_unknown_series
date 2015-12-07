@@ -1,0 +1,21 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/search/shows?q=Aoeu%20Htns
+  response:
+    body: {string: !!python/unicode '[]'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 06 Dec 2015 08:28:47 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+version: 1
