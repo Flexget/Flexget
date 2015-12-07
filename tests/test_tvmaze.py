@@ -78,6 +78,11 @@ class TestTVMazeShowLookup(FlexGetBase):
               - Jake 2.0
               - Unwrapped 2.0
               - Tosh.0
+          test_episode_summary:
+            mock:
+              - {title: 'The.Flash.2014.S02E02.HDTV.x264-LOL'}
+            series:
+              - The Flash
     """
 
     @use_vcr
@@ -260,9 +265,26 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry['tvmaze_episode_id'] == 387214, 'episode id should be 387214, instead its %s' % entry[
             'tvmaze_episode_id']
         entry = self.task.find_entry(series_name='Jake 2.0')
-        assert entry['tvmaze_series_name'] == 'Jake 2.0',  \
+        assert entry['tvmaze_series_name'] == 'Jake 2.0', \
             'tvmaze_series_name should be Jake 2.0, instead its %s' % entry['tvmaze_series_name']
         assert entry['tvmaze_series_id'] == 2381, 'series id should be 2381, instead its %s' % entry[
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 184265, 'episode id should be 184265, instead its %s' % entry[
             'tvmaze_episode_id']
+
+    @use_vcr()
+    def test_episode_summary(self):
+        expected_summary = "The team's visitors, Jay Garrick, explains that he comes from a" \
+                           " parallel world and was a speedster there, but lost his powers transitioning over. " \
+                           "Now he insists that Barry needs his help fighting a new metahuman," \
+                           " Sand Demon, who came from Jay's world. Meanwhile, Officer Patty  Spivot " \
+                           "tries to join Joe's Metahuman Taskforce.'"
+
+        self.execute_task('test_episode_summary')
+        entry = self.task.entries[0]
+        assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 211206, 'episode id should be 211206, instead its %s' % entry[
+            'tvmaze_episode_id']
+        assert entry['tvmaze_episode_summary'] == expected_summary, 'Expected summary is different %s' % entry[
+            'tvmaze_episode_summary']
