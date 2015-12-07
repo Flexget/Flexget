@@ -13,13 +13,22 @@ from sqlalchemy.orm import relation
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.utils.database import with_session
+from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')
 
-DB_VERSION = 0
+DB_VERSION = 1
 Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
+
+
+@db_schema.upgrade('tvmaze')
+def upgrade(ver, session):
+    if ver == 0:
+        table_add_column('tvmaze_episode', 'summary', Unicode, session)
+        ver = 1
+    return ver
 
 
 class TVMazeGenre(Base):
@@ -149,6 +158,7 @@ class TVMazeEpisodes(Base):
     medium_image = Column(String)
     airstamp = Column(DateTime)
     runtime = Column(Integer)
+    summary = Column(Unicode)
     last_update = Column(DateTime)
 
     def __init__(self, episode, series_id):
@@ -159,6 +169,7 @@ class TVMazeEpisodes(Base):
         self.update(episode)
 
     def update(self, episode):
+        self.summary = episode.summary
         self.title = episode.title
         try:
             self.airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
