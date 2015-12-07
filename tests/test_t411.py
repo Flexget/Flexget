@@ -71,6 +71,7 @@ class MockRestClient(object):
 
     def __init__(self):
         self.details_called = False
+        self.api_token = "LOL:CAT:TOKEN"
 
     def auth(self):
         return

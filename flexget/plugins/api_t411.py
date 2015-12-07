@@ -6,6 +6,7 @@ import urllib
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.database import with_session
+from requests.auth import AuthBase
 
 from sqlalchemy import (Table, Column, Integer, String, ForeignKey, DateTime, Boolean)
 from sqlalchemy.orm import relation, backref
@@ -312,7 +313,7 @@ class T411ObjectMapper(object):
 
         return category_to_term_type, term_types
 
-    def map_search_result_entry(self, json_entry):
+    def map_search_result_entry(self, json_entry, download_auth):
         result = Entry()
         result['t411_torrent_id'] = json_entry['id']
         result['title'] = json_entry['name']
@@ -330,6 +331,7 @@ class T411ObjectMapper(object):
         result['t411_privacy'] = json_entry['privacy']
         result['t411_owner_id'] = int(json_entry['owner'])
         result['t411_owner_username'] = json_entry['username']
+        result['download_auth'] = download_auth
         return result
 
     def map_details(self, json_details, resolver):
@@ -570,7 +572,11 @@ class T411Proxy(object):
         json_not_pending_torrents = filter(lambda x: not isinstance(x, int), json_torrents)
         log.debug("Search produces %d results including %d 'on pending' (the latter will not produces entries)"
                   % (len(json_torrents), len(json_torrents) - len(json_not_pending_torrents)))
-        return map(self.mapper.map_search_result_entry, json_not_pending_torrents)
+        download_auth = T411BindAuth(self.rest_client.api_token)
+        
+        def bind_map_function(json):
+            return self.mapper.map_search_result_entry(json, download_auth)
+        return map(bind_map_function, json_not_pending_torrents)
 
     @cache_required
     def details(self, torrent_id):
@@ -609,6 +615,15 @@ class T411Proxy(object):
             result = True
         self.session.commit()
         return result
+
+
+class T411BindAuth(AuthBase):
+    def __init__(self, api_token):
+        self.api_token = api_token
+
+    def __call__(self, request):
+        request.headers['authorization'] = self.api_token
+        return request
 
 
 @event('manager.db_cleanup')
