@@ -2,6 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 
 from datetime import timedelta, datetime
 
+import mock
+import pytvmaze
+
 from flexget.manager import Session
 from flexget.plugins.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries
 from tests import FlexGetBase, use_vcr
@@ -14,9 +17,8 @@ class TestTVMazeShowLookup(FlexGetBase):
         templates:
           global:
             tvmaze_lookup: yes
-            # Access a tvdb field to cause lazy loading to occur
             set:
-              afield: "{{tvdb_id}}{{tvmaze_episode_name}}{{tvmaze_series_name}}"
+              afield: "{{tvmaze_episode_name}}{{tvmaze_series_name}}"
         tasks:
           test:
             mock:
@@ -78,7 +80,19 @@ class TestTVMazeShowLookup(FlexGetBase):
               - Jake 2.0
               - Unwrapped 2.0
               - Tosh.0
+          test_episode_without_air_date:
+            mock:
+              - {title: 'The.Flash.2014.S02E01.HDTV.x264-LOL'}
+            series:
+              - The Flash (2014)
+
     """
+    episode = pytvmaze.episode_by_number(maze_id=13, season_number=2, episode_number=1)
+    assert episode.airdate == '2015-10-06', 'Expected airdate is 2015-10-06, got %s' % episode.airdate
+    assert episode.airstamp == '2015-10-06T20:00:00-04:00', \
+        'Expected airstamp is 2015-10-06T20:00:00-04:00, got %s' % episode.airstamp
+    episode.airdate = None
+    episode.airstamp = None
 
     @use_vcr
     def test_lookup_name(self):
@@ -260,9 +274,19 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry['tvmaze_episode_id'] == 387214, 'episode id should be 387214, instead its %s' % entry[
             'tvmaze_episode_id']
         entry = self.task.find_entry(series_name='Jake 2.0')
-        assert entry['tvmaze_series_name'] == 'Jake 2.0',  \
+        assert entry['tvmaze_series_name'] == 'Jake 2.0', \
             'tvmaze_series_name should be Jake 2.0, instead its %s' % entry['tvmaze_series_name']
         assert entry['tvmaze_series_id'] == 2381, 'series id should be 2381, instead its %s' % entry[
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 184265, 'episode id should be 184265, instead its %s' % entry[
             'tvmaze_episode_id']
+
+    @mock.patch('flexget.plugins.api_tvmaze.episode_by_number')
+    def test_episode_without_air_date_and_air_stamp(self, episode_mock):
+        episode_mock.return_value = self.episode
+        self.execute_task('test_episode_without_air_date')
+        entry = self.task.find_entry(title='The.Flash.2014.S02E01.HDTV.x264-LOL')
+        assert entry['tvmaze_episode_airdate'] == None, \
+            'Expected airdate to be None, got %s' % entry['tvmaze_episode_airdate']
+        assert entry['tvmaze_episode_airstamp'] == None, \
+            'Expected airdate to be None, got %s' % entry['tvmaze_episode_airstamp']
