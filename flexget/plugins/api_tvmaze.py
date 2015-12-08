@@ -84,13 +84,11 @@ class TVMazeSeries(Base):
         self.language = series.language
         self.schedule = series.schedule
         self.url = series.url
-        try:
+        if series.image:
             self.original_image = series.image.get('original')
-        except AttributeError:
-            self.original_image = None
-        try:
             self.medium_image = series.image.get('medium')
-        except AttributeError:
+        else:
+            self.original_image = None
             self.medium_image = None
         self.tvdb_id = series.externals.get('thetvdb')
         self.tvrage_id = series.externals.get('tvrage')
@@ -160,20 +158,21 @@ class TVMazeEpisodes(Base):
 
     def update(self, episode):
         self.title = episode.title
-        try:
+        if episode.airdate:
             self.airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
-        except ValueError:
+        else:
             self.airdate = None
         self.url = episode.url
-        try:
+        if episode.image:
             self.original_image = episode.image.get('original')
-        except AttributeError:
-            self.original_image = None
-        try:
             self.medium_image = episode.image.get('medium')
-        except AttributeError:
+        else:
+            self.original_image = None
             self.medium_image = None
-        self.airstamp = parser.parse(episode.airstamp)
+        if episode.airstamp:
+            self.airstamp = parser.parse(episode.airstamp)
+        else:
+            self.airstamp = None
         self.runtime = episode.runtime
         self.last_update = datetime.now()
 
