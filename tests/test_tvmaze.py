@@ -18,7 +18,7 @@ class TestTVMazeShowLookup(FlexGetBase):
           global:
             tvmaze_lookup: yes
             set:
-              afield: "{{tvmaze_episode_name}}{{tvmaze_series_name}}"
+              afield: "{{tvdb_id}}{{tvmaze_episode_name}}{{tvmaze_series_name}}"
         tasks:
           test:
             mock:
@@ -82,21 +82,22 @@ class TestTVMazeShowLookup(FlexGetBase):
               - Tosh.0
           test_episode_without_air_date:
             mock:
-              - {title: 'The.Flash.2014.S02E01.HDTV.x264-LOL'}
+              - {title: 'Chicago Fire S04E08 HDTV x264-LOL'}
             series:
-              - The Flash (2014)
+              - Chicago Fire
+            set:
+              bfield: "{{tvmaze_episode_airdate}}{{tvmaze_episode_airstamp}}"
 
     """
-    episode = pytvmaze.episode_by_number(maze_id=13, season_number=2, episode_number=1)
-    assert episode.airdate == '2015-10-06', 'Expected airdate is 2015-10-06, got %s' % episode.airdate
-    assert episode.airstamp == '2015-10-06T20:00:00-04:00', \
-        'Expected airstamp is 2015-10-06T20:00:00-04:00, got %s' % episode.airstamp
+    episode = pytvmaze.episode_by_number(maze_id=59, season_number=4, episode_number=8)
+    assert episode.airdate == '2015-12-01', 'Expected airdate is 2015-12-01, got %s' % episode.airdate
+    assert episode.airstamp == '2015-12-01T22:00:00-05:00', \
+        'Expected airstamp is 2015-12-01T22:00:00-05:00, got %s' % episode.airstamp
     episode.airdate = None
     episode.airstamp = None
 
     @use_vcr
     def test_lookup_name(self):
-        """tvmaze: Test Lookup (ONLINE)"""
         self.execute_task('test')
         entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvmaze_series_id'] == 118, \
@@ -106,7 +107,6 @@ class TestTVMazeShowLookup(FlexGetBase):
 
     @use_vcr
     def test_lookup(self):
-        """tvmaze: Test Lookup (ONLINE)"""
         self.execute_task('test')
         entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvmaze_episode_name'] == 'Paternity', \
@@ -281,11 +281,12 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry['tvmaze_episode_id'] == 184265, 'episode id should be 184265, instead its %s' % entry[
             'tvmaze_episode_id']
 
-    @mock.patch('flexget.plugins.api_tvmaze.episode_by_number')
+    @mock.patch('flexget.plugins.api_tvmaze.episode_by_number', autospec=True)
     def test_episode_without_air_date_and_air_stamp(self, episode_mock):
         episode_mock.return_value = self.episode
         self.execute_task('test_episode_without_air_date')
-        entry = self.task.find_entry(title='The.Flash.2014.S02E01.HDTV.x264-LOL')
+
+        entry = self.task.find_entry(title='Chicago Fire S04E08 HDTV x264-LOL')
         assert entry['tvmaze_episode_airdate'] == None, \
             'Expected airdate to be None, got %s' % entry['tvmaze_episode_airdate']
         assert entry['tvmaze_episode_airstamp'] == None, \
