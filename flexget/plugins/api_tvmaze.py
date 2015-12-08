@@ -118,7 +118,7 @@ class TVMazeSeries(Base):
         self.genres[:] = get_db_genres(series.genres, session)
 
     def __repr__(self):
-        return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.id, self.last_update)
+        return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.tvmaze_id, self.last_update)
 
     def __str__(self):
         return self.name
