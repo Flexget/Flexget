@@ -236,12 +236,16 @@ class UrlrewriteArchive(object):
 
         session = Session()
         entries = set()
+        if isinstance(config, bool):
+            tag_names = None
+        else:
+            tag_names = config
         try:
             for query in entry.get('search_strings', [entry['title']]):
                 # clean some characters out of the string for better results
                 query = re.sub(r'[ \(\)]+', ' ', query).strip()
                 log.debug('looking for `%s` config: %s' % (query, config))
-                for archive_entry in search(session, query, desc=True):
+                for archive_entry in search(session, query, tags=tag_names, desc=True):
                     log.debug('rewrite search result: %s' % archive_entry)
                     entry = Entry()
                     entry.update_using_map(self.entry_map, archive_entry, ignore_none=True)
