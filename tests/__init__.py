@@ -90,11 +90,14 @@ def use_vcr(func=None, **kwargs):
     # If we are not going online, disable domain delay during test
     if not online:
         func = mock.patch('flexget.utils.requests.wait_for_domain', new=mock.MagicMock())(func)
-
     if VCR_RECORD_MODE == 'off':
         return func
     else:
         return vcr.use_cassette(**kwargs)(func)
+
+
+class CrashReport(Exception):
+    pass
 
 
 class MockManager(Manager):
@@ -140,6 +143,11 @@ class MockManager(Manager):
 
     def release_lock(self):
         pass
+
+    def crash_report(self):
+        # We don't want to silently swallow crash reports during unit tests
+        log.error('Crash Report Traceback:', exc_info=True)
+        raise CrashReport('Crash report created during unit test, check log for traceback.')
 
 
 def build_parser_function(parser_name):
