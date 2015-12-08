@@ -92,25 +92,23 @@ class TVMazeSeries(Base):
             self.medium_image = None
         self.tvdb_id = series.externals.get('thetvdb')
         self.tvrage_id = series.externals.get('tvrage')
-        try:
+        if series.premiered:
             self.premiered = parser.parse(series.premiered)
-        except AttributeError:
+            self.year = int(series.premiered[:4])
+        else:
             self.premiered = None
+            self.year = None
         self.summary = series.summary
-        try:
+        if series.webChannel:
             self.webchannel = series.webChannel.get('name')
-        except AttributeError:
+        else:
             self.webchannel = None
         self.runtime = series.runtime
         self.show_type = series.type
-        try:
+        if series.network:
             self.network = series.network.get('name')
-        except AttributeError:
+        else:
             self.network = None
-        try:
-            self.year = int(series.premiered[:4])
-        except (TypeError, ValueError):
-            self.year = None
         self.last_update = datetime.now()
 
         self.genres[:] = get_db_genres(series.genres, session)
