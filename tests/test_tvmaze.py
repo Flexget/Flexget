@@ -281,6 +281,7 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry['tvmaze_episode_id'] == 184265, 'episode id should be 184265, instead its %s' % entry[
             'tvmaze_episode_id']
 
+    @use_vcr()
     @mock.patch('flexget.plugins.api_tvmaze.episode_by_number', autospec=True)
     def test_episode_without_air_date_and_air_stamp(self, episode_mock):
         episode_mock.return_value = self.episode
