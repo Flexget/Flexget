@@ -408,7 +408,8 @@ def cli_search(options):
         console('Please wait...')
         console('')
         results = False
-        for ae in search(session, search_term, tags=tags, sources=sources):
+        query = re.sub(r'[ \(\)]+', ' ', search_term).strip()
+        for ae in search(session, query, tags=tags, sources=sources):
             print_ae(ae)
             results = True
         if not results:
