@@ -73,7 +73,8 @@ class TraktEmit(object):
                     listed_series[trakt_id] = {
                         'series_name': item['show']['title'],
                         'trakt_id': trakt_id,
-                        'tvdb_id': item['show']['ids']['tvdb']}
+                        'tvdb_id': item['show']['ids']['tvdb'],
+                        'trakt_list': config.get('list')}
         context = config['context']
         if context == 'collected':
             context = 'collection'
