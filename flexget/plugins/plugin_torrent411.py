@@ -11,37 +11,46 @@ log = logging.getLogger('t411_input')
 
 
 class T411InputPlugin(object):
-
     def __init__(self):
-        # proxy = T411Proxy()
-        category_constraint = {'type': 'string'}
-        terms_contraints = {'type': 'string'}
-        # if not proxy.has_cached_criterias():
-        #     category_constraint['enum'] = proxy.all_category_names()
-        #     terms_contraints['enum'] = proxy.all_term_names()
-        # else:
-        #     log.warning('T411Proxy has not cached category names and term names.'
-        #                 'Your config may use unavailable names ; these names will be ignored and noticed.')
-
         self.schema = {
             'type': 'object',
             'properties': {
-                'category': category_constraint,
-                'terms': one_or_more(terms_contraints),
+                'category': {'type': 'string'},
+                'terms': one_or_more({'type': 'string'}),
                 'max_results': {'type': 'number', 'default': 100}
                 },
             'additionalProperties': False
         }
 
-    @plugin.internet(log)
-    def on_task_input(self, task, config):
-        proxy = T411Proxy()
-        proxy.set_credential()
+    @staticmethod
+    def build_request_from(config):
         query = FriendlySearchQuery()
         query.category_name = config.get('category')
         query.term_names = config.get('terms', [])
         query.max_results = config.get('max_results')
+        return query
+
+    @plugin.internet(log)
+    def on_task_input(self, task, config):
+        proxy = T411Proxy()
+        proxy.set_credential()
+        query = T411InputPlugin.build_request_from(config)
         return proxy.search(query)
+
+    @classmethod
+    @plugin.internet(log)
+    def search(cls, task, entry, config=None):
+        proxy = T411Proxy()
+        proxy.set_credential()
+        query = T411InputPlugin.build_request_from(config)
+
+        entries = set()
+        for search_string in entry.get('search_strings', [entry['title']]):
+            query.expression = search_string
+            search_result = proxy.search(query)
+            entries.update(search_result)
+
+        return entries
 
 @event('plugin.register')
 def register_plugin():
