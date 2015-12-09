@@ -1,8 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.config_schema import one_or_more
-from flexget.plugins.api_t411 import T411Proxy, FriendlySearchQuery, Category, TermType, Term
-from flexget.utils.cached_input import cached
+from flexget.plugins.api_t411 import T411Proxy, FriendlySearchQuery
 
 from flexget import plugin
 from flexget.event import event
@@ -11,6 +10,15 @@ log = logging.getLogger('t411_input')
 
 
 class T411InputPlugin(object):
+    """T411 search/Input plugin.
+    Before any usage, please add your credential with
+    "flexget t411 add-auth <username> <password>"
+
+    t411:
+      category: <see available categories on "flexget t411 list-cats">
+      terms: <see available terms on "flexget t411 list-terms --category <category name>"
+      max_resutls: XXX
+    """
     def __init__(self):
         self.schema = {
             'type': 'object',
