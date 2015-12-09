@@ -14,7 +14,6 @@ class TestTVMazeShowLookup(FlexGetBase):
         templates:
           global:
             tvmaze_lookup: yes
-            # Access a tvdb field to cause lazy loading to occur
             set:
               afield: "{{tvdb_id}}{{tvmaze_episode_name}}{{tvmaze_series_name}}"
         tasks:
@@ -78,6 +77,13 @@ class TestTVMazeShowLookup(FlexGetBase):
               - Jake 2.0
               - Unwrapped 2.0
               - Tosh.0
+          test_episode_without_air_date:
+            mock:
+              - {title: 'Firefly S01E13 HDTV x264-LOL'}
+            series:
+              - Firefly
+            set:
+              bfield: "{{tvmaze_episode_airdate}}{{tvmaze_episode_airstamp}}"
           test_episode_summary:
             mock:
               - {title: 'The.Flash.2014.S02E02.HDTV.x264-LOL'}
@@ -87,7 +93,6 @@ class TestTVMazeShowLookup(FlexGetBase):
 
     @use_vcr
     def test_lookup_name(self):
-        """tvmaze: Test Lookup (ONLINE)"""
         self.execute_task('test')
         entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvmaze_series_id'] == 118, \
@@ -97,7 +102,6 @@ class TestTVMazeShowLookup(FlexGetBase):
 
     @use_vcr
     def test_lookup(self):
-        """tvmaze: Test Lookup (ONLINE)"""
         self.execute_task('test')
         entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvmaze_episode_name'] == 'Paternity', \
@@ -271,6 +275,20 @@ class TestTVMazeShowLookup(FlexGetBase):
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 184265, 'episode id should be 184265, instead its %s' % entry[
             'tvmaze_episode_id']
+
+    @use_vcr()
+    def test_episode_without_air_date_and_air_stamp(self):
+        self.execute_task('test_episode_without_air_date')
+
+        entry = self.task.find_entry(title='Firefly S01E13 HDTV x264-LOL')
+        assert entry['tvmaze_series_id'] == 180, 'series id should be 180, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 13007, 'episode id should be 13007, instead its %s' % entry[
+            'tvmaze_episode_id']
+        assert entry['tvmaze_episode_airdate'] == None, \
+            'Expected airdate to be None, got %s' % entry['tvmaze_episode_airdate']
+        assert entry['tvmaze_episode_airstamp'] == None, \
+            'Expected airdate to be None, got %s' % entry['tvmaze_episode_airstamp']
 
     @use_vcr()
     def test_episode_summary(self):

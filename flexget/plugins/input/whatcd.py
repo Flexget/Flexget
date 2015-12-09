@@ -296,7 +296,7 @@ class InputWhatCD(object):
         self.session.set_domain_delay('ssl.what.cd', '2 seconds')
 
         # Custom user agent
-        user_agent = config.pop('user_agent')
+        user_agent = config.pop('user_agent', None)
         if user_agent:
             self.session.headers.update({"User-Agent": user_agent})
 
