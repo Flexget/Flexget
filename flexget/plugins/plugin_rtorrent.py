@@ -402,9 +402,9 @@ class RTorrentPluginBase(object):
         try:
             client = RTorrent(config['uri'], username=config.get('username'),
                               password=config.get('password'), timeout=config.get('timeout'))
-            if client.version < [0, 9, 4]:
-                log.error('rtorrent version >=0.9.4 required, found {0}'.format('.'.join(map(str, client.version))))
-                task.abort('rtorrent version >=0.9.4 required, found {0}'.format('.'.join(map(str, client.version))))
+            if client.version < [0, 9, 2]:
+                log.error('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
+                task.abort('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
         except (IOError, xmlrpclib.Error) as e:
             raise plugin.PluginError("Couldn't connect to rTorrent: %s" % str(e))
 
