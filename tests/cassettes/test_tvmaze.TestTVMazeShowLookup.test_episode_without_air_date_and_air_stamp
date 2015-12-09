@@ -6,49 +6,42 @@ interactions:
       Host: [api.tvmaze.com]
       User-Agent: [Python-urllib/2.7]
     method: GET
-    uri: http://api.tvmaze.com/search/shows?q=Chicago%20Fire
+    uri: http://api.tvmaze.com/search/shows?q=Firefly
   response:
-    body: {string: !!python/unicode '[{"score":2.3654017,"show":{"id":59,"url":"http://www.tvmaze.com/shows/59/chicago-fire","name":"Chicago
-        Fire","type":"Scripted","language":"English","genres":["Drama","Action","Adventure"],"status":"Running","runtime":60,"premiered":"2012-10-10","schedule":{"time":"22:00","days":["Tuesday"]},"rating":{"average":8.9},"weight":19,"network":{"id":1,"name":"NBC","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":30748,"thetvdb":258541},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/17/43868.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/17/43868.jpg"},"summary":"<p><em>\"No
-        job is more stressful, dangerous or exhilarating than those of the Firefighters,
-        Rescue Squad and Paramedics of Chicago Firehouse 51. These are the courageous
-        men and women who forge headfirst into danger when everyone else is running
-        the other way and whose actions make the difference between life and death.
-        These are their stories.\"</em></p><p>From renowned Emmy Award-winning executive
-        producer Dick Wolf and creators Derek Haas and Michael Brandt comes season
-        four of the high-octane drama \"Chicago Fire\" - an edge-of-your-seat view
-        into the lives of everyday heroes committed to one of America''s noblest professions.
-        For the firefighters, rescue squad and paramedics of Chicago Firehouse 51,
-        no occupation is more stressful or dangerous, yet so rewarding and exhilarating.
-        These courageous men and women are among the elite who forge headfirst into
-        danger when everyone else is running the other way and whose actions make
-        the difference between life and death.</p><p>The pressure to perform on such
-        a high level has a way of taking a personal toll, sometimes putting team members
-        from the Truck and the specially trained Rescue Squad at odds with each other.
-        Despite any differences, this is an extended family, and when it''s \"go time,\"
-        everyone inside Firehouse 51 knows no other way than to lay it all on the
-        line for each other. Lt. Matthew Casey (Jesse Spencer) leads the Truck Company,
-        and brash Lt. Kelly Severide (Taylor Kinney) runs the Rescue Squad.</p><p>The
-        firehouse also includes Battalion Chief Wallace Boden (Eamonn Walker), a fireman''s
-        fireman who recently welcomed a newborn son with his wife, Donna (Melissa
-        Ponzio). As chief of the firehouse, it''s Boden''s job to keep everything
-        in line and running smoothly between truck and squad. Paramedic turned tough-as-nails
-        firefighter Gabriela Dawson (Monica Raymund) returns alongside Paramedic Sylvie
-        Brett (Kara Killmer) and seasoned veteran Christopher Herrmann (David Eigenberg).
-        Dora Madison also joins the cast as spunky, spirited paramedic Jessica \"Chili\"
-        Chilton.</p><p>Also returning for the fourth season are Randy \"Mouch\" McHolland
-        (Christian Stolte), Jose Cruz (Joe Minoso) and Brian \"Otis\" Zvonecek (Yuri
-        Sardarov).</p><p>In addition to Wolf, Haas and Brandt, executive producers
-        also include Matt Olmstead, Joe Chappelle, Danielle Gelber, Arthur Forney
-        and Peter Jankowski.</p><p>\"Chicago Fire\" is produced by Universal Television
-        and Wolf Films.</p>","updated":1449563509,"_links":{"self":{"href":"http://api.tvmaze.com/shows/59"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/432941"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/432942"}}}}]'}
+    body: {string: !!python/unicode '[{"score":2.9922216,"show":{"id":180,"url":"http://www.tvmaze.com/shows/180/firefly","name":"Firefly","type":"Scripted","language":"English","genres":["Adventure","Science-Fiction","Western"],"status":"Ended","runtime":60,"premiered":"2002-09-20","schedule":{"time":"20:00","days":["Friday"]},"rating":{"average":9.5},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3548,"thetvdb":78874},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/2600.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/2600.jpg"},"summary":"<p>Five
+        hundred years in the future, a renegade crew aboard a small spacecraft tries
+        to survive as they travel the unknown parts of the galaxy and evade warring
+        factions as well as authority agents out to get them.</p>","updated":1449590156,"_links":{"self":{"href":"http://api.tvmaze.com/shows/180"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/13006"}}}}]'}
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 08 Dec 2015 15:24:20 GMT']
+      date: ['Wed, 09 Dec 2015 08:34:21 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/shows/180/episodebynumber?season=1&number=13
+  response:
+    body: {string: !!python/unicode '{"id":13007,"url":"http://www.tvmaze.com/episodes/13007/firefly-1x13-heart-of-gold","name":"Heart
+        of Gold","season":1,"number":13,"airdate":"","airtime":"","airstamp":null,"runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/9/23981.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/9/23981.jpg"},"summary":"<p>The
+        crew comes to the aid of a bordello when its madam, an old acquaintance of
+        Inara''s, asks for help after a rancher claims a prostitute''s baby is his
+        and he''s taking it because his wife is barren.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/13007"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Wed, 09 Dec 2015 08:34:22 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}

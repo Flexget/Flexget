@@ -2,9 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 
 from datetime import timedelta, datetime
 
-import mock
-import pytvmaze
-
 from flexget.manager import Session
 from flexget.plugins.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries
 from tests import FlexGetBase, use_vcr
@@ -82,19 +79,13 @@ class TestTVMazeShowLookup(FlexGetBase):
               - Tosh.0
           test_episode_without_air_date:
             mock:
-              - {title: 'Chicago Fire S04E08 HDTV x264-LOL'}
+              - {title: 'Firefly S01E13 HDTV x264-LOL'}
             series:
-              - Chicago Fire
+              - Firefly
             set:
               bfield: "{{tvmaze_episode_airdate}}{{tvmaze_episode_airstamp}}"
 
     """
-    episode = pytvmaze.episode_by_number(maze_id=59, season_number=4, episode_number=8)
-    assert episode.airdate == '2015-12-01', 'Expected airdate is 2015-12-01, got %s' % episode.airdate
-    assert episode.airstamp == '2015-12-01T22:00:00-05:00', \
-        'Expected airstamp is 2015-12-01T22:00:00-05:00, got %s' % episode.airstamp
-    episode.airdate = None
-    episode.airstamp = None
 
     @use_vcr
     def test_lookup_name(self):
@@ -282,12 +273,14 @@ class TestTVMazeShowLookup(FlexGetBase):
             'tvmaze_episode_id']
 
     @use_vcr()
-    @mock.patch('flexget.plugins.api_tvmaze.episode_by_number', autospec=True)
-    def test_episode_without_air_date_and_air_stamp(self, episode_mock):
-        episode_mock.return_value = self.episode
+    def test_episode_without_air_date_and_air_stamp(self):
         self.execute_task('test_episode_without_air_date')
 
-        entry = self.task.find_entry(title='Chicago Fire S04E08 HDTV x264-LOL')
+        entry = self.task.find_entry(title='Firefly S01E13 HDTV x264-LOL')
+        assert entry['tvmaze_series_id'] == 180, 'series id should be 180, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 13007, 'episode id should be 13007, instead its %s' % entry[
+            'tvmaze_episode_id']
         assert entry['tvmaze_episode_airdate'] == None, \
             'Expected airdate to be None, got %s' % entry['tvmaze_episode_airdate']
         assert entry['tvmaze_episode_airstamp'] == None, \
