@@ -18,7 +18,7 @@ class T411InputPlugin(object):
                 'category': {'type': 'string'},
                 'terms': one_or_more({'type': 'string'}),
                 'max_results': {'type': 'number', 'default': 100}
-                },
+            },
             'additionalProperties': False
         }
 
@@ -54,4 +54,4 @@ class T411InputPlugin(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(T411InputPlugin, 't411', api_ver=2)
+    plugin.register(T411InputPlugin, 't411', groups=['search','input'], api_ver=2)
