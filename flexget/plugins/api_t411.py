@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 from datetime import datetime
+from functools import partial
 import json
 import logging
 import urllib
@@ -13,7 +14,7 @@ from sqlalchemy import (Table, Column, Integer, String, ForeignKey, DateTime, Bo
 from sqlalchemy.orm import relation, backref
 from flexget import db_schema
 from flexget.utils.requests import Session
-from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
+from sqlalchemy.orm.exc import NoResultFound
 
 log = logging.getLogger('t411')
 
@@ -27,6 +28,7 @@ category_term_types = Table('category_term_types', Base.metadata,
 torrent_terms = Table('torrent_terms', Base.metadata,
                       Column('torrent_id', Integer, ForeignKey('torrent.id')),
                       Column('term_id', Integer, ForeignKey('term.id')))
+
 
 @db_schema.upgrade('api_t411')
 def upgrade(ver, session):
@@ -95,6 +97,8 @@ class Credential(Base):
     password = Column(String, nullable=False)
     api_token = Column(String)
     default = Column(Boolean, nullable=False, default=False)
+
+
 # endregion ORM definition
 
 
@@ -123,12 +127,14 @@ def auth_required(func):
     :param func:
     :return:
     """
+
     def wrapper(self, *args, **kwargs):
         if not self.is_authenticated():
             log.debug('None API token. Authenticating with "%s" account...' % self.credentials.get('username'))
             self.auth()
             assert self.is_authenticated()
         return func(self, *args, **kwargs)
+
     return wrapper
 
 
@@ -150,6 +156,11 @@ class T411RestClient(object):
         self.web_session = Session()
 
     def auth(self):
+        """
+        Request server to obtain a api token. Obtained
+        token will be set for future usage of the client instance
+        :return:
+        """
         auth_url = self.api_template_url % T411API_AUTH_PATH
         response = self.web_session.post(auth_url, self.credentials)
         json_response = response.json()
@@ -160,10 +171,19 @@ class T411RestClient(object):
             self.set_api_token(json_response.get('token'))
 
     def set_api_token(self, api_token):
+        """
+        Set the client for use an api token.
+        :param api_token:
+        :return:
+        """
         self.api_token = api_token
         self.web_session.headers.update({'Authorization': self.api_token})
 
     def is_authenticated(self):
+        """
+        :return: True if an api token is set. Note that the client
+        doesn't check if the token is valid (expired or wrong).
+        """
         return self.api_token is not None
 
     def get_json(self, path):
@@ -181,7 +201,7 @@ class T411RestClient(object):
             try:
                 last_line = request.text.splitlines()[-1]
                 result = json.loads(last_line)
-            except (ValueError, IndexError) as e:
+            except (ValueError, IndexError):
                 log.warning("Server response doesn't contains any JSON encoded response.")
                 return None
 
@@ -207,6 +227,15 @@ class T411RestClient(object):
 
     @auth_required
     def search(self, query):
+        """
+        Search torrent
+        :param query: dict
+        :param query['category_id']: Int optional
+        :param query['result_per_page']: Int optional
+        :param query['page_index']: Int optional
+        :param query['terms']: (Term type id, Term id,)
+        :return dict
+        """
         url = T411API_SEARCH_PATH
         if query.get('expression') is not None:
             url += query['expression']
@@ -236,13 +265,19 @@ class T411RestClient(object):
 
 
 class T411ObjectMapper(object):
-    date_format = "%Y-%m-%d %H:%M:%S"
-
     """
     Tool class to convert JSON object from the REST client
     into object for ORM
     """
+    date_format = "%Y-%m-%d %H:%M:%S"
+
     def map_category(self, json_category):
+        """
+        Parse one JSON object of a category (and its subcategories) to Category
+        :param json_category: dict
+        :return:
+        """
+
         # Some categories are empty, so we reject them
         if json_category.get('id') is None \
                 or json_category.get('pid') is None \
@@ -292,7 +327,7 @@ class T411ObjectMapper(object):
         # term type definition can appears multiple times
         category_to_term_type = []  # relations category-term type
         term_types = {}  # term types, indexed by termtype id
-        terms = {} # terms, indexed by id
+        terms = {}  # terms, indexed by id
         for category_key, json_term_types in json_tree.iteritems():
             for term_type_key, term_type_content in json_term_types.iteritems():
                 term_type_id = int(term_type_key)
@@ -305,7 +340,7 @@ class T411ObjectMapper(object):
                     term_type.id = term_type_id
                     term_type.name = term_type_content.get('type')
                     term_type.mode = term_type_content.get('mode')
-                    term_types[term_type.id] = term_type # index term type
+                    term_types[term_type.id] = term_type  # index term type
                     for term_id, term_name in term_type_content.get('terms').iteritems():
                         # Parsing & indexing terms
                         if term_id not in terms:
@@ -314,7 +349,12 @@ class T411ObjectMapper(object):
 
         return category_to_term_type, term_types
 
-    def map_search_result_entry(self, json_entry, download_auth):
+    @staticmethod
+    def map_search_result_entry(json_entry, download_auth=None):
+        """
+        Parse json object of a torrent entry to flexget Entry
+        :param download_auth: Requests authenticator
+        """
         result = Entry()
         result['t411_torrent_id'] = json_entry['id']
         result['title'] = json_entry['name']
@@ -324,7 +364,7 @@ class T411ObjectMapper(object):
         result['leechers'] = int(json_entry['leechers'])
         result['t411_comments'] = int(json_entry['comments'])
         result['t411_isVerified'] = json_entry['isVerified'] is '1'
-        result['t411_pubdate'] = datetime.strptime(json_entry['added'], self.date_format)
+        result['t411_pubdate'] = datetime.strptime(json_entry['added'], T411ObjectMapper.date_format)
         result['content_size'] = int(json_entry['size'])
         result['t411_times_completed'] = int(json_entry['times_completed'])
         result['t411_category_name'] = json_entry['categoryname']
@@ -335,7 +375,11 @@ class T411ObjectMapper(object):
         result['download_auth'] = download_auth
         return result
 
-    def map_details(self, json_details, resolver):
+    @staticmethod
+    def map_details(json_details, resolver):
+        """
+        WIP
+        """
         result = Torrent()
         result.id = json_details.get('id')
         result.name = json_details.get('name')
@@ -354,16 +398,18 @@ class T411ObjectMapper(object):
 def cache_required(func):
     """
     Decorator for ensuring cached data into db.
-    Ifnot a synchronize will be launched
+    If not a synchronize will be launched
     :param func:
     :return:
     """
+
     def wrapper(self, *args, **kwargs):
         log.debug("Checking database...")
         if not self.has_cached_criterias():
             log.debug('None cached data. Synchronizing...')
             self.synchronize_database()
         return func(self, *args, **kwargs)
+
     return wrapper
 
 
@@ -372,6 +418,7 @@ class T411Proxy(object):
     A T411 proxy service. This proxy interact both with
     T411 Rest Client and T411 local database.
     """
+
     @with_session
     def __init__(self, session=None):
         """
@@ -402,12 +449,12 @@ class T411Proxy(object):
 
         if credential is None:
             raise PluginError('You cannot use t411 plugin without credentials. '
-                      'Please set credential with "flexget t411 add-auth <username> <password>".')
+                              'Please set credential with "flexget t411 add-auth <username> <password>".')
         self.__set_credential(credential.username, credential.password, credential.api_token)
 
     def has_cached_criterias(self):
         """
-        :return: True if database contains previous version of criterias
+        :return: True if database contains data of a previous synchronization
         """
         if self.__has_cached_criterias is None:
             self.__has_cached_criterias = self.session.query(Category).count() > 0
@@ -446,17 +493,17 @@ class T411Proxy(object):
         return query.all()
 
     @cache_required
-    def find_term_types(self, category_id=None, category_name=None, term_type_name=None):
-        query = self.session.query(TermType)\
+    def find_term_types(self, category_id=None, term_type_name=None):
+        query = self.session.query(TermType) \
             .filter(TermType.name == term_type_name) \
             .filter(TermType.categories.any(Category.id == category_id))
         return query.one()
 
     @cache_required
     def find_term_by_name(self, term_type_id, term_name):
-        return self.session.query(Term)\
-            .filter(Term.type_id == term_type_id)\
-            .filter(Term.name == term_name)\
+        return self.session.query(Term) \
+            .filter(Term.type_id == term_type_id) \
+            .filter(Term.name == term_name) \
             .one()
 
     @cache_required
@@ -486,47 +533,6 @@ class T411Proxy(object):
     def all_term_names(self):
         name_query = self.session.query(Term.name).all()
         return [name for (name,) in name_query]
-
-    @cache_required
-    def print_categories(self):
-        categories = self.session.query(Category).filter(Category.parent_id.is_(None)).all()
-        formatting_main = '%-30s %-5s %-5s'
-        formatting_sub = '     %-25s %-5s %-5s'
-        log.debug(formatting_main % ('Name', 'PID', 'ID'))
-        for category in categories:
-            log.debug(formatting_main % (category.name, category.parent_id, category.id))
-            for sub_category in category.sub_categories:
-                log.debug(formatting_sub % (sub_category.name, sub_category.parent_id, sub_category.id))
-
-    @cache_required
-    def print_all_terms(self):
-        formatting_main = '%-50s %-10s %-5s'
-        formatting_sub = '     %-45s %-10s %-5s'
-        term_types = self.session.query(TermType).all()
-        log.debug(formatting_main % ('Name', 'Mode', 'Id'))
-        for term_type in term_types:
-            log.debug(formatting_main % (term_type.name, term_type.mode, term_type.id))
-            for term in term_type.terms:
-                log.debug(formatting_sub % (term.name, '', term.id))
-
-    @cache_required
-    def print_terms(self, category_id=None, category_name=None):
-        if category_id is not None:
-            category = self.session.query(Category).filter(Category.id == category_id).one()
-        elif category_name is not None:
-            category = self.find_categories(category_name)
-        else:
-            self.print_all_terms()
-            return
-
-        log.debug('Terms for the category %s' % category.name)
-        formatting_main = '%-50s %-10s %-5s'
-        formatting_sub = '     %-45s %-10s %-5s'
-        log.debug(formatting_main % ('Name', 'Mode', 'Id'))
-        for term_type in category.term_types:
-            log.debug(formatting_main % (term_type.name, term_type.mode, term_type.id))
-            for term in term_type.terms:
-                log.debug(formatting_sub % (term.name, '', term.id))
 
     @cache_required
     def friendly_query_to_client_query(self, friendly_query):
@@ -578,16 +584,21 @@ class T411Proxy(object):
                   % (len(json_torrents), len(json_torrents) - len(json_not_pending_torrents)))
         download_auth = T411BindAuth(self.rest_client.api_token)
 
-        def bind_map_function(json):
-            return self.mapper.map_search_result_entry(json, download_auth)
-        return map(bind_map_function, json_not_pending_torrents)
+        map_function = partial(T411ObjectMapper.map_search_result_entry, download_auth=download_auth)
+        return map(map_function, json_not_pending_torrents)
 
     @cache_required
     def details(self, torrent_id):
+        """
+        WIP
+        Download and store torrent details
+        :param torrent_id:
+        :return:
+        """
         details = self.session \
-                    .query(Torrent) \
-                    .filter(Torrent.id == torrent_id) \
-                    .first()
+            .query(Torrent) \
+            .filter(Torrent.id == torrent_id) \
+            .first()
         if details:
             return details
         else:

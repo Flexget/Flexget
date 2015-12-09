@@ -32,6 +32,11 @@ class T411InputPlugin(object):
 
     @staticmethod
     def build_request_from(config):
+        """
+        Build a query from plugin config dict
+        :param config: dict
+        :return:
+        """
         query = FriendlySearchQuery()
         query.category_name = config.get('category')
         query.term_names = config.get('terms', [])
