@@ -84,41 +84,37 @@ class TVMazeSeries(Base):
         self.language = series.language
         self.schedule = series.schedule
         self.url = series.url
-        try:
+        if series.image:
             self.original_image = series.image.get('original')
-        except AttributeError:
-            self.original_image = None
-        try:
             self.medium_image = series.image.get('medium')
-        except AttributeError:
+        else:
+            self.original_image = None
             self.medium_image = None
         self.tvdb_id = series.externals.get('thetvdb')
         self.tvrage_id = series.externals.get('tvrage')
-        try:
+        if series.premiered:
             self.premiered = parser.parse(series.premiered)
-        except AttributeError:
+            self.year = int(series.premiered[:4])
+        else:
             self.premiered = None
+            self.year = None
         self.summary = series.summary
-        try:
+        if series.webChannel:
             self.webchannel = series.webChannel.get('name')
-        except AttributeError:
+        else:
             self.webchannel = None
         self.runtime = series.runtime
         self.show_type = series.type
-        try:
+        if series.network:
             self.network = series.network.get('name')
-        except AttributeError:
+        else:
             self.network = None
-        try:
-            self.year = int(series.premiered[:4])
-        except (TypeError, ValueError):
-            self.year = None
         self.last_update = datetime.now()
 
         self.genres[:] = get_db_genres(series.genres, session)
 
     def __repr__(self):
-        return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.id, self.last_update)
+        return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.tvmaze_id, self.last_update)
 
     def __str__(self):
         return self.name
@@ -160,20 +156,21 @@ class TVMazeEpisodes(Base):
 
     def update(self, episode):
         self.title = episode.title
-        try:
+        if episode.airdate:
             self.airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
-        except ValueError:
+        else:
             self.airdate = None
         self.url = episode.url
-        try:
+        if episode.image:
             self.original_image = episode.image.get('original')
-        except AttributeError:
-            self.original_image = None
-        try:
             self.medium_image = episode.image.get('medium')
-        except AttributeError:
+        else:
+            self.original_image = None
             self.medium_image = None
-        self.airstamp = parser.parse(episode.airstamp)
+        if episode.airstamp:
+            self.airstamp = parser.parse(episode.airstamp)
+        else:
+            self.airstamp = None
         self.runtime = episode.runtime
         self.last_update = datetime.now()
 
