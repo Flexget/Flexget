@@ -89,6 +89,11 @@ class TestTVMazeShowLookup(FlexGetBase):
               - {title: 'The.Flash.2014.S02E02.HDTV.x264-LOL'}
             series:
               - The Flash
+          test_show_with_non_ascii_chars:
+            mock:
+              - {title: 'Unite 9 S01E16 VFQ HDTV XviD-bLinKkY'}
+            series:
+              - Unite 9
     """
 
     @use_vcr
@@ -305,3 +310,15 @@ class TestTVMazeShowLookup(FlexGetBase):
             'tvmaze_episode_id']
         assert entry['tvmaze_episode_summary'] == expected_summary, 'Expected summary is different %s' % entry[
             'tvmaze_episode_summary']
+
+    @use_vcr()
+    def test_show_with_non_ascii_chars(self):
+        self.execute_task('test_show_with_non_ascii_chars')
+        entry = self.task.entries[0]
+        assert entry['tvmaze_series_name'] == u'Unit\xe9 9', u'series id should be Unit\xe9 9, instead its %s' % entry[
+            'tvmaze_series_name']
+        assert entry['tvmaze_series_id'] == 8652, 'series id should be 8652, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 476294, 'episode id should be 476294, instead its %s' % entry[
+            'tvmaze_episode_id']
+
