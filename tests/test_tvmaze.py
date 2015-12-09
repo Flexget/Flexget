@@ -292,11 +292,10 @@ class TestTVMazeShowLookup(FlexGetBase):
 
     @use_vcr()
     def test_episode_summary(self):
-        expected_summary = "The team's visitors, Jay Garrick, explains that he comes from a" \
-                           " parallel world and was a speedster there, but lost his powers transitioning over. " \
-                           "Now he insists that Barry needs his help fighting a new metahuman," \
-                           " Sand Demon, who came from Jay's world. Meanwhile, Officer Patty  Spivot " \
-                           "tries to join Joe's Metahuman Taskforce.'"
+        expected_summary = u"The team's visitors, Jay Garrick, explains that he comes from a parallel world" \
+                           u" and was a speedster there, but lost his powers transitioning over. Now he insists" \
+                           u" that Barry needs his help fighting a new metahuman, Sand Demon, who came from" \
+                           u" Jay's world. Meanwhile, Officer Patty Spivot tries to join Joe's Metahuman Taskforce."
 
         self.execute_task('test_episode_summary')
         entry = self.task.entries[0]

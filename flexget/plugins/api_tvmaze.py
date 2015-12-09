@@ -6,14 +6,13 @@ from datetime import datetime
 from dateutil import parser
 from pytvmaze import get_show, episode_by_number, episodes_by_date
 from pytvmaze.exceptions import ShowNotFound, EpisodeNotFound, NoEpisodesForAirdate, IllegalAirDate, ConnectionError
-from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table, or_, \
+from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table, or_, \
     and_
 from sqlalchemy.orm import relation
 
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.utils.database import with_session
-from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')
@@ -26,8 +25,7 @@ UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 @db_schema.upgrade('tvmaze')
 def upgrade(ver, session):
     if ver == 0:
-        table_add_column('tvmaze_episode', 'summary', Unicode, session)
-        ver = 1
+        raise db_schema.UpgradeImpossible
     return ver
 
 
@@ -57,7 +55,7 @@ class TVMazeSeries(Base):
 
     tvmaze_id = Column(Integer, primary_key=True)
     status = Column(Unicode)
-    rating = Column(Numeric)
+    rating = Column(Float)
     genres = relation(TVMazeGenre, secondary=genres_table)
     weight = Column(Integer)
     updated = Column(DateTime)  # last time show was updated at tvmaze
