@@ -6,7 +6,7 @@ from datetime import datetime
 from dateutil import parser
 from pytvmaze import get_show, episode_by_number, episodes_by_date
 from pytvmaze.exceptions import ShowNotFound, EpisodeNotFound, NoEpisodesForAirdate, IllegalAirDate, ConnectionError
-from sqlalchemy import Column, Integer, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table, or_, \
+from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table, or_, \
     and_
 from sqlalchemy.orm import relation
 
@@ -17,9 +17,16 @@ from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')
 
-DB_VERSION = 0
+DB_VERSION = 1
 Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
+
+
+@db_schema.upgrade('tvmaze')
+def upgrade(ver, session):
+    if ver == 0:
+        raise db_schema.UpgradeImpossible
+    return ver
 
 
 class TVMazeGenre(Base):
@@ -48,7 +55,7 @@ class TVMazeSeries(Base):
 
     tvmaze_id = Column(Integer, primary_key=True)
     status = Column(Unicode)
-    rating = Column(Numeric)
+    rating = Column(Float)
     genres = relation(TVMazeGenre, secondary=genres_table)
     weight = Column(Integer)
     updated = Column(DateTime)  # last time show was updated at tvmaze
@@ -145,6 +152,7 @@ class TVMazeEpisodes(Base):
     medium_image = Column(String)
     airstamp = Column(DateTime)
     runtime = Column(Integer)
+    summary = Column(Unicode)
     last_update = Column(DateTime)
 
     def __init__(self, episode, series_id):
@@ -155,6 +163,7 @@ class TVMazeEpisodes(Base):
         self.update(episode)
 
     def update(self, episode):
+        self.summary = episode.summary
         self.title = episode.title
         if episode.airdate:
             self.airdate = datetime.strptime(episode.airdate, '%Y-%m-%d')
