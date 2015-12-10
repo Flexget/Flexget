@@ -96,7 +96,9 @@ class PluginTVMazeLookup(object):
         'tvmaze_series_url': 'url',
         'tvmaze_series_status': 'status',
         'tvmaze_series_rating': 'rating',
-        'tvmaze_series_episodes': lambda show: [episodes.title for episodes in show.episodes]
+        'tvmaze_series_episodes': lambda show: [episodes.title for episodes in show.episodes],
+        'tvmaze_series_characters': lambda show: [character.name for character in show.characters],
+        'tvmaze_series_actors': lambda show: [actor.name for actor in show.actors]
     }
 
     # Episode info
