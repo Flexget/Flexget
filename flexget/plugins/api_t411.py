@@ -30,7 +30,7 @@ torrent_terms = Table('torrent_terms', Base.metadata,
                       Column('term_id', Integer, ForeignKey('term.id')))
 
 
-@db_schema.upgrade('api_t411')
+@db_schema.upgrade('t411')
 def upgrade(ver, session):
     return SCHEMA_VER
 
