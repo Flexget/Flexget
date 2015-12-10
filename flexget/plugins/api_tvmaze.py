@@ -4,16 +4,14 @@ import logging
 from datetime import datetime
 
 from dateutil import parser
-from pytvmaze import get_show, episode_by_number, episodes_by_date, show_cast
-from pytvmaze.exceptions import ShowNotFound, EpisodeNotFound, NoEpisodesForAirdate, IllegalAirDate, ConnectionError, \
-    CastNotFound
-from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, PickleType, func, Table, or_, \
+from pytvmaze import get_show, episode_by_number, episodes_by_date
+from pytvmaze.exceptions import ShowNotFound, EpisodeNotFound, NoEpisodesForAirdate, IllegalAirDate, ConnectionError
+from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table, or_, \
     and_
 from sqlalchemy.orm import relation
 
 from flexget import db_schema, plugin
 from flexget.event import event
-from flexget.manager import Session
 from flexget.utils.database import with_session
 from flexget.utils.tools import split_title_year
 
@@ -29,88 +27,6 @@ def upgrade(ver, session):
     if ver == 0:
         raise db_schema.UpgradeImpossible
     return ver
-
-
-class TVMazePeople(Base):
-    __tablename__ = 'tvmaze_people'
-
-    tvmaze_id = Column(Integer, primary_key=True)
-    name = Column(Unicode, unique=True, nullable=False)
-    original_image = Column(String)
-    medium_image = Column(String)
-    url = Column(String)
-    characters = relation(TVMazeCharacters, secondary=people_to_characters_table)
-    last_update = Column(DateTime)
-
-    def __init__(self, person):
-        self.tvmaze_id = person.id
-        self.name = person.name
-        self.url = person.url
-
-    def update(self, person):
-        if person.image:
-            self.original_image = person.image.get('original')
-            self.medium_image = person.image.get('medium')
-        else:
-            self.original_image = None
-            self.medium_image = None
-        self.last_update = datetime.now()
-
-        self.characters[:] = get_db_characters(person.characters)
-
-    @property
-    def expired(self):
-        if not self.last_update:
-            log.debug('no last update attribute, person set for update')
-            return True
-        time_dif = datetime.now() - self.last_update
-        expiration = time_dif.days > UPDATE_INTERVAL
-        log.debug('person (0} is expired. days overdue for update: {1}'.format(self.name, expiration))
-        return expiration
-
-
-class TVMazeCharacters(Base):
-    __tablename__ = 'tvmaze_characters'
-
-    tvmaze_id = Column(Integer, primary_key=True)
-    name = Column(Unicode, unique=True, nullable=False)
-    original_image = Column(String)
-    medium_image = Column(String)
-    url = Column(String)
-    people = relation(TVMazePeople, secondary=people_to_characters_table)
-    last_update = Column(DateTime)
-
-    def __init__(self, character):
-        self.tvmaze_id = character.id
-        self.name = character.name
-        self.url = character.url
-
-    def update(self, character):
-        if character.image:
-            self.original_image = character.image.get('original')
-            self.medium_image = character.image.get('medium')
-        else:
-            self.original_image = None
-            self.medium_image = None
-        self.last_update = datetime.now()
-
-        self.characters[:] = get_db_people(character.characters)
-
-    @property
-    def expired(self):
-        if not self.last_update:
-            log.debug('no last update attribute, character set for update')
-            return True
-        time_dif = datetime.now() - self.last_update
-        expiration = time_dif.days > UPDATE_INTERVAL
-        log.debug('character (0} is expired. days overdue for update: {1}'.format(self.name, expiration))
-        return expiration
-
-
-people_to_characters_table = Table('tvmaze_people_to_characters', Base.metadata,
-                                   Column('series_id', Integer, ForeignKey('tvmaze_series.tvmaze_id')),
-                                   Column('person_id', Integer, ForeignKey('tvmaze_people.tvmaze_id')),
-                                   Column('character_id', Integer, ForeignKey('tvmaze_characters.tvmaze_id')))
 
 
 class TVMazeGenre(Base):
@@ -160,8 +76,6 @@ class TVMazeSeries(Base):
     network = Column(Unicode)
     episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season_number', cascade='all, delete, delete-orphan',
                         backref='series')
-    actors = relation(TVMazePeople, secondary=people_to_characters_table)
-    characters = relation(TVMazeCharacters, secondary=people_to_characters_table)
     last_update = Column(DateTime)  # last time we updated the db for the show
 
     def __init__(self, series, session):
@@ -280,42 +194,6 @@ class TVMazeEpisodes(Base):
                   'days overdue for update: {3}'.format(self.number, self.season_number, self.series_id, expiration))
         return expiration
 
-
-def get_db_characters(characters):
-    db_characters = []
-    for character in characters:
-        with Session() as session:
-            db_character = session.query(TVMazeCharacters).filter(TVMazeCharacters.tvmaze_id == character.id).first()
-            if not db_character:
-                db_character = TVMazeCharacters(character=character)
-                session.add(db_character)
-            elif db_character.expired:
-                db_character.update(character)
-        db_characters.append(db_character)
-    return db_characters
-
-def get_db_people(people):
-    db_characters = []
-    for person in people:
-        with Session() as session:
-            db_person = session.query(TVMazePeople).filter(TVMazePeople.tvmaze_id == person.id).first()
-            if not db_person:
-                db_person = TVMazePeople(person=person)
-                session.add(db_person)
-            elif db_person.expired:
-                db_person.update(person)
-        db_characters.append(db_person)
-    return db_characters
-
-def get_cast(series_maze_id):
-    try:
-        cast = show_cast(series_maze_id)
-    except CastNotFound as e:
-        log.warning('Could not get show cast')
-        raise LookupError(e)
-    characters = cast.characters
-    people = cast.people
-    return get_db_people(people), get_db_characters(characters)
 
 def get_db_genres(genres, session):
     db_genres = []
@@ -535,14 +413,6 @@ class APITVMaze(object):
             session.add(episode)
 
         return episode
-
-    @staticmethod
-    @with_session
-    def cast_lookup(session=None, only_cached=False, **lookup_params):
-        series = APITVMaze.series_lookup(session=session, only_cached=only_cached, **lookup_params)
-        if not series:
-            raise LookupError('Could not find series with the following parameters: {0}'.format(**lookup_params))
-        # TODO return cast
 
 
 @event('plugin.register')
