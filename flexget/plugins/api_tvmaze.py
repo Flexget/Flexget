@@ -28,6 +28,7 @@ def upgrade(ver, session):
         raise db_schema.UpgradeImpossible
     return ver
 
+
 actors_to_characters_table = Table('tvmaze_actors_to_characters', Base.metadata,
                                    Column('series_id', Integer, ForeignKey('tvmaze_series.tvmaze_id')),
                                    Column('actor_id', Integer, ForeignKey('tvmaze_actors.tvmaze_id')),
@@ -287,6 +288,8 @@ def get_db_characters(characters, session):
         elif db_character.expired:
             log.debug('found expired character in db, refreshing')
             db_character.update(character)
+        else:
+            log.debug('character {0} found in db, returning'.format(db_character.name))
         db_characters.append(db_character)
     return db_characters
 
@@ -294,15 +297,17 @@ def get_db_characters(characters, session):
 def get_db_actors(actors, session):
     db_characters = []
     for actor in actors:
-        db_person = session.query(TVMazeActors).filter(TVMazeActors.tvmaze_id == actor.id).first()
-        if not db_person:
-            db_person = TVMazeActors(actor=actor, session=session)
-            log.debug('adding actor {0} to db'.format(db_person.name))
-            session.add(db_person)
-        elif db_person.expired:
+        db_actor = session.query(TVMazeActors).filter(TVMazeActors.tvmaze_id == actor.id).first()
+        if not db_actor:
+            db_actor = TVMazeActors(actor=actor, session=session)
+            log.debug('adding actor {0} to db'.format(db_actor.name))
+            session.add(db_actor)
+        elif db_actor.expired:
             log.debug('found expired actor in db, refreshing')
-            db_person.update(actor)
-        db_characters.append(db_person)
+            db_actor.update(actor)
+        else:
+            log.debug('actor {0} found in db, returning'.format(db_actor.name))
+        db_characters.append(db_actor)
     return db_characters
 
 
@@ -314,6 +319,8 @@ def get_db_genres(genres, session):
             db_genre = TVMazeGenre(name=genre)
             log.debug('adding genre {0} to db'.format(genre))
             session.add(db_genre)
+        else:
+            log.debug('genre {0} found in db, returning'.format(db_genre.name))
         db_genres.append(db_genre)
     return db_genres
 
