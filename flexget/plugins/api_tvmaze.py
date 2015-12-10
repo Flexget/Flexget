@@ -19,7 +19,7 @@ from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')
 
-DB_VERSION = 1
+DB_VERSION = 2
 Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 
@@ -294,6 +294,7 @@ def get_db_characters(characters):
         db_characters.append(db_character)
     return db_characters
 
+
 def get_db_people(people):
     db_characters = []
     for person in people:
@@ -307,6 +308,7 @@ def get_db_people(people):
         db_characters.append(db_person)
     return db_characters
 
+
 def get_cast(series_maze_id):
     try:
         cast = show_cast(series_maze_id)
@@ -316,6 +318,7 @@ def get_cast(series_maze_id):
     characters = cast.characters
     people = cast.people
     return get_db_people(people), get_db_characters(characters)
+
 
 def get_db_genres(genres, session):
     db_genres = []
@@ -385,6 +388,9 @@ def prepare_lookup_for_pytvmaze(**lookup_params):
     prepared_params['show_network'] = lookup_params.get('network') or lookup_params.get('trakt_series_network')
     prepared_params['show_country'] = lookup_params.get('country') or lookup_params.get('trakt_series_country')
     prepared_params['show_language'] = lookup_params.get('language')
+
+    # Include cast information by default
+    prepared_params['embed'] = 'cast'
 
     return prepared_params
 
@@ -535,14 +541,6 @@ class APITVMaze(object):
             session.add(episode)
 
         return episode
-
-    @staticmethod
-    @with_session
-    def cast_lookup(session=None, only_cached=False, **lookup_params):
-        series = APITVMaze.series_lookup(session=session, only_cached=only_cached, **lookup_params)
-        if not series:
-            raise LookupError('Could not find series with the following parameters: {0}'.format(**lookup_params))
-        # TODO return cast
 
 
 @event('plugin.register')
