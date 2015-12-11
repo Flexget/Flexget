@@ -16,7 +16,7 @@ from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.database import with_session
 from flexget.utils.sqlalchemy_utils import table_columns, get_index_by_name, table_schema
 
-SCHEMA_VER = 4
+SCHEMA_VER = 5
 
 Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
@@ -218,6 +218,10 @@ def upgrade(ver, session):
         log.info('Adding original title column, cached data will not have this information')
         table_add_column('imdb_movies', 'original_title', Unicode, session)
         ver = 4
+    if ver == 4:
+        log.info('Adding runtime column, cached data will not have this information')
+        table_add_column('imdb_movies', 'runtime', Unicode, session)
+        ver = 5
     return ver
 
 
@@ -247,6 +251,7 @@ class ImdbLookup(object):
         'imdb_actors': lambda movie: dict((actor.imdb_id, actor.name) for actor in movie.actors),
         'imdb_directors': lambda movie: dict((director.imdb_id, director.name) for director in movie.directors),
         'imdb_mpaa_rating': 'mpaa_rating',
+        'imdb_runtime': 'runtime',
         # Generic fields filled by all movie lookup plugins:
         'movie_name': 'title',
         'movie_year': 'year'}
@@ -421,7 +426,7 @@ class ImdbLookup(object):
                 log.exception(e)
             raise plugin.PluginError('Invalid parameter: %s' % entry['imdb_url'], log)
 
-        for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'mpaa_rating']:
+        for att in ['title', 'score', 'votes', 'year', 'genres', 'languages', 'actors', 'directors', 'mpaa_rating', 'runtime']:
             log.trace('movie.%s: %s' % (att, getattr(movie, att)))
 
         # Update the entry fields
@@ -445,6 +450,7 @@ class ImdbLookup(object):
         movie.score = parser.score
         movie.votes = parser.votes
         movie.year = parser.year
+        movie.runtime = parser.runtime
         movie.mpaa_rating = parser.mpaa_rating
         movie.plot_outline = parser.plot_outline
         movie.url = imdb_url

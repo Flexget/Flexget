@@ -215,6 +215,7 @@ class ImdbParser(object):
         self.score = 0.0
         self.votes = 0
         self.year = 0
+        self.runtime = 0
         self.plot_outline = None
         self.name = None
         self.original_name = None
@@ -271,6 +272,13 @@ class ImdbParser(object):
             log.debug('Detected name: %s' % self.name)
         else:
             log.warning('Unable to get name for %s - plugin needs update?' % url)
+
+        tag_duration = soup.find('time',itemprop='duration',text=re.compile('(\d+) min'))
+        if tag_duration:
+            self.runtime = int(tag_duration.text.strip().rstrip('min'))
+            log.debug('Detected runtime: %d' % self.runtime)
+        else:
+            log.warning('Unable to get runtime for %s - plugin needs update?' % url)
 
         tag_original_title_i = soup.find('i', text=re.compile(r'original title'))
         if tag_original_title_i:
