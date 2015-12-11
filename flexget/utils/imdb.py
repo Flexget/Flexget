@@ -45,6 +45,9 @@ def make_url(imdb_id):
     """Return IMDb URL of the given ID"""
     return u'http://www.imdb.com/title/%s/' % imdb_id
 
+def make_keywords_url(imdb_id):
+    """ Return IMDb Plot Keywords URL of the given ID"""
+    return u'http://www.imdb.com/title/%s/keywords' % imdb_id
 
 class ImdbSearch(object):
 
@@ -216,6 +219,7 @@ class ImdbParser(object):
         self.votes = 0
         self.year = 0
         self.plot_outline = None
+        self.plot_keywords = []
         self.name = None
         self.original_name = None
         self.url = None
@@ -232,6 +236,11 @@ class ImdbParser(object):
         self.url = url
         page = requests.get(url)
         soup = get_soup(page.text)
+
+        keywords_url = make_keywords_url(self.imdb_id)
+        self.keywords_url = keywords_url
+        keywords_page = requests.get(keywords_url)
+        keywords_soup = get_soup(keywords_page.text)
 
         # get photo
         tag_photo = soup.find('td', attrs={'id': 'img_primary'})
@@ -364,10 +373,21 @@ class ImdbParser(object):
                     director_name = None
                 self.directors[director_id] = director_name
 
+        # get plot keywords
+        keywords = keywords_soup.find('div', attrs={'id': 'keywords_content'})
+        if keywords:
+            for td in keywords.find_all('td', attrs={'data-item-keyword': True}):
+                link = td.find('a')
+                if link:
+                    self.plot_keywords.append(link.text.strip().lower())
+        else:
+            log.warning('Unable to find plot keywords section for %s - plugin needs update?' % url)
+
         log.debug('Detected genres: %s' % self.genres)
         log.debug('Detected languages: %s' % self.languages)
         log.debug('Detected director(s): %s' % ', '.join(self.directors))
         log.debug('Detected actors: %s' % ', '.join(self.actors))
+        log.debug('Detected plot keywords: %s' % self.plot_keywords)
 
         # get plot
         h2_plot = soup.find('h2', text='Storyline')
