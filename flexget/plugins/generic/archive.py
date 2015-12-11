@@ -425,8 +425,7 @@ def cli_search(options):
 def cli_inject(manager, options):
     log.debug('Finding inject content')
     inject_entries = defaultdict(list)
-    session = Session()
-    try:
+    with Session() as session:
         for id in options.ids:
             archive_entry = session.query(ArchiveEntry).get(id)
 
@@ -441,31 +440,32 @@ def cli_inject(manager, options):
                           (', '.join([s.name for s in archive_entry.sources]), archive_entry.title))
                 continue
 
-            # update list of tasks to be injected
-            for source in archive_entry.sources:
-                inject_entries[source.name].append(archive_entry)
-    finally:
-        session.close()
-
-    for task_name in inject_entries:
-        entries = []
-        for inject_entry in inject_entries[task_name]:
-            log.info('Injecting from archive `%s`' % inject_entry.title)
-            entry = Entry(inject_entry.title, inject_entry.url)
-            if inject_entry.description:
-                entry['description'] = inject_entry.description
+            inject_entry = Entry(archive_entry.title, archive_entry.url)
+            if archive_entry.description:
+                inject_entry['description'] = archive_entry.description
             if options.immortal:
                 log.debug('Injecting as immortal')
-                entry['immortal'] = True
-            entry['accepted_by'] = 'archive inject'
-            entry.accept('injected')
-            entries.append(entry)
+                inject_entry['immortal'] = True
+            inject_entry['accepted_by'] = 'archive inject'
+            inject_entry.accept('injected')
 
-        manager.execute(options={'inject': entries, 'tasks': [task_name]})
+            # update list of tasks to be injected
+            for source in archive_entry.sources:
+                inject_entries[source.name].append(inject_entry)
 
-    with manager.acquire_lock():
-        manager.shutdown(finish_queue=True)
-        manager.run()
+    for task_name in inject_entries:
+        for inject_entry in inject_entries[task_name]:
+            log.info('Injecting from archive `%s` into `%s`' % (inject_entry['title'], task_name))
+
+    for index, task_name in enumerate(inject_entries):
+        options.inject = inject_entries[task_name]
+        options.tasks = [task_name]
+        # TODO: This is a bit hacky, consider a better way
+        if index == len(inject_entries) - 1:
+            # We use execute_command on the last item, rather than regular execute, to start FlexGet running.
+            break
+        manager.execute(options)
+    manager.execute_command(options)
 
 
 def do_cli(manager, options):
