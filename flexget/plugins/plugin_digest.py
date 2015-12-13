@@ -5,6 +5,7 @@ from datetime import datetime
 from sqlalchemy import Column, Unicode, PickleType, Integer, DateTime
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.db_schema import versioned_base
 from flexget.entry import Entry
 from flexget.event import event
@@ -26,13 +27,38 @@ class DigestEntry(Base):
 
 
 class OutputDigest(object):
-    schema = {'type': 'string'}
+    schema = {
+        'oneOf': [
+            {'type': 'string'},
+            {
+                'type': 'object',
+                'properties': {
+                    'list': {'type': 'string'},
+                    'state': one_or_more({'type': 'string', 'enum': ['accepted', 'rejected', 'failed', 'undecided']})
+                },
+                'required': ['list'],
+                'additionalProperties': False
+            }
+        ]
+    }
+
+    def prepare_config(self, config):
+        if not isinstance(config, dict):
+            config = {'list': config}
+        config.setdefault('state', ['accepted'])
+        if not isinstance(config['state'], list):
+            config['state'] = [config['state']]
+        return config
 
     def on_task_learn(self, task, config):
-        # TODO: Configurable entry state?
+        config = self.prepare_config(config)
         with Session() as session:
-            for entry in task.accepted:
-                session.add(DigestEntry(list=config, entry=entry))
+            for entry in task.all_entries:
+                if entry.state not in config['state']:
+                    continue
+                entry['digest_task'] = task.name
+                entry['digest_state'] = entry.state
+                session.add(DigestEntry(list=config['list'], entry=entry))
 
 
 class EmitDigest(object):
@@ -46,7 +72,8 @@ class EmitDigest(object):
                     {'type': 'string', 'format': 'interval'},
                     {'type': 'boolean'}],
                 'default': True
-            }
+            },
+            'restore_state': {'type': 'boolean', 'default': False}
         },
         'required': ['list'],
         'additionalProperties': False
@@ -65,7 +92,12 @@ class EmitDigest(object):
                 if 0 < config.get('limit', -1) <= index:
                     session.delete(digest_entry)
                     continue
-                entries.append(Entry(digest_entry.entry))
+                entry = Entry(digest_entry.entry)
+                if config.get('restore_state') and entry.get('digest_state'):
+                    # Not sure this is the best way, but we don't want hooks running on this task
+                    # (like backlog hooking entry.fail)
+                    entry._state = entry['digest_state']
+                entries.append(entry)
                 # If expire is 'True', we remove it after it is output once.
                 if config.get('expire', True) is True:
                     session.delete(digest_entry)

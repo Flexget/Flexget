@@ -126,8 +126,7 @@ class SCGIServerProxy(xmlrpclib.ServerProxy):
                  verbose=False, allow_none=False, use_datetime=False, timeout=30):
         parsed_uri = urlparse(uri)
         self.timeout = timeout
-        self.uri = uri
-        self.__host = uri
+        self.__host = parsed_uri.hostname
         self.__handler = parsed_uri.path
         if not self.__handler:
             self.__handler = '/'
@@ -145,7 +144,7 @@ class SCGIServerProxy(xmlrpclib.ServerProxy):
     def __request(self, method_name, params):
         # call a method on the remote server
         request = xmlrpclib.dumps(params, method_name, encoding=self.__encoding, allow_none=self.__allow_none)
-        response = self.__transport.request(self.uri, self.__handler, request, verbose=self.__verbose)
+        response = self.__transport.request(self.__host, self.__handler, request, verbose=self.__verbose)
 
         if len(response) == 1:
             response = response[0]
@@ -229,6 +228,9 @@ class RTorrent(object):
         if parsed_uri.scheme in ['http', 'https']:
             sp = HTTPServerProxy
         elif parsed_uri.scheme == 'scgi':
+            sp = SCGIServerProxy
+        elif parsed_uri.scheme == '' and parsed_uri.path:
+            self.uri = "scgi://%s" % parsed_uri.path
             sp = SCGIServerProxy
         else:
             raise IOError('Unsupported scheme %s for uri %s' % (parsed_uri.scheme, self.uri))
@@ -400,9 +402,9 @@ class RTorrentPluginBase(object):
         try:
             client = RTorrent(config['uri'], username=config.get('username'),
                               password=config.get('password'), timeout=config.get('timeout'))
-            if client.version < [0, 9, 4]:
-                log.error('rtorrent version >=0.9.4 required, found {0}'.format('.'.join(map(str, client.version))))
-                task.abort('rtorrent version >=0.9.4 required, found {0}'.format('.'.join(map(str, client.version))))
+            if client.version < [0, 9, 2]:
+                log.error('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
+                task.abort('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
         except (IOError, xmlrpclib.Error) as e:
             raise plugin.PluginError("Couldn't connect to rTorrent: %s" % str(e))
 

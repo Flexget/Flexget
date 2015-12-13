@@ -163,6 +163,10 @@ class Entry(LazyDict):
         self.run_hooks('complete', **kwargs)
 
     @property
+    def state(self):
+        return self._state
+
+    @property
     def accepted(self):
         return self._state == 'accepted'
 

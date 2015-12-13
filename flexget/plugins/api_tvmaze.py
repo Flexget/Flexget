@@ -186,8 +186,8 @@ class TVMazeSeries(Base):
             self.premiered = None
             self.year = None
         self.summary = series.summary
-        if series.webChannel:
-            self.webchannel = series.webChannel.get('name')
+        if series.web_channel:
+            self.webchannel = series.web_channel.get('name')
         else:
             self.webchannel = None
         self.runtime = series.runtime
