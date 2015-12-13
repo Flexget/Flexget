@@ -199,8 +199,14 @@ class TVMazeSeries(Base):
         self.last_update = datetime.now()
 
         self.genres[:] = get_db_genres(series.genres, session)
-        self.actors[:] = get_db_actors(series.cast.people, session)
-        self.characters[:] = get_db_actors(series.cast.characters, session)
+        if series.cast and series.cast.people:
+            self.actors[:] = get_db_actors(series.cast.people, session)
+        else:
+            self.actors[:] = []
+        if series.cast and series.cast.characters:
+            self.characters[:] = get_db_characters(series.cast.characters, session)
+        else:
+            self.characters[:] = []
 
     def __repr__(self):
         return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.tvmaze_id, self.last_update)
@@ -287,7 +293,7 @@ def get_db_characters(characters, session):
             session.add(db_character)
         elif db_character.expired:
             log.debug('found expired character in db, refreshing')
-            db_character.update(character)
+            db_character.update(character, session)
         else:
             log.debug('character {0} found in db, returning'.format(db_character.name))
         db_characters.append(db_character)
@@ -304,7 +310,7 @@ def get_db_actors(actors, session):
             session.add(db_actor)
         elif db_actor.expired:
             log.debug('found expired actor in db, refreshing')
-            db_actor.update(actor)
+            db_actor.update(actor, session)
         else:
             log.debug('actor {0} found in db, returning'.format(db_actor.name))
         db_characters.append(db_actor)

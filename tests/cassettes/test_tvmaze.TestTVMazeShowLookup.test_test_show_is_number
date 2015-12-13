@@ -8,20 +8,20 @@ interactions:
     method: GET
     uri: http://api.tvmaze.com/search/shows?q=1992
   response:
-    body: {string: !!python/unicode '[{"score":2.9575481,"show":{"id":4879,"url":"http://www.tvmaze.com/shows/4879/1992","name":"1992","type":"Scripted","language":"Italian","genres":["Drama","History"],"status":"Running","runtime":50,"premiered":"2015-03-24","schedule":{"time":"21:00","days":["Tuesday"]},"rating":{"average":8},"weight":0,"network":{"id":370,"name":"Sky
+    body: {string: !!python/unicode '[{"score":2.8952885,"show":{"id":4879,"url":"http://www.tvmaze.com/shows/4879/1992","name":"1992","type":"Scripted","language":"Italian","genres":["Drama","History"],"status":"Running","runtime":50,"premiered":"2015-03-24","schedule":{"time":"21:00","days":["Tuesday"]},"rating":{"average":8},"weight":0,"network":{"id":370,"name":"Sky
         Cinema","country":{"name":"Italy","code":"IT","timezone":"Europe/Rome"}},"webChannel":null,"externals":{"tvrage":47669,"thetvdb":292192},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/21/53426.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/21/53426.jpg"},"summary":"<p>Set
         in early nineties Italy when there was a nationwide judicial investigation
         into corruption. This resulted in the break down of many political parties
         as well as the arrest and conviction of some high profile political figures.
         The story will follow six people whose lives are intertwined with the rapidly
         changing political landscape, exposing the far-reaching impact of the greed
-        and corruption.</p>","updated":1446374970,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4879"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/308495"}}}},{"score":0.8449834,"show":{"id":5920,"url":"http://www.tvmaze.com/shows/5920/space-1999","name":"Space:
+        and corruption.</p>","updated":1446374970,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4879"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/308495"}}}},{"score":0.90077925,"show":{"id":5920,"url":"http://www.tvmaze.com/shows/5920/space-1999","name":"Space:
         1999","type":"Scripted","language":"English","genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":60,"premiered":"1975-09-04","schedule":{"time":"","days":[]},"rating":{"average":8},"weight":1,"network":{"id":35,"name":"ITV","country":{"name":"United
         Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":76366},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/23/58465.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/23/58465.jpg"},"summary":"<p>It''s
         1999 and Moonbase Alpha has been built on the Moon to safeguard the\n nuclear
         waste shipped from Earth. On September 13, 1999, disaster \nstrikes and the
         nuclear waste explodes, causing a chain reaction that \nhurls the Moon out
-        of Earth''s orbit and into deep space.</p>","updated":1444601120,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5920"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/354641"}}}},{"score":0.8114062,"show":{"id":7260,"url":"http://www.tvmaze.com/shows/7260/answer-me-1994","name":"Answer
+        of Earth''s orbit and into deep space.</p>","updated":1444601120,"_links":{"self":{"href":"http://api.tvmaze.com/shows/5920"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/354641"}}}},{"score":0.85949814,"show":{"id":7260,"url":"http://www.tvmaze.com/shows/7260/answer-me-1994","name":"Answer
         Me 1994","type":"Scripted","language":"Korean","genres":["Comedy","Romance"],"status":"Ended","runtime":65,"premiered":"2013-10-18","schedule":{"time":"03:40","days":["Friday"]},"rating":{"average":null},"weight":0,"network":{"id":280,"name":"tvN","country":{"name":"Korea,
         Republic of","code":"KR","timezone":"Asia/Seoul"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":273209},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/27/67567.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/27/67567.jpg"},"summary":"<p>A
         drama about a group of college students who live in a boarding house located
@@ -29,7 +29,7 @@ interactions:
         over the countryside who come to Seoul for college. It will cover the lives
         of college freshmen in 1994 as they learn to live in a big city and what the
         students will go through as they experience Seoul, the basketball tournament
-        obsession, Seo Taiji and Kids, and other social issues that occurred in 1994.</p>","updated":1446299861,"_links":{"self":{"href":"http://api.tvmaze.com/shows/7260"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/414745"}}}},{"score":0.8114062,"show":{"id":7266,"url":"http://www.tvmaze.com/shows/7266/answer-me-1997","name":"Answer
+        obsession, Seo Taiji and Kids, and other social issues that occurred in 1994.</p>","updated":1446299861,"_links":{"self":{"href":"http://api.tvmaze.com/shows/7260"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/414745"}}}},{"score":0.85949814,"show":{"id":7266,"url":"http://www.tvmaze.com/shows/7266/answer-me-1997","name":"Answer
         Me 1997","type":"Scripted","language":"Korean","genres":["Comedy","Romance"],"status":"Ended","runtime":30,"premiered":"2012-07-24","schedule":{"time":"23:00","days":["Tuesday"]},"rating":{"average":10},"weight":0,"network":{"id":280,"name":"tvN","country":{"name":"Korea,
         Republic of","code":"KR","timezone":"Asia/Seoul"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":260977},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/27/67572.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/27/67572.jpg"},"summary":"<p>This
         drama will focus on the extreme fan culture that emerged in the 1990s when
@@ -38,7 +38,7 @@ interactions:
         in 2012 and brings back memories to 1997 when they were still high school
         students. Moving back and forth between the ''90s and today, the story centers
         on the life of Sung Shi Won (Jung Eun Ji), who idolizes boyband H.O.T., and
-        her 5 high school friends.</p>","updated":1446299847,"_links":{"self":{"href":"http://api.tvmaze.com/shows/7266"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/414822"}}}},{"score":0.7355492,"show":{"id":4243,"url":"http://www.tvmaze.com/shows/4243/iron-man-1996","name":"Iron
+        her 5 high school friends.</p>","updated":1446299847,"_links":{"self":{"href":"http://api.tvmaze.com/shows/7266"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/414822"}}}},{"score":0.661087,"show":{"id":4243,"url":"http://www.tvmaze.com/shows/4243/iron-man-1996","name":"Iron
         Man 1996","type":"Animation","language":null,"genres":["Action","Adventure","Science-Fiction"],"status":"Ended","runtime":30,"premiered":"1994-09-24","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":{"id":72,"name":"Syndication","country":{"name":"United
         States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":76278},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/20/50854.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/20/50854.jpg"},"summary":"","updated":1443128992,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4243"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/279853"}}}}]'}
     headers:
@@ -46,7 +46,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Thu, 10 Dec 2015 09:30:57 GMT']
+      date: ['Sun, 13 Dec 2015 13:53:27 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -102,7 +102,238 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Thu, 10 Dec 2015 09:30:57 GMT']
+      date: ['Sun, 13 Dec 2015 13:53:28 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/shows/4879/episodebynumber?season=1&number=2
+  response:
+    body: {string: !!python/unicode '{"id":308487,"url":"http://www.tvmaze.com/episodes/308487/1992-1x02-episode-2","name":"Episode
+        2","season":1,"number":2,"airdate":"2015-03-24","airtime":"22:00","airstamp":"2015-03-24T22:00:00+01:00","runtime":50,"image":null,"summary":"<p>Leonardo
+        Notte attempts to hide his murky past as a radical left activist, while Luca
+        Pastore takes care of some personal business. </p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/308487"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 13 Dec 2015 13:53:28 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/search/shows?q=24
+  response:
+    body: {string: "[{\"score\":2.2310047,\"show\":{\"id\":167,\"url\":\"http://www.tvmaze.com/shows/167/24\",\"name\":\"24\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Drama\",\"Action\",\"Crime\",\"Thriller\",\"Mystery\"],\"status\":\"Ended\",\"runtime\":60,\"premiered\":\"2001-11-06\",\"schedule\":{\"time\":\"21:00\",\"days\":[\"Monday\"]},\"rating\":{\"average\":8.5},\"weight\":2,\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":2445,\"thetvdb\":76290},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/2330.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/2330.jpg\"},\"summary\":\"<p>Jack
+        Bauer, agent of CTU (Counter Terrorist Unit) faces threats against his country
+        and himself in this action packed show. Each season contains of one day, each
+        episode shows one hour of Jack Bauer's day. <em>24</em> is the only action
+        show in real time and gained alot of fans during the years with this concept.</p>\",\"updated\":1449350166,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/167\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/12094\"}}}},{\"score\":2.2089772,\"show\":{\"id\":6353,\"url\":\"http://www.tvmaze.com/shows/6353/24\",\"name\":\"24\",\"type\":\"Scripted\",\"language\":\"Hindi\",\"genres\":[],\"status\":\"Ended\",\"runtime\":60,\"premiered\":\"2013-10-04\",\"schedule\":{\"time\":\"22:00\",\"days\":[\"Saturday\"]},\"rating\":{\"average\":9},\"weight\":0,\"network\":{\"id\":438,\"name\":\"Colors\",\"country\":{\"name\":\"India\",\"code\":\"IN\",\"timezone\":\"Asia/Kolkata\"}},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":273614},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/24/60878.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/24/60878.jpg\"},\"summary\":\"<p>24
+        is an Indian television drama that aired from 4 October 2013 \\nthrough 21
+        December 2013 and was based on the American series of the \\nsame name</p>\",\"updated\":1446195199,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/6353\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/377269\"}}}},{\"score\":1.4585931,\"show\":{\"id\":6919,\"url\":\"http://www.tvmaze.com/shows/6919/24-hour-catwalk\",\"name\":\"24
+        Hour Catwalk\",\"type\":\"Reality\",\"language\":\"English\",\"genres\":[],\"status\":\"Ended\",\"runtime\":60,\"premiered\":\"2012-01-05\",\"schedule\":{\"time\":\"22:00\",\"days\":[\"Thursday\"]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":18,\"name\":\"Lifetime\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":29552,\"thetvdb\":254989},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/26/65147.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/26/65147.jpg\"},\"summary\":\"<p>The
+        fierce and competitive world of fashion gets even cattier with the premiere
+        of the new series <em>24 Hour Catwalk</em><span><em>. </em>Featuring television
+        personality and global style icon Alexa Chung, four\\n talented designers
+        get the chance to create their own collection for \\nthe judging eyes of industry
+        bigwigs. But, they must do so in only 24 \\nhours! Who will have the vision,
+        the talent and most importantly, the \\nendurance to make it on the runway?</span></p>\",\"updated\":1446376871,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/6919\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/400681\"}}}},{\"score\":1.4585931,\"show\":{\"id\":3961,\"url\":\"http://www.tvmaze.com/shows/3961/boarding-house-no-24\",\"name\":\"Boarding
+        House No. 24\",\"type\":\"Scripted\",\"language\":\"Korean\",\"genres\":[\"Comedy\",\"Romance\"],\"status\":\"Ended\",\"runtime\":60,\"premiered\":\"2014-09-23\",\"schedule\":{\"time\":\"18:00\",\"days\":[\"Tuesday\"]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":166,\"name\":\"MBC\",\"country\":{\"name\":\"Korea,
+        Republic of\",\"code\":\"KR\",\"timezone\":\"Asia/Seoul\"}},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":286314},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/19/49094.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/19/49094.jpg\"},\"summary\":\"<p>A
+        sitcom about seven boarders who have different personalities and situations.
+        It is depicting dreams, careers, love and friendship of young people in their
+        20s who live under the same roof due to the plot of the house owner Kim Kwang
+        Kyu.</p>\",\"updated\":1442776727,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/3961\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/253527\"}}}},{\"score\":1.3801502,\"show\":{\"id\":6892,\"url\":\"http://www.tvmaze.com/shows/6892/247\",\"name\":\"24/7\",\"type\":\"Documentary\",\"language\":\"English\",\"genres\":[],\"status\":\"Running\",\"runtime\":60,\"premiered\":\"2007-04-15\",\"schedule\":{\"time\":\"23:00\",\"days\":[\"Saturday\"]},\"rating\":{\"average\":null},\"weight\":1,\"network\":{\"id\":8,\"name\":\"HBO\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":24555,\"thetvdb\":213021},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/26/65144.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/26/65144.jpg\"},\"summary\":\"<p><strong><em>\\\"24/7\\\"</em></strong>
+        is HBO's reality series that goes behind-the-scenes with athletes as they
+        prepare for future matchups. The series debuted in 2007 with a look at Oscar
+        De La Hoya and Floyd Mayweather Jr. as they prepared to face each other for
+        the junior-middleweight title. Later seasons focused on other boxing matchups,
+        in addition to NASCAR driver Jimmie Johnson and multiple NHL teams.</p>\",\"updated\":1449357533,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/6892\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/436758\"}}}},{\"score\":1.3796896,\"show\":{\"id\":7591,\"url\":\"http://www.tvmaze.com/shows/7591/wwe-24\",\"name\":\"WWE
+        24\",\"type\":\"Documentary\",\"language\":\"English\",\"genres\":[],\"status\":\"Running\",\"runtime\":60,\"premiered\":\"2015-01-30\",\"schedule\":{\"time\":\"\",\"days\":[]},\"rating\":{\"average\":null},\"weight\":0,\"network\":null,\"webChannel\":{\"id\":15,\"name\":\"WWE
+        Network\",\"country\":{\"name\":\"United States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"externals\":{\"tvrage\":null,\"thetvdb\":291489},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/28/70049.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/28/70049.jpg\"},\"summary\":\"\",\"updated\":1446673788,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/7591\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/428097\"}}}},{\"score\":1.1055934,\"show\":{\"id\":4439,\"url\":\"http://www.tvmaze.com/shows/4439/24-hours-in-ae\",\"name\":\"24
+        Hours in A&E\",\"type\":\"Documentary\",\"language\":\"English\",\"genres\":[\"Medical\"],\"status\":\"Running\",\"runtime\":null,\"premiered\":\"2011-05-11\",\"schedule\":{\"time\":\"21:00\",\"days\":[\"Thursday\"]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":45,\"name\":\"Channel
+        4\",\"country\":{\"name\":\"United Kingdom\",\"code\":\"GB\",\"timezone\":\"Europe/London\"}},\"webChannel\":null,\"externals\":{\"tvrage\":28202,\"thetvdb\":248699},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/26/65390.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/26/65390.jpg\"},\"summary\":\"<p>Cameras
+        film around the clock in some of Britain's busiest A&amp;E departments.</p>\",\"updated\":1449926510,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/4439\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/506829\"},\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/529660\"}}}},{\"score\":1.1041203,\"show\":{\"id\":6813,\"url\":\"http://www.tvmaze.com/shows/6813/36-24-36\",\"name\":\"36-24-36\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Comedy\"],\"status\":\"In
+        Development\",\"runtime\":30,\"premiered\":null,\"schedule\":{\"time\":\"\",\"days\":[]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":9,\"name\":\"Showtime\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":null},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/25/64498.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/25/64498.jpg\"},\"summary\":\"<p><strong><em>\\\"</em></strong><em><strong>36-24-36\\\"</strong>,</em>
+        whose title refers to what had been considered \\\"ideal\\\" female model
+        measurements, is about the first black TV model to be featured on a major
+        game show in 1990. Celebrity and glamour collide with sexual harassment, racism,
+        misogyny, homophobia, bulimia and job insecurity, for the four gorgeous models
+        on the No. 1 game show of the \u201890's.</p>\",\"updated\":1445565602,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/6813\"}}}},{\"score\":1.1041203,\"show\":{\"id\":6817,\"url\":\"http://www.tvmaze.com/shows/6817/24-hour-rental\",\"name\":\"24
+        Hour Rental\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Comedy\",\"Crime\"],\"status\":\"Running\",\"runtime\":30,\"premiered\":\"2015-10-30\",\"schedule\":{\"time\":\"00:01\",\"days\":[\"Friday\"]},\"rating\":{\"average\":null},\"weight\":0,\"network\":null,\"webChannel\":{\"id\":2,\"name\":\"Hulu\",\"country\":{\"name\":\"United
+        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"externals\":{\"tvrage\":null,\"thetvdb\":null},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/25/64502.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/25/64502.jpg\"},\"summary\":\"<p>In
+        a \\\"Clerks\\\" meets \\\"Sopranos\\\" gangster series, petty criminals operate
+        a shady video rental store. Forget about gallows humor, 24 Hr. Rental is black
+        comedy 2 weeks after the execution. <strong><em>\\\"24 HOUR RENTAL\\\"</em></strong>
+        follows Tracker (Orzari), a former Mafia boss. Having barely avoided an early
+        retirement in a shallow grave, he now operates a seedy video store. Struggling
+        to stay afloat in the Internet age, Tracker runs his shop as a front for a
+        host of petty crimes-from fencing jewelry to peddling dope cut with Drano
+        and desperation-all in hopes of returning to power. </p>\",\"updated\":1445568308,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/6817\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/397230\"}}}},{\"score\":1.1041144,\"show\":{\"id\":6954,\"url\":\"http://www.tvmaze.com/shows/6954/24-hours-to-kill\",\"name\":\"24
+        Hours to Kill\",\"type\":\"Documentary\",\"language\":\"English\",\"genres\":[\"Crime\"],\"status\":\"Ended\",\"runtime\":55,\"premiered\":\"2010-11-30\",\"schedule\":{\"time\":\"21:00\",\"days\":[\"Monday\"]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":323,\"name\":\"TV3\",\"country\":{\"name\":\"Ireland\",\"code\":\"IE\",\"timezone\":\"Europe/Dublin\"}},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":279324},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/26/65411.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/26/65411.jpg\"},\"summary\":\"<p>This
+        compelling series deconstructs and examines a selection of Ireland's most
+        shocking killings, which in turn sparked some of the county's most infamous
+        murder trials.</p>\",\"updated\":1448790877,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/6954\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/401313\"}}}}]"}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 13 Dec 2015 13:53:28 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [!!python/unicode api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/shows/167?embed=cast
+  response:
+    body: {string: !!python/unicode '{"id":167,"url":"http://www.tvmaze.com/shows/167/24","name":"24","type":"Scripted","language":"English","genres":["Drama","Action","Crime","Thriller","Mystery"],"status":"Ended","runtime":60,"premiered":"2001-11-06","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":8.5},"weight":2,"network":{"id":4,"name":"FOX","country":{"name":"United
+        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":2445,"thetvdb":76290},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2330.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2330.jpg"},"summary":"<p>Jack
+        Bauer, agent of CTU (Counter Terrorist Unit) faces threats against his country
+        and himself in this action packed show. Each season contains of one day, each
+        episode shows one hour of Jack Bauer''s day. <em>24</em> is the only action
+        show in real time and gained alot of fans during the years with this concept.</p>","updated":1449350166,"_links":{"self":{"href":"http://api.tvmaze.com/shows/167"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/12094"}},"_embedded":{"cast":[{"person":{"id":30502,"url":"http://www.tvmaze.com/people/30502/kiefer-sutherland","name":"Kiefer
+        Sutherland","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7476.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7476.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/30502"}}},"character":{"id":44057,"url":"http://www.tvmaze.com/characters/44057/24-jack-bauer","name":"Jack
+        Bauer","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2331.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2331.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44057"}}}},{"person":{"id":8149,"url":"http://www.tvmaze.com/people/8149/mary-lynn-rajskub","name":"Mary
+        Lynn Rajskub","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10181.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10181.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8149"}}},"character":{"id":44060,"url":"http://www.tvmaze.com/characters/44060/24-chloe-obrian","name":"Chloe
+        O''Brian","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2333.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2333.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44060"}}}},{"person":{"id":5545,"url":"http://www.tvmaze.com/people/5545/carlos-bernard","name":"Carlos
+        Bernard","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10188.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10188.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/5545"}}},"character":{"id":44075,"url":"http://www.tvmaze.com/characters/44075/24-tony-almeida","name":"Tony
+        Almeida","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2332.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2332.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44075"}}}},{"person":{"id":30507,"url":"http://www.tvmaze.com/people/30507/dennis-haysbert","name":"Dennis
+        Haysbert","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10202.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10202.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/30507"}}},"character":{"id":44095,"url":"http://www.tvmaze.com/characters/44095/24-david-palmer","name":"David
+        Palmer","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2361.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2361.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44095"}}}},{"person":{"id":30508,"url":"http://www.tvmaze.com/people/30508/elisha-cuthbert","name":"Elisha
+        Cuthbert","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10205.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10205.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/30508"}}},"character":{"id":44096,"url":"http://www.tvmaze.com/characters/44096/24-kimberly-bauer","name":"Kimberly
+        Bauer","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2358.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2358.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44096"}}}},{"person":{"id":1302,"url":"http://www.tvmaze.com/people/1302/james-morrison","name":"James
+        Morrison","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3506.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3506.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/1302"}}},"character":{"id":44076,"url":"http://www.tvmaze.com/characters/44076/24-bill-buchanan","name":"Bill
+        Buchanan","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2351.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2351.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44076"}}}},{"person":{"id":5195,"url":"http://www.tvmaze.com/people/5195/reiko-aylesworth","name":"Reiko
+        Aylesworth","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10204.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10204.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/5195"}}},"character":{"id":44098,"url":"http://www.tvmaze.com/characters/44098/24-michelle-dessler","name":"Michelle
+        Dessler","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2357.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2357.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44098"}}}},{"person":{"id":8900,"url":"http://www.tvmaze.com/people/8900/kim-raver","name":"Kim
+        Raver","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/12/31751.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/12/31751.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8900"}}},"character":{"id":44066,"url":"http://www.tvmaze.com/characters/44066/24-audrey-boudreau","name":"Audrey
+        Boudreau","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2360.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2360.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44066"}}}},{"person":{"id":16516,"url":"http://www.tvmaze.com/people/16516/db-woodside","name":"D.B.
+        Woodside","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10196.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10196.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/16516"}}},"character":{"id":44088,"url":"http://www.tvmaze.com/characters/44088/24-wayne-palmer","name":"Wayne
+        Palmer","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2350.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2350.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44088"}}}},{"person":{"id":297,"url":"http://www.tvmaze.com/people/297/roger-r-cross","name":"Roger
+        R. Cross","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3276.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3276.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/297"}}},"character":{"id":44089,"url":"http://www.tvmaze.com/characters/44089/24-curtis-manning","name":"Curtis
+        Manning","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2356.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2356.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44089"}}}},{"person":{"id":9142,"url":"http://www.tvmaze.com/people/9142/penny-johnson-jerald","name":"Penny
+        Johnson Jerald","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1072.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1072.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/9142"}}},"character":{"id":44099,"url":"http://www.tvmaze.com/characters/44099/24-sherry-palmer","name":"Sherry
+        Palmer","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2365.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2365.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44099"}}}},{"person":{"id":30504,"url":"http://www.tvmaze.com/people/30504/cherry-jones","name":"Cherry
+        Jones","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10184.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10184.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/30504"}}},"character":{"id":44067,"url":"http://www.tvmaze.com/characters/44067/24-allison-taylor","name":"Allison
+        Taylor","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2349.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2349.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44067"}}}},{"person":{"id":3244,"url":"http://www.tvmaze.com/people/3244/gregory-itzin","name":"Gregory
+        Itzin","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/8156.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/8156.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/3244"}}},"character":{"id":44092,"url":"http://www.tvmaze.com/characters/44092/24-charles-logan","name":"Charles
+        Logan","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2352.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2352.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44092"}}}},{"person":{"id":3636,"url":"http://www.tvmaze.com/people/3636/annie-wersching","name":"Annie
+        Wersching","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10189.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10189.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/3636"}}},"character":{"id":44068,"url":"http://www.tvmaze.com/characters/44068/24-renee-walker","name":"Renee
+        Walker","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2348.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2348.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44068"}}}},{"person":{"id":5140,"url":"http://www.tvmaze.com/people/5140/louis-lombardi","name":"Louis
+        Lombardi","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10199.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10199.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/5140"}}},"character":{"id":44091,"url":"http://www.tvmaze.com/characters/44091/24-edgar-stiles","name":"Edgar
+        Stiles","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2354.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2354.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44091"}}}},{"person":{"id":25523,"url":"http://www.tvmaze.com/people/25523/sarah-clarke","name":"Sarah
+        Clarke","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10207.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10207.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/25523"}}},"character":{"id":44102,"url":"http://www.tvmaze.com/characters/44102/24-nina-myers","name":"Nina
+        Myers","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2355.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2355.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44102"}}}},{"person":{"id":8193,"url":"http://www.tvmaze.com/people/8193/bob-gunton","name":"Bob
+        Gunton","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10190.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10190.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/8193"}}},"character":{"id":44077,"url":"http://www.tvmaze.com/characters/44077/24-ethan-kanin","name":"Ethan
+        Kanin","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2346.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2346.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44077"}}}},{"person":{"id":12614,"url":"http://www.tvmaze.com/people/12614/jayne-atkinson","name":"Jayne
+        Atkinson","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10195.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10195.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/12614"}}},"character":{"id":44086,"url":"http://www.tvmaze.com/characters/44086/24-karen-hayes","name":"Karen
+        Hayes","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2341.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2341.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44086"}}}},{"person":{"id":2133,"url":"http://www.tvmaze.com/people/2133/carlo-rota","name":"Carlo
+        Rota","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/6483.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/6483.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/2133"}}},"character":{"id":44085,"url":"http://www.tvmaze.com/characters/44085/24-morris-obrian","name":"Morris
+        O''Brian","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2342.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2342.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44085"}}}},{"person":{"id":15936,"url":"http://www.tvmaze.com/people/15936/eric-balfour","name":"Eric
+        Balfour","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7350.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7350.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/15936"}}},"character":{"id":44084,"url":"http://www.tvmaze.com/characters/44084/24-milo-pressman","name":"Milo
+        Pressman","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2337.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2337.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44084"}}}},{"person":{"id":12837,"url":"http://www.tvmaze.com/people/12837/xander-berkeley","name":"Xander
+        Berkeley","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/7962.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/7962.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/12837"}}},"character":{"id":44100,"url":"http://www.tvmaze.com/characters/44100/24-george-mason","name":"George
+        Mason","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2363.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2363.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44100"}}}},{"person":{"id":1284,"url":"http://www.tvmaze.com/people/1284/william-devane","name":"William
+        Devane","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10183.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10183.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/1284"}}},"character":{"id":44061,"url":"http://www.tvmaze.com/characters/44061/24-president-james-heller","name":"President
+        James Heller","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/44061"}}}},{"person":{"id":14724,"url":"http://www.tvmaze.com/people/14724/sarah-wynter","name":"Sarah
+        Wynter","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10206.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10206.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/14724"}}},"character":{"id":44101,"url":"http://www.tvmaze.com/characters/44101/24-kate-warner","name":"Kate
+        Warner","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/44101"}}}},{"person":{"id":6144,"url":"http://www.tvmaze.com/people/6144/peter-macnicol","name":"Peter
+        MacNicol","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/6445.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/6445.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/6144"}}},"character":{"id":44087,"url":"http://www.tvmaze.com/characters/44087/24-tom-lennox","name":"Tom
+        Lennox","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2339.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2339.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44087"}}}},{"person":{"id":5067,"url":"http://www.tvmaze.com/people/5067/jean-smart","name":"Jean
+        Smart","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10198.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10198.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/5067"}}},"character":{"id":44090,"url":"http://www.tvmaze.com/characters/44090/24-martha-logan","name":"Martha
+        Logan","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2353.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2353.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44090"}}}},{"person":{"id":6867,"url":"http://www.tvmaze.com/people/6867/freddie-prinze-jr","name":"Freddie
+        Prinze, Jr.","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/3249.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/3249.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/6867"}}},"character":{"id":44069,"url":"http://www.tvmaze.com/characters/44069/24-cole-ortiz","name":"Cole
+        Ortiz","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2374.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2374.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44069"}}}},{"person":{"id":30505,"url":"http://www.tvmaze.com/people/30505/john-boyd","name":"John
+        Boyd","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/7572.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/7572.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/30505"}}},"character":{"id":44070,"url":"http://www.tvmaze.com/characters/44070/24-arlo-glass","name":"Arlo
+        Glass","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2373.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2373.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44070"}}}},{"person":{"id":4765,"url":"http://www.tvmaze.com/people/4765/leslie-hope","name":"Leslie
+        Hope","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10208.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10208.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/4765"}}},"character":{"id":44103,"url":"http://www.tvmaze.com/characters/44103/24-teri-bauer","name":"Teri
+        Bauer","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2362.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2362.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44103"}}}},{"person":{"id":19935,"url":"http://www.tvmaze.com/people/19935/marisol-nichols","name":"Marisol
+        Nichols","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/8007.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/8007.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/19935"}}},"character":{"id":44083,"url":"http://www.tvmaze.com/characters/44083/24-nadia-yassir","name":"Nadia
+        Yassir","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2340.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2340.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44083"}}}},{"person":{"id":19250,"url":"http://www.tvmaze.com/people/19250/james-badge-dale","name":"James
+        Badge Dale","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/9982.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/9982.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/19250"}}},"character":{"id":44097,"url":"http://www.tvmaze.com/characters/44097/24-chase-edmunds","name":"Chase
+        Edmunds","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2364.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2364.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44097"}}}},{"person":{"id":28224,"url":"http://www.tvmaze.com/people/28224/janeane-garofalo","name":"Janeane
+        Garofalo","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10192.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10192.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/28224"}}},"character":{"id":44079,"url":"http://www.tvmaze.com/characters/44079/24-janis-gold","name":"Janis
+        Gold","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2343.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2343.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44079"}}}},{"person":{"id":23922,"url":"http://www.tvmaze.com/people/23922/katee-sackhoff","name":"Katee
+        Sackhoff","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/20/50990.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/20/50990.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/23922"}}},"character":{"id":44072,"url":"http://www.tvmaze.com/characters/44072/24-dana-walsh","name":"Dana
+        Walsh","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2369.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2369.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44072"}}}},{"person":{"id":379,"url":"http://www.tvmaze.com/people/379/jeffrey-nordling","name":"Jeffrey
+        Nordling","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/2/7161.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/2/7161.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/379"}}},"character":{"id":44081,"url":"http://www.tvmaze.com/characters/44081/24-larry-moss","name":"Larry
+        Moss","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2345.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2345.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44081"}}}},{"person":{"id":20391,"url":"http://www.tvmaze.com/people/20391/mykelti-williamson","name":"Mykelti
+        Williamson","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10186.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10186.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/20391"}}},"character":{"id":44073,"url":"http://www.tvmaze.com/characters/44073/24-brian-hastings","name":"Brian
+        Hastings","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2370.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2370.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44073"}}}},{"person":{"id":30506,"url":"http://www.tvmaze.com/people/30506/anil-kapoor","name":"Anil
+        Kapoor","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10187.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10187.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/30506"}}},"character":{"id":44074,"url":"http://www.tvmaze.com/characters/44074/24-omar-hassan","name":"Omar
+        Hassan","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2371.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2371.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44074"}}}},{"person":{"id":20675,"url":"http://www.tvmaze.com/people/20675/colm-feore","name":"Colm
+        Feore","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10191.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10191.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/20675"}}},"character":{"id":44078,"url":"http://www.tvmaze.com/characters/44078/24-henry-taylor","name":"Henry
+        Taylor","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2347.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2347.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44078"}}}},{"person":{"id":29885,"url":"http://www.tvmaze.com/people/29885/yvonne-strahovski","name":"Yvonne
+        Strahovski","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2380.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2380.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/29885"}}},"character":{"id":44058,"url":"http://www.tvmaze.com/characters/44058/24-kate-morgan","name":"Kate
+        Morgan","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/44058"}}}},{"person":{"id":29615,"url":"http://www.tvmaze.com/people/29615/tate-donovan","name":"Tate
+        Donovan","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2379.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2379.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/29615"}}},"character":{"id":44059,"url":"http://www.tvmaze.com/characters/44059/24-mark-boudreau","name":"Mark
+        Boudreau","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/44059"}}}},{"person":{"id":22866,"url":"http://www.tvmaze.com/people/22866/chris-diamantopoulos","name":"Chris
+        Diamantopoulos","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2020.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2020.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/22866"}}},"character":{"id":44071,"url":"http://www.tvmaze.com/characters/44071/24-rob-weiss","name":"Rob
+        Weiss","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2372.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2372.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44071"}}}},{"person":{"id":2912,"url":"http://www.tvmaze.com/people/2912/lana-parrilla","name":"Lana
+        Parrilla","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/1/4220.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/1/4220.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/2912"}}},"character":{"id":44093,"url":"http://www.tvmaze.com/characters/44093/24-sarah-gavin","name":"Sarah
+        Gavin","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2359.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2359.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44093"}}}},{"person":{"id":26320,"url":"http://www.tvmaze.com/people/26320/alberta-watson","name":"Alberta
+        Watson","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10201.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10201.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/26320"}}},"character":{"id":44094,"url":"http://www.tvmaze.com/characters/44094/24-erin-driscoll","name":"Erin
+        Driscoll","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2336.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2336.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44094"}}}},{"person":{"id":17482,"url":"http://www.tvmaze.com/people/17482/gbenga-akinnagbe","name":"Gbenga  Akinnagbe","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2378.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2378.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/17482"}}},"character":{"id":44062,"url":"http://www.tvmaze.com/characters/44062/24-erik-ritter","name":"Erik
+        Ritter","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/44062"}}}},{"person":{"id":5178,"url":"http://www.tvmaze.com/people/5178/rhys-coiro","name":"Rhys
+        Coiro","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/3/8053.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/3/8053.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/5178"}}},"character":{"id":44080,"url":"http://www.tvmaze.com/characters/44080/24-sean-hillinger","name":"Sean
+        Hillinger","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2344.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2344.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44080"}}}},{"person":{"id":12049,"url":"http://www.tvmaze.com/people/12049/benjamin-bratt","name":"Benjamin
+        Bratt","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2377.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2377.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/12049"}}},"character":{"id":44065,"url":"http://www.tvmaze.com/characters/44065/24-steve-navarro","name":"Steve
+        Navarro","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/44065"}}}},{"person":{"id":4766,"url":"http://www.tvmaze.com/people/4766/regina-king","name":"Regina
+        King","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/4/10193.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/4/10193.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/4766"}}},"character":{"id":44082,"url":"http://www.tvmaze.com/characters/44082/24-sandra-palmer","name":"Sandra
+        Palmer","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2338.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2338.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/characters/44082"}}}},{"person":{"id":30503,"url":"http://www.tvmaze.com/people/30503/michael-wincott","name":"Michael
+        Wincott","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2376.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2376.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/30503"}}},"character":{"id":44064,"url":"http://www.tvmaze.com/characters/44064/24-adrian-cross","name":"Adrian
+        Cross","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/44064"}}}},{"person":{"id":9993,"url":"http://www.tvmaze.com/people/9993/giles-matthey","name":"Giles
+        Matthey","image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2375.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2375.jpg"},"_links":{"self":{"href":"http://api.tvmaze.com/people/9993"}}},"character":{"id":44063,"url":"http://www.tvmaze.com/characters/44063/24-jordan-reed","name":"Jordan
+        Reed","image":null,"_links":{"self":{"href":"http://api.tvmaze.com/characters/44063"}}}}]}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 13 Dec 2015 13:53:28 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/shows/167/episodebynumber?season=9&number=12
+  response:
+    body: {string: !!python/unicode '{"id":12094,"url":"http://www.tvmaze.com/episodes/12094/24-9x12-day-9-1000-pm-1100-am","name":"Day
+        9: 10:00 PM-11:00 AM","season":9,"number":12,"airdate":"2014-07-14","airtime":"21:00","airstamp":"2014-07-14T21:00:00-04:00","runtime":60,"image":null,"summary":"","_links":{"self":{"href":"http://api.tvmaze.com/episodes/12094"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 13 Dec 2015 13:53:29 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
