@@ -12,7 +12,7 @@ class EstimateRelease(object):
     for various things (series, movies).
     """
 
-    def estimate(self, entry):
+    def estimate(self, entry, preferred_estimator=None):
         """
         Estimate release schedule for Entry
 
@@ -21,11 +21,15 @@ class EstimateRelease(object):
         """
 
         log.debug(entry['title'])
-        estimators = [e.instance.estimate for e in plugin.get_plugins(group='estimate_release')]
-        for estimator in sorted(
-                estimators, key=lambda e: getattr(e, 'priority', plugin.DEFAULT_PRIORITY), reverse=True
-        ):
-            estimate = estimator(entry)
+        estimators = [e.instance for e in plugin.get_plugins(group='estimate_release')]
+        estimators.sort(key=lambda e: getattr(e, 'priority', plugin.DEFAULT_PRIORITY), reverse=True)
+        if preferred_estimator:
+            log.debug('preferred estimator detected, moving {0} to top of the list'.format(preferred_estimator))
+            estimator_match = filter(lambda e: e.plugin_info.name == preferred_estimator, estimators)[0]
+            estimators.remove(estimator_match)
+            estimators.insert(0, estimator_match)
+        for estimator in estimators:
+            estimate = estimator.estimate(entry)
             # return first successful estimation
             if estimate is not None:
                 return estimate
