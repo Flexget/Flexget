@@ -1,6 +1,8 @@
 Issues
 ======
 
+If you are looking for help, rather than reporting a problem, please use the [forum.](http://discuss.flexget.com)
+
 Before submitting an issue, make sure you:
 
 - Are running the latest version of FlexGet (check `flexget --version`)
@@ -19,6 +21,9 @@ Before submitting an issue, make sure you:
 
 Pull Requests
 =============
+
+For help, see GitHub's guides on [forking a repo](https://help.github.com/articles/fork-a-repo/) and
+[pull requests.](https://help.github.com/articles/using-pull-requests/)
 
 When submitting pull requests:
 
