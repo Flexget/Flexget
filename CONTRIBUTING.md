@@ -9,7 +9,7 @@ Before submitting an issue, make sure you:
 - Check if there is already an issue open about the problem.
 - Fully describe the problem, explain what you expected to happen.
 - Include the relevant config of the task having the trouble. (Remember to censor private info though.)
-- Include log segments (especially if there are tracebacks.) Remember to sensor private info from these as well.
+- Include log segments (especially if there are tracebacks.) Remember to censor private info from these as well.
   Sometimes debug logs may be needed as well `flexget --debug execute --tasks my_problem_task`
 - Surround your config and log segments with 3 backticks ```` ``` ```` so that they are made into proper code blocks:
 
