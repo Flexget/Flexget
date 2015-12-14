@@ -343,6 +343,24 @@ def get_db_genres(genres, session):
     return db_genres
 
 
+def get_actor_details(actor):
+    return {'name': actor.name,
+            'original_image': actor.original_image,
+            'medium_image': actor.medium_image,
+            'url': actor.url,
+            'characters': ' ,'.join(character.name for character in actor.characters if character)
+            }
+
+
+def get_character_details(character):
+    return {'name': character.name,
+            'original_image': character.original_image,
+            'medium_image': character.medium_image,
+            'url': character.url,
+            'actors': ' ,'.join(actor.name for actor in character.actors if actor)
+            }
+
+
 def search_params_for_series(**lookup_params):
     search_params = {
         'tvmaze_id': lookup_params.get('maze_id') or lookup_params.get('tvmaze_id'),

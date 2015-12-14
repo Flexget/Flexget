@@ -342,3 +342,5 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert len(entry['tvmaze_series_actors']) == 9, \
             'expected actors list for series to contain 9 members,' \
             ' instead it contains %s' % len(entry['tvmaze_series_actors'])
+        actors = entry['tvmaze_series_actors']
+        characters = entry['tvmaze_series_characters']

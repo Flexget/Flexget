@@ -7,7 +7,7 @@ from flexget.event import event
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.api_tvmaze import APITVMaze
+    from flexget.plugins.api_tvmaze import APITVMaze, get_actor_details, get_character_details
 
     series_lookup = APITVMaze.series_lookup
     episode_lookup = APITVMaze.episode_lookup
@@ -97,8 +97,8 @@ class PluginTVMazeLookup(object):
         'tvmaze_series_status': 'status',
         'tvmaze_series_rating': 'rating',
         'tvmaze_series_episodes': lambda show: [episodes.title for episodes in show.episodes],
-        'tvmaze_series_characters': lambda show: [character.name for character in show.characters],
-        'tvmaze_series_actors': lambda show: [actor.name for actor in show.actors]
+        'tvmaze_series_characters': lambda show: [get_character_details(character) for character in show.characters],
+        'tvmaze_series_actors': lambda show: [get_actor_details(actor) for actor in show.actors]
     }
 
     # Episode info
