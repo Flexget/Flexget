@@ -363,9 +363,9 @@ class T411ObjectMapper(object):
         result['seeders'] = int(json_entry['seeders'])
         result['leechers'] = int(json_entry['leechers'])
         result['t411_comments'] = int(json_entry['comments'])
-        result['t411_isVerified'] = json_entry['isVerified'] is '1'
+        result['t411_verified'] = json_entry['isVerified'] is '1'
         result['t411_pubdate'] = datetime.strptime(json_entry['added'], T411ObjectMapper.date_format)
-        result['content_size'] = int(json_entry['size'])
+        result['content_size'] = int(json_entry['size'] / (1024 ** 2))
         result['t411_times_completed'] = int(json_entry['times_completed'])
         result['t411_category_name'] = json_entry['categoryname']
         result['t411_category_image'] = json_entry['categoryimage']
@@ -377,9 +377,6 @@ class T411ObjectMapper(object):
 
     @staticmethod
     def map_details(json_details, resolver):
-        """
-        WIP
-        """
         result = Torrent()
         result.id = json_details.get('id')
         result.name = json_details.get('name')
