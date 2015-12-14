@@ -200,12 +200,9 @@ class TVMazeSeries(Base):
 
         self.genres[:] = get_db_genres(series.genres, session)
         if series.cast and series.cast.people:
-            self.actors[:] = get_db_actors(series.cast.people, session)
+            self.actors[:], self.characters[:] = get_db_actors_and_characters(series.cast.people, session)
         else:
             self.actors[:] = []
-        if series.cast and series.cast.characters:
-            self.characters[:] = get_db_characters(series.cast.characters, session)
-        else:
             self.characters[:] = []
 
     def __repr__(self):
@@ -283,38 +280,53 @@ class TVMazeEpisodes(Base):
         return expiration
 
 
-def get_db_characters(characters, session):
+def get_db_actors_and_characters(actors, session):
+    """
+    Return a tuple of db actors list and db characters list generated from show cast.
+    :param actors: List of actors retrieved by API
+    :param session: DB Session
+    :return: tuple of db actors list and db characters list
+    """
     db_characters = []
-    for character in characters:
-        db_character = session.query(TVMazeCharacters).filter(TVMazeCharacters.tvmaze_id == character.id).first()
-        if not db_character:
-            db_character = TVMazeCharacters(character=character, session=session)
-            log.debug('adding actor {0} to db'.format(db_character.name))
-            session.add(db_character)
-        elif db_character.expired:
-            log.debug('found expired character in db, refreshing')
-            db_character.update(character, session)
-        else:
-            log.debug('character {0} found in db, returning'.format(db_character.name))
-        db_characters.append(db_character)
-    return db_characters
-
-
-def get_db_actors(actors, session):
-    db_characters = []
+    db_actors = []
     for actor in actors:
-        db_actor = session.query(TVMazeActors).filter(TVMazeActors.tvmaze_id == actor.id).first()
-        if not db_actor:
-            db_actor = TVMazeActors(actor=actor, session=session)
-            log.debug('adding actor {0} to db'.format(db_actor.name))
-            session.add(db_actor)
-        elif db_actor.expired:
-            log.debug('found expired actor in db, refreshing')
-            db_actor.update(actor, session)
-        else:
-            log.debug('actor {0} found in db, returning'.format(db_actor.name))
-        db_characters.append(db_actor)
-    return db_characters
+        db_actor = get_db_actor(actor, session)
+        db_character = get_db_character(actor.character, session)
+
+        db_character.actors.append(db_actor)
+        db_actor.characters.append(db_character)
+
+        db_actors.append(db_actor)
+        db_characters.append(db_character)
+    return db_actors, db_characters
+
+
+def get_db_actor(actor, session):
+    db_actor = session.query(TVMazeActors).filter(TVMazeActors.tvmaze_id == actor.id).first()
+    if not db_actor:
+        db_actor = TVMazeActors(actor=actor, session=session)
+        log.debug('adding actor {0} to db'.format(db_actor.name))
+        session.add(db_actor)
+    elif db_actor.expired:
+        log.debug('found expired actor in db, refreshing')
+        db_actor.update(actor, session)
+    else:
+        log.debug('actor {0} found in db, returning'.format(db_actor.name))
+    return db_actor
+
+
+def get_db_character(character, session):
+    db_character = session.query(TVMazeCharacters).filter(TVMazeCharacters.tvmaze_id == character.id).first()
+    if not db_character:
+        db_character = TVMazeCharacters(character=character, session=session)
+        log.debug('adding character {0} to db'.format(db_character.name))
+        session.add(db_character)
+    elif db_character.expired:
+        log.debug('found expired character in db, refreshing')
+        db_character.update(character, session)
+    else:
+        log.debug('character {0} found in db, returning'.format(db_character.name))
+    return db_character
 
 
 def get_db_genres(genres, session):
