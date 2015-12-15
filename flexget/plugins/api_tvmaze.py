@@ -70,7 +70,6 @@ class TVMazeActor(Base):
             return True
         time_dif = datetime.now() - self.last_update
         expiration = time_dif.days > UPDATE_INTERVAL
-        log.debug('actor (0} is expired. days overdue for update: {1}'.format(self.name, expiration))
         return expiration
 
 
@@ -109,7 +108,6 @@ class TVMazeCharacter(Base):
             return True
         time_dif = datetime.now() - self.last_update
         expiration = time_dif.days > UPDATE_INTERVAL
-        log.debug('character (0} is expired. days overdue for update: {1}'.format(self.name, expiration))
         return expiration
 
 
@@ -224,7 +222,6 @@ class TVMazeSeries(Base):
             return True
         time_dif = datetime.now() - self.last_update
         expiration = time_dif.days > UPDATE_INTERVAL
-        log.debug('series {0} is expired: {1}'.format(self.name, expiration))
         return expiration
 
 
@@ -302,9 +299,11 @@ def get_db_actors_and_characters(actors, session):
         # Links actor to character
         if db_actor not in db_character.actors:
             db_character.actors.append(db_actor)
+            session.commit()
         # Links character to actor
         if db_character not in db_actor.characters:
             db_actor.characters.append(db_character)
+            session.commit()
 
         db_actors.append(db_actor)
         db_characters.append(db_character)
