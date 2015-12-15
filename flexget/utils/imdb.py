@@ -263,9 +263,7 @@ class ImdbParser(object):
             log.warning('Unable to get infodiv class for %s - plugin needs update?' % url)
 
         # get name
-        tag_name = soup.find('h1')
-        if tag_name:
-            tag_name = tag_name.find('span', attrs={'itemprop': 'name'})
+        tag_name = soup.find('h1', attrs={'itemprop': 'name'})
         if tag_name:
             self.name = tag_name.text
             log.debug('Detected name: %s' % self.name)
@@ -282,7 +280,7 @@ class ImdbParser(object):
             # if title is already in original language, it doesn't have the tag
             log.debug('Unable to get original title for %s - it probably does not exists' % url)
 
-        star_box = soup.find('div', attrs={'class': 'star-box giga-star'})
+        star_box = soup.find('div', attrs={'class': 'ratings_wrapper'})
         if star_box:
             # detect if movie is eligible for ratings
             rating_ineligible = star_box.find('div', attrs={'class': 'rating-ineligible'})
