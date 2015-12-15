@@ -34,11 +34,11 @@ class TestImdbParser(object):
         assert parser.mpaa_rating == 'R', 'Rating not parsed correctly'
         assert parser.name == 'The Usual Suspects', 'Name not parsed correctly'
         assert (parser.photo ==
-                'http://ia.media-imdb.com/images/M/MV5BMzI1MjI5MDQyOV5BMl5BanBnXkFtZTcwNzE4Mjg3NA@@._V1_SX214_AL_.jpg'
+                'http://ia.media-imdb.com/images/M/MV5BMzI1MjI5MDQyOV5BMl5BanBnXkFtZTcwNzE4Mjg3NA@@._V1_UX182_CR0,0,182,268_AL_.jpg'
         ), 'Photo not parsed correctly'
         assert parser.plot_outline == (
             'Following a truck hijack in New York, five conmen are arrested and brought together for questioning. '
-            'As none of them is guilty, they plan a revenge operation against the police. The operation goes well, '
+            'As none of them are guilty, they plan a revenge operation against the police. The operation goes well, '
             'but then the influence of a legendary mastermind criminal called Keyser S\xf6ze is felt. It becomes '
             'clear that each one of them has wronged S\xf6ze at some point and must pay back now. The payback job '
             'leaves 27 men dead in a boat explosion, but the real question arises now: Who actually is Keyser S\xf6ze?'
@@ -52,7 +52,7 @@ class TestImdbParser(object):
     def test_no_plot(self):
         # Make sure parser doesn't crash for movies with no plot
         parser = ImdbParser()
-        parser.parse('tt0245062')
-        assert parser.name == 'The Magnet'
+        parser.parse('tt1300562')
+        assert parser.name == 'Goodbye Mothers'
         # There is no plot
         assert not parser.plot_outline
