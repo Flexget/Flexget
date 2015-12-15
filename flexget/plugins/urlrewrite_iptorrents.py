@@ -17,9 +17,8 @@ log = logging.getLogger('iptorrents')
 
 CATEGORIES = {
 
-    'Movie-all': 72,
-
     # Movies
+    'Movie-all': 72,
     'Movie-3D': 87,
     'Movie-480p': 77,
     'Movie-BD-R': 89,
@@ -34,7 +33,6 @@ CATEGORIES = {
 
     # TV
     'TV-all': 73,
-
     'TV-Sports': 55,
     'TV-480p': 78,
     'TV-MP4': 66,
@@ -43,7 +41,8 @@ CATEGORIES = {
     'TV-Packs-Non-English': 83,
     'TV-SD-x264': 79,
     'TV-x264': 5,
-    'TV-XVID': 4
+    'TV-XVID': 4,
+    'TV-Web-DL': 22
 }
 
 BASE_URL = 'http://iptorrents.com'
@@ -65,7 +64,7 @@ class UrlRewriteIPTorrents(object):
                 Movie-Non-English, Movie-Packs, Movie-XviD,
 
                 TV-all, TV-Sports, TV-480p, TV-MP4, TV-Non-English, TV-Packs,
-                TV-Packs-Non-English, TV-SD-x264, TV-x264,	TV-XVID
+                TV-Packs-Non-English, TV-SD-x264, TV-x264, TV-XVID, TV-Web-DL
     """
 
     schema = {
