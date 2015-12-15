@@ -117,7 +117,7 @@ class OutputPushover(object):
                     log.warning('Problem rendering {0}: {1}'.format(key, e))
                     data[key] = None
                 except ValueError:
-                    pass
+                    data[key] = None
 
                 # If field is empty or rendering fails, try to render field default if exists
                 if not data[key]:
