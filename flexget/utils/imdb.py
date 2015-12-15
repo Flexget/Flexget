@@ -233,150 +233,84 @@ class ImdbParser(object):
         page = requests.get(url)
         soup = get_soup(page.text)
 
-        # get photo
-        tag_photo = soup.find('td', attrs={'id': 'img_primary'})
-        if tag_photo:
-            tag_img = tag_photo.find('img')
-            if tag_img:
-                self.photo = tag_img.get('src')
-                log.debug('Detected photo: %s' % self.photo)
+        title_overview = soup.find('div', attrs={'class': 'title-overview'})
+        if not title_overview:
+            log.error('IMDB parser needs updating, imdb format changed.')
+            return
 
-        # get rating. contentRating <span> in infobar.
-        tag_infobar_div = soup.find('div', attrs={'class': 'infobar'})
-        if tag_infobar_div:
-            tag_mpaa_rating = tag_infobar_div.find('span', attrs={'itemprop': 'contentRating'})
-            if tag_mpaa_rating:
-                if not tag_mpaa_rating.get('class') or not tag_mpaa_rating['class'][0].startswith('us_'):
-                    log.warning('Could not determine mpaa rating for %s' % url)
-                else:
-                    rating_class = tag_mpaa_rating['class'][0]
-                    if rating_class == 'us_not_rated':
-                        self.mpaa_rating = 'NR'
-                    else:
-                        self.mpaa_rating = rating_class.lstrip('us_').replace('_', '-').upper()
-                log.debug('Detected mpaa rating: %s' % self.mpaa_rating)
-            else:
-                log.debug('Unable to match signature of mpaa rating for %s - '
-                          'could be a TV episode, or plugin needs update?' % url)
+        # Parse the year from the page title, no good places in the body (in current format)
+        year_match = re.search(r'\((\d{4})\) - IMDb', soup.title.text)
+        if year_match:
+            self.year = int(year_match.group(1))
+
+        # Parse stuff from the title-overview section
+        self.name = title_overview.find('h1', itemprop='name').text
+
+        mpaa_rating_elem = title_overview.find(itemprop='contentRating')
+        if mpaa_rating_elem:
+            self.mpaa_rating = mpaa_rating_elem['content']
         else:
-            # We should match the infobar, it's an integral part of the IMDB page.
-            log.warning('Unable to get infodiv class for %s - plugin needs update?' % url)
+            log.debug('No rating found for %s' % self.imdb_id)
 
-        # get name
-        tag_name = soup.find('h1')
-        if tag_name:
-            tag_name = tag_name.find('span', attrs={'itemprop': 'name'})
-        if tag_name:
-            self.name = tag_name.text
-            log.debug('Detected name: %s' % self.name)
+        photo_elem = title_overview.find(itemprop='image')
+        if photo_elem:
+            self.photo = photo_elem['src']
         else:
-            log.warning('Unable to get name for %s - plugin needs update?' % url)
+            log.debug('No photo found for %s' % self.imdb_id)
 
-        tag_original_title_i = soup.find('i', text=re.compile(r'original title'))
-        if tag_original_title_i:
-            span = tag_original_title_i.parent
-            tag_original_title_i.decompose()
-            self.original_name = span.text.strip().strip('"')
-            log.debug('Detected original name: %s' % self.original_name)
+        original_name_elem = title_overview.find(attrs={'class': 'originalTitle'})
+        if original_name_elem:
+            self.original_name = original_name_elem.find(text=True, recursive=False)
         else:
-            # if title is already in original language, it doesn't have the tag
-            log.debug('Unable to get original title for %s - it probably does not exists' % url)
+            log.debug('No original title found for %s' % self.imdb_id)
 
-        star_box = soup.find('div', attrs={'class': 'star-box giga-star'})
-        if star_box:
-            # detect if movie is eligible for ratings
-            rating_ineligible = star_box.find('div', attrs={'class': 'rating-ineligible'})
-            if rating_ineligible:
-                log.debug('movie is not eligible for ratings')
-            else:
-                # get votes
-                tag_votes = star_box.find(itemprop='ratingCount')
-                if tag_votes:
-                    self.votes = str_to_int(tag_votes.string) or 0
-                    log.debug('Detected votes: %s' % self.votes)
-                else:
-                    log.warning('Unable to get votes for %s - plugin needs update?' % url)
-
-                # get score - find the ratingValue item that contains a numerical value
-                span_score = star_box.find(itemprop='ratingValue', text=re.compile('[\d\.]+'))
-                if span_score:
-                    try:
-                        self.score = float(span_score.string)
-                    except (ValueError, TypeError):
-                        log.debug('tag_score %r is not valid float' % span_score.string)
-                    log.debug('Detected score: %s' % self.score)
-                else:
-                    log.warning('Unable to get score for %s - plugin needs update?' % url)
+        votes_elem = title_overview.find(itemprop='ratingCount')
+        if votes_elem:
+            self.votes = str_to_int(votes_elem.text)
         else:
-            log.warning('Unable to find score/vote section for %s - plugin needs update?' % url)
+            log.debug('No votes found for %s' % self.imdb_id)
 
-        # get genres
-        genres = soup.find('div', itemprop='genre')
-        if genres:
-            for link in genres.find_all('a'):
-                self.genres.append(link.text.strip().lower())
+        score_elem = title_overview.find(itemprop='ratingValue')
+        if score_elem:
+            self.score = float(score_elem.text)
         else:
-            log.warning('Unable to find genres section for %s - plugin needs update?' % url)
+            log.debug('No score found for %s' % self.imdb_id)
 
-        # get languages
-        for link in soup.find_all('a', href=re.compile('/language/.*')):
-            # skip non-primary languages "(a few words)", etc.
-            m = re.search('(?x) \( [^()]* \\b few \\b', link.next_sibling)
-            if not m:
-                lang = link.text.lower()
+        # get director(s)
+        for director in title_overview.select('[itemprop="director"] > a'):
+            director_id = extract_id(director['href'])
+            director_name = director.text
+            # tag instead of name
+            if isinstance(director_name, Tag):
+                director_name = None
+            self.directors[director_id] = director_name
+
+        # Details section
+        title_details = soup.find('div', attrs={'id': 'titleDetails'})
+        if title_details:
+            # get languages
+            for link in title_details.find_all('a', href=re.compile('/language/')):
+                lang = link.text.strip().lower()
                 if lang not in self.languages:
                     self.languages.append(lang.strip())
 
-        # get year
-        tag_year = soup.find('a', attrs={'href': re.compile('^/year/\d+')})
-        if tag_year:
-            self.year = int(tag_year.text)
-            log.debug('Detected year: %s' % self.year)
-        elif soup.head.title:
-            m = re.search(r'(\d{4})\)', soup.head.title.string)
-            if m:
-                self.year = int(m.group(1))
-                log.debug('Detected year: %s' % self.year)
+        # Storyline section
+        storyline = soup.find('div', attrs={'id': 'titleStoryLine'})
+        if storyline:
+            plot_elem = storyline.find('p')
+            if plot_elem:
+                self.plot_outline = plot_elem.find(text=True, recursive=False).strip()
             else:
-                log.warning('Unable to get year for %s (regexp mismatch) - plugin needs update?' % url)
-        else:
-            log.warning('Unable to get year for %s (missing title) - plugin needs update?' % url)
+                log.debug('No storyline found for %s' % self.imdb_id)
+            self.genres = [i.text.strip().lower() for i in storyline.select('[itemprop="genre"] > a')]
 
-        # get main cast
-        tag_cast = soup.find('table', 'cast_list')
-        if tag_cast:
-            for actor in tag_cast.find_all('a', href=re.compile('/name/nm')):
+        # Cast section
+        cast = soup.find('div', attrs={'id': 'titleCast'})
+        if cast:
+            for actor in cast.select('[itemprop="actor"] > a'):
                 actor_id = extract_id(actor['href'])
                 actor_name = actor.text.strip()
                 # tag instead of name
                 if isinstance(actor_name, Tag):
                     actor_name = None
                 self.actors[actor_id] = actor_name
-
-        # get director(s)
-        h4_director = soup.find('h4', text=re.compile('Director'))
-        if h4_director:
-            for director in h4_director.parent.find_all('a', href=re.compile('/name/nm')):
-                director_id = extract_id(director['href'])
-                director_name = director.text
-                # tag instead of name
-                if isinstance(director_name, Tag):
-                    director_name = None
-                self.directors[director_id] = director_name
-
-        log.debug('Detected genres: %s' % self.genres)
-        log.debug('Detected languages: %s' % self.languages)
-        log.debug('Detected director(s): %s' % ', '.join(self.directors))
-        log.debug('Detected actors: %s' % ', '.join(self.actors))
-
-        # get plot
-        h2_plot = soup.find('h2', text='Storyline')
-        if h2_plot:
-            p_plot = h2_plot.find_next('p')
-            if p_plot and p_plot.next.string:
-                self.plot_outline = p_plot.next.string.strip()
-                log.debug('Detected plot outline: %s' % self.plot_outline)
-            else:
-                log.debug('Plot does not have p-tag')
-        else:
-            log.debug('Failed to find plot')
