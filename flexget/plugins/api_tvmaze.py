@@ -35,7 +35,7 @@ actors_to_characters_table = Table('tvmaze_actors_to_characters', Base.metadata,
                                    Column('character_id', Integer, ForeignKey('tvmaze_characters.tvmaze_id')))
 
 
-class TVMazeActors(Base):
+class TVMazeActor(Base):
     __tablename__ = 'tvmaze_actors'
 
     tvmaze_id = Column(Integer, primary_key=True)
@@ -43,13 +43,16 @@ class TVMazeActors(Base):
     original_image = Column(String)
     medium_image = Column(String)
     url = Column(String)
-    characters = relation('TVMazeCharacters', secondary=actors_to_characters_table)
+    characters = relation('TVMazeCharacter', secondary=actors_to_characters_table)
     last_update = Column(DateTime)
 
     def __init__(self, actor, session):
         self.tvmaze_id = actor.id
         self.name = actor.name
         self.url = actor.url
+
+    def __repr__(self):
+        return '<TVMazeActor,name={0},id={1}'.format(self.name, self.tvmaze_id)
 
     def update(self, actor, session):
         if actor.image:
@@ -71,7 +74,7 @@ class TVMazeActors(Base):
         return expiration
 
 
-class TVMazeCharacters(Base):
+class TVMazeCharacter(Base):
     __tablename__ = 'tvmaze_characters'
 
     tvmaze_id = Column(Integer, primary_key=True)
@@ -79,13 +82,16 @@ class TVMazeCharacters(Base):
     original_image = Column(String)
     medium_image = Column(String)
     url = Column(String)
-    actors = relation('TVMazeActors', secondary=actors_to_characters_table)
+    actors = relation('TVMazeActor', secondary=actors_to_characters_table)
     last_update = Column(DateTime)
 
     def __init__(self, character, session):
         self.tvmaze_id = character.id
         self.name = character.name
         self.url = character.url
+
+    def __repr__(self):
+        return '<TVMazeCharacter,name={0},id={1}'.format(self.name, self.tvmaze_id)
 
     def update(self, character, session):
         if character.image:
@@ -154,8 +160,8 @@ class TVMazeSeries(Base):
     network = Column(Unicode)
     episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season_number', cascade='all, delete, delete-orphan',
                         backref='series')
-    actors = relation(TVMazeActors, secondary=actors_to_characters_table)
-    characters = relation(TVMazeCharacters, secondary=actors_to_characters_table)
+    actors = relation(TVMazeActor, secondary=actors_to_characters_table)
+    characters = relation(TVMazeCharacter, secondary=actors_to_characters_table)
     last_update = Column(DateTime)  # last time we updated the db for the show
 
     def __init__(self, series, session):
@@ -293,8 +299,12 @@ def get_db_actors_and_characters(actors, session):
         db_actor = get_db_actor(actor, session)
         db_character = get_db_character(actor.character, session)
 
-        db_character.actors.append(db_actor)
-        db_actor.characters.append(db_character)
+        # Links actor to character
+        if db_actor not in db_character.actors:
+            db_character.actors.append(db_actor)
+        # Links character to actor
+        if db_character not in db_actor.characters:
+            db_actor.characters.append(db_character)
 
         db_actors.append(db_actor)
         db_characters.append(db_character)
@@ -302,9 +312,9 @@ def get_db_actors_and_characters(actors, session):
 
 
 def get_db_actor(actor, session):
-    db_actor = session.query(TVMazeActors).filter(TVMazeActors.tvmaze_id == actor.id).first()
+    db_actor = session.query(TVMazeActor).filter(TVMazeActor.tvmaze_id == actor.id).first()
     if not db_actor:
-        db_actor = TVMazeActors(actor=actor, session=session)
+        db_actor = TVMazeActor(actor=actor, session=session)
         log.debug('adding actor {0} to db'.format(db_actor.name))
         session.add(db_actor)
     elif db_actor.expired:
@@ -316,9 +326,9 @@ def get_db_actor(actor, session):
 
 
 def get_db_character(character, session):
-    db_character = session.query(TVMazeCharacters).filter(TVMazeCharacters.tvmaze_id == character.id).first()
+    db_character = session.query(TVMazeCharacter).filter(TVMazeCharacter.tvmaze_id == character.id).first()
     if not db_character:
-        db_character = TVMazeCharacters(character=character, session=session)
+        db_character = TVMazeCharacter(character=character, session=session)
         log.debug('adding character {0} to db'.format(db_character.name))
         session.add(db_character)
     elif db_character.expired:
