@@ -442,6 +442,7 @@ class APITVMaze(object):
         # Searching cache first
         series = from_cache(session=session, cache_type=TVMazeSeries, search_params=search_params)
 
+        search = None
         # Preparing search from lookup table
         title = lookup_params.get('series_name') or lookup_params.get('show_name') or lookup_params.get('title')
         if not series and title:
@@ -482,12 +483,17 @@ class APITVMaze(object):
             log.debug('creating new series {0} in tvmaze_series db'.format(pytvmaze_show.name))
             series = TVMazeSeries(pytvmaze_show, session)
             session.add(series)
-        # If there's a mismatch between actual series name and requested title,
-        # add it to lookup table for future lookups
-        if series and title.lower() != series.name.lower():
+
+        # Check if show returned from lookup table as expired
+        if series and title.lower() == series.name.lower():
+            return series
+        elif series and not search:
             log.debug('mismatch between series title {0} and search title {1}. '
                       'saving in lookup table'.format(title, series.name))
             session.add(TVMazeLookup(search_name=title, series=series))
+        elif series and search:
+            log.debug('Updating search result in db')
+            search.series = series
         return series
 
     @staticmethod
