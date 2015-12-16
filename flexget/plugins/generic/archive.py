@@ -28,11 +28,13 @@ archive_tags_table = Table('archive_entry_tags', Base.metadata,
                            Column('entry_id', Integer, ForeignKey('archive_entry.id')),
                            Column('tag_id', Integer, ForeignKey('archive_tag.id')),
                            Index('ix_archive_tags', 'entry_id', 'tag_id'))
+Base.register_table(archive_tags_table)
 
 archive_sources_table = Table('archive_entry_sources', Base.metadata,
                               Column('entry_id', Integer, ForeignKey('archive_entry.id')),
                               Column('source_id', Integer, ForeignKey('archive_source.id')),
                               Index('ix_archive_sources', 'entry_id', 'source_id'))
+Base.register_table(archive_sources_table)
 
 
 class ArchiveEntry(Base):
