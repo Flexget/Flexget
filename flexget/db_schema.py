@@ -187,6 +187,17 @@ class Meta(type):
 
         return type.__new__(mcs, str(metaname), tuple(new_bases), dict_)
 
+    def register_table(cls, table):
+        """
+        This can be used if a plugin is declaring non-declarative sqlalchemy tables.
+
+        :param table: Can either be the name of the table, or an :class:`sqlalchemy.Table` instance.
+        """
+        if isinstance(table, basestring):
+            register_plugin_table(table, cls.plugin, cls.version)
+        else:
+            register_plugin_table(table.name, cls.plugin, cls.version)
+
     def __getattr__(self, item):
         """Transparently return attributes of Base instead of our own."""
         return getattr(Base, item)
