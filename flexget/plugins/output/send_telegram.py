@@ -360,10 +360,10 @@ class SendTelegram(object):
         groups = dict()
 
         for chat in (x.message.chat for x in updates):
-            if isinstance(chat, telegram.User):
+            if chat.type == 'private':
                 usernames[chat.username] = chat
                 fullnames[(chat.first_name, chat.last_name)] = chat
-            elif isinstance(chat, telegram.GroupChat):
+            elif chat.type in ('group', 'supergroup' or 'channel'):
                 groups[chat.title] = chat
             else:
                 self.log.warn('unknown chat type: {0}'.format(type(chat)))
