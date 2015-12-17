@@ -70,6 +70,10 @@ class EmitSeries(object):
                       search_strings=search_strings,
                       series_name=series.name,
                       series_alternate_names=alts,  # Not sure if this field is useful down the road.
+                      tvdb_id=series.tvdb_id,
+                      imdb_id=series.imdb_id,
+                      tmdb_id=series.tmdb_id,
+                      trakt_show_id=series.trakt_show_id,
                       series_season=season,
                       series_episode=episode,
                       series_id=series_id,
