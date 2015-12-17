@@ -23,13 +23,13 @@ except ImportError:
 sys.path.insert(0, '')
 
 options = environment.options
-# There is a bug in sqlalchemy 0.9.0, see gh#127
-# There is a bug in beautifulsoup 4.2.0 that breaks imdb parsing, see http://flexget.com/ticket/2091
-# There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
+
 install_requires = [
     'FeedParser>=5.2.1',
+    # There is a bug in sqlalchemy 0.9.0, see gh#127
     'SQLAlchemy >=0.7.5, !=0.9.0, <1.999',
     'PyYAML',
+    # There is a bug in beautifulsoup 4.2.0 that breaks imdb parsing, see http://flexget.com/ticket/2091
     'beautifulsoup4>=4.1, !=4.2.0, <4.5',
     'html5lib>=0.11',
     'PyRSS2Gen',
@@ -37,6 +37,7 @@ install_requires = [
     'progressbar',
     'rpyc',
     'jinja2',
+    # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
     'requests>=1.0, !=2.4.0, <2.99',
     'python-dateutil!=2.0, !=2.2',
     'jsonschema>=2.0',
