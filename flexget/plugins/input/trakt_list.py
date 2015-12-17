@@ -72,7 +72,12 @@ class TraktList(object):
             'type': {'type': 'string', 'enum': ['shows', 'movies', 'episodes']},
             'list': {"oneOf": [
               {'type': 'string'}, 
-              {"type": "object", "properties": {"rating": {"type": "integer", 'enum': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}}
+              {
+                  "type": "object",
+                  "properties": {
+                      "rating": {"type": "integer", 'enum': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}
+                  },
+                  "additionalProperties": False
             }]},
             'strip_dates': {'type': 'boolean', 'default': False}
         },
