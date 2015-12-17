@@ -23,8 +23,10 @@ class Text(object):
         <field>: <regexp to match value>
       format:
         <field>: <python string formatting>
+      encoding: utf-8
 
     Note: each entry must have atleast two fields, title and url
+    The encoding parameter is any string recognized by the str.decode function.
 
     Example::
 
@@ -44,6 +46,9 @@ class Text(object):
                     {'type': 'string', 'format': 'url'},
                     {'type': 'string', 'format': 'file'}
                 ]
+            },
+            'encoding': {
+                'type': 'string',
             },
             'entry': {
                 'type': 'object',
@@ -78,6 +83,7 @@ class Text(object):
 
         entry_config = config.get('entry')
         format_config = config.get('format', {})
+        encoding = config.get('encoding', None)
 
         entries = []
         # keep track what fields have been found
@@ -86,6 +92,8 @@ class Text(object):
 
         # now parse text
         for line in lines:
+            if encoding is not None:
+                line = line.decode(encoding)
             for field, regexp in entry_config.iteritems():
                 # log.debug('search field: %s regexp: %s' % (field, regexp))
                 match = re.search(regexp, line)
