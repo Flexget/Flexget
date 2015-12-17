@@ -458,7 +458,7 @@ class PluginTransmission(TransmissionBase):
                 # We need to index the files if any of the following are defined
                 if ('main_file_only' in options['post'] and options['post']['main_file_only'] == True or 
                    'content_filename' in options['post'] or skip_files):
-                        fl = cli.get_files(r.id)
+                        fl = cli.get_files(r.id).encode('utf-8')
                 
                         if ('magnetization_timeout' in options['post'] and
                         options['post']['magnetization_timeout'] > 0 and
