@@ -345,32 +345,6 @@ class TestTVMazeShowLookup(FlexGetBase):
             'tvmaze_series_id']
         assert entry['tvmaze_episode_id'] == 211206, 'episode id should be 211206, instead its %s' % entry[
             'tvmaze_episode_id']
-        assert len(entry['tvmaze_series_characters']) == 9, \
-            'expected character list for series to contain 9 members,' \
-            ' instead it contains %s' % len(entry['tvmaze_series_characters'])
         assert len(entry['tvmaze_series_actors']) == 9, \
             'expected actors list for series to contain 9 members,' \
             ' instead it contains %s' % len(entry['tvmaze_series_actors'])
-
-    @use_vcr()
-    def test_multiple_characters_per_actor(self):
-        self.execute_task('test_multiple_characters_per_actor')
-        entry = self.task.find_entry(title='Californication.S01E01.HDTV.x264-LOL')
-        assert entry['tvmaze_series_id'] == 28, 'series id should be 28, instead its %s' % entry[
-            'tvmaze_series_id']
-        assert entry['tvmaze_episode_id'] == 1463, 'episode id should be 1463, instead its %s' % entry[
-            'tvmaze_episode_id']
-        entry = self.task.find_entry(title='The.X-Files.S01E01.HDTV.x264-LOL')
-        assert entry['tvmaze_series_id'] == 430, 'series id should be 430, instead its %s' % entry[
-            'tvmaze_series_id']
-        assert entry['tvmaze_episode_id'] == 40420, 'episode id should be 40420, instead its %s' % entry[
-            'tvmaze_episode_id']
-        entry = self.task.find_entry(title='Aquarius.US.S01E1.HDTV.x264-LOL')
-        assert entry['tvmaze_series_id'] == 341, 'series id should be 341, instead its %s' % entry[
-            'tvmaze_series_id']
-        assert entry['tvmaze_episode_id'] == 162067, 'episode id should be 162067, instead its %s' % entry[
-            'tvmaze_episode_id']
-        actors = entry['tvmaze_series_actors']
-        for actor in actors:
-            if actor['name'] == 'David Duchovny':
-                assert actor['characters'] == u'Hank Moody ,Special Agent Fox Mulder ,Sam Hodiak'

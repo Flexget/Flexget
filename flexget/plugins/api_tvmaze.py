@@ -24,15 +24,15 @@ UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 
 @db_schema.upgrade('tvmaze')
 def upgrade(ver, session):
-    if ver < 2:
+    if ver is None or ver < 2:
         raise db_schema.UpgradeImpossible
     return ver
 
 
 actors_to_characters_table = Table('tvmaze_actors_to_characters', Base.metadata,
                                    Column('series_id', Integer, ForeignKey('tvmaze_series.tvmaze_id')),
-                                   Column('actor_id', Integer, ForeignKey('tvmaze_actors.tvmaze_id')),
-                                   Column('character_id', Integer, ForeignKey('tvmaze_characters.tvmaze_id')))
+                                   Column('actor_id', Integer, ForeignKey('tvmaze_actors.tvmaze_id')))
+Base.register_table(actors_to_characters_table)
 
 
 class TVMazeActor(Base):
@@ -43,7 +43,6 @@ class TVMazeActor(Base):
     original_image = Column(String)
     medium_image = Column(String)
     url = Column(String)
-    characters = relation('TVMazeCharacter', secondary=actors_to_characters_table)
     last_update = Column(DateTime)
 
     def __init__(self, actor, session):
@@ -73,44 +72,6 @@ class TVMazeActor(Base):
         return expiration
 
 
-class TVMazeCharacter(Base):
-    __tablename__ = 'tvmaze_characters'
-
-    tvmaze_id = Column(Integer, primary_key=True)
-    name = Column(Unicode, unique=True, nullable=False)
-    original_image = Column(String)
-    medium_image = Column(String)
-    url = Column(String)
-    actors = relation('TVMazeActor', secondary=actors_to_characters_table)
-    last_update = Column(DateTime)
-
-    def __init__(self, character, session):
-        self.tvmaze_id = character.id
-        self.name = character.name
-        self.url = character.url
-
-    def __repr__(self):
-        return '<TVMazeCharacter,name={0},id={1}'.format(self.name, self.tvmaze_id)
-
-    def update(self, character, session):
-        if character.image:
-            self.original_image = character.image.get('original')
-            self.medium_image = character.image.get('medium')
-        else:
-            self.original_image = None
-            self.medium_image = None
-        self.last_update = datetime.now()
-
-    @property
-    def expired(self):
-        if not self.last_update:
-            log.debug('no last update attribute, character set for update')
-            return True
-        time_dif = datetime.now() - self.last_update
-        expiration = time_dif.days > UPDATE_INTERVAL
-        return expiration
-
-
 class TVMazeGenre(Base):
     __tablename__ = 'tvmaze_genres'
 
@@ -121,6 +82,8 @@ class TVMazeGenre(Base):
 genres_table = Table('tvmaze_series_genres', Base.metadata,
                      Column('series_id', Integer, ForeignKey('tvmaze_series.tvmaze_id')),
                      Column('genre_id', Integer, ForeignKey('tvmaze_genres.id')))
+
+Base.register_table(genres_table)
 
 
 class TVMazeLookup(Base):
@@ -159,7 +122,6 @@ class TVMazeSeries(Base):
     episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season_number', cascade='all, delete, delete-orphan',
                         backref='series')
     actors = relation(TVMazeActor, secondary=actors_to_characters_table)
-    characters = relation(TVMazeCharacter, secondary=actors_to_characters_table)
     last_update = Column(DateTime)  # last time we updated the db for the show
 
     def __init__(self, series, session):
@@ -204,10 +166,9 @@ class TVMazeSeries(Base):
 
         self.genres[:] = get_db_genres(series.genres, session)
         if series.cast and series.cast.people:
-            self.actors[:], self.characters[:] = get_db_actors_and_characters(series.cast.people, session)
+            self.actors[:] = get_db_actors(series.cast.people, session)
         else:
             self.actors[:] = []
-            self.characters[:] = []
 
     def __repr__(self):
         return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.tvmaze_id, self.last_update)
@@ -283,31 +244,18 @@ class TVMazeEpisodes(Base):
         return expiration
 
 
-def get_db_actors_and_characters(actors, session):
+def get_db_actors(actors, session):
     """
     Return a tuple of db actors list and db characters list generated from show cast.
     :param actors: List of actors retrieved by API
     :param session: DB Session
     :return: tuple of db actors list and db characters list
     """
-    db_characters = []
     db_actors = []
     for actor in actors:
         db_actor = get_db_actor(actor, session)
-        db_character = get_db_character(actor.character, session)
-
-        # Links actor to character
-        if db_actor not in db_character.actors:
-            db_character.actors.append(db_actor)
-            session.commit()
-        # Links character to actor
-        if db_character not in db_actor.characters:
-            db_actor.characters.append(db_character)
-            session.commit()
-
         db_actors.append(db_actor)
-        db_characters.append(db_character)
-    return db_actors, db_characters
+    return db_actors
 
 
 def get_db_actor(actor, session):
@@ -322,20 +270,6 @@ def get_db_actor(actor, session):
     else:
         log.debug('actor {0} found in db, returning'.format(db_actor.name))
     return db_actor
-
-
-def get_db_character(character, session):
-    db_character = session.query(TVMazeCharacter).filter(TVMazeCharacter.tvmaze_id == character.id).first()
-    if not db_character:
-        db_character = TVMazeCharacter(character=character, session=session)
-        log.debug('adding character {0} to db'.format(db_character.name))
-        session.add(db_character)
-    elif db_character.expired:
-        log.debug('found expired character in db, refreshing')
-        db_character.update(character, session)
-    else:
-        log.debug('character {0} found in db, returning'.format(db_character.name))
-    return db_character
 
 
 def get_db_genres(genres, session):
@@ -357,16 +291,7 @@ def get_actor_details(actor):
             'original_image': actor.original_image,
             'medium_image': actor.medium_image,
             'url': actor.url,
-            'characters': ' ,'.join(character.name for character in actor.characters if character)
-            }
-
-
-def get_character_details(character):
-    return {'name': character.name,
-            'original_image': character.original_image,
-            'medium_image': character.medium_image,
-            'url': character.url,
-            'actors': ' ,'.join(actor.name for actor in character.actors if actor)
+            'id': actor.tvmaze_id
             }
 
 
