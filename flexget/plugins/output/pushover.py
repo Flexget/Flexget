@@ -54,7 +54,7 @@ class OutputPushover(object):
                 {'type': 'number', 'minimum': -2, 'maximum': 2},
                 {'type': 'string'}]},
             'url': {'type': 'string'},
-            'urltitle': {'type': 'string'},
+            'url_title': {'type': 'string'},
             'sound': {'type': 'string'},
             'retry': {'type': 'integer', 'minimum': 30},
             'expire': {'type': 'integer', 'maximum': 86400},

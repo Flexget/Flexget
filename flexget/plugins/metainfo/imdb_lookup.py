@@ -14,7 +14,7 @@ from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
 from flexget.utils.database import with_session
 
-SCHEMA_VER = 5
+SCHEMA_VER = 6
 
 Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
@@ -24,16 +24,19 @@ genres_table = Table('imdb_movie_genres', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
     Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
     Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'))
+Base.register_table(genres_table)
 
 actors_table = Table('imdb_movie_actors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
     Column('actor_id', Integer, ForeignKey('imdb_actors.id')),
     Index('ix_imdb_movie_actors', 'movie_id', 'actor_id'))
+Base.register_table(actors_table)
 
 directors_table = Table('imdb_movie_directors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
     Column('director_id', Integer, ForeignKey('imdb_directors.id')),
     Index('ix_imdb_movie_directors', 'movie_id', 'director_id'))
+Base.register_table(directors_table)
 
 
 class Movie(Base):
@@ -176,8 +179,9 @@ log = logging.getLogger('imdb_lookup')
 
 @db_schema.upgrade('imdb_lookup')
 def upgrade(ver, session):
-    # We may have cached bad data due to imdb changes, just wipe everything. GitHub #697
-    if ver is None or ver <= 4:
+    # v5 We may have cached bad data due to imdb changes, just wipe everything. GitHub #697
+    # v6 The association tables were not cleared on the last upgrade, clear again. GitHub #714
+    if ver is None or ver <= 5:
         raise UpgradeImpossible('Resetting imdb_lookup caches because bad data may have been cached.')
     return ver
 

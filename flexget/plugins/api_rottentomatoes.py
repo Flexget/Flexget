@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 import time
 import logging
 import difflib
-import random
 import urllib
 from datetime import datetime, timedelta
 from urllib2 import URLError
@@ -57,16 +56,19 @@ genres_table = Table('rottentomatoes_movie_genres', Base.metadata,
     Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
     Column('genre_id', Integer, ForeignKey('rottentomatoes_genres.id')),
     Index('ix_rottentomatoes_movie_genres', 'movie_id', 'genre_id'))
+Base.register_table(genres_table)
 
 actors_table = Table('rottentomatoes_movie_actors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
     Column('actor_id', Integer, ForeignKey('rottentomatoes_actors.id')),
     Index('ix_rottentomatoes_movie_actors', 'movie_id', 'actor_id'))
+Base.register_table(actors_table)
 
 directors_table = Table('rottentomatoes_movie_directors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('rottentomatoes_movies.id')),
     Column('director_id', Integer, ForeignKey('rottentomatoes_directors.id')),
     Index('ix_rottentomatoes_movie_directors', 'movie_id', 'director_id'))
+Base.register_table(directors_table)
 
 
 # TODO: get rid of
