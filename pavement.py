@@ -30,7 +30,7 @@ install_requires = [
     'FeedParser>=5.2.1',
     'SQLAlchemy >=0.7.5, !=0.9.0, <1.999',
     'PyYAML',
-    'beautifulsoup4>=4.1, !=4.2.0, <4.4',
+    'beautifulsoup4>=4.1, !=4.2.0, <4.5',
     'html5lib>=0.11',
     'PyRSS2Gen',
     'pynzb',
