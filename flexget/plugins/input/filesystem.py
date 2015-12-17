@@ -185,7 +185,7 @@ class Filesystem(object):
         get_dirs = 'dirs' in config['retrieve']
         get_symlinks = 'symlinks' in config['retrieve']
 
-        log.info('Starting to scan folders.')
+        log.verbose('Starting to scan folders.')
         return self.get_entries_from_path(path_list, match, recursive, test_mode, get_files, get_dirs, get_symlinks)
 
 

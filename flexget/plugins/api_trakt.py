@@ -185,10 +185,12 @@ class TraktGenre(Base):
 show_genres_table = Table('trakt_show_genres', Base.metadata,
                           Column('show_id', Integer, ForeignKey('trakt_shows.id')),
                           Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
+Base.register_table(show_genres_table)
 
 movie_genres_table = Table('trakt_movie_genres', Base.metadata,
                            Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
                            Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
+Base.register_table(movie_genres_table)
 
 
 def get_db_genres(genres, session):
@@ -224,10 +226,12 @@ class TraktActor(Base):
 show_actors_table = Table('trakt_show_actors', Base.metadata,
                           Column('show_id', Integer, ForeignKey('trakt_shows.id')),
                           Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
+Base.register_table(show_actors_table)
 
 movie_actors_table = Table('trakt_movie_actors', Base.metadata,
                            Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
                            Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
+Base.register_table(movie_actors_table)
 
 
 def get_db_actors(id, style):
