@@ -77,8 +77,6 @@ class TestFilesystem(FlexGetBase):
               path: """ + test3 + """
               recursive: yes
               retrieve: [files, dirs]
-            accept_all: yes
-            download: c:\\temp
         """
 
     item_list = ['file1.mkv', 'file2.txt', 'file10.mkv', 'file11.txt', 'file4.avi', 'file3.xlsx', 'file5.mkv', 'dir1',
