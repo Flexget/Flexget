@@ -203,7 +203,7 @@ class TestFilesystem(FlexGetBase):
 
     def test_non_ascii(self):
         task_name = 'non_ascii'
-        should_exist = ['\u0398 is theta', 'Do you want to build a \u2603.txt']
+        should_exist = ['\u0161 dir', '\u0152 file.txt']
         self.execute_task(task_name)
 
         self.assert_check(task_name, 'positive', should_exist)
