@@ -59,7 +59,7 @@ class OutputFtp(object):
         log.debug("Connecting to " + ftp_url.hostname)
         ftp.connect(ftp_url.hostname, ftp_url.port)
         ftp.login(ftp_url.username, ftp_url.password)
-	if config['use-ssl']:
+        if config['use-ssl']:
             ftp.prot_p()
         ftp.sendcmd('TYPE I')
         ftp.set_pasv(True)
