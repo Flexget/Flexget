@@ -40,9 +40,8 @@ requests = ReqSession(timeout=25)
 api_key = '4D297D8CFDE0E105'
 language = 'en'
 server = 'http://www.thetvdb.com/api/'
-_mirrors = {}
 persist = SimplePersistence('api_tvdb')
-
+_mirrors = {}
 
 @db_schema.upgrade('api_tvdb')
 def upgrade(ver, session):
@@ -67,8 +66,8 @@ def upgrade(ver, session):
 
 
 def get_mirror(type='xml'):
+
     """Returns a random mirror for a given type 'xml', 'zip', or 'banner'"""
-    global _mirrors
     if not _mirrors.get(type):
         # Get the list of mirrors from tvdb
         page = None
