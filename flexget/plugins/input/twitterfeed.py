@@ -127,7 +127,7 @@ class TwitterFeed(object):
                                                   since_id=since_id,
                                                   max_id=max_id)
             except twitter.TwitterError as e:
-                raise plugin.PluginError('Unable to fetch timeline %s for task %s: %s' % (account, task.name, e))
+                raise plugin.PluginError('Unable to fetch timeline %s for %s' % (account, e))
 
             if not tweets:
                 break
