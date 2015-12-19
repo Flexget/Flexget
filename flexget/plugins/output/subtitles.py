@@ -150,7 +150,8 @@ class Subtitles(object):
 
             # download
             for sub in filtered_subs:
-                log.debug('SUBS FOUND: ', sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID'])
+                log.debug('SUBS FOUND: %s %s %s' %
+                          (sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID']))
 
                 f = urlopener(sub['ZipDownloadLink'], log)
                 subfilename = re.match('^attachment; filename="(.*)"$', f.info()['content-disposition']).group(1)
