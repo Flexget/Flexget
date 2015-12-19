@@ -128,7 +128,7 @@ class Filesystem(object):
                 log.info("    Timestamp: %s" % entry["timestamp"])
             return entry
         else:
-            log.error('Non valid entry created: %s '% entry)
+            log.error('Non valid entry created: %s ' % entry)
             return
 
     def get_max_depth(self, recursion, base_depth):

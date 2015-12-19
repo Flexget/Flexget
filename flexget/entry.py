@@ -133,7 +133,7 @@ class Entry(LazyDict):
         elif not self.accepted:
             self._state = 'accepted'
             self.trace(reason, operation='accept')
-                # Run entry on_accept hooks
+            # Run entry on_accept hooks
             self.run_hooks('accept', reason=reason, **kwargs)
 
     def reject(self, reason=None, **kwargs):
