@@ -3,15 +3,15 @@ FlexGet build and development utilities - unfortunately this file is somewhat me
 """
 from __future__ import print_function
 import os
-import subprocess
 import shutil
 import sys
-from paver.easy import *
+
+from paver.easy import environment, task, cmdopts, Bunch, path, call_task, might_call, consume_args
+# These 2 packages do magic on import, even though they aren't used explicitly
 import paver.virtual
 import paver.setuputils
 from paver.shell import sh
 from paver.setuputils import setup, find_package_data, find_packages
-
 
 sphinxcontrib = False
 try:
