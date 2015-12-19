@@ -39,6 +39,10 @@ class EmitSeries(object):
         ]
     }
 
+
+    def __init__(self):
+        self.rerun_entries = []
+
     def ep_identifiers(self, season, episode):
         return ['S%02dE%02d' % (season, episode),
                 '%dx%02d' % (season, episode)]
@@ -79,6 +83,7 @@ class EmitSeries(object):
         return entry
 
     def on_task_input(self, task, config):
+
         if not config:
             return
         if isinstance(config, bool):
