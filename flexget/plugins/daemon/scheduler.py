@@ -108,7 +108,7 @@ def job_id(conf):
 
 def run_job(tasks):
     """Add the execution to the queue and waits until it is finished"""
-    from flexget.manager import manager
+
     finished_events = manager.execute(options={'tasks': tasks, 'cron': True}, priority=5)
     for task_id, task_name, event in finished_events:
         event.wait()
