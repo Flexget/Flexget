@@ -2,6 +2,7 @@
 FlexGet build and development utilities - unfortunately this file is somewhat messy
 """
 from __future__ import print_function
+import glob
 import os
 import shutil
 import sys
@@ -211,9 +212,6 @@ def test(options):
 @task
 def clean():
     """Cleans up the virtualenv"""
-    import os
-    import glob
-
     for p in ('bin', 'Scripts', 'build', 'dist', 'include', 'lib', 'man',
               'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
         pth = path(p)
