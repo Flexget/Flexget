@@ -42,8 +42,6 @@ register_asset_type('plugins_css', 'css/plugins.min.css', filters='cssmin')
 
 
 def register_asset(asset_type, asset):
-    global _asset_registry
-
     if asset_type not in _asset_registry:
         raise KeyError('asset registry %s does not exist' % asset_type)
 
