@@ -297,6 +297,7 @@ class UrlRewriteTorrent411(object):
                 {'type': 'string', 'enum': list(SUB_CATEGORIES)}
             ),
         },
+        'deprecated': '"torrent411" plugin has been replaced by the "t4111" plugin.',
         'required': ['username', 'password'],
         'additionalProperties': False
     }
