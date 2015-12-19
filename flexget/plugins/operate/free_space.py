@@ -38,7 +38,7 @@ class PluginFreeSpace(object):
         ]
     }
 
-    def prepare_config(self, config):
+    def prepare_config(self, config, task):
         if isinstance(config, (float, int)):
             config = {'space': config}
         # Use config path if none is specified

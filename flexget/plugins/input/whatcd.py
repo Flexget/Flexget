@@ -253,7 +253,7 @@ class InputWhatCD(object):
             if pages and page >= pages:
                 break
 
-            log.debug("Attempting to get page {} of search results".format(page, pages))
+            log.debug("Attempting to get page {} of search results".format(page))
             result = self._request('browse', page=page, **config)
             if not result['results']:
                 break
