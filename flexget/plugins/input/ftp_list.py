@@ -114,7 +114,7 @@ class InputFtpList(object):
 
             self._handle_path(entries, ftp, baseurl, path, mlst_supported, files_only, recursive, get_size, encoding)
 
-	ftp.close()
+        ftp.close()
 
         return entries
 
