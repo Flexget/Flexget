@@ -48,7 +48,7 @@ class PluginFreeSpace(object):
 
     @plugin.priority(255)
     def on_task_download(self, task, config):
-        config = self.prepare_config(config)
+        config = self.prepare_config(config, task)
         # Only bother aborting if there were accepted entries this run.
         if task.accepted:
             if get_free_space(config['path']) < config['space']:
