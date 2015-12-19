@@ -1,5 +1,4 @@
 import logging
-
 import sys
 import os
 import socket
@@ -109,7 +108,7 @@ class SCGITransport(xmlrpclib.Transport):
             response_body += data
 
         if self.verbose:
-            log.info('body:', repr(response_body))
+            log.info('body: %s', repr(response_body))
 
         # Remove SCGI headers from the response.
         response_header, response_body = re.split(r'\n\s*?\n', response_body, maxsplit=1)
@@ -261,8 +260,10 @@ class RTorrent(object):
     def version(self):
         return [int(v) for v in self._server.system.client_version().split('.')]
 
-    def load(self, raw_torrent, fields={}, start=False, mkdir=True):
+    def load(self, raw_torrent, fields=None, start=False, mkdir=True):
 
+        if fields is None:
+            fields = {}
         # First param is empty 'target'
         params = ['', xmlrpclib.Binary(raw_torrent)]
 
