@@ -39,6 +39,18 @@ class ChatIdEntry(ChatIdsBase):
     surname = Column(String, index=True, nullable=True)
     group = Column(String, index=True, nullable=True)
 
+    def __str__(self):
+        x = ['id={0}'.format(self.id)]
+        if self.username:
+            x.append('username={0}'.format(self.username))
+        if self.firstname:
+            x.append('firstname={0}'.format(self.firstname))
+        if self.surname:
+            x.append('surname={0}'.format(self.surname))
+        if self.group:
+            x.append('group={0}'.format(self.group))
+        return ' '.join(x)
+
 
 class SendTelegram(object):
     """Send a message to one or more Telegram users or groups upon accepting a download.
@@ -84,6 +96,13 @@ class SendTelegram(object):
     """
     log = None  # initialized during plugin.register
     """:type: flexget.logger.FlexGetLogger"""
+    _token = None
+    _tmpl = None
+    _use_markdown = False
+    _usernames = None
+    _fullnames = None
+    _groups = None
+    _bot = None
 
     schema = {
         'type': 'object',
@@ -136,33 +155,28 @@ class SendTelegram(object):
         'additionalProperties': False,
     }
 
-    @staticmethod
-    def _parse_config(config):
+    def _parse_config(self, config):
         """
         :type config: dict
-        :returns: token, tmpl, use_markdown, usernames, fullnames, groups
-        :rtype: str, str, bool, tuple[list[str], list[tuple[str, str]], list[str]]
 
         """
-        token = config[_TOKEN_ATTR]
-        tmpl = config[_TMPL_ATTR]
-        use_markdown = config[_MARKDOWN_ATTR]
-        usernames = []
-        fullnames = []
-        groups = []
+        self._token = config[_TOKEN_ATTR]
+        self._tmpl = config[_TMPL_ATTR]
+        self._use_markdown = config[_MARKDOWN_ATTR]
+        self._usernames = []
+        self._fullnames = []
+        self._groups = []
 
         for i in config[_RCPTS_ATTR]:
             if _USERNAME_ATTR in i:
-                usernames.append(i[_USERNAME_ATTR])
+                self._usernames.append(i[_USERNAME_ATTR])
             elif _FULLNAME_ATTR in i:
                 fullname = i[_FULLNAME_ATTR]
                 firstname = fullname[_FIRSTNAME_ATTR]
                 surname = fullname[_SURNAME_ATTR]
-                fullnames.append((firstname, surname))
+                self._fullnames.append((firstname, surname))
             elif _GROUP_ATTR in i:
-                groups.append(i[_GROUP_ATTR])
-
-        return token, tmpl, use_markdown, usernames, fullnames, groups
+                self._groups.append(i[_GROUP_ATTR])
 
     def on_task_output(self, task, config):
         """makes this plugin count as output (stops warnings about missing outputs)"""
@@ -170,26 +184,31 @@ class SendTelegram(object):
 
     def on_task_exit(self, task, config):
         """Send telegram message(s) at exit"""
+        session = task.session
         self._enforce_telegram_plugin_ver()
 
-        token, tmpl, use_markdown, usernames, fullnames, groups = self._parse_config(config)
+        self._parse_config(config)
         self.log.debug('token={0} use_markdown={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
-            token, usernames, fullnames, groups, tmpl, use_markdown))
+            self._token, self._usernames, self._fullnames, self._groups, self._tmpl, self._use_markdown))
 
-        bot = telegram.Bot(token)
-        try:
-            bot.getMe()
-        except UnicodeDecodeError as e:
-            self.log.trace('bot.getMe() raised: {!r}'.format(e))
-            raise plugin.PluginWarning('invalid bot token')
-        session = task.session
-
-        chat_ids = self._get_chat_ids_n_update_db(bot, session, usernames, fullnames, groups)
+        self._init_bot()
+        chat_ids = self._get_chat_ids_n_update_db(session)
 
         if not chat_ids:
             return
 
-        self._send_msgs(task, bot, chat_ids, tmpl, use_markdown)
+        self._send_msgs(task, chat_ids)
+
+    def _init_bot(self):
+        self._bot = telegram.Bot(self._token)
+        self._check_token()
+
+    def _check_token(self):
+        try:
+            self._bot.getMe()
+        except UnicodeDecodeError as e:
+            self.log.trace('bot.getMe() raised: {!r}'.format(e))
+            raise plugin.PluginWarning('invalid bot token')
 
     @staticmethod
     def _enforce_telegram_plugin_ver():
@@ -200,14 +219,14 @@ class SendTelegram(object):
         elif LooseVersion(telegram.__version__) < str(_MIN_TELEGRAM_VER):
             raise plugin.PluginWarning('old python-telegram-bot ({0})'.format(telegram.__version__))
 
-    def _send_msgs(self, task, bot, chat_ids, tmpl, use_markdown):
+    def _send_msgs(self, task, chat_ids):
         kwargs = dict()
-        if use_markdown:
+        if self._use_markdown:
             kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
         for entry in task.accepted:
-            msg = self._render_msg(entry, tmpl)
+            msg = self._render_msg(entry, self._tmpl)
             for chat_id in (x.id for x in chat_ids):
-                bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
+                self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
 
     def _render_msg(self, entry, tmpl):
         """
@@ -224,17 +243,16 @@ class SendTelegram(object):
             msg = title
         return msg
 
-    def _get_chat_ids_n_update_db(self, bot, session, usernames, fullnames, groups):
+    def _get_chat_ids_n_update_db(self, session):
         """
-        :type bot: telgram.Bot
         :type session: sqlalchemy.orm.Session
-        :type usernames: list[str]
-        :type fullnames: list[tuple[str, str]]
-        :type groups: list[str]
         :rtype: list[ChatIdEntry]
 
         """
-        chat_ids, has_new_chat_ids = self._get_chat_ids(session, bot, usernames, fullnames, groups)
+        usernames = self._usernames[:]
+        fullnames = self._fullnames[:]
+        groups = self._groups[:]
+        chat_ids, has_new_chat_ids = self._get_chat_ids(session, usernames, fullnames, groups)
         self.log.debug('chat_ids={0}'.format(chat_ids))
 
         if not chat_ids:
@@ -251,12 +269,11 @@ class SendTelegram(object):
 
         return chat_ids
 
-    def _get_chat_ids(self, session, bot, usernames, fullnames, groups):
+    def _get_chat_ids(self, session, usernames, fullnames, groups):
         """get chat ids for `usernames`, `fullnames` & `groups`.
         entries with a matching chat ids will be removed from the input lists.
 
         :type session: sqlalchemy.orm.Session
-        :type bot: telegram.Bot
         :type usernames: list[str]
         :type fullnames: list[tuple[str, str]]
         :type groups: list[str]
@@ -268,14 +285,15 @@ class SendTelegram(object):
 
         self.log.debug('loading cached chat ids')
         chat_ids = self._get_cached_chat_ids(session, usernames, fullnames, groups)
+        self.log.debug('found {0} cached chat_ids: {1}'.format(len(chat_ids), [str(x) for x in chat_ids]))
 
         if not (usernames or fullnames or groups):
             self.log.debug('all chat ids found in cache')
             return chat_ids, False
 
         self.log.debug('loading new chat ids')
-        new_chat_ids = list(self._get_new_chat_ids(bot, usernames, fullnames, groups))
-        self.log.debug('found {0} new chat ids'.format(len(new_chat_ids)))
+        new_chat_ids = list(self._get_new_chat_ids(usernames, fullnames, groups))
+        self.log.debug('found {0} new chat_ids: {1}'.format(len(new_chat_ids), [str(x) for x in new_chat_ids]))
 
         chat_ids.extend(new_chat_ids)
         return chat_ids, bool(new_chat_ids)
@@ -322,17 +340,16 @@ class SendTelegram(object):
 
         return chat_ids
 
-    def _get_new_chat_ids(self, bot, usernames, fullnames, groups):
+    def _get_new_chat_ids(self, usernames, fullnames, groups):
         """get chat ids by querying the telegram `bot`
 
-        :type bot: telegram.Bot
         :type usernames: list[str]
         :type fullnames: list[tuple[str, str]]
         :type groups: list[str]
         :rtype: __generator[ChatIdEntry]
 
         """
-        upd_usernames, upd_fullnames, upd_groups = self._get_bot_updates(bot)
+        upd_usernames, upd_fullnames, upd_groups = self._get_bot_updates()
 
         len_ = len(usernames)
         for i, username in enumerate(reversed(usernames)):
@@ -360,13 +377,22 @@ class SendTelegram(object):
                 yield entry
                 groups.pop(len_ - i - 1)
 
-    def _get_bot_updates(self, bot):
+    def _get_bot_updates(self):
         """get updated chats info from telegram
         :type bot: telegram.Bot
         :rtype: (dict[str, telegram.User], dict[(str, str), telegram.User], dict[str, telegram.GroupChat])
 
         """
-        updates = bot.getUpdates()
+        # highly unlikely, but if there are more than 100 msgs waiting for the bot, we should not miss one
+        updates = []
+        last_upd = 0
+        while 1:
+            ups = self._bot.getUpdates(last_upd, limit=100)
+            updates.extend(ups)
+            if len(ups) < 100:
+                break
+            last_upd = ups[-1].update_id
+
         usernames = dict()
         fullnames = dict()
         groups = dict()
