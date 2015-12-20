@@ -7,6 +7,7 @@ class TestFilesystem(FlexGetBase):
     base = "filesystem_test_dir/"
     test1 = base + '/Test1'
     test2 = base + '/Test2'
+    test3 = base + '/Test3'
 
     __yaml__ = """
         tasks:
@@ -71,6 +72,11 @@ class TestFilesystem(FlexGetBase):
               path: """ + test1 + """
               recursive: yes
               retrieve: dirs
+          non_ascii:
+            filesystem:
+              path: """ + test3 + """
+              recursive: yes
+              retrieve: [files, dirs]
         """
 
     item_list = ['file1.mkv', 'file2.txt', 'file10.mkv', 'file11.txt', 'file4.avi', 'file3.xlsx', 'file5.mkv', 'dir1',
@@ -194,3 +200,10 @@ class TestFilesystem(FlexGetBase):
 
         self.assert_check(task_name, 'positive', should_exist)
         self.assert_check(task_name, 'negative', should_not_exist)
+
+    def test_non_ascii(self):
+        task_name = 'non_ascii'
+        should_exist = ['\u0161 dir', '\u0152 file.txt']
+        self.execute_task(task_name)
+
+        self.assert_check(task_name, 'positive', should_exist)

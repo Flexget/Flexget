@@ -170,7 +170,6 @@ def get_latest_status(episode):
 def display_details(name):
     """Display detailed series information, ie. series show NAME"""
 
-    from flexget.manager import Session
     with Session() as session:
 
         name = normalize_series_name(name)

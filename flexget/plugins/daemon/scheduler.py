@@ -108,7 +108,6 @@ def job_id(conf):
 
 def run_job(tasks):
     """Add the execution to the queue and waits until it is finished"""
-    from flexget.manager import manager
     finished_events = manager.execute(options={'tasks': tasks, 'cron': True}, priority=5)
     for task_id, task_name, event in finished_events:
         event.wait()
@@ -211,6 +210,7 @@ schedule_api = api.namespace('schedules', description='Task Scheduler')
 
 api_schedule_schema = api.schema('schedule', schedule_schema)
 api_schedules_list_schema = api.schema('schedule', main_schema)
+
 
 def _schedule_by_id(schedule_id):
     for schedule in manager.config.get('schedules', []):

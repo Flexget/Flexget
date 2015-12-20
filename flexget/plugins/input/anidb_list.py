@@ -11,6 +11,7 @@ from flexget.utils.soup import get_soup
 log = logging.getLogger('anidb_list')
 USER_ID_RE = r'^\d{1,6}$'
 
+
 class AnidbList(object):
     """"Creates an entry for each movie in your Anidb list."""
 
@@ -68,7 +69,7 @@ class AnidbList(object):
                 entry['anidb_name'] = entry['title']
                 entries.append(entry)
             else:
-               log.verbose('Entry is not a movie')
+                log.verbose('Entry is not a movie')
         return entries
 
 

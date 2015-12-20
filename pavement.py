@@ -2,16 +2,17 @@
 FlexGet build and development utilities - unfortunately this file is somewhat messy
 """
 from __future__ import print_function
+import glob
 import os
-import subprocess
 import shutil
 import sys
-from paver.easy import *
+
+from paver.easy import environment, task, cmdopts, Bunch, path, call_task, might_call, consume_args
+# These 2 packages do magic on import, even though they aren't used explicitly
 import paver.virtual
 import paver.setuputils
 from paver.shell import sh
 from paver.setuputils import setup, find_package_data, find_packages
-
 
 sphinxcontrib = False
 try:
@@ -23,20 +24,21 @@ except ImportError:
 sys.path.insert(0, '')
 
 options = environment.options
-# There is a bug in sqlalchemy 0.9.0, see gh#127
-# There is a bug in beautifulsoup 4.2.0 that breaks imdb parsing, see http://flexget.com/ticket/2091
-# There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
+
 install_requires = [
     'FeedParser>=5.2.1',
+    # There is a bug in sqlalchemy 0.9.0, see gh#127
     'SQLAlchemy >=0.7.5, !=0.9.0, <1.999',
     'PyYAML',
-    'beautifulsoup4>=4.1, !=4.2.0, <4.4',
+    # There is a bug in beautifulsoup 4.2.0 that breaks imdb parsing, see http://flexget.com/ticket/2091
+    'beautifulsoup4>=4.1, !=4.2.0, <4.5',
     'html5lib>=0.11',
     'PyRSS2Gen',
     'pynzb',
     'progressbar',
     'rpyc',
     'jinja2',
+    # There is a bug in requests 2.4.0 where it leaks urllib3 exceptions
     'requests>=1.0, !=2.4.0, <2.99',
     'python-dateutil!=2.0, !=2.2',
     'jsonschema>=2.0',
@@ -210,9 +212,6 @@ def test(options):
 @task
 def clean():
     """Cleans up the virtualenv"""
-    import os
-    import glob
-
     for p in ('bin', 'Scripts', 'build', 'dist', 'include', 'lib', 'man',
               'share', 'FlexGet.egg-info', 'paver-minilib.zip', 'setup.py'):
         pth = path(p)

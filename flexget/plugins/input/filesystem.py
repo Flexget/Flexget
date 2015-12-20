@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
+import urllib
+import urlparse
 from datetime import datetime
 
 from path import Path
@@ -102,9 +104,10 @@ class Filesystem(object):
         """
         Creates a single entry using a filepath and a type (file/dir)
         """
+        filepath = filepath.abspath()
         entry = Entry()
         entry['location'] = filepath
-        entry['url'] = 'file://%s' % filepath
+        entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(filepath.encode('utf8')))
         entry['filename'] = filepath.name
         if filepath.isfile():
             entry['title'] = filepath.namebase
@@ -125,7 +128,7 @@ class Filesystem(object):
                 log.info("    Timestamp: %s" % entry["timestamp"])
             return entry
         else:
-            log.error('Non valid entry created: %s '% entry)
+            log.error('Non valid entry created: %s ' % entry)
             return
 
     def get_max_depth(self, recursion, base_depth):
@@ -164,8 +167,8 @@ class Filesystem(object):
                 if object_depth <= max_depth:
                     if match(path_object):
                         if (path_object.isdir() and get_dirs) or (
-                            path_object.islink() and get_symlinks) or (
-                            path_object.isfile() and get_files):
+                                path_object.islink() and get_symlinks) or (
+                                path_object.isfile() and get_files):
                             entry = self.create_entry(path_object, test_mode)
                         else:
                             log.debug("Path object's %s type doesn't match requested object types." % path_object)

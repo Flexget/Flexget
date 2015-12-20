@@ -23,13 +23,11 @@ class CouchPotato(object):
         'additionalProperties': False
     }
 
-
     def movie_list_request(self, base_url, port, api_key):
         parsedurl = urlparse(base_url)
         log.debug('Received movie list request')
         return '%s://%s:%s%s/api/%s/movie.list?status=active' % (
             parsedurl.scheme, parsedurl.netloc, port, parsedurl.path, api_key)
-
 
     def profile_list_request(self, base_url, port, api_key):
         parsedurl = urlparse(base_url)
