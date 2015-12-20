@@ -263,13 +263,13 @@ def get_db_actor(actor, session):
     db_actor = session.query(TVMazeActor).filter(TVMazeActor.tvmaze_id == actor.id).first()
     if not db_actor:
         db_actor = TVMazeActor(actor=actor)
-        log.debug('adding actor {0} to db'.format(db_actor.name))
+        log.debug('adding actor %s to db' % (db_actor.name))
         session.add(db_actor)
     elif db_actor.expired:
         log.debug('found expired actor in db, refreshing')
         db_actor.update(actor)
     else:
-        log.debug('actor {0} found in db, returning'.format(db_actor.name))
+        log.debug('actor %s found in db, returning' % (db_actor.name))
     return db_actor
 
 
@@ -279,10 +279,10 @@ def get_db_genres(genres, session):
         db_genre = session.query(TVMazeGenre).filter(TVMazeGenre.name == genre).first()
         if not db_genre:
             db_genre = TVMazeGenre(name=genre)
-            log.debug('adding genre {0} to db'.format(genre))
+            log.debug('adding genre %s to db' % (genre))
             session.add(db_genre)
         else:
-            log.debug('genre {0} found in db, returning'.format(db_genre.name))
+            log.debug('genre %s found in db, returning' % (db_genre.name))
         db_genres.append(db_genre)
     return db_genres
 
