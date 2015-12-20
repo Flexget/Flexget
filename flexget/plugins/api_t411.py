@@ -130,7 +130,7 @@ def auth_required(func):
 
     def wrapper(self, *args, **kwargs):
         if not self.is_authenticated():
-            log.debug('None API token. Authenticating with "%s" account...' % self.credentials.get('username'))
+            log.debug('None API token. Authenticating with "%s" account...', self.credentials.get('username'))
             self.auth()
             assert self.is_authenticated()
         return func(self, *args, **kwargs)
@@ -166,7 +166,7 @@ class T411RestClient(object):
         json_response = response.json()
         error_description = json_response.get('error', None)
         if error_description:
-            log.error('%d - %s' % (json_response.get('code'), error_description))
+            log.error('%d - %s', json_response.get('code'), error_description)
         else:
             self.set_api_token(json_response.get('token'))
 
@@ -197,7 +197,7 @@ class T411RestClient(object):
         try:
             result = request.json()
         except ValueError:
-            log.debug("Response from %s was not JSON encoded. Attempting deep inspection..." % path)
+            log.debug("Response from %s was not JSON encoded. Attempting deep inspection...", path)
             try:
                 last_line = request.text.splitlines()[-1]
                 result = json.loads(last_line)
@@ -469,8 +469,10 @@ class T411Proxy(object):
 
         main_categories, indexed_categories = self.mapper.map_category_tree(category_tree)
         category_to_term_type, term_types = self.mapper.map_term_type_tree(term_tree)
-        log.debug('%d categories (%d are main categories) and %d term types retrieved'
-                  % (len(indexed_categories), len(main_categories), len(term_types)))
+        log.debug('%d categories (%d are main categories) and %d term types retrieved',
+                  len(indexed_categories),
+                  len(main_categories),
+                  len(term_types))
         for (category_id, term_type_id) in category_to_term_type:
             category = indexed_categories.get(category_id)
             term_type = term_types.get(term_type_id)
@@ -546,7 +548,7 @@ class T411Proxy(object):
                     .filter(Category.name == friendly_query.category_name) \
                     .one()
                 client_query['category_id'] = category_id
-                log.debug('Category named "%s" resolved by id %d' % (friendly_query.category_name, category_id))
+                log.debug('Category named "%s" resolved by id %d',friendly_query.category_name, category_id)
 
                 if len(friendly_query.term_names) > 0:
                     or_like = (Term.name.like(friendly_query.term_names[0] + '%'))
@@ -577,8 +579,9 @@ class T411Proxy(object):
         json_results = self.rest_client.search(client_query)
         json_torrents = json_results.get('torrents', [])
         json_not_pending_torrents = filter(lambda x: not isinstance(x, int), json_torrents)
-        log.debug("Search produces %d results including %d 'on pending' (the latter will not produces entries)"
-                  % (len(json_torrents), len(json_torrents) - len(json_not_pending_torrents)))
+        log.debug("Search produces %d results including %d 'on pending' (the latter will not produces entries)",
+                  len(json_torrents),
+                  len(json_torrents) - len(json_not_pending_torrents))
         download_auth = T411BindAuth(self.rest_client.api_token)
 
         map_function = partial(T411ObjectMapper.map_search_result_entry, download_auth=download_auth)

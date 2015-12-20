@@ -78,7 +78,7 @@ class T411LookupPlugin:
     def lazy_lookup(entry):
         torrent_id = entry.get('t411_torrent_id')
         if torrent_id:
-            log.debug('Lookup for %s' % entry['t411_torrent_id'])
+            log.debug('Lookup for %s', entry['t411_torrent_id'])
         else:
             raise plugin.PluginError('looking up T411 for entry failed, no t411_torrent_id passed.')
 
