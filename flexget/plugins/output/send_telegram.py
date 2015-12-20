@@ -198,7 +198,7 @@ class SendTelegram(object):
         elif not hasattr(telegram, str('__version__')):
             raise plugin.PluginWarning('invalid or old python-telegram-bot pkg')
         elif LooseVersion(telegram.__version__) < str(_MIN_TELEGRAM_VER):
-            raise plugin.PluginWarning('old python-telegram-bot ({})'.format(telegram.__version__))
+            raise plugin.PluginWarning('old python-telegram-bot ({0})'.format(telegram.__version__))
 
     def _send_msgs(self, task, bot, chat_ids, tmpl, use_markdown):
         kwargs = dict()
