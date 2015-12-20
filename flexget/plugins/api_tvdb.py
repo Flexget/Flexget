@@ -18,7 +18,7 @@ from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from requests import RequestException
 
-from flask import Blueprint, request, jsonify
+from flask import jsonify
 
 from flexget import db_schema
 from flexget.utils.tools import decode_html
@@ -40,8 +40,8 @@ requests = ReqSession(timeout=25)
 api_key = '4D297D8CFDE0E105'
 language = 'en'
 server = 'http://www.thetvdb.com/api/'
-_mirrors = {}
 persist = SimplePersistence('api_tvdb')
+_mirrors = {}
 
 
 @db_schema.upgrade('api_tvdb')
@@ -68,7 +68,6 @@ def upgrade(ver, session):
 
 def get_mirror(type='xml'):
     """Returns a random mirror for a given type 'xml', 'zip', or 'banner'"""
-    global _mirrors
     if not _mirrors.get(type):
         # Get the list of mirrors from tvdb
         page = None
@@ -177,7 +176,7 @@ class TVDBSeries(TVDBContainer, Base):
             return
         # If we don't already have a local copy, download one.
         url = get_mirror('banner') + self.poster
-        log.debug('Downloading poster %s' % url)
+        log.debug('Downloading poster %s', url)
         dirname = os.path.join('tvdb', 'posters')
         # Create folders if the don't exist
         fullpath = os.path.join(base_dir, dirname)
@@ -260,10 +259,10 @@ def find_series_id(name):
     try:
         xmldata = ElementTree.fromstring(page)
     except ParseError as e:
-        log.error('error parsing tvdb result for %s: %s' % (name, e))
+        log.error('error parsing tvdb result for %s: %s', name, e)
         return
     if xmldata is None:
-        log.error("Didn't get a return from tvdb on the series search for %s" % name)
+        log.error("Didn't get a return from tvdb on the series search for %s", name)
         return
     # See if there is an exact match
     # TODO: Check if there are multiple exact matches
@@ -305,7 +304,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
     if not (name or tvdb_id):
         raise LookupError('No criteria specified for tvdb lookup')
 
-    log.debug('Looking up tvdb information for %r' % {'name': name, 'tvdb_id': tvdb_id})
+    log.debug('Looking up tvdb information for %s %s', name, tvdb_id)
 
     series = None
 
@@ -326,18 +325,18 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         if not only_cached:
             mark_expired(session=session)
         if not only_cached and series.expired:
-            log.verbose('Data for %s has expired, refreshing from tvdb' % series.seriesname)
+            log.verbose('Data for %s has expired, refreshing from tvdb', series.seriesname)
             try:
                 series.update()
             except LookupError as e:
-                log.warning('Error while updating from tvdb (%s), using cached data.' % e.args[0])
+                log.warning('Error while updating from tvdb (%s), using cached data.', e.args[0])
         else:
             log.debug('Series %s information restored from cache.' % id_str())
     else:
         if only_cached:
             raise LookupError('Series %s not found from cache' % id_str())
         # There was no series found in the cache, do a lookup from tvdb
-        log.debug('Series %s not found in cache, looking up from tvdb.' % id_str())
+        log.debug('Series %s not found in cache, looking up from tvdb.', id_str())
         if tvdb_id:
             series = TVDBSeries()
             series.update(tvdb_id)
@@ -411,18 +410,18 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
         raise LookupError('No episode identifier specified.')
     if episode:
         if episode.expired and not only_cached:
-            log.info('Data for %r has expired, refreshing from tvdb' % episode)
+            log.info('Data for %r has expired, refreshing from tvdb', episode)
             try:
                 episode.update()
             except LookupError as e:
-                log.warning('Error while updating from tvdb (%s), using cached data.' % e.args[0])
+                log.warning('Error while updating from tvdb (%s), using cached data.', e.args[0])
         else:
-            log.debug('Using episode info for %s from cache.' % ep_description)
+            log.debug('Using episode info for %s from cache.', ep_description)
     else:
         if only_cached:
             raise LookupError('Episode %s not found from cache' % ep_description)
         # There was no episode found in the cache, do a lookup from tvdb
-        log.debug('Episode %s not found in cache, looking up from tvdb.' % ep_description)
+        log.debug('Episode %s not found in cache, looking up from tvdb.', ep_description)
         try:
             raw_data = requests.get(url).content
             data = ElementTree.fromstring(raw_data)
@@ -481,13 +480,13 @@ def mark_expired(session=None):
 
     try:
         # Get items that have changed since our last update
-        log.debug("Getting %s worth of updates from thetvdb" % get_update)
+        log.debug("Getting %s worth of updates from thetvdb", get_update)
         content = requests.get(server + api_key + '/updates/updates_%s.xml' % get_update).content
         if not isinstance(content, basestring):
             raise Exception('expected string, got %s' % type(content))
         updates = ElementTree.fromstring(content)
     except RequestException as e:
-        log.error('Could not get update information from tvdb: %s' % e)
+        log.error('Could not get update information from tvdb: %s', e)
         return
 
     if updates is not None:
@@ -516,10 +515,10 @@ def mark_expired(session=None):
         # Update our cache to mark the items that have expired
         for chunk in chunked(expired_series):
             num = session.query(TVDBSeries).filter(TVDBSeries.id.in_(chunk)).update({'expired': True}, 'fetch')
-            log.debug('%s series marked as expired' % num)
+            log.debug('%s series marked as expired', num)
         for chunk in chunked(expired_episodes):
             num = session.query(TVDBEpisode).filter(TVDBEpisode.id.in_(chunk)).update({'expired': True}, 'fetch')
-            log.debug('%s episodes marked as expired' % num)
+            log.debug('%s episodes marked as expired', num)
 
         # Save the time of this update
         session.commit()

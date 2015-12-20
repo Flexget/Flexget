@@ -1,5 +1,4 @@
 import logging
-
 import sys
 import os
 import socket
@@ -109,7 +108,7 @@ class SCGITransport(xmlrpclib.Transport):
             response_body += data
 
         if self.verbose:
-            log.info('body:', repr(response_body))
+            log.info('body: %s', repr(response_body))
 
         # Remove SCGI headers from the response.
         response_header, response_body = re.split(r'\n\s*?\n', response_body, maxsplit=1)
@@ -124,10 +123,10 @@ class SCGIServerProxy(xmlrpclib.ServerProxy):
 
     def __init__(self, uri, transport=None, encoding=None,
                  verbose=False, allow_none=False, use_datetime=False, timeout=30):
-        parsed_uri = urlparse(uri)
         self.timeout = timeout
-        self.__host = parsed_uri.hostname
-        self.__handler = parsed_uri.path
+        parsed_url = urlparse(uri)
+        self.__host = uri if  parsed_url.scheme else None
+        self.__handler = urlparse(uri).path
         if not self.__handler:
             self.__handler = '/'
 
@@ -230,7 +229,7 @@ class RTorrent(object):
         elif parsed_uri.scheme == 'scgi':
             sp = SCGIServerProxy
         elif parsed_uri.scheme == '' and parsed_uri.path:
-            self.uri = "scgi://%s" % parsed_uri.path
+            self.uri = parsed_uri.path
             sp = SCGIServerProxy
         else:
             raise IOError('Unsupported scheme %s for uri %s' % (parsed_uri.scheme, self.uri))
@@ -261,8 +260,10 @@ class RTorrent(object):
     def version(self):
         return [int(v) for v in self._server.system.client_version().split('.')]
 
-    def load(self, raw_torrent, fields={}, start=False, mkdir=True):
+    def load(self, raw_torrent, fields=None, start=False, mkdir=True):
 
+        if fields is None:
+            fields = {}
         # First param is empty 'target'
         params = ['', xmlrpclib.Binary(raw_torrent)]
 

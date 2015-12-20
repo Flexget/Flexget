@@ -1036,7 +1036,6 @@ class FilterSeries(FilterSeriesBase):
 
                 log.trace('series_name: %s series_config: %s', series_name, series_config)
 
-                import time
                 start_time = time.clock()
 
                 self.process_series(task, series_entries, series_config)

@@ -2,13 +2,13 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
 import re
-import sys
 from copy import copy
 from datetime import datetime, date, time
 import locale
 from email.utils import parsedate
 from time import mktime
 
+import jinja2.filters
 from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, Template,
                     TemplateNotFound, TemplateSyntaxError, Undefined)
 
@@ -119,13 +119,9 @@ def now():
     return datetime.now()
 
 
-# Override the built-in Jinja default filter due to Jinja bug
-# https://github.com/mitsuhiko/jinja2/pull/138
-def filter_default(value, default_value=u'', boolean=False):
-    if isinstance(value, Undefined) or (boolean and not value):
-        return default_value
-    return value
-
+# Override the built-in Jinja default filter to change the `boolean` param to True by default
+def filter_default(value, default_value='', boolean=True):
+    return jinja2.filters.do_default(value, default_value, boolean)
 
 filter_d = filter_default
 

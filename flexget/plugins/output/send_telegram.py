@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
+from distutils.version import LooseVersion
+
 from sqlalchemy import Column, Integer, String
 
 from flexget import db_schema, plugin
@@ -10,6 +12,8 @@ try:
     import telegram
 except ImportError:
     telegram = None
+
+_MIN_TELEGRAM_VER = '3.1.0'
 
 _PLUGIN_NAME = 'send_telegram'
 
@@ -166,8 +170,7 @@ class SendTelegram(object):
 
     def on_task_exit(self, task, config):
         """Send telegram message(s) at exit"""
-        if telegram is None:
-            raise plugin.PluginWarning('missing telegram python pkg')
+        self._enforce_telegram_plugin_ver()
 
         token, tmpl, use_markdown, usernames, fullnames, groups = self._parse_config(config)
         self.log.debug('token={0} use_markdown={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
@@ -187,6 +190,15 @@ class SendTelegram(object):
             return
 
         self._send_msgs(task, bot, chat_ids, tmpl, use_markdown)
+
+    @staticmethod
+    def _enforce_telegram_plugin_ver():
+        if telegram is None:
+            raise plugin.PluginWarning('missing python-telegram-bot pkg')
+        elif not hasattr(telegram, str('__version__')):
+            raise plugin.PluginWarning('invalid or old python-telegram-bot pkg')
+        elif LooseVersion(telegram.__version__) < str(_MIN_TELEGRAM_VER):
+            raise plugin.PluginWarning('old python-telegram-bot ({})'.format(telegram.__version__))
 
     def _send_msgs(self, task, bot, chat_ids, tmpl, use_markdown):
         kwargs = dict()
@@ -360,10 +372,10 @@ class SendTelegram(object):
         groups = dict()
 
         for chat in (x.message.chat for x in updates):
-            if isinstance(chat, telegram.User):
+            if chat.type == 'private':
                 usernames[chat.username] = chat
                 fullnames[(chat.first_name, chat.last_name)] = chat
-            elif isinstance(chat, telegram.GroupChat):
+            elif chat.type in ('group', 'supergroup' or 'channel'):
                 groups[chat.title] = chat
             else:
                 self.log.warn('unknown chat type: {0}'.format(type(chat)))
