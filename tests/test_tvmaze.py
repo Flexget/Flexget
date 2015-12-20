@@ -94,6 +94,20 @@ class TestTVMazeShowLookup(FlexGetBase):
               - {title: 'Unite 9 S01E16 VFQ HDTV XviD-bLinKkY'}
             series:
               - Unite 9
+          test_show_cast:
+            mock:
+              - {title: 'The.Flash.2014.S02E02.HDTV.x264-LOL'}
+            series:
+              - The Flash
+          test_multiple_characters_per_actor:
+            mock:
+              - {title: 'Californication.S01E01.HDTV.x264-LOL'}
+              - {title: 'The.X-Files.S01E01.HDTV.x264-LOL'}
+              - {title: 'Aquarius.US.S01E1.HDTV.x264-LOL'}
+            series:
+              - Californication
+              - The X-Files
+              - Aquarius
     """
 
     @use_vcr
@@ -230,7 +244,8 @@ class TestTVMazeShowLookup(FlexGetBase):
 
             # Verify series data has been refreshed with actual values upon 2nd call, and series expiration flag
             # is set to False
-            assert series.weight == 2, 'weight should have been updated back to 2 from 99'
+            assert series.weight == 4, \
+                'weight should have been updated back to 4 from 99, instead its %s' % series.weight
             assert session.query(TVMazeSeries).first().expired == False, 'expired status should be False'
 
     @use_vcr()
@@ -322,3 +337,14 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry['tvmaze_episode_id'] == 476294, 'episode id should be 476294, instead its %s' % entry[
             'tvmaze_episode_id']
 
+    @use_vcr()
+    def test_show_cast(self):
+        self.execute_task('test_show_cast')
+        entry = self.task.entries[0]
+        assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 211206, 'episode id should be 211206, instead its %s' % entry[
+            'tvmaze_episode_id']
+        assert len(entry['tvmaze_series_actors']) == 9, \
+            'expected actors list for series to contain 9 members,' \
+            ' instead it contains %s' % len(entry['tvmaze_series_actors'])

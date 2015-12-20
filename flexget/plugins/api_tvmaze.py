@@ -6,7 +6,7 @@ from datetime import datetime
 from dateutil import parser
 from pytvmaze import get_show, episode_by_number, episodes_by_date
 from pytvmaze.exceptions import ShowNotFound, EpisodeNotFound, NoEpisodesForAirdate, IllegalAirDate, ConnectionError
-from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, Numeric, PickleType, func, Table, or_, \
+from sqlalchemy import Column, Integer, Float, DateTime, String, Unicode, ForeignKey, PickleType, func, Table, or_, \
     and_
 from sqlalchemy.orm import relation
 
@@ -17,16 +17,60 @@ from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')
 
-DB_VERSION = 1
+DB_VERSION = 2
 Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 
 
 @db_schema.upgrade('tvmaze')
 def upgrade(ver, session):
-    if ver == 0:
+    if ver is None or ver < 2:
         raise db_schema.UpgradeImpossible
     return ver
+
+
+actors_to_shows_table = Table('tvmaze_actors_to_shows', Base.metadata,
+                              Column('series_id', Integer, ForeignKey('tvmaze_series.tvmaze_id')),
+                              Column('actor_id', Integer, ForeignKey('tvmaze_actors.tvmaze_id')))
+Base.register_table(actors_to_shows_table)
+
+
+class TVMazeActor(Base):
+    __tablename__ = 'tvmaze_actors'
+
+    tvmaze_id = Column(Integer, primary_key=True)
+    name = Column(Unicode, unique=True, nullable=False)
+    original_image = Column(String)
+    medium_image = Column(String)
+    url = Column(String)
+    last_update = Column(DateTime)
+
+    def __init__(self, actor):
+        self.tvmaze_id = actor.id
+        self.name = actor.name
+        self.url = actor.url
+        self.update(actor)
+
+    def __repr__(self):
+        return '<TVMazeActor,name={0},id={1}'.format(self.name, self.tvmaze_id)
+
+    def update(self, actor):
+        if actor.image:
+            self.original_image = actor.image.get('original')
+            self.medium_image = actor.image.get('medium')
+        else:
+            self.original_image = None
+            self.medium_image = None
+        self.last_update = datetime.now()
+
+    @property
+    def expired(self):
+        if not self.last_update:
+            log.debug('no last update attribute, actor set for update')
+            return True
+        time_dif = datetime.now() - self.last_update
+        expiration = time_dif.days > UPDATE_INTERVAL
+        return expiration
 
 
 class TVMazeGenre(Base):
@@ -39,6 +83,8 @@ class TVMazeGenre(Base):
 genres_table = Table('tvmaze_series_genres', Base.metadata,
                      Column('series_id', Integer, ForeignKey('tvmaze_series.tvmaze_id')),
                      Column('genre_id', Integer, ForeignKey('tvmaze_genres.id')))
+
+Base.register_table(genres_table)
 
 
 class TVMazeLookup(Base):
@@ -76,6 +122,7 @@ class TVMazeSeries(Base):
     network = Column(Unicode)
     episodes = relation('TVMazeEpisodes', order_by='TVMazeEpisodes.season_number', cascade='all, delete, delete-orphan',
                         backref='series')
+    actors = relation(TVMazeActor, secondary=actors_to_shows_table)
     last_update = Column(DateTime)  # last time we updated the db for the show
 
     def __init__(self, series, session):
@@ -119,6 +166,10 @@ class TVMazeSeries(Base):
         self.last_update = datetime.now()
 
         self.genres[:] = get_db_genres(series.genres, session)
+        if series.cast and series.cast.people:
+            self.actors[:] = get_db_actors(series.cast.people, session)
+        else:
+            self.actors[:] = []
 
     def __repr__(self):
         return '<TVMazeSeries(title=%s,id=%s,last_update=%s)>' % (self.name, self.tvmaze_id, self.last_update)
@@ -133,7 +184,6 @@ class TVMazeSeries(Base):
             return True
         time_dif = datetime.now() - self.last_update
         expiration = time_dif.days > UPDATE_INTERVAL
-        log.debug('series {0} is expired: {1}'.format(self.name, expiration))
         return expiration
 
 
@@ -195,15 +245,55 @@ class TVMazeEpisodes(Base):
         return expiration
 
 
+def get_db_actors(actors, session):
+    """
+    Return a tuple of db actors list and db characters list generated from show cast.
+    :param actors: List of actors retrieved by API
+    :param session: DB Session
+    :return: tuple of db actors list and db characters list
+    """
+    db_actors = []
+    for actor in actors:
+        db_actor = get_db_actor(actor, session)
+        db_actors.append(db_actor)
+    return db_actors
+
+
+def get_db_actor(actor, session):
+    db_actor = session.query(TVMazeActor).filter(TVMazeActor.tvmaze_id == actor.id).first()
+    if not db_actor:
+        db_actor = TVMazeActor(actor=actor)
+        log.debug('adding actor %s to db', db_actor.name)
+        session.add(db_actor)
+    elif db_actor.expired:
+        log.debug('found expired actor in db, refreshing')
+        db_actor.update(actor)
+    else:
+        log.debug('actor %s found in db, returning', db_actor.name)
+    return db_actor
+
+
 def get_db_genres(genres, session):
     db_genres = []
     for genre in genres:
         db_genre = session.query(TVMazeGenre).filter(TVMazeGenre.name == genre).first()
         if not db_genre:
             db_genre = TVMazeGenre(name=genre)
+            log.debug('adding genre %s to db', genre)
             session.add(db_genre)
+        else:
+            log.debug('genre %s found in db, returning', db_genre.name)
         db_genres.append(db_genre)
     return db_genres
+
+
+def get_actor_details(actor):
+    return {'name': actor.name,
+            'original_image': actor.original_image,
+            'medium_image': actor.medium_image,
+            'url': actor.url,
+            'id': actor.tvmaze_id
+            }
 
 
 def search_params_for_series(**lookup_params):
@@ -264,6 +354,9 @@ def prepare_lookup_for_pytvmaze(**lookup_params):
     prepared_params['show_country'] = lookup_params.get('country') or lookup_params.get('trakt_series_country')
     prepared_params['show_language'] = lookup_params.get('language')
 
+    # Include cast information by default
+    prepared_params['embed'] = 'cast'
+
     return prepared_params
 
 
@@ -275,6 +368,7 @@ class APITVMaze(object):
         # Searching cache first
         series = from_cache(session=session, cache_type=TVMazeSeries, search_params=search_params)
 
+        search = None
         # Preparing search from lookup table
         title = lookup_params.get('series_name') or lookup_params.get('show_name') or lookup_params.get('title')
         if not series and title:
@@ -315,12 +409,17 @@ class APITVMaze(object):
             log.debug('creating new series {0} in tvmaze_series db'.format(pytvmaze_show.name))
             series = TVMazeSeries(pytvmaze_show, session)
             session.add(series)
-        # If there's a mismatch between actual series name and requested title,
-        # add it to lookup table for future lookups
-        if series and title.lower() != series.name.lower():
+
+        # Check if show returned from lookup table as expired
+        if series and title.lower() == series.name.lower():
+            return series
+        elif series and not search:
             log.debug('mismatch between series title {0} and search title {1}. '
                       'saving in lookup table'.format(title, series.name))
             session.add(TVMazeLookup(search_name=title, series=series))
+        elif series and search:
+            log.debug('Updating search result in db')
+            search.series = series
         return series
 
     @staticmethod
