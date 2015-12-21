@@ -12,6 +12,9 @@ from bs4 import BeautifulSoup
 import dateutil.parser
 import requests
 
+visible_tags = [r'[fix]', r'[feature]', r'[tweak]', r'[enhancement]', r'[refactor]']
+hidden_tags = ['[dev]']
+
 out_path = 'ChangeLog'
 if len(sys.argv) > 1:
     dir_name = os.path.dirname(sys.argv[1])
@@ -34,7 +37,15 @@ with codecs.open(out_path, 'w', encoding='utf-8') as out_file:
         tag = re.search('refs/tags/([\d.]+)', next(git_log_iter))
         date = dateutil.parser.parse(next(git_log_iter))
         commit_hash = next(git_log_iter)
+        commit_hash = '[https://github.com/Flexget/Flexget/commit/%s %s]' % (commit_hash, commit_hash)
         body = list(iter(git_log_iter.next, '---'))
+        for visible_tag in visible_tags:
+            regex = re.compile(visible_tag)
+            match = regex.search(body[0])
+            if match:
+                break
+        else:
+            continue
         if tag:
             ver = tag.group(1)
             ua_link = ''
