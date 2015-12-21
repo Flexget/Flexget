@@ -238,7 +238,7 @@ class RTorrent(object):
 
     def _clean_fields(self, fields, reverse=False):
         if not fields:
-            fields = self.default_fields
+            fields = list(self.default_fields)
 
         if reverse:
             for field in ['up.total', 'down.total', 'down.rate']:
@@ -294,8 +294,11 @@ class RTorrent(object):
 
         return result
 
-    def torrent(self, info_hash, fields=default_fields):
+    def torrent(self, info_hash, fields=None):
         """ Get the details of a torrent """
+        if not fields:
+            fields = list(self.default_fields)
+
         fields = self._clean_fields(fields)
 
         multi_call = xmlrpclib.MultiCall(self._server)
@@ -308,7 +311,9 @@ class RTorrent(object):
         # TODO: Maybe we should return a named tuple or a Torrent class?
         return dict(zip(self._clean_fields(fields, reverse=True), [val for val in resp]))
 
-    def torrents(self, view='main', fields=default_fields):
+    def torrents(self, view='main', fields=None):
+        if not fields:
+            fields = list(self.default_fields)
         fields = self._clean_fields(fields)
 
         params = ['d.%s=' % field for field in fields]
