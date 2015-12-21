@@ -616,7 +616,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
             'password': {'type': 'string'},
             'timeout': {'type': 'integer', 'default': 30},
             'view': {'type': 'string', 'default': 'main'},
-            'fields': one_or_more({'type': 'string', 'enum': RTorrent.default_fields}),
+            'fields': one_or_more({'type': 'string', 'enum': list(RTorrent.default_fields)}),
         },
         'required': ['uri'],
         'additionalProperties': False
