@@ -241,7 +241,12 @@ class ImdbParser(object):
         # Parse stuff from the title-overview section
         name_elem = title_overview.find('h1', itemprop='name')
         self.name = name_elem.find(text=True, recursive=False).strip()
-        self.year = int(name_elem.find('a').text)
+
+        year = name_elem.find('a')
+        if year:
+            self.year = int(year.text)
+        else:
+            log.debug('No rating found for %s' % self.imdb_id)
 
         mpaa_rating_elem = title_overview.find(itemprop='contentRating')
         if mpaa_rating_elem:
