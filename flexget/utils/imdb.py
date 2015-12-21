@@ -246,7 +246,7 @@ class ImdbParser(object):
         if year:
             self.year = int(year.text)
         else:
-            log.debug('No rating found for %s' % self.imdb_id)
+            log.debug('No year found for %s' % self.imdb_id)
 
         mpaa_rating_elem = title_overview.find(itemprop='contentRating')
         if mpaa_rating_elem:
