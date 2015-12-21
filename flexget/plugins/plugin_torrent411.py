@@ -67,7 +67,7 @@ class T411InputPlugin(object):
         return entries
 
 
-class T411LookupPlugin:
+class T411LookupPlugin(object):
     schema = {'type': 'boolean'}
 
     torrent_details_map = {
