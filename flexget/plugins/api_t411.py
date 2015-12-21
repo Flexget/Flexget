@@ -415,13 +415,10 @@ class T411Proxy(object):
     A T411 proxy service. This proxy interact both with
     T411 Rest Client and T411 local database.
     """
-
-    @with_session
     def __init__(self, session=None):
         """
         :param session: flexget.manager.Session
         """
-        self.session = session
         self.rest_client = T411RestClient()
         self.mapper = T411ObjectMapper()
         self.__has_cached_criterias = None
@@ -433,13 +430,14 @@ class T411Proxy(object):
             'password': password
         }
 
-    def set_credential(self, username=None):
+    @with_session
+    def set_credential(self, username=None, session=None):
         """
         Set REST client credential from database
         :param username: if set, account's credential will be used.
         :return:
         """
-        query = self.session.query(Credential)
+        query = session.query(Credential)
         if username:
             query = query.filter(Credential.username == username)
         credential = query.first()
@@ -449,15 +447,17 @@ class T411Proxy(object):
                               'Please set credential with "flexget t411 add-auth <username> <password>".')
         self.__set_credential(credential.username, credential.password, credential.api_token)
 
-    def has_cached_criterias(self):
+    @with_session
+    def has_cached_criterias(self, session=None):
         """
         :return: True if database contains data of a previous synchronization
         """
         if self.__has_cached_criterias is None:
-            self.__has_cached_criterias = self.session.query(Category).count() > 0
+            self.__has_cached_criterias = session.query(Category).count() > 0
         return self.__has_cached_criterias
 
-    def synchronize_database(self):
+    @with_session
+    def synchronize_database(self, session=None):
         """
         If database has been cleaned, this method
         will update it.
@@ -478,13 +478,14 @@ class T411Proxy(object):
             term_type = term_types.get(term_type_id)
             category.term_types.append(term_type)
 
-        self.session.add_all(main_categories)
-        self.session.commit()
+        session.add_all(main_categories)
+        session.commit()
         self.__has_cached_criterias = None
 
     @cache_required
-    def find_categories(self, category_name=None, is_sub_category=False):
-        query = self.session.query(Category)
+    @with_session
+    def find_categories(self, category_name=None, is_sub_category=False, session=None):
+        query = session.query(Category)
         if category_name is not None:
             query = query.filter(Category.name == category_name)
         if is_sub_category:
@@ -492,35 +493,40 @@ class T411Proxy(object):
         return query.all()
 
     @cache_required
-    def find_term_types(self, category_id=None, term_type_name=None):
-        query = self.session.query(TermType) \
+    @with_session
+    def find_term_types(self, category_id=None, term_type_name=None, session=None):
+        query = session.query(TermType) \
             .filter(TermType.name == term_type_name) \
             .filter(TermType.categories.any(Category.id == category_id))
         return query.one()
 
     @cache_required
-    def find_term_by_name(self, term_type_id, term_name):
-        return self.session.query(Term) \
+    @with_session
+    def find_term_by_name(self, term_type_id, term_name, session=None):
+        return session.query(Term) \
             .filter(Term.type_id == term_type_id) \
             .filter(Term.name == term_name) \
             .one()
 
     @cache_required
-    def find_term(self, category_id, term_type_name, term_name):
-        return self.session.query(Term) \
+    @with_session
+    def find_term(self, category_id, term_type_name, term_name, session=None):
+        return session.query(Term) \
             .filter(TermType.name == term_type_name) \
             .filter(TermType.categories.any(Category.id == category_id)) \
             .filter(TermType.terms.any(Term.name == term_name)) \
             .first()
 
     @cache_required
-    def main_categories(self):
-        query = self.session.query(Category).filter(Category.parent_id.is_(None))
+    @with_session
+    def main_categories(self, session=None):
+        query = session.query(Category).filter(Category.parent_id.is_(None))
         return query.all()
 
     @cache_required
-    def all_category_names(self, categories_filter='all'):
-        name_query = self.session.query(Category.name)
+    @with_session
+    def all_category_names(self, categories_filter='all', session=None):
+        name_query = session.query(Category.name)
         if categories_filter == 'sub':
             name_query.filter(Category.parent_id is not None)
         elif categories_filter == 'main':
@@ -529,12 +535,14 @@ class T411Proxy(object):
         return [name for (name,) in name_query.all()]
 
     @cache_required
-    def all_term_names(self):
-        name_query = self.session.query(Term.name).all()
+    @with_session
+    def all_term_names(self, session=None):
+        name_query = session.query(Term.name).all()
         return [name for (name,) in name_query]
 
     @cache_required
-    def friendly_query_to_client_query(self, friendly_query):
+    @with_session
+    def friendly_query_to_client_query(self, friendly_query, session=None):
         """
         :param FriendlySearchQuery query:
         :return (,)[]: T411RestClient.search compatible
@@ -543,7 +551,7 @@ class T411Proxy(object):
 
         if friendly_query.category_name is not None:
             try:
-                (category_id,) = self.session \
+                (category_id,) = session \
                     .query(Category.id) \
                     .filter(Category.name == friendly_query.category_name) \
                     .one()
@@ -555,7 +563,7 @@ class T411Proxy(object):
                     for term_name in friendly_query.term_names[1:]:
                         or_like |= (Term.name.like(term_name + '%'))
 
-                    client_query['terms'] = self.session \
+                    client_query['terms'] = session \
                         .query(Term.type_id, Term.id) \
                         .filter(or_like) \
                         .filter(TermType.categories.any(Category.id == category_id)) \
@@ -588,14 +596,15 @@ class T411Proxy(object):
         return map(map_function, json_not_pending_torrents)
 
     @cache_required
-    def details(self, torrent_id):
+    @with_session
+    def details(self, torrent_id, session=None):
         """
         WIP
         Download and store torrent details
         :param torrent_id:
         :return:
         """
-        details = self.session \
+        details = session \
             .query(Torrent) \
             .filter(Torrent.id == torrent_id) \
             .first()
@@ -608,27 +617,28 @@ class T411Proxy(object):
                 return self.find_term(category_id, term_type_name, term_name)
 
             details = self.mapper.map_details(json_details, resolver)
-            self.session.add(details)
-            self.session.commit()
+            session.add(details)
+            session.commit()
             return details
 
-    def add_credential(self, username, password):
+    @with_session
+    def add_credential(self, username, password, session=None):
         """
         Add a credential
         :param username:    T411 username
         :param password:    T411 password
         :return:    False if username still has an entry (password has been updated)
         """
-        credential = self.session.query(Credential).filter(Credential.username == username).first()
+        credential = session.query(Credential).filter(Credential.username == username).first()
         if credential:
             credential.password = password
             credential.api_token = None
             result = False
         else:
             credential = Credential(username=username, password=password)
-            self.session.add(credential)
+            session.add(credential)
             result = True
-        self.session.commit()
+        session.commit()
         return result
 
 
