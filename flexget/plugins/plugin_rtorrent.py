@@ -174,7 +174,7 @@ class SCGIServerProxy(xmlrpclib.ServerProxy):
 class RTorrent(object):
     """ rTorrent API client """
 
-    default_fields = [
+    default_fields = (
         'hash',
         'name',
         'up_total', 'down_total', 'down_rate',
@@ -184,13 +184,13 @@ class RTorrent(object):
         'bytes_done', 'down.rate', 'left_bytes',
         'ratio',
         'base_path',
-    ]
+    )
 
-    required_fields = [
+    required_fields = (
         'hash',
         'name',
         'base_path'
-    ]
+    )
 
     def __init__(self, uri, username=None, password=None, timeout=30):
         """
