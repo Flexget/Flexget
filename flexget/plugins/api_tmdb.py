@@ -57,6 +57,7 @@ def upgrade(ver, session):
 genres_table = Table('tmdb_movie_genres', Base.metadata,
     Column('movie_id', Integer, ForeignKey('tmdb_movies.id')),
     Column('genre_id', Integer, ForeignKey('tmdb_genres.id')))
+Base.register_table(genres_table)
 
 
 class TMDBContainer(object):

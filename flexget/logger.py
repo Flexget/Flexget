@@ -8,7 +8,7 @@ import threading
 import uuid
 import warnings
 
-#Support order in python 2.7 and 3
+# Support order in python 2.7 and 3
 try:
     from collections import OrderedDict
 except ImportError:

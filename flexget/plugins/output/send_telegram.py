@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
+from distutils.version import LooseVersion
+
 from sqlalchemy import Column, Integer, String
 
 from flexget import db_schema, plugin
@@ -11,10 +13,13 @@ try:
 except ImportError:
     telegram = None
 
+_MIN_TELEGRAM_VER = '3.1.0'
+
 _PLUGIN_NAME = 'send_telegram'
 
 _TOKEN_ATTR = 'bot_token'
 _TMPL_ATTR = 'template'
+_MARKDOWN_ATTR = 'use-markdown'
 _RCPTS_ATTR = 'recipients'
 _USERNAME_ATTR = 'username'
 _FULLNAME_ATTR = 'fullname'
@@ -54,6 +59,7 @@ class SendTelegram(object):
       send_telegram:
         bot_token: token
         template: {{title}}
+        use-markdown: no
         recipients:
           - username: my-user-name
           - group: my-group-name
@@ -66,6 +72,9 @@ class SendTelegram(object):
 
     `template`::
     Optional. The template from the example is the default.
+
+    `use-markdown`::
+    Optional. Whether the template uses markdown formatting. The default is `no`.
 
     `username` vs. `fullname`::
 
@@ -81,6 +90,7 @@ class SendTelegram(object):
         'properties': {
             _TOKEN_ATTR: {'type': 'string'},
             _TMPL_ATTR: {'type': 'string', 'default': '{{title}}'},
+            _MARKDOWN_ATTR: {'type': 'boolean', 'default': False},
             _RCPTS_ATTR: {
                 'type': 'array',
                 'minItems': 1,
@@ -130,12 +140,13 @@ class SendTelegram(object):
     def _parse_config(config):
         """
         :type config: dict
-        :returns: token, tmpl, usernames, fullnames, groups
-        :rtype: str, str, tuple[list[str], list[tuple[str, str]], list[str]]
+        :returns: token, tmpl, use_markdown, usernames, fullnames, groups
+        :rtype: str, str, bool, tuple[list[str], list[tuple[str, str]], list[str]]
 
         """
         token = config[_TOKEN_ATTR]
         tmpl = config[_TMPL_ATTR]
+        use_markdown = config[_MARKDOWN_ATTR]
         usernames = []
         fullnames = []
         groups = []
@@ -151,7 +162,7 @@ class SendTelegram(object):
             elif _GROUP_ATTR in i:
                 groups.append(i[_GROUP_ATTR])
 
-        return token, tmpl, usernames, fullnames, groups
+        return token, tmpl, use_markdown, usernames, fullnames, groups
 
     def on_task_output(self, task, config):
         """makes this plugin count as output (stops warnings about missing outputs)"""
@@ -159,14 +170,11 @@ class SendTelegram(object):
 
     def on_task_exit(self, task, config):
         """Send telegram message(s) at exit"""
-        if telegram is None:
-            raise plugin.PluginWarning('missing telegram python pkg')
+        self._enforce_telegram_plugin_ver()
 
-        accepted_tasks = list(task.accepted)
-        """:type: list[flexget.entry.Entry]"""
-        token, tmpl, usernames, fullnames, groups = self._parse_config(config)
-        self.log.debug('token={0} tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
-            token, usernames, fullnames, groups, tmpl))
+        token, tmpl, use_markdown, usernames, fullnames, groups = self._parse_config(config)
+        self.log.debug('token={0} use_markdown={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
+            token, usernames, fullnames, groups, tmpl, use_markdown))
 
         bot = telegram.Bot(token)
         try:
@@ -181,10 +189,25 @@ class SendTelegram(object):
         if not chat_ids:
             return
 
-        for entry in accepted_tasks:
+        self._send_msgs(task, bot, chat_ids, tmpl, use_markdown)
+
+    @staticmethod
+    def _enforce_telegram_plugin_ver():
+        if telegram is None:
+            raise plugin.PluginWarning('missing python-telegram-bot pkg')
+        elif not hasattr(telegram, str('__version__')):
+            raise plugin.PluginWarning('invalid or old python-telegram-bot pkg')
+        elif LooseVersion(telegram.__version__) < str(_MIN_TELEGRAM_VER):
+            raise plugin.PluginWarning('old python-telegram-bot ({})'.format(telegram.__version__))
+
+    def _send_msgs(self, task, bot, chat_ids, tmpl, use_markdown):
+        kwargs = dict()
+        if use_markdown:
+            kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
+        for entry in task.accepted:
             msg = self._render_msg(entry, tmpl)
             for chat_id in (x.id for x in chat_ids):
-                bot.sendMessage(chat_id=chat_id, text=msg)
+                bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
 
     def _render_msg(self, entry, tmpl):
         """
@@ -349,10 +372,10 @@ class SendTelegram(object):
         groups = dict()
 
         for chat in (x.message.chat for x in updates):
-            if isinstance(chat, telegram.User):
+            if chat.type == 'private':
                 usernames[chat.username] = chat
                 fullnames[(chat.first_name, chat.last_name)] = chat
-            elif isinstance(chat, telegram.GroupChat):
+            elif chat.type in ('group', 'supergroup' or 'channel'):
                 groups[chat.title] = chat
             else:
                 self.log.warn('unknown chat type: {0}'.format(type(chat)))

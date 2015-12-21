@@ -84,7 +84,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 13 Dec 2015 14:00:07 GMT']
+      date: ['Sun, 13 Dec 2015 13:59:51 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -133,7 +133,32 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Sun, 13 Dec 2015 14:00:07 GMT']
+      date: ['Sun, 13 Dec 2015 13:59:51 GMT']
+      server: [nginx/1.4.6 (Ubuntu)]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [api.tvmaze.com]
+      User-Agent: [Python-urllib/2.7]
+    method: GET
+    uri: http://api.tvmaze.com/shows/13/episodebynumber?season=2&number=2
+  response:
+    body: {string: !!python/unicode '{"id":211206,"url":"http://www.tvmaze.com/episodes/211206/the-flash-2x02-flash-of-two-worlds","name":"Flash
+        of Two Worlds","season":2,"number":2,"airdate":"2015-10-13","airtime":"20:00","airstamp":"2015-10-13T20:00:00-04:00","runtime":60,"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_landscape/23/59298.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/23/59298.jpg"},"summary":"<p>The
+        team''s visitors, Jay Garrick, explains that he comes from a parallel world
+        and was a speedster there, but lost his powers transitioning over. Now he
+        insists that Barry needs his help fighting a new metahuman, Sand Demon, who
+        came from Jay''s world. Meanwhile, Officer Patty Spivot tries to join Joe''s
+        Metahuman Taskforce.</p>","_links":{"self":{"href":"http://api.tvmaze.com/episodes/211206"}}}'}
+    headers:
+      access-control-allow-origin: ['*']
+      cache-control: ['public, max-age=3600']
+      connection: [close]
+      content-type: [application/json; charset=UTF-8]
+      date: ['Sun, 13 Dec 2015 13:59:52 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}

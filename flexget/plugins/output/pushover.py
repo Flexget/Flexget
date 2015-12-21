@@ -54,7 +54,7 @@ class OutputPushover(object):
                 {'type': 'number', 'minimum': -2, 'maximum': 2},
                 {'type': 'string'}]},
             'url': {'type': 'string'},
-            'urltitle': {'type': 'string'},
+            'url_title': {'type': 'string'},
             'sound': {'type': 'string'},
             'retry': {'type': 'integer', 'minimum': 30},
             'expire': {'type': 'integer', 'maximum': 86400},
@@ -115,15 +115,17 @@ class OutputPushover(object):
                     data[key] = entry.render(value)
                 except RenderError as e:
                     log.warning('Problem rendering {0}: {1}'.format(key, e))
+                    data[key] = None
                 except ValueError:
-                    pass
+                    data[key] = None
 
                 # If field is empty or rendering fails, try to render field default if exists
-                try:
-                    data[key] = entry.render(self.defaults.get(key))
-                except ValueError:
-                    if value:
-                        data[key] = value
+                if not data[key]:
+                    try:
+                        data[key] = entry.render(self.defaults.get(key))
+                    except ValueError:
+                        if value:
+                            data[key] = value
 
             # Special case, verify certain fields exists if priority is 2
             if data.get('priority') == 2 and not all([data.get('expire'), data.get('retry')]):

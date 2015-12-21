@@ -103,7 +103,7 @@ class SNSNotificationEmitter(object):
             try:
                 response = topic.publish(Message=message)
             except Exception as e:
-                log.error("Error publishing %s: %s", e)
+                log.error("Error publishing %s: %s", entry['title'], e)
                 continue
             else:
                 log.debug("Published %s: %s", entry, response)

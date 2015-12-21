@@ -185,10 +185,12 @@ class TraktGenre(Base):
 show_genres_table = Table('trakt_show_genres', Base.metadata,
                           Column('show_id', Integer, ForeignKey('trakt_shows.id')),
                           Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
+Base.register_table(show_genres_table)
 
 movie_genres_table = Table('trakt_movie_genres', Base.metadata,
                            Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
                            Column('genre_id', Integer, ForeignKey('trakt_genres.id')))
+Base.register_table(movie_genres_table)
 
 
 def get_db_genres(genres, session):
@@ -224,10 +226,12 @@ class TraktActor(Base):
 show_actors_table = Table('trakt_show_actors', Base.metadata,
                           Column('show_id', Integer, ForeignKey('trakt_shows.id')),
                           Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
+Base.register_table(show_actors_table)
 
 movie_actors_table = Table('trakt_movie_actors', Base.metadata,
                            Column('movie_id', Integer, ForeignKey('trakt_movies.id')),
                            Column('actors_id', Integer, ForeignKey('trakt_actors.id')))
+Base.register_table(movie_actors_table)
 
 
 def get_db_actors(id, style):
@@ -633,6 +637,7 @@ class ApiTrakt(object):
     def lookup_series(session=None, only_cached=None, **lookup_params):
         series = get_cached('show', session=session, **lookup_params)
         title = lookup_params.get('title')
+        found = None
         if not series and title:
             found = session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
                                                                 title.lower()).first()
@@ -658,9 +663,14 @@ class ApiTrakt(object):
         else:
             series = TraktShow(trakt_show, session)
             session.add(series)
-        if series and title.lower() != series.title.lower():
+        if series and title.lower() == series.title.lower():
+            return series
+        elif series and not found:
             log.debug('Adding search result to db')
             session.add(TraktShowSearchResult(search=title, series=series))
+        elif series and found:
+            log.debug('Updating search result in db')
+            found.series = series
         return series
 
     @staticmethod
@@ -668,6 +678,7 @@ class ApiTrakt(object):
     def lookup_movie(session=None, only_cached=None, **lookup_params):
         movie = get_cached('movie', session=session, **lookup_params)
         title = lookup_params.get('title')
+        found = None
         if not movie and title:
             found = session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
                                                                  title.lower()).first()
@@ -693,9 +704,14 @@ class ApiTrakt(object):
         else:
             movie = TraktMovie(trakt_movie, session)
             session.add(movie)
-        if movie and title.lower() != movie.title.lower():
+        if movie and title.lower() == movie.title.lower():
+            return movie
+        if movie and not found:
             log.debug('Adding search result to db')
             session.add(TraktMovieSearchResult(search=title, movie=movie))
+        elif movie and found:
+            log.debug('Updating search result in db')
+            found.movie = movie
         return movie
 
     @staticmethod
