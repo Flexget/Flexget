@@ -454,13 +454,13 @@ movie_queue_parser.add_argument('downloaded', type=bool, required=False, default
 
 
 @movie_queue_api.route('/')
-@api.doc(parser=movie_queue_parser)
 class MovieQueueAPI(APIResource):
 
     @api.response(404, 'page does not exist')
     @api.response(200, 'movie queue results', movie_queue_schema)
+    @api.doc(parser=movie_queue_parser)
     def get(self, session=None):
-        """ Movie queue movies """
+        """ List queued movies """
         args = movie_queue_parser.parse_args()
         page = args['page']
         max_results = args['max']
