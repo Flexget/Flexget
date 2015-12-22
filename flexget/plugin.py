@@ -20,10 +20,6 @@ from flexget.event import fire_event, remove_event_handlers
 
 log = logging.getLogger('plugin')
 
-__all__ = ['PluginWarning', 'PluginError', 'register_parser_option', 'register_task_phase',
-           'get_plugin_by_name', 'get_plugins_by_group', 'get_plugin_keywords', 'get_plugins_by_phase',
-           'get_phases_by_plugin', 'internet', 'priority']
-
 
 class DependencyError(Exception):
     """Plugin depends on other plugin, but it cannot be loaded.

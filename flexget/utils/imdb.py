@@ -238,13 +238,15 @@ class ImdbParser(object):
             log.error('IMDB parser needs updating, imdb format changed.')
             return
 
-        # Parse the year from the page title, no good places in the body (in current format)
-        year_match = re.search(r'\((\d{4})\) - IMDb', soup.title.text)
-        if year_match:
-            self.year = int(year_match.group(1))
-
         # Parse stuff from the title-overview section
-        self.name = title_overview.find('h1', itemprop='name').text
+        name_elem = title_overview.find('h1', itemprop='name')
+        self.name = name_elem.find(text=True, recursive=False).strip()
+
+        year = name_elem.find('a')
+        if year:
+            self.year = int(year.text)
+        else:
+            log.debug('No year found for %s' % self.imdb_id)
 
         mpaa_rating_elem = title_overview.find(itemprop='contentRating')
         if mpaa_rating_elem:

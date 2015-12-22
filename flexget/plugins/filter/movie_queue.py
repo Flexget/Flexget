@@ -21,7 +21,7 @@ except ImportError:
                                  message='movie_queue requires the queue_base plugin')
 
 log = logging.getLogger('movie_queue')
-Base = db_schema.versioned_base('movie_queue', 2)
+Base = db_schema.versioned_base('movie_queue', 3)
 
 
 @event('manager.lock_acquired')
@@ -65,6 +65,22 @@ def upgrade(ver, session):
                 session.execute(update(movie_table, movie_table.c.id == row['id'],
                                        {'quality': 'ANY'}))
         ver = 2
+    if ver == 2:
+        from flexget.utils.imdb import ImdbParser
+        # Corrupted movie titles may be in the queue due to imdb layout changes. GitHub #729
+        movie_table = table_schema('movie_queue', session)
+        queue_base_table = table_schema('queue', session)
+        query = select([movie_table.c.id, movie_table.c.imdb_id, queue_base_table.c.title])
+        query = query.where(movie_table.c.id == queue_base_table.c.id)
+        for row in session.execute(query):
+            if row['imdb_id'] and (not row['title'] or row['title'] == 'None' or '\n' in row['title']):
+                log.info('Fixing movie_queue title for %s' % row['imdb_id'])
+                parser = ImdbParser()
+                parser.parse(row['imdb_id'])
+                if parser.name:
+                    session.execute(update(queue_base_table, queue_base_table.c.id == row['id'],
+                                           {'title': parser.name}))
+        ver = 3
     return ver
 
 

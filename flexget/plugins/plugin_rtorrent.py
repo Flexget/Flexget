@@ -174,7 +174,7 @@ class SCGIServerProxy(xmlrpclib.ServerProxy):
 class RTorrent(object):
     """ rTorrent API client """
 
-    default_fields = [
+    default_fields = (
         'hash',
         'name',
         'up_total', 'down_total', 'down_rate',
@@ -184,13 +184,13 @@ class RTorrent(object):
         'bytes_done', 'down.rate', 'left_bytes',
         'ratio',
         'base_path',
-    ]
+    )
 
-    required_fields = [
+    required_fields = (
         'hash',
         'name',
         'base_path'
-    ]
+    )
 
     def __init__(self, uri, username=None, password=None, timeout=30):
         """
@@ -238,7 +238,7 @@ class RTorrent(object):
 
     def _clean_fields(self, fields, reverse=False):
         if not fields:
-            fields = self.default_fields
+            fields = list(self.default_fields)
 
         if reverse:
             for field in ['up.total', 'down.total', 'down.rate']:
@@ -294,8 +294,11 @@ class RTorrent(object):
 
         return result
 
-    def torrent(self, info_hash, fields=default_fields):
+    def torrent(self, info_hash, fields=None):
         """ Get the details of a torrent """
+        if not fields:
+            fields = list(self.default_fields)
+
         fields = self._clean_fields(fields)
 
         multi_call = xmlrpclib.MultiCall(self._server)
@@ -308,7 +311,9 @@ class RTorrent(object):
         # TODO: Maybe we should return a named tuple or a Torrent class?
         return dict(zip(self._clean_fields(fields, reverse=True), [val for val in resp]))
 
-    def torrents(self, view='main', fields=default_fields):
+    def torrents(self, view='main', fields=None):
+        if not fields:
+            fields = list(self.default_fields)
         fields = self._clean_fields(fields)
 
         params = ['d.%s=' % field for field in fields]
@@ -616,7 +621,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
             'password': {'type': 'string'},
             'timeout': {'type': 'integer', 'default': 30},
             'view': {'type': 'string', 'default': 'main'},
-            'fields': one_or_more({'type': 'string', 'enum': RTorrent.default_fields}),
+            'fields': one_or_more({'type': 'string', 'enum': list(RTorrent.default_fields)}),
         },
         'required': ['uri'],
         'additionalProperties': False
