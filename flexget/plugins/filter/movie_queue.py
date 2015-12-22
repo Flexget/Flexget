@@ -99,11 +99,17 @@ class QueuedMovie(queue_base.QueuedItem, Base):
 
     def to_dict(self):
         return {
+            'added': self.added,
+            'downloaded': self.downloaded,
+            'entry_original_url': self.entry_original_url,
+            'entry_title': self.entry_title,
+            'entry_url': self.entry_url,
             'id': self.id,
             'imdb_id': self.imdb_id,
             'tmdb_id': self.tmdb_id,
             'quality': self.quality,
-            'quality_req': self.quality_req
+            'quality_req': self.quality_req.text,
+            'title': self.title,
         }
 
 
@@ -416,16 +422,26 @@ movie_queue_api = api.namespace('movie_queue', description='Movie Queue')
 movie_queue_schema = {
     'type': 'object',
     'properties': {
-        'items': {
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'properties': {
-                    'movie_title': {'type': 'string'}
-
-                }
+        'movies': {'type': 'array', 'items': {
+            'type': 'object',
+            'properties': {
+                'added': {'type': 'string'},
+                'downloaded': {'type': 'string'},
+                'entry_original_url': {'type': 'string'},
+                'entry_title': {'type': 'string'},
+                'entry_url': {'type': 'string'},
+                'id': {'type': 'integer'},
+                'imdb_id': {'type': 'string'},
+                'quality': {'type': 'string'},
+                'quality_req': {'type': 'string'},
+                'title': {'type': 'string'},
+                'tmdb_id': {'type': 'string'},
             }
         }
+                   },
+        'number_of_movies': {'type': 'integer'},
+        'pages': {'type': 'integer'},
+
     }
 }
 
@@ -445,7 +461,7 @@ class MovieQueueAPI(APIResource):
     @api.response(200, 'movie queue results', movie_queue_schema)
     def get(self, session=None):
         """ Movie queue movies """
-        args = movie_queue_parser.parser.args()
+        args = movie_queue_parser.parse_args()
         page = args['page']
         max_results = args['max']
         downloaded = args['downloaded']
@@ -455,7 +471,21 @@ class MovieQueueAPI(APIResource):
 
         pages = int(ceil(count / float(max_results)))
 
+        movie_items = []
+
+        if page > pages:
+            return {'error': 'page %s does not exist' % page}, 404
+
+        start = (page - 1) * max_results
+        finish = start + max_results
+        if finish > count:
+            finish = count
+
+        for movie_number in range(start, finish):
+            movie_items.append(movie_queue[movie_number])
+
         return jsonify({
-            'movies': [movie.to_dict() for movie in movie_queue],
+            'movies': [movie.to_dict() for movie in movie_items],
+            'number_of_movies': count,
             'pages': pages
         })
