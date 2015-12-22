@@ -556,7 +556,7 @@ class T411Proxy(object):
                     .filter(Category.name == friendly_query.category_name) \
                     .one()
                 client_query['category_id'] = category_id
-                log.debug('Category named "%s" resolved by id %d',friendly_query.category_name, category_id)
+                log.debug('Category named "%s" resolved by id %d', friendly_query.category_name, category_id)
 
                 if len(friendly_query.term_names) > 0:
                     or_like = (Term.name.like(friendly_query.term_names[0] + '%'))

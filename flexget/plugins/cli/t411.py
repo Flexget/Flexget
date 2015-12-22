@@ -44,7 +44,7 @@ def add_credential(username, password):
         console('Credential successfully updated')
 
 
-def __print_term_type(term_type):
+def print_term_type(term_type):
     console('  %s' % term_type.name)
     for term in term_type.terms:
         console('    %s' % term.name)
@@ -62,7 +62,7 @@ def print_terms(category_name=None, term_type_name=None):
             for category in categories:
                 console(category.name)
                 for term_type in category.term_types:
-                    __print_term_type(term_type)
+                    print_term_type(term_type)
 
 
 def print_categories(parent_category_name=None):
@@ -77,7 +77,7 @@ def print_categories(parent_category_name=None):
         if parent_category_name is None:
             categories = proxy.main_categories(session=session)
         else:
-            categories = [proxy.find_categories(parent_category_name,session=session)]
+            categories = [proxy.find_categories(parent_category_name, session=session)]
         formatting_main = '%-30s %-5s %-5s'
         formatting_sub = '     %-25s %-5s %-5s'
         console(formatting_main % ('Category name', 'PID', 'ID'))
@@ -97,8 +97,6 @@ def register_parser_arguments():
     auth_parser = action_parsers.add_parser('add-auth', help='authorize Flexget to access your Torrent411 account')
     auth_parser.add_argument('username', metavar='<username>', help='Your t411 username')
     auth_parser.add_argument('password', metavar='<password>', help='Your t411 password')
-
-    #action_parsers.add_parser('list-auth', help='list registered Torrent411\'s account(s)')
 
     list_categories_parser = action_parsers.add_parser('list-cats', help='list available categories on Torrent411')
     list_categories_parser.add_argument('category',
