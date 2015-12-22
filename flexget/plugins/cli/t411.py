@@ -77,7 +77,7 @@ def print_categories(parent_category_name=None):
         if parent_category_name is None:
             categories = proxy.main_categories(session=session)
         else:
-            categories = [proxy.find_categories(parent_category_name, session=session)]
+            categories = proxy.find_categories(parent_category_name, session=session)
         formatting_main = '%-30s %-5s %-5s'
         formatting_sub = '     %-25s %-5s %-5s'
         console(formatting_main % ('Category name', 'PID', 'ID'))
