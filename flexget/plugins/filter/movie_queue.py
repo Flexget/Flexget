@@ -440,7 +440,8 @@ movie_queue_schema = {
         }
                    },
         'number_of_movies': {'type': 'integer'},
-        'pages': {'type': 'integer'},
+        'total_number_of_pages': {'type': 'integer'},
+        'page_number': {'type': 'integer'}
 
     }
 }
@@ -454,7 +455,7 @@ movie_queue_parser.add_argument('downloaded', type=bool, required=False, default
 
 
 @movie_queue_api.route('/')
-class MovieQueueAPI(APIResource):
+class MovieQueueListAPI(APIResource):
 
     @api.response(404, 'page does not exist')
     @api.response(200, 'movie queue results', movie_queue_schema)
@@ -487,5 +488,6 @@ class MovieQueueAPI(APIResource):
         return jsonify({
             'movies': [movie.to_dict() for movie in movie_items],
             'number_of_movies': count,
-            'pages': pages
+            'page_number': page,
+            'total_number_of_pages': pages
         })
