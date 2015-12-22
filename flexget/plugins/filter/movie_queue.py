@@ -446,7 +446,7 @@ movie_queue_schema = {
     }
 }
 
-movie_queue_schema = api.schema('movie_queue', movie_queue_schema)
+movie_queue_schema = api.schema('list_movie_queue', movie_queue_schema)
 
 movie_queue_parser = api.parser()
 movie_queue_parser.add_argument('page', type=int, required=False, default=1, help='Page number')
@@ -456,9 +456,8 @@ movie_queue_parser.add_argument('downloaded', type=bool, required=False, default
 
 @movie_queue_api.route('/')
 class MovieQueueListAPI(APIResource):
-
-    @api.response(404, 'page does not exist')
-    @api.response(200, 'movie queue results', movie_queue_schema)
+    @api.response(404, 'Page does not exist')
+    @api.response(200, 'Movie queue retrieved successfully', movie_queue_schema)
     @api.doc(parser=movie_queue_parser)
     def get(self, session=None):
         """ List queued movies """
@@ -469,6 +468,9 @@ class MovieQueueListAPI(APIResource):
 
         movie_queue = queue_get(session=session, downloaded=downloaded)
         count = len(movie_queue)
+
+        if count == 0:
+            return {'success': 'no movies found in queue'}
 
         pages = int(ceil(count / float(max_results)))
 
@@ -491,3 +493,46 @@ class MovieQueueListAPI(APIResource):
             'page_number': page,
             'total_number_of_pages': pages
         })
+
+
+movie_add_schema = {
+    'type': 'object',
+    'properties': {
+        'message': {'type': 'string'},
+        'title': {'type': 'string'},
+        'imdb_id': {'type': 'string'},
+        'tmbd_id': {'type': 'string'},
+        'quality': {'type': 'string'}
+    }
+}
+
+movie_queue_add_parser = api.parser()
+movie_queue_add_parser.add_argument('title', type=str, required=False, help='Title of movie')
+movie_queue_add_parser.add_argument('imdb_id', type=str, required=False, help='IMDB ID of movie')
+movie_queue_add_parser.add_argument('tmbd_id', type=str, required=False, help='TMDB ID of movie')
+movie_queue_add_parser.add_argument('quality', type=str, required=False, default='any',
+                                    help='Quality requirement of movie')
+
+
+@movie_queue_api.route('/add')
+class MovieQueueAddAPI(APIResource):
+    @api.response(400, 'Page not found')
+    @api.response(200, 'Movie successfully added')
+    @api.doc(parser=movie_queue_add_parser)
+    def post(self, session=None):
+        data = movie_queue_add_parser.parse_args()
+
+        title = data.get('title')
+        imdb_id = data.get('imdb_id')
+        tmdb_id = data.get('tmdb_id')
+        quality = qualities.Requirements(data.get('quality'))
+
+        movie = queue_add(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality, session=session)
+        return jsonify({
+            'message': 'Successfully added movie to movie queue',
+            'title': movie.get('title'),
+            'imdb_id': movie.get('imdb_id'),
+            'tmdb_id': movie.get('tmdb_id'),
+            'quality': movie.get('quality').text,
+        })
+
