@@ -1,17 +1,19 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
 
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from flexget import db_schema, plugin
+from flexget.api import api, APIResource
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
 from flexget.utils import qualities
+from flexget.utils.database import quality_requirement_property, with_session
 from flexget.utils.imdb import extract_id
 from flexget.utils.log import log_once
-from flexget.utils.database import quality_requirement_property, with_session
 from flexget.utils.sqlalchemy_utils import table_exists, table_schema
 
 try:
@@ -396,3 +398,48 @@ def queue_get(session=None, downloaded=False):
 @event('plugin.register')
 def register_plugin():
     plugin.register(MovieQueue, 'movie_queue', api_ver=2)
+
+
+movie_queue_api = api.namespace('movie_queue', description='Movie Queue')
+
+movie_queue_schema = {
+    'type': 'object',
+    'properties': {
+        'items': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'movie_title': {'type': 'string'}
+
+                }
+            }
+        }
+    }
+}
+
+movie_queue_schema = api.schema('movie_queue', movie_queue_schema)
+
+movie_queue_parser = api.parser()
+movie_queue_parser.add_argument('page', type=int, required=False, default=1, help='Page number')
+movie_queue_parser.add_argument('max', type=int, required=False, default=50, help='Movies per page')
+movie_queue_parser.add_argument('downloaded', type=bool, required=False, default=False, help='Show only downloaded')
+
+
+
+@movie_queue_api.route('/')
+@api.doc(parser=movie_queue_parser)
+class MovieQueueAPI(APIResource):
+    @api.response(404, 'page does not exist')
+    @api.response(200, 'movie queue results', movie_queue_schema)
+    def get(self, session=None):
+        """ Movie queue movies """
+        args = movie_queue_parser.parser.args()
+        page = args['page']
+        max_results = args['max']
+        downloaded = args['downloaded']
+
+        movie_queue = queue_get(session=session, downloaded=downloaded)
+
+
+
