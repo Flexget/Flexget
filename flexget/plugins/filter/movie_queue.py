@@ -509,7 +509,7 @@ movie_add_schema = {
 movie_queue_add_parser = api.parser()
 movie_queue_add_parser.add_argument('title', type=str, required=False, help='Title of movie')
 movie_queue_add_parser.add_argument('imdb_id', type=str, required=False, help='IMDB ID of movie')
-movie_queue_add_parser.add_argument('tmbd_id', type=str, required=False, help='TMDB ID of movie')
+movie_queue_add_parser.add_argument('tmdb_id', type=str, required=False, help='TMDB ID of movie')
 movie_queue_add_parser.add_argument('quality', type=str, required=False, default='any',
                                     help='Quality requirement of movie')
 
@@ -520,14 +520,32 @@ class MovieQueueAddAPI(APIResource):
     @api.response(200, 'Movie successfully added')
     @api.doc(parser=movie_queue_add_parser)
     def post(self, session=None):
-        data = movie_queue_add_parser.parse_args()
+        kwargs = movie_queue_add_parser.parse_args()
 
-        title = data.get('title')
-        imdb_id = data.get('imdb_id')
-        tmdb_id = data.get('tmdb_id')
-        quality = qualities.Requirements(data.get('quality'))
+        try:
+            kwargs['quality'] = qualities.Requirements(kwargs.get('quality'))
+        except ValueError as e:
+            reply = {
+                'status': 'error',
+                'message': e.message
+            }
+            return reply, 400
+        kwargs['session'] = session
 
-        movie = queue_add(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality, session=session)
+        try:
+            movie = queue_add(**kwargs)
+        except QueueError as e:
+            reply = {
+                'status': 'error',
+                'message': e.message
+            }
+            return reply, 400
+        except AttributeError:
+            reply = {
+                'status': 'error',
+                'message': 'Not enough parameters given. Either \"title\", \"imdb_id\" or \"tmdb_id\" are required'}
+            return reply, 500
+
         return jsonify({
             'message': 'Successfully added movie to movie queue',
             'title': movie.get('title'),
@@ -535,4 +553,3 @@ class MovieQueueAddAPI(APIResource):
             'tmdb_id': movie.get('tmdb_id'),
             'quality': movie.get('quality').text,
         })
-
