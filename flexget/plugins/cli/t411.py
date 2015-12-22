@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 from flexget import options, plugin
 from flexget.event import event
 from flexget.logger import console
+from flexget.manager import Session
 
 try:
     from flexget.plugins.api_t411 import (T411Proxy)
@@ -56,11 +57,12 @@ def print_terms(category_name=None, term_type_name=None):
     if term_type_name:
         console("Not yet implemented !")
     else:
-        categories = proxy.find_categories(category_name=category_name, is_sub_category=True)
-        for category in categories:
-            console(category.name)
-            for term_type in category.term_types:
-                __print_term_type(term_type)
+        with Session() as session:
+            categories = proxy.find_categories(category_name=category_name, is_sub_category=True, session=session)
+            for category in categories:
+                console(category.name)
+                for term_type in category.term_types:
+                    __print_term_type(term_type)
 
 
 def print_categories(parent_category_name=None):
@@ -71,17 +73,18 @@ def print_categories(parent_category_name=None):
     """
     proxy = T411Proxy()
     proxy.set_credential()
-    if parent_category_name is None:
-        categories = proxy.main_categories()
-    else:
-        categories = [proxy.find_categories(parent_category_name)]
-    formatting_main = '%-30s %-5s %-5s'
-    formatting_sub = '     %-25s %-5s %-5s'
-    console(formatting_main % ('Category name', 'PID', 'ID'))
-    for category in categories:
-        console(formatting_main % (category.name, category.parent_id, category.id))
-        for sub_category in category.sub_categories:
-            console(formatting_sub % (sub_category.name, sub_category.parent_id, sub_category.id))
+    with Session() as session:
+        if parent_category_name is None:
+            categories = proxy.main_categories(session=session)
+        else:
+            categories = [proxy.find_categories(parent_category_name,session=session)]
+        formatting_main = '%-30s %-5s %-5s'
+        formatting_sub = '     %-25s %-5s %-5s'
+        console(formatting_main % ('Category name', 'PID', 'ID'))
+        for category in categories:
+            console(formatting_main % (category.name, category.parent_id, category.id))
+            for sub_category in category.sub_categories:
+                console(formatting_sub % (sub_category.name, sub_category.parent_id, sub_category.id))
 
 
 @event('options.register')
