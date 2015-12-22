@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
+from math import ceil
 
+from flask import jsonify
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
@@ -94,6 +96,15 @@ class QueuedMovie(queue_base.QueuedItem, Base):
     tmdb_id = Column(Integer)
     quality = Column('quality', String)
     quality_req = quality_requirement_property('quality')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'imdb_id': self.imdb_id,
+            'tmdb_id': self.tmdb_id,
+            'quality': self.quality,
+            'quality_req': self.quality_req
+        }
 
 
 class MovieQueue(queue_base.FilterQueueBase):
@@ -426,10 +437,10 @@ movie_queue_parser.add_argument('max', type=int, required=False, default=50, hel
 movie_queue_parser.add_argument('downloaded', type=bool, required=False, default=False, help='Show only downloaded')
 
 
-
 @movie_queue_api.route('/')
 @api.doc(parser=movie_queue_parser)
 class MovieQueueAPI(APIResource):
+
     @api.response(404, 'page does not exist')
     @api.response(200, 'movie queue results', movie_queue_schema)
     def get(self, session=None):
@@ -440,6 +451,11 @@ class MovieQueueAPI(APIResource):
         downloaded = args['downloaded']
 
         movie_queue = queue_get(session=session, downloaded=downloaded)
+        count = len(movie_queue)
 
+        pages = int(ceil(count / float(max_results)))
 
-
+        return jsonify({
+            'movies': [movie.to_dict() for movie in movie_queue],
+            'pages': pages
+        })
