@@ -3,7 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from math import ceil
 
-from flask import jsonify
+from flask import jsonify, request
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
@@ -307,7 +307,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
         item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality.text)
         session.add(item)
         log.info('Adding %s to movie queue with quality=%s.' % (title, quality))
-        return {'title': title, 'imdb_id': imdb_id, 'tmdb_id': tmdb_id, 'quality': quality}
+        return item.to_dict()
     else:
         if item.downloaded:
             raise QueueError('ERROR: %s has already been queued and downloaded' % title, errno=1)
@@ -495,32 +495,54 @@ class MovieQueueListAPI(APIResource):
         })
 
 
-movie_add_schema = {
+movie_add_results_schema = {
     'type': 'object',
     'properties': {
-        'message': {'type': 'string'},
-        'title': {'type': 'string'},
-        'imdb_id': {'type': 'string'},
-        'tmbd_id': {'type': 'string'},
-        'quality': {'type': 'string'}
-    }
+        'message': 'Successfully added movie to movie queue',
+        'movies': {
+            'type': 'object',
+            'properties': {
+                'added': {'type': 'string'},
+                'downloaded': {'type': 'string'},
+                'entry_original_url': {'type': 'string'},
+                'entry_title': {'type': 'string'},
+                'entry_url': {'type': 'string'},
+                'id': {'type': 'integer'},
+                'imdb_id': {'type': 'string'},
+                'quality': {'type': 'string'},
+                'quality_req': {'type': 'string'},
+                'title': {'type': 'string'},
+                'tmdb_id': {'type': 'string'},
+            }
+        }}
 }
 
-movie_queue_add_parser = api.parser()
-movie_queue_add_parser.add_argument('title', type=str, required=False, help='Title of movie')
-movie_queue_add_parser.add_argument('imdb_id', type=str, required=False, help='IMDB ID of movie')
-movie_queue_add_parser.add_argument('tmdb_id', type=str, required=False, help='TMDB ID of movie')
-movie_queue_add_parser.add_argument('quality', type=str, required=False, default='any',
-                                    help='Quality requirement of movie')
+movie_add_input_schema = {
+    'type': 'object',
+    'properties': {
+        'title': {'type': 'string'},
+        'imdb_id': {'type': 'string', 'pattern': r'tt\d{7}'},
+        'tmdb_id': {'type': 'integer'},
+        'quality': {'type': 'string', 'format': 'quality_requirements'}
+    },
+    'anyOf': [
+        {'required': ['title']},
+        {'required': ['imdb_id']},
+        {'required': ['tmdb_id']}
+    ]
+}
+
+movie_add_results_schema = api.schema('movie_add_results', movie_add_results_schema)
+movie_add_input_schema = api.schema('movie_add_input_schema', movie_add_input_schema)
 
 
-@movie_queue_api.route('/add')
+@movie_queue_api.route('/add/')
 class MovieQueueAddAPI(APIResource):
     @api.response(400, 'Page not found')
-    @api.response(200, 'Movie successfully added')
-    @api.doc(parser=movie_queue_add_parser)
+    @api.response(200, 'Movie successfully added', movie_add_results_schema)
+    @api.validate(movie_add_input_schema)
     def post(self, session=None):
-        kwargs = movie_queue_add_parser.parse_args()
+        kwargs = request.json
 
         try:
             kwargs['quality'] = qualities.Requirements(kwargs.get('quality'))
@@ -540,16 +562,10 @@ class MovieQueueAddAPI(APIResource):
                 'message': e.message
             }
             return reply, 400
-        except AttributeError:
-            reply = {
-                'status': 'error',
-                'message': 'Not enough parameters given. Either \"title\", \"imdb_id\" or \"tmdb_id\" are required'}
-            return reply, 500
 
-        return jsonify({
-            'message': 'Successfully added movie to movie queue',
-            'title': movie.get('title'),
-            'imdb_id': movie.get('imdb_id'),
-            'tmdb_id': movie.get('tmdb_id'),
-            'quality': movie.get('quality').text,
-        })
+        return jsonify(
+            {
+                'message': 'Successfully added movie to movie queue',
+                'movie': movie
+            }
+        )
