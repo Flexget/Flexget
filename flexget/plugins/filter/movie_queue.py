@@ -422,23 +422,25 @@ movie_queue_api = api.namespace('movie_queue', description='Movie Queue')
 movie_queue_schema = {
     'type': 'object',
     'properties': {
-        'movies': {'type': 'array', 'items': {
-            'type': 'object',
-            'properties': {
-                'added': {'type': 'string'},
-                'downloaded': {'type': 'string'},
-                'entry_original_url': {'type': 'string'},
-                'entry_title': {'type': 'string'},
-                'entry_url': {'type': 'string'},
-                'id': {'type': 'integer'},
-                'imdb_id': {'type': 'string'},
-                'quality': {'type': 'string'},
-                'quality_req': {'type': 'string'},
-                'title': {'type': 'string'},
-                'tmdb_id': {'type': 'string'},
-            }
-        }
-                   },
+        'movies': {
+            'type': 'array',
+            'items':
+                {'type': 'object',
+                 'properties': {
+                     'added': {'type': 'string'},
+                     'downloaded': {'type': 'string'},
+                     'entry_original_url': {'type': 'string'},
+                     'entry_title': {'type': 'string'},
+                     'entry_url': {'type': 'string'},
+                     'id': {'type': 'integer'},
+                     'imdb_id': {'type': 'string'},
+                     'quality': {'type': 'string'},
+                     'quality_req': {'type': 'string'},
+                     'title': {'type': 'string'},
+                     'tmdb_id': {'type': 'string'}
+                 }
+                 }
+        },
         'number_of_movies': {'type': 'integer'},
         'total_number_of_pages': {'type': 'integer'},
         'page_number': {'type': 'integer'}
