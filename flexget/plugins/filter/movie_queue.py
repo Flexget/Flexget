@@ -471,14 +471,11 @@ class MovieQueueListAPI(APIResource):
         movie_queue = queue_get(session=session, downloaded=downloaded)
         count = len(movie_queue)
 
-        if count == 0:
-            return {[]}
-
         pages = int(ceil(count / float(max_results)))
 
         movie_items = []
 
-        if page > pages:
+        if page > pages and pages != 0:
             return {'error': 'page %s does not exist' % page}, 404
 
         start = (page - 1) * max_results
