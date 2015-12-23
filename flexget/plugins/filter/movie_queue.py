@@ -108,7 +108,6 @@ class QueuedMovie(queue_base.QueuedItem, Base):
             'imdb_id': self.imdb_id,
             'tmdb_id': self.tmdb_id,
             'quality': self.quality,
-            'quality_req': self.quality_req.text,
             'title': self.title,
         }
 
@@ -373,7 +372,7 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None):
         if not item.downloaded:
             raise QueueError('%s is not marked as downloaded' % title)
         item.downloaded = None
-        return title
+        return item.to_dict()
     except NoResultFound as e:
         raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s not found from queue' % (title, imdb_id, tmdb_id))
 
@@ -392,7 +391,7 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None):
     try:
         item = session.query(QueuedMovie).filter(QueuedMovie.imdb_id == imdb_id).one()
         item.quality = quality
-        return item.title
+        return item.to_dict()
     except NoResultFound as e:
         raise QueueError('imdb_id=%s, tmdb_id=%s not found from queue' % (imdb_id, tmdb_id))
 
@@ -430,7 +429,6 @@ movie_object = {
         'id': {'type': 'integer'},
         'imdb_id': {'type': 'string'},
         'quality': {'type': 'string'},
-        'quality_req': {'type': 'string'},
         'title': {'type': 'string'},
         'tmdb_id': {'type': 'string'},
     }
@@ -508,10 +506,36 @@ movie_del_input_schema = {
 movie_del_results_schema = api.schema('movie_del_results_schema', movie_del_results_schema)
 movie_del_input_schema = api.schema('movie_del_input_schema', movie_del_input_schema)
 
+movie_edit_results_schema = {
+    'type': 'object',
+    'properties': {
+        'message': {'type': 'string'},
+        'movie': movie_object
+    }
+}
+
+movie_edit_input_schema = {
+    'type': 'object',
+    'properties': {
+        'title': {'type': 'string'},
+        'imdb_id': {'type': 'string', 'pattern': r'tt\d{7}'},
+        'tmdb_id': {'type': 'integer'},
+        'quality': {'type': 'string', 'format': 'quality_requirements'},
+        'reset_downloaded': {'type': 'boolean'}
+    },
+    'anyOf': [
+        {'required': ['title']},
+        {'required': ['imdb_id']},
+        {'required': ['tmdb_id']}
+    ]
+}
+
+movie_edit_results_schema = api.schema('movie_edit_results_schema', movie_edit_results_schema)
+movie_edit_input_schema = api.schema('movie_edit_input_schema', movie_edit_input_schema)
+
 
 @movie_queue_api.route('/')
 class MovieQueueAPI(APIResource):
-
     @api.response(404, 'Page does not exist')
     @api.response(200, 'Movie queue retrieved successfully', movie_queue_schema)
     @api.doc(parser=movie_queue_parser)
@@ -601,6 +625,60 @@ class MovieQueueAPI(APIResource):
         return jsonify(
             {
                 'message': 'Successfully deleted movie from movie queue',
+                'movie': movie
+            }
+        )
+
+    @api.response(400, 'Page not found')
+    @api.response(200, 'Movie successfully updated', movie_edit_results_schema)
+    @api.validate(movie_edit_input_schema)
+    def put(self, session=None):
+        """ Updates movie quality or downloaded state in movie queue """
+        kwargs = request.json
+        kwargs['session'] = session
+
+        movie = None
+
+        if kwargs.get('reset_downloaded'):
+            lookup = {
+                'title': kwargs.get('title'),
+                'imdb_id': kwargs.get('imdb_id'),
+                'tmdb_id': kwargs.get('tmdb_id'),
+                'session': kwargs['session']
+            }
+            try:
+                movie = queue_forget(**lookup)
+            except QueueError as e:
+                reply = {
+                    'status': 'error',
+                    'message': e.message
+                }
+                return reply, 400
+
+        if kwargs.get('quality'):
+            lookup = {
+                'quality': kwargs.get('quality'),
+                'imdb_id': kwargs.get('imdb_id'),
+                'tmdb_id': kwargs.get('tmdb_id'),
+                'session': kwargs['session']
+            }
+            try:
+                movie = queue_edit(**lookup)
+            except QueueError as e:
+                reply = {
+                    'status': 'error',
+                    'message': e.message
+                }
+                return reply, 400
+        if not movie:
+            return {
+                       'status': 'error',
+                       'message': 'Not enough parameters to edit movie data'
+                   }, 400
+
+        return jsonify(
+            {
+                'message': 'Successfully updated movie details',
                 'movie': movie
             }
         )
