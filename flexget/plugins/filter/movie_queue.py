@@ -507,11 +507,13 @@ movie_del_input_schema = {
         'title': {'type': 'string'},
         'imdb_id': {'type': 'string', 'pattern': r'tt\d{7}'},
         'tmdb_id': {'type': 'integer'},
+        'movie_id': {'type': 'integer'}
     },
     'anyOf': [
         {'required': ['title']},
         {'required': ['imdb_id']},
-        {'required': ['tmdb_id']}
+        {'required': ['tmdb_id']},
+        {'required': ['movie_id']}
     ]
 }
 
@@ -532,13 +534,15 @@ movie_edit_input_schema = {
         'title': {'type': 'string'},
         'imdb_id': {'type': 'string', 'pattern': r'tt\d{7}'},
         'tmdb_id': {'type': 'integer'},
+        'movie_id': {'type': 'integer'},
         'quality': {'type': 'string', 'format': 'quality_requirements'},
         'reset_downloaded': {'type': 'boolean'}
     },
     'anyOf': [
         {'required': ['title']},
         {'required': ['imdb_id']},
-        {'required': ['tmdb_id']}
+        {'required': ['tmdb_id']},
+        {'required': ['movie_id']}
     ]
 }
 
@@ -656,6 +660,7 @@ class MovieQueueAPI(APIResource):
                 'title': kwargs.get('title'),
                 'imdb_id': kwargs.get('imdb_id'),
                 'tmdb_id': kwargs.get('tmdb_id'),
+                'movie_id': kwargs.get('movie_id'),
                 'session': kwargs['session']
             }
             try:
@@ -672,6 +677,7 @@ class MovieQueueAPI(APIResource):
                 'quality': kwargs.get('quality'),
                 'imdb_id': kwargs.get('imdb_id'),
                 'tmdb_id': kwargs.get('tmdb_id'),
+                'movie_id': kwargs.get('movie_id'),
                 'session': kwargs['session']
             }
             try:
