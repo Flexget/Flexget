@@ -470,7 +470,7 @@ class MovieQueueListAPI(APIResource):
         count = len(movie_queue)
 
         if count == 0:
-            return {'success': 'no movies found in queue'}
+            return {[]}
 
         pages = int(ceil(count / float(max_results)))
 
