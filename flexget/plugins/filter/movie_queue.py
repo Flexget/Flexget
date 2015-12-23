@@ -457,9 +457,61 @@ movie_queue_parser.add_argument('page', type=int, required=False, default=1, hel
 movie_queue_parser.add_argument('max', type=int, required=False, default=50, help='Movies per page')
 movie_queue_parser.add_argument('downloaded', type=bool, required=False, default=False, help='Show only downloaded')
 
+movie_add_results_schema = {
+    'type': 'object',
+    'properties': {
+        'message': {'type': 'string'},
+        'movie': movie_object
+    }
+}
+
+movie_add_input_schema = {
+    'type': 'object',
+    'properties': {
+        'title': {'type': 'string'},
+        'imdb_id': {'type': 'string', 'pattern': r'tt\d{7}'},
+        'tmdb_id': {'type': 'integer'},
+        'quality': {'type': 'string', 'format': 'quality_requirements'}
+    },
+    'anyOf': [
+        {'required': ['title']},
+        {'required': ['imdb_id']},
+        {'required': ['tmdb_id']}
+    ]
+}
+
+movie_add_results_schema = api.schema('movie_add_results', movie_add_results_schema)
+movie_add_input_schema = api.schema('movie_add_input_schema', movie_add_input_schema)
+
+movie_del_results_schema = {
+    'type': 'object',
+    'properties': {
+        'message': {'type': 'string'},
+        'movie': {'type': 'string'}
+    }
+}
+
+movie_del_input_schema = {
+    'type': 'object',
+    'properties': {
+        'title': {'type': 'string'},
+        'imdb_id': {'type': 'string', 'pattern': r'tt\d{7}'},
+        'tmdb_id': {'type': 'integer'},
+    },
+    'anyOf': [
+        {'required': ['title']},
+        {'required': ['imdb_id']},
+        {'required': ['tmdb_id']}
+    ]
+}
+
+movie_del_results_schema = api.schema('movie_del_results_schema', movie_del_results_schema)
+movie_del_input_schema = api.schema('movie_del_input_schema', movie_del_input_schema)
+
 
 @movie_queue_api.route('/')
-class MovieQueueListAPI(APIResource):
+class MovieQueueAPI(APIResource):
+
     @api.response(404, 'Page does not exist')
     @api.response(200, 'Movie queue retrieved successfully', movie_queue_schema)
     @api.doc(parser=movie_queue_parser)
@@ -495,40 +547,11 @@ class MovieQueueListAPI(APIResource):
             'total_number_of_pages': pages
         })
 
-
-movie_add_results_schema = {
-    'type': 'object',
-    'properties': {
-        'message': {'type': 'string'},
-        'movie': movie_object
-    }
-}
-
-movie_add_input_schema = {
-    'type': 'object',
-    'properties': {
-        'title': {'type': 'string'},
-        'imdb_id': {'type': 'string', 'pattern': r'tt\d{7}'},
-        'tmdb_id': {'type': 'integer'},
-        'quality': {'type': 'string', 'format': 'quality_requirements'}
-    },
-    'anyOf': [
-        {'required': ['title']},
-        {'required': ['imdb_id']},
-        {'required': ['tmdb_id']}
-    ]
-}
-
-movie_add_results_schema = api.schema('movie_add_results', movie_add_results_schema)
-movie_add_input_schema = api.schema('movie_add_input_schema', movie_add_input_schema)
-
-
-@movie_queue_api.route('/add/')
-class MovieQueueAddAPI(APIResource):
     @api.response(400, 'Page not found')
     @api.response(200, 'Movie successfully added', movie_add_results_schema)
     @api.validate(movie_add_input_schema)
     def post(self, session=None):
+        """ Add movies to movie queue """
         kwargs = request.json
 
         try:
@@ -553,6 +576,31 @@ class MovieQueueAddAPI(APIResource):
         return jsonify(
             {
                 'message': 'Successfully added movie to movie queue',
+                'movie': movie
+            }
+        )
+
+    @api.response(400, 'Page not found')
+    @api.response(200, 'Movie successfully deleted', movie_del_results_schema)
+    @api.validate(movie_del_input_schema)
+    def delete(self, session=None):
+        """ Delete movies from movie queue """
+        kwargs = request.json
+
+        kwargs['session'] = session
+
+        try:
+            movie = queue_del(**kwargs)
+        except QueueError as e:
+            reply = {
+                'status': 'error',
+                'message': e.message
+            }
+            return reply, 400
+
+        return jsonify(
+            {
+                'message': 'Successfully deleted movie from movie queue',
                 'movie': movie
             }
         )
