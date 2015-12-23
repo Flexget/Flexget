@@ -342,10 +342,11 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
         session.delete(item)
         return title
     except NoResultFound as e:
-        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s not found from queue' % (title, imdb_id, tmdb_id))
+        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' %
+                         (title, imdb_id, tmdb_id, movie_id))
     except MultipleResultsFound:
-        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s matches multiple results in queue' %
-                         (title, imdb_id, tmdb_id))
+        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s matches multiple results in queue' %
+                         (title, imdb_id, tmdb_id, movie_id))
 
 
 @with_session
@@ -378,7 +379,8 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=
         item.downloaded = None
         return item.to_dict()
     except NoResultFound as e:
-        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s not found from queue' % (title, imdb_id, tmdb_id))
+        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' %
+                         (title, imdb_id, tmdb_id, movie_id))
 
 
 @with_session
@@ -405,7 +407,7 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None)
         item.quality = quality
         return item.to_dict()
     except NoResultFound as e:
-        raise QueueError('imdb_id=%s, tmdb_id=%s not found from queue' % (imdb_id, tmdb_id))
+        raise QueueError('imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' % (imdb_id, tmdb_id, movie_id))
 
 
 @with_session
@@ -536,7 +538,7 @@ movie_edit_input_schema = {
         'tmdb_id': {'type': 'integer'},
         'movie_id': {'type': 'integer'},
         'quality': {'type': 'string', 'format': 'quality_requirements'},
-        'reset_downloaded': {'type': 'boolean'}
+        'reset_downloaded': {'type': 'boolean', 'default': False}
     },
     'anyOf': [
         {'required': ['title']},
