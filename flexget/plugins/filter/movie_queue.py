@@ -315,7 +315,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
 
 
 @with_session
-def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None):
+def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=None):
     """
     Delete the given item from the queue.
 
@@ -326,7 +326,7 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None):
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
-    log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s' % (title, imdb_id, tmdb_id))
+    log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s' % (title, imdb_id, tmdb_id, movie_id))
     query = session.query(QueuedMovie)
     if imdb_id:
         query = query.filter(QueuedMovie.imdb_id == imdb_id)
@@ -334,6 +334,8 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None):
         query = query.filter(QueuedMovie.tmdb_id == tmdb_id)
     elif title:
         query = query.filter(QueuedMovie.title == title)
+    elif movie_id:
+        query = query.filter(QueuedMovie.id == movie_id)
     try:
         item = query.one()
         title = item.title
@@ -347,7 +349,7 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None):
 
 
 @with_session
-def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None):
+def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=None):
     """
     Forget movie download  from the queue.
 
@@ -358,7 +360,7 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None):
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
-    log.debug('queue_forget - title=%s, imdb_id=%s, tmdb_id=%s' % (title, imdb_id, tmdb_id))
+    log.debug('queue_forget - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s' % (title, imdb_id, tmdb_id, movie_id))
     query = session.query(QueuedMovie)
     if imdb_id:
         query = query.filter(QueuedMovie.imdb_id == imdb_id)
@@ -366,6 +368,8 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None):
         query = query.filter(QueuedMovie.tmdb_id == tmdb_id)
     elif title:
         query = query.filter(QueuedMovie.title == title)
+    elif movie_id:
+        query = query.filter(QueuedMovie.id == movie_id)
     try:
         item = query.one()
         title = item.title
@@ -378,7 +382,7 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None):
 
 
 @with_session
-def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None):
+def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None):
     """
     :param quality: Change the required quality for a movie in the queue
     :param imdb_id: Imdb id
@@ -388,8 +392,16 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None):
     :raises QueueError: If queued item could not be found with given arguments
     """
     # check if the item is queued
+    log.debug('queue_edit - quality=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s' % (quality, imdb_id, tmdb_id, movie_id))
+    query = session.query(QueuedMovie)
+    if imdb_id:
+        query = session.query(QueuedMovie).filter(QueuedMovie.imdb_id == imdb_id)
+    elif tmdb_id:
+        query = session.query(QueuedMovie).filter(QueuedMovie.tmdb_id == tmdb_id)
+    elif movie_id:
+        query = session.query(QueuedMovie).filter(QueuedMovie.id == movie_id)
     try:
-        item = session.query(QueuedMovie).filter(QueuedMovie.imdb_id == imdb_id).one()
+        item = query.one()
         item.quality = quality
         return item.to_dict()
     except NoResultFound as e:
