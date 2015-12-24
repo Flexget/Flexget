@@ -108,6 +108,7 @@ class QueuedMovie(queue_base.QueuedItem, Base):
             'imdb_id': self.imdb_id,
             'tmdb_id': self.tmdb_id,
             'quality': self.quality,
+            'quality_req': self.quality_req.text,
             'title': self.title,
         }
 
@@ -484,7 +485,7 @@ movie_add_input_schema = {
         'title': {'type': 'string'},
         'imdb_id': {'type': 'string', 'pattern': r'tt\d{7}'},
         'tmdb_id': {'type': 'integer'},
-        'quality': {'type': 'string', 'format': 'quality_requirements'}
+        'quality': {'type': 'string', 'format': 'quality_requirements', 'default': 'any'}
     },
     'anyOf': [
         {'required': ['title']},
