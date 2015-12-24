@@ -305,6 +305,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
     if not item:
         item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality.text)
         session.add(item)
+        session.commit()
         log.info('Adding %s to movie queue with quality=%s.' % (title, quality))
         return item.to_dict()
     else:
