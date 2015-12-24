@@ -105,7 +105,9 @@ class VersionChecker(object):
                     return
 
             latest_version = get_latest_flexget_version_number()
-            if latest_version and latest_version != current_version:
+            if not latest_version:
+                return
+            elif latest_version != current_version:
                 log.warning('You are not running latest Flexget Version. Current is %s and latest is %s',
                             current_version, latest_version)
             if last_check:
