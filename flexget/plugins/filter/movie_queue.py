@@ -4,6 +4,7 @@ import logging
 from math import ceil
 
 from flask import jsonify, request
+from flask_restful import inputs
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
@@ -468,8 +469,9 @@ movie_queue_schema = api.schema('list_movie_queue', movie_queue_schema)
 
 movie_queue_parser = api.parser()
 movie_queue_parser.add_argument('page', type=int, required=False, default=1, help='Page number')
-movie_queue_parser.add_argument('max', type=int, required=False, default=50, help='Movies per page')
-movie_queue_parser.add_argument('downloaded', type=bool, required=False, default=False, help='Show only downloaded')
+movie_queue_parser.add_argument('max', type=int, required=False, default=100, help='Movies per page')
+movie_queue_parser.add_argument('downloaded', type=inputs.boolean, required=False, default=False,
+                                help='Show only downloaded')
 
 movie_add_results_schema = {
     'type': 'object',
