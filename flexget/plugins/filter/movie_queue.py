@@ -613,7 +613,7 @@ class MovieQueueAPI(APIResource):
                 'status': 'error',
                 'message': e.message
             }
-            return reply, 400
+            return reply, 500
 
         return jsonify(
             {
@@ -634,17 +634,13 @@ class MovieQueueAPI(APIResource):
         try:
             movie = queue_del(**kwargs)
         except QueueError as e:
-            reply = {
-                'status': 'error',
-                'message': e.message
-            }
-            return reply, 400
+            reply = {'status': 'error',
+                     'message': e.message}
+            return reply, 500
 
         return jsonify(
-            {
-                'message': 'Successfully deleted movie from movie queue',
-                'movie': movie
-            }
+            {'message': 'Successfully deleted movie from movie queue',
+             'movie': movie}
         )
 
     @api.response(400, 'Page not found')
@@ -672,7 +668,7 @@ class MovieQueueAPI(APIResource):
                     'status': 'error',
                     'message': e.message
                 }
-                return reply, 400
+                return reply, 500
 
         if kwargs.get('quality'):
             edit_lookup = {
@@ -687,7 +683,7 @@ class MovieQueueAPI(APIResource):
             except QueueError as e:
                 reply = {'status': 'error',
                          'message': e.message}
-                return reply, 400
+                return reply, 500
         if not movie:
             return {'status': 'error',
                     'message': 'Not enough parameters to edit movie data'}, 400
