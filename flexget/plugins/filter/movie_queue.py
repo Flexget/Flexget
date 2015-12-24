@@ -326,7 +326,7 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
-    log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s' % (title, imdb_id, tmdb_id, movie_id))
+    log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', (title, imdb_id, tmdb_id, movie_id))
     query = session.query(QueuedMovie)
     if imdb_id:
         query = query.filter(QueuedMovie.imdb_id == imdb_id)
@@ -342,8 +342,8 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
         session.delete(item)
         return title
     except NoResultFound as e:
-        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' %
-                         (title, imdb_id, tmdb_id, movie_id))
+        raise QueueError(
+            'title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' % (title, imdb_id, tmdb_id, movie_id))
     except MultipleResultsFound:
         raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s matches multiple results in queue' %
                          (title, imdb_id, tmdb_id, movie_id))
@@ -361,7 +361,7 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
-    log.debug('queue_forget - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s' % (title, imdb_id, tmdb_id, movie_id))
+    log.debug('queue_forget - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', (title, imdb_id, tmdb_id, movie_id))
     query = session.query(QueuedMovie)
     if imdb_id:
         query = query.filter(QueuedMovie.imdb_id == imdb_id)
@@ -394,7 +394,7 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None)
     :raises QueueError: If queued item could not be found with given arguments
     """
     # check if the item is queued
-    log.debug('queue_edit - quality=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s' % (quality, imdb_id, tmdb_id, movie_id))
+    log.debug('queue_edit - quality=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', (quality, imdb_id, tmdb_id, movie_id))
     query = session.query(QueuedMovie)
     if imdb_id:
         query = session.query(QueuedMovie).filter(QueuedMovie.imdb_id == imdb_id)
@@ -658,7 +658,7 @@ class MovieQueueAPI(APIResource):
         movie = None
 
         if kwargs.get('reset_downloaded'):
-            lookup = {
+            forget_lookup = {
                 'title': kwargs.get('title'),
                 'imdb_id': kwargs.get('imdb_id'),
                 'tmdb_id': kwargs.get('tmdb_id'),
@@ -666,7 +666,7 @@ class MovieQueueAPI(APIResource):
                 'session': kwargs['session']
             }
             try:
-                movie = queue_forget(**lookup)
+                movie = queue_forget(**forget_lookup)
             except QueueError as e:
                 reply = {
                     'status': 'error',
@@ -675,7 +675,7 @@ class MovieQueueAPI(APIResource):
                 return reply, 400
 
         if kwargs.get('quality'):
-            lookup = {
+            edit_lookup = {
                 'quality': kwargs.get('quality'),
                 'imdb_id': kwargs.get('imdb_id'),
                 'tmdb_id': kwargs.get('tmdb_id'),
@@ -683,18 +683,14 @@ class MovieQueueAPI(APIResource):
                 'session': kwargs['session']
             }
             try:
-                movie = queue_edit(**lookup)
+                movie = queue_edit(**edit_lookup)
             except QueueError as e:
-                reply = {
-                    'status': 'error',
-                    'message': e.message
-                }
+                reply = {'status': 'error',
+                         'message': e.message}
                 return reply, 400
         if not movie:
-            return {
-                       'status': 'error',
-                       'message': 'Not enough parameters to edit movie data'
-                   }, 400
+            return {'status': 'error',
+                    'message': 'Not enough parameters to edit movie data'}, 400
 
         return jsonify(
             {
