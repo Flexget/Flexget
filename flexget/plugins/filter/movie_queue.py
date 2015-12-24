@@ -533,24 +533,12 @@ movie_edit_results_schema = {
 movie_edit_input_schema = {
     'type': 'object',
     'properties': {
-        'title': {'type': 'string'},
-        'imdb_id': {'type': 'string', 'pattern': r'tt\d{7}'},
-        'tmdb_id': {'type': 'integer'},
-        'movie_id': {'type': 'integer'},
         'quality': {'type': 'string', 'format': 'quality_requirements'},
         'reset_downloaded': {'type': 'boolean', 'default': False}
     },
-    'allOf': [
-        {'anyOf': [
-            {'required': ['title']},
-            {'required': ['imdb_id']},
-            {'required': ['tmdb_id']},
-            {'required': ['movie_id']}
-        ]},
-        {'anyOf': [
-            {'required': ['quality']},
-            {'required': ['reset_downloaded']}
-        ]}
+    'anyOf': [
+        {'required': ['quality']},
+        {'required': ['reset_downloaded']}
     ]
 }
 
@@ -628,17 +616,16 @@ class MovieQueueAPI(APIResource):
             }
         )
 
+
+@movie_queue_api.route('/<int:movie_id>/')
+@api.doc(params={'movie_id': 'ID of Queued Movie'})
+class MovieQueueManageAPI(APIResource):
     @api.response(400, 'Page not found')
     @api.response(200, 'Movie successfully deleted', movie_del_results_schema)
-    @api.validate(movie_del_input_schema)
-    def delete(self, session=None):
+    def delete(self, movie_id, session=None):
         """ Delete movies from movie queue """
-        kwargs = request.json
-
-        kwargs['session'] = session
-
         try:
-            movie = queue_del(**kwargs)
+            movie = queue_del(session=session, movie_id=movie_id)
         except QueueError as e:
             reply = {'status': 'error',
                      'message': e.message}
@@ -652,23 +639,14 @@ class MovieQueueAPI(APIResource):
     @api.response(400, 'Page not found')
     @api.response(200, 'Movie successfully updated', movie_edit_results_schema)
     @api.validate(movie_edit_input_schema)
-    def put(self, session=None):
+    def put(self, movie_id, session=None):
         """ Updates movie quality or downloaded state in movie queue """
-        kwargs = request.json
-        kwargs['session'] = session
-
+        data = request.json
         movie = None
 
-        if kwargs.get('reset_downloaded'):
-            forget_lookup = {
-                'title': kwargs.get('title'),
-                'imdb_id': kwargs.get('imdb_id'),
-                'tmdb_id': kwargs.get('tmdb_id'),
-                'movie_id': kwargs.get('movie_id'),
-                'session': kwargs['session']
-            }
+        if data.get('reset_downloaded'):
             try:
-                movie = queue_forget(**forget_lookup)
+                movie = queue_forget(movie_id=movie_id, session=session)
             except QueueError as e:
                 reply = {
                     'status': 'error',
@@ -676,16 +654,10 @@ class MovieQueueAPI(APIResource):
                 }
                 return reply, 500
 
-        if kwargs.get('quality'):
-            edit_lookup = {
-                'quality': kwargs.get('quality'),
-                'imdb_id': kwargs.get('imdb_id'),
-                'tmdb_id': kwargs.get('tmdb_id'),
-                'movie_id': kwargs.get('movie_id'),
-                'session': kwargs['session']
-            }
+        if data.get('quality'):
+            quality = data.get('quality')
             try:
-                movie = queue_edit(**edit_lookup)
+                movie = queue_edit(movie_id=movie_id, session=session, quality=quality)
             except QueueError as e:
                 reply = {'status': 'error',
                          'message': e.message}
