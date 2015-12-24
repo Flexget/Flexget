@@ -326,7 +326,7 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
-    log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', (title, imdb_id, tmdb_id, movie_id))
+    log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', title, imdb_id, tmdb_id, movie_id)
     query = session.query(QueuedMovie)
     if imdb_id:
         query = query.filter(QueuedMovie.imdb_id == imdb_id)
@@ -361,7 +361,7 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
-    log.debug('queue_forget - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', (title, imdb_id, tmdb_id, movie_id))
+    log.debug('queue_forget - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', title, imdb_id, tmdb_id, movie_id)
     query = session.query(QueuedMovie)
     if imdb_id:
         query = query.filter(QueuedMovie.imdb_id == imdb_id)
@@ -394,7 +394,7 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None)
     :raises QueueError: If queued item could not be found with given arguments
     """
     # check if the item is queued
-    log.debug('queue_edit - quality=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', (quality, imdb_id, tmdb_id, movie_id))
+    log.debug('queue_edit - quality=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', quality, imdb_id, tmdb_id, movie_id)
     query = session.query(QueuedMovie)
     if imdb_id:
         query = session.query(QueuedMovie).filter(QueuedMovie.imdb_id == imdb_id)
@@ -540,11 +540,17 @@ movie_edit_input_schema = {
         'quality': {'type': 'string', 'format': 'quality_requirements'},
         'reset_downloaded': {'type': 'boolean', 'default': False}
     },
-    'anyOf': [
-        {'required': ['title']},
-        {'required': ['imdb_id']},
-        {'required': ['tmdb_id']},
-        {'required': ['movie_id']}
+    'allOf': [
+        {'anyOf': [
+            {'required': ['title']},
+            {'required': ['imdb_id']},
+            {'required': ['tmdb_id']},
+            {'required': ['movie_id']}
+        ]},
+        {'anyOf': [
+            {'required': ['quality']},
+            {'required': ['reset_downloaded']}
+        ]}
     ]
 }
 
