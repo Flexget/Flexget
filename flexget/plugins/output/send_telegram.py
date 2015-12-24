@@ -1,12 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import sys
 from distutils.version import LooseVersion
 
 from sqlalchemy import Column, Integer, String
 
-from flexget import db_schema, plugin
+from flexget import db_schema, plugin, options
 from flexget.event import event
+from flexget.utils.database import with_session
 from flexget.utils.template import RenderError
+from flexget.utils.tools import console
 
 try:
     import telegram
@@ -58,7 +61,7 @@ class SendTelegram(object):
 
     Preparations::
 
-    * Install 'python-telegram-bot' python pkg
+    * Install 'python-telegram-bot' python pkg (i.e. `pip install python-telegram-bot`)
     * Create a bot & obtain a token for it (see https://core.telegram.org/bots#botfather).
     * For direct messages (not to a group), start a conversation with the bot and click "START" in the Telegram app.
     * For group messages, add the bot to the desired group and send a start message to the bot: "/start" (mind the
@@ -78,6 +81,17 @@ class SendTelegram(object):
           - fullname:
               first: my-first-name
               sur: my-sur-name
+
+
+    Bootstrapping and testing the bot::
+
+    * Execute: `flexget send_telegram bootstrap`.
+      Look at the console output and make sure that the operation was successful.
+    * Execute: `flexget send_telegram test-msg`.
+      This will send a test message for every recipient you've configured.
+
+
+    Configuration notes::
 
     You may use any combination of recipients types (`username`, `group` or `fullname`) - 0 or more of each (but you
     need at least one total...).
@@ -185,19 +199,59 @@ class SendTelegram(object):
     def on_task_exit(self, task, config):
         """Send telegram message(s) at exit"""
         session = task.session
-        self._enforce_telegram_plugin_ver()
-
-        self._parse_config(config)
-        self.log.debug('token={0} use_markdown={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
-            self._token, self._usernames, self._fullnames, self._groups, self._tmpl, self._use_markdown))
-
-        self._init_bot()
-        chat_ids = self._get_chat_ids_n_update_db(session)
+        chat_ids = self._real_init(session, config)
 
         if not chat_ids:
             return
 
         self._send_msgs(task, chat_ids)
+
+    def _real_init(self, session, config, ):
+        self._enforce_telegram_plugin_ver()
+        self._parse_config(config)
+        self.log.debug('token={0} use_markdown={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
+            self._token, self._usernames, self._fullnames, self._groups, self._tmpl, self._use_markdown))
+        self._init_bot()
+        chat_ids = self._get_chat_ids_n_update_db(session)
+        return chat_ids
+
+    def bootstrap(self, session, config):
+        """bootstrap the plugin configuration and update db with cached chat_ids"""
+        console('{0} - bootstrapping...'.format(_PLUGIN_NAME))
+        chat_ids = self._real_init(session, config)
+
+        found_usernames = [x.username for x in chat_ids if x.username]
+        found_fullnames = [(x.firstname, x.surname) for x in chat_ids if x.firstname]
+        found_grps = [x.group for x in chat_ids if x.group]
+
+        missing_usernames = [x for x in self._usernames if x not in found_usernames]
+        missing_fullnames = [x for x in self._fullnames if x not in found_fullnames]
+        missing_grps = [x for x in self._groups if x not in found_grps]
+
+        if missing_usernames or missing_fullnames or missing_grps:
+            for i in missing_usernames:
+                console('ERR: could not find chat_id for username: {0}'.format(i))
+            for i in missing_fullnames:
+                console('ERR: could not find chat_id for fullname: {0} {1}'.format(*i))
+            for i in missing_grps:
+                console('ERR: could not find chat_id for group: {0}'.format(i))
+            res = False
+        else:
+            console('{0} - bootstrap was successful'.format(_PLUGIN_NAME))
+            res = True
+
+        return res
+
+    def test_msg(self, session, config):
+        """send test message to configured recipients"""
+        console('{0} loading chat_ids...'.format(_PLUGIN_NAME))
+        chat_ids = self._real_init(session, config)
+
+        console('{0} sending test message(s)...'.format(_PLUGIN_NAME))
+        for chat_id in (x.id for x in chat_ids):
+            self._bot.sendMessage(chat_id=chat_id, text='test message from flexget')
+
+        return True
 
     def _init_bot(self):
         self._bot = telegram.Bot(self._token)
@@ -415,9 +469,59 @@ class SendTelegram(object):
 
         """
         self.log.info('saving updated chat_ids to db')
-        session.add_all(chat_ids)
+
+        # avoid duplicate chat_ids. (this is possible if configuration specified both username & fullname
+        chat_ids_d = dict((x.id, x) for x in chat_ids)
+
+        session.add_all(chat_ids_d.itervalues())
+        session.commit()
+
+
+def _guess_task_name(manager):
+    for task in manager.tasks:
+        if _get_config(manager, task) is not None:
+            break
+    else:
+        task = None
+    return task
+
+
+def _get_config(manager, task):
+    return manager.config['tasks'][task].get(_PLUGIN_NAME)
+
+
+@with_session()
+def do_cli(manager, args, session=None):
+    """
+    :type manager: flexget.Manager
+
+    """
+    task_name = _guess_task_name(manager)
+    config = _get_config(manager, task_name)
+    plugin_info = plugin.get_plugin_by_name(_PLUGIN_NAME)
+    send_telegram = plugin_info.instance
+    """:type: SendTelegram"""
+
+    if args.action == 'bootstrap':
+        res = send_telegram.bootstrap(session, config)
+    elif args.action == 'test-msg':
+        res = send_telegram.test_msg(session, config)
+    else:
+        raise RuntimeError('unknown action')
+
+    sys.exit(int(not res))
 
 
 @event('plugin.register')
 def register_plugin():
     plugin.register(SendTelegram, _PLUGIN_NAME, api_ver=2)
+
+
+@event('options.register')
+def register_parser_arguments():
+    parser = options.register_command(_PLUGIN_NAME, do_cli, help='{0} cli'.format(_PLUGIN_NAME))
+    """:type: options.CoreArgumentParser"""
+    subp = parser.add_subparsers(dest='action')
+    bsp = subp.add_parser('bootstrap', help='bootstrap the plugin according to config')
+    bsp.add_argument('--tasks', )
+    subp.add_parser('test-msg', help='send test message to all configured recipients')
