@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import logging
 from math import ceil
+from operator import itemgetter
 
 from flask import jsonify, request
 from flask_restful import inputs
@@ -465,13 +466,36 @@ movie_queue_schema = {
     }
 }
 
+
+def movie_queue_sort_value_enum(value):
+    enum = ['added', 'downloaded', 'id', 'title']
+    if not isinstance(value, basestring):
+        raise ValueError('Value expected to be string')
+    if value not in enum:
+        raise ValueError('Value expected to be in' + ' ,'.join(enum))
+    return value
+
+
+def movie_queue_sort_order_enum(value):
+    enum = ['desc', 'asc']
+    if not isinstance(value, basestring):
+        raise ValueError('Value expected to be string')
+    if value not in enum:
+        raise ValueError('Value expected to be in' + ' ,'.join(enum))
+    if value == 'desc':
+        return True
+    return False
+
+
 movie_queue_schema = api.schema('list_movie_queue', movie_queue_schema)
 
 movie_queue_parser = api.parser()
-movie_queue_parser.add_argument('page', type=int, required=False, default=1, help='Page number')
-movie_queue_parser.add_argument('max', type=int, required=False, default=100, help='Movies per page')
-movie_queue_parser.add_argument('downloaded', type=inputs.boolean, required=False, default=False,
-                                help='Show only downloaded')
+movie_queue_parser.add_argument('page', type=int, default=1, help='Page number')
+movie_queue_parser.add_argument('max', type=int, default=100, help='Movies per page')
+movie_queue_parser.add_argument('downloaded', type=inputs.boolean, default=False, help='Show only downloaded')
+movie_queue_parser.add_argument('sort_by', type=movie_queue_sort_value_enum, default='added',
+                                help="Sort response by 'added', 'downloaded', 'id', 'title'")
+movie_queue_parser.add_argument('order', type=movie_queue_sort_order_enum, default='desc', help='Sorting order')
 
 movie_add_results_schema = {
     'type': 'object',
@@ -561,6 +585,8 @@ class MovieQueueAPI(APIResource):
         page = args['page']
         max_results = args['max']
         downloaded = args['downloaded']
+        sort_by = args['sort_by']
+        order = args['order']
 
         movie_queue = queue_get(session=session, downloaded=downloaded)
         count = len(movie_queue)
@@ -578,10 +604,12 @@ class MovieQueueAPI(APIResource):
             finish = count
 
         for movie_number in range(start, finish):
-            movie_items.append(movie_queue[movie_number])
+            movie_items.append(movie_queue[movie_number].to_dict())
+
+        sorted_movie_list = sorted(movie_items, key=itemgetter(sort_by), reverse=order)
 
         return jsonify({
-            'movies': [movie.to_dict() for movie in movie_items],
+            'movies': sorted_movie_list,
             'number_of_movies': count,
             'page_number': page,
             'total_number_of_pages': pages
