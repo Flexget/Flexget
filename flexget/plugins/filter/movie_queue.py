@@ -526,8 +526,8 @@ movie_add_input_schema = api.schema('movie_add_input_schema', movie_add_input_sc
 movie_del_results_schema = {
     'type': 'object',
     'properties': {
-        'message': {'type': 'string'},
-        'movie': {'type': 'string'}
+        'status': {'type': 'string'},
+        'message': {'type': 'string'}
     }
 }
 
@@ -656,9 +656,8 @@ class MovieQueueManageAPI(APIResource):
             return reply, 404
 
         return jsonify(
-            {'message': 'Successfully deleted movie from movie queue',
-             'movie': movie}
-        )
+            {'status': 'success',
+             'message': 'Successfully delete movie_id {0}'.format(movie_id)})
 
     @api.response(404, 'Page not found')
     @api.response(200, 'Movie successfully updated', movie_edit_results_schema)
