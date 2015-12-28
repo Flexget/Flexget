@@ -621,15 +621,7 @@ class MovieQueueAPI(APIResource):
     def post(self, session=None):
         """ Add movies to movie queue """
         kwargs = request.json
-
-        try:
-            kwargs['quality'] = qualities.Requirements(kwargs.get('quality'))
-        except ValueError as e:
-            reply = {
-                'status': 'error',
-                'message': e.message
-            }
-            return reply, 400
+        kwargs['quality'] = qualities.Requirements(kwargs.get('quality'))
         kwargs['session'] = session
 
         try:
@@ -639,7 +631,7 @@ class MovieQueueAPI(APIResource):
                 'status': 'error',
                 'message': e.message
             }
-            return reply, 500
+            return reply, 404
 
         return jsonify(
             {
