@@ -644,7 +644,7 @@ class MovieQueueAPI(APIResource):
 @movie_queue_api.route('/<int:movie_id>/')
 @api.doc(params={'movie_id': 'ID of Queued Movie'})
 class MovieQueueManageAPI(APIResource):
-    @api.response(400, 'Page not found')
+    @api.response(404, 'Movie not found')
     @api.response(200, 'Movie successfully deleted', movie_del_results_schema)
     def delete(self, movie_id, session=None):
         """ Delete movies from movie queue """
@@ -653,14 +653,14 @@ class MovieQueueManageAPI(APIResource):
         except QueueError as e:
             reply = {'status': 'error',
                      'message': e.message}
-            return reply, 500
+            return reply, 404
 
         return jsonify(
             {'message': 'Successfully deleted movie from movie queue',
              'movie': movie}
         )
 
-    @api.response(400, 'Page not found')
+    @api.response(404, 'Page not found')
     @api.response(200, 'Movie successfully updated', movie_edit_results_schema)
     @api.validate(movie_edit_input_schema)
     def put(self, movie_id, session=None):
@@ -676,7 +676,7 @@ class MovieQueueManageAPI(APIResource):
                     'status': 'error',
                     'message': e.message
                 }
-                return reply, 500
+                return reply, 404
 
         if data.get('quality'):
             quality = data.get('quality')
@@ -685,7 +685,7 @@ class MovieQueueManageAPI(APIResource):
             except QueueError as e:
                 reply = {'status': 'error',
                          'message': e.message}
-                return reply, 500
+                return reply, 404
         if not movie:
             return {'status': 'error',
                     'message': 'Not enough parameters to edit movie data'}, 400
