@@ -616,7 +616,7 @@ class MovieQueueAPI(APIResource):
         })
 
     @api.response(400, 'Page not found')
-    @api.response(200, 'Movie successfully added', movie_add_results_schema)
+    @api.response(201, 'Movie successfully added', movie_add_results_schema)
     @api.validate(movie_add_input_schema)
     def post(self, session=None):
         """ Add movies to movie queue """
