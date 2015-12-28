@@ -147,7 +147,7 @@ class TVMazeSeries(Base):
         self.tvdb_id = series.externals.get('thetvdb')
         self.tvrage_id = series.externals.get('tvrage')
         if series.premiered:
-            self.premiered = parser.parse(series.premiered)
+            self.premiered = parser.parse(series.premiered, ignoretz=True)
             self.year = int(series.premiered[:4])
         else:
             self.premiered = None
@@ -227,7 +227,7 @@ class TVMazeEpisodes(Base):
             self.original_image = None
             self.medium_image = None
         if episode.airstamp:
-            self.airstamp = parser.parse(episode.airstamp)
+            self.airstamp = parser.parse(episode.airstamp, ignoretz=True)
         else:
             self.airstamp = None
         self.runtime = episode.runtime
@@ -240,8 +240,7 @@ class TVMazeEpisodes(Base):
             return True
         time_dif = datetime.now() - self.last_update
         expiration = time_dif.days > UPDATE_INTERVAL
-        log.debug('episode {0}, season {1} for series {2} is expired.'
-                  'days overdue for update: {3}'.format(self.number, self.season_number, self.series_id, expiration))
+        log.debug('episode {0}, season {1} for series {2} is expired.', self.number, self.season_number, self.series_id)
         return expiration
 
 
