@@ -108,6 +108,11 @@ class TestTVMazeShowLookup(FlexGetBase):
               - Californication
               - The X-Files
               - Aquarius
+          test_episode_air_date:
+            mock:
+              - {title: 'The.Flash.2014.S02E02.HDTV.x264-LOL'}
+            series:
+              - The Flash
     """
 
     @use_vcr
@@ -348,3 +353,15 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert len(entry['tvmaze_series_actors']) == 9, \
             'expected actors list for series to contain 9 members,' \
             ' instead it contains %s' % len(entry['tvmaze_series_actors'])
+
+    @use_vcr()
+    def test_episode_air_date(self):
+        self.execute_task('test_episode_air_date')
+        entry = self.task.entries[0]
+        assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 211206, 'episode id should be 211206, instead its %s' % entry[
+            'tvmaze_episode_id']
+        assert isinstance(entry['tvmaze_episode_airdate'], datetime), 'expected to received datetime type'
+        airdate = datetime.strftime(entry['tvmaze_episode_airdate'], '%Y-%m-%d')
+        assert airdate == '2015-10-13', 'episode airdate should be 2015-10-13, instead its %s' % airdate
