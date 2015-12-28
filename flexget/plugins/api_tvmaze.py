@@ -17,14 +17,14 @@ from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('api_tvmaze')
 
-DB_VERSION = 2
+DB_VERSION = 3
 Base = db_schema.versioned_base('tvmaze', DB_VERSION)
 UPDATE_INTERVAL = 7  # Used for expiration, number is in days
 
 
 @db_schema.upgrade('tvmaze')
 def upgrade(ver, session):
-    if ver is None or ver < 2:
+    if ver is None or ver < 3:
         raise db_schema.UpgradeImpossible
     return ver
 
@@ -39,7 +39,7 @@ class TVMazeActor(Base):
     __tablename__ = 'tvmaze_actors'
 
     tvmaze_id = Column(Integer, primary_key=True)
-    name = Column(Unicode, unique=True, nullable=False)
+    name = Column(Unicode, nullable=False)
     original_image = Column(String)
     medium_image = Column(String)
     url = Column(String)
