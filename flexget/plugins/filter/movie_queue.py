@@ -641,23 +641,38 @@ class MovieQueueAPI(APIResource):
         )
 
 
-@movie_queue_api.route('/<int:movie_id>/')
-@api.doc(params={'movie_id': 'ID of Queued Movie'})
+@movie_queue_api.route('/<type>/<id>/')
+@api.doc(params={'id': 'ID of Queued Movie', 'type': 'Type of ID to be used (imdb/tmdb/movie_id)'})
 class MovieQueueManageAPI(APIResource):
     @api.response(404, 'Movie not found')
+    @api.response(400, 'Invalid type received')
     @api.response(200, 'Movie successfully deleted', movie_del_results_schema)
-    def delete(self, movie_id, session=None):
+    def delete(self, type, id, session=None):
         """ Delete movies from movie queue """
+        if type not in ['imdb', 'tmdb', 'movie_id']:
+            reply = jsonify({
+                'status': 'error',
+                'message': 'invalid ID type received. Must be one of "imdb", "tmdb" or "movie_id"'
+            })
+            return reply, 400
+        kwargs = {'session': session}
+        if type == 'imdb':
+            kwargs['imdb_id'] = id
+        elif type == 'tmdb':
+            kwargs['tmdb_id'] = id
+        elif type == 'movie_id':
+            kwargs['movie_id'] = id
         try:
-            movie = queue_del(session=session, movie_id=movie_id)
+            queue_del(**kwargs)
         except QueueError as e:
             reply = {'status': 'error',
                      'message': e.message}
             return reply, 404
 
-        return jsonify(
+        reply = jsonify(
             {'status': 'success',
-             'message': 'Successfully delete movie_id {0}'.format(movie_id)})
+             'message': 'successfully deleted {0} movie {1}'.format(type, id)})
+        return reply
 
     @api.response(404, 'Page not found')
     @api.response(200, 'Movie successfully updated', movie_edit_results_schema)
