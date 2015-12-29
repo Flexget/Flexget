@@ -249,7 +249,7 @@ class TestTVMazeShowLookup(FlexGetBase):
 
             # Verify series data has been refreshed with actual values upon 2nd call, and series expiration flag
             # is set to False
-            assert series.weight == 4, \
+            assert series.weight == 5, \
                 'weight should have been updated back to 4 from 99, instead its %s' % series.weight
             assert session.query(TVMazeSeries).first().expired == False, 'expired status should be False'
 
