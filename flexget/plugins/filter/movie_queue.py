@@ -640,19 +640,19 @@ class MovieQueueAPI(APIResource):
             }
         )
 
+
 @api.response(404, 'Movie not found')
 @api.response(400, 'Invalid type received')
 @movie_queue_api.route('/<type>/<id>/')
 @api.doc(params={'id': 'ID of Queued Movie', 'type': 'Type of ID to be used (imdb/tmdb/movie_id)'})
 class MovieQueueManageAPI(APIResource):
-
     @api.response(200, 'Movie successfully deleted', movie_del_results_schema)
     def delete(self, type, id, session=None):
         """ Delete movies from movie queue """
         if type not in ['imdb', 'tmdb', 'movie_id']:
             reply = jsonify({
                 'status': 'error',
-                'message': 'invalid ID type received. Must be one of "imdb", "tmdb" or "movie_id"'
+                'message': 'invalid ID type received. Must be one of (imdb/tmdb/movie_id)'
             })
             return reply, 400
         kwargs = {'session': session}
@@ -679,11 +679,12 @@ class MovieQueueManageAPI(APIResource):
     def put(self, type, id, session=None):
         """ Updates movie quality or downloaded state in movie queue """
         if type not in ['imdb', 'tmdb', 'movie_id']:
-            reply = jsonify({
+            reply = {
                 'status': 'error',
-                'message': 'invalid ID type received. Must be one of "imdb", "tmdb" or "movie_id"'
-            })
+                'message': 'invalid ID type received. Must be one of (imdb/tmdb/movie_id)'
+            }
             return reply, 400
+
         data = request.json
         kwargs = {'session': session}
         if type == 'imdb':
@@ -718,6 +719,7 @@ class MovieQueueManageAPI(APIResource):
 
         return jsonify(
             {
+                'status': 'success',
                 'message': 'Successfully updated movie details',
                 'movie': movie
             }
