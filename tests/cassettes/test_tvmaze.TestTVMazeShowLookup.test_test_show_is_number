@@ -46,7 +46,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 29 Dec 2015 08:18:49 GMT']
+      date: ['Tue, 29 Dec 2015 09:59:44 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -102,7 +102,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 29 Dec 2015 08:18:49 GMT']
+      date: ['Tue, 29 Dec 2015 09:59:44 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -124,82 +124,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 29 Dec 2015 08:18:50 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Connection: [close]
-      Host: [api.tvmaze.com]
-      User-Agent: [Python-urllib/2.7]
-    method: GET
-    uri: http://api.tvmaze.com/search/shows?q=24
-  response:
-    body: {string: !!python/unicode '[{"score":2.2946587,"show":{"id":167,"url":"http://www.tvmaze.com/shows/167/24","name":"24","type":"Scripted","language":"English","genres":["Drama","Action","Crime","Thriller","Mystery"],"status":"Ended","runtime":60,"premiered":"2001-11-06","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":8.5},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":2445,"thetvdb":76290},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2330.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2330.jpg"},"summary":"<p>Jack
-        Bauer, agent of CTU (Counter Terrorist Unit) faces threats against his country
-        and himself in this action packed show. Each season contains of one day, each
-        episode shows one hour of Jack Bauer''s day. <em>24</em> is the only action
-        show in real time and gained alot of fans during the years with this concept.</p>","updated":1449350166,"_links":{"self":{"href":"http://api.tvmaze.com/shows/167"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/12094"}}}},{"score":2.267119,"show":{"id":6353,"url":"http://www.tvmaze.com/shows/6353/24","name":"24","type":"Scripted","language":"Hindi","genres":[],"status":"Ended","runtime":60,"premiered":"2013-10-04","schedule":{"time":"22:00","days":["Saturday"]},"rating":{"average":9},"weight":0,"network":{"id":438,"name":"Colors","country":{"name":"India","code":"IN","timezone":"Asia/Kolkata"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":273614},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/24/60878.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/24/60878.jpg"},"summary":"<p>24
-        is an Indian television drama that aired from 4 October 2013 \nthrough 21
-        December 2013 and was based on the American series of the \nsame name</p>","updated":1446195199,"_links":{"self":{"href":"http://api.tvmaze.com/shows/6353"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/377269"}}}},{"score":1.4970775,"show":{"id":6919,"url":"http://www.tvmaze.com/shows/6919/24-hour-catwalk","name":"24
-        Hour Catwalk","type":"Reality","language":"English","genres":[],"status":"Ended","runtime":60,"premiered":"2012-01-05","schedule":{"time":"22:00","days":["Thursday"]},"rating":{"average":null},"weight":0,"network":{"id":18,"name":"Lifetime","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":29552,"thetvdb":254989},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/26/65147.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/26/65147.jpg"},"summary":"<p>The
-        fierce and competitive world of fashion gets even cattier with the premiere
-        of the new series <em>24 Hour Catwalk</em><span><em>. </em>Featuring television
-        personality and global style icon Alexa Chung, four\n talented designers get
-        the chance to create their own collection for \nthe judging eyes of industry
-        bigwigs. But, they must do so in only 24 \nhours! Who will have the vision,
-        the talent and most importantly, the \nendurance to make it on the runway?</span></p>","updated":1446376871,"_links":{"self":{"href":"http://api.tvmaze.com/shows/6919"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/400681"}}}},{"score":1.4970775,"show":{"id":3961,"url":"http://www.tvmaze.com/shows/3961/boarding-house-no-24","name":"Boarding
-        House No. 24","type":"Scripted","language":"Korean","genres":["Comedy","Romance"],"status":"Ended","runtime":60,"premiered":"2014-09-23","schedule":{"time":"18:00","days":["Tuesday"]},"rating":{"average":null},"weight":0,"network":{"id":166,"name":"MBC","country":{"name":"Korea,
-        Republic of","code":"KR","timezone":"Asia/Seoul"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":286314},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/19/49094.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/19/49094.jpg"},"summary":"<p>A
-        sitcom about seven boarders who have different personalities and situations.
-        It is depicting dreams, careers, love and friendship of young people in their
-        20s who live under the same roof due to the plot of the house owner Kim Kwang
-        Kyu.</p>","updated":1442776727,"_links":{"self":{"href":"http://api.tvmaze.com/shows/3961"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/253527"}}}},{"score":1.417155,"show":{"id":6892,"url":"http://www.tvmaze.com/shows/6892/247","name":"24/7","type":"Documentary","language":"English","genres":[],"status":"Running","runtime":60,"premiered":"2007-04-15","schedule":{"time":"23:00","days":["Saturday"]},"rating":{"average":null},"weight":0,"network":{"id":8,"name":"HBO","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":24555,"thetvdb":213021},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/26/65144.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/26/65144.jpg"},"summary":"<p><strong><em>\"24/7\"</em></strong>
-        is HBO''s reality series that goes behind-the-scenes with athletes as they
-        prepare for future matchups. The series debuted in 2007 with a look at Oscar
-        De La Hoya and Floyd Mayweather Jr. as they prepared to face each other for
-        the junior-middleweight title. Later seasons focused on other boxing matchups,
-        in addition to NASCAR driver Jimmie Johnson and multiple NHL teams.</p>","updated":1449357533,"_links":{"self":{"href":"http://api.tvmaze.com/shows/6892"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/436758"}}}},{"score":1.4162618,"show":{"id":7591,"url":"http://www.tvmaze.com/shows/7591/wwe-24","name":"WWE
-        24","type":"Documentary","language":"English","genres":[],"status":"Running","runtime":60,"premiered":"2015-01-30","schedule":{"time":"","days":[]},"rating":{"average":null},"weight":0,"network":null,"webChannel":{"id":15,"name":"WWE
-        Network","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":null,"thetvdb":291489},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/28/70049.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/28/70049.jpg"},"summary":"","updated":1446673788,"_links":{"self":{"href":"http://api.tvmaze.com/shows/7591"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/428097"}}}},{"score":1.1356854,"show":{"id":4439,"url":"http://www.tvmaze.com/shows/4439/24-hours-in-ae","name":"24
-        Hours in A&E","type":"Documentary","language":"English","genres":["Medical"],"status":"Running","runtime":null,"premiered":"2011-05-11","schedule":{"time":"21:00","days":["Thursday"]},"rating":{"average":null},"weight":0,"network":{"id":45,"name":"Channel
-        4","country":{"name":"United Kingdom","code":"GB","timezone":"Europe/London"}},"webChannel":null,"externals":{"tvrage":28202,"thetvdb":248699},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/26/65390.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/26/65390.jpg"},"summary":"<p>Cameras
-        film around the clock in some of Britain''s busiest A&amp;E departments.</p>","updated":1451140431,"_links":{"self":{"href":"http://api.tvmaze.com/shows/4439"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/533068"},"nextepisode":{"href":"http://api.tvmaze.com/episodes/534233"}}}},{"score":1.1335595,"show":{"id":2202,"url":"http://www.tvmaze.com/shows/2202/emergency-247","name":"Emergency
-        24/7","type":"Reality","language":"English","genres":[],"status":"Running","runtime":60,"premiered":"2015-06-19","schedule":{"time":"22:00","days":["Friday"]},"rating":{"average":null},"weight":0,"network":{"id":177,"name":"Discovery
-        Life Channel","country":{"name":"United States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":49634,"thetvdb":300080},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/14/37360.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/14/37360.jpg"},"summary":"<p><strong>EMERGENCY
-        24/7</strong> follows an elite team of doctors as they diagnose and treat
-        patients at one of the UK''s leading trauma centers. On call 24/7, they take
-        their skills out of the emergency room, whether by helicopter or car, and
-        onto the streets, in a race against time to save lives. Treating patients
-        on the spot, these specialists use all available clues to make critical, split-second
-        decisions that just might save lives. Every case is a new mystery waiting
-        to be solved and gives viewers a rare insider''s perspective of what''s at
-        stake.</p>","updated":1441292650,"_links":{"self":{"href":"http://api.tvmaze.com/shows/2202"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/201115"}}}},{"score":1.1330276,"show":{"id":6817,"url":"http://www.tvmaze.com/shows/6817/24-hour-rental","name":"24
-        Hour Rental","type":"Scripted","language":"English","genres":["Comedy","Crime"],"status":"Running","runtime":30,"premiered":"2015-10-30","schedule":{"time":"00:01","days":["Friday"]},"rating":{"average":null},"weight":0,"network":null,"webChannel":{"id":2,"name":"Hulu","country":{"name":"United
-        States","code":"US","timezone":"America/New_York"}},"externals":{"tvrage":null,"thetvdb":null},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/25/64502.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/25/64502.jpg"},"summary":"<p>In
-        a \"Clerks\" meets \"Sopranos\" gangster series, petty criminals operate a
-        shady video rental store. Forget about gallows humor, 24 Hr. Rental is black
-        comedy 2 weeks after the execution. <strong><em>\"24 HOUR RENTAL\"</em></strong>
-        follows Tracker (Orzari), a former Mafia boss. Having barely avoided an early
-        retirement in a shallow grave, he now operates a seedy video store. Struggling
-        to stay afloat in the Internet age, Tracker runs his shop as a front for a
-        host of petty crimes-from fencing jewelry to peddling dope cut with Drano
-        and desperation-all in hopes of returning to power. </p>","updated":1445568308,"_links":{"self":{"href":"http://api.tvmaze.com/shows/6817"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/397230"}}}},{"score":1.1329956,"show":{"id":6954,"url":"http://www.tvmaze.com/shows/6954/24-hours-to-kill","name":"24
-        Hours to Kill","type":"Documentary","language":"English","genres":["Crime"],"status":"Ended","runtime":55,"premiered":"2010-11-30","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":null},"weight":0,"network":{"id":323,"name":"TV3","country":{"name":"Ireland","code":"IE","timezone":"Europe/Dublin"}},"webChannel":null,"externals":{"tvrage":null,"thetvdb":279324},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/26/65411.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/26/65411.jpg"},"summary":"<p>This
-        compelling series deconstructs and examines a selection of Ireland''s most
-        shocking killings, which in turn sparked some of the county''s most infamous
-        murder trials.</p>","updated":1448790877,"_links":{"self":{"href":"http://api.tvmaze.com/shows/6954"},"previousepisode":{"href":"http://api.tvmaze.com/episodes/401313"}}}}]'}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [close]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 29 Dec 2015 08:18:50 GMT']
+      date: ['Tue, 29 Dec 2015 09:59:45 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -210,7 +135,7 @@ interactions:
       Host: [!!python/unicode api.tvmaze.com]
       User-Agent: [Python-urllib/2.7]
     method: GET
-    uri: http://api.tvmaze.com/shows/167?embed=cast
+    uri: http://api.tvmaze.com/singlesearch/shows?q=24&embed=cast
   response:
     body: {string: !!python/unicode '{"id":167,"url":"http://www.tvmaze.com/shows/167/24","name":"24","type":"Scripted","language":"English","genres":["Drama","Action","Crime","Thriller","Mystery"],"status":"Ended","runtime":60,"premiered":"2001-11-06","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":8.5},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
         States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":2445,"thetvdb":76290},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/2330.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/2330.jpg"},"summary":"<p>Jack
@@ -316,7 +241,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 29 Dec 2015 08:18:50 GMT']
+      date: ['Tue, 29 Dec 2015 09:59:45 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -336,7 +261,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 29 Dec 2015 08:18:51 GMT']
+      date: ['Tue, 29 Dec 2015 09:59:45 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}

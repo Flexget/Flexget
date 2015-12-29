@@ -3,100 +3,10 @@ interactions:
     body: null
     headers:
       Connection: [close]
-      Host: [api.tvmaze.com]
-      User-Agent: [Python-urllib/2.7]
-    method: GET
-    uri: http://api.tvmaze.com/search/shows?q=House
-  response:
-    body: {string: "[{\"score\":1.8433278,\"show\":{\"id\":118,\"url\":\"http://www.tvmaze.com/shows/118/house\",\"name\":\"House\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Drama\",\"Mystery\",\"Medical\"],\"status\":\"Ended\",\"runtime\":60,\"premiered\":\"2004-11-16\",\"schedule\":{\"time\":\"21:00\",\"days\":[\"Monday\"]},\"rating\":{\"average\":9},\"weight\":1,\"network\":{\"id\":4,\"name\":\"FOX\",\"country\":{\"name\":\"United
-        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":3908,\"thetvdb\":73255},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/1347.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/1347.jpg\"},\"summary\":\"<p>Sink
-        your teeth into meaty drama and intrigue with <em>House</em>, FOX's take on
-        mystery, where the villain is a medical malady and the hero is an irreverent,
-        controversial doctor who trusts no one, least of all his patients.</p>\",\"updated\":1451238101,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/118\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/9206\"}}}},{\"score\":1.6899121,\"show\":{\"id\":3819,\"url\":\"http://www.tvmaze.com/shows/3819/house-vs-house\",\"name\":\"House
-        vs. House\",\"type\":\"Reality\",\"language\":\"English\",\"genres\":[],\"status\":\"Running\",\"runtime\":60,\"premiered\":\"2014-07-22\",\"schedule\":{\"time\":\"10:00\",\"days\":[\"Friday\"]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":125,\"name\":\"fyi,\",\"country\":{\"name\":\"United
-        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":287378},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/19/48008.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/19/48008.jpg\"},\"summary\":\"<p><strong><em>\\\"House
-        vs. House\\\"</em></strong> is a new home makeover competition series where
-        amateur and experienced renovation teams compete for the chance to win $10,000
-        by proving they can create the better DIY projects in their home. From painting
-        and decorating, to one-of-a-kind, imaginative projects, each episode features
-        two teams will go head-to-head in grueling challenges. Tanya McQueen, a DIY
-        design expert, and David Brian Sanders, an architect and designer, will determine
-        which team completes the most impressive transformation and award the cash
-        prize.</p>\",\"updated\":1442545142,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/3819\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/245354\"}}}},{\"score\":1.3094149,\"show\":{\"id\":9649,\"url\":\"http://www.tvmaze.com/shows/9649/four-houses\",\"name\":\"Four
-        Houses\",\"type\":\"Reality\",\"language\":\"English\",\"genres\":[],\"status\":\"Ended\",\"runtime\":60,\"premiered\":\"2012-07-02\",\"schedule\":{\"time\":\"22:00\",\"days\":[\"Monday\"]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":80,\"name\":\"TLC\",\"country\":{\"name\":\"United
-        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":32044,\"thetvdb\":260169},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/33/83920.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/33/83920.jpg\"},\"summary\":\"<p>Modeled
-        after the TLC show \\\"Four Weddings,\\\" this competition series follows
-        four homeowners who are invited to preview, critique and score one another's
-        homes for the chance to win $10,000 as well as be featured in Better Homes
-        and Gardens magazine. The hour-long episodes feature design-proud homeowners
-        hoping to impress the other three competitors with their decor and style choices,
-        which are graded -- often with frank and harsh opinions attached -- using
-        an overall impression score out of 10 and ranked for originality, style and
-        livability. The homeowner with the highest score wins the grand prize.</p>\",\"updated\":1449506859,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/9649\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/518272\"}}}},{\"score\":1.1949483,\"show\":{\"id\":3961,\"url\":\"http://www.tvmaze.com/shows/3961/boarding-house-no-24\",\"name\":\"Boarding
-        House No. 24\",\"type\":\"Scripted\",\"language\":\"Korean\",\"genres\":[\"Comedy\",\"Romance\"],\"status\":\"Ended\",\"runtime\":60,\"premiered\":\"2014-09-23\",\"schedule\":{\"time\":\"18:00\",\"days\":[\"Tuesday\"]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":166,\"name\":\"MBC\",\"country\":{\"name\":\"Korea,
-        Republic of\",\"code\":\"KR\",\"timezone\":\"Asia/Seoul\"}},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":286314},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/19/49094.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/19/49094.jpg\"},\"summary\":\"<p>A
-        sitcom about seven boarders who have different personalities and situations.
-        It is depicting dreams, careers, love and friendship of young people in their
-        20s who live under the same roof due to the plot of the house owner Kim Kwang
-        Kyu.</p>\",\"updated\":1442776727,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/3961\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/253527\"}}}},{\"score\":1.1629046,\"show\":{\"id\":10856,\"url\":\"http://www.tvmaze.com/shows/10856/danger-mouse\",\"name\":\"Danger
-        Mouse\",\"type\":\"Animation\",\"language\":\"English\",\"genres\":[],\"status\":\"Ended\",\"runtime\":10,\"premiered\":\"1981-09-28\",\"schedule\":{\"time\":\"\",\"days\":[]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":35,\"name\":\"ITV\",\"country\":{\"name\":\"United
-        Kingdom\",\"code\":\"GB\",\"timezone\":\"Europe/London\"}},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":76308},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/36/91453.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/36/91453.jpg\"},\"summary\":\"<p><strong>\\\"</strong><strong><em>Danger
-        Mouse\\\"</em></strong> is a British children's animated television series
-        produced by Cosgrove Hall Films for Thames Television. It featured the eponymous
-        Danger Mouse who worked as a secret agent. The show was a parody of British
-        spy fiction, particularly the <i>Danger Man</i> series and James Bond. The
-        show originally ran in the United Kingdom from 28 September 1981 to 19 March
-        1992.</p>\",\"updated\":1451264476,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/10856\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/548650\"}}}},{\"score\":1.1629046,\"show\":{\"id\":5104,\"url\":\"http://www.tvmaze.com/shows/5104/danger-mouse\",\"name\":\"Danger
-        Mouse\",\"type\":\"Animation\",\"language\":\"English\",\"genres\":[],\"status\":\"Running\",\"runtime\":12,\"premiered\":\"2015-09-28\",\"schedule\":{\"time\":\"18:00\",\"days\":[\"Monday\",\"Tuesday\",\"Wednesday\",\"Thursday\",\"Friday\"]},\"rating\":{\"average\":10},\"weight\":0,\"network\":{\"id\":60,\"name\":\"CBBC\",\"country\":{\"name\":\"United
-        Kingdom\",\"code\":\"GB\",\"timezone\":\"Europe/London\"}},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":300969},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/21/54509.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/21/54509.jpg\"},\"summary\":\"<p><strong><em>\\\"Danger
-        Mouse\\\"</em></strong> is back saving London, saving the World and, most
-        \\nimportantly, saving Penfold in brand new and fantastically absurd, \\nenergetic
-        adventures.</p>\",\"updated\":1451275168,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/5104\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/529647\"}}}},{\"score\":1.1362889,\"show\":{\"id\":3081,\"url\":\"http://www.tvmaze.com/shows/3081/fuller-house\",\"name\":\"Fuller
-        House\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Comedy\",\"Family\"],\"status\":\"In
-        Development\",\"runtime\":30,\"premiered\":\"2016-02-26\",\"schedule\":{\"time\":\"\",\"days\":[]},\"rating\":{\"average\":null},\"weight\":1,\"network\":null,\"webChannel\":{\"id\":1,\"name\":\"Netflix\",\"country\":{\"name\":\"United
-        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"externals\":{\"tvrage\":null,\"thetvdb\":null},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/35/88556.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/35/88556.jpg\"},\"summary\":\"<p>D.J.
-        Tanner-Fuller is a widow and mother of three. Things become too much to handle,
-        so she asks for help from her sister Stephanie and her best-friend Kimmy.</p>\",\"updated\":1450708340,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/3081\"},\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/540721\"}}}},{\"score\":1.1352307,\"show\":{\"id\":4987,\"url\":\"http://www.tvmaze.com/shows/4987/house-hunters\",\"name\":\"House
-        Hunters\",\"type\":\"Reality\",\"language\":\"English\",\"genres\":[],\"status\":\"Running\",\"runtime\":30,\"premiered\":\"1999-09-30\",\"schedule\":{\"time\":\"22:00\",\"days\":[\"Monday\",\"Tuesday\",\"Wednesday\",\"Thursday\",\"Friday\"]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":192,\"name\":\"HGTV\",\"country\":{\"name\":\"United
-        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":3910,\"thetvdb\":73182},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/21/54158.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/21/54158.jpg\"},\"summary\":\"<p><strong><em>\\\"</em></strong><i><strong><em>House
-        Hunters\\\"</em></strong></i> takes viewers behind the scenes as individuals,
-        \\ncouples and families learn what to look for and decide whether or not a
-        \\nhome is meant for them. Focusing on the emotional experience of finding
-        \\nand purchasing a new home, each episode shows the process as buyers \\nsearch
-        for a home.</p>\",\"updated\":1451340537,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/4987\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/549707\"},\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/549708\"}}}},{\"score\":1.1336421,\"show\":{\"id\":2710,\"url\":\"http://www.tvmaze.com/shows/2710/playing-house\",\"name\":\"Playing
-        House\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Comedy\",\"Family\"],\"status\":\"Running\",\"runtime\":30,\"premiered\":\"2014-04-29\",\"schedule\":{\"time\":\"22:00\",\"days\":[\"Tuesday\"]},\"rating\":{\"average\":9},\"weight\":0,\"network\":{\"id\":30,\"name\":\"USA
-        Network\",\"country\":{\"name\":\"United States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":35945,\"thetvdb\":269898},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/14/36561.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/14/36561.jpg\"},\"summary\":\"<p>In
-        <em><strong>\\\"PLAYING HOUSE\\\"</strong></em>, when pregnant Maggie discovers
-        her husband cheating, her BFF Emma gives up her career to help Maggie raise
-        the baby. Now the lifelong friends must navigate their biggest and most hilarious
-        adventure yet, in the best way they know how - together.</p>\",\"updated\":1443956185,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/2710\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/203575\"}}}},{\"score\":1.1325822,\"show\":{\"id\":6405,\"url\":\"http://www.tvmaze.com/shows/6405/the-loud-house\",\"name\":\"The
-        Loud House\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[],\"status\":\"In
-        Development\",\"runtime\":11,\"premiered\":\"2016-01-20\",\"schedule\":{\"time\":\"\",\"days\":[]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":27,\"name\":\"Nickelodeon\",\"country\":{\"name\":\"United
-        States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":301972},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/24/61289.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/24/61289.jpg\"},\"summary\":\"<p>The
-        series focuses on Lincoln Loud, an 11-year-old boy, who lives in a \\nhouse
-        with his ten sisters\u2014eldest sister Lori, unintelligent yet \\nbeautiful
-        blonde Leni, aspiring rock star Luna, jokester and comedienne \\nLuan, energetic
-        athlete Lynn, gloomy emo Lucy, personality-opposite twins\\n Lola and Lana,
-        intellectual genius Lisa and baby Lily\u2014and how he tries \\nto survive
-        as the only son in the family by finding creative solutions \\nto the ordinary
-        and chaotic problems in the household.</p><p>(Source: Wikipedia)</p>\",\"updated\":1444905148,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/6405\"},\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/377968\"}}}}]"}
-    headers:
-      access-control-allow-origin: ['*']
-      cache-control: ['public, max-age=3600']
-      connection: [close]
-      content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 29 Dec 2015 08:18:40 GMT']
-      server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
-    status: {code: 200, message: OK}
-- request:
-    body: null
-    headers:
-      Connection: [close]
       Host: [!!python/unicode api.tvmaze.com]
       User-Agent: [Python-urllib/2.7]
     method: GET
-    uri: http://api.tvmaze.com/shows/118?embed=cast
+    uri: http://api.tvmaze.com/singlesearch/shows?q=House&embed=cast
   response:
     body: {string: !!python/unicode '{"id":118,"url":"http://www.tvmaze.com/shows/118/house","name":"House","type":"Scripted","language":"English","genres":["Drama","Mystery","Medical"],"status":"Ended","runtime":60,"premiered":"2004-11-16","schedule":{"time":"21:00","days":["Monday"]},"rating":{"average":9},"weight":1,"network":{"id":4,"name":"FOX","country":{"name":"United
         States","code":"US","timezone":"America/New_York"}},"webChannel":null,"externals":{"tvrage":3908,"thetvdb":73255},"image":{"medium":"http://tvmazecdn.com/uploads/images/medium_portrait/0/1347.jpg","original":"http://tvmazecdn.com/uploads/images/original_untouched/0/1347.jpg"},"summary":"<p>Sink
@@ -130,7 +40,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 29 Dec 2015 08:18:40 GMT']
+      date: ['Tue, 29 Dec 2015 09:59:37 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
