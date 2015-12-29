@@ -186,14 +186,15 @@ class T411RestClient(object):
         """
         return self.api_token is not None
 
-    def get_json(self, path):
+    def get_json(self, path, params=None):
         """
         Common method for requesting JSON response
         :param path:
         :return:
         """
         url = self.api_template_url % path
-        request = self.web_session.get(url)
+        request = self.web_session.get(url, params=params)
+        log.debug(request.url)
         try:
             result = request.json()
         except ValueError:
@@ -239,24 +240,27 @@ class T411RestClient(object):
         url = T411API_SEARCH_PATH
         if query.get('expression') is not None:
             url += query['expression']
-        url += '?'
 
-        url_params = []
+        url_params = {}
         if query.get('category_id') is not None:
             # using cat or cid will do the same result
             # but using cid without query expression will not broke
             # results
-            url_params.append(('cid', query['category_id']))
+            url_params['cid'] = query['category_id']
         if query.get('result_per_page') is not None:
-            url_params.append(('limit', query['result_per_page']))
+            url_params['limit'] = query['result_per_page']
         if query.get('page_index') is not None:
-            url_params.append(('offset', query['page_index']))
+            url_params['offset'] = query['page_index']
         if query.get('terms') is not None:
-            url_params.extend([('term[' + str(term_type_id) + '][]', term_id)
-                               for (term_type_id, term_id) in query['terms']])
+            for (term_type_id, term_id) in query['terms']:
+                term_type_key_param = 'term[' + str(term_type_id) + '][]'
 
-        url += urllib.urlencode(url_params)
-        return self.get_json(url)
+                if url_params.get(term_type_key_param) is None:
+                    url_params[term_type_key_param] = []
+
+                url_params[term_type_key_param].append(term_id)
+
+        return self.get_json(url, params=url_params)
 
     @auth_required
     def details(self, torrent_id):

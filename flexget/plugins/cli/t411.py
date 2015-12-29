@@ -44,15 +44,12 @@ def add_credential(username, password):
         console('Credential successfully updated')
 
 
-def print_term_type(term_type):
-    console('  %s' % term_type.name)
-    for term in term_type.terms:
-        console('    %s' % term.name)
-
-
 def print_terms(category_name=None, term_type_name=None):
     proxy = T411Proxy()
     proxy.set_credential()
+    formatting_main = '%-60s %-5s %-5s'
+    formatting_sub = '     %-55s %-5s %-5s'
+    console(formatting_main % ('Name', 'PID', 'ID'))
 
     if term_type_name:
         console("Not yet implemented !")
@@ -60,9 +57,11 @@ def print_terms(category_name=None, term_type_name=None):
         with Session() as session:
             categories = proxy.find_categories(category_name=category_name, is_sub_category=True, session=session)
             for category in categories:
-                console(category.name)
+                console(formatting_main % (category.name, category.parent_id, category.id))
                 for term_type in category.term_types:
-                    print_term_type(term_type)
+                    console(formatting_main % (term_type.name, '', term_type.id))
+                    for term in term_type.terms:
+                        console(formatting_sub % (term.name, term_type.id, term.id))
 
 
 def print_categories(parent_category_name=None):
