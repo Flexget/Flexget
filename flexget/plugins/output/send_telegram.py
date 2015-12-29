@@ -22,7 +22,7 @@ _PLUGIN_NAME = 'send_telegram'
 
 _TOKEN_ATTR = 'bot_token'
 _TMPL_ATTR = 'template'
-_MARKDOWN_ATTR = 'use-markdown'
+_MARKDOWN_ATTR = 'use_markdown'
 _RCPTS_ATTR = 'recipients'
 _USERNAME_ATTR = 'username'
 _FULLNAME_ATTR = 'fullname'
@@ -74,7 +74,7 @@ class SendTelegram(object):
       send_telegram:
         bot_token: token
         template: {{title}}
-        use-markdown: no
+        use_markdown: no
         recipients:
           - username: my-user-name
           - group: my-group-name
@@ -99,7 +99,7 @@ class SendTelegram(object):
     `template`::
     Optional. The template from the example is the default.
 
-    `use-markdown`::
+    `use_markdown`::
     Optional. Whether the template uses markdown formatting. The default is `no`.
 
     `username` vs. `fullname`::
