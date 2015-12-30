@@ -663,10 +663,10 @@ class MovieQueueManageAPI(APIResource):
     def delete(self, type, id, session=None):
         """ Delete movies from movie queue """
         if type not in ['imdb', 'tmdb', 'movie_id']:
-            reply = jsonify({
+            reply = {
                 'status': 'error',
                 'message': 'invalid ID type received. Must be one of (imdb/tmdb/movie_id)'
-            })
+            }
             return reply, 400
         kwargs = {'session': session}
         if type == 'imdb':
