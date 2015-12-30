@@ -191,9 +191,9 @@ class PluginTransmissionInput(TransmissionBase):
         for torrent in self.client.get_torrents():
             downloaded, bigfella = self.torrent_info(torrent, config)
             seed_ratio_ok, idle_limit_ok = self.check_seed_limits(torrent, session)
-            if not config['onlycomplete'] or
-               (downloaded and ((torrent.status == 'stopped' and seed_ratio_ok is None and idle_limit_ok is None) or
-                                (seed_ratio_ok is True or idle_limit_ok is True))):
+            if not config['onlycomplete'] or (downloaded and
+                ((torrent.status == 'stopped' and seed_ratio_ok is None and idle_limit_ok is None) or
+                 (seed_ratio_ok is True or idle_limit_ok is True))):
                 entry = Entry(title=torrent.name,
                               url='file://%s' % torrent.torrentFile,
                               torrent_info_hash=torrent.hashString,
