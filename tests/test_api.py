@@ -1,14 +1,16 @@
+import datetime
 import json
 import os
-from mock import patch
 
-from tests import FlexGetBase, MockManager
+from mock import patch, Mock
+
 from flexget import __version__
-from flexget.manager import Manager
 from flexget.api import app, __version__ as __api_version__
-
-from flexget.webserver import User
+from flexget.manager import Manager
+from flexget.plugins.filter import movie_queue
 from flexget.utils.database import with_session
+from flexget.webserver import User
+from tests import FlexGetBase, MockManager
 
 
 @with_session
@@ -30,7 +32,6 @@ def append_header(key, value, kwargs):
 
 
 class APITest(FlexGetBase):
-
     def __init__(self):
         self.client = app.test_client()
         FlexGetBase.__init__(self)
@@ -40,6 +41,12 @@ class APITest(FlexGetBase):
         if kwargs.get('auth', True):
             append_header('Authorization', 'Token %s' % api_key(), kwargs)
         return self.client.post(*args, **kwargs)
+
+    def json_put(self, *args, **kwargs):
+        append_header('Content-Type', 'application/json', kwargs)
+        if kwargs.get('auth', True):
+            append_header('Authorization', 'Token %s' % api_key(), kwargs)
+        return self.client.put(*args, **kwargs)
 
     def get(self, *args, **kwargs):
         if kwargs.get('auth', True):
@@ -55,7 +62,6 @@ class APITest(FlexGetBase):
 
 
 class TestServerAPI(APITest):
-
     __yaml__ = """
         tasks:
           test:
@@ -100,7 +106,6 @@ class TestServerAPI(APITest):
 
 
 class TestTaskAPI(APITest):
-
     __yaml__ = """
         tasks:
           test:
@@ -232,3 +237,92 @@ class TestTaskAPI(APITest):
 
 
 # TODO: Finish tests
+
+
+class TestMovieQueueAPI(APITest):
+    mock_return_movie = {u'added': datetime.datetime(2015, 12, 30, 12, 32, 10, 688000),
+                         u'tmdb_id': None, u'imdb_id': u'tt1234567', u'downloaded': None,
+                         u'quality': u'', u'id': 181, u'entry_title': None,
+                         u'title': u'The Top 14 Perform', u'entry_original_url': None,
+                         u'entry_url': None, u'quality_req': u''}
+
+    @patch.object(movie_queue, 'queue_get')
+    def test_queue_get(self, mocked_queue_get):
+        rsp = self.get('/movie_queue/?max=100&downloaded_only=false&order=desc&page=1&sort_by=added')
+        assert rsp.status_code == 200
+        assert mocked_queue_get.called
+
+    @patch.object(movie_queue, 'queue_add')
+    def test_queue_add(self, mocked_queue_add):
+        imdb_movie = {
+            "imdb_id": "tt1234567"
+        }
+        tmdb_movie = {
+            "tmdb_id": 1234567
+        }
+        title_movie = {
+            "title": "movie"
+        }
+
+        mocked_queue_add.return_value = self.mock_return_movie
+
+        rsp = self.json_post('/movie_queue/', data=json.dumps(imdb_movie))
+        assert rsp.status_code == 201, 'response code should be 201, is actually %s' % rsp.status_code
+        assert mocked_queue_add.called
+
+        rsp = self.json_post('/movie_queue/', data=json.dumps(tmdb_movie))
+        assert rsp.status_code == 201, 'response code should be 201, is actually %s' % rsp.status_code
+        assert mocked_queue_add.called
+
+        rsp = self.json_post('/movie_queue/', data=json.dumps(title_movie))
+        assert rsp.status_code == 201, 'response code should be 201, is actually %s' % rsp.status_code
+        assert mocked_queue_add.called
+
+    @patch.object(movie_queue, 'queue_get')
+    @patch.object(movie_queue, 'queue_del')
+    def test_queue_del(self, mocked_queue_del, mocked_queue_get):
+        movie = Mock()
+        movie.id = 'id'
+        mocked_queue_get.return_value = [movie]
+        rsp = self.delete('/movie_queue/')
+
+        assert rsp.status_code == 200
+        assert json.loads(rsp.data) == {
+            "status": "success",
+            "message": "successfully deleted all pending movies from queue"
+        }
+        assert mocked_queue_get.called
+        assert mocked_queue_del.called
+
+    @patch.object(movie_queue, 'queue_forget')
+    @patch.object(movie_queue, 'queue_edit')
+    def test_queue_movie_put(self, mocked_queue_edit, mocked_queue_forget):
+        payload = {
+            "reset_downloaded": True,
+            "quality": "720p"
+        }
+        valid_response = {u'status': u'success',
+                          u'movie': {u'added': u'Wed, 30 Dec 2015 12:32:10 GMT', u'entry_title': None, u'tmdb_id': None,
+                                     u'title': u'The Top 14 Perform', u'entry_original_url': None, u'entry_url': None,
+                                     u'downloaded': None, u'quality_req': u'', u'imdb_id': u'tt1234567',
+                                     u'quality': u'',
+                                     u'id': 181},
+                          u'message': u'Successfully updated movie details'}
+
+        mocked_queue_edit.return_value = self.mock_return_movie
+        mocked_queue_forget.return_value = self.mock_return_movie
+
+        rsp = self.json_put('/movie_queue/imdb/tt1234567/', data=json.dumps(payload))
+
+        assert json.loads(rsp.data) == valid_response, 'response data is %s' % json.loads(rsp.data)
+        assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
+
+        assert mocked_queue_edit.called
+        assert mocked_queue_forget.called
+
+    @patch.object(movie_queue, 'queue_del')
+    def test_queue_movie_put(self, mocked_queue_del):
+        rsp = self.delete('/movie_queue/imdb/tt1234567/')
+
+        assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
+        assert mocked_queue_del.called
