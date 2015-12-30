@@ -661,9 +661,8 @@ class MovieQueueAPI(APIResource):
 @movie_queue_api.route('/<type>/<id>/')
 @api.doc(params={'id': 'ID of Queued Movie', 'type': 'Type of ID to be used (imdb/tmdb/movie_id)'})
 class MovieQueueManageAPI(APIResource):
-    @api.response(200, 'Movie successfully deleted', movie_del_results_schema)
-    def delete(self, type, id, session=None):
-        """ Delete movies from movie queue """
+
+    def validate_type(self, type, id, session):
         if type not in ['imdb', 'tmdb', 'movie_id']:
             reply = {
                 'status': 'error',
@@ -677,6 +676,13 @@ class MovieQueueManageAPI(APIResource):
             kwargs['tmdb_id'] = id
         elif type == 'movie_id':
             kwargs['movie_id'] = id
+        return kwargs
+
+
+    @api.response(200, 'Movie successfully deleted', movie_del_results_schema)
+    def delete(self, type, id, session=None):
+        """ Delete movies from movie queue """
+        kwargs = self.validate_type(type, id, session)
         try:
             queue_del(**kwargs)
         except QueueError as e:
@@ -693,23 +699,9 @@ class MovieQueueManageAPI(APIResource):
     @api.validate(movie_edit_input_schema)
     def put(self, type, id, session=None):
         """ Updates movie quality or downloaded state in movie queue """
-        if type not in ['imdb', 'tmdb', 'movie_id']:
-            reply = {
-                'status': 'error',
-                'message': 'invalid ID type received. Must be one of (imdb/tmdb/movie_id)'
-            }
-            return reply, 400
-
-        data = request.json
-        kwargs = {'session': session}
-        if type == 'imdb':
-            kwargs['imdb_id'] = id
-        elif type == 'tmdb':
-            kwargs['tmdb_id'] = id
-        elif type == 'movie_id':
-            kwargs['movie_id'] = id
+        kwargs = self.validate_type(type, id, session)
         movie = None
-
+        data = request.json
         if data.get('reset_downloaded'):
             try:
                 movie = queue_forget(**kwargs)
