@@ -321,7 +321,7 @@ class TestMovieQueueAPI(APITest):
         assert mocked_queue_forget.called
 
     @patch.object(movie_queue, 'queue_del')
-    def test_queue_movie_put(self, mocked_queue_del):
+    def test_queue_movie_del(self, mocked_queue_del):
         rsp = self.delete('/movie_queue/imdb/tt1234567/')
 
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
