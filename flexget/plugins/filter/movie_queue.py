@@ -646,12 +646,14 @@ class MovieQueueAPI(APIResource):
             }
             return reply, 404
 
-        return jsonify(
+        reply = jsonify(
             {
                 'message': 'Successfully added movie to movie queue',
                 'movie': movie
             }
         )
+        reply.status_code = 201
+        return reply
 
 
 @api.response(404, 'Movie not found')
