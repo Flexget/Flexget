@@ -615,6 +615,19 @@ class MovieQueueAPI(APIResource):
             'total_number_of_pages': pages
         })
 
+    @api.response(200, 'Movie queue deleted successfully')
+    def delete(self, session=None):
+        """ Deletes all pending movies from queue """
+        movies = queue_get(downloaded=False)
+
+        for movie in movies:
+            queue_del(movie_id=movie.id)
+
+        return {
+            'status': 'success',
+            'message': 'successfully deleted all pending movies from queue'
+        }
+
     @api.response(400, 'Page not found')
     @api.response(201, 'Movie successfully added', movie_add_results_schema)
     @api.validate(movie_add_input_schema)
