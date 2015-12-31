@@ -44,7 +44,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 29 Dec 2015 09:59:40 GMT']
+      date: ['Tue, 29 Dec 2015 09:59:29 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}
@@ -69,7 +69,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 29 Dec 2015 09:59:40 GMT']
+      date: ['Tue, 29 Dec 2015 09:59:30 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.11]
     status: {code: 200, message: OK}

@@ -57,7 +57,7 @@ install_requires = [
     'flask-login>=0.3.2',
     'pyparsing>=2.0.3',
     'pyScss>=1.3.4',
-    'pytvmaze>=1.4.0'
+    'pytvmaze>=1.4.3'
 ]
 
 if sys.version_info < (2, 7):
