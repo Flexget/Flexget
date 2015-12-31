@@ -44,11 +44,11 @@ class OutputQBitTorrent(object):
                 raise plugin.PluginError('Authentication failed.')
         self.connected = True
 
-    def add_torrent(self, url, **kwargs):
+    def add_torrent(self, url, data):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
         self.session.post(self.url + '/command/download',
-                          data={'urls': [url]} + kwargs)
+                          data={'urls': [url]} + data)
 
     def prepare_config(self, config):
         config.setdefault('host', 'localhost')
