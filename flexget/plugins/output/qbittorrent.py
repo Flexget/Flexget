@@ -2,7 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import logging
 
-from qbittorrent import Client
+from requests import Session
 
 from flexget import plugin
 from flexget.event import event
@@ -14,8 +14,8 @@ class OutputQBitTorrent(object):
     Example:
 
       qbittorrent:
-        username: <USERNAME>
-        password: <PASSWORD>
+        username: <USERNAME> (default: (none))
+        password: <PASSWORD> (default: (none))
         host: <HOSTNAME> (default: localhost)
         port: <PORT> (default: 8080)
         movedone: <OUTPUT_DIR> (default: (none))
@@ -30,16 +30,25 @@ class OutputQBitTorrent(object):
             'port': {'type': 'integer'},
             'movedone': {'type': 'string'},
             'label': {'type': 'string'}
-        },
-        'required': ['username', 'password']
+        }
     }
 
     def connect(self, config):
-        qb = Client('http://{}:{}'.format(config['host'], config['port']))
-        response = qb.login(config['username'], config['password'])
-        if response == 'Fails.':
-            raise plugin.PluginError('Authentication failed.')
-        return qb
+        self.session = Session()
+        self.url = 'http://{}:{}'.format(config['host'], config['port'])
+        if config.get('username') and config.get('password'):
+            response = self.session.post(self.url + '/login',
+                                         data={'username': config['username'],
+                                               'password': config['password']})
+            if response == 'Fails.':
+                raise plugin.PluginError('Authentication failed.')
+        self.connected = True
+
+    def add_torrent(self, url, **kwargs):
+        if not self.connected:
+            raise plugin.PluginError('Not connected.')
+        self.session.post(self.url + '/command/download',
+                          data={'urls': [url]} + kwargs)
 
     def prepare_config(self, config):
         config.setdefault('host', 'localhost')
@@ -52,13 +61,13 @@ class OutputQBitTorrent(object):
         """Add torrents to qbittorrent at exit."""
         if task.accepted:
             config = self.prepare_config(config)
-            qb = self.connect(config)
+            self.connect(config)
         for entry in task.accepted:
             data = {}
             data['save_path'] = entry.get('movedone', config.get('movedone'))
             data['label'] = entry.get('label', config['label']).lower()
             url = entry.get('url')
-            qb.download_from_link(url, **data)
+            self.add_torrent(url, data)
 
 @event('plugin.register')
 def register_plugin():
