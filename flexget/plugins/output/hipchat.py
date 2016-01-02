@@ -23,7 +23,9 @@ class OutputHipchat(object):
         [url: <HIPCHAT_URL> (default: https://api.hipchat.com)]
     Configuration parameters are also supported from entries (eg. through set).
     """
-    default_message = ('{{ series_name }} {{ series_id }} {{ quality }}')
+    default_message = ('{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} {{series_id}} '
+                        '{{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} '
+                        '{{imdb_year}}{% else %}{{title}}{% endif %}')
     schema = {
         'type': 'object',
         'properties': {
