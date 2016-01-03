@@ -35,7 +35,7 @@ class OutputPushover(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-    defaults = {'message': "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}}"
+    defaults = {'message': "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} "
                            "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}}"
                            "{{imdb_year}}{% else %}{{title}}{% endif %}",
                 'url': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}',
