@@ -339,7 +339,7 @@ class SendTelegram(object):
 
         self.log.debug('loading cached chat ids')
         chat_ids = self._get_cached_chat_ids(session, usernames, fullnames, groups)
-        self.log.debug('found {0} cached chat_ids: {1}'.format(len(chat_ids), [str(x) for x in chat_ids]))
+        self.log.debug('found {0} cached chat_ids: {1}'.format(len(chat_ids), ['{0}'.format(x) for x in chat_ids]))
 
         if not (usernames or fullnames or groups):
             self.log.debug('all chat ids found in cache')
@@ -347,7 +347,7 @@ class SendTelegram(object):
 
         self.log.debug('loading new chat ids')
         new_chat_ids = list(self._get_new_chat_ids(usernames, fullnames, groups))
-        self.log.debug('found {0} new chat_ids: {1}'.format(len(new_chat_ids), [str(x) for x in new_chat_ids]))
+        self.log.debug('found {0} new chat_ids: {1}'.format(len(new_chat_ids), ['{0}'.format(x) for x in new_chat_ids]))
 
         chat_ids.extend(new_chat_ids)
         return chat_ids, bool(new_chat_ids)
