@@ -127,12 +127,13 @@ class UrlRewriteIPTorrents(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
             query = urllib.quote_plus(query.encode('utf8'))
+            query = re.sub('%27', '', query)
 
             url = "{base_url}/t?{filter}&q={query}&qf=".format(base_url=BASE_URL, filter=filter_url, query=query)
             log.debug('searching with url: %s' % url)
             req = requests.get(url, cookies={'uid': str(config['uid']), 'pass': config['password']})
 
-            if '/u/' + str(config.get('uid')) not in req.content:
+            if '/u/' + str(config.get('uid')) not in unicode(req.content, errors="ignore"):
                 raise plugin.PluginError("Invalid cookies (user not logged in)...")
 
             soup = get_soup(req.content, parser="html.parser")
