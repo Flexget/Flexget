@@ -523,32 +523,6 @@ movie_add_input_schema = {
 movie_add_results_schema = api.schema('movie_add_results', movie_add_results_schema)
 movie_add_input_schema = api.schema('movie_add_input_schema', movie_add_input_schema)
 
-movie_del_results_schema = {
-    'type': 'object',
-    'properties': {
-        'status': {'type': 'string'},
-        'message': {'type': 'string'}
-    }
-}
-
-movie_del_input_schema = {
-    'type': 'object',
-    'properties': {
-        'title': {'type': 'string'},
-        'imdb_id': {'type': 'string', 'pattern': r'tt\d{7}'},
-        'tmdb_id': {'type': 'integer'},
-        'movie_id': {'type': 'integer'}
-    },
-    'anyOf': [
-        {'required': ['title']},
-        {'required': ['imdb_id']},
-        {'required': ['tmdb_id']},
-        {'required': ['movie_id']}
-    ]
-}
-
-movie_del_results_schema = api.schema('movie_del_results_schema', movie_del_results_schema)
-movie_del_input_schema = api.schema('movie_del_input_schema', movie_del_input_schema)
 
 movie_edit_results_schema = {
     'type': 'object',
@@ -679,7 +653,7 @@ class MovieQueueManageAPI(APIResource):
         return kwargs
 
 
-    @api.response(200, 'Movie successfully deleted', movie_del_results_schema)
+    @api.response(200, 'Movie successfully deleted')
     def delete(self, type, id, session=None):
         """ Delete movies from movie queue """
         kwargs = self.validate_type(type, id, session)
