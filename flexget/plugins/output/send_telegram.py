@@ -22,7 +22,7 @@ _PLUGIN_NAME = 'send_telegram'
 
 _TOKEN_ATTR = 'bot_token'
 _TMPL_ATTR = 'template'
-_MARKDOWN_ATTR = 'use-markdown'
+_MARKDOWN_ATTR = 'use_markdown'
 _RCPTS_ATTR = 'recipients'
 _USERNAME_ATTR = 'username'
 _FULLNAME_ATTR = 'fullname'
@@ -74,7 +74,7 @@ class SendTelegram(object):
       send_telegram:
         bot_token: token
         template: {{title}}
-        use-markdown: no
+        use_markdown: no
         recipients:
           - username: my-user-name
           - group: my-group-name
@@ -99,7 +99,7 @@ class SendTelegram(object):
     `template`::
     Optional. The template from the example is the default.
 
-    `use-markdown`::
+    `use_markdown`::
     Optional. Whether the template uses markdown formatting. The default is `no`.
 
     `username` vs. `fullname`::
@@ -339,7 +339,7 @@ class SendTelegram(object):
 
         self.log.debug('loading cached chat ids')
         chat_ids = self._get_cached_chat_ids(session, usernames, fullnames, groups)
-        self.log.debug('found {0} cached chat_ids: {1}'.format(len(chat_ids), [str(x) for x in chat_ids]))
+        self.log.debug('found {0} cached chat_ids: {1}'.format(len(chat_ids), ['{0}'.format(x) for x in chat_ids]))
 
         if not (usernames or fullnames or groups):
             self.log.debug('all chat ids found in cache')
@@ -347,7 +347,7 @@ class SendTelegram(object):
 
         self.log.debug('loading new chat ids')
         new_chat_ids = list(self._get_new_chat_ids(usernames, fullnames, groups))
-        self.log.debug('found {0} new chat_ids: {1}'.format(len(new_chat_ids), [str(x) for x in new_chat_ids]))
+        self.log.debug('found {0} new chat_ids: {1}'.format(len(new_chat_ids), ['{0}'.format(x) for x in new_chat_ids]))
 
         chat_ids.extend(new_chat_ids)
         return chat_ids, bool(new_chat_ids)
