@@ -469,8 +469,6 @@ movie_queue_schema = {
 
 def movie_queue_sort_value_enum(value):
     enum = ['added', 'downloaded', 'id', 'title']
-    if not isinstance(value, basestring):
-        raise ValueError('Value expected to be string')
     if value not in enum:
         raise ValueError('Value expected to be in' + ' ,'.join(enum))
     return value
@@ -478,8 +476,6 @@ def movie_queue_sort_value_enum(value):
 
 def movie_queue_sort_order_enum(value):
     enum = ['desc', 'asc']
-    if not isinstance(value, basestring):
-        raise ValueError('Value expected to be string')
     if value not in enum:
         raise ValueError('Value expected to be in' + ' ,'.join(enum))
     if value == 'desc':
