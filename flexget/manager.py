@@ -881,5 +881,6 @@ class Manager(object):
                 traceback.print_exc(file=outfile)
             log.critical('An unexpected crash has occurred. Writing crash report to %s. '
                          'Please verify you are running the latest version of flexget by using "flexget -V" '
-                         'from CLI or by using version_checker plugin at ...', filename)
+                         'from CLI or by using version_checker plugin'
+                         ' at http://flexget.com/wiki/Plugins/version_checker', filename)
         log.debug('Traceback:', exc_info=True)
