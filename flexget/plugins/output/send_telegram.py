@@ -1,12 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import sys
 from distutils.version import LooseVersion
 
 from sqlalchemy import Column, Integer, String
 
-from flexget import db_schema, plugin
+from flexget import db_schema, plugin, options
 from flexget.event import event
+from flexget.utils.database import with_session
 from flexget.utils.template import RenderError
+from flexget.utils.tools import console
 
 try:
     import telegram
@@ -19,7 +22,7 @@ _PLUGIN_NAME = 'send_telegram'
 
 _TOKEN_ATTR = 'bot_token'
 _TMPL_ATTR = 'template'
-_MARKDOWN_ATTR = 'use-markdown'
+_MARKDOWN_ATTR = 'use_markdown'
 _RCPTS_ATTR = 'recipients'
 _USERNAME_ATTR = 'username'
 _FULLNAME_ATTR = 'fullname'
@@ -39,6 +42,18 @@ class ChatIdEntry(ChatIdsBase):
     surname = Column(String, index=True, nullable=True)
     group = Column(String, index=True, nullable=True)
 
+    def __str__(self):
+        x = ['id={0}'.format(self.id)]
+        if self.username:
+            x.append('username={0}'.format(self.username))
+        if self.firstname:
+            x.append('firstname={0}'.format(self.firstname))
+        if self.surname:
+            x.append('surname={0}'.format(self.surname))
+        if self.group:
+            x.append('group={0}'.format(self.group))
+        return ' '.join(x)
+
 
 class SendTelegram(object):
     """Send a message to one or more Telegram users or groups upon accepting a download.
@@ -46,7 +61,7 @@ class SendTelegram(object):
 
     Preparations::
 
-    * Install 'python-telegram-bot' python pkg
+    * Install 'python-telegram-bot' python pkg (i.e. `pip install python-telegram-bot`)
     * Create a bot & obtain a token for it (see https://core.telegram.org/bots#botfather).
     * For direct messages (not to a group), start a conversation with the bot and click "START" in the Telegram app.
     * For group messages, add the bot to the desired group and send a start message to the bot: "/start" (mind the
@@ -59,7 +74,7 @@ class SendTelegram(object):
       send_telegram:
         bot_token: token
         template: {{title}}
-        use-markdown: no
+        use_markdown: no
         recipients:
           - username: my-user-name
           - group: my-group-name
@@ -67,13 +82,24 @@ class SendTelegram(object):
               first: my-first-name
               sur: my-sur-name
 
+
+    Bootstrapping and testing the bot::
+
+    * Execute: `flexget send_telegram bootstrap`.
+      Look at the console output and make sure that the operation was successful.
+    * Execute: `flexget send_telegram test-msg`.
+      This will send a test message for every recipient you've configured.
+
+
+    Configuration notes::
+
     You may use any combination of recipients types (`username`, `group` or `fullname`) - 0 or more of each (but you
     need at least one total...).
 
     `template`::
     Optional. The template from the example is the default.
 
-    `use-markdown`::
+    `use_markdown`::
     Optional. Whether the template uses markdown formatting. The default is `no`.
 
     `username` vs. `fullname`::
@@ -84,6 +110,13 @@ class SendTelegram(object):
     """
     log = None  # initialized during plugin.register
     """:type: flexget.logger.FlexGetLogger"""
+    _token = None
+    _tmpl = None
+    _use_markdown = False
+    _usernames = None
+    _fullnames = None
+    _groups = None
+    _bot = None
 
     schema = {
         'type': 'object',
@@ -136,33 +169,28 @@ class SendTelegram(object):
         'additionalProperties': False,
     }
 
-    @staticmethod
-    def _parse_config(config):
+    def _parse_config(self, config):
         """
         :type config: dict
-        :returns: token, tmpl, use_markdown, usernames, fullnames, groups
-        :rtype: str, str, bool, tuple[list[str], list[tuple[str, str]], list[str]]
 
         """
-        token = config[_TOKEN_ATTR]
-        tmpl = config[_TMPL_ATTR]
-        use_markdown = config[_MARKDOWN_ATTR]
-        usernames = []
-        fullnames = []
-        groups = []
+        self._token = config[_TOKEN_ATTR]
+        self._tmpl = config[_TMPL_ATTR]
+        self._use_markdown = config[_MARKDOWN_ATTR]
+        self._usernames = []
+        self._fullnames = []
+        self._groups = []
 
         for i in config[_RCPTS_ATTR]:
             if _USERNAME_ATTR in i:
-                usernames.append(i[_USERNAME_ATTR])
+                self._usernames.append(i[_USERNAME_ATTR])
             elif _FULLNAME_ATTR in i:
                 fullname = i[_FULLNAME_ATTR]
                 firstname = fullname[_FIRSTNAME_ATTR]
                 surname = fullname[_SURNAME_ATTR]
-                fullnames.append((firstname, surname))
+                self._fullnames.append((firstname, surname))
             elif _GROUP_ATTR in i:
-                groups.append(i[_GROUP_ATTR])
-
-        return token, tmpl, use_markdown, usernames, fullnames, groups
+                self._groups.append(i[_GROUP_ATTR])
 
     def on_task_output(self, task, config):
         """makes this plugin count as output (stops warnings about missing outputs)"""
@@ -170,26 +198,71 @@ class SendTelegram(object):
 
     def on_task_exit(self, task, config):
         """Send telegram message(s) at exit"""
-        self._enforce_telegram_plugin_ver()
-
-        token, tmpl, use_markdown, usernames, fullnames, groups = self._parse_config(config)
-        self.log.debug('token={0} use_markdown={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
-            token, usernames, fullnames, groups, tmpl, use_markdown))
-
-        bot = telegram.Bot(token)
-        try:
-            bot.getMe()
-        except UnicodeDecodeError as e:
-            self.log.trace('bot.getMe() raised: {!r}'.format(e))
-            raise plugin.PluginWarning('invalid bot token')
         session = task.session
-
-        chat_ids = self._get_chat_ids_n_update_db(bot, session, usernames, fullnames, groups)
+        chat_ids = self._real_init(session, config)
 
         if not chat_ids:
             return
 
-        self._send_msgs(task, bot, chat_ids, tmpl, use_markdown)
+        self._send_msgs(task, chat_ids)
+
+    def _real_init(self, session, config, ):
+        self._enforce_telegram_plugin_ver()
+        self._parse_config(config)
+        self.log.debug('token={0} use_markdown={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
+            self._token, self._usernames, self._fullnames, self._groups, self._tmpl, self._use_markdown))
+        self._init_bot()
+        chat_ids = self._get_chat_ids_n_update_db(session)
+        return chat_ids
+
+    def bootstrap(self, session, config):
+        """bootstrap the plugin configuration and update db with cached chat_ids"""
+        console('{0} - bootstrapping...'.format(_PLUGIN_NAME))
+        chat_ids = self._real_init(session, config)
+
+        found_usernames = [x.username for x in chat_ids if x.username]
+        found_fullnames = [(x.firstname, x.surname) for x in chat_ids if x.firstname]
+        found_grps = [x.group for x in chat_ids if x.group]
+
+        missing_usernames = [x for x in self._usernames if x not in found_usernames]
+        missing_fullnames = [x for x in self._fullnames if x not in found_fullnames]
+        missing_grps = [x for x in self._groups if x not in found_grps]
+
+        if missing_usernames or missing_fullnames or missing_grps:
+            for i in missing_usernames:
+                console('ERR: could not find chat_id for username: {0}'.format(i))
+            for i in missing_fullnames:
+                console('ERR: could not find chat_id for fullname: {0} {1}'.format(*i))
+            for i in missing_grps:
+                console('ERR: could not find chat_id for group: {0}'.format(i))
+            res = False
+        else:
+            console('{0} - bootstrap was successful'.format(_PLUGIN_NAME))
+            res = True
+
+        return res
+
+    def test_msg(self, session, config):
+        """send test message to configured recipients"""
+        console('{0} loading chat_ids...'.format(_PLUGIN_NAME))
+        chat_ids = self._real_init(session, config)
+
+        console('{0} sending test message(s)...'.format(_PLUGIN_NAME))
+        for chat_id in (x.id for x in chat_ids):
+            self._bot.sendMessage(chat_id=chat_id, text='test message from flexget')
+
+        return True
+
+    def _init_bot(self):
+        self._bot = telegram.Bot(self._token)
+        self._check_token()
+
+    def _check_token(self):
+        try:
+            self._bot.getMe()
+        except UnicodeDecodeError as e:
+            self.log.trace('bot.getMe() raised: {!r}'.format(e))
+            raise plugin.PluginWarning('invalid bot token')
 
     @staticmethod
     def _enforce_telegram_plugin_ver():
@@ -198,16 +271,16 @@ class SendTelegram(object):
         elif not hasattr(telegram, str('__version__')):
             raise plugin.PluginWarning('invalid or old python-telegram-bot pkg')
         elif LooseVersion(telegram.__version__) < str(_MIN_TELEGRAM_VER):
-            raise plugin.PluginWarning('old python-telegram-bot ({})'.format(telegram.__version__))
+            raise plugin.PluginWarning('old python-telegram-bot ({0})'.format(telegram.__version__))
 
-    def _send_msgs(self, task, bot, chat_ids, tmpl, use_markdown):
+    def _send_msgs(self, task, chat_ids):
         kwargs = dict()
-        if use_markdown:
+        if self._use_markdown:
             kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
         for entry in task.accepted:
-            msg = self._render_msg(entry, tmpl)
+            msg = self._render_msg(entry, self._tmpl)
             for chat_id in (x.id for x in chat_ids):
-                bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
+                self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
 
     def _render_msg(self, entry, tmpl):
         """
@@ -224,17 +297,16 @@ class SendTelegram(object):
             msg = title
         return msg
 
-    def _get_chat_ids_n_update_db(self, bot, session, usernames, fullnames, groups):
+    def _get_chat_ids_n_update_db(self, session):
         """
-        :type bot: telgram.Bot
         :type session: sqlalchemy.orm.Session
-        :type usernames: list[str]
-        :type fullnames: list[tuple[str, str]]
-        :type groups: list[str]
         :rtype: list[ChatIdEntry]
 
         """
-        chat_ids, has_new_chat_ids = self._get_chat_ids(session, bot, usernames, fullnames, groups)
+        usernames = self._usernames[:]
+        fullnames = self._fullnames[:]
+        groups = self._groups[:]
+        chat_ids, has_new_chat_ids = self._get_chat_ids(session, usernames, fullnames, groups)
         self.log.debug('chat_ids={0}'.format(chat_ids))
 
         if not chat_ids:
@@ -251,12 +323,11 @@ class SendTelegram(object):
 
         return chat_ids
 
-    def _get_chat_ids(self, session, bot, usernames, fullnames, groups):
+    def _get_chat_ids(self, session, usernames, fullnames, groups):
         """get chat ids for `usernames`, `fullnames` & `groups`.
         entries with a matching chat ids will be removed from the input lists.
 
         :type session: sqlalchemy.orm.Session
-        :type bot: telegram.Bot
         :type usernames: list[str]
         :type fullnames: list[tuple[str, str]]
         :type groups: list[str]
@@ -268,14 +339,15 @@ class SendTelegram(object):
 
         self.log.debug('loading cached chat ids')
         chat_ids = self._get_cached_chat_ids(session, usernames, fullnames, groups)
+        self.log.debug('found {0} cached chat_ids: {1}'.format(len(chat_ids), ['{0}'.format(x) for x in chat_ids]))
 
         if not (usernames or fullnames or groups):
             self.log.debug('all chat ids found in cache')
             return chat_ids, False
 
         self.log.debug('loading new chat ids')
-        new_chat_ids = list(self._get_new_chat_ids(bot, usernames, fullnames, groups))
-        self.log.debug('found {0} new chat ids'.format(len(new_chat_ids)))
+        new_chat_ids = list(self._get_new_chat_ids(usernames, fullnames, groups))
+        self.log.debug('found {0} new chat_ids: {1}'.format(len(new_chat_ids), ['{0}'.format(x) for x in new_chat_ids]))
 
         chat_ids.extend(new_chat_ids)
         return chat_ids, bool(new_chat_ids)
@@ -322,17 +394,16 @@ class SendTelegram(object):
 
         return chat_ids
 
-    def _get_new_chat_ids(self, bot, usernames, fullnames, groups):
+    def _get_new_chat_ids(self, usernames, fullnames, groups):
         """get chat ids by querying the telegram `bot`
 
-        :type bot: telegram.Bot
         :type usernames: list[str]
         :type fullnames: list[tuple[str, str]]
         :type groups: list[str]
         :rtype: __generator[ChatIdEntry]
 
         """
-        upd_usernames, upd_fullnames, upd_groups = self._get_bot_updates(bot)
+        upd_usernames, upd_fullnames, upd_groups = self._get_bot_updates()
 
         len_ = len(usernames)
         for i, username in enumerate(reversed(usernames)):
@@ -360,13 +431,22 @@ class SendTelegram(object):
                 yield entry
                 groups.pop(len_ - i - 1)
 
-    def _get_bot_updates(self, bot):
+    def _get_bot_updates(self):
         """get updated chats info from telegram
         :type bot: telegram.Bot
         :rtype: (dict[str, telegram.User], dict[(str, str), telegram.User], dict[str, telegram.GroupChat])
 
         """
-        updates = bot.getUpdates()
+        # highly unlikely, but if there are more than 100 msgs waiting for the bot, we should not miss one
+        updates = []
+        last_upd = 0
+        while 1:
+            ups = self._bot.getUpdates(last_upd, limit=100)
+            updates.extend(ups)
+            if len(ups) < 100:
+                break
+            last_upd = ups[-1].update_id
+
         usernames = dict()
         fullnames = dict()
         groups = dict()
@@ -389,9 +469,59 @@ class SendTelegram(object):
 
         """
         self.log.info('saving updated chat_ids to db')
-        session.add_all(chat_ids)
+
+        # avoid duplicate chat_ids. (this is possible if configuration specified both username & fullname
+        chat_ids_d = dict((x.id, x) for x in chat_ids)
+
+        session.add_all(chat_ids_d.itervalues())
+        session.commit()
+
+
+def _guess_task_name(manager):
+    for task in manager.tasks:
+        if _get_config(manager, task) is not None:
+            break
+    else:
+        task = None
+    return task
+
+
+def _get_config(manager, task):
+    return manager.config['tasks'][task].get(_PLUGIN_NAME)
+
+
+@with_session()
+def do_cli(manager, args, session=None):
+    """
+    :type manager: flexget.Manager
+
+    """
+    task_name = _guess_task_name(manager)
+    config = _get_config(manager, task_name)
+    plugin_info = plugin.get_plugin_by_name(_PLUGIN_NAME)
+    send_telegram = plugin_info.instance
+    """:type: SendTelegram"""
+
+    if args.action == 'bootstrap':
+        res = send_telegram.bootstrap(session, config)
+    elif args.action == 'test-msg':
+        res = send_telegram.test_msg(session, config)
+    else:
+        raise RuntimeError('unknown action')
+
+    sys.exit(int(not res))
 
 
 @event('plugin.register')
 def register_plugin():
     plugin.register(SendTelegram, _PLUGIN_NAME, api_ver=2)
+
+
+@event('options.register')
+def register_parser_arguments():
+    parser = options.register_command(_PLUGIN_NAME, do_cli, help='{0} cli'.format(_PLUGIN_NAME))
+    """:type: options.CoreArgumentParser"""
+    subp = parser.add_subparsers(dest='action')
+    bsp = subp.add_parser('bootstrap', help='bootstrap the plugin according to config')
+    bsp.add_argument('--tasks', )
+    subp.add_parser('test-msg', help='send test message to all configured recipients')

@@ -1,14 +1,15 @@
 import json
+
 import os
+
 from mock import patch
 
-from tests import FlexGetBase, MockManager
 from flexget import __version__
-from flexget.manager import Manager
 from flexget.api import app, __version__ as __api_version__
-
-from flexget.webserver import User
+from flexget.manager import Manager
 from flexget.utils.database import with_session
+from flexget.webserver import User
+from tests import FlexGetBase, MockManager
 
 
 @with_session
@@ -30,7 +31,6 @@ def append_header(key, value, kwargs):
 
 
 class APITest(FlexGetBase):
-
     def __init__(self):
         self.client = app.test_client()
         FlexGetBase.__init__(self)
@@ -40,6 +40,12 @@ class APITest(FlexGetBase):
         if kwargs.get('auth', True):
             append_header('Authorization', 'Token %s' % api_key(), kwargs)
         return self.client.post(*args, **kwargs)
+
+    def json_put(self, *args, **kwargs):
+        append_header('Content-Type', 'application/json', kwargs)
+        if kwargs.get('auth', True):
+            append_header('Authorization', 'Token %s' % api_key(), kwargs)
+        return self.client.put(*args, **kwargs)
 
     def get(self, *args, **kwargs):
         if kwargs.get('auth', True):
@@ -55,7 +61,6 @@ class APITest(FlexGetBase):
 
 
 class TestServerAPI(APITest):
-
     __yaml__ = """
         tasks:
           test:
@@ -100,7 +105,6 @@ class TestServerAPI(APITest):
 
 
 class TestTaskAPI(APITest):
-
     __yaml__ = """
         tasks:
           test:
@@ -229,6 +233,5 @@ class TestTaskAPI(APITest):
         assert mocked_save_config.called
         assert 'test' not in self.manager.user_config['tasks']
         assert 'test' not in self.manager.config['tasks']
-
 
 # TODO: Finish tests

@@ -108,6 +108,11 @@ class TestTVMazeShowLookup(FlexGetBase):
               - Californication
               - The X-Files
               - Aquarius
+          test_episode_air_date:
+            mock:
+              - {title: 'The.Flash.2014.S02E02.HDTV.x264-LOL'}
+            series:
+              - The Flash
     """
 
     @use_vcr
@@ -166,7 +171,7 @@ class TestTVMazeShowLookup(FlexGetBase):
             assert series.tvmaze_id == entry['tvmaze_series_id'], 'tvmaze id should be the same as the first entry'
             assert series.name.lower() == entry['tvmaze_series_name'].lower(), 'series name should match first entry'
 
-    @use_vcr()
+    @use_vcr
     def test_date(self):
         self.execute_task('test_date')
         entry = self.task.find_entry(title='the daily show 2012-6-6')
@@ -184,7 +189,7 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry.get('tvmaze_series_year') == 2014, 'expected tvmaze_series_year 2014, got %s' % entry.get(
             'tvmaze_series_year')
 
-    @use_vcr()
+    @use_vcr
     def test_from_filesystem(self):
         self.execute_task('test_from_filesystem')
         entry = self.task.find_entry(title='Marvels.Jessica.Jones.S01E02.PROPER.720p.WEBRiP.x264-QCF')
@@ -213,7 +218,7 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry.get('tvmaze_episode_id') == 185073, 'episode id should be 185073, is actually %s' % entry.get(
             'tvmaze_episode_id')
 
-    @use_vcr()
+    @use_vcr
     def test_series_expiration(self):
         self.execute_task('test_series_expiration')
         entry = self.task.entries[0]
@@ -244,11 +249,11 @@ class TestTVMazeShowLookup(FlexGetBase):
 
             # Verify series data has been refreshed with actual values upon 2nd call, and series expiration flag
             # is set to False
-            assert series.weight == 4, \
+            assert series.weight == 5, \
                 'weight should have been updated back to 4 from 99, instead its %s' % series.weight
             assert session.query(TVMazeSeries).first().expired == False, 'expired status should be False'
 
-    @use_vcr()
+    @use_vcr
     def test_test_show_is_number(self):
         self.execute_task('test_show_is_number')
         entry = self.task.find_entry(series_name='1992')
@@ -264,7 +269,7 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry['tvmaze_episode_id'] == 12094, 'episode id should be 12094, instead its %s' % entry[
             'tvmaze_episode_id']
 
-    @use_vcr()
+    @use_vcr
     def test_show_contain_number(self):
         self.execute_task('test_show_contain_number')
         entry = self.task.find_entry(series_name='Detroit 1-8-7')
@@ -296,7 +301,7 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry['tvmaze_episode_id'] == 184265, 'episode id should be 184265, instead its %s' % entry[
             'tvmaze_episode_id']
 
-    @use_vcr()
+    @use_vcr
     def test_episode_without_air_date_and_air_stamp(self):
         self.execute_task('test_episode_without_air_date')
 
@@ -310,7 +315,7 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry['tvmaze_episode_airstamp'] == None, \
             'Expected airdate to be None, got %s' % entry['tvmaze_episode_airstamp']
 
-    @use_vcr()
+    @use_vcr
     def test_episode_summary(self):
         expected_summary = u"The team's visitors, Jay Garrick, explains that he comes from a parallel world" \
                            u" and was a speedster there, but lost his powers transitioning over. Now he insists" \
@@ -326,7 +331,7 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry['tvmaze_episode_summary'] == expected_summary, 'Expected summary is different %s' % entry[
             'tvmaze_episode_summary']
 
-    @use_vcr()
+    @use_vcr
     def test_show_with_non_ascii_chars(self):
         self.execute_task('test_show_with_non_ascii_chars')
         entry = self.task.entries[0]
@@ -337,7 +342,7 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert entry['tvmaze_episode_id'] == 476294, 'episode id should be 476294, instead its %s' % entry[
             'tvmaze_episode_id']
 
-    @use_vcr()
+    @use_vcr
     def test_show_cast(self):
         self.execute_task('test_show_cast')
         entry = self.task.entries[0]
@@ -348,3 +353,15 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert len(entry['tvmaze_series_actors']) == 9, \
             'expected actors list for series to contain 9 members,' \
             ' instead it contains %s' % len(entry['tvmaze_series_actors'])
+
+    @use_vcr
+    def test_episode_air_date(self):
+        self.execute_task('test_episode_air_date')
+        entry = self.task.entries[0]
+        assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 211206, 'episode id should be 211206, instead its %s' % entry[
+            'tvmaze_episode_id']
+        assert isinstance(entry['tvmaze_episode_airdate'], datetime), 'expected to received datetime type'
+        airdate = datetime.strftime(entry['tvmaze_episode_airdate'], '%Y-%m-%d')
+        assert airdate == '2015-10-13', 'episode airdate should be 2015-10-13, instead its %s' % airdate
