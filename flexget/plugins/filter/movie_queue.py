@@ -347,7 +347,8 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
         return title
     except NoResultFound as e:
         raise QueueError(
-            'title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' % (title, imdb_id, tmdb_id, movie_id))
+                'title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' % (
+                title, imdb_id, tmdb_id, movie_id))
     except MultipleResultsFound:
         raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s matches multiple results in queue' %
                          (title, imdb_id, tmdb_id, movie_id))
@@ -519,7 +520,6 @@ movie_add_input_schema = {
 movie_add_results_schema = api.schema('movie_add_results', movie_add_results_schema)
 movie_add_input_schema = api.schema('movie_add_input_schema', movie_add_input_schema)
 
-
 movie_edit_results_schema = {
     'type': 'object',
     'properties': {
@@ -585,19 +585,6 @@ class MovieQueueAPI(APIResource):
             'total_number_of_pages': pages
         })
 
-    @api.response(200, 'Movie queue deleted successfully')
-    def delete(self, session=None):
-        """ Deletes all pending movies from queue """
-        movies = queue_get(downloaded=False)
-
-        for movie in movies:
-            queue_del(movie_id=movie.id)
-
-        return {
-            'status': 'success',
-            'message': 'successfully deleted all pending movies from queue'
-        }
-
     @api.response(400, 'Page not found')
     @api.response(201, 'Movie successfully added', movie_add_results_schema)
     @api.validate(movie_add_input_schema)
@@ -617,10 +604,10 @@ class MovieQueueAPI(APIResource):
             return reply, 404
 
         reply = jsonify(
-            {
-                'message': 'Successfully added movie to movie queue',
-                'movie': movie
-            }
+                {
+                    'message': 'Successfully added movie to movie queue',
+                    'movie': movie
+                }
         )
         reply.status_code = 201
         return reply
@@ -631,7 +618,6 @@ class MovieQueueAPI(APIResource):
 @movie_queue_api.route('/<type>/<id>/')
 @api.doc(params={'id': 'ID of Queued Movie', 'type': 'Type of ID to be used (imdb/tmdb/movie_id)'})
 class MovieQueueManageAPI(APIResource):
-
     def validate_type(self, type, id, session):
         if type not in ['imdb', 'tmdb', 'movie_id']:
             reply = {
@@ -648,7 +634,6 @@ class MovieQueueManageAPI(APIResource):
             kwargs['movie_id'] = id
         return kwargs
 
-
     @api.response(200, 'Movie successfully deleted')
     def delete(self, type, id, session=None):
         """ Delete movies from movie queue """
@@ -661,8 +646,8 @@ class MovieQueueManageAPI(APIResource):
             return reply, 404
 
         reply = jsonify(
-            {'status': 'success',
-             'message': 'successfully deleted {0} movie {1}'.format(type, id)})
+                {'status': 'success',
+                 'message': 'successfully deleted {0} movie {1}'.format(type, id)})
         return reply
 
     @api.response(200, 'Movie successfully updated', movie_edit_results_schema)
@@ -695,9 +680,9 @@ class MovieQueueManageAPI(APIResource):
                     'message': 'Not enough parameters to edit movie data'}, 400
 
         return jsonify(
-            {
-                'status': 'success',
-                'message': 'Successfully updated movie details',
-                'movie': movie
-            }
+                {
+                    'status': 'success',
+                    'message': 'Successfully updated movie details',
+                    'movie': movie
+                }
         )
