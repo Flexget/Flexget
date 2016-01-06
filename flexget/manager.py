@@ -14,7 +14,6 @@ import traceback
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
-import pkg_resources
 import sqlalchemy
 import yaml
 from sqlalchemy.exc import OperationalError
@@ -27,14 +26,13 @@ from flexget.utils.sqlalchemy_utils import ContextSession
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)
 
-from flexget import config_schema, db_schema, logger, plugin # noqa
-from flexget.event import fire_event # noqa
-from flexget.ipc import IPCClient, IPCServer # noqa
-from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv # noqa
-from flexget.task import Task # noqa
-from flexget.task_queue import TaskQueue # noqa
-from flexget.utils.tools import pid_exists, console # noqa
-
+from flexget import config_schema, db_schema, logger, plugin  # noqa
+from flexget.event import fire_event  # noqa
+from flexget.ipc import IPCClient, IPCServer  # noqa
+from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv  # noqa
+from flexget.task import Task  # noqa
+from flexget.task_queue import TaskQueue  # noqa
+from flexget.utils.tools import pid_exists, console  # noqa
 
 log = logging.getLogger('manager')
 
@@ -43,7 +41,6 @@ DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
 class Manager(object):
-
     """Manager class for FlexGet
 
     Fires events:
@@ -425,6 +422,7 @@ class Manager(object):
             # Override the default string handling function
             # to always return unicode objects
             return self.construct_scalar(node)
+
         yaml.Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
         yaml.SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
 
@@ -432,13 +430,14 @@ class Manager(object):
         def unicode_representer(dumper, uni):
             node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
             return node
+
         yaml.add_representer(unicode, unicode_representer)
 
         # Set up the dumper to increase the indent for lists
         def increase_indent_wrapper(func):
-
             def increase_indent(self, flow=False, indentless=False):
                 func(self, flow, False)
+
             return increase_indent
 
         yaml.Dumper.increase_indent = increase_indent_wrapper(yaml.Dumper.increase_indent)
@@ -880,5 +879,7 @@ class Manager(object):
             with codecs.open(filename, 'w', encoding='utf-8') as outfile:
                 outfile.writelines(logger.debug_buffer)
                 traceback.print_exc(file=outfile)
-            log.critical('An unexpected crash has occurred. Writing crash report to %s' % filename)
+            log.critical('An unexpected crash has occurred. Writing crash report to %s. '
+                         'Please verify you are running the latest version of flexget by using "flexget -V" '
+                         'from CLI or by using version_checker plugin at ...', filename)
         log.debug('Traceback:', exc_info=True)
