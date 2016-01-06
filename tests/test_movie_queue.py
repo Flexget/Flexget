@@ -1,7 +1,7 @@
 import datetime
 import json
 
-from mock import patch, Mock
+from mock import patch
 
 from flexget.plugins.filter import movie_queue
 from flexget.plugins.filter.movie_queue import queue_add, queue_get
@@ -136,22 +136,6 @@ class TestMovieQueueAPI(APITest):
         rsp = self.json_post('/movie_queue/', data=json.dumps(title_movie))
         assert rsp.status_code == 201, 'response code should be 201, is actually %s' % rsp.status_code
         assert mocked_queue_add.called
-
-    @patch.object(movie_queue, 'queue_get')
-    @patch.object(movie_queue, 'queue_del')
-    def test_queue_del(self, mocked_queue_del, mocked_queue_get):
-        movie = Mock()
-        movie.id = 'id'
-        mocked_queue_get.return_value = [movie]
-        rsp = self.delete('/movie_queue/')
-
-        assert rsp.status_code == 200
-        assert json.loads(rsp.data) == {
-            "status": "success",
-            "message": "successfully deleted all pending movies from queue"
-        }
-        assert mocked_queue_get.called
-        assert mocked_queue_del.called
 
     @patch.object(movie_queue, 'queue_forget')
     @patch.object(movie_queue, 'queue_edit')
