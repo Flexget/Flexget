@@ -421,6 +421,41 @@ class SeriesTask(Base):
         self.name = name
 
 
+def display_series_summary(configured=None, premieres=None, status=None, days=None):
+    """
+    Return a query with results for all series.
+    :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
+    Default is 'all'
+    :param premieres: Return only shows with 1 season and less than 3 episodes
+    :param status:
+    :param days:
+    :return:
+    """
+    if not configured:
+        configured = 'configured'
+    elif configured not in ['configured', 'unconfigured', 'all']:
+        raise LookupError('"configured" parameter must be either "configured", "unconfigured", or "all"')
+    session = Session()
+    query = (session.query(Series).outerjoin(Series.episodes).outerjoin(Episode.releases).
+                 outerjoin(Series.in_tasks).group_by(Series.id))
+    if configured == 'configured':
+        query = query.having(func.count(SeriesTask.id) >= 1)
+    elif configured == 'unconfigured':
+        query = query.having(func.count(SeriesTask.id) < 1)
+    if premieres:
+        query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2).
+                 having(func.count(SeriesTask.id) < 1)).filter(Release.downloaded == True)
+    if status == 'new':
+        if not days:
+            days = 7
+        query = query.having(func.max(Episode.first_seen) > datetime.now() - timedelta(days=days))
+    if status == 'stale':
+        if not days:
+            days = 365
+        query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
+    return query
+
+
 def get_latest_episode(series):
     """Return latest known identifier in dict (season, episode, name) for series name"""
     session = Session.object_session(series)

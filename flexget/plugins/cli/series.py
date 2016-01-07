@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 from datetime import datetime, timedelta
+
 from sqlalchemy import func
 
 from flexget import options, plugin
@@ -11,7 +13,7 @@ from flexget.manager import Session
 try:
     from flexget.plugins.filter.series import (Series, Episode, Release, SeriesTask, forget_series,
                                                forget_series_episode, set_series_begin, normalize_series_name,
-                                               new_eps_after, get_latest_release)
+                                               new_eps_after, get_latest_release, display_series_summary)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
@@ -33,70 +35,65 @@ def display_summary(options):
     Display series summary.
     :param options: argparse options from the CLI
     """
-    session = Session()
-    try:
-        query = (session.query(Series).outerjoin(Series.episodes).outerjoin(Episode.releases).
-                 outerjoin(Series.in_tasks).group_by(Series.id))
-        if options.configured == 'configured':
-            query = query.having(func.count(SeriesTask.id) >= 1)
-        elif options.configured == 'unconfigured':
-            query = query.having(func.count(SeriesTask.id) < 1)
-        if options.premieres:
-            query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2).
-                     having(func.count(SeriesTask.id) < 1)).filter(Release.downloaded == True)
-        if options.new:
-            query = query.having(func.max(Episode.first_seen) > datetime.now() - timedelta(days=options.new))
-        if options.stale:
-            query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=options.stale))
-        if options.porcelain:
-            formatting = '%-30s %s %-10s %s %-10s %s %-20s'
-            console(formatting % ('Name', '|', 'Latest', '|', 'Age', '|', 'Downloaded'))
-        else:
-            formatting = ' %-30s %-10s %-10s %-20s'
-            console('-' * 79)
-            console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
-            console('-' * 79)
-        for series in query.order_by(Series.name).yield_per(10):
-            series_name = series.name
-            if len(series_name) > 30:
-                series_name = series_name[:27] + '...'
+    kwargs = {'configured': options.configured,
+              'premieres': options.premieres}
+    if options.new:
+        kwargs['status'] = 'new'
+        kwargs['days'] = options.new
+    elif options.stale:
+        kwargs['status'] = 'stale'
+        kwargs['days'] = options.stale
 
-            new_ep = ' '
-            behind = 0
-            status = 'N/A'
-            age = 'N/A'
-            episode_id = 'N/A'
-            latest = get_latest_release(series)
-            if latest:
-                if latest.first_seen > datetime.now() - timedelta(days=2):
-                    if options.porcelain:
-                        pass
-                    else:
-                        new_ep = '>'
-                behind = new_eps_after(latest)
-                status = get_latest_status(latest)
-                age = latest.age
-                episode_id = latest.identifier
+    query = display_series_summary(**kwargs)
 
-            if behind:
-                episode_id += ' +%s' % behind
+    if options.porcelain:
+        formatting = '%-30s %s %-10s %s %-10s %s %-20s'
+        console(formatting % ('Name', '|', 'Latest', '|', 'Age', '|', 'Downloaded'))
+    else:
+        formatting = ' %-30s %-10s %-10s %-20s'
+        console('-' * 79)
+        console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
+        console('-' * 79)
 
-            if options.porcelain:
-                console(formatting % (series_name, '|', episode_id, '|', age, '|', status))
-            else:
-                console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
-            if behind >= 3:
-                console(' ! Latest download is %d episodes behind, this may require '
-                        'manual intervention' % behind)
+    for series in query.order_by(Series.name).yield_per(10):
+        series_name = series.name
+        if len(series_name) > 30:
+            series_name = series_name[:27] + '...'
+
+        new_ep = ' '
+        behind = 0
+        status = 'N/A'
+        age = 'N/A'
+        episode_id = 'N/A'
+        latest = get_latest_release(series)
+        if latest:
+            if latest.first_seen > datetime.now() - timedelta(days=2):
+                if options.porcelain:
+                    pass
+                else:
+                    new_ep = '>'
+            behind = new_eps_after(latest)
+            status = get_latest_status(latest)
+            age = latest.age
+            episode_id = latest.identifier
+
+        if behind:
+            episode_id += ' +%s' % behind
 
         if options.porcelain:
-            pass
+            console(formatting % (series_name, '|', episode_id, '|', age, '|', status))
         else:
-            console('-' * 79)
-            console(' > = new episode ')
-            console(' Use `flexget series show NAME` to get detailed information')
-    finally:
-        session.close()
+            console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
+        if behind >= 3:
+            console(' ! Latest download is %d episodes behind, this may require '
+                    'manual intervention' % behind)
+
+    if options.porcelain:
+        pass
+    else:
+        console('-' * 79)
+        console(' > = new episode ')
+        console(' Use `flexget series show NAME` to get detailed information')
 
 
 def begin(manager, options):
