@@ -1603,11 +1603,11 @@ series_api = api.namespace('series', description='Series')
 show_object = {
     'type': 'object',
     'properties': {
-        'name': {'type': 'string'},
-        'episode_id': {'type': 'string'},
-        'latest_download': {'type': 'string'},
-        'behind': {'type': 'integer'},
-        'age': {'type': 'string'}
+        'show_name': {'type': 'string'},
+        'last_episode_id': {'type': 'string'},
+        'latest_release_downloaded': {'type': 'string'},
+        'episodes_behind_latest': {'type': 'integer'},
+        'age_since_last_download': {'type': 'string'}
     }
 }
 
@@ -1680,11 +1680,11 @@ class SeriesListAPI(APIResource):
                 behind = status = age = episode_id = 'N/A'
 
             show_item = {
-                'name': series_name,
-                'episode_id': episode_id,
-                'latest_release': status,
-                'behind': behind,
-                'age': age
+                'show_name': series_name,
+                'last_episode_id': episode_id,
+                'latest_release_downloaded': status,
+                'episodes_behind_latest': behind,
+                'age_since_last_download': age
             }
             shows.append(show_item)
 
