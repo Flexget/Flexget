@@ -2,6 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 
 import argparse
 import logging
+from math import ceil
+from operator import itemgetter
+
 import re
 import time
 from copy import copy
@@ -1389,7 +1392,7 @@ class FilterSeries(FilterSeriesBase):
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
             if (not backfill and (episode.season < latest.season or
                                       (episode.identified_by == 'sequence' and episode.number < (
-                                          latest.number - grace)))):
+                                                  latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
@@ -1640,6 +1643,44 @@ def series_list_status_enum(value):
     return value
 
 
+def series_list_sort_value_enum(value):
+    enum = ['show_name', 'episodes_behind_latest']
+    if value not in enum:
+        raise ValueError('Value expected to be in' + ' ,'.join(enum))
+    return value
+
+
+def series_list_sort_order_enum(value):
+    enum = ['desc', 'asc']
+    if value not in enum:
+        raise ValueError('Value expected to be in' + ' ,'.join(enum))
+    if value == 'desc':
+        return True
+    return False
+
+
+def get_series_details(series):
+    series_name = series.name
+    latest = get_latest_release(series)
+
+    if latest:
+        behind = new_eps_after(latest)
+        status = get_latest_status(latest)
+        age = latest.age
+        episode_id = latest.identifier
+    else:
+        behind = status = age = episode_id = 'N/A'
+
+    show_item = {
+        'show_name': series_name,
+        'last_episode_id': episode_id,
+        'latest_release_downloaded': status,
+        'episodes_behind_latest': behind,
+        'age_since_last_download': age
+    }
+    return show_item
+
+
 series_list_schema = api.schema('list_series', series_list_schema)
 
 series_list_parser = api.parser()
@@ -1649,15 +1690,26 @@ series_list_parser.add_argument('premieres', type=inputs.boolean, default='false
                                 help="Filter by downloaded premieres only")
 series_list_parser.add_argument('status', type=series_list_status_enum, help="Filter by 'new' or 'stale' status")
 series_list_parser.add_argument('days', type=int, help='Filter status by number of days')
+series_list_parser.add_argument('page', type=int, default=1, help='Page number')
+series_list_parser.add_argument('max', type=int, default=100, help='Shows per page')
+series_list_parser.add_argument('sort_by', type=series_list_sort_value_enum, default='show_name',
+                                help="Sort response by 'show_name', 'episodes_behind_latest'")
+series_list_parser.add_argument('order', type=series_list_sort_order_enum, default='desc', help='Sorting order')
 
 
 @series_api.route('/')
 class SeriesListAPI(APIResource):
+    @api.response(400, 'Page does not exist')
     @api.response(200, 'Series list retrieved successfully', series_list_schema)
     @api.doc(parser=series_list_parser)
     def get(self, session=None):
         """ List shows """
         args = series_list_parser.parse_args()
+        page = args['page']
+        max_results = args['max']
+        sort_by = args['sort_by']
+        order = args['order']
+
         kwargs = {
             'configured': args.get('configured'),
             'premieres': args.get('premieres'),
@@ -1665,30 +1717,30 @@ class SeriesListAPI(APIResource):
             'days': args.get('days')
 
         }
+
         series_list = display_series_summary(**kwargs)
+        series_list = series_list.order_by(Series.name)
+
+        num_of_shows = series_list.count()
+        pages = int(ceil(num_of_shows / float(max_results)))
+
         shows = []
-        for series in series_list.order_by(Series.name):
-            series_name = series.name
-            latest = get_latest_release(series)
+        if page > pages and pages != 0:
+            return {'error': 'page %s does not exist' % page}, 400
 
-            if latest:
-                behind = new_eps_after(latest)
-                status = get_latest_status(latest)
-                age = latest.age
-                episode_id = latest.identifier
-            else:
-                behind = status = age = episode_id = 'N/A'
+        start = (page - 1) * max_results
+        finish = start + max_results
+        if finish > num_of_shows:
+            finish = num_of_shows
 
-            show_item = {
-                'show_name': series_name,
-                'last_episode_id': episode_id,
-                'latest_release_downloaded': status,
-                'episodes_behind_latest': behind,
-                'age_since_last_download': age
-            }
-            shows.append(show_item)
+        for show_number in range(start, finish):
+            shows.append(get_series_details(series_list[show_number]))
+
+        sorted_show_list = sorted(shows, key=itemgetter(sort_by), reverse=order)
 
         return jsonify({
-            'shows': shows,
-            'number_of_shows': len(shows)
+            'shows': sorted_show_list,
+            'number_of_shows': num_of_shows,
+            'page': page,
+            'total_number_of_pages': pages
         })
