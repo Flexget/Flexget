@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 import logging
 import re
@@ -6,24 +7,26 @@ import time
 from copy import copy
 from datetime import datetime, timedelta
 
+from flask_restful import inputs
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
                         desc, select, update, delete, ForeignKey, Index, func, and_, not_)
-from sqlalchemy.orm import relation, backref, object_session
-from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.exc import OperationalError
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
+from sqlalchemy.orm import relation, backref, object_session
 
 from flexget import db_schema, options, plugin
+from flexget.api import api, APIResource, jsonify
 from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.manager import Session
-from flexget.utils import qualities
-from flexget.utils.log import log_once
-from flexget.plugins.parsers import SERIES_ID_TYPES
 from flexget.plugin import get_plugin_by_name
+from flexget.plugins.parsers import SERIES_ID_TYPES
+from flexget.utils import qualities
+from flexget.utils.database import quality_property
+from flexget.utils.log import log_once
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
 from flexget.utils.tools import merge_dict_from_to, parse_timedelta
-from flexget.utils.database import quality_property
 
 SCHEMA_VER = 12
 
@@ -103,7 +106,7 @@ def upgrade(ver, session):
         ep_table = table_schema('series_episodes', session)
         ep_mode_series = select([series_table.c.id], series_table.c.identified_by == 'ep')
         where_clause = and_(ep_table.c.series_id.in_(ep_mode_series),
-            ep_table.c.season != None, ep_table.c.number != None, ep_table.c.identified_by == None)
+                            ep_table.c.season != None, ep_table.c.number != None, ep_table.c.identified_by == None)
         session.execute(update(ep_table, where_clause, {'identified_by': 'ep'}))
         ver = 6
     if ver == 6:
@@ -153,8 +156,8 @@ def upgrade(ver, session):
 @event('manager.db_cleanup')
 def db_cleanup(manager, session):
     # Clean up old undownloaded releases
-    result = session.query(Release).\
-        filter(Release.downloaded == False).\
+    result = session.query(Release). \
+        filter(Release.downloaded == False). \
         filter(Release.first_seen < datetime.now() - timedelta(days=120)).delete(False)
     if result:
         log.verbose('Removed %d undownloaded episode releases.', result)
@@ -257,7 +260,6 @@ class AlternateNames(Base):
 
 
 class Series(Base):
-
     """ Name is handled case insensitively transparently
     """
 
@@ -297,7 +299,6 @@ class Series(Base):
 
 
 class Episode(Base):
-
     __tablename__ = 'series_episodes'
 
     id = Column(Integer, primary_key=True)
@@ -318,7 +319,7 @@ class Episode(Base):
 
     @first_seen.expression
     def first_seen(cls):
-        return select([func.min(Release.first_seen)]).where(Release.episode_id == cls.id).\
+        return select([func.min(Release.first_seen)]).where(Release.episode_id == cls.id). \
             correlate(Episode.__table__).label('first_seen')
 
     @property
@@ -380,7 +381,6 @@ Index('episode_series_identifier', Episode.series_id, Episode.identifier)
 
 
 class Release(Base):
-
     __tablename__ = 'episode_releases'
 
     id = Column(Integer, primary_key=True)
@@ -404,7 +404,7 @@ class Release(Base):
 
     def __unicode__(self):
         return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % \
-            (self.id, self.quality, self.downloaded, self.proper_count, self.title)
+               (self.id, self.quality, self.downloaded, self.proper_count, self.title)
 
     def __repr__(self):
         return unicode(self).encode('ascii', 'replace')
@@ -419,6 +419,24 @@ class SeriesTask(Base):
 
     def __init__(self, name):
         self.name = name
+
+
+def get_latest_status(episode):
+    """
+    :param episode: Instance of Episode
+    :return: Status string for given episode
+    """
+    status = ''
+    for release in sorted(episode.releases, key=lambda r: r.quality):
+        if not release.downloaded:
+            continue
+        status += release.quality.name
+        if release.proper_count > 0:
+            status += '-proper'
+            if release.proper_count > 1:
+                status += str(release.proper_count)
+        status += ', '
+    return status.rstrip(', ') if status else None
 
 
 def display_series_summary(configured=None, premieres=None, status=None, days=None):
@@ -437,7 +455,7 @@ def display_series_summary(configured=None, premieres=None, status=None, days=No
         raise LookupError('"configured" parameter must be either "configured", "unconfigured", or "all"')
     session = Session()
     query = (session.query(Series).outerjoin(Series.episodes).outerjoin(Episode.releases).
-                 outerjoin(Series.in_tasks).group_by(Series.id))
+             outerjoin(Series.in_tasks).group_by(Series.id))
     if configured == 'configured':
         query = query.having(func.count(SeriesTask.id) >= 1)
     elif configured == 'unconfigured':
@@ -459,10 +477,10 @@ def display_series_summary(configured=None, premieres=None, status=None, days=No
 def get_latest_episode(series):
     """Return latest known identifier in dict (season, episode, name) for series name"""
     session = Session.object_session(series)
-    episode = session.query(Episode).join(Episode.series).\
-        filter(Series.id == series.id).\
-        filter(Episode.season != None).\
-        order_by(desc(Episode.season)).\
+    episode = session.query(Episode).join(Episode.series). \
+        filter(Series.id == series.id). \
+        filter(Episode.season != None). \
+        order_by(desc(Episode.season)). \
         order_by(desc(Episode.number)).first()
     if not episode:
         # log.trace('get_latest_info: no info available for %s', name)
@@ -552,7 +570,7 @@ def new_eps_after(since_ep):
     """
     session = Session.object_session(since_ep)
     series = since_ep.series
-    series_eps = session.query(Episode).join(Episode.series).\
+    series_eps = session.query(Episode).join(Episode.series). \
         filter(Series.id == series.id)
     if series.identified_by == 'ep':
         if since_ep.season is None or since_ep.number is None:
@@ -585,8 +603,8 @@ def store_parser(session, parser, series=None, quality=None):
         quality = parser.quality
     if not series:
         # if series does not exist in database, add new
-        series = session.query(Series).\
-            filter(Series.name == parser.name).\
+        series = session.query(Series). \
+            filter(Series.name == parser.name). \
             filter(Series.id != None).first()
         if not series:
             log.debug('adding series %s into db', parser.name)
@@ -598,8 +616,8 @@ def store_parser(session, parser, series=None, quality=None):
     releases = []
     for ix, identifier in enumerate(parser.identifiers):
         # if episode does not exist in series, add new
-        episode = session.query(Episode).filter(Episode.series_id == series.id).\
-            filter(Episode.identifier == identifier).\
+        episode = session.query(Episode).filter(Episode.series_id == series.id). \
+            filter(Episode.identifier == identifier). \
             filter(Episode.series_id != None).first()
         if not episode:
             log.debug('adding episode %s into series %s', identifier, parser.name)
@@ -623,10 +641,10 @@ def store_parser(session, parser, series=None, quality=None):
         # filter(Release.episode_id != None) fixes weird bug where release had/has been added
         # to database but doesn't have episode_id, this causes all kinds of havoc with the plugin.
         # perhaps a bug in sqlalchemy?
-        release = session.query(Release).filter(Release.episode_id == episode.id).\
-            filter(Release.title == parser.data).\
-            filter(Release.quality == quality).\
-            filter(Release.proper_count == parser.proper_count).\
+        release = session.query(Release).filter(Release.episode_id == episode.id). \
+            filter(Release.title == parser.data). \
+            filter(Release.quality == quality). \
+            filter(Release.proper_count == parser.proper_count). \
             filter(Release.episode_id != None).first()
         if not release:
             log.debug('adding release %s into episode', parser)
@@ -669,7 +687,7 @@ def set_series_begin(series, ep_id):
     if series.identified_by not in ['auto', '', None]:
         if identified_by != series.identified_by:
             raise ValueError('`begin` value `%s` does not match identifier type for identified_by `%s`' %
-                (ep_id, series.identified_by))
+                             (ep_id, series.identified_by))
     series.identified_by = identified_by
     episode = (session.query(Episode).filter(Episode.series_id == series.id).
                filter(Episode.identified_by == series.identified_by).
@@ -714,7 +732,7 @@ def forget_series_episode(name, identifier):
     try:
         series = session.query(Series).filter(Series.name == name).first()
         if series:
-            episode = session.query(Episode).filter(Episode.identifier == identifier).\
+            episode = session.query(Episode).filter(Episode.identifier == identifier). \
                 filter(Episode.series_id == series.id).first()
             if episode:
                 if not series.begin:
@@ -994,7 +1012,7 @@ class FilterSeries(FilterSeriesBase):
         for series_name, series_config in all_series.iteritems():
             for name in all_series.keys():
                 if (name.lower().startswith(series_name.lower())) and \
-                   (name.lower() != series_name.lower()):
+                        (name.lower() != series_name.lower()):
                     if 'exact' not in series_config:
                         log.verbose('Auto enabling exact matching for series %s (reason %s)', series_name, name)
                         series_config['exact'] = True
@@ -1120,7 +1138,7 @@ class FilterSeries(FilterSeriesBase):
         for entry in entries:
             # skip processed entries
             if (entry.get('series_parser') and entry['series_parser'].valid and
-                    entry['series_parser'].name.lower() != series_name.lower()):
+                        entry['series_parser'].name.lower() != series_name.lower()):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
@@ -1149,8 +1167,8 @@ class FilterSeries(FilterSeriesBase):
 
             # sort episodes in order of quality
             entries.sort(
-                key=lambda e: (e['quality'], e['series_parser'].episodes, e['series_parser'].proper_count),
-                reverse=True)
+                    key=lambda e: (e['quality'], e['series_parser'].episodes, e['series_parser'].proper_count),
+                    reverse=True)
 
             log.debug('start with episodes: %s', [e['title'] for e in entries])
 
@@ -1307,7 +1325,7 @@ class FilterSeries(FilterSeriesBase):
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
             if (entry['quality'] in downloaded_qualities and
-                    entry['series_parser'].proper_count > downloaded_qualities[entry['quality']]):
+                        entry['series_parser'].proper_count > downloaded_qualities[entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
@@ -1370,7 +1388,8 @@ class FilterSeries(FilterSeriesBase):
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
             if (not backfill and (episode.season < latest.season or
-                    (episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
+                                      (episode.identified_by == 'sequence' and episode.number < (
+                                          latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
@@ -1378,7 +1397,7 @@ class FilterSeries(FilterSeriesBase):
 
             # Allow future episodes within grace, or first episode of next season
             if (episode.season > latest.season + 1 or (episode.season > latest.season and episode.number > 1) or
-               (episode.season == latest.season and episode.number > (latest.number + grace))):
+                    (episode.season == latest.season and episode.number > (latest.number + grace))):
                 log.debug('too new! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the future from latest downloaded episode %s. '
@@ -1577,3 +1596,99 @@ def register_parser_arguments():
     # Backwards compatibility
     exec_parser.add_argument('--disable-advancement', action='store_true', dest='disable_tracking',
                              help=argparse.SUPPRESS)
+
+
+series_api = api.namespace('series', description='Series')
+
+show_object = {
+    'type': 'object',
+    'properties': {
+        'name': {'type': 'string'},
+        'episode_id': {'type': 'string'},
+        'latest_download': {'type': 'string'},
+        'behind': {'type': 'integer'},
+        'age': {'type': 'string'}
+    }
+}
+
+series_list_schema = {
+    'type': 'object',
+    'properties': {
+        'shows': {
+            'type': 'array',
+            'items': show_object
+        },
+        'number_of_shows': {'type': 'integer'},
+        'total_number_of_pages': {'type': 'integer'},
+        'page_number': {'type': 'integer'}
+
+    }
+}
+
+
+def series_list_configured_enum(value):
+    enum = ['configured', 'unconfigured', 'all']
+    if value not in enum:
+        raise ValueError('Value expected to be in' + ' ,'.join(enum))
+    return value
+
+
+def series_list_status_enum(value):
+    enum = ['new', 'stale']
+    if value not in enum:
+        raise ValueError('Value expected to be in' + ' ,'.join(enum))
+    return value
+
+
+series_list_schema = api.schema('list_series', series_list_schema)
+
+series_list_parser = api.parser()
+series_list_parser.add_argument('configured', type=series_list_configured_enum, default='configured',
+                                help="Filter by 'configured', 'unconfigured' or 'all'")
+series_list_parser.add_argument('premieres', type=inputs.boolean, default='false',
+                                help="Filter by downloaded premieres only")
+series_list_parser.add_argument('status', type=series_list_status_enum, help="Filter by 'new' or 'stale' status")
+series_list_parser.add_argument('days', type=int, help='Filter status by number of days')
+
+
+@series_api.route('/')
+class SeriesListAPI(APIResource):
+    @api.response(200, 'Series list retrieved successfully', series_list_schema)
+    @api.doc(parser=series_list_parser)
+    def get(self, session=None):
+        """ List shows """
+        args = series_list_parser.parse_args()
+        kwargs = {
+            'configured': args.get('configured'),
+            'premieres': args.get('premieres'),
+            'status': args.get('status'),
+            'days': args.get('days')
+
+        }
+        series_list = display_series_summary(**kwargs)
+        shows = []
+        for series in series_list.order_by(Series.name):
+            series_name = series.name
+            latest = get_latest_release(series)
+
+            if latest:
+                behind = new_eps_after(latest)
+                status = get_latest_status(latest)
+                age = latest.age
+                episode_id = latest.identifier
+            else:
+                behind = status = age = episode_id = 'N/A'
+
+            show_item = {
+                'name': series_name,
+                'episode_id': episode_id,
+                'latest_release': status,
+                'behind': behind,
+                'age': age
+            }
+            shows.append(show_item)
+
+        return jsonify({
+            'shows': shows,
+            'number_of_shows': len(shows)
+        })
