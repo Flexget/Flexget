@@ -473,6 +473,9 @@ class PluginTransmission(TransmissionBase):
  file list unavailable for processing.' % entry['title'])
                             else:
                                 total_size = cli.get_torrent(r.id, ['id', 'totalSize']).totalSize
+                                if 'paused' in options['post'] and options['post']['paused'] == True:
+                                    cli.stop_torrent(r.id)
+                                    log.info('Torrent "%s" stopped because of addpaused=yes' % entry['title'])
                 
                         # Find files based on config
                         dl_list = []
