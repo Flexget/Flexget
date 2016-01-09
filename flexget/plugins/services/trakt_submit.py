@@ -17,7 +17,7 @@ class TraktSubmit(object):
             'username': {'type': 'string'},
             'account': {'type': 'string'},
             'list': {'type': 'string'},
-            'type': {'type': 'string', 'enum': ['show', 'season', 'episode', 'movie', 'auto'], 'default': 'auto'}
+            'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies', 'auto'], 'default': 'auto'}
         },
         'required': ['list'],
         'anyOf': [{'required': ['username']}, {'required': ['account']}],
@@ -36,21 +36,21 @@ class TraktSubmit(object):
             config['username'] = 'me'
         found = {'shows': [], 'movies': []}
         for entry in task.accepted:
-            if config['type'] in ['auto', 'show', 'season', 'episode'] and entry.get('series_name') is not None:
+            if config['type'] in ['auto', 'shows', 'seasons', 'episodes'] and entry.get('series_name') is not None:
                 show = {'title': entry['series_name'], 'ids': get_entry_ids(entry)}
-                if config['type'] in ['auto', 'season', 'episode'] and entry.get('series_season') is not None:
+                if config['type'] in ['auto', 'seasons', 'episodes'] and entry.get('series_season') is not None:
                     season = {'number': entry['series_season']}
-                    if config['type'] in ['auto', 'episode'] and entry.get('series_episode') is not None:
+                    if config['type'] in ['auto', 'episodes'] and entry.get('series_episode') is not None:
                         season['episodes'] = [{'number': entry['series_episode']}]
                     show['seasons'] = [season]
-                if config['type'] in ['season', 'episode'] and 'seasons' not in show:
+                if config['type'] in ['seasons', 'episodes'] and 'seasons' not in show:
                     self.log.debug('Not submitting `%s`, no season found.' % entry['title'])
                     continue
-                if config['type'] == 'episode' and 'episodes' not in show:
+                if config['type'] == 'episodes' and 'episodes' not in show:
                     self.log.debug('Not submitting `%s`, no episode number found.' % entry['title'])
                     continue
                 found['shows'].append(show)
-            elif config['type'] in ['auto', 'movie']:
+            elif config['type'] in ['auto', 'movies']:
                 movie = {'ids': get_entry_ids(entry)}
                 if not movie['ids']:
                     if entry.get('movie_name') is not None:
