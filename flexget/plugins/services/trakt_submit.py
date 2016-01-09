@@ -16,7 +16,8 @@ class TraktSubmit(object):
         'properties': {
             'username': {'type': 'string'},
             'account': {'type': 'string'},
-            'list': {'type': 'string'}
+            'list': {'type': 'string'},
+            'type': {'type': 'string', 'enum': ['show', 'season', 'episode', 'movie', 'auto'], 'default': 'auto'}
         },
         'required': ['list'],
         'anyOf': [{'required': ['username']}, {'required': ['account']}],
@@ -35,19 +36,29 @@ class TraktSubmit(object):
             config['username'] = 'me'
         found = {'shows': [], 'movies': []}
         for entry in task.accepted:
-            if entry.get('series_name') is not None:
+            if config['type'] in ['auto', 'show', 'season', 'episode'] and entry.get('series_name') is not None:
                 show = {'title': entry['series_name'], 'ids': get_entry_ids(entry)}
-                if entry.get('series_season') is not None:
+                if config['type'] in ['auto', 'season', 'episode'] and entry.get('series_season') is not None:
                     season = {'number': entry['series_season']}
-                    if entry.get('series_episode') is not None:
+                    if config['type'] in ['auto', 'episode'] and entry.get('series_episode') is not None:
                         season['episodes'] = [{'number': entry['series_episode']}]
                     show['seasons'] = [season]
+                if config['type'] in ['season', 'episode'] and 'seasons' not in show:
+                    self.log.debug('Not submitting `%s`, no season found.' % entry['title'])
+                    continue
+                if config['type'] == 'episode' and 'episodes' not in show:
+                    self.log.debug('Not submitting `%s`, no episode number found.' % entry['title'])
+                    continue
                 found['shows'].append(show)
-            elif any(field in entry for field in ['imdb_id', 'tmdb_id', 'movie_name']):
+            elif config['type'] in ['auto', 'movie']:
                 movie = {'ids': get_entry_ids(entry)}
                 if not movie['ids']:
-                    movie['title'] = entry.get('movie_name') or entry.get('imdb_name')
-                    movie['year'] = entry.get('movie_year') or entry.get('imdb_year')
+                    if entry.get('movie_name') is not None:
+                        movie['title'] = entry.get('movie_name') or entry.get('imdb_name')
+                        movie['year'] = entry.get('movie_year') or entry.get('imdb_year')
+                    else:
+                        self.log.debug('Not submitting `%s`, no movie name or id found.' % entry['title'])
+                        continue
                 found['movies'].append(movie)
 
         if not (found['shows'] or found['movies']):
