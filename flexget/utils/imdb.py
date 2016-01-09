@@ -239,10 +239,10 @@ class ImdbParser(object):
             return
 
         # Parse stuff from the title-overview section
-        name_elem = title_overview.find(itemprop='name')
+        name_elem = title_overview.h1.find(itemprop='name')
         self.name = name_elem.contents[0]
 
-        year = title_overview.find(attrs={'class': 'nobr'}).find('a', href=True)
+        year = title_overview.h1.find('a', href=True)
         if year:
             self.year = int(year.text)
         else:
