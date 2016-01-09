@@ -35,11 +35,11 @@ class TraktSubmit(object):
             config['username'] = 'me'
         found = {'shows': [], 'movies': []}
         for entry in task.accepted:
-            if 'series_name' in entry:
+            if entry.get('series_name') is not None:
                 show = {'title': entry['series_name'], 'ids': get_entry_ids(entry)}
-                if 'series_season' in entry:
+                if entry.get('series_season') is not None:
                     season = {'number': entry['series_season']}
-                    if 'series_episode' in entry:
+                    if entry.get('series_episode') is not None:
                         season['episodes'] = [{'number': entry['series_episode']}]
                     show['seasons'] = [season]
                 found['shows'].append(show)
