@@ -2,6 +2,8 @@ import logging
 import urllib
 
 import feedparser
+import urllib2
+from time import sleep
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -34,6 +36,7 @@ class Newznab(object):
             'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book']},
             'url': {'type': 'string', 'format': 'url'},
             'website': {'type': 'string', 'format': 'url'},
+            'wait': {'type': 'integer', 'default': 0},
             'apikey': {'type': 'string'}
         },
         'required': ['category'],
@@ -56,17 +59,24 @@ class Newznab(object):
 
     def fill_entries_for_url(self, url, config):
         entries = []
-        rss = feedparser.parse(url)
-        status = rss.get('status', False)
-        if status != 200 and status != 301:     # in cae of redirection...
-            log.error('Search result not 200 (OK), received %s' % status)
-            raise
+        header = {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
+        r = urllib2.Request(url, headers=header)
+        log.verbose('Fetching %s' % url)
+        try:
+            response = urllib2.urlopen(r)
+        except Exception as e:
+            log.error("Failed fetching '%s': %s" % (url, e))
+            
+        data = response.read()
+        rss = feedparser.parse(data)
+        log.debug("Raw RSS: %s" % rss)
 
         if not len(rss.entries):
             log.info('No results returned')
 
         for rss_entry in rss.entries:
             new_entry = Entry()
+            
             for key in rss_entry.keys():
                 new_entry[key] = rss_entry[key]
             new_entry['url'] = new_entry['link']
@@ -78,6 +88,9 @@ class Newznab(object):
 
     def search(self, task, entry, config=None):
         config = self.build_config(config)
+        if config['wait']:
+            log.debug("'Wait' configured, sleeping for %d seconds." % config['wait'])
+            sleep(config['wait'])
         if config['category'] == 'movie':
             return self.do_search_movie(entry, config)
         elif config['category'] == 'tvsearch':
