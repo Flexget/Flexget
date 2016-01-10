@@ -46,7 +46,7 @@ def do_cli(manager, options):
         except QueueError as e:
             console('ERROR: %s' % e.message)
         else:
-            console('Forgot that %s was downloaded. Movie will be downloaded again.' % title)
+            console('Forgot that %s was downloaded. Movie will be downloaded again.' % title.get('title'))
         return
 
     if options.queue_action == 'add':

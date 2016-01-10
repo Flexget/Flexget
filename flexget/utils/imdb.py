@@ -239,10 +239,10 @@ class ImdbParser(object):
             return
 
         # Parse stuff from the title-overview section
-        name_elem = title_overview.find('h1', itemprop='name')
-        self.name = name_elem.find(text=True, recursive=False).strip()
+        name_elem = title_overview.find(itemprop='name')
+        self.name = name_elem.contents[0]
 
-        year = name_elem.find('a')
+        year = title_overview.find(attrs={'class': 'nobr'}).find('a', href=True)
         if year:
             self.year = int(year.text)
         else:
@@ -260,9 +260,9 @@ class ImdbParser(object):
         else:
             log.debug('No photo found for %s' % self.imdb_id)
 
-        original_name_elem = title_overview.find(attrs={'class': 'originalTitle'})
+        original_name_elem = title_overview.find(attrs={'class': 'title-extra'})
         if original_name_elem:
-            self.original_name = original_name_elem.find(text=True, recursive=False)
+            self.original_name = original_name_elem.contents[0].strip().strip('"')
         else:
             log.debug('No original title found for %s' % self.imdb_id)
 
