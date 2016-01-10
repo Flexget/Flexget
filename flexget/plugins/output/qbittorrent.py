@@ -48,7 +48,7 @@ class OutputQBitTorrent(object):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
         self.session.post(self.url + '/command/download',
-                          data=dict(data, **{'urls': [url]}))
+                          data=data)
 
     def prepare_config(self, config):
         config.setdefault('host', 'localhost')
@@ -66,7 +66,7 @@ class OutputQBitTorrent(object):
             data = {}
             data['save_path'] = entry.get('movedone', config.get('movedone'))
             data['label'] = entry.get('label', config['label']).lower()
-            url = entry.get('url')
+            data['urls'] = [entry.get('url')]
             self.add_torrent(url, data)
 
 @event('plugin.register')
