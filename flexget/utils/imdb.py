@@ -8,7 +8,7 @@ from bs4.element import Tag
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session
 from flexget.utils.tools import str_to_int
-from flexget.plugin import get_plugin_by_name
+from flexget.plugin import get_plugin_by_name, PluginError
 
 log = logging.getLogger('utils.imdb')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
@@ -235,16 +235,19 @@ class ImdbParser(object):
 
         title_overview = soup.find('div', attrs={'class': 'title-overview'})
         if not title_overview:
-            log.error('IMDB parser needs updating, imdb format changed.')
-            return
+            raise PluginError('IMDB parser needs updating, imdb format changed.')
 
         # Parse stuff from the title-overview section
-        name_elem = title_overview.h1.find(itemprop='name')
-        self.name = name_elem.contents[0]
-
-        year = title_overview.h1.find('a', href=True)
-        if year:
-            self.year = int(year.text)
+        name_elem = title_overview.find('h1')
+        if name_elem and name_elem.find(itemprop='name', text=True):
+            self.name = name_elem.find(itemprop='name', text=True).text.strip()
+        else:
+            raise PluginError('Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url))
+        year = title_overview.find(class_='nobr')
+        if year and not year.a:
+            self.year = int(year.text.strip('()'))
+        elif year.a:
+            self.year = int(year.a.text)
         else:
             log.debug('No year found for %s' % self.imdb_id)
 
