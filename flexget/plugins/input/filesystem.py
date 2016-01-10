@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
+import sys
 import urllib
 import urlparse
 from datetime import datetime
@@ -160,7 +161,7 @@ class Filesystem(object):
                 try:
                     path_object.exists()
                 except UnicodeError:
-                    log.error('File %s not decodable with filesystem encoding: %s' % path_object)
+                    log.error('File %s not decodable with filesystem encoding: %s' % (path_object, sys.getfilesystemencoding()))
                     continue
                 entry = None
                 object_depth = len(path_object.splitall())
