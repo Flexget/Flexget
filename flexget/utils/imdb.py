@@ -247,7 +247,7 @@ class ImdbParser(object):
         year = title_overview.find(class_='nobr')
         if year and not year.a:
             self.year = int(year.text.strip('()'))
-        elif year.a:
+        elif year and year.a:
             self.year = int(year.a.text)
         else:
             log.debug('No year found for %s' % self.imdb_id)
