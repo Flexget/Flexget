@@ -56,3 +56,12 @@ class TestImdbParser(object):
         assert parser.name == 'Goodbye Mothers'
         # There is no plot
         assert not parser.plot_outline
+
+    @use_vcr
+    def test_no_year(self):
+        # Make sure parser doesn't crash for movies with no year
+        parser = ImdbParser()
+        parser.parse('tt3303790')
+        assert parser.name == 'Master of None'
+        # There is no year
+        assert not parser.year
