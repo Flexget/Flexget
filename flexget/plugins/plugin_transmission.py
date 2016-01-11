@@ -475,7 +475,7 @@ class PluginTransmission(TransmissionBase):
                                 total_size = cli.get_torrent(r.id, ['id', 'totalSize']).totalSize
                                 if 'paused' in options['post'] and options['post']['paused'] == True:
                                     cli.stop_torrent(r.id)
-                                    log.info('Torrent "%s" stopped because of addpaused=yes' % entry['title'])
+                                    log.verbose('Torrent "%s" stopped because of addpaused=yes' % entry['title'])
                 
                         # Find files based on config
                         dl_list = []
