@@ -760,7 +760,15 @@ def shows_by_name(normalized_name):
 def show_episodes(series):
     """ Return all episodes of a given series """
     session = Session()
-    return session.query(Episode).filter(Episode.series_id == series.id)
+    episodes = session.query(Episode).filter(Episode.series_id == series.id)
+    # Query episodes in sane order instead of iterating from series.episodes
+    if series.identified_by == 'sequence':
+        episodes = episodes.order_by(Episode.number).all()
+    elif series.identified_by == 'ep':
+        episodes = episodes.order_by(Episode.season, Episode.number).all()
+    else:
+        episodes = episodes.order_by(Episode.identifier).all()
+    return episodes
 
 
 def populate_entry_fields(entry, parser, config):

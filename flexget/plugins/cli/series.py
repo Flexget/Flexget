@@ -184,15 +184,7 @@ def display_details(name):
     console(' %-63s%-15s' % ('Identifier, Title', 'Quality'))
     console('-' * 79)
 
-    # Query episodes in sane order instead of iterating from series.episodes
     episodes = show_episodes(series)
-    if series.identified_by == 'sequence':
-        episodes = episodes.order_by(Episode.number).all()
-    elif series.identified_by == 'ep':
-        episodes = episodes.order_by(Episode.season, Episode.number).all()
-    else:
-        episodes = episodes.order_by(Episode.identifier).all()
-
     for episode in episodes:
 
         if episode.identifier is None:
