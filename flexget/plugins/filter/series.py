@@ -2,13 +2,12 @@ from __future__ import unicode_literals, division, absolute_import
 
 import argparse
 import logging
-from math import ceil
-from operator import itemgetter
-
 import re
 import time
 from copy import copy
 from datetime import datetime, timedelta
+from math import ceil
+from operator import itemgetter
 
 from flask_restful import inputs
 from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
@@ -749,6 +748,19 @@ def forget_series_episode(name, identifier):
             raise ValueError('Unknown series %s' % name)
     finally:
         session.close()
+
+
+def shows_by_name(normalized_name):
+    """ Returns all series matching `normalized_name` """
+    session = Session()
+    return session.query(Series).filter(Series._name_normalized.contains(normalized_name)).order_by(
+        func.char_length(Series.name)).all()
+
+
+def show_episodes(series):
+    """ Return all episodes of a given series """
+    session = Session()
+    return session.query(Episode).filter(Episode.series_id == series.id)
 
 
 def populate_entry_fields(entry, parser, config):
@@ -1606,6 +1618,7 @@ series_api = api.namespace('series', description='Flexget Series operations')
 show_object = {
     'type': 'object',
     'properties': {
+        'show_id': {'type': 'integer'},
         'show_name': {'type': 'string'},
         'last_episode_id': {'type': 'string'},
         'latest_release_downloaded': {'type': 'string'},
@@ -1672,6 +1685,7 @@ def get_series_details(series):
         behind = status = age = episode_id = 'N/A'
 
     show_item = {
+        'show_id': series.id,
         'show_name': series_name,
         'last_episode_id': episode_id,
         'latest_release_downloaded': status,
