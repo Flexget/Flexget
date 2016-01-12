@@ -32,7 +32,7 @@ from flexget.ipc import IPCClient, IPCServer  # noqa
 from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
-from flexget.utils.tools import pid_exists, console  # noqa
+from flexget.utils.tools import pid_exists, console, get_current_flexget_version  # noqa
 
 log = logging.getLogger('manager')
 
@@ -882,5 +882,6 @@ class Manager(object):
             log.critical('An unexpected crash has occurred. Writing crash report to %s. '
                          'Please verify you are running the latest version of flexget by using "flexget -V" '
                          'from CLI or by using version_checker plugin'
-                         ' at http://flexget.com/wiki/Plugins/version_checker', filename)
+                         ' at http://flexget.com/wiki/Plugins/version_checker. You are currently using'
+                         'version %s', filename, get_current_flexget_version())
         log.debug('Traceback:', exc_info=True)
