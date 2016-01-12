@@ -252,7 +252,9 @@ def parse_what(what, lookup=True, session=None):
     result = {'title': None, 'imdb_id': None, 'tmdb_id': None}
     result['imdb_id'] = extract_id(what)
     if not result['imdb_id']:
-        if what.startswith('tmdb_id='):
+        if isinstance(what, int):
+            result['tmdb_id'] = what
+        elif what.startswith('tmdb_id='):
             result['tmdb_id'] = what[8:]
         else:
             result['title'] = what
@@ -296,8 +298,11 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
 
     if not title or not (imdb_id or tmdb_id):
         # We don't have all the info we need to add movie, do a lookup for more info
-        result = parse_what(imdb_id or title, session=session)
+        result = parse_what(imdb_id or title or tmdb_id, session=session)
         title = result['title']
+        if not title:
+            raise QueueError('Could not parse movie info for given parameters: title=%s, imdb_id=%s, tmdb_id=%s' % (
+            title, imdb_id, tmdb_id))
         imdb_id = result['imdb_id']
         tmdb_id = result['tmdb_id']
 
@@ -348,7 +353,7 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
     except NoResultFound as e:
         raise QueueError(
                 'title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' % (
-                title, imdb_id, tmdb_id, movie_id))
+                    title, imdb_id, tmdb_id, movie_id))
     except MultipleResultsFound:
         raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s matches multiple results in queue' %
                          (title, imdb_id, tmdb_id, movie_id))

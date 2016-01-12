@@ -8,7 +8,7 @@ from bs4.element import Tag
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session
 from flexget.utils.tools import str_to_int
-from flexget.plugin import get_plugin_by_name
+from flexget.plugin import get_plugin_by_name, PluginError
 
 log = logging.getLogger('utils.imdb')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
@@ -235,16 +235,20 @@ class ImdbParser(object):
 
         title_overview = soup.find('div', attrs={'class': 'title-overview'})
         if not title_overview:
-            log.error('IMDB parser needs updating, imdb format changed.')
-            return
+            raise PluginError('IMDB parser needs updating, imdb format changed. Please report on Github.')
 
         # Parse stuff from the title-overview section
-        name_elem = title_overview.find('h1', itemprop='name')
-        self.name = name_elem.find(text=True, recursive=False).strip()
-
-        year = name_elem.find('a')
-        if year:
-            self.year = int(year.text)
+        name_elem = title_overview.find('h1')
+        if name_elem and name_elem.find(itemprop='name', text=True):
+            self.name = name_elem.find(itemprop='name', text=True).text.strip()
+        else:
+            log.error('Possible IMDB parser needs updating, Please report on Github.')
+            raise PluginError('Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url))
+        year = title_overview.find(class_='nobr')
+        if year and not year.a:
+            self.year = int(year.text.strip('()'))
+        elif year and year.a:
+            self.year = int(year.a.text)
         else:
             log.debug('No year found for %s' % self.imdb_id)
 
@@ -260,9 +264,9 @@ class ImdbParser(object):
         else:
             log.debug('No photo found for %s' % self.imdb_id)
 
-        original_name_elem = title_overview.find(attrs={'class': 'originalTitle'})
+        original_name_elem = title_overview.find(attrs={'class': 'title-extra'})
         if original_name_elem:
-            self.original_name = original_name_elem.find(text=True, recursive=False)
+            self.original_name = original_name_elem.contents[0].strip().strip('"')
         else:
             log.debug('No original title found for %s' % self.imdb_id)
 
