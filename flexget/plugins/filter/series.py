@@ -15,6 +15,7 @@ from sqlalchemy import (Column, Integer, String, Unicode, DateTime, Boolean,
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 from sqlalchemy.orm import relation, backref, object_session
+from sqlalchemy.orm.exc import NoResultFound
 
 from flexget import db_schema, options, plugin
 from flexget.api import api, APIResource, jsonify
@@ -441,7 +442,7 @@ def get_latest_status(episode):
     return status.rstrip(', ') if status else None
 
 
-def display_series_summary(configured=None, premieres=None, status=None, days=None):
+def display_series_summary(configured=None, premieres=None, status=None, days=None, session=None):
     """
     Return a query with results for all series.
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
@@ -455,7 +456,6 @@ def display_series_summary(configured=None, premieres=None, status=None, days=No
         configured = 'configured'
     elif configured not in ['configured', 'unconfigured', 'all']:
         raise LookupError('"configured" parameter must be either "configured", "unconfigured", or "all"')
-    session = Session()
     query = (session.query(Series).outerjoin(Series.episodes).outerjoin(Episode.releases).
              outerjoin(Series.in_tasks).group_by(Series.id))
     if configured == 'configured':
@@ -538,7 +538,7 @@ def get_latest_release(series, downloaded=True, season=None):
     :param Season: season to find newest release for
     :return: Instance of Episode or None if not found.
     """
-    session = Session.object_session(series)
+    session = Session()
     releases = session.query(Episode).join(Episode.releases, Episode.series).filter(Series.id == series.id)
 
     if downloaded:
@@ -750,16 +750,18 @@ def forget_series_episode(name, identifier):
         session.close()
 
 
-def shows_by_name(normalized_name):
+def shows_by_name(normalized_name, session=None):
     """ Returns all series matching `normalized_name` """
-    session = Session()
     return session.query(Series).filter(Series._name_normalized.contains(normalized_name)).order_by(
-        func.char_length(Series.name)).all()
+            func.char_length(Series.name)).all()
 
 
-def show_episodes(series):
+def show_by_id(show_id, session=None):
+    return session.query(Series).filter(Series.id == show_id).one()
+
+
+def show_episodes(series, session=None):
     """ Return all episodes of a given series """
-    session = Session()
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
     # Query episodes in sane order instead of iterating from series.episodes
     if series.identified_by == 'sequence':
@@ -1696,11 +1698,32 @@ def get_series_details(series):
         'show_id': series.id,
         'show_name': series_name,
         'last_episode_id': episode_id,
-        'latest_release_downloaded': status,
+        'latest_download_quality': status,
         'episodes_behind_latest': behind,
         'age_since_last_download': age
     }
     return show_item
+
+
+def get_episode_details(episode):
+    releases = []
+
+    episode_item = {
+        'identifier': episode.identifier,
+        'identifier_type': episode.identified_by,
+        'download_age': episode.age
+    }
+
+    for release in episode.releases:
+        rel = {
+            'quality': release.quality.name,
+            'title': release.title,
+            'proper_count': release.proper_count,
+            'downloaded': release.downloaded
+        }
+        releases.append(rel)
+    episode_item['releases'] = releases
+    return episode_item
 
 
 series_list_schema = api.schema('list_series', series_list_schema)
@@ -1736,7 +1759,8 @@ class SeriesListAPI(APIResource):
             'configured': args.get('configured'),
             'premieres': args.get('premieres'),
             'status': args.get('status'),
-            'days': args.get('days')
+            'days': args.get('days'),
+            'session': session
 
         }
 
@@ -1765,4 +1789,92 @@ class SeriesListAPI(APIResource):
             'number_of_shows': num_of_shows,
             'page': page,
             'total_number_of_pages': pages
+        })
+
+
+release_object = {
+    'type': 'object',
+    'properties': {
+        'quality': {'type': 'string'},
+        'title': {'type': 'string'},
+        'proper_count': {'type': 'integer'},
+        'downloaded': {'type': 'boolean'}
+    }
+}
+
+episode_object = {
+    'type': 'object',
+    'properties': {
+        'identifier': {'type': 'string'},
+        'identifier_type': {'type': 'string'},
+        'download_age': {'type': 'string'},
+        'releases': {
+            'type': 'array',
+            'items': release_object}
+    }
+}
+
+show_details_schema = {
+    'type': 'object',
+    'properties': {
+        'episodes': {
+            'type': 'array',
+            'items': episode_object
+        },
+        'show': show_object
+    }
+}
+
+shows_schema = {
+    'type': 'object',
+    'properties': {
+        'shows': {
+            'type': 'array',
+            'items': show_object
+        },
+        'number_of_shows': {'type': 'integer'}
+    }
+}
+
+show_details_schema = api.schema('show_details', show_details_schema)
+shows_schema = api.schema('list_of_shows', shows_schema)
+
+
+@series_api.route('/search/<name>')
+class SeriesGetShowsAPI(APIResource):
+    @api.response(200, 'Show list retrieved successfully', shows_schema)
+    def get(self, name, session):
+        """ List of shows matching lookup name """
+        name = normalize_series_name(name)
+        matches = shows_by_name(name, session=session)
+
+        shows = []
+        for match in matches:
+            shows.append(get_series_details(match))
+
+        return jsonify({
+            'shows': shows,
+            'number_of_shows': len(shows)
+        })
+
+
+@series_api.route('/<int:id>')
+class SeriesShowDetailsAPI(APIResource):
+    @api.response(404, 'ID not found')
+    @api.response(200, 'Show information retrieved successfully', show_details_schema)
+    def get(self, id, session):
+        try:
+            show = show_by_id(id, session=session)
+        except NoResultFound:
+            return {
+                'status': 'error',
+                'message': 'Show with ID %s not found' % id
+            }, 404
+
+        episodes = [get_episode_details(ep) for ep in show_episodes(show, session)]
+        show = get_series_details(show)
+
+        return jsonify({
+            'show': show,
+            'episodes': episodes
         })

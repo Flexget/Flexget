@@ -34,8 +34,10 @@ def display_summary(options):
     Display series summary.
     :param options: argparse options from the CLI
     """
+    session = Session()
     kwargs = {'configured': options.configured,
-              'premieres': options.premieres}
+              'premieres': options.premieres,
+              'session': session}
     if options.new:
         kwargs['status'] = 'new'
         kwargs['days'] = options.new
@@ -165,10 +167,10 @@ def get_latest_status(episode):
 
 def display_details(name):
     """Display detailed series information, ie. series show NAME"""
-
+    session = Session()
     name = normalize_series_name(name)
     # Sort by length of name, so that partial matches always show shortest matching title
-    matches = shows_by_name(name)
+    matches = shows_by_name(name, session=session)
     if not matches:
         console('ERROR: Unknown series `%s`' % name)
         return
@@ -184,7 +186,7 @@ def display_details(name):
     console(' %-63s%-15s' % ('Identifier, Title', 'Quality'))
     console('-' * 79)
 
-    episodes = show_episodes(series)
+    episodes = show_episodes(series, session=session)
     for episode in episodes:
 
         if episode.identifier is None:
