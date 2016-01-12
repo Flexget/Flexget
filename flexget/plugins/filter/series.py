@@ -1858,18 +1858,24 @@ class SeriesGetShowsAPI(APIResource):
         })
 
 
+show_ep_id_parser = api.parser()
+show_ep_id_parser.add_argument('ep_id', help="Episode ID to start getting the series from (e.g. S02E01, 2013-12-11,"
+                                             " or 9, depending on how the series is numbered")
+
+
 @series_api.route('/<int:id>')
 class SeriesShowDetailsAPI(APIResource):
     @api.response(404, 'ID not found')
     @api.response(200, 'Show information retrieved successfully', show_details_schema)
     def get(self, id, session):
+        """ Get show details by ID """
         try:
             show = show_by_id(id, session=session)
         except NoResultFound:
             return {
-                'status': 'error',
-                'message': 'Show with ID %s not found' % id
-            }, 404
+                       'status': 'error',
+                       'message': 'Show with ID %s not found' % id
+                   }, 404
 
         episodes = [get_episode_details(ep) for ep in show_episodes(show, session)]
         show = get_series_details(show)
@@ -1878,3 +1884,50 @@ class SeriesShowDetailsAPI(APIResource):
             'show': show,
             'episodes': episodes
         })
+
+    @api.response(200, 'Removed series or episode from DB')
+    @api.response(400, 'Unrecognized ep_id')
+    @api.response(404, 'ID not found')
+    @api.doc(parser=show_ep_id_parser)
+    def delete(self, id, session):
+        """ Remove episode or series from DB """
+        try:
+            show = show_by_id(id, session=session)
+        except NoResultFound:
+            return {
+                       'status': 'error',
+                       'message': 'Show with ID %s not found' % id
+                   }, 404
+
+        args = show_ep_id_parser.parse_args()
+        ep_id = args.get('ep_id')
+        name = show.name
+        if ep_id:
+            try:
+                forget_series_episode(name, ep_id)
+            except ValueError:
+                try:
+                    forget_series_episode(name, ep_id.upper())
+                except ValueError as e:
+                    return {
+                               'status': 'error',
+                               'message': str(e)
+                           }, 400
+
+            return {
+                       'status': 'success',
+                       'message': 'successfully removed episode %s from series %s' % (ep_id, name.capitalize())
+                   }, 200
+
+        else:
+            try:
+                forget_series(name)
+            except ValueError as e:
+                return {
+                           'status': 'error',
+                           'message': str(e)
+                       }, 400
+            return {
+                       'status': 'success',
+                       'message': 'successfully removed series %s from DB' % name.capitalize()
+                   }, 200

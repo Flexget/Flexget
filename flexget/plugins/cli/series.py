@@ -102,7 +102,7 @@ def begin(manager, options):
     ep_id = options.episode_id
     session = Session()
     try:
-        series = session.query(Series).filter(Series.name == series_name).first()
+        series = shows_by_name(series_name, session)[0]
         if not series:
             console('Series not yet in database, adding `%s`' % series_name)
             series = Series()
