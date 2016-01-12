@@ -1858,14 +1858,19 @@ class SeriesGetShowsAPI(APIResource):
         })
 
 
-show_ep_id_parser = api.parser()
-show_ep_id_parser.add_argument('ep_id', help="Episode ID to start getting the series from (e.g. S02E01, 2013-12-11,"
-                                             " or 9, depending on how the series is numbered")
+show_forget_parser = api.parser()
+show_forget_parser.add_argument('ep_id', help="Episode ID to start getting the series from (e.g. S02E01, 2013-12-11,"
+                                              " or 9, depending on how the series is numbered")
+
+show_begin_parser = api.parser()
+show_begin_parser.add_argument('ep_id', required=True, help="Episode ID to start getting the series"
+                                                            " from (e.g. S02E01, 2013-12-11,4 or 9, "
+                                                            "depending on how the series is numbered")
 
 
 @series_api.route('/<int:id>')
 class SeriesShowDetailsAPI(APIResource):
-    @api.response(404, 'ID not found')
+    @api.response(404, 'Show ID not found')
     @api.response(200, 'Show information retrieved successfully', show_details_schema)
     def get(self, id, session):
         """ Get show details by ID """
@@ -1887,8 +1892,8 @@ class SeriesShowDetailsAPI(APIResource):
 
     @api.response(200, 'Removed series or episode from DB')
     @api.response(400, 'Unrecognized ep_id')
-    @api.response(404, 'ID not found')
-    @api.doc(parser=show_ep_id_parser)
+    @api.response(404, 'Show ID not found')
+    @api.doc(parser=show_forget_parser)
     def delete(self, id, session):
         """ Remove episode or series from DB """
         try:
@@ -1899,7 +1904,7 @@ class SeriesShowDetailsAPI(APIResource):
                        'message': 'Show with ID %s not found' % id
                    }, 404
 
-        args = show_ep_id_parser.parse_args()
+        args = show_forget_parser.parse_args()
         ep_id = args.get('ep_id')
         name = show.name
         if ep_id:
@@ -1916,7 +1921,7 @@ class SeriesShowDetailsAPI(APIResource):
 
             return {
                        'status': 'success',
-                       'message': 'successfully removed episode %s from series %s' % (ep_id, name.capitalize())
+                       'message': 'successfully removed episode `%s` from series `%s`' % (ep_id, name.capitalize())
                    }, 200
 
         else:
@@ -1929,5 +1934,67 @@ class SeriesShowDetailsAPI(APIResource):
                        }, 400
             return {
                        'status': 'success',
-                       'message': 'successfully removed series %s from DB' % name.capitalize()
+                       'message': 'successfully removed series `%s` from DB' % name.capitalize()
                    }, 200
+
+    @api.response(200, 'Episodes for series will be accepted starting with ep_id')
+    @api.response(400, 'Unrecognized ep_id')
+    @api.response(404, 'Show ID not found')
+    @api.doc(parser=show_begin_parser)
+    def put(self, id, session):
+        """ Set the initial episode to start downloading from """
+        try:
+            show = show_by_id(id, session=session)
+        except NoResultFound:
+            return {
+                       'status': 'error',
+                       'message': 'Show with ID %s not found' % id
+                   }, 404
+
+        args = show_begin_parser.parse_args()
+        ep_id = args.get('ep_id')
+        try:
+            set_series_begin(show, ep_id)
+        except ValueError as e:
+            return {
+                       'status': 'error',
+                       'message': str(e)
+                   }, 400
+        return {
+                   'status': 'success',
+                   'message': 'Episodes for `%s` will be accepted starting with `%s`' % (show.name, ep_id)
+               }, 200
+
+
+@series_api.route('/<name>')
+class SeriesBeginByNameAPI(APIResource):
+    @api.response(200, 'Adding series and setting first accepted episode to ep_id ')
+    @api.response(500, 'Shows already exists')
+    @api.doc(parser=show_begin_parser)
+    def post(self, name, session):
+        """ Create a new show and set its first accepted episode """
+        normalized_name = normalize_series_name(name)
+        matches = shows_by_name(normalized_name, session=session)
+        if matches:
+            return {
+                       'status': 'error',
+                       'message': 'Show `%s` already exist in DB' % name
+                   }, 500
+        show = Series()
+        show.name = name
+        session.add(show)
+
+        args = show_begin_parser.parse_args()
+        ep_id = args.get('ep_id')
+        try:
+            set_series_begin(show, ep_id)
+        except ValueError as e:
+            return {
+                       'status': 'error',
+                       'message': str(e)
+                   }, 400
+        return {
+                   'status': 'success',
+                   'message': 'Successfully added series `%s` and set first accepted episode to `%s`' % (
+                   show.name, ep_id)
+               }, 200
