@@ -1598,7 +1598,7 @@ def register_parser_arguments():
                              help=argparse.SUPPRESS)
 
 
-series_api = api.namespace('series', description='Series')
+series_api = api.namespace('series', description='Flexget Series operations')
 
 show_object = {
     'type': 'object',
@@ -1656,7 +1656,7 @@ class SeriesListAPI(APIResource):
     @api.response(200, 'Series list retrieved successfully', series_list_schema)
     @api.doc(parser=series_list_parser)
     def get(self, session=None):
-        """ List shows """
+        """ List existing shows """
         args = series_list_parser.parse_args()
         kwargs = {
             'configured': args.get('configured'),
