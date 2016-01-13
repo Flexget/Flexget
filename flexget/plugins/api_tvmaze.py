@@ -240,7 +240,7 @@ class TVMazeEpisodes(Base):
             return True
         time_dif = datetime.now() - self.last_update
         expiration = time_dif.days > UPDATE_INTERVAL
-        log.debug('episode {0}, season {1} for series {2} is expired.', self.number, self.season_number, self.series_id)
+        log.debug('episode %s, season %s for series %s is expired.', self.number, self.season_number, self.series_id)
         return expiration
 
 
