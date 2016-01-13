@@ -1649,30 +1649,36 @@ series_list_schema = {
     }
 }
 
+series_list_configured_enum_list = ['configured', 'unconfigured', 'all']
+series_list_status_enum_list = ['new', 'stale']
+series_list_sort_value_enum_list = ['show_name', 'episodes_behind_latest']
+series_list_sort_order_enum_list = ['desc', 'asc']
+
 
 def series_list_configured_enum(value):
-    enum = ['configured', 'unconfigured', 'all']
+    enum = series_list_configured_enum_list
     if value not in enum:
         raise ValueError('Value expected to be in' + ' ,'.join(enum))
     return value
 
 
 def series_list_status_enum(value):
-    enum = ['new', 'stale']
+    enum = series_list_status_enum_list
     if value not in enum:
         raise ValueError('Value expected to be in' + ' ,'.join(enum))
     return value
 
 
 def series_list_sort_value_enum(value):
-    enum = ['show_name', 'episodes_behind_latest']
+    enum = series_list_sort_value_enum_list
     if value not in enum:
         raise ValueError('Value expected to be in' + ' ,'.join(enum))
     return value
 
 
 def series_list_sort_order_enum(value):
-    enum = ['desc', 'asc']
+    """ Sort oder enum. Return True for 'desc' and False for 'asc' """
+    enum = series_list_sort_order_enum_list
     if value not in enum:
         raise ValueError('Value expected to be in' + ' ,'.join(enum))
     if value == 'desc':
@@ -1727,17 +1733,24 @@ def get_episode_details(episode):
 series_list_schema = api.schema('list_series', series_list_schema)
 
 series_list_parser = api.parser()
-series_list_parser.add_argument('configured', type=series_list_configured_enum, default='configured',
-                                help="Filter by 'configured', 'unconfigured' or 'all'")
-series_list_parser.add_argument('premieres', type=inputs.boolean, default='false',
-                                help="Filter by downloaded premieres only")
-series_list_parser.add_argument('status', type=series_list_status_enum, help="Filter by 'new' or 'stale' status")
-series_list_parser.add_argument('days', type=int, help='Filter status by number of days')
-series_list_parser.add_argument('page', type=int, default=1, help='Page number')
-series_list_parser.add_argument('max', type=int, default=100, help='Shows per page')
+series_list_parser.add_argument('in_config', type=series_list_configured_enum, default='configured',
+                                help="Filter list if shows are currently in configuration. "
+                                     "Filter by {0}. Default is configured.".format(
+                                    ' ,'.join(series_list_configured_enum_list)))
+series_list_parser.add_argument('premieres', type=inputs.boolean, default=False,
+                                help="Filter by downloaded premieres only. Default is False.")
+series_list_parser.add_argument('status', type=series_list_status_enum,
+                                help="Filter by {0} status".format(' ,'.join(series_list_status_enum_list)))
+series_list_parser.add_argument('days', type=int,
+                                help="Filter status by number of days. Default is 7 for new and 365 for stale")
+series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
+series_list_parser.add_argument('max', type=int, default=100, help='Shows per page. Default is 100.')
 series_list_parser.add_argument('sort_by', type=series_list_sort_value_enum, default='show_name',
-                                help="Sort response by 'show_name', 'episodes_behind_latest'")
-series_list_parser.add_argument('order', type=series_list_sort_order_enum, default='desc', help='Sorting order')
+                                help="Sort response by {0}. Default is show_name.".format(
+                                        ' ,'.join(series_list_sort_value_enum_list)))
+series_list_parser.add_argument('order', type=series_list_sort_order_enum, default='desc',
+                                help="Sorting order. One of {0}. Default is desc".format(
+                                        ' ,'.join(series_list_sort_order_enum_list)))
 
 
 @series_api.route('/')
@@ -1752,9 +1765,12 @@ class SeriesListAPI(APIResource):
         max_results = args['max']
         sort_by = args['sort_by']
         order = args['order']
+        # In case the default 'desc' order was received
+        if order == 'desc':
+            order = True
 
         kwargs = {
-            'configured': args.get('configured'),
+            'configured': args.get('in_config'),
             'premieres': args.get('premieres'),
             'status': args.get('status'),
             'days': args.get('days'),
@@ -1838,9 +1854,10 @@ show_details_schema = api.schema('show_details', show_details_schema)
 shows_schema = api.schema('list_of_shows', shows_schema)
 
 
-@series_api.route('/search/<name>')
+@series_api.route('/search/<string:name>')
 class SeriesGetShowsAPI(APIResource):
     @api.response(200, 'Show list retrieved successfully', shows_schema)
+    @api.doc(params={'name': 'Name of the show(s) to search'})
     def get(self, name, session):
         """ List of shows matching lookup name """
         name = normalize_series_name(name)
