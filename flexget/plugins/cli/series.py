@@ -34,74 +34,73 @@ def display_summary(options):
     Display series summary.
     :param options: argparse options from the CLI
     """
-    session = Session()
-    kwargs = {'configured': options.configured,
-              'premieres': options.premieres,
-              'session': session}
-    if options.new:
-        kwargs['status'] = 'new'
-        kwargs['days'] = options.new
-    elif options.stale:
-        kwargs['status'] = 'stale'
-        kwargs['days'] = options.stale
+    with Session() as session:
+        kwargs = {'configured': options.configured,
+                  'premieres': options.premieres,
+                  'session': session}
+        if options.new:
+            kwargs['status'] = 'new'
+            kwargs['days'] = options.new
+        elif options.stale:
+            kwargs['status'] = 'stale'
+            kwargs['days'] = options.stale
 
-    query = display_series_summary(**kwargs)
-
-    if options.porcelain:
-        formatting = '%-30s %s %-10s %s %-10s %s %-20s'
-        console(formatting % ('Name', '|', 'Latest', '|', 'Age', '|', 'Downloaded'))
-    else:
-        formatting = ' %-30s %-10s %-10s %-20s'
-        console('-' * 79)
-        console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
-        console('-' * 79)
-
-    for series in query.order_by(Series.name).yield_per(10):
-        series_name = series.name
-        if len(series_name) > 30:
-            series_name = series_name[:27] + '...'
-
-        new_ep = ' '
-        behind = 0
-        status = 'N/A'
-        age = 'N/A'
-        episode_id = 'N/A'
-        latest = get_latest_release(series)
-        if latest:
-            if latest.first_seen > datetime.now() - timedelta(days=2):
-                if options.porcelain:
-                    pass
-                else:
-                    new_ep = '>'
-            behind = new_eps_after(latest)
-            status = get_latest_status(latest)
-            age = latest.age
-            episode_id = latest.identifier
-
-        if behind:
-            episode_id += ' +%s' % behind
+        query = display_series_summary(**kwargs)
 
         if options.porcelain:
-            console(formatting % (series_name, '|', episode_id, '|', age, '|', status))
+            formatting = '%-30s %s %-10s %s %-10s %s %-20s'
+            console(formatting % ('Name', '|', 'Latest', '|', 'Age', '|', 'Downloaded'))
         else:
-            console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
-        if behind >= 3:
-            console(' ! Latest download is %d episodes behind, this may require '
-                    'manual intervention' % behind)
+            formatting = ' %-30s %-10s %-10s %-20s'
+            console('-' * 79)
+            console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
+            console('-' * 79)
 
-    if options.porcelain:
-        pass
-    else:
-        console('-' * 79)
-        console(' > = new episode ')
-        console(' Use `flexget series show NAME` to get detailed information')
+        for series in query.order_by(Series.name).yield_per(10):
+            series_name = series.name
+            if len(series_name) > 30:
+                series_name = series_name[:27] + '...'
+
+            new_ep = ' '
+            behind = 0
+            status = 'N/A'
+            age = 'N/A'
+            episode_id = 'N/A'
+            latest = get_latest_release(series)
+            if latest:
+                if latest.first_seen > datetime.now() - timedelta(days=2):
+                    if options.porcelain:
+                        pass
+                    else:
+                        new_ep = '>'
+                behind = new_eps_after(latest)
+                status = get_latest_status(latest)
+                age = latest.age
+                episode_id = latest.identifier
+
+            if behind:
+                episode_id += ' +%s' % behind
+
+            if options.porcelain:
+                console(formatting % (series_name, '|', episode_id, '|', age, '|', status))
+            else:
+                console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
+            if behind >= 3:
+                console(' ! Latest download is %d episodes behind, this may require '
+                        'manual intervention' % behind)
+
+        if options.porcelain:
+            pass
+        else:
+            console('-' * 79)
+            console(' > = new episode ')
+            console(' Use `flexget series show NAME` to get detailed information')
 
 
 def begin(manager, options):
     series_name = options.series_name
     ep_id = options.episode_id
-    session = Session()
-    try:
+    with Session() as session:
         series = shows_by_name(series_name, session)[0]
         if not series:
             console('Series not yet in database, adding `%s`' % series_name)
@@ -115,9 +114,7 @@ def begin(manager, options):
         else:
             console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
             session.commit()
-    finally:
-        session.close()
-    manager.config_changed()
+        manager.config_changed()
 
 
 def forget(manager, options):
@@ -167,60 +164,60 @@ def get_latest_status(episode):
 
 def display_details(name):
     """Display detailed series information, ie. series show NAME"""
-    session = Session()
-    name = normalize_series_name(name)
-    # Sort by length of name, so that partial matches always show shortest matching title
-    matches = shows_by_name(name, session=session)
-    if not matches:
-        console('ERROR: Unknown series `%s`' % name)
-        return
-    # Pick the best matching series
-    series = matches[0]
-    console('Showing results for `%s`.' % series.name)
-    if len(matches) > 1:
-        console('WARNING: Multiple series match to `%s`.' % name)
-        console('Be more specific to see the results of other matches:')
-        for s in matches[1:]:
-            console(' - %s' % s.name)
+    with Session() as session:
+        name = normalize_series_name(name)
+        # Sort by length of name, so that partial matches always show shortest matching title
+        matches = shows_by_name(name, session=session)
+        if not matches:
+            console('ERROR: Unknown series `%s`' % name)
+            return
+        # Pick the best matching series
+        series = matches[0]
+        console('Showing results for `%s`.' % series.name)
+        if len(matches) > 1:
+            console('WARNING: Multiple series match to `%s`.' % name)
+            console('Be more specific to see the results of other matches:')
+            for s in matches[1:]:
+                console(' - %s' % s.name)
 
-    console(' %-63s%-15s' % ('Identifier, Title', 'Quality'))
-    console('-' * 79)
+        console(' %-63s%-15s' % ('Identifier, Title', 'Quality'))
+        console('-' * 79)
 
-    episodes = show_episodes(series, session=session)
-    for episode in episodes:
+        episodes = show_episodes(series, session=session)
+        for episode in episodes:
 
-        if episode.identifier is None:
-            console(' None <--- Broken!')
-        else:
-            console(' %s (%s) - %s' % (episode.identifier, episode.identified_by or 'N/A', episode.age))
-
-        for release in episode.releases:
-            status = release.quality.name
-            title = release.title
-            if len(title) > 55:
-                title = title[:55] + '...'
-            if release.proper_count > 0:
-                status += '-proper'
-                if release.proper_count > 1:
-                    status += str(release.proper_count)
-            if release.downloaded:
-                console('  * %-60s%-15s' % (title, status))
+            if episode.identifier is None:
+                console(' None <--- Broken!')
             else:
-                console('    %-60s%-15s' % (title, status))
+                console(' %s (%s) - %s' % (episode.identifier, episode.identified_by or 'N/A', episode.age))
 
-    console('-' * 79)
-    console(' * = downloaded')
-    if not series.identified_by:
-        console('')
-        console(' Series plugin is still learning which episode numbering mode is ')
-        console(' correct for this series (identified_by: auto).')
-        console(' Few duplicate downloads can happen with different numbering schemes')
-        console(' during this time.')
-    else:
-        console(' Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by)
-    console(' See option `identified_by` for more information.')
-    if series.begin:
-        console(' Begin episode for this series set to `%s`.' % series.begin.identifier)
+            for release in episode.releases:
+                status = release.quality.name
+                title = release.title
+                if len(title) > 55:
+                    title = title[:55] + '...'
+                if release.proper_count > 0:
+                    status += '-proper'
+                    if release.proper_count > 1:
+                        status += str(release.proper_count)
+                if release.downloaded:
+                    console('  * %-60s%-15s' % (title, status))
+                else:
+                    console('    %-60s%-15s' % (title, status))
+
+        console('-' * 79)
+        console(' * = downloaded')
+        if not series.identified_by:
+            console('')
+            console(' Series plugin is still learning which episode numbering mode is ')
+            console(' correct for this series (identified_by: auto).')
+            console(' Few duplicate downloads can happen with different numbering schemes')
+            console(' during this time.')
+        else:
+            console(' Series uses `%s` mode to identify episode numbering (identified_by).' % series.identified_by)
+        console(' See option `identified_by` for more information.')
+        if series.begin:
+            console(' Begin episode for this series set to `%s`.' % series.begin.identifier)
 
 
 @event('options.register')
