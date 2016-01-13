@@ -442,7 +442,7 @@ def get_latest_status(episode):
     return status.rstrip(', ') if status else None
 
 
-def display_series_summary(configured=None, premieres=None, status=None, days=None, session=None):
+def get_series_summary(configured=None, premieres=None, status=None, days=None, session=None):
     """
     Return a query with results for all series.
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
@@ -1764,7 +1764,7 @@ class SeriesListAPI(APIResource):
 
         }
 
-        series_list = display_series_summary(**kwargs)
+        series_list = get_series_summary(**kwargs)
         series_list = series_list.order_by(Series.name)
 
         num_of_shows = series_list.count()

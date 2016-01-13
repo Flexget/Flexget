@@ -11,7 +11,7 @@ from flexget.manager import Session
 try:
     from flexget.plugins.filter.series import (Series, Episode, Release, SeriesTask, forget_series,
                                                forget_series_episode, set_series_begin, normalize_series_name,
-                                               new_eps_after, get_latest_release, display_series_summary, shows_by_name,
+                                               new_eps_after, get_latest_release, get_series_summary, shows_by_name,
                                                show_episodes)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
@@ -45,7 +45,7 @@ def display_summary(options):
             kwargs['status'] = 'stale'
             kwargs['days'] = options.stale
 
-        query = display_series_summary(**kwargs)
+        query = get_series_summary(**kwargs)
 
         if options.porcelain:
             formatting = '%-30s %s %-10s %s %-10s %s %-20s'
