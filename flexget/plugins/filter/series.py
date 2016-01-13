@@ -753,7 +753,7 @@ def forget_series_episode(name, identifier):
 def shows_by_name(normalized_name, session=None):
     """ Returns all series matching `normalized_name` """
     return session.query(Series).filter(Series._name_normalized.contains(normalized_name)).order_by(
-        func.char_length(Series.name)).all()
+            func.char_length(Series.name)).all()
 
 
 def show_by_id(show_id, session=None):
@@ -1162,8 +1162,8 @@ class FilterSeries(FilterSeriesBase):
 
         for entry in entries:
             # skip processed entries
-            if (entry.get('series_parser') and entry['series_parser'].valid and
-                        entry['series_parser'].name.lower() != series_name.lower()):
+            if (entry.get('series_parser') and entry['series_parser'].valid and entry[
+                'series_parser'].name.lower() != series_name.lower()):
                 continue
 
             # Quality field may have been manipulated by e.g. assume_quality. Use quality field from entry if available.
@@ -1191,9 +1191,8 @@ class FilterSeries(FilterSeriesBase):
             reason = None
 
             # sort episodes in order of quality
-            entries.sort(
-                    key=lambda e: (e['quality'], e['series_parser'].episodes, e['series_parser'].proper_count),
-                    reverse=True)
+            entries.sort(key=lambda e: (e['quality'], e['series_parser'].episodes, e['series_parser'].proper_count),
+                         reverse=True)
 
             log.debug('start with episodes: %s', [e['title'] for e in entries])
 
@@ -1349,8 +1348,8 @@ class FilterSeries(FilterSeriesBase):
 
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
-            if (entry['quality'] in downloaded_qualities and
-                        entry['series_parser'].proper_count > downloaded_qualities[entry['quality']]):
+            if (entry['quality'] in downloaded_qualities and entry['series_parser'].proper_count > downloaded_qualities[
+                entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
@@ -1412,9 +1411,8 @@ class FilterSeries(FilterSeriesBase):
 
         if latest and latest.identified_by == episode.identified_by:
             # Allow any previous episodes this season, or previous episodes within grace if sequence mode
-            if (not backfill and (episode.season < latest.season or
-                                      (episode.identified_by == 'sequence' and episode.number < (
-                                                  latest.number - grace)))):
+            if (not backfill and (episode.season < latest.season or (
+                            episode.identified_by == 'sequence' and episode.number < (latest.number - grace)))):
                 log.debug('too old! rejecting all occurrences')
                 for entry in entries:
                     entry.reject('Too much in the past from latest downloaded episode %s' % latest.identifier)
@@ -1877,10 +1875,9 @@ class SeriesShowDetailsAPI(APIResource):
         try:
             show = show_by_id(show_id, session=session)
         except NoResultFound:
-            return {
-                       'status': 'error',
-                       'message': 'Show with ID %s not found' % show_id
-                   }, 404
+            return {'status': 'error',
+                    'message': 'Show with ID %s not found' % show_id
+                    }, 404
 
         episodes = [get_episode_details(ep) for ep in show_episodes(show, session)]
         show = get_series_details(show)

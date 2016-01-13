@@ -9,10 +9,9 @@ from flexget.logger import console
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.filter.series import (Series, Release, SeriesTask, forget_series,
-                                               forget_series_episode, set_series_begin, normalize_series_name,
-                                               new_eps_after, get_latest_release, get_series_summary, shows_by_name,
-                                               show_episodes)
+    from flexget.plugins.filter.series import (Series, forget_series, forget_series_episode, set_series_begin,
+                                               normalize_series_name, new_eps_after, get_latest_release,
+                                               get_series_summary, shows_by_name, show_episodes)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
