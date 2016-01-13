@@ -429,10 +429,12 @@ def queue_get(session=None, downloaded=False):
     :param bool downloaded: Whether or not to return only downloaded
     :return: List of QueuedMovie objects (detached from session)
     """
+    query = session.query(QueuedMovie)
     if not downloaded:
-        return session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).all()
+        query = query.filter(QueuedMovie.downloaded == None)
     else:
-        return session.query(QueuedMovie).filter(QueuedMovie.downloaded != None).all()
+        query = query.filter(QueuedMovie.downloaded != None)
+    return query.all()
 
 
 @event('plugin.register')
