@@ -482,6 +482,8 @@ def movie_queue_sort_value_enum(value):
 
 def movie_queue_sort_order_enum(value):
     enum = ['desc', 'asc']
+    if isinstance(value, bool):
+        return value
     if value not in enum:
         raise ValueError('Value expected to be in' + ' ,'.join(enum))
     if value == 'desc':
@@ -494,10 +496,10 @@ movie_queue_schema = api.schema('list_movie_queue', movie_queue_schema)
 movie_queue_parser = api.parser()
 movie_queue_parser.add_argument('page', type=int, default=1, help='Page number')
 movie_queue_parser.add_argument('max', type=int, default=100, help='Movies per page')
-movie_queue_parser.add_argument('downloaded_only', type=inputs.boolean, default='false', help='Show only downloaded')
+movie_queue_parser.add_argument('downloaded_only', type=inputs.boolean, default=False, help='Show only downloaded')
 movie_queue_parser.add_argument('sort_by', type=movie_queue_sort_value_enum, default='added',
                                 help="Sort response by 'added', 'downloaded', 'id', 'title'")
-movie_queue_parser.add_argument('order', type=movie_queue_sort_order_enum, default='desc', help='Sorting order')
+movie_queue_parser.add_argument('order', type=movie_queue_sort_order_enum, default=True, help='Sorting order')
 
 movie_add_results_schema = {
     'type': 'object',
