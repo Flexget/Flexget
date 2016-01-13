@@ -538,7 +538,7 @@ def get_latest_release(series, downloaded=True, season=None):
     :param Season: season to find newest release for
     :return: Instance of Episode or None if not found.
     """
-    session = Session()
+    session = Session.object_session(series)
     releases = session.query(Episode).join(Episode.releases, Episode.series).filter(Series.id == series.id)
 
     if downloaded:
