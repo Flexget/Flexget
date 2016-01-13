@@ -111,6 +111,11 @@ class TestMovieQueueAPI(APITest):
         assert rsp.status_code == 200
         assert mocked_queue_get.called
 
+        # Test using defaults
+        rsp = self.get('/movie_queue/')
+        assert rsp.status_code == 200
+        assert mocked_queue_get.called
+
     @patch.object(movie_queue, 'queue_add')
     def test_queue_add(self, mocked_queue_add):
         imdb_movie = {
