@@ -64,7 +64,7 @@ class OutputQBitTorrent(object):
             self.connect(config)
         for entry in task.accepted:
             data = {}
-            data['save_path'] = entry.get('movedone', config.get('movedone'))
+            data['savepath'] = entry.get('movedone', config.get('movedone'))
             data['label'] = entry.get('label', config['label']).lower()
             data['urls'] = [entry.get('url')]
             self.add_torrent(data)
