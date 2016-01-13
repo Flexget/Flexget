@@ -662,7 +662,7 @@ class PluginTransmissionClean(TransmissionBase):
         delete_files = bool(config['delete_files']) if 'delete_files' in config else False
         trans_checks = bool(config['transmission_seed_limits']) if 'transmission_seed_limits' in config else False
         tracker_re = re.compile(config['tracker'], re.IGNORECASE) if 'tracker' in config else None
-        directories_re = config['directories'] if 'directories' in config else None
+        directories_re = config.get('directories')
         
         session = self.client.get_session()
 
