@@ -1968,8 +1968,8 @@ class SeriesShowDetailsAPI(APIResource):
 
 @series_api.route('/<name>')
 class SeriesBeginByNameAPI(APIResource):
-    @api.response(200, 'Adding series and setting first accepted episode to ep_id ')
-    @api.response(500, 'Shows already exists')
+    @api.response(200, 'Adding series and setting first accepted episode to ep_id')
+    @api.response(500, 'Show already exists')
     @api.doc(parser=show_begin_parser)
     def post(self, name, session):
         """ Create a new show and set its first accepted episode """
