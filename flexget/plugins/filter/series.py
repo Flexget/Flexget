@@ -1916,12 +1916,12 @@ class SeriesShowDetailsAPI(APIResource):
                 except ValueError as e:
                     return {
                                'status': 'error',
-                               'message': str(e)
+                               'message': e.message
                            }, 400
 
             return {
                        'status': 'success',
-                       'message': 'successfully removed episode `%s` from series `%s`' % (ep_id, name.capitalize())
+                       'message': 'successfully removed episode `%s` from series `%s`' % (ep_id, name)
                    }, 200
 
         else:
@@ -1930,11 +1930,11 @@ class SeriesShowDetailsAPI(APIResource):
             except ValueError as e:
                 return {
                            'status': 'error',
-                           'message': str(e)
+                           'message': e.message
                        }, 400
             return {
                        'status': 'success',
-                       'message': 'successfully removed series `%s` from DB' % name.capitalize()
+                       'message': 'successfully removed series `%s` from DB' % name
                    }, 200
 
     @api.response(200, 'Episodes for series will be accepted starting with ep_id')
