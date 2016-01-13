@@ -1942,7 +1942,7 @@ class SeriesShowDetailsAPI(APIResource):
     @api.response(404, 'Show ID not found')
     @api.doc(parser=show_begin_parser)
     def put(self, id, session):
-        """ Set the initial episode to start downloading from """
+        """ Set the initial episode of an existing show """
         try:
             show = show_by_id(id, session=session)
         except NoResultFound:
@@ -1958,7 +1958,7 @@ class SeriesShowDetailsAPI(APIResource):
         except ValueError as e:
             return {
                        'status': 'error',
-                       'message': str(e)
+                       'message': e.message
                    }, 400
         return {
                    'status': 'success',
@@ -1991,7 +1991,7 @@ class SeriesBeginByNameAPI(APIResource):
         except ValueError as e:
             return {
                        'status': 'error',
-                       'message': str(e)
+                       'message': e.message
                    }, 400
         return {
                    'status': 'success',
