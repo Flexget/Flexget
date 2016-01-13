@@ -9,7 +9,7 @@ from flexget.logger import console
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.filter.series import (Series, Episode, Release, SeriesTask, forget_series,
+    from flexget.plugins.filter.series import (Series, Release, SeriesTask, forget_series,
                                                forget_series_episode, set_series_begin, normalize_series_name,
                                                new_eps_after, get_latest_release, get_series_summary, shows_by_name,
                                                show_episodes)

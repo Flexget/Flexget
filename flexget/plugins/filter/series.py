@@ -753,7 +753,7 @@ def forget_series_episode(name, identifier):
 def shows_by_name(normalized_name, session=None):
     """ Returns all series matching `normalized_name` """
     return session.query(Series).filter(Series._name_normalized.contains(normalized_name)).order_by(
-            func.char_length(Series.name)).all()
+        func.char_length(Series.name)).all()
 
 
 def show_by_id(show_id, session=None):
@@ -1350,7 +1350,7 @@ class FilterSeries(FilterSeriesBase):
         # Accept propers we actually need, and remove them from the list of entries to continue processing
         for entry in best_propers:
             if (entry['quality'] in downloaded_qualities and
-                entry['series_parser'].proper_count > downloaded_qualities[entry['quality']]):
+                        entry['series_parser'].proper_count > downloaded_qualities[entry['quality']]):
                 entry.accept('proper')
                 pass_filter.remove(entry)
 
