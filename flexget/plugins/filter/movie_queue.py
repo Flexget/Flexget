@@ -5,7 +5,6 @@ from math import ceil
 from operator import itemgetter
 
 from flask import jsonify, request
-from flask_restful import inputs
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
@@ -302,7 +301,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
         title = result['title']
         if not title:
             raise QueueError('Could not parse movie info for given parameters: title=%s, imdb_id=%s, tmdb_id=%s' % (
-            title, imdb_id, tmdb_id))
+                title, imdb_id, tmdb_id))
         imdb_id = result['imdb_id']
         tmdb_id = result['tmdb_id']
 
@@ -421,7 +420,7 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None)
 
 
 @with_session
-def queue_get(session=None, downloaded=False):
+def queue_get(session=None, downloaded=None):
     """
     Get the current movie queue.
 
@@ -430,11 +429,12 @@ def queue_get(session=None, downloaded=False):
     :return: List of QueuedMovie objects (detached from session)
     """
     query = session.query(QueuedMovie)
-    if not downloaded:
-        query = query.filter(QueuedMovie.downloaded == None)
+    if downloaded is False:
+        return query.filter(QueuedMovie.downloaded == None).all()
+    elif downloaded:
+        return query.filter(QueuedMovie.downloaded != None).all()
     else:
-        query = query.filter(QueuedMovie.downloaded != None)
-    return query.all()
+        return query.all()
 
 
 @event('plugin.register')
@@ -473,6 +473,22 @@ movie_queue_schema = {
 
     }
 }
+movie_queue_status_value_enum_list = ['pending', 'downloaded', 'all']
+
+
+def movie_queue_status_value_enum(value):
+    """ Movie queue status enum. Return True for 'downloaded', False for 'pending' and None for 'all' """
+    enum = movie_queue_status_value_enum_list
+    if isinstance(value, bool):
+        return value
+    if value not in enum:
+        raise ValueError('Value expected to be in' + ' ,'.join(enum))
+    if value == 'downloaded':
+        return True
+    elif value == 'pending':
+        return False
+    else:
+        return None
 
 
 def movie_queue_sort_value_enum(value):
@@ -498,7 +514,9 @@ movie_queue_schema = api.schema('list_movie_queue', movie_queue_schema)
 movie_queue_parser = api.parser()
 movie_queue_parser.add_argument('page', type=int, default=1, help='Page number')
 movie_queue_parser.add_argument('max', type=int, default=100, help='Movies per page')
-movie_queue_parser.add_argument('downloaded_only', type=inputs.boolean, default=False, help='Show only downloaded')
+movie_queue_parser.add_argument('status', type=movie_queue_status_value_enum, default=False,
+                                help='Filter list by status. Filter by {0}. Default is "pending"'.format(
+                                    ' ,'.join(movie_queue_status_value_enum_list)))
 movie_queue_parser.add_argument('sort_by', type=movie_queue_sort_value_enum, default='added',
                                 help="Sort response by 'added', 'downloaded', 'id', 'title'")
 movie_queue_parser.add_argument('order', type=movie_queue_sort_order_enum, default=True, help='Sorting order')
@@ -563,7 +581,7 @@ class MovieQueueAPI(APIResource):
         args = movie_queue_parser.parse_args()
         page = args['page']
         max_results = args['max']
-        downloaded = args['downloaded_only']
+        downloaded = args['status']
         sort_by = args['sort_by']
         order = args['order']
 
