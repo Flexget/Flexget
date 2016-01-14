@@ -81,6 +81,7 @@ series_list_schema = {
         'page_number': {'type': 'integer'}
     }
 }
+series_list_schema = api.schema('list_series', series_list_schema)
 
 episode_list_schema = {
     'type': 'object',
@@ -94,6 +95,17 @@ episode_list_schema = {
         'show': {'type': 'string'}
     }
 }
+episode_list_schema = api.schema('episode_list', episode_list_schema)
+
+episode_schema = {
+    'type': 'object',
+    'properties': {
+        'episodes': {'type': 'episode_object'},
+        'show_id': {'type': 'integer'},
+        'show': {'type': 'string'}
+    }
+}
+episode_schema = api.schema('episode_item', episode_schema)
 
 series_begin_input_schema = {
     'type': 'object',
@@ -101,6 +113,7 @@ series_begin_input_schema = {
         'episode_identifier': {'type': 'string'}
     }
 }
+series_begin_input_schema = api.schema('begin_item', series_begin_input_schema)
 
 series_list_configured_enum_list = ['configured', 'unconfigured', 'all']
 series_list_status_enum_list = ['new', 'stale']
@@ -207,9 +220,6 @@ def episode_in_show(series_id, episode_id):
         episode = session.query(Episode).filter(Episode.id == episode_id).one()
         return episode.series_id == series_id
 
-
-series_list_schema = api.schema('list_series', series_list_schema)
-series_begin_input_schema = api.schema('begin_item', series_begin_input_schema)
 
 series_list_parser = api.parser()
 series_list_parser.add_argument('in_config', type=series_list_configured_enum, default='configured',
@@ -474,7 +484,7 @@ class SeriesEpisodesAPI(APIResource):
                         'number_of_episodes': len(episodes),
                         'episodes': episodes})
 
-    @api.response(200, 'Successfully deleted all episodes from show')
+    @api.response(200, 'Successfully forgotten all episodes from show')
     def delete(self, show_id, session):
         """ Forgets all episodes of a show"""
         try:
@@ -492,7 +502,7 @@ class SeriesEpisodesAPI(APIResource):
                         'message': e.args[0]
                         }, 400
         return {'status': 'success',
-                'message': 'Successfully deleted all episodes from show %s' % show_id,
+                'message': 'Successfully forgotten all episodes from show %s' % show_id,
                 }, 200
 
 
@@ -502,7 +512,7 @@ class SeriesEpisodesAPI(APIResource):
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
 class SeriesEpisodeAPI(APIResource):
-    @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
+    @api.response(200, 'Episode retrieved successfully for show', episode_schema)
     def get(self, show_id, ep_id, session):
         """ Get episode by show ID and episode ID"""
         try:
@@ -525,3 +535,27 @@ class SeriesEpisodeAPI(APIResource):
             'show_id': show_id,
             'episode': get_episode_details(episode)
         })
+
+    @api.response(200, 'Episode successfully forgotten for show', episode_schema)
+    def delete(self, show_id, ep_id, session):
+        """ Forgets episode by show ID and episode ID """
+        try:
+            show = show_by_id(show_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Show with ID %s not found' % show_id
+                    }, 404
+        try:
+            episode = episode_by_id(ep_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Episode with ID %s not found' % ep_id
+                    }, 404
+        if not episode_in_show(show_id, ep_id):
+            return {'status': 'error',
+                    'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
+
+        forget_episodes_by_id(show_id, ep_id)
+        return {'status': 'success',
+                'message': 'Episode %s successfully forgotten for show %s' % (ep_id, show_id)
+                }
