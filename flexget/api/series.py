@@ -1,14 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 
 from math import ceil
-from operator import itemgetter
 
+from flask import request
 from flask_restful import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, jsonify
 from flexget.plugins.filter.series import get_latest_release, new_eps_after, get_series_summary, \
-    Series, normalize_series_name, shows_by_name, show_by_id, forget_series_episode, forget_series, \
+    Series, normalize_series_name, shows_by_name, show_by_id, forget_series, \
     set_series_begin
 
 series_api = api.namespace('series', description='Flexget Series operations')
@@ -63,6 +63,13 @@ series_list_schema = {
         'number_of_shows': {'type': 'integer'},
         'total_number_of_pages': {'type': 'integer'},
         'page_number': {'type': 'integer'}
+    }
+}
+
+series_begin_input_schema = {
+    'type': 'object',
+    'properties': {
+        'episode_identifier': {'type': 'string'}
     }
 }
 
@@ -173,6 +180,7 @@ def get_episode_details(episode):
 
 
 series_list_schema = api.schema('list_series', series_list_schema)
+series_begin_input_schema = api.schema('begin_item', series_begin_input_schema)
 
 series_list_parser = api.parser()
 series_list_parser.add_argument('in_config', type=series_list_configured_enum, default='configured',
@@ -239,7 +247,7 @@ class SeriesListAPI(APIResource):
             shows.append(get_series_details(series_list[show_number]))
 
         # TODO re-enable sorting
-        #sorted_show_list = sorted(shows, key=itemgetter(sort_by), reverse=order)
+        # sorted_show_list = sorted(shows, key=itemgetter(sort_by), reverse=order)
 
         return jsonify({
             'shows': shows,
@@ -316,17 +324,8 @@ class SeriesGetShowsAPI(APIResource):
         })
 
 
-show_forget_parser = api.parser()
-show_forget_parser.add_argument('ep_id', help="Episode ID to start getting the series from (e.g. S02E01, 2013-12-11,"
-                                              " or 9, depending on how the series is numbered")
-
-show_begin_parser = api.parser()
-show_begin_parser.add_argument('ep_id', required=True, help="Episode ID to start getting the series"
-                                                            " from (e.g. S02E01, 2013-12-11,4 or 9, "
-                                                            "depending on how the series is numbered")
-
-
 @series_api.route('/<int:show_id>')
+@api.doc(params={'show_id': 'ID of the show'})
 class SeriesShowDetailsAPI(APIResource):
     @api.response(404, 'Show ID not found')
     @api.response(200, 'Show information retrieved successfully', show_details_schema)
@@ -345,12 +344,10 @@ class SeriesShowDetailsAPI(APIResource):
             'show': show
         })
 
-    @api.response(200, 'Removed series or episode from DB')
-    @api.response(400, 'Unrecognized ep_id')
+    @api.response(200, 'Removed series from DB')
     @api.response(404, 'Show ID not found')
-    @api.doc(parser=show_forget_parser)
     def delete(self, show_id, session):
-        """ Remove episode or series from DB """
+        """ Remove series from DB """
         try:
             show = show_by_id(show_id, session=session)
         except NoResultFound:
@@ -358,39 +355,21 @@ class SeriesShowDetailsAPI(APIResource):
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
 
-        args = show_forget_parser.parse_args()
-        ep_id = args.get('ep_id')
         name = show.name
-        if ep_id:
-            try:
-                forget_series_episode(name, ep_id)
-            except ValueError:
-                try:
-                    forget_series_episode(name, ep_id.upper())
-                except ValueError as e:
-                    return {'status': 'error',
-                            'message': e.args[0]
-                            }, 400
 
-            return {'status': 'success',
-                    'message': 'successfully removed episode `%s` from series `%s`' % (ep_id, name)
-                    }, 200
-
-        else:
-            try:
-                forget_series(name)
-            except ValueError as e:
-                return {'status': 'error',
-                        'message': e.args[0]
-                        }, 400
-            return {'status': 'success',
-                    'message': 'successfully removed series `%s` from DB' % name
-                    }, 200
+        try:
+            forget_series(name)
+        except ValueError as e:
+            return {'status': 'error',
+                    'message': e.args[0]
+                    }, 400
+        return {'status': 'success',
+                'message': 'successfully removed series `%s` from DB' % name
+                }, 200
 
     @api.response(200, 'Episodes for series will be accepted starting with ep_id')
-    @api.response(400, 'Unrecognized ep_id')
     @api.response(404, 'Show ID not found')
-    @api.doc(parser=show_begin_parser)
+    @api.validate(series_begin_input_schema)
     def put(self, show_id, session):
         """ Set the initial episode of an existing show """
         try:
@@ -399,9 +378,8 @@ class SeriesShowDetailsAPI(APIResource):
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
-
-        args = show_begin_parser.parse_args()
-        ep_id = args.get('ep_id')
+        data = request.json
+        ep_id = data.get('episode_identifier')
         try:
             set_series_begin(show, ep_id)
         except ValueError as e:
@@ -417,7 +395,6 @@ class SeriesShowDetailsAPI(APIResource):
 class SeriesBeginByNameAPI(APIResource):
     @api.response(200, 'Adding series and setting first accepted episode to ep_id')
     @api.response(500, 'Show already exists')
-    @api.doc(parser=show_begin_parser)
     def post(self, name, session):
         """ Create a new show and set its first accepted episode """
         normalized_name = normalize_series_name(name)
@@ -430,15 +407,13 @@ class SeriesBeginByNameAPI(APIResource):
         show.name = name
         session.add(show)
 
-        args = show_begin_parser.parse_args()
-        ep_id = args.get('ep_id')
         try:
-            set_series_begin(show, ep_id)
+            set_series_begin(show)
         except ValueError as e:
             return {'status': 'error',
                     'message': e.args[0]
                     }, 400
         return {'status': 'success',
                 'message': 'Successfully added series `%s` and set first accepted episode to `%s`' % (
-                    show.name, ep_id)
+                    show.name)
                 }, 200
