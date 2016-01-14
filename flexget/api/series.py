@@ -507,10 +507,15 @@ class SeriesEpisodeAPI(APIResource):
         """ Get episode by show ID and episode ID"""
         try:
             show = show_by_id(show_id, session=session)
-            episode = episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
+                    }, 404
+        try:
+            episode = episode_by_id(ep_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Episode with ID %s not found' % ep_id
                     }, 404
         if not episode_in_show(show_id, ep_id):
             return {'status': 'error',
