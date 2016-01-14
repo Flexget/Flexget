@@ -25,10 +25,38 @@ begin_object = {
 release_object = {
     'type': 'object',
     'properties': {
-        'releases_id': {'type': 'integer'},
-        'release_quality': {'type': 'string'}
+        'release_id': {'type': 'integer'},
+        'release_title': {'type': 'string'},
+        'release_downloaded': {'type': 'string'},
+        'release_quality': {'type': 'string'},
+        'release_proper_count': {'type': 'integer'},
+        'release_first_seen': {'type': 'string'},
+        'release_episode_id': {'type': 'integer'}
     }
 }
+
+release_schema = {
+    'type': 'object',
+    'properties': {
+        'episode_id': {'type': 'integer'},
+        'release': release_object
+    }
+}
+release_schema = api.schema('release_schema', release_schema)
+
+release_list_schema = {
+    'type': 'object',
+    'properties': {
+        'releases': {
+            'type': 'array',
+            'items': release_object
+        },
+        'number_of_releases': {'type': 'integer'},
+        'episode_id': {'type': 'integer'},
+        'show_id': {'type': 'integer'}
+    }
+}
+release_list_schema = api.schema('release_list_schema', release_list_schema)
 
 latest_object = {
     'type': 'object',
@@ -100,7 +128,7 @@ episode_list_schema = api.schema('episode_list', episode_list_schema)
 episode_schema = {
     'type': 'object',
     'properties': {
-        'episodes': {'type': 'episode_object'},
+        'episode': {'type': episode_object},
         'show_id': {'type': 'integer'},
         'show': {'type': 'string'}
     }
@@ -152,6 +180,19 @@ def series_list_sort_order_enum(value):
     return False
 
 
+def get_release_details(release):
+    release_item = {
+        'release_id': release.id,
+        'release_title': release.title,
+        'release_downloaded': release.downloaded,
+        'release_quality': release.quality.name,
+        'release_proper_count': release.proper_count,
+        'release_first_seen': release.first_seen,
+        'release_episode_id': release.episode_id,
+    }
+    return release_item
+
+
 def get_episode_details(episode):
     episode_item = {
         'episode_id': episode.id,
@@ -190,11 +231,7 @@ def get_series_details(series):
         latest_ep_age = latest_ep.age
         new_eps_after_latest_ep = new_eps_after(latest_ep)
         for release in latest_ep.downloaded_releases:
-            rel = {
-                'releases_id': release.id,
-                'release_quality': release.quality.name
-            }
-            downloaded_releases.append(rel)
+            downloaded_releases.append(get_release_details(release))
     else:
         latest_ep_id = latest_ep_identifier = latest_ep_age = new_eps_after_latest_ep = None
 
@@ -559,3 +596,63 @@ class SeriesEpisodeAPI(APIResource):
         return {'status': 'success',
                 'message': 'Episode %s successfully forgotten for show %s' % (ep_id, show_id)
                 }
+
+
+release_downloaded_enum_list = ['downloaded', 'not_downloaded', 'all']
+
+
+def release_downloaded_enum(value):
+    enum = release_downloaded_enum_list
+    if value not in enum:
+        raise ValueError('Value expected to be in' + ' ,'.join(enum))
+    return value
+
+
+release_list_parser = api.parser()
+release_list_parser.add_argument('downloaded', type=release_downloaded_enum, default='all',
+                                 help='Filter between {0}'.format(' ,'.join(release_downloaded_enum_list)))
+
+
+@api.response(404, 'Show ID not found')
+@api.response(404, 'Episode ID not found')
+@api.response(400, 'Episode with ep_ids does not belong to show with show_id')
+@series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases')
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
+class SeriesReleasesAPI(APIResource):
+    @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
+    @api.doc(parser=release_list_parser)
+    def get(self, show_id, ep_id, session):
+        """ Get all episodes releases by show ID and episode ID """
+        try:
+            show = show_by_id(show_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Show with ID %s not found' % show_id
+                    }, 404
+        try:
+            episode = episode_by_id(ep_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Episode with ID %s not found' % ep_id
+                    }, 404
+        if not episode_in_show(show_id, ep_id):
+            return {'status': 'error',
+                    'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
+        args = release_list_parser.parse_args()
+        downloaded = args['downloaded']
+        release_items = []
+        for release in episode.releases:
+            if downloaded == 'downloaded' and release.downloaded:
+                release_items.append(get_release_details(release))
+            elif downloaded == 'not_downloaded' and not release.downloaded:
+                release_items.append(get_release_details(release))
+            elif downloaded == 'all':
+                release_items.append(get_release_details(release))
+
+        return jsonify({
+            'releases': release_items,
+            'number_of_releases': len(release_items),
+            'episode_id': ep_id,
+            'show_id': show_id
+
+        })
