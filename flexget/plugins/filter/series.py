@@ -793,6 +793,10 @@ def episode_by_id(episode_id, session=None):
     return session.query(Episode).filter(Episode.id == episode_id).one()
 
 
+def release_by_id(release_id, session=None):
+    return session.query(Release).filter(Release.id == release_id).one()
+
+
 def show_episodes(series, session=None):
     """ Return all episodes of a given series """
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
