@@ -238,10 +238,11 @@ class SeriesListAPI(APIResource):
         for show_number in range(start, finish):
             shows.append(get_series_details(series_list[show_number]))
 
-        sorted_show_list = sorted(shows, key=itemgetter(sort_by), reverse=order)
+        # TODO re-enable sorting
+        #sorted_show_list = sorted(shows, key=itemgetter(sort_by), reverse=order)
 
         return jsonify({
-            'shows': sorted_show_list,
+            'shows': shows,
             'number_of_shows': num_of_shows,
             'page': page,
             'total_number_of_pages': pages
