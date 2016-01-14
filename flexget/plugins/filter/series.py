@@ -751,6 +751,12 @@ def shows_by_name(normalized_name, session=None):
             func.char_length(Series.name)).all()
 
 
+def shows_by_exact_name(normalized_name, session=None):
+    """ Returns all series matching `normalized_name` """
+    return session.query(Series).filter(Series._name_normalized == normalized_name).order_by(
+            func.char_length(Series.name)).all()
+
+
 def show_by_id(show_id, session=None):
     return session.query(Series).filter(Series.id == show_id).one()
 

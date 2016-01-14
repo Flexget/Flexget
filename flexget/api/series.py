@@ -9,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flexget.api import api, APIResource, jsonify
 from flexget.plugins.filter.series import get_latest_release, new_eps_after, get_series_summary, \
     Series, normalize_series_name, shows_by_name, show_by_id, forget_series, \
-    set_series_begin
+    set_series_begin, shows_by_exact_name
 
 series_api = api.namespace('series', description='Flexget Series operations')
 
@@ -395,10 +395,11 @@ class SeriesShowDetailsAPI(APIResource):
 class SeriesBeginByNameAPI(APIResource):
     @api.response(200, 'Adding series and setting first accepted episode to ep_id')
     @api.response(500, 'Show already exists')
+    @api.validate(series_begin_input_schema)
     def post(self, name, session):
         """ Create a new show and set its first accepted episode """
         normalized_name = normalize_series_name(name)
-        matches = shows_by_name(normalized_name, session=session)
+        matches = shows_by_exact_name(normalized_name, session=session)
         if matches:
             return {'status': 'error',
                     'message': 'Show `%s` already exist in DB' % name
@@ -406,14 +407,15 @@ class SeriesBeginByNameAPI(APIResource):
         show = Series()
         show.name = name
         session.add(show)
-
+        data = request.json
+        ep_id = data.get('episode_identifier')
         try:
-            set_series_begin(show)
+            set_series_begin(show, ep_id)
         except ValueError as e:
             return {'status': 'error',
                     'message': e.args[0]
                     }, 400
         return {'status': 'success',
                 'message': 'Successfully added series `%s` and set first accepted episode to `%s`' % (
-                    show.name)
+                    show.name, ep_id)
                 }, 200
