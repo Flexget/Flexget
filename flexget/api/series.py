@@ -10,7 +10,7 @@ from flexget.api import api, APIResource, jsonify
 from flexget.manager import Session
 from flexget.plugins.filter.series import get_latest_release, new_eps_after, get_series_summary, \
     Series, normalize_series_name, shows_by_name, show_by_id, forget_series, \
-    set_series_begin, shows_by_exact_name, forget_episodes_by_id, episode_by_id, Episode
+    set_series_begin, shows_by_exact_name, forget_episodes_by_id, episode_by_id, Episode, delete_release_by_id
 
 series_api = api.namespace('series', description='Flexget Series operations')
 
@@ -618,9 +618,9 @@ release_list_parser.add_argument('downloaded', type=release_downloaded_enum, def
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id')
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
+@api.doc(parser=release_list_parser)
 class SeriesReleasesAPI(APIResource):
     @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
-    @api.doc(parser=release_list_parser)
     def get(self, show_id, ep_id, session):
         """ Get all episodes releases by show ID and episode ID """
         try:
@@ -642,11 +642,9 @@ class SeriesReleasesAPI(APIResource):
         downloaded = args['downloaded']
         release_items = []
         for release in episode.releases:
-            if downloaded == 'downloaded' and release.downloaded:
-                release_items.append(get_release_details(release))
-            elif downloaded == 'not_downloaded' and not release.downloaded:
-                release_items.append(get_release_details(release))
-            elif downloaded == 'all':
+            if (downloaded == 'downloaded' and release.downloaded) or \
+                    (downloaded == 'not_downloaded' and not release.downloaded) or \
+                            downloaded == 'all':
                 release_items.append(get_release_details(release))
 
         return jsonify({
@@ -656,3 +654,37 @@ class SeriesReleasesAPI(APIResource):
             'show_id': show_id
 
         })
+
+    @api.response(200, 'Successfully deleted all releases for episode')
+    def delete(self, show_id, ep_id, session):
+        """ Deletes all episodes releases by show ID and episode ID """
+        try:
+            show = show_by_id(show_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Show with ID %s not found' % show_id
+                    }, 404
+        try:
+            episode = episode_by_id(ep_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Episode with ID %s not found' % ep_id
+                    }, 404
+        if not episode_in_show(show_id, ep_id):
+            return {'status': 'error',
+                    'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
+
+        args = release_list_parser.parse_args()
+        downloaded = args['downloaded']
+        release_items = []
+        for release in episode.releases:
+            if (downloaded == 'downloaded' and release.downloaded) or \
+                    (downloaded == 'not_downloaded' and not release.downloaded) or \
+                            downloaded == 'all':
+                release_items.append(release)
+        number_of_releases = len(release_items)
+        for release in release_items:
+            delete_release_by_id(release.id)
+        return {'status': 'success',
+                'message': 'Successfully deleted %s releases for episode %s and show %s' % (
+                number_of_releases, ep_id, show_id)}

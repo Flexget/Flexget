@@ -762,6 +762,17 @@ def forget_episodes_by_id(series_id, episode_id):
             raise ValueError('Unknown series %s' % series_id)
 
 
+def delete_release_by_id(release_id):
+    with Session() as session:
+        release = session.query(Release).filter(Release.id == release_id).first()
+        if release:
+            session.delete(release)
+            session.commit()
+            log.debug('Deleted release ID %s' % release_id)
+        else:
+            raise ValueError('Unknown identifier %s for release' % release_id)
+
+
 def shows_by_name(normalized_name, session=None):
     """ Returns all series matching `normalized_name` """
     return session.query(Series).filter(Series._name_normalized.contains(normalized_name)).order_by(
