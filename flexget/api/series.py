@@ -9,7 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from flexget.api import api, APIResource, jsonify
 from flexget.plugins.filter.series import get_latest_release, new_eps_after, get_series_summary, \
     Series, normalize_series_name, shows_by_name, show_by_id, forget_series, \
-    set_series_begin, shows_by_exact_name
+    set_series_begin, shows_by_exact_name, forget_episodes_by_id
 
 series_api = api.namespace('series', description='Flexget Series operations')
 
@@ -447,10 +447,10 @@ class SeriesBeginByNameAPI(APIResource):
                 }, 200
 
 
+@api.response(404, 'Show ID not found')
 @series_api.route('/<int:show_id>/episodes')
 @api.doc(params={'show_id': 'ID of the show'})
 class SeriesEpisodesAPI(APIResource):
-    @api.response(404, 'Show ID not found')
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
     def get(self, show_id, session):
         """ Get episodes by show ID """
@@ -466,3 +466,24 @@ class SeriesEpisodesAPI(APIResource):
                         'show_id': show_id,
                         'number_of_episodes': len(episodes),
                         'episodes': episodes})
+
+    @api.response(200, 'Successfully deleted all episodes from show')
+    def delete(self, show_id, session):
+        """ Forgets all episodes of a show"""
+        try:
+            show = show_by_id(show_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Show with ID %s not found' % show_id
+                    }, 404
+
+        for episode in show.episodes:
+            try:
+                forget_episodes_by_id(show.id, episode.id)
+            except ValueError as e:
+                return {'status': 'error',
+                        'message': e.args[0]
+                        }, 400
+        return {'status': 'success',
+                'message': 'Successfully deleted all episodes from show %s' % show_id,
+                }, 200

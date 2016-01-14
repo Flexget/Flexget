@@ -745,6 +745,23 @@ def forget_series_episode(name, identifier):
         session.close()
 
 
+def forget_episodes_by_id(series_id, episode_id):
+    with Session() as session:
+        series = session.query(Series).filter(Series.id == series_id).first()
+        if series:
+            episode = session.query(Episode).filter(Episode.id == episode_id).first()
+            if episode:
+                if not series.begin:
+                    series.identified_by = ''  # reset identified_by flag so that it will be recalculated
+                session.delete(episode)
+                session.commit()
+                log.debug('Episode %s from series %s removed from database.', episode_id, series_id)
+            else:
+                raise ValueError('Unknown identifier %s for series %s' % (episode_id, series_id))
+        else:
+            raise ValueError('Unknown series %s' % series_id)
+
+
 def shows_by_name(normalized_name, session=None):
     """ Returns all series matching `normalized_name` """
     return session.query(Series).filter(Series._name_normalized.contains(normalized_name)).order_by(
