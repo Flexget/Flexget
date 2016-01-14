@@ -43,6 +43,21 @@ latest_object = {
     }
 }
 
+episode_object = {
+    'type': 'object',
+    'properties': {
+        "episode_age": {'type': 'string'},
+        "episode_first_seen": {'type': 'string'},
+        "episode_id": {'type': 'string'},
+        "episode_identified_by": {'type': 'string'},
+        "episode_identifier": {'type': 'string'},
+        "episode_is_premiere": {'type': 'boolean'},
+        "episode_number": {'type': 'string'},
+        "episode_season": {'type': 'string'},
+        "episode_series_id": {'type': 'string'}
+    }
+}
+
 show_object = {
     'type': 'object',
     'properties': {
@@ -63,6 +78,19 @@ series_list_schema = {
         'number_of_shows': {'type': 'integer'},
         'total_number_of_pages': {'type': 'integer'},
         'page_number': {'type': 'integer'}
+    }
+}
+
+episode_list_schema = {
+    'type': 'object',
+    'properties': {
+        'episodes': {
+            'type': 'array',
+            'items': episode_object
+        },
+        'number_of_episodes': {'type': 'integer'},
+        'show_id': {'type': 'integer'},
+        'show': {'type': 'string'}
     }
 }
 
@@ -108,6 +136,21 @@ def series_list_sort_order_enum(value):
     if value == 'desc':
         return True
     return False
+
+
+def get_episode_details(episode):
+    episode_item = {
+        'episode_id': episode.id,
+        'episode_identifier': episode.identifier,
+        'episode_season': episode.season,
+        'episode_identified_by': episode.identified_by,
+        'episode_number': episode.number,
+        'episode_series_id': episode.series_id,
+        'episode_first_seen': episode.first_seen,
+        'episode_age': episode.age,
+        'episode_is_premiere': episode.is_premiere
+    }
+    return episode_item
 
 
 def get_series_details(series):
@@ -158,27 +201,6 @@ def get_series_details(series):
     return show_item
 
 
-def get_episode_details(episode):
-    releases = []
-
-    episode_item = {
-        'identifier': episode.identifier,
-        'identifier_type': episode.identified_by,
-        'download_age': episode.age
-    }
-
-    for release in episode.releases:
-        rel = {
-            'quality': release.quality.name,
-            'title': release.title,
-            'proper_count': release.proper_count,
-            'downloaded': release.downloaded
-        }
-        releases.append(rel)
-    episode_item['releases'] = releases
-    return episode_item
-
-
 series_list_schema = api.schema('list_series', series_list_schema)
 series_begin_input_schema = api.schema('begin_item', series_begin_input_schema)
 
@@ -195,12 +217,14 @@ series_list_parser.add_argument('days', type=int,
                                 help="Filter status by number of days. Default is 7 for new and 365 for stale")
 series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
 series_list_parser.add_argument('max', type=int, default=100, help='Shows per page. Default is 100.')
+"""
 series_list_parser.add_argument('sort_by', type=series_list_sort_value_enum, default='show_name',
                                 help="Sort response by {0}. Default is show_name.".format(
                                         ' ,'.join(series_list_sort_value_enum_list)))
 series_list_parser.add_argument('order', type=series_list_sort_order_enum, default='desc',
                                 help="Sorting order. One of {0}. Default is desc".format(
                                         ' ,'.join(series_list_sort_order_enum_list)))
+"""
 
 
 @series_api.route('/')
@@ -213,11 +237,13 @@ class SeriesListAPI(APIResource):
         args = series_list_parser.parse_args()
         page = args['page']
         max_results = args['max']
+        """
         sort_by = args['sort_by']
         order = args['order']
         # In case the default 'desc' order was received
         if order == 'desc':
             order = True
+        """
 
         kwargs = {
             'configured': args.get('in_config'),
@@ -326,7 +352,7 @@ class SeriesGetShowsAPI(APIResource):
 
 @series_api.route('/<int:show_id>')
 @api.doc(params={'show_id': 'ID of the show'})
-class SeriesShowDetailsAPI(APIResource):
+class SeriesShowAPI(APIResource):
     @api.response(404, 'Show ID not found')
     @api.response(200, 'Show information retrieved successfully', show_details_schema)
     def get(self, show_id, session):
@@ -419,3 +445,24 @@ class SeriesBeginByNameAPI(APIResource):
                 'message': 'Successfully added series `%s` and set first accepted episode to `%s`' % (
                     show.name, ep_id)
                 }, 200
+
+
+@series_api.route('/<int:show_id>/episodes')
+@api.doc(params={'show_id': 'ID of the show'})
+class SeriesEpisodesAPI(APIResource):
+    @api.response(404, 'Show ID not found')
+    @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
+    def get(self, show_id, session):
+        """ Get episodes by show ID """
+        try:
+            show = show_by_id(show_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Show with ID %s not found' % show_id
+                    }, 404
+        episodes = [get_episode_details(episode) for episode in show.episodes]
+
+        return jsonify({'show': show.name,
+                        'show_id': show_id,
+                        'number_of_episodes': len(episodes),
+                        'episodes': episodes})
