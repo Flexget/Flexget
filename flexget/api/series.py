@@ -7,21 +7,49 @@ from flask_restful import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, jsonify
-from flexget.plugins.filter.series import get_latest_release, new_eps_after, get_latest_status, get_series_summary, \
-    Series, normalize_series_name, shows_by_name, show_by_id, show_episodes, forget_series_episode, forget_series, \
+from flexget.plugins.filter.series import get_latest_release, new_eps_after, get_series_summary, \
+    Series, normalize_series_name, shows_by_name, show_by_id, forget_series_episode, forget_series, \
     set_series_begin
 
 series_api = api.namespace('series', description='Flexget Series operations')
+
+begin_object = {
+    'type': 'object',
+    'properties': {
+        'episode_id': {'type': 'integer'},
+        'episode_identifier': {'type': 'string'}
+    }
+}
+
+release_object = {
+    'type': 'object',
+    'properties': {
+        'releases_id': {'type': 'integer'},
+        'release_quality': {'type': 'string'}
+    }
+}
+
+latest_object = {
+    'type': 'object',
+    'properties': {
+        'episode_id': {'type': 'integer'},
+        'episode_identifier': {'type': 'string'},
+        'episode_age': {'type': 'string'},
+        'number_of_episodes_behind': {'type': 'integer'},
+        'downloaded_releases': {
+            'type': 'array',
+            'items': release_object
+        }
+    }
+}
 
 show_object = {
     'type': 'object',
     'properties': {
         'show_id': {'type': 'integer'},
         'show_name': {'type': 'string'},
-        'last_episode_id': {'type': 'string'},
-        'latest_release_downloaded': {'type': 'string'},
-        'episodes_behind_latest': {'type': 'integer'},
-        'age_since_last_download': {'type': 'string'}
+        'begin_episode': begin_object,
+        'latest_downloaded_episode': latest_object,
     }
 }
 
@@ -35,7 +63,6 @@ series_list_schema = {
         'number_of_shows': {'type': 'integer'},
         'total_number_of_pages': {'type': 'integer'},
         'page_number': {'type': 'integer'}
-
     }
 }
 
@@ -77,24 +104,49 @@ def series_list_sort_order_enum(value):
 
 
 def get_series_details(series):
-    series_name = series.name
-    latest = get_latest_release(series)
+    latest_ep = get_latest_release(series)
+    begin_ep = series.begin
 
-    if latest:
-        behind = new_eps_after(latest)
-        status = get_latest_status(latest)
-        age = latest.age
-        episode_id = latest.identifier
+    if begin_ep:
+        begin_ep_id = begin_ep.id
+        begin_ep_identifier = begin_ep.identifier
     else:
-        behind = status = age = episode_id = 'N/A'
+        begin_ep_id = begin_ep_identifier = None
+
+    begin = {
+        'episode_id': begin_ep_id,
+        'episode_identifier': begin_ep_identifier
+    }
+
+    downloaded_releases = []
+
+    if latest_ep:
+        latest_ep_id = latest_ep.id
+        latest_ep_identifier = latest_ep.identifier
+        latest_ep_age = latest_ep.age
+        new_eps_after_latest_ep = new_eps_after(latest_ep)
+        for release in latest_ep.downloaded_releases:
+            rel = {
+                'releases_id': release.id,
+                'release_quality': release.quality.name
+            }
+            downloaded_releases.append(rel)
+    else:
+        latest_ep_id = latest_ep_identifier = latest_ep_age = new_eps_after_latest_ep = None
+
+    latest = {
+        'episode_id': latest_ep_id,
+        'episode_identifier': latest_ep_identifier,
+        'episode_age': latest_ep_age,
+        'number_of_episodes_behind': new_eps_after_latest_ep,
+        'downloaded_releases': downloaded_releases
+    }
 
     show_item = {
         'show_id': series.id,
-        'show_name': series_name,
-        'last_episode_id': episode_id,
-        'latest_download_quality': status,
-        'episodes_behind_latest': behind,
-        'age_since_last_download': age
+        'show_name': series.name,
+        'begin_episode': begin,
+        'latest_downloaded_episode': latest
     }
     return show_item
 
@@ -286,12 +338,10 @@ class SeriesShowDetailsAPI(APIResource):
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
 
-        episodes = [get_episode_details(ep) for ep in show_episodes(show, session)]
         show = get_series_details(show)
 
         return jsonify({
-            'show': show,
-            'episodes': episodes
+            'show': show
         })
 
     @api.response(200, 'Removed series or episode from DB')
