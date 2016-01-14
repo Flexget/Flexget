@@ -778,6 +778,10 @@ def show_by_id(show_id, session=None):
     return session.query(Series).filter(Series.id == show_id).one()
 
 
+def episode_by_id(episode_id, session=None):
+    return session.query(Episode).filter(Episode.id == episode_id).one()
+
+
 def show_episodes(series, session=None):
     """ Return all episodes of a given series """
     episodes = session.query(Episode).filter(Episode.series_id == series.id)

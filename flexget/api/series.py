@@ -7,9 +7,10 @@ from flask_restful import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, jsonify
+from flexget.manager import Session
 from flexget.plugins.filter.series import get_latest_release, new_eps_after, get_series_summary, \
     Series, normalize_series_name, shows_by_name, show_by_id, forget_series, \
-    set_series_begin, shows_by_exact_name, forget_episodes_by_id
+    set_series_begin, shows_by_exact_name, forget_episodes_by_id, episode_by_id, Episode
 
 series_api = api.namespace('series', description='Flexget Series operations')
 
@@ -199,6 +200,12 @@ def get_series_details(series):
         'latest_downloaded_episode': latest
     }
     return show_item
+
+
+def episode_in_show(series_id, episode_id):
+    with Session() as session:
+        episode = session.query(Episode).filter(Episode.id == episode_id).one()
+        return episode.series_id == series_id
 
 
 series_list_schema = api.schema('list_series', series_list_schema)
@@ -487,3 +494,29 @@ class SeriesEpisodesAPI(APIResource):
         return {'status': 'success',
                 'message': 'Successfully deleted all episodes from show %s' % show_id,
                 }, 200
+
+
+@api.response(404, 'Show ID not found')
+@api.response(404, 'Episode ID not found')
+@api.response(400, 'Episode with ep_ids does not belong to show with show_id')
+@series_api.route('/<int:show_id>/episodes/<int:ep_id>')
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
+class SeriesEpisodeAPI(APIResource):
+    @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
+    def get(self, show_id, ep_id, session):
+        """ Get episode by show ID and episode ID"""
+        try:
+            show = show_by_id(show_id, session=session)
+            episode = episode_by_id(ep_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Show with ID %s not found' % show_id
+                    }, 404
+        if not episode_in_show(show_id, ep_id):
+            return {'status': 'error',
+                    'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
+        return jsonify({
+            'show': show.name,
+            'show_id': show_id,
+            'episode': get_episode_details(episode)
+        })
