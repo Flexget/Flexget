@@ -6,6 +6,7 @@ from netrc import netrc, NetrcParseError
 import logging
 import base64
 import re
+import time
 from urlparse import urlparse
 
 from flexget import plugin, validator
@@ -473,9 +474,6 @@ class PluginTransmission(TransmissionBase):
  file list unavailable for processing.' % entry['title'])
                             else:
                                 total_size = cli.get_torrent(r.id, ['id', 'totalSize']).totalSize
-                                if 'paused' in options['post'] and options['post']['paused'] == True:
-                                    cli.stop_torrent(r.id)
-                                    log.verbose('Torrent "%s" stopped because of addpaused=yes' % entry['title'])
                 
                         # Find files based on config
                         dl_list = []
@@ -592,6 +590,11 @@ class PluginTransmission(TransmissionBase):
                 if ('paused' in options['post'] and options['post']['paused'] == False or
                    'paused' not in options['post'] and cli.get_session().start_added_torrents == True):
                         cli.start_torrent(r.id)
+                elif ('paused' in options['post'] and options['post']['paused'] == True):
+                    log.debug('sleeping 5s to stop the torrent...')
+                    time.sleep(5)
+                    cli.stop_torrent(r.id)
+                    log.info('Torrent "%s" stopped because of addpaused=yes' % entry['title'])
 
             except TransmissionError as e:
                 log.debug('TransmissionError', exc_info=True)
