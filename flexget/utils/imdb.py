@@ -305,7 +305,10 @@ class ImdbParser(object):
         if storyline:
             plot_elem = storyline.find('p')
             if plot_elem:
-                self.plot_outline = plot_elem.find(text=True, recursive=False).strip()
+                # Remove the "Written By" part.
+                if plot_elem.em:
+                    plot_elem.em.replace_with('')
+                self.plot_outline = plot_elem.text.strip()
             else:
                 log.debug('No storyline found for %s' % self.imdb_id)
             self.genres = [i.text.strip().lower() for i in storyline.select('[itemprop="genre"] > a')]

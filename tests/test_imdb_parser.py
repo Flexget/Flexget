@@ -65,3 +65,15 @@ class TestImdbParser(object):
         assert parser.name == 'Master of None'
         # There is no year
         assert not parser.year
+
+    @use_vcr
+    def test_plot_with_links(self):
+        """Make sure plot doesn't terminate at the first link. GitHub #756"""
+        parser = ImdbParser()
+        parser.parse('tt2503944')
+        assert parser.plot_outline == ("Chef Adam Jones (Bradley Cooper) had it all - and lost it. A two-star Michelin "
+                                       "rockstar with the bad habits to match, the former enfant terrible of the Paris "
+                                       "restaurant scene did everything different every time out, and only ever cared "
+                                       "about the thrill of creating explosions of taste. To land his own kitchen and "
+                                       "that third elusive Michelin star though, he'll need the best of the best on "
+                                       "his side, including the beautiful Helene (Sienna Miller).")
