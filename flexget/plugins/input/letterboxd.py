@@ -142,7 +142,8 @@ class Letterboxd(object):
             next_page = soup.find(class_='paginate-next')
             if next_page is not None:
                 next_page = next_page.get('href')
-                url = base_url + next_page
+                if next_page is not None:
+                    url = base_url + next_page
 
         return entries
 

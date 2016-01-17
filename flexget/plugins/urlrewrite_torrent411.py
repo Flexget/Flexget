@@ -50,25 +50,29 @@ CATEGORIES = {
 
 SUB_CATEGORIES = {
 
-    'Anglais': [17, 540],
-    'VFF': [17, 541],
-    'Muet': [17, 722],
-    'Multi-Francais': [17, 542],
-    'Multi-Quebecois': [17, 1160],
-    'VFQ': [17, 719],
-    'VFSTFR': [17, 720],
-    'VOSTFR': [17, 721],
+    'Anglais': [51, 1209],
+    'VFF': [51, 1210],
+    'Muet': [51, 1211],
+    'Multi-Francais': [51, 1212],
+    'Multi-Quebecois': [51, 1213],
+    'VFQ': [51, 1214],
+    'VFSTFR': [51, 1215],
+    'VOASTA': [51, 1217], # new
+    'VOSTFR': [51, 1216],
 
-    'NTSC': [8, 20],
-    'PAL': [8, 21],
+# deprecated    'NTSC': [8, 20], 
+# deprecated    'PAL': [8, 21],
 
-    'BDrip-SD': [7, 8],
+    'BDrip-BRrip-SD': [7, 8], # new: replaces BDrip-SD and BRrip-SD
+    'BDrip-SD': [7, 8], # deprecated: replaced by 'BDrip-BRrip-SD'
     'Bluray-4K': [7, 1171],
     'Bluray-Full-Remux': [7, 17],
-    'BRrip-SD': [7, 9],
+    'BRrip-SD': [7, 8], # deprecated: was 9, replaced by 'BDrip-BRrip-SD'
     'DVD-R-5': [7, 13],
     'DVD-R-9': [7, 14],
     'DVDrip': [7, 10],
+    'HDlight-1080p': [7, 1208], # new
+    'HDlight-720p': [7, 1218],  # new
     'HDrip-1080p': [7, 16],
     'HDrip-720p': [7, 15],
     'TVrip-SD': [7, 11],
@@ -273,14 +277,12 @@ class UrlRewriteTorrent411(object):
               Sub-Category is any combination of:
 
               Anglais, VFF, Muet, Multi-Francais, Multi-Quebecois,
-              VFQ, VFSTFR, VOSTFR
+              VFQ, VFSTFR, VOSTFR, VOASTA
 
-              NTSC, PAL
-
-              BDrip-SD, Bluray-4K, Bluray-Full-Remux, BRrip-SD, DVD-R-5,
-              DVD-R-9, DVDrip, HDrip-1080p, HDrip-720p, TVrip-SD,
-              TVripHD-1080p, TVripHD-720p, VCD-SVCD-VHSrip, WEBrip,
-              WEBripHD-1080p, WEBripHD-1080p
+              BDrip-BRrip-SD, Bluray-4K, Bluray-Full-Remux, DVD-R-5,
+              DVD-R-9, DVDrip, HDrip-1080p, HDrip-720p, HDlight-1080p,
+              HDlight-720p, TVrip-SD, TVripHD-1080p, TVripHD-720p,
+              VCD-SVCD-VHSrip, WEBrip, WEBripHD-1080p, WEBripHD-1080p
 
               2D, 3D-Converti-Amateur, 3D-Converti-Pro, 3D-Natif
     """

@@ -22,6 +22,7 @@ ConnectionConfig = namedtuple('ConnectionConfig', ['host', 'port', 'username', '
 CONNECT_TRIES = 3
 RETRY_INTERVAL = 15
 RETRY_STEP = 5
+SOCKET_TIMEOUT = 15
 
 # make separate os.path instances for local vs remote path styles
 localpath = os.path
@@ -48,7 +49,8 @@ def sftp_connect(conf):
             sftp = pysftp.Connection(host=conf.host, username=conf.username,
                                      private_key=conf.private_key, password=conf.password, 
                                      port=conf.port, private_key_pass=conf.private_key_pass)
-            log.debug('Connected to %s' % conf.host)
+            sftp.timeout = SOCKET_TIMEOUT
+            log.verbose('Connected to %s' % conf.host)
         except Exception as e:
             if not tries:
                 raise e
@@ -71,7 +73,6 @@ def dependency_check():
         raise plugin.DependencyError(issued_by='sftp', 
                                      missing='pysftp', 
                                      message='sftp plugin requires the pysftp Python module.')
-
 
 class SftpList(object):
     """
@@ -327,7 +328,7 @@ class SftpDownload(object):
             sftp.get(path, destination)
         except Exception as e:
             log.error('Failed to download %s (%s)' % (path, e))
-            if remotepath.exists(destination):
+            if localpath.exists(destination):
                 log.debug('Removing partially downloaded file %s' % destination)
                 os.remove(destination)
             raise e
