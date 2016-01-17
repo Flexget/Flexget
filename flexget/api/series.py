@@ -262,7 +262,7 @@ def episode_in_show(series_id, episode_id):
 def release_in_episode(episode_id, release_id):
     with Session() as session:
         release = session.query(Release).filter(Release.id == release_id).one()
-        return release.episode_id_id == episode_id
+        return release.episode_id == episode_id
 
 
 series_list_parser = api.parser()
@@ -528,6 +528,7 @@ class SeriesEpisodesAPI(APIResource):
                         'number_of_episodes': len(episodes),
                         'episodes': episodes})
 
+    @api.response(500, 'Error when trying to forget episode')
     @api.response(200, 'Successfully forgotten all episodes from show')
     def delete(self, show_id, session):
         """ Forgets all episodes of a show"""
@@ -544,14 +545,14 @@ class SeriesEpisodesAPI(APIResource):
             except ValueError as e:
                 return {'status': 'error',
                         'message': e.args[0]
-                        }, 400
+                        }, 500
         return {'status': 'success',
                 'message': 'Successfully forgotten all episodes from show %s' % show_id,
                 }, 200
 
 
 @api.response(404, 'Show ID not found')
-@api.response(404, 'Episode ID not found')
+@api.response(414, 'Episode ID not found')
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id')
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
@@ -570,7 +571,7 @@ class SeriesEpisodeAPI(APIResource):
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
-                    }, 404
+                    }, 414
         if not episode_in_show(show_id, ep_id):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
@@ -594,7 +595,7 @@ class SeriesEpisodeAPI(APIResource):
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
-                    }, 404
+                    }, 414
         if not episode_in_show(show_id, ep_id):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
@@ -621,7 +622,7 @@ release_list_parser.add_argument('downloaded', type=release_downloaded_enum, def
 
 
 @api.response(404, 'Show ID not found')
-@api.response(404, 'Episode ID not found')
+@api.response(414, 'Episode ID not found')
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id')
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
@@ -641,7 +642,7 @@ class SeriesReleasesAPI(APIResource):
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
-                    }, 404
+                    }, 414
         if not episode_in_show(show_id, ep_id):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
@@ -676,7 +677,7 @@ class SeriesReleasesAPI(APIResource):
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
-                    }, 404
+                    }, 414
         if not episode_in_show(show_id, ep_id):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
@@ -698,16 +699,16 @@ class SeriesReleasesAPI(APIResource):
 
 
 @api.response(404, 'Show ID not found')
-@api.response(404, 'Episode ID not found')
-@api.response(404, 'Release ID not found')
+@api.response(414, 'Episode ID not found')
+@api.response(424, 'Release ID not found')
 @api.response(400, 'Episode with ep_id does not belong to show with show_id')
-@api.response(400, 'Release with rel_id does not belong to episode with ep_id')
-@series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/<int:rel_id>')
+@api.response(410, 'Release with rel_id does not belong to episode with ep_id')
+@series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/<int:rel_id>/')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'})
-class SeriesReleasesAPI(APIResource):
+class SeriesReleaseAPI(APIResource):
     @api.response(200, 'Release retrieved successfully for episode')
     def get(self, show_id, ep_id, rel_id, session):
-        """ Get episode release by show ID, episode ID and release ID """
+        ''' Get episode release by show ID, episode ID and release ID '''
         try:
             show = show_by_id(show_id, session=session)
         except NoResultFound:
@@ -719,19 +720,19 @@ class SeriesReleasesAPI(APIResource):
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
-                    }, 404
+                    }, 414
         try:
             release = release_by_id(rel_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Release with ID %s not found' % rel_id
-                    }, 404
+                    }, 424
         if not episode_in_show(show_id, ep_id):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
         if not release_in_episode(ep_id, rel_id):
             return {'status': 'error',
-                    'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 400
+                    'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
 
         return jsonify({
             'show': show.name,
@@ -739,3 +740,35 @@ class SeriesReleasesAPI(APIResource):
             'episode_id': ep_id,
             'release': get_release_details(release)
         })
+
+    @api.response(200, 'Release successfully deleted')
+    def delete(self, show_id, ep_id, rel_id, session):
+        ''' Delete episode release by show ID, episode ID and release ID '''
+        try:
+            show = show_by_id(show_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Show with ID %s not found' % show_id
+                    }, 404
+        try:
+            episode = episode_by_id(ep_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Episode with ID %s not found' % ep_id
+                    }, 414
+        try:
+            release = release_by_id(rel_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Release with ID %s not found' % rel_id
+                    }, 424
+        if not episode_in_show(show_id, ep_id):
+            return {'status': 'error',
+                    'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
+        if not release_in_episode(ep_id, rel_id):
+            return {'status': 'error',
+                    'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
+
+        delete_release_by_id(rel_id)
+        return {'status': 'success',
+                'message': 'Successfully deleted release %s for episode %s and show %s' % (rel_id, ep_id, show_id)}
