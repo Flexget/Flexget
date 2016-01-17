@@ -746,6 +746,7 @@ def forget_series_episode(name, identifier):
 
 
 def forget_episodes_by_id(series_id, episode_id):
+    """ Removes a specific episode using `series_id` and `episode_id`."""
     with Session() as session:
         series = session.query(Series).filter(Series.id == series_id).first()
         if series:
@@ -786,14 +787,17 @@ def shows_by_exact_name(normalized_name, session=None):
 
 
 def show_by_id(show_id, session=None):
+    """ Return an instance of a show by querying its ID """
     return session.query(Series).filter(Series.id == show_id).one()
 
 
 def episode_by_id(episode_id, session=None):
+    """ Return an instance of an episode by querying its ID """
     return session.query(Episode).filter(Episode.id == episode_id).one()
 
 
 def release_by_id(release_id, session=None):
+    """ Return an instance of a release by querying its ID """
     return session.query(Release).filter(Release.id == release_id).one()
 
 
@@ -808,6 +812,20 @@ def show_episodes(series, session=None):
     else:
         episodes = episodes.order_by(Episode.identifier).all()
     return episodes
+
+
+def episode_in_show(series_id, episode_id):
+    """ Return True if `episode_id` is part of show with `series_id`, else return False """
+    with Session() as session:
+        episode = session.query(Episode).filter(Episode.id == episode_id).one()
+        return episode.series_id == series_id
+
+
+def release_in_episode(episode_id, release_id):
+    """ Return True if `release_id` is part of episode with `episode_id`, else return False """
+    with Session() as session:
+        release = session.query(Release).filter(Release.id == release_id).one()
+        return release.episode_id == episode_id
 
 
 def populate_entry_fields(entry, parser, config):

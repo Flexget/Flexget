@@ -7,11 +7,10 @@ from flask_restful import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, jsonify
-from flexget.manager import Session
 from flexget.plugins.filter.series import get_latest_release, new_eps_after, get_series_summary, \
     Series, normalize_series_name, shows_by_name, show_by_id, forget_series, \
-    set_series_begin, shows_by_exact_name, forget_episodes_by_id, episode_by_id, Episode, delete_release_by_id, Release, \
-    release_by_id
+    set_series_begin, shows_by_exact_name, forget_episodes_by_id, episode_by_id, delete_release_by_id, release_by_id, \
+    episode_in_show, release_in_episode
 
 series_api = api.namespace('series', description='Flexget Series operations')
 
@@ -251,18 +250,6 @@ def get_series_details(series):
         'latest_downloaded_episode': latest
     }
     return show_item
-
-
-def episode_in_show(series_id, episode_id):
-    with Session() as session:
-        episode = session.query(Episode).filter(Episode.id == episode_id).one()
-        return episode.series_id == series_id
-
-
-def release_in_episode(episode_id, release_id):
-    with Session() as session:
-        release = session.query(Release).filter(Release.id == release_id).one()
-        return release.episode_id == episode_id
 
 
 series_list_parser = api.parser()
