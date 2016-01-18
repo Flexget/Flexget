@@ -185,6 +185,8 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
 
     @property
     def series(self):
+        if self._guess_result.get('country') and hasattr(self._guess_result.get('country'), 'alpha2'):
+            return "%s (%s)" % (self._guess_result.get('title'), self._guess_result.get('country').alpha2)
         return self._guess_result.get('title')
 
     @property
