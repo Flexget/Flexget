@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import sys
 from distutils.version import LooseVersion
+from urllib2 import URLError
 
 from sqlalchemy import Column, Integer, String
 
@@ -263,6 +264,8 @@ class SendTelegram(object):
         except UnicodeDecodeError as e:
             self.log.trace('bot.getMe() raised: {!r}'.format(e))
             raise plugin.PluginWarning('invalid bot token')
+        except URLError as e:
+            self.log.error('Could not connect Telegram servers at this time, please try again later: %s', e.args[0])
 
     @staticmethod
     def _enforce_telegram_plugin_ver():
