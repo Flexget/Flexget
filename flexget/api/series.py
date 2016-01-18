@@ -308,7 +308,7 @@ class SeriesListAPI(APIResource):
         num_of_shows = series_list.count()
         pages = int(ceil(num_of_shows / float(max_results)))
 
-        shows = []
+        shows = sorted_show_list = []
         if page > pages and pages != 0:
             return {'error': 'page %s does not exist' % page}, 400
 

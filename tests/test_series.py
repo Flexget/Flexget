@@ -2,10 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 
 from StringIO import StringIO
 
+from mock import patch
+
 from flexget.logger import capture_output
 from flexget.manager import get_parser
 from flexget.task import TaskAbort
 from tests import FlexGetBase, build_parser_function
+from flexget.plugins.filter import series
+from tests.test_api import APITest
 
 
 def age_series(**kwargs):
@@ -2273,3 +2277,11 @@ class TestSeriesForget(FlexGetBase):
         self.execute_task('get_episode')
         assert len(self.task.accepted) == 1, 'new release not accepted after forgetting ep'
         assert self.task.accepted[0] != first_rls, 'same release accepted on second run'
+
+
+class TestSeriesAPI(APITest):
+    def test_series_get(self):
+        # Test default
+        rsp = self.get('/series/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
