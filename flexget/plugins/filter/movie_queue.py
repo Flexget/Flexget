@@ -6,7 +6,7 @@ from operator import itemgetter
 
 from flask import jsonify, request
 from flask_restful import inputs
-from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
+from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update, func
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from flexget import db_schema, plugin
@@ -342,7 +342,7 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
     elif tmdb_id:
         query = query.filter(QueuedMovie.tmdb_id == tmdb_id)
     elif title:
-        query = query.filter(QueuedMovie.title == title)
+        query = query.filter(func.lower(QueuedMovie.title) == func.lower(title))
     elif movie_id:
         query = query.filter(QueuedMovie.id == movie_id)
     try:
