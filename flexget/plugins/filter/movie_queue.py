@@ -443,7 +443,7 @@ def register_plugin():
     plugin.register(MovieQueue, 'movie_queue', api_ver=2)
 
 
-movie_queue_api = api.namespace('movie_queue', description='Movie Queue')
+movie_queue_api = api.namespace('movie_queue', description='Movie Queue operations')
 
 movie_object = {
     'type': 'object',
