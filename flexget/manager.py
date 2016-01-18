@@ -883,5 +883,5 @@ class Manager(object):
                          'Please verify you are running the latest version of flexget by using "flexget -V" '
                          'from CLI or by using version_checker plugin'
                          ' at http://flexget.com/wiki/Plugins/version_checker. You are currently using'
-                         'version %s', filename, get_current_flexget_version())
+                         ' version %s', filename, get_current_flexget_version())
         log.debug('Traceback:', exc_info=True)
