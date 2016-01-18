@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import datetime
 from math import ceil
 
 from flask import request
@@ -145,7 +146,7 @@ series_begin_input_schema = api.schema('begin_item', series_begin_input_schema)
 
 series_list_configured_enum_list = ['configured', 'unconfigured', 'all']
 series_list_status_enum_list = ['new', 'stale']
-series_list_sort_value_enum_list = ['show_name', 'episodes_behind_latest']
+series_list_sort_value_enum_list = ['show_name', 'episodes_behind_latest', 'last_download_date']
 series_list_sort_order_enum_list = ['desc', 'asc']
 
 
@@ -230,17 +231,18 @@ def get_series_details(series):
         latest_ep_identifier = latest_ep.identifier
         latest_ep_age = latest_ep.age
         new_eps_after_latest_ep = new_eps_after(latest_ep)
-        for release in latest_ep.downloaded_releases:
-            downloaded_releases.append(get_release_details(release))
+        release = get_release_details(
+                sorted(latest_ep.downloaded_releases,
+                       key=lambda release: release.first_seen if release.downloaded else None, reverse=True)[0])
     else:
-        latest_ep_id = latest_ep_identifier = latest_ep_age = new_eps_after_latest_ep = None
+        latest_ep_id = latest_ep_identifier = latest_ep_age = new_eps_after_latest_ep = release = None
 
     latest = {
         'episode_id': latest_ep_id,
         'episode_identifier': latest_ep_identifier,
         'episode_age': latest_ep_age,
         'number_of_episodes_behind': new_eps_after_latest_ep,
-        'downloaded_releases': downloaded_releases
+        'last_downloaded_release': release
     }
 
     show_item = {
@@ -265,14 +267,13 @@ series_list_parser.add_argument('days', type=int,
                                 help="Filter status by number of days. Default is 7 for new and 365 for stale")
 series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
 series_list_parser.add_argument('max', type=int, default=100, help='Shows per page. Default is 100.')
-"""
+
 series_list_parser.add_argument('sort_by', type=series_list_sort_value_enum, default='show_name',
                                 help="Sort response by {0}. Default is show_name.".format(
                                         ' ,'.join(series_list_sort_value_enum_list)))
 series_list_parser.add_argument('order', type=series_list_sort_order_enum, default='desc',
                                 help="Sorting order. One of {0}. Default is desc".format(
                                         ' ,'.join(series_list_sort_order_enum_list)))
-"""
 
 
 @series_api.route('/')
@@ -285,13 +286,12 @@ class SeriesListAPI(APIResource):
         args = series_list_parser.parse_args()
         page = args['page']
         max_results = args['max']
-        """
+
         sort_by = args['sort_by']
         order = args['order']
         # In case the default 'desc' order was received
         if order == 'desc':
             order = True
-        """
 
         kwargs = {
             'configured': args.get('in_config'),
@@ -320,11 +320,21 @@ class SeriesListAPI(APIResource):
         for show_number in range(start, finish):
             shows.append(get_series_details(series_list[show_number]))
 
-        # TODO re-enable sorting
-        # sorted_show_list = sorted(shows, key=itemgetter(sort_by), reverse=order)
+        if sort_by == 'show_name':
+            sorted_show_list = sorted(shows, key=lambda show: show['show_name'], reverse=order)
+        elif sort_by == 'episodes_behind_latest':
+            sorted_show_list = sorted(shows,
+                                      key=lambda show: show['latest_downloaded_episode']['number_of_episodes_behind'],
+                                      reverse=order)
+        elif sort_by == 'last_download_date':
+            sorted_show_list = sorted(shows,
+                                      key=lambda show: show['latest_downloaded_episode']['last_downloaded_release'][
+                                          'release_first_seen'] if show['latest_downloaded_episode'][
+                                          'last_downloaded_release'] else datetime.datetime(1970, 1, 1),
+                                      reverse=order)
 
         return jsonify({
-            'shows': shows,
+            'shows': sorted_show_list,
             'number_of_shows': num_of_shows,
             'page': page,
             'total_number_of_pages': pages
