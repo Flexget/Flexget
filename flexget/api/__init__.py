@@ -94,7 +94,7 @@ class Api(RestPlusAPI):
             return model
         return super(Api, self).inherit(name, parent, fields)
 
-    def validate(self, model):
+    def validate(self, model, doc=True):
         """
         When a method is decorated with this, json data submitted to the endpoint will be validated with the given
         `model`. This also auto-documents the expected model, as well as the possible :class:`ValidationError` response.
@@ -129,14 +129,6 @@ class Api(RestPlusAPI):
             # If first argument isn't a class this happens
             pass
         return super(Api, self).response(code_or_apierror, description)
-
-    def handle_error(self, error):
-        """Responsible for returning the proper response for errors in api methods."""
-        if isinstance(error, ApiError):
-            return jsonify(error.to_dict()), error.code
-        elif isinstance(error, HTTPException):
-            return jsonify({'code': error.code, 'error': error.description}), error.code
-        return super(Api, self).handle_error(error)
 
 
 class APIResource(Resource):
@@ -181,7 +173,7 @@ class ApiError(Exception):
 
     def to_dict(self):
         rv = self.payload or {}
-        rv.update(code=self.code, error=self.message)
+        rv.update(code=self.code, message=self.message)
         return rv
 
     @classmethod
@@ -237,6 +229,13 @@ class ValidationError(ApiError):
             else:
                 error_dict[attr] = getattr(error, attr)
         return error_dict
+
+
+@api.errorhandler(ApiError)
+@api.errorhandler(NotFoundError)
+@api.errorhandler(ValidationError)
+def api_errors(error):
+    return error.to_dict(), error.code
 
 
 @event('manager.daemon.started')
