@@ -2,13 +2,14 @@ from __future__ import unicode_literals, division, absolute_import
 
 from StringIO import StringIO
 
-from mock import patch
+from mock import patch, mock
 
 from flexget.logger import capture_output
 from flexget.manager import get_parser
 from flexget.task import TaskAbort
 from tests import FlexGetBase, build_parser_function
 from flexget.plugins.filter import series
+from flexget.plugins.filter.series import get_series_summary
 from tests.test_api import APITest
 
 
@@ -2280,8 +2281,26 @@ class TestSeriesForget(FlexGetBase):
 
 
 class TestSeriesAPI(APITest):
-    def test_series_get(self):
-        # Test default
+    @patch.object(series, 'get_series_summary')
+    def test_series_get(self, mock_series_get):
+        #No params
         rsp = self.get('/series/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_series_get.called
+
+        #Default params
+        rsp = self.get('/series/?max=100&sort_by=show_name&in_config=configured&order=desc&page=1')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        # Changed params
+        rsp = self.get('/series/?status=new&max=10&days=4&sort_by=last_download_date&in_config=all'
+                       '&premieres=true&order=asc&page=2')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+
+    def test_series_search(self):
+        rsp = self.get('/series/search/the%20big%20bang%20theory')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+
 
