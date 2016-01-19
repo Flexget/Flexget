@@ -466,7 +466,8 @@ class SeriesShowAPI(APIResource):
                     'message': e.args[0]
                     }, 400
         return {'status': 'success',
-                'message': 'Episodes for `%s` will be accepted starting with `%s`' % (show.name, ep_id)
+                'message': 'Episodes will be accepted starting with `%s`' % ep_id,
+                'show': get_series_details(show)
                 }, 200
 
 
@@ -496,7 +497,8 @@ class SeriesBeginByNameAPI(APIResource):
                     }, 400
         return {'status': 'success',
                 'message': 'Successfully added series `%s` and set first accepted episode to `%s`' % (
-                    show.name, ep_id)
+                    show.name, ep_id),
+                'show': get_series_details(show)
                 }, 200
 
 
