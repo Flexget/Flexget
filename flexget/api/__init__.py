@@ -162,7 +162,7 @@ class ApiError(Exception):
         'type': 'object',
         'properties': {
             'code': {'type': 'integer'},
-            'error': {'type': 'string'}
+            'message': {'type': 'string'}
         },
         'required': ['code', 'error']
     })
