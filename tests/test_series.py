@@ -2359,3 +2359,12 @@ class TestSeriesAPI(APITest):
         rsp = self.json_put('/series/1', data=json.dumps(ep_id))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         assert mock_show_by_id.called
+
+    def test_new_series_begin(self):
+        show = 'Test Show'
+        ep_id = {"episode_identifier": "s01e01"}
+
+        rsp = self.json_post(('/series/%s' % show), data=json.dumps(ep_id))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+
