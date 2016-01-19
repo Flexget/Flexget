@@ -2368,7 +2368,7 @@ class TestSeriesAPI(APITest):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
     @patch.object(series, 'show_by_id')
-    def test_series_episodes(self, mock_show_by_id):
+    def test_series_get_episodes(self, mock_show_by_id):
         show = series.Series()
         episode = series.Episode()
         release = series.Release()
@@ -2381,5 +2381,22 @@ class TestSeriesAPI(APITest):
         rsp = self.get('/series/1/episodes')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
         assert mock_show_by_id.called
+
+    @patch.object(series, 'forget_episodes_by_id')
+    @patch.object(series, 'show_by_id')
+    def test_series_delete_episodes(self, mock_show_by_id, mock_forget_episodes_by_id):
+        show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
+        release.downloaded = True
+        episode.releases.append(release)
+        show.episodes.append(episode)
+
+        mock_show_by_id.return_value = show
+
+        rsp = self.delete('/series/1/episodes')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+        assert mock_forget_episodes_by_id.called
 
 
