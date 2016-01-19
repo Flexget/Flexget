@@ -2,8 +2,11 @@ from __future__ import unicode_literals, division, absolute_import
 
 from StringIO import StringIO
 
+from mock import patch
+
 from flexget.logger import capture_output
-from flexget.manager import get_parser
+from flexget.manager import get_parser, Session
+from flexget.plugins.filter import series
 from flexget.task import TaskAbort
 from tests import FlexGetBase, build_parser_function
 from tests.test_api import APITest
@@ -2262,7 +2265,12 @@ class TestSeriesForget(FlexGetBase):
 
 
 class TestSeriesAPI(APITest):
-    def test_series_list_get(self):
+    @patch.object(series, 'get_series_summary')
+    def test_series_list_get(self, mock_series_list):
+        session = Session()
+        query = session.query(series.Series)
+        mock_series_list.return_value = query
+
         # No params
         rsp = self.get('/series/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
@@ -2280,7 +2288,50 @@ class TestSeriesAPI(APITest):
         rsp = self.get('/series/?status=bla&max=10&days=4&sort_by=last_download_date&in_config=all'
                        '&premieres=true&order=asc&page=2')
         assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        assert mock_series_list.call_count == 3, 'Should have 3 calls, is actually %s' % mock_series_list.call_count
 
-    def test_series_search(self):
+    @patch.object(series, 'new_eps_after')
+    @patch.object(series, 'get_latest_release')
+    @patch.object(series, 'show_by_id')
+    @patch.object(series, 'shows_by_name')
+    def test_series_search(self, mocked_series_search, mock_show_by_id, mock_latest_release, mock_new_eps_after):
+        show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
+        release.downloaded = True
+        episode.releases.append(release)
+
+        mock_show_by_id.return_value = show
+        mock_latest_release.return_value = episode
+        mock_new_eps_after.return_value = 0
+        mocked_series_search.return_value = [show]
+
         rsp = self.get('/series/search/the%20big%20bang%20theory')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+        assert mock_latest_release.called
+        assert mock_new_eps_after.called
+        assert mocked_series_search.called
+
+    @patch.object(series, 'new_eps_after')
+    @patch.object(series, 'get_latest_release')
+    @patch.object(series, 'show_by_id')
+    def test_series_get(self, mock_show_by_id, mock_latest_release, mock_new_eps_after):
+        show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
+        release.downloaded = True
+        episode.releases.append(release)
+
+        mock_show_by_id.return_value = show
+        mock_latest_release.return_value = episode
+        mock_new_eps_after.return_value = 0
+
+        rsp = self.get('/series/1')
+
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_latest_release.called
+        assert mock_new_eps_after.called
+        assert mock_show_by_id.called
+
+

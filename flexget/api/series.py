@@ -9,6 +9,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, jsonify
 from flexget.plugins.filter import series
+
 series_api = api.namespace('series', description='Flexget Series operations')
 
 begin_object = {
@@ -219,8 +220,6 @@ def get_series_details(show):
         'episode_id': begin_ep_id,
         'episode_identifier': begin_ep_identifier
     }
-
-    downloaded_releases = []
 
     if latest_ep:
         latest_ep_id = latest_ep.id
