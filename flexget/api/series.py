@@ -465,10 +465,10 @@ class SeriesShowAPI(APIResource):
             return {'status': 'error',
                     'message': e.args[0]
                     }, 400
-        return {'status': 'success',
+        return jsonify({'status': 'success',
                 'message': 'Episodes will be accepted starting with `%s`' % ep_id,
                 'show': get_series_details(show)
-                }, 200
+                })
 
 
 @series_api.route('/<name>')
@@ -495,11 +495,11 @@ class SeriesBeginByNameAPI(APIResource):
             return {'status': 'error',
                     'message': e.args[0]
                     }, 400
-        return {'status': 'success',
+        return jsonify({'status': 'success',
                 'message': 'Successfully added series `%s` and set first accepted episode to `%s`' % (
                     show.name, ep_id),
                 'show': get_series_details(show)
-                }, 200
+                })
 
 
 @api.response(404, 'Show ID not found')
