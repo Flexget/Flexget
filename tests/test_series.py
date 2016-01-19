@@ -2367,4 +2367,19 @@ class TestSeriesAPI(APITest):
         rsp = self.json_post(('/series/%s' % show), data=json.dumps(ep_id))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
+    @patch.object(series, 'show_by_id')
+    def test_series_episodes(self, mock_show_by_id):
+        show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
+        release.downloaded = True
+        episode.releases.append(release)
+        show.episodes.append(episode)
+
+        mock_show_by_id.return_value = show
+
+        rsp = self.get('/series/1/episodes')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+
 
