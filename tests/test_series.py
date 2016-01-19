@@ -2477,6 +2477,26 @@ class TestSeriesAPI(APITest):
         assert mock_episode_by_id.call_count == 3
         assert mock_episode_in_show.call_count == 3
 
+    @patch.object(series, 'release_in_episode')
+    @patch.object(series, 'release_by_id')
+    @patch.object(series, 'episode_in_show')
+    @patch.object(series, 'episode_by_id')
+    @patch.object(series, 'show_by_id')
+    def test_series_get_release(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show, mock_release_by_id,
+                                mock_release_in_episode):
+        show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
 
+        mock_show_by_id.return_value = show
+        mock_episode_by_id.return_value = episode
+        mock_release_by_id.return_value = release
 
+        rsp = self.get('/series/2/episodes/653/releases/1551/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+        assert mock_episode_by_id.called
+        assert mock_episode_in_show.called
+        assert mock_release_by_id.called
+        assert mock_release_in_episode.called
 
