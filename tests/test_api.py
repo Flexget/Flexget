@@ -76,7 +76,7 @@ class TestValidator(APITest):
         assert rsp.status_code == 400
         data = json.loads(rsp.data)
         assert data.get('code') == 400
-        assert data.get('error') == 'validation error'
+        assert data.get('message') == 'validation error'
         assert data.get('validation_errors')
         assert 'The keys' in data['validation_errors'][0]['message']
         assert 'invalid_plugin' in data['validation_errors'][0]['message']
