@@ -2348,13 +2348,21 @@ class TestSeriesAPI(APITest):
         assert mock_show_by_id.called
         assert mock_forget_series.called
 
+    @patch.object(series, 'new_eps_after')
+    @patch.object(series, 'get_latest_release')
     @patch.object(series, 'set_series_begin')
     @patch.object(series, 'show_by_id')
-    def test_series_begin(self, mock_show_by_id, mock_series_begin):
+    def test_series_begin(self, mock_show_by_id, mock_series_begin, mock_latest_release, mock_new_eps_after):
         show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
+        release.downloaded = True
+        episode.releases.append(release)
         ep_id = {"episode_identifier": "s01e01"}
 
         mock_show_by_id.return_value = show
+        mock_latest_release.return_value = episode
+        mock_new_eps_after.return_value = 0
 
         rsp = self.json_put('/series/1', data=json.dumps(ep_id))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
