@@ -2293,23 +2293,20 @@ class TestSeriesAPI(APITest):
 
     @patch.object(series, 'new_eps_after')
     @patch.object(series, 'get_latest_release')
-    @patch.object(series, 'show_by_id')
     @patch.object(series, 'shows_by_name')
-    def test_series_search(self, mocked_series_search, mock_show_by_id, mock_latest_release, mock_new_eps_after):
+    def test_series_search(self, mocked_series_search, mock_latest_release, mock_new_eps_after):
         show = series.Series()
         episode = series.Episode()
         release = series.Release()
         release.downloaded = True
         episode.releases.append(release)
 
-        mock_show_by_id.return_value = show
         mock_latest_release.return_value = episode
         mock_new_eps_after.return_value = 0
         mocked_series_search.return_value = [show]
 
         rsp = self.get('/series/search/the%20big%20bang%20theory')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_show_by_id.called
         assert mock_latest_release.called
         assert mock_new_eps_after.called
         assert mocked_series_search.called
@@ -2423,10 +2420,12 @@ class TestSeriesAPI(APITest):
         assert mock_episode_by_id.called
         assert mock_episode_in_show.called
 
+    @patch.object(series, 'forget_episodes_by_id')
     @patch.object(series, 'episode_in_show')
     @patch.object(series, 'episode_by_id')
     @patch.object(series, 'show_by_id')
-    def test_series_delete_episode(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show):
+    def test_series_delete_episode(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show,
+                                   mock_forget_episodes_by_id):
         show = series.Series()
         episode = series.Episode()
 
@@ -2438,6 +2437,7 @@ class TestSeriesAPI(APITest):
         assert mock_show_by_id.called
         assert mock_episode_by_id.called
         assert mock_episode_in_show.called
+        assert mock_forget_episodes_by_id.called
 
     @patch.object(series, 'episode_in_show')
     @patch.object(series, 'episode_by_id')
@@ -2515,7 +2515,7 @@ class TestSeriesAPI(APITest):
     @patch.object(series, 'episode_by_id')
     @patch.object(series, 'show_by_id')
     def test_series_delete_release(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show, mock_release_by_id,
-                                mock_release_in_episode, mock_delete_release_by_id):
+                                   mock_release_in_episode, mock_delete_release_by_id):
         show = series.Series()
         episode = series.Episode()
         release = series.Release()
@@ -2532,4 +2532,3 @@ class TestSeriesAPI(APITest):
         assert mock_release_by_id.called
         assert mock_release_in_episode.called
         assert mock_delete_release_by_id.called
-
