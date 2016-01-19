@@ -9,7 +9,7 @@ from collections import deque
 from flask import Flask, request, jsonify
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.resource import Resource
-from flask_restplus.model import ApiModel
+from flask_restplus.model import Model
 from flask_compress import Compress
 from jsonschema.exceptions import RefResolutionError
 from werkzeug.exceptions import HTTPException
@@ -36,11 +36,11 @@ def register_config():
     register_config_key('api', api_config_schema)
 
 
-class ApiSchemaModel(ApiModel):
+class ApiSchemaModel(Model):
     """A flask restplus :class:`flask_restplus.models.ApiModel` which can take a json schema directly."""
-    def __init__(self, schema, *args, **kwargs):
+    def __init__(self, name, schema, *args, **kwargs):
+        super(ApiSchemaModel, self).__init__(name, model={})
         self._schema = schema
-        super(ApiSchemaModel, self).__init__()
 
     @property
     def __schema__(self):
@@ -76,7 +76,10 @@ class Api(RestPlusAPI):
 
         :returns: An :class:`ApiSchemaModel` instance registered to this api.
         """
-        return self.model(name, **kwargs)(ApiSchemaModel(schema))
+        model = ApiSchemaModel(name, schema, **kwargs)
+        model.__apidoc__.update(kwargs)
+        self.models[name] = model
+        return model
 
     def inherit(self, name, parent, fields):
         """
@@ -84,7 +87,7 @@ class Api(RestPlusAPI):
         :class:`ApiSchemaModel`.
         """
         if isinstance(parent, ApiSchemaModel):
-            model = ApiSchemaModel(fields)
+            model = ApiSchemaModel(name, fields)
             model.__apidoc__['name'] = name
             model.__parent__ = parent
             self.models[name] = model
@@ -140,13 +143,14 @@ class APIResource(Resource):
     """All api resources should subclass this class."""
     method_decorators = [with_session]
 
-    def __init__(self):
+    def __init__(self, api, *args, **kwargs):
         self.manager = manager.manager
-        super(APIResource, self).__init__()
+        super(APIResource, self).__init__(api, *args, **kwargs)
 
 
 app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__path__[0]), 'templates'))
 app.config['REMEMBER_COOKIE_NAME'] = 'flexgetToken'
+app.config['DEBUG'] = True
 
 Compress(app)
 api = Api(

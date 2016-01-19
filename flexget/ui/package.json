@@ -23,6 +23,9 @@
     "gulp-uglify": "^1.4.1",
     "gulp-util": "^3.0.6",
     "gulp-watch": "^4.3.5",
+    "jasmine-core": "^2.3.4",
+    "karma-chrome-launcher": "^0.2.1",
+    "karma-jasmine": "^0.3.6",
     "main-bower-files": "^2.9.0"
   },
   "scripts": {

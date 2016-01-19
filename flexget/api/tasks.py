@@ -13,7 +13,7 @@ task_api_schema = {
     'type': 'object',
     'properties': {
         'name': {'type': 'string'},
-        'config': {'$ref': '/schema/plugins'}
+        'config': {'$ref': 'schema/plugins'}
     },
     'additionalProperties': False
 }
