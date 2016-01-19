@@ -8,11 +8,7 @@ from flask_restful import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource, jsonify
-from flexget.plugins.filter.series import get_latest_release, new_eps_after, get_series_summary, \
-    Series, normalize_series_name, shows_by_name, show_by_id, forget_series, \
-    set_series_begin, shows_by_exact_name, forget_episodes_by_id, episode_by_id, delete_release_by_id, release_by_id, \
-    episode_in_show, release_in_episode
-
+from flexget.plugins.filter import series
 series_api = api.namespace('series', description='Flexget Series operations')
 
 begin_object = {
@@ -209,9 +205,9 @@ def get_episode_details(episode):
     return episode_item
 
 
-def get_series_details(series):
-    latest_ep = get_latest_release(series)
-    begin_ep = series.begin
+def get_series_details(show):
+    latest_ep = series.get_latest_release(show)
+    begin_ep = show.begin
 
     if begin_ep:
         begin_ep_id = begin_ep.id
@@ -230,7 +226,7 @@ def get_series_details(series):
         latest_ep_id = latest_ep.id
         latest_ep_identifier = latest_ep.identifier
         latest_ep_age = latest_ep.age
-        new_eps_after_latest_ep = new_eps_after(latest_ep)
+        new_eps_after_latest_ep = series.new_eps_after(latest_ep)
         release = get_release_details(
                 sorted(latest_ep.downloaded_releases,
                        key=lambda release: release.first_seen if release.downloaded else None, reverse=True)[0])
@@ -246,8 +242,8 @@ def get_series_details(series):
     }
 
     show_item = {
-        'show_id': series.id,
-        'show_name': series.name,
+        'show_id': show.id,
+        'show_name': show.name,
         'begin_episode': begin,
         'latest_downloaded_episode': latest
     }
@@ -302,8 +298,8 @@ class SeriesListAPI(APIResource):
 
         }
 
-        series_list = get_series_summary(**kwargs)
-        series_list = series_list.order_by(Series.name)
+        series_list = series.get_series_summary(**kwargs)
+        series_list = series_list.order_by(series.Series.name)
 
         num_of_shows = series_list.count()
         pages = int(ceil(num_of_shows / float(max_results)))
@@ -395,8 +391,8 @@ class SeriesGetShowsAPI(APIResource):
     @api.doc(params={'name': 'Name of the show(s) to search'})
     def get(self, name, session):
         """ List of shows matching lookup name """
-        name = normalize_series_name(name)
-        matches = shows_by_name(name, session=session)
+        name = series.normalize_series_name(name)
+        matches = series.shows_by_name(name, session=session)
 
         shows = []
         for match in matches:
@@ -416,7 +412,7 @@ class SeriesShowAPI(APIResource):
     def get(self, show_id, session):
         """ Get show details by ID """
         try:
-            show = show_by_id(show_id, session=session)
+            show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
@@ -433,7 +429,7 @@ class SeriesShowAPI(APIResource):
     def delete(self, show_id, session):
         """ Remove series from DB """
         try:
-            show = show_by_id(show_id, session=session)
+            show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
@@ -442,7 +438,7 @@ class SeriesShowAPI(APIResource):
         name = show.name
 
         try:
-            forget_series(name)
+            series.forget_series(name)
         except ValueError as e:
             return {'status': 'error',
                     'message': e.args[0]
@@ -457,7 +453,7 @@ class SeriesShowAPI(APIResource):
     def put(self, show_id, session):
         """ Set the initial episode of an existing show """
         try:
-            show = show_by_id(show_id, session=session)
+            show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
@@ -465,7 +461,7 @@ class SeriesShowAPI(APIResource):
         data = request.json
         ep_id = data.get('episode_identifier')
         try:
-            set_series_begin(show, ep_id)
+            series.set_series_begin(show, ep_id)
         except ValueError as e:
             return {'status': 'error',
                     'message': e.args[0]
@@ -482,19 +478,19 @@ class SeriesBeginByNameAPI(APIResource):
     @api.validate(series_begin_input_schema)
     def post(self, name, session):
         """ Create a new show and set its first accepted episode """
-        normalized_name = normalize_series_name(name)
-        matches = shows_by_exact_name(normalized_name, session=session)
+        normalized_name = series.normalize_series_name(name)
+        matches = series.shows_by_exact_name(normalized_name, session=session)
         if matches:
             return {'status': 'error',
                     'message': 'Show `%s` already exist in DB' % name
                     }, 500
-        show = Series()
+        show = series.Series()
         show.name = name
         session.add(show)
         data = request.json
         ep_id = data.get('episode_identifier')
         try:
-            set_series_begin(show, ep_id)
+            series.set_series_begin(show, ep_id)
         except ValueError as e:
             return {'status': 'error',
                     'message': e.args[0]
@@ -513,7 +509,7 @@ class SeriesEpisodesAPI(APIResource):
     def get(self, show_id, session):
         """ Get episodes by show ID """
         try:
-            show = show_by_id(show_id, session=session)
+            show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
@@ -530,7 +526,7 @@ class SeriesEpisodesAPI(APIResource):
     def delete(self, show_id, session):
         """ Forgets all episodes of a show"""
         try:
-            show = show_by_id(show_id, session=session)
+            show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
@@ -538,7 +534,7 @@ class SeriesEpisodesAPI(APIResource):
 
         for episode in show.episodes:
             try:
-                forget_episodes_by_id(show.id, episode.id)
+                series.forget_episodes_by_id(show.id, episode.id)
             except ValueError as e:
                 return {'status': 'error',
                         'message': e.args[0]
@@ -558,18 +554,18 @@ class SeriesEpisodeAPI(APIResource):
     def get(self, show_id, ep_id, session):
         """ Get episode by show ID and episode ID"""
         try:
-            show = show_by_id(show_id, session=session)
+            show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = episode_by_id(ep_id, session)
+            episode = series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
                     }, 414
-        if not episode_in_show(show_id, ep_id):
+        if not series.episode_in_show(show_id, ep_id):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
         return jsonify({
@@ -582,22 +578,22 @@ class SeriesEpisodeAPI(APIResource):
     def delete(self, show_id, ep_id, session):
         """ Forgets episode by show ID and episode ID """
         try:
-            show = show_by_id(show_id, session=session)
+            show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = episode_by_id(ep_id, session)
+            episode = series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
                     }, 414
-        if not episode_in_show(show_id, ep_id):
+        if not series.episode_in_show(show_id, ep_id):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
 
-        forget_episodes_by_id(show_id, ep_id)
+        series.forget_episodes_by_id(show_id, ep_id)
         return {'status': 'success',
                 'message': 'Episode %s successfully forgotten for show %s' % (ep_id, show_id)
                 }
@@ -629,18 +625,18 @@ class SeriesReleasesAPI(APIResource):
     def get(self, show_id, ep_id, session):
         """ Get all episodes releases by show ID and episode ID """
         try:
-            show = show_by_id(show_id, session=session)
+            show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = episode_by_id(ep_id, session)
+            episode = series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
                     }, 414
-        if not episode_in_show(show_id, ep_id):
+        if not series.episode_in_show(show_id, ep_id):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
         args = release_list_parser.parse_args()
@@ -664,18 +660,18 @@ class SeriesReleasesAPI(APIResource):
     def delete(self, show_id, ep_id, session):
         """ Deletes all episodes releases by show ID and episode ID """
         try:
-            show = show_by_id(show_id, session=session)
+            show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = episode_by_id(ep_id, session)
+            episode = series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
                     }, 414
-        if not episode_in_show(show_id, ep_id):
+        if not series.episode_in_show(show_id, ep_id):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
 
@@ -689,7 +685,7 @@ class SeriesReleasesAPI(APIResource):
                 release_items.append(release)
         number_of_releases = len(release_items)
         for release in release_items:
-            delete_release_by_id(release.id)
+            series.delete_release_by_id(release.id)
         return {'status': 'success',
                 'message': 'Successfully deleted %s releases for episode %s and show %s' % (
                     number_of_releases, ep_id, show_id)}
@@ -707,27 +703,27 @@ class SeriesReleaseAPI(APIResource):
     def get(self, show_id, ep_id, rel_id, session):
         ''' Get episode release by show ID, episode ID and release ID '''
         try:
-            show = show_by_id(show_id, session=session)
+            show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = episode_by_id(ep_id, session)
+            episode = series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
                     }, 414
         try:
-            release = release_by_id(rel_id, session)
+            release = series.release_by_id(rel_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Release with ID %s not found' % rel_id
                     }, 424
-        if not episode_in_show(show_id, ep_id):
+        if not series.episode_in_show(show_id, ep_id):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
-        if not release_in_episode(ep_id, rel_id):
+        if not series.release_in_episode(ep_id, rel_id):
             return {'status': 'error',
                     'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
 
@@ -742,30 +738,30 @@ class SeriesReleaseAPI(APIResource):
     def delete(self, show_id, ep_id, rel_id, session):
         ''' Delete episode release by show ID, episode ID and release ID '''
         try:
-            show = show_by_id(show_id, session=session)
+            show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
         try:
-            episode = episode_by_id(ep_id, session)
+            episode = series.episode_by_id(ep_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Episode with ID %s not found' % ep_id
                     }, 414
         try:
-            release = release_by_id(rel_id, session)
+            release = series.release_by_id(rel_id, session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Release with ID %s not found' % rel_id
                     }, 424
-        if not episode_in_show(show_id, ep_id):
+        if not series.episode_in_show(show_id, ep_id):
             return {'status': 'error',
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
-        if not release_in_episode(ep_id, rel_id):
+        if not series.release_in_episode(ep_id, rel_id):
             return {'status': 'error',
                     'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
 
-        delete_release_by_id(rel_id)
+        series.delete_release_by_id(rel_id)
         return {'status': 'success',
                 'message': 'Successfully deleted release %s for episode %s and show %s' % (rel_id, ep_id, show_id)}
