@@ -2399,4 +2399,22 @@ class TestSeriesAPI(APITest):
         assert mock_show_by_id.called
         assert mock_forget_episodes_by_id.called
 
+    @patch.object(series, 'episode_in_show')
+    @patch.object(series, 'episode_by_id')
+    @patch.object(series, 'show_by_id')
+    def test_series_get_episode(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show):
+        show = series.Series()
+        episode = series.Episode()
+
+        mock_show_by_id.return_value = show
+        mock_episode_by_id.return_value = episode
+
+        rsp = self.get('/series/1/episodes/1')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+        assert mock_episode_by_id.called
+        assert mock_episode_in_show.called
+
+
+
 
