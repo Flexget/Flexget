@@ -8,6 +8,7 @@ from flexget.logger import capture_output
 from flexget.manager import get_parser, Session
 from flexget.plugins.filter import series
 from flexget.task import TaskAbort
+from flexget.utils import json
 from tests import FlexGetBase, build_parser_function
 from tests.test_api import APITest
 
@@ -2347,4 +2348,14 @@ class TestSeriesAPI(APITest):
         assert mock_show_by_id.called
         assert mock_forget_series.called
 
+    @patch.object(series, 'set_series_begin')
+    @patch.object(series, 'show_by_id')
+    def test_series_begin(self, mock_show_by_id, mock_series_begin):
+        show = series.Series()
+        ep_id = {"episode_identifier": "s01e01"}
 
+        mock_show_by_id.return_value = show
+
+        rsp = self.json_put('/series/1', data=json.dumps(ep_id))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
