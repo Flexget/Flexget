@@ -60,6 +60,29 @@ class APITest(FlexGetBase):
         return self.client.delete(*args, **kwargs)
 
 
+class TestValidator(APITest):
+
+    def test_invalid_payload(self):
+        new_task = {
+            'name': 'new_task',
+            'config': {
+                'invalid_plugin': [{'title': 'entry 1'}],
+                'fake_plugin2': {'url': 'http://test/rss'}
+            }
+        }
+
+        rsp = self.json_post('/tasks/', data=json.dumps(new_task))
+
+        assert rsp.status_code == 400
+        data = json.loads(rsp.data)
+        assert data.get('code') == 400
+        assert data.get('error') == 'validation error'
+        assert data.get('validation_errors')
+        assert 'The keys' in data['validation_errors'][0]['message']
+        assert 'invalid_plugin' in data['validation_errors'][0]['message']
+        assert 'fake_plugin2' in data['validation_errors'][0]['message']
+
+
 class TestServerAPI(APITest):
     __yaml__ = """
         tasks:
