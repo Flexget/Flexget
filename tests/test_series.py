@@ -2334,4 +2334,17 @@ class TestSeriesAPI(APITest):
         assert mock_new_eps_after.called
         assert mock_show_by_id.called
 
+    @patch.object(series, 'forget_series')
+    @patch.object(series, 'show_by_id')
+    def test_series_delete(self, mock_show_by_id, mock_forget_series):
+        show = series.Series()
+        show.name = 'Some name'
+
+        mock_show_by_id.return_value = show
+
+        rsp = self.delete('/series/1')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+        assert mock_forget_series.called
+
 
