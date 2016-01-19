@@ -49,7 +49,7 @@ install_requires = [
     'flask>=0.7',
     'flask-restful>=0.3.3',
     'ordereddict>=1.1',
-    'flask-restplus==0.7.2',
+    'flask-restplus==0.8.6',
     'cherrypy>=3.7.0',
     'flask-assets>=0.11',
     'cssmin>=0.2.0',
