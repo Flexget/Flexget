@@ -110,7 +110,6 @@ class QueuedMovie(queue_base.QueuedItem, Base):
             'imdb_id': self.imdb_id,
             'tmdb_id': self.tmdb_id,
             'quality': self.quality,
-            'quality_req': self.quality_req.text,
             'title': self.title,
         }
 
