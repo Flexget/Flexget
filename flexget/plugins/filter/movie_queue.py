@@ -5,7 +5,6 @@ from math import ceil
 from operator import itemgetter
 
 from flask import jsonify, request
-from flask_restful import inputs
 from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update, func
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
@@ -516,10 +515,11 @@ movie_queue_parser.add_argument('page', type=int, default=1, help='Page number')
 movie_queue_parser.add_argument('max', type=int, default=100, help='Movies per page')
 movie_queue_parser.add_argument('status', type=movie_queue_status_value_enum, default=False,
                                 help='Filter list by status. Filter by {0}. Default is "pending"'.format(
-                                    ' ,'.join(movie_queue_status_value_enum_list)))
+                                        ' ,'.join(movie_queue_status_value_enum_list)))
 movie_queue_parser.add_argument('sort_by', type=movie_queue_sort_value_enum, default='added',
                                 help="Sort response by 'added', 'downloaded', 'id', 'title'")
-movie_queue_parser.add_argument('order', type=movie_queue_sort_order_enum, default='desc', help='Sorting order')
+movie_queue_parser.add_argument('order', type=movie_queue_sort_order_enum, default='desc',
+                                help="Sorting order, can be 'asc' or 'desc'")
 
 movie_add_results_schema = {
     'type': 'object',
