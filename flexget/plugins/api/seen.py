@@ -7,6 +7,15 @@ from flask_restplus import inputs
 
 from flexget.api import api, APIResource, jsonify
 from flexget.plugins.filter import seen
+from flexget.utils.imdb import is_imdb_url, extract_id
+
+
+def return_imdb_id(value):
+    if is_imdb_url(value):
+            imdb_id = extract_id(value)
+            if imdb_id:
+                value = imdb_id
+    return value
 
 seen_api = api.namespace('seen', description='Managed Flexget seen entries and fields')
 
@@ -33,6 +42,7 @@ seen_object = {
         'fields': {'type': 'array', 'items': seen_field_object}
     }
 }
+seen_object_schema = ('seen_object_schema', seen_object)
 
 seen_search_schema = {
     'type': 'object',
@@ -115,6 +125,7 @@ seen_search_parser.add_argument('order', type=seen_search_sort_order_enum, defau
 
 
 @seen_api.route('/<string:value>')
+@api.doc(params={'value': 'Name, IMDB ID or IMDB URL'})
 class SeenAPI(APIResource):
     @api.response(404, 'Page does not exist')
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
@@ -124,13 +135,14 @@ class SeenAPI(APIResource):
         args = seen_search_parser.parse_args()
         page = args['page']
         max_results = args['max']
-        status = args['status']
+        status = args['local_seen']
         sort_by = args['sort_by']
         order = args['order']
         # Handles default if it explicitly called
         if order == 'desc':
             order = True
 
+        value = return_imdb_id(value)
         value = '%' + value + '%'
         seen_entries_list = seen.search(value, status, session)
         count = len(seen_entries_list)
@@ -156,3 +168,9 @@ class SeenAPI(APIResource):
             'page_number': page,
             'total_number_of_pages': pages
         })
+    @api.response(400, 'A matching seen object is already added')
+    @api.response(200, 'Successfully added new seen object', seen_object_schema)
+    def post(self, value, session):
+        """ Manually add entries to seen plugin """
+
+

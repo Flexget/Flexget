@@ -234,10 +234,10 @@ def db_cleanup(manager, session):
         log.verbose('Removed %d seen fields older than 1 year.' % result)
 
 
-def add(seen_name):
+def add(seen_name, task_name):
     with Session() as session:
-        se = SeenEntry(seen_name, 'cli_seen')
-        sf = SeenField('cli_seen', seen_name)
+        se = SeenEntry(seen_name, task_name)
+        sf = SeenField(task_name, seen_name)
         se.fields.append(sf)
         session.add(se)
         return se
