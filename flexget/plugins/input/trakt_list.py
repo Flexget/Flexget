@@ -34,8 +34,8 @@ field_maps = {
         'trakt_slug': 'show.ids.slug'
     },
     'episode': {
-        'title': lambda i: '%s (%s) S%02dE%02d %s' % (i['show']['title'], i['show']['year'], i['episode']['season'],
-                                                 i['episode']['number'], i['episode']['title']),
+        'title': lambda i: ('%s (%s) S%02dE%02d %s' % (i['show']['title'], i['show']['year'], i['episode']['season'],
+                                                       i['episode']['number'], i['episode']['title'] or '')).strip(),
         'series_name': lambda i: '%s (%s)' % (i['show']['title'], i['show']['year']),
         'series_season': 'episode.season',
         'series_episode': 'episode.number',
@@ -45,7 +45,8 @@ field_maps = {
         'tvrage_id': 'show.ids.tvrage',
         'trakt_episode_id': 'episode.ids.trakt',
         'trakt_show_id': 'show.ids.trakt',
-        'trakt_show_slug': 'show.ids.slug'
+        'trakt_show_slug': 'show.ids.slug',
+        'trakt_ep_name': 'episode.title'
     }
 }
 
@@ -130,8 +131,8 @@ class TraktList(object):
                 log.debug('Skipping %s because it is not a %s' % (item[item['type']].get('title', 'unknown'),
                                                                   list_type))
                 continue
-            if not item[list_type]['title']:
-                # There seems to be some bad shows sometimes in lists with no titles. Skip them.
+            if list_type != 'episode' and not item[list_type]['title']:
+                # Skip shows/movies with no title
                 log.warning('Item in trakt list does not appear to have a title, skipping.')
                 continue
             entry = Entry()

@@ -71,7 +71,7 @@ class TraktEmit(object):
                         continue
                     trakt_id = item['show']['ids']['trakt']
                     listed_series[trakt_id] = {
-                        'series_name': item['show']['title'],
+                        'series_name': '%s (%s)' % (item['show']['title'], item['show']['year']),
                         'trakt_id': trakt_id,
                         'tvdb_id': item['show']['ids']['tvdb'],
                         'trakt_list': config.get('list')}

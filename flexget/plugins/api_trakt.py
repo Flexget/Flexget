@@ -160,8 +160,12 @@ def get_entry_ids(entry):
     """Creates a trakt ids dict from id fields on an entry. Prefers already populated info over lazy lookups."""
     ids = {}
     for lazy in [False, True]:
-        if entry.get('trakt_id', eval_lazy=lazy):
-            ids['trakt'] = entry['trakt_id']
+        if entry.get('trakt_movie_id', eval_lazy=lazy):
+            ids['trakt'] = entry['trakt_movie_id']
+        elif entry.get('trakt_show_id', eval_lazy=lazy):
+            ids['trakt'] = entry['trakt_show_id']
+        elif entry.get('trakt_episode_id', eval_lazy=lazy):
+            ids['trakt'] = entry['trakt_episode_id']
         if entry.get('tmdb_id', eval_lazy=lazy):
             ids['tmdb'] = entry['tmdb_id']
         if entry.get('tvdb_id', eval_lazy=lazy):

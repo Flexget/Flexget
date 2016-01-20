@@ -22,6 +22,12 @@ class TestEmitMovieQueue(FlexGetBase):
             emit_movie_queue:
               # TODO: Currently plugin calls tmdb lookup to get year, movie queue should probably store
               year: no
+          download_movie:
+            mock:
+            - title: The Matrix
+              imdb_id: tt0133093
+              tmdb_id: 603
+            movie_queue: accept
         """
 
     def test_default(self):
@@ -34,3 +40,12 @@ class TestEmitMovieQueue(FlexGetBase):
         assert entry.get('tmdb_id', eval_lazy=False) == 603
         self.execute_task('test_default')
         assert len(self.task.entries) == 1, 'Movie should be emitted every run'
+
+    def test_emit_undownloaded(self):
+        """Makes sure that items already downloaded are not emitted."""
+        queue_add(title='The Matrix 1999', imdb_id='tt0133093', tmdb_id=603)
+        self.execute_task('test_default')
+        assert len(self.task.entries) == 1
+        self.execute_task('download_movie')
+        self.execute_task('test_default')
+        assert len(self.task.entries) == 0, 'Should not emit already downloaded queue items.'

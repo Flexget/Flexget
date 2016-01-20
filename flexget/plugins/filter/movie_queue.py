@@ -5,7 +5,8 @@ from math import ceil
 from operator import itemgetter
 
 from flask import jsonify, request
-from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
+from flask_restful import inputs
+from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update, func
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from flexget import db_schema, plugin
@@ -341,7 +342,7 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
     elif tmdb_id:
         query = query.filter(QueuedMovie.tmdb_id == tmdb_id)
     elif title:
-        query = query.filter(QueuedMovie.title == title)
+        query = query.filter(func.lower(QueuedMovie.title) == func.lower(title))
     elif movie_id:
         query = query.filter(QueuedMovie.id == movie_id)
     try:
@@ -442,7 +443,7 @@ def register_plugin():
     plugin.register(MovieQueue, 'movie_queue', api_ver=2)
 
 
-movie_queue_api = api.namespace('movie_queue', description='Movie Queue')
+movie_queue_api = api.namespace('movie_queue', description='Movie Queue operations')
 
 movie_object = {
     'type': 'object',
@@ -519,7 +520,7 @@ movie_queue_parser.add_argument('status', type=movie_queue_status_value_enum, de
                                     ' ,'.join(movie_queue_status_value_enum_list)))
 movie_queue_parser.add_argument('sort_by', type=movie_queue_sort_value_enum, default='added',
                                 help="Sort response by 'added', 'downloaded', 'id', 'title'")
-movie_queue_parser.add_argument('order', type=movie_queue_sort_order_enum, default=True, help='Sorting order')
+movie_queue_parser.add_argument('order', type=movie_queue_sort_order_enum, default='desc', help='Sorting order')
 
 movie_add_results_schema = {
     'type': 'object',
@@ -584,6 +585,9 @@ class MovieQueueAPI(APIResource):
         downloaded = args['status']
         sort_by = args['sort_by']
         order = args['order']
+        # Handles default if it explicitly called
+        if order == 'desc':
+            order = True
 
         movie_queue = queue_get(session=session, downloaded=downloaded)
         count = len(movie_queue)
