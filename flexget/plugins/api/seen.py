@@ -5,17 +5,18 @@ from operator import itemgetter
 
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource, jsonify
+from flexget.api import api, APIResource, jsonify, request
 from flexget.plugins.filter import seen
 from flexget.utils.imdb import is_imdb_url, extract_id
 
 
 def return_imdb_id(value):
     if is_imdb_url(value):
-            imdb_id = extract_id(value)
-            if imdb_id:
-                value = imdb_id
+        imdb_id = extract_id(value)
+        if imdb_id:
+            value = imdb_id
     return value
+
 
 seen_api = api.namespace('seen', description='Managed Flexget seen entries and fields')
 
@@ -42,7 +43,31 @@ seen_object = {
         'fields': {'type': 'array', 'items': seen_field_object}
     }
 }
-seen_object_schema = ('seen_object_schema', seen_object)
+seen_object_schema = api.schema('seen_object_schema', seen_object)
+
+seen_field_input_schema = {
+    'type': 'object',
+    'properties': {
+        'field': {'type': 'string'},
+        'value': {'type': 'string'},
+    },
+    'required': ['field', 'value'],
+    'additional_properties': False
+}
+
+seen_object_input_schema = {
+    'type': 'object',
+    'properties': {
+        'title': {'type': 'string'},
+        'reason': {'type': 'string'},
+        'task': {'type': 'string'},
+        'local': {'type': 'boolean', 'default': False},
+        'fields': {'type': 'array', 'items': seen_field_input_schema}
+    },
+    'required': ['title', 'fields', 'task'],
+    'additional_properties': False
+}
+seen_object_input_schema = api.schema('seen_object_input_schema', seen_object_input_schema)
 
 seen_search_schema = {
     'type': 'object',
@@ -126,7 +151,7 @@ seen_search_parser.add_argument('order', type=seen_search_sort_order_enum, defau
 
 @seen_api.route('/<string:value>')
 @api.doc(params={'value': 'Name, IMDB ID or IMDB URL'})
-class SeenAPI(APIResource):
+class SeenSEarchAPI(APIResource):
     @api.response(404, 'Page does not exist')
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
     @api.doc(parser=seen_search_parser)
@@ -168,9 +193,25 @@ class SeenAPI(APIResource):
             'page_number': page,
             'total_number_of_pages': pages
         })
+
+
+@seen_api.route('/')
+class SeenAddAPI(APIResource):
     @api.response(400, 'A matching seen object is already added')
     @api.response(200, 'Successfully added new seen object', seen_object_schema)
-    def post(self, value, session):
+    @api.validate(seen_object_input_schema)
+    def post(self, session):
         """ Manually add entries to seen plugin """
+        data = request.json
+        title = data.get('title')
+        task = 'seen_API'
+        fields = data.get('fields')
+        reason = data.get('reason')
+        local = data.get('local', False)
 
-
+        seen_entry = seen.add(title, task, fields, reason, local)
+        return {
+            'status': 'success',
+            'message': 'successfully added seen object',
+            'seen_object': get_seen_entry_details(seen_entry)
+        }
