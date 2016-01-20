@@ -240,6 +240,7 @@ def add(seen_name):
         sf = SeenField('cli_seen', seen_name)
         se.fields.append(sf)
         session.add(se)
+        return se
 
 
 def search(value, session=None):
