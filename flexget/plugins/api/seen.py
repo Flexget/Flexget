@@ -1,5 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 
+from math import ceil
+from operator import itemgetter
+
+from flask_restplus import inputs
+
 from flexget.api import api, APIResource, jsonify
 from flexget.plugins.filter import seen
 
@@ -36,7 +41,9 @@ seen_search_schema = {
             'type': 'array',
             'items': seen_object
         },
-        'number_of_seen_entries': {'type': 'integer'}
+        'number_of_seen_entries': {'type': 'integer'},
+        'total_number_of_pages': {'type': 'integer'},
+        'page_number': {'type': 'integer'}
     }
 }
 seen_search_schema = api.schema('seen_search_schema', seen_search_schema)
@@ -66,20 +73,86 @@ def get_seen_entry_details(seen_entry):
     return seen_entry_object
 
 
+def seen_search_local_status_enum(value):
+    try:
+        return inputs.boolean(value)
+    except ValueError:
+        if value != 'all':
+            raise ValueError('Invalid value received')
+        return value
+
+
+seen_search_sort_enum_list = ['title', 'task', 'added', 'local', 'id']
+
+
+def seen_search_sort_enum(value):
+    enum = seen_search_sort_enum_list
+    if value not in enum:
+        raise ValueError('Value expected to be in' + ' ,'.join(enum))
+    return value
+
+
+def seen_search_sort_order_enum(value):
+    enum = ['desc', 'asc']
+    if isinstance(value, bool):
+        return value
+    if value not in enum:
+        raise ValueError('Value expected to be in' + ' ,'.join(enum))
+    if value == 'desc':
+        return True
+    return False
+
+
+seen_search_parser = api.parser()
+seen_search_parser.add_argument('page', type=int, default=1, help='Page number')
+seen_search_parser.add_argument('max', type=int, default=100, help='SEen entries per page')
+seen_search_parser.add_argument('local_seen', type=seen_search_local_status_enum, default='all',
+                                help='Filter list by local status. Filter by true, false or all. Default is all')
+seen_search_parser.add_argument('sort_by', type=seen_search_sort_enum, default='added',
+                                help="Sort response by {0}".format(' ,'.join(seen_search_sort_enum_list)))
+seen_search_parser.add_argument('order', type=seen_search_sort_order_enum, default='desc',
+                                help='Sorting order. Can be asc or desc. Default is desc')
+
+
 @seen_api.route('/<string:value>')
 class SeenAPI(APIResource):
+    @api.response(404, 'Page does not exist')
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
+    @api.doc(parser=seen_search_parser)
     def get(self, value, session):
         """ Search for seen entries """
+        args = seen_search_parser.parse_args()
+        page = args['page']
+        max_results = args['max']
+        status = args['status']
+        sort_by = args['sort_by']
+        order = args['order']
+        # Handles default if it explicitly called
+        if order == 'desc':
+            order = True
+
         value = '%' + value + '%'
-        seen_entries_list = seen.search(value, session)
+        seen_entries_list = seen.search(value, status, session)
+        count = len(seen_entries_list)
 
+        pages = int(ceil(count / float(max_results)))
         seen_entries = []
+        if page > pages and pages != 0:
+            return {'error': 'page %s does not exist' % page}, 404
 
-        for seen_entry in seen_entries_list:
-            seen_entries.append(get_seen_entry_details(seen_entry))
+        start = (page - 1) * max_results
+        finish = start + max_results
+        if finish > count:
+            finish = count
+
+        for seen_entry_num in range(start, finish):
+            seen_entries.append(get_seen_entry_details(seen_entries_list[seen_entry_num]))
+
+        sorted_seen_entries_list = sorted(seen_entries, key=itemgetter(sort_by), reverse=order)
 
         return jsonify({
-            'seen_entries': seen_entries,
-            'number_of_seen_entries': len(seen_entries)
+            'seen_entries': sorted_seen_entries_list,
+            'number_of_seen_entries': count,
+            'page_number': page,
+            'total_number_of_pages': pages
         })

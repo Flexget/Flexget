@@ -243,9 +243,12 @@ def add(seen_name):
         return se
 
 
-def search(value, session=None):
-        return session.query(SeenEntry).join(SeenField).filter(SeenField.value.like(value)).order_by(
-                SeenField.added).all()
+def search(value, status='all', session=None):
+        query = session.query(SeenEntry).join(SeenField).filter(SeenField.value.like(value)).order_by(
+                SeenField.added)
+        if status != 'all':
+            query = query.filter(SeenEntry.local == status)
+        return query.all()
 
 
 @event('plugin.register')
