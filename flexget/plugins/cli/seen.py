@@ -35,7 +35,7 @@ def seen_add(options):
         imdb_id = extract_id(seen_name)
         if imdb_id:
             seen_name = imdb_id
-    seen.add(seen_name, 'cli_add')
+    seen.add(seen_name, 'cli_add', {'cli_add': seen_name})
     console('Added %s as seen. This will affect all tasks.' % seen_name)
 
 
