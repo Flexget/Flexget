@@ -1,12 +1,14 @@
+# coding=utf-8
 from __future__ import unicode_literals, division, absolute_import
 import logging
 from flexget.config_schema import one_or_more
+from flexget.manager import Session
 from flexget.plugins.api_t411 import T411Proxy, FriendlySearchQuery
 
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('t411_input')
+log = logging.getLogger('t411_plugin')
 
 
 class T411InputPlugin(object):
@@ -68,11 +70,7 @@ class T411InputPlugin(object):
 
 
 class T411LookupPlugin(object):
-    schema = {'type': 'boolean'}
-
-    torrent_details_map = {
-        't411_terms': lambda details: [term.name for term in details.terms],
-    }
+    schema = {'type': 'string', 'enum': ['fill', 'override']}
 
     @staticmethod
     def lazy_lookup(entry):
@@ -84,17 +82,33 @@ class T411LookupPlugin(object):
 
         proxy = T411Proxy()
         proxy.set_credential()
-        details = proxy.details(torrent_id)
-        entry.update_using_map(T411LookupPlugin.torrent_details_map, details)
+        with Session() as session:
+            bind_details = proxy.details(torrent_id, session=session)
+            unbind_details = [dict([
+                ('term_type_name', term.type.name),
+                ('term_type_id', term.type.id),
+                ('term_id', term.id),
+                ('term_name', term.name)]) for term in bind_details.terms]
+            entry['t411_terms'] = unbind_details
 
     # Run after series and metainfo series
     @plugin.priority(110)
     def on_task_metainfo(self, task, config):
+        proxy = T411Proxy()
+        proxy.set_credential()
         for entry in task.entries:
             if entry.get('t411_torrent_id') is None:
                 continue
 
-            entry.register_lazy_func(T411LookupPlugin.lazy_lookup, T411LookupPlugin.torrent_details_map)
+            # entry.register_lazy_func(T411LookupPlugin.lazy_lookup, T411LookupPlugin.torrent_details_map)
+            T411LookupPlugin.lazy_lookup(entry)
+            if entry.get('t411_terms', eval_lazy=True) is not None:
+                video_quality = proxy.parse_terms_to_quality(entry.get('t411_terms'))
+                entry_quality = entry.get('quality')
+                if entry_quality.source.name == 'unknown' or config == 'override':
+                    entry_quality.source = video_quality.source
+                if entry_quality.resolution.name == 'unknown' or config == 'override':
+                    entry_quality.resolution = video_quality.resolution
 
 
 @event('plugin.register')

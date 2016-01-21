@@ -5,6 +5,7 @@ import logging
 import mock
 
 from flexget.plugins.api_t411 import T411RestClient, T411ObjectMapper, T411Proxy, FriendlySearchQuery
+from flexget.utils.qualities import Requirements
 from tests import use_vcr, FlexGetBase
 
 log = logging.getLogger('test_t411')
@@ -18,7 +19,7 @@ class MockRestClient(object):
         "limit": 10,
         "torrents": [{
                          "id": 123123,
-                         "name": "Mickey vs Donald",
+                         "name": "Mickey vs Donald S01E01 1080p dd5.1 10bit",
                          "category": "14",
                          "seeders": "11",
                          "leechers": "2",
@@ -56,7 +57,11 @@ class MockRestClient(object):
                                       "123": "Antivirus",
                                       "345": "Torrent clients"
                           }
-                 }
+                 }, "7": {
+                        "type": "Vidéo - Qualité",
+                        "mode": "single",
+                        "terms": {"12": "TVripHD 720 [Rip HD depuis Source HD]"}
+                }
         }
     }
 
@@ -65,7 +70,8 @@ class MockRestClient(object):
         "name": "Mock Title 720p",
         "category": 14,
         "terms": {
-            "Application - Genre": "Antivirus"
+            "Application - Genre": "Antivirus",
+            "Vidéo - Qualité": "TVripHD 720 [Rip HD depuis Source HD]"
         }
     }
 
@@ -251,9 +257,9 @@ class TestProxy(FlexGetBase):
         proxy.rest_client = MockRestClient()
         details = proxy.details(123123)
         assert proxy.rest_client.details_called == True
-        assert details.name == "Mock Title 720p"
-        assert details.terms[0].id == 123
-        #assert details.terms[0].type.id == 11
+        assert details.name == "Mock Title"
+        assert details.terms[0].id == 12
+        # Session not still bound! assert details.terms[0].type.id == 7
 
         proxy.rest_client.details_called = False
         proxy.details(123123)
@@ -263,18 +269,23 @@ class TestProxy(FlexGetBase):
 class TestInputPlugin(FlexGetBase):
     __yaml__ = """
         tasks:
+          series:
+            - Mickey vs Donald
           uncached_db:
             t411:
               category: cartoons
               terms:
                 - Antivirus
+            t411_lookup: fill
     """
 
     @mock.patch('flexget.plugins.api_t411.T411Proxy.set_credential')
     @mock.patch('flexget.plugins.api_t411.T411RestClient.search')
     @mock.patch('flexget.plugins.api_t411.T411RestClient.retrieve_terms_tree')
     @mock.patch('flexget.plugins.api_t411.T411RestClient.retrieve_category_tree')
-    def test_schema(self, mock_cat, mock_term, mock_search, mock_auth):
+    @mock.patch('flexget.plugins.api_t411.T411RestClient.details')
+    def test_schema(self, mock_details, mock_cat, mock_term, mock_search, mock_auth):
+        mock_details.return_value = MockRestClient.details_result
         mock_cat.return_value = MockRestClient.cat_result
         mock_term.return_value = MockRestClient.term_result
         mock_search.return_value = MockRestClient.search_result
@@ -282,3 +293,9 @@ class TestInputPlugin(FlexGetBase):
         self.execute_task('uncached_db')
         log.debug(self.task.all_entries)
         assert len(self.task.all_entries) == 1
+        entry = self.task.all_entries[0]
+        quality = entry.get('quality')
+        assert quality is not None
+        log.debug(quality)
+        quality_tester = Requirements('1080p hdtv 10bit dd5.1')
+        assert quality_tester.allows(quality)

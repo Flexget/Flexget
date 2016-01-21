@@ -3,10 +3,10 @@ from datetime import datetime
 from functools import partial
 import json
 import logging
-import urllib
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
+from flexget.utils import qualities
 from flexget.utils.database import with_session
 from requests.auth import AuthBase
 
@@ -16,7 +16,7 @@ from flexget import db_schema
 from flexget.utils.requests import Session
 from sqlalchemy.orm.exc import NoResultFound
 
-log = logging.getLogger('t411')
+log = logging.getLogger('t411_api')
 
 # region ORM definitions
 SCHEMA_VER = 0
@@ -117,8 +117,31 @@ T411API_TERMS_PATH = "/terms/tree/"
 T411API_SEARCH_PATH = "/torrents/search/"
 T411API_DOWNLOAD_PATH = "/torrents/download/"
 T411API_DETAILS_PATH = "/torrents/details/"
-T411_VIDEO_QUALITY_TERM_TYPE = 7
+T411_TERM_TYPE_ID_VIDEO_QUALITY = 7
 
+T411_VIDEO_QUALITY_MAP = {
+    8: qualities.get("bluray"),
+    1171: qualities.get("bluray"),
+    17: qualities.get("bluray 1080p"),
+    1220: qualities.get("remux"),
+    13: qualities.get("dvdrip"),
+    14: qualities.get("dvdrip"),
+    10: qualities.get("dvdrip"),
+    1208: qualities.get("bluray 1080p"),
+    1218: qualities.get("bluray 720p"),
+    16: qualities.get("bluray 1080p"),
+    1219: qualities.get("bluray"),
+    15: qualities.get("bluray 720p"),
+    11: qualities.get("tvrip"),
+    1162: qualities.get("hdtv 1080p"),
+    12: qualities.get("hdtv 720p"),
+    18: qualities.get("ppvrip"),
+    1233: qualities.get("webdl"),
+    1174: qualities.get("webdl 1080p"),
+    1182: qualities.get("webdl"),
+    1175: qualities.get("webdl 720p"),
+    19: qualities.get("webrip")
+}
 
 def auth_required(func):
     """
@@ -381,13 +404,19 @@ class T411ObjectMapper(object):
 
     @staticmethod
     def map_details(json_details, resolver):
+        """
+        Parse json entry of details of a torrent entry
+        to Torrent object.
+        """
         result = Torrent()
         result.id = json_details.get('id')
         result.name = json_details.get('name')
         result.category_id = json_details.get('category')
 
+        # Parse collection of termtype-termvalue
         for (term_type_name, terms_candidat) in json_details.get('terms').iteritems():
             if isinstance(terms_candidat, list):
+                # Some terms type are multi-valuable, eg. Genres
                 for term_name in terms_candidat:
                     result.terms.append(resolver(result.category_id, term_type_name, term_name))
             else:
@@ -615,10 +644,11 @@ class T411Proxy(object):
         if details:
             return details
         else:
+            # Cache dismiss, retrieve details via online way
             json_details = self.rest_client.details(torrent_id)
 
             def resolver(category_id, term_type_name, term_name):
-                return self.find_term(category_id, term_type_name, term_name)
+                return self.find_term(category_id, term_type_name, term_name, session=session)
 
             details = self.mapper.map_details(json_details, resolver)
             session.add(details)
@@ -644,6 +674,26 @@ class T411Proxy(object):
             result = True
         session.commit()
         return result
+
+    @cache_required
+    @with_session
+    def parse_terms_to_quality(self, terms, session=None):
+        """
+        If terms contains a term with the termtype 'video quality'
+        then this function convert it into a flexget Quality
+        else it return None
+        :param terms: Array of Term
+        :param session:
+        :return: flexget.utils.Quality
+        """
+        video_quality_description = next(
+            term for term in terms
+            if term.get('term_type_id') == T411_TERM_TYPE_ID_VIDEO_QUALITY)
+        if video_quality_description is not None:
+            video_quality = T411_VIDEO_QUALITY_MAP.get(video_quality_description.get('term_id'))
+            return video_quality
+        else:
+            return None
 
 
 class T411BindAuth(AuthBase):
