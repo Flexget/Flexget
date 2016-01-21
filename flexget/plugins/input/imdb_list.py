@@ -65,7 +65,7 @@ class ImdbList(object):
         try:
             page = task.requests.get(url, params=params, headers=headers)
         except HTTPError as e:
-            log.error(e.args[0])
+            raise plugin.PluginError(e.args[0])
         if page.status_code != 200:
             raise plugin.PluginError('Unable to get imdb list. Either list is private or does not exist.')
 
