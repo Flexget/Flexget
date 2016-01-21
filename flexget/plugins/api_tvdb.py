@@ -1,12 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
-import urllib
 import os
 import posixpath
-from datetime import datetime, timedelta
 import random
-
+import urllib
 import xml.etree.ElementTree as ElementTree
+from datetime import datetime, timedelta
+
 try:
     from xml.etree.ElementTree import ParseError
 except ImportError:
@@ -34,7 +35,6 @@ SCHEMA_VER = 4
 log = logging.getLogger('api_tvdb')
 Base = db_schema.versioned_base('api_tvdb', SCHEMA_VER)
 requests = ReqSession(timeout=25)
-
 
 # This is a FlexGet API key
 api_key = '4D297D8CFDE0E105'
@@ -122,7 +122,6 @@ class TVDBContainer(object):
 
 
 class TVDBSeries(TVDBContainer, Base):
-
     __tablename__ = "tvdb_series"
 
     id = Column(Integer, primary_key=True, autoincrement=False)
@@ -195,6 +194,32 @@ class TVDBSeries(TVDBContainer, Base):
     def __repr__(self):
         return '<TVDBSeries name=%s,tvdb_id=%s>' % (self.seriesname, self.id)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'last_updated': datetime.fromtimestamp(self.lastupdated).strftime('%Y-%m-%d %H:%M:%S'),
+            'expired': self.expired,
+            'series_name': self.seriesname,
+            'language': self.language,
+            'rating': self.rating,
+            'status': self.status,
+            'runtime': self.runtime,
+            'airs_time': self.airs_time,
+            'airs_dayofweek': self.airs_dayofweek,
+            'content_rating': self.contentrating,
+            'network': self.network,
+            'overview': self.overview,
+            'imdb_id': self.imdb_id,
+            'zap2it_id': self.zap2it_id,
+            'banner': self.banner,
+            'fanart': self.fanart,
+            'poster': self.poster,
+            'poster_file': self.poster_file,
+            'genre': self.genre,
+            'first_aired': self.firstaired,
+            'actors': self.actors
+        }
+
 
 class TVDBEpisode(TVDBContainer, Base):
     __tablename__ = 'tvdb_episodes'
@@ -235,12 +260,11 @@ class TVDBEpisode(TVDBContainer, Base):
             raise LookupError('Could not retrieve information from thetvdb')
 
     def __repr__(self):
-        return '<TVDBEpisode series=%s,season=%s,episode=%s>' %\
+        return '<TVDBEpisode series=%s,season=%s,episode=%s>' % \
                (self.series.seriesname, self.seasonnumber, self.episodenumber)
 
 
 class TVDBSearchResult(Base):
-
     __tablename__ = 'tvdb_search_results'
 
     id = Column(Integer, primary_key=True)
@@ -317,7 +341,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         series = session.query(TVDBSeries).filter(func.lower(TVDBSeries.seriesname) == name.lower()).first()
         if not series:
             found = session.query(TVDBSearchResult).filter(
-                func.lower(TVDBSearchResult.search) == name.lower()).first()
+                    func.lower(TVDBSearchResult.search) == name.lower()).first()
             if found and found.series:
                 series = found.series
     if series:
@@ -390,20 +414,20 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
     if airdate is not None:
         airdatestring = airdate.strftime('%Y-%m-%d')
         ep_description = '%s.%s' % (series.seriesname, airdatestring)
-        episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
+        episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id). \
             filter(TVDBEpisode.firstaired == airdate).first()
         url = get_mirror() + ('GetEpisodeByAirDate.php?apikey=%s&seriesid=%d&airdate=%s&language=%s' %
-                             (api_key, series.id, airdatestring, language))
+                              (api_key, series.id, airdatestring, language))
     elif absolutenum is not None:
         ep_description = '%s.%d' % (series.seriesname, absolutenum)
-        episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
+        episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id). \
             filter(TVDBEpisode.absolute_number == absolutenum).first()
         url = get_mirror() + api_key + '/series/%d/absolute/%s/%s.xml' % (series.id, absolutenum, language)
     elif seasonnum is not None and episodenum is not None:
         ep_description = '%s.S%sE%s' % (series.seriesname, seasonnum, episodenum)
         # See if we have this episode cached
-        episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id).\
-            filter(TVDBEpisode.seasonnumber == seasonnum).\
+        episode = session.query(TVDBEpisode).filter(TVDBEpisode.series_id == series.id). \
+            filter(TVDBEpisode.seasonnumber == seasonnum). \
             filter(TVDBEpisode.episodenumber == episodenum).first()
         url = get_mirror() + api_key + '/series/%d/default/%d/%d/%s.xml' % (series.id, seasonnum, episodenum, language)
     else:
@@ -426,7 +450,7 @@ def lookup_episode(name=None, seasonnum=None, episodenum=None, absolutenum=None,
             raw_data = requests.get(url).content
             data = ElementTree.fromstring(raw_data)
             if data is not None:
-                error = data.find('Error') # TODO: lowercase????
+                error = data.find('Error')  # TODO: lowercase????
                 if error is not None:
                     raise LookupError('Error looking up episode from TVDb (%s)' % error.text)
                 ep_data = data.find('Episode')
@@ -534,7 +558,6 @@ tvdb_api_parser.add_argument('search', type=str, required=True, help='TV Show na
 
 @tvdb_api.route('/search/')
 class TVDBSearchApi(APIResource):
-
     @api.doc(parser=tvdb_api_parser)
     @api.response(400, 'missing search parameter')
     def get(self, session=None):
@@ -554,4 +577,4 @@ class TVDBSearchApi(APIResource):
         else:
             result = lookup_series(name=search, session=session)
 
-        return jsonify(result)
+        return jsonify(result.to_dict())
