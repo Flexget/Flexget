@@ -62,7 +62,7 @@ seen_object_input_schema = {
         'reason': {'type': 'string'},
         'task': {'type': 'string'},
         'local': {'type': 'boolean', 'default': False},
-        'fields': {'type': 'array', 'items': seen_field_input_schema}
+        'fields': seen_field_input_schema
     },
     'required': ['title', 'fields', 'task'],
     'additional_properties': False
