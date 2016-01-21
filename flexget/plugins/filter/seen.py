@@ -148,6 +148,24 @@ def forget(value):
         return count, field_count
 
 
+@with_session
+def search_by_field_values(field_value_list, task_name, local=False, session=None):
+    """
+    Return a SeenEntry instance if it matches field values
+    :param field_value_list: List of field values to match
+    :param task_name: Name of task to compare to in case local flag is sent
+    :param local: Local flag
+    :param session: Current session
+    :return: SeenEntry Object or None
+    """
+    found = session.query(SeenField).join(SeenEntry).filter(SeenField.value.in_(field_value_list))
+    if local:
+        found = found.filter(SeenEntry.task == task_name.name)
+    else:
+        found = found.filter(SeenEntry.local == False)
+    return found.first()
+
+
 class FilterSeen(object):
     """
         Remembers previously downloaded content and rejects them in
@@ -190,12 +208,8 @@ class FilterSeen(object):
             if values:
                 log.trace('querying for: %s' % ', '.join(values))
                 # check if SeenField.value is any of the values
-                found = task.session.query(SeenField).join(SeenEntry).filter(SeenField.value.in_(values))
-                if local:
-                    found = found.filter(SeenEntry.task == task.name)
-                else:
-                    found = found.filter(SeenEntry.local == False)
-                found = found.first()
+                found = search_by_field_values(field_value_list=values, task_name=task.name, local=local,
+                                               session=task.session)
                 if found:
                     log.debug("Rejecting '%s' '%s' because of seen '%s'" % (entry['url'], entry['title'], found.value))
                     se = task.session.query(SeenEntry).filter(SeenEntry.id == found.seen_entry_id).one()
@@ -258,6 +272,7 @@ def db_cleanup(manager, session):
     result = session.query(SeenField).filter(SeenField.added < datetime.now() - timedelta(days=365)).delete()
     if result:
         log.verbose('Removed %d seen fields older than 1 year.' % result)
+
 
 @with_session
 def add(title, task_name, fields, reason=None, local=None, session=None):
