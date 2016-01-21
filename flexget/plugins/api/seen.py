@@ -45,16 +45,6 @@ seen_object = {
 }
 seen_object_schema = api.schema('seen_object_schema', seen_object)
 
-seen_field_input_schema = {
-    'type': 'object',
-    'properties': {
-        'field': {'type': 'string'},
-        'value': {'type': 'string'},
-    },
-    'required': ['field', 'value'],
-    'additional_properties': False
-}
-
 seen_object_input_schema = {
     'type': 'object',
     'properties': {
@@ -62,7 +52,7 @@ seen_object_input_schema = {
         'reason': {'type': 'string'},
         'task': {'type': 'string'},
         'local': {'type': 'boolean', 'default': False},
-        'fields': seen_field_input_schema
+        'fields': {'type': 'object'}
     },
     'required': ['title', 'fields', 'task'],
     'additional_properties': False
@@ -82,30 +72,6 @@ seen_search_schema = {
     }
 }
 seen_search_schema = api.schema('seen_search_schema', seen_search_schema)
-
-
-def get_seen_entry_details(seen_entry):
-    fields = []
-    for field in seen_entry.fields:
-        field_object = {
-            'field': field.field,
-            'id': field.id,
-            'value': field.value,
-            'added': field.added,
-            'seen_entry_id': field.seen_entry_id
-        }
-        fields.append(field_object)
-
-    seen_entry_object = {
-        'id': seen_entry.id,
-        'title': seen_entry.title,
-        'reason': seen_entry.reason,
-        'task': seen_entry.task,
-        'added': seen_entry.added,
-        'local': seen_entry.local,
-        'fields': fields
-    }
-    return seen_entry_object
 
 
 def seen_search_local_status_enum(value):
@@ -183,7 +149,7 @@ class SeenSEarchAPI(APIResource):
             finish = count
 
         for seen_entry_num in range(start, finish):
-            seen_entries.append(get_seen_entry_details(seen_entries_list[seen_entry_num]))
+            seen_entries.append(seen_entries_list[seen_entry_num].to_dict())
 
         sorted_seen_entries_list = sorted(seen_entries, key=itemgetter(sort_by), reverse=order)
 
@@ -203,15 +169,18 @@ class SeenAddAPI(APIResource):
     def post(self, session):
         """ Manually add entries to seen plugin """
         data = request.json
-        title = data.get('title')
-        task = 'seen_API'
-        fields = data.get('fields')
-        reason = data.get('reason')
-        local = data.get('local', False)
-
-        seen_entry = seen.add(title, task, fields, reason, local)
-        return {
+        kwargs = {
+            'title': data.get('title'),
+            'task_name': 'seen_API',
+            'fields': data.get('fields'),
+            'reason': data.get('reason'),
+            'local': data.get('local', False),
+            'session': session
+        }
+        # TODO check if seen entry already exist
+        seen_entry = seen.add(**kwargs)
+        return jsonify({
             'status': 'success',
             'message': 'successfully added seen object',
-            'seen_object': get_seen_entry_details(seen_entry)
-        }
+            'seen_object': seen_entry
+        })

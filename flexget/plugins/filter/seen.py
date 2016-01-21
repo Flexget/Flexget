@@ -20,6 +20,7 @@ from sqlalchemy.schema import ForeignKey
 from flexget import db_schema, plugin
 from flexget.event import event
 from flexget.manager import Session
+from flexget.utils.database import with_session
 from flexget.utils.imdb import extract_id
 from flexget.utils.sqlalchemy_utils import table_schema, table_add_column
 
@@ -77,6 +78,22 @@ class SeenEntry(Base):
     def __str__(self):
         return '<SeenEntry(title=%s,reason=%s,task=%s,added=%s)>' % (self.title, self.reason, self.task, self.added)
 
+    def to_dict(self):
+        fields = []
+        for field in self.fields:
+            fields.append(field.to_dict())
+
+        seen_entry_object = {
+            'seen_id': self.id,
+            'title': self.title,
+            'reason': self.reason,
+            'task': self.task,
+            'added': self.added,
+            'local': self.local,
+            'fields': fields
+        }
+        return seen_entry_object
+
 
 class SeenField(Base):
     __tablename__ = 'seen_field'
@@ -94,6 +111,15 @@ class SeenField(Base):
 
     def __str__(self):
         return '<SeenField(field=%s,value=%s,added=%s)>' % (self.field, self.value, self.added)
+
+    def to_dict(self):
+        return {
+            'field_name': self.field,
+            'field_id': self.id,
+            'value': self.value,
+            'added': self.added,
+            'seen_entry_id': self.seen_entry_id
+        }
 
 
 @event('forget')
@@ -233,8 +259,8 @@ def db_cleanup(manager, session):
     if result:
         log.verbose('Removed %d seen fields older than 1 year.' % result)
 
-
-def add(title, task_name, fields, reason=None, local=None):
+@with_session
+def add(title, task_name, fields, reason=None, local=None, session=None):
     """
     Adds seen entries to DB
     :param title: name of title to be added
@@ -242,21 +268,21 @@ def add(title, task_name, fields, reason=None, local=None):
     :param fields: Dict of fields to be added to seen object
     :return: Seen Entry object as committed to DB
     """
-    with Session() as session:
-        se = SeenEntry(title, task_name, reason, local)
-        for field, value in fields.items():
-            sf = SeenField(field, value)
-            se.fields.append(sf)
-        session.add(se)
-    return se
+    se = SeenEntry(title, task_name, reason, local)
+    for field, value in fields.items():
+        sf = SeenField(field, value)
+        se.fields.append(sf)
+    session.add(se)
+    session.commit()
+    return se.to_dict()
 
 
-def search(value, status='all', session=None):
-        query = session.query(SeenEntry).join(SeenField).filter(SeenField.value.like(value)).order_by(
-                SeenField.added)
-        if status != 'all':
-            query = query.filter(SeenEntry.local == status)
-        return query.all()
+def search(value, status=None, session=None):
+    query = session.query(SeenEntry).join(SeenField).filter(SeenField.value.like(value)).order_by(
+            SeenField.added)
+    if status != 'all':
+        query = query.filter(SeenEntry.local == status)
+    return query.all()
 
 
 @event('plugin.register')
