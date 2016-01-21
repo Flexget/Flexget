@@ -196,7 +196,7 @@ class TVDBSeries(TVDBContainer, Base):
 
     def to_dict(self):
         return {
-            'id': self.id,
+            'TVDB_id': self.id,
             'last_updated': datetime.fromtimestamp(self.lastupdated).strftime('%Y-%m-%d %H:%M:%S'),
             'expired': self.expired,
             'series_name': self.seriesname,
@@ -212,10 +212,10 @@ class TVDBSeries(TVDBContainer, Base):
             'imdb_id': self.imdb_id,
             'zap2it_id': self.zap2it_id,
             'banner': self.banner,
-            'fanart': self.fanart,
+            'fan_art': self.fanart,
             'poster': self.poster,
             'poster_file': self.poster_file,
-            'genre': self.genre,
+            'genres': self.genre,
             'first_aired': self.firstaired,
             'actors': self.actors
         }
@@ -552,21 +552,13 @@ def mark_expired(session=None):
 
 tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
 
-tvdb_api_parser = api.parser()
-tvdb_api_parser.add_argument('search', type=str, required=True, help='TV Show name or tvdbid')
 
-
-@tvdb_api.route('/search/')
+@tvdb_api.route('/<string:search>/')
+@api.doc(params={'search': 'TV Show name or TVDB ID'})
 class TVDBSearchApi(APIResource):
-    @api.doc(parser=tvdb_api_parser)
-    @api.response(400, 'missing search parameter')
-    def get(self, session=None):
-        args = tvdb_api_parser.parse_args()
-        search = args['search']
-
-        if not search:
-            return {'detail': 'missing query parameter'}, 400
-
+    @api.response(200, 'Successfully found show')
+    @api.response(400, 'Missing search parameter')
+    def get(self, search, session=None):
         try:
             tvdb_id = int(search)
         except ValueError:
