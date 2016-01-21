@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from requests.exceptions import HTTPError
+
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.imdb import extract_id
@@ -59,7 +61,11 @@ class ImdbList(object):
 
         headers = {'Accept-Language': config.get('force_language')}
         log.debug('Requesting: %s %s' % (url, headers))
-        page = task.requests.get(url, params=params, headers=headers)
+        page = None
+        try:
+            page = task.requests.get(url, params=params, headers=headers)
+        except HTTPError as e:
+            log.error(e.args[0])
         if page.status_code != 200:
             raise plugin.PluginError('Unable to get imdb list. Either list is private or does not exist.')
 
