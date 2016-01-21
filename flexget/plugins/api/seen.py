@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 from math import ceil
 from operator import itemgetter
+from urllib import unquote
 
 from flask_restplus import inputs
 
@@ -106,7 +107,7 @@ def seen_search_sort_order_enum(value):
 
 seen_search_parser = api.parser()
 seen_search_parser.add_argument('page', type=int, default=1, help='Page number')
-seen_search_parser.add_argument('max', type=int, default=100, help='SEen entries per page')
+seen_search_parser.add_argument('max', type=int, default=100, help='Seen entries per page')
 seen_search_parser.add_argument('local_seen', type=seen_search_local_status_enum, default='all',
                                 help='Filter list by local status. Filter by true, false or all. Default is all')
 seen_search_parser.add_argument('sort_by', type=seen_search_sort_enum, default='added',
@@ -134,6 +135,7 @@ class SeenSEarchAPI(APIResource):
             order = True
 
         value = return_imdb_id(value)
+        value = unquote(value)
         value = '%' + value + '%'
         seen_entries_list = seen.search(value, status, session)
         count = len(seen_entries_list)
