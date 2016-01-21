@@ -177,7 +177,13 @@ class SeenAddAPI(APIResource):
             'local': data.get('local', False),
             'session': session
         }
-        # TODO check if seen entry already exist
+        values = [value for value in kwargs['fields'].values()]
+        exist = seen.search_by_field_values(field_value_list=values, task_name='seen_API', local=kwargs['local'],
+                                            session=session)
+        if exist:
+            return {'status': 'error',
+                    'message': "Seen entry matching the value '{0}' is already added".format(exist.value)}, 400
+
         seen_entry = seen.add(**kwargs)
         return jsonify({
             'status': 'success',
