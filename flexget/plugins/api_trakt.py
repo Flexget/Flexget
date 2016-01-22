@@ -640,7 +640,7 @@ class ApiTrakt(object):
     @with_session
     def lookup_series(session=None, only_cached=None, **lookup_params):
         series = get_cached('show', session=session, **lookup_params)
-        title = lookup_params.get('title')
+        title = lookup_params.get('title', '')
         found = None
         if not series and title:
             found = session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
@@ -670,8 +670,10 @@ class ApiTrakt(object):
         if series and title.lower() == series.title.lower():
             return series
         elif series and not found:
-            log.debug('Adding search result to db')
-            session.add(TraktShowSearchResult(search=title, series=series))
+            if not session.query(TraktShowSearchResult).filter(func.lower(TraktShowSearchResult.search) ==
+                                                               title.lower()).first():
+                log.debug('Adding search result to db')
+                session.add(TraktShowSearchResult(search=title, series=series))
         elif series and found:
             log.debug('Updating search result in db')
             found.series = series
@@ -681,7 +683,7 @@ class ApiTrakt(object):
     @with_session
     def lookup_movie(session=None, only_cached=None, **lookup_params):
         movie = get_cached('movie', session=session, **lookup_params)
-        title = lookup_params.get('title')
+        title = lookup_params.get('title', '')
         found = None
         if not movie and title:
             found = session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
@@ -711,8 +713,10 @@ class ApiTrakt(object):
         if movie and title.lower() == movie.title.lower():
             return movie
         if movie and not found:
-            log.debug('Adding search result to db')
-            session.add(TraktMovieSearchResult(search=title, movie=movie))
+            if not session.query(TraktMovieSearchResult).filter(func.lower(TraktMovieSearchResult.search) ==
+                                                                title.lower()).first():
+                log.debug('Adding search result to db')
+                session.add(TraktMovieSearchResult(search=title, movie=movie))
         elif movie and found:
             log.debug('Updating search result in db')
             found.movie = movie

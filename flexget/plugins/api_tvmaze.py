@@ -95,6 +95,9 @@ class TVMazeLookup(Base):
     series_id = Column(Integer, ForeignKey('tvmaze_series.tvmaze_id'))
     series = relation('TVMazeSeries', backref='search_strings')
 
+    def __repr__(self):
+        return '<TVMazeLookup(search_name={0},series_id={1})'.format(self.search_name, self.series_id)
+
 
 class TVMazeSeries(Base):
     __tablename__ = 'tvmaze_series'
@@ -320,7 +323,7 @@ def from_cache(session=None, search_params=None, cache_type=None):
     else:
         log.debug('searching db {0} for the values {1}'.format(cache_type.__tablename__, search_params.items()))
         result = session.query(cache_type).filter(
-            or_(getattr(cache_type, col) == val for col, val in search_params.iteritems() if val)).first()
+                or_(getattr(cache_type, col) == val for col, val in search_params.iteritems() if val)).first()
     return result
 
 
@@ -328,6 +331,16 @@ def from_cache(session=None, search_params=None, cache_type=None):
 def from_lookup(session=None, title=None):
     log.debug('searching lookup table using title {0}'.format(title))
     return session.query(TVMazeLookup).filter(func.lower(TVMazeLookup.search_name) == title.lower()).first()
+
+
+@with_session
+def add_to_lookup(session=None, title=None, series=None):
+    log.debug('trying to add lookup title {0} to series {1} in lookup table'.format(title, series.name))
+    exist = session.query(TVMazeLookup).filter(TVMazeLookup.search_name == title).first()
+    if exist:
+        log.debug('title {0} already exist for series {1}, no need to save lookup'.format(title, series.name))
+        return
+    session.add(TVMazeLookup(search_name=title, series=series))
 
 
 def prepare_lookup_for_pytvmaze(**lookup_params):
@@ -348,7 +361,7 @@ def prepare_lookup_for_pytvmaze(**lookup_params):
     prepared_params['tvrage_id'] = lookup_params.get('tvrage_id') or lookup_params.get('trakt_series_tvrage_id')
     prepared_params['show_name'] = title
     prepared_params['show_year'] = lookup_params.get('trakt_series_year') or lookup_params.get(
-        'year') or lookup_params.get('imdb_year') or year_match
+            'year') or lookup_params.get('imdb_year') or year_match
     prepared_params['show_network'] = lookup_params.get('network') or lookup_params.get('trakt_series_network')
     prepared_params['show_country'] = lookup_params.get('country') or lookup_params.get('trakt_series_country')
     prepared_params['show_language'] = lookup_params.get('language')
@@ -372,7 +385,7 @@ class APITVMaze(object):
         title = lookup_params.get('series_name') or lookup_params.get('show_name') or lookup_params.get('title')
         if not series and title:
             log.debug('did not find exact match for series {0} in cache, looking in search table'.format(
-                search_params['name']))
+                    search_params['name']))
             search = from_lookup(session=session, title=title)
             if search and search.series:
                 series = search.series
@@ -415,7 +428,7 @@ class APITVMaze(object):
         elif series and not search:
             log.debug('mismatch between series title {0} and search title {1}. '
                       'saving in lookup table'.format(title, series.name))
-            session.add(TVMazeLookup(search_name=title, series=series))
+            add_to_lookup(session=session, title=title, series=series)
         elif series and search:
             log.debug('Updating search result in db')
             search.series = series
@@ -446,13 +459,13 @@ class APITVMaze(object):
         # See if episode already exists in cache
         log.debug('searching for episode of show {0} in cache'.format(series.name))
         episode = session.query(TVMazeEpisodes).filter(
-            or_(
-                and_(TVMazeEpisodes.series_id == series.tvmaze_id,
-                     TVMazeEpisodes.season_number == season_number,
-                     TVMazeEpisodes.number == episode_number),
-                and_(TVMazeEpisodes.series_id == series.tvmaze_id,
-                     TVMazeEpisodes.airdate == episode_date)
-            )
+                or_(
+                        and_(TVMazeEpisodes.series_id == series.tvmaze_id,
+                             TVMazeEpisodes.season_number == season_number,
+                             TVMazeEpisodes.number == episode_number),
+                        and_(TVMazeEpisodes.series_id == series.tvmaze_id,
+                             TVMazeEpisodes.airdate == episode_date)
+                )
         ).first()
 
         # Logic for cache only mode
@@ -484,8 +497,9 @@ class APITVMaze(object):
             # TODO will this match all series_id types?
             try:
                 log.debug(
-                    'fetching episode {0} season {1} for series_id {2} for tvmaze'.format(episode_number, season_number,
-                                                                                          series.tvmaze_id))
+                        'fetching episode {0} season {1} for series_id {2} for tvmaze'.format(episode_number,
+                                                                                              season_number,
+                                                                                              series.tvmaze_id))
                 pytvmaze_episode = episode_by_number(maze_id=series.tvmaze_id, season_number=season_number,
                                                      episode_number=episode_number)
             except EpisodeNotFound as e:
@@ -496,10 +510,10 @@ class APITVMaze(object):
                 raise LookupError(e)
         # See if episode exists in DB
         episode = session.query(TVMazeEpisodes).filter(
-            and_(
-                TVMazeEpisodes.tvmaze_id == pytvmaze_episode.maze_id,
-                TVMazeEpisodes.number == pytvmaze_episode.episode_number,
-                TVMazeEpisodes.season_number == pytvmaze_episode.season_number)
+                and_(
+                        TVMazeEpisodes.tvmaze_id == pytvmaze_episode.maze_id,
+                        TVMazeEpisodes.number == pytvmaze_episode.episode_number,
+                        TVMazeEpisodes.season_number == pytvmaze_episode.season_number)
         ).first()
 
         if episode:
