@@ -257,7 +257,7 @@ class TestProxy(FlexGetBase):
         proxy.rest_client = MockRestClient()
         details = proxy.details(123123)
         assert proxy.rest_client.details_called == True
-        assert details.name == "Mock Title"
+        assert details.name == "Mock Title 720p"
         assert details.terms[0].id == 12
         # Session not still bound! assert details.terms[0].type.id == 7
 
