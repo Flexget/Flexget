@@ -7,7 +7,7 @@
 
     function authenticationSetup($rootScope, $state, $http, route, toolBar, authService) {
         /* Register login page and redirect to page when login is required */
-        route.register('login', '/login?timeout', 'LoginController', 'plugin/authentication/static/login.html');
+        route.register('login', '/login?timeout', 'LoginController', 'components/authentication/login.tmpl.html');
 
         $rootScope.$on('event:auth-loginRequired', function (event, timeout) {
             $state.go('login', {'timeout': timeout});
