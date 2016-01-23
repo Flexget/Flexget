@@ -1,16 +1,20 @@
 (function () {
-  'use strict';
+    'use strict';
 
-  angular.module('flexget.components').directive('sideNav', function (sideNav) {
+    angular.module('flexget.components')
+        .directive('sideNav', sideNavDirective);
 
-    return {
-      restrict: 'E',
-      replace: 'true',
-      templateUrl: 'components/sidenav/sidenav.tmpl.html',
-      link: function (scope, element, attrs) {
-        scope.navItems = sideNav.items;
-      }
-    };
-  });
+    function sideNavDirective() {
+        return {
+            restrict: 'E',
+            replace: 'true',
+            templateUrl: 'components/sidenav/sidenav.tmpl.html',
+            controller: function ($scope, $mdMedia, sideNav) {
+                $scope.navItems = sideNav.items;
+            }
+        }
 
-})();
+    }
+
+})
+();

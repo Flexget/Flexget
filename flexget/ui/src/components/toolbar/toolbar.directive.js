@@ -9,8 +9,9 @@
             restrict: 'E',
             replace: 'true',
             templateUrl: 'components/toolbar/toolbar.tmpl.html',
-            link: function (scope, element, attrs) {
-                scope.toolBarItems = toolBar.items;
+            controller: function ($scope, sideNav) {
+                $scope.toggle = sideNav.toggle;
+                $scope.toolBarItems = toolBar.items;
             }
         };
     }

@@ -1,26 +1,10 @@
-.login {
-  min-width: 350px;
-  z-index: 1000;
-  padding:10px;
-}
-
 .login .header {
   background: white url($header-image) no-repeat center !important;
-  height: 90px;
-  border-bottom: 1px solid #e5e5e5;
+  min-height: 90px;
+  min-width: 400px;
 }
 
-.login button {
-  width: 100%;
-}
-
-.overlay {
-  -webkit-overflow-scrolling: auto;
-  background-color: white;
-  position:fixed;
-  width:100%;
-  height:100%;
-  top:0;
-  left:0;
-  z-index:1000;
+.login md-input-container {
+  margin: 8px 0;
+  min-width: 200px;
 }

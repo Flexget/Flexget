@@ -5,10 +5,7 @@
         .run(authenticationSetup)
         .config(authenticationConfig);
 
-    function authenticationSetup($rootScope, $state, $http, route, toolBar, authService) {
-        /* Register login page and redirect to page when login is required */
-        route.register('login', '/login?timeout', 'LoginController', 'components/authentication/login.tmpl.html');
-
+    function authenticationSetup($rootScope, $state, $http, toolBar, authService) {
         $rootScope.$on('event:auth-loginRequired', function (event, timeout) {
             $state.go('login', {'timeout': timeout});
         });
@@ -40,7 +37,14 @@
         toolBar.registerMenuItem('Manage', 'Logout', 'fa fa-sign-out', logout, 255);
     }
 
-    function authenticationConfig($httpProvider) {
+    function authenticationConfig($httpProvider, $stateProvider) {
+        /* Register login page and redirect to page when login is required */
+        $stateProvider.state('login', {
+            controller: 'LoginController',
+            templateUrl: 'components/authentication/login.tmpl.html'
+        });
+
+
         /* Intercept 401/403 http return codes and redirect to login page */
 
         $httpProvider.interceptors.push(['$rootScope', '$q', '$injector', function ($rootScope, $q, $injector) {

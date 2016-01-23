@@ -1,21 +1,27 @@
-<div class="overlay" layout="row" layout-align="center start">
-    <div class="login" flex-sm>
-        <div class="header"></div>
-        <div layout="column">
-            <p class="text-success text-center" ng-if="timeout == 'true'">Your session timed out</p>
-            <p class="text-danger">{{ error }}</p>
-            <form>
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" class="form-control" id="username" placeholder="Username" ng-model="credentials.username">
-                </div>
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" class="form-control" id="password" placeholder="Password" ng-model="credentials.password">
-                </div>
-                <md-checkbox md-no-ink aria-label="Remember Me" ng-model="remember" class="md-primary">Remember Me</md-checkbox>
-                <button type="submit" class="btn btn-primary" data-ng-click="login()">Login</button>
-            </form>
-        </div>
+<div class="login" layout="column" layout-align="center center">
+    <div class="header"></div>
+    <div flex>
+        <p style="color: orange" class="text-success text-center" ng-if="timeout == 'true'">Your session timed out</p>
+
+        <p style="color: red">{{ error }}</p>
+
+        <form>
+            <md-content layout="column" layout-align="center center">
+                <md-input-container>
+                    <label>Username</label>
+                    <input id="username" ng-model="credentials.username">
+                </md-input-container>
+                <md-input-container>
+                    <label>Password</label>
+                    <input ng-model="credentials.password" type="password">
+                </md-input-container>
+                <md-input-container>
+                    <md-checkbox md-no-ink aria-label="Remember Me" ng-model="remember" class="md-primary">Remember Me</md-checkbox>
+                </md-input-container>
+                <md-input-container>
+                    <md-button class="md-raised md-primary" data-ng-click="login()">Login</md-button>
+                </md-input-container>
+            </md-content>
+        </form>
     </div>
 </div>
