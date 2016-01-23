@@ -23,7 +23,7 @@
     },
     "font-awesome": {
       "main": [
-        "scss/font-awesome.scss",
+        "css/font-awesome.css",
         "fonts/*"
       ]
     }
