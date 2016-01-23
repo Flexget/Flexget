@@ -381,4 +381,4 @@ def build_webui():
     sh(['bower', 'install'], cwd=cwd)
 
     # Build the ui
-    sh('gulp', cwd=cwd)
+    sh('gulp buildapp', cwd=cwd)
