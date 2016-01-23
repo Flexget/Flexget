@@ -151,7 +151,7 @@ def setup_server(manager, session=None):
         web_server.start()
 
 
-@event('manager.shutdown_requested')
+@event('manager.shutdown')
 def stop_server(manager):
     """ Sets up and starts/restarts the webui. """
     if not manager.is_daemon:
