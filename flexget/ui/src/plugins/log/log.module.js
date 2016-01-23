@@ -2,7 +2,7 @@
   'use strict';
 
   var logModule = angular.module('flexget.plugins.log', ['ui.grid', 'ui.grid.autoResize', 'ui.grid.autoScroll']);
-  registerModule(logModule);
+  registerPlugin(logModule);
 
   logModule.run(function(route, sideNav, toolBar, $state) {
     route.register('log', '/log', 'logController', 'plugins/log/log.tmpl.html');

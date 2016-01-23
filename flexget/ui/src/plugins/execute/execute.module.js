@@ -3,7 +3,7 @@
 
   var executeModule = angular.module("flexget.plugins.execute", ['ui.grid', 'ui.grid.autoResize', 'angular-spinkit']);
 
-  registerModule(executeModule);
+  registerPlugin(executeModule);
 
   executeModule.run(function(route, sideNav) {
     route.register('execute', '/execute', 'executeController', 'plugins/execute/execute.tmpl.html');

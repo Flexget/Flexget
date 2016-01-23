@@ -3,7 +3,7 @@
 
   var historyModule = angular.module("flexget.plugins.history", ['angular.filter']);
 
-  registerModule(historyModule);
+  registerPlugin(historyModule);
 
   historyModule.run(function(route, sideNav) {
     route.register('history', '/history', 'historyController', 'plugins/history/history.tmpl.html');

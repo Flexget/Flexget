@@ -2,7 +2,7 @@
   'use strict';
 
   var scheduleModule = angular.module('flexget.plugins.schedule', ['schemaForm']);
-  registerModule(scheduleModule);
+  registerPlugin(scheduleModule);
 
   scheduleModule.run(function(route, sideNav) {
     route.register('schedule', '/schedule', 'scheduleController', 'plugins/schedule/schedule.tmpl.html');
