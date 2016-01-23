@@ -9,7 +9,7 @@
 
         return {
             register: function (href, caption, icon, order) {
-                href = '/ui/#' + href;
+                href = '#' + href;
                 items.push({href: href, caption: caption, icon: icon, order: order})
             },
             items: items
