@@ -39,6 +39,9 @@ def serve_app(path):
 
 @webui_app.route('/')
 def root():
+    if not app_base:
+        return send_from_directory(ui_base, 'load.failure.html')
+
     return send_from_directory(app_base, 'app.html')
 
 
@@ -75,6 +78,8 @@ def register_web_ui(mgr):
             log.fatal('Failed to start web ui,'
                       ' this can happen if you are running from GitHub version and forgot to run the web ui build, '
                       'see http://flexget.com/wiki/Web-UI for instructions')
+
+            app_base = None
 
     register_app(webui_app.url_path, webui_app)
     register_home('%s/' % webui_app.url_path)
