@@ -35,4 +35,4 @@ tests/cover/
 flexget/ui/node_modules/
 flexget/ui/bower_components/
 flexget/ui/.tmp/
-flexget/ui/dist/
+flexget/ui/app/

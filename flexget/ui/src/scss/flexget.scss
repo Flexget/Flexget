@@ -1,0 +1,22 @@
+// Core
+@import "variables";
+@import "header";
+
+// Components
+@import "../components/sidenav/sidenav";
+@import "../components/authentication/authentication";
+
+
+.text-lightgrey {
+    color: #B8B8B8;
+}
+
+.text-white {
+    color: white;
+}
+
+@font-face {
+    font-family: 'FontAwesome';
+    font-style: normal;
+    font-weight: 400;
+}

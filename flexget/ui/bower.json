@@ -12,12 +12,20 @@
     "angular-cookies": "~1.4.8",
     "please-wait": "~0.0.5",
     "oboe": "~2.1.2",
-    "angular-spinkit": "~0.3.3"
+    "angular-spinkit": "~0.3.3",
+    "angular-loading-bar": "~0.8.0",
+    "ui-grid-auto-scroll": "~1.0.0"
   },
   "devDependencies": {},
   "overrides": {
     "please-wait": {
       "ignore": true
+    },
+    "font-awesome": {
+      "main": [
+        "scss/font-awesome.scss",
+        "fonts/*"
+      ]
     }
   }
 }
