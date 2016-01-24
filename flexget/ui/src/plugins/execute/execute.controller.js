@@ -4,7 +4,8 @@
     angular.module("flexget.plugins.execute")
         .controller('executeController', executeController);
 
-    function executeController($scope, $log, tasks) {
+    function executeController($scope, tasks) {
+        var vm = this;
 
         var stream, allTasks = [];
 
@@ -14,9 +15,9 @@
                 allTasks = tasks
             });
 
-        $scope.executeTasks = [];
-        $scope.searchText = [];
-        $scope.queryTasks = function (query) {
+        vm.executeTasks = [];
+        vm.searchText = [];
+        vm.queryTasks = function (query) {
             var taskFilter = function () {
                 var lowercaseQuery = angular.lowercase(query);
                 return function filterFn(task) {
@@ -26,26 +27,26 @@
             return query ? allTasks.filter(taskFilter()) : [];
         };
 
-        $scope.clear = function () {
-            $scope.stream = false;
+        vm.clear = function () {
+            vm.stream = false;
         };
 
-        $scope.run = function () {
-            $scope.stream = {
+        vm.run = function () {
+            vm.stream = {
                 tasks: [],
                 log: []
             };
 
-            stream = tasks.executeStream($scope.executeTasks)
+            stream = tasks.executeStream(vm.executeTasks)
                 .start(function () {
                     //
                 })
                 .done(function () {
-                    $scope.stream.percent = 100;
+                    vm.stream.percent = 100;
                 })
                 .tasks(function (tasks) {
                     angular.forEach(tasks, function (task) {
-                        $scope.stream.tasks.push({
+                        vm.stream.tasks.push({
                             id: task.id,
                             status: 'pending',
                             name: task.name,
@@ -55,7 +56,7 @@
                     });
                 })
                 .log(function (log) {
-                    $scope.stream.log.push(log);
+                    vm.stream.log.push(log);
                 })
                 .progress(function (taskId, update) {
                     var task = getTask(taskId);
@@ -73,8 +74,8 @@
                 });
 
             var getTask = function (taskId) {
-                for (var i = 0; i < $scope.stream.tasks.length; i++) {
-                    var task = $scope.stream.tasks[i];
+                for (var i = 0; i < vm.stream.tasks.length; i++) {
+                    var task = vm.stream.tasks[i];
                     if (task.id == taskId) {
                         return task
                     }
@@ -83,10 +84,10 @@
 
             var updateProgress = function () {
                 var totalPercent = 0;
-                for (var i = 0; i < $scope.stream.tasks.length; i++) {
-                    totalPercent = totalPercent + $scope.stream.tasks[i].percent;
+                for (var i = 0; i < vm.stream.tasks.length; i++) {
+                    totalPercent = totalPercent + vm.stream.tasks[i].percent;
                 }
-                $scope.stream.percent = totalPercent / $scope.stream.tasks.length;
+                vm.stream.percent = totalPercent / vm.stream.tasks.length;
             }
         };
 

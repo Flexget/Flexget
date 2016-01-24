@@ -2,7 +2,7 @@
     'use strict';
 
     angular.module('flexget.plugins.execute')
-        .filter('executePhaseFilter', executePhaseFilter)
+        .filter('executePhaseFilter', executePhaseFilter);
 
     function executePhaseFilter() {
         var phaseDescriptions = {

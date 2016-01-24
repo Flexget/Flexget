@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('flexget.components')
+    angular.module('flexget.services')
         .service('server', serverService);
 
     function serverService($http) {

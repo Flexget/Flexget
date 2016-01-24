@@ -1,26 +1,29 @@
 (function () {
     'use strict';
-    angular.module('flexget.components')
+
+    angular.module('flexget.services')
         .run(serverConfig);
 
     function serverConfig(toolBar, server, $mdDialog) {
 
         var reload = function () {
-            var reloadController = function ($scope, $mdDialog) {
-                $scope.title = 'Reload Config';
-                $scope.showCircular = true;
-                $scope.content = null;
-                $scope.buttons = [];
-                $scope.ok = null;
+            var reloadController = function ($mdDialog) {
+                var vm = this;
 
-                $scope.hide = function () {
+                vm.title = 'Reload Config';
+                vm.showCircular = true;
+                vm.content = null;
+                vm.buttons = [];
+                vm.ok = null;
+
+                vm.hide = function () {
                     $mdDialog.hide();
                 };
 
                 var done = function (text) {
-                    $scope.showCircular = false;
-                    $scope.content = text;
-                    $scope.ok = 'Close';
+                    vm.showCircular = false;
+                    vm.content = text;
+                    vm.ok = 'Close';
                 };
 
                 server.reload()
@@ -33,8 +36,9 @@
             };
 
             $mdDialog.show({
-                templateUrl: 'static/partials/dialog_circular.html',
+                templateUrl: 'services/modal/modal.dialog.circular.tmpl.html',
                 parent: angular.element(document.body),
+                controllerAs: 'vm',
                 controller: reloadController
             });
         };
@@ -42,22 +46,24 @@
         var doShutdown = function () {
             window.stop(); // Kill any http connection
 
-            var shutdownController = function ($scope, $mdDialog) {
-                $scope.title = 'Shutting Down';
-                $scope.showCircular = true;
-                $scope.content = null;
-                $scope.buttons = [];
-                $scope.ok = null;
+            var shutdownController = function ($mdDialog) {
+                var vm = this;
 
-                $scope.hide = function () {
+                vm.title = 'Shutting Down';
+                vm.showCircular = true;
+                vm.content = null;
+                vm.buttons = [];
+                vm.ok = null;
+
+                vm.hide = function () {
                     $mdDialog.hide();
                 };
 
                 var done = function (text) {
-                    $scope.title = 'Shutdown';
-                    $scope.showCircular = false;
-                    $scope.content = text;
-                    $scope.ok = 'Close';
+                    vm.title = 'Shutdown';
+                    vm.showCircular = false;
+                    vm.content = text;
+                    vm.ok = 'Close';
                 };
 
                 server.shutdown().
@@ -69,8 +75,9 @@
                 });
             };
             $mdDialog.show({
-                templateUrl: 'static/partials/dialog_circular.html',
+                templateUrl: 'services/modal/modal.dialog.circular.tmpl.html',
                 parent: angular.element(document.body),
+                controllerAs: 'vm',
                 controller: shutdownController
             });
 
@@ -96,5 +103,3 @@
     }
 
 })();
-
-

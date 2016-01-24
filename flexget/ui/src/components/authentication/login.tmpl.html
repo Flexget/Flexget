@@ -3,22 +3,22 @@
     <div>
         <form>
             <md-content layout="column" flex-gt-md="35" flex-offset-gt-md="33">
-                <p style="color: orange" class="text-success text-center" ng-if="timeout == 'true'">Your session timed out</p>
+                <p style="color: orange" class="text-success text-center" ng-if="vm.timeout == 'true'">Your session timed out</p>
 
-                <p style="color: red">{{ error }}</p>
+                <p style="color: red">{{ vm.error }}</p>
                 <md-input-container flex>
                     <label>Username</label>
-                    <input id="username" ng-model="credentials.username">
+                    <input id="username" ng-model="vm.credentials.username">
                 </md-input-container>
                 <md-input-container>
                     <label>Password</label>
-                    <input ng-model="credentials.password" type="password">
+                    <input ng-model="vm.credentials.password" type="password">
                 </md-input-container>
                 <div layout="column" layout-align="center center">
-                    <md-checkbox md-no-ink aria-label="Remember Me" ng-model="remember" class="md-primary">Remember Me</md-checkbox>
+                    <md-checkbox md-no-ink aria-label="Remember Me" ng-model="vm.remember" class="md-primary">Remember Me</md-checkbox>
                 </div>
-                <md-button class="md-raised md-primary" data-ng-click="login()">Login</md-button>
+                <md-button type="submit" class="md-raised md-primary" data-ng-click="vm.login()">Login</md-button>
+        </form>
     </div>
-    </form>
 </div>
 </div>

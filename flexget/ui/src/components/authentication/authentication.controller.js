@@ -4,23 +4,25 @@
     angular.module('flexget.components')
         .controller('LoginController', loginController);
 
-    function loginController($scope, $stateParams, authService) {
-        $scope.timeout = $stateParams.timeout;
-        $scope.remember = false;
-        $scope.error = '';
-        $scope.credentials = {
+    function loginController($stateParams, authService) {
+        var vm = this;
+
+        vm.timeout = $stateParams.timeout;
+        vm.remember = false;
+        vm.error = '';
+        vm.credentials = {
             username: '',
             password: ''
         };
 
-        $scope.login = function () {
-            authService.login($scope.credentials.username, $scope.credentials.password, $scope.remember)
+        vm.login = function () {
+            authService.login(vm.credentials.username, vm.credentials.password, vm.remember)
                 .error(function (data) {
-                    $scope.credentials.password = '';
+                    vm.credentials.password = '';
                     if ('message' in data) {
-                        $scope.error = data.message;
+                        vm.error = data.message;
                     } else {
-                        $scope.error = 'Error during authentication';
+                        vm.error = 'Error during authentication';
                     }
                 });
         };

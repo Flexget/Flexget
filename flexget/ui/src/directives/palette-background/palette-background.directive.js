@@ -14,7 +14,7 @@
         };
         return directive;
 
-        function link($scope, $element, attrs) {
+        function link(scope, $element, attrs) {
             var splitColor = attrs.paletteBackground.split(':');
             var color = flexTheme.getPaletteColor(splitColor[0], splitColor[1]);
 

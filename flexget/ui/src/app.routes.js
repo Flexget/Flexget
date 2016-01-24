@@ -17,7 +17,8 @@
                     $stateProvider.state('flexget.' + name, {
                         url: url,
                         templateUrl: template,
-                        controller: controller
+                        controller: controller,
+                        controllerAs: 'vm'
                     });
                 }
             }

@@ -9,11 +9,12 @@
             restrict: 'E',
             replace: 'true',
             templateUrl: 'components/sidenav/sidenav.tmpl.html',
-            controller: function ($scope, $mdMedia, sideNav) {
-                $scope.navItems = sideNav.items;
+            controllerAs: 'vm',
+            controller: function ($mdMedia, sideNav) {
+                var vm = this;
+                vm.navItems = sideNav.items;
             }
         }
-
     }
 
 })

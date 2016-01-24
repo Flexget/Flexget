@@ -9,7 +9,7 @@
     function widget($mdTheming, flexTheme) {
         var directive = {
             restrict: 'E',
-            templateUrl: 'components/widget/widget.tmpl.html',
+            templateUrl: 'directives/widget/widget.tmpl.html',
             transclude: true,
             replace: true,
             scope: {
@@ -24,27 +24,27 @@
         };
         return directive;
 
-        function link($scope, $element, attrs) {
+        function link(scope, $element, attrs) {
             // set the value of the widget layout attribute
-            $scope.vm.widgetLayout = attrs.titlePosition === 'left' || attrs.titlePosition === 'right' ? 'row' : 'column';
+            scope.vm.widgetLayout = attrs.titlePosition === 'left' || attrs.titlePosition === 'right' ? 'row' : 'column';
             // set the layout attribute for the widget content
-            $scope.vm.contentLayout = angular.isUndefined(attrs.contentLayout) ? 'column' : attrs.contentLayout;
+            scope.vm.contentLayout = angular.isUndefined(attrs.contentLayout) ? 'column' : attrs.contentLayout;
             // set if the layout-padding attribute will be added
-            $scope.vm.contentPadding = angular.isDefined(attrs.contentPadding);
+            scope.vm.contentPadding = angular.isDefined(attrs.contentPadding);
             // set the content align
-            $scope.vm.contentLayoutAlign = angular.isUndefined(attrs.contentLayoutAlign) ? '' : attrs.contentLayoutAlign;
+            scope.vm.contentLayoutAlign = angular.isUndefined(attrs.contentLayoutAlign) ? '' : attrs.contentLayoutAlign;
             // set the order of the title and content based on title position
-            $scope.vm.titleOrder = attrs.titlePosition === 'right' || attrs.titlePosition === 'bottom' ? 2 : 1;
-            $scope.vm.contentOrder = attrs.titlePosition === 'right' || attrs.titlePosition === 'bottom' ? 1 : 2;
+            scope.vm.titleOrder = attrs.titlePosition === 'right' || attrs.titlePosition === 'bottom' ? 2 : 1;
+            scope.vm.contentOrder = attrs.titlePosition === 'right' || attrs.titlePosition === 'bottom' ? 1 : 2;
             // set if we overlay the title on top of the widget content
-            $scope.vm.overlayTitle = angular.isUndefined(attrs.overlayTitle) ? undefined : true;
+            scope.vm.overlayTitle = angular.isUndefined(attrs.overlayTitle) ? undefined : true;
 
             $mdTheming($element);
 
             if (angular.isDefined(attrs.titleBackground)) {
                 var splitColor = attrs.titleBackground.split(':');
                 var color = flexTheme.getPaletteColor(splitColor[0], splitColor[1]);
-                $scope.vm.titleStyle = {
+                scope.vm.titleStyle = {
                     'background-color': flexTheme.rgba(color.value),
                     'border-color': flexTheme.rgba(color.value),
                     'color': flexTheme.rgba(color.contrast)
@@ -60,9 +60,9 @@
                 $element.css('background-image', 'url(' + attrs.backgroundImage + ')');
             }
 
-            $scope.menuClick = function ($event) {
-                if (angular.isUndefined($scope.menu.menuClick)) {
-                    $scope.menu.menuClick($event);
+            scope.menuClick = function ($event) {
+                if (angular.isUndefined(scope.menu.menuClick)) {
+                    scope.menu.menuClick($event);
                 }
             };
 

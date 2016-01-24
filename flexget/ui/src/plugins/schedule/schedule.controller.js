@@ -4,11 +4,13 @@
     angular.module('flexget.plugins.schedule')
         .controller('scheduleController', scheduleController);
 
-    function scheduleController($scope, $http) {
-        $scope.title = 'Schedules';
-        $scope.description = 'Task execution';
+    function scheduleController($http) {
+        var vm = this;
 
-        $scope.form = [
+        vm.title = 'Schedules';
+        vm.description = 'Task execution';
+
+        vm.form = [
             '*',
             {
                 type: 'submit',
@@ -16,9 +18,9 @@
             }
         ];
 
-        $scope.onSubmit = function (form) {
+        vm.onSubmit = function (form) {
             // First we broadcast an event so all fields validate themselves
-            $scope.$broadcast('schemaFormValidate');
+            vm.$broadcast('schemaFormValidate');
 
             // Then we check if the form is valid
             if (form.$valid) {
@@ -30,14 +32,14 @@
         $http.get('/api/schema/config/schedules').
         success(function (data, status, headers, config) {
             // schema-form doesn't allow forms with an array at root level
-            $scope.schema = {type: 'object', 'properties': {'schedules': data}, required: ['schedules']};
+            vm.schema = {type: 'object', 'properties': {'schedules': data}, required: ['schedules']};
         }).
         error(function (data, status, headers, config) {
             // log error
         });
         $http.get('/api/schedules').
         success(function (data, status, headers, config) {
-            $scope.models = [data];
+            vm.models = [data];
         }).
         error(function (data, status, headers, config) {
             // log error

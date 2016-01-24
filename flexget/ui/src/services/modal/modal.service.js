@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('flexget.components')
+    angular.module('flexget.services')
         .service('modal', modalService);
 
     function modalService($modal) {
@@ -11,7 +11,7 @@
             keyboard: true,
             modalFade: true,
             size: 'md',
-            templateUrl: 'components/modal/modal.html',
+            templateUrl: 'services/modal/modal.tmpl.html',
             headerText: 'Proceed?',
             bodyText: 'Perform this action?',
             okText: 'Ok',
@@ -26,17 +26,22 @@
             angular.extend(tempOptions, defaultOptions, options);
 
             if (!tempOptions.controller) {
-                tempOptions.controller = function ($scope, $modalInstance) {
-                    $scope.modalOptions = tempOptions;
+                tempOptions.controller = function ($modalInstance) {
+                    vm = this;
 
-                    $scope.ok = function (result) {
+                    vm.modalOptions = tempOptions;
+
+                    vm.ok = function (result) {
                         $modalInstance.close(result);
                     };
-                    $scope.close = function (result) {
+                    vm.close = function (result) {
                         $modalInstance.dismiss('cancel');
                     };
                 }
             }
+
+            tempOptions.controllerAs = 'vm';
+
             return $modal.open(tempOptions).result;
         };
 

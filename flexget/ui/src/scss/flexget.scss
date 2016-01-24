@@ -3,8 +3,9 @@
 @import "header";
 // Components
 @import "../components/sidenav/sidenav";
-@import "../components/widget/widget";
 @import "../components/authentication/authentication";
+// Directives
+@import "../directives/widget/widget";
 
 .text-lightgrey {
   color: #B8B8B8;
@@ -22,8 +23,8 @@
 
 #content {
   background: #E6E6E6;
+  md-content.md-default-theme, md-content {
+    background: #E6E6E6;
+  }
 }
 
-md-content.md-default-theme, md-content {
-  background: #E6E6E6;
-}

@@ -4,29 +4,31 @@
     angular.module('flexget.plugins.log')
         .controller('logController', logController);
 
-    function logController($scope, $timeout, uiGridConstants) {
-        var filterTimeout, newDataTimeout;
+    function logController($scope, $timeout) {
+        var vm = this;
+
+        var filterTimeout;
         var logStream = false;
 
-        $scope.status = 'Connecting';
-        $scope.filter = {
+        vm.status = 'Connecting';
+        vm.filter = {
             lines: 400,
             search: ''
         };
 
-        $scope.stop = function () {
+        vm.stop = function () {
             if (angular.isDefined(filterTimeout)) {
                 $timeout.cancel(filterTimeout);
             }
             if (typeof logStream !== 'undefined' && logStream) {
                 logStream.abort();
                 logStream = false;
-                $scope.status = "Disconnected";
+                vm.status = "Disconnected";
             }
 
         };
 
-        $scope.refresh = function () {
+        vm.refresh = function () {
             // Delay for 1 second before getting search results from server
             if (angular.isDefined(filterTimeout)) {
                 $timeout.cancel(filterTimeout);
@@ -38,42 +40,42 @@
 
         var getLogData = function () {
             // Disconnect existing log streams
-            $scope.stop();
+            vm.stop();
 
-            $scope.status = "Connecting";
-            $scope.gridOptions.data = [];
+            vm.status = "Connecting";
+            vm.gridOptions.data = [];
 
-            var queryParams = '?lines=' + $scope.filter.lines;
-            if ($scope.filter.search) {
-                queryParams = queryParams + '&search=' + $scope.filter.search;
+            var queryParams = '?lines=' + vm.filter.lines;
+            if (vm.filter.search) {
+                queryParams = queryParams + '&search=' + vm.filter.search;
             }
 
             logStream = oboe({url: '/api/server/log/' + queryParams})
                 .start(function () {
                     $scope.$applyAsync(function () {
-                        $scope.status = "Streaming";
+                        vm.status = "Streaming";
                     });
                 })
                 .node('{message}', function (node) {
                     $scope.$applyAsync(function () {
-                        $scope.gridOptions.data.push(node);
+                        vm.gridOptions.data.push(node);
                     });
                 })
                 .fail(function (test) {
                     $scope.$applyAsync(function () {
-                        $scope.status = "Disconnected";
+                        vm.status = "Disconnected";
                     });
                 })
         };
 
-        var rowTemplate = '<div class="{{ row.entity.levelname | lowercase }}"' +
+        var rowTemplate = '<div class="{{ row.entity.log_level | lowercase }}"' +
             'ng-class="{summary: row.entity.message.startsWith(\'Summary\'), accepted: row.entity.message.startsWith(\'ACCEPTED\')}"><div ' +
             'ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.uid" ' +
             'class="ui-grid-cell" ' +
             'ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader }"  ui-grid-cell>' +
             '</div></div>';
 
-        $scope.gridOptions = {
+        vm.gridOptions = {
             data: [],
             enableSorting: true,
             rowHeight: 20,
@@ -86,14 +88,14 @@
             ],
             rowTemplate: rowTemplate,
             onRegisterApi: function (gridApi) {
-                $scope.gridApi = gridApi;
+                vm.gridApi = gridApi;
                 getLogData();
             }
         };
 
         // Cancel timer and stop the stream when navigating away
         $scope.$on("$destroy", function () {
-            $scope.stop();
+            vm.stop();
         });
     }
 

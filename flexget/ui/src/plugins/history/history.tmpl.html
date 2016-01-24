@@ -1,5 +1,5 @@
 <md-content>
-    <section ng-repeat="(key, value) in entries | groupBy: 'time | limitTo : 10'">
+    <section ng-repeat="(key, value) in vm.entries | groupBy: 'time | limitTo : 10'">
         <md-subheader class="md-primary">{{ key }}</md-subheader>
         <md-list layout-padding>
             <md-list-item class="md-2-line" ng-repeat="entry in value">

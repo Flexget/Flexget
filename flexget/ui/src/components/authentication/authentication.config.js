@@ -41,6 +41,7 @@
         /* Register login page and redirect to page when login is required */
         $stateProvider.state('login', {
             controller: 'LoginController',
+            controllerAs: 'vm',
             templateUrl: 'components/authentication/login.tmpl.html'
         });
 

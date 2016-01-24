@@ -1,35 +1,16 @@
-<md-button class="md-primary">Primary</md-button>
-<md-button class="md-primary md-hue-1">Primary</md-button>
-<md-button class="md-primary md-hue-2">Primary</md-button>
-<md-button class="md-primary md-hue-3">Primary</md-button>
-<md-button class="md-primary md-hue-4">Primary</md-button>
-test
-<md-button class="md-accent">accent</md-button>
-<md-button class="md-accent md-hue-1">accent</md-button>
-<md-button class="md-accent md-hue-2">accent</md-button>
-<md-button class="md-accent md-hue-3">accent</md-button>
-<md-button class="md-accent md-hue-4">accent</md-button>
-
-<md-button class="md-warn">Warn</md-button>
-<md-button class="md-warn  md-hue-1">Warn</md-button>
-<md-button class="md-warn  md-hue-2">Warn</md-button>
-<md-button class="md-warn  md-hue-3">Warn</md-button>
-<md-button class="md-warn  md-hue-4">Warn</md-button>
-
-
 <div ng-hide="stream" layout="column" layout-align="start center" flex>
     <div>
         <h3 class="text-center">Execute Tasks</h3>
     </div>
     <div class="text-center">
-        <md-chips ng-model="executeTasks" md-autocomplete-snap md-require-match="false" secondary-placeholder="Enter task">
+        <md-chips ng-model="vm.executeTasks" md-autocomplete-snap md-require-match="false" secondary-placeholder="Enter task">
             <md-autocomplete
-                    md-items="task in queryTasks(searchText)"
+                    md-items="task in vm.queryTasks(searchText)"
                     md-item-text="task"
                     placeholder="Enter task"
                     md-selected-item="selectedItem"
-                    md-search-text="searchText">
-                <span md-highlight-text="searchText">{{task}}</span>
+                    md-search-text="vm.searchText">
+                <span md-highlight-text="vm.searchText">{{task}}</span>
             </md-autocomplete>
         </md-chips>
         <md-button class="md-raised md-primary" ng-click="run()">Execute</md-button>
