@@ -20,7 +20,7 @@ proxy.on('error', function (error, req, res) {
 function proxyMiddleware(req, res, next) {
     if (req.url == '/') {
         next();
-    } else if (/\.(html|css|js|png|jpg|jpeg|gif|ico|xml|rss|txt|eot|svg|ttf|woff|cur)(\?((r|v|rel|rev)=[\-\.\w]*)?)?$/.test(req.url)) {
+    } else if (/\.(html|css|js|png|jpg|jpeg|gif|ico|xml|rss|txt|eot|svg|ttf|woff|woff2|cur)(\?((r|v|rel|rev)=[\-\.\w]*)?)?$/.test(req.url)) {
         next();
     } else {
         proxy.web(req, res);
