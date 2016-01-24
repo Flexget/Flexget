@@ -4,15 +4,14 @@
     angular.module('flexget.components')
         .factory('sideNav', sideNavService);
 
-    function sideNavService($mdSidenav, $mdMedia) {
+    function sideNavService($rootScope, $mdSidenav, $mdMedia) {
         var items = [];
-        var menuMini = false;
 
         var toggle = function () {
             if ($mdSidenav('left').isLockedOpen()) {
-                menuMini = !menuMini;
+                $rootScope.menuMini = !$rootScope.menuMini;
             } else {
-                menuMini = false;
+                $rootScope.menuMini = false;
                 $mdSidenav('left').toggle();
             }
         };
@@ -24,7 +23,6 @@
         };
 
         return {
-            mini: menuMini,
             toggle: toggle,
             close: close,
             register: function (href, caption, icon, order) {
