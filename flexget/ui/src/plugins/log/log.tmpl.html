@@ -1,26 +1,42 @@
-<div layout="column" layout-align-gt-sm="center center" class="log">
-    <div class="text-center">
-        <span style="font-weight: 800;" ng-class="{'text-success': status == 'Streaming', 'text-primary': status == 'Connecting', 'text-danger': status == 'Disconnected'}">{{ status }}</span>
-        <md-button class="md-icon-button md-primary" aria-label="Settings" ng-click="toggleStream()">
-            <md-icon class="fa fa-pause" ng-if="status == 'Streaming'"></md-icon>
-            <md-icon class="fa fa-stop" ng-if="status == 'Connecting'"></md-icon>
-            <md-icon class="fa fa-refresh" ng-if="status == 'Disconnected'"></md-icon>
-        </md-button>
+<flex-widget layout="column" class="log" content-padding>
+    <div class="widget-title" layout="row" layout-padding layout-align="space-between center">
+        <div flex layout="row">
+            <h3 class="md-subhead">Server Log
+                <p class="md-body-1" ng-class="{'text-success': status == 'Streaming', 'text-primary': status == 'Connecting', 'text-danger': status == 'Disconnected'}">{{ status }}</p>
+            </h3>
+            <div flex></div>
+            <md-input-container md-no-float class="md-block" style="margin: 0px" flex="60" flex-gt-md="70">
+                <md-icon class="fa fa-filter"></md-icon>
+                <label>Filter</label>
+                <md-tooltip md-direction="left">Supports and, or, (), and ""</md-tooltip>
+                <input type="text" aria-label="message" ng-model="search" ng-change="refresh()"/>
+            </md-input-container>
+        </div>
+        <md-menu>
+            <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
+                <md-icon md-font-icon="fa fa-ellipsis-v"></md-icon>
+            </md-button>
+            <md-menu-content>
+                <md-menu-item layout-margin>
+                    <md-input-container>
+                        <label>Max Lines</label>
+                        <input type="number" aria-label="lines" ng-model="lines" ng-change="refresh();"/>
+                    </md-input-container>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button ng-click="refresh()">
+                        <md-icon md-font-icon="fa fa-refresh"></md-icon>
+                        <span>Refresh</span>
+                    </md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button ng-click="stop()">
+                        <md-icon md-font-icon="fa fa-stop"></md-icon>
+                        <span>Stop</span>
+                    </md-button>
+                </md-menu-item>
+            </md-menu-content>
+        </md-menu>
     </div>
-    <div layout-gt-sm="row" layout-align-gt-sm="center center" flex-sm>
-        <md-input-container class="md-icon-float" flex-sm flex-gt-sm="30">
-            <label>Get lines</label>
-            <md-icon class="fa fa-binoculars"></md-icon>
-            <input type="number" aria-label="lines" ng-model="lines" ng-change="updateGrid();"/>
-        </md-input-container>
-        <md-input-container class="md-icon-float" flex-gt-sm="90">
-            <label>Filter</label>
-            <md-tooltip md-direction="right">Supports and, or, (), and ""</md-tooltip>
-            <md-icon class="fa fa-filter"></md-icon>
-            <input type="text" aria-label="message" ng-model="search" ng-change="updateGrid()"/>
-        </md-input-container>
-    </div>
-</div>
-<div flex layout="row" class="log-grid">
-    <div id="log-grid" class="grid" ui-grid="gridOptions" ui-grid-auto-resize flex ui-grid-auto-scroll></div>
-</div>
+    <div id="log-grid" ui-grid="gridOptions" ui-grid-auto-resize flex ui-grid-auto-scroll></div>
+</flex-widget>

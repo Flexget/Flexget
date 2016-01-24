@@ -12,15 +12,19 @@
         $scope.lines = 400;
         $scope.search = '';
 
-        $scope.toggleStream = function () {
-            if ($scope.status == "Disconnected") {
-                $scope.updateGrid();
-            } else {
-                abort();
+        $scope.stop = function () {
+            if (angular.isDefined(filterTimeout)) {
+                $timeout.cancel(filterTimeout);
             }
+            if (typeof logStream !== 'undefined' && logStream) {
+                logStream.abort();
+                logStream = false;
+                $scope.status = "Disconnected";
+            }
+
         };
 
-        $scope.updateGrid = function () {
+        $scope.refresh = function () {
             // Delay for 1 second before getting search results from server
             if (angular.isDefined(filterTimeout)) {
                 $timeout.cancel(filterTimeout);
@@ -30,20 +34,9 @@
             }, 1000);
         };
 
-        var abort = function () {
-            if (angular.isDefined(filterTimeout)) {
-                $timeout.cancel(filterTimeout);
-            }
-            if (typeof logStream !== 'undefined' && logStream) {
-                logStream.abort();
-                logStream = false;
-                $scope.status = "Disconnected";
-            }
-        };
-
         var getLogData = function () {
             // Disconnect existing log streams
-            abort();
+            $scope.stop();
 
             $scope.status = "Connecting";
             $scope.gridOptions.data = [];
@@ -98,8 +91,9 @@
 
         // Cancel timer and stop the stream when navigating away
         $scope.$on("$destroy", function () {
-            abort();
+            $scope.stop();
         });
     }
 
-})();
+})
+();
