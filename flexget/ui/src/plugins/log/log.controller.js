@@ -9,8 +9,10 @@
         var logStream = false;
 
         $scope.status = 'Connecting';
-        $scope.lines = 400;
-        $scope.search = '';
+        $scope.filter = {
+            lines: 400,
+            search: ''
+        };
 
         $scope.stop = function () {
             if (angular.isDefined(filterTimeout)) {
@@ -41,9 +43,9 @@
             $scope.status = "Connecting";
             $scope.gridOptions.data = [];
 
-            var queryParams = '?lines=' + $scope.lines;
-            if ($scope.search) {
-                queryParams = queryParams + '&search=' + $scope.search;
+            var queryParams = '?lines=' + $scope.filter.lines;
+            if ($scope.filter.search) {
+                queryParams = queryParams + '&search=' + $scope.filter.search;
             }
 
             logStream = oboe({url: '/api/server/log/' + queryParams})
