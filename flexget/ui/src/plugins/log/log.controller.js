@@ -4,10 +4,9 @@
     angular.module('flexget.plugins.log')
         .controller('logController', logController);
 
-    function logController($scope, $timeout) {
+    function logController($scope) {
         var vm = this;
 
-        var filterTimeout;
         var logStream = false;
 
         vm.status = 'Connecting';
@@ -15,11 +14,11 @@
             lines: 400,
             search: ''
         };
+        vm.refreshOpts = {
+            debounce: 1000
+        };
 
         vm.stop = function () {
-            if (angular.isDefined(filterTimeout)) {
-                $timeout.cancel(filterTimeout);
-            }
             if (typeof logStream !== 'undefined' && logStream) {
                 logStream.abort();
                 logStream = false;
@@ -29,16 +28,6 @@
         };
 
         vm.refresh = function () {
-            // Delay for 1 second before getting search results from server
-            if (angular.isDefined(filterTimeout)) {
-                $timeout.cancel(filterTimeout);
-            }
-            filterTimeout = $timeout(function () {
-                getLogData()
-            }, 1000);
-        };
-
-        var getLogData = function () {
             // Disconnect existing log streams
             vm.stop();
 
@@ -89,7 +78,7 @@
             rowTemplate: rowTemplate,
             onRegisterApi: function (gridApi) {
                 vm.gridApi = gridApi;
-                getLogData();
+                vm.refresh();
             }
         };
 

@@ -9,7 +9,7 @@
                 <md-icon class="fa fa-filter"></md-icon>
                 <label>Filter</label>
                 <md-tooltip md-direction="left">Supports and, or, (), and ""</md-tooltip>
-                <input type="text" aria-label="message" ng-model="vm.filter.search" ng-change="vm.refresh()"/>
+                <input type="text" aria-label="message" ng-model="vm.filter.search" ng-change="vm.refresh()" ng-model-options="vm.refreshOpts"/>
             </md-input-container>
         </div>
         <md-menu>
@@ -20,7 +20,7 @@
                 <md-menu-item layout-margin>
                     <md-input-container>
                         <label>Max Lines</label>
-                        <input type="number" aria-label="lines" ng-model="vm.filter.lines" ng-change="vm.refresh();"/>
+                        <input type="number" aria-label="lines" ng-model="vm.filter.lines" ng-change="vm.refresh()" ng-model-options="vm.refreshOpts"/>
                     </md-input-container>
                 </md-menu-item>
                 <md-menu-item>
