@@ -20,6 +20,10 @@
   font-weight: 400;
 }
 
-.flexContent {
-  background: rgba(0, 0, 0, .1);
+#content {
+  background: #E6E6E6;
+}
+
+md-content.md-default-theme, md-content {
+  background: #E6E6E6;
 }
