@@ -7,7 +7,8 @@
             'ngMaterial',
             'ngCookies',
             'angular-loading-bar',
-            'flexget.components'
+            'flexget.components',
+            'flexget.directives'
         ]);
 
     function bootstrapApplication() {

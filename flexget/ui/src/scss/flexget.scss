@@ -1,22 +1,25 @@
 // Core
 @import "variables";
 @import "header";
-
 // Components
 @import "../components/sidenav/sidenav";
+@import "../components/widget/widget";
 @import "../components/authentication/authentication";
 
-
 .text-lightgrey {
-    color: #B8B8B8;
+  color: #B8B8B8;
 }
 
 .text-white {
-    color: white;
+  color: white;
 }
 
 @font-face {
-    font-family: 'FontAwesome';
-    font-style: normal;
-    font-weight: 400;
+  font-family: 'FontAwesome';
+  font-style: normal;
+  font-weight: 400;
+}
+
+.flexContent {
+  background: rgba(0, 0, 0, .1);
 }

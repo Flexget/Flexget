@@ -1,10 +1,10 @@
-<div class="header" ng-class="menuMini ? 'header-mini': 'header-full'">
+<div class="header md-whiteframe-4dp" ng-class="menuMini ? 'header-mini': 'header-full'">
     <div class="logo"><a href="/ui/#/home"></a></div>
     <tool-bar></tool-bar>
 </div>
 <div layout="row" flex ng-class="menuMini ? 'nav-menu-mini': 'nav-menu-full'">
     <side-nav></side-nav>
     <div layout="column" flex id="content">
-        <md-content ui-view layout="column" flex layout-padding></md-content>
+        <div ui-view layout-padding></div>
     </div>
 </div>
