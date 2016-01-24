@@ -264,7 +264,7 @@ class LogParser:
 
             operator_parenthesis = Group(
                 (Suppress('(') + operator_or + Suppress(")"))
-            ).setResultsName0('parenthesis') | operator_quotes
+            ).setResultsName('parenthesis') | operator_quotes
 
             operator_not = Forward()
             operator_not << (Group(

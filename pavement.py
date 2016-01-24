@@ -95,7 +95,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget',
                                    exclude=['FlexGet.egg-info', '*.pyc'],
-                                   exclude_directories=['node_modules', 'bower_components'],
+                                   exclude_directories=['node_modules', 'bower_components', '.tmp'],
                                    only_in_packages=False),  # NOTE: the exclude does not seem to work
     zip_safe=False,
     test_suite='nose.collector',
@@ -381,4 +381,4 @@ def build_webui():
     sh(['bower', 'install'], cwd=cwd)
 
     # Build the ui
-    sh('gulp', cwd=cwd)
+    sh('gulp buildapp', cwd=cwd)

@@ -1,0 +1,42 @@
+<flex-widget layout="column" class="log" content-padding>
+    <div class="widget-title" layout="row" layout-padding layout-align="space-between center">
+        <div flex layout="row">
+            <h3 class="md-subhead">Server Log
+                <p class="md-body-1" ng-class="{'text-success': vm.status == 'Streaming', 'text-primary': vm.status == 'Connecting', 'text-danger': vm.status == 'Disconnected'}">{{ vm.status }}</p>
+            </h3>
+            <div flex></div>
+            <md-input-container md-no-float class="md-block" style="margin: 0px" flex="60" flex-gt-md="70">
+                <md-icon class="fa fa-filter"></md-icon>
+                <label>Filter</label>
+                <md-tooltip md-direction="left">Supports and, or, (), and ""</md-tooltip>
+                <input type="text" aria-label="message" ng-model="vm.filter.search" ng-change="vm.refresh()"/>
+            </md-input-container>
+        </div>
+        <md-menu>
+            <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
+                <md-icon md-font-icon="fa fa-ellipsis-v"></md-icon>
+            </md-button>
+            <md-menu-content>
+                <md-menu-item layout-margin>
+                    <md-input-container>
+                        <label>Max Lines</label>
+                        <input type="number" aria-label="lines" ng-model="vm.filter.lines" ng-change="vm.refresh();"/>
+                    </md-input-container>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button ng-click="vm.refresh()">
+                        <md-icon md-font-icon="fa fa-refresh"></md-icon>
+                        <span>Refresh</span>
+                    </md-button>
+                </md-menu-item>
+                <md-menu-item>
+                    <md-button ng-click="vm.stop()">
+                        <md-icon md-font-icon="fa fa-stop"></md-icon>
+                        <span>Stop</span>
+                    </md-button>
+                </md-menu-item>
+            </md-menu-content>
+        </md-menu>
+    </div>
+    <div id="log-grid" ui-grid="vm.gridOptions" ui-grid-auto-resize flex ui-grid-auto-scroll></div>
+</flex-widget>

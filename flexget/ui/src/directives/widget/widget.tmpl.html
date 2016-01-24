@@ -1,0 +1,37 @@
+<md-content flex>
+    <div class="widget md-whiteframe-z2" ng-class="::{'widget-overlay-title': vm.overlayTitle}" flex layout="{{ vm.widgetLayout }}">
+
+        <div class="widget-title" ng-if="::(vm.title || vm.subtitle)" layout="row" layout-padding layout-align="space-between center" flex-order="{{ vm.titleOrder }}" ng-style="::vm.titleStyle">
+            <div layout="column" ng-if="::vm.avatar">
+                <img ng-src="{{::vm.avatar}}" class="widget-avatar"/>
+            </div>
+            <div flex layout="column">
+                <h3 class="md-subhead" ng-if="::vm.title">{{::vm.title}}</h3>
+
+                <p class="md-body-1" ng-if="::vm.subtitle">{{::vm.subtitle}}</p>
+            </div>
+            <md-menu ng-if="::vm.menu">
+                <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
+                    <md-icon md-font-icon="{{::vm.menu.icon}}"></md-icon>
+                </md-button>
+                <md-menu-content>
+                    <md-menu-item ng-repeat="item in ::vm.menu.items">
+                        <md-button ng-click="item.click($event)">
+                            <md-icon ng-if="::item.icon" md-font-icon="{{::item.icon}}"></md-icon>
+                            <span>{{::item.title}}</span>
+                        </md-button>
+                    </md-menu-item>
+                </md-menu-content>
+            </md-menu>
+        </div>
+
+        <div class="widget-content" layout="{{ vm.contentLayout }}" layout-align="{{ vm.contentLayoutAlign }}" ng-class="{'layout-padding': vm.contentPadding}" ng-transclude flex-order="{{ vm.contentOrder }}"></div>
+
+        <div class="widget-loading ng-hide" ng-show="vm.loading" layout layout-fill layout-align="center center">
+            <div class="widget-loading-inner" ng-show="vm.loading">
+                <md-progress-circular md-mode="indeterminate"></md-progress-circular>
+            </div>
+        </div>
+
+    </div>
+</md-content>
