@@ -7,7 +7,7 @@
     function toolbarDirective(toolBar) {
         return {
             restrict: 'E',
-            replace: 'true',
+            scope: {},
             templateUrl: 'components/toolbar/toolbar.tmpl.html',
             controllerAs: 'vm',
             controller: function (sideNav) {
