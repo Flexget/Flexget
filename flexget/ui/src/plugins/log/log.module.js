@@ -8,7 +8,7 @@
         route.register('log', '/log', 'logController', 'plugins/log/log.tmpl.html');
         sideNav.register('/log', 'Log', 'fa fa-file-text-o', 128);
         toolBar.registerButton('Log', 'fa fa-file-text-o', function () {
-            $state.go('log')
+            $state.go('flexget.log')
         });
     });
 

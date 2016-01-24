@@ -12,6 +12,7 @@
             controllerAs: 'vm',
             controller: function ($mdMedia, sideNav) {
                 var vm = this;
+                vm.toggle = sideNav.toggle;
                 vm.navItems = sideNav.items;
             }
         }
