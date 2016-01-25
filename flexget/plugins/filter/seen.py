@@ -147,6 +147,10 @@ def forget(value):
             session.delete(se)
         return count, field_count
 
+@with_session
+def forget_by_id(entry_id):
+
+
 
 @with_session
 def search_by_field_values(field_value_list, task_name, local=False, session=None):

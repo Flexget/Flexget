@@ -10,6 +10,7 @@ from flexget.api import api, APIResource, jsonify, request
 from flexget.plugins.filter import seen
 from flexget.utils.imdb import is_imdb_url, extract_id
 
+PLUGIN_TASK_NAME = 'seen_plugin_API'
 
 def return_imdb_id(value):
     if is_imdb_url(value):
@@ -171,14 +172,14 @@ class SeenSearchAPI(APIResource):
         data = request.json
         kwargs = {
             'title': data.get('title'),
-            'task_name': 'seen_API',
+            'task_name': PLUGIN_TASK_NAME,
             'fields': data.get('fields'),
             'reason': data.get('reason'),
             'local': data.get('local', False),
             'session': session
         }
         values = [value for value in kwargs['fields'].values()]
-        exist = seen.search_by_field_values(field_value_list=values, task_name='seen_API', local=kwargs['local'],
+        exist = seen.search_by_field_values(field_value_list=values, task_name=PLUGIN_TASK_NAME, local=kwargs['local'],
                                             session=session)
         if exist:
             return {'status': 'error',
