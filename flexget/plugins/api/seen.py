@@ -4,7 +4,7 @@ from math import ceil
 from operator import itemgetter
 from urllib import unquote
 
-from flask_restplus import inputs, fields
+from flask_restplus import inputs
 
 from flexget.api import api, APIResource, jsonify, request
 from flexget.plugins.filter import seen
@@ -108,12 +108,12 @@ def seen_search_sort_order_enum(value):
 seen_search_parser = api.parser()
 seen_search_parser.add_argument('page', type=int, default=1, help='Page number')
 seen_search_parser.add_argument('max', type=int, default=100, help='Seen entries per page')
-seen_search_parser.add_argument('local_seen', type=fields.String(enum=['true', 'false', 'all'], default='all'),
-                                help='Filter list by local status.')
-seen_search_parser.add_argument('sort_by', type=fields.String(enum=seen_search_sort_enum_list, default='added'),
-                                help="Sort responses by entry attributes")
-seen_search_parser.add_argument('order', type=fields.String(enum=['asc', 'desc'], default='desc'),
-                                help='Sorting order')
+seen_search_parser.add_argument('local_seen', type=seen_search_local_status_enum, default='all',
+                                help='Filter list by local status. Filter by true, false or all. Default is all')
+seen_search_parser.add_argument('sort_by', type=seen_search_sort_enum, default='added',
+                                help="Sort response by {0}".format(' ,'.join(seen_search_sort_enum_list)))
+seen_search_parser.add_argument('order', type=seen_search_sort_order_enum, default='desc',
+                                help='Sorting order. Can be asc or desc. Default is desc')
 
 
 @seen_api.route('/<string:value>')
@@ -121,7 +121,7 @@ seen_search_parser.add_argument('order', type=fields.String(enum=['asc', 'desc']
 class SeenSearchAPI(APIResource):
     @api.response(404, 'Page does not exist')
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
-    @api.expect(seen_search_parser)
+    @api.doc(parser=seen_search_parser)
     def get(self, value, session):
         """ Search for seen entries """
         args = seen_search_parser.parse_args()
