@@ -5,11 +5,11 @@
                 <span class="md-title">Server log</span>
                 <span class="md-subhead">{{ vm.status }}</span>
             </md-card-header-text>
-            <md-input-container md-no-float class="md-block" style="margin: 0px" flex="60" flex-gt-md="70">
+            <md-input-container class="md-block" style="margin: 0px" flex="60" flex-gt-md="70">
                 <md-icon class="fa fa-filter"></md-icon>
                 <label>Filter</label>
-                <md-tooltip md-direction="left">Supports and, or, (), and ""</md-tooltip>
                 <input type="text" aria-label="message" ng-model="vm.filter.search" ng-change="vm.refresh()" ng-model-options="vm.refreshOpts"/>
+                <div class="hint">Supports operators and, or, (), and "str"</div>
             </md-input-container>
             <md-menu>
                 <md-button class="widget-button md-icon-button" ng-click="$mdOpenMenu()" aria-label="open menu">
