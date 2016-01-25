@@ -6,13 +6,13 @@ import pkgutil
 from functools import wraps
 from collections import deque
 
-from flask import Flask, request, jsonify
+from flask import Flask, request
+from flask.ext.cors import CORS
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.resource import Resource
 from flask_restplus.model import Model
 from flask_compress import Compress
 from jsonschema.exceptions import RefResolutionError
-from werkzeug.exceptions import HTTPException
 
 from flexget.event import event
 from flexget.webserver import register_app, get_secret
@@ -144,7 +144,9 @@ app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__path__[0]),
 app.config['REMEMBER_COOKIE_NAME'] = 'flexgetToken'
 app.config['DEBUG'] = True
 
+CORS(app)
 Compress(app)
+
 api = Api(
     app,
     catch_all_404s=True,

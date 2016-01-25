@@ -4,10 +4,11 @@ import datetime
 from math import ceil
 
 from flask import request
+from flask import jsonify
 from flask_restful import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource, jsonify
+from flexget.api import api, APIResource
 from flexget.plugins.filter import series
 
 series_api = api.namespace('series', description='Flexget Series operations')
