@@ -183,3 +183,21 @@ class TestSeenAPI(APITest):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         assert mock_seen_search.call_count == 4, 'Should have 4 calls, is actually %s' % mock_seen_search.call_count
+
+    @patch.object(seen, 'search')
+    def test_seen_delete(self, mock_seen_search):
+        session = Session()
+        entry_list = session.query(SeenEntry).join(SeenField).all()
+        mock_seen_search.return_value = entry_list
+
+        # No params
+        rsp = self.delete('/seen/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        # With value
+        rsp = self.delete('/seen/?value=bla')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        assert mock_seen_search.call_count == 2, 'Should have 2 calls, is actually %s' % mock_seen_search.call_count
+
+
