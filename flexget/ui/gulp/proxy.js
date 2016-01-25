@@ -4,7 +4,7 @@ var httpProxy = require('http-proxy');
 var chalk = require('chalk');
 var util = require('gulp-util');
 
-var proxyTarget = 'http://'+ util.env.server ? util.env.server : '127.0.0.0:5050' + '/';
+var proxyTarget = 'http://' + (util.env.server ? util.env.server : '127.0.0.0:5050') + '/';
 
 var proxy = httpProxy.createProxyServer({
     target: proxyTarget
