@@ -244,12 +244,14 @@ class ImdbParser(object):
         else:
             log.error('Possible IMDB parser needs updating, Please report on Github.')
             raise PluginError('Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url))
+
         year = title_overview.find(class_='nobr')
-        if year and not year.a:
-            self.year = int(year.text.strip('()'))
-        elif year and year.a:
-            self.year = int(year.a.text)
-        else:
+        if year:
+            m = re.search(r'([0-9]{4})', year.text)
+            if m:
+                self.year = int(m.group(1))
+
+        if not self.year:
             log.debug('No year found for %s' % self.imdb_id)
 
         mpaa_rating_elem = title_overview.find(itemprop='contentRating')
@@ -305,7 +307,10 @@ class ImdbParser(object):
         if storyline:
             plot_elem = storyline.find('p')
             if plot_elem:
-                self.plot_outline = plot_elem.find(text=True, recursive=False).strip()
+                # Remove the "Written By" part.
+                if plot_elem.em:
+                    plot_elem.em.replace_with('')
+                self.plot_outline = plot_elem.text.strip()
             else:
                 log.debug('No storyline found for %s' % self.imdb_id)
             self.genres = [i.text.strip().lower() for i in storyline.select('[itemprop="genre"] > a')]

@@ -1,0 +1,88 @@
+<div layout="column" flex class="execute">
+    <div layout="row" layout-align="center center" layout-padding>
+        <flex-widget flex="100" flex-gt-sm="50" flex-gt-md="40" class="task-search">
+            <div>
+                <md-chips ng-model="vm.tasksInput.tasks" md-autocomplete-snap md-require-match="false" secondary-placeholder="Enter task">
+                    <md-autocomplete
+                            md-items="task in vm.tasksInput.query(vm.tasksInput.search)"
+                            md-item-text="task"
+                            placeholder="Enter task(s) to execute"
+                            md-selected-item="selectedItem"
+                            md-search-text="vm.tasksInput.search">
+                        <span md-highlight-text="vm.tasksInput.search">{{ task }}</span>
+                    </md-autocomplete>
+                </md-chips>
+            </div>
+            <div flex></div>
+            <div layout="row" layout-align="center center">
+                <div flex="100" flex-gt-md="50" layout="column">
+                    <md-button class="md-raised md-primary" ng-click="vm.execute()">Execute</md-button>
+                </div>
+            </div>
+        </flex-widget>
+    </div>
+    <flex-widget layout-padding ng-hide="vm.stream">
+        currently executing
+        {{ vm.running }}
+    </flex-widget>
+    <flex-widget layout-padding title="Execution Results" ng-show="vm.stream">
+        <div>
+            <md-progress-linear md-mode="determinate" value="{{ vm.stream.percent }}"></md-progress-linear>
+        </div>
+        <div ng-show="vm.stream" layout="column" flex>
+            <md-tabs md-selected="selectedIndex" md-center-tabs flex>
+                <md-tab ng-repeat="task in vm.stream.tasks">
+                    <md-tab-label>
+                        <div layout="column" layout-fill layout-padding layout-align="center">
+                            <div>{{ task.name }}</div>
+                            <div>
+                                <wave-spinner ng-show="task.status == 'running'" class="text-primary"></wave-spinner>
+                            </div>
+                        </div>
+                    </md-tab-label>
+                    <md-tab-body>
+                        <div layout="row" layout-align="space-around center">
+                            <div ng-hide="task.status == 'complete'" class="text-center">
+                                <div ng-if="task.status == 'pending'" class="md-display-2">Pending</div>
+                                <div ng-if="task.status == 'running'">
+                                    <div class="md-display-2">{{ task.phase | executePhaseFilter }}</div>
+                                    <div>
+                                        <small>({{ task.plugin }})</small>
+                                    </div>
+                                </div>
+                            </div>
+                            <div ng-if="task.status == 'complete'">
+                                <md-list>
+                                    <md-subheader class="md-no-sticky text-center">
+                                        <span>Accepted {{ task.accepted }}</span>
+                                        <span>Rejected {{ task.rejected }}</span>
+                                        <span>Accepted {{ task.failed }}</span>
+                                        <span>Undecided {{ task.undecided }}</span>
+                                    </md-subheader>
+                                    <md-list-item class="md-2-line" ng-repeat="entry in task.entries">
+                                        <md-icon class="fa fa-check-circle"></md-icon>
+                                        <h4> {{ entry.title }} </h4>
+
+                                        <p>
+                                            <small>
+                                                {{ entry.accepted_by }}{{ entry.rejected_by }}{{ entry.failed_by }}</small>
+                                        </p>
+                                        <md-icon class="md-secondary" ng-click="doSecondaryAction($event)" aria-label="Chat" md-svg-icon="communication:message"></md-icon>
+                                    </md-list-item>
+                                </md-list>
+                                <div ng-repeat="" flex>
+                                    {{ entry.title }}
+                                </div>
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="space-around center">
+                            <div></div>
+                            <md-button class="md-raised md-primary" ng-click="vm.clear()">Clear</md-button>
+                            <div></div>
+                        </div>
+                    </md-tab-body>
+                </md-tab>
+            </md-tabs>
+        </div>
+    </flex-widget>
+</div>

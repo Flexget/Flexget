@@ -34,4 +34,5 @@ pip-*.tar.gz
 tests/cover/
 flexget/ui/node_modules/
 flexget/ui/bower_components/
-flexget/ui/vendor/
+flexget/ui/.tmp/
+flexget/ui/app/

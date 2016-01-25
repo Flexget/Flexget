@@ -44,12 +44,12 @@ install_requires = [
     'jsonschema>=2.0',
     'tmdb3',
     'path.py',
-    'guessit>=0.9.3, <0.10.4',
+    'guessit>=2.0rc5',
     'apscheduler',
     'flask>=0.7',
     'flask-restful>=0.3.3',
     'ordereddict>=1.1',
-    'flask-restplus==0.7.2',
+    'flask-restplus==0.8.6',
     'cherrypy>=3.7.0',
     'flask-assets>=0.11',
     'cssmin>=0.2.0',
@@ -95,7 +95,7 @@ setup(
     packages=find_packages(exclude=['tests']),
     package_data=find_package_data('flexget', package='flexget',
                                    exclude=['FlexGet.egg-info', '*.pyc'],
-                                   exclude_directories=['node_modules', 'bower_components'],
+                                   exclude_directories=['node_modules', 'bower_components', '.tmp'],
                                    only_in_packages=False),  # NOTE: the exclude does not seem to work
     zip_safe=False,
     test_suite='nose.collector',
@@ -381,4 +381,4 @@ def build_webui():
     sh(['bower', 'install'], cwd=cwd)
 
     # Build the ui
-    sh('gulp', cwd=cwd)
+    sh('gulp buildapp', cwd=cwd)

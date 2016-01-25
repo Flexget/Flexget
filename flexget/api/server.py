@@ -1,8 +1,9 @@
 import os
 import logging
 import json
-from datetime import datetime
 from time import sleep
+
+import cherrypy
 
 from flask import Response
 
@@ -197,6 +198,10 @@ class ServerLogAPI(APIResource):
             current_inode = file_inode(base_log_file)
 
             while True:
+                # If the server is shutting down then end the stream nicely
+                if cherrypy.engine.state != cherrypy.engine.states.STARTED:
+                    break
+
                 new_inode = file_inode(base_log_file)
                 if current_inode != new_inode:
                     # File updated/rotated. Read from beginning
@@ -264,7 +269,7 @@ class LogParser:
 
             operator_parenthesis = Group(
                 (Suppress('(') + operator_or + Suppress(")"))
-            ).setResultsName0('parenthesis') | operator_quotes
+            ).setResultsName('parenthesis') | operator_quotes
 
             operator_not = Forward()
             operator_not << (Group(

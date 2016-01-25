@@ -1,6 +1,8 @@
 from datetime import datetime
 from Queue import Queue, Empty
 
+import cherrypy
+
 from flask import request, jsonify, Response
 
 from flexget.options import get_parser
@@ -151,6 +153,10 @@ class ExecutionAPIStream(APIResource):
             yield json.dumps({'tasks': [{'id': task['id'], 'name': task['name']} for task in tasks_queued]}) + ',\n'
 
             while True:
+                # If the server is shutting down then end the stream nicely
+                if cherrypy.engine.state != cherrypy.engine.states.STARTED:
+                    break
+
                 try:
                     yield queue.get(timeout=1) + ',\n'
                     continue

@@ -4,13 +4,11 @@ import threading
 import hashlib
 import random
 import socket
-
+import cherrypy
 from sqlalchemy import Column, Integer, Unicode
-
 from flask import Flask, abort, redirect
 from flask.ext.login import UserMixin
-
-from flexget import options, plugin
+from flexget import options
 from flexget.event import event
 from flexget.config_schema import register_config_key
 from flexget.utils.tools import singleton
@@ -151,7 +149,7 @@ def setup_server(manager, session=None):
         web_server.start()
 
 
-@event('manager.shutdown_requested')
+@event('manager.shutdown')
 def stop_server(manager):
     """ Sets up and starts/restarts the webui. """
     if not manager.is_daemon:
@@ -170,7 +168,6 @@ class WebServer(threading.Thread):
         threading.Thread.__init__(self, name='web_server')
         self.bind = str(bind)  # String to remove unicode warning from cherrypy startup
         self.port = port
-        self.server = None
 
     def start(self):
         # If we have already started and stopped a thread, we need to reinitialize it to create a new one
@@ -179,14 +176,21 @@ class WebServer(threading.Thread):
         threading.Thread.start(self)
 
     def _start_server(self):
-        from cherrypy import wsgiserver
-
-        apps = {'/': _default_app}
+        # Mount the WSGI callable object (app) on the root directory
+        cherrypy.tree.graft(_default_app, '/')
         for path, registered_app in _app_register.iteritems():
-            apps[path] = registered_app
+            cherrypy.tree.graft(registered_app, path)
 
-        d = wsgiserver.WSGIPathInfoDispatcher(apps)
-        self.server = wsgiserver.CherryPyWSGIServer((self.bind, self.port), d)
+        cherrypy.log.error_log.propagate = False
+        cherrypy.log.access_log.propagate = False
+
+        # Set the configuration of the web server
+        cherrypy.config.update({
+            'engine.autoreload.on': False,
+            'server.socket_port': self.port,
+            'server.socket_host': self.bind,
+            'log.screen': False,
+        })
 
         try:
             host = self.bind if self.bind != "0.0.0.0" else socket.gethostbyname(socket.gethostname())
@@ -195,15 +199,16 @@ class WebServer(threading.Thread):
 
         log.info('Web interface available at http://%s:%s' % (host, self.port))
 
-        self.server.start()
+        # Start the CherryPy WSGI web server
+        cherrypy.engine.start()
+        cherrypy.engine.block()
 
     def run(self):
         self._start_server()
 
     def stop(self):
         log.info('Shutting down web server')
-        if self.server:
-            self.server.stop()
+        cherrypy.engine.exit()
 
 
 @with_session
