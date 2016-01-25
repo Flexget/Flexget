@@ -84,7 +84,7 @@ class SeenEntry(Base):
             fields.append(field.to_dict())
 
         seen_entry_object = {
-            'seen_id': self.id,
+            'id': self.id,
             'title': self.title,
             'reason': self.reason,
             'task': self.task,
@@ -155,12 +155,11 @@ def forget_by_id(entry_id, session=None):
     :param entry_id: SeenEntry ID
     :param session: DB Session
     """
-    entry = session.query(SeenEntry).filter(SeenEntry.id == entry_id).one()
+    entry = session.query(SeenEntry).filter(SeenEntry.id == entry_id).first()
     if not entry:
         raise ValueError('Could not find entry with ID {0}'.format(entry_id))
     log.debug('Deleting seen entry with ID {0}'.format(entry_id))
     session.delete(entry)
-
 
 
 @with_session

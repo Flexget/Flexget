@@ -221,3 +221,19 @@ class SeenSearchAPI(APIResource):
                         'message': 'Could not delete entry ID {0}'.format(entry.id)}, 500
         return {'status': 'success',
                 'message': 'Successfully delete {0} entries from DB'.format(count)}
+
+
+@seen_api.route('/<int:seen_entry_id>')
+@api.doc(params={'seen_entry_id': 'ID of seen entry'})
+@api.response(500, 'Delete process failed')
+@api.response(200, 'Successfully deleted entry')
+class SeenSearchAPI(APIResource):
+    def delete(self, seen_entry_id, session):
+        """ Delete seen entry by ID """
+        try:
+            seen.forget_by_id(seen_entry_id)
+        except ValueError as e:
+            return {'status': 'error',
+                    'message': 'Could not delete entry ID {0}'.format(seen_entry_id)}, 500
+        return {'status': 'success',
+                'message': 'Successfully delete seen entry ID {0} from DB'.format(seen_entry_id)}
