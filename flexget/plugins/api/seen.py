@@ -12,6 +12,7 @@ from flexget.utils.imdb import is_imdb_url, extract_id
 
 PLUGIN_TASK_NAME = 'seen_plugin_API'
 
+
 def return_imdb_id(value):
     if is_imdb_url(value):
         imdb_id = extract_id(value)
@@ -117,6 +118,11 @@ seen_search_parser.add_argument('sort_by', type=seen_search_sort_enum, default='
 seen_search_parser.add_argument('order', type=seen_search_sort_order_enum, default='desc',
                                 help='Sorting order. Can be asc or desc. Default is desc')
 
+seen_delete_parser = api.parser()
+seen_delete_parser.add_argument('value', help='Delete by value or leave empty to delete all. BE CAREFUL WITH THIS')
+seen_delete_parser.add_argument('local_seen', type=seen_search_local_status_enum, default='all',
+                                help='Delete list by local status. Filter by true, false or all. Default is all')
+
 
 @seen_api.route('/')
 class SeenSearchAPI(APIResource):
@@ -191,3 +197,27 @@ class SeenSearchAPI(APIResource):
             'message': 'successfully added seen object',
             'seen_object': seen_entry
         })
+
+    @api.response(500, 'Delete process failed')
+    @api.response(200, 'Successfully delete all entries')
+    @api.doc(parser=seen_delete_parser)
+    def delete(self, session):
+        """ Delete seen entries """
+        args = seen_delete_parser.parse_args()
+        value = args['value']
+        status = args['local_seen']
+
+        if value:
+            value = unquote(value)
+            value = '%' + value + '%'
+        seen_entries_list = seen.search(value, status, session)
+        count = len(seen_entries_list)
+
+        for entry in seen_entries_list:
+            try:
+                seen.forget_by_id(entry.id)
+            except ValueError as e:
+                return {'status': 'error',
+                        'message': 'Could not delete entry ID {0}'.format(entry.id)}, 500
+        return {'status': 'success',
+                'message': 'Successfully delete {0} entries from DB'.format(count)}

@@ -147,8 +147,19 @@ def forget(value):
             session.delete(se)
         return count, field_count
 
+
 @with_session
-def forget_by_id(entry_id):
+def forget_by_id(entry_id, session=None):
+    """
+    Delete SeenEntry via its ID
+    :param entry_id: SeenEntry ID
+    :param session: DB Session
+    """
+    entry = session.query(SeenEntry).filter(SeenEntry.id == entry_id).one()
+    if not entry:
+        raise ValueError('Could not find entry with ID {0}'.format(entry_id))
+    log.debug('Deleting seen entry with ID {0}'.format(entry_id))
+    session.delete(entry)
 
 
 
