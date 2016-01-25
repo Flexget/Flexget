@@ -174,7 +174,7 @@ def search_by_field_values(field_value_list, task_name, local=False, session=Non
     """
     found = session.query(SeenField).join(SeenEntry).filter(SeenField.value.in_(field_value_list))
     if local:
-        found = found.filter(SeenEntry.task == task_name.name)
+        found = found.filter(SeenEntry.task == task_name)
     else:
         found = found.filter(SeenEntry.local == False)
     return found.first()
