@@ -19,8 +19,6 @@ from sqlalchemy.schema import ForeignKey
 from sqlalchemy.orm import relation
 from requests import RequestException
 
-from flask import jsonify
-
 from flexget import db_schema
 from flexget.utils.tools import decode_html
 from flexget.utils.requests import Session as ReqSession
@@ -28,7 +26,6 @@ from flexget.utils.database import with_session, pipe_list_synonym, text_date_sy
 from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.manager import Session
 from flexget.utils.simple_persistence import SimplePersistence
-from flexget.api import api, APIResource
 
 SCHEMA_VER = 4
 
@@ -548,30 +545,3 @@ def mark_expired(session=None):
         session.commit()
         persist['last_local'] = datetime.now()
         persist['last_server'] = new_server
-
-
-tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
-
-
-@tvdb_api.route('/<string:search>/')
-@api.doc(params={'search': 'TV Show name or TVDB ID'})
-class TVDBSearchApi(APIResource):
-    @api.response(200, 'Successfully found show')
-    @api.response(404, 'No show found')
-    def get(self, search, session=None):
-        try:
-            tvdb_id = int(search)
-        except ValueError:
-            tvdb_id = None
-
-        try:
-            if tvdb_id:
-                result = lookup_series(tvdb_id=tvdb_id, session=session)
-            else:
-                result = lookup_series(name=search, session=session)
-        except LookupError as e:
-            return {'status': 'error',
-                    'message': e.args[0]
-                    }, 404
-
-        return jsonify(result.to_dict())
