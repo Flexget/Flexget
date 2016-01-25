@@ -32,14 +32,12 @@
     "main-bower-files": "~2.11.0",
     "stream-browserify": "^2.0.1",
     "uglify-save-license": "~0.4.1",
-    "wiredep": "~2.2.2"
-  },
-  "engines": {
-    "node": ">=0.10.0"
-  },
-  "dependencies": {
+    "wiredep": "~2.2.2",
     "chalk": "^1.1.1",
     "eslint": "^1.10.3",
     "require-dir": "^0.3.0"
+  },
+  "engines": {
+    "node": ">=0.10.0"
   }
 }

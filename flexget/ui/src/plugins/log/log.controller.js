@@ -7,21 +7,31 @@
     function logController($scope) {
         var vm = this;
 
-        var logStream = false;
+        vm.logStream = false;
 
         vm.status = 'Connecting';
+
         vm.filter = {
             lines: 400,
             search: ''
         };
+
         vm.refreshOpts = {
             debounce: 1000
         };
 
+        vm.toggle = function () {
+            if (vm.status == 'Disconnected') {
+                vm.refresh();
+            } else {
+                vm.stop();
+            }
+        };
+
         vm.stop = function () {
-            if (typeof logStream !== 'undefined' && logStream) {
-                logStream.abort();
-                logStream = false;
+            if (typeof vm.logStream !== 'undefined' && vm.logStream) {
+                vm.logStream.abort();
+                vm.logStream = false;
                 vm.status = "Disconnected";
             }
 
@@ -39,7 +49,7 @@
                 queryParams = queryParams + '&search=' + vm.filter.search;
             }
 
-            logStream = oboe({url: '/api/server/log/' + queryParams})
+            vm.logStream = oboe({url: '/api/server/log/' + queryParams})
                 .start(function () {
                     $scope.$applyAsync(function () {
                         vm.status = "Streaming";

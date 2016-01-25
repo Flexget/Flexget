@@ -1,5 +1,5 @@
-<md-content flex>
-    <flex-widget>
+<md-content flex layout-margin>
+    <div>
         <section ng-repeat="(key, value) in vm.entries | groupBy: 'time | limitTo : 10'">
             <md-subheader class="md-primary">{{ key }}</md-subheader>
             <md-list layout-padding>
@@ -12,5 +12,5 @@
                 </md-list-item>
             </md-list>
         </section>
-    </flex-widget>
+    </div>
 </md-content>

@@ -5,9 +5,16 @@
         .controller('executeController', executeController);
 
     function executeController($scope, tasks) {
-        var vm = this;
+        var vm = this, stream, allTasks = [];
 
-        var stream, allTasks = [];
+        vm.options = {
+            learn: false,
+            noCache: false,
+            stopWaiting: false,
+            tracking: false,
+            now: false,
+            tail: false
+        };
 
         // Get a list of tasks for auto complete
         tasks.list()
@@ -15,29 +22,42 @@
                 allTasks = tasks
             });
 
-        vm.executeTasks = [];
-        vm.searchText = [];
-        vm.queryTasks = function (query) {
-            var taskFilter = function () {
-                var lowercaseQuery = angular.lowercase(query);
-                return function filterFn(task) {
-                    return (angular.lowercase(task).indexOf(lowercaseQuery) > -1);
+        // Used for input form to select tasks to execute
+        vm.tasksInput = {
+            tasks: [],
+            search: [],
+            query: function (query) {
+                var filter = function () {
+                    var lowercaseQuery = angular.lowercase(query);
+                    return function filterFn(task) {
+                        return (angular.lowercase(task).indexOf(lowercaseQuery) > -1);
+                    };
                 };
-            };
-            return query ? allTasks.filter(taskFilter()) : [];
+                return query ? allTasks.filter(filter()) : [];
+            }
         };
 
+        var getRunning = function () {
+            tasks.queue().then(function (tasks) {
+                vm.running = tasks
+            })
+        };
+        getRunning();
+
         vm.clear = function () {
+            getRunning();
             vm.stream = false;
         };
 
-        vm.run = function () {
+        vm.execute = function () {
             vm.stream = {
                 tasks: [],
                 log: []
             };
 
-            stream = tasks.executeStream(vm.executeTasks)
+            getRunning();
+
+            stream = tasks.executeStream(vm.tasksInput.tasks)
                 .start(function () {
                     //
                 })

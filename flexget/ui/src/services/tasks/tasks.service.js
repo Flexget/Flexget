@@ -4,7 +4,7 @@
     angular.module('flexget.components')
         .service('tasks', tasksService);
 
-    function tasksService($rootScope, $http) {
+    function tasksService($rootScope, $http, $q) {
         // List tasks
         this.list = function () {
             return $http.get('/api/tasks/')
@@ -89,6 +89,18 @@
                 }
             };
             return executeWrapper;
+        };
+
+        this.queue = function () {
+            var defer = $q.defer();
+
+            $http.get('/api/execution/queue/').then(function (response) {
+                defer.resolve(response.data.tasks);
+            }, function (response) {
+                defer.reject(response);
+            });
+
+            return defer.promise;
         };
 
         // Update task config
