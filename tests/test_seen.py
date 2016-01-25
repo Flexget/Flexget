@@ -5,6 +5,7 @@ from mock import patch
 from flexget.manager import Session
 from flexget.plugins.filter import seen
 from flexget.plugins.filter.seen import SeenEntry, SeenField
+from flexget.utils import json
 from tests import FlexGetBase
 from tests.test_api import APITest
 
@@ -131,14 +132,14 @@ class TestFilterSeenMovies(FlexGetBase):
     def test_seen_movies(self):
         self.execute_task('test_1')
         assert not (self.task.find_entry(title='Seen movie title 1') and self.task.find_entry(
-            title='Seen movie title 2')), 'Movie accepted twice in one run'
+                title='Seen movie title 2')), 'Movie accepted twice in one run'
 
         # execute again
         self.task.execute()
         assert not self.task.find_entry(
-            title='Seen movie title 1'), 'Test movie entry 1 should be rejected in second execution'
+                title='Seen movie title 1'), 'Test movie entry 1 should be rejected in second execution'
         assert not self.task.find_entry(
-            title='Seen movie title 2'), 'Test movie entry 2 should be rejected in second execution'
+                title='Seen movie title 2'), 'Test movie entry 2 should be rejected in second execution'
 
         # execute another task
         self.execute_task('test_2')
@@ -200,4 +201,19 @@ class TestSeenAPI(APITest):
 
         assert mock_seen_search.call_count == 2, 'Should have 2 calls, is actually %s' % mock_seen_search.call_count
 
+    def test_seen_add(self):
+        fields = {
+            'url': 'http://test.com/file.torrent',
+            'title': 'Test.Title',
+            'torrent_hash_id': 'dsfgsdfg34tq34tq34t'
+        }
+        entry = {
+            'local': False,
+            'reason': 'test_reason',
+            'task': 'test_task',
+            'title': 'Test.Title',
+            'fields': fields
+        }
 
+        rsp = self.json_post('/seen/', data=json.dumps(entry))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
