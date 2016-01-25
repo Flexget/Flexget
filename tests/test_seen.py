@@ -186,7 +186,7 @@ class TestSeenAPI(APITest):
         assert mock_seen_search.call_count == 4, 'Should have 4 calls, is actually %s' % mock_seen_search.call_count
 
     @patch.object(seen, 'search')
-    def test_seen_delete(self, mock_seen_search):
+    def test_seen_delete_all(self, mock_seen_search):
         session = Session()
         entry_list = session.query(SeenEntry).join(SeenField).all()
         mock_seen_search.return_value = entry_list
@@ -200,6 +200,12 @@ class TestSeenAPI(APITest):
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         assert mock_seen_search.call_count == 2, 'Should have 2 calls, is actually %s' % mock_seen_search.call_count
+
+    @patch.object(seen, 'forget_by_id')
+    def test_delete_seen_entry(self, mock_forget):
+        rsp = self.delete('/seen/1234')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_cod
+        assert mock_forget.called
 
     def test_seen_add(self):
         fields = {
