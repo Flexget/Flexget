@@ -1,15 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 
-try:
-    from xml.etree.ElementTree import ParseError
-except ImportError:
-    # Python 2.6 throws this instead when there is invalid xml
-    from xml.parsers.expat import ExpatError as ParseError
-
 from flask import jsonify
-from flexget.plugins.api_tvdb import lookup_series
 
 from flexget.api import api, APIResource
+from flexget.plugins.api_tvdb import lookup_series
 
 tvdb_api = api.namespace('tvdb', description='TheTVDB Shows')
 
