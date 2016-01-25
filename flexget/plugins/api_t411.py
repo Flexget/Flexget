@@ -418,9 +418,13 @@ class T411ObjectMapper(object):
             if isinstance(terms_candidat, list):
                 # Some terms type are multi-valuable, eg. Genres
                 for term_name in terms_candidat:
-                    result.terms.append(resolver(result.category_id, term_type_name, term_name))
+                    term_entity = resolver(result.category_id, term_type_name, term_name)
+                    if term_entity is not None:
+                        result.terms.append(term_entity)
             else:
-                result.terms.append(resolver(result.category_id, term_type_name, terms_candidat))
+                term_entity = resolver(result.category_id, term_type_name, terms_candidat)
+                if term_entity is not None:
+                    result.terms.append(term_entity)
 
         return result
 
@@ -434,7 +438,6 @@ def cache_required(func):
     """
 
     def wrapper(self, *args, **kwargs):
-        log.debug("Checking database...")
         if not self.has_cached_criterias():
             log.debug('None cached data. Synchronizing...')
             self.synchronize_database()
@@ -544,11 +547,12 @@ class T411Proxy(object):
     @cache_required
     @with_session
     def find_term(self, category_id, term_type_name, term_name, session=None):
-        return session.query(Term) \
-            .filter(TermType.name == term_type_name) \
-            .filter(TermType.categories.any(Category.id == category_id)) \
-            .filter(TermType.terms.any(Term.name == term_name)) \
+        result = session.query(Term) \
+            .filter(Term.type.has(TermType.categories.any(Category.id == category_id))) \
+            .filter(Term.type.has(TermType.name == term_type_name)) \
+            .filter(Term.name == term_name) \
             .first()
+        return result
 
     @cache_required
     @with_session
@@ -644,6 +648,7 @@ class T411Proxy(object):
         if details:
             return details
         else:
+            log.debug('Torrent %d cache miss. Online retrieving...', torrent_id)
             # Cache dismiss, retrieve details via online way
             json_details = self.rest_client.details(torrent_id)
 
@@ -686,9 +691,9 @@ class T411Proxy(object):
         :param session:
         :return: flexget.utils.Quality
         """
-        video_quality_description = next(
+        video_quality_description = next((
             term for term in terms
-            if term.get('term_type_id') == T411_TERM_TYPE_ID_VIDEO_QUALITY)
+            if term.get('term_type_id') == T411_TERM_TYPE_ID_VIDEO_QUALITY), None)
         if video_quality_description is not None:
             video_quality = T411_VIDEO_QUALITY_MAP.get(video_quality_description.get('term_id'))
             return video_quality

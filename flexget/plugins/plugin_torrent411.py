@@ -105,6 +105,9 @@ class T411LookupPlugin(object):
             if entry.get('t411_terms', eval_lazy=True) is not None:
                 video_quality = proxy.parse_terms_to_quality(entry.get('t411_terms'))
                 entry_quality = entry.get('quality')
+                if video_quality is None:
+                    log.info('Torrent %i hasn\'t video quality description, pass.', entry.get('t411_torrent_id'))
+                    continue
                 if entry_quality.source.name == 'unknown' or config == 'override':
                     entry_quality.source = video_quality.source
                 if entry_quality.resolution.name == 'unknown' or config == 'override':
