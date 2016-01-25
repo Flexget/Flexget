@@ -106,6 +106,7 @@ def seen_search_sort_order_enum(value):
 
 
 seen_search_parser = api.parser()
+seen_search_parser.add_argument('value', help='Search by any field value or leave empty to get entries')
 seen_search_parser.add_argument('page', type=int, default=1, help='Page number')
 seen_search_parser.add_argument('max', type=int, default=100, help='Seen entries per page')
 seen_search_parser.add_argument('local_seen', type=seen_search_local_status_enum, default='all',
@@ -116,15 +117,15 @@ seen_search_parser.add_argument('order', type=seen_search_sort_order_enum, defau
                                 help='Sorting order. Can be asc or desc. Default is desc')
 
 
-@seen_api.route('/<string:value>')
-@api.doc(params={'value': 'Name, IMDB ID or IMDB URL'})
+@seen_api.route('/')
 class SeenSearchAPI(APIResource):
     @api.response(404, 'Page does not exist')
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
     @api.doc(parser=seen_search_parser)
-    def get(self, value, session):
+    def get(self, session):
         """ Search for seen entries """
         args = seen_search_parser.parse_args()
+        value = args['value']
         page = args['page']
         max_results = args['max']
         status = args['local_seen']
@@ -134,9 +135,9 @@ class SeenSearchAPI(APIResource):
         if order == 'desc':
             order = True
 
-        value = return_imdb_id(value)
-        value = unquote(value)
-        value = '%' + value + '%'
+        if value:
+            value = unquote(value)
+            value = '%' + value + '%'
         seen_entries_list = seen.search(value, status, session)
         count = len(seen_entries_list)
 
@@ -162,9 +163,6 @@ class SeenSearchAPI(APIResource):
             'total_number_of_pages': pages
         })
 
-
-@seen_api.route('/')
-class SeenAddAPI(APIResource):
     @api.response(400, 'A matching seen object is already added')
     @api.response(200, 'Successfully added new seen object', seen_object_schema)
     @api.validate(seen_object_input_schema)

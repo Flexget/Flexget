@@ -292,9 +292,11 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
     return se.to_dict()
 
 
-def search(value, status=None, session=None):
-    query = session.query(SeenEntry).join(SeenField).filter(SeenField.value.like(value)).order_by(
-            SeenField.added)
+def search(value=None, status=None, session=None):
+    if value:
+        query = session.query(SeenEntry).join(SeenField).filter(SeenField.value.like(value)).order_by(SeenField.added)
+    else:
+        query = session.query(SeenEntry).join(SeenField).order_by(SeenField.added)
     if status != 'all':
         query = query.filter(SeenEntry.local == status)
     return query.all()
