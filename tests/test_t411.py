@@ -4,7 +4,7 @@ from __builtin__ import object
 import logging
 import mock
 
-from flexget.plugins.api_t411 import T411RestClient, T411ObjectMapper, T411Proxy, FriendlySearchQuery
+from flexget.plugins.api_t411 import T411RestClient, T411ObjectMapper, T411Proxy, FriendlySearchQuery, ApiError
 from flexget.utils.qualities import Requirements
 from tests import use_vcr, FlexGetBase
 
@@ -166,6 +166,20 @@ class TestRestClient(object):
         search_result = client.search({})
         assert search_result.get('query') is None
         assert search_result.get('limit') == 10
+
+    @use_vcr()
+    def test_error_message_handler(self):
+        exception_was_raised = False
+        client = T411RestClient()
+        client.set_api_token('LEAVE:THIS:TOKEN:FALSE')
+        del client.web_session.headers['Accept-Encoding']
+        try:
+            client.details(666666)
+        except ApiError as e:
+            exception_was_raised = True
+            assert e.code == 202
+            pass
+        assert exception_was_raised
 
 
 class TestObjectMapper(object):
