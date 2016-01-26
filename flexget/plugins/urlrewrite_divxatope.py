@@ -11,6 +11,8 @@ from flexget.utils.soup import get_soup
 from flexget.entry import Entry
 from flexget.utils.search import torrent_availability, normalize_unicode
 
+from bs4.element import Tag
+
 log = logging.getLogger('divxatope')
 
 
@@ -65,10 +67,7 @@ class UrlRewriteDivxATope(object):
         regex = re.compile("(.+) \(\d\d\d\d\)")
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
-            query_no_year = regex.findall(query)
-            # if contains (YEAR) remove
-            if len(query_no_year) > 0:
-                query = query_no_year[0]
+            query = regex.findall(query)[0]
             log.debug('Searching DivxATope %s' % query)
             query = query.encode('utf8', 'ignore')
             data = {'search': query}
@@ -76,7 +75,7 @@ class UrlRewriteDivxATope(object):
                 response = task.requests.post(url_search, data=data)
             except requests.RequestException as e:
                 log.error('Error searching DivxATope: %s' % e)
-                continue
+                break
             content = response.content
             
             soup = get_soup(content)
@@ -89,7 +88,10 @@ class UrlRewriteDivxATope(object):
                 quality_lan = child.find('strong').contents
                 log.debug(len(quality_lan))
                 if len(quality_lan) > 2:
-                    entry_quality_lan = quality_lan[0] + ' ' + quality_lan[2]
+                    if (isinstance(quality_lan[0],Tag)):
+                        entry_quality_lan = quality_lan[1]
+                    else:
+                        entry_quality_lan = quality_lan[0] + ' ' + quality_lan[2]
                 elif len(quality_lan) == 2:
                     entry_quality_lan = quality_lan[1]
                 entry['title'] = entry_title + ' ' + entry_quality_lan
