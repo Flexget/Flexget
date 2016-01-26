@@ -3,8 +3,8 @@ from __future__ import unicode_literals, division, absolute_import
 import datetime
 from math import ceil
 
-from flask import request
 from flask import jsonify
+from flask import request
 from flask_restful import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -273,6 +273,8 @@ series_list_parser.add_argument('order', type=series_list_sort_order_enum, defau
 
 
 @series_api.route('/')
+@api.doc(description='Use this endpoint to retrieve data on Flexget collected series,'
+                     ' add new series to DB and reset episode and releases status')
 class SeriesListAPI(APIResource):
     @api.response(400, 'Page does not exist')
     @api.response(200, 'Series list retrieved successfully', series_list_schema)
@@ -386,6 +388,7 @@ shows_schema = api.schema('list_of_shows', shows_schema)
 
 
 @series_api.route('/search/<string:name>')
+@api.doc(description='Searches for a show in the DB via its name. Returns a list of matching shows.')
 class SeriesGetShowsAPI(APIResource):
     @api.response(200, 'Show list retrieved successfully', shows_schema)
     @api.doc(params={'name': 'Name of the show(s) to search'})
@@ -405,7 +408,7 @@ class SeriesGetShowsAPI(APIResource):
 
 
 @series_api.route('/<int:show_id>')
-@api.doc(params={'show_id': 'ID of the show'})
+@api.doc(params={'show_id': 'ID of the show'}, description='Enable operations on a specific show using its ID')
 class SeriesShowAPI(APIResource):
     @api.response(404, 'Show ID not found')
     @api.response(200, 'Show information retrieved successfully', show_details_schema)
@@ -467,12 +470,15 @@ class SeriesShowAPI(APIResource):
                     'message': e.args[0]
                     }, 400
         return jsonify({'status': 'success',
-                'message': 'Episodes will be accepted starting with `%s`' % ep_id,
-                'show': get_series_details(show)
-                })
+                        'message': 'Episodes will be accepted starting with `%s`' % ep_id,
+                        'show': get_series_details(show)
+                        })
 
 
 @series_api.route('/<name>')
+@api.doc(description="Use this endpoint to add a new show to Flexget's DB and set the 1st initial episode via"
+                     " its body. 'episode_identifier' should be one of SxxExx, integer or date "
+                     "formatted such as 2012-12-12")
 class SeriesBeginByNameAPI(APIResource):
     @api.response(200, 'Adding series and setting first accepted episode to ep_id')
     @api.response(500, 'Show already exists')
@@ -497,15 +503,15 @@ class SeriesBeginByNameAPI(APIResource):
                     'message': e.args[0]
                     }, 400
         return jsonify({'status': 'success',
-                'message': 'Successfully added series `%s` and set first accepted episode to `%s`' % (
-                    show.name, ep_id),
-                'show': get_series_details(show)
-                })
+                        'message': 'Successfully added series `%s` and set first accepted episode to `%s`' % (
+                            show.name, ep_id),
+                        'show': get_series_details(show)
+                        })
 
 
 @api.response(404, 'Show ID not found')
 @series_api.route('/<int:show_id>/episodes')
-@api.doc(params={'show_id': 'ID of the show'})
+@api.doc(params={'show_id': 'ID of the show'}, description='Use this endpoint to get or delete all episodes of a show')
 class SeriesEpisodesAPI(APIResource):
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
     def get(self, show_id, session):
@@ -550,7 +556,8 @@ class SeriesEpisodesAPI(APIResource):
 @api.response(414, 'Episode ID not found')
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id')
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
+         description='Use this endpoint to get or delete a specific episode for a show')
 class SeriesEpisodeAPI(APIResource):
     @api.response(200, 'Episode retrieved successfully for show', episode_schema)
     def get(self, show_id, ep_id, session):
@@ -620,8 +627,11 @@ release_list_parser.add_argument('downloaded', type=release_downloaded_enum, def
 @api.response(414, 'Episode ID not found')
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id')
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
-@api.doc(parser=release_list_parser)
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
+         parser=release_list_parser,
+         description='Use this endpoint to get or delete all information about seen releases for a specific episode of'
+                     ' a show. Deleting releases will trigger flexget to re-download an episode if a matching release'
+                     ' will be seen again for it.')
 class SeriesReleasesAPI(APIResource):
     @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
     def get(self, show_id, ep_id, session):
@@ -699,7 +709,10 @@ class SeriesReleasesAPI(APIResource):
 @api.response(400, 'Episode with ep_id does not belong to show with show_id')
 @api.response(410, 'Release with rel_id does not belong to episode with ep_id')
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/<int:rel_id>/')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'})
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'},
+         description='Use this endpoint to get or delete a specific release from an episode of a show. Deleting a '
+                     'release will trigger flexget to re-download an episode if a matching release will be seen again '
+                     'for it.')
 class SeriesReleaseAPI(APIResource):
     @api.response(200, 'Release retrieved successfully for episode')
     def get(self, show_id, ep_id, rel_id, session):
