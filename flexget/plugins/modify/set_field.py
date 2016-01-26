@@ -58,6 +58,7 @@ class ModifySet(object):
         except RenderError as e:
             logger('Could not set %s for %s: %s' % (field, entry['title'], e))
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(ModifySet, 'set', api_ver=2)

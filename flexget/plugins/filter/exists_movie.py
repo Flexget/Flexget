@@ -1,9 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-import os
 import re
 import logging
 
-from path import path
+from path import Path
 
 from flexget import plugin
 from flexget.event import event
@@ -44,8 +43,8 @@ class FilterExistsMovie(object):
         ]
     }
 
-    dir_pattern = re.compile('\b(cd.\d|subs?|samples?)\b',re.IGNORECASE)
-    file_pattern = re.compile('\.(avi|mkv|mp4|mpg|webm)$',re.IGNORECASE)
+    dir_pattern = re.compile('\b(cd.\d|subs?|samples?)\b', re.IGNORECASE)
+    file_pattern = re.compile('\.(avi|mkv|mp4|mpg|webm)$', re.IGNORECASE)
 
     def __init__(self):
         self.cache = TimedDict(cache_time='1 hour')
@@ -53,7 +52,7 @@ class FilterExistsMovie(object):
     def prepare_config(self, config):
         # if config is not a dict, assign value to 'path' key
         if not isinstance(config, dict):
-            config = { 'path': config }
+            config = {'path': config}
 
         if not config.get('type'):
             config['type'] = 'dirs'
@@ -81,7 +80,7 @@ class FilterExistsMovie(object):
         qualities = {}
 
         for folder in config['path']:
-            folder = path(folder).expanduser()
+            folder = Path(folder).expanduser()
             # see if this path has already been scanned
             if folder in self.cache:
                 log.verbose('Using cached scan for %s ...' % folder)
@@ -97,8 +96,8 @@ class FilterExistsMovie(object):
             log.verbose('Scanning path %s ...' % folder)
 
             # Help debugging by removing a lot of noise
-            #logging.getLogger('movieparser').setLevel(logging.WARNING)
-            #logging.getLogger('imdb_lookup').setLevel(logging.WARNING)
+            # logging.getLogger('movieparser').setLevel(logging.WARNING)
+            # logging.getLogger('imdb_lookup').setLevel(logging.WARNING)
 
             # scan through
             items = []
@@ -160,7 +159,6 @@ class FilterExistsMovie(object):
                     movie = get_plugin_by_name('parsing').instance.parse_movie(entry['title'])
                     entry['movie_name'] = movie.name
 
-
             # actual filtering
             if entry[key] in qualities:
                 if config.get('allow_different_qualities') == 'better':
@@ -180,6 +178,7 @@ class FilterExistsMovie(object):
                 (incompatible_entries, count_entries, incompatible_files, count_files))
 
         log.debug('-- Finished filtering entries -------------------------------')
+
 
 @event('plugin.register')
 def register_plugin():

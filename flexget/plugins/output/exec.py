@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from collections import MutableMapping
 import logging
 import subprocess
 
 
 from flexget import plugin
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.template import render_from_entry, render_from_task, RenderError
@@ -13,33 +13,18 @@ from flexget.utils.tools import io_encoding
 log = logging.getLogger('exec')
 
 
-class EscapingDict(MutableMapping):
-    """Helper class, same as a dict, but returns all string value with quotes escaped."""
+class EscapingEntry(Entry):
+    """Helper class, same as a Entry, but returns all string value with quotes escaped."""
 
-    def __init__(self, mapping):
-        self._data = mapping
-
-    def __len__(self):
-        return len(self._data)
-
-    def __iter__(self):
-        return iter(self._data)
+    def __init__(self, entry):
+        super(EscapingEntry, self).__init__(entry)
 
     def __getitem__(self, key):
-        value = self._data[key]
+        value = super(EscapingEntry, self).__getitem__(key)
+        # TODO: May need to be different depending on OS
         if isinstance(value, basestring):
-            # TODO: May need to be different depending on OS
             value = value.replace('"', '\\"')
         return value
-
-    def __setitem__(self, key, value):
-        self._data[key] = value
-
-    def __delitem__(self, key):
-        del self._data[key]
-
-    def __copy__(self):
-        return EscapingDict(self._data.copy())
 
 
 class PluginExec(object):
@@ -130,7 +115,7 @@ class PluginExec(object):
 
     def execute(self, task, phase_name, config):
         config = self.prepare_config(config)
-        if not phase_name in config:
+        if phase_name not in config:
             log.debug('phase %s not configured' % phase_name)
             return
 
@@ -139,14 +124,14 @@ class PluginExec(object):
 
         allow_background = config.get('allow_background')
         for operation, entries in name_map.iteritems():
-            if not operation in config[phase_name]:
+            if operation not in config[phase_name]:
                 continue
 
             log.debug('running phase_name: %s operation: %s entries: %s' % (phase_name, operation, len(entries)))
 
             for entry in entries:
                 for cmd in config[phase_name][operation]:
-                    entrydict = EscapingDict(entry) if config.get('auto_escape') else entry
+                    entrydict = EscapingEntry(entry) if config.get('auto_escape') else entry
                     # Do string replacement from entry, but make sure quotes get escaped
                     try:
                         cmd = render_from_entry(cmd, entrydict)
@@ -154,7 +139,8 @@ class PluginExec(object):
                         log.error('Could not set exec command for %s: %s' % (entry['title'], e))
                         # fail the entry if configured to do so
                         if config.get('fail_entries'):
-                            entry.fail('Entry `%s` does not have required fields for string replacement.' % entry['title'])
+                            entry.fail('Entry `%s` does not have required fields for string replacement.' %
+                                       entry['title'])
                         continue
 
                     log.debug('phase_name: %s operation: %s cmd: %s' % (phase_name, operation, cmd))
@@ -171,7 +157,8 @@ class PluginExec(object):
                                 entry.fail('cmd `%s` could not be encoded to %s.' % (cmd, config['encoding']))
                             continue
                         # Run the command, fail entries with non-zero return code if configured to
-                        if self.execute_cmd(cmd, allow_background, config['encoding']) != 0 and config.get('fail_entries'):
+                        if (self.execute_cmd(cmd, allow_background, config['encoding']) != 0 and
+                                config.get('fail_entries')):
                             entry.fail('exec return code was non-zero')
 
         # phase keyword in this

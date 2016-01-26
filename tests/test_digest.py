@@ -32,13 +32,32 @@ class TestDigest(FlexGetBase):
             - title: entry 5
             accept_all: yes
             digest: aoeu
+          different states:
+            mock:
+            - title: accepted
+            - title: rejected
+            regexp:
+              accept:
+              - accepted
+              reject:
+              - rejected
+            digest:
+              list: aoeu
+              state: ['accepted', 'rejected']
           emit digest:
             emit_digest:
               list: aoeu
+            seen: local
+          emit state:
+            emit_digest:
+              list: aoeu
+              restore_state: yes
+            seen: local
           emit limit:
             emit_digest:
               list: aoeu
               limit: 3
+            seen: local
         """
 
     def test_multiple_task_merging(self):
@@ -64,3 +83,16 @@ class TestDigest(FlexGetBase):
         self.execute_task('many entries')
         self.execute_task('emit limit')
         assert len(self.task.all_entries) == 3
+
+    def test_different_states(self):
+        self.execute_task('different states')
+        self.execute_task('emit digest')
+        assert len(self.task.all_entries) == 2
+        for entry in self.task.all_entries:
+            assert entry.undecided, 'Should have been emitted in undecided state'
+
+    def test_restore_state(self):
+        self.execute_task('different states')
+        self.execute_task('emit state')
+        for entry in self.task.all_entries:
+            assert entry.state == entry['title'], 'Should have been emitted in same state as when digested'

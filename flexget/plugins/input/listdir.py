@@ -1,9 +1,8 @@
 """Plugin for filesystem tasks."""
 from __future__ import unicode_literals, division, absolute_import
-import os
 import logging
 
-from path import path
+from path import Path
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -22,7 +21,8 @@ class Listdir(object):
       listdir: /storage/movies/
     """
 
-    schema = one_or_more({'type': 'string', 'format': 'path'})
+    schema = one_or_more({'type': 'string', 'format': 'path',
+                         'deprecated': '"listdir" plugin has been replaced by the "filesystem" plugin.'})
 
     def on_task_input(self, task, config):
         # If only a single path is passed turn it into a 1 element list
@@ -30,7 +30,7 @@ class Listdir(object):
             config = [config]
         entries = []
         for folder in config:
-            folder = path(folder).expanduser()
+            folder = Path(folder).expanduser()
             try:
                 dir_files = folder.listdir()
             except OSError as e:

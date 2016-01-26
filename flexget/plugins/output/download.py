@@ -243,7 +243,7 @@ class PluginDownload(object):
             return
 
         # expand ~ in temp path
-        #TODO jinja?
+        # TODO jinja?
         try:
             tmp_path = os.path.expanduser(tmp_path)
         except RenderError as e:
@@ -425,7 +425,7 @@ class PluginDownload(object):
             if not entry.get('filename'):
                 entry['filename'] = entry['title']
                 log.debug('set filename from title %s' % entry['filename'])
-                if not 'mime-type' in entry:
+                if 'mime-type' not in entry:
                     log.warning('Unable to figure proper filename for %s. Using title.' % entry['title'])
                 else:
                     guess = mimetypes.guess_extension(entry['mime-type'])

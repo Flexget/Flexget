@@ -236,6 +236,7 @@ class FilterRegexp(object):
                 rest.append(entry)
         return rest
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterRegexp, 'regexp', api_ver=2)

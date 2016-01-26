@@ -136,7 +136,7 @@ class Subtitles(object):
 
                     def seqmatch(subfile):
                         s = difflib.SequenceMatcher(lambda x: x in " ._", entry['title'], subfile)
-                        #print "matching: ", entry['title'], subfile, s.ratio()
+                        # print "matching: ", entry['title'], subfile, s.ratio()
                         return s.ratio() > match_limit
 
                     # filter only those that have matching release names
@@ -150,7 +150,8 @@ class Subtitles(object):
 
             # download
             for sub in filtered_subs:
-                log.debug('SUBS FOUND: ', sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID'])
+                log.debug('SUBS FOUND: %s %s %s' %
+                          (sub['MovieReleaseName'], sub['SubRating'], sub['SubLanguageID']))
 
                 f = urlopener(sub['ZipDownloadLink'], log)
                 subfilename = re.match('^attachment; filename="(.*)"$', f.info()['content-disposition']).group(1)

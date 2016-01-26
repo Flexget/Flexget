@@ -6,12 +6,41 @@ from urllib import quote
 
 from requests.exceptions import RequestException
 
-from flexget import plugin, validator
+from flexget import plugin
 from flexget.event import event
-from flexget.utils import json, requests
+from flexget.utils import json
 from flexget.config_schema import one_or_more
+from flexget.utils.template import RenderError
 
 log = getLogger('pyload')
+
+
+class PyloadApi(object):
+    def __init__(self, requests, url):
+        self.requests = requests
+        self.url = url
+
+    def get_session(self, config):
+        # Login
+        post = {'username': config['username'], 'password': config['password']}
+        result = self.query("login", post)
+        response = result.json()
+        if not response:
+            raise plugin.PluginError('Login failed', log)
+        return response.replace('"', '')
+
+    def query(self, method, post=None):
+        try:
+            response = self.requests.request(
+                'post' if post is not None else 'get',
+                self.url.rstrip("/") + "/" + method.strip("/"),
+                data=post)
+            response.raise_for_status()
+            return response
+        except RequestException as e:
+            if e.response and e.response.status_code == 500:
+                raise plugin.PluginError('Internal API Error: <%s> <%s> <%s>' % (method, self.url, post), log)
+            raise
 
 
 class PluginPyLoad(object):
@@ -27,6 +56,7 @@ class PluginPyLoad(object):
         password: my_password
         folder: desired_folder
         package: desired_package_name (jinja2 supported)
+        package_password: desired_package_password
         hoster:
           - YoutubeCom
         parse_url: no
@@ -45,7 +75,7 @@ class PluginPyLoad(object):
     """
 
     __author__ = 'http://pyload.org'
-    __version__ = '0.4'
+    __version__ = '0.5'
 
     DEFAULT_API = 'http://localhost:8000/api'
     DEFAULT_QUEUE = False
@@ -66,6 +96,7 @@ class PluginPyLoad(object):
                     'password': {'type': 'string'},
                     'folder': {'type': 'string'},
                     'package': {'type': 'string'},
+                    'package_password': {'type': 'string'},
                     'queue': {'type': 'boolean'},
                     'parse_url': {'type': 'boolean'},
                     'multiple_hoster': {'type': 'boolean'},
@@ -80,7 +111,6 @@ class PluginPyLoad(object):
         ]
     }
 
-
     def on_task_output(self, task, config):
         if not config.get('enabled', True):
             return
@@ -92,8 +122,11 @@ class PluginPyLoad(object):
     def add_entries(self, task, config):
         """Adds accepted entries"""
 
+        apiurl = config.get('api', self.DEFAULT_API)
+        api = PyloadApi(task.requests, apiurl)
+
         try:
-            session = self.get_session(config)
+            session = api.get_session(config)
         except IOError:
             raise plugin.PluginError('pyLoad not reachable', log)
         except plugin.PluginError:
@@ -101,7 +134,6 @@ class PluginPyLoad(object):
         except Exception as e:
             raise plugin.PluginError('Unknown error: %s' % str(e), log)
 
-        api = config.get('api', self.DEFAULT_API)
         hoster = config.get('hoster', self.DEFAULT_HOSTER)
 
         for entry in task.accepted:
@@ -113,7 +145,7 @@ class PluginPyLoad(object):
 
             log.debug("Parsing url %s" % url)
 
-            result = query_api(api, "parseURLs", {"html": content, "url": url, "session": session})
+            result = api.query("parseURLs", {"html": content, "url": url, "session": session})
 
             # parsed { plugins: [urls] }
             parsed = result.json()
@@ -165,7 +197,7 @@ class PluginPyLoad(object):
                         'dest': dest,
                         'session': session}
 
-                pid = query_api(api, "addPackage", post).text
+                pid = api.query("addPackage", post).text
                 log.debug('added package pid: %s' % pid)
 
                 # Set Folder
@@ -180,35 +212,16 @@ class PluginPyLoad(object):
                         log.error('Error rendering jinja event: %s' % e)
                     # set folder with api
                     data = json.dumps({'folder': folder})
-                    query_api(api, "setPackageData", {'pid': pid, 'data': data, 'session': session})
+                    api.query("setPackageData", {'pid': pid, 'data': data, 'session': session})
+                
+                # Set Package Password
+                package_password = config.get('package_password')
+                if package_password:
+                    data = json.dumps({'password': package_password})
+                    api.query("setPackageData", {'pid': pid, 'data': data, 'session': session})
 
             except Exception as e:
                 entry.fail(str(e))
-
-    def get_session(self, config):
-        url = config.get('api', self.DEFAULT_API)
-
-        # Login
-        post = {'username': config['username'], 'password': config['password']}
-        result = query_api(url, "login", post)
-        response = result.json()
-        if not response:
-            raise plugin.PluginError('Login failed', log)
-        return response.replace('"', '')
-
-
-def query_api(url, method, post=None):
-    try:
-        response = requests.request(
-            'post' if post is not None else 'get',
-            url.rstrip("/") + "/" + method.strip("/"),
-            data=post)
-        response.raise_for_status()
-        return response
-    except RequestException as e:
-        if e.response.status_code == 500:
-            raise plugin.PluginError('Internal API Error: <%s> <%s> <%s>' % (method, url, post), log)
-        raise
 
 
 @event('plugin.register')

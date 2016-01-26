@@ -96,8 +96,8 @@ class TorrentScrub(object):
             if modified:
                 entry["torrent"].content = metainfo
                 entry["torrent"].modified = True
-                log.info((("Key %s was" if len(modified) == 1 else "Keys %s were")
-                          + " scrubbed from torrent '%s'!") % (", ".join(sorted(modified)), entry['title']))
+                log.info((("Key %s was" if len(modified) == 1 else "Keys %s were") +
+                          " scrubbed from torrent '%s'!") % (", ".join(sorted(modified)), entry['title']))
                 new_infohash = entry["torrent"].info_hash
                 if infohash != new_infohash:
                     log.warn("Info hash changed from #%s to #%s in '%s'" %

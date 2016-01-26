@@ -30,7 +30,7 @@ Base = db_schema.versioned_base('thetvdb_favorites', 0)
 def upgrade(ver, session):
     if ver is None:
         columns = table_columns('thetvdb_favorites', session)
-        if not 'series_ids' in columns:
+        if 'series_ids' not in columns:
             # Drop the old table
             log.info('Dropping old version of thetvdb_favorites table from db')
             drop_tables(['thetvdb_favorites'], session)
@@ -134,6 +134,7 @@ class InputThetvdbFavorites(object):
                     series_name = re.sub(r'\s+\(\d{4}\)$', '', series_name)
                 entries.append(Entry(series_name, '', tvdb_id=series.id))
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

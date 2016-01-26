@@ -47,7 +47,7 @@ CATEGORIES = {
     'Games Pack': 986
 }
 
-URL = 'http://www.torrentshack.eu/'
+URL = 'http://www.torrentshack.me/'
 
 
 class TorrentShackSearch(object):
@@ -135,7 +135,6 @@ class TorrentShackSearch(object):
                 categories_id.append(category)
         config['category'] = categories_id
         return config
-
 
     @plugin.internet(log)
     def search(self, task, entry, config=None):

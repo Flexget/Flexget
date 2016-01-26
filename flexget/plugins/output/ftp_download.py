@@ -1,6 +1,7 @@
 import logging
 import os
 import ftplib
+import urllib
 from urlparse import urlparse
 
 from flexget import plugin
@@ -18,8 +19,10 @@ class OutputFtp(object):
 
         config:
             ftp_download:
-              tls: False
-              ftp_tmp_path: /tmp
+              use-ssl: <True/False>
+              ftp_tmp_path: <path>
+              delete_origin: <True/False>
+              download_empty_dirs: <True/False>
 
         TODO:
           - Resume downloads
@@ -33,7 +36,8 @@ class OutputFtp(object):
         'properties': {
             'use-ssl': {'type': 'boolean', 'default': False},
             'ftp_tmp_path': {'type': 'string', 'format': 'path'},
-            'delete_origin': {'type': 'boolean', 'default' : False}
+            'delete_origin': {'type': 'boolean', 'default': False},
+            'download_empty_dirs': {'type': 'boolean', 'default': False}
         },
         'additionalProperties': False
     }
@@ -42,6 +46,7 @@ class OutputFtp(object):
         config.setdefault('use-ssl', False)
         config.setdefault('delete_origin', False)
         config.setdefault('ftp_tmp_path', os.path.join(task.manager.config_base, 'temp'))
+        config.setdefault('download_empty_dirs', False)
         return config
 
     def ftp_connect(self, config, ftp_url, current_path):
@@ -49,11 +54,16 @@ class OutputFtp(object):
             ftp = ftplib.FTP_TLS()
         else:
             ftp = ftplib.FTP()
+
+        # ftp.set_debuglevel(2)
         log.debug("Connecting to " + ftp_url.hostname)
         ftp.connect(ftp_url.hostname, ftp_url.port)
         ftp.login(ftp_url.username, ftp_url.password)
+        if config['use-ssl']:
+            ftp.prot_p()
         ftp.sendcmd('TYPE I')
         ftp.set_pasv(True)
+        log.debug("Changing directory to: " + current_path)
         ftp.cwd(current_path)
 
         return ftp
@@ -69,11 +79,12 @@ class OutputFtp(object):
         config = self.prepare_config(config, task)
         for entry in task.accepted:
             ftp_url = urlparse(entry.get('url'))
+            ftp_url = ftp_url._replace(path = urllib.unquote(ftp_url.path))
             current_path = os.path.dirname(ftp_url.path)
             try:
                 ftp = self.ftp_connect(config, ftp_url, current_path)
-            except:
-                entry.failed("Unable to connect to server")
+            except ftplib.all_errors as e:
+                entry.fail("Unable to connect to server : %s" % (e))
                 break
 
             if not os.path.isdir(config['ftp_tmp_path']):
@@ -111,6 +122,10 @@ class OutputFtp(object):
             return ftp
 
         if not dirs:
+            if config['download_empty_dirs']:
+                os.mkdir(tmp_path)
+            else:
+                log.debug("Empty directory, skipping.")
             return ftp
 
         for file_name in (path for path in dirs if path not in ('.', '..')):
@@ -163,7 +178,7 @@ class OutputFtp(object):
                     ftp.retrbinary('RETR %s' % file_name, local_file.write)
             except Exception as error:
                 if max_attempts != 0:
-                    log.debug("Retrying download after error %s" % error);
+                    log.debug("Retrying download after error %s" % error)
                 else:
                     log.error("Too many errors downloading %s. Aborting." % file_name)
                     break

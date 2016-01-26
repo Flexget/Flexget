@@ -46,29 +46,33 @@ CATEGORIES = {
     'Sport': 636,
     'Video-clips': 402
 
-    }
+}
 
 SUB_CATEGORIES = {
 
-    'Anglais': [17, 540],
-    'VFF': [17, 541],
-    'Muet': [17, 722],
-    'Multi-Francais': [17, 542],
-    'Multi-Quebecois': [17, 1160],
-    'VFQ': [17, 719],
-    'VFSTFR': [17, 720],
-    'VOSTFR': [17, 721],
+    'Anglais': [51, 1209],
+    'VFF': [51, 1210],
+    'Muet': [51, 1211],
+    'Multi-Francais': [51, 1212],
+    'Multi-Quebecois': [51, 1213],
+    'VFQ': [51, 1214],
+    'VFSTFR': [51, 1215],
+    'VOASTA': [51, 1217], # new
+    'VOSTFR': [51, 1216],
 
-    'NTSC': [8, 20],
-    'PAL': [8, 21],
+    # deprecated    'NTSC': [8, 20],
+    # deprecated    'PAL': [8, 21],
 
-    'BDrip-SD': [7, 8],
+    'BDrip-BRrip-SD': [7, 8], # new: replaces BDrip-SD and BRrip-SD
+    'BDrip-SD': [7, 8], # deprecated: replaced by 'BDrip-BRrip-SD'
     'Bluray-4K': [7, 1171],
     'Bluray-Full-Remux': [7, 17],
-    'BRrip-SD': [7, 9],
+    'BRrip-SD': [7, 8], # deprecated: was 9, replaced by 'BDrip-BRrip-SD'
     'DVD-R-5': [7, 13],
     'DVD-R-9': [7, 14],
     'DVDrip': [7, 10],
+    'HDlight-1080p': [7, 1208], # new
+    'HDlight-720p': [7, 1218],  # new
     'HDrip-1080p': [7, 16],
     'HDrip-720p': [7, 15],
     'TVrip-SD': [7, 11],
@@ -125,7 +129,7 @@ class t411Auth(AuthBase):
 
 #   RETREIVING LOGIN COOKIES ONLY ONCE A DAY
     def get_login_cookies(self, username, password):
-        url_auth = 'http://www.t411.io/users/login'
+        url_auth = 'http://www.t411.in/users/login'
         db_session = Session()
         account = db_session.query(torrent411Account).filter(
             torrent411Account.username == username).first()
@@ -239,16 +243,16 @@ class UrlRewriteTorrent411(object):
 
             -- RSS DOWNLOAD WITH LOGIN
             rss:
-              url: http://www.t411.io/rss/?cat=210
+              url: http://www.t411.in/rss/?cat=210
               username: ****
               password: ****
 
             - OR -
 
-            -- RSS NORMAL URL REWRITE (i.e.: http://www.t411.io/torrents/download/?id=12345678)
+            -- RSS NORMAL URL REWRITE (i.e.: http://www.t411.in/torrents/download/?id=12345678)
             -- WARNING: NEED CUSTOM COOKIES NOT HANDLE BY THIS PLUGIN
             rss:
-              url: http://www.t411.io/rss/?cat=210
+              url: http://www.t411.in/rss/?cat=210
 
         ---
             SEARCH WITHIN SITE
@@ -273,14 +277,12 @@ class UrlRewriteTorrent411(object):
               Sub-Category is any combination of:
 
               Anglais, VFF, Muet, Multi-Francais, Multi-Quebecois,
-              VFQ, VFSTFR, VOSTFR
+              VFQ, VFSTFR, VOSTFR, VOASTA
 
-              NTSC, PAL
-
-              BDrip-SD, Bluray-4K, Bluray-Full-Remux, BRrip-SD, DVD-R-5,
-              DVD-R-9, DVDrip, HDrip-1080p, HDrip-720p, TVrip-SD,
-              TVripHD-1080p, TVripHD-720p, VCD-SVCD-VHSrip, WEBrip,
-              WEBripHD-1080p, WEBripHD-1080p
+              BDrip-BRrip-SD, Bluray-4K, Bluray-Full-Remux, DVD-R-5,
+              DVD-R-9, DVDrip, HDrip-1080p, HDrip-720p, HDlight-1080p,
+              HDlight-720p, TVrip-SD, TVripHD-1080p, TVripHD-720p,
+              VCD-SVCD-VHSrip, WEBrip, WEBripHD-1080p, WEBripHD-1080p
 
               2D, 3D-Converti-Amateur, 3D-Converti-Pro, 3D-Natif
     """
@@ -292,8 +294,8 @@ class UrlRewriteTorrent411(object):
             'password': {'type': 'string'},
             'category': {'type': 'string'},
             'sub_category': one_or_more(
-                    {'type': 'string', 'enum': list(SUB_CATEGORIES)}
-                ),
+                {'type': 'string', 'enum': list(SUB_CATEGORIES)}
+            ),
         },
         'required': ['username', 'password'],
         'additionalProperties': False
@@ -303,7 +305,7 @@ class UrlRewriteTorrent411(object):
 #   urlrewriter API
     def url_rewritable(self, task, entry):
         url = entry['url']
-        if re.match(r'^(https?://)?(www\.)?t411\.io/torrents/(?!download/)[-A-Za-z0-9+&@#/%|?=~_|!:,.;]+', url):
+        if re.match(r'^(https?://)?(www\.)?t411\.in/torrents/(?!download/)[-A-Za-z0-9+&@#/%|?=~_|!:,.;]+', url):
             return True
         return False
 
@@ -316,8 +318,9 @@ class UrlRewriteTorrent411(object):
             log.debug("Got the URL: %s" % entry['url'])
             rawdata = ""
             try:
-                request = urllib2.Request(url)
-                response = urllib2.urlopen(request)
+                opener = urllib2.build_opener()
+                opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+                response = opener.open(url)
             except Exception as e:
                 raise UrlRewritingError("Connection Error for %s : %s" % (url, e))
             rawdata = response.read()
@@ -326,7 +329,7 @@ class UrlRewriteTorrent411(object):
             if match:
                 torrent_id = match.group(1)
                 log.debug("Got the Torrent ID: %s" % torrent_id)
-                entry['url'] = 'http://www.t411.io/torrents/download/?id=' + torrent_id
+                entry['url'] = 'http://www.t411.in/torrents/download/?id=' + torrent_id
                 if 'download_auth' in entry:
                     auth_handler = t411Auth(*entry['download_auth'])
                     entry['download_auth'] = auth_handler
@@ -338,7 +341,7 @@ class UrlRewriteTorrent411(object):
         """
         Search for name from torrent411.
         """
-        url_base = 'http://www.t411.io'
+        url_base = 'http://www.t411.in'
 
         if not isinstance(config, dict):
             config = {}
@@ -357,7 +360,8 @@ class UrlRewriteTorrent411(object):
 
             if sub_categories[0] is not None:
                 sub_categories = [SUB_CATEGORIES[c] for c in sub_categories]
-                filter_url = filter_url + '&' + '&'.join([urllib.quote_plus('term[%s][]' % c[0]).encode('utf-8') + '=' + str(c[1])
+                filter_url = filter_url + '&' + '&'.join([urllib.quote_plus('term[%s][]' % c[0]).
+                                                          encode('utf-8') + '=' + str(c[1])
                                                           for c in sub_categories])
 
         entries = set()
@@ -367,8 +371,10 @@ class UrlRewriteTorrent411(object):
                           urllib.quote_plus(query.encode('utf-8')) +
                           filter_url)
 
-            req = urllib2.Request(url_base + url_search)
-            response = urllib2.urlopen(req)
+            opener = urllib2.build_opener()
+            opener.addheaders = [('User-agent', 'Mozilla/5.0')]
+            response = opener.open(url_base + url_search)
+
             data = response.read()
             soup = get_soup(data)
             tb = soup.find("table", class_="results")
@@ -380,11 +386,13 @@ class UrlRewriteTorrent411(object):
                 nfo_link_res = re.search('torrents/nfo/\?id=(\d+)', str(tr))
                 if nfo_link_res is not None:
                     tid = nfo_link_res.group(1)
-                title_res = re.search('<a href=\"//www.t411.io/torrents/([-A-Za-z0-9+&@#/%|?=~_|!:,.;]+)\" title="([^"]*)">',str(tr))
+                title_res = re.search(
+                    '<a href=\"//www.t411.in/torrents/([-A-Za-z0-9+&@#/%|?=~_|!:,.;]+)\" title="([^"]*)">',
+                    str(tr))
                 if title_res is not None:
                     entry['title'] = title_res.group(2).decode('utf-8')
                 size = tr('td')[5].contents[0]
-                entry['url'] = 'http://www.t411.io/torrents/download/?id=%s' % tid
+                entry['url'] = 'http://www.t411.in/torrents/download/?id=%s' % tid
                 entry['torrent_seeds'] = tr('td')[7].contents[0]
                 entry['torrent_leeches'] = tr('td')[8].contents[0]
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'],

@@ -7,12 +7,12 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.requests import Session, get
-from flexget.utils.search import normalize_unicode
+from flexget.utils.search import normalize_scene
 
 log = logging.getLogger('rarbg')
 
 requests = Session()
-requests.set_domain_delay('torrentapi.org', '10.3 seconds')  # they only allow 1 request per 10 seconds
+requests.set_domain_delay('torrentapi.org', '2.3 seconds')  # they only allow 1 request per 2 seconds
 
 CATEGORIES = {
     'all': 0,
@@ -70,11 +70,11 @@ class SearchRarBG(object):
         "additionalProperties": False
     }
 
-    base_url = 'https://torrentapi.org/pubapi.php'
+    base_url = 'https://torrentapi.org/pubapi_v2.php'
 
     def get_token(self):
         # Don't use a session as tokens are not affected by domain limit
-        r = get('https://torrentapi.org/pubapi.php', params={'get_token': 'get_token', 'format': 'json'})
+        r = get(self.base_url, params={'get_token': 'get_token', 'format': 'json'})
         token = None
         try:
             token = r.json().get('token')
@@ -101,21 +101,23 @@ class SearchRarBG(object):
 
         token = self.get_token()
         if not token:
-            log.error('No token set. Exiting RARBG search.')
+            log.error('Could not retrieve token. Abandoning search.')
             return entries
 
         params = {'mode': 'search', 'token': token, 'ranked': int(config['ranked']),
                   'min_seeders': config['min_seeders'], 'min_leechers': config['min_leechers'],
-                  'sort': config['sorted_by'], 'category': category_url_fragment, 'format': 'json'}
+                  'sort': config['sorted_by'], 'category': category_url_fragment, 'format': 'json_extended',
+                  'app_id': 'flexget'}
 
         for search_string in entry.get('search_strings', [entry['title']]):
             params.pop('search_string', None)
             params.pop('search_imdb', None)
+            params.pop('search_tvdb', None)
 
             if entry.get('movie_name'):
                 params['search_imdb'] = entry.get('imdb_id')
             else:
-                query = normalize_unicode(search_string)
+                query = normalize_scene(search_string)
                 query_url_fragment = query.encode('utf8')
                 params['search_string'] = query_url_fragment
                 if config['use_tvdb']:
@@ -130,14 +132,25 @@ class SearchRarBG(object):
             except ValueError:
                 log.debug(page.text)
                 continue
+            if r.get('error'):
+                log.error('Error code %s: %s' % (r.get('error_code'), r.get('error')))
+                continue
+            else:
+                for result in r.get('torrent_results'):
+                    e = Entry()
 
-            for result in r:
-                e = Entry()
+                    e['title'] = result.get('title')
+                    e['url'] = result.get('download')
+                    e['torrent_seeds'] = int(result.get('seeders'))
+                    e['torrent_leeches'] = int(result.get('leechers'))
+                    e['content_size'] = int(result.get('size')) / 1024 / 1024
+                    episode_info = result.get('episode_info')
+                    if episode_info:
+                        e['imdb_id'] = episode_info.get('imdb')
+                        e['tvdb_id'] = episode_info.get('tvdb')
+                        e['tvrage_id'] = episode_info.get('tvrage')
 
-                e['title'] = result.get('f')
-                e['url'] = result.get('d')
-
-                entries.add(e)
+                    entries.add(e)
 
         return entries
 

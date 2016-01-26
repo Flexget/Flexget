@@ -24,8 +24,8 @@ ua_response = requests.get('http://flexget.com/wiki/UpgradeActions')
 ua_soup = BeautifulSoup(ua_response.text, 'html5lib')
 
 # 1.0.3280 was last revision on svn
-git_log_output = subprocess.check_output(['git', 'log', '--pretty=%n---%n.%d%n%ci%n%h%n%s%n%-b%n---%n',
-                                          '--topo-order', '--decorate=full','refs/tags/1.0.3280..HEAD'])
+git_log_output = subprocess.check_output(['git', 'log', '--first-parent', '--topo-order', '--decorate=full',
+                                          '--pretty=%n---%n.%d%n%ci%n%h%n%s%n%-b%n---%n', 'refs/tags/1.0.3280..HEAD'])
 git_log_iter = ifilter(None, git_log_output.decode('utf-8').splitlines())
 
 with codecs.open(out_path, 'w', encoding='utf-8') as out_file:

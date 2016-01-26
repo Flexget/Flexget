@@ -2,13 +2,13 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 import os
 import re
-import sys
 from copy import copy
 from datetime import datetime, date, time
 import locale
 from email.utils import parsedate
 from time import mktime
 
+import jinja2.filters
 from jinja2 import (Environment, StrictUndefined, ChoiceLoader, FileSystemLoader, PackageLoader, Template,
                     TemplateNotFound, TemplateSyntaxError, Undefined)
 
@@ -79,6 +79,7 @@ def filter_parsedate(val):
     """Attempts to parse a date according to the rules in RFC 2822"""
     return datetime.fromtimestamp(mktime(parsedate(val)))
 
+
 def filter_date_suffix(date):
     day = int(date[-2:])
     if 4 <= day <= 20 or 24 <= day <= 30:
@@ -86,6 +87,7 @@ def filter_date_suffix(date):
     else:
         suffix = ["st", "nd", "rd"][day % 10 - 1]
     return date + suffix
+
 
 def filter_format_number(val, places=None, grouping=True):
     """Formats a number according to the user's locale."""
@@ -106,21 +108,20 @@ def filter_pad(val, width, fillchar='0'):
     """Pads a number or string with fillchar to the specified width."""
     return unicode(val).rjust(width, fillchar)
 
+
 def filter_to_date(date_time_val):
     if not isinstance(date_time_val, (datetime, date, time)):
         return date_time_val
     return date_time_val.date()
 
+
 def now():
     return datetime.now()
 
-# Override the built-in Jinja default filter due to Jinja bug
-# https://github.com/mitsuhiko/jinja2/pull/138
-def filter_default(value, default_value=u'', boolean=False):
-    if isinstance(value, Undefined) or (boolean and not value):
-        return default_value
-    return value
 
+# Override the built-in Jinja default filter to change the `boolean` param to True by default
+def filter_default(value, default_value='', boolean=True):
+    return jinja2.filters.do_default(value, default_value, boolean)
 
 filter_d = filter_default
 

@@ -3,6 +3,7 @@ from __future__ import absolute_import, division, unicode_literals
 import os
 import re
 import urlparse
+import logging
 from collections import defaultdict
 from datetime import datetime
 
@@ -14,6 +15,8 @@ from flexget.utils import qualities, template
 from flexget.utils.tools import parse_timedelta
 
 schema_paths = {}
+
+log = logging.getLogger('config_schema')
 
 
 # TODO: Rethink how config key and schema registration work
@@ -57,7 +60,7 @@ def get_schema():
     return _root_config_schema
 
 
-def one_or_more(schema):
+def one_or_more(schema, unique_items=False):
     """
     Helper function to construct a schema that validates items matching `schema` or an array
     containing items matching `schema`.
@@ -67,7 +70,7 @@ def one_or_more(schema):
     schema.setdefault('title', 'single value')
     return {
         'oneOf': [
-            {'title': 'multiple values', 'type': 'array', 'items': schema, 'minItems': 1},
+            {'title': 'multiple values', 'type': 'array', 'items': schema, 'minItems': 1, 'uniqueItems': unique_items},
             schema
         ]
     }
@@ -153,7 +156,7 @@ def parse_size(size_input):
         return int(1024 ** prefixes.index(unit) * value)
 
 
-## Public API end here, the rest should not be used outside this module
+# Public API end here, the rest should not be used outside this module
 
 
 class RefResolver(jsonschema.RefResolver):
@@ -177,7 +180,6 @@ def is_quality_req(instance):
     if not isinstance(instance, str_types):
         return True
     return qualities.Requirements(instance)
-
 
 
 @format_checker.checks('time', raises=ValueError)
@@ -241,7 +243,7 @@ def is_path(instance):
     raise ValueError('`%s` does not exist' % instance)
 
 
-#TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
+# TODO: jsonschema has a format checker for uri if rfc3987 is installed, perhaps we should use that
 @format_checker.checks('url')
 def is_url(instance):
     if not isinstance(instance, str_types):
@@ -336,7 +338,6 @@ def select_child_errors(validator, errors):
 
 
 def validate_properties_w_defaults(validator, properties, instance, schema):
-
     if not validator.is_type(instance, 'object'):
         return
     for key, subschema in properties.iteritems():
@@ -358,9 +359,15 @@ def validate_oneOf(validator, oneOf, instance, schema):
         yield e
 
 
+def validate_deprecated(validator, message, instance, schema):
+    """Not really a validator, just warns if deprecated section of config is being used."""
+    log.warning(message)
+
+
 validators = {
     'anyOf': validate_anyOf,
-    'oneOf': validate_oneOf
+    'oneOf': validate_oneOf,
+    'deprecated': validate_deprecated
 }
 
 SchemaValidator = jsonschema.validators.extend(jsonschema.Draft4Validator, validators)

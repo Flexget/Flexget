@@ -28,7 +28,7 @@ def do_cli(manager, options):
 
 
 def key_equals_value(text):
-    if not '=' in text:
+    if '=' not in text:
         raise argparse.ArgumentTypeError('must be in the form: <field name>=<value>')
     key, value = text.split('=')
     return key, yaml.safe_load(value)

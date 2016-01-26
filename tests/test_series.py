@@ -2,10 +2,15 @@ from __future__ import unicode_literals, division, absolute_import
 
 from StringIO import StringIO
 
+from mock import patch
+
 from flexget.logger import capture_output
-from flexget.manager import get_parser
+from flexget.manager import get_parser, Session
+from flexget.plugins.filter import series
 from flexget.task import TaskAbort
+from flexget.utils import json
 from tests import FlexGetBase, build_parser_function
+from tests.test_api import APITest
 
 
 def age_series(**kwargs):
@@ -18,7 +23,6 @@ def age_series(**kwargs):
 
 
 class BaseQuality(FlexGetBase):
-
     __yaml__ = """
         tasks:
           exact_quality:
@@ -174,7 +178,6 @@ class TestInternalQuality(BaseQuality):
 
 
 class BaseDatabase(FlexGetBase):
-
     __yaml__ = """
         templates:
           global:
@@ -236,7 +239,6 @@ class TestInternalDatabase(BaseDatabase):
 
 
 class BaseFilterSeries(FlexGetBase):
-
     __yaml__ = """
         tasks:
           test:
@@ -337,7 +339,8 @@ class BaseFilterSeries(FlexGetBase):
         entry = self.task.find_entry('accepted', title='Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet')
         assert not entry.get('series_guessed'), 'series plugin should override series_guessed'
         assert entry['series_name'] == entry['series_parser'].name == 'Test Series', \
-            'Series name should be \'Test Series\', was: entry: %s, parser: %s' % (entry['series_name'], entry['series_parser'].name)
+            'Series name should be \'Test Series\', was: entry: %s, parser: %s' % (
+                entry['series_name'], entry['series_parser'].name)
 
     def test_all_series_mode(self):
         """Series plugin: test all option"""
@@ -351,7 +354,8 @@ class BaseFilterSeries(FlexGetBase):
         assert entry.get('series_guessed')
         entry2 = self.task.find_entry('accepted', title='other show season 2 episode 2')
         # Make sure case is normalized so series are marked with the same name no matter the case in the title
-        assert entry.get('series_name') == entry2.get('series_name') == 'Other Show', 'Series names should be in title case'
+        assert entry.get('series_name') == entry2.get(
+                'series_name') == 'Other Show', 'Series names should be in title case'
         entry = self.task.find_entry('accepted', title='Date.Show.03-29-2012.HDTV.XViD-FlexGet')
         assert entry.get('series_guessed')
         assert entry.get('series_name') == 'Date Show'
@@ -372,8 +376,8 @@ class TestInternalFilterSeries(BaseFilterSeries):
         super(TestInternalFilterSeries, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
-class BaseEpisodeAdvancement(FlexGetBase):
 
+class BaseEpisodeAdvancement(FlexGetBase):
     __yaml__ = """
         tasks:
 
@@ -519,7 +523,7 @@ class BaseEpisodeAdvancement(FlexGetBase):
         assert self.task.find_entry('accepted', title='forwards s03e01'), \
             'forwards s03e01 should have been accepted'
         self.execute_task('test_forwards_4')
-        assert self.task.find_entry('rejected', title='forwards s04e02'),\
+        assert self.task.find_entry('rejected', title='forwards s04e02'), \
             'forwards s04e02 should have been rejected'
         self.execute_task('test_forwards_5')
         assert self.task.find_entry('rejected', title='forwards s05e01'), \
@@ -569,7 +573,6 @@ class TestInternalEpisodeAdvancement(BaseEpisodeAdvancement):
 
 
 class BaseFilterSeriesPriority(FlexGetBase):
-
     __yaml__ = """
         tasks:
           test:
@@ -605,7 +608,6 @@ class TestInternalFilterSeriesPriority(BaseFilterSeriesPriority):
 
 
 class BasePropers(FlexGetBase):
-
     __yaml__ = """
         templates:
           global:
@@ -826,7 +828,6 @@ class TestInternalPropers(BasePropers):
 
 
 class BaseSimilarNames(FlexGetBase):
-
     # hmm, not very good way to test this .. seriesparser should be tested alone?
 
     __yaml__ = """
@@ -876,7 +877,6 @@ class TestInternalSimilarNames(BaseSimilarNames):
 
 
 class BaseDuplicates(FlexGetBase):
-
     __yaml__ = """
 
         templates:
@@ -963,7 +963,6 @@ class TestInternalDuplicates(BaseDuplicates):
 
 
 class BaseQualities(FlexGetBase):
-
     __yaml__ = """
         templates:
           global:
@@ -1115,7 +1114,6 @@ class TestInternalQualities(BaseQualities):
 
 
 class BaseIdioticNumbering(FlexGetBase):
-
     __yaml__ = """
         templates:
           global:
@@ -1156,7 +1154,6 @@ class TestInternalIdioticNumbering(BaseIdioticNumbering):
 
 
 class BaseNormalization(FlexGetBase):
-
     __yaml__ = """
         tasks:
           global:
@@ -1210,7 +1207,6 @@ class TestInternalNormalization(BaseNormalization):
 
 
 class BaseMixedNumbering(FlexGetBase):
-
     __yaml__ = """
         templates:
           global:
@@ -1247,8 +1243,8 @@ class TestInternalMixedNumbering(BaseMixedNumbering):
         super(TestInternalMixedNumbering, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
-class BaseExact(FlexGetBase):
 
+class BaseExact(FlexGetBase):
     __yaml__ = """
         tasks:
           auto:
@@ -1308,7 +1304,6 @@ class TestInternalExact(BaseExact):
 
 
 class BaseTimeframe(FlexGetBase):
-
     __yaml__ = """
         templates:
           global:
@@ -1456,7 +1451,7 @@ class BaseTimeframe(FlexGetBase):
 
     def test_qualities_fail(self):
         self.execute_task('test_qualities_fail')
-        assert self.task.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet'),\
+        assert self.task.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet'), \
             'should have accepted wanted quality'
         assert len(self.task.accepted) == 1
 
@@ -1505,7 +1500,6 @@ class TestInternalTimeframe(BaseTimeframe):
 
 
 class BaseBacklog(FlexGetBase):
-
     __yaml__ = """
         tasks:
           backlog:
@@ -1520,7 +1514,7 @@ class BaseBacklog(FlexGetBase):
         self.execute_task('backlog')
         assert self.task.entries and not self.task.accepted, 'no entries at the start'
         # simulate test going away from the task
-        del(self.manager.config['tasks']['backlog']['mock'])
+        del (self.manager.config['tasks']['backlog']['mock'])
         age_series(hours=12)
         self.execute_task('backlog')
         assert self.task.accepted, 'backlog is not injecting episodes'
@@ -1539,7 +1533,6 @@ class TestInternalBacklog(BaseBacklog):
 
 
 class BaseManipulate(FlexGetBase):
-
     """Tests that it's possible to manipulate entries before they're parsed by series plugin"""
 
     __yaml__ = """
@@ -1582,7 +1575,6 @@ class TestInternalManipulate(BaseManipulate):
 
 
 class BaseFromGroup(FlexGetBase):
-
     __yaml__ = """
         tasks:
           test:
@@ -1615,8 +1607,8 @@ class TestInternalFromGroup(BaseFromGroup):
         super(TestInternalFromGroup, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
-class BaseBegin(FlexGetBase):
 
+class BaseBegin(FlexGetBase):
     __yaml__ = """
         templates:
           eps:
@@ -1742,7 +1734,6 @@ class TestInternalBegin(BaseBegin):
 
 
 class BaseSeriesPremiere(FlexGetBase):
-
     __yaml__ = """
         templates:
           global:
@@ -1760,9 +1751,10 @@ class BaseSeriesPremiere(FlexGetBase):
         """Test series premiere"""
         self.execute_task('test')
         assert self.task.find_entry('accepted', title='Foobar.S01E01.PDTV-FlexGet',
-            series_name='Foobar', series_season=1, series_episode=1), 'Series premiere should have been accepted'
+                                    series_name='Foobar', series_season=1,
+                                    series_episode=1), 'Series premiere should have been accepted'
         assert len(self.task.accepted) == 1
-    # TODO: Add more tests, test interaction with series plugin and series_exists
+        # TODO: Add more tests, test interaction with series plugin and series_exists
 
 
 class TestGuessitSeriesPremiere(BaseSeriesPremiere):
@@ -1778,7 +1770,6 @@ class TestInternalSeriesPremiere(BaseSeriesPremiere):
 
 
 class BaseImportSeries(FlexGetBase):
-
     __yaml__ = """
         tasks:
           timeframe_max:
@@ -1810,7 +1801,7 @@ class BaseImportSeries(FlexGetBase):
         age_series(minutes=6)
         self.execute_task('timeframe_max')
         assert self.task.find_entry('accepted', title='the show s03e02 hdtv'), \
-                'hdtv should have been accepted after timeframe.'
+            'hdtv should have been accepted after timeframe.'
 
     def test_import_altnames(self):
         """Tests configure_series with alternate_name."""
@@ -1831,8 +1822,8 @@ class TestInternalImportSeries(BaseImportSeries):
         super(TestInternalImportSeries, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
-class BaseIDTypes(FlexGetBase):
 
+class BaseIDTypes(FlexGetBase):
     __yaml__ = """
         tasks:
           all_types:
@@ -1870,8 +1861,8 @@ class TestInternalIDTypes(BaseIDTypes):
         super(TestInternalIDTypes, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
-class BaseCaseChange(FlexGetBase):
 
+class BaseCaseChange(FlexGetBase):
     __yaml__ = """
         tasks:
           first:
@@ -1906,8 +1897,8 @@ class TestInternalCaseChange(BaseCaseChange):
         super(TestInternalCaseChange, self).__init__()
         self.add_tasks_function(build_parser_function('internal'))
 
-class BaseInvalidSeries(FlexGetBase):
 
+class BaseInvalidSeries(FlexGetBase):
     __yaml__ = """
         tasks:
           blank:
@@ -1937,7 +1928,6 @@ class TestInternalInvalidSeries(BaseInvalidSeries):
 
 
 class BaseDoubleEps(FlexGetBase):
-
     __yaml__ = """
         tasks:
           test_double1:
@@ -2113,26 +2103,26 @@ class BaseSpecials(FlexGetBase):
     """
 
     def test_prefer_specials(self):
-        #Test that an entry matching both ep and special is flagged as a special when prefer_specials is True
+        # Test that an entry matching both ep and special is flagged as a special when prefer_specials is True
         self.execute_task('preferspecials')
         entry = self.task.find_entry('accepted', title='the show s03e04 special')
         assert entry.get('series_id_type') == 'special', 'Entry which should have been flagged a special was not.'
 
     def test_not_prefer_specials(self):
-        #Test that an entry matching both ep and special is flagged as an ep when prefer_specials is False
+        # Test that an entry matching both ep and special is flagged as an ep when prefer_specials is False
         self.execute_task('nopreferspecials')
         entry = self.task.find_entry('accepted', title='the show s03e05 special')
         assert entry.get('series_id_type') != 'special', 'Entry which should not have been flagged a special was.'
 
     def test_assume_special(self):
-        #Test that an entry with no ID found gets flagged as a special and accepted if assume_special is True
+        # Test that an entry with no ID found gets flagged as a special and accepted if assume_special is True
         self.execute_task('assumespecial')
         entry = self.task.find_entry(title='the show SOMETHING')
         assert entry.get('series_id_type') == 'special', 'Entry which should have been flagged as a special was not.'
         assert entry.accepted, 'Entry which should have been accepted was not.'
 
     def test_not_assume_special(self):
-        #Test that an entry with no ID found does not get flagged as a special and accepted if assume_special is False
+        # Test that an entry with no ID found does not get flagged as a special and accepted if assume_special is False
         self.execute_task('noassumespecial')
         entry = self.task.find_entry(title='the show SOMETHING')
         assert entry.get('series_id_type') != 'special', 'Entry which should not have been flagged as a special was.'
@@ -2241,3 +2231,304 @@ class TestCLI(FlexGetBase):
             self.manager.handle_cli(options=options)
         lines = buffer.getvalue().split('\n')
         assert all(any(line.lstrip().startswith(series) for line in lines) for series in ['Some Show', 'Other Show'])
+
+
+class TestSeriesForget(FlexGetBase):
+    __yaml__ = """
+        tasks:
+          get_episode:
+            seen: local
+            series:
+            - My Show
+            mock:
+            - title: My Show S01E01 1080p
+            - title: My Show S01E01 720p
+          forget_episode:
+            seen: no
+            mock:
+            - title: My Show S01E01
+              series_name: My Show
+              series_id: S01E01
+            accept_all: yes
+            series_forget: yes
+    """
+
+    def test_forget_episode(self):
+        self.execute_task('get_episode')
+        assert len(self.task.accepted) == 1
+        first_rls = self.task.accepted[0]
+        self.execute_task('get_episode')
+        assert not self.task.accepted, 'series plugin duplicate blocking not working?'
+        self.execute_task('forget_episode')
+        self.execute_task('get_episode')
+        assert len(self.task.accepted) == 1, 'new release not accepted after forgetting ep'
+        assert self.task.accepted[0] != first_rls, 'same release accepted on second run'
+
+
+class TestSeriesAPI(APITest):
+    @patch.object(series, 'get_series_summary')
+    def test_series_list_get(self, mock_series_list):
+        session = Session()
+        query = session.query(series.Series)
+        mock_series_list.return_value = query
+
+        # No params
+        rsp = self.get('/series/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        # Default params
+        rsp = self.get('/series/?max=100&sort_by=show_name&in_config=configured&order=desc&page=1')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        # Changed params
+        rsp = self.get('/series/?status=new&max=10&days=4&sort_by=last_download_date&in_config=all'
+                       '&premieres=true&order=asc&page=2')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        # Negative test, invalid parameter
+        rsp = self.get('/series/?status=bla&max=10&days=4&sort_by=last_download_date&in_config=all'
+                       '&premieres=true&order=asc&page=2')
+        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
+        assert mock_series_list.call_count == 3, 'Should have 3 calls, is actually %s' % mock_series_list.call_count
+
+    @patch.object(series, 'new_eps_after')
+    @patch.object(series, 'get_latest_release')
+    @patch.object(series, 'shows_by_name')
+    def test_series_search(self, mocked_series_search, mock_latest_release, mock_new_eps_after):
+        show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
+        release.downloaded = True
+        episode.releases.append(release)
+
+        mock_latest_release.return_value = episode
+        mock_new_eps_after.return_value = 0
+        mocked_series_search.return_value = [show]
+
+        rsp = self.get('/series/search/the%20big%20bang%20theory')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_latest_release.called
+        assert mock_new_eps_after.called
+        assert mocked_series_search.called
+
+    @patch.object(series, 'new_eps_after')
+    @patch.object(series, 'get_latest_release')
+    @patch.object(series, 'show_by_id')
+    def test_series_get(self, mock_show_by_id, mock_latest_release, mock_new_eps_after):
+        show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
+        release.downloaded = True
+        episode.releases.append(release)
+
+        mock_show_by_id.return_value = show
+        mock_latest_release.return_value = episode
+        mock_new_eps_after.return_value = 0
+
+        rsp = self.get('/series/1')
+
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_latest_release.called
+        assert mock_new_eps_after.called
+        assert mock_show_by_id.called
+
+    @patch.object(series, 'forget_series')
+    @patch.object(series, 'show_by_id')
+    def test_series_delete(self, mock_show_by_id, mock_forget_series):
+        show = series.Series()
+        show.name = 'Some name'
+
+        mock_show_by_id.return_value = show
+
+        rsp = self.delete('/series/1')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+        assert mock_forget_series.called
+
+    @patch.object(series, 'new_eps_after')
+    @patch.object(series, 'get_latest_release')
+    @patch.object(series, 'set_series_begin')
+    @patch.object(series, 'show_by_id')
+    def test_series_begin(self, mock_show_by_id, mock_series_begin, mock_latest_release, mock_new_eps_after):
+        show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
+        release.downloaded = True
+        episode.releases.append(release)
+        ep_id = {"episode_identifier": "s01e01"}
+
+        mock_show_by_id.return_value = show
+        mock_latest_release.return_value = episode
+        mock_new_eps_after.return_value = 0
+
+        rsp = self.json_put('/series/1', data=json.dumps(ep_id))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+
+    def test_new_series_begin(self):
+        show = 'Test Show'
+        ep_id = {"episode_identifier": "s01e01"}
+
+        rsp = self.json_post(('/series/%s' % show), data=json.dumps(ep_id))
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+    @patch.object(series, 'show_by_id')
+    def test_series_get_episodes(self, mock_show_by_id):
+        show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
+        release.downloaded = True
+        episode.releases.append(release)
+        show.episodes.append(episode)
+
+        mock_show_by_id.return_value = show
+
+        rsp = self.get('/series/1/episodes')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+
+    @patch.object(series, 'forget_episodes_by_id')
+    @patch.object(series, 'show_by_id')
+    def test_series_delete_episodes(self, mock_show_by_id, mock_forget_episodes_by_id):
+        show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
+        release.downloaded = True
+        episode.releases.append(release)
+        show.episodes.append(episode)
+
+        mock_show_by_id.return_value = show
+
+        rsp = self.delete('/series/1/episodes')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+        assert mock_forget_episodes_by_id.called
+
+    @patch.object(series, 'episode_in_show')
+    @patch.object(series, 'episode_by_id')
+    @patch.object(series, 'show_by_id')
+    def test_series_get_episode(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show):
+        show = series.Series()
+        episode = series.Episode()
+
+        mock_show_by_id.return_value = show
+        mock_episode_by_id.return_value = episode
+
+        rsp = self.get('/series/1/episodes/1')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+        assert mock_episode_by_id.called
+        assert mock_episode_in_show.called
+
+    @patch.object(series, 'forget_episodes_by_id')
+    @patch.object(series, 'episode_in_show')
+    @patch.object(series, 'episode_by_id')
+    @patch.object(series, 'show_by_id')
+    def test_series_delete_episode(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show,
+                                   mock_forget_episodes_by_id):
+        show = series.Series()
+        episode = series.Episode()
+
+        mock_show_by_id.return_value = show
+        mock_episode_by_id.return_value = episode
+
+        rsp = self.delete('/series/1/episodes/1')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+        assert mock_episode_by_id.called
+        assert mock_episode_in_show.called
+        assert mock_forget_episodes_by_id.called
+
+    @patch.object(series, 'episode_in_show')
+    @patch.object(series, 'episode_by_id')
+    @patch.object(series, 'show_by_id')
+    def test_series_get_episode_releases(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show):
+        show = series.Series()
+        episode = series.Episode()
+
+        mock_show_by_id.return_value = show
+        mock_episode_by_id.return_value = episode
+
+        rsp = self.get('/series/1/episodes/1/releases?downloaded=all')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        rsp = self.get('/series/1/episodes/1/releases?downloaded=downloaded')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        rsp = self.get('/series/1/episodes/1/releases?downloaded=not_downloaded')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        assert mock_show_by_id.call_count == 3
+        assert mock_episode_by_id.call_count == 3
+        assert mock_episode_in_show.call_count == 3
+
+    @patch.object(series, 'episode_in_show')
+    @patch.object(series, 'episode_by_id')
+    @patch.object(series, 'show_by_id')
+    def test_series_delete_episode_releases(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show):
+        show = series.Series()
+        episode = series.Episode()
+
+        mock_show_by_id.return_value = show
+        mock_episode_by_id.return_value = episode
+
+        rsp = self.delete('/series/1/episodes/1/releases?downloaded=all')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        rsp = self.delete('/series/1/episodes/1/releases?downloaded=downloaded')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        rsp = self.delete('/series/1/episodes/1/releases?downloaded=not_downloaded')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+
+        assert mock_show_by_id.call_count == 3
+        assert mock_episode_by_id.call_count == 3
+        assert mock_episode_in_show.call_count == 3
+
+    @patch.object(series, 'release_in_episode')
+    @patch.object(series, 'release_by_id')
+    @patch.object(series, 'episode_in_show')
+    @patch.object(series, 'episode_by_id')
+    @patch.object(series, 'show_by_id')
+    def test_series_get_release(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show, mock_release_by_id,
+                                mock_release_in_episode):
+        show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
+
+        mock_show_by_id.return_value = show
+        mock_episode_by_id.return_value = episode
+        mock_release_by_id.return_value = release
+
+        rsp = self.get('/series/2/episodes/653/releases/1551/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+        assert mock_episode_by_id.called
+        assert mock_episode_in_show.called
+        assert mock_release_by_id.called
+        assert mock_release_in_episode.called
+
+    @patch.object(series, 'delete_release_by_id')
+    @patch.object(series, 'release_in_episode')
+    @patch.object(series, 'release_by_id')
+    @patch.object(series, 'episode_in_show')
+    @patch.object(series, 'episode_by_id')
+    @patch.object(series, 'show_by_id')
+    def test_series_delete_release(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show, mock_release_by_id,
+                                   mock_release_in_episode, mock_delete_release_by_id):
+        show = series.Series()
+        episode = series.Episode()
+        release = series.Release()
+
+        mock_show_by_id.return_value = show
+        mock_episode_by_id.return_value = episode
+        mock_release_by_id.return_value = release
+
+        rsp = self.delete('/series/2/episodes/653/releases/1551/')
+        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_show_by_id.called
+        assert mock_episode_by_id.called
+        assert mock_episode_in_show.called
+        assert mock_release_by_id.called
+        assert mock_release_in_episode.called
+        assert mock_delete_release_by_id.called

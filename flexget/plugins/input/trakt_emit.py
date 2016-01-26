@@ -1,5 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import
-import hashlib
 import logging
 from urlparse import urljoin
 
@@ -8,8 +7,7 @@ from requests import RequestException
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils import json
-from flexget.utils.trakt import API_URL, get_session, make_list_slug, get_api_url
+from flexget.plugins.api_trakt import get_session, make_list_slug, get_api_url
 
 log = logging.getLogger('trakt_emit')
 
@@ -22,12 +20,14 @@ class TraktEmit(object):
     Syntax:
 
     trakt_emit:
+      account: <value>
       username: <value>
       position: <last|next>
       context: <collect|collected|watch|watched>
       list: <value>
 
-    Options username, password and api_key are required.
+    `account` option is required if the profile is private. `username` will default to account owner if `account` is
+    specified.
 
     """
 
@@ -35,42 +35,46 @@ class TraktEmit(object):
         'type': 'object',
         'properties': {
             'username': {'type': 'string'},
-            'password': {'type': 'string'},
+            'account': {'type': 'string'},
             'position': {'type': 'string', 'enum': ['last', 'next'], 'default': 'next'},
             'context': {'type': 'string', 'enum': ['watched', 'collected'], 'default': 'watched'},
             'list': {'type': 'string'}
         },
-        'required': ['username'],
+        'anyOf': [{'required': ['username']}, {'required': ['account']}],
+        'error_anyOf': 'At least one of `username` or `account` options are needed.',
         'additionalProperties': False
     }
 
     def on_task_input(self, task, config):
-        session = get_session(config['username'], config.get('password'))
+        if config.get('account') and not config.get('username'):
+            config['username'] = 'me'
+        session = get_session(account=config.get('account'))
         listed_series = {}
         if config.get('list'):
-            url = urljoin(API_URL, 'users/%s/' % config['username'])
+            args = ('users', config['username'])
             if config['list'] in ['collection', 'watchlist', 'watched']:
-                url = urljoin(url, '%s/shows' % config['list'])
+                args += (config['list'], 'shows')
             else:
-                url = urljoin(url, 'lists/%s/items' % make_list_slug(config['list']))
+                args += ('lists', make_list_slug(config['list']), 'items')
             try:
-                data = session.get(url).json()
+                data = session.get(get_api_url(args)).json()
             except RequestException as e:
                 raise plugin.PluginError('Unable to get trakt list `%s`: %s' % (config['list'], e))
             if not data:
                 log.warning('The list "%s" is empty.' % config['list'])
                 return
             for item in data:
-                if item['show'] is not None:
+                if item.get('show'):
                     if not item['show']['title']:
                         # Seems we can get entries with a blank show title sometimes
                         log.warning('Found trakt list show with no series name.')
                         continue
                     trakt_id = item['show']['ids']['trakt']
                     listed_series[trakt_id] = {
-                        'series_name': item['show']['title'],
+                        'series_name': '%s (%s)' % (item['show']['title'], item['show']['year']),
                         'trakt_id': trakt_id,
-                        'tvdb_id': item['show']['ids']['tvdb']}
+                        'tvdb_id': item['show']['ids']['tvdb'],
+                        'trakt_list': config.get('list')}
         context = config['context']
         if context == 'collected':
             context = 'collection'
@@ -103,6 +107,12 @@ class TraktEmit(object):
                             else:
                                 epn += 1
                         break
+                else:
+                    if config['position'] == 'next':
+                        eps = epn = 1
+                    else:
+                        # There were no watched/collected episodes, nothing to emit in 'last' mode
+                        continue
             if eps and epn:
                 entry = self.make_entry(fields, eps, epn)
                 entries.append(entry)

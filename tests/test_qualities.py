@@ -22,7 +22,7 @@ class TestQualityModule(object):
 
 class QualityParser(object):
 
-    def get_quality_failures(self):
+    def test_quality_failures(self):
         items = [('Test.File 1080p.web-dl', '1080p webdl'),
                  ('Test.File.web-dl.1080p', '1080p webdl'),
                  ('Test.File.WebHD.720p', '720p webdl'),
@@ -93,26 +93,15 @@ class QualityParser(object):
             quality = self.parser.parse_movie(item[0]).quality
             if str(quality) != item[1]:
                 failures.append('`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality))
-        return failures
-
+        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
 
 
 class TestInternalQualityParser(QualityParser):
     parser = ParserInternal()
 
-    def test_qualities(self):
-        failures = self.get_quality_failures()
-        assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
-
 
 class TestGuessitQualityParser(QualityParser):
     parser = ParserGuessit()
-
-    def test_qualities(self):
-        failures = self.get_quality_failures()
-        if failures:
-            raise SkipTest('Guessit quality parser does not match FlexGet: %s' % ', '.join(failures))
-
 
 
 class TestFilterQuality(FlexGetBase):

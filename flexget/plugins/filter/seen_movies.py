@@ -61,6 +61,7 @@ class FilterSeenMovies(FilterSeen):
                     else:
                         accepted_ids[field].add(entry[field])
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterSeenMovies, 'seen_movies', api_ver=2)

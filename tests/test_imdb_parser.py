@@ -38,7 +38,7 @@ class TestImdbParser(object):
         ), 'Photo not parsed correctly'
         assert parser.plot_outline == (
             'Following a truck hijack in New York, five conmen are arrested and brought together for questioning. '
-            'As none of them is guilty, they plan a revenge operation against the police. The operation goes well, '
+            'As none of them are guilty, they plan a revenge operation against the police. The operation goes well, '
             'but then the influence of a legendary mastermind criminal called Keyser S\xf6ze is felt. It becomes '
             'clear that each one of them has wronged S\xf6ze at some point and must pay back now. The payback job '
             'leaves 27 men dead in a boat explosion, but the real question arises now: Who actually is Keyser S\xf6ze?'
@@ -52,7 +52,28 @@ class TestImdbParser(object):
     def test_no_plot(self):
         # Make sure parser doesn't crash for movies with no plot
         parser = ImdbParser()
-        parser.parse('tt0245062')
-        assert parser.name == 'The Magnet'
+        parser.parse('tt1300562')
+        assert parser.name == 'Goodbye Mothers'
         # There is no plot
         assert not parser.plot_outline
+
+    @use_vcr
+    def test_no_year(self):
+        # Make sure parser doesn't crash for movies with no year
+        parser = ImdbParser()
+        parser.parse('tt3303790')
+        assert parser.name == 'Master of None'
+        # There is no year
+        assert not parser.year
+
+    @use_vcr
+    def test_plot_with_links(self):
+        """Make sure plot doesn't terminate at the first link. GitHub #756"""
+        parser = ImdbParser()
+        parser.parse('tt2503944')
+        assert parser.plot_outline == ("Chef Adam Jones (Bradley Cooper) had it all - and lost it. A two-star Michelin "
+                                       "rockstar with the bad habits to match, the former enfant terrible of the Paris "
+                                       "restaurant scene did everything different every time out, and only ever cared "
+                                       "about the thrill of creating explosions of taste. To land his own kitchen and "
+                                       "that third elusive Michelin star though, he'll need the best of the best on "
+                                       "his side, including the beautiful Helene (Sienna Miller).")

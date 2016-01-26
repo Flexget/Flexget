@@ -46,7 +46,7 @@ class EmitMovieQueue(object):
         entries = []
 
         with Session() as session:
-            for queue_item in queue_get(session=session):
+            for queue_item in queue_get(session=session, downloaded=False):
                 entry = Entry()
                 # make sure the entry has IMDB fields filled
                 entry['url'] = ''
@@ -70,18 +70,19 @@ class EmitMovieQueue(object):
                     # normal title
                     entry['title'] = queue_item.title
 
-                # Add the year and quality if configured to
-                if config.get('year') and entry.get('movie_year'):
+                # Add the year and quality if configured to (make sure not to double it up)
+                if config.get('year') and entry.get('movie_year') and unicode(entry['movie_year']) not in entry['title']:
                     entry['title'] += ' %s' % entry['movie_year']
                 # TODO: qualities can now be ranges.. how should we handle this?
                 if config.get('quality') and queue_item.quality != 'ANY':
                     log.info('quality option of emit_movie_queue is disabled while we figure out how to handle ranges')
-                    #entry['title'] += ' %s' % queue_item.quality
+                    # entry['title'] += ' %s' % queue_item.quality
                 entries.append(entry)
                 log.debug('Added title and IMDB id to new entry: %s - %s' %
                          (entry['title'], entry['imdb_id']))
 
         return entries
+
 
 @event('plugin.register')
 def register_plugin():

@@ -61,7 +61,7 @@ class RegexpParse(object):
             - {regexp: 'can't find first regexp so try this one'}
     """
 
-    #dict used to convert string values of regexp flags to int
+    # dict used to convert string values of regexp flags to int
     FLAG_VALUES = {'DEBUG': re.DEBUG,
                    'I': re.I,
                    'IGNORECASE': re.IGNORECASE,
@@ -87,7 +87,7 @@ class RegexpParse(object):
         root.accept('url', key='source', required=True)
         root.accept('file', key='source', required=True)
 
-        #sections to divied source into
+        # sections to divied source into
         sections_regexp_lists = root.accept('list', key='sections')
         section_regexp_list = sections_regexp_lists.accept('dict', required=True)
         section_regexp_list.accept('regexp', key='regexp', required=True)
@@ -95,7 +95,7 @@ class RegexpParse(object):
 
         keys = root.accept('dict', key='keys', required=True)
 
-        #required key need to specify for validator
+        # required key need to specify for validator
         title = keys.accept('dict', key='title', required=True)
         title.accept('boolean', key='required')
         regexp_list = title.accept('list', key='regexps', required=True)
@@ -103,7 +103,7 @@ class RegexpParse(object):
         regexp.accept('regexp', key='regexp', required=True)
         regexp.accept('text', key='flags')
 
-        #required key need to specify for validator
+        # required key need to specify for validator
         url = keys.accept_any_key('dict', key='url', required=True)
         url.accept('boolean', key='required')
         regexp_list = url.accept('list', key='regexps', required=True)
@@ -111,7 +111,7 @@ class RegexpParse(object):
         regexp.accept('regexp', key='regexp', required=True)
         regexp.accept('text', key='flags')
 
-        #accept any other key the user wants to use
+        # accept any other key the user wants to use
         key = keys.accept_any_key('dict')
         key.accept('boolean', key='required')
         regexp_list = key.accept('list', key='regexps', required=True)
@@ -151,10 +151,10 @@ class RegexpParse(object):
     def on_task_input(self, task, config):
         url = config['source']
 
-        #if it's a file open it and read into content (assume utf-8 encoding)
+        # if it's a file open it and read into content (assume utf-8 encoding)
         if os.path.isfile(os.path.expanduser(url)):
             content = codecs.open(url, 'r', encoding='utf-8').read()
-        #else use requests to get the data
+        # else use requests to get the data
         else:
             content = task.requests.get(url).text
 
@@ -167,14 +167,14 @@ class RegexpParse(object):
                     flags = self.flagstr_to_flags(sep['flags'])
                 sections.extend(re.findall(sep['regexp'], content, flags))
 
-        #no seperators just do work on the whole content
+        # no seperators just do work on the whole content
         else:
             sections.append(content)
 
-        #holds all the regex in a dict for the field they are trying to fill
+        # holds all the regex in a dict for the field they are trying to fill
         key_to_regexps = {}
 
-        #put every key in keys into the rey_to_regexps list
+        # put every key in keys into the rey_to_regexps list
         for key, value in config['keys'].iteritems():
             key_to_regexps[key] = self.compile_regexp_dict_list(value['regexps'])
             if 'required' in value and value['required']:

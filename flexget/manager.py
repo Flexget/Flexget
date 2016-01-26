@@ -14,7 +14,6 @@ import traceback
 from contextlib import contextmanager
 from datetime import datetime, timedelta
 
-import pkg_resources
 import sqlalchemy
 import yaml
 from sqlalchemy.exc import OperationalError
@@ -23,17 +22,17 @@ from sqlalchemy.orm import sessionmaker
 
 # These need to be declared before we start importing from other flexget modules, since they might import them
 from flexget.utils.sqlalchemy_utils import ContextSession
+
 Base = declarative_base()
 Session = sessionmaker(class_=ContextSession)
 
-from flexget import config_schema, db_schema, logger, plugin
-from flexget.event import fire_event
-from flexget.ipc import IPCClient, IPCServer
-from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv
-from flexget.task import Task
-from flexget.task_queue import TaskQueue
-from flexget.utils.tools import pid_exists
-
+from flexget import config_schema, db_schema, logger, plugin  # noqa
+from flexget.event import fire_event  # noqa
+from flexget.ipc import IPCClient, IPCServer  # noqa
+from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv  # noqa
+from flexget.task import Task  # noqa
+from flexget.task_queue import TaskQueue  # noqa
+from flexget.utils.tools import pid_exists, console, get_current_flexget_version  # noqa
 
 log = logging.getLogger('manager')
 
@@ -41,17 +40,7 @@ manager = None
 DB_CLEANUP_INTERVAL = timedelta(days=7)
 
 
-@sqlalchemy.event.listens_for(sqlalchemy.engine.Engine, 'connect')
-def set_sqlite_pragma(dbapi_connection, connection_record):
-    cursor = dbapi_connection.cursor()
-    # There were reported db problems with WAL mode on XFS filesystem, which is sticky and may have been turned
-    # on with certain FlexGet versions (e2c118e) #2749
-    cursor.execute('PRAGMA journal_mode=delete')
-    cursor.close()
-
-
 class Manager(object):
-
     """Manager class for FlexGet
 
     Fires events:
@@ -156,6 +145,7 @@ class Manager(object):
             # If an absolute path is not specified, use the config directory.
             if not os.path.isabs(log_file):
                 log_file = os.path.join(self.config_base, log_file)
+
             logger.start(log_file, self.options.loglevel.upper(), to_console=not self.options.cron)
 
         manager = self
@@ -265,7 +255,7 @@ class Manager(object):
         for task_name in task_names:
             task = Task(self, task_name, options=options, output=output, loglevel=loglevel, priority=priority)
             self.task_queue.put(task)
-            finished_events.append(task.finished_event)
+            finished_events.append((task.id, task.name, task.finished_event))
         return finished_events
 
     def start(self):
@@ -282,8 +272,9 @@ class Manager(object):
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
         if ipc_info:
+            console('There is a FlexGet process already running for this config, sending execution there.')
+            log.debug('Sending command to running FlexGet process: %s' % self.args)
             try:
-                log.info('There is a FlexGet process already running for this config, sending execution there.')
                 client = IPCClient(ipc_info['port'], ipc_info['password'])
             except ValueError as e:
                 log.error(e)
@@ -315,7 +306,6 @@ class Manager(object):
 
         * :meth:`.execute_command`
         * :meth:`.daemon_command`
-        * :meth:`.webui_command`
         * CLI plugin callback function
 
         The manager should have a lock and be initialized before calling this method.
@@ -327,13 +317,11 @@ class Manager(object):
         command = options.cli_command
         command_options = getattr(options, command)
         # First check for built-in commands
-        if command in ['execute', 'daemon', 'webui']:
+        if command in ['execute', 'daemon']:
             if command == 'execute':
                 self.execute_command(command_options)
             elif command == 'daemon':
                 self.daemon_command(command_options)
-            elif command == 'webui':
-                self.webui_command(command_options)
         else:
             # Otherwise dispatch the command to the callback function
             options.cli_command_callback(self, command_options)
@@ -360,7 +348,7 @@ class Manager(object):
                                            loglevel=logger.get_capture_loglevel())
             if not options.cron:
                 # Wait until execution of all tasks has finished
-                for event in finished_events:
+                for task_id, task_name, event in finished_events:
                     event.wait()
         else:
             self.task_queue.start()
@@ -381,9 +369,14 @@ class Manager(object):
 
         :param options: argparse options
         """
+
+        # Import API so it can register to daemon.started event
         if options.action == 'start':
             if self.is_daemon:
                 log.error('Daemon already running for this config.')
+                return
+            elif self.task_queue.is_alive():
+                log.error('Non-daemon execution of FlexGet is running. Cannot start daemon until it is finished.')
                 return
             if options.daemonize:
                 self.daemonize()
@@ -418,32 +411,6 @@ class Manager(object):
                 else:
                     log.info('Config successfully reloaded from disk.')
 
-    def webui_command(self, options):
-        """
-        Handles the 'webui' CLI command.
-
-        :param options: argparse options
-        """
-        if self.is_daemon:
-            log.error('Webui or daemon is already running.')
-            return
-        # TODO: make webui an enablable plugin in regular daemon mode
-        try:
-            pkg_resources.require('flexget[webui]')
-        except pkg_resources.DistributionNotFound as e:
-            log.error('Dependency not met. %s' % e)
-            log.error('Webui dependencies not installed. You can use `pip install flexget[webui]` to install them.')
-            self.shutdown()
-            return
-        if options.daemonize:
-            self.daemonize()
-        self.is_daemon = True
-        from flexget.ui import webui
-        self.task_queue.start()
-        self.ipc_server.start()
-        webui.start(self)
-        self.task_queue.wait()
-
     def _handle_sigterm(self, signum, frame):
         log.info('Got SIGTERM. Shutting down.')
         self.shutdown(finish_queue=False)
@@ -455,6 +422,7 @@ class Manager(object):
             # Override the default string handling function
             # to always return unicode objects
             return self.construct_scalar(node)
+
         yaml.Loader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
         yaml.SafeLoader.add_constructor(u'tag:yaml.org,2002:str', construct_yaml_str)
 
@@ -462,13 +430,14 @@ class Manager(object):
         def unicode_representer(dumper, uni):
             node = yaml.ScalarNode(tag=u'tag:yaml.org,2002:str', value=uni)
             return node
+
         yaml.add_representer(unicode, unicode_representer)
 
         # Set up the dumper to increase the indent for lists
         def increase_indent_wrapper(func):
-
             def increase_indent(self, flow=False, indentless=False):
                 func(self, flow, False)
+
             return increase_indent
 
         yaml.Dumper.increase_indent = increase_indent_wrapper(yaml.Dumper.increase_indent)
@@ -539,7 +508,6 @@ class Manager(object):
         self.lockfile = os.path.join(self.config_base, '.%s-lock' % self.config_name)
         self.db_filename = os.path.join(self.config_base, 'db-%s.sqlite' % self.config_name)
 
-
     def load_config(self):
         """
         Loads the config file from disk, validates and activates it.
@@ -567,7 +535,7 @@ class Manager(object):
             print(' o Indentation error')
             print(' o Missing : from end of the line')
             print(' o Non ASCII characters (use UTF8)')
-            print(' o If text contains any of :[]{}% characters it must be single-quoted ' \
+            print(' o If text contains any of :[]{}% characters it must be single-quoted '
                   '(eg. value{1} should be \'value{1}\')\n')
 
             # Not very good practice but we get several kind of exceptions here, I'm not even sure all of them
@@ -609,6 +577,7 @@ class Manager(object):
 
         :raises: `ValueError` and rolls back to previous config if the provided config is not valid.
         """
+        new_user_config = config
         old_config = self.config
         try:
             self.config = self.validate_config(config)
@@ -619,17 +588,20 @@ class Manager(object):
             self.config = old_config
             raise
         log.debug('New config data loaded.')
+        self.user_config = new_user_config
         fire_event('manager.config_updated', self)
 
     def save_config(self):
         """Dumps current config to yaml config file"""
+        # TODO: Only keep x number of backups..
+
         # Back up the user's current config before overwriting
         backup_path = os.path.join(self.config_base,
                                    '%s-%s.bak' % (self.config_name, datetime.now().strftime('%y%m%d%H%M%S')))
         log.debug('backing up old config to %s before new save' % backup_path)
         shutil.copy(self.config_path, backup_path)
         with open(self.config_path, 'w') as config_file:
-            config_file.write(yaml.dump(self.config, default_flow_style=False))
+            config_file.write(yaml.dump(self.user_config, default_flow_style=False))
 
     def config_changed(self):
         """Makes sure that all tasks will have the config_modified flag come out true on the next run.
@@ -637,6 +609,7 @@ class Manager(object):
         from flexget.task import config_changed
         for task in self.tasks:
             config_changed(task)
+        fire_event('manager.config_updated', self)
 
     def validate_config(self, config=None):
         """
@@ -890,7 +863,7 @@ class Manager(object):
         self.engine.dispose()
         # remove temporary database used in test mode
         if self.options.test:
-            if not 'test' in self.db_filename:
+            if 'test' not in self.db_filename:
                 raise Exception('trying to delete non test database?')
             if self._has_lock:
                 os.remove(self.db_filename)
@@ -906,5 +879,9 @@ class Manager(object):
             with codecs.open(filename, 'w', encoding='utf-8') as outfile:
                 outfile.writelines(logger.debug_buffer)
                 traceback.print_exc(file=outfile)
-            log.critical('An unexpected crash has occurred. Writing crash report to %s' % filename)
+            log.critical('An unexpected crash has occurred. Writing crash report to %s. '
+                         'Please verify you are running the latest version of flexget by using "flexget -V" '
+                         'from CLI or by using version_checker plugin'
+                         ' at http://flexget.com/wiki/Plugins/version_checker. You are currently using'
+                         ' version %s', filename, get_current_flexget_version())
         log.debug('Traceback:', exc_info=True)

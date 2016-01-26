@@ -1,14 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 import functools
 from collections import Mapping
-from datetime import datetime
+from datetime import datetime, date
 
 from sqlalchemy import extract, func
 from sqlalchemy.orm import synonym
 from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 
 from flexget.manager import Session
-from flexget.utils import qualities
+from flexget.utils import qualities, json
 
 
 def with_session(*args, **kwargs):
@@ -39,7 +39,6 @@ def with_session(*args, **kwargs):
         # Arguments were specified, turn them into arguments for Session creation e.g. @with_session(autocommit=True)
         _Session = functools.partial(Session, *args, **kwargs)
         return decorator
-
 
 
 def pipe_list_synonym(name):
@@ -129,6 +128,17 @@ def safe_pickle_synonym(name):
 
     def setter(self, entry):
         setattr(self, name, only_builtins(entry))
+
+    return synonym(name, descriptor=property(getter, setter))
+
+
+def json_synonym(name):
+    """Use json to serialize python objects for db storage."""
+    def getter(self):
+        return json.loads(getattr(self, name), decode_datetime=True)
+
+    def setter(self, entry):
+        setattr(self, name, json.dumps(entry, encode_datetime=True))
 
     return synonym(name, descriptor=property(getter, setter))
 

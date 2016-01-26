@@ -74,6 +74,7 @@ class InputCSV(object):
             entries.append(entry)
         return entries
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(InputCSV, 'csv', api_ver=2)

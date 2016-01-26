@@ -3,6 +3,8 @@ from __future__ import unicode_literals, division, absolute_import
 import re
 import logging
 
+import path
+
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
@@ -45,6 +47,7 @@ class Text(object):
                     {'type': 'string', 'format': 'file'}
                 ]
             },
+            'encoding': {'type': 'string'},
             'entry': {
                 'type': 'object',
                 'properties': {
@@ -72,9 +75,9 @@ class Text(object):
     def on_task_input(self, task, config):
         url = config['url']
         if '://' in url:
-            lines = task.requests.get(url).iter_lines()
+            lines = task.requests.get(url).iter_lines(decode_unicode=True)
         else:
-            lines = open(url, 'rb').readlines()
+            lines = path.Path(url).lines(encoding=config.get('encoding', 'utf-8'))
 
         entry_config = config.get('entry')
         format_config = config.get('format', {})
@@ -87,7 +90,7 @@ class Text(object):
         # now parse text
         for line in lines:
             for field, regexp in entry_config.iteritems():
-                #log.debug('search field: %s regexp: %s' % (field, regexp))
+                # log.debug('search field: %s regexp: %s' % (field, regexp))
                 match = re.search(regexp, line)
                 if match:
                     # check if used field detected, in such case start with new entry

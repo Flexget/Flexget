@@ -1,23 +1,27 @@
 """Contains miscellaneous helpers"""
 
 from __future__ import unicode_literals, division, absolute_import, print_function
-import copy
-import urllib2
-import httplib
-import os
-import socket
-import time
-import re
-import sys
-import locale
+
 import Queue
 import ast
+import copy
+import httplib
+import locale
 import operator
-
+import os
+import re
+import socket
+import sys
+import time
+import urllib2
 from collections import MutableMapping
-from urlparse import urlparse
-from htmlentitydefs import name2codepoint
 from datetime import timedelta, datetime
+from htmlentitydefs import name2codepoint
+from urlparse import urlparse
+
+import requests
+
+import flexget
 
 
 def str_to_boolean(string):
@@ -56,7 +60,6 @@ def convert_bytes(bytes):
 
 
 class MergeException(Exception):
-
     def __init__(self, value):
         self.value = value
 
@@ -97,6 +100,7 @@ def _htmldecode(text):
             return uchr(name2codepoint[entity])
         else:
             return match.group(0)
+
     return charrefpat.sub(entitydecode, text)
 
 
@@ -150,7 +154,7 @@ def merge_dict_from_to(d1, d2):
                 else:
                     raise Exception('Unknown type: %s value: %s in dictionary' % (type(v), repr(v)))
             elif (isinstance(v, (basestring, bool, int, float, type(None))) and
-                    isinstance(d2[k], (basestring, bool, int, float, type(None)))):
+                      isinstance(d2[k], (basestring, bool, int, float, type(None)))):
                 # Allow overriding of non-container types with other non-container types
                 pass
             else:
@@ -161,7 +165,6 @@ def merge_dict_from_to(d1, d2):
 
 
 class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
-
     def http_error_301(self, req, fp, code, msg, headers):
         result = urllib2.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
         result.status = code
@@ -335,11 +338,13 @@ def parse_timedelta(value):
     except TypeError:
         raise ValueError('Invalid time format \'%s\'' % value)
 
+
 def multiply_timedelta(interval, number):
     """timedeltas can not normally be multiplied by floating points. This does that."""
     # Python 2.6 doesn't have total seconds
     total_seconds = interval.seconds + interval.days * 24 * 3600
-    return timedelta(seconds=total_seconds*number)
+    return timedelta(seconds=total_seconds * number)
+
 
 if os.name == 'posix':
     def pid_exists(pid):
@@ -410,6 +415,7 @@ def arithmeticEval(s):
 
 class TimedDict(MutableMapping):
     """Acts like a normal dict, but keys will only remain in the dictionary for a specified time span."""
+
     def __init__(self, cache_time='5 minutes'):
         self.cache_time = parse_timedelta(cache_time)
         self._store = dict()
@@ -455,4 +461,34 @@ def singleton(cls):
         if cls not in instances:
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
+
     return getinstance
+
+
+def split_title_year(title):
+    """Splits title containing a year into a title, year pair."""
+    if not title:
+        return
+    match = re.search(r'(.*?)\(?(\d{4})?\)?$', title)
+    title = match.group(1).strip()
+    if match.group(2):
+        year = int(match.group(2))
+    else:
+        year = None
+    return title, year
+
+
+def get_latest_flexget_version_number():
+    """
+    Return latest Flexget version from http://download.flexget.com/latestversion
+    """
+    try:
+        page = requests.get('http://download.flexget.com/latestversion')
+    except requests.RequestException:
+        return
+    ver = page.text.strip()
+    return ver
+
+
+def get_current_flexget_version():
+    return flexget.__version__

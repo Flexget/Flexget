@@ -96,7 +96,7 @@ class cached(object):
 
             if api_ver == 1:
                 # get name for a cache from tasks configuration
-                if not self.name in task.config:
+                if self.name not in task.config:
                     raise Exception('@cache config name %s is not configured in task %s' % (self.name, task.name))
                 hash = config_hash(task.config[self.name])
             else:
@@ -165,7 +165,8 @@ class cached(object):
                     self.cache[cache_name] = copy.deepcopy(response)
                 except TypeError:
                     # might be caused because of backlog restoring some idiotic stuff, so not neccessarily a bug
-                    log.critical('Unable to save task content into cache, if problem persists longer than a day please report this as a bug')
+                    log.critical('Unable to save task content into cache,\
+ if problem persists longer than a day please report this as a bug')
                 if self.persist:
                     # Store to database
                     log.debug('Storing cache %s to database.' % cache_name)

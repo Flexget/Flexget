@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import argparse
 from datetime import datetime, timedelta
-from sqlalchemy import func
 
 from flexget import options, plugin
 from flexget.event import event
@@ -9,9 +9,9 @@ from flexget.logger import console
 from flexget.manager import Session
 
 try:
-    from flexget.plugins.filter.series import (Series, Episode, Release, SeriesTask, forget_series,
-                                               forget_series_episode, set_series_begin, normalize_series_name,
-                                               new_eps_after, get_latest_release)
+    from flexget.plugins.filter.series import (Series, forget_series, forget_series_episode, set_series_begin,
+                                               normalize_series_name, new_eps_after, get_latest_release,
+                                               get_series_summary, shows_by_name, show_episodes)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
@@ -33,25 +33,28 @@ def display_summary(options):
     Display series summary.
     :param options: argparse options from the CLI
     """
-    formatting = ' %-30s %-10s %-10s %-20s'
-    console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
-    console('-' * 79)
-
-    session = Session()
-    try:
-        query = (session.query(Series).outerjoin(Series.episodes).outerjoin(Episode.releases).
-                 outerjoin(Series.in_tasks).group_by(Series.id))
-        if options.configured == 'configured':
-            query = query.having(func.count(SeriesTask.id) >= 1)
-        elif options.configured == 'unconfigured':
-            query = query.having(func.count(SeriesTask.id) < 1)
-        if options.premieres:
-            query = (query.having(func.max(Episode.season) <= 1).having(func.max(Episode.number) <= 2).
-                     having(func.count(SeriesTask.id) < 1)).filter(Release.downloaded == True)
+    with Session() as session:
+        kwargs = {'configured': options.configured,
+                  'premieres': options.premieres,
+                  'session': session}
         if options.new:
-            query = query.having(func.max(Episode.first_seen) > datetime.now() - timedelta(days=options.new))
-        if options.stale:
-            query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=options.stale))
+            kwargs['status'] = 'new'
+            kwargs['days'] = options.new
+        elif options.stale:
+            kwargs['status'] = 'stale'
+            kwargs['days'] = options.stale
+
+        query = get_series_summary(**kwargs)
+
+        if options.porcelain:
+            formatting = '%-30s %s %-10s %s %-10s %s %-20s'
+            console(formatting % ('Name', '|', 'Latest', '|', 'Age', '|', 'Downloaded'))
+        else:
+            formatting = ' %-30s %-10s %-10s %-20s'
+            console('-' * 79)
+            console(formatting % ('Name', 'Latest', 'Age', 'Downloaded'))
+            console('-' * 79)
+
         for series in query.order_by(Series.name).yield_per(10):
             series_name = series.name
             if len(series_name) > 30:
@@ -65,7 +68,10 @@ def display_summary(options):
             latest = get_latest_release(series)
             if latest:
                 if latest.first_seen > datetime.now() - timedelta(days=2):
-                    new_ep = '>'
+                    if options.porcelain:
+                        pass
+                    else:
+                        new_ep = '>'
                 behind = new_eps_after(latest)
                 status = get_latest_status(latest)
                 age = latest.age
@@ -74,29 +80,34 @@ def display_summary(options):
             if behind:
                 episode_id += ' +%s' % behind
 
-            console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
+            if options.porcelain:
+                console(formatting % (series_name, '|', episode_id, '|', age, '|', status))
+            else:
+                console(new_ep + formatting[1:] % (series_name, episode_id, age, status))
             if behind >= 3:
                 console(' ! Latest download is %d episodes behind, this may require '
                         'manual intervention' % behind)
 
-        console('-' * 79)
-        console(' > = new episode ')
-        console(' Use `flexget series show NAME` to get detailed information')
-    finally:
-        session.close()
+        if options.porcelain:
+            pass
+        else:
+            console('-' * 79)
+            console(' > = new episode ')
+            console(' Use `flexget series show NAME` to get detailed information')
 
 
 def begin(manager, options):
     series_name = options.series_name
     ep_id = options.episode_id
-    session = Session()
-    try:
-        series = session.query(Series).filter(Series.name == series_name).first()
+    with Session() as session:
+        series = shows_by_name(series_name, session)
         if not series:
             console('Series not yet in database, adding `%s`' % series_name)
             series = Series()
             series.name = series_name
             session.add(series)
+        else:
+            series = series[0]
         try:
             set_series_begin(series, ep_id)
         except ValueError as e:
@@ -104,9 +115,7 @@ def begin(manager, options):
         else:
             console('Episodes for `%s` will be accepted starting with `%s`' % (series.name, ep_id))
             session.commit()
-    finally:
-        session.close()
-    manager.config_changed()
+        manager.config_changed()
 
 
 def forget(manager, options):
@@ -156,14 +165,10 @@ def get_latest_status(episode):
 
 def display_details(name):
     """Display detailed series information, ie. series show NAME"""
-
-    from flexget.manager import Session
     with Session() as session:
-
         name = normalize_series_name(name)
         # Sort by length of name, so that partial matches always show shortest matching title
-        matches = (session.query(Series).filter(Series._name_normalized.contains(name)).
-                   order_by(func.char_length(Series.name)).all())
+        matches = shows_by_name(name, session=session)
         if not matches:
             console('ERROR: Unknown series `%s`' % name)
             return
@@ -179,15 +184,7 @@ def display_details(name):
         console(' %-63s%-15s' % ('Identifier, Title', 'Quality'))
         console('-' * 79)
 
-        # Query episodes in sane order instead of iterating from series.episodes
-        episodes = session.query(Episode).filter(Episode.series_id == series.id)
-        if series.identified_by == 'sequence':
-            episodes = episodes.order_by(Episode.number).all()
-        elif series.identified_by == 'ep':
-            episodes = episodes.order_by(Episode.season, Episode.number).all()
-        else:
-            episodes = episodes.order_by(Episode.identifier).all()
-
+        episodes = show_episodes(series, session=session)
         for episode in episodes:
 
             if episode.identifier is None:
@@ -247,6 +244,7 @@ def register_parser_arguments():
     list_parser.add_argument('--stale', nargs='?', type=int, metavar='DAYS', const=365,
                              help='limit list to series which have not seen a release in %(const)s days. number of '
                                   'days can be overridden with %(metavar)s')
+    list_parser.add_argument('--porcelain', action='store_true', help='make the output parseable')
     show_parser = subparsers.add_parser('show', parents=[series_parser],
                                         help='show the releases FlexGet has seen for a given series ')
     begin_parser = subparsers.add_parser('begin', parents=[series_parser],
@@ -257,6 +255,3 @@ def register_parser_arguments():
     forget_parser = subparsers.add_parser('forget', parents=[series_parser],
                                           help='removes episodes or whole series from the series database')
     forget_parser.add_argument('episode_id', nargs='?', default=None, help='episode ID to forget (optional)')
-
-
-

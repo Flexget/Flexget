@@ -39,6 +39,9 @@ class EmitSeries(object):
         ]
     }
 
+    def __init__(self):
+        self.rerun_entries = []
+
     def ep_identifiers(self, season, episode):
         return ['S%02dE%02d' % (season, episode),
                 '%dx%02d' % (season, episode)]
@@ -179,13 +182,16 @@ class EmitSeries(object):
             if entry.accepted:
                 log.debug('%s %s was accepted, rerunning to look for next ep.' %
                           (entry['series_name'], entry['series_id']))
-                self.rerun_entries.append(self.search_entry(series, entry['series_season'], entry['series_episode'] + 1, task))
+                self.rerun_entries.append(self.search_entry(series,
+                                                            entry['series_season'],
+                                                            entry['series_episode'] + 1,
+                                                            task))
                 task.rerun()
             elif db_release:
                 # There are know releases of this episode, but none were accepted
                 return
             elif latest and identified_by == 'ep' and (
-                            entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
+                    entry['series_season'] == latest.season and entry['series_episode'] == latest.number + 1):
                 # We searched for next predicted episode of this season unsuccessfully, try the next season
                 self.rerun_entries.append(self.search_entry(series, latest.season + 1, 1, task))
                 log.debug('%s %s not found, rerunning to look for next season' %

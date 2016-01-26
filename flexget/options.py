@@ -365,7 +365,7 @@ class ArgumentParser(ArgParser):
         cgitb.enable(format="text")
 
 
-# This will hold just the arguments directly for Manager. Webui needs this clean, to build its parser.
+# This will hold just the arguments directly for Manager.
 manager_parser = ArgumentParser(add_help=False)
 manager_parser.add_argument('-V', '--version', action=VersionAction, version=flexget.__version__,
                             help='Print FlexGet version and exit.')
@@ -440,41 +440,6 @@ class CoreArgumentParser(ArgumentParser):
                                  help='wait for all queued tasks to finish before stopping daemon')
         daemon_parser.add_subparser('status', help='check if a daemon is running')
         daemon_parser.add_subparser('reload', help='causes a running daemon to reload the config from disk')
-
-        # The parser for the webui
-        # Hide the webui command if deps aren't available
-        webui_kwargs = {}
-        try:
-            pkg_resources.require('flexget[webui]')
-            webui_kwargs['help'] = 'run continuously, with a web interface to configure and interact with the daemon'
-        except pkg_resources.DistributionNotFound:
-            pass
-        webui_parser = self.add_subparser('webui', **webui_kwargs)
-
-        def ip_type(value):
-            try:
-                socket.inet_aton(value)
-            except socket.error:
-                raise ArgumentTypeError('must be a valid ip address to bind to')
-            return value
-
-        webui_parser.add_argument('--bind', type=ip_type, default='0.0.0.0', metavar='IP',
-                                  help='IP address to bind to when serving the web interface [default: %(default)s]')
-        webui_parser.add_argument('--port', type=int, default=5050,
-                                  help='run FlexGet webui on port [default: %(default)s]')
-        webui_parser.add_argument('-d', '--daemonize', action='store_true', help=daemonize_help)
-
-        # TODO: move these to authentication plugin?
-        webui_parser.add_argument('--no-auth', action='store_true',
-                                  help='runs without authentication required (dangerous)')
-        webui_parser.add_argument('--no-local-auth', action='store_true',
-                                  help='runs without any authentication required when accessed from localhost')
-        webui_parser.add_argument('--username', help='username needed to login [default: flexget]')
-        webui_parser.add_argument('--password', help='password needed to login [default: flexget]')
-
-        # enable flask autoreloading (development)
-        webui_parser.add_argument('--autoreload', action='store_true', help=SUPPRESS)
-        webui_parser.set_defaults(loglevel='info')
 
     def add_subparsers(self, **kwargs):
         # The subparsers should not be CoreArgumentParsers

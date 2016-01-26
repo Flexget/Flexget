@@ -28,11 +28,13 @@ archive_tags_table = Table('archive_entry_tags', Base.metadata,
                            Column('entry_id', Integer, ForeignKey('archive_entry.id')),
                            Column('tag_id', Integer, ForeignKey('archive_tag.id')),
                            Index('ix_archive_tags', 'entry_id', 'tag_id'))
+Base.register_table(archive_tags_table)
 
 archive_sources_table = Table('archive_entry_sources', Base.metadata,
                               Column('entry_id', Integer, ForeignKey('archive_entry.id')),
                               Column('source_id', Integer, ForeignKey('archive_source.id')),
                               Index('ix_archive_sources', 'entry_id', 'source_id'))
+Base.register_table(archive_sources_table)
 
 
 class ArchiveEntry(Base):
@@ -181,13 +183,13 @@ class Archive(object):
             if ae:
                 # add (missing) sources
                 source = get_source(task.name, task.session)
-                if not source in ae.sources:
+                if source not in ae.sources:
                     log.debug('Adding `%s` into `%s` sources' % (task.name, ae))
                     ae.sources.append(source)
                 # add (missing) tags
                 for tag_name in tag_names:
                     atag = get_tag(tag_name, task.session)
-                    if not atag in ae.tags:
+                    if atag not in ae.tags:
                         log.debug('Adding tag %s into %s' % (tag_name, ae))
                         ae.tags.append(atag)
             else:
@@ -236,10 +238,16 @@ class UrlrewriteArchive(object):
 
         session = Session()
         entries = set()
+        if isinstance(config, bool):
+            tag_names = None
+        else:
+            tag_names = config
         try:
             for query in entry.get('search_strings', [entry['title']]):
+                # clean some characters out of the string for better results
+                query = re.sub(r'[ \(\)]+', ' ', query).strip()
                 log.debug('looking for `%s` config: %s' % (query, config))
-                for archive_entry in search(session, query, desc=True):
+                for archive_entry in search(session, query, tags=tag_names, desc=True):
                     log.debug('rewrite search result: %s' % archive_entry)
                     entry = Entry()
                     entry.update_using_map(self.entry_map, archive_entry, ignore_none=True)
@@ -288,7 +296,7 @@ def consolidate():
             # add legacy task to the sources list
             orig.sources.append(get_source(orig.task, session))
             # remove task, deprecated .. well, let's still keep it ..
-            #orig.task = None
+            # orig.task = None
 
             for dupe in session.query(ArchiveEntry).\
                 filter(ArchiveEntry.id != orig.id).\
@@ -340,7 +348,7 @@ def tag_source(source_name, tag_names=None):
         # tag 'em
         log.verbose('Please wait while adding tags %s ...' % (', '.join(tag_names)))
         for a in session.query(ArchiveEntry).\
-            filter(ArchiveEntry.sources.any(name=source_name)).yield_per(5):
+                filter(ArchiveEntry.sources.any(name=source_name)).yield_per(5):
             a.tags.extend(tags)
     finally:
         session.commit()
@@ -406,7 +414,8 @@ def cli_search(options):
         console('Please wait...')
         console('')
         results = False
-        for ae in search(session, search_term, tags=tags, sources=sources):
+        query = re.sub(r'[ \(\)]+', ' ', search_term).strip()
+        for ae in search(session, query, tags=tags, sources=sources):
             print_ae(ae)
             results = True
         if not results:
@@ -418,8 +427,7 @@ def cli_search(options):
 def cli_inject(manager, options):
     log.debug('Finding inject content')
     inject_entries = defaultdict(list)
-    session = Session()
-    try:
+    with Session() as session:
         for id in options.ids:
             archive_entry = session.query(ArchiveEntry).get(id)
 
@@ -434,31 +442,32 @@ def cli_inject(manager, options):
                           (', '.join([s.name for s in archive_entry.sources]), archive_entry.title))
                 continue
 
-            # update list of tasks to be injected
-            for source in archive_entry.sources:
-                inject_entries[source.name].append(archive_entry)
-    finally:
-        session.close()
-
-    for task_name in inject_entries:
-        entries = []
-        for inject_entry in inject_entries[task_name]:
-            log.info('Injecting from archive `%s`' % inject_entry.title)
-            entry = Entry(inject_entry.title, inject_entry.url)
-            if inject_entry.description:
-                entry['description'] = inject_entry.description
+            inject_entry = Entry(archive_entry.title, archive_entry.url)
+            if archive_entry.description:
+                inject_entry['description'] = archive_entry.description
             if options.immortal:
                 log.debug('Injecting as immortal')
-                entry['immortal'] = True
-            entry['accepted_by'] = 'archive inject'
-            entry.accept('injected')
-            entries.append(entry)
+                inject_entry['immortal'] = True
+            inject_entry['accepted_by'] = 'archive inject'
+            inject_entry.accept('injected')
 
-        manager.execute(options={'inject': entries, 'tasks': [task_name]})
+            # update list of tasks to be injected
+            for source in archive_entry.sources:
+                inject_entries[source.name].append(inject_entry)
 
-    with manager.acquire_lock():
-        manager.shutdown(finish_queue=True)
-        manager.run()
+    for task_name in inject_entries:
+        for inject_entry in inject_entries[task_name]:
+            log.info('Injecting from archive `%s` into `%s`' % (inject_entry['title'], task_name))
+
+    for index, task_name in enumerate(inject_entries):
+        options.inject = inject_entries[task_name]
+        options.tasks = [task_name]
+        # TODO: This is a bit hacky, consider a better way
+        if index == len(inject_entries) - 1:
+            # We use execute_command on the last item, rather than regular execute, to start FlexGet running.
+            break
+        manager.execute(options)
+    manager.execute_command(options)
 
 
 def do_cli(manager, options):

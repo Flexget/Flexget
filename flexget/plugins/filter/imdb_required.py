@@ -31,6 +31,7 @@ class FilterImdbRequired(object):
             if 'imdb_id' not in entry and 'imdb_url' not in entry:
                 entry.reject('imdb required')
 
+
 @event('plugin.register')
 def register_plugin():
     plugin.register(FilterImdbRequired, 'imdb_required', api_ver=2)

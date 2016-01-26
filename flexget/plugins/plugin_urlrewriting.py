@@ -67,11 +67,14 @@ class PluginUrlRewriting(object):
                         log.debug('Url rewriting %s' % entry['url'])
                         urlrewriter.instance.url_rewrite(task, entry)
                         if entry['url'] != old_url:
-                            log.info('Entry \'%s\' URL rewritten to %s (with %s)' % (entry['title'], entry['url'], name))
+                            log.info('Entry \'%s\' URL rewritten to %s (with %s)' % (
+                                entry['title'],
+                                entry['url'],
+                                name))
                 except UrlRewritingError as r:
                     # increase failcount
-                    #count = self.shared_cache.storedefault(entry['url'], 1)
-                    #count += 1
+                    # count = self.shared_cache.storedefault(entry['url'], 1)
+                    # count += 1
                     raise UrlRewritingError('URL rewriting %s failed: %s' % (name, r.value))
                 except plugin.PluginError as e:
                     raise UrlRewritingError('URL rewriting %s failed: %s' % (name, e.value))
