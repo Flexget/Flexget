@@ -74,12 +74,11 @@ latest_object = {
 episode_object = {
     'type': 'object',
     'properties': {
-        "episode_age": {'type': 'string'},
         "episode_first_seen": {'type': 'string'},
         "episode_id": {'type': 'string'},
         "episode_identified_by": {'type': 'string'},
         "episode_identifier": {'type': 'string'},
-        "episode_is_premiere": {'type': 'boolean'},
+        "episode_premiere_type": {'type': 'string'},
         "episode_number": {'type': 'string'},
         "episode_season": {'type': 'string'},
         "episode_series_id": {'type': 'string'}
@@ -201,8 +200,7 @@ def get_episode_details(episode):
         'episode_number': episode.number,
         'episode_series_id': episode.series_id,
         'episode_first_seen': episode.first_seen,
-        'episode_age': episode.age,
-        'episode_is_premiere': episode.is_premiere
+        'episode_premiere_type': episode.is_premiere
     }
     return episode_item
 
