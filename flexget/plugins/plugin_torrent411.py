@@ -1,6 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals, division, absolute_import
 import logging
+import re
 from flexget.config_schema import one_or_more
 from flexget.manager import Session
 from flexget.plugins.api_t411 import T411Proxy, FriendlySearchQuery
@@ -61,7 +62,18 @@ class T411InputPlugin(object):
         query = T411InputPlugin.build_request_from(config)
 
         entries = set()
+        search_strings = []
         for search_string in entry.get('search_strings', [entry['title']]):
+            search_strings.append(search_string)
+            # Escaping some expression Grey's -> Grey, Marvel's -> Marvel etc
+            short_search_string = re.sub("'", "", search_string)
+            if search_string != short_search_string:
+                search_strings.append(short_search_string)
+                very_short_search_string = re.sub("'[a-z]", "", search_string)
+                if short_search_string != very_short_search_string:
+                    search_strings.append(very_short_search_string)
+
+        for search_string in search_strings:
             query.expression = search_string
             search_result = proxy.search(query)
             entries.update(search_result)
