@@ -140,6 +140,7 @@ movie_edit_input_schema = api.schema('movie_edit_input_schema', movie_edit_input
 
 
 @movie_queue_api.route('/')
+@api.doc(description='Get queued movies from list or add a new movie')
 class MovieQueueAPI(APIResource):
     @api.response(404, 'Page does not exist')
     @api.response(200, 'Movie queue retrieved successfully', movie_queue_schema)
@@ -214,7 +215,8 @@ class MovieQueueAPI(APIResource):
 @api.response(404, 'Movie not found')
 @api.response(400, 'Invalid type received')
 @movie_queue_api.route('/<type>/<id>/')
-@api.doc(params={'id': 'ID of Queued Movie', 'type': 'Type of ID to be used (imdb/tmdb/movie_id)'})
+@api.doc(params={'id': 'ID of Queued Movie', 'type': 'Type of ID to be used (imdb/tmdb/movie_id)'},
+         description='Remove a movie from movie queue or edit its quality or download status')
 class MovieQueueManageAPI(APIResource):
     def validate_type(self, type, id, session):
         if type not in ['imdb', 'tmdb', 'movie_id']:
