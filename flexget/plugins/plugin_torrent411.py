@@ -4,7 +4,7 @@ import logging
 import re
 from flexget.config_schema import one_or_more
 from flexget.manager import Session
-from flexget.plugins.api_t411 import T411Proxy, FriendlySearchQuery
+from flexget.plugins.api_t411 import T411Proxy, FriendlySearchQuery, ApiError
 
 from flexget import plugin
 from flexget.event import event
@@ -52,7 +52,11 @@ class T411InputPlugin(object):
         proxy = T411Proxy()
         proxy.set_credential()
         query = T411InputPlugin.build_request_from(config)
-        return proxy.search(query)
+        try:
+            return proxy.search(query)
+        except ApiError as e:
+            log.warning("Server send an error message : %d - %s", e.code, e.message)
+            return []
 
     @classmethod
     @plugin.internet(log)
@@ -75,7 +79,10 @@ class T411InputPlugin(object):
 
         for search_string in search_strings:
             query.expression = search_string
-            search_result = proxy.search(query)
+            try:
+                search_result = proxy.search(query)
+            except ApiError as e:
+                log.warning("Server send an error message : %d - %s", e.code, e.message)
             entries.update(search_result)
 
         return entries
@@ -95,13 +102,16 @@ class T411LookupPlugin(object):
         proxy = T411Proxy()
         proxy.set_credential()
         with Session() as session:
-            bind_details = proxy.details(torrent_id, session=session)
-            unbind_details = [dict([
-                ('term_type_name', term.type.name),
-                ('term_type_id', term.type.id),
-                ('term_id', term.id),
-                ('term_name', term.name)]) for term in bind_details.terms]
-            entry['t411_terms'] = unbind_details
+            try:
+                bind_details = proxy.details(torrent_id, session=session)
+                unbind_details = [dict([
+                    ('term_type_name', term.type.name),
+                    ('term_type_id', term.type.id),
+                    ('term_id', term.id),
+                    ('term_name', term.name)]) for term in bind_details.terms]
+                entry['t411_terms'] = unbind_details
+            except ApiError as e:
+                log.warning("Server send an error message : %d - %s", e.code, e.message)
 
     # Run after series and metainfo series
     @plugin.priority(110)

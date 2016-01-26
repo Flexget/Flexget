@@ -161,6 +161,16 @@ def auth_required(func):
     return wrapper
 
 
+class ApiError(Exception):
+    """
+    Exception raise when RestClient received a business error
+    from T411 server.
+    """
+    def __init__(self, code, description):
+        self.description = description
+        self.code = code
+
+
 class T411RestClient(object):
     """A REST client for T411 API"""
 
@@ -209,6 +219,21 @@ class T411RestClient(object):
         """
         return self.api_token is not None
 
+    @staticmethod
+    def raise_on_fail_response(json_response):
+        """
+        This method throw an Exception if server return a
+        error message
+        :return:
+        """
+        if json_response is None:
+            pass
+
+        error_name = json_response.get('error', None)
+        error_code = json_response.get('code', None)
+        if error_name is not None:
+            raise ApiError(error_code, error_name)
+
     def get_json(self, path, params=None):
         """
         Common method for requesting JSON response
@@ -217,7 +242,6 @@ class T411RestClient(object):
         """
         url = self.api_template_url % path
         request = self.web_session.get(url, params=params)
-        log.debug(request.url)
         try:
             result = request.json()
         except ValueError:
@@ -227,8 +251,9 @@ class T411RestClient(object):
                 result = json.loads(last_line)
             except (ValueError, IndexError):
                 log.warning("Server response doesn't contains any JSON encoded response.")
-                return None
+                raise
 
+        T411RestClient.raise_on_fail_response(result)
         return result
 
     @auth_required
@@ -287,7 +312,7 @@ class T411RestClient(object):
 
     @auth_required
     def details(self, torrent_id):
-        url = T411API_DETAILS_PATH + torrent_id
+        url = T411API_DETAILS_PATH + str(torrent_id)
         return self.get_json(url)
 
 
