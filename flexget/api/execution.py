@@ -112,7 +112,6 @@ _streams = {}
 
 
 @execution_api.route('/execute/<task_name>/')
-@api.doc(description='Wildcards supported ie: TV* will execute all tasks with TV in the name')
 class ExecutionAPI(APIResource):
     @api.response(404, 'task not found')
     @api.response(200, 'Execution task with optional progress and/or log stream', execution_api_result_schema)
