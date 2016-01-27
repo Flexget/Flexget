@@ -25,7 +25,8 @@ gulp.task('inject', ['styles'], function () {
 
   var wiredepOptions = {
     directory: 'bower_components',
-    ignorePath: '../'
+    ignorePath: '../',
+    exclude: [/angular-material\.css/]
   };
 
   return gulp.src(paths.src + '/app.html')
