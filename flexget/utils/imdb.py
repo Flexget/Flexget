@@ -238,16 +238,16 @@ class ImdbParser(object):
             raise PluginError('IMDB parser needs updating, imdb format changed. Please report on Github.')
 
         # Parse stuff from the title-overview section
-        name_elem = title_overview.find('h1')
-        if name_elem and name_elem.find(itemprop='name', text=True):
-            self.name = name_elem.find(itemprop='name', text=True).text.strip()
+        name_elem = title_overview.find('h1', attrs={'itemprop': 'name'})
+        if name_elem:
+            self.name = name_elem.text.strip()
         else:
             log.error('Possible IMDB parser needs updating, Please report on Github.')
             raise PluginError('Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url))
 
-        year = title_overview.find(class_='nobr')
+        year = title_overview.find('meta', attrs={'itemprop': 'datePublished'})
         if year:
-            m = re.search(r'([0-9]{4})', year.text)
+            m = re.search(r'([0-9]{4})', year['content'])
             if m:
                 self.year = int(m.group(1))
 
