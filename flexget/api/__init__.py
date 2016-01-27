@@ -128,7 +128,7 @@ class Api(RestPlusAPI):
         except TypeError:
             # If first argument isn't a class this happens
             pass
-        return super(Api, self).response(code_or_apierror, description)
+        return super(Api, self).response(code_or_apierror, description, model=model)
 
 
 class APIResource(Resource):
