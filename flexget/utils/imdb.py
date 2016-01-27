@@ -245,9 +245,9 @@ class ImdbParser(object):
             log.error('Possible IMDB parser needs updating, Please report on Github.')
             raise PluginError('Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url))
 
-        year = title_overview.find(class_='nobr')
+        year = title_overview.find('meta', attrs={'itemprop': 'datePublished'})
         if year:
-            m = re.search(r'([0-9]{4})', year.text)
+            m = re.search(r'([0-9]{4})', year['content'])
             if m:
                 self.year = int(m.group(1))
 
