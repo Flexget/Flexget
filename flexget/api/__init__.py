@@ -94,13 +94,13 @@ class Api(RestPlusAPI):
             return model
         return super(Api, self).inherit(name, parent, fields)
 
-    def validate(self, model, doc=True):
+    def validate(self, model, description=None):
         """
         When a method is decorated with this, json data submitted to the endpoint will be validated with the given
         `model`. This also auto-documents the expected model, as well as the possible :class:`ValidationError` response.
         """
         def decorator(func):
-            @api.expect(model)
+            @api.expect((model, description))
             @api.response(ValidationError)
             @wraps(func)
             def wrapper(*args, **kwargs):
