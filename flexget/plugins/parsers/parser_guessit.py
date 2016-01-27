@@ -5,18 +5,21 @@ import logging
 import re
 import time
 
-from guessit.rules import rebulk_builder
-from guessit.api import GuessItApi
-
-from rebulk import Rebulk
-from rebulk.pattern import RePattern
-
 from flexget import plugin
 from flexget.event import event
 from flexget.utils import qualities
-from .parser_common import clean_value, old_assume_quality
 from .parser_common import ParsedEntry, ParsedVideoQuality, ParsedVideo, ParsedSerie, ParsedMovie
+from .parser_common import old_assume_quality
 
+try:
+    from guessit.rules import rebulk_builder
+    from guessit.api import GuessItApi
+
+    from rebulk import Rebulk
+    from rebulk.pattern import RePattern
+except ImportError:
+    raise plugin.DependencyError(issued_by='guessit_parser', missing='guessit',
+                                 message='Guessit is needed for this plugin. Please install via PIP')
 
 log = logging.getLogger('parser_guessit')
 
@@ -259,6 +262,7 @@ class GuessitParsedSerie(GuessitParsedVideo, ParsedSerie):
     def valid_strict(self):
         return True
 
+
 def _id_regexps_function(input_string, context):
     ret = []
     for regexp in context.get('id_regexps'):
@@ -266,9 +270,12 @@ def _id_regexps_function(input_string, context):
             ret.append(match.span)
     return ret
 
-_id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId', disabled=lambda context: not context.get('id_regexps'))
+
+_id_regexps = Rebulk().functional(_id_regexps_function, name='regexpId',
+                                  disabled=lambda context: not context.get('id_regexps'))
 
 guessit_api = GuessItApi(rebulk_builder().rebulk(_id_regexps))
+
 
 class ParserGuessit(object):
     def _guessit_options(self, options):
