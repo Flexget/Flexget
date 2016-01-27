@@ -240,14 +240,14 @@ class ImdbParser(object):
         # Parse stuff from the title-overview section
         name_elem = title_overview.find('h1', attrs={'itemprop': 'name'})
         if name_elem:
-            self.name = name_elem.text.strip()
+            self.name = name_elem.contents[0].strip()
         else:
             log.error('Possible IMDB parser needs updating, Please report on Github.')
             raise PluginError('Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url))
 
-        year = title_overview.find('meta', attrs={'itemprop': 'datePublished'})
+        year = title_overview.find('span', attrs={'id': 'titleYear'})
         if year:
-            m = re.search(r'([0-9]{4})', year['content'])
+            m = re.search(r'([0-9]{4})', year.text)
             if m:
                 self.year = int(m.group(1))
 
@@ -266,7 +266,7 @@ class ImdbParser(object):
         else:
             log.debug('No photo found for %s' % self.imdb_id)
 
-        original_name_elem = title_overview.find(attrs={'class': 'title-extra'})
+        original_name_elem = title_overview.find(attrs={'class': 'originalTitle'})
         if original_name_elem:
             self.original_name = original_name_elem.contents[0].strip().strip('"')
         else:
