@@ -44,7 +44,7 @@ install_requires = [
     'jsonschema>=2.0',
     'tmdb3',
     'path.py',
-    'guessit>=2.0rc5',
+    'guessit>=2.0.1',
     'apscheduler',
     'pytvmaze>=1.4.4',
     'ordereddict>=1.1',
