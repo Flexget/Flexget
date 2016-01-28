@@ -100,12 +100,14 @@ def begin(manager, options):
     series_name = options.series_name
     ep_id = options.episode_id
     with Session() as session:
-        series = shows_by_name(series_name, session)[0]
+        series = shows_by_name(series_name, session)
         if not series:
             console('Series not yet in database, adding `%s`' % series_name)
             series = Series()
             series.name = series_name
             session.add(series)
+        else:
+            series = series[0]
         try:
             set_series_begin(series, ep_id)
         except ValueError as e:

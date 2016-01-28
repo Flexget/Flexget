@@ -4,41 +4,40 @@
     angular.module('flexget.plugins.log')
         .controller('logController', logController);
 
-    function logController($scope, $timeout) {
+    function logController($scope) {
         var vm = this;
 
-        var filterTimeout;
-        var logStream = false;
+        vm.logStream = false;
 
         vm.status = 'Connecting';
+
         vm.filter = {
             lines: 400,
             search: ''
         };
 
-        vm.stop = function () {
-            if (angular.isDefined(filterTimeout)) {
-                $timeout.cancel(filterTimeout);
+        vm.refreshOpts = {
+            debounce: 1000
+        };
+
+        vm.toggle = function () {
+            if (vm.status == 'Disconnected') {
+                vm.refresh();
+            } else {
+                vm.stop();
             }
-            if (typeof logStream !== 'undefined' && logStream) {
-                logStream.abort();
-                logStream = false;
+        };
+
+        vm.stop = function () {
+            if (typeof vm.logStream !== 'undefined' && vm.logStream) {
+                vm.logStream.abort();
+                vm.logStream = false;
                 vm.status = "Disconnected";
             }
 
         };
 
         vm.refresh = function () {
-            // Delay for 1 second before getting search results from server
-            if (angular.isDefined(filterTimeout)) {
-                $timeout.cancel(filterTimeout);
-            }
-            filterTimeout = $timeout(function () {
-                getLogData()
-            }, 1000);
-        };
-
-        var getLogData = function () {
             // Disconnect existing log streams
             vm.stop();
 
@@ -50,7 +49,7 @@
                 queryParams = queryParams + '&search=' + vm.filter.search;
             }
 
-            logStream = oboe({url: '/api/server/log/' + queryParams})
+            vm.logStream = oboe({url: '/api/server/log/' + queryParams})
                 .start(function () {
                     $scope.$applyAsync(function () {
                         vm.status = "Streaming";
@@ -89,7 +88,7 @@
             rowTemplate: rowTemplate,
             onRegisterApi: function (gridApi) {
                 vm.gridApi = gridApi;
-                getLogData();
+                vm.refresh();
             }
         };
 

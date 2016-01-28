@@ -6,13 +6,13 @@ import pkgutil
 from functools import wraps
 from collections import deque
 
-from flask import Flask, request, jsonify
+from flask import Flask, request
+from flask.ext.cors import CORS
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.resource import Resource
 from flask_restplus.model import Model
 from flask_compress import Compress
 from jsonschema.exceptions import RefResolutionError
-from werkzeug.exceptions import HTTPException
 
 from flexget.event import event
 from flexget.webserver import register_app, get_secret
@@ -20,7 +20,8 @@ from flexget.config_schema import process_config, register_config_key
 from flexget import manager
 from flexget.utils.database import with_session
 
-__version__ = '0.1-alpha'
+
+__version__ = '0.2-dev'
 
 log = logging.getLogger('api')
 
@@ -39,7 +40,7 @@ def register_config():
 class ApiSchemaModel(Model):
     """A flask restplus :class:`flask_restplus.models.ApiModel` which can take a json schema directly."""
     def __init__(self, name, schema, *args, **kwargs):
-        super(ApiSchemaModel, self).__init__(name, model={})
+        super(ApiSchemaModel, self).__init__(name, *args, **kwargs)
         self._schema = schema
 
     @property
@@ -68,6 +69,19 @@ class Api(RestPlusAPI):
       - methods to auto document and handle :class:`ApiError` responses
     """
 
+    def _rewrite_refs(self, schema):
+        if isinstance(schema, list):
+            for value in schema:
+                self._rewrite_refs(value)
+
+        if isinstance(schema, dict):
+            for key, value in schema.iteritems():
+                if isinstance(value, (list, dict)):
+                    self._rewrite_refs(value)
+
+                if key == '$ref' and value.startswith('/'):
+                    schema[key] = '#definitions%s' % value
+
     def schema(self, name, schema, **kwargs):
         """
         Register a json schema.
@@ -94,19 +108,21 @@ class Api(RestPlusAPI):
             return model
         return super(Api, self).inherit(name, parent, fields)
 
-    def validate(self, model, doc=True):
+    def validate(self, model, schema_override=None, description=None):
         """
         When a method is decorated with this, json data submitted to the endpoint will be validated with the given
         `model`. This also auto-documents the expected model, as well as the possible :class:`ValidationError` response.
         """
         def decorator(func):
-            @api.expect(model)
+            @api.expect((model, description))
             @api.response(ValidationError)
             @wraps(func)
             def wrapper(*args, **kwargs):
                 payload = request.json
                 try:
-                    errors = process_config(config=payload, schema=model.__schema__, set_defaults=False)
+                    schema = schema_override if schema_override else model.__schema__
+                    errors = process_config(config=payload, schema=schema, set_defaults=False)
+
                     if errors:
                         raise ValidationError(errors)
                 except RefResolutionError as e:
@@ -128,7 +144,7 @@ class Api(RestPlusAPI):
         except TypeError:
             # If first argument isn't a class this happens
             pass
-        return super(Api, self).response(code_or_apierror, description)
+        return super(Api, self).response(code_or_apierror, description, model=model)
 
 
 class APIResource(Resource):
@@ -144,7 +160,9 @@ app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__path__[0]),
 app.config['REMEMBER_COOKIE_NAME'] = 'flexgetToken'
 app.config['DEBUG'] = True
 
+CORS(app)
 Compress(app)
+
 api = Api(
     app,
     catch_all_404s=True,
