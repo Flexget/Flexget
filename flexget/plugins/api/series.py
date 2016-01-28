@@ -5,7 +5,7 @@ from math import ceil
 
 from flask import jsonify
 from flask import request
-from flask_restful import inputs
+from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
@@ -141,43 +141,6 @@ series_begin_input_schema = {
 }
 series_begin_input_schema = api.schema('begin_item', series_begin_input_schema)
 
-series_list_configured_enum_list = ['configured', 'unconfigured', 'all']
-series_list_status_enum_list = ['new', 'stale']
-series_list_sort_value_enum_list = ['show_name', 'episodes_behind_latest', 'last_download_date']
-series_list_sort_order_enum_list = ['desc', 'asc']
-
-
-def series_list_configured_enum(value):
-    enum = series_list_configured_enum_list
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    return value
-
-
-def series_list_status_enum(value):
-    enum = series_list_status_enum_list
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    return value
-
-
-def series_list_sort_value_enum(value):
-    enum = series_list_sort_value_enum_list
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    return value
-
-
-def series_list_sort_order_enum(value):
-    """ Sort oder enum. Return True for 'desc' and False for 'asc' """
-    enum = series_list_sort_order_enum_list
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    if value == 'desc':
-        return True
-    return False
-
-
 def get_release_details(release):
     release_item = {
         'release_id': release.id,
@@ -249,25 +212,20 @@ def get_series_details(show):
 
 
 series_list_parser = api.parser()
-series_list_parser.add_argument('in_config', type=series_list_configured_enum, default='configured',
-                                help="Filter list if shows are currently in configuration. "
-                                     "Filter by {0}. Default is configured.".format(
-                                        ' ,'.join(series_list_configured_enum_list)))
+series_list_parser.add_argument('in_config', choices=('configured', 'unconfigured', 'all'), default='configured',
+                                help="Filter list if shows are currently in configuration.")
 series_list_parser.add_argument('premieres', type=inputs.boolean, default=False,
-                                help="Filter by downloaded premieres only. Default is False.")
-series_list_parser.add_argument('status', type=series_list_status_enum,
-                                help="Filter by {0} status".format(' ,'.join(series_list_status_enum_list)))
+                                help="Filter by downloaded premieres only.")
+series_list_parser.add_argument('status', choices=('new', 'stale'), help="Filter by status")
 series_list_parser.add_argument('days', type=int,
                                 help="Filter status by number of days. Default is 7 for new and 365 for stale")
 series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
 series_list_parser.add_argument('max', type=int, default=100, help='Shows per page. Default is 100.')
 
-series_list_parser.add_argument('sort_by', type=series_list_sort_value_enum, default='show_name',
-                                help="Sort response by {0}. Default is show_name.".format(
-                                        ' ,'.join(series_list_sort_value_enum_list)))
-series_list_parser.add_argument('order', type=series_list_sort_order_enum, default='desc',
-                                help="Sorting order. One of {0}. Default is desc".format(
-                                        ' ,'.join(series_list_sort_order_enum_list)))
+series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behind_latest', 'last_download_date'),
+                                default='show_name',
+                                help="Sort response by attribute.")
+series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
 
 
 @series_api.route('/')
@@ -288,6 +246,8 @@ class SeriesListAPI(APIResource):
         # In case the default 'desc' order was received
         if order == 'desc':
             order = True
+        else:
+            order = False
 
         kwargs = {
             'configured': args.get('in_config'),
