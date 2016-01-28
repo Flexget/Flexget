@@ -95,7 +95,7 @@ class T411LookupPlugin(object):
     def lazy_lookup(entry):
         torrent_id = entry.get('t411_torrent_id')
         if torrent_id:
-            log.debug('Lookup for %s', entry['t411_torrent_id'])
+            log.debug('Lookup for %s', torrent_id)
         else:
             raise plugin.PluginError('looking up T411 for entry failed, no t411_torrent_id passed.')
 
@@ -103,7 +103,7 @@ class T411LookupPlugin(object):
         proxy.set_credential()
         with Session() as session:
             try:
-                bind_details = proxy.details(torrent_id, session=session)
+                bind_details = proxy.details(int(torrent_id), session=session)
                 unbind_details = [dict([
                     ('term_type_name', term.type.name),
                     ('term_type_id', term.type.id),
