@@ -27,14 +27,21 @@ tasks_list_api_schema = api.schema('tasks.list', {
     'additionalProperties': False
 })
 
-task_api_schema = api.schema('tasks.task', {
+
+task_schema_validate = {
     'type': 'object',
     'properties': {
         'name': {'type': 'string'},
-        'config': {'type': 'object'}
+        'config': {'$ref': '/schema/plugins'}
     },
     'additionalProperties': False
-})
+}
+
+
+task_schema = copy.deepcopy(task_schema_validate)
+task_schema['properties']['config'] = {'type': 'object'}
+
+task_api_schema = api.schema('tasks.task', task_schema)
 
 task_api_desc = 'Task config schema too large to display, you can view the schema using the schema API'
 
@@ -50,7 +57,7 @@ class TasksAPI(APIResource):
             tasks.append({'name': name, 'config': config})
         return {'tasks': tasks}
 
-    @api.validate(task_api_schema, description='New task object')
+    @api.validate(task_api_schema, schema_override=task_schema_validate, description='New task object')
     @api.response(201, description='Newly created task', model=task_api_schema)
     @api.response(409, description='Task already exists')
     def post(self, session=None):
@@ -94,7 +101,7 @@ class TaskAPI(APIResource):
 
         return {'name': task, 'config': self.manager.user_config['tasks'][task]}
 
-    @api.validate(task_api_schema)
+    @api.validate(task_api_schema, schema_override=task_schema_validate)
     @api.response(200, model=task_api_schema)
     @api.response(201, description='renamed task', model=task_api_schema)
     @api.response(404, description='task does not exist', model=task_api_schema)

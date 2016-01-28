@@ -108,7 +108,7 @@ class Api(RestPlusAPI):
             return model
         return super(Api, self).inherit(name, parent, fields)
 
-    def validate(self, model, description=None):
+    def validate(self, model, schema_override=None, description=None):
         """
         When a method is decorated with this, json data submitted to the endpoint will be validated with the given
         `model`. This also auto-documents the expected model, as well as the possible :class:`ValidationError` response.
@@ -120,7 +120,9 @@ class Api(RestPlusAPI):
             def wrapper(*args, **kwargs):
                 payload = request.json
                 try:
-                    errors = process_config(config=payload, schema=model.__schema__, set_defaults=False)
+                    schema = schema_override if schema_override else model.__schema__
+                    errors = process_config(config=payload, schema=schema, set_defaults=False)
+
                     if errors:
                         raise ValidationError(errors)
                 except RefResolutionError as e:
