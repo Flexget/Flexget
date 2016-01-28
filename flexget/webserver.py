@@ -221,6 +221,7 @@ def get_users(session=None):
 def user_exist(name, session=None):
     return session.query(User).filter(User.name == name).first()
 
+
 @with_session
 def add_user(name, password, session=None):
     user = User(name=name, password=password)
@@ -228,7 +229,14 @@ def add_user(name, password, session=None):
     session.commit()
     return user
 
+
 @with_session
 def delete_user(user, session=None):
     session.delete(user)
+    session.commit()
+
+
+@with_session
+def change_password(user, password, session=None):
+    user.password = password
     session.commit()
