@@ -410,7 +410,7 @@ class T411ObjectMapper(object):
         :param download_auth: Requests authenticator
         """
         result = Entry()
-        result['t411_torrent_id'] = json_entry['id']
+        result['t411_torrent_id'] = int(json_entry['id'])
         result['title'] = json_entry['name']
         result['url'] = T411RestClient.download_url(json_entry['id'])
         result['t411_category'] = int(json_entry['category'])
