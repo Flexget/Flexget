@@ -1,7 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import datetime
 from math import ceil
-from operator import itemgetter
 
 from flask import jsonify, request
 
@@ -40,54 +40,16 @@ movie_queue_schema = {
 
     }
 }
-movie_queue_status_value_enum_list = ['pending', 'downloaded', 'all']
-
-
-def movie_queue_status_value_enum(value):
-    """ Movie queue status enum. Return True for 'downloaded', False for 'pending' and None for 'all' """
-    enum = movie_queue_status_value_enum_list
-    if isinstance(value, bool):
-        return value
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    if value == 'downloaded':
-        return True
-    elif value == 'pending':
-        return False
-    else:
-        return None
-
-
-def movie_queue_sort_value_enum(value):
-    enum = ['added', 'downloaded', 'id', 'title']
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    return value
-
-
-def movie_queue_sort_order_enum(value):
-    enum = ['desc', 'asc']
-    if isinstance(value, bool):
-        return value
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    if value == 'desc':
-        return True
-    return False
-
 
 movie_queue_schema = api.schema('list_movie_queue', movie_queue_schema)
 
 movie_queue_parser = api.parser()
 movie_queue_parser.add_argument('page', type=int, default=1, help='Page number')
 movie_queue_parser.add_argument('max', type=int, default=100, help='Movies per page')
-movie_queue_parser.add_argument('status', type=movie_queue_status_value_enum, default=False,
-                                help='Filter list by status. Filter by {0}. Default is "pending"'.format(
-                                        ' ,'.join(movie_queue_status_value_enum_list)))
-movie_queue_parser.add_argument('sort_by', type=movie_queue_sort_value_enum, default='added',
-                                help="Sort response by 'added', 'downloaded', 'id', 'title'")
-movie_queue_parser.add_argument('order', type=movie_queue_sort_order_enum, default='desc',
-                                help="Sorting order, can be 'asc' or 'desc'")
+movie_queue_parser.add_argument('status', choices=('pending', 'downloaded'), help='Filter list by status')
+movie_queue_parser.add_argument('sort_by', choices=('added', 'downloaded', 'id', 'title'), default='added',
+                                help="Sort response by value")
+movie_queue_parser.add_argument('order', choices=('asc', 'desc'), default='desc', help="Sorting order")
 
 movie_add_results_schema = {
     'type': 'object',
@@ -143,8 +105,8 @@ movie_edit_input_schema = api.schema('movie_edit_input_schema', movie_edit_input
 @api.doc(description='Get queued movies from list or add a new movie')
 class MovieQueueAPI(APIResource):
     @api.response(404, 'Page does not exist')
-    @api.response(200, 'Movie queue retrieved successfully', movie_queue_schema)
-    @api.doc(parser=movie_queue_parser)
+    @api.response(code_or_apierror=200, model=movie_queue_schema)
+    @api.doc(parser=movie_queue_parser, description='test')
     def get(self, session=None):
         """ List queued movies """
         args = movie_queue_parser.parse_args()
@@ -156,6 +118,16 @@ class MovieQueueAPI(APIResource):
         # Handles default if it explicitly called
         if order == 'desc':
             order = True
+        else:
+            order = False
+
+        # Handles download status conversion
+        if downloaded == 'downloaded':
+            downloaded = True
+        elif downloaded == 'pending':
+            downloaded = False
+        else:
+            downloaded = None
 
         movie_queue = mq.queue_get(session=session, downloaded=downloaded)
         count = len(movie_queue)
@@ -175,7 +147,9 @@ class MovieQueueAPI(APIResource):
         for movie_number in range(start, finish):
             movie_items.append(movie_queue[movie_number].to_dict())
 
-        sorted_movie_list = sorted(movie_items, key=itemgetter(sort_by), reverse=order)
+        sorted_movie_list = sorted(movie_items,
+                                   key=lambda movie: movie[sort_by] if movie[sort_by] else datetime.datetime,
+                                   reverse=order)
 
         return jsonify({
             'movies': sorted_movie_list,
