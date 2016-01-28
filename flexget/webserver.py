@@ -240,3 +240,9 @@ def delete_user(user, session=None):
 def change_password(user, password, session=None):
     user.password = password
     session.commit()
+
+@with_session
+def generate_token(user, session=None):
+    user.token = generate_key()
+    session.commit()
+    return user

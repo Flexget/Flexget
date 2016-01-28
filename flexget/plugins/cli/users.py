@@ -6,7 +6,8 @@ from flexget.logger import console
 from flexget.utils.database import with_session
 
 try:
-    from flexget.webserver import User, generate_key, get_users, user_exist, add_user, delete_user, change_password
+    from flexget.webserver import User, generate_key, get_users, user_exist, add_user, delete_user, change_password, \
+        generate_token
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='webserver',
                                  message='Users commandline interface not loaded')
@@ -14,58 +15,53 @@ except ImportError:
 
 @with_session
 def do_cli(manager, options, session=None):
-    try:
-        if hasattr(options, 'user'):
-            options.user = options.user.lower()
+    if hasattr(options, 'user'):
+        options.user = options.user.lower()
 
-        if options.action == 'list':
-            users = get_users(session)
+    if options.action == 'list':
+        users = get_users(session)
+        if users:
+            max_width = len(max([user.name for user in users], key=len)) + 4
+            console('_' * (max_width + 56 + 9))
+            console('| %-*s | %-*s |' % (max_width, 'Username', 56, 'API Token'))
             if users:
-                max_width = len(max([user.name for user in users], key=len)) + 4
-                console('_' * (max_width + 56 + 9))
-                console('| %-*s | %-*s |' % (max_width, 'Username', 56, 'API Token'))
-                if users:
-                    for user in users:
-                        console('| %-*s | %-*s |' % (max_width, user.name, 56, user.token))
-            else:
-                console('No users found')
+                for user in users:
+                    console('| %-*s | %-*s |' % (max_width, user.name, 56, user.token))
+        else:
+            console('No users found')
 
-        if options.action == 'add':
-            exists = user_exist(options.user, session)
-            if exists:
-                console('User %s already exists' % options.user)
-                return
-            user = add_user(name=options.user, password=options.password)
-            console('Added %s to the database with generated API Token: %s' % (user.name, user.token))
+    if options.action == 'add':
+        exists = user_exist(options.user, session)
+        if exists:
+            console('User %s already exists' % options.user)
+            return
+        user = add_user(name=options.user, password=options.password)
+        console('Added %s to the database with generated API Token: %s' % (user.name, user.token))
 
-        if options.action == 'delete':
-            user = user_exist(options.user, session)
-            if not user:
-                console('User %s does not exist' % options.user)
-                return
-            delete_user(user)
-            console('Deleted user %s' % options.user)
+    if options.action == 'delete':
+        user = user_exist(options.user, session)
+        if not user:
+            console('User %s does not exist' % options.user)
+            return
+        delete_user(user)
+        console('Deleted user %s' % options.user)
 
-        if options.action == 'passwd':
-            user = user_exist(options.user, session)
-            if not user:
-                console('User %s does not exist' % options.user)
-                return
-            change_password(user, options.password, session)
-            console('Updated password for user %s' % options.user)
+    if options.action == 'passwd':
+        user = user_exist(options.user, session)
+        if not user:
+            console('User %s does not exist' % options.user)
+            return
+        change_password(user, options.password, session)
+        console('Updated password for user %s' % options.user)
 
-        if options.action == 'gentoken':
-            user = session.query(User).filter(User.name == options.user).first()
-            if not user:
-                console('User %s does not exist' % options.user)
-                return
-
-            user.token = generate_key()
-            session.commit()
-            console('Generated new token for user %s' % user.name)
-            console('Token %s' % user.token)
-    finally:
-        session.close()
+    if options.action == 'gentoken':
+        user = user_exist(options.user, session)
+        if not user:
+            console('User %s does not exist' % options.user)
+            return
+        user = generate_token(user, session)
+        console('Generated new token for user %s' % user.name)
+        console('Token %s' % user.token)
 
 
 @event('options.register')
