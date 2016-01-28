@@ -227,3 +227,8 @@ def add_user(name, password, session=None):
     session.add(user)
     session.commit()
     return user
+
+@with_session
+def delete_user(user, session=None):
+    session.delete(user)
+    session.commit()
