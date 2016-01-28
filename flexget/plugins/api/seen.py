@@ -79,7 +79,7 @@ seen_search_parser.add_argument('order', choices=('asc', 'desc'), default='desc'
 
 seen_delete_parser = api.parser()
 seen_delete_parser.add_argument('value', help='Delete by value or leave empty to delete all. BE CAREFUL WITH THIS')
-seen_search_parser.add_argument('is_seen_local', type=inputs.boolean, default=None, help='Get results that are limited'
+seen_delete_parser.add_argument('is_seen_local', type=inputs.boolean, default=None, help='Get results that are limited'
                                                                                          ' to local seen.')
 
 
