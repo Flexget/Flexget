@@ -8,20 +8,10 @@ from flask_restplus import inputs
 
 from flexget.api import api, APIResource, jsonify, request
 from flexget.plugins.filter import seen
-from flexget.utils.imdb import is_imdb_url, extract_id
-
-PLUGIN_TASK_NAME = 'seen_plugin_API'
-
-
-def return_imdb_id(value):
-    if is_imdb_url(value):
-        imdb_id = extract_id(value)
-        if imdb_id:
-            value = imdb_id
-    return value
-
 
 seen_api = api.namespace('seen', description='Managed Flexget seen entries and fields')
+
+PLUGIN_TASK_NAME = 'seen_plugin_API'  # Name of task to use when adding entries via API
 
 seen_field_object = {
     'type': 'object',
@@ -76,52 +66,20 @@ seen_search_schema = {
 }
 seen_search_schema = api.schema('seen_search_schema', seen_search_schema)
 
-
-def seen_search_local_status_enum(value):
-    try:
-        return inputs.boolean(value)
-    except ValueError:
-        if value != 'all':
-            raise ValueError('Invalid value received')
-        return value
-
-
-seen_search_sort_enum_list = ['title', 'task', 'added', 'local', 'id']
-
-
-def seen_search_sort_enum(value):
-    enum = seen_search_sort_enum_list
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    return value
-
-
-def seen_search_sort_order_enum(value):
-    enum = ['desc', 'asc']
-    if isinstance(value, bool):
-        return value
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    if value == 'desc':
-        return True
-    return False
-
-
 seen_search_parser = api.parser()
 seen_search_parser.add_argument('value', help='Search by any field value or leave empty to get entries')
 seen_search_parser.add_argument('page', type=int, default=1, help='Page number')
 seen_search_parser.add_argument('max', type=int, default=100, help='Seen entries per page')
-seen_search_parser.add_argument('local_seen', type=seen_search_local_status_enum, default='all',
-                                help='Filter list by local status. Filter by true, false or all. Default is all')
-seen_search_parser.add_argument('sort_by', type=seen_search_sort_enum, default='added',
-                                help="Sort response by {0}".format(' ,'.join(seen_search_sort_enum_list)))
-seen_search_parser.add_argument('order', type=seen_search_sort_order_enum, default='desc',
-                                help='Sorting order. Can be asc or desc. Default is desc')
+seen_search_parser.add_argument('is_seen_local', type=inputs.boolean, default=None, help='Get results that are limited'
+                                                                                         ' to local seen.')
+seen_search_parser.add_argument('sort_by', choices=('title', 'task', 'added', 'local', 'id'), default='added',
+                                help="Sort response by attribute")
+seen_search_parser.add_argument('order', choices=('asc', 'desc'), default='desc', help='Sorting order.')
 
 seen_delete_parser = api.parser()
 seen_delete_parser.add_argument('value', help='Delete by value or leave empty to delete all. BE CAREFUL WITH THIS')
-seen_delete_parser.add_argument('local_seen', type=seen_search_local_status_enum, default='all',
-                                help='Delete list by local status. Filter by true, false or all. Default is all')
+seen_search_parser.add_argument('is_seen_local', type=inputs.boolean, default=None, help='Get results that are limited'
+                                                                                         ' to local seen.')
 
 
 @seen_api.route('/')
@@ -135,17 +93,19 @@ class SeenSearchAPI(APIResource):
         value = args['value']
         page = args['page']
         max_results = args['max']
-        status = args['local_seen']
+        is_seen_local = args['is_seen_local']
         sort_by = args['sort_by']
         order = args['order']
         # Handles default if it explicitly called
         if order == 'desc':
             order = True
+        else:
+            order = False
 
         if value:
             value = unquote(value)
             value = '%' + value + '%'
-        seen_entries_list = seen.search(value, status, session)
+        seen_entries_list = seen.search(value, is_seen_local, session)
         count = len(seen_entries_list)
 
         pages = int(ceil(count / float(max_results)))
@@ -205,12 +165,12 @@ class SeenSearchAPI(APIResource):
         """ Delete seen entries """
         args = seen_delete_parser.parse_args()
         value = args['value']
-        status = args['local_seen']
+        is_seen_local = args['is_seen_local']
 
         if value:
             value = unquote(value)
             value = '%' + value + '%'
-        seen_entries_list = seen.search(value, status, session)
+        seen_entries_list = seen.search(value, is_seen_local, session)
         count = len(seen_entries_list)
 
         for entry in seen_entries_list:

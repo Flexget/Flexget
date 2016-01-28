@@ -311,7 +311,7 @@ def search(value=None, status=None, session=None):
         query = session.query(SeenEntry).join(SeenField).filter(SeenField.value.like(value)).order_by(SeenField.added)
     else:
         query = session.query(SeenEntry).join(SeenField).order_by(SeenField.added)
-    if status != 'all':
+    if status is not None:
         query = query.filter(SeenEntry.local == status)
     return query.all()
 
