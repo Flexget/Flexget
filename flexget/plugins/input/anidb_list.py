@@ -1,5 +1,3 @@
-# http://anidb.net/perl-bin/animedb.pl?show=mywishlist&uid=150881
-
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
