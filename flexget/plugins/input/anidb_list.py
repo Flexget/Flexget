@@ -1,3 +1,5 @@
+# http://anidb.net/perl-bin/animedb.pl?show=mywishlist&uid=150881
+
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
@@ -11,7 +13,6 @@ from flexget.utils.soup import get_soup
 log = logging.getLogger('anidb_list')
 USER_ID_RE = r'^\d{1,6}$'
 
-
 class AnidbList(object):
     """"Creates an entry for each movie in your Anidb list."""
 
@@ -21,12 +22,15 @@ class AnidbList(object):
             'user_id': {
                 'type': 'integer',
                 'pattern': USER_ID_RE,
-                'error_pattern': 'user_id must be in the form XXXXXXX'
-            }
+                'error_pattern': 'user_id must be in the form XXXXXXX'},
+            'type': {
+                'type': 'string',
+                'enum': ['shows', 'movies']},
+            'strip_dates': {'type': 'boolean'}
         },
         'additionalProperties': False,
-        'required': ['user_id'],
-        'error_required': 'user_id is required'
+        'required': ['user_id', 'type'],
+        'error_required': 'user_id and type are required'
     }
 
     @cached('anidb_list', persist='2 hours')
@@ -49,12 +53,23 @@ class AnidbList(object):
             return
 
         entries = []
+        entry_type = ''
+        if config['type'] == 'movies':
+            entry_type = 'Type: Movie'
+        elif config['type'] == 'shows':
+            entry_type = 'Type: TV Series'
         for tr in trs:
-            if tr.find('span', title='Type: Movie'):
+            if tr.find('span', title=entry_type):
                 a = tr.find('label').find('a')
                 if not a:
-                    log.debug('no title link found for row, skipping')
+                    log.debug('No title link found for the row, skipping')
                     continue
+
+                anime_title = a.string
+                if config.get('strip_dates'):
+                    # Remove year from end of series name if present
+                    anime_title = re.sub(r'\s+\(\d{4}\)$', '', anime_title)
+
                 link = ('http://anidb.net/perl-bin/' + a.get('href'))
 
                 anime_id = ""
@@ -63,13 +78,13 @@ class AnidbList(object):
                     anime_id = match.group(1)
 
                 entry = Entry()
-                entry['title'] = a.string
+                entry['title'] = anime_title
                 entry['url'] = link
                 entry['anidb_id'] = anime_id
                 entry['anidb_name'] = entry['title']
                 entries.append(entry)
             else:
-                log.verbose('Entry is not a movie')
+                log.verbose('Entry does not match the requested type')
         return entries
 
 
