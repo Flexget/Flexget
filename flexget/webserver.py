@@ -1,20 +1,21 @@
 from __future__ import unicode_literals, division, absolute_import
-import logging
-import threading
+
 import hashlib
+import logging
 import random
 import socket
+import threading
+
 import cherrypy
-from sqlalchemy import Column, Integer, Unicode
 from flask import Flask, abort, redirect
 from flask.ext.login import UserMixin
-from flexget import options
-from flexget.event import event
+from sqlalchemy import Column, Integer, Unicode
+
 from flexget.config_schema import register_config_key
-from flexget.utils.tools import singleton
+from flexget.event import event
 from flexget.manager import Base
 from flexget.utils.database import with_session
-from flexget.logger import console
+from flexget.utils.tools import singleton
 
 log = logging.getLogger('web_server')
 
@@ -131,8 +132,8 @@ def setup_server(manager, session=None):
         return
 
     web_server = WebServer(
-        bind=web_server_config['bind'],
-        port=web_server_config['port'],
+            bind=web_server_config['bind'],
+            port=web_server_config['port'],
     )
 
     _default_app.secret_key = get_secret()
@@ -209,86 +210,3 @@ class WebServer(threading.Thread):
     def stop(self):
         log.info('Shutting down web server')
         cherrypy.engine.exit()
-
-
-@with_session
-def do_cli(manager, options, session=None):
-    try:
-        if hasattr(options, 'user'):
-            options.user = options.user.lower()
-
-        if options.action == 'list':
-            users = session.query(User).all()
-            if users:
-                max_width = len(max([user.name for user in users], key=len)) + 4
-                console('_' * (max_width + 56 + 9))
-                console('| %-*s | %-*s |' % (max_width, 'Username', 56, 'API Token'))
-                if users:
-                    for user in users:
-                        console('| %-*s | %-*s |' % (max_width, user.name, 56, user.token))
-            else:
-                console('No users found')
-
-        if options.action == 'add':
-            exists = session.query(User).filter(User.name == options.user).first()
-            if exists:
-                console('User %s already exists' % options.user)
-                return
-            user = User(name=options.user, password=options.password)
-            session.add(user)
-            session.commit()
-            console('Added %s to the database with generated API Token: %s' % (user.name, user.token))
-
-        if options.action == 'delete':
-            user = session.query(User).filter(User.name == options.user).first()
-            if not user:
-                console('User %s does not exist' % options.user)
-                return
-            session.delete(user)
-            session.commit()
-            console('Deleted user %s' % options.user)
-
-        if options.action == 'passwd':
-            user = session.query(User).filter(User.name == options.user).first()
-            if not user:
-                console('User %s does not exist' % options.user)
-                return
-
-            user.password = options.password
-            session.commit()
-            console('Updated password for user %s' % options.user)
-
-        if options.action == 'gentoken':
-            user = session.query(User).filter(User.name == options.user).first()
-            if not user:
-                console('User %s does not exist' % options.user)
-                return
-
-            user.token = generate_key()
-            session.commit()
-            console('Generated new token for user %s' % user.name)
-            console('Token %s' % user.token)
-    finally:
-        session.close()
-
-
-@event('options.register')
-def register_parser_arguments():
-    parser = options.register_command('users', do_cli, help='Manage users providing access to the web server')
-    subparsers = parser.add_subparsers(dest='action', metavar='<action>')
-
-    subparsers.add_parser('list', help='List users')
-
-    add_parser = subparsers.add_parser('add', help='add a new user')
-    add_parser.add_argument('user', metavar='<username>', help='Users login')
-    add_parser.add_argument('password', metavar='<password>', help='Users password')
-
-    del_parser = subparsers.add_parser('delete', help='delete a new user')
-    del_parser.add_argument('user', metavar='<username>', help='Login to delete')
-
-    pwd_parser = subparsers.add_parser('passwd', help='change password for user')
-    pwd_parser.add_argument('user', metavar='<username>', help='User to change password')
-    pwd_parser.add_argument('password', metavar='<new password>', help='New Password')
-
-    gentoken_parser = subparsers.add_parser('gentoken', help='Generate a new api token for a user')
-    gentoken_parser.add_argument('user', metavar='<username>', help='User to regenerate api token')
