@@ -11,7 +11,7 @@
         });
 
         var logout = function () {
-            $http.get('/api/logout/')
+            $http.get('/api/auth/logout/')
                 .success(function () {
                     $state.go('login');
                 });
