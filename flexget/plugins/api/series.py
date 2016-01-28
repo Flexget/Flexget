@@ -141,6 +141,7 @@ series_begin_input_schema = {
 }
 series_begin_input_schema = api.schema('begin_item', series_begin_input_schema)
 
+
 def get_release_details(release):
     release_item = {
         'release_id': release.id,
@@ -566,19 +567,9 @@ class SeriesEpisodeAPI(APIResource):
                 }
 
 
-release_downloaded_enum_list = ['downloaded', 'not_downloaded', 'all']
-
-
-def release_downloaded_enum(value):
-    enum = release_downloaded_enum_list
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    return value
-
-
 release_list_parser = api.parser()
-release_list_parser.add_argument('downloaded', type=release_downloaded_enum, default='all',
-                                 help='Filter between {0}'.format(' ,'.join(release_downloaded_enum_list)))
+release_list_parser.add_argument('downloaded', choices=('downloaded', 'not_downloaded', 'all'), default='all',
+                                 help='Filter between release status')
 
 
 @api.response(404, 'Show ID not found')
