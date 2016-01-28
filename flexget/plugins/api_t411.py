@@ -24,10 +24,12 @@ Base = db_schema.versioned_base('t411', SCHEMA_VER)
 category_term_types = Table('category_term_types', Base.metadata,
                             Column('category_id', Integer, ForeignKey('categories.id')),
                             Column('term_type_id', Integer, ForeignKey('term_types.id')))
+Base.register_table(category_term_types)
 
 torrent_terms = Table('torrent_terms', Base.metadata,
                       Column('torrent_id', Integer, ForeignKey('torrent.id')),
                       Column('term_id', Integer, ForeignKey('term.id')))
+Base.register_table(torrent_terms)
 
 
 @db_schema.upgrade('t411')
