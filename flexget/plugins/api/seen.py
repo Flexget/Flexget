@@ -4,9 +4,10 @@ from math import ceil
 from operator import itemgetter
 from urllib import unquote
 
+from flask import jsonify, request
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource, jsonify, request
+from flexget.api import api, APIResource
 from flexget.plugins.filter import seen
 
 seen_api = api.namespace('seen', description='Managed Flexget seen entries and fields')
@@ -69,7 +70,7 @@ seen_search_schema = api.schema('seen_search_schema', seen_search_schema)
 seen_search_parser = api.parser()
 seen_search_parser.add_argument('value', help='Search by any field value or leave empty to get entries')
 seen_search_parser.add_argument('page', type=int, default=1, help='Page number')
-seen_search_parser.add_argument('max', type=int, default=100, help='Seen entries per page')
+seen_search_parser.add_argument('max', type=int, default=50, help='Seen entries per page')
 seen_search_parser.add_argument('is_seen_local', type=inputs.boolean, default=None, help='Get results that are limited'
                                                                                          ' to local seen.')
 seen_search_parser.add_argument('sort_by', choices=('title', 'task', 'added', 'local', 'id'), default='added',
@@ -83,6 +84,7 @@ seen_search_parser.add_argument('is_seen_local', type=inputs.boolean, default=No
 
 
 @seen_api.route('/')
+@api.doc(description='Get, delete or create seen entries')
 class SeenSearchAPI(APIResource):
     @api.response(404, 'Page does not exist')
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
@@ -184,7 +186,7 @@ class SeenSearchAPI(APIResource):
 
 
 @seen_api.route('/<int:seen_entry_id>')
-@api.doc(params={'seen_entry_id': 'ID of seen entry'})
+@api.doc(params={'seen_entry_id': 'ID of seen entry'}, description='Delete a specific seen entry via its ID')
 @api.response(500, 'Delete process failed')
 @api.response(200, 'Successfully deleted entry')
 class SeenSearchAPI(APIResource):
