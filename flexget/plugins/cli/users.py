@@ -6,7 +6,7 @@ from flexget.logger import console
 from flexget.utils.database import with_session
 
 try:
-    from flexget.webserver import User, generate_key, get_users
+    from flexget.webserver import User, generate_key, get_users, user_exist, add_user
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='webserver',
                                  message='Users commandline interface not loaded')
@@ -31,13 +31,11 @@ def do_cli(manager, options, session=None):
                 console('No users found')
 
         if options.action == 'add':
-            exists = session.query(User).filter(User.name == options.user).first()
+            exists = user_exist(options.user, session)
             if exists:
                 console('User %s already exists' % options.user)
                 return
-            user = User(name=options.user, password=options.password)
-            session.add(user)
-            session.commit()
+            user = add_user(name=options.user, password=options.password)
             console('Added %s to the database with generated API Token: %s' % (user.name, user.token))
 
         if options.action == 'delete':
