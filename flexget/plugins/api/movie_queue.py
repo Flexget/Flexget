@@ -14,8 +14,8 @@ movie_queue_api = api.namespace('movie_queue', description='Movie Queue operatio
 movie_object = {
     'type': 'object',
     'properties': {
-        'added': {'type': 'string'},
-        'downloaded': {'type': 'string'},
+        'added_date': {'type': 'string'},
+        'is_downloaded': {'type': 'string'},
         'entry_original_url': {'type': 'string'},
         'entry_title': {'type': 'string'},
         'entry_url': {'type': 'string'},
