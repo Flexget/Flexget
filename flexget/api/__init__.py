@@ -20,7 +20,8 @@ from flexget.config_schema import process_config, register_config_key
 from flexget import manager
 from flexget.utils.database import with_session
 
-__version__ = '0.1-alpha'
+
+__version__ = '0.2-dev'
 
 log = logging.getLogger('api')
 
@@ -39,7 +40,7 @@ def register_config():
 class ApiSchemaModel(Model):
     """A flask restplus :class:`flask_restplus.models.ApiModel` which can take a json schema directly."""
     def __init__(self, name, schema, *args, **kwargs):
-        super(ApiSchemaModel, self).__init__(name, model={})
+        super(ApiSchemaModel, self).__init__(name, *args, **kwargs)
         self._schema = schema
 
     @property
@@ -67,6 +68,19 @@ class Api(RestPlusAPI):
       - methods to make using json schemas easier
       - methods to auto document and handle :class:`ApiError` responses
     """
+
+    def _rewrite_refs(self, schema):
+        if isinstance(schema, list):
+            for value in schema:
+                self._rewrite_refs(value)
+
+        if isinstance(schema, dict):
+            for key, value in schema.iteritems():
+                if isinstance(value, (list, dict)):
+                    self._rewrite_refs(value)
+
+                if key == '$ref' and value.startswith('/'):
+                    schema[key] = '#definitions%s' % value
 
     def schema(self, name, schema, **kwargs):
         """

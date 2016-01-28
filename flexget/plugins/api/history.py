@@ -16,7 +16,7 @@ history_api = api.namespace('history', description='Entry History')
 history_api_schema = {
     'type': 'object',
     'properties': {
-        'items': {
+        'entries': {
             'type': 'array',
             'items': {
                 'type': 'object',
@@ -35,7 +35,7 @@ history_api_schema = {
     }
 }
 
-history_api_schema = api.schema('history', history_api_schema)
+history_api_schema = api.schema('history.list', history_api_schema)
 
 history_parser = api.parser()
 history_parser.add_argument('page', type=int, required=False, default=1, help='Page number')
@@ -46,10 +46,10 @@ history_parser.add_argument('task', type=str, required=False, default=None, help
 @history_api.route('/')
 @api.doc(parser=history_parser)
 class HistoryAPI(APIResource):
-    @api.response(404, 'page does not exist')
-    @api.response(200, 'history results', history_api_schema)
+    @api.response(404, description='Page does not exist')
+    @api.response(200, model=history_api_schema)
     def get(self, session=None):
-        """ List entries """
+        """ List of previously accepted entries """
         args = history_parser.parse_args()
         page = args['page']
         max_results = args['max']
@@ -61,7 +61,7 @@ class HistoryAPI(APIResource):
             count = session.query(History).count()
 
         if not count:
-            return {'items': [], 'pages': 0}
+            return {'entries': [], 'pages': 0}
 
         pages = int(ceil(count / float(max_results)))
 
@@ -78,6 +78,6 @@ class HistoryAPI(APIResource):
             items = session.query(History).order_by(desc(History.time)).slice(start, finish)
 
         return jsonify({
-            'items': [item.to_dict() for item in items],
+            'entries': [item.to_dict() for item in items],
             'pages': pages
         })

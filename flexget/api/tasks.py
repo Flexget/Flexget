@@ -1,7 +1,5 @@
 import copy
-
 from flask import request
-
 from flexget.config_schema import process_config
 from flexget.api import api, APIResource, ApiError, NotFoundError
 from datetime import datetime
@@ -15,49 +13,46 @@ from flexget.event import event
 from flexget.utils.lazy_dict import LazyLookup
 import flask_restplus
 
-
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
 
-task_api_schema = {
-    'type': 'object',
-    'properties': {
-        'name': {'type': 'string'},
-        'config': {'$ref': '/schema/plugins'}
-    },
-    'additionalProperties': False
-}
-
-tasks_api_schema = {
+tasks_list_api_schema = api.schema('tasks.list', {
     "type": "object",
     "properties": {
         "tasks": {
             "type": "array",
-            "items": task_api_schema
+            "items": {'$ref': '#/definitions/tasks.task'}
         }
     },
     'additionalProperties': False
-}
+})
 
-tasks_api_schema = api.schema('tasks', tasks_api_schema)
-task_api_schema = api.schema('task', task_api_schema)
+task_api_schema = api.schema('tasks.task', {
+    'type': 'object',
+    'properties': {
+        'name': {'type': 'string'},
+        'config': {'type': 'object'}
+    },
+    'additionalProperties': False
+})
+
+task_api_desc = 'Task config schema too large to display, you can view the schema using the schema API'
 
 
 @tasks_api.route('/')
+@api.doc(description=task_api_desc)
 class TasksAPI(APIResource):
-
-    @api.response(200, 'list of tasks', tasks_api_schema)
+    @api.response(200, model=tasks_list_api_schema)
     def get(self, session=None):
-        """ Show all tasks """
-
+        """ List all tasks """
         tasks = []
         for name, config in self.manager.user_config.get('tasks', {}).iteritems():
             tasks.append({'name': name, 'config': config})
         return {'tasks': tasks}
 
-    @api.validate(task_api_schema)
-    @api.response(201, 'newly created task', task_api_schema)
-    @api.response(409, 'task already exists', task_api_schema)
+    @api.validate(task_api_schema, description='New task object')
+    @api.response(201, description='Newly created task', model=task_api_schema)
+    @api.response(409, description='Task already exists')
     def post(self, session=None):
         """ Add new task """
         data = request.json
@@ -87,12 +82,11 @@ class TasksAPI(APIResource):
 
 
 @tasks_api.route('/<task>/')
-@api.doc(params={'task': 'task name'})
+@api.doc(params={'task': 'task name'}, description=task_api_desc)
 class TaskAPI(APIResource):
-
-    @api.response(200, 'task config', task_api_schema)
-    @api.response(NotFoundError, 'task not found')
-    @api.response(ApiError, 'unable to read config')
+    @api.response(200, model=task_api_schema)
+    @api.response(NotFoundError, description='task not found')
+    @api.response(ApiError, description='unable to read config')
     def get(self, task, session=None):
         """ Get task config """
         if task not in self.manager.user_config.get('tasks', {}):
@@ -101,11 +95,11 @@ class TaskAPI(APIResource):
         return {'name': task, 'config': self.manager.user_config['tasks'][task]}
 
     @api.validate(task_api_schema)
-    @api.response(200, 'updated task', task_api_schema)
-    @api.response(201, 'renamed task', task_api_schema)
-    @api.response(404, 'task does not exist', task_api_schema)
-    @api.response(400, 'cannot rename task as it already exist', task_api_schema)
-    def post(self, task, session=None):
+    @api.response(200, model=task_api_schema)
+    @api.response(201, description='renamed task', model=task_api_schema)
+    @api.response(404, description='task does not exist', model=task_api_schema)
+    @api.response(400, description='cannot rename task as it already exist', model=task_api_schema)
+    def put(self, task, session=None):
         """ Update tasks config """
         data = request.json
 
@@ -144,8 +138,8 @@ class TaskAPI(APIResource):
 
         return {'name': new_task_name, 'config': self.manager.user_config['tasks'][new_task_name]}, code
 
-    @api.response(200, 'deleted task')
-    @api.response(404, 'task not found')
+    @api.response(200, description='deleted task')
+    @api.response(404, description='task not found')
     def delete(self, task, session=None):
         """ Delete a task """
         try:
@@ -157,7 +151,6 @@ class TaskAPI(APIResource):
         self.manager.save_config()
         self.manager.config_changed()
         return {}
-
 
 
 def _task_info_dict(task):
@@ -224,13 +217,13 @@ task_execution_results_schema = {
     }
 }
 
-task_api_queue_schema = api.schema('execution_queue', task_queue_schema)
-task_execution_api_result_schema = api.schema('execution_result', task_execution_results_schema)
+task_api_queue_schema = api.schema('task.queue', task_queue_schema)
+task_api_execute_schema = api.schema('task.execution', task_execution_results_schema)
 
 
 @tasks_api.route('/queue/')
 class TaskQueueAPI(APIResource):
-    @api.response(200, 'Show tasks in queue for execution', task_api_queue_schema)
+    @api.response(200, model=task_api_queue_schema)
     def get(self, session=None):
         """ List task(s) in queue for execution """
         tasks = [_task_info_dict(task) for task in self.manager.task_queue.run_queue.queue]
@@ -250,9 +243,12 @@ class ExecuteLog(Queue):
 
 stream_parser = api.parser()
 
-stream_parser.add_argument('progress', type=flask_restplus.inputs.boolean, required=False, default=True, help='Include task progress updates')
-stream_parser.add_argument('summary', type=flask_restplus.inputs.boolean, required=False, default=True, help='Include task summary')
-stream_parser.add_argument('log', type=flask_restplus.inputs.boolean, required=False, default=False, help='Include execution log')
+stream_parser.add_argument('progress', type=flask_restplus.inputs.boolean, required=False, default=True,
+                           help='Include task progress updates')
+stream_parser.add_argument('summary', type=flask_restplus.inputs.boolean, required=False, default=True,
+                           help='Include task summary')
+stream_parser.add_argument('log', type=flask_restplus.inputs.boolean, required=False, default=False,
+                           help='Include execution log')
 stream_parser.add_argument('entry_dump', type=flask_restplus.inputs.boolean, required=False, default=False,
                            help='Include dump of entries including fields')
 
@@ -260,9 +256,10 @@ _streams = {}
 
 
 @tasks_api.route('/<task>/execute/')
+@api.doc(params={'task': 'task name'})
 class TaskExecutionAPI(APIResource):
-    @api.response(404, 'task not found')
-    @api.response(200, 'Execution task with optional progress and/or log stream', task_execution_api_result_schema)
+    @api.response(404, description='task not found')
+    @api.response(200, model=task_api_execute_schema)
     @api.doc(parser=stream_parser)
     def get(self, task, session=None):
         """ Execute task and stream results """
