@@ -6,7 +6,7 @@ from flexget.logger import console
 from flexget.utils.database import with_session
 
 try:
-    from flexget.webserver import User, generate_key
+    from flexget.webserver import User, generate_key, get_users
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='webserver',
                                  message='Users commandline interface not loaded')
@@ -19,7 +19,7 @@ def do_cli(manager, options, session=None):
             options.user = options.user.lower()
 
         if options.action == 'list':
-            users = session.query(User).all()
+            users = get_users(session)
             if users:
                 max_width = len(max([user.name for user in users], key=len)) + 4
                 console('_' * (max_width + 56 + 9))

@@ -210,3 +210,8 @@ class WebServer(threading.Thread):
     def stop(self):
         log.info('Shutting down web server')
         cherrypy.engine.exit()
+
+
+@with_session
+def get_users(session=None):
+    return session.query(User).all()
