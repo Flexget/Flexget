@@ -66,7 +66,7 @@ login_api_schema = api.schema('auth.login', {
 
 login_parser = api.parser()
 login_parser.add_argument('remember', type=inputs.boolean, required=False, default=False,
-                          help='Remember login (sets persistant session cookies)'
+                          help='Remember login (sets persistent session cookies)'
                           )
 
 
