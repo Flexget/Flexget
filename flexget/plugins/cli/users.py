@@ -19,7 +19,7 @@ def do_cli(manager, options, session=None):
         options.user = options.user.lower()
 
     if options.action == 'list':
-        users = get_users(session)
+        users = get_users(session=session)
         if users:
             max_width = len(max([user.name for user in users], key=len)) + 4
             console('_' * (max_width + 56 + 9))
@@ -31,7 +31,7 @@ def do_cli(manager, options, session=None):
             console('No users found')
 
     if options.action == 'add':
-        exists = user_exist(options.user, session)
+        exists = user_exist(name=options.user, session=session)
         if exists:
             console('User %s already exists' % options.user)
             return
@@ -39,27 +39,27 @@ def do_cli(manager, options, session=None):
         console('Added %s to the database with generated API Token: %s' % (user.name, user.token))
 
     if options.action == 'delete':
-        user = user_exist(options.user, session)
+        user = user_exist(name=options.user, session=session)
         if not user:
             console('User %s does not exist' % options.user)
             return
-        delete_user(user)
+        delete_user(user=user, session=session)
         console('Deleted user %s' % options.user)
 
     if options.action == 'passwd':
-        user = user_exist(options.user, session)
+        user = user_exist(name=options.user, session=session)
         if not user:
             console('User %s does not exist' % options.user)
             return
-        change_password(user, options.password, session)
+        change_password(user=user, password=options.password, session=session)
         console('Updated password for user %s' % options.user)
 
     if options.action == 'gentoken':
-        user = user_exist(options.user, session)
+        user = user_exist(name=options.user, session=session)
         if not user:
             console('User %s does not exist' % options.user)
             return
-        user = generate_token(user, session)
+        user = generate_token(user=user, session=session)
         console('Generated new token for user %s' % user.name)
         console('Token %s' % user.token)
 
