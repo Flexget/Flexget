@@ -6,8 +6,7 @@ from flexget.logger import console
 from flexget.utils.database import with_session
 
 try:
-    from flexget.webserver import User, generate_key, get_users, user_exist, add_user, delete_user, change_password, \
-        generate_token
+    from flexget.webserver import User, generate_key, user_exist, change_password, generate_token, WeakPassword
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='webserver',
                                  message='Users commandline interface not loaded')
@@ -23,7 +22,11 @@ def do_cli(manager, options, session=None):
         if not user:
             console('User %s does not exist' % options.user)
             return
-        change_password(user_name=user.name, password=options.password, session=session)
+        try:
+            change_password(user_name=user.name, password=options.password, session=session)
+        except WeakPassword as e:
+            console(e.value)
+            return
         console('Updated password for user %s' % options.user)
 
     if options.action == 'gentoken':

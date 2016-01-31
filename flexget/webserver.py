@@ -6,6 +6,7 @@ import random
 import socket
 import threading
 
+import safe
 import cherrypy
 from flask import Flask, abort, redirect
 from flask.ext.login import UserMixin
@@ -68,6 +69,23 @@ def get_secret(session=None):
         session.commit()
 
     return web_secret.value
+
+
+class WeakPassword(Exception):
+    def __init__(self, value, logger=log, **kwargs):
+        super(WeakPassword, self).__init__()
+        # Value is expected to be a string
+        if not isinstance(value, basestring):
+            value = unicode(value)
+        self.value = value
+        self.log = logger
+        self.kwargs = kwargs
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
+
+    def __unicode__(self):
+        return unicode(self.value)
 
 
 class User(Base, UserMixin):
@@ -220,6 +238,9 @@ def user_exist(name, session=None):
 @with_session
 def change_password(user_name, password, session=None):
     user = user_exist(name=user_name, session=session)
+    check = safe.check(password)
+    if check.strength not in ['medium', 'strong']:
+        raise WeakPassword('Password {0} is not strong enough'.format(password))
     user.password = password
 
 

@@ -4,7 +4,7 @@ from flask import request
 from flask.ext.login import current_user
 
 from flexget.api import api, APIResource
-from flexget.webserver import change_password, generate_token
+from flexget.webserver import change_password, generate_token, WeakPassword
 
 user_api = api.namespace('user', description='Manage user login credentials')
 
@@ -21,11 +21,16 @@ user_password_input_schema = api.schema('user_password_input', user_password_inp
 @api.doc('Change user password')
 class UserManagementAPI(APIResource):
     @api.validate(model=user_password_input_schema, description='Password change schema')
+    @api.response(400, 'Password not strong enough')
     def put(self, session=None):
         """ Change user password """
         user = current_user
         data = request.json
-        change_password(user_name=user.name, password=data.get('password'), session=session)
+        try:
+            change_password(user_name=user.name, password=data.get('password'), session=session)
+        except WeakPassword as e:
+            return {'status': 'error',
+                    'message': e.value}, 400
         return {'status': 'success',
                 'message': 'Successfully changed user password'}
 
