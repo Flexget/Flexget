@@ -43,7 +43,7 @@ def do_cli(manager, options, session=None):
         if not user:
             console('User %s does not exist' % options.user)
             return
-        delete_user(user=user, session=session)
+        delete_user(user_name=user.name, session=session)
         console('Deleted user %s' % options.user)
 
     if options.action == 'passwd':
@@ -59,7 +59,7 @@ def do_cli(manager, options, session=None):
         if not user:
             console('User %s does not exist' % options.user)
             return
-        user = generate_token(user=user, session=session)
+        user = generate_token(user_name=user.name, session=session)
         console('Generated new token for user %s' % user.name)
         console('Token %s' % user.token)
 

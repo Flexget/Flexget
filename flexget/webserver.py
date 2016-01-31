@@ -231,16 +231,16 @@ def add_user(name, password, session=None):
 
 
 @with_session
-def delete_user(user, session=None):
+def delete_user(user_name, session=None):
+    user = user_exist(name=user_name, session=session)
     session.delete(user)
-    session.commit()
 
 
 @with_session
 def change_password(user_name, password, session=None):
     user = user_exist(name=user_name, session=session)
     user.password = password
-    session.commit()
+
 
 @with_session
 def generate_token(user_name, session=None):

@@ -1,33 +1,26 @@
 from __future__ import unicode_literals, division, absolute_import
 
-import datetime
-from math import ceil
-
-from flask.ext.login import login_user, LoginManager, current_user, current_app
-from flask import jsonify
 from flask import request
-from flask_restplus import inputs
-from sqlalchemy.orm.exc import NoResultFound
+from flask.ext.login import current_user
 
 from flexget.api import api, APIResource
-from flexget.plugins.filter import series
-from flexget.webserver import change_password
-import requests
+from flexget.webserver import change_password, generate_token
 
 user_api = api.namespace('user', description='Manage user login credentials')
 
 user_password_input = {
-     'type': 'object',
+    'type': 'object',
     'properties': {
         'password': {'type': 'string'}
     }
 }
 user_password_input_schema = api.schema('user_password_input', user_password_input)
 
+
 @user_api.route('/')
 @api.doc('Change user password')
 class UserManagementAPI(APIResource):
-    @api.validate(model=user_password_input_schema, description='test')
+    @api.validate(model=user_password_input_schema, description='Password change schema')
     def put(self, session=None):
         """ Change user password """
         user = current_user
@@ -35,3 +28,27 @@ class UserManagementAPI(APIResource):
         change_password(user_name=user.name, password=data.get('password'), session=session)
         return {'status': 'success',
                 'message': 'Successfully changed user password'}
+
+
+user_token_response = {
+    'type': 'object',
+    'properties': {
+        'status': {'type': 'string'},
+        'message': {'type': 'string'},
+        'token': {'type': 'string'}
+    }
+}
+
+user_token_response_schema = api.schema('user_token_response', user_token_response)
+
+
+@user_api.route('/token/')
+@api.doc('Change user token')
+class UserManagementAPI(APIResource):
+    @api.response(200, 'Successfully changed user token', user_token_response_schema)
+    def get(self, session=None):
+        """ Change current user token """
+        user = generate_token(user_name=current_user.name, session=session)
+        return {'status': 'success',
+                'message': 'Successfully changed user token',
+                'token': user.token}
