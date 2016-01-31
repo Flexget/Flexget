@@ -6,11 +6,12 @@ import random
 import socket
 import threading
 
-import safe
 import cherrypy
+import safe
 from flask import Flask, abort, redirect
 from flask.ext.login import UserMixin
 from sqlalchemy import Column, Integer, Unicode
+from werkzeug.security import generate_password_hash
 
 from flexget.config_schema import register_config_key
 from flexget.event import event
@@ -158,7 +159,14 @@ def setup_server(manager, session=None):
 
     # Create default flexget user
     if session.query(User).count() == 0:
-        session.add(User(name="flexget", password="flexget"))
+        session.add(User(name="flexget", password=generate_password_hash("flexget")))
+        session.commit()
+    # Migrate existing user password to be hashed
+    elif session.query(User).count() >= 1:
+        users = session.query(User).filter(User.name == "flexget").all()
+        for user in users:
+            if not user.password.startswith('pbkdf2:sha1'):
+                user.password = unicode(generate_password_hash(user.password))
         session.commit()
 
     if web_server.is_alive():
@@ -241,7 +249,7 @@ def change_password(user_name, password, session=None):
     check = safe.check(password)
     if check.strength not in ['medium', 'strong']:
         raise WeakPassword('Password {0} is not strong enough'.format(password))
-    user.password = password
+    user.password = unicode(generate_password_hash(password))
 
 
 @with_session
