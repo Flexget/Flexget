@@ -12,7 +12,7 @@ log = logging.getLogger('anidb_list')
 USER_ID_RE = r'^\d{1,6}$'
 
 class AnidbList(object):
-    """"Creates an entry for each movie in your Anidb list."""
+    """"Creates an entry for each movie or series in your AniDB wishlist."""
 
     schema = {
         'type': 'object',
@@ -23,24 +23,27 @@ class AnidbList(object):
                 'error_pattern': 'user_id must be in the form XXXXXXX'},
             'type': {
                 'type': 'string',
-                'enum': ['shows', 'movies']},
-            'strip_dates': {'type': 'boolean'}
+                'enum': ['shows', 'movies'],
+                'default' : 'movies'},
+            'strip_dates': {
+                'type': 'boolean',
+                'default' : False}
         },
         'additionalProperties': False,
-        'required': ['user_id', 'type'],
-        'error_required': 'user_id and type are required'
+        'required': ['user_id'],
+        'error_required': 'user_id is required'
     }
 
     @cached('anidb_list', persist='2 hours')
     def on_task_input(self, task, config):
-        # Create movie entries by parsing anidb wishlist page html using beautifulsoup
+        # Create entries by parsing AniDB wishlist page html using beautifulsoup
         log.verbose('Retrieving AniDB list: mywishlist')
         url = 'http://anidb.net/perl-bin/animedb.pl?show=mywishlist&uid=%s' % config['user_id']
         log.debug('Requesting: %s' % url)
 
         page = task.requests.get(url)
         if page.status_code != 200:
-            raise plugin.PluginError('Unable to get AniDB list. Either list is private or does not exist.')
+            raise plugin.PluginError('Unable to get AniDB list. Either the list is private or does not exist.')
 
         soup = get_soup(page.text)
         soup = soup.find('table', class_='wishlist')
@@ -84,7 +87,6 @@ class AnidbList(object):
             else:
                 log.verbose('Entry does not match the requested type')
         return entries
-
 
 @event('plugin.register')
 def register_plugin():
