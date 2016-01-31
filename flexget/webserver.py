@@ -213,27 +213,8 @@ class WebServer(threading.Thread):
 
 
 @with_session
-def get_users(session=None):
-    return session.query(User).all()
-
-
-@with_session
 def user_exist(name, session=None):
     return session.query(User).filter(User.name == name).first()
-
-
-@with_session
-def add_user(name, password, session=None):
-    user = User(name=name, password=password)
-    session.add(user)
-    session.commit()
-    return user
-
-
-@with_session
-def delete_user(user_name, session=None):
-    user = user_exist(name=user_name, session=session)
-    session.delete(user)
 
 
 @with_session
