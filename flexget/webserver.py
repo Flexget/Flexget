@@ -237,12 +237,14 @@ def delete_user(user, session=None):
 
 
 @with_session
-def change_password(user, password, session=None):
+def change_password(user_name, password, session=None):
+    user = user_exist(name=user_name, session=session)
     user.password = password
     session.commit()
 
 @with_session
-def generate_token(user, session=None):
+def generate_token(user_name, session=None):
+    user = user_exist(name=user_name, session=session)
     user.token = generate_key()
     session.commit()
     return user

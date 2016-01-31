@@ -32,6 +32,6 @@ class UserManagementAPI(APIResource):
         """ Change user password """
         user = current_user
         data = request.json
-        change_password(user=user, password=data.get('password'), session=session)
+        change_password(user_name=user.name, password=data.get('password'), session=session)
         return {'status': 'success',
                 'message': 'Successfully changed user password'}

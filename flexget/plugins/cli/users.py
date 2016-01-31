@@ -51,7 +51,7 @@ def do_cli(manager, options, session=None):
         if not user:
             console('User %s does not exist' % options.user)
             return
-        change_password(user=user, password=options.password, session=session)
+        change_password(user_name=user.name, password=options.password, session=session)
         console('Updated password for user %s' % options.user)
 
     if options.action == 'gentoken':
