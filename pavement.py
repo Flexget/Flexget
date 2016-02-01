@@ -57,6 +57,7 @@ install_requires = [
     'flask-login>=0.3.2',
     'flask-cors>=2.1.2',
     'pyparsing>=2.0.3',
+    'Safe'
 ]
 
 if sys.version_info < (2, 7):

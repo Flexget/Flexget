@@ -1,10 +1,13 @@
 import base64
+
 from flask import request, jsonify, session as flask_session
 from flask.ext.login import login_user, LoginManager, current_user, current_app
-from flexget.api import api, APIResource, app
-from flexget.webserver import User
-from flexget.utils.database import with_session
 from flask_restplus import inputs
+from werkzeug.security import check_password_hash
+
+from flexget.api import api, APIResource, app
+from flexget.utils.database import with_session
+from flexget.webserver import User
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -31,7 +34,11 @@ def load_user_from_request(request, session=None):
         try:
             credentials = base64.b64decode(auth_value.replace('Basic ', '', 1))
             username, password = credentials.split(':')
-            return session.query(User).filter(User.name == username, User.password == password).first()
+            user = session.query(User).filter(User.name == username).first()
+            if check_password_hash(user.password, password):
+                return user
+            else:
+                return None
         except (TypeError, ValueError):
             pass
 
@@ -79,13 +86,12 @@ class LoginAPI(APIResource):
     def post(self, session=None):
         """ Login with username and password """
         data = request.json
+        user_name = data.get('username')
+        password = data.get('password')
 
         if data:
-            user = session.query(User) \
-                .filter(User.name == data.get('username').lower(), User.password == data.get('password')) \
-                .first()
-
-            if user:
+            user = session.query(User).filter(User.name == user_name.lower()).first()
+            if user and check_password_hash(user.password, password):
                 args = login_parser.parse_args()
                 login_user(user, remember=args['remember'])
                 return {'status': 'success'}
