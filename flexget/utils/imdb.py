@@ -138,8 +138,8 @@ class ImdbSearch(object):
             movie = {}
             movie['match'] = 1.0
             movie['name'] = name
-            movie['url'] = actual_url
             movie['imdb_id'] = extract_id(actual_url)
+            movie['url'] = make_url(movie['imdb_id'])
             movie['year'] = None  # skips year check
             movies.append(movie)
             return movies
@@ -167,8 +167,8 @@ class ImdbSearch(object):
 
             link = row.find_next('a')
             movie['name'] = link.text
-            movie['url'] = 'http://www.imdb.com' + link.get('href')
-            movie['imdb_id'] = extract_id(movie['url'])
+            movie['imdb_id'] = extract_id(link.get('href'))
+            movie['url'] = make_url(movie['imdb_id'])
             log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
 
             # calc & set best matching ratio
