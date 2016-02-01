@@ -306,6 +306,7 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
     return se.to_dict()
 
 
+@with_session
 def search(value=None, status=None, session=None):
     if value:
         query = session.query(SeenEntry).join(SeenField).filter(SeenField.value.like(value)).order_by(SeenField.added)

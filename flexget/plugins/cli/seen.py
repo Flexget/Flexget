@@ -40,16 +40,15 @@ def seen_add(options):
 
 
 def seen_search(options):
-    with Session() as session:
-        search_term = '%' + options.search_term + '%'
-        seen_entries = seen.search(search_term, status=None, session=session)
-        for se in seen_entries:
-            console('ID: %s Name: %s Task: %s Added: %s' % (se.id, se.title, se.task, se.added.strftime('%c')))
-            for sf in se.fields:
-                console(' %s: %s' % (sf.field, sf.value))
-            console('')
-        if not seen_entries:
-            console('No results')
+    search_term = '%' + options.search_term + '%'
+    seen_entries = seen.search(search_term, status=None)
+    for se in seen_entries:
+        console('ID: %s Name: %s Task: %s Added: %s' % (se.id, se.title, se.task, se.added.strftime('%c')))
+        for sf in se.fields:
+            console(' %s: %s' % (sf.field, sf.value))
+        console('')
+    if not seen_entries:
+        console('No results')
 
 
 @event('options.register')
