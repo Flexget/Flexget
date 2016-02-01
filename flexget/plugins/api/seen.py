@@ -98,20 +98,28 @@ class SeenSearchAPI(APIResource):
         is_seen_local = args['is_seen_local']
         sort_by = args['sort_by']
         order = args['order']
+
         # Handles default if it explicitly called
         if order == 'desc':
             order = True
         else:
             order = False
 
+        # Unquotes and prepares value for DB lookup
         if value:
             value = unquote(value)
-            value = '%' + value + '%'
-        seen_entries_list = seen.search(value, is_seen_local, session)
-        count = len(seen_entries_list)
+            value = '%{0}%'.format(value)
+
+        raw_seen_entries_list = seen.search(value, is_seen_local, session)
+        converted_seen_entry_list = [entry.to_dict() for entry in raw_seen_entries_list]
+        sorted_seen_entries_list = sorted(converted_seen_entry_list, key=itemgetter(sort_by), reverse=order)
+
+        # Pagination
+        count = len(sorted_seen_entries_list)
 
         pages = int(ceil(count / float(max_results)))
-        seen_entries = []
+
+        # Invalid page request
         if page > pages and pages != 0:
             return {'error': 'page %s does not exist' % page}, 404
 
@@ -120,13 +128,12 @@ class SeenSearchAPI(APIResource):
         if finish > count:
             finish = count
 
+        paginated_seen_entries = []
         for seen_entry_num in range(start, finish):
-            seen_entries.append(seen_entries_list[seen_entry_num].to_dict())
-
-        sorted_seen_entries_list = sorted(seen_entries, key=itemgetter(sort_by), reverse=order)
+            paginated_seen_entries.append(sorted_seen_entries_list[seen_entry_num])
 
         return jsonify({
-            'seen_entries': sorted_seen_entries_list,
+            'seen_entries': paginated_seen_entries,
             'number_of_seen_entries': count,
             'page_number': page,
             'total_number_of_pages': pages
