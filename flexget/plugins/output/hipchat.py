@@ -14,8 +14,9 @@ class OutputHipchat(object):
     """
     Example::
       hipchat:
-        auth_token: <AUTH_TOKEN>
-        room_key: <ROOM_KEY>
+        auth:
+          auth_token: <AUTH_TOKEN>
+          room_key: <ROOM_KEY>
         [color: green|yellow|red|grey|purple (default: green)]
         [notify: true|false (default: false)]
         [title: <TITLE> (default: "New download started:")]
@@ -24,20 +25,30 @@ class OutputHipchat(object):
     Configuration parameters are also supported from entries (eg. through set).
     """
     default_message = ('{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} {{series_id}} '
-                        '{{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} '
-                        '{{imdb_year}}{% else %}{{title}}{% endif %}')
+                       '{{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} '
+                       '{{imdb_year}}{% else %}{{title}}{% endif %}')
+
+    auth = {
+            'type': 'object',
+            'properties': {
+                'auth_token': {'type': 'string'},
+                'room_key': {'type': 'string'}
+            },
+            'required': ['auth_token', 'room_key'],
+            'additionalProperties': False
+    }
+
     schema = {
         'type': 'object',
         'properties': {
-            'auth_token': one_or_more({'type': 'string'}),
-            'room_key': one_or_more({'type': 'string'}),
+            'auth': one_or_more(auth),
             'color': {'type': 'string', 'default': 'green'},
             'notify': {'type': 'string', 'default': 'false'},
             'title': {'type': 'string', 'default': 'New download started:'},
             'message': {'type': 'string', 'default': default_message},
             'url': {'type': 'string', 'default': 'https://api.hipchat.com'},
         },
-        'required': ['auth_token', 'room_key'],
+        'required': ['auth'],
         'additionalProperties': False
     }
 
@@ -46,8 +57,7 @@ class OutputHipchat(object):
     def on_task_output(self, task, config):
 
         for entry in task.accepted:
-            auth_token = config['auth_token']
-            room_key = config['room_key']
+            auth = config['auth']
             color = config['color']
             notify = config['notify']
             title = config['title']
@@ -89,9 +99,9 @@ class OutputHipchat(object):
                 log.warning('Problem rendering `url`: %s' % e)
                 url = 'https://api.hipchat.com'
 
-            full_url = '%s/v2/room/%s/notification?auth_token=%s' % (url, room_key, auth_token)
+            full_url = '%s/v2/room/%s/notification?auth_token=%s' % (url, auth['room_key'], auth['auth_token'])
 
-            self.send_push(task, auth_token, room_key, color, notify, title, message, full_url)
+            self.send_push(task, auth['auth_token'], auth['room_key'], color, notify, title, message, full_url)
 
     def send_push(self, task, auth_token, room_key, color, notify, title, message, url):
 
