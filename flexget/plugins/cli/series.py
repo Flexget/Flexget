@@ -11,7 +11,7 @@ from flexget.manager import Session
 try:
     from flexget.plugins.filter.series import (Series, forget_series, forget_series_episode, set_series_begin,
                                                normalize_series_name, new_eps_after, get_latest_release,
-                                               get_series_summary, shows_by_name, show_episodes)
+                                               get_series_summary, shows_by_name, show_episodes, shows_by_exact_name)
 except ImportError:
     raise plugin.DependencyError(issued_by='cli_series', missing='series',
                                  message='Series commandline interface not loaded')
@@ -99,8 +99,9 @@ def display_summary(options):
 def begin(manager, options):
     series_name = options.series_name
     ep_id = options.episode_id
+    normalized_name = normalize_series_name(series_name)
     with Session() as session:
-        series = shows_by_name(series_name, session)
+        series = shows_by_exact_name(normalized_name, session)
         if not series:
             console('Series not yet in database, adding `%s`' % series_name)
             series = Series()

@@ -11,9 +11,8 @@ from flexget.utils.soup import get_soup
 log = logging.getLogger('anidb_list')
 USER_ID_RE = r'^\d{1,6}$'
 
-
 class AnidbList(object):
-    """"Creates an entry for each movie in your Anidb list."""
+    """"Creates an entry for each movie or series in your AniDB wishlist."""
 
     schema = {
         'type': 'object',
@@ -21,8 +20,14 @@ class AnidbList(object):
             'user_id': {
                 'type': 'integer',
                 'pattern': USER_ID_RE,
-                'error_pattern': 'user_id must be in the form XXXXXXX'
-            }
+                'error_pattern': 'user_id must be in the form XXXXXXX'},
+            'type': {
+                'type': 'string',
+                'enum': ['shows', 'movies'],
+                'default' : 'movies'},
+            'strip_dates': {
+                'type': 'boolean',
+                'default' : False}
         },
         'additionalProperties': False,
         'required': ['user_id'],
@@ -31,14 +36,14 @@ class AnidbList(object):
 
     @cached('anidb_list', persist='2 hours')
     def on_task_input(self, task, config):
-        # Create movie entries by parsing anidb wishlist page html using beautifulsoup
+        # Create entries by parsing AniDB wishlist page html using beautifulsoup
         log.verbose('Retrieving AniDB list: mywishlist')
         url = 'http://anidb.net/perl-bin/animedb.pl?show=mywishlist&uid=%s' % config['user_id']
         log.debug('Requesting: %s' % url)
 
         page = task.requests.get(url)
         if page.status_code != 200:
-            raise plugin.PluginError('Unable to get AniDB list. Either list is private or does not exist.')
+            raise plugin.PluginError('Unable to get AniDB list. Either the list is private or does not exist.')
 
         soup = get_soup(page.text)
         soup = soup.find('table', class_='wishlist')
@@ -49,12 +54,23 @@ class AnidbList(object):
             return
 
         entries = []
+        entry_type = ''
+        if config['type'] == 'movies':
+            entry_type = 'Type: Movie'
+        elif config['type'] == 'shows':
+            entry_type = 'Type: TV Series'
         for tr in trs:
-            if tr.find('span', title='Type: Movie'):
+            if tr.find('span', title=entry_type):
                 a = tr.find('label').find('a')
                 if not a:
-                    log.debug('no title link found for row, skipping')
+                    log.debug('No title link found for the row, skipping')
                     continue
+
+                anime_title = a.string
+                if config.get('strip_dates'):
+                    # Remove year from end of series name if present
+                    anime_title = re.sub(r'\s+\(\d{4}\)$', '', anime_title)
+
                 link = ('http://anidb.net/perl-bin/' + a.get('href'))
 
                 anime_id = ""
@@ -63,15 +79,14 @@ class AnidbList(object):
                     anime_id = match.group(1)
 
                 entry = Entry()
-                entry['title'] = a.string
+                entry['title'] = anime_title
                 entry['url'] = link
                 entry['anidb_id'] = anime_id
                 entry['anidb_name'] = entry['title']
                 entries.append(entry)
             else:
-                log.verbose('Entry is not a movie')
+                log.verbose('Entry does not match the requested type')
         return entries
-
 
 @event('plugin.register')
 def register_plugin():

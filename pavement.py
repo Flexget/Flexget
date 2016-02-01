@@ -44,7 +44,7 @@ install_requires = [
     'jsonschema>=2.0',
     'tmdb3',
     'path.py',
-    'guessit>=2.0.1',
+    'guessit>=2.0.3',
     'apscheduler',
     'pytvmaze>=1.4.4',
     'ordereddict>=1.1',
@@ -57,6 +57,7 @@ install_requires = [
     'flask-login>=0.3.2',
     'flask-cors>=2.1.2',
     'pyparsing>=2.0.3',
+    'Safe'
 ]
 
 if sys.version_info < (2, 7):
