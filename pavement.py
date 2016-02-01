@@ -364,6 +364,18 @@ def requirements(options):
 
 
 @task
+def upgrade_deps():
+    try:
+        import pip
+        cmd = ['install', '--upgrade']
+        cmd.extend(install_requires)
+        pip.main(cmd)
+    except ImportError:
+        print('FATAL: Unable to import pip, please install it and run this again!')
+        sys.exit(1)
+
+
+@task
 def build_webui():
 
     cwd = os.path.join('flexget', 'ui')
