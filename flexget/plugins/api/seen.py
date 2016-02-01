@@ -104,7 +104,7 @@ class SeenSearchAPI(APIResource):
             value = unquote(value)
             value = '%{0}%'.format(value)
 
-        raw_seen_entries_list = seen.search(value, is_seen_local, session)
+        raw_seen_entries_list = seen.search(value=value, status=is_seen_local, session=session)
         converted_seen_entry_list = [entry.to_dict() for entry in raw_seen_entries_list]
         sorted_seen_entries_list = sorted(converted_seen_entry_list, key=itemgetter(sort_by), reverse=order)
 
