@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import copy
 from math import ceil
 from operator import itemgetter
 from urllib import unquote
@@ -39,18 +40,11 @@ seen_object = {
 }
 seen_object_schema = api.schema('seen_object_schema', seen_object)
 
-seen_object_input_schema = {
-    'type': 'object',
-    'properties': {
-        'title': {'type': 'string'},
-        'reason': {'type': 'string'},
-        'task': {'type': 'string'},
-        'local': {'type': 'boolean', 'default': False},
-        'fields': {'type': 'object'}
-    },
-    'required': ['title', 'fields', 'task'],
-    'additional_properties': False
-}
+seen_object_input_schema = copy.deepcopy(seen_object)
+del seen_object_input_schema['properties']['id']
+seen_object_input_schema.update({'required': ['title', 'fields', 'task'],
+                                 'additional_properties': False})
+
 seen_object_input_schema = api.schema('seen_object_input_schema', seen_object_input_schema)
 
 seen_search_schema = {
