@@ -34,14 +34,25 @@ seen_object = {
         'reason': {'type': 'string'},
         'task': {'type': 'string'},
         'added': {'type': 'string'},
-        'local': {'type': 'string'},
+        'local': {'type': 'boolean'},
         'fields': {'type': 'array', 'items': seen_field_object}
     }
 }
 seen_object_schema = api.schema('seen_object_schema', seen_object)
 
+# Copy inout schema from seen object and manipulate to get desired fields
 seen_object_input_schema = copy.deepcopy(seen_object)
+
+# ID not needed when inputting entry
 del seen_object_input_schema['properties']['id']
+
+# Get dict and not array of dicts
+seen_object_input_schema['properties']['fields'] = {'type': 'object'}
+
+# Set default local status to False
+seen_object_input_schema['properties']['local'] = {'type': 'boolean', 'default': False}
+
+# Add JSON schema validation fields
 seen_object_input_schema.update({'required': ['title', 'fields', 'task'],
                                  'additional_properties': False})
 
