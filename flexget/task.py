@@ -5,6 +5,8 @@ import hashlib
 import itertools
 import logging
 import threading
+import random
+import string
 from functools import wraps
 
 from sqlalchemy import Column, Integer, String, Unicode
@@ -193,6 +195,7 @@ class Task(object):
 
         """
         self.name = unicode(name)
+        self.id = ''.join(random.choice(string.digits) for _ in range(6))
         self.manager = manager
         if config is None:
             config = manager.config['tasks'].get(name, {})

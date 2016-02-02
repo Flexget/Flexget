@@ -1,0 +1,78 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/search?query=Shameless&type=show&year=2011
+    response:
+      body: {string: '[{"type":"show","score":89.14082,"show":{"title":"Shameless
+          (US)","overview":"Chicagoan Frank Gallagher is the proud single dad of six
+          smart, industrious, independent kids, who without him would be... perhaps
+          better off. When Frank''s not at the bar spending what little money they
+          have, he''s passed out on the floor. But the kids have found ways to grow
+          up in spite of him. They may not be like any family you know, but they make
+          no apologies for being exactly who they are.","year":2011,"status":"returning
+          series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/034/160/posters/original/0fed195982.jpg","medium":"https://walter.trakt.us/images/shows/000/034/160/posters/medium/0fed195982.jpg","thumb":"https://walter.trakt.us/images/shows/000/034/160/posters/thumb/0fed195982.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/034/160/fanarts/original/4f8b2fdbd4.jpg","medium":"https://walter.trakt.us/images/shows/000/034/160/fanarts/medium/4f8b2fdbd4.jpg","thumb":"https://walter.trakt.us/images/shows/000/034/160/fanarts/thumb/4f8b2fdbd4.jpg"}},"ids":{"trakt":34160,"slug":"shameless-us","tvdb":161511,"imdb":"tt1586680","tmdb":34307,"tvrage":25117}}}]'}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [24ec65816a5c095c-DFW]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Thu, 03 Dec 2015 04:06:01 GMT']
+        etag: [W/"b7e48af7f87c7734f039704ba2ea0208"]
+        expires: ['Thu, 03 Dec 2015 08:06:01 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=dd4bcf8b33caaf5b56ca112c27b2a44501449115561; expires=Fri,
+            02-Dec-16 04:06:01 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-pagination-item-count: ['1']
+        x-pagination-limit: ['10']
+        x-pagination-page: ['1']
+        x-pagination-page-count: ['1']
+        x-request-id: [eea04fed-2490-4564-8b91-a1907182b44f]
+        x-runtime: ['0.020141']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+  - request:
+      body: null
+      headers:
+        Content-Type: [application/json]
+        Cookie: [__cfduid=dd4bcf8b33caaf5b56ca112c27b2a44501449115561]
+        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
+        trakt-api-version: [2]
+      method: GET
+      uri: https://api-v2launch.trakt.tv/shows/34160?extended=full
+    response:
+      body: {string: '{"title":"Shameless (US)","year":2011,"ids":{"trakt":34160,"slug":"shameless-us","tvdb":161511,"imdb":"tt1586680","tmdb":34307,"tvrage":25117},"overview":"Chicagoan
+          Frank Gallagher is the proud single dad of six smart, industrious, independent
+          kids, who without him would be... perhaps better off. When Frank''s not
+          at the bar spending what little money they have, he''s passed out on the
+          floor. But the kids have found ways to grow up in spite of him. They may
+          not be like any family you know, but they make no apologies for being exactly
+          who they are.","first_aired":"2011-01-09T00:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":55,"certification":"TV-MA","network":"Showtime","country":"us","trailer":"http://youtube.com/watch?v=CHstRRD_8LE","homepage":null,"status":"returning
+          series","rating":8.85946,"votes":5870,"updated_at":"2015-12-02T10:30:58.000Z","language":"en","available_translations":["en","it","ru","fr","de","zh","pt","hu","ro","sv","es","bs"],"genres":["comedy","drama"],"aired_episodes":60}'}
+      headers:
+        cache-control: ['public, max-age=14400']
+        cf-cache-status: [HIT]
+        cf-ray: [24ec6581ea68095c-DFW]
+        connection: [keep-alive]
+        content-type: [application/json; charset=utf-8]
+        date: ['Thu, 03 Dec 2015 04:06:01 GMT']
+        etag: [W/"45c7ca6f947da4615ddc50aef4198e97"]
+        expires: ['Thu, 03 Dec 2015 08:06:01 GMT']
+        last-modified: ['Wed, 02 Dec 2015 10:30:58 GMT']
+        server: [cloudflare-nginx]
+        vary: [Accept-Encoding]
+        x-content-type-options: [nosniff]
+        x-frame-options: [SAMEORIGIN]
+        x-request-id: [5e8c9ab0-1d3b-4d1f-8c9e-448a62b4b7cd]
+        x-runtime: ['0.010181']
+        x-xss-protection: [1; mode=block]
+      status: {code: 200, message: OK}
+version: 1

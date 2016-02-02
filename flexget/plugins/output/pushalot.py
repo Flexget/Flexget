@@ -2,10 +2,10 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 
 from flexget import plugin
+from flexget.config_schema import one_or_more
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
-from flexget.config_schema import one_or_more
 
 log = logging.getLogger("pushalot")
 
@@ -30,35 +30,54 @@ class OutputPushalot(object):
 
     Configuration parameters are also supported from entries (eg. through set).
     """
-    default_body = "{% if series_name is defined %}{{tvdb_series_name|d(series_name)}} " \
-                   "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}{{imdb_name}} "\
-                   "{{imdb_year}}{% else %}{{title}}{% endif %}"
-    schema = {
-        'type': 'object',
-        'properties': {
-            'token': one_or_more({'type': 'string'}),
-            'title': {'type': 'string', 'default': "Task {{task}}"},
-            'body': {'type': 'string', 'default': default_body},
-            'link': {'type': 'string', 'default': '{% if imdb_url is defined %}{{imdb_url}}{% endif %}'},
-            'linktitle': {'type': 'string', 'default': ''},
-            'important': {'type': 'boolean', 'default': False},
-            'silent': {'type': 'boolean', 'default': False},
-            'image': {'type': 'string', 'default': ''},
-            'source': {'type': 'string', 'default': 'FlexGet'},
-            'timetolive': {'type': 'integer', 'default': 0},
-        },
-        'required': ['token'],
-        'additionalProperties': False
+    default_body = ("{% if series_name is defined %}{{tvdb_series_name|d(series_name)}}" +
+                    "{{series_id}} {{tvdb_ep_name|d('')}}{% elif imdb_name is defined %}" +
+                    "{{imdb_name}} {{imdb_year}}{% else %}{{title}}{% endif %}")
+    schema = {'oneof': [
+        {'type': 'object',
+         'properties': {
+             'token': one_or_more({'type': 'string'}),
+             'title': {'type': 'string'},
+             'body': {'type': 'string'},
+             'link': {'type': 'string'},
+             'linktitle': {'type': 'string'},
+             'important': {'type': 'boolean'},
+             'silent': {'type': 'boolean'},
+             'image': {'type': 'string'},
+             'source': {'type': 'string'},
+             'timetolive': {'type': 'integer'},
+         },
+         'required': ['token'],
+         'additionalProperties': False},
+        {'type': 'string'}
+    ]
     }
+
+    def prepare_config(self, config):
+        if not isinstance(config, dict):
+            config = {'token': config}
+
+        if isinstance(config.get('token'), basestring):
+            config['token'] = [config['token']]
+
+        config.setdefault('title', "Task {{task}}")
+        config.setdefault('body', self.default_body)
+        config.setdefault('link', '{% if imdb_url is defined %}{{imdb_url}}{% endif %}')
+        config.setdefault('linktitle', '')
+        config.setdefault('important', False)
+        config.setdefault('silent', False)
+        config.setdefault('image', '')
+        config.setdefault('source', 'FlexGet')
+        config.setdefault('timetolive', 0)
+
+        return config
 
     # Run last to make sure other outputs are successful before sending notification
     @plugin.priority(0)
     def on_task_output(self, task, config):
 
-        # Support for multiple tokens
-        tokens = config["token"]
-        if not isinstance(tokens, list):
-            tokens = [tokens]
+        config = self.prepare_config(config)
+        tokens = config.get('token')
 
         # Loop through the provided entries
         for entry in task.accepted:
@@ -71,7 +90,7 @@ class OutputPushalot(object):
             silent = config["silent"]
             image = config["image"]
             source = config["source"]
-            timetolive = config["timetolive"]           
+            timetolive = config["timetolive"]
 
             # Attempt to render the title field
             try:

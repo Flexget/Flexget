@@ -212,10 +212,9 @@ class TestImdb(FlexGetBase):
                 '%s should\'ve been accepted' % movie
         assert not self.task.find_entry('rejected', title='22 Bullets'), \
             '22 Bullets should have been rejected'
-        # This test no longer valid (01/31/13) with IMDB language change
-        # rockstar = self.task.find_entry(imdb_name='Rockstar')['imdb_languages']
-        # # http://flexget.com/ticket/1399
-        # assert rockstar == ['hindi'], 'Did not find only primary language'
+        rockstar = self.task.find_entry(imdb_name='Rockstar')['imdb_languages']
+        # http://flexget.com/ticket/1399
+        assert rockstar == ['hindi'], 'Did not find only primary language'
         host_langs = self.task.find_entry(imdb_name='The Host')['imdb_languages']
         # switched to panjabi since that's what I got ...
         assert host_langs == ['korean', 'english'], \

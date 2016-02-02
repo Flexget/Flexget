@@ -134,7 +134,8 @@ class Session(requests.Session):
 
         # Raise Timeout right away if site is known to timeout
         if is_unresponsive(url):
-            raise requests.Timeout('Requests to this site have timed out recently. Waiting before trying again.')
+            raise requests.Timeout('Requests to this site (%s) have timed out recently. Waiting before trying again.' %
+                urlparse(url).hostname)
 
         # Delay, if needed, before another request to this site
         wait_for_domain(url, self.domain_delay)
@@ -144,11 +145,13 @@ class Session(requests.Session):
 
         # If we do not have an adapter for this url, pass it off to urllib
         if not any(url.startswith(adapter) for adapter in self.adapters):
+            log.debug('No adaptor, passing off to urllib')
             return _wrap_urlopen(url, timeout=kwargs['timeout'])
 
         try:
+            log.debug('Fetching %s' % url)
             result = requests.Session.request(self, method, url, *args, **kwargs)
-        except (requests.Timeout, requests.ConnectionError):
+        except requests.Timeout:
             # Mark this site in known unresponsive list
             set_unresponsive(url)
             raise

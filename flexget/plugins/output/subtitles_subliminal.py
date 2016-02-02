@@ -85,11 +85,13 @@ class PluginSubliminal(object):
         from babelfish import Language
         from dogpile.cache.exception import RegionAlreadyConfigured
         import subliminal
+        from subliminal.cli import MutexLock
         try:
-            subliminal.cache_region.configure('dogpile.cache.dbm', 
-                                              arguments={'filename': os.path.join(tempfile.gettempdir(),
-                                                                                  'cachefile.dbm'),
-                                              'lock_factory': subliminal.MutexLock})
+            subliminal.region.configure('dogpile.cache.dbm', 
+                                        arguments={
+                                            'filename': os.path.join(tempfile.gettempdir(), 'cachefile.dbm'),
+                                            'lock_factory': MutexLock,
+                                        })
         except RegionAlreadyConfigured:
             pass
         logging.getLogger("subliminal").setLevel(logging.CRITICAL)
@@ -129,7 +131,7 @@ class PluginSubliminal(object):
                     else:
                         subtitle = subliminal.download_best_subtitles([video], entry_langs, providers=providers_list,
                                                                       min_score=msc)
-                        if subtitle:
+                        if subtitle and any(subtitle.values()):
                             downloaded_subtitles.update(subtitle)
                             log.info('Subtitles found for %s' % entry['location'])
                         else:
@@ -141,7 +143,7 @@ class PluginSubliminal(object):
                                 subtitle = subliminal.download_best_subtitles([video], remaining_alts,
                                                                               providers=providers_list, min_score=msc)
                             # this potentially just checks an already checked assignment bleh
-                            if subtitle:
+                            if subtitle and any(subtitle.values()):
                                 downloaded_subtitles.update(subtitle)
                                 entry.fail('subtitles found for a second-choice language.')
                             else:
@@ -162,7 +164,9 @@ class PluginSubliminal(object):
                     entry.fail(msg)
         if downloaded_subtitles:
             # save subtitles to disk
-            subliminal.save_subtitles(downloaded_subtitles, single=single_mode)
+            for k, v in downloaded_subtitles.iteritems():
+                if v:
+                    subliminal.save_subtitles(k, v, single=single_mode)
 
 
 @event('plugin.register')

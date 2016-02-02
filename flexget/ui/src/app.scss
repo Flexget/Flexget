@@ -1,0 +1,25 @@
+// import animate scss
+@import "../bower_components/animate.css-scss/animate.scss";
+
+// import angular material
+@import "../bower_components/angular-material/angular-material.scss";
+
+// Import main flexget app
+@import "scss/flexget";
+
+// set template font family
+button, select, html, textarea, input {
+  font-family: RobotoDraft, Roboto, 'Helvetica Neue', sans-serif;
+}
+
+body {
+    font-family: RobotoDraft, Roboto, 'Helvetica Neue', sans-serif;
+    font-weight: 400;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+
+/*  inject sass files automatically */
+// injector
+// endinjector

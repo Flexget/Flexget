@@ -39,6 +39,9 @@ class EmitSeries(object):
         ]
     }
 
+    def __init__(self):
+        self.rerun_entries = []
+
     def ep_identifiers(self, season, episode):
         return ['S%02dE%02d' % (season, episode),
                 '%dx%02d' % (season, episode)]

@@ -66,7 +66,10 @@ def set_version(plugin, version, session=None):
 @with_session
 def upgrade_required(session=None):
     """Returns true if an upgrade of the database is required."""
-    for old_schema in session.query(PluginSchema).all():
+    old_schemas = session.query(PluginSchema).all()
+    if len(old_schemas) < len(plugin_schemas):
+        return True
+    for old_schema in old_schemas:
         if old_schema.plugin in plugin_schemas and old_schema.version < plugin_schemas[old_schema.plugin]['version']:
             return True
     return False
@@ -183,6 +186,17 @@ class Meta(type):
                 new_bases.append(base)
 
         return type.__new__(mcs, str(metaname), tuple(new_bases), dict_)
+
+    def register_table(cls, table):
+        """
+        This can be used if a plugin is declaring non-declarative sqlalchemy tables.
+
+        :param table: Can either be the name of the table, or an :class:`sqlalchemy.Table` instance.
+        """
+        if isinstance(table, basestring):
+            register_plugin_table(table, cls.plugin, cls.version)
+        else:
+            register_plugin_table(table.name, cls.plugin, cls.version)
 
     def __getattr__(self, item):
         """Transparently return attributes of Base instead of our own."""

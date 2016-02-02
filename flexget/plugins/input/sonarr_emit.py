@@ -105,25 +105,19 @@ class SonarrEmit(object):
                                   series_season=season,
                                   series_episode=episode,
                                   series_id='S%02dE%02d' % (season, episode),
-                                  tvdb_id=record['series']['tvdbId'],
-                                  tvrage_id=record['series']['tvRageId'],
+                                  tvdb_id=record['series'].get('tvdbId'),
+                                  tvrage_id=record['series'].get('tvRageId'),
+                                  tvmaze_id=record['series'].get('tvMazeId'),
                                   title=record['series']['title'] + ' ' + 'S%02dE%02d' % (season, episode))
                     if entry.isvalid():
                         entries.append(entry)
                     else:
                         log.error('Invalid entry created? %s' % entry)
                     # Test mode logging
-                    if task.options.test:
-                        log.info("Test mode. Entry includes:")
-                        log.info("    Title: %s" % entry["title"])
-                        log.info("    URL: %s" % entry["url"])
-                        log.info("    Show name: %s" % entry["series_name"])
-                        log.info("    TVDB ID: %s" % entry["tvdb_id"])
-                        log.info("    TVRAGE ID: %s" % entry["tvrage_id"])
-                        log.info("    Season: %s" % entry["series_season"])
-                        log.info("    Episode: %s" % entry["series_episode"])
-                        log.info("    Series ID: %s" % entry["series_id"])
-                    continue
+                    if entry and task.options.test:
+                        log.verbose("Test mode. Entry includes:")
+                        for key, value in entry.items():
+                            log.verbose('     %s: %s' % (key.capitalize(), value))
             json = self.get_page(task, config, page)
         return entries
 
