@@ -6,6 +6,7 @@ from distutils.version import LooseVersion
 from urllib2 import URLError
 
 from sqlalchemy import Column, Integer, String
+from telegram.error import TelegramError
 
 from flexget import db_schema, plugin, options
 from flexget.event import event
@@ -22,9 +23,11 @@ _MIN_TELEGRAM_VER = '3.1.0'
 
 _PLUGIN_NAME = 'send_telegram'
 
+_PARSERS = ['markdown', 'html']
+
 _TOKEN_ATTR = 'bot_token'
 _TMPL_ATTR = 'template'
-_MARKDOWN_ATTR = 'use_markdown'
+_PARSE_ATTR = 'parse_mode'
 _RCPTS_ATTR = 'recipients'
 _USERNAME_ATTR = 'username'
 _FULLNAME_ATTR = 'fullname'
@@ -125,7 +128,7 @@ class SendTelegram(object):
         'properties': {
             _TOKEN_ATTR: {'type': 'string'},
             _TMPL_ATTR: {'type': 'string', 'default': '{{title}}'},
-            _MARKDOWN_ATTR: {'type': 'boolean', 'default': False},
+            _PARSE_ATTR: {'type': 'string', 'enum': _PARSERS},
             _RCPTS_ATTR: {
                 'type': 'array',
                 'minItems': 1,
@@ -178,7 +181,7 @@ class SendTelegram(object):
         """
         self._token = config[_TOKEN_ATTR]
         self._tmpl = config[_TMPL_ATTR]
-        self._use_markdown = config[_MARKDOWN_ATTR]
+        self._parse_mode = config[_PARSE_ATTR]
         self._usernames = []
         self._fullnames = []
         self._groups = []
@@ -279,12 +282,18 @@ class SendTelegram(object):
 
     def _send_msgs(self, task, chat_ids):
         kwargs = dict()
-        if self._use_markdown:
+        if self._parse_mode == 'markdown':
             kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
+        elif self._parse_mode == 'html':
+            kwargs['parse_mode'] = 'HTML' # TODO: Change this to use ParseMode when it's implemented
         for entry in task.accepted:
             msg = self._render_msg(entry, self._tmpl)
             for chat_id in (x.id for x in chat_ids):
-                self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
+                try:
+                    self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
+                except TelegramError as e:
+                    self.log.error('Cannot send message: %s' % e.message)
+                    continue
 
     def _render_msg(self, entry, tmpl):
         """
