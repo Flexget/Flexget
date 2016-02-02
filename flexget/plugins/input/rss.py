@@ -123,6 +123,9 @@ class InputRSS(object):
         """Set default values to config"""
         if isinstance(config, basestring):
             config = {'url': config}
+        else:
+            # Make a copy so that original config is not modified
+            config = dict(config)
         # set the default link value to 'auto'
         config.setdefault('link', 'auto')
         # Convert any field names from the config to format feedparser will use for 'link', 'title' and 'other_fields'
