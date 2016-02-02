@@ -97,7 +97,8 @@ class QueuedMovie(queue_base.QueuedItem, Base):
     def to_dict(self):
         return {
             'added': self.added,
-            'is_downloaded': self.downloaded or False,
+            'is_downloaded': True if self.downloaded else False,
+            'download_date': self.downloaded if self.downloaded else None,
             'entry_original_url': self.entry_original_url,
             'entry_title': self.entry_title,
             'entry_url': self.entry_url,

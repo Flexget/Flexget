@@ -18,6 +18,7 @@ movie_object = {
     'properties': {
         'added_date': {'type': 'string'},
         'is_downloaded': {'type': 'boolean'},
+        'download_date': {'type': 'string'},
         'entry_original_url': {'type': 'string'},
         'entry_title': {'type': 'string'},
         'entry_url': {'type': 'string'},
@@ -50,8 +51,8 @@ movie_queue_parser = api.parser()
 movie_queue_parser.add_argument('page', type=int, default=1, help='Page number')
 movie_queue_parser.add_argument('max', type=int, default=100, help='Movies per page')
 movie_queue_parser.add_argument('is_downloaded', type=inputs.boolean, help='Filter list by movies download status')
-movie_queue_parser.add_argument('sort_by', choices=('added', 'is_downloaded', 'id', 'title'), default='added',
-                                help="Sort response by value")
+movie_queue_parser.add_argument('sort_by', choices=('added', 'is_downloaded', 'id', 'title', 'download_date'),
+                                default='added', help="Sort response by attribute")
 movie_queue_parser.add_argument('order', choices=('asc', 'desc'), default='desc', help="Sorting order")
 
 movie_add_results_schema = {
