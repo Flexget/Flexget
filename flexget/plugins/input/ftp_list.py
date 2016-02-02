@@ -2,6 +2,7 @@ import logging
 import ftplib
 import os
 import re
+import urllib
 
 from flexget import plugin
 from flexget.event import event
@@ -73,6 +74,8 @@ class InputFtpList(object):
         try:
             ftp.connect(connection_config['host'], connection_config['port'])
             ftp.login(connection_config['username'], connection_config['password'])
+            if connection_config['use-ssl']:
+                ftp.prot_p()
         except ftplib.all_errors as e:
             raise plugin.PluginError(e)
 
@@ -111,6 +114,8 @@ class InputFtpList(object):
 
             self._handle_path(entries, ftp, baseurl, path, mlst_supported, files_only, recursive, get_size, encoding)
 
+        ftp.close()
+
         return entries
 
     def _handle_path(self, entries, ftp, baseurl, path='', mlst_supported=False, files_only=False, recursive=False,
@@ -143,8 +148,8 @@ class InputFtpList(object):
                                   recursive, get_size, encoding)
 
             if not files_only or mlst.get('type') == 'file':
-                url = baseurl + path + '/' + p
-                url = url.replace(' ', '%20')
+                url = baseurl + urllib.quote(path) + '/' + urllib.quote(p)
+                log.debug("Encoded URL: " + url)
                 title = os.path.basename(p)
                 log.info('Accepting entry "%s" [%s]' % (path + '/' + p, mlst.get('type') or "unknown",))
                 entry = Entry(title, url)
@@ -158,7 +163,7 @@ class InputFtpList(object):
                 elif get_size:
                     entry['content_size'] = float(mlst.get('size')) / (1024 * 1024)
                 entries.append(entry)
-        
+
     def parse_mlst(self, mlst):
         re_results = re.findall('(.*?)=(.*?);', mlst)
         parsed = {}

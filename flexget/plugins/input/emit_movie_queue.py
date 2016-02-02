@@ -46,7 +46,7 @@ class EmitMovieQueue(object):
         entries = []
 
         with Session() as session:
-            for queue_item in queue_get(session=session):
+            for queue_item in queue_get(session=session, downloaded=False):
                 entry = Entry()
                 # make sure the entry has IMDB fields filled
                 entry['url'] = ''

@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-from collections import MutableMapping
 import logging
 import subprocess
 
 
 from flexget import plugin
+from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
 from flexget.utils.template import render_from_entry, render_from_task, RenderError
@@ -13,33 +13,18 @@ from flexget.utils.tools import io_encoding
 log = logging.getLogger('exec')
 
 
-class EscapingDict(MutableMapping):
-    """Helper class, same as a dict, but returns all string value with quotes escaped."""
+class EscapingEntry(Entry):
+    """Helper class, same as a Entry, but returns all string value with quotes escaped."""
 
-    def __init__(self, mapping):
-        self._data = mapping
-
-    def __len__(self):
-        return len(self._data)
-
-    def __iter__(self):
-        return iter(self._data)
+    def __init__(self, entry):
+        super(EscapingEntry, self).__init__(entry)
 
     def __getitem__(self, key):
-        value = self._data[key]
+        value = super(EscapingEntry, self).__getitem__(key)
+        # TODO: May need to be different depending on OS
         if isinstance(value, basestring):
-            # TODO: May need to be different depending on OS
             value = value.replace('"', '\\"')
         return value
-
-    def __setitem__(self, key, value):
-        self._data[key] = value
-
-    def __delitem__(self, key):
-        del self._data[key]
-
-    def __copy__(self):
-        return EscapingDict(self._data.copy())
 
 
 class PluginExec(object):
@@ -146,7 +131,7 @@ class PluginExec(object):
 
             for entry in entries:
                 for cmd in config[phase_name][operation]:
-                    entrydict = EscapingDict(entry) if config.get('auto_escape') else entry
+                    entrydict = EscapingEntry(entry) if config.get('auto_escape') else entry
                     # Do string replacement from entry, but make sure quotes get escaped
                     try:
                         cmd = render_from_entry(cmd, entrydict)

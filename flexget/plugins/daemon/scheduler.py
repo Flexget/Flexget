@@ -9,9 +9,9 @@ from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 
-from flexget.config_schema import register_config_key, format_checker
+from flexget.config_schema import register_config_key, format_checker, register_schema
 from flexget.event import event
-from flexget.manager import Base
+from flexget.manager import Base, manager
 from flexget.utils import json
 
 log = logging.getLogger('scheduler')
@@ -32,6 +32,7 @@ def is_cron_schedule(instance):
 UNITS = ['minutes', 'hours', 'days', 'weeks']
 interval_schema = {
     'type': 'object',
+    'title': 'Simple Interval',
     'properties': {
         'minutes': {'type': 'number'},
         'hours': {'type': 'number'},
@@ -39,13 +40,14 @@ interval_schema = {
         'weeks': {'type': 'number'}
     },
     # Only allow one unit to be specified
-    'oneOf': [{'required': [unit]} for unit in UNITS],
-    'error_oneOf': 'Interval must be specified as one of %s' % ', '.join(UNITS),
+    'maxProperties': 1,
+    'error_maxProperties': 'Interval must be specified as one of %s' % ', '.join(UNITS),
     'additionalProperties': False
 }
 
 cron_schema = {
     'type': 'object',
+    'title': 'Advanced Cron Interval',
     'properties': {
         'year': {'type': ['integer', 'string']},
         'month': {'type': ['integer', 'string']},
@@ -55,32 +57,45 @@ cron_schema = {
         'hour': {'type': ['integer', 'string']},
         'minute': {'type': ['integer', 'string']}
     },
-    'format': 'cron_schedule',
     'additionalProperties': False
 }
+
+schedule_schema = {
+    'type': 'object',
+    'title': 'Schedule',
+    'description': 'A schedule which runs specified tasks periodically.',
+    'properties': {
+        'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
+        'interval': interval_schema,
+        'schedule': cron_schema
+    },
+    'required': ['tasks'],
+    'minProperties': 2,
+    'maxProperties': 2,
+    'error_minProperties': 'Either `cron` or `interval` must be defined.',
+    'error_maxProperties': 'Either `cron` or `interval` must be defined.',
+    'additionalProperties': False
+}
+
 
 main_schema = {
     'oneOf': [
         {
             'type': 'array',
-            'items': {
-                'properties': {
-                    'tasks': {'type': ['array', 'string'], 'items': {'type': 'string'}},
-                    'interval': interval_schema,
-                    'schedule': cron_schema
-                },
-                'required': ['tasks'],
-                'oneOf': [{'required': ['schedule']}, {'required': ['interval']}],
-                'error_oneOf': 'Either `cron` or `interval` must be defined.',
-                'additionalProperties': False
-            }
+            'title': 'Enable',
+            'items': schedule_schema
         },
-        {'type': 'boolean', 'enum': [False]}
+        {
+            'type': 'boolean',
+            'title': 'Disable',
+            'description': 'Disable task schedules',
+        }
     ]
 }
 
 
 scheduler = None
+scheduler_job_map = {}
 
 
 def job_id(conf):
@@ -90,9 +105,8 @@ def job_id(conf):
 
 def run_job(tasks):
     """Add the execution to the queue and waits until it is finished"""
-    from flexget.manager import manager
     finished_events = manager.execute(options={'tasks': tasks, 'cron': True}, priority=5)
-    for event in finished_events:
+    for task_id, task_name, event in finished_events:
         event.wait()
 
 
@@ -131,10 +145,16 @@ def setup_jobs(manager):
     """Set up the jobs for apscheduler to run."""
     if not manager.is_daemon:
         return
+
+    global scheduler_job_map
+    scheduler_job_map = {}
+
     if 'schedules' not in manager.config:
         log.info('No schedules defined in config. Defaulting to run all tasks on a 1 hour interval.')
-    config = manager.config.get('schedules', [{'tasks': ['*'], 'interval': {'hours': 1}}])
-    if not config:  # Schedules are disabled with `schedules: no`
+    config = manager.config.get('schedules', True)
+    if config is True:
+        config = [{'tasks': ['*'], 'interval': {'hours': 1}}]
+    elif not config:  # Schedules are disabled with `schedules: no`
         if scheduler.running:
             log.info('Shutting down scheduler')
             scheduler.shutdown()
@@ -144,6 +164,7 @@ def setup_jobs(manager):
     for job_config in config:
         jid = job_id(job_config)
         configured_job_ids.append(jid)
+        scheduler_job_map[id(job_config)] = jid
         if jid in existing_job_ids:
             continue
         if 'interval' in job_config:
@@ -179,3 +200,5 @@ def stop_scheduler(manager):
 @event('config.register')
 def register_config():
     register_config_key('schedules', main_schema)
+    register_schema('/schema/config/schedule', schedule_schema)
+

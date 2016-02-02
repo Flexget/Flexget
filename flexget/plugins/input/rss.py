@@ -370,7 +370,8 @@ class InputRSS(object):
             def add_entry(ea):
                 ea['title'] = entry.title
 
-                for rss_field, flexget_field in fields.iteritems():
+                # fields dict may be modified during this loop, so loop over a copy (fields.items())
+                for rss_field, flexget_field in fields.items():
                     if rss_field in entry:
                         if not isinstance(getattr(entry, rss_field), basestring):
                             # Error if this field is not a string

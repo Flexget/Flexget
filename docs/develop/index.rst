@@ -23,7 +23,7 @@ Core
 * jsonschema
 * Some smaller misc libraries
 
-WebUI
+HTTPServer
 ~~~~~
 
 * Flask
@@ -87,11 +87,11 @@ Unit tests
 
 There are currently over 250 unit tests ensuring that existing functionality
 is not accidentally broken. Unit tests can be invoked with the installation
-of additionnal requirments:
+of additionnal requirments::
 
-  pip install jenkins-requirements.txt
+  pip install -r jenkins-requirements.txt
 
-Easiest way to run tests is trough paver::
+Easiest way to run tests is through paver::
 
   paver test
 

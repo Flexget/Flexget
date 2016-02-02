@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
 
 from flexget import plugin
@@ -10,6 +11,7 @@ from flexget.utils.log import log_once
 try:
     # TODO: Fix this after api_tmdb has module level functions
     from flexget.plugins.api_tmdb import ApiTmdb
+
     lookup = ApiTmdb.lookup
 except ImportError:
     raise plugin.DependencyError(issued_by='tmdb_lookup', missing='api_tmdb')
@@ -35,7 +37,7 @@ class PluginTmdbLookup(object):
         'tmdb_released': 'released',
         'tmdb_votes': 'votes',
         'tmdb_certification': 'certification',
-        'tmdb_posters': lambda movie: [poster.url for poster in movie.posters],
+        'tmdb_posters': lambda movie: [poster.url for poster in sorted(movie.posters, key=lambda poster: poster.size)],
         'tmdb_runtime': 'runtime',
         'tmdb_tagline': 'tagline',
         'tmdb_budget': 'budget',

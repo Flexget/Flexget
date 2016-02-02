@@ -113,9 +113,12 @@ class InputPlex(object):
         return globalaccesstoken
 
     def plex_get_accesstoken(self, config, globalaccesstoken=""):
-        accesstoken = ""
+        accesstoken = None
         if not globalaccesstoken:
             globalaccesstoken = self.plex_get_globalaccesstoken(config)
+        if config['server'] in ('localhost', '127.0.0.1'):
+            log.debug('Server using localhost. Global Token will be used')
+            return globalaccesstoken
         try:
             r = requests.get("https://my.plexapp.com/pms/servers?X-Plex-Token=%s" % globalaccesstoken)
         except requests.RequestException as e:
@@ -123,7 +126,7 @@ class InputPlex(object):
                                      "authentication-token: %s. (%s)" % (globalaccesstoken, e))
         dom = parseString(r.text)
         for node in dom.getElementsByTagName('Server'):
-            if node.getAttribute('address') == config['server']:
+            if config['server'] in (node.getAttribute('address'), node.getAttribute('localAddresses')):
                 accesstoken = node.getAttribute('accessToken')
                 log.debug("Got plextoken: %s" % accesstoken)
         if not accesstoken:
@@ -146,7 +149,7 @@ class InputPlex(object):
         entries = []
         if config['unwatched_only'] and config['section'] != 'recentlyViewedShows' and config['section'] != 'all':
             urlconfig['unwatched'] = '1'
-        if config['username'] and config['password'] and config['server'] != '127.0.0.1':
+        if config['username'] and config['password']:
             accesstoken = self.plex_get_accesstoken(config)
             log.debug("Got accesstoken: %s" % accesstoken)
             urlconfig['X-Plex-Token'] = accesstoken

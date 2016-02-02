@@ -1,3 +1,4 @@
+*~
 *.pyc
 *.swo
 *.swp
@@ -32,3 +33,7 @@ pip-*.tar.gz
 *.noseids
 .coverage
 tests/cover/
+flexget/ui/node_modules/
+flexget/ui/bower_components/
+flexget/ui/.tmp/
+flexget/ui/app/

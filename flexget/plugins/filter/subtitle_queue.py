@@ -6,8 +6,8 @@ import urllib
 import urlparse
 import os.path
 
-from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, DateTime, Boolean
-from sqlalchemy.orm import backref, relationship
+from sqlalchemy import Column, Integer, String, ForeignKey, or_, DateTime, Boolean
+from sqlalchemy.orm import relationship
 from sqlalchemy.schema import Table
 
 from datetime import datetime, date, time
@@ -44,8 +44,8 @@ SUBTITLE_EXTENSIONS = ('.srt', '.sub', '.smi', '.txt', '.ssa', '.ass', '.mpl')  
 
 association_table = Table('association', Base.metadata,
                           Column('sub_queue_id', Integer, ForeignKey('subtitle_queue.id')),
-                          Column('lang_id', Integer, ForeignKey('subtitle_language.id'))
-                          )
+                          Column('lang_id', Integer, ForeignKey('subtitle_language.id')))
+Base.register_table(association_table)
 
 
 def normalize_path(path):

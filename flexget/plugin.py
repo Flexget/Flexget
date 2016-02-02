@@ -6,12 +6,11 @@ from __future__ import absolute_import, division, unicode_literals
 import logging
 import os
 import re
-import sys
 import time
 import warnings
 from itertools import ifilter
 
-from path import path
+from path import Path
 from requests import RequestException
 
 from flexget import plugins as plugins_pkg
@@ -20,10 +19,6 @@ from flexget.event import add_event_handler as add_phase_handler
 from flexget.event import fire_event, remove_event_handlers
 
 log = logging.getLogger('plugin')
-
-__all__ = ['PluginWarning', 'PluginError', 'register_plugin', 'register_parser_option', 'register_task_phase',
-           'get_plugin_by_name', 'get_plugins_by_group', 'get_plugin_keywords', 'get_plugins_by_phase',
-           'get_phases_by_plugin', 'internet', 'priority']
 
 
 class DependencyError(Exception):
@@ -372,7 +367,7 @@ def _load_plugins_from_dirs(dirs):
     """
 
     log.debug('Trying to load plugins from: %s' % dirs)
-    dirs = [path(d) for d in dirs if os.path.isdir(d)]
+    dirs = [Path(d) for d in dirs if os.path.isdir(d)]
     # add all dirs to plugins_pkg load path so that imports work properly from any of the plugin dirs
     plugins_pkg.__path__ = map(_strip_trailing_sep, dirs)
     for plugins_dir in dirs:

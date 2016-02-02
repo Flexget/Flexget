@@ -1,5 +1,4 @@
 import logging
-
 import sys
 import os
 import socket
@@ -109,7 +108,7 @@ class SCGITransport(xmlrpclib.Transport):
             response_body += data
 
         if self.verbose:
-            log.info('body:', repr(response_body))
+            log.info('body: %s', repr(response_body))
 
         # Remove SCGI headers from the response.
         response_header, response_body = re.split(r'\n\s*?\n', response_body, maxsplit=1)
@@ -124,11 +123,10 @@ class SCGIServerProxy(xmlrpclib.ServerProxy):
 
     def __init__(self, uri, transport=None, encoding=None,
                  verbose=False, allow_none=False, use_datetime=False, timeout=30):
-        parsed_uri = urlparse(uri)
         self.timeout = timeout
-        self.uri = uri
-        self.__host = uri
-        self.__handler = parsed_uri.path
+        parsed_url = urlparse(uri)
+        self.__host = uri if  parsed_url.scheme else None
+        self.__handler = urlparse(uri).path
         if not self.__handler:
             self.__handler = '/'
 
@@ -145,7 +143,7 @@ class SCGIServerProxy(xmlrpclib.ServerProxy):
     def __request(self, method_name, params):
         # call a method on the remote server
         request = xmlrpclib.dumps(params, method_name, encoding=self.__encoding, allow_none=self.__allow_none)
-        response = self.__transport.request(self.uri, self.__handler, request, verbose=self.__verbose)
+        response = self.__transport.request(self.__host, self.__handler, request, verbose=self.__verbose)
 
         if len(response) == 1:
             response = response[0]
@@ -176,7 +174,7 @@ class SCGIServerProxy(xmlrpclib.ServerProxy):
 class RTorrent(object):
     """ rTorrent API client """
 
-    default_fields = [
+    default_fields = (
         'hash',
         'name',
         'up_total', 'down_total', 'down_rate',
@@ -186,13 +184,13 @@ class RTorrent(object):
         'bytes_done', 'down.rate', 'left_bytes',
         'ratio',
         'base_path',
-    ]
+    )
 
-    required_fields = [
+    required_fields = (
         'hash',
         'name',
         'base_path'
-    ]
+    )
 
     def __init__(self, uri, username=None, password=None, timeout=30):
         """
@@ -230,6 +228,9 @@ class RTorrent(object):
             sp = HTTPServerProxy
         elif parsed_uri.scheme == 'scgi':
             sp = SCGIServerProxy
+        elif parsed_uri.scheme == '' and parsed_uri.path:
+            self.uri = parsed_uri.path
+            sp = SCGIServerProxy
         else:
             raise IOError('Unsupported scheme %s for uri %s' % (parsed_uri.scheme, self.uri))
 
@@ -237,7 +238,7 @@ class RTorrent(object):
 
     def _clean_fields(self, fields, reverse=False):
         if not fields:
-            fields = self.default_fields
+            fields = list(self.default_fields)
 
         if reverse:
             for field in ['up.total', 'down.total', 'down.rate']:
@@ -259,8 +260,10 @@ class RTorrent(object):
     def version(self):
         return [int(v) for v in self._server.system.client_version().split('.')]
 
-    def load(self, raw_torrent, fields={}, start=False, mkdir=True):
+    def load(self, raw_torrent, fields=None, start=False, mkdir=True):
 
+        if fields is None:
+            fields = {}
         # First param is empty 'target'
         params = ['', xmlrpclib.Binary(raw_torrent)]
 
@@ -274,14 +277,28 @@ class RTorrent(object):
             if result != 0:
                 raise xmlrpclib.Error('Failed creating directory %s' % fields['directory'])
 
+        # by default rtorrent won't allow calls over 512kb in size.
+        xmlrpc_size = len(xmlrpclib.dumps(tuple(params), 'raw_start')) + 71680  # Add 70kb for buffer
+        if xmlrpc_size > 524288:
+            prev_size = self._server.network.xmlrpc.size_limit()
+            self._server.network.xmlrpc.size_limit.set('', xmlrpc_size)
+
         # Call load method and return the response
         if start:
-            return self._server.load.raw_start(*params)
+            result = self._server.load.raw_start(*params)
         else:
-            return self._server.load.raw(*params)
+            result = self._server.load.raw(*params)
 
-    def torrent(self, info_hash, fields=default_fields):
+        if xmlrpc_size > 524288:
+            self._server.network.xmlrpc.size_limit.set('', prev_size)
+
+        return result
+
+    def torrent(self, info_hash, fields=None):
         """ Get the details of a torrent """
+        if not fields:
+            fields = list(self.default_fields)
+
         fields = self._clean_fields(fields)
 
         multi_call = xmlrpclib.MultiCall(self._server)
@@ -294,7 +311,9 @@ class RTorrent(object):
         # TODO: Maybe we should return a named tuple or a Torrent class?
         return dict(zip(self._clean_fields(fields, reverse=True), [val for val in resp]))
 
-    def torrents(self, view='main', fields=default_fields):
+    def torrents(self, view='main', fields=None):
+        if not fields:
+            fields = list(self.default_fields)
         fields = self._clean_fields(fields)
 
         params = ['d.%s=' % field for field in fields]
@@ -389,8 +408,9 @@ class RTorrentPluginBase(object):
         try:
             client = RTorrent(config['uri'], username=config.get('username'),
                               password=config.get('password'), timeout=config.get('timeout'))
-            if client.version < [0, 9, 4]:
-                task.abort('rtorrent version >=0.9.4 required, found {0}'.format('.'.join(map(str, client.version))))
+            if client.version < [0, 9, 2]:
+                log.error('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
+                task.abort('rtorrent version >=0.9.2 required, found {0}'.format('.'.join(map(str, client.version))))
         except (IOError, xmlrpclib.Error) as e:
             raise plugin.PluginError("Couldn't connect to rTorrent: %s" % str(e))
 
@@ -570,6 +590,7 @@ class RTorrentOutputPlugin(RTorrentPluginBase):
             if resp != 0:
                 entry.fail('Failed to add to rTorrent invalid return value %s' % resp)
         except (IOError, xmlrpclib.Error) as e:
+            log.exception(e)
             entry.fail('Failed to add to rTorrent %s' % str(e))
             return
 
@@ -600,7 +621,7 @@ class RTorrentInputPlugin(RTorrentPluginBase):
             'password': {'type': 'string'},
             'timeout': {'type': 'integer', 'default': 30},
             'view': {'type': 'string', 'default': 'main'},
-            'fields': one_or_more({'type': 'string', 'enum': RTorrent.default_fields}),
+            'fields': one_or_more({'type': 'string', 'enum': list(RTorrent.default_fields)}),
         },
         'required': ['uri'],
         'additionalProperties': False

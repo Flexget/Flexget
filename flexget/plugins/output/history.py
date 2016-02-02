@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
 from datetime import datetime
 
@@ -13,7 +14,6 @@ log = logging.getLogger('history')
 
 
 class History(Base):
-
     __tablename__ = 'history'
 
     id = Column(Integer, primary_key=True)
@@ -29,6 +29,17 @@ class History(Base):
 
     def __str__(self):
         return '<History(filename=%s,task=%s)>' % (self.filename, self.task)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'task': self.task,
+            'filename': self.filename,
+            'url': self.url,
+            'title': self.title,
+            'time': self.time.isoformat(),
+            'details': self.details,
+        }
 
 
 class PluginHistory(object):

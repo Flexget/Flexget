@@ -25,7 +25,8 @@ needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage', 'sphinx.ext.extlinks', 'sphinx.ext.doctest']
+extensions = ['sphinx.ext.autodoc', 'sphinx.ext.coverage', 'sphinx.ext.extlinks', 'sphinx.ext.doctest',
+              'sphinx.ext.intersphinx']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['templates']
@@ -251,3 +252,13 @@ texinfo_documents = [
 # sphinx.ext.extlinks
 extlinks = {'ticket': ('http://flexget.com/ticket/%s', 'ticket '),
             'wiki': ('http://flexget.com/wiki/%s', 'wiki ')}
+
+intersphinx_mapping = {
+    'flask': ('http://flask.pocoo.org/docs/0.10/', None),
+    'flask_restful': ('http://flask-restful.readthedocs.org/en/0.3.3/', None),
+    'flask_restplus': ('http://flask-restplus.readthedocs.org/en/stable/', None),
+    'jsonschema': ('http://python-jsonschema.readthedocs.org/en/latest/', None),
+    'python': ('https://docs.python.org/2.7', None),
+    'requests': ('http://docs.python-requests.org/en/latest/', None)
+}
+

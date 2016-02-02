@@ -2,21 +2,19 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from datetime import datetime, timedelta
 
-from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, delete
+from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime
 from sqlalchemy.schema import ForeignKey, Index
-from sqlalchemy.orm import relation, joinedload
+from sqlalchemy.orm import relation
 
 from flexget import db_schema, plugin
+from flexget.db_schema import UpgradeImpossible
 from flexget.event import event
 from flexget.entry import Entry
-from flexget.manager import Session
 from flexget.utils.log import log_once
 from flexget.utils.imdb import ImdbSearch, ImdbParser, extract_id, make_url
-from flexget.utils.sqlalchemy_utils import table_add_column
 from flexget.utils.database import with_session
-from flexget.utils.sqlalchemy_utils import table_columns, get_index_by_name, table_schema
 
-SCHEMA_VER = 4
+SCHEMA_VER = 7
 
 Base = db_schema.versioned_base('imdb_lookup', SCHEMA_VER)
 
@@ -26,16 +24,19 @@ genres_table = Table('imdb_movie_genres', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
     Column('genre_id', Integer, ForeignKey('imdb_genres.id')),
     Index('ix_imdb_movie_genres', 'movie_id', 'genre_id'))
+Base.register_table(genres_table)
 
 actors_table = Table('imdb_movie_actors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
     Column('actor_id', Integer, ForeignKey('imdb_actors.id')),
     Index('ix_imdb_movie_actors', 'movie_id', 'actor_id'))
+Base.register_table(actors_table)
 
 directors_table = Table('imdb_movie_directors', Base.metadata,
     Column('movie_id', Integer, ForeignKey('imdb_movies.id')),
     Column('director_id', Integer, ForeignKey('imdb_directors.id')),
     Index('ix_imdb_movie_directors', 'movie_id', 'director_id'))
+Base.register_table(directors_table)
 
 
 class Movie(Base):
@@ -178,46 +179,11 @@ log = logging.getLogger('imdb_lookup')
 
 @db_schema.upgrade('imdb_lookup')
 def upgrade(ver, session):
-    if ver is None:
-        columns = table_columns('imdb_movies', session)
-        if 'photo' not in columns:
-            log.info('Adding photo column to imdb_movies table.')
-            table_add_column('imdb_movies', 'photo', String, session)
-        if 'updated' not in columns:
-            log.info('Adding updated column to imdb_movies table.')
-            table_add_column('imdb_movies', 'updated', DateTime, session)
-        if 'mpaa_rating' not in columns:
-            log.info('Adding mpaa_rating column to imdb_movies table.')
-            table_add_column('imdb_movies', 'mpaa_rating', String, session)
-        ver = 0
-    if ver == 0:
-        # create indexes retrospectively (~r2563)
-        log.info('Adding imdb indexes delivering up to 20x speed increase \o/ ...')
-        indexes = [get_index_by_name(actors_table, 'ix_imdb_movie_actors'),
-                   get_index_by_name(genres_table, 'ix_imdb_movie_genres'),
-                   get_index_by_name(directors_table, 'ix_imdb_movie_directors')]
-        for index in indexes:
-            if index is None:
-                log.critical('Index adding failure!')
-                continue
-            log.info('Creating index %s ...' % index.name)
-            index.create(bind=session.connection())
-        ver = 1
-    if ver == 1:
-        # http://flexget.com/ticket/1399
-        log.info('Adding prominence column to imdb_movie_languages table.')
-        table_add_column('imdb_movie_languages', 'prominence', Integer, session)
-        ver = 2
-    if ver == 2:
-        log.info('Adding search result timestamp and clearing all previous results.')
-        table_add_column('imdb_search', 'queried', DateTime, session)
-        search_table = table_schema('imdb_search', session)
-        session.execute(delete(search_table, search_table.c.fails))
-        ver = 3
-    if ver == 3:
-        log.info('Adding original title column, cached data will not have this information')
-        table_add_column('imdb_movies', 'original_title', Unicode, session)
-        ver = 4
+    # v5 We may have cached bad data due to imdb changes, just wipe everything. GitHub #697
+    # v6 The association tables were not cleared on the last upgrade, clear again. GitHub #714
+    # v7 Another layout change cached bad data. GitHub #729
+    if ver is None or ver <= 6:
+        raise UpgradeImpossible('Resetting imdb_lookup caches because bad data may have been cached.')
     return ver
 
 

@@ -1,0 +1,427 @@
+{
+  "list": [
+    {
+      "core": false,
+      "_rev": "0003037a",
+      "finish": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "qualities": [
+        "720p",
+        "1080p",
+        "brrip",
+        "dvdrip"
+      ],
+      "_id": "dc2e824db8844923bd27756a5e805f63",
+      "_t": "profile",
+      "label": "Best",
+      "minimum_score": 1,
+      "stop_after": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "wait_for": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "order": 0,
+      "3d": [
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "_rev": "0001ea74",
+      "finish": [
+        true,
+        true
+      ],
+      "qualities": [
+        "720p",
+        "1080p"
+      ],
+      "_id": "6bc3e0b5974a40998302c8247c08d177",
+      "_t": "profile",
+      "label": "HD",
+      "minimum_score": 1,
+      "stop_after": [
+        0,
+        0
+      ],
+      "wait_for": [
+        0,
+        0
+      ],
+      "order": 1,
+      "3d": [
+        false,
+        false
+      ]
+    },
+    {
+      "_rev": "000184ba",
+      "finish": [
+        true,
+        true
+      ],
+      "qualities": [
+        "dvdrip",
+        "dvdr"
+      ],
+      "_id": "bc173ad09f7248d8815a026d8cbe5f36",
+      "_t": "profile",
+      "label": "SD",
+      "minimum_score": 1,
+      "stop_after": [
+        0,
+        0
+      ],
+      "wait_for": [
+        0,
+        0
+      ],
+      "order": 2,
+      "3d": [
+        false,
+        false
+      ]
+    },
+    {
+      "_rev": "00010d23",
+      "finish": [
+        true,
+        true,
+        true,
+        true
+      ],
+      "qualities": [
+        "1080p",
+        "720p",
+        "720p",
+        "1080p"
+      ],
+      "_id": "13de9bf6e9fe47099b4da917ea69cbbb",
+      "_t": "profile",
+      "label": "Prefer 3D HD",
+      "minimum_score": 1,
+      "stop_after": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "wait_for": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "order": 3,
+      "3d": [
+        true,
+        true,
+        false,
+        false
+      ]
+    },
+    {
+      "_rev": "0001e38d",
+      "finish": [
+        true,
+        true
+      ],
+      "qualities": [
+        "1080p",
+        "720p"
+      ],
+      "_id": "4e7862b2e11441269b18289ca7a9f45a",
+      "_t": "profile",
+      "label": "3D HD",
+      "minimum_score": 1,
+      "stop_after": [
+        0,
+        0
+      ],
+      "wait_for": [
+        0,
+        0
+      ],
+      "order": 4,
+      "3d": [
+        true,
+        true
+      ]
+    },
+    {
+      "core": true,
+      "_rev": "00016e51",
+      "finish": [
+        true
+      ],
+      "_id": "cfe38eb1acbb4d91b654116675fcca69",
+      "_t": "profile",
+      "label": "BR-Disk",
+      "qualities": [
+        "bd50"
+      ],
+      "wait_for": [
+        0
+      ],
+      "order": 20
+    },
+    {
+      "core": true,
+      "_rev": "000164fa",
+      "finish": [
+        true
+      ],
+      "_id": "e2db122cf84a4ee48cb6621e14c1e1a0",
+      "_t": "profile",
+      "label": "1080p",
+      "qualities": [
+        "1080p"
+      ],
+      "wait_for": [
+        0
+      ],
+      "order": 21
+    },
+    {
+      "core": true,
+      "_rev": "0001f3f4",
+      "finish": [
+        true
+      ],
+      "_id": "7c3b014118c0424197e2c697705e2b2c",
+      "_t": "profile",
+      "label": "720p",
+      "qualities": [
+        "720p"
+      ],
+      "wait_for": [
+        0
+      ],
+      "order": 22
+    },
+    {
+      "core": true,
+      "_rev": "00018d21",
+      "finish": [
+        true
+      ],
+      "_id": "f8bb1f0687be4211942ef69b3507806a",
+      "_t": "profile",
+      "label": "BR-Rip",
+      "qualities": [
+        "brrip"
+      ],
+      "wait_for": [
+        0
+      ],
+      "order": 23
+    },
+    {
+      "core": true,
+      "_rev": "0001ebb7",
+      "finish": [
+        true
+      ],
+      "_id": "0987e8135ae84b3cb9b2d8323e8f14aa",
+      "_t": "profile",
+      "label": "DVD-R",
+      "qualities": [
+        "dvdr"
+      ],
+      "wait_for": [
+        0
+      ],
+      "order": 24
+    },
+    {
+      "core": true,
+      "_rev": "00019df2",
+      "finish": [
+        true
+      ],
+      "_id": "e33457505c574b678a22a1de345a1d39",
+      "_t": "profile",
+      "label": "DVD-Rip",
+      "qualities": [
+        "dvdrip"
+      ],
+      "wait_for": [
+        0
+      ],
+      "order": 25
+    },
+    {
+      "core": true,
+      "_rev": "000171f0",
+      "finish": [
+        true
+      ],
+      "_id": "fef8e117f74142bc8b0420163ef43777",
+      "_t": "profile",
+      "label": "Screener",
+      "qualities": [
+        "scr"
+      ],
+      "wait_for": [
+        0
+      ],
+      "order": 26
+    },
+    {
+      "core": true,
+      "_rev": "00016609",
+      "finish": [
+        true
+      ],
+      "_id": "43b9bcaafa864f8b8f9e13437690c0c6",
+      "_t": "profile",
+      "label": "R5",
+      "qualities": [
+        "r5"
+      ],
+      "wait_for": [
+        0
+      ],
+      "order": 27
+    },
+    {
+      "core": true,
+      "_rev": "0001453c",
+      "finish": [
+        true
+      ],
+      "_id": "f3295e167bf6420a92f0b1198e58bc85",
+      "_t": "profile",
+      "label": "TeleCine",
+      "qualities": [
+        "tc"
+      ],
+      "wait_for": [
+        0
+      ],
+      "order": 28
+    },
+    {
+      "core": true,
+      "_rev": "0001888b",
+      "finish": [
+        true
+      ],
+      "_id": "eeb266735bd6452aa265aac0c862991c",
+      "_t": "profile",
+      "label": "TeleSync",
+      "qualities": [
+        "ts"
+      ],
+      "wait_for": [
+        0
+      ],
+      "order": 29
+    },
+    {
+      "core": true,
+      "_rev": "00018074",
+      "finish": [
+        true
+      ],
+      "_id": "8e662582e9bc45cebea27fa30cc5078d",
+      "_t": "profile",
+      "label": "Cam",
+      "qualities": [
+        "cam"
+      ],
+      "wait_for": [
+        0
+      ],
+      "order": 30
+    },
+    {
+      "core": false,
+      "_rev": "000c25eb",
+      "finish": [
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true,
+        true
+      ],
+      "minimum_score": 1,
+      "_id": "edde87b960df41cab15f135da8f09933",
+      "_t": "profile",
+      "label": "Test",
+      "qualities": [
+        "cam",
+        "ts",
+        "tc",
+        "r5",
+        "scr",
+        "dvdrip",
+        "dvdr",
+        "brrip",
+        "720p",
+        "1080p",
+        "bd50"
+      ],
+      "stop_after": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "wait_for": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "order": 999,
+      "3d": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "success": true
+}

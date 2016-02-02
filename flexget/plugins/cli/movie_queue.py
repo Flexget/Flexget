@@ -46,7 +46,7 @@ def do_cli(manager, options):
         except QueueError as e:
             console('ERROR: %s' % e.message)
         else:
-            console('Forgot that %s was downloaded. Movie will be downloaded again.' % title)
+            console('Forgot that %s was downloaded. Movie will be downloaded again.' % title.get('title'))
         return
 
     if options.queue_action == 'add':
@@ -83,15 +83,31 @@ def do_cli(manager, options):
 
 def queue_list(options):
     """List movie queue"""
-    items = queue_get(downloaded=(options.type == 'downloaded'))
-    console('-' * 79)
-    console('%-10s %-7s %-37s %s' % ('IMDB id', 'TMDB id', 'Title', 'Quality'))
-    console('-' * 79)
+    if options.type == 'downloaded':
+        downloaded = True
+    elif options.type == 'waiting':
+        downloaded = False
+    else:
+        downloaded = None
+    items = queue_get(downloaded=downloaded)
+    if options.porcelain:
+        console('%-10s %-s %-7s %-s %-37s %-s %s' % ('IMDB id', '|', 'TMDB id', '|', 'Title', '|', 'Quality'))
+    else:
+        console('-' * 79)
+        console('%-10s %-7s %-37s %s' % ('IMDB id', 'TMDB id', 'Title', 'Quality'))
+        console('-' * 79)
     for item in items:
-        console('%-10s %-7s %-37s %s' % (item.imdb_id, item.tmdb_id, item.title, item.quality))
+        if options.porcelain:
+            console('%-10s %-s %-7s %-s %-37s %-s %s' %
+                    (item.imdb_id, '|', item.tmdb_id, '|', item.title, '|', item.quality))
+        else:
+            console('%-10s %-7s %-37s %s' % (item.imdb_id, item.tmdb_id, item.title, item.quality))
     if not items:
         console('No results')
-    console('-' * 79)
+    if options.porcelain:
+        pass
+    else:
+        console('-' * 79)
 
 
 def clear():
@@ -118,8 +134,9 @@ def register_parser_arguments():
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='queue_action')
     list_parser = subparsers.add_parser('list', help='list movies from the queue')
-    list_parser.add_argument('type', nargs='?', choices=['waiting', 'downloaded'], default='waiting',
+    list_parser.add_argument('type', nargs='?', choices=['waiting', 'downloaded', 'all'], default='waiting',
                              help='choose to show waiting or already downloaded movies')
+    list_parser.add_argument('--porcelain', action='store_true', help='make the output parseable')
     add_parser = subparsers.add_parser('add', parents=[what_parser], help='add a movie to the queue')
     add_parser.add_argument('quality', metavar='<quality>', default='ANY', nargs='?',
                             help='the quality requirements for getting this movie (default: %(default)s)')

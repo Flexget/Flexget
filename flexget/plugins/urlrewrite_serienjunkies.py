@@ -13,19 +13,19 @@ from flexget.utils.soup import get_soup
 log = logging.getLogger('serienjunkies')
 
 regex_single_ep = re.compile(r'(S\d+E\d\d+)(?!-E)', re.I)
-regex_multi_ep  = re.compile(r'(?P<season>S\d\d)E(?P<startep>\d\d+)-E?(?P<stopep>\d\d+)', re.I)
-regex_season    = re.compile(r'(?<=\.|\-)S\d\d(?:[-\.]S\d\d)*(?!E\d\d+)', re.I)
+regex_multi_ep = re.compile(r'(?P<season>S\d\d)E(?P<startep>\d\d+)-E?(?P<stopep>\d\d+)', re.I)
+regex_season = re.compile(r'(?<=\.|\-)S\d\d(?:[-\.]S\d\d)*(?!E\d\d+)', re.I)
 
 regex_language_container = re.compile(r'Sprache')
 
-regex_is_german   = re.compile(r'german|deutsch', re.I)
-regex_is_foreign  = re.compile(
+regex_is_german = re.compile(r'german|deutsch', re.I)
+regex_is_foreign = re.compile(
     r'englisc?h|französisch|japanisch|dänisch|norwegisch|niederländisch|ungarisch|italienisch|portugiesisch', re.I)
 regex_is_subtitle = re.compile(r'Untertitel|Subs?|UT', re.I)
 
 
 LANGUAGE = ['german', 'foreign', 'subtitle', 'dual']
-HOSTER   = ['ul', 'cz', 'so', 'all']
+HOSTER = ['ul', 'cz', 'so', 'all']
 
 DEFAULT_LANGUAGE = 'dual'
 DEFAULT_HOSTER = 'ul'
@@ -63,7 +63,7 @@ class UrlRewriteSerienjunkies(object):
 
     # urlrewriter API
     def url_rewrite(self, task, entry):
-        series_url   = entry['url']
+        series_url = entry['url']
         search_title = re.sub('\[.*\] ', '', entry['title'])
 
         self.config = task.config.get('serienjunkies') or {}
@@ -115,7 +115,7 @@ class UrlRewriteSerienjunkies(object):
 
             # filter language
             if not self.check_language(episode_lang):
-                log.warning('languages not matching: %s <> %s' % (self.config['language'],episode_lang))
+                log.warning('languages not matching: %s <> %s' % (self.config['language'], episode_lang))
                 continue
 
             # find download links
@@ -147,7 +147,8 @@ class UrlRewriteSerienjunkies(object):
             season = regex_multi_ep.search(search_title).group('season') + 'E'
             for i in range(first_ep, last_ep + 1):
                 # ToDO: Umlaute , Mehrzeilig etc.
-                search_titles.append(regex_multi_ep.sub(season + str(i).zfill(2) + '[\\\\w\\\\.\\\\(\\\\)]*', search_title))
+                search_titles.append(regex_multi_ep.sub(season + str(i).zfill(2) + '[\\\\w\\\\.\\\\(\\\\)]*',
+                                                        search_title))
         elif regex_season.search(search_title):
             log.debug('Title seems to describe one or more season')
             search_string = regex_season.search(search_title).group(0)
