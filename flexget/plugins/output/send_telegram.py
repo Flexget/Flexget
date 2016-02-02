@@ -6,7 +6,6 @@ from ssl import SSLError
 from urllib2 import URLError
 
 from sqlalchemy import Column, Integer, String
-from telegram.error import TelegramError
 
 from flexget import db_schema, plugin, options
 from flexget.event import event
@@ -16,6 +15,7 @@ from flexget.utils.tools import console
 
 try:
     import telegram
+    from telegram.error import TelegramError
 except ImportError:
     telegram = None
 
