@@ -6,9 +6,8 @@ from math import ceil
 from flask import jsonify, request
 from flask_restplus import inputs
 
-from flexget.plugins.api.series import NoResultFound
-
 from flexget.api import api, APIResource
+from flexget.plugins.api.series import NoResultFound
 from flexget.plugins.filter import movie_queue as mq
 from flexget.utils import qualities
 
@@ -125,13 +124,14 @@ class MovieQueueAPI(APIResource):
         else:
             order = False
 
-        movie_queue = mq.queue_get(session=session, downloaded=downloaded)
-        count = len(movie_queue)
+        raw_movie_queue = mq.queue_get(session=session, downloaded=downloaded)
+        converted_movie_queue = [movie.to_dict() for movie in raw_movie_queue]
+        sorted_movie_list = sorted(converted_movie_queue,
+                                   key=lambda movie: movie[sort_by] if movie[sort_by] else datetime.datetime,
+                                   reverse=order)
 
+        count = len(sorted_movie_list)
         pages = int(ceil(count / float(max_results)))
-
-        movie_items = []
-
         if page > pages and pages != 0:
             return {'error': 'page %s does not exist' % page}, 404
 
@@ -140,15 +140,12 @@ class MovieQueueAPI(APIResource):
         if finish > count:
             finish = count
 
+        movie_items = []
         for movie_number in range(start, finish):
-            movie_items.append(movie_queue[movie_number].to_dict())
-
-        sorted_movie_list = sorted(movie_items,
-                                   key=lambda movie: movie[sort_by] if movie[sort_by] else datetime.datetime,
-                                   reverse=order)
+            movie_items.append(sorted_movie_list[movie_number])
 
         return jsonify({
-            'movies': sorted_movie_list,
+            'movies': movie_items,
             'number_of_movies': count,
             'page_number': page,
             'total_number_of_pages': pages
