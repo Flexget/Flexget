@@ -97,7 +97,8 @@ class QueuedMovie(queue_base.QueuedItem, Base):
     def to_dict(self):
         return {
             'added': self.added,
-            'downloaded': self.downloaded,
+            'is_downloaded': True if self.downloaded else False,
+            'download_date': self.downloaded if self.downloaded else None,
             'entry_original_url': self.entry_original_url,
             'entry_title': self.entry_title,
             'entry_url': self.entry_url,
@@ -409,6 +410,7 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None)
     try:
         item = query.one()
         item.quality = quality
+        session.commit()
         return item.to_dict()
     except NoResultFound as e:
         raise QueueError('imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' % (imdb_id, tmdb_id, movie_id))
@@ -430,6 +432,17 @@ def queue_get(session=None, downloaded=None):
         return query.filter(QueuedMovie.downloaded != None).all()
     else:
         return query.all()
+
+
+@with_session
+def get_movie_by_id(movie_id, session=None):
+    """
+    Return movie item from movie_id
+    :param movie_id: ID of queued movie
+    :param session: Session
+    :return: Dict of movie details
+    """
+    return session.query(QueuedMovie).filter(QueuedMovie.id == movie_id).one().to_dict()
 
 
 @event('plugin.register')

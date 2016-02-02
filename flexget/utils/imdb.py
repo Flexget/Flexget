@@ -138,8 +138,8 @@ class ImdbSearch(object):
             movie = {}
             movie['match'] = 1.0
             movie['name'] = name
-            movie['url'] = actual_url
             movie['imdb_id'] = extract_id(actual_url)
+            movie['url'] = make_url(movie['imdb_id'])
             movie['year'] = None  # skips year check
             movies.append(movie)
             return movies
@@ -167,8 +167,8 @@ class ImdbSearch(object):
 
             link = row.find_next('a')
             movie['name'] = link.text
-            movie['url'] = 'http://www.imdb.com' + link.get('href')
-            movie['imdb_id'] = extract_id(movie['url'])
+            movie['imdb_id'] = extract_id(link.get('href'))
+            movie['url'] = make_url(movie['imdb_id'])
             log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
 
             # calc & set best matching ratio
@@ -238,14 +238,14 @@ class ImdbParser(object):
             raise PluginError('IMDB parser needs updating, imdb format changed. Please report on Github.')
 
         # Parse stuff from the title-overview section
-        name_elem = title_overview.find('h1')
-        if name_elem and name_elem.find(itemprop='name', text=True):
-            self.name = name_elem.find(itemprop='name', text=True).text.strip()
+        name_elem = title_overview.find('h1', attrs={'itemprop': 'name'})
+        if name_elem:
+            self.name = name_elem.contents[0].strip()
         else:
             log.error('Possible IMDB parser needs updating, Please report on Github.')
             raise PluginError('Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url))
 
-        year = title_overview.find(class_='nobr')
+        year = title_overview.find('span', attrs={'id': 'titleYear'})
         if year:
             m = re.search(r'([0-9]{4})', year.text)
             if m:
@@ -266,7 +266,7 @@ class ImdbParser(object):
         else:
             log.debug('No photo found for %s' % self.imdb_id)
 
-        original_name_elem = title_overview.find(attrs={'class': 'title-extra'})
+        original_name_elem = title_overview.find(attrs={'class': 'originalTitle'})
         if original_name_elem:
             self.original_name = original_name_elem.contents[0].strip().strip('"')
         else:

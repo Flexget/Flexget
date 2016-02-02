@@ -3,11 +3,12 @@ from __future__ import unicode_literals, division, absolute_import
 import datetime
 from math import ceil
 
+from flask import jsonify
 from flask import request
-from flask_restful import inputs
+from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource, jsonify
+from flexget.api import api, APIResource
 from flexget.plugins.filter import series
 
 series_api = api.namespace('series', description='Flexget Series operations')
@@ -73,12 +74,11 @@ latest_object = {
 episode_object = {
     'type': 'object',
     'properties': {
-        "episode_age": {'type': 'string'},
         "episode_first_seen": {'type': 'string'},
         "episode_id": {'type': 'string'},
         "episode_identified_by": {'type': 'string'},
         "episode_identifier": {'type': 'string'},
-        "episode_is_premiere": {'type': 'boolean'},
+        "episode_premiere_type": {'type': 'string'},
         "episode_number": {'type': 'string'},
         "episode_season": {'type': 'string'},
         "episode_series_id": {'type': 'string'}
@@ -141,42 +141,6 @@ series_begin_input_schema = {
 }
 series_begin_input_schema = api.schema('begin_item', series_begin_input_schema)
 
-series_list_configured_enum_list = ['configured', 'unconfigured', 'all']
-series_list_status_enum_list = ['new', 'stale']
-series_list_sort_value_enum_list = ['show_name', 'episodes_behind_latest', 'last_download_date']
-series_list_sort_order_enum_list = ['desc', 'asc']
-
-
-def series_list_configured_enum(value):
-    enum = series_list_configured_enum_list
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    return value
-
-
-def series_list_status_enum(value):
-    enum = series_list_status_enum_list
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    return value
-
-
-def series_list_sort_value_enum(value):
-    enum = series_list_sort_value_enum_list
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    return value
-
-
-def series_list_sort_order_enum(value):
-    """ Sort oder enum. Return True for 'desc' and False for 'asc' """
-    enum = series_list_sort_order_enum_list
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    if value == 'desc':
-        return True
-    return False
-
 
 def get_release_details(release):
     release_item = {
@@ -200,8 +164,7 @@ def get_episode_details(episode):
         'episode_number': episode.number,
         'episode_series_id': episode.series_id,
         'episode_first_seen': episode.first_seen,
-        'episode_age': episode.age,
-        'episode_is_premiere': episode.is_premiere
+        'episode_premiere_type': episode.is_premiere
     }
     return episode_item
 
@@ -250,28 +213,25 @@ def get_series_details(show):
 
 
 series_list_parser = api.parser()
-series_list_parser.add_argument('in_config', type=series_list_configured_enum, default='configured',
-                                help="Filter list if shows are currently in configuration. "
-                                     "Filter by {0}. Default is configured.".format(
-                                        ' ,'.join(series_list_configured_enum_list)))
+series_list_parser.add_argument('in_config', choices=('configured', 'unconfigured', 'all'), default='configured',
+                                help="Filter list if shows are currently in configuration.")
 series_list_parser.add_argument('premieres', type=inputs.boolean, default=False,
-                                help="Filter by downloaded premieres only. Default is False.")
-series_list_parser.add_argument('status', type=series_list_status_enum,
-                                help="Filter by {0} status".format(' ,'.join(series_list_status_enum_list)))
+                                help="Filter by downloaded premieres only.")
+series_list_parser.add_argument('status', choices=('new', 'stale'), help="Filter by status")
 series_list_parser.add_argument('days', type=int,
                                 help="Filter status by number of days. Default is 7 for new and 365 for stale")
 series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
 series_list_parser.add_argument('max', type=int, default=100, help='Shows per page. Default is 100.')
 
-series_list_parser.add_argument('sort_by', type=series_list_sort_value_enum, default='show_name',
-                                help="Sort response by {0}. Default is show_name.".format(
-                                        ' ,'.join(series_list_sort_value_enum_list)))
-series_list_parser.add_argument('order', type=series_list_sort_order_enum, default='desc',
-                                help="Sorting order. One of {0}. Default is desc".format(
-                                        ' ,'.join(series_list_sort_order_enum_list)))
+series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behind_latest', 'last_download_date'),
+                                default='show_name',
+                                help="Sort response by attribute.")
+series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
 
 
 @series_api.route('/')
+@api.doc(description='Use this endpoint to retrieve data on Flexget collected series,'
+                     ' add new series to DB and reset episode and releases status')
 class SeriesListAPI(APIResource):
     @api.response(400, 'Page does not exist')
     @api.response(200, 'Series list retrieved successfully', series_list_schema)
@@ -287,6 +247,8 @@ class SeriesListAPI(APIResource):
         # In case the default 'desc' order was received
         if order == 'desc':
             order = True
+        else:
+            order = False
 
         kwargs = {
             'configured': args.get('in_config'),
@@ -385,6 +347,7 @@ shows_schema = api.schema('list_of_shows', shows_schema)
 
 
 @series_api.route('/search/<string:name>')
+@api.doc(description='Searches for a show in the DB via its name. Returns a list of matching shows.')
 class SeriesGetShowsAPI(APIResource):
     @api.response(200, 'Show list retrieved successfully', shows_schema)
     @api.doc(params={'name': 'Name of the show(s) to search'})
@@ -404,7 +367,7 @@ class SeriesGetShowsAPI(APIResource):
 
 
 @series_api.route('/<int:show_id>')
-@api.doc(params={'show_id': 'ID of the show'})
+@api.doc(params={'show_id': 'ID of the show'}, description='Enable operations on a specific show using its ID')
 class SeriesShowAPI(APIResource):
     @api.response(404, 'Show ID not found')
     @api.response(200, 'Show information retrieved successfully', show_details_schema)
@@ -466,12 +429,15 @@ class SeriesShowAPI(APIResource):
                     'message': e.args[0]
                     }, 400
         return jsonify({'status': 'success',
-                'message': 'Episodes will be accepted starting with `%s`' % ep_id,
-                'show': get_series_details(show)
-                })
+                        'message': 'Episodes will be accepted starting with `%s`' % ep_id,
+                        'show': get_series_details(show)
+                        })
 
 
 @series_api.route('/<name>')
+@api.doc(description="Use this endpoint to add a new show to Flexget's DB and set the 1st initial episode via"
+                     " its body. 'episode_identifier' should be one of SxxExx, integer or date "
+                     "formatted such as 2012-12-12")
 class SeriesBeginByNameAPI(APIResource):
     @api.response(200, 'Adding series and setting first accepted episode to ep_id')
     @api.response(500, 'Show already exists')
@@ -496,15 +462,15 @@ class SeriesBeginByNameAPI(APIResource):
                     'message': e.args[0]
                     }, 400
         return jsonify({'status': 'success',
-                'message': 'Successfully added series `%s` and set first accepted episode to `%s`' % (
-                    show.name, ep_id),
-                'show': get_series_details(show)
-                })
+                        'message': 'Successfully added series `%s` and set first accepted episode to `%s`' % (
+                            show.name, ep_id),
+                        'show': get_series_details(show)
+                        })
 
 
 @api.response(404, 'Show ID not found')
 @series_api.route('/<int:show_id>/episodes')
-@api.doc(params={'show_id': 'ID of the show'})
+@api.doc(params={'show_id': 'ID of the show'}, description='Use this endpoint to get or delete all episodes of a show')
 class SeriesEpisodesAPI(APIResource):
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
     def get(self, show_id, session):
@@ -549,7 +515,8 @@ class SeriesEpisodesAPI(APIResource):
 @api.response(414, 'Episode ID not found')
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id')
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
+         description='Use this endpoint to get or delete a specific episode for a show')
 class SeriesEpisodeAPI(APIResource):
     @api.response(200, 'Episode retrieved successfully for show', episode_schema)
     def get(self, show_id, ep_id, session):
@@ -600,27 +567,20 @@ class SeriesEpisodeAPI(APIResource):
                 }
 
 
-release_downloaded_enum_list = ['downloaded', 'not_downloaded', 'all']
-
-
-def release_downloaded_enum(value):
-    enum = release_downloaded_enum_list
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    return value
-
-
 release_list_parser = api.parser()
-release_list_parser.add_argument('downloaded', type=release_downloaded_enum, default='all',
-                                 help='Filter between {0}'.format(' ,'.join(release_downloaded_enum_list)))
+release_list_parser.add_argument('downloaded', choices=('downloaded', 'not_downloaded', 'all'), default='all',
+                                 help='Filter between release status')
 
 
 @api.response(404, 'Show ID not found')
 @api.response(414, 'Episode ID not found')
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id')
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
-@api.doc(parser=release_list_parser)
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
+         parser=release_list_parser,
+         description='Use this endpoint to get or delete all information about seen releases for a specific episode of'
+                     ' a show. Deleting releases will trigger flexget to re-download an episode if a matching release'
+                     ' will be seen again for it.')
 class SeriesReleasesAPI(APIResource):
     @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
     def get(self, show_id, ep_id, session):
@@ -698,7 +658,10 @@ class SeriesReleasesAPI(APIResource):
 @api.response(400, 'Episode with ep_id does not belong to show with show_id')
 @api.response(410, 'Release with rel_id does not belong to episode with ep_id')
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/<int:rel_id>/')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'})
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'},
+         description='Use this endpoint to get or delete a specific release from an episode of a show. Deleting a '
+                     'release will trigger flexget to re-download an episode if a matching release will be seen again '
+                     'for it.')
 class SeriesReleaseAPI(APIResource):
     @api.response(200, 'Release retrieved successfully for episode')
     def get(self, show_id, ep_id, rel_id, session):

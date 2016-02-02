@@ -2,10 +2,12 @@ import base64
 
 from flask import request, jsonify, session as flask_session
 from flask.ext.login import login_user, LoginManager, current_user, current_app
+from flask_restplus import inputs
+from werkzeug.security import check_password_hash
 
 from flexget.api import api, APIResource, app
-from flexget.webserver import User
 from flexget.utils.database import with_session
+from flexget.webserver import User
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -32,7 +34,11 @@ def load_user_from_request(request, session=None):
         try:
             credentials = base64.b64decode(auth_value.replace('Basic ', '', 1))
             username, password = credentials.split(':')
-            return session.query(User).filter(User.name == username, User.password == password).first()
+            user = session.query(User).filter(User.name == username).first()
+            if check_password_hash(user.password, password):
+                return user
+            else:
+                return None
         except (TypeError, ValueError):
             pass
 
@@ -46,17 +52,18 @@ def load_user(username, session=None):
 @app.before_request
 def check_valid_login():
     # Allow access to root, login and swagger documentation without authentication
-    if request.path == '/' or request.path.startswith('/login') or \
-            request.path.startswith('/logout') or request.path.startswith('/swagger'):
+    if request.path == '/' or request.path.startswith('/auth/login') or \
+            request.path.startswith('/auth/logout') or request.path.startswith('/swagger'):
         return
 
     if not current_user.is_authenticated:
         return current_app.login_manager.unauthorized()
 
-# API Authentication and Authorization
-login_api = api.namespace('login', description='API Authentication')
 
-login_api_schema = api.schema('login', {
+# API Authentication and Authorization
+auth_api = api.namespace('auth', description='Authentication')
+
+login_api_schema = api.schema('auth.login', {
     'type': 'object',
     'properties': {
         'username': {'type': 'string'},
@@ -65,42 +72,38 @@ login_api_schema = api.schema('login', {
 })
 
 login_parser = api.parser()
-login_parser.add_argument('remember', type=bool, required=False, default=False, help='Remember for next time')
+login_parser.add_argument('remember', type=inputs.boolean, required=False, default=False,
+                          help='Remember login (sets persistent session cookies)'
+                          )
 
 
-@login_api.route('/')
-@api.doc(description='Login to API with username and password')
+@auth_api.route('/login/')
 class LoginAPI(APIResource):
-
-    @api.expect(login_api_schema)
-    @api.response(400, 'Invalid username or password')
+    @api.expect((login_api_schema, 'Username and Password'))
+    @api.response(401, 'Invalid username or password')
     @api.response(200, 'Login successful')
     @api.doc(parser=login_parser)
     def post(self, session=None):
+        """ Login with username and password """
         data = request.json
+        user_name = data.get('username')
+        password = data.get('password')
 
         if data:
-            user = session.query(User)\
-                .filter(User.name == data.get('username').lower(), User.password == data.get('password'))\
-                .first()
-
-            if user:
+            user = session.query(User).filter(User.name == user_name.lower()).first()
+            if user and check_password_hash(user.password, password):
                 args = login_parser.parse_args()
                 login_user(user, remember=args['remember'])
                 return {'status': 'success'}
 
-        return {'status': 'failed', 'message': 'Invalid username or password'}, 400
+        return {'status': 'failed', 'message': 'Invalid username or password'}, 401
 
 
-logout_api = api.namespace('logout', description='API Authentication')
-
-
-@logout_api.route('/')
-@api.doc(description='Logout and clear session cookies')
+@auth_api.route('/logout/')
 class LogoutAPI(APIResource):
-
     @api.response(200, 'Logout successful')
     def get(self, session=None):
+        """ Logout and clear session cookies """
         flask_session.clear()
         resp = jsonify({'status': 'success'})
         resp.set_cookie('flexgetToken', '', expires=0)

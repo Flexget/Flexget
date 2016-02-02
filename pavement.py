@@ -44,20 +44,20 @@ install_requires = [
     'jsonschema>=2.0',
     'tmdb3',
     'path.py',
-    'guessit>=2.0rc5',
+    'guessit>=2.0.3',
     'apscheduler',
+    'pytvmaze>=1.4.4',
+    'ordereddict>=1.1',
+    # WebUI Requirements
+    'cherrypy>=3.7.0',
     'flask>=0.7',
     'flask-restful>=0.3.3',
-    'ordereddict>=1.1',
     'flask-restplus==0.8.6',
-    'cherrypy>=3.7.0',
-    'flask-assets>=0.11',
-    'cssmin>=0.2.0',
     'flask-compress>=1.2.1',
     'flask-login>=0.3.2',
+    'flask-cors>=2.1.2',
     'pyparsing>=2.0.3',
-    'pyScss>=1.3.4',
-    'pytvmaze>=1.4.4'
+    'Safe'
 ]
 
 if sys.version_info < (2, 7):
@@ -361,6 +361,18 @@ def requirements(options):
     filename = options.requirements.get('file', 'requirements.txt')
     with open(filename, mode='w') as req_file:
         req_file.write('\n'.join(options.install_requires))
+
+
+@task
+def upgrade_deps():
+    try:
+        import pip
+        cmd = ['install', '--upgrade']
+        cmd.extend(install_requires)
+        pip.main(cmd)
+    except ImportError:
+        print('FATAL: Unable to import pip, please install it and run this again!')
+        sys.exit(1)
 
 
 @task

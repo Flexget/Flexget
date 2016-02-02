@@ -10,19 +10,20 @@ from flask import Response
 from pyparsing import Word, Keyword, Group, Forward, Suppress, OneOrMore, oneOf, White, restOfLine, ParseException, Combine
 from pyparsing import nums, alphanums, printables
 
+from flask_restplus import inputs
+
 from flexget.api import api, APIResource, ApiError, __version__ as __api_version__
 from flexget._version import __version__
 
 log = logging.getLogger('api.server')
 
-server_api = api.namespace('server', description='Manage Flexget Daemon')
+server_api = api.namespace('server', description='Manage Daemon')
 
 
 @server_api.route('/reload/')
 class ServerReloadAPI(APIResource):
-
-    @api.response(ApiError, 'Error loading the config')
-    @api.response(200, 'Reloaded config')
+    @api.response(ApiError, description='Error loading the config')
+    @api.response(200, description='Newly reloaded config')
     def get(self, session=None):
         """ Reload Flexget config """
         log.info('Reloading config from disk.')
@@ -35,7 +36,7 @@ class ServerReloadAPI(APIResource):
         return {}
 
 
-pid_schema = api.schema('server_pid', {
+pid_schema = api.schema('server.pid', {
     'type': 'object',
     'properties': {
         'pid': {
@@ -47,14 +48,14 @@ pid_schema = api.schema('server_pid', {
 
 @server_api.route('/pid/')
 class ServerPIDAPI(APIResource):
-    @api.response(200, 'Reloaded config', pid_schema)
+    @api.response(200, description='Reloaded config', model=pid_schema)
     def get(self, session=None):
         """ Get server PID """
         return{'pid': os.getpid()}
 
 
 shutdown_parser = api.parser()
-shutdown_parser.add_argument('force', type=bool, required=False, default=False, help='Ignore tasks in the queue')
+shutdown_parser.add_argument('force', type=inputs.boolean, required=False, default=False, help='Ignore tasks in the queue')
 
 
 @server_api.route('/shutdown/')
@@ -70,13 +71,13 @@ class ServerShutdownAPI(APIResource):
 
 @server_api.route('/config/')
 class ServerConfigAPI(APIResource):
-    @api.response(200, 'Flexget config')
+    @api.response(200, description='Flexget config')
     def get(self, session=None):
         """ Get Flexget Config """
         return self.manager.config
 
 
-version_schema = api.schema('version', {
+version_schema = api.schema('server.version', {
     'type': 'object',
     'properties': {
         'flexget_version': {'type': 'string'},
@@ -87,7 +88,7 @@ version_schema = api.schema('version', {
 
 @server_api.route('/version/')
 class ServerVersionAPI(APIResource):
-    @api.response(200, 'Flexget version', version_schema)
+    @api.response(200, description='Flexget version', model=version_schema)
     def get(self, session=None):
         """ Flexget Version """
         return {'flexget_version': __version__, 'api_version': __api_version__}
@@ -150,7 +151,7 @@ def file_inode(filename):
 class ServerLogAPI(APIResource):
 
     @api.doc(parser=server_log_parser)
-    @api.response(200, 'Streams as line delimited JSON')
+    @api.response(200, description='Streams as line delimited JSON')
     def get(self, session=None):
         """ Stream Flexget log Streams as line delimited JSON """
         args = server_log_parser.parse_args()

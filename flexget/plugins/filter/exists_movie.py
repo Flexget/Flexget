@@ -112,6 +112,10 @@ class FilterExistsMovie(object):
                         continue
                     items.append(f.name)
 
+            if not items:
+                log.verbose('No items with type %s were found in %s' % (config.get('type'), folder))
+                continue
+
             for item in items:
                 count_files += 1
 
