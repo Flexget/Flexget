@@ -186,34 +186,16 @@ class MovieQueueAPI(APIResource):
         return reply
 
 
-@api.response(404, 'Movie not found')
-@api.response(400, 'Invalid type received')
-@movie_queue_api.route('/<type>/<id>/')
-@api.doc(params={'id': 'ID of Queued Movie', 'type': 'Type of ID to be used (imdb/tmdb/movie_id)'},
+@api.response(404, 'ID not found')
+@movie_queue_api.route('/<id>/')
+@api.doc(params={'id': 'ID of Queued Movie',},
          description='Remove a movie from movie queue or edit its quality or download status')
 class MovieQueueManageAPI(APIResource):
-    def validate_type(self, type, id, session):
-        if type not in ['imdb', 'tmdb', 'movie_id']:
-            reply = {
-                'status': 'error',
-                'message': 'invalid ID type received. Must be one of (imdb/tmdb/movie_id)'
-            }
-            return reply, 400
-        kwargs = {'session': session}
-        if type == 'imdb':
-            kwargs['imdb_id'] = id
-        elif type == 'tmdb':
-            kwargs['tmdb_id'] = id
-        elif type == 'movie_id':
-            kwargs['movie_id'] = id
-        return kwargs
-
     @api.response(200, 'Movie successfully deleted')
-    def delete(self, type, id, session=None):
+    def delete(self, id, session=None):
         """ Delete movies from movie queue """
-        kwargs = self.validate_type(type, id, session)
         try:
-            mq.queue_del(**kwargs)
+            mq.queue_del(movie_id=id)
         except mq.QueueError as e:
             reply = {'status': 'error',
                      'message': e.message}
@@ -221,19 +203,19 @@ class MovieQueueManageAPI(APIResource):
 
         reply = jsonify(
                 {'status': 'success',
-                 'message': 'successfully deleted {0} movie {1}'.format(type, id)})
+                 'message': 'successfully deleted movie with ID {1}'.format(id)})
         return reply
 
     @api.response(200, 'Movie successfully updated', movie_edit_results_schema)
-    @api.validate(movie_edit_input_schema)
-    def put(self, type, id, session=None):
+    @api.validate(model=movie_edit_input_schema,
+                  description='Values to use when editing existing movie. At least one value should be used')
+    def put(self, id, session=None):
         """ Updates movie quality or downloaded state in movie queue """
-        kwargs = self.validate_type(type, id, session)
         movie = None
         data = request.json
         if data.get('reset_downloaded'):
             try:
-                movie = mq.queue_forget(**kwargs)
+                movie = mq.queue_forget(movie_id=id)
             except mq.QueueError as e:
                 reply = {
                     'status': 'error',
@@ -242,9 +224,8 @@ class MovieQueueManageAPI(APIResource):
                 return reply, 404
 
         if data.get('quality'):
-            kwargs['quality'] = data['quality']
             try:
-                movie = mq.queue_edit(**kwargs)
+                movie = mq.queue_edit(quality=data['quality'], movie_id=id)
             except mq.QueueError as e:
                 reply = {'status': 'error',
                          'message': e.message}
