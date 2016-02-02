@@ -214,8 +214,8 @@ class SendTelegram(object):
     def _real_init(self, session, config, ):
         self._enforce_telegram_plugin_ver()
         self._parse_config(config)
-        self.log.debug('token={0} use_markdown={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
-                self._token, self._usernames, self._fullnames, self._groups, self._tmpl, self._use_markdown))
+        self.log.debug('token={0} parse_mode={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
+                self._token, self._usernames, self._fullnames, self._groups, self._tmpl, self._parse_mode))
         self._init_bot()
         chat_ids = self._get_chat_ids_n_update_db(session)
         return chat_ids
