@@ -207,7 +207,7 @@ class MovieQueueManageAPI(APIResource):
 
         reply = jsonify(
                 {'status': 'success',
-                 'message': 'successfully deleted movie with ID {1}'.format(id)})
+                 'message': 'successfully deleted movie with ID {0}'.format(id)})
         return reply
 
     @api.response(200, 'Movie successfully updated', movie_edit_results_schema)

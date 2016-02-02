@@ -160,7 +160,7 @@ class TestMovieQueueAPI(APITest):
         mocked_queue_edit.return_value = self.mock_return_movie
         mocked_queue_forget.return_value = self.mock_return_movie
 
-        rsp = self.json_put('/movie_queue/imdb/tt1234567/', data=json.dumps(payload))
+        rsp = self.json_put('/movie_queue/1/', data=json.dumps(payload))
 
         assert json.loads(rsp.data) == valid_response, 'response data is %s' % json.loads(rsp.data)
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
@@ -170,7 +170,9 @@ class TestMovieQueueAPI(APITest):
 
     @patch.object(movie_queue, 'queue_del')
     def test_queue_movie_del(self, mocked_queue_del):
-        rsp = self.delete('/movie_queue/imdb/tt1234567/')
+        rsp = self.delete('/movie_queue/7/')
 
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
         assert mocked_queue_del.called
+
+
