@@ -181,7 +181,7 @@ class SendTelegram(object):
         """
         self._token = config[_TOKEN_ATTR]
         self._tmpl = config[_TMPL_ATTR]
-        self._parse_mode = config[_PARSE_ATTR]
+        self._parse_mode = config.get(_PARSE_ATTR)
         self._usernames = []
         self._fullnames = []
         self._groups = []
