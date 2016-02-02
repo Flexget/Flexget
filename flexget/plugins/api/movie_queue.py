@@ -4,6 +4,9 @@ import datetime
 from math import ceil
 
 from flask import jsonify, request
+from flask_restplus import inputs
+
+from flexget.plugins.api.series import NoResultFound
 
 from flexget.api import api, APIResource
 from flexget.plugins.filter import movie_queue as mq
@@ -15,7 +18,7 @@ movie_object = {
     'type': 'object',
     'properties': {
         'added_date': {'type': 'string'},
-        'is_downloaded': {'type': 'string'},
+        'is_downloaded': {'type': 'boolean'},
         'entry_original_url': {'type': 'string'},
         'entry_title': {'type': 'string'},
         'entry_url': {'type': 'string'},
@@ -26,6 +29,7 @@ movie_object = {
         'tmdb_id': {'type': 'string'},
     }
 }
+movie_object_schema = api.schema('movie_object', movie_object)
 
 movie_queue_schema = {
     'type': 'object',
@@ -46,8 +50,8 @@ movie_queue_schema = api.schema('list_movie_queue', movie_queue_schema)
 movie_queue_parser = api.parser()
 movie_queue_parser.add_argument('page', type=int, default=1, help='Page number')
 movie_queue_parser.add_argument('max', type=int, default=100, help='Movies per page')
-movie_queue_parser.add_argument('status', choices=('pending', 'downloaded'), help='Filter list by status')
-movie_queue_parser.add_argument('sort_by', choices=('added', 'downloaded', 'id', 'title'), default='added',
+movie_queue_parser.add_argument('is_downloaded', type=inputs.boolean, help='Filter list by movies download status')
+movie_queue_parser.add_argument('sort_by', choices=('added', 'is_downloaded', 'id', 'title'), default='added',
                                 help="Sort response by value")
 movie_queue_parser.add_argument('order', choices=('asc', 'desc'), default='desc', help="Sorting order")
 
@@ -112,7 +116,7 @@ class MovieQueueAPI(APIResource):
         args = movie_queue_parser.parse_args()
         page = args['page']
         max_results = args['max']
-        downloaded = args['status']
+        downloaded = args['is_downloaded']
         sort_by = args['sort_by']
         order = args['order']
         # Handles default if it explicitly called
@@ -120,14 +124,6 @@ class MovieQueueAPI(APIResource):
             order = True
         else:
             order = False
-
-        # Handles download status conversion
-        if downloaded == 'downloaded':
-            downloaded = True
-        elif downloaded == 'pending':
-            downloaded = False
-        else:
-            downloaded = None
 
         movie_queue = mq.queue_get(session=session, downloaded=downloaded)
         count = len(movie_queue)
@@ -189,8 +185,18 @@ class MovieQueueAPI(APIResource):
 @api.response(404, 'ID not found')
 @movie_queue_api.route('/<id>/')
 @api.doc(params={'id': 'ID of Queued Movie',},
-         description='Remove a movie from movie queue or edit its quality or download status')
+         description='Get, remove or edit a movie from movie queue')
 class MovieQueueManageAPI(APIResource):
+    @api.response(200, 'Movie successfully retrieved', movie_object_schema)
+    def get(self, id, session=None):
+        """ Returns a movie from queue by ID """
+        try:
+            movie = mq.get_movie_by_id(movie_id=id)
+        except NoResultFound as e:
+            return {'status': 'error',
+                    'message': 'movie with ID {0} was not found'.format(id)}, 404
+        return jsonify(movie)
+
     @api.response(200, 'Movie successfully deleted')
     def delete(self, id, session=None):
         """ Delete movies from movie queue """

@@ -97,7 +97,7 @@ class QueuedMovie(queue_base.QueuedItem, Base):
     def to_dict(self):
         return {
             'added': self.added,
-            'downloaded': self.downloaded,
+            'is_downloaded': self.downloaded or False,
             'entry_original_url': self.entry_original_url,
             'entry_title': self.entry_title,
             'entry_url': self.entry_url,
@@ -431,6 +431,17 @@ def queue_get(session=None, downloaded=None):
         return query.filter(QueuedMovie.downloaded != None).all()
     else:
         return query.all()
+
+
+@with_session
+def get_movie_by_id(movie_id, session=None):
+    """
+    Return movie item from movie_id
+    :param movie_id: ID of queued movie
+    :param session: Session
+    :return: Dict of movie details
+    """
+    return session.query(QueuedMovie).filter(QueuedMovie.id == movie_id).one().to_dict()
 
 
 @event('plugin.register')
