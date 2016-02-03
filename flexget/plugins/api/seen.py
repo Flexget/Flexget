@@ -43,8 +43,9 @@ seen_object_schema = api.schema('seen_object_schema', seen_object)
 # Copy inout schema from seen object and manipulate to get desired fields
 seen_object_input_schema = copy.deepcopy(seen_object)
 
-# ID not needed when inputting entry
+# Removing unneeded fields
 del seen_object_input_schema['properties']['id']
+del seen_object_input_schema['properties']['added']
 
 # Get dict and not array of dicts
 seen_object_input_schema['properties']['fields'] = {'type': 'object'}
@@ -53,7 +54,7 @@ seen_object_input_schema['properties']['fields'] = {'type': 'object'}
 seen_object_input_schema['properties']['local'] = {'type': 'boolean', 'default': False}
 
 # Add JSON schema validation fields
-seen_object_input_schema.update({'required': ['title', 'fields', 'task'],
+seen_object_input_schema.update({'required': ['title', 'fields'],
                                  'additional_properties': False})
 
 seen_object_input_schema = api.schema('seen_object_input_schema', seen_object_input_schema)
@@ -144,15 +145,19 @@ class SeenSearchAPI(APIResource):
             'total_number_of_pages': pages
         })
 
+    example = "fields: {'url': 'http://123.com', 'title': 'A.Torrent', 'imdb_id': 'tt1234567'"
+
     @api.response(400, 'A matching seen object is already added')
     @api.response(200, 'Successfully added new seen object', seen_object_schema)
-    @api.validate(seen_object_input_schema)
+    @api.validate(model=seen_object_input_schema,
+                  description='Fields attribute takes a dict to add as seen entry fields, '
+                              'for example: {0}'.format(example))
     def post(self, session):
         """ Manually add entries to seen plugin """
         data = request.json
         kwargs = {
             'title': data.get('title'),
-            'task_name': PLUGIN_TASK_NAME,
+            'task_name': data.get('task', PLUGIN_TASK_NAME),
             'fields': data.get('fields'),
             'reason': data.get('reason'),
             'local': data.get('local', False),
