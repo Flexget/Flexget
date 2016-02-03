@@ -76,16 +76,16 @@ seen_search_parser = api.parser()
 seen_search_parser.add_argument('value', help='Search by any field value or leave empty to get entries')
 seen_search_parser.add_argument('page', type=int, default=1, help='Page number')
 seen_search_parser.add_argument('max', type=int, default=50, help='Seen entries per page')
-seen_search_parser.add_argument('is_seen_local', type=inputs.boolean, default=None, help='Get results that are limited'
-                                                                                         ' to local seen.')
+seen_search_parser.add_argument('is_seen_local', type=inputs.boolean, default=None,
+                                help='Filter results by seen locality.')
 seen_search_parser.add_argument('sort_by', choices=('title', 'task', 'added', 'local', 'id'), default='added',
                                 help="Sort response by attribute")
 seen_search_parser.add_argument('order', choices=('asc', 'desc'), default='desc', help='Sorting order.')
 
 seen_delete_parser = api.parser()
 seen_delete_parser.add_argument('value', help='Delete by value or leave empty to delete all. BE CAREFUL WITH THIS')
-seen_delete_parser.add_argument('is_seen_local', type=inputs.boolean, default=None, help='Get results that are limited'
-                                                                                         ' to local seen.')
+seen_delete_parser.add_argument('is_seen_local', type=inputs.boolean, default=None,
+                                help='Filter results by seen locality.')
 
 
 @seen_api.route('/')
