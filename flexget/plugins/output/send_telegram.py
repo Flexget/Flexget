@@ -104,8 +104,11 @@ class SendTelegram(object):
     `template`::
     Optional. The template from the example is the default.
 
-    `use_markdown`::
-    Optional. Whether the template uses markdown formatting. The default is `no`.
+    `parse_mode`::
+    Optional. Whether the template uses `markdown` or `html` formatting.
+
+    NOTE: The markdown parser will fall back to basic parsing if there is a parsing error. This can be cause due to
+    unclosed tags (watch out for wandering underscore when using markdown)
 
     `username` vs. `fullname`::
 
