@@ -359,6 +359,7 @@ def prepare_lookup_for_pytvmaze(**lookup_params):
     prepared_params['maze_id'] = lookup_params.get('tvmaze_id')
     prepared_params['tvdb_id'] = lookup_params.get('tvdb_id') or lookup_params.get('trakt_series_tvdb_id')
     prepared_params['tvrage_id'] = lookup_params.get('tvrage_id') or lookup_params.get('trakt_series_tvrage_id')
+    prepared_params['imdb_id'] = lookup_params.get('imdb_id')
     prepared_params['show_name'] = title
     prepared_params['show_year'] = lookup_params.get('trakt_series_year') or lookup_params.get(
             'year') or lookup_params.get('imdb_year') or year_match

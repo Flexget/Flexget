@@ -46,7 +46,7 @@ install_requires = [
     'path.py',
     'guessit>=2.0.3',
     'apscheduler',
-    'pytvmaze>=1.4.4',
+    'pytvmaze>=1.4.5',
     'ordereddict>=1.1',
     # WebUI Requirements
     'cherrypy>=3.7.0',
