@@ -102,6 +102,7 @@ series_list_schema = {
             'type': 'array',
             'items': show_object
         },
+        'total_number_of_shows': {'type': 'integer'},
         'number_of_shows': {'type': 'integer'},
         'total_number_of_pages': {'type': 'integer'},
         'page_number': {'type': 'integer'}
@@ -221,7 +222,7 @@ series_list_parser.add_argument('status', choices=('new', 'stale'), help="Filter
 series_list_parser.add_argument('days', type=int,
                                 help="Filter status by number of days. Default is 7 for new and 365 for stale")
 series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
-series_list_parser.add_argument('max', type=int, default=100, help='Shows per page. Default is 100.')
+series_list_parser.add_argument('number_of_shows', type=int, default=100, help='Shows per page. Default is 100.')
 
 series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behind_latest', 'last_download_date'),
                                 default='show_name',
@@ -240,7 +241,7 @@ class SeriesListAPI(APIResource):
         """ List existing shows """
         args = series_list_parser.parse_args()
         page = args['page']
-        max_results = args['max']
+        max_results = args['number_of_shows']
 
         sort_by = args['sort_by']
         order = args['order']
@@ -290,9 +291,12 @@ class SeriesListAPI(APIResource):
         for show_number in range(start, finish):
             shows.append(sorted_show_list[show_number])
 
+        number_of_shows = min(max_results, num_of_shows)
+
         return jsonify({
             'shows': shows,
-            'number_of_shows': num_of_shows,
+            'number_of_shows': number_of_shows,
+            'total_number_of_shows': num_of_shows,
             'page': page,
             'total_number_of_pages': pages
         })
