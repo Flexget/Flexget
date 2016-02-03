@@ -190,8 +190,8 @@ def get_series_details(show):
         latest_ep_age = latest_ep.age
         new_eps_after_latest_ep = series.new_eps_after(latest_ep)
         release = get_release_details(
-                sorted(latest_ep.downloaded_releases,
-                       key=lambda release: release.first_seen if release.downloaded else None, reverse=True)[0])
+            sorted(latest_ep.downloaded_releases,
+                   key=lambda release: release.first_seen if release.downloaded else None, reverse=True)[0])
     else:
         latest_ep_id = latest_ep_identifier = latest_ep_age = new_eps_after_latest_ep = release = None
 
@@ -259,13 +259,26 @@ class SeriesListAPI(APIResource):
 
         }
 
-        series_list = series.get_series_summary(**kwargs)
-        series_list = series_list.order_by(series.Series.name)
+        raw_series_list = series.get_series_summary(**kwargs)
+        converted_series_list = [get_series_details(show) for show in raw_series_list]
+        sorted_show_list = []
+        if sort_by == 'show_name':
+            sorted_show_list = sorted(converted_series_list, key=lambda show: show['show_name'], reverse=order)
+        elif sort_by == 'episodes_behind_latest':
+            sorted_show_list = sorted(converted_series_list,
+                                      key=lambda show: show['latest_downloaded_episode']['number_of_episodes_behind'],
+                                      reverse=order)
+        elif sort_by == 'last_download_date':
+            sorted_show_list = sorted(converted_series_list,
+                                      key=lambda show: show['latest_downloaded_episode']['last_downloaded_release'][
+                                          'release_first_seen'] if show['latest_downloaded_episode'][
+                                          'last_downloaded_release'] else datetime.datetime(1970, 1, 1),
+                                      reverse=order)
 
-        num_of_shows = series_list.count()
+        num_of_shows = len(sorted_show_list)
         pages = int(ceil(num_of_shows / float(max_results)))
 
-        shows = sorted_show_list = []
+        shows = []
         if page > pages and pages != 0:
             return {'error': 'page %s does not exist' % page}, 400
 
@@ -275,23 +288,10 @@ class SeriesListAPI(APIResource):
             finish = num_of_shows
 
         for show_number in range(start, finish):
-            shows.append(get_series_details(series_list[show_number]))
-
-        if sort_by == 'show_name':
-            sorted_show_list = sorted(shows, key=lambda show: show['show_name'], reverse=order)
-        elif sort_by == 'episodes_behind_latest':
-            sorted_show_list = sorted(shows,
-                                      key=lambda show: show['latest_downloaded_episode']['number_of_episodes_behind'],
-                                      reverse=order)
-        elif sort_by == 'last_download_date':
-            sorted_show_list = sorted(shows,
-                                      key=lambda show: show['latest_downloaded_episode']['last_downloaded_release'][
-                                          'release_first_seen'] if show['latest_downloaded_episode'][
-                                          'last_downloaded_release'] else datetime.datetime(1970, 1, 1),
-                                      reverse=order)
+            shows.append(sorted_show_list[show_number])
 
         return jsonify({
-            'shows': sorted_show_list,
+            'shows': shows,
             'number_of_shows': num_of_shows,
             'page': page,
             'total_number_of_pages': pages
