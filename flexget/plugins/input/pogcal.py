@@ -36,7 +36,7 @@ class InputPogDesign(object):
             page = session.get('http://www.pogdesign.co.uk/cat/showselect.php')
         except requests.RequestException as e:
             raise plugin.PluginError('Error retrieving source: %s' % e)
-        soup = BeautifulSoup(page.text)
+        soup = BeautifulSoup(page.text, "html5lib")
         entries = []
         for row in soup.find_all('label', {'class': 'label_check'}):
             if row.find(attrs={'checked': 'checked'}):
