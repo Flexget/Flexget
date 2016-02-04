@@ -575,7 +575,7 @@ release_list_parser.add_argument('downloaded', choices=('downloaded', 'not_downl
                                  help='Filter between release status')
 
 
-@api.response(404, 'Show ID not found',default_error_schema)
+@api.response(404, 'Show ID not found', default_error_schema)
 @api.response(414, 'Episode ID not found', default_error_schema)
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id', default_error_schema)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases')
@@ -657,7 +657,7 @@ class SeriesReleasesAPI(APIResource):
 @api.response(414, 'Episode ID not found', default_error_schema)
 @api.response(424, 'Release ID not found', default_error_schema)
 @api.response(400, 'Episode with ep_id does not belong to show with show_id', default_error_schema)
-@api.response(410, 'Release with rel_id does not belong to episode with ep_id',default_error_schema)
+@api.response(410, 'Release with rel_id does not belong to episode with ep_id', default_error_schema)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/<int:rel_id>/')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'},
          description='Use this endpoint to get or delete a specific release from an episode of a show. Deleting a '
