@@ -15,6 +15,18 @@ seen_api = api.namespace('seen', description='Managed Flexget seen entries and f
 
 PLUGIN_TASK_NAME = 'seen_plugin_API'  # Name of task to use when adding entries via API
 
+default_error_schema = {
+    'type': 'object',
+    'properties': {
+        'status': {'type': 'string'},
+        'message': {'type': 'string'}
+    }
+}
+
+empty_response = api.schema('empty', {'type': 'object'})
+
+default_error_schema = api.schema('default_error_schema', default_error_schema)
+
 seen_field_object = {
     'type': 'object',
     'properties': {
@@ -92,7 +104,7 @@ seen_delete_parser.add_argument('is_seen_local', type=inputs.boolean, default=No
 @seen_api.route('/')
 @api.doc(description='Get, delete or create seen entries')
 class SeenSearchAPI(APIResource):
-    @api.response(404, 'Page does not exist')
+    @api.response(404, 'Page does not exist', model=default_error_schema)
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
     @api.doc(parser=seen_search_parser)
     def get(self, session):
@@ -127,7 +139,8 @@ class SeenSearchAPI(APIResource):
 
         # Invalid page request
         if page > pages and pages != 0:
-            return {'error': 'page %s does not exist' % page}, 404
+            return {'status': 'error',
+                    'message': 'page %s does not exist' % page}, 404
 
         start = (page - 1) * max_results
         finish = start + max_results
@@ -147,8 +160,8 @@ class SeenSearchAPI(APIResource):
 
     example = "fields: {'url': 'http://123.com', 'title': 'A.Torrent', 'imdb_id': 'tt1234567'"
 
-    @api.response(400, 'A matching seen object is already added')
-    @api.response(200, 'Successfully added new seen object', seen_object_schema)
+    @api.response(500, 'A matching seen object is already added', model=default_error_schema)
+    @api.response(201, 'Successfully added new seen object', seen_object_schema)
     @api.validate(model=seen_object_input_schema,
                   description='Fields attribute takes a dict to add as seen entry fields, '
                               'for example: {0}'.format(example))
@@ -171,14 +184,10 @@ class SeenSearchAPI(APIResource):
                     'message': "Seen entry matching the value '{0}' is already added".format(exist.value)}, 400
 
         seen_entry = seen.add(**kwargs)
-        return jsonify({
-            'status': 'success',
-            'message': 'successfully added seen object',
-            'seen_object': seen_entry
-        })
+        return jsonify(seen_entry), 201
 
-    @api.response(500, 'Delete process failed')
-    @api.response(200, 'Successfully delete all entries')
+    @api.response(500, 'Delete process failed', model=default_error_schema)
+    @api.response(200, 'Successfully delete all entries', empty_response)
     @api.doc(parser=seen_delete_parser)
     def delete(self, session):
         """ Delete seen entries """
@@ -190,7 +199,6 @@ class SeenSearchAPI(APIResource):
             value = unquote(value)
             value = '%' + value + '%'
         seen_entries_list = seen.search(value, is_seen_local, session)
-        count = len(seen_entries_list)
 
         for entry in seen_entries_list:
             try:
@@ -198,14 +206,13 @@ class SeenSearchAPI(APIResource):
             except ValueError as e:
                 return {'status': 'error',
                         'message': 'Could not delete entry ID {0}'.format(entry.id)}, 500
-        return {'status': 'success',
-                'message': 'Successfully delete {0} entries from DB'.format(count)}
+        return {}
 
 
 @seen_api.route('/<int:seen_entry_id>')
 @api.doc(params={'seen_entry_id': 'ID of seen entry'}, description='Delete a specific seen entry via its ID')
-@api.response(500, 'Delete process failed')
-@api.response(200, 'Successfully deleted entry')
+@api.response(500, 'Delete process failed', model=default_error_schema)
+@api.response(200, 'Successfully deleted entry', empty_response)
 class SeenSearchAPI(APIResource):
     def delete(self, seen_entry_id, session):
         """ Delete seen entry by ID """
@@ -214,5 +221,4 @@ class SeenSearchAPI(APIResource):
         except ValueError as e:
             return {'status': 'error',
                     'message': 'Could not delete entry ID {0}'.format(seen_entry_id)}, 500
-        return {'status': 'success',
-                'message': 'Successfully delete seen entry ID {0} from DB'.format(seen_entry_id)}
+        return {}
