@@ -23,6 +23,8 @@ default_error_schema = {
 
 default_error_schema = api.schema('default_error_schema', default_error_schema)
 
+empty_response = api.schema('empty', {'type': 'object'})
+
 movie_object = {
     'type': 'object',
     'properties': {
@@ -192,7 +194,7 @@ class MovieQueueManageAPI(APIResource):
                     'message': 'movie with ID {0} was not found'.format(id)}, 404
         return jsonify(movie)
 
-    @api.response(200, 'Movie successfully deleted', model=default_error_schema)
+    @api.response(200, 'Movie successfully deleted', model=empty_response)
     def delete(self, id, session=None):
         """ Delete movies from movie queue """
         try:
