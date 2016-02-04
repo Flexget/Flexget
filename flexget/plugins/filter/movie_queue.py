@@ -320,7 +320,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
         item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality.text, queue_name=queue_name)
         session.add(item)
         session.commit()
-        log.info('Adding %s to movie queue %s with quality=%s.' % (queue_name, title, quality))
+        log.info('Adding %s to movie queue %s with quality=%s.' % (title, queue_name, quality))
         return item.to_dict()
     else:
         if item.downloaded:
@@ -453,16 +453,25 @@ def queue_get(session=None, downloaded=None, queue_name=None):
 
 
 @with_session
-def get_movie_by_id(movie_id, session=None, queue_name=None):
+def get_movie_by_id(movie_id, session=None):
     """
     Return movie item from movie_id
     :param movie_id: ID of queued movie
     :param session: Session
     :return: Dict of movie details
     """
-    queue_name = queue_name or 'default'
-    return session.query(QueuedMovie).filter(
-        and_(QueuedMovie.id == movie_id, func.lower(QueuedMovie.queue_name) == queue_name.lower())).one().to_dict()
+    return session.query(QueuedMovie).filter(QueuedMovie.id == movie_id).one().to_dict()
+
+
+@with_session
+def delete_movie_by_id(movie_id, session=None):
+    """
+    Deletes movie by its ID
+    :param movie_id: ID of queued movie
+    :param session: Session
+    """
+    movie = session.query(QueuedMovie).filter(QueuedMovie.id == movie_id).one()
+    session.delete(movie)
 
 
 @event('plugin.register')
