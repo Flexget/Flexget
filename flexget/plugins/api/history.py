@@ -6,7 +6,7 @@ from math import ceil
 from flask import jsonify
 from sqlalchemy import desc
 
-from flexget.api import api, APIResource
+from flexget.api import api, APIResource, default_error_schema
 from flexget.plugins.output.history import History
 
 log = logging.getLogger('history')
@@ -36,16 +36,6 @@ history_api_schema = {
 }
 
 history_api_schema = api.schema('history.list', history_api_schema)
-
-default_error_schema = {
-    'type': 'object',
-    'properties': {
-        'status': {'type': 'string'},
-        'message': {'type': 'string'}
-    }
-}
-
-default_error_schema = api.schema('default_error_schema', default_error_schema)
 
 history_parser = api.parser()
 history_parser.add_argument('page', type=int, required=False, default=1, help='Page number')

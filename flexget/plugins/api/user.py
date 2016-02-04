@@ -3,7 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 from flask import request
 from flask.ext.login import current_user
 
-from flexget.api import api, APIResource
+from flexget.api import api, APIResource, default_error_schema, empty_response
 from flexget.webserver import change_password, generate_token, WeakPassword
 
 user_api = api.namespace('user', description='Manage user login credentials')
@@ -15,18 +15,6 @@ user_password_input = {
     }
 }
 user_password_input_schema = api.schema('user_password_input', user_password_input)
-
-default_error_schema = {
-    'type': 'object',
-    'properties': {
-        'status': {'type': 'string'},
-        'message': {'type': 'string'}
-    }
-}
-
-default_error_schema = api.schema('default_error_schema', default_error_schema)
-
-empty_response = api.schema('empty', {'type': 'object'})
 
 
 @user_api.route('/')

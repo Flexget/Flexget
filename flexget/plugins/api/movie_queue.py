@@ -6,24 +6,12 @@ from math import ceil
 from flask import jsonify, request
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource
+from flexget.api import api, APIResource, default_error_schema, empty_response
 from flexget.plugins.api.series import NoResultFound
 from flexget.plugins.filter import movie_queue as mq
 from flexget.utils import qualities
 
 movie_queue_api = api.namespace('movie_queue', description='Movie Queue operations')
-
-default_error_schema = {
-    'type': 'object',
-    'properties': {
-        'status': {'type': 'string'},
-        'message': {'type': 'string'}
-    }
-}
-
-default_error_schema = api.schema('default_error_schema', default_error_schema)
-
-empty_response = api.schema('empty', {'type': 'object'})
 
 movie_object = {
     'type': 'object',

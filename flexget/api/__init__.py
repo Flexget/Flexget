@@ -1,25 +1,23 @@
-import logging
 import json
+import logging
 import os
 import pkgutil
-
-from functools import wraps
 from collections import deque
+from functools import wraps
 
 from flask import Flask, request
 from flask.ext.cors import CORS
-from flask_restplus import Api as RestPlusAPI
-from flask_restplus.resource import Resource
-from flask_restplus.model import Model
 from flask_compress import Compress
+from flask_restplus import Api as RestPlusAPI
+from flask_restplus.model import Model
+from flask_restplus.resource import Resource
 from jsonschema.exceptions import RefResolutionError
 
-from flexget.event import event
-from flexget.webserver import register_app, get_secret
-from flexget.config_schema import process_config, register_config_key
 from flexget import manager
+from flexget.config_schema import process_config, register_config_key
+from flexget.event import event
 from flexget.utils.database import with_session
-
+from flexget.webserver import register_app, get_secret
 
 __version__ = '0.2-dev'
 
@@ -39,6 +37,7 @@ def register_config():
 
 class ApiSchemaModel(Model):
     """A flask restplus :class:`flask_restplus.models.ApiModel` which can take a json schema directly."""
+
     def __init__(self, name, schema, *args, **kwargs):
         super(ApiSchemaModel, self).__init__(name, *args, **kwargs)
         self._schema = schema
@@ -113,6 +112,7 @@ class Api(RestPlusAPI):
         When a method is decorated with this, json data submitted to the endpoint will be validated with the given
         `model`. This also auto-documents the expected model, as well as the possible :class:`ValidationError` response.
         """
+
         def decorator(func):
             @api.expect((model, description))
             @api.response(ValidationError)
@@ -128,7 +128,9 @@ class Api(RestPlusAPI):
                 except RefResolutionError as e:
                     raise ApiError(str(e))
                 return func(*args, **kwargs)
+
             return wrapper
+
         return decorator
 
     def response(self, code_or_apierror, description=None, model=None, **kwargs):
@@ -273,6 +275,7 @@ class ApiClient(object):
 
     It skips http, and is only usable from within the running flexget process.
     """
+
     def __init__(self):
         app = Flask(__name__)
         app.register_blueprint(api)
@@ -305,6 +308,19 @@ class ApiEndopint(object):
     def __call__(self, data=None, method=None):
         return self.caller(self.endpoint, data=data, method=method)
 
+
 # Import API Sub Modules
 for loader, module_name, is_pkg in pkgutil.walk_packages(__path__):
     loader.find_module(module_name).load_module(module_name)
+
+default_error = {
+    'type': 'object',
+    'properties': {
+        'status': {'type': 'string'},
+        'message': {'type': 'string'}
+    }
+}
+
+default_error_schema = api.schema('default_error_schema', default_error)
+
+empty_response = api.schema('empty', {'type': 'object'})
