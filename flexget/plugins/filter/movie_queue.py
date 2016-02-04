@@ -83,6 +83,7 @@ def upgrade(ver, session):
                                            {'title': parser.name}))
         ver = 3
     if ver == 3:
+        # adding queue_name column to movie_queue table and setting initial value to default)
         table_add_column('movie_queue', 'queue_name', Unicode, session, default='default')
         ver == 4
     return ver
@@ -111,6 +112,7 @@ class QueuedMovie(queue_base.QueuedItem, Base):
             'tmdb_id': self.tmdb_id,
             'quality': self.quality,
             'title': self.title,
+            'queue_name:': self.queue_name
         }
 
 
@@ -318,7 +320,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
         item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality.text, queue_name=queue_name)
         session.add(item)
         session.commit()
-        log.info('Adding %s to movie queue with quality=%s.' % (title, quality))
+        log.info('Adding %s to movie queue %s with quality=%s.' % (queue_name, title, quality))
         return item.to_dict()
     else:
         if item.downloaded:
