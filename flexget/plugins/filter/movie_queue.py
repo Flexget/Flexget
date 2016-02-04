@@ -380,12 +380,12 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=
         item = query.one()
         title = item.title
         if not item.downloaded:
-            raise QueueError('%s is not marked as downloaded' % title)
+            raise QueueError(message=('%s is not marked as downloaded' % title), errno=1)
         item.downloaded = None
         return item.to_dict()
     except NoResultFound as e:
-        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' %
-                         (title, imdb_id, tmdb_id, movie_id))
+        raise QueueError(message=('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' %
+                         (title, imdb_id, tmdb_id, movie_id)), errno=2)
 
 
 @with_session

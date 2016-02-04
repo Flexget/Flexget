@@ -94,7 +94,7 @@ movie_edit_input_schema = {
     'type': 'object',
     'properties': {
         'quality': {'type': 'string', 'format': 'quality_requirements'},
-        'reset_downloaded': {'type': 'boolean', 'default': False}
+        'reset_downloaded': {'type': 'boolean', 'default': True}
     },
     'anyOf': [
         {'required': ['quality']},
@@ -219,8 +219,7 @@ class MovieQueueManageAPI(APIResource):
             try:
                 movie = mq.queue_forget(movie_id=id)
             except mq.QueueError as e:
-                # Hacky way to do this. Ideally we should change movie_queue.QueueError to return more details instead
-                if e.message.endswith('not marked as downloaded'):
+                if e.errno == 1:
                     reply = {
                         'status': 'error',
                         'message': e.message
