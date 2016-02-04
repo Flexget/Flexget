@@ -273,6 +273,8 @@ class SendTelegram(object):
             raise plugin.PluginWarning('invalid bot token')
         except (URLError, SSLError) as e:
             self.log.error('Could not connect Telegram servers at this time, please try again later: %s', e.args[0])
+        except TelegramError as e:
+            self.log.error('Could not connect Telegram servers at this time, please try again later: %s', e.message)
 
     @staticmethod
     def _enforce_telegram_plugin_ver():
