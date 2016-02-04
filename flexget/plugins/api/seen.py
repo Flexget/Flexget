@@ -184,7 +184,8 @@ class SeenSearchAPI(APIResource):
                     'message': "Seen entry matching the value '{0}' is already added".format(exist.value)}, 400
 
         seen_entry = seen.add(**kwargs)
-        return jsonify(seen_entry), 201
+        reply = jsonify(seen_entry)
+        reply.status_code = 201
 
     @api.response(500, 'Delete process failed', model=default_error_schema)
     @api.response(200, 'Successfully delete all entries', empty_response)

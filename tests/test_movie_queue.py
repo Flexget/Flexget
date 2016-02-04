@@ -182,13 +182,11 @@ class TestMovieQueueAPI(APITest):
             "reset_downloaded": True,
             "quality": "720p"
         }
-        valid_response = {u'status': u'success',
-                          u'movie': {u'added': u'Wed, 30 Dec 2015 12:32:10 GMT', u'entry_title': None, u'tmdb_id': None,
-                                     u'title': u'The Top 14 Perform', u'entry_original_url': None, u'entry_url': None,
-                                     u'downloaded': None, u'quality_req': u'', u'imdb_id': u'tt1234567',
-                                     u'quality': u'',
-                                     u'id': 181},
-                          u'message': u'Successfully updated movie details'}
+        valid_response = {u'added': u'Wed, 30 Dec 2015 12:32:10 GMT', u'entry_title': None, u'tmdb_id': None,
+                          u'title': u'The Top 14 Perform', u'entry_original_url': None, u'entry_url': None,
+                          u'downloaded': None, u'quality_req': u'', u'imdb_id': u'tt1234567',
+                          u'quality': u'',
+                          u'id': 181}
 
         mocked_queue_edit.return_value = self.mock_return_movie
         mocked_queue_forget.return_value = self.mock_return_movie

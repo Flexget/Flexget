@@ -242,4 +242,4 @@ class MovieQueueManageAPI(APIResource):
             return {'status': 'error',
                     'message': 'Not enough parameters to edit movie data'}, 400
 
-        return jsonify({movie})
+        return jsonify(movie)

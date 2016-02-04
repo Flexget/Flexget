@@ -9,7 +9,7 @@ class TestUserAPI(APITest):
         strong_password = {'password': 'AVer123y$ron__g-=PaW[]rd'}
 
         rsp = self.json_put('/user/', data=json.dumps(weak_password))
-        assert rsp.status_code == 400
+        assert rsp.status_code == 500
 
         rsp = self.json_put('/user/', data=json.dumps(medium_password))
         assert rsp.status_code == 200
