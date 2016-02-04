@@ -34,6 +34,27 @@ class TestMovieQueue(FlexGetBase):
 
            movie_queue_forget:
              movie_queue: forget
+
+           movie_queue_different_queue_add:
+             movie_queue:
+               action: add
+               queue_name: A new queue
+
+           movie_queue_different_queue_accept:
+             movie_queue:
+               action: accept
+               queue_name: A new queue
+
+           movie_queue_different_queue_remove:
+             movie_queue:
+               action: remove
+               queue_name: A new queue
+
+           movie_queue_different_queue_forget:
+             movie_queue:
+               action: forget
+               queue_name: A new queue
+
     """
 
     def test_movie_queue_accept(self):
@@ -96,6 +117,48 @@ class TestMovieQueue(FlexGetBase):
         self.execute_task('movie_queue_forget')
         assert not queue_get(downloaded=True)
         assert len(queue_get()) == 1
+
+    def test_movie_queue_different_queue_add(self):
+        self.execute_task('movie_queue_different_queue_add')
+        queue = queue_get()
+        assert len(queue) == 0
+        queue = queue_get(queue_name='A new queue')
+        assert len(queue) == 1
+
+    def test_movie_queue_different_queue_accept(self):
+        queue_add(title=u'MovieInQueue', imdb_id=u'tt1931533', tmdb_id=603, queue_name='A new queue')
+        self.execute_task('movie_queue_different_queue_accept')
+        assert len(self.task.entries) == 1
+
+        entry = self.task.entries[0]
+        assert entry.get('imdb_id', eval_lazy=False) == 'tt1931533'
+        assert entry.get('tmdb_id', eval_lazy=False) == 603
+
+        self.execute_task('movie_queue_different_queue_accept')
+        assert len(self.task.entries) == 0, 'Movie should only be accepted once'
+
+    def test_movie_queue_different_queue_remove(self):
+        queue_add(title=u'MovieInQueue', imdb_id=u'tt1931533', tmdb_id=603, queue_name='A new queue')
+        queue_add(title=u'KeepMe', imdb_id=u'tt1933533', tmdb_id=604, queue_name='A new queue')
+
+        self.execute_task('movie_queue_different_queue_remove')
+
+        assert len(self.task.entries) == 1
+
+        queue = queue_get(queue_name='A new queue')
+        assert len(queue) == 1
+
+        entry = queue[0]
+        assert entry.imdb_id == 'tt1933533'
+        assert entry.tmdb_id == 604
+
+    def test_movie_queue_different_queue_forget(self):
+        queue_add(title=u'MovieInQueue', imdb_id=u'tt1931533', tmdb_id=603, queue_name='A new queue')
+        self.execute_task('movie_queue_different_queue_accept')
+        assert len(queue_get(downloaded=True, queue_name='A new queue')) == 1
+        self.execute_task('movie_queue_different_queue_forget')
+        assert not queue_get(downloaded=True, queue_name='A new queue')
+        assert len(queue_get(queue_name='a New queue')) == 1
 
 
 class TestMovieQueueAPI(APITest):
