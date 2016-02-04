@@ -202,10 +202,7 @@ class MovieQueueManageAPI(APIResource):
                      'message': e.message}
             return reply, 404
 
-        reply = jsonify(
-            {'status': 'success',
-             'message': 'successfully deleted movie with ID {0}'.format(id)})
-        return reply
+        return {}
 
     @api.response(405, 'Movie not marked as downloaded', model=default_error_schema)
     @api.response(200, 'Movie successfully updated', movie_object_schema)

@@ -198,7 +198,7 @@ class SeenSearchAPI(APIResource):
         if value:
             value = unquote(value)
             value = '%' + value + '%'
-        seen_entries_list = seen.search(value, is_seen_local, session)
+        seen_entries_list = seen.search(value=value, status=is_seen_local, session=session)
 
         for entry in seen_entries_list:
             try:
