@@ -94,7 +94,7 @@ class LoginAPI(APIResource):
             if user and check_password_hash(user.password, password):
                 args = login_parser.parse_args()
                 login_user(user, remember=args['remember'])
-                return {'status': 'success'}
+                return {}
 
         return {'status': 'failed', 'message': 'Invalid username or password'}, 401
 
@@ -105,6 +105,6 @@ class LogoutAPI(APIResource):
     def get(self, session=None):
         """ Logout and clear session cookies """
         flask_session.clear()
-        resp = jsonify({'status': 'success'})
+        resp = jsonify({})
         resp.set_cookie('flexgetToken', '', expires=0)
         return resp
