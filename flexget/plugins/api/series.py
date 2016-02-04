@@ -8,10 +8,22 @@ from flask import request
 from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource, default_error_schema, empty_response
+from flexget.api import api, APIResource
 from flexget.plugins.filter import series
 
 series_api = api.namespace('series', description='Flexget Series operations')
+
+default_error_schema = {
+    'type': 'object',
+    'properties': {
+        'status': {'type': 'string'},
+        'message': {'type': 'string'}
+    }
+}
+
+default_error_schema = api.schema('default_error_schema', default_error_schema)
+
+empty_response = api.schema('empty', {'type': 'object'})
 
 begin_object = {
     'type': 'object',

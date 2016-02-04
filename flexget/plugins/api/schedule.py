@@ -1,12 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-
 import copy
-
 from flask import request, jsonify
-
-from flexget.api import api, APIResource, default_error_schema, empty_response
 from flexget.manager import manager
-from flexget.plugins.daemon.scheduler import schedule_schema, scheduler, scheduler_job_map
+from flexget.plugins.daemon.scheduler import schedule_schema, main_schema, scheduler, scheduler_job_map
+from flexget.api import api, APIResource
 
 schedule_api = api.namespace('schedules', description='Task Scheduler')
 
@@ -83,7 +80,7 @@ class SchedulesAPI(APIResource):
 @api.doc(description=schedule_desc)
 class ScheduleAPI(APIResource):
     @api.response(200, model=api_schedule_schema)
-    @api.response(404, description='Schedule not found', model=default_error_schema)
+    @api.response(404, description='Schedule not found')
     def get(self, schedule_id, session=None):
         """ Get schedule details """
         schedule = _schedule_by_id(schedule_id)
@@ -117,7 +114,7 @@ class ScheduleAPI(APIResource):
 
     @api.validate(api_schedule_schema, description='Updated Schedule Object')
     @api.response(200, model=api_schedule_schema)
-    @api.response(404, description='Schedule not found', model=default_error_schema)
+    @api.response(404, description='Schedule not found')
     def put(self, schedule_id, session=None):
         """ Update schedule """
         data = request.json
@@ -129,8 +126,8 @@ class ScheduleAPI(APIResource):
         new_schedule = self._update_schedule(schedule, data)
         return jsonify({'schedule': new_schedule})
 
-    @api.response(404, description='Schedule not found', model=default_error_schema)
-    @api.response(200, description='Schedule deleted', model=empty_response)
+    @api.response(404, description='Schedule not found')
+    @api.response(200, description='Schedule deleted')
     def delete(self, schedule_id, session=None):
         """ Delete a schedule """
         for i in range(len(manager.config.get('schedules', []))):

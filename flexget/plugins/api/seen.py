@@ -8,12 +8,24 @@ from urllib import unquote
 from flask import jsonify, request
 from flask_restplus import inputs
 
-from flexget.api import api, APIResource, default_error_schema, empty_response
+from flexget.api import api, APIResource
 from flexget.plugins.filter import seen
 
 seen_api = api.namespace('seen', description='Managed Flexget seen entries and fields')
 
 PLUGIN_TASK_NAME = 'seen_plugin_API'  # Name of task to use when adding entries via API
+
+default_error_schema = {
+    'type': 'object',
+    'properties': {
+        'status': {'type': 'string'},
+        'message': {'type': 'string'}
+    }
+}
+
+empty_response = api.schema('empty', {'type': 'object'})
+
+default_error_schema = api.schema('default_error_schema', default_error_schema)
 
 seen_field_object = {
     'type': 'object',
