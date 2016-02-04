@@ -295,6 +295,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
     :param imdb_id: IMDB id for the movie. (optional)
     :param tmdb_id: TMDB id for the movie. (optional)
     :param quality: A QualityRequirements object defining acceptable qualities.
+    :param queue_name: Name of movie queue to get items from
     :param session: Optional session to use for database updates
     """
 
@@ -338,6 +339,7 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
     :param imdb_id: Imdb id
     :param tmdb_id: Tmdb id
     :param session: Optional session to use, new session used otherwise
+    :param queue_name: Name of movie queue to get items from
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
@@ -375,6 +377,7 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=
     :param imdb_id: Imdb id
     :param tmdb_id: Tmdb id
     :param session: Optional session to use, new session used otherwise
+    :param queue_name: Name of movie queue to get items from
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
@@ -409,6 +412,7 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None,
     :param imdb_id: Imdb id
     :param tmdb_id: Tmdb id
     :param session: Optional session to use, new session used otherwise
+    :param queue_name: Name of movie queue to get items from
     :return: Title of edited item
     :raises QueueError: If queued item could not be found with given arguments
     """
@@ -440,6 +444,7 @@ def queue_get(session=None, downloaded=None, queue_name=None):
 
     :param session: New session is used it not given
     :param bool downloaded: Whether or not to return only downloaded
+    :param queue_name: Name of movie queue to get items from
     :return: List of QueuedMovie objects (detached from session)
     """
     queue_name = queue_name or 'default'
