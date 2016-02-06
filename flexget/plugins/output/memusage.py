@@ -35,27 +35,28 @@ def update()
 heapy = None
 
 
-@event('manager.execute.started')
-def on_exec_started(manager, options):
-    if not options.mem_usage:
+@event('manager.startup')
+def on_manager_startup(manager):
+    if not manager.options.mem_usage:
         return
     global heapy
     heapy = hpy()
 
 
-@event('manager.execute.completed')
-def on_exec_stopped(manager, options):
-    if not options.mem_usage:
+@event('manager.shutdown')
+def on_manager_shutdown(manager):
+    if not manager.options.mem_usage:
         return
     global heapy
     console('Calculating memory usage:')
     console(heapy.heap())
     console('-' * 79)
+    console('Calculating report (this may take a while):')
     console(heapy.heap().get_rp(40))
     heapy = None
 
 
 @event('options.register')
 def register_parser_arguments():
-    options.get_parser('execute').add_argument('--mem-usage', action='store_true', dest='mem_usage', default=False,
+    options.get_parser().add_argument('--mem-usage', action='store_true', dest='mem_usage', default=False,
                                                help='display memory usage debug information')
