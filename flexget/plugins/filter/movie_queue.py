@@ -142,6 +142,8 @@ class MovieQueue(queue_base.FilterQueueBase):
         if config.get('action') != 'accept':
             return
 
+        queue_name = config.get('queue_name')
+
         # Tell tmdb_lookup to add lazy lookup fields if not already present
         try:
             plugin.get_plugin_by_name('imdb_lookup').instance.register_lazy_fields(entry)
@@ -167,8 +169,8 @@ class MovieQueue(queue_base.FilterQueueBase):
 
         quality = entry.get('quality', qualities.Quality())
 
-        movie = task.session.query(QueuedMovie).filter(QueuedMovie.downloaded == None). \
-            filter(or_(*conditions)).first()
+        movie = task.session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).filter(
+            QueuedMovie.queue_name == queue_name).filter(or_(*conditions)).first()
         if movie and movie.quality_req.allows(quality):
             return movie
 

@@ -126,13 +126,28 @@ class TestMovieQueue(FlexGetBase):
         assert len(queue) == 1
 
     def test_movie_queue_different_queue_accept(self):
+        default_queue = queue_get()
+        named_queue = queue_get(queue_name='A new queue')
+        assert len(default_queue) == len(named_queue) == 0
+
         queue_add(title=u'MovieInQueue', imdb_id=u'tt1931533', tmdb_id=603, queue_name='A new queue')
+        queue_add(title=u'MovieInQueue', imdb_id=u'tt1931533', tmdb_id=603)
+
+        default_queue = queue_get()
+        named_queue = queue_get(queue_name='A new queue')
+        assert len(named_queue) == len(default_queue) == 1
+
         self.execute_task('movie_queue_different_queue_accept')
         assert len(self.task.entries) == 1
 
         entry = self.task.entries[0]
         assert entry.get('imdb_id', eval_lazy=False) == 'tt1931533'
         assert entry.get('tmdb_id', eval_lazy=False) == 603
+
+        default_queue = queue_get()
+        named_queue = queue_get(queue_name='A new queue', downloaded=False)
+        assert len(named_queue) == 0
+        assert len(default_queue) == 1
 
         self.execute_task('movie_queue_different_queue_accept')
         assert len(self.task.entries) == 0, 'Movie should only be accepted once'
