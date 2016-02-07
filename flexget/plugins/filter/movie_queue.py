@@ -389,7 +389,7 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=
     elif tmdb_id:
         query = query.filter(QueuedMovie.tmdb_id == tmdb_id)
     elif title:
-        query = query.filter(QueuedMovie.title == title)
+        query = query.filter(func.lower(QueuedMovie.title) == func.lower(title))
     elif movie_id:
         query = query.filter(QueuedMovie.id == movie_id)
     try:
