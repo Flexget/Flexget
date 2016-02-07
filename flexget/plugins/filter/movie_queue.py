@@ -322,13 +322,13 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
         item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality.text, queue_name=queue_name)
         session.add(item)
         session.commit()
-        log.info('Adding %s to movie queue %s with quality=%s.', (title, queue_name, quality))
+        log.info('Adding %s to movie queue %s with quality=%s.', title, queue_name, quality)
         return item.to_dict()
     else:
         if item.downloaded:
             raise QueueError('ERROR: %s has already been queued and downloaded' % title, errno=1)
         else:
-            raise QueueError('ERROR: %s is already in the queue' % title, errno=1)
+            raise QueueError('ERROR: %s is already in the queue %s' % (title, queue_name), errno=1)
 
 
 @with_session
@@ -344,7 +344,7 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
-    log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', title, imdb_id, tmdb_id, movie_id)
+    log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s, queue_name=%s', title, imdb_id, tmdb_id, movie_id)
     query = session.query(QueuedMovie).filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
     if imdb_id:
         query = query.filter(QueuedMovie.imdb_id == imdb_id)
@@ -361,11 +361,11 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
         return title
     except NoResultFound as e:
         raise QueueError(
-            'title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' % (
-                title, imdb_id, tmdb_id, movie_id))
+            'title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue %s' % (
+                title, imdb_id, tmdb_id, movie_id, queue_name))
     except MultipleResultsFound:
-        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s matches multiple results in queue' %
-                         (title, imdb_id, tmdb_id, movie_id))
+        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s matches multiple results in queue %s' %
+                         (title, imdb_id, tmdb_id, movie_id, queue_name))
 
 
 @with_session
