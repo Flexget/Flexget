@@ -28,6 +28,17 @@ class TestEmitMovieQueue(FlexGetBase):
               imdb_id: tt0133093
               tmdb_id: 603
             movie_queue: accept
+          emit_from_separate_queue:
+            emit_movie_queue:
+              queue_name: queue 2
+          download_movie_separate_queue:
+            mock:
+            - title: The Matrix
+              imdb_id: tt0133093
+              tmdb_id: 603
+            movie_queue:
+              action: accept
+              queue_name: queue 2
         """
 
     def test_default(self):
@@ -49,3 +60,18 @@ class TestEmitMovieQueue(FlexGetBase):
         self.execute_task('download_movie')
         self.execute_task('test_default')
         assert len(self.task.entries) == 0, 'Should not emit already downloaded queue items.'
+
+    def test_emit_different_queue(self):
+        queue_add(title='The Matrix 1999', imdb_id='tt0133093', tmdb_id=603)
+        queue_add(title='The Matrix 1999', imdb_id='tt0133093', tmdb_id=603, queue_name='queue 2')
+
+        self.execute_task('test_default')
+        assert len(self.task.entries) == 1
+        self.execute_task('emit_from_separate_queue')
+        assert len(self.task.entries) == 1
+
+        self.execute_task('download_movie_separate_queue')
+        self.execute_task('test_default')
+        assert len(self.task.entries) == 1
+        self.execute_task('emit_from_separate_queue')
+        assert len(self.task.entries) == 0
