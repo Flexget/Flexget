@@ -3,7 +3,6 @@ from __future__ import unicode_literals, division, absolute_import
 from flexget import options
 from flexget.event import event
 from flexget.logger import console
-from flexget.manager import Session
 from flexget.plugins.filter import seen
 from flexget.utils.database import with_session
 from flexget.utils.imdb import is_imdb_url, extract_id
@@ -38,6 +37,7 @@ def seen_add(options):
             seen_name = imdb_id
     seen.add(seen_name, 'cli_add', {'cli_add': seen_name})
     console('Added %s as seen. This will affect all tasks.' % seen_name)
+
 
 @with_session
 def seen_search(options, session=None):
