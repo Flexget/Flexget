@@ -142,7 +142,7 @@ class MovieQueue(queue_base.FilterQueueBase):
         if config.get('action') != 'accept':
             return
 
-        queue_name = config.get('queue_name')
+        queue_name = config.get('queue_name', 'default')
 
         # Tell tmdb_lookup to add lazy lookup fields if not already present
         try:
