@@ -322,7 +322,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
         item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality.text, queue_name=queue_name)
         session.add(item)
         session.commit()
-        log.info('Adding %s to movie queue %s with quality=%s.' % (title, queue_name, quality))
+        log.info('Adding %s to movie queue %s with quality=%s.', (title, queue_name, quality))
         return item.to_dict()
     else:
         if item.downloaded:
