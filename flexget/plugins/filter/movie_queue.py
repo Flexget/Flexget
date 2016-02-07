@@ -287,7 +287,7 @@ def parse_what(what, lookup=True, session=None):
 
 # API functions to edit queue
 @with_session
-def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None, queue_name=None):
+def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None, queue_name='default'):
     """
     Add an item to the queue with the specified quality requirements.
 
@@ -302,7 +302,6 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
     """
 
     quality = quality or qualities.Requirements('any')
-    queue_name = queue_name or 'default'
 
     if not title or not (imdb_id or tmdb_id):
         # We don't have all the info we need to add movie, do a lookup for more info
@@ -333,7 +332,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
 
 
 @with_session
-def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=None, queue_name=None):
+def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=None, queue_name='default'):
     """
     Delete the given item from the queue.
 
@@ -345,7 +344,6 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
-    queue_name = queue_name or 'default'
     log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', title, imdb_id, tmdb_id, movie_id)
     query = session.query(QueuedMovie).filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
     if imdb_id:
@@ -371,7 +369,7 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
 
 
 @with_session
-def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=None, queue_name=None):
+def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=None, queue_name='default'):
     """
     Forget movie download  from the queue.
 
@@ -383,7 +381,6 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
-    queue_name = queue_name or 'default'
     log.debug('queue_forget - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s, queue_name=%s', title, imdb_id, tmdb_id,
               movie_id, queue_name)
     query = session.query(QueuedMovie).filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
@@ -408,7 +405,7 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=
 
 
 @with_session
-def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None, queue_name=None):
+def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None, queue_name='default'):
     """
     :param quality: Change the required quality for a movie in the queue
     :param imdb_id: Imdb id
@@ -419,7 +416,6 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None,
     :raises QueueError: If queued item could not be found with given arguments
     """
     # check if the item is queued
-    queue_name = queue_name or 'default'
     log.debug('queue_edit - quality=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s, queue_name=%s', quality, imdb_id, tmdb_id,
               movie_id, queue_name)
     query = session.query(QueuedMovie).filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
@@ -440,7 +436,7 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None,
 
 
 @with_session
-def queue_get(session=None, downloaded=None, queue_name=None):
+def queue_get(session=None, downloaded=None, queue_name='default'):
     """
     Get the current movie queue.
 
@@ -449,7 +445,6 @@ def queue_get(session=None, downloaded=None, queue_name=None):
     :param queue_name: Name of movie queue to get items from
     :return: List of QueuedMovie objects (detached from session)
     """
-    queue_name = queue_name or 'default'
     query = session.query(QueuedMovie).filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
     if downloaded is False:
         return query.filter(QueuedMovie.downloaded == None).all()
