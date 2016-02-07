@@ -5,6 +5,7 @@ from flexget.event import event
 from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugins.filter import seen
+from flexget.utils.database import with_session
 from flexget.utils.imdb import is_imdb_url, extract_id
 
 
@@ -38,10 +39,10 @@ def seen_add(options):
     seen.add(seen_name, 'cli_add', {'cli_add': seen_name})
     console('Added %s as seen. This will affect all tasks.' % seen_name)
 
-
-def seen_search(options):
+@with_session
+def seen_search(options, session=None):
     search_term = '%' + options.search_term + '%'
-    seen_entries = seen.search(search_term, status=None)
+    seen_entries = seen.search(value=search_term, status=None, session=session)
     for se in seen_entries:
         console('ID: %s Name: %s Task: %s Added: %s' % (se.id, se.title, se.task, se.added.strftime('%c')))
         for sf in se.fields:
