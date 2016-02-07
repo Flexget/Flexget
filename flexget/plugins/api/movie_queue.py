@@ -194,7 +194,7 @@ class MovieQueueManageAPI(APIResource):
         """ Delete movies from movie queue """
         try:
             mq.delete_movie_by_id(movie_id=id)
-        except NoResultFound as e:
+        except NoResultFound:
             return {'status': 'error',
                     'message': 'movie with ID {0} was not found'.format(id)}, 404
         return {}
@@ -206,7 +206,11 @@ class MovieQueueManageAPI(APIResource):
     def put(self, id, session=None):
         """ Updates movie quality or downloaded state in movie queue """
         data = request.json
-        movie = mq.get_movie_by_id(movie_id=id)
+        try:
+            movie = mq.get_movie_by_id(movie_id=id)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'movie with ID {0} was not found'.format(id)}, 404
         queue_name = movie.get('queue_name')
         if data.get('reset_downloaded'):
             try:

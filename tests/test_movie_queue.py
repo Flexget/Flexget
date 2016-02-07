@@ -238,9 +238,10 @@ class TestMovieQueueAPI(APITest):
         assert rsp.status_code == 201, 'response code should be 201, is actually %s' % rsp.status_code
         assert mocked_queue_add.call_count == 4
 
+    @patch.object(movie_queue, 'get_movie_by_id')
     @patch.object(movie_queue, 'queue_forget')
     @patch.object(movie_queue, 'queue_edit')
-    def test_queue_movie_put(self, mocked_queue_edit, mocked_queue_forget):
+    def test_queue_movie_put(self, mocked_queue_edit, mocked_queue_forget, mocked_get_movie_by_id):
         payload = {
             "reset_downloaded": True,
             "quality": "720p"
@@ -259,15 +260,16 @@ class TestMovieQueueAPI(APITest):
         assert json.loads(rsp.data) == valid_response, 'response data is %s' % json.loads(rsp.data)
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
 
+        assert mocked_get_movie_by_id.called
         assert mocked_queue_edit.called
         assert mocked_queue_forget.called
 
-    @patch.object(movie_queue, 'queue_del')
-    def test_queue_movie_del(self, mocked_queue_del):
+    @patch.object(movie_queue, 'delete_movie_by_id')
+    def test_queue_movie_del(self, delete_movie_by_id):
         rsp = self.delete('/movie_queue/7/')
 
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
-        assert mocked_queue_del.called
+        assert delete_movie_by_id.called
 
     @patch.object(movie_queue, 'get_movie_by_id')
     def test_queue_get_movie(self, mocked_get_movie_by_id):
