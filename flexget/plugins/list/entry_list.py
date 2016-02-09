@@ -37,7 +37,7 @@ class DBEntrySet(MutableSet):
         self.config = config
 
     def _query(self, session):
-        return session.query(StoredEntry).filter(StoredEntry.list == self.config['list'])
+        return session.query(StoredEntry).filter(StoredEntry.list == self.config)
 
     def _entry_query(self, session, entry):
         return (self._query(session).filter(StoredEntry.title == entry['title'])
@@ -67,7 +67,7 @@ class DBEntrySet(MutableSet):
             # Refresh all the fields if we already have this entry
             stored_entry.entry = entry
         else:
-            session.add(StoredEntry(list=self.config['list'], entry=entry))
+            session.add(StoredEntry(list=self.config, entry=entry))
 
     @with_session
     def __ior__(self, other, session=None):
