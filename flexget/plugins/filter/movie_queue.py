@@ -85,7 +85,7 @@ def upgrade(ver, session):
     if ver == 3:
         # adding queue_name column to movie_queue table and setting initial value to default)
         table_add_column('movie_queue', 'queue_name', Unicode, session, default='default')
-        ver == 4
+        ver = 4
     return ver
 
 
