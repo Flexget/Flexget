@@ -344,7 +344,8 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
-    log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s, queue_name=%s', title, imdb_id, tmdb_id, movie_id)
+    log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s, queue_name=%s',
+              title, imdb_id, tmdb_id, movie_id, queue_name)
     query = session.query(QueuedMovie).filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
     if imdb_id:
         query = query.filter(QueuedMovie.imdb_id == imdb_id)
