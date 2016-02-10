@@ -144,7 +144,7 @@ class TraktList(object):
 
     @staticmethod
     def remove_entries(config, entries):
-        TraktList.submit(config, entries, remove=False)
+        TraktList.submit(config, entries, remove=True)
 
     @staticmethod
     def list_entries(config):
