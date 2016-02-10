@@ -70,7 +70,7 @@ class TestTorrentSize(FlexGetBase):
 
 
 class TestFileSize(FlexGetBase):
-    """This is to test that content_size is picked up from the file itself when listdir is used as the input.
+    """This is to test that content_size is picked up from the file itself when filesystem is used as the input.
     This doesn't do a super job of testing, because we don't have any test files bigger than 1 MB."""
 
     __yaml__ = """
