@@ -370,6 +370,14 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
 
 
 @with_session
+def queue_clear(queue_name='default', session=None):
+    """Deletes waiting movies from queue"""
+    (session.query(QueuedMovie).filter(QueuedMovie.downloaded == False)
+                               .filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
+                               .delete())
+
+
+@with_session
 def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=None, queue_name='default'):
     """
     Forget movie download  from the queue.

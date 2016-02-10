@@ -11,7 +11,8 @@ from flexget.plugin import DependencyError
 from flexget.utils import qualities
 
 try:
-    from flexget.plugins.filter.movie_queue import QueueError, queue_add, queue_del, queue_get, queue_forget, parse_what
+    from flexget.plugins.filter.movie_queue import (QueueError, queue_add, queue_del, queue_get, queue_forget,
+                                                    queue_clear, parse_what)
 except ImportError:
     raise DependencyError(issued_by='cli_movie_queue', missing='movie_queue')
 
@@ -118,10 +119,10 @@ def clear(options):
     console('-' * 79)
     for item in items:
         console(item.title)
-        queue_del(title=item.title, queue_name=options.queue_name)
     if not items:
         console('No results')
     console('-' * 79)
+    queue_clear(options.queue_name)
 
 
 @event('options.register')
