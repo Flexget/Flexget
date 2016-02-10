@@ -1,4 +1,6 @@
-from flask import jsonify
+from flask import jsonify, request
+from jsonschema import RefResolutionError
+
 from flexget.api import api, APIResource
 from flexget.config_schema import schema_paths, resolve_ref
 
@@ -37,10 +39,9 @@ class SchemaAPI(APIResource):
     def get(self, path, session=None):
         """ Get schema definition """
         path = '/schema/%s' % path
-
-        if path in schema_paths:
-            schema = resolve_ref(path)
-            if hasattr(schema, '__call__'):
-                schema = schema()
-            return schema
-        return {'error': 'invalid schema path'}, 404
+        if request.query_string:
+            path += '?' + request.query_string
+        try:
+            return resolve_ref(path)
+        except RefResolutionError:
+            return {'error': 'invalid schema path'}, 404

@@ -34,6 +34,27 @@ class TestMovieQueue(FlexGetBase):
 
            movie_queue_forget:
              movie_queue: forget
+
+           movie_queue_different_queue_add:
+             movie_queue:
+               action: add
+               queue_name: A new queue
+
+           movie_queue_different_queue_accept:
+             movie_queue:
+               action: accept
+               queue_name: A new queue
+
+           movie_queue_different_queue_remove:
+             movie_queue:
+               action: remove
+               queue_name: A new queue
+
+           movie_queue_different_queue_forget:
+             movie_queue:
+               action: forget
+               queue_name: A new queue
+
     """
 
     def test_movie_queue_accept(self):
@@ -96,6 +117,63 @@ class TestMovieQueue(FlexGetBase):
         self.execute_task('movie_queue_forget')
         assert not queue_get(downloaded=True)
         assert len(queue_get()) == 1
+
+    def test_movie_queue_different_queue_add(self):
+        self.execute_task('movie_queue_different_queue_add')
+        queue = queue_get()
+        assert len(queue) == 0
+        queue = queue_get(queue_name='A new queue')
+        assert len(queue) == 1
+
+    def test_movie_queue_different_queue_accept(self):
+        default_queue = queue_get()
+        named_queue = queue_get(queue_name='A new queue')
+        assert len(default_queue) == len(named_queue) == 0
+
+        queue_add(title=u'MovieInQueue', imdb_id=u'tt1931533', tmdb_id=603, queue_name='A new queue')
+        queue_add(title=u'MovieInQueue', imdb_id=u'tt1931533', tmdb_id=603)
+
+        default_queue = queue_get()
+        named_queue = queue_get(queue_name='A new queue')
+        assert len(named_queue) == len(default_queue) == 1
+
+        self.execute_task('movie_queue_different_queue_accept')
+        assert len(self.task.entries) == 1
+
+        entry = self.task.entries[0]
+        assert entry.get('imdb_id', eval_lazy=False) == 'tt1931533'
+        assert entry.get('tmdb_id', eval_lazy=False) == 603
+
+        default_queue = queue_get()
+        named_queue = queue_get(queue_name='A new queue', downloaded=False)
+        assert len(named_queue) == 0
+        assert len(default_queue) == 1
+
+        self.execute_task('movie_queue_different_queue_accept')
+        assert len(self.task.entries) == 0, 'Movie should only be accepted once'
+
+    def test_movie_queue_different_queue_remove(self):
+        queue_add(title=u'MovieInQueue', imdb_id=u'tt1931533', tmdb_id=603, queue_name='A new queue')
+        queue_add(title=u'KeepMe', imdb_id=u'tt1933533', tmdb_id=604, queue_name='A new queue')
+
+        self.execute_task('movie_queue_different_queue_remove')
+
+        assert len(self.task.entries) == 1
+
+        queue = queue_get(queue_name='A new queue')
+        assert len(queue) == 1
+
+        entry = queue[0]
+        assert entry.imdb_id == 'tt1933533'
+        assert entry.tmdb_id == 604
+
+    def test_movie_queue_different_queue_forget(self):
+        queue_add(title=u'MovieInQueue', imdb_id=u'tt1931533', tmdb_id=603, queue_name='A new queue')
+        self.execute_task('movie_queue_different_queue_accept')
+        assert len(queue_get(downloaded=True, queue_name='A new queue')) == 1
+        self.execute_task('movie_queue_different_queue_forget')
+        assert not queue_get(downloaded=True, queue_name='A new queue')
+        assert len(queue_get(queue_name='a New queue')) == 1
 
 
 class TestMovieQueueAPI(APITest):
@@ -175,9 +253,10 @@ class TestMovieQueueAPI(APITest):
         assert rsp.status_code == 201, 'response code should be 201, is actually %s' % rsp.status_code
         assert mocked_queue_add.call_count == 4
 
+    @patch.object(movie_queue, 'get_movie_by_id')
     @patch.object(movie_queue, 'queue_forget')
     @patch.object(movie_queue, 'queue_edit')
-    def test_queue_movie_put(self, mocked_queue_edit, mocked_queue_forget):
+    def test_queue_movie_put(self, mocked_queue_edit, mocked_queue_forget, mocked_get_movie_by_id):
         payload = {
             "reset_downloaded": True,
             "quality": "720p"
@@ -196,15 +275,16 @@ class TestMovieQueueAPI(APITest):
         assert json.loads(rsp.data) == valid_response, 'response data is %s' % json.loads(rsp.data)
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
 
+        assert mocked_get_movie_by_id.called
         assert mocked_queue_edit.called
         assert mocked_queue_forget.called
 
-    @patch.object(movie_queue, 'queue_del')
-    def test_queue_movie_del(self, mocked_queue_del):
+    @patch.object(movie_queue, 'delete_movie_by_id')
+    def test_queue_movie_del(self, delete_movie_by_id):
         rsp = self.delete('/movie_queue/7/')
 
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
-        assert mocked_queue_del.called
+        assert delete_movie_by_id.called
 
     @patch.object(movie_queue, 'get_movie_by_id')
     def test_queue_get_movie(self, mocked_get_movie_by_id):
