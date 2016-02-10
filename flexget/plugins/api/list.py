@@ -20,7 +20,7 @@ entry_schema = {
     'type': 'object',
     'properties': {
         'title': {'type': 'string'},
-        'url': {'type', 'string'}
+        'url': {'type': 'string'}
     },
     'required': ['title', 'url'],
     'additionalProperties': True
