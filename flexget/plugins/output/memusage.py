@@ -47,11 +47,14 @@ def on_manager_startup(manager):
 def on_manager_shutdown(manager):
     if not manager.options.mem_usage:
         return
+
+    import resource
+    print 'Resource Module memory usage: %s (kb)' % resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     global heapy
-    console('Calculating memory usage:')
+    console('Heapy module calculating memory usage:')
     console(heapy.heap())
     console('-' * 79)
-    console('Calculating report (this may take a while):')
+    console('Heapy module calculating report (this may take a while):')
     console(heapy.heap().get_rp(40))
     heapy = None
 

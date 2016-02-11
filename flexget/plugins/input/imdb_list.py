@@ -9,7 +9,6 @@ from flexget.utils.imdb import extract_id
 from flexget.utils.cached_input import cached
 from flexget.entry import Entry
 from flexget.utils.soup import get_soup
-
 log = logging.getLogger('imdb_list')
 USER_ID_RE = r'^ur\d{7,8}$'
 CUSTOM_LIST_RE = r'^ls\d{7,10}$'
