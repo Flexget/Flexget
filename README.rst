@@ -42,6 +42,12 @@ For more detailed instructions see the `installation guide`_.
 
 .. _installation guide: http://flexget.com/wiki/Install
 
+Install using Docker (Linux only)
+---------------------------------
+
+Docker can be used to install and run flexget::
+
+    docker run -it -v /home/<username>/.flexget:/root/.flexget --rm toilal/flexget
 
 How to use GIT checkout
 -----------------------

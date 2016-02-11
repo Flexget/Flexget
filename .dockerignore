@@ -38,3 +38,7 @@ flexget/ui/node_modules/
 flexget/ui/bower_components/
 flexget/ui/.tmp/
 flexget/ui/app/
+
+docs/
+tests/
+.*
