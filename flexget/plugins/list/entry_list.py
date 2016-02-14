@@ -50,7 +50,7 @@ class DBEntrySet(MutableSet):
 
     @with_session
     def __contains__(self, entry, session=None):
-        return self._entry_query(session, entry) is not None
+        return self._entry_query(session, entry) is not Noneb
 
     @with_session
     def __len__(self, session=None):
