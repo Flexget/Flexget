@@ -245,12 +245,10 @@ series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc'
 
 
 @series_api.route('/')
-@api.doc(description='Use this endpoint to retrieve data on Flexget collected series,'
-                     ' add new series to DB and reset episode and releases status')
 class SeriesListAPI(APIResource):
     @api.response(404, 'Page does not exist', default_error_schema)
     @api.response(200, 'Series list retrieved successfully', series_list_schema)
-    @api.doc(parser=series_list_parser)
+    @api.doc(parser=series_list_parser, description="Get a  list of Flexget's shows in DB")
     def get(self, session=None):
         """ List existing shows """
         args = series_list_parser.parse_args()
@@ -385,10 +383,11 @@ class SeriesGetShowsAPI(APIResource):
 
 
 @series_api.route('/<int:show_id>')
-@api.doc(params={'show_id': 'ID of the show'}, description='Enable operations on a specific show using its ID')
+@api.doc(params={'show_id': 'ID of the show'})
 class SeriesShowAPI(APIResource):
     @api.response(404, 'Show ID not found', default_error_schema)
     @api.response(200, 'Show information retrieved successfully', show_details_schema)
+    @api.doc(description='Get a specific show using its ID')
     def get(self, show_id, session):
         """ Get show details by ID """
         try:
@@ -404,6 +403,7 @@ class SeriesShowAPI(APIResource):
 
     @api.response(200, 'Removed series from DB', empty_response)
     @api.response(404, 'Show ID not found', default_error_schema)
+    @api.doc(description='Delete a specific show using its ID')
     def delete(self, show_id, session):
         """ Remove series from DB """
         try:
@@ -426,6 +426,7 @@ class SeriesShowAPI(APIResource):
     @api.response(200, 'Episodes for series will be accepted starting with ep_id', show_details_schema)
     @api.response(404, 'Show ID not found', default_error_schema)
     @api.validate(series_begin_input_schema)
+    @api.doc(description='Set a begin episode using a show ID')
     def put(self, show_id, session):
         """ Set the initial episode of an existing show """
         try:
@@ -446,7 +447,7 @@ class SeriesShowAPI(APIResource):
 
 
 @series_api.route('/<name>')
-@api.doc(description="Use this endpoint to add a new show to Flexget's DB and set the 1st initial episode via"
+@api.doc(description="Add a new show to Flexget's DB and set the 1st initial episode via"
                      " its body. 'episode_identifier' should be one of SxxExx, integer or date "
                      "formatted such as 2012-12-12")
 class SeriesBeginByNameAPI(APIResource):
@@ -477,9 +478,10 @@ class SeriesBeginByNameAPI(APIResource):
 
 @api.response(404, 'Show ID not found', default_error_schema)
 @series_api.route('/<int:show_id>/episodes')
-@api.doc(params={'show_id': 'ID of the show'}, description='Use this endpoint to get or delete all episodes of a show')
+@api.doc(params={'show_id': 'ID of the show'})
 class SeriesEpisodesAPI(APIResource):
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
+    @api.doc(description='Get all show episodes via its ID')
     def get(self, show_id, session):
         """ Get episodes by show ID """
         try:
@@ -497,6 +499,7 @@ class SeriesEpisodesAPI(APIResource):
 
     @api.response(500, 'Error when trying to forget episode', default_error_schema)
     @api.response(200, 'Successfully forgotten all episodes from show', empty_response)
+    @api.doc(description='Delete all show episodes via its ID. Deleting an episode will mark it as wanted again')
     def delete(self, show_id, session):
         """ Forgets all episodes of a show"""
         try:
@@ -520,10 +523,10 @@ class SeriesEpisodesAPI(APIResource):
 @api.response(414, 'Episode ID not found', default_error_schema)
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id', default_error_schema)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
-         description='Use this endpoint to get or delete a specific episode for a show')
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
 class SeriesEpisodeAPI(APIResource):
     @api.response(200, 'Episode retrieved successfully for show', episode_schema)
+    @api.doc(description='Get a specific episode via its ID and show ID')
     def get(self, show_id, ep_id, session):
         """ Get episode by show ID and episode ID"""
         try:
@@ -548,6 +551,8 @@ class SeriesEpisodeAPI(APIResource):
         })
 
     @api.response(200, 'Episode successfully forgotten for show', empty_response)
+    @api.doc(description='Delete a specific episode via its ID and show ID. Deleting an episode will mark it as '
+                         'wanted again')
     def delete(self, show_id, ep_id, session):
         """ Forgets episode by show ID and episode ID """
         try:
@@ -580,12 +585,10 @@ release_list_parser.add_argument('downloaded', choices=('downloaded', 'not_downl
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id', default_error_schema)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases')
 @api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
-         parser=release_list_parser,
-         description='Use this endpoint to get or delete all information about seen releases for a specific episode of'
-                     ' a show. Deleting releases will trigger flexget to re-download an episode if a matching release'
-                     ' will be seen again for it.')
+         parser=release_list_parser)
 class SeriesReleasesAPI(APIResource):
     @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
+    @api.doc(description='Get all downloaded releases for a specific episode of a specific show')
     def get(self, show_id, ep_id, session):
         """ Get all episodes releases by show ID and episode ID """
         try:
@@ -659,12 +662,10 @@ class SeriesReleasesAPI(APIResource):
 @api.response(400, 'Episode with ep_id does not belong to show with show_id', default_error_schema)
 @api.response(410, 'Release with rel_id does not belong to episode with ep_id', default_error_schema)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases/<int:rel_id>/')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'},
-         description='Use this endpoint to get or delete a specific release from an episode of a show. Deleting a '
-                     'release will trigger flexget to re-download an episode if a matching release will be seen again '
-                     'for it.')
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID', 'rel_id': 'Release ID'})
 class SeriesReleaseAPI(APIResource):
     @api.response(200, 'Release retrieved successfully for episode', release_schema)
+    @api.doc(description='Get a specific downloaded release for a specific episode of a specific show')
     def get(self, show_id, ep_id, rel_id, session):
         ''' Get episode release by show ID, episode ID and release ID '''
         try:
