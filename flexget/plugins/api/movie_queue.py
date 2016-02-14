@@ -103,11 +103,10 @@ movie_edit_input_schema = api.schema('movie_edit_input_schema', movie_edit_input
 
 
 @movie_queue_api.route('/')
-@api.doc(description='Get queued movies from list or add a new movie')
 class MovieQueueAPI(APIResource):
     @api.response(404, 'Page does not exist', model=default_error_schema)
     @api.response(code_or_apierror=200, model=movie_queue_schema)
-    @api.doc(parser=movie_queue_parser)
+    @api.doc(parser=movie_queue_parser, description="Get flexget's queued movies")
     def get(self, session=None):
         """ List queued movies """
         args = movie_queue_parser.parse_args()
@@ -154,6 +153,7 @@ class MovieQueueAPI(APIResource):
     @api.response(500, 'Movie already in queue', model=default_error_schema)
     @api.response(201, 'Movie successfully added', model=movie_object_schema)
     @api.validate(movie_add_input_schema)
+    @api.doc(description="Add a movie to flexget's queued movies")
     def post(self, session=None):
         """ Add movies to movie queue """
         kwargs = request.json
@@ -176,10 +176,10 @@ class MovieQueueAPI(APIResource):
 
 @api.response(404, 'ID not found', model=default_error_schema)
 @movie_queue_api.route('/<id>/')
-@api.doc(params={'id': 'ID of Queued Movie',},
-         description='Get, remove or edit a movie from movie queue')
+@api.doc(params={'id': 'ID of Queued Movie'})
 class MovieQueueManageAPI(APIResource):
     @api.response(200, 'Movie successfully retrieved', movie_object_schema)
+    @api.doc(description="Get a specific movie")
     def get(self, id, session=None):
         """ Returns a movie from queue by ID """
         try:
@@ -190,6 +190,7 @@ class MovieQueueManageAPI(APIResource):
         return jsonify(movie)
 
     @api.response(200, 'Movie successfully deleted', model=empty_response)
+    @api.doc(description="Delete a specific movie")
     def delete(self, id, session=None):
         """ Delete movies from movie queue """
         try:
@@ -203,6 +204,7 @@ class MovieQueueManageAPI(APIResource):
     @api.response(200, 'Movie successfully updated', movie_object_schema)
     @api.validate(model=movie_edit_input_schema,
                   description='Values to use when editing existing movie. At least one value should be used')
+    @api.doc(description="Update a specific movie")
     def put(self, id, session=None):
         """ Updates movie quality or downloaded state in movie queue """
         data = request.json
