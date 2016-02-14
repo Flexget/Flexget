@@ -624,6 +624,7 @@ class SeriesReleasesAPI(APIResource):
         })
 
     @api.response(200, 'Successfully deleted all releases for episode', empty_response)
+    @api.doc(description='Delete all releases for a specific episode of a specific show.')
     def delete(self, show_id, ep_id, session):
         """ Deletes all episodes releases by show ID and episode ID """
         try:
@@ -701,6 +702,7 @@ class SeriesReleaseAPI(APIResource):
         })
 
     @api.response(200, 'Release successfully deleted', empty_response)
+    @api.doc(description='Delete a specific releases for a specific episode of a specific show.')
     def delete(self, show_id, ep_id, rel_id, session):
         ''' Delete episode release by show ID, episode ID and release ID '''
         try:
