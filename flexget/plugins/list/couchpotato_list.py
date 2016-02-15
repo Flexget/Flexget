@@ -191,6 +191,7 @@ class CouchPotatoList(MutableSet):
             if movie.get('title') == entry.get('movie_name'):
                 movie_id = movie.get('couchpotato_id')
                 CouchPotatoBase.remove_movie(self.config, movie_id)
+                return
 
 
 class PluginCouchPotatoList(object):
