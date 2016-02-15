@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
+from collections import MutableSet
 from urlparse import urlparse
 
 import requests
@@ -13,19 +14,7 @@ from flexget.event import event
 log = logging.getLogger('couchpotato_list')
 
 
-class CouchPotatoList(object):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'base_url': {'type': 'string'},
-            'port': {'type': 'number', 'default': 80},
-            'api_key': {'type': 'string'},
-            'include_data': {'type': 'boolean', 'default': False}
-        },
-        'required': ['api_key', 'base_url'],
-        'additionalProperties': False
-    }
-
+class CouchPotatoBase(object):
     @staticmethod
     def movie_list_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
@@ -41,11 +30,29 @@ class CouchPotatoList(object):
             parsedurl.scheme, parsedurl.netloc, port, parsedurl.path, api_key)
 
     @staticmethod
+    def movie_add_request(base_url, port, api_key):
+        parsedurl = urlparse(base_url)
+        log.debug('Received movie add request')
+        return '%s://%s:%s%s/api/%s/movie.add' % (
+            parsedurl.scheme, parsedurl.netloc, port, parsedurl.path, api_key)
+
+    @staticmethod
+    def movie_delete_request(base_url, port, api_key):
+        parsedurl = urlparse(base_url)
+        log.debug('Received movie add request')
+        return '%s://%s:%s%s/api/%s/movie.delete?delete_from=wanted' % (
+            parsedurl.scheme, parsedurl.netloc, port, parsedurl.path, api_key)
+
+    @staticmethod
     def build_url(base_url, request_type, port, api_key):
         if request_type == 'active':
-            return CouchPotatoList.movie_list_request(base_url, port, api_key)
+            return CouchPotatoBase.movie_list_request(base_url, port, api_key)
         elif request_type == 'profiles':
-            return CouchPotatoList.profile_list_request(base_url, port, api_key)
+            return CouchPotatoBase.profile_list_request(base_url, port, api_key)
+        elif request_type == 'add':
+            return CouchPotatoBase.movie_add_request(base_url, port, api_key)
+        elif request_type == 'delete':
+            return CouchPotatoBase.movie_delete_request(base_url, port, api_key)
         else:
             raise plugin.PluginError('Received unknown API request, aborting.')
 
@@ -90,15 +97,15 @@ class CouchPotatoList(object):
     @staticmethod
     def list_entries(config, test_mode=None):
         log.verbose('Connection to CouchPotato to retrieve movie list.')
-        active_movies_url = CouchPotatoList.build_url(config.get('base_url'), 'active', config.get('port'),
+        active_movies_url = CouchPotatoBase.build_url(config.get('base_url'), 'active', config.get('port'),
                                                       config.get('api_key'))
-        active_movies_json = CouchPotatoList.get_json(active_movies_url)
+        active_movies_json = CouchPotatoBase.get_json(active_movies_url)
         # Gets profile and quality lists if include_data is TRUE
         if config.get('include_data'):
             log.verbose('Connection to CouchPotato to retrieve movie data.')
-            profile_url = CouchPotatoList.build_url(config.get('base_url'), 'profiles', config.get('port'),
+            profile_url = CouchPotatoBase.build_url(config.get('base_url'), 'profiles', config.get('port'),
                                                     config.get('api_key'))
-            profile_json = CouchPotatoList.get_json(profile_url)
+            profile_json = CouchPotatoBase.get_json(profile_url)
 
         entries = []
         for movie in active_movies_json['movies']:
@@ -107,7 +114,7 @@ class CouchPotatoList(object):
                 if config.get('include_data') and profile_json:
                     for profile in profile_json['list']:
                         if profile['_id'] == movie['profile_id']:  # Matches movie profile with profile JSON
-                            quality_req = CouchPotatoList.quality_requirement_builder(profile)
+                            quality_req = CouchPotatoBase.quality_requirement_builder(profile)
                 entry = Entry(title=movie["title"],
                               url='',
                               imdb_id=movie['info'].get('imdb'),
@@ -127,10 +134,88 @@ class CouchPotatoList(object):
 
         return entries
 
+    @staticmethod
+    def add_movie(config, entry, test_mode=None):
+        if not entry.get('imdb_id'):
+            log.error('Cannot add movie to couchpotato without and imdb ID: %s' % entry)
+            return
+        log.verbose('Connection to CouchPotato to add a movie to list.')
+        add_movie_url = CouchPotatoBase.build_url(config.get('base_url'), 'add', config.get('port'),
+                                                  config.get('api_key'))
+        title = entry.get('movie_name')
+        imdb_id = entry.get('imdb_id')
+        add_movie_url += '?title=%s&identifier=%s' % (title, imdb_id)
+        add_movie_json = CouchPotatoBase.get_json(add_movie_url)
+        return add_movie_json['movie']
+
+    @staticmethod
+    def remove_movie(config, entry, test_mode=None):
+        log.verbose('Connection to CouchPotato to remove a movie from the list.')
+        movie_search_url = CouchPotatoBase.build_url(config.get('base_url'), 'active', config.get('port'),
+                                                     config.get('api_key'))
+        movie_search_url += '?search=%s' % entry.get('movie_name')
+        movie_search_json = CouchPotatoBase.get_json(movie_search_url)
+        if len(movie_search_json['movies']) > 0:
+            if len(movie_search_json['movies']) > 1:
+                log.warning('More than 1 match found for title %s. Skipping' % entry.get('movie_name'))
+                return
+            log.verbose('Deleting movie %s from Couchpotato' % entry.get('movie_name'))
+            delete_movie_url = CouchPotatoBase.build_url(config.get('base_url'), 'delete', config.get('port'),
+                                                         config.get('api_key'))
+            movie_id = movie_search_json['movies'][0]['_id']
+            delete_movie_url += '&id=%s' % movie_id
+            CouchPotatoBase.get_json(delete_movie_url)
+
+
+class CouchPotatoList(MutableSet):
+    def _find_entry(self, entry):
+        for cp_entry in self.entries:
+            # TODO This could be a little too broad, rethink this
+            for key in entry:
+                if entry[key] == cp_entry[key]:
+                    return True
+
+    def __init__(self, config):
+        self.config = config
+        self.entries = CouchPotatoBase.list_entries(config)
+
+    def __iter__(self):
+        return (entry for entry in self.entries)
+
+    def __len__(self):
+        return len(self.entries)
+
+    def __contains__(self, entry):
+        return self._find_entry(entry) is not None
+
+    def add(self, entry):
+        return CouchPotatoBase.add_movie(self.config, entry)
+
+    def discard(self, entry):
+        CouchPotatoBase.remove_movie(self.config, entry)
+
+
+class PluginCouchPotatoList(object):
+    schema = {
+        'type': 'object',
+        'properties': {
+            'base_url': {'type': 'string'},
+            'port': {'type': 'number', 'default': 80},
+            'api_key': {'type': 'string'},
+            'include_data': {'type': 'boolean', 'default': False}
+        },
+        'required': ['api_key', 'base_url'],
+        'additionalProperties': False
+    }
+
+    @staticmethod
+    def get_list(config):
+        return CouchPotatoList(config)
+
     def on_task_input(self, task, config):
-        return self.list_entries(config)
+        return list(CouchPotatoList(config))
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(CouchPotatoList, 'couchpotato_list', api_ver=2, groups=['list'])
+    plugin.register(PluginCouchPotatoList, 'couchpotato_list', api_ver=2, groups=['list'])

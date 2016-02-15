@@ -113,7 +113,7 @@ class MovieList(MutableSet):
             name, year = entry['movie_name'], entry['movie_year']
         else:
             name, year = split_title_year(entry['title'])
-        res = (session.query(MovieListMovie).filter(inourlist)
+        res = (session.quey(MovieListMovie).filter(inourlist)
                                             .filter(MovieListMovie.title == name)
                                             .filter(MovieListMovie.year == year).first())
         return res
