@@ -119,7 +119,8 @@ class CouchPotatoBase(object):
                               url='',
                               imdb_id=movie['info'].get('imdb'),
                               tmdb_id=movie['info'].get('tmdb_id'),
-                              quality_req=quality_req)
+                              quality_req=quality_req,
+                              couchpotato_id=movie.get('_id'))
                 if entry.isvalid():
                     log.debug('adding entry %s' % entry)
                     entries.append(entry)
@@ -149,27 +150,17 @@ class CouchPotatoBase(object):
         return add_movie_json['movie']
 
     @staticmethod
-    def remove_movie(config, entry, test_mode=None):
-        log.verbose('Connection to CouchPotato to remove a movie from the list.')
-        movie_search_url = CouchPotatoBase.build_url(config.get('base_url'), 'active', config.get('port'),
+    def remove_movie(config, movie_id, test_mode=None):
+        log.verbose('Deleting movie from Couchpotato')
+        delete_movie_url = CouchPotatoBase.build_url(config.get('base_url'), 'delete', config.get('port'),
                                                      config.get('api_key'))
-        movie_search_url += '?search=%s' % entry.get('movie_name')
-        movie_search_json = CouchPotatoBase.get_json(movie_search_url)
-        if len(movie_search_json['movies']) > 0:
-            if len(movie_search_json['movies']) > 1:
-                log.warning('More than 1 match found for title %s. Skipping' % entry.get('movie_name'))
-                return
-            log.verbose('Deleting movie %s from Couchpotato' % entry.get('movie_name'))
-            delete_movie_url = CouchPotatoBase.build_url(config.get('base_url'), 'delete', config.get('port'),
-                                                         config.get('api_key'))
-            movie_id = movie_search_json['movies'][0]['_id']
-            delete_movie_url += '&id=%s' % movie_id
-            CouchPotatoBase.get_json(delete_movie_url)
+        delete_movie_url += '&id=%s' % movie_id
+        CouchPotatoBase.get_json(delete_movie_url)
 
 
 class CouchPotatoList(MutableSet):
     def _find_entry(self, entry):
-        for cp_entry in self.entries:
+        for cp_entry in self.movies:
             # TODO This could be a little too broad, rethink this
             for key in entry:
                 if entry[key] == cp_entry[key]:
@@ -177,13 +168,13 @@ class CouchPotatoList(MutableSet):
 
     def __init__(self, config):
         self.config = config
-        self.entries = CouchPotatoBase.list_entries(config)
+        self.movies = CouchPotatoBase.list_entries(config)
 
     def __iter__(self):
-        return (entry for entry in self.entries)
+        return (entry for entry in self.movies)
 
     def __len__(self):
-        return len(self.entries)
+        return len(self.movies)
 
     def __contains__(self, entry):
         return self._find_entry(entry) is not None
@@ -196,7 +187,10 @@ class CouchPotatoList(MutableSet):
         return CouchPotatoBase.add_movie(self.config, entry)
 
     def discard(self, entry):
-        CouchPotatoBase.remove_movie(self.config, entry)
+        for movie in self.movies:
+            if movie.get('title') == entry.get('movie_name'):
+                movie_id = movie.get('couchpotato_id')
+                CouchPotatoBase.remove_movie(self.config, movie_id)
 
 
 class PluginCouchPotatoList(object):
