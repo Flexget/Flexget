@@ -89,6 +89,15 @@ output Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`qbittorrent` Module
+----------------------
+
+.. automodule:: flexget.plugins.output.qbittorrent
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
 :mod:`queue_movies` Module
 --------------------------
 
@@ -128,4 +137,3 @@ output Package
     :members:
     :undoc-members:
     :show-inheritance:
-

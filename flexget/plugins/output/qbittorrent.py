@@ -9,6 +9,7 @@ from flexget.event import event
 
 log = logging.getLogger('qbittorrent')
 
+
 class OutputQBitTorrent(object):
     """
     Example:
@@ -34,6 +35,11 @@ class OutputQBitTorrent(object):
     }
 
     def connect(self, config):
+        """
+        Connect to Qbittorrent Web UI. Username and password not necessary
+        if 'Bypass authentication for localhost' is checked and host is
+        'localhost'.
+        """
         self.session = Session()
         self.url = 'http://{}:{}'.format(config['host'], config['port'])
         if config.get('username') and config.get('password'):
@@ -41,14 +47,16 @@ class OutputQBitTorrent(object):
                                          data={'username': config['username'],
                                                'password': config['password']})
             if response == 'Fails.':
+                log.debug('Error connecting to Qbittorrent')
                 raise plugin.PluginError('Authentication failed.')
+        log.debug('Successfully connected to Qbittorrent')
         self.connected = True
 
     def add_torrent(self, data):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
-        self.session.post(self.url + '/command/download',
-                          data=data)
+        self.session.post(self.url + '/command/download', data=data)
+        log.debug('Added task to Qbittorrent')
 
     def prepare_config(self, config):
         config.setdefault('host', 'localhost')
@@ -68,6 +76,7 @@ class OutputQBitTorrent(object):
             data['label'] = entry.get('label', config['label']).lower()
             data['urls'] = [entry.get('url')]
             self.add_torrent(data)
+
 
 @event('plugin.register')
 def register_plugin():
