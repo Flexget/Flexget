@@ -32,6 +32,26 @@ categories = {
     'webrip': 'c14'
 }
 
+default_search_params = {
+    #'searchstring': 'search term',
+    #'advancedsearchparameters': '[year=1999]',
+    'sort': 'browsedate',
+    'skw': 'showall',
+    'compression': 'unraredonly',
+    'packs': 'torrentsonly',
+    'titleonly': 'true',
+    'subscriptions': 'showall',
+    'visibility': 'aliveonly',
+    'visiblecategories': 'Action,Adventure,Animation,Biography,Comedy,Crime,Documentary,Drama,Eastern,Family,Fantasy,'
+                         'History,Holiday,Horror,Kids,Musical,Mystery,Romance,Sci-Fi,Short,Sports,Thriller,War,Western',
+    'hiddenqualities': 'FLAC,MP3',
+    'order': 'DESC',
+    'action': 'torrentstable',
+    'bookmarks': 'showall',
+    'viewtype': 1,
+    'page': 1
+}
+
 
 class SearchPTN(object):
     schema = {
@@ -42,76 +62,83 @@ class SearchPTN(object):
             'password': {'type': 'string'},
             'categories': {
                 'type': 'array',
-                'items': {'type': 'string', 'enum': list(categories)}
+                'items': {'type': 'string', 'enum': list(categories)},
+                'deprecated': 'PtN category filtering is broken. Someone open a PR!'
             }
         },
         'required': ['username', 'login_key', 'password'],
         'additionalProperties': False
     }
 
+    def create_entries(self, soup, passkey=None, imdb_id=None):
+        entries = []
+        links = soup.findAll('a', attrs={'href': re.compile('download\.php\?torrent=\d+')})
+        rows = [l.find_parent('tr') for l in links]
+        for row in rows:
+            entry = Entry()
+            entry['title'] = row.find('a', attrs={'href': re.compile('detail\.php\?id')}).text
+            dl_href = row.find('a', attrs={'href': re.compile('download\.php\?torrent=\d+')}).get('href')
+            entry['url'] = 'http://piratethenet.org/' + dl_href + '&passkey=' + passkey
+            entry['torrent_seeds'] = int(row.find(title='Number of Seeders').text)
+            entry['torrent_leeches'] = int(row.find(title='Number of Leechers').text)
+            entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
+            size, unit = row.find(title='Torrent size').text.split(' ')
+            if unit == 'GB':
+                entry['content_size'] = int(float(size) * 1024)
+            elif unit == 'MB':
+                entry['content_size'] = int(float(size))
+            elif unit == 'KB':
+                entry['content_size'] = int(float(size) / 1024)
+            if imdb_id:
+                entry['imdb_id'] = imdb_id
+            entries.append(entry)
+        return entries
+
     def search(self, task, entry, config):
-        if not session.cookies:
+        if not session.cookies or not session.passkey:
             try:
                 login_params = {'username': config['username'],
                                 'password': config['password'],
                                 'loginkey': config['login_key']}
-                session.post('https://piratethenet.org/takelogin.php', data=login_params, verify=False)
+                r = session.post('https://piratethenet.org/takelogin.php', data=login_params, verify=False)
             except requests.RequestException as e:
                 log.error('Error while logging in to PtN: %s', e)
+                raise plugin.PluginError('Could not log in to PtN')
 
-        # Default to searching by title (0=title 3=imdb_id)
-        search_by = 0
-        if 'imdb_id' in entry:
-            searches = [entry['imdb_id']]
-            search_by = 3
-        elif 'movie_name' in entry:
-            search = entry['movie_name']
+            # Sorty hacky, we'll just store the passkey on the session
+            passkey = re.search('passkey=([\d\w]+)"', r.text)
+            if passkey:
+                session.passkey = passkey.group(1)
+            else:
+                log.error('PtN cookie info invalid')
+                raise plugin.PluginError('PTN cookie info invalid')
+
+        search_params = default_search_params.copy()
+        if 'movie_name' in entry:
             if 'movie_year' in entry:
-                search += ' %s' % entry['movie_year']
-            searches = [search]
+                search_params['advancedsearchparameters'] = '[year=%s]' % entry['movie_year']
+            searches = [entry['movie_name']]
         else:
             searches = entry.get('search_strings', [entry['title']])
 
-        params = {'_by': search_by}
-        if config.get('categories'):
-            for cat in config['categories']:
-                params[categories[cat]] = 1
         results = set()
         for search in searches:
-            params['search'] = search
+            search_params['searchstring'] = search
             try:
-                r = session.get('http://piratethenet.org/browse.php', params=params)
+                r = session.get('http://piratethenet.org/torrentsutils.php', params=search_params)
             except requests.RequestException as e:
                 log.error('Error searching ptn: %s' % e)
                 continue
-            soup = get_soup(r.text)
-            if 'login' in soup.head.title.text.lower():
-                log.error('PtN cookie info invalid')
-                raise plugin.PluginError('PTN cookie info invalid')
-            links = soup.findAll('a', attrs={'href': re.compile('download\.php\?torrent=\d+')})
-            for row in [l.find_parent('tr') for l in links]:
-                entry = Entry()
-                td = row.findAll('td')
-                entry['title'] = row.find('a', attrs={'href': re.compile('details\.php\?id=\d+')}).text
-                entry['imdb_id'] = extract_id(row.find('a', attrs={'href': re.compile('imdb\.com')}).get('href'))
-                dl_href = row.find('a', attrs={'href': re.compile('download\.php\?torrent=\d+')}).get('href')
-                passkey = re.findall('passkey=([\d\w]*)"', r.text)[0]
-                entry['url'] = 'http://piratethenet.org/' + dl_href + '&passkey=' + passkey
-                # last two table cells contains amount of seeders and leeechers respectively
-                s, l = td[-2:]
-                entry['torrent_seeds'] = int(s.text)
-                entry['torrent_leeches'] = int(l.text)
-                entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-                # 4th last table cell contains size, of which last two symbols are unit
-                size = td[-4].text[:-2]
-                unit = td[-4].text[-2:]
-                if unit == 'GB':
-                    entry['content_size'] = int(float(size) * 1024)
-                elif unit == 'MB':
-                    entry['content_size'] = int(float(size))
-                elif unit == 'KB':
-                    entry['content_size'] = int(float(size) / 1024)
-                results.add(entry)
+            # html5parser doesn't work properly for some reason
+            soup = get_soup(r.text, parser='html.parser')
+            for movie in soup.select('.torrentstd'):
+                imdb_id = movie.find('a', href=re.compile('.*imdb\.com/title/tt'))
+                if imdb_id:
+                    imdb_id = extract_id(imdb_id['href'])
+                if imdb_id and 'imdb_id' in entry and imdb_id != entry['imdb_id']:
+                    continue
+                results.update(self.create_entries(movie, passkey=session.passkey, imdb_id=imdb_id))
+
         return results
 
 

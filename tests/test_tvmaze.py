@@ -113,6 +113,13 @@ class TestTVMazeShowLookup(FlexGetBase):
               - {title: 'The.Flash.2014.S02E02.HDTV.x264-LOL'}
             series:
               - The Flash
+          test_queries_via_ids:
+            mock:
+              - {title: 'The.Flash.2014.S02E02.HDTV.x264-LOL', tvmaze_id: '13'}
+              - {title: 'The.Flash.2014.S02E03.HDTV.x264-LOL', tvdb_id: '279121'}
+              - {title: 'The.Flash.2014.S02E04.HDTV.x264-LOL', imdb_id: 'tt3107288'}
+            series:
+              - The Flash
     """
 
     @use_vcr
@@ -365,3 +372,23 @@ class TestTVMazeShowLookup(FlexGetBase):
         assert isinstance(entry['tvmaze_episode_airdate'], datetime), 'expected to received datetime type'
         airdate = datetime.strftime(entry['tvmaze_episode_airdate'], '%Y-%m-%d')
         assert airdate == '2015-10-13', 'episode airdate should be 2015-10-13, instead its %s' % airdate
+
+    @use_vcr
+    def test_queries_via_ids(self):
+        self.execute_task('test_queries_via_ids')
+        entry = self.task.entries[0]
+        assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 211206, 'episode id should be 211206, instead its %s' % entry[
+            'tvmaze_episode_id']
+        entry = self.task.entries[1]
+        assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 187808, 'episode id should be 187808, instead its %s' % entry[
+            'tvmaze_episode_id']
+        entry = self.task.entries[2]
+        assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[
+            'tvmaze_series_id']
+        assert entry['tvmaze_episode_id'] == 284974, 'episode id should be 284974, instead its %s' % entry[
+            'tvmaze_episode_id']
+

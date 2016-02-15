@@ -215,7 +215,7 @@ class ParsedEntry(ABCMeta(str('ParsedEntryABCMeta'), (object,), {})):
         if self.type != self.parsed_type:
             return False
         if not self._name:
-            return True # Not False ???!
+            return True  # Not False ???!
         if self._validated_name is None:
             self._validated_name = self._validate()
         if self.strict_name and self._validated_name != clean_value(self.parsed_name):

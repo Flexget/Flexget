@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+import itertools
 import logging
 import threading
 import socket
@@ -18,9 +19,10 @@ log = logging.getLogger('torrent_alive')
 
 
 class TorrentAliveThread(threading.Thread):
+    _counter = itertools.count().next
 
     def __init__(self, tracker, info_hash):
-        threading.Thread.__init__(self)
+        threading.Thread.__init__(self, name='torrent_alive-%d' % self._counter())
         self.tracker = tracker
         self.info_hash = info_hash
         self.tracker_seeds = 0

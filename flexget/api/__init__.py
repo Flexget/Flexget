@@ -6,13 +6,13 @@ import pkgutil
 from functools import wraps
 from collections import deque
 
-from flask import Flask, request, jsonify
+from flask import Flask, request
+from flask.ext.cors import CORS
 from flask_restplus import Api as RestPlusAPI
 from flask_restplus.resource import Resource
-from flask_restplus.model import ApiModel
+from flask_restplus.model import Model
 from flask_compress import Compress
 from jsonschema.exceptions import RefResolutionError
-from werkzeug.exceptions import HTTPException
 
 from flexget.event import event
 from flexget.webserver import register_app, get_secret
@@ -20,7 +20,8 @@ from flexget.config_schema import process_config, register_config_key
 from flexget import manager
 from flexget.utils.database import with_session
 
-__version__ = '0.1-alpha'
+
+__version__ = '0.3-beta'
 
 log = logging.getLogger('api')
 
@@ -36,11 +37,11 @@ def register_config():
     register_config_key('api', api_config_schema)
 
 
-class ApiSchemaModel(ApiModel):
+class ApiSchemaModel(Model):
     """A flask restplus :class:`flask_restplus.models.ApiModel` which can take a json schema directly."""
-    def __init__(self, schema, *args, **kwargs):
+    def __init__(self, name, schema, *args, **kwargs):
+        super(ApiSchemaModel, self).__init__(name, *args, **kwargs)
         self._schema = schema
-        super(ApiSchemaModel, self).__init__()
 
     @property
     def __schema__(self):
@@ -68,6 +69,19 @@ class Api(RestPlusAPI):
       - methods to auto document and handle :class:`ApiError` responses
     """
 
+    def _rewrite_refs(self, schema):
+        if isinstance(schema, list):
+            for value in schema:
+                self._rewrite_refs(value)
+
+        if isinstance(schema, dict):
+            for key, value in schema.iteritems():
+                if isinstance(value, (list, dict)):
+                    self._rewrite_refs(value)
+
+                if key == '$ref' and value.startswith('/'):
+                    schema[key] = '#definitions%s' % value
+
     def schema(self, name, schema, **kwargs):
         """
         Register a json schema.
@@ -76,7 +90,10 @@ class Api(RestPlusAPI):
 
         :returns: An :class:`ApiSchemaModel` instance registered to this api.
         """
-        return self.model(name, **kwargs)(ApiSchemaModel(schema))
+        model = ApiSchemaModel(name, schema, **kwargs)
+        model.__apidoc__.update(kwargs)
+        self.models[name] = model
+        return model
 
     def inherit(self, name, parent, fields):
         """
@@ -84,26 +101,28 @@ class Api(RestPlusAPI):
         :class:`ApiSchemaModel`.
         """
         if isinstance(parent, ApiSchemaModel):
-            model = ApiSchemaModel(fields)
+            model = ApiSchemaModel(name, fields)
             model.__apidoc__['name'] = name
             model.__parent__ = parent
             self.models[name] = model
             return model
         return super(Api, self).inherit(name, parent, fields)
 
-    def validate(self, model):
+    def validate(self, model, schema_override=None, description=None):
         """
         When a method is decorated with this, json data submitted to the endpoint will be validated with the given
         `model`. This also auto-documents the expected model, as well as the possible :class:`ValidationError` response.
         """
         def decorator(func):
-            @api.expect(model)
+            @api.expect((model, description))
             @api.response(ValidationError)
             @wraps(func)
             def wrapper(*args, **kwargs):
                 payload = request.json
                 try:
-                    errors = process_config(config=payload, schema=model.__schema__, set_defaults=False)
+                    schema = schema_override if schema_override else model.__schema__
+                    errors = process_config(config=payload, schema=schema, set_defaults=False)
+
                     if errors:
                         raise ValidationError(errors)
                 except RefResolutionError as e:
@@ -125,30 +144,25 @@ class Api(RestPlusAPI):
         except TypeError:
             # If first argument isn't a class this happens
             pass
-        return super(Api, self).response(code_or_apierror, description)
-
-    def handle_error(self, error):
-        """Responsible for returning the proper response for errors in api methods."""
-        if isinstance(error, ApiError):
-            return jsonify(error.to_dict()), error.code
-        elif isinstance(error, HTTPException):
-            return jsonify({'code': error.code, 'error': error.description}), error.code
-        return super(Api, self).handle_error(error)
+        return super(Api, self).response(code_or_apierror, description, model=model)
 
 
 class APIResource(Resource):
     """All api resources should subclass this class."""
     method_decorators = [with_session]
 
-    def __init__(self):
+    def __init__(self, api, *args, **kwargs):
         self.manager = manager.manager
-        super(APIResource, self).__init__()
+        super(APIResource, self).__init__(api, *args, **kwargs)
 
 
 app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__path__[0]), 'templates'))
 app.config['REMEMBER_COOKIE_NAME'] = 'flexgetToken'
+app.config['DEBUG'] = True
 
+CORS(app)
 Compress(app)
+
 api = Api(
     app,
     catch_all_404s=True,
@@ -166,7 +180,7 @@ class ApiError(Exception):
         'type': 'object',
         'properties': {
             'code': {'type': 'integer'},
-            'error': {'type': 'string'}
+            'message': {'type': 'string'}
         },
         'required': ['code', 'error']
     })
@@ -177,7 +191,7 @@ class ApiError(Exception):
 
     def to_dict(self):
         rv = self.payload or {}
-        rv.update(code=self.code, error=self.message)
+        rv.update(code=self.code, message=self.message)
         return rv
 
     @classmethod
@@ -233,6 +247,13 @@ class ValidationError(ApiError):
             else:
                 error_dict[attr] = getattr(error, attr)
         return error_dict
+
+
+@api.errorhandler(ApiError)
+@api.errorhandler(NotFoundError)
+@api.errorhandler(ValidationError)
+def api_errors(error):
+    return error.to_dict(), error.code
 
 
 @event('manager.daemon.started')

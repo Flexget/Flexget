@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 from argparse import ArgumentParser
 
 from sqlalchemy.exc import OperationalError
@@ -10,7 +11,8 @@ from flexget.plugin import DependencyError
 from flexget.utils import qualities
 
 try:
-    from flexget.plugins.filter.movie_queue import QueueError, queue_add, queue_del, queue_get, queue_forget, parse_what
+    from flexget.plugins.filter.movie_queue import (QueueError, queue_add, queue_del, queue_get, queue_forget,
+                                                    queue_clear, parse_what)
 except ImportError:
     raise DependencyError(issued_by='cli_movie_queue', missing='movie_queue')
 
@@ -26,13 +28,13 @@ def do_cli(manager, options):
     manager.config_changed()
 
     if options.queue_action == 'clear':
-        clear()
+        clear(options)
         return
 
     if options.queue_action == 'del':
         try:
             what = parse_what(options.movie_name, lookup=False)
-            title = queue_del(**what)
+            title = queue_del(queue_name=options.queue_name, **what)
         except QueueError as e:
             console('ERROR: %s' % e.message)
         else:
@@ -42,7 +44,7 @@ def do_cli(manager, options):
     if options.queue_action == 'forget':
         try:
             what = parse_what(options.movie_name, lookup=False)
-            title = queue_forget(**what)
+            title = queue_forget(queue_name=options.queue_name, **what)
         except QueueError as e:
             console('ERROR: %s' % e.message)
         else:
@@ -68,7 +70,7 @@ def do_cli(manager, options):
             return
 
         try:
-            queue_add(quality=quality, **what)
+            queue_add(quality=quality, queue_name=options.queue_name, **what)
         except QueueError as e:
             console(e.message)
             if e.errno == 1:
@@ -83,7 +85,13 @@ def do_cli(manager, options):
 
 def queue_list(options):
     """List movie queue"""
-    items = queue_get(downloaded=(options.type == 'downloaded'))
+    if options.type == 'downloaded':
+        downloaded = True
+    elif options.type == 'waiting':
+        downloaded = False
+    else:
+        downloaded = None
+    items = queue_get(downloaded=downloaded, queue_name=options.queue_name)
     if options.porcelain:
         console('%-10s %-s %-7s %-s %-37s %-s %s' % ('IMDB id', '|', 'TMDB id', '|', 'Title', '|', 'Quality'))
     else:
@@ -104,17 +112,17 @@ def queue_list(options):
         console('-' * 79)
 
 
-def clear():
+def clear(options):
     """Deletes waiting movies from queue"""
-    items = queue_get(downloaded=False)
+    items = queue_get(downloaded=False, queue_name=options.queue_name)
     console('Removing the following movies from movie queue:')
     console('-' * 79)
     for item in items:
         console(item.title)
-        queue_del(title=item.title)
     if not items:
         console('No results')
     console('-' * 79)
+    queue_clear(options.queue_name)
 
 
 @event('options.register')
@@ -123,17 +131,20 @@ def register_parser_arguments():
     what_parser = ArgumentParser(add_help=False)
     what_parser.add_argument('movie_name', metavar='<movie>',
                              help='the movie (can be movie title, imdb id, or in the form `tmdb_id=XXXX`')
+    name_parser = ArgumentParser(add_help=False)
+    name_parser.add_argument('--queue_name', default='default', metavar='<queue_name>',
+                             help='name of movie queue to operate on. optional, leave empty for default')
     # Register subcommand
     parser = options.register_command('movie-queue', do_cli, help='view and manage the movie queue')
     # Set up our subparsers
     subparsers = parser.add_subparsers(title='actions', metavar='<action>', dest='queue_action')
-    list_parser = subparsers.add_parser('list', help='list movies from the queue')
-    list_parser.add_argument('type', nargs='?', choices=['waiting', 'downloaded'], default='waiting',
+    list_parser = subparsers.add_parser('list', parents=[name_parser], help='list movies from the queue')
+    list_parser.add_argument('type', nargs='?', choices=['waiting', 'downloaded', 'all'], default='waiting',
                              help='choose to show waiting or already downloaded movies')
     list_parser.add_argument('--porcelain', action='store_true', help='make the output parseable')
-    add_parser = subparsers.add_parser('add', parents=[what_parser], help='add a movie to the queue')
+    add_parser = subparsers.add_parser('add', parents=[what_parser, name_parser], help='add a movie to the queue')
     add_parser.add_argument('quality', metavar='<quality>', default='ANY', nargs='?',
                             help='the quality requirements for getting this movie (default: %(default)s)')
-    subparsers.add_parser('del', parents=[what_parser], help='remove a movie from the queue')
-    subparsers.add_parser('forget', parents=[what_parser], help='remove the downloaded flag from a movie')
-    subparsers.add_parser('clear', help='remove all un-downloaded movies from the queue')
+    subparsers.add_parser('del', parents=[what_parser, name_parser], help='remove a movie from the queue')
+    subparsers.add_parser('forget', parents=[what_parser, name_parser], help='remove the downloaded flag from a movie')
+    subparsers.add_parser('clear', parents=[name_parser], help='remove all un-downloaded movies from the queue')

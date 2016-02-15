@@ -1,16 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
-from math import ceil
-from operator import itemgetter
 
-from flask import jsonify, request
-from flask_restful import inputs
-from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update
+from sqlalchemy import Column, Integer, String, ForeignKey, or_, and_, select, update, func, Unicode
 from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 from flexget import db_schema, plugin
-from flexget.api import api, APIResource
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.manager import Session
@@ -18,7 +13,7 @@ from flexget.utils import qualities
 from flexget.utils.database import quality_requirement_property, with_session
 from flexget.utils.imdb import extract_id
 from flexget.utils.log import log_once
-from flexget.utils.sqlalchemy_utils import table_exists, table_schema
+from flexget.utils.sqlalchemy_utils import table_exists, table_schema, table_add_column
 
 try:
     from flexget.plugins.filter import queue_base
@@ -27,7 +22,7 @@ except ImportError:
                                  message='movie_queue requires the queue_base plugin')
 
 log = logging.getLogger('movie_queue')
-Base = db_schema.versioned_base('movie_queue', 3)
+Base = db_schema.versioned_base('movie_queue', 4)
 
 
 @event('manager.lock_acquired')
@@ -87,6 +82,10 @@ def upgrade(ver, session):
                     session.execute(update(queue_base_table, queue_base_table.c.id == row['id'],
                                            {'title': parser.name}))
         ver = 3
+    if ver == 3:
+        # adding queue_name column to movie_queue table and setting initial value to default)
+        table_add_column('movie_queue', 'queue_name', Unicode, session, default='default')
+        ver = 4
     return ver
 
 
@@ -98,11 +97,13 @@ class QueuedMovie(queue_base.QueuedItem, Base):
     tmdb_id = Column(Integer)
     quality = Column('quality', String)
     quality_req = quality_requirement_property('quality')
+    queue_name = Column(Unicode)
 
     def to_dict(self):
         return {
             'added': self.added,
-            'downloaded': self.downloaded,
+            'is_downloaded': True if self.downloaded else False,
+            'download_date': self.downloaded if self.downloaded else None,
             'entry_original_url': self.entry_original_url,
             'entry_title': self.entry_title,
             'entry_url': self.entry_url,
@@ -110,8 +111,8 @@ class QueuedMovie(queue_base.QueuedItem, Base):
             'imdb_id': self.imdb_id,
             'tmdb_id': self.tmdb_id,
             'quality': self.quality,
-            'quality_req': self.quality_req.text,
             'title': self.title,
+            'queue_name:': self.queue_name
         }
 
 
@@ -124,6 +125,7 @@ class MovieQueue(queue_base.FilterQueueBase):
                 'properties': {
                     'action': {'type': 'string', 'enum': ['accept', 'add', 'remove', 'forget']},
                     'quality': {'type': 'string', 'format': 'quality_requirements'},
+                    'queue_name': {'type': 'string'}
                 },
                 'required': ['action'],
                 'additionalProperties': False
@@ -139,6 +141,8 @@ class MovieQueue(queue_base.FilterQueueBase):
         # only the accept action is applied in the 'matches' section
         if config.get('action') != 'accept':
             return
+
+        queue_name = config.get('queue_name', 'default')
 
         # Tell tmdb_lookup to add lazy lookup fields if not already present
         try:
@@ -165,8 +169,8 @@ class MovieQueue(queue_base.FilterQueueBase):
 
         quality = entry.get('quality', qualities.Quality())
 
-        movie = task.session.query(QueuedMovie).filter(QueuedMovie.downloaded == None). \
-            filter(or_(*conditions)).first()
+        movie = task.session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).filter(
+            QueuedMovie.queue_name == queue_name).filter(or_(*conditions)).first()
         if movie and movie.quality_req.allows(quality):
             return movie
 
@@ -175,6 +179,7 @@ class MovieQueue(queue_base.FilterQueueBase):
             return
         if not isinstance(config, dict):
             config = {'action': config}
+        config.setdefault('queue_name', 'default')
         for entry in task.accepted:
             # Tell tmdb_lookup to add lazy lookup fields if not already present
             try:
@@ -199,6 +204,7 @@ class MovieQueue(queue_base.FilterQueueBase):
                                entry.get('tmdb_name', eval_lazy=False) or
                                entry.get('movie_name', eval_lazy=False))
             log.debug('movie_queue kwargs: %s' % kwargs)
+            kwargs['queue_name'] = config.get('queue_name')
             try:
                 action = config.get('action')
                 if action == 'add':
@@ -252,7 +258,9 @@ def parse_what(what, lookup=True, session=None):
     result = {'title': None, 'imdb_id': None, 'tmdb_id': None}
     result['imdb_id'] = extract_id(what)
     if not result['imdb_id']:
-        if what.startswith('tmdb_id='):
+        if isinstance(what, int):
+            result['tmdb_id'] = what
+        elif what.startswith('tmdb_id='):
             result['tmdb_id'] = what[8:]
         else:
             result['title'] = what
@@ -279,7 +287,7 @@ def parse_what(what, lookup=True, session=None):
 
 # API functions to edit queue
 @with_session
-def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None):
+def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None, queue_name='default'):
     """
     Add an item to the queue with the specified quality requirements.
 
@@ -289,6 +297,7 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
     :param imdb_id: IMDB id for the movie. (optional)
     :param tmdb_id: TMDB id for the movie. (optional)
     :param quality: A QualityRequirements object defining acceptable qualities.
+    :param queue_name: Name of movie queue to get items from
     :param session: Optional session to use for database updates
     """
 
@@ -296,30 +305,34 @@ def queue_add(title=None, imdb_id=None, tmdb_id=None, quality=None, session=None
 
     if not title or not (imdb_id or tmdb_id):
         # We don't have all the info we need to add movie, do a lookup for more info
-        result = parse_what(imdb_id or title, session=session)
+        result = parse_what(imdb_id or title or tmdb_id, session=session)
         title = result['title']
+        if not title:
+            raise QueueError('Could not parse movie info for given parameters: title=%s, imdb_id=%s, tmdb_id=%s' % (
+                title, imdb_id, tmdb_id))
         imdb_id = result['imdb_id']
         tmdb_id = result['tmdb_id']
 
     # check if the item is already queued
-    item = session.query(QueuedMovie).filter(or_(and_(QueuedMovie.imdb_id != None, QueuedMovie.imdb_id == imdb_id),
-                                                 and_(QueuedMovie.tmdb_id != None, QueuedMovie.tmdb_id == tmdb_id))). \
-        first()
+    item = session.query(QueuedMovie).filter(and_((func.lower(QueuedMovie.queue_name) == queue_name.lower()),
+                                                  or_(and_(QueuedMovie.imdb_id != None, QueuedMovie.imdb_id == imdb_id),
+                                                      and_(QueuedMovie.tmdb_id != None,
+                                                           QueuedMovie.tmdb_id == tmdb_id)))).first()
     if not item:
-        item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality.text)
+        item = QueuedMovie(title=title, imdb_id=imdb_id, tmdb_id=tmdb_id, quality=quality.text, queue_name=queue_name)
         session.add(item)
         session.commit()
-        log.info('Adding %s to movie queue with quality=%s.' % (title, quality))
+        log.info('Adding %s to movie queue %s with quality=%s.', title, queue_name, quality)
         return item.to_dict()
     else:
         if item.downloaded:
             raise QueueError('ERROR: %s has already been queued and downloaded' % title, errno=1)
         else:
-            raise QueueError('ERROR: %s is already in the queue' % title, errno=1)
+            raise QueueError('ERROR: %s is already in the queue %s' % (title, queue_name), errno=1)
 
 
 @with_session
-def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=None):
+def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=None, queue_name='default'):
     """
     Delete the given item from the queue.
 
@@ -327,17 +340,19 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
     :param imdb_id: Imdb id
     :param tmdb_id: Tmdb id
     :param session: Optional session to use, new session used otherwise
+    :param queue_name: Name of movie queue to get items from
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
-    log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', title, imdb_id, tmdb_id, movie_id)
-    query = session.query(QueuedMovie)
+    log.debug('queue_del - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s, queue_name=%s',
+              title, imdb_id, tmdb_id, movie_id, queue_name)
+    query = session.query(QueuedMovie).filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
     if imdb_id:
         query = query.filter(QueuedMovie.imdb_id == imdb_id)
     elif tmdb_id:
         query = query.filter(QueuedMovie.tmdb_id == tmdb_id)
     elif title:
-        query = query.filter(QueuedMovie.title == title)
+        query = query.filter(func.lower(QueuedMovie.title) == func.lower(title))
     elif movie_id:
         query = query.filter(QueuedMovie.id == movie_id)
     try:
@@ -347,15 +362,23 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
         return title
     except NoResultFound as e:
         raise QueueError(
-                'title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' % (
-                title, imdb_id, tmdb_id, movie_id))
+            'title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue %s' % (
+                title, imdb_id, tmdb_id, movie_id, queue_name))
     except MultipleResultsFound:
-        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s matches multiple results in queue' %
-                         (title, imdb_id, tmdb_id, movie_id))
+        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s matches multiple results in queue %s' %
+                         (title, imdb_id, tmdb_id, movie_id, queue_name))
 
 
 @with_session
-def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=None):
+def queue_clear(queue_name='default', session=None):
+    """Deletes waiting movies from queue"""
+    (session.query(QueuedMovie).filter(QueuedMovie.downloaded == False)
+                               .filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
+                               .delete())
+
+
+@with_session
+def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=None, queue_name='default'):
     """
     Forget movie download  from the queue.
 
@@ -363,44 +386,48 @@ def queue_forget(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=
     :param imdb_id: Imdb id
     :param tmdb_id: Tmdb id
     :param session: Optional session to use, new session used otherwise
+    :param queue_name: Name of movie queue to get items from
     :return: Title of forgotten movie
     :raises QueueError: If queued item could not be found with given arguments
     """
-    log.debug('queue_forget - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', title, imdb_id, tmdb_id, movie_id)
-    query = session.query(QueuedMovie)
+    log.debug('queue_forget - title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s, queue_name=%s', title, imdb_id, tmdb_id,
+              movie_id, queue_name)
+    query = session.query(QueuedMovie).filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
     if imdb_id:
         query = query.filter(QueuedMovie.imdb_id == imdb_id)
     elif tmdb_id:
         query = query.filter(QueuedMovie.tmdb_id == tmdb_id)
     elif title:
-        query = query.filter(QueuedMovie.title == title)
+        query = query.filter(func.lower(QueuedMovie.title) == func.lower(title))
     elif movie_id:
         query = query.filter(QueuedMovie.id == movie_id)
     try:
         item = query.one()
         title = item.title
         if not item.downloaded:
-            raise QueueError('%s is not marked as downloaded' % title)
+            raise QueueError(message=('%s is not marked as downloaded' % title), errno=1)
         item.downloaded = None
         return item.to_dict()
     except NoResultFound as e:
-        raise QueueError('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' %
-                         (title, imdb_id, tmdb_id, movie_id))
+        raise QueueError(message=('title=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s, queue_name=%s not found in queue' %
+                                  (title, imdb_id, tmdb_id, movie_id, queue_name)), errno=2)
 
 
 @with_session
-def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None):
+def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None, queue_name='default'):
     """
     :param quality: Change the required quality for a movie in the queue
     :param imdb_id: Imdb id
     :param tmdb_id: Tmdb id
     :param session: Optional session to use, new session used otherwise
+    :param queue_name: Name of movie queue to get items from
     :return: Title of edited item
     :raises QueueError: If queued item could not be found with given arguments
     """
     # check if the item is queued
-    log.debug('queue_edit - quality=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s', quality, imdb_id, tmdb_id, movie_id)
-    query = session.query(QueuedMovie)
+    log.debug('queue_edit - quality=%s, imdb_id=%s, tmdb_id=%s, movie_id=%s, queue_name=%s', quality, imdb_id, tmdb_id,
+              movie_id, queue_name)
+    query = session.query(QueuedMovie).filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
     if imdb_id:
         query = session.query(QueuedMovie).filter(QueuedMovie.imdb_id == imdb_id)
     elif tmdb_id:
@@ -410,279 +437,54 @@ def queue_edit(quality, imdb_id=None, tmdb_id=None, session=None, movie_id=None)
     try:
         item = query.one()
         item.quality = quality
+        session.commit()
         return item.to_dict()
     except NoResultFound as e:
-        raise QueueError('imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue' % (imdb_id, tmdb_id, movie_id))
+        raise QueueError(
+            'imdb_id=%s, tmdb_id=%s, movie_id=%s not found in queue %s' % (imdb_id, tmdb_id, movie_id, queue_name))
 
 
 @with_session
-def queue_get(session=None, downloaded=False):
+def queue_get(session=None, downloaded=None, queue_name='default'):
     """
     Get the current movie queue.
 
     :param session: New session is used it not given
     :param bool downloaded: Whether or not to return only downloaded
+    :param queue_name: Name of movie queue to get items from
     :return: List of QueuedMovie objects (detached from session)
     """
-    if not downloaded:
-        return session.query(QueuedMovie).filter(QueuedMovie.downloaded == None).all()
+    query = session.query(QueuedMovie).filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
+    if downloaded is False:
+        return query.filter(QueuedMovie.downloaded == None).all()
+    elif downloaded:
+        return query.filter(QueuedMovie.downloaded != None).all()
     else:
-        return session.query(QueuedMovie).filter(QueuedMovie.downloaded != None).all()
+        return query.all()
+
+
+@with_session
+def get_movie_by_id(movie_id, session=None):
+    """
+    Return movie item from movie_id
+    :param movie_id: ID of queued movie
+    :param session: Session
+    :return: Dict of movie details
+    """
+    return session.query(QueuedMovie).filter(QueuedMovie.id == movie_id).one().to_dict()
+
+
+@with_session
+def delete_movie_by_id(movie_id, session=None):
+    """
+    Deletes movie by its ID
+    :param movie_id: ID of queued movie
+    :param session: Session
+    """
+    movie = session.query(QueuedMovie).filter(QueuedMovie.id == movie_id).one()
+    session.delete(movie)
 
 
 @event('plugin.register')
 def register_plugin():
     plugin.register(MovieQueue, 'movie_queue', api_ver=2)
-
-
-movie_queue_api = api.namespace('movie_queue', description='Movie Queue')
-
-movie_object = {
-    'type': 'object',
-    'properties': {
-        'added': {'type': 'string'},
-        'downloaded': {'type': 'string'},
-        'entry_original_url': {'type': 'string'},
-        'entry_title': {'type': 'string'},
-        'entry_url': {'type': 'string'},
-        'id': {'type': 'integer'},
-        'imdb_id': {'type': 'string'},
-        'quality': {'type': 'string'},
-        'title': {'type': 'string'},
-        'tmdb_id': {'type': 'string'},
-    }
-}
-
-movie_queue_schema = {
-    'type': 'object',
-    'properties': {
-        'movies': {
-            'type': 'array',
-            'items': movie_object
-        },
-        'number_of_movies': {'type': 'integer'},
-        'total_number_of_pages': {'type': 'integer'},
-        'page_number': {'type': 'integer'}
-
-    }
-}
-
-
-def movie_queue_sort_value_enum(value):
-    enum = ['added', 'downloaded', 'id', 'title']
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    return value
-
-
-def movie_queue_sort_order_enum(value):
-    enum = ['desc', 'asc']
-    if value not in enum:
-        raise ValueError('Value expected to be in' + ' ,'.join(enum))
-    if value == 'desc':
-        return True
-    return False
-
-
-movie_queue_schema = api.schema('list_movie_queue', movie_queue_schema)
-
-movie_queue_parser = api.parser()
-movie_queue_parser.add_argument('page', type=int, default=1, help='Page number')
-movie_queue_parser.add_argument('max', type=int, default=100, help='Movies per page')
-movie_queue_parser.add_argument('downloaded_only', type=inputs.boolean, default='false', help='Show only downloaded')
-movie_queue_parser.add_argument('sort_by', type=movie_queue_sort_value_enum, default='added',
-                                help="Sort response by 'added', 'downloaded', 'id', 'title'")
-movie_queue_parser.add_argument('order', type=movie_queue_sort_order_enum, default='desc', help='Sorting order')
-
-movie_add_results_schema = {
-    'type': 'object',
-    'properties': {
-        'message': {'type': 'string'},
-        'movie': movie_object
-    }
-}
-
-movie_add_input_schema = {
-    'type': 'object',
-    'properties': {
-        'title': {'type': 'string'},
-        'imdb_id': {'type': 'string', 'pattern': r'tt\d{7}'},
-        'tmdb_id': {'type': 'integer'},
-        'quality': {'type': 'string', 'format': 'quality_requirements', 'default': 'any'}
-    },
-    'anyOf': [
-        {'required': ['title']},
-        {'required': ['imdb_id']},
-        {'required': ['tmdb_id']}
-    ]
-}
-
-movie_add_results_schema = api.schema('movie_add_results', movie_add_results_schema)
-movie_add_input_schema = api.schema('movie_add_input_schema', movie_add_input_schema)
-
-movie_edit_results_schema = {
-    'type': 'object',
-    'properties': {
-        'message': {'type': 'string'},
-        'movie': movie_object
-    }
-}
-
-movie_edit_input_schema = {
-    'type': 'object',
-    'properties': {
-        'quality': {'type': 'string', 'format': 'quality_requirements'},
-        'reset_downloaded': {'type': 'boolean', 'default': False}
-    },
-    'anyOf': [
-        {'required': ['quality']},
-        {'required': ['reset_downloaded']}
-    ]
-}
-
-movie_edit_results_schema = api.schema('movie_edit_results_schema', movie_edit_results_schema)
-movie_edit_input_schema = api.schema('movie_edit_input_schema', movie_edit_input_schema)
-
-
-@movie_queue_api.route('/')
-class MovieQueueAPI(APIResource):
-    @api.response(404, 'Page does not exist')
-    @api.response(200, 'Movie queue retrieved successfully', movie_queue_schema)
-    @api.doc(parser=movie_queue_parser)
-    def get(self, session=None):
-        """ List queued movies """
-        args = movie_queue_parser.parse_args()
-        page = args['page']
-        max_results = args['max']
-        downloaded = args['downloaded_only']
-        sort_by = args['sort_by']
-        order = args['order']
-
-        movie_queue = queue_get(session=session, downloaded=downloaded)
-        count = len(movie_queue)
-
-        pages = int(ceil(count / float(max_results)))
-
-        movie_items = []
-
-        if page > pages and pages != 0:
-            return {'error': 'page %s does not exist' % page}, 404
-
-        start = (page - 1) * max_results
-        finish = start + max_results
-        if finish > count:
-            finish = count
-
-        for movie_number in range(start, finish):
-            movie_items.append(movie_queue[movie_number].to_dict())
-
-        sorted_movie_list = sorted(movie_items, key=itemgetter(sort_by), reverse=order)
-
-        return jsonify({
-            'movies': sorted_movie_list,
-            'number_of_movies': count,
-            'page_number': page,
-            'total_number_of_pages': pages
-        })
-
-    @api.response(400, 'Page not found')
-    @api.response(201, 'Movie successfully added', movie_add_results_schema)
-    @api.validate(movie_add_input_schema)
-    def post(self, session=None):
-        """ Add movies to movie queue """
-        kwargs = request.json
-        kwargs['quality'] = qualities.Requirements(kwargs.get('quality'))
-        kwargs['session'] = session
-
-        try:
-            movie = queue_add(**kwargs)
-        except QueueError as e:
-            reply = {
-                'status': 'error',
-                'message': e.message
-            }
-            return reply, 404
-
-        reply = jsonify(
-                {
-                    'message': 'Successfully added movie to movie queue',
-                    'movie': movie
-                }
-        )
-        reply.status_code = 201
-        return reply
-
-
-@api.response(404, 'Movie not found')
-@api.response(400, 'Invalid type received')
-@movie_queue_api.route('/<type>/<id>/')
-@api.doc(params={'id': 'ID of Queued Movie', 'type': 'Type of ID to be used (imdb/tmdb/movie_id)'})
-class MovieQueueManageAPI(APIResource):
-    def validate_type(self, type, id, session):
-        if type not in ['imdb', 'tmdb', 'movie_id']:
-            reply = {
-                'status': 'error',
-                'message': 'invalid ID type received. Must be one of (imdb/tmdb/movie_id)'
-            }
-            return reply, 400
-        kwargs = {'session': session}
-        if type == 'imdb':
-            kwargs['imdb_id'] = id
-        elif type == 'tmdb':
-            kwargs['tmdb_id'] = id
-        elif type == 'movie_id':
-            kwargs['movie_id'] = id
-        return kwargs
-
-    @api.response(200, 'Movie successfully deleted')
-    def delete(self, type, id, session=None):
-        """ Delete movies from movie queue """
-        kwargs = self.validate_type(type, id, session)
-        try:
-            queue_del(**kwargs)
-        except QueueError as e:
-            reply = {'status': 'error',
-                     'message': e.message}
-            return reply, 404
-
-        reply = jsonify(
-                {'status': 'success',
-                 'message': 'successfully deleted {0} movie {1}'.format(type, id)})
-        return reply
-
-    @api.response(200, 'Movie successfully updated', movie_edit_results_schema)
-    @api.validate(movie_edit_input_schema)
-    def put(self, type, id, session=None):
-        """ Updates movie quality or downloaded state in movie queue """
-        kwargs = self.validate_type(type, id, session)
-        movie = None
-        data = request.json
-        if data.get('reset_downloaded'):
-            try:
-                movie = queue_forget(**kwargs)
-            except QueueError as e:
-                reply = {
-                    'status': 'error',
-                    'message': e.message
-                }
-                return reply, 404
-
-        if data.get('quality'):
-            kwargs['quality'] = data['quality']
-            try:
-                movie = queue_edit(**kwargs)
-            except QueueError as e:
-                reply = {'status': 'error',
-                         'message': e.message}
-                return reply, 404
-        if not movie:
-            return {'status': 'error',
-                    'message': 'Not enough parameters to edit movie data'}, 400
-
-        return jsonify(
-                {
-                    'status': 'success',
-                    'message': 'Successfully updated movie details',
-                    'movie': movie
-                }
-        )

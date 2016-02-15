@@ -1,13 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+from requests.exceptions import HTTPError
+
 from flexget import plugin
 from flexget.event import event
 from flexget.utils.imdb import extract_id
 from flexget.utils.cached_input import cached
 from flexget.entry import Entry
 from flexget.utils.soup import get_soup
-
 log = logging.getLogger('imdb_list')
 USER_ID_RE = r'^ur\d{7,8}$'
 CUSTOM_LIST_RE = r'^ls\d{7,10}$'
@@ -59,7 +60,11 @@ class ImdbList(object):
 
         headers = {'Accept-Language': config.get('force_language')}
         log.debug('Requesting: %s %s' % (url, headers))
-        page = task.requests.get(url, params=params, headers=headers)
+        page = None
+        try:
+            page = task.requests.get(url, params=params, headers=headers)
+        except HTTPError as e:
+            raise plugin.PluginError(e.args[0])
         if page.status_code != 200:
             raise plugin.PluginError('Unable to get imdb list. Either list is private or does not exist.')
 

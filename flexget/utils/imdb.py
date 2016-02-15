@@ -8,7 +8,7 @@ from bs4.element import Tag
 from flexget.utils.soup import get_soup
 from flexget.utils.requests import Session
 from flexget.utils.tools import str_to_int
-from flexget.plugin import get_plugin_by_name
+from flexget.plugin import get_plugin_by_name, PluginError
 
 log = logging.getLogger('utils.imdb')
 # IMDb delivers a version of the page which is unparsable to unknown (and some known) user agents, such as requests'
@@ -138,8 +138,8 @@ class ImdbSearch(object):
             movie = {}
             movie['match'] = 1.0
             movie['name'] = name
-            movie['url'] = actual_url
             movie['imdb_id'] = extract_id(actual_url)
+            movie['url'] = make_url(movie['imdb_id'])
             movie['year'] = None  # skips year check
             movies.append(movie)
             return movies
@@ -167,8 +167,8 @@ class ImdbSearch(object):
 
             link = row.find_next('a')
             movie['name'] = link.text
-            movie['url'] = 'http://www.imdb.com' + link.get('href')
-            movie['imdb_id'] = extract_id(movie['url'])
+            movie['imdb_id'] = extract_id(link.get('href'))
+            movie['url'] = make_url(movie['imdb_id'])
             log.debug('processing name: %s url: %s' % (movie['name'], movie['url']))
 
             # calc & set best matching ratio
@@ -235,17 +235,23 @@ class ImdbParser(object):
 
         title_overview = soup.find('div', attrs={'class': 'title-overview'})
         if not title_overview:
-            log.error('IMDB parser needs updating, imdb format changed.')
-            return
+            raise PluginError('IMDB parser needs updating, imdb format changed. Please report on Github.')
 
         # Parse stuff from the title-overview section
-        name_elem = title_overview.find(itemprop='name')
-        self.name = name_elem.contents[0]
-
-        year = title_overview.find(attrs={'class': 'nobr'}).find('a', href=True)
-        if year:
-            self.year = int(year.text)
+        name_elem = title_overview.find('h1', attrs={'itemprop': 'name'})
+        if name_elem:
+            self.name = name_elem.contents[0].strip()
         else:
+            log.error('Possible IMDB parser needs updating, Please report on Github.')
+            raise PluginError('Unable to set imdb_name for %s from %s' % (self.imdb_id, self.url))
+
+        year = title_overview.find('span', attrs={'id': 'titleYear'})
+        if year:
+            m = re.search(r'([0-9]{4})', year.text)
+            if m:
+                self.year = int(m.group(1))
+
+        if not self.year:
             log.debug('No year found for %s' % self.imdb_id)
 
         mpaa_rating_elem = title_overview.find(itemprop='contentRating')
@@ -260,7 +266,7 @@ class ImdbParser(object):
         else:
             log.debug('No photo found for %s' % self.imdb_id)
 
-        original_name_elem = title_overview.find(attrs={'class': 'title-extra'})
+        original_name_elem = title_overview.find(attrs={'class': 'originalTitle'})
         if original_name_elem:
             self.original_name = original_name_elem.contents[0].strip().strip('"')
         else:
@@ -301,7 +307,10 @@ class ImdbParser(object):
         if storyline:
             plot_elem = storyline.find('p')
             if plot_elem:
-                self.plot_outline = plot_elem.find(text=True, recursive=False).strip()
+                # Remove the "Written By" part.
+                if plot_elem.em:
+                    plot_elem.em.replace_with('')
+                self.plot_outline = plot_elem.text.strip()
             else:
                 log.debug('No storyline found for %s' % self.imdb_id)
             self.genres = [i.text.strip().lower() for i in storyline.select('[itemprop="genre"] > a')]

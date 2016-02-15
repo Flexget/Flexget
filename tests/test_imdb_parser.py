@@ -28,13 +28,13 @@ class TestImdbParser(object):
             'nm0000860': 'Paul Bartel'
         }, 'Actors not parsed correctly'
         assert parser.directors == {'nm0001741': 'Bryan Singer'}, 'Directors not parsed correctly'
-        assert parser.genres == [u'crime', u'drama', u'thriller'], 'Genres not parsed correctly'
+        assert parser.genres == [u'crime', u'mystery', u'thriller'], 'Genres not parsed correctly'
         assert parser.imdb_id == 'tt0114814', 'ID not parsed correctly'
         assert parser.languages == ['english', 'hungarian', 'spanish', 'french'], 'Languages not parsed correctly'
         assert parser.mpaa_rating == 'R', 'Rating not parsed correctly'
         assert parser.name == 'The Usual Suspects', 'Name not parsed correctly'
         assert (parser.photo ==
-                'http://ia.media-imdb.com/images/M/MV5BMzI1MjI5MDQyOV5BMl5BanBnXkFtZTcwNzE4Mjg3NA@@._V1_SX214_AL_.jpg'
+                'http://ia.media-imdb.com/images/M/MV5BMzI1MjI5MDQyOV5BMl5BanBnXkFtZTcwNzE4Mjg3NA@@._V1_UX182_CR0,0,182,268_AL_.jpg'
         ), 'Photo not parsed correctly'
         assert parser.plot_outline == (
             'Following a truck hijack in New York, five conmen are arrested and brought together for questioning. '
@@ -56,3 +56,24 @@ class TestImdbParser(object):
         assert parser.name == 'Goodbye Mothers'
         # There is no plot
         assert not parser.plot_outline
+
+    @use_vcr
+    def test_no_year(self):
+        # Make sure parser doesn't crash for movies with no year
+        parser = ImdbParser()
+        parser.parse('tt3303790')
+        assert parser.name == 'Master of None'
+        # There is no year
+        assert not parser.year
+
+    @use_vcr
+    def test_plot_with_links(self):
+        """Make sure plot doesn't terminate at the first link. GitHub #756"""
+        parser = ImdbParser()
+        parser.parse('tt2503944')
+        assert parser.plot_outline == ("Chef Adam Jones (Bradley Cooper) had it all - and lost it. A two-star Michelin "
+                                       "rockstar with the bad habits to match, the former enfant terrible of the Paris "
+                                       "restaurant scene did everything different every time out, and only ever cared "
+                                       "about the thrill of creating explosions of taste. To land his own kitchen and "
+                                       "that third elusive Michelin star though, he'll need the best of the best on "
+                                       "his side, including the beautiful Helene (Sienna Miller).")

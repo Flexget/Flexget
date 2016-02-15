@@ -89,9 +89,10 @@ class TraktSubmit(object):
                 action = 'deleted'
             res = result.json()
             movies = res[action].get('movies', 0)
+            shows = res[action].get('shows', 0)
             eps = res[action].get('episodes', 0)
-            self.log.info('Successfully %s to/from list %s: %s movie(s), %s episode(s).' % (action, config['list'],
-                                                                                            movies, eps))
+            self.log.info('Successfully %s to/from list %s: %s movie(s), %s show(s), %s episode(s).',
+                          action, config['list'], movies, shows, eps)
             for k, r in res['not_found'].iteritems():
                 if r:
                     self.log.debug('not found %s: %s' % (k, r))

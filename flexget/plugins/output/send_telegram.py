@@ -2,6 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 
 import sys
 from distutils.version import LooseVersion
+from ssl import SSLError
+from urllib2 import URLError
 
 from sqlalchemy import Column, Integer, String
 
@@ -13,16 +15,19 @@ from flexget.utils.tools import console
 
 try:
     import telegram
+    from telegram.error import TelegramError
 except ImportError:
     telegram = None
 
-_MIN_TELEGRAM_VER = '3.1.0'
+_MIN_TELEGRAM_VER = '3.2.0'
 
 _PLUGIN_NAME = 'send_telegram'
 
+_PARSERS = ['markdown', 'html']
+
 _TOKEN_ATTR = 'bot_token'
 _TMPL_ATTR = 'template'
-_MARKDOWN_ATTR = 'use_markdown'
+_PARSE_ATTR = 'parse_mode'
 _RCPTS_ATTR = 'recipients'
 _USERNAME_ATTR = 'username'
 _FULLNAME_ATTR = 'fullname'
@@ -99,8 +104,11 @@ class SendTelegram(object):
     `template`::
     Optional. The template from the example is the default.
 
-    `use_markdown`::
-    Optional. Whether the template uses markdown formatting. The default is `no`.
+    `parse_mode`::
+    Optional. Whether the template uses `markdown` or `html` formatting.
+
+    NOTE: The markdown parser will fall back to basic parsing if there is a parsing error. This can be cause due to
+    unclosed tags (watch out for wandering underscore when using markdown)
 
     `username` vs. `fullname`::
 
@@ -123,7 +131,7 @@ class SendTelegram(object):
         'properties': {
             _TOKEN_ATTR: {'type': 'string'},
             _TMPL_ATTR: {'type': 'string', 'default': '{{title}}'},
-            _MARKDOWN_ATTR: {'type': 'boolean', 'default': False},
+            _PARSE_ATTR: {'type': 'string', 'enum': _PARSERS},
             _RCPTS_ATTR: {
                 'type': 'array',
                 'minItems': 1,
@@ -176,7 +184,7 @@ class SendTelegram(object):
         """
         self._token = config[_TOKEN_ATTR]
         self._tmpl = config[_TMPL_ATTR]
-        self._use_markdown = config[_MARKDOWN_ATTR]
+        self._parse_mode = config.get(_PARSE_ATTR)
         self._usernames = []
         self._fullnames = []
         self._groups = []
@@ -209,8 +217,8 @@ class SendTelegram(object):
     def _real_init(self, session, config, ):
         self._enforce_telegram_plugin_ver()
         self._parse_config(config)
-        self.log.debug('token={0} use_markdown={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
-            self._token, self._usernames, self._fullnames, self._groups, self._tmpl, self._use_markdown))
+        self.log.debug('token={0} parse_mode={5}, tmpl={4!r} usernames={1} fullnames={2} groups={3}'.format(
+                self._token, self._usernames, self._fullnames, self._groups, self._tmpl, self._parse_mode))
         self._init_bot()
         chat_ids = self._get_chat_ids_n_update_db(session)
         return chat_ids
@@ -263,6 +271,10 @@ class SendTelegram(object):
         except UnicodeDecodeError as e:
             self.log.trace('bot.getMe() raised: {!r}'.format(e))
             raise plugin.PluginWarning('invalid bot token')
+        except (URLError, SSLError) as e:
+            self.log.error('Could not connect Telegram servers at this time, please try again later: %s', e.args[0])
+        except TelegramError as e:
+            self.log.error('Could not connect Telegram servers at this time, please try again later: %s', e.message)
 
     @staticmethod
     def _enforce_telegram_plugin_ver():
@@ -275,12 +287,29 @@ class SendTelegram(object):
 
     def _send_msgs(self, task, chat_ids):
         kwargs = dict()
-        if self._use_markdown:
+        if self._parse_mode == 'markdown':
             kwargs['parse_mode'] = telegram.ParseMode.MARKDOWN
+        elif self._parse_mode == 'html':
+            kwargs['parse_mode'] = 'HTML'  # TODO: Change this to use ParseMode when it's implemented
         for entry in task.accepted:
             msg = self._render_msg(entry, self._tmpl)
             for chat_id in (x.id for x in chat_ids):
-                self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
+                try:
+                    self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
+                except TelegramError as e:
+                    if kwargs['parse_mode']:
+                        self.log.warning(
+                                'Failed to render message using parse mode %s. Falling back to basic parsing: %s' % (
+                                    kwargs['parse_mode'], e.message))
+                        del kwargs['parse_mode']
+                        try:
+                            self._bot.sendMessage(chat_id=chat_id, text=msg, **kwargs)
+                        except TelegramError as e:
+                            self.log.error('Cannot send message, : %s' % e.message)
+                            continue
+                    else:
+                        self.log.error('Cannot send message, : %s' % e.message)
+                        continue
 
     def _render_msg(self, entry, tmpl):
         """

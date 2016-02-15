@@ -60,6 +60,29 @@ class APITest(FlexGetBase):
         return self.client.delete(*args, **kwargs)
 
 
+class TestValidator(APITest):
+
+    def test_invalid_payload(self):
+        new_task = {
+            'name': 'new_task',
+            'config': {
+                'invalid_plugin': [{'title': 'entry 1'}],
+                'fake_plugin2': {'url': 'http://test/rss'}
+            }
+        }
+
+        rsp = self.json_post('/tasks/', data=json.dumps(new_task))
+
+        assert rsp.status_code == 400
+        data = json.loads(rsp.data)
+        assert data.get('code') == 400
+        assert data.get('message') == 'validation error'
+        assert data.get('validation_errors')
+        assert 'The keys' in data['validation_errors'][0]['message']
+        assert 'invalid_plugin' in data['validation_errors'][0]['message']
+        assert 'fake_plugin2' in data['validation_errors'][0]['message']
+
+
 class TestServerAPI(APITest):
     __yaml__ = """
         tasks:
@@ -145,12 +168,6 @@ class TestTaskAPI(APITest):
         assert mocked_save_config.called
         assert json.loads(rsp.data) == new_task
         assert self.manager.user_config['tasks']['new_task'] == new_task['config']
-
-        # With defaults
-        new_task['config']['rss']['ascii'] = False
-        new_task['config']['rss']['group_links'] = False
-        new_task['config']['rss']['silent'] = False
-        new_task['config']['rss']['all_entries'] = True
         assert self.manager.config['tasks']['new_task'] == new_task['config']
 
     def test_add_task_existing(self):
@@ -185,18 +202,12 @@ class TestTaskAPI(APITest):
             }
         }
 
-        rsp = self.json_post('/tasks/test/', data=json.dumps(updated_task))
+        rsp = self.json_put('/tasks/test/', data=json.dumps(updated_task))
 
         assert rsp.status_code == 200
         assert mocked_save_config.called
         assert json.loads(rsp.data) == updated_task
         assert self.manager.user_config['tasks']['test'] == updated_task['config']
-
-        # With defaults
-        updated_task['config']['rss']['ascii'] = False
-        updated_task['config']['rss']['group_links'] = False
-        updated_task['config']['rss']['silent'] = False
-        updated_task['config']['rss']['all_entries'] = True
         assert self.manager.config['tasks']['test'] == updated_task['config']
 
     @patch.object(Manager, 'save_config')
@@ -209,7 +220,7 @@ class TestTaskAPI(APITest):
             }
         }
 
-        rsp = self.json_post('/tasks/test/', data=json.dumps(updated_task))
+        rsp = self.json_put('/tasks/test/', data=json.dumps(updated_task))
 
         assert rsp.status_code == 201
         assert mocked_save_config.called
@@ -217,12 +228,6 @@ class TestTaskAPI(APITest):
         assert 'test' not in self.manager.user_config['tasks']
         assert 'test' not in self.manager.config['tasks']
         assert self.manager.user_config['tasks']['new_test'] == updated_task['config']
-
-        # With defaults
-        updated_task['config']['rss']['ascii'] = False
-        updated_task['config']['rss']['group_links'] = False
-        updated_task['config']['rss']['silent'] = False
-        updated_task['config']['rss']['all_entries'] = True
         assert self.manager.config['tasks']['new_test'] == updated_task['config']
 
     @patch.object(Manager, 'save_config')
