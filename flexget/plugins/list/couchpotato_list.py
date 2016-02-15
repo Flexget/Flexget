@@ -91,7 +91,7 @@ class CouchPotatoBase(object):
             set([sources[quality] for quality in quality_profile['qualities'] if quality in sources]))
 
         quality_requirement = (res_string + ' ' + source_string).rstrip()
-        log.debug('quality requirement is %s' % quality_requirement)
+        log.debug('quality requirement is %s',  quality_requirement)
         return quality_requirement
 
     @staticmethod
@@ -122,23 +122,23 @@ class CouchPotatoBase(object):
                               quality_req=quality_req,
                               couchpotato_id=movie.get('_id'))
                 if entry.isvalid():
-                    log.debug('adding entry %s' % entry)
+                    log.debug('adding entry %s', entry)
                     entries.append(entry)
                 else:
-                    log.error('Invalid entry created? %s' % entry)
+                    log.error('Invalid entry created? %s', entry)
                     continue
                 # Test mode logging
                 if entry and test_mode:
                     log.info("Test mode. Entry includes:")
                     for key, value in entry.items():
-                        log.info('     %s: %s' % (key.capitalize(), value))
+                        log.info('     %s: %s', (key.capitalize(), value))
 
         return entries
 
     @staticmethod
     def add_movie(config, entry, test_mode=None):
         if not entry.get('imdb_id'):
-            log.error('Cannot add movie to couchpotato without and imdb ID: %s' % entry)
+            log.error('Cannot add movie to couchpotato without and imdb ID: %s',  entry)
             return
         log.verbose('Connection to CouchPotato to add a movie to list.')
         add_movie_url = CouchPotatoBase.build_url(config.get('base_url'), 'add', config.get('port'),
