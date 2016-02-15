@@ -36,7 +36,7 @@ class OutputQBitTorrent(object):
 
     def connect(self, config):
         """
-        Connect to Qbittorrent Web UI. Username and password not necessary
+        Connect to qBittorrent Web UI. Username and password not necessary
         if 'Bypass authentication for localhost' is checked and host is
         'localhost'.
         """
@@ -47,16 +47,16 @@ class OutputQBitTorrent(object):
                                          data={'username': config['username'],
                                                'password': config['password']})
             if response == 'Fails.':
-                log.debug('Error connecting to Qbittorrent')
+                log.debug('Error connecting to qBittorrent')
                 raise plugin.PluginError('Authentication failed.')
-        log.debug('Successfully connected to Qbittorrent')
+        log.debug('Successfully connected to qBittorrent')
         self.connected = True
 
     def add_torrent(self, data):
         if not self.connected:
             raise plugin.PluginError('Not connected.')
         self.session.post(self.url + '/command/download', data=data)
-        log.debug('Added task to Qbittorrent')
+        log.debug('Added task to qBittorrent')
 
     def prepare_config(self, config):
         config.setdefault('host', 'localhost')
@@ -66,7 +66,7 @@ class OutputQBitTorrent(object):
 
     @plugin.priority(120)
     def on_task_output(self, task, config):
-        """Add torrents to qbittorrent at exit."""
+        """Add torrents to qBittorrent at exit."""
         if task.accepted:
             config = self.prepare_config(config)
             self.connect(config)
