@@ -159,6 +159,10 @@ class CouchPotatoBase(object):
 
 
 class CouchPotatoList(MutableSet):
+    @property
+    def movies(self):
+        return CouchPotatoBase.list_entries(self.config)
+
     def _find_entry(self, entry):
         for cp_entry in self.movies:
             # TODO This could be a little too broad, rethink this
@@ -168,7 +172,6 @@ class CouchPotatoList(MutableSet):
 
     def __init__(self, config):
         self.config = config
-        self.movies = CouchPotatoBase.list_entries(config)
 
     def __iter__(self):
         return (entry for entry in self.movies)
