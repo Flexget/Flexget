@@ -182,10 +182,6 @@ class CouchPotatoList(MutableSet):
     def __contains__(self, entry):
         return self._find_entry(entry) is not None
 
-    def __ior__(self, other):
-        for value in other:
-            self.add(value)
-
     def add(self, entry):
         return CouchPotatoBase.add_movie(self.config, entry)
 
