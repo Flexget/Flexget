@@ -161,7 +161,9 @@ class CouchPotatoBase(object):
 class CouchPotatoList(MutableSet):
     @property
     def movies(self):
-        return CouchPotatoBase.list_entries(self.config)
+        if self._movies == None:
+            self._movies = CouchPotatoBase.list_entries(self.config)
+        return self._movies
 
     def _find_entry(self, entry):
         for cp_entry in self.movies:
@@ -173,6 +175,7 @@ class CouchPotatoList(MutableSet):
 
     def __init__(self, config):
         self.config = config
+        self._movies = None
 
     def __iter__(self):
         return (entry for entry in self.movies)
@@ -184,7 +187,11 @@ class CouchPotatoList(MutableSet):
         return self._find_entry(entry) is not None
 
     def add(self, entry):
-        return CouchPotatoBase.add_movie(self.config, entry)
+        if not self._find_entry(entry):
+            self._movies = None
+            return CouchPotatoBase.add_movie(self.config, entry)
+        else:
+            log.debug('entry %s already exists in couchpotato list', entry)
 
     def discard(self, entry):
         for movie in self.movies:
@@ -192,7 +199,7 @@ class CouchPotatoList(MutableSet):
             if movie.get('title').lower() == title.lower():
                 movie_id = movie.get('couchpotato_id')
                 CouchPotatoBase.remove_movie(self.config, movie_id)
-                return
+                self._movies = None
 
 
 class PluginCouchPotatoList(object):
