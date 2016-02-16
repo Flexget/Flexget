@@ -58,10 +58,12 @@ class DBEntrySet(MutableSet):
 
     @with_session
     def discard(self, entry, session=None):
-        self._entry_query(session, entry).delete()
+        log.debug('deleting entry %s', entry)
+        session.delete(self._entry_query(session, entry))
 
     @with_session
     def add(self, entry, session=None):
+        log.debug('adding entry %s', entry)
         stored_entry = self._entry_query(session, entry)
         if stored_entry:
             # Refresh all the fields if we already have this entry

@@ -201,7 +201,8 @@ class CouchPotatoSet(MutableSet):
     def add(self, entry):
         if not self._find_entry(entry):
             self._movies = None
-            return CouchPotatoBase.add_movie(self.config, entry)
+            movie = CouchPotatoBase.add_movie(self.config, entry)
+            log.verbose('Successfully added movie %s to CouchPotato', movie['movie']['info']['original_title'])
         else:
             log.debug('entry %s already exists in couchpotato list', entry)
 
@@ -210,6 +211,7 @@ class CouchPotatoSet(MutableSet):
             title = entry.get('movie_name') or entry.get('title')
             if movie.get('title').lower() == title.lower():
                 movie_id = movie.get('couchpotato_id')
+                log.verbose('Trying to remove movie %s from CouchPotato', title)
                 CouchPotatoBase.remove_movie(self.config, movie_id)
                 self._movies = None
 
