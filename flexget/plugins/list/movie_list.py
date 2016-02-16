@@ -21,6 +21,7 @@ class MovieListList(Base):
     __tablename__ = 'movie_list_lists'
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, unique=True)
+    movies = relationship('MovieListMovie', backref='list', cascade='all, delete, delete-orphan')
 
 
 class MovieListMovie(Base):
@@ -29,7 +30,7 @@ class MovieListMovie(Base):
     title = Column(Unicode)
     year = Column(Integer)
     list_id = Column(Integer, ForeignKey(MovieListList.id), nullable=False)
-    list = relationship(MovieListList, backref='movies', cascade='all, delete, delete-orphan')
+    ids = relationship('MovieListID', backref='movie', cascade='all, delete, delete-orphan')
 
     def to_entry(self):
         entry = Entry()
@@ -48,7 +49,6 @@ class MovieListID(Base):
     id_name = Column(Unicode)
     id_value = Column(Unicode)
     movie_id = Column(Integer, ForeignKey(MovieListMovie.id))
-    movie = relationship(MovieListMovie, backref='ids', cascade='all, delete, delete-orphan')
 
 
 class MovieList(MutableSet):
