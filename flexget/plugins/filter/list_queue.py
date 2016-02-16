@@ -3,10 +3,10 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('list_queue')
+log = logging.getLogger('list_match')
 
 
-class ListQueue(object):
+class ListMatch(object):
     schema = {
         'type': 'array',
         'items': {
@@ -39,4 +39,4 @@ class ListQueue(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ListQueue, 'list_queue', api_ver=2)
+    plugin.register(ListMatch, 'list_match', api_ver=2)
