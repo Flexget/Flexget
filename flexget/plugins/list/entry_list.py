@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
 from collections import MutableSet
 from datetime import datetime
@@ -40,9 +41,8 @@ class DBEntrySet(MutableSet):
         return session.query(StoredEntry).filter(StoredEntry.list == self.config)
 
     def _entry_query(self, session, entry):
-        return (self._query(session).filter(StoredEntry.title == entry['title'])
-                                    .filter(StoredEntry.original_url == entry['original_url'])
-                                    .first())
+        return (self._query(session).filter(
+            or_(StoredEntry.title == entry['title'], StoredEntry.original_url == entry['original_url'])).first())
 
     @with_session
     def __iter__(self, session=None):
