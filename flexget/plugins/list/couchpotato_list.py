@@ -91,7 +91,7 @@ class CouchPotatoBase(object):
             set([sources[quality] for quality in quality_profile['qualities'] if quality in sources]))
 
         quality_requirement = (res_string + ' ' + source_string).rstrip()
-        log.debug('quality requirement is %s',  quality_requirement)
+        log.debug('quality requirement is %s', quality_requirement)
         return quality_requirement
 
     @staticmethod
@@ -138,7 +138,7 @@ class CouchPotatoBase(object):
     @staticmethod
     def add_movie(config, entry, test_mode=None):
         if not entry.get('imdb_id'):
-            log.error('Cannot add movie to couchpotato without and imdb ID: %s',  entry)
+            log.error('Cannot add movie to couchpotato without and imdb ID: %s', entry)
             return
         log.verbose('Connection to CouchPotato to add a movie to list.')
         add_movie_url = CouchPotatoBase.build_url(config.get('base_url'), 'add', config.get('port'),
@@ -165,10 +165,11 @@ class CouchPotatoList(MutableSet):
 
     def _find_entry(self, entry):
         for cp_entry in self.movies:
-            # TODO This could be a little too broad, rethink this
-            for key in entry:
-                if entry[key] == cp_entry[key]:
-                    return True
+            if any(entry.get(id) is not None and entry[id] == cp_entry[id] for id in
+                   ['couchpotato_id', 'imdb_id', 'tmdb_id']):
+                return True
+            if entry.get('title').lower() == cp_entry.get('title').lower():
+                return True
 
     def __init__(self, config):
         self.config = config
@@ -187,7 +188,8 @@ class CouchPotatoList(MutableSet):
 
     def discard(self, entry):
         for movie in self.movies:
-            if movie.get('title') == entry.get('movie_name'):
+            title = entry.get('movie_name') or entry.get('title')
+            if movie.get('title').lower() == title.lower():
                 movie_id = movie.get('couchpotato_id')
                 CouchPotatoBase.remove_movie(self.config, movie_id)
                 return
