@@ -215,7 +215,7 @@ class TraktSet(MutableSet):
                         continue
                 found.setdefault('movies', []).append(movie)
 
-        if not (found['shows'] or found['movies']):
+        if not (found.get('shows') or found.get('movies')):
             log.debug('Nothing to submit to trakt.')
             return
 
