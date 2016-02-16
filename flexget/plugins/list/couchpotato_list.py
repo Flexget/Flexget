@@ -39,7 +39,7 @@ class CouchPotatoBase(object):
     @staticmethod
     def movie_delete_request(base_url, port, api_key):
         parsedurl = urlparse(base_url)
-        log.debug('Received movie add request')
+        log.debug('Received movie delete request')
         return '%s://%s:%s%s/api/%s/movie.delete?delete_from=wanted' % (
             parsedurl.scheme, parsedurl.netloc, port, parsedurl.path, api_key)
 
@@ -96,13 +96,13 @@ class CouchPotatoBase(object):
 
     @staticmethod
     def list_entries(config, test_mode=None):
-        log.verbose('Connection to CouchPotato to retrieve movie list.')
+        log.verbose('Connecting to CouchPotato to retrieve movie list.')
         active_movies_url = CouchPotatoBase.build_url(config.get('base_url'), 'active', config.get('port'),
                                                       config.get('api_key'))
         active_movies_json = CouchPotatoBase.get_json(active_movies_url)
         # Gets profile and quality lists if include_data is TRUE
         if config.get('include_data'):
-            log.verbose('Connection to CouchPotato to retrieve movie data.')
+            log.verbose('Connecting to CouchPotato to retrieve profile data.')
             profile_url = CouchPotatoBase.build_url(config.get('base_url'), 'profiles', config.get('port'),
                                                     config.get('api_key'))
             profile_json = CouchPotatoBase.get_json(profile_url)
@@ -122,7 +122,7 @@ class CouchPotatoBase(object):
                               quality_req=quality_req,
                               couchpotato_id=movie.get('_id'))
                 if entry.isvalid():
-                    log.debug('adding entry %s', entry)
+                    log.debug('returning entry %s', entry)
                     entries.append(entry)
                 else:
                     log.error('Invalid entry created? %s', entry)
