@@ -73,8 +73,8 @@ class MovieList(MutableSet):
     @with_session
     def add(self, entry, session=None):
         # Check if this is already in the list, refresh info if so
-        db_list = self._db_list(session)
-        db_movie = self._find_entry(entry, session)
+        db_list = self._db_list(session=session)
+        db_movie = self._find_entry(entry, session=session)
         # Just delete and re-create to refresh
         if db_movie:
             session.delete(db_movie)
