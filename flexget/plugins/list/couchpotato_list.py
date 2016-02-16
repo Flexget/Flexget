@@ -158,7 +158,19 @@ class CouchPotatoBase(object):
         CouchPotatoBase.get_json(delete_movie_url)
 
 
-class CouchPotatoList(MutableSet):
+class CouchPotatoSet(MutableSet):
+    schema = {
+        'type': 'object',
+        'properties': {
+            'base_url': {'type': 'string'},
+            'port': {'type': 'number', 'default': 80},
+            'api_key': {'type': 'string'},
+            'include_data': {'type': 'boolean', 'default': False}
+        },
+        'required': ['api_key', 'base_url'],
+        'additionalProperties': False
+    }
+
     @property
     def movies(self):
         if self._movies == None:
@@ -202,27 +214,45 @@ class CouchPotatoList(MutableSet):
                 self._movies = None
 
 
-class PluginCouchPotatoList(object):
-    schema = {
-        'type': 'object',
-        'properties': {
-            'base_url': {'type': 'string'},
-            'port': {'type': 'number', 'default': 80},
-            'api_key': {'type': 'string'},
-            'include_data': {'type': 'boolean', 'default': False}
-        },
-        'required': ['api_key', 'base_url'],
-        'additionalProperties': False
-    }
+class CouchPotatoList(object):
+    schema = CouchPotatoSet.schema
 
     @staticmethod
     def get_list(config):
-        return CouchPotatoList(config)
+        return CouchPotatoSet(config)
 
     def on_task_input(self, task, config):
-        return list(CouchPotatoList(config))
+        return list(CouchPotatoSet(config))
+
+
+class CouchPotatoAdd(object):
+    """Add all accepted elements in your couchpotato list."""
+    schema = CouchPotatoSet.schema
+
+    @plugin.priority(-255)
+    def on_task_output(self, task, config):
+        if task.manager.options.test:
+            log.info('Not submitting to couchpotato because of test mode.')
+            return
+        thelist = CouchPotatoSet(config)
+        thelist |= task.accepted
+
+
+class CouchPotatoRemove(object):
+    """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
+    schema = CouchPotatoSet.schema
+
+    @plugin.priority(-255)
+    def on_task_output(self, task, config):
+        if task.manager.options.test:
+            log.info('Not submitting to couchpotato because of test mode.')
+            return
+        thelist = CouchPotatoSet(config)
+        thelist -= task.accepted
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(PluginCouchPotatoList, 'couchpotato_list', api_ver=2, groups=['list'])
+    plugin.register(CouchPotatoList, 'couchpotato_list', api_ver=2, groups=['list'])
+    plugin.register(CouchPotatoAdd, 'couchpotato_add', api_ver=2)
+    plugin.register(CouchPotatoRemove, 'couchpotato_remove', api_ver=2)
