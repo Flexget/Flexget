@@ -13,18 +13,18 @@ with open(qualities_profiles_file, "r") as data:
     qualities_response = json.load(data)
 
 
-class TestCouchpotato(FlexGetBase):
+class TestCouchpotatoList(FlexGetBase):
     __yaml__ = """
         tasks:
           couch:
-            couchpotato:
+            couchpotato_list:
               base_url: 'http://test.url.com'
               port: 5050
               api_key: '123abc'
         """
 
-    @mock.patch('flexget.plugins.input.couchpotato.CouchPotato.get_json')
-    def test_couchpotato_no_data(self, mock_get):
+    @mock.patch('flexget.plugins.list.couchpotato_list.CouchPotatoBase.get_json')
+    def test_couchpotato_list_no_data(self, mock_get):
         mock_get.return_value = movie_list_response
 
         self.execute_task('couch')
@@ -36,7 +36,7 @@ class TestCouchpotato(FlexGetBase):
                 entry['title'], entry['quality_req'])
 
 
-class TestCouchpotatoWithQuality(FlexGetBase):
+class TestCouchpotatoListWithQuality(FlexGetBase):
     expected_qualities = {'American Ultra': '720p|1080p',
                           'Anomalisa': '720p|1080p',
                           'Ant-Man': '720p',
@@ -72,7 +72,7 @@ class TestCouchpotatoWithQuality(FlexGetBase):
     __yaml__ = """
         tasks:
           couch:
-            couchpotato:
+            couchpotato_list:
               base_url: 'http://test.url.com'
               port: 5050
               api_key: '123abc'
@@ -88,8 +88,8 @@ class TestCouchpotatoWithQuality(FlexGetBase):
             'Expected Quality for entry {} should be {}, instead its {}'.format(entry['title'], expected_quality,
                                                                                 entry.store['quality_req'])
 
-    @mock.patch('flexget.plugins.input.couchpotato.CouchPotato.get_json')
-    def test_couchpotato_with_quality(self, mock_get):
+    @mock.patch('flexget.plugins.list.couchpotato_list.CouchPotatoBase.get_json')
+    def test_couchpotato_list_with_quality(self, mock_get):
         mock_get.side_effect = [movie_list_response, qualities_response]
         self.execute_task('couch')
 
