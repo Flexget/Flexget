@@ -138,7 +138,7 @@ class CouchPotatoBase(object):
     @staticmethod
     def add_movie(config, entry, test_mode=None):
         if not entry.get('imdb_id'):
-            log.error('Cannot add movie to couchpotato without and imdb ID: %s', entry)
+            log.error('Cannot add movie to couchpotato without an imdb ID: %s', entry)
             return
         log.verbose('Connection to CouchPotato to add a movie to list.')
         add_movie_url = CouchPotatoBase.build_url(config.get('base_url'), 'add', config.get('port'),
