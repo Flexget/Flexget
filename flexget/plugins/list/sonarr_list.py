@@ -35,23 +35,23 @@ class SonarrSet(MutableSet):
         log.debug('Received series list request')
         url = '%s://%s:%s%s/api/series' % (parsedurl.scheme, parsedurl.netloc, port, parsedurl.path)
         headers = {'X-Api-Key': api_key}
-        return {'url': url, 'headers': headers}
+        return url, headers
 
     def profile_list_request(self, base_url, port, api_key):
         parsedurl = urlparse(base_url)
         log.debug('Received profile list request')
         url = '%s://%s:%s%s/api/profile' % (parsedurl.scheme, parsedurl.netloc, port, parsedurl.path)
         headers = {'X-Api-Key': api_key}
-        return {'url': url, 'headers': headers}
+        return url, headers
 
     def series_add_request(self, base_url, port, api_key):
         pass
 
-    def get_json(self, request):
+    def get_json(self, url, headers):
         try:
-            return requests.get(request).json()
+            return requests.get(url, headers=headers).json()
         except RequestException as e:
-            raise plugin.PluginError('Unable to connect to Sonarr at %s. Error: %s' % (request['url'], e))
+            raise plugin.PluginError('Unable to connect to Sonarr at %s. Error: %s' % (url, e))
 
     def post_json(self, request):
         try:
@@ -63,7 +63,7 @@ class SonarrSet(MutableSet):
     def request_builder(self, base_url, request_type, port, api_key):
         if request_type == 'series':
             return self.series_request_builder(base_url, port, api_key)
-        elif request_type == 'profiles':
+        elif request_type == 'profile':
             return self.profile_list_request(base_url, port, api_key)
         else:
             raise plugin.PluginError('Received unknown API request, aborting.')
@@ -88,15 +88,15 @@ class SonarrSet(MutableSet):
         return allowed_qualities, cutoff
 
     def list_entries(self):
-        series_request = self.request_builder(self.config.get('base_url'), 'series', self.config.get('port'),
+        series_url, series_headers = self.request_builder(self.config.get('base_url'), 'series', self.config.get('port'),
                                               self.config['api_key'])
-        json = self.get_json(series_request)
+        json = self.get_json(series_url, series_headers)
 
         # Retrieves Sonarr's profile list if include_data is set to true
         if self.config.get('include_data'):
-            profile_request = self.request_builder(self.config.get('base_url'), 'profile', self.config.get('port'),
+            profile_url, profile_headers = self.request_builder(self.config.get('base_url'), 'profile', self.config.get('port'),
                                                    self.config['api_key'])
-            profiles_json = self.get_json(profile_request)
+            profiles_json = self.get_json(profile_url, profile_headers)
 
         entries = []
         for show in json:
@@ -132,6 +132,7 @@ class SonarrSet(MutableSet):
             if path:
                 entry['configure_series_path'] = path
             if entry.isvalid():
+                log.debug('returning entry %s', entry)
                 entries.append(entry)
             else:
                 log.error('Invalid entry created? %s' % entry)
@@ -141,13 +142,13 @@ class SonarrSet(MutableSet):
 
     def add_show(self, entry):
         # TODO Sonarr makes it kinda hard to add shows to it, requiring details like array of seasons,
-        # internal quality profile and path pon disk. need to think if this is worth it.
+        # internal quality profile and path on disk. need to think if this is worth it.
         pass
 
     def remove_show(self, show):
-        delete_series_request = self.request_builder(self.config.get('base_url'), 'series', self.config.get('port'),                                              self.config['api_key'])
-        delete_series_request['url'] += '/%s' % show.get('id')
-        response = requests.delete(delete_series_request)
+        delete_series_url, delete_series_headers = self.request_builder(self.config.get('base_url'), 'series', self.config.get('port'),                                              self.config['api_key'])
+        delete_series_url += '/%s' % show.get('id')
+        response = requests.delete(delete_series_url, headers=delete_series_headers)
 
     @property
     def shows(self):
