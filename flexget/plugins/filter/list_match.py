@@ -5,7 +5,7 @@ from flexget.event import event
 
 log = logging.getLogger('list_match')
 
-ITEMS_SCHEMA = {'type': 'array',
+LISTS_SCHEMA = {'type': 'array',
                 'items':
                     {'allOf': [
                         {'$ref': '/schema/plugins?group=list'},
@@ -22,10 +22,10 @@ ITEMS_SCHEMA = {'type': 'array',
 
 class ListMatch(object):
     schema = {'oneOf':
-                  [ITEMS_SCHEMA,
+                  [LISTS_SCHEMA,
                    {'type': 'object',
                     'properties': {
-                        'items': ITEMS_SCHEMA,
+                        'lists': LISTS_SCHEMA,
                         'remove_on_match': {'type': 'boolean'}
                     }}
                    ]
