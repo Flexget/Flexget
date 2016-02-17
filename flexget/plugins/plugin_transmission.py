@@ -21,7 +21,6 @@ from fnmatch import fnmatch
 
 log = logging.getLogger('transmission')
 
-
 def save_opener(f):
     """
         Transmissionrpc sets a new default opener for urllib2
@@ -141,6 +140,12 @@ class TransmissionBase(object):
             raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required.', log)
         if [int(part) for part in transmissionrpc.__version__.split('.')] < [0, 11]:
             raise plugin.PluginError('Transmissionrpc module version 0.11 or higher required, please upgrade', log)
+
+        if not task.requests.verify:
+            import ssl
+            log.verbose('Setting unverified SSL context.')
+            ssl._create_default_https_context = ssl._create_unverified_context
+
         """ 
         Mark rpc client for garbage collector so every task can start 
         a fresh new according its own config - fix to bug #2804
