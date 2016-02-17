@@ -227,34 +227,6 @@ class CouchPotatoList(object):
         return list(CouchPotatoSet(config))
 
 
-class CouchPotatoAdd(object):
-    """Add all accepted elements in your couchpotato list."""
-    schema = CouchPotatoSet.schema
-
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
-        if task.manager.options.test:
-            log.info('Not submitting to couchpotato because of test mode.')
-            return
-        thelist = CouchPotatoSet(config)
-        thelist |= task.accepted
-
-
-class CouchPotatoRemove(object):
-    """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
-    schema = CouchPotatoSet.schema
-
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
-        if task.manager.options.test:
-            log.info('Not submitting to couchpotato because of test mode.')
-            return
-        thelist = CouchPotatoSet(config)
-        thelist -= task.accepted
-
-
 @event('plugin.register')
 def register_plugin():
     plugin.register(CouchPotatoList, 'couchpotato_list', api_ver=2, groups=['list'])
-    plugin.register(CouchPotatoAdd, 'couchpotato_add', api_ver=2)
-    plugin.register(CouchPotatoRemove, 'couchpotato_remove', api_ver=2)
