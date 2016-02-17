@@ -59,7 +59,6 @@ class SonarrSet(MutableSet):
         except RequestException as e:
             raise plugin.PluginError('Unable to connect to Sonarr at %s. Error: %s' % (request['url'], e))
 
-
     def request_builder(self, base_url, request_type, port, api_key):
         if request_type == 'series':
             return self.series_request_builder(base_url, port, api_key)
@@ -88,14 +87,16 @@ class SonarrSet(MutableSet):
         return allowed_qualities, cutoff
 
     def list_entries(self):
-        series_url, series_headers = self.request_builder(self.config.get('base_url'), 'series', self.config.get('port'),
-                                              self.config['api_key'])
+        series_url, series_headers = self.request_builder(self.config.get('base_url'), 'series',
+                                                          self.config.get('port'),
+                                                          self.config['api_key'])
         json = self.get_json(series_url, series_headers)
 
         # Retrieves Sonarr's profile list if include_data is set to true
         if self.config.get('include_data'):
-            profile_url, profile_headers = self.request_builder(self.config.get('base_url'), 'profile', self.config.get('port'),
-                                                   self.config['api_key'])
+            profile_url, profile_headers = self.request_builder(self.config.get('base_url'), 'profile',
+                                                                self.config.get('port'),
+                                                                self.config['api_key'])
             profiles_json = self.get_json(profile_url, profile_headers)
 
         entries = []
@@ -146,7 +147,8 @@ class SonarrSet(MutableSet):
         pass
 
     def remove_show(self, show):
-        delete_series_url, delete_series_headers = self.request_builder(self.config.get('base_url'), 'series', self.config.get('port'),                                              self.config['api_key'])
+        delete_series_url, delete_series_headers = self.request_builder(self.config.get('base_url'), 'series',
+                                                                        self.config.get('port'), self.config['api_key'])
         delete_series_url += '/%s' % show.get('id')
         response = requests.delete(delete_series_url, headers=delete_series_headers)
 
@@ -190,7 +192,7 @@ class SonarrSet(MutableSet):
             log.debug('Did not find matching show in Sonarr for %s, skipping', entry)
             return
         self.remove_show(show)
-
+        log.verbose('removed show %s from Sonarr', show['title'])
 
 
 class SonarrList(object):
@@ -204,34 +206,6 @@ class SonarrList(object):
         return list(SonarrSet(config))
 
 
-class SonarrAdd(object):
-    """Add all accepted elements in your couchpotato list."""
-    schema = SonarrSet.schema
-
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
-        if task.manager.options.test:
-            log.info('Not submitting to couchpotato because of test mode.')
-            return
-        thelist = SonarrSet(config)
-        thelist |= task.accepted
-
-
-class SonarrRemove(object):
-    """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
-    schema = SonarrSet.schema
-
-    @plugin.priority(-255)
-    def on_task_output(self, task, config):
-        if task.manager.options.test:
-            log.info('Not submitting to couchpotato because of test mode.')
-            return
-        thelist = SonarrSet(config)
-        thelist -= task.accepted
-
-
 @event('plugin.register')
 def register_plugin():
     plugin.register(SonarrList, 'sonarr_list', api_ver=2, groups=['list'])
-    plugin.register(SonarrAdd, 'sonarr_add', api_ver=2)
-    plugin.register(SonarrRemove, 'sonarr_remove', api_ver=2)
