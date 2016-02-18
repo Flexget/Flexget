@@ -70,6 +70,7 @@ class CrossMatch(object):
                 if common:
                     msg = 'intersects with %s on field(s) %s' % \
                           (generated_entry['title'], ', '.join(common))
+                    entry.update(generated_entry)
                     if action == 'reject':
                         entry.reject(msg)
                     if action == 'accept':
