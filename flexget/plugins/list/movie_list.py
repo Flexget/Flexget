@@ -56,6 +56,10 @@ class MovieList(MutableSet):
     def _db_list(self, session):
         return session.query(MovieListList).filter(MovieListList.name == self.config).first()
 
+    def _from_iterable(cls, it):
+        # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
+        return set(it)
+
     @with_session
     def __init__(self, config, session=None):
         self.config = config
