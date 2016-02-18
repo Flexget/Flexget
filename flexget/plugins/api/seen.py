@@ -102,11 +102,10 @@ seen_delete_parser.add_argument('is_seen_local', type=inputs.boolean, default=No
 
 
 @seen_api.route('/')
-@api.doc(description='Get, delete or create seen entries')
 class SeenSearchAPI(APIResource):
     @api.response(404, 'Page does not exist', model=default_error_schema)
     @api.response(200, 'Successfully retrieved seen objects', seen_search_schema)
-    @api.doc(parser=seen_search_parser)
+    @api.doc(parser=seen_search_parser, description='Get seen entries')
     def get(self, session):
         """ Search for seen entries """
         args = seen_search_parser.parse_args()
@@ -165,6 +164,7 @@ class SeenSearchAPI(APIResource):
     @api.validate(model=seen_object_input_schema,
                   description='Fields attribute takes a dict to add as seen entry fields, '
                               'for example: {0}'.format(example))
+    @api.doc(description='Add seen entries')
     def post(self, session):
         """ Manually add entries to seen plugin """
         data = request.json
@@ -189,7 +189,7 @@ class SeenSearchAPI(APIResource):
 
     @api.response(500, 'Delete process failed', model=default_error_schema)
     @api.response(200, 'Successfully delete all entries', empty_response)
-    @api.doc(parser=seen_delete_parser)
+    @api.doc(parser=seen_delete_parser, description='Delete seen entries')
     def delete(self, session):
         """ Delete seen entries """
         args = seen_delete_parser.parse_args()
