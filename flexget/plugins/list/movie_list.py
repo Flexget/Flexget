@@ -87,12 +87,14 @@ class MovieList(MutableSet):
         for id_name in SUPPORTED_IDS:
             if id_name in entry:
                 db_movie.ids.append(MovieListID(id_name=id_name, id_value=entry[id_name]))
+        log.debug('adding entry %s', entry)
         db_list.movies.append(db_movie)
 
     @with_session
     def discard(self, entry, session=None):
         db_movie = self._find_entry(entry, session=session)
         if db_movie:
+            log.debug('deleting entry %s', entry)
             session.delete(db_movie)
 
     def __contains__(self, entry):
