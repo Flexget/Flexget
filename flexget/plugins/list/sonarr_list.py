@@ -94,7 +94,7 @@ class SonarrSet(MutableSet):
         else:
             raise plugin.PluginError('Received unknown API request, aborting.')
 
-    def transalte_quality(self, quality_name):
+    def translate_quality(self, quality_name):
         """
         Translate Sonnar's qualities to ones recognize by Flexget
         """
@@ -107,9 +107,9 @@ class SonarrSet(MutableSet):
 
     def quality_requirement_builder(self, quality_profile):
 
-        allowed_qualities = [self.transalte_quality(quality['quality']['name']) for quality in quality_profile['items']
+        allowed_qualities = [self.translate_quality(quality['quality']['name']) for quality in quality_profile['items']
                              if quality['allowed']]
-        cutoff = self.transalte_quality(quality_profile['cutoff']['name'])
+        cutoff = self.translate_quality(quality_profile['cutoff']['name'])
 
         return allowed_qualities, cutoff
 
