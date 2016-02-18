@@ -5,6 +5,7 @@ from collections import MutableSet
 from datetime import datetime
 
 from sqlalchemy import Column, Unicode, PickleType, Integer, DateTime, or_
+from sqlalchemy.sql.elements import and_
 
 from flexget import plugin
 from flexget.db_schema import versioned_base
@@ -32,6 +33,9 @@ class StoredEntry(Base):
         self.original_url = entry['original_url']
         self.entry = entry
 
+    def __repr__(self):
+        return '<StoredEntry,title=%s,original_url=%s>' % (self.title, self.original_url)
+
 
 class DBEntrySet(MutableSet):
     def __init__(self, config):
@@ -41,8 +45,13 @@ class DBEntrySet(MutableSet):
         return session.query(StoredEntry).filter(StoredEntry.list == self.config)
 
     def _entry_query(self, session, entry):
-        return (self._query(session).filter(
-            or_(StoredEntry.title == entry['title'], StoredEntry.original_url == entry['original_url'])).first())
+        query = self._query(session)
+        db_entry = query.filter(or_(
+            StoredEntry.title == entry['title'], and_(
+                StoredEntry.original_url,
+                StoredEntry.original_url == entry['original_url']))).first()
+        if db_entry:
+            return db_entry
 
     @with_session
     def __iter__(self, session=None):
@@ -58,17 +67,20 @@ class DBEntrySet(MutableSet):
 
     @with_session
     def discard(self, entry, session=None):
-        log.debug('deleting entry %s', entry)
-        session.delete(self._entry_query(session, entry))
+        db_entry = self._entry_query(session=session, entry=entry)
+        if db_entry:
+            log.debug('deleting entry %s', db_entry)
+            session.delete(db_entry)
 
     @with_session
     def add(self, entry, session=None):
-        log.debug('adding entry %s', entry)
         stored_entry = self._entry_query(session, entry)
         if stored_entry:
             # Refresh all the fields if we already have this entry
+            log.debug('refreshing entry %s', entry)
             stored_entry.entry = entry
         else:
+            log.debug('adding entry %s', entry)
             session.add(StoredEntry(list=self.config, entry=entry))
 
     @with_session
