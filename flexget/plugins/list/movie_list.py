@@ -12,7 +12,7 @@ from flexget.event import event
 from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('movie_list')
-Base = versioned_base('trakt_list', 0)
+Base = versioned_base('movie_list', 0)
 
 SUPPORTED_IDS = ['imdb_id', 'trakt_movie_id', 'tmdb_id']
 
@@ -21,7 +21,7 @@ class MovieListList(Base):
     __tablename__ = 'movie_list_lists'
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, unique=True)
-    movies = relationship('MovieListMovie', backref='list', cascade='all, delete, delete-orphan')
+    movies = relationship('MovieListMovie', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
 
 
 class MovieListMovie(Base):
@@ -35,6 +35,7 @@ class MovieListMovie(Base):
     def to_entry(self):
         entry = Entry()
         entry['title'] = entry['movie_name'] = self.title
+        entry['url'] = 'mock://localhost/movie_list/%d' % self.id
         if self.year:
             entry['title'] += ' (%d)' % self.year
             entry['movie_year'] = self.year
@@ -64,7 +65,7 @@ class MovieList(MutableSet):
 
     @with_session
     def __iter__(self, session=None):
-        return (movie.to_entry() for movie in self._db_list(session).movies)
+        return iter([movie.to_entry() for movie in self._db_list(session).movies])
 
     @with_session
     def __len__(self, session=None):
@@ -90,7 +91,7 @@ class MovieList(MutableSet):
 
     @with_session
     def discard(self, entry, session=None):
-        db_movie = self._find_entry(entry, session)
+        db_movie = self._find_entry(entry, session=session)
         if db_movie:
             session.delete(db_movie)
 
@@ -103,18 +104,16 @@ class MovieList(MutableSet):
         for id_name in SUPPORTED_IDS:
             if id_name in entry:
                 # TODO: Make this real
-                res = (session.query(MovieListID).filter(inourlist)
-                                                 .filter(MovieListID.id_name == id_name)
-                                                 .filter(MovieListID.id_value == entry[id_name]).first())
+                res = (self._db_list(session).movies.filter(MovieListID.id_name == id_name)
+                                                    .filter(MovieListID.id_value == entry[id_name]).first())
                 if res:
-                    return res.movie
+                    return res
         # Fall back to title/year match
         if 'movie_name' in entry and 'movie_year' in entry:
             name, year = entry['movie_name'], entry['movie_year']
         else:
             name, year = split_title_year(entry['title'])
-        res = (session.quey(MovieListMovie).filter(inourlist)
-                                            .filter(MovieListMovie.title == name)
+        res = (self._db_list(session).movies.filter(MovieListMovie.title == name)
                                             .filter(MovieListMovie.year == year).first())
         return res
 

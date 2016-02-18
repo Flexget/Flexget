@@ -34,14 +34,15 @@ class ListMatch(object):
     def prepare_config(self, config):
         if isinstance(config, list):
             config = {'items': config}
-            config.setdefault('remove_on_match', True)
+        config.setdefault('remove_on_match', True)
+        return config
 
     def on_task_filter(self, task, config):
         config = self.prepare_config(config)
         for item in config.get('items'):
             for plugin_name, plugin_config in item.iteritems():
                 thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
-                for entry in task.all_entries:
+                for entry in task.entries:
                     if entry in thelist:
                         entry.accept()
 
