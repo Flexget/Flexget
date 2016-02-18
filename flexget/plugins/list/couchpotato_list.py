@@ -159,6 +159,7 @@ class CouchPotatoBase(object):
 
 
 class CouchPotatoSet(MutableSet):
+    supported_ids = ['couchpotato_id', 'imdb_id', 'tmdb_id']
     schema = {
         'type': 'object',
         'properties': {
@@ -179,8 +180,7 @@ class CouchPotatoSet(MutableSet):
 
     def _find_entry(self, entry):
         for cp_entry in self.movies:
-            if any(entry.get(id) is not None and entry[id] == cp_entry[id] for id in
-                   ['couchpotato_id', 'imdb_id', 'tmdb_id']):
+            if any(entry.get(id) is not None and entry[id] == cp_entry[id] for id in self.supported_ids):
                 return True
             if entry.get('title').lower() == cp_entry.get('title').lower():
                 return True
