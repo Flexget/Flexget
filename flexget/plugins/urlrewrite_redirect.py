@@ -4,7 +4,7 @@ import logging
 from flexget import plugin
 from flexget.event import event
 
-log = logging.getLogger('urlrewrite_redirect')
+log = logging.getLogger('redirect_url')
 
 
 class UrlRewriteRedirect(object):
@@ -12,17 +12,17 @@ class UrlRewriteRedirect(object):
     def __init__(self):
         self.processed = set()
 
-    def on_task_start(self):
+    def on_task_start(self, task, config):
         self.processed = set()
 
-    def url_rewritable(self, task, entry):
-        if not any(entry['url'].startswith(adapter) for adapter in task.requests.adapters):
-            return False
-        return entry['url'] not in self.processed
-
-    def url_rewrite(self, task, entry):
-        # Don't accidentally go online in unit tests
-        if not task.manager.unit_test:
+    def on_task_urlrewrite(self, task, config):
+        if not config:
+            return
+        for entry in task.accepted:
+            if not any(entry['url'].startswith(adapter) for adapter in task.requests.adapters):
+                continue
+            elif entry['url'] in self.processed:
+                continue
             auth = None
             if 'download_auth' in entry:
                 auth = entry['download_auth']
@@ -34,10 +34,10 @@ class UrlRewriteRedirect(object):
             else:
                 if r.status_code < 400 and r.url != entry['url']:
                     entry['url'] = r.url
-        # Make sure we don't try to rewrite this url again
-        self.processed.add(entry['url'])
+            # Make sure we don't try to rewrite this url again
+            self.processed.add(entry['url'])
 
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(UrlRewriteRedirect, 'urlrewrite_redirect', groups=['urlrewriter'], api_ver=2)
+    plugin.register(UrlRewriteRedirect, 'redirect_url', api_ver=2)
