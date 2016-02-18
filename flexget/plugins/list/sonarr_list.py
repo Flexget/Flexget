@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import json
 import logging
 from collections import MutableSet
 from urlparse import urlparse
@@ -37,10 +38,24 @@ class SonarrSet(MutableSet):
         headers = {'X-Api-Key': api_key}
         return url, headers
 
+    def lookup_request(self, base_url, port, api_key):
+        parsedurl = urlparse(base_url)
+        log.debug('Received series lookup request')
+        url = '%s://%s:%s%s/api/series/lookup?term=' % (parsedurl.scheme, parsedurl.netloc, port, parsedurl.path)
+        headers = {'X-Api-Key': api_key}
+        return url, headers
+
     def profile_list_request(self, base_url, port, api_key):
         parsedurl = urlparse(base_url)
         log.debug('Received profile list request')
         url = '%s://%s:%s%s/api/profile' % (parsedurl.scheme, parsedurl.netloc, port, parsedurl.path)
+        headers = {'X-Api-Key': api_key}
+        return url, headers
+
+    def rootfolder_request(self, base_url, port, api_key):
+        parsedurl = urlparse(base_url)
+        log.debug('Received rootfolder list request')
+        url = '%s://%s:%s%s/api/Rootfolder' % (parsedurl.scheme, parsedurl.netloc, port, parsedurl.path)
         headers = {'X-Api-Key': api_key}
         return url, headers
 
@@ -49,21 +64,33 @@ class SonarrSet(MutableSet):
 
     def get_json(self, url, headers):
         try:
-            return requests.get(url, headers=headers).json()
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                raise plugin.PluginError('Invalid response received from Sonarr: %s' % response.content)
         except RequestException as e:
             raise plugin.PluginError('Unable to connect to Sonarr at %s. Error: %s' % (url, e))
 
-    def post_json(self, request):
+    def post_json(self, url, headers, data):
         try:
-            return requests.post(request).json()
+            response =  requests.post(url, headers=headers, data=data)
+            if response.status_code == 201:
+                return response.json()
+            else:
+                raise plugin.PluginError('Invalid response received from Sonarr: %s' % response.content)
         except RequestException as e:
-            raise plugin.PluginError('Unable to connect to Sonarr at %s. Error: %s' % (request['url'], e))
+            raise plugin.PluginError('Unable to connect to Sonarr at %s. Error: %s' % (url, e))
 
     def request_builder(self, base_url, request_type, port, api_key):
         if request_type == 'series':
             return self.series_request_builder(base_url, port, api_key)
         elif request_type == 'profile':
             return self.profile_list_request(base_url, port, api_key)
+        elif request_type == 'lookup':
+            return self.lookup_request(base_url, port, api_key)
+        elif request_type == 'rootfolder':
+            return self.rootfolder_request(base_url, port, api_key)
         else:
             raise plugin.PluginError('Received unknown API request, aborting.')
 
@@ -88,8 +115,7 @@ class SonarrSet(MutableSet):
 
     def list_entries(self):
         series_url, series_headers = self.request_builder(self.config.get('base_url'), 'series',
-                                                          self.config.get('port'),
-                                                          self.config['api_key'])
+                                                          self.config.get('port'), self.config['api_key'])
         json = self.get_json(series_url, series_headers)
 
         # Retrieves Sonarr's profile list if include_data is set to true
@@ -142,14 +168,43 @@ class SonarrSet(MutableSet):
         return entries
 
     def add_show(self, entry):
-        # TODO Sonarr makes it kinda hard to add shows to it, requiring details like array of seasons,
-        # internal quality profile and path on disk. need to think if this is worth it.
-        pass
+        log.debug('searching for show match for %s using Sonarr', entry)
+        lookup_series_url, lookup_series_headers = self.request_builder(self.config.get('base_url'), 'lookup',
+                                                                        self.config.get('port'), self.config['api_key'])
+        if entry.get('tvdb_id'):
+            lookup_series_url += 'tvdb:%s' % entry.get('tvdb_id')
+        else:
+            lookup_series_url += entry.get('title')
+        lookup_results = self.get_json(lookup_series_url, headers=lookup_series_headers)
+        if not lookup_results:
+            log.debug('could not find series match to %s', entry)
+            return
+        else:
+            if len(lookup_results) > 1:
+                log.debug('got multiple results for Sonarr, using first one')
+        show = lookup_results[0]
+        log.debug('using show %s', show)
+        # Getting rootfolder
+        rootfolder_series_url, rootfolder_series_headers = self.request_builder(self.config.get('base_url'),
+                                                                                'rootfolder', self.config.get('port'),
+                                                                                self.config['api_key'])
+        rootfolder = self.get_json(rootfolder_series_url, headers=rootfolder_series_headers)
+
+        # Setting defaults for Sonarr
+        show['profileId'] = 1
+        show['qualityProfileId '] = 1
+        show['rootFolderPath'] = rootfolder[0]['path']
+
+        series_url, series_headers = self.request_builder(self.config.get('base_url'), 'series',
+                                                          self.config.get('port'), self.config['api_key'])
+        log.debug('adding show %s to sonarr', show)
+        returned_show = self.post_json(series_url, headers=series_headers, data=json.dumps(show))
+        return returned_show
 
     def remove_show(self, show):
         delete_series_url, delete_series_headers = self.request_builder(self.config.get('base_url'), 'series',
                                                                         self.config.get('port'), self.config['api_key'])
-        delete_series_url += '/%s' % show.get('id')
+        delete_series_url += '/%s' % show.get('sonarr_id')
         response = requests.delete(delete_series_url, headers=delete_series_headers)
 
     @property
@@ -182,7 +237,7 @@ class SonarrSet(MutableSet):
         if not self._find_entry(entry):
             show = self.add_show(entry)
             self._shows = None
-            log.verbose('Successfully added movie %s to Sonarr', show['title'])
+            log.verbose('Successfully added show %s to Sonarr', show['title'])
         else:
             log.debug('entry %s already exists in Sonarr list', entry)
 
