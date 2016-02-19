@@ -63,7 +63,7 @@ class Newznab(object):
                 config['url'] = config['website'] + '/api?' + urllib.urlencode(params)
         return config
 
-    def fill_entries_for_url(self, url, config):
+    def fill_entries_for_url(self, url, task):
         entries = []
 #        header = {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
         log.verbose('Fetching %s' % url)
@@ -117,7 +117,7 @@ class Newznab(object):
 
         url = (config['url'] + '&rid=%s&season=%s&ep=%s' %
                (arg_entry['tvrage_id'], arg_entry['series_season'], arg_entry['series_episode']))
-        return self.fill_entries_for_url(url, config, task)
+        return self.fill_entries_for_url(url, task)
 
     def do_search_movie(self, arg_entry, task, config=None):
         entries = []
@@ -128,7 +128,7 @@ class Newznab(object):
 
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
         url = config['url'] + '&imdbid=' + imdb_id
-        return self.fill_entries_for_url(url, config, task)
+        return self.fill_entries_for_url(url, task)
 
 
 @event('plugin.register')
