@@ -46,10 +46,12 @@ class Newznab(object):
     }
 
     def build_config(self, config):
+
+        log.debug(config['category'])
+
         if config['category'] == 'tv':
             config['category'] = 'tvsearch'
 
-        log.debug(config['category'])
         log.debug(parse_timedelta(config['wait']).seconds)
         config['wait_time'] = parse_timedelta(config['wait'])
         if 'url' not in config:
