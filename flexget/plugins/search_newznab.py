@@ -2,10 +2,10 @@ import logging
 import urllib
 
 import feedparser
-import urllib2
 from time import sleep
 
 from flexget import plugin
+from flexget.utils import requests
 from flexget.entry import Entry
 from flexget.event import event
 
@@ -36,7 +36,7 @@ class Newznab(object):
             'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book']},
             'url': {'type': 'string', 'format': 'url'},
             'website': {'type': 'string', 'format': 'url'},
-            'wait': {'type': 'integer', 'default': 0},
+            'wait': {'type': 'string', 'format': 'interval'},
             'apikey': {'type': 'string'}
         },
         'required': ['category'],
@@ -47,6 +47,10 @@ class Newznab(object):
         if config['category'] == 'tv':
             config['category'] = 'tvsearch'
         log.debug(config['category'])
+        if isinstance(config.get('wait'), basestring):
+            config['wait_time'] = parse_timedelta(config['wait'])
+        else:
+            config['wait_time'] = 0
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
                 params = {
@@ -59,16 +63,15 @@ class Newznab(object):
 
     def fill_entries_for_url(self, url, config):
         entries = []
-        header = {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
-        r = urllib2.Request(url, headers=header)
+#        header = {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
         log.verbose('Fetching %s' % url)
+
         try:
-            response = urllib2.urlopen(r)
-        except Exception as e:
+            r = task.requests.get(url)
+        except requests.RequestException as e:
             log.error("Failed fetching '%s': %s" % (url, e))
-            
-        data = response.read()
-        rss = feedparser.parse(data)
+
+        rss = feedparser.parse(r.content)
         log.debug("Raw RSS: %s" % rss)
 
         if not len(rss.entries):
@@ -88,9 +91,9 @@ class Newznab(object):
 
     def search(self, task, entry, config=None):
         config = self.build_config(config)
-        if config['wait']:
-            log.debug("'Wait' configured, sleeping for %d seconds." % config['wait'])
-            sleep(config['wait'])
+        if config['wait_time']:
+            log.debug("'Wait' configured, sleeping for %d seconds." % config['wait_time'])
+            sleep(config['wait_time'])
         if config['category'] == 'movie':
             return self.do_search_movie(entry, config)
         elif config['category'] == 'tvsearch':
