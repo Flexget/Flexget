@@ -6,6 +6,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
 from flexget.utils.tools import parse_timedelta
+from datetime import timedelta
 
 import feedparser
 from time import sleep
@@ -49,7 +50,7 @@ class Newznab(object):
             config['category'] = 'tvsearch'
 
         log.debug(config['category'])
-        log.debug(parse_timedelta(config['wait']))
+        log.debug(parse_timedelta(config['wait']).seconds)
         config['wait_time'] = parse_timedelta(config['wait'])
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
