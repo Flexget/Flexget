@@ -46,7 +46,7 @@ class Newznab(object):
     }
 
     def build_config(self, config):
-        print type(config)
+        log.debug( type(config))
 
         if config['category'] == 'tv':
             config['category'] = 'tvsearch'
