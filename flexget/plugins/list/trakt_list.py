@@ -173,6 +173,7 @@ class TraktSet(MutableSet):
             endpoint += (self.config['list'], self.config['type'])
         else:
             endpoint += ('lists', make_list_slug(self.config['list']), 'items')
+        return endpoint
 
     def show_match(self, entry1, entry2):
         if any(entry1.get(id) is not None and entry1[id] == entry2[id] for id in
