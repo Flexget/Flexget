@@ -54,52 +54,37 @@ case you need to use that one instead of plain 'python'.
 
 To start using FlexGet from this directory:
 
-Prerequisites for bootstrap.py:
- - Either put the wheels for `setuptools`_ and `pip`_ in the directory bootstrap.py resides.
- - Or install (a recent version of) the `virtualenv`_ package to your system.
+First, install (a recent version of) the `virtualenv`_ package to your system.
 
-.. _setuptools: https://pypi.python.org/pypi/setuptools
-.. _pip: https://pypi.python.org/pypi/pip
 .. _virtualenv: https://pypi.python.org/pypi/virtualenv
 
-After the prerequisites for bootstrap.py are finished, run the following commands::
+Now, in your checkout directory, run::
 
-    python bootstrap.py
+    virtualenv .
 
-This will initialize python virtualenv and install all required dependencies
-in it.
+Or, if you need deluge or transmission libraries from system wide python use::
 
-If you need deluge or transmission libraries from system wide python use::
+    virtualenv --system-site-packages .
 
-    python bootstrap.py --system-site-packages
+This will initialize python virtualenv. This doesn't need to be directly in
+your checkout directory, but these instructions assume that's where it is.
+Now use pip from your new virtualenv to install paver, then install flexget
+from your checkout dir in editable mode::
+
+    bin/pip install paver
+    bin/pip install -e .
 
 After that FlexGet is usable via ``<checkout directory>/bin/flexget``. Verify
 installation by running::
 
     bin/flexget -V
 
-You may also place the configuration files in ``~/.flexget`` (Unix, Mac OS X)
-or ``C:\Documents and Setting\<username>\flexget`` (Windows).
+You may place the config file in your checkout directory, or in ``~/.flexget``
+(Unix, Mac OS X) or ``C:\Documents and Setting\<username>\flexget`` (Windows).
 
 If you don't want to use virtualenv there's ``flexget_vanilla.py`` file which
 can be used to run FlexGet without bootstrapping, note that you will need to
 install all required dependencies yourself.
-
-Custom Virtualenv
------------------
-
-If you want to hack on flexget, but don't want to use paver bootstrap because
-you want to keep your virtualenv outside the repo. You can setup your own virtualenv
-and easily install flexget with in that virtualenv.
-
-    # Create virtualenv and source active it.
-    pip install paver
-
-    pip install -e . # with in the repo.
-
-This will install all the flexget dependencies. Now ``flexget`` should work just fine.
-
-Happy Hacking.
 
 
 .. image:: https://d2weczhvl823v0.cloudfront.net/Flexget/flexget/trend.png
