@@ -52,6 +52,7 @@ field_maps = {
     }
 }
 
+
 class TraktSet(MutableSet):
     schema = {
         'type': 'object',
@@ -69,21 +70,48 @@ class TraktSet(MutableSet):
 
     def __init__(self, config):
         self.config = config
+        if self.config.get('account') and not self.config.get('username'):
+            self.config['username'] = 'me'
         self._items = None
+
+    def __iter__(self):
+        return iter(self.items)
+
+    def __len__(self):
+        return len(self.items)
+
+    def add(self, entry):
+        self.submit([entry])
+
+    def __ior__(self, entries):
+        # Optimization to submit multiple entries at same time
+        self.submit(entries)
+
+    def discard(self, entry):
+        self.submit([entry], remove=True)
+
+    def __isub__(self, entries):
+        # Optimization to submit multiple entries at same time
+        self.submit(entries, remove=True)
+
+    def __contains__(self, entry):
+        for item in self.items:
+            if self.config['type'] in ['episodes', 'auto'] and self.episode_match(item, entry):
+                return True
+            if self.config['type'] in ['seasons', 'auto'] and self.season_match(item, entry):
+                return True
+            if self.config['type'] in ['shows', 'auto'] and self.show_match(item, entry):
+                return True
+            if self.config['type'] in ['movies', 'auto'] and self.movie_match(item, entry):
+                return True
+
+    # -- Public interface ends here -- #
 
     @property
     def items(self):
         if self._items is None:
-            if self.config.get('account') and not self.config.get('username'):
-                self.config['username'] = 'me'
             session = get_session(account=self.config.get('account'))
-            endpoint = ['users', self.config['username']]
-            if type(self.config['list']) is dict:
-                endpoint += ('ratings', self.config['type'], self.config['list']['rating'])
-            elif self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
-                endpoint += (self.config['list'], self.config['type'])
-            else:
-                endpoint += ('lists', make_list_slug(self.config['list']), 'items')
+            endpoint = self.get_list_endpoint()
     
             log.verbose('Retrieving `%s` list `%s`' % (self.config['type'], self.config['list']))
             try:
@@ -130,25 +158,21 @@ class TraktSet(MutableSet):
             self._items = entries
         return self._items
 
-    def __iter__(self):
-        return iter(self.items)
+    def invalidate_cache(self):
+        self._items = None
 
-    def __len__(self):
-        return len(self.items)
-
-    def add(self, entry):
-        self.submit([entry])
-
-    def __ior__(self, entries):
-        # Optimization to submit multiple entries at same time
-        self.submit(entries)
-
-    def discard(self, entry):
-        self.submit([entry], remove=True)
-
-    def __isub__(self, entries):
-        # Optimization to submit multiple entries at same time
-        self.submit(entries, remove=True)
+    def get_list_endpoint(self):
+        endpoint = ['users', self.config['username']]
+        if isinstance(self.config['list'], dict):
+            if self.config['type'] == 'auto':
+                raise plugin.PluginError('`type` cannot be `auto` for ratings lists.')
+            endpoint += ('ratings', self.config['type'], self.config['list']['rating'])
+        elif self.config['list'] in ['collection', 'watchlist', 'watched', 'ratings']:
+            if self.config['type'] == 'auto':
+                raise plugin.PluginError('`type` cannot be `auto` for %s list.' % self.config['list'])
+            endpoint += (self.config['list'], self.config['type'])
+        else:
+            endpoint += ('lists', make_list_slug(self.config['list']), 'items')
 
     def show_match(self, entry1, entry2):
         if any(entry1.get(id) is not None and entry1[id] == entry2[id] for id in
@@ -173,21 +197,8 @@ class TraktSet(MutableSet):
             return True
         return False
 
-    def __contains__(self, entry):
-        for item in self.items:
-            if self.config['type'] in ['episodes', 'auto'] and self.episode_match(item, entry):
-                return True
-            if self.config['type'] in ['seasons', 'auto'] and self.season_match(item, entry):
-                return True
-            if self.config['type'] in ['shows', 'auto'] and self.show_match(item, entry):
-                return True
-            if self.config['type'] in ['movies', 'auto'] and self.movie_match(item, entry):
-                return True
-
     def submit(self, entries, remove=False):
         """Submits movies or episodes to trakt api."""
-        if self.config.get('account') and not self.config.get('username'):
-            self.config['username'] = 'me'
         found = {}
         for entry in entries:
             if self.config['type'] in ['auto', 'shows', 'seasons', 'episodes'] and entry.get('series_name') is not None:
@@ -245,7 +256,7 @@ class TraktSet(MutableSet):
             # TODO: Improve messages about existing and unknown results
             # Mark the results expired if we added or removed anything
             if sum(res[action].values()) > 0:
-                self._items = None
+                self.invalidate_cache()
         elif result.status_code == 404:
             log.error('List does not appear to exist on trakt: %s' % self.config['list'])
         elif result.status_code == 401:
@@ -269,7 +280,7 @@ class TraktList(object):
 
 class TraktAdd(object):
     """Add all accepted elements in your trakt.tv watchlist/library/seen or custom list."""
-    schema = TraktList.schema
+    schema = dict(TraktList.schema, deprecated='trakt_add is deprecated, use list_add instead')
 
     @plugin.priority(-255)
     def on_task_output(self, task, config):
@@ -282,7 +293,7 @@ class TraktAdd(object):
 
 class TraktRemove(object):
     """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
-    schema = TraktList.schema
+    schema = dict(TraktList.schema, deprecated='trakt_remove is deprecated, use list_remove instead')
 
     @plugin.priority(-255)
     def on_task_output(self, task, config):
