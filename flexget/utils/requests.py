@@ -168,6 +168,16 @@ def request(method, url, **kwargs):
     return s.request(method=method, url=url, **kwargs)
 
 
+def head(url, **kwargs):
+    """Sends a HEAD request. Returns :class:`Response` object.
+
+    :param url: URL for the new :class:`Request` object.
+    :param kwargs: Optional arguments that ``request`` takes.
+    """
+    kwargs.setdefault('allow_redirects', True)
+    return request('head', url, **kwargs)
+
+
 def get(url, **kwargs):
     """Sends a GET request. Returns :class:`Response` object.
 
