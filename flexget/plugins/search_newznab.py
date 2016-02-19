@@ -49,10 +49,7 @@ class Newznab(object):
             config['category'] = 'tvsearch'
 
         log.debug(config['category'])
-        if isinstance(config.get('wait'), basestring):
-            config['wait_time'] = parse_timedelta(config['wait'])
-        else:
-            config['wait_time'] = 0
+        config['wait_time'] = parse_timedelta(config['wait'])
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
                 params = {
