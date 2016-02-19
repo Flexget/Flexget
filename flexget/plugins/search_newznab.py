@@ -1,14 +1,14 @@
 import logging
 import urllib
 
-import feedparser
-from time import sleep
-
 from flexget import plugin
-from flexget.utils import requests
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils import requests
 from flexget.utils.tools import parse_timedelta
+
+import feedparser
+from time import sleep
 
 __author__ = 'deksan'
 
@@ -47,6 +47,7 @@ class Newznab(object):
     def build_config(self, config):
         if config['category'] == 'tv':
             config['category'] = 'tvsearch'
+
         log.debug(config['category'])
         if isinstance(config.get('wait'), basestring):
             config['wait_time'] = parse_timedelta(config['wait'])
@@ -91,6 +92,7 @@ class Newznab(object):
         return entries
 
     def search(self, task, entry, config=None):
+        global task
         config = self.build_config(config)
         if config['wait_time']:
             log.debug("'Wait' configured, sleeping for %d seconds." % config['wait_time'])
