@@ -8,6 +8,7 @@ from flexget import plugin
 from flexget.utils import requests
 from flexget.entry import Entry
 from flexget.event import event
+from flexget.utils.tools import parse_timedelta
 
 __author__ = 'deksan'
 
