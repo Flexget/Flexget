@@ -97,15 +97,15 @@ class Newznab(object):
             log.debug("'Wait' configured, sleeping for %d seconds." % config['wait_time'])
             sleep(config['wait_time'])
         if config['category'] == 'movie':
-            return self.do_search_movie(entry, config, task)
+            return self.do_search_movie(entry, task, config)
         elif config['category'] == 'tvsearch':
-            return self.do_search_tvsearch(entry, config, task)
+            return self.do_search_tvsearch(entry, task, config)
         else:
             entries = []
             log.warning("Not done yet...")
             return entries
 
-    def do_search_tvsearch(self, arg_entry, config=None, task):
+    def do_search_tvsearch(self, arg_entry, task, config=None):
         log.info('Searching for %s' % (arg_entry['title']))
         # normally this should be used with emit_series who has provided season and episodenumber
         if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
@@ -119,7 +119,7 @@ class Newznab(object):
                (arg_entry['tvrage_id'], arg_entry['series_season'], arg_entry['series_episode']))
         return self.fill_entries_for_url(url, config, task)
 
-    def do_search_movie(self, arg_entry, config, task):
+    def do_search_movie(self, arg_entry, task, config=None):
         entries = []
         log.info('Searching for %s (imdbid:%s)' % (arg_entry['title'], arg_entry['imdb_id']))
         # normally this should be used with emit_movie_queue who has imdbid (i guess)
