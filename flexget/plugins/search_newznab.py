@@ -119,7 +119,7 @@ class Newznab(object):
                (arg_entry['tvrage_id'], arg_entry['series_season'], arg_entry['series_episode']))
         return self.fill_entries_for_url(url, config, task)
 
-    def do_search_movie(self, arg_entry, config=None, task):
+    def do_search_movie(self, arg_entry, config, task):
         entries = []
         log.info('Searching for %s (imdbid:%s)' % (arg_entry['title'], arg_entry['imdb_id']))
         # normally this should be used with emit_movie_queue who has imdbid (i guess)
