@@ -92,21 +92,20 @@ class Newznab(object):
         return entries
 
     def search(self, task, entry, config=None):
-        global task
         config = self.build_config(config)
         if config['wait_time']:
             log.debug("'Wait' configured, sleeping for %d seconds." % config['wait_time'])
             sleep(config['wait_time'])
         if config['category'] == 'movie':
-            return self.do_search_movie(entry, config)
+            return self.do_search_movie(entry, config, task)
         elif config['category'] == 'tvsearch':
-            return self.do_search_tvsearch(entry, config)
+            return self.do_search_tvsearch(entry, config, task)
         else:
             entries = []
             log.warning("Not done yet...")
             return entries
 
-    def do_search_tvsearch(self, arg_entry, config=None):
+    def do_search_tvsearch(self, arg_entry, config=None, task):
         log.info('Searching for %s' % (arg_entry['title']))
         # normally this should be used with emit_series who has provided season and episodenumber
         if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
@@ -118,9 +117,9 @@ class Newznab(object):
 
         url = (config['url'] + '&rid=%s&season=%s&ep=%s' %
                (arg_entry['tvrage_id'], arg_entry['series_season'], arg_entry['series_episode']))
-        return self.fill_entries_for_url(url, config)
+        return self.fill_entries_for_url(url, config, task)
 
-    def do_search_movie(self, arg_entry, config=None):
+    def do_search_movie(self, arg_entry, config=None, task):
         entries = []
         log.info('Searching for %s (imdbid:%s)' % (arg_entry['title'], arg_entry['imdb_id']))
         # normally this should be used with emit_movie_queue who has imdbid (i guess)
@@ -129,7 +128,7 @@ class Newznab(object):
 
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
         url = config['url'] + '&imdbid=' + imdb_id
-        return self.fill_entries_for_url(url, config)
+        return self.fill_entries_for_url(url, config, task)
 
 
 @event('plugin.register')
