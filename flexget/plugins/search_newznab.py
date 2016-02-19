@@ -37,7 +37,7 @@ class Newznab(object):
             'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book']},
             'url': {'type': 'string', 'format': 'url'},
             'website': {'type': 'string', 'format': 'url'},
-            'wait': {'type': 'string', 'format': 'interval'},
+            'wait': {'type': 'string', 'format': 'interval', default: "0 seconds"},
             'apikey': {'type': 'string'}
         },
         'required': ['category'],
