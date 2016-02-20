@@ -4,12 +4,7 @@ import urllib
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.utils import requests
-from flexget.utils.tools import parse_timedelta
-from datetime import timedelta
-
 import feedparser
-from time import sleep
 
 __author__ = 'deksan'
 
@@ -38,7 +33,6 @@ class Newznab(object):
             'category': {'type': 'string', 'enum': ['movie', 'tvsearch', 'tv', 'music', 'book']},
             'url': {'type': 'string', 'format': 'url'},
             'website': {'type': 'string', 'format': 'url'},
-            'wait': {'type': 'string', 'format': 'interval', 'default': "0 seconds"},
             'apikey': {'type': 'string'}
         },
         'required': ['category'],
@@ -51,8 +45,6 @@ class Newznab(object):
         if config['category'] == 'tv':
             config['category'] = 'tvsearch'
 
-        log.debug("Wait is %d" % parse_timedelta(config['wait']).seconds)
-        config['wait_time'] = parse_timedelta(config['wait']).seconds
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
                 params = {
@@ -61,16 +53,16 @@ class Newznab(object):
                     'extended': 1
                 }
                 config['url'] = config['website'] + '/api?' + urllib.urlencode(params)
+
         return config
 
     def fill_entries_for_url(self, url, task):
         entries = []
-#        header = {'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
         log.verbose('Fetching %s' % url)
 
         try:
             r = task.requests.get(url)
-        except requests.RequestException as e:
+        except task.requests.RequestException as e:
             log.error("Failed fetching '%s': %s" % (url, e))
 
         rss = feedparser.parse(r.content)
@@ -93,9 +85,6 @@ class Newznab(object):
 
     def search(self, task, entry, config=None):
         config = self.build_config(config)
-        if config['wait_time']:
-            log.debug("'Wait' configured, sleeping for %d seconds." % config['wait_time'])
-            sleep(config['wait_time'])
         if config['category'] == 'movie':
             return self.do_search_movie(entry, task, config)
         elif config['category'] == 'tvsearch':
@@ -129,7 +118,6 @@ class Newznab(object):
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
         url = config['url'] + '&imdbid=' + imdb_id
         return self.fill_entries_for_url(url, task)
-
 
 @event('plugin.register')
 def register_plugin():
