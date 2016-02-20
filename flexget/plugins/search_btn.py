@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
+import re
+
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
@@ -21,7 +23,13 @@ class SearchBTN(object):
         searches = entry.get('search_strings', [entry['title']])
 
         if 'series_name' in entry:
-            search = {'series': entry['series_name']}
+            search = {'category': 'Episode'}
+            if 'tvdb_id' in entry:
+                search['tvdb'] = entry['tvdb_id']
+            elif 'tvrage_id' in entry:
+                search['tvrage'] = entry['tvrage_id']
+            else:
+                search['series'] = entry['series_name']
             if 'series_id' in entry:
                 # BTN wants an ep style identifier even for sequence shows
                 if entry.get('series_id_type') == 'sequence':
@@ -29,6 +37,12 @@ class SearchBTN(object):
                 else:
                     search['name'] = entry['series_id'] + '%' # added wildcard search for better results.
             searches = [search]
+            # If searching by series name ending in a parenthetical, try again without it if there are no results.
+            if search.get('series') and search['series'].endswith(')'):
+                match = re.match('(.+)\([^\(\)]+\)$', search['series'])
+                if match:
+                    searches.append(dict(search, series=match.group(1).strip()))
+
 
         results = set()
         for search in searches:
@@ -42,11 +56,11 @@ class SearchBTN(object):
             content = r.json()
             if not content or not content['result']:
                 log.debug('No results from btn')
+                if content and content.get('error'):
+                    log.error('Error searching btn: %s' % content['error'].get('message', content['error']))
                 continue
             if 'torrents' in content['result']:
                 for item in content['result']['torrents'].itervalues():
-                    if item['Category'] != 'Episode':
-                        continue
                     entry = Entry()
                     entry['title'] = item['ReleaseName']
                     entry['title'] += ' '.join(['', item['Resolution'], item['Source'], item['Codec']])
@@ -55,9 +69,13 @@ class SearchBTN(object):
                     entry['torrent_leeches'] = int(item['Leechers'])
                     entry['torrent_info_hash'] = item['InfoHash']
                     entry['search_sort'] = torrent_availability(entry['torrent_seeds'], entry['torrent_leeches'])
-                    if item['TvdbID']:
+                    if item['TvdbID'] and int(item['TvdbID']):
                         entry['tvdb_id'] = int(item['TvdbID'])
+                    if item['TvrageID'] and int(item['TvrageID']):
+                        entry['tvrage_id'] = int(item['TvrageID'])
                     results.add(entry)
+                # Don't continue searching if this search yielded results
+                break
         return results
 
 
