@@ -50,6 +50,7 @@ class EntryListAPI(APIResource):
     @api.response(200, model=entry_list_return_model)
     def get(self, list_name, session=None):
         ''' Get Entry list entries '''
+        # TODO Pagination
         entries = [entry.to_dict() for entry in el.get_list(list_name)]
         return jsonify({'entries': entries,
                         'number_of_entries': len(entries),
