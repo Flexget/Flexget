@@ -60,7 +60,7 @@ class DomainLimiter(object):
         raise NotImplementedError
 
 
-class TBLimiter(DomainLimiter):
+class TokenBucketLimiter(DomainLimiter):
     """
     A token bucket rate limiter for domains.
     
@@ -76,7 +76,7 @@ class TBLimiter(DomainLimiter):
         :param rate: Amount of time to accrue 1 token. Either `timedelta` or interval string.
         :param bool wait: If true, will wait for a token to be available. If false, errors when token is not available.
         """
-        super(TBLimiter, self).__init__(domain)
+        super(TokenBucketLimiter, self).__init__(domain)
         self.max_tokens = tokens
         self.rate = parse_timedelta(rate)
         self.wait = wait
@@ -115,7 +115,7 @@ class TBLimiter(DomainLimiter):
         self.tokens -= 1
 
 
-class TimedLimiter(TBLimiter):
+class TimedLimiter(TokenBucketLimiter):
     """Enforces a minimum interval between requests to a given domain."""
     def __init__(self, domain, interval):
         super(TimedLimiter, self).__init__(domain, 1, interval)
