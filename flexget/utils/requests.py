@@ -177,7 +177,7 @@ class Session(requests.Session):
         Registers a minimum interval between requests to `domain`
 
         :param domain: The domain to set the interval on
-        :param delay: An instance of :class:`Delay` (or an interval, which will create a `TimedDelay`)
+        :param delay: The amount of time between requests, can be a timedelta or string like '3 seconds'
         """
         warnings.warn('set_domain_delay is deprecated, use add_domain_limiter', DeprecationWarning, stacklevel=2)
         self.domain_limiters[domain] = TimedLimiter(domain, delay)
