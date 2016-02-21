@@ -31,7 +31,8 @@ class OutputQBitTorrent(object):
             'port': {'type': 'integer'},
             'movedone': {'type': 'string'},
             'label': {'type': 'string'}
-        }
+        },
+        'additionalProperties': False
     }
 
     def connect(self, config):
@@ -75,7 +76,16 @@ class OutputQBitTorrent(object):
             data['savepath'] = entry.get('movedone', config.get('movedone'))
             data['label'] = entry.get('label', config['label']).lower()
             data['urls'] = [entry.get('url')]
-            self.add_torrent(data)
+            if task.manager.options.test:
+                log.info('Test mode.')
+                log.info('Would add torrent to qBittorrent with:')
+                log.info('    Url: {}'.format(data['urls'][0]))
+                if data['savepath']:
+                    log.info('    Save path: {}'.format(data['savepath']))
+                if data['label']:
+                    log.info('    Label: {}'.format(data['label']))
+            else:
+                self.add_torrent(data)
 
 
 @event('plugin.register')
