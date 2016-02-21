@@ -7,17 +7,18 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests, json
+from flexget.utils.requests import TBLimiter
 from flexget.utils.search import torrent_availability
 
 log = logging.getLogger('search_btn')
-
-# TODO: btn has a limit of 150 searches per hour
 
 
 class SearchBTN(object):
     schema = {'type': 'string'}
 
     def search(self, task, entry, config):
+        # Advertised limit is 150/hour (24s/request average). This may need some tweaking.
+        task.requests.add_domain_limiter(TBLimiter('api.btnapps.net', 75, '25 seconds'))
         api_key = config
 
         searches = entry.get('search_strings', [entry['title']])
