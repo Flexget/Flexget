@@ -66,7 +66,7 @@ class OutputQBitTorrent(object):
 
     def prepare_config(self, config):
         if isinstance(config, bool):
-            config = {'enabled', config}
+            config = {'enabled': config}
         config.setdefault('enabled', True)
         config.setdefault('host', 'localhost')
         config.setdefault('port', 8080)
