@@ -220,6 +220,10 @@ class SonarrSet(MutableSet):
             if entry.get('title').lower() == sb_entry.get('title').lower():
                 return sb_entry
 
+    def _from_iterable(self, it):
+        # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
+        return set(it)
+
     def __init__(self, config):
         self.config = config
         self._shows = None
