@@ -16,7 +16,7 @@ log = logging.getLogger('search_btn')
 class SearchBTN(object):
     schema = {'type': 'string'}
     # Advertised limit is 150/hour (24s/request average). This may need some tweaking.
-    request_limiter = TokenBucketLimiter('api.btnapps.net', 75, '25 seconds')
+    request_limiter = TokenBucketLimiter('api.btnapps.net', 100, '25 seconds')
 
     def search(self, task, entry, config):
         task.requests.add_domain_limiter(self.request_limiter)
