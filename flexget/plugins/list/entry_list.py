@@ -100,6 +100,9 @@ class EntryList(object):
     def get_list(config):
         return DBEntrySet(config)
 
+    def on_task_input(self, task, config):
+        return list(DBEntrySet(config))
+
 
 @event('plugin.register')
 def register_plugin():
