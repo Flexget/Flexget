@@ -13,7 +13,8 @@ from requests import RequestException, HTTPError
 from flexget import __version__ as version
 from flexget.utils.tools import parse_timedelta, TimedDict, timedelta_total_seconds
 
-log = logging.getLogger('requests')
+# If we use just 'requests' here, we'll get the logger created by requests, rather than our own
+log = logging.getLogger('utils.requests')
 
 # Don't emit info level urllib3 log messages or below
 logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
