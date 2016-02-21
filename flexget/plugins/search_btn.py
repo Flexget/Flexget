@@ -15,10 +15,11 @@ log = logging.getLogger('search_btn')
 
 class SearchBTN(object):
     schema = {'type': 'string'}
+    # Advertised limit is 150/hour (24s/request average). This may need some tweaking.
+    request_limiter = TBLimiter('api.btnapps.net', 75, '25 seconds')
 
     def search(self, task, entry, config):
-        # Advertised limit is 150/hour (24s/request average). This may need some tweaking.
-        task.requests.add_domain_limiter(TBLimiter('api.btnapps.net', 75, '25 seconds'))
+        task.requests.add_domain_limiter(self.request_limiter)
         api_key = config
 
         searches = entry.get('search_strings', [entry['title']])
@@ -58,7 +59,11 @@ class SearchBTN(object):
             if not content or not content['result']:
                 log.debug('No results from btn')
                 if content and content.get('error'):
-                    log.error('Error searching btn: %s' % content['error'].get('message', content['error']))
+                    if content['error'].get('code') == -32002:
+                        log.error('btn api call limit exceeded, throttling connection rate')
+                        self.request_limiter.tokens = -1
+                    else:
+                        log.error('Error searching btn: %s' % content['error'].get('message', content['error']))
                 continue
             if 'torrents' in content['result']:
                 for item in content['result']['torrents'].itervalues():
