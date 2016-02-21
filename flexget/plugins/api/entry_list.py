@@ -22,8 +22,8 @@ base_entry_model = {
     'additionalProperties': True
 }
 entry_return_model = copy.deepcopy(base_entry_model)
-entry_return_model['task'] = {'type': 'string'}
-entry_return_model['accepted_by'] = {'type': 'string'}
+entry_return_model['properties']['task'] = {'type': 'string'}
+entry_return_model['properties']['accepted_by'] = {'type': 'string'}
 
 entry_list_return_model = {
     'type': 'object',
