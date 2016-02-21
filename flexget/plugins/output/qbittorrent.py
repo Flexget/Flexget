@@ -23,16 +23,21 @@ class OutputQBitTorrent(object):
         label: <LABEL> (default: (none))
     """
     schema = {
-        'type': 'object',
-        'properties': {
-            'username': {'type': 'string'},
-            'password': {'type': 'string'},
-            'host': {'type': 'string'},
-            'port': {'type': 'integer'},
-            'movedone': {'type': 'string'},
-            'label': {'type': 'string'}
-        },
-        'additionalProperties': False
+        'anyOf': [
+            {'type': 'boolean'},
+            {
+                'type': 'object',
+                'properties': {
+                    'username': {'type': 'string'},
+                    'password': {'type': 'string'},
+                    'host': {'type': 'string'},
+                    'port': {'type': 'integer'},
+                    'movedone': {'type': 'string'},
+                    'label': {'type': 'string'}
+                },
+                'additionalProperties': False
+            }
+        ]
     }
 
     def connect(self, config):
@@ -60,12 +65,28 @@ class OutputQBitTorrent(object):
         log.debug('Added task to qBittorrent')
 
     def prepare_config(self, config):
+        if isinstance(config, bool):
+            config = {'enabled', config}
+        config.setdefault('enabled', True)
         config.setdefault('host', 'localhost')
         config.setdefault('port', 8080)
         config.setdefault('label', '')
         return config
 
     @plugin.priority(120)
+    def on_task_download(self, task, config):
+        """
+        Call download plugin to generate torrent files to load into
+        qBittorrent.
+        """
+        config = self.prepare_config(config)
+        if not config['enabled']:
+            return
+        if 'download' not in task.config:
+            download = plugin.get_plugin_by_name('download')
+            download.instance.get_temp_files(task, handle_magnets=True)
+
+    @plugin.priority(135)
     def on_task_output(self, task, config):
         """Add torrents to qBittorrent at exit."""
         if task.accepted:
@@ -79,11 +100,11 @@ class OutputQBitTorrent(object):
             if task.manager.options.test:
                 log.info('Test mode.')
                 log.info('Would add torrent to qBittorrent with:')
-                log.info('    Url: {}'.format(data['urls'][0]))
+                log.info('    Url: %s', data['urls'][0])
                 if data['savepath']:
-                    log.info('    Save path: {}'.format(data['savepath']))
+                    log.info('    Save path: %s', data['savepath'])
                 if data['label']:
-                    log.info('    Label: {}'.format(data['label']))
+                    log.info('    Label: %s', data['label'])
             else:
                 self.add_torrent(data)
 
