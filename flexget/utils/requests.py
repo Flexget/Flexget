@@ -145,6 +145,18 @@ def _wrap_urlopen(url, timeout=None):
     return resp
 
 
+def limit_domains(url, limit_dict):
+    """
+    If this url matches a domain in `limit_dict`, run the limiter.
+
+    This is separated in to its own function so that limits can be disabled during unit tests with VCR.
+    """
+    for domain, limiter in limit_dict.iteritems():
+        if domain in url:
+            limiter()
+            break
+
+
 class Session(requests.Session):
     """
     Subclass of requests Session class which defines some of our own defaults, records unresponsive sites,
@@ -204,10 +216,7 @@ class Session(requests.Session):
                 urlparse(url).hostname)
 
         # Run domain limiters for this url
-        for domain, limiter in self.domain_limiters.iteritems():
-            if domain in url:
-                limiter()
-                break
+        limit_domains(url, self.domain_limiters)
 
         kwargs.setdefault('timeout', self.timeout)
         raise_status = kwargs.pop('raise_status', True)
