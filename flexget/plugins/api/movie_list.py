@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import copy
 import logging
 from flask import jsonify, request
 from flexget.api import api, APIResource
@@ -17,8 +18,7 @@ base_movie_entry = {
         'title': {'type': 'string'},
         'url': {'type': 'string'},
         'movie_name': {'type': 'string'},
-        'movie_year': {'type': 'integer'},
-        'list_name': {'type': 'string'}
+        'movie_year': {'type': 'integer'}
     },
     'additionalProperties': True,
     'allOf': [
@@ -26,20 +26,25 @@ base_movie_entry = {
         {'oneOf': [
             {'required': ['title']},
             {'required': ['movie_name', 'movie_year']}
-        ]},
+        ]}
     ]
 }
+
+return_movie_entry = copy.deepcopy(base_movie_entry)
+return_movie_entry['properties']['id'] = {'type': 'integer'}
+return_movie_entry['properties']['list_name'] = {'type': 'string'}
 
 movie_list_return_model = {
    'type': 'object',
     'properties': {
-        'entries': {'type': 'array', 'items': base_movie_entry},
+        'entries': {'type': 'array', 'items': return_movie_entry},
         'number_of_entries': {'type': 'integer'},
         'list_name': {'type': 'string'}
     }
 }
 
 base_movie_entry = api.schema('base_movie_entry', base_movie_entry)
+return_movie_entry = api.schema('base_movie_entry', return_movie_entry)
 movie_list_return_model = api.schema('movie_list_return_model', movie_list_return_model)
 
 @movie_list_api.route('/<string:list_name>')
@@ -55,15 +60,15 @@ class MovieListAPI(APIResource):
                         'list_name': list_name})
 
     @api.validate(base_movie_entry)
-    @api.response(201, model=base_movie_entry)
+    @api.response(201, model=return_movie_entry)
     @api.doc(description="This will create a new list if list name doesn't exist")
     def post(self, list_name, session=None):
         ''' Adds a movie to the list. '''
         data = request.json
         movies = ml.get_list(list_name)
 
-        movies.add(data, session=session)
-        return dict(Entry(data)), 201
+        movie = movies.add(data, session=session)
+        return movie, 201
 
     @api.validate(base_movie_entry)
     @api.response(200, model=empty_response)
