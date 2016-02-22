@@ -25,23 +25,16 @@ base_entry_model = {
     'required': ['title', 'url']
 }
 
-entry_return_model = copy.deepcopy(base_entry_model)
-entry_return_model['properties']['task'] = {'type': 'string'}
-entry_return_model['properties']['accepted_by'] = {'type': 'string'}
-entry_return_model['properties']['original_url'] = {'type': 'string'}
-
-base_entry_model = api.schema('base_entry_model', base_entry_model)
-entry_return_model = api.schema('entry_return_model', entry_return_model)
-
 entry_list_return_model = {
     'type': 'object',
     'properties': {
-        'entries': {'type': 'array', 'items': entry_return_model},
+        'entries': {'type': 'array', 'items': base_entry_model},
         'number_of_entries': {'type': 'integer'},
         'list_name': {'type': 'string'}
     }
 }
 
+base_entry_model = api.schema('base_entry_model', base_entry_model)
 entry_list_return_model = api.schema('entry_list_return_model', entry_list_return_model)
 
 
@@ -58,7 +51,7 @@ class EntryListAPI(APIResource):
                         'list_name': list_name})
 
     @api.validate(base_entry_model)
-    @api.response(201, model=entry_return_model)
+    @api.response(201, model=base_entry_model)
     def post(self, list_name, session=None):
         ''' Adds an entry to the list '''
         data = request.json
