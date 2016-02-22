@@ -13,6 +13,16 @@ log = logging.getLogger('movie_list')
 
 movie_list_api = api.namespace('movie_list', description='Movie List operations')
 
+default_error_schema = {
+    'type': 'object',
+    'properties': {
+        'status': {'type': 'string'},
+        'message': {'type': 'string'}
+    }
+}
+
+default_error_schema = api.schema('default_error_schema', default_error_schema)
+
 base_movie_entry = {
     'type': 'object',
     'properties': {
@@ -74,11 +84,46 @@ class MovieListAPI(APIResource):
         movie = movies.add(data, session=session)
         return movie, 201
 
+
+@movie_list_api.route('/<string:list_name>/<int:id>/')
+@api.doc(params={'list_name': 'Name of the list', 'id': 'ID of the movie'})
+class MovieListIDAPI(APIResource):
+    @api.response(200, model=return_movie_entry_schema)
+    @api.response(404, model=default_error_schema)
+    def get(self, list_name, id, session=None):
+        ''' Get a specific movie ID '''
+        movies = [dict(movie) for movie in ml.get_list(list_name)]
+        for movie in movies:
+            if movie['id'] == id:
+                return movie
+        return {'status': 'error',
+                'message': 'could not find movie with id %d in list %s'% (id, list_name)}, 404
+
     @api.validate(base_movie_entry_schema)
-    @api.response(200, model=empty_response)
-    def delete(self, list_name, session=None):
-        ''' Remove an movie from the list '''
+    @api.response(200, model=return_movie_entry_schema)
+    @api.response(404, model=default_error_schema)
+    def put(self, list_name, id, session=None):
+        ''' Edit a specific movie ID '''
         data = request.json
-        entries = ml.get_list(list_name)
-        entries.discard(data)
-        return {}
+        movies = ml.get_list(list_name)
+        resolved_movies = [dict(movie) for movie in movies]
+        for resolved_movie in resolved_movies:
+            if resolved_movie['id'] == id:
+                movies.discard(resolved_movie)
+                new_movie = movies.add(data)
+                return new_movie, 201
+        return {'status': 'error',
+                'message': 'could not find movie with id %d in list %s'% (id, list_name)}, 404
+
+    @api.response(200, model=empty_response)
+    @api.response(404, model=default_error_schema)
+    def delete(self, list_name, id, session=None):
+        ''' Remove an movie from the list '''
+        movies = ml.get_list(list_name)
+        resolved_movies = [dict(movie) for movie in movies]
+        for resolved_movie in resolved_movies:
+            if resolved_movie['id'] == id:
+                movies.discard(resolved_movie)
+                return {}
+        return {'status': 'error',
+                'message': 'could not find movie with id %d in list %s'% (id, list_name)}, 404
