@@ -34,6 +34,7 @@ class MovieListMovie(Base):
 
     def to_entry(self):
         entry = Entry()
+        entry['id'] = self.id
         entry['title'] = entry['movie_name'] = self.title
         entry['url'] = 'mock://localhost/movie_list/%d' % self.id
         if self.year:
