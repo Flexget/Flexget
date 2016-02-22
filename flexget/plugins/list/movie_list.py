@@ -94,6 +94,7 @@ class MovieList(MutableSet):
                 db_movie.ids.append(MovieListID(id_name=id_name, id_value=entry[id_name]))
         log.debug('adding entry %s', entry)
         db_list.movies.append(db_movie)
+        return db_movie.to_entry()
 
     @with_session
     def discard(self, entry, session=None):

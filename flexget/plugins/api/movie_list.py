@@ -49,8 +49,8 @@ class MovieListAPI(APIResource):
     def get(self, list_name, session=None):
         ''' Get Movie list entries '''
         # TODO Pagination
-        movies = [entry.to_dict() for entry in ml.get_list(list_name)]
-        return jsonify({'entries': movies,
+        movies = [dict(movie) for movie in ml.get_list(list_name)]
+        return jsonify({'movies': movies,
                         'number_of_entries': len(movies),
                         'list_name': list_name})
 
@@ -61,11 +61,9 @@ class MovieListAPI(APIResource):
         ''' Adds a movie to the list. '''
         data = request.json
         movies = ml.get_list(list_name)
-        # TODO This could be a param but i don't think it matters that much
-        data['accepted_by'] = data['task'] = 'FlexGet API'
 
         movies.add(data, session=session)
-        return Entry(data).to_dict(), 201
+        return dict(Entry(data)), 201
 
     @api.validate(base_movie_entry)
     @api.response(200, model=empty_response)

@@ -18,7 +18,8 @@ base_entry_model = {
     'type': 'object',
     'properties': {
         'title': {'type': 'string'},
-        'url': {'type': 'string'}
+        'url': {'type': 'string'},
+        'original_url': {'type': 'string'}
     },
     'additionalProperties': True,
     'required': ['title', 'url']
@@ -51,7 +52,7 @@ class EntryListAPI(APIResource):
     def get(self, list_name, session=None):
         ''' Get Entry list entries '''
         # TODO Pagination
-        entries = [entry.to_dict() for entry in el.get_list(list_name)]
+        entries = [dict(entry) for entry in el.get_list(list_name)]
         return jsonify({'entries': entries,
                         'number_of_entries': len(entries),
                         'list_name': list_name})
@@ -62,11 +63,9 @@ class EntryListAPI(APIResource):
         ''' Adds an entry to the list '''
         data = request.json
         entries = el.get_list(list_name)
-        # TODO This could be a param but i don't think it matters that much
-        data['accepted_by'] = data['task'] = 'FlexGet API'
 
         entries.add(data, session=session)
-        return Entry(data).to_dict(), 201
+        return dict(Entry(data)), 201
 
     @api.validate(base_entry_model)
     @api.response(200, model=empty_response)
@@ -75,3 +74,4 @@ class EntryListAPI(APIResource):
         data = request.json
         entries = el.get_list(list_name)
         entries.discard(data)
+        return {}
