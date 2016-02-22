@@ -290,9 +290,3 @@ class Entry(LazyDict):
 
     def __repr__(self):
         return '<Entry(title=%s,state=%s)>' % (self['title'], self._state)
-
-    def to_dict(self):
-        dict_entry = {}
-        for key, value in self.items():
-            dict_entry[key] = value
-        return dict_entry
