@@ -85,9 +85,6 @@ class ImdbEntrySet(MutableSet):
         if self._items is None:
             r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
                                  (self.list_id, self.user_id))
-            field_names = ['imdb_list_position', 'imdb_id', 'imdb_list_created', 'imdb_list_modified', '_',
-                           'imdb_name', '_', '_', 'imdb_user_score', 'imdb_score', 'imdb_runtime', 'imdb_year', '_',
-                           'imdb_votes', '_']
             lines = r.iter_lines()
             # Throw away first line with headers
             next(lines)
@@ -164,7 +161,6 @@ class ImdbEntrySet(MutableSet):
 
     def __len__(self):
         return len(self.items)
-
 
 
 class ImdbList(object):
