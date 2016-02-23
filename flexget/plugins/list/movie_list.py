@@ -25,12 +25,9 @@ class MovieListList(Base):
     movies = relationship('MovieListMovie', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
 
     def to_dict(self):
-        movies = [movie.to_dict() for movie in self.movies]
-
         return {
             'id': self.id,
-            'name': self.name,
-            'movies': movies
+            'name': self.name
         }
 
 
@@ -54,13 +51,13 @@ class MovieListMovie(Base):
         return entry
 
     def to_dict(self):
-        movie_list_ids = [movie_list_id.to_dict() for movie_list_id in self.ids]
+        movies_list_ids = [movie_list_id.to_dict() for movie_list_id in self.ids]
         return {
             'id': self.id,
             'title': self.title,
             'year': self.year,
             'list_id': self.list_id,
-            'movie_list_ids': movie_list_ids
+            'movies_list_ids': movies_list_ids
         }
 
 
@@ -176,10 +173,15 @@ def get_all_lists(session=None):
 
 
 @with_session
-def get_list_by_id(id, session=None):
-    return session.query(MovieListList).filter(MovieListList.id == id).one()
+def get_list_by_name(name, session=None):
+    return session.query(MovieListList).filter(MovieListList.name.contains(name)).all()
 
 
 @with_session
-def get_movie_by_id(id, session=None):
-    return session.query(MovieListMovie).filter(MovieListMovie.id == id).one()
+def get_list_by_id(list_id, session=None):
+    return session.query(MovieListList).filter(MovieListList.id == list_id).one()
+
+
+@with_session
+def get_movie_by_id(movie_id, session=None):
+    return session.query(MovieListMovie).filter(MovieListMovie.id == movie_id).one()
