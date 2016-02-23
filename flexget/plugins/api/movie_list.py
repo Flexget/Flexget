@@ -4,10 +4,12 @@ import copy
 import logging
 
 from flask import jsonify
+from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
 from flexget.api import api, APIResource
 from flexget.plugins.list import movie_list as ml
+from flexget.utils.tools import split_title_year
 
 log = logging.getLogger('movie_list')
 
@@ -25,13 +27,23 @@ empty_response = api.schema('empty', {'type': 'object'})
 default_error_schema = api.schema('default_error_schema', default_error_schema)
 empty_response = api.schema('empty_response', empty_response)
 
+input_movie_list_id_object = {
+    'type': 'object',
+    'minProperties': 1,
+    'additionalProperties': {"type": "string"}
+}
+
 input_movie_entry = {
     'type': 'object',
     'properties': {
         'title': {'type': 'string'},
         'url': {'type': 'string'},
         'movie_name': {'type': 'string'},
-        'movie_year': {'type': 'integer'}
+        'movie_year': {'type': 'integer'},
+        'movie_identifiers': {
+            'type': 'array',
+            'items': input_movie_list_id_object
+        }
     },
     'additionalProperties': True,
     'required': ['url'],
@@ -40,21 +52,15 @@ input_movie_entry = {
         {'required': ['movie_name', 'movie_year']}
     ]
 }
-input_movie_list_id_object = {
-    'type': 'object',
-    'properties': {
-        'id_name': {'type': 'string'},
-        'id_value': {'type': 'string'},
-    },
-    'required': ['id_name', 'id_value'],
-    'additionalProperties': False
-}
 
 return_movie_list_id_object = copy.deepcopy(input_movie_list_id_object)
-return_movie_list_id_object['properties']['id'] = {'type': 'integer'}
-return_movie_list_id_object['properties']['movie_id'] = {'type': 'integer'}
+return_movie_list_id_object.update(
+    {'properties': {
+        'id': {'type': 'integer'},
+        'movie_id': {'type': 'integer'}
+    }})
 
-movie_object = {
+movie_list_object = {
     'type': 'object',
     'properties': {
         'title': {'type': 'string'},
@@ -80,7 +86,7 @@ return_movies = {
     'properties': {
         'movies': {
             'type': 'array',
-            'items': movie_object
+            'items': movie_list_object
         },
         'number_of_movies': {'type': 'integer'}
     }
@@ -91,7 +97,7 @@ input_movie_entry_schema = api.schema('input_movie_entry', input_movie_entry)
 input_movie_list_id_object = api.schema('input_movie_list_id_object', input_movie_list_id_object)
 
 movie_list_id_object_schema = api.schema('movie_list_id_object', return_movie_list_id_object)
-movie_object_schema = api.schema('movie_object', movie_object)
+movie_list_object_schema = api.schema('movie_list_object', movie_list_object)
 list_object_schema = api.schema('list_object', list_object)
 return_lists_schema = api.schema('return_lists', return_lists)
 return_movies_schema = api.schema('return_movies', return_movies)
@@ -142,3 +148,36 @@ class MovieListMoviesAPI(APIResource):
                     'message': 'list_id %d does not exist' % list_id}, 404
         return {}
 
+    @api.validate(input_movie_entry_schema)
+    @api.response(201, model=movie_list_object_schema)
+    @api.response(404, description='List not found', model=default_error_schema)
+    @api.response(500, description='Movie already exist in list', model=default_error_schema)
+    def post(self, list_id, session=None):
+        ''' Add movies to list by ID '''
+        try:
+            list = ml.get_list_by_id(list_id=list_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'list_id %d does not exist' % list_id}, 404
+        data = request.json
+        if 'movie_name' in data:
+            title, year = data['movie_name'], data.get('movie_year')
+        else:
+            title, year = split_title_year(data['title'])
+        movie = ml.get_movie_by_title(list_id=list_id, title=title, session=session)
+        if movie:
+            return {'status': 'error',
+                    'message': 'movie with name "%s" already exist in list %d' % (title, list_id)}, 500
+        movie = ml.MovieListMovie()
+        movie.title = title
+        movie.year = year
+        for identifier in data.get('movie_identifiers'):
+            for key, value in identifier.items():
+                if key in ml.SUPPORTED_IDS:
+                    movie.ids.append(ml.MovieListID(id_name=key, id_value=value))
+        movie.list_id = list_id
+        session.add(movie)
+        session.commit()
+        response = jsonify({'movie': movie.to_dict()})
+        response.status_code = 201
+        return response

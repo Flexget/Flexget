@@ -3,7 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 import logging
 from collections import MutableSet
 
-from sqlalchemy import Column, Unicode, Integer, ForeignKey
+from sqlalchemy import Column, Unicode, Integer, ForeignKey, func
 from sqlalchemy.orm import relationship
 
 from flexget import plugin
@@ -190,9 +190,17 @@ def get_movie_by_id(movie_id, session=None):
     log.debug('fetching movie with id %d' % movie_id)
     return session.query(MovieListMovie).filter(MovieListMovie.id == movie_id).one()
 
+
 @with_session
 def delete_list_by_id(list_id, session=None):
     list = get_list_by_id(list_id=list_id, session=session)
     if list:
         log.debug('deleting list with id %d' % list_id)
         session.delete(list)
+
+
+@with_session
+def get_movie_by_title(list_id, title, session=None):
+    list = get_list_by_id(list_id=list_id, session=session)
+    if list:
+        return session.query(MovieListMovie).filter(func.lower(MovieListMovie.title) == title.lower()).first()
