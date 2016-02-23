@@ -20,8 +20,10 @@ default_error_schema = {
         'message': {'type': 'string'}
     }
 }
+empty_response = api.schema('empty', {'type': 'object'})
 
 default_error_schema = api.schema('default_error_schema', default_error_schema)
+empty_response = api.schema('empty_response', empty_response)
 
 input_movie_entry = {
     'type': 'object',
@@ -51,7 +53,6 @@ input_movie_list_id_object = {
 return_movie_list_id_object = copy.deepcopy(input_movie_list_id_object)
 return_movie_list_id_object['properties']['id'] = {'type': 'integer'}
 return_movie_list_id_object['properties']['movie_id'] = {'type': 'integer'}
-
 
 movie_object = {
     'type': 'object',
@@ -106,18 +107,22 @@ class MovieListAPI(APIResource):
 
 
 @movie_list_api.route('/search/<string:list_name>/')
+@api.doc(params={'list_name': 'Name of the list(s) to search'})
 class MovieListSearchAPI(APIResource):
     @api.response(200, model=return_lists_schema)
     def get(self, list_name, session=None):
+        ''' Search lists by name '''
         movie_lists = [movie_list.to_dict() for movie_list in ml.get_list_by_name(name=list_name, session=session)]
         return jsonify({'movie_lists': movie_lists})
 
 
 @movie_list_api.route('/<int:list_id>')
+@api.doc(params={'list_id': 'ID of the list'})
 class MovieListMoviesAPI(APIResource):
     @api.response(404, model=default_error_schema)
     @api.response(200, model=return_movies_schema)
     def get(self, list_id, session=None):
+        ''' Get movies by list ID '''
         try:
             list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -125,3 +130,15 @@ class MovieListMoviesAPI(APIResource):
                     'message': 'list_id %d does not exist' % list_id}, 404
         movies = [movie.to_dict() for movie in list.movies]
         return jsonify({'movies': movies})
+
+    @api.response(200, model=empty_response)
+    @api.response(404, model=default_error_schema)
+    def delete(self, list_id, session=None):
+        ''' Delete list by ID '''
+        try:
+            ml.delete_list_by_id(list_id=list_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'list_id %d does not exist' % list_id}, 404
+        return {}
+

@@ -169,19 +169,30 @@ def register_plugin():
 
 @with_session
 def get_all_lists(session=None):
+    log.debug('retrieving all lists')
     return session.query(MovieListList).all()
 
 
 @with_session
 def get_list_by_name(name, session=None):
+    log.debug('searching for movie lists matching %s' % name)
     return session.query(MovieListList).filter(MovieListList.name.contains(name)).all()
 
 
 @with_session
 def get_list_by_id(list_id, session=None):
+    log.debug('fetching list with id %d' % list_id)
     return session.query(MovieListList).filter(MovieListList.id == list_id).one()
 
 
 @with_session
 def get_movie_by_id(movie_id, session=None):
+    log.debug('fetching movie with id %d' % movie_id)
     return session.query(MovieListMovie).filter(MovieListMovie.id == movie_id).one()
+
+@with_session
+def delete_list_by_id(list_id, session=None):
+    list = get_list_by_id(list_id=list_id, session=session)
+    if list:
+        log.debug('deleting list with id %d' % list_id)
+        session.delete(list)
