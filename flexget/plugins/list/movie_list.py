@@ -5,6 +5,7 @@ from collections import MutableSet
 
 from sqlalchemy import Column, Unicode, Integer, ForeignKey, func
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.elements import and_
 
 from flexget import plugin
 from flexget.db_schema import versioned_base, with_session
@@ -186,9 +187,10 @@ def get_list_by_id(list_id, session=None):
 
 
 @with_session
-def get_movie_by_id(movie_id, session=None):
-    log.debug('fetching movie with id %d' % movie_id)
-    return session.query(MovieListMovie).filter(MovieListMovie.id == movie_id).one()
+def get_movie_by_id(list_id, movie_id, session=None):
+    log.debug('fetching movie with id %d from list id %d' % (movie_id, list_id))
+    return session.query(MovieListMovie).filter(
+        and_(MovieListMovie.id == movie_id, MovieListMovie.list_id == list_id)).one()
 
 
 @with_session

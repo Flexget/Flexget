@@ -124,7 +124,7 @@ class MovieListSearchAPI(APIResource):
 
 @movie_list_api.route('/<int:list_id>')
 @api.doc(params={'list_id': 'ID of the list'})
-class MovieListMoviesAPI(APIResource):
+class MovieListListAPI(APIResource):
     @api.response(404, model=default_error_schema)
     @api.response(200, model=list_object_schema)
     def get(self, list_id, session=None):
@@ -150,7 +150,7 @@ class MovieListMoviesAPI(APIResource):
 
 @movie_list_api.route('/<int:list_id>/movies/')
 @api.doc(params={'list_id': 'ID of the list'})
-class MovieListMovieAPI(APIResource):
+class MovieListMoviesAPI(APIResource):
     @api.response(404, model=default_error_schema)
     @api.response(200, model=return_movies_schema)
     def get(self, list_id, session=None):
@@ -197,3 +197,16 @@ class MovieListMovieAPI(APIResource):
         response.status_code = 201
         return response
 
+
+@movie_list_api.route('/<int:list_id>/movies/<int:movie_id>/')
+@api.doc(params={'list_id': 'ID of the list', 'movie_id': 'ID of the movie'})
+class MovieListMovieAPI(APIResource):
+    @api.response(200, model=movie_list_object_schema)
+    @api.response(404, description='List not found', model=default_error_schema)
+    def get(self, list_id, movie_id, session=None):
+        try:
+            movie = ml.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'could not find movie with id %d in list %d' % (movie_id, list_id)}, 404
+        return jsonify(movie.to_dict())
