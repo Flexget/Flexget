@@ -1,16 +1,20 @@
 from __future__ import unicode_literals, division, absolute_import
+import csv
 import logging
+from datetime import datetime
+
 import re
 from collections import MutableSet
 
+from flexget import plugin
+from flexget.entry import Entry
+from flexget.event import event
 from flexget.utils.requests import Session
 from flexget.utils.soup import get_soup
 
 
 log = logging.getLogger('imdb_list')
-USER_ID_RE = r'^ur\d{7,8}$'
-CUSTOM_LIST_RE = r'^ls\d{7,10}$'
-USER_LISTS = ['watchlist', 'ratings', 'checkins']
+IMMUTABLE_LISTS = ['ratings', 'checkins']
 
 
 class ImdbEntrySet(MutableSet):
@@ -25,43 +29,99 @@ class ImdbEntrySet(MutableSet):
         'additionalProperties': False,
         'required': ['login', 'password', 'list']
     }
+
     def __init__(self, config):
         self.config = config
-        self.session = Session()
-        self.session.headers = {'Accept-Language': config.get('force_language', 'en-us')}
+        self._session = Session()
+        self._session.headers = {'Accept-Language': config.get('force_language', 'en-us')}
         self.user_id = None
         self.list_id = None
-        self.authenticate()
+        self._items = None
+        self._authenticated = False
+
+    @property
+    def session(self):
+        if not self._authenticated:
+            self.authenticate()
+        return self._session
 
     def authenticate(self):
         """Authenticates a session with imdb, and grabs any IDs needed for getting/modifying list."""
-        r = self.session.get('https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-h'
-                             'andler&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&op'
-                             'enid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%2F%'
-                             '2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.openid.'
-                             'net%2Fauth%2F2.0')
+        r = self._session.get('https://www.imdb.com/ap/signin?openid.return_to=https%3A%2F%2Fwww.imdb.com%2Fap-signin-'
+                              'handler&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&'
+                              'openid.assoc_handle=imdb_mobile_us&openid.mode=checkid_setup&openid.claimed_id=http%3A%'
+                              '2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.ns=http%3A%2F%2Fspecs.ope'
+                              'nid.net%2Fauth%2F2.0')
         soup = get_soup(r.content)
         inputs = soup.select('form#ap_signin_form input')
         data = dict((i['name'], i.get('value')) for i in inputs if i.get('name'))
         data['email'] = self.config['login']
         data['password'] = self.config['password']
-        self.session.post('https://www.imdb.com/ap/signin', data=data)
+        self._session.post('https://www.imdb.com/ap/signin', data=data)
         # Get user id by exctracting from redirect url
-        r = self.session.get('http://www.imdb.com/list/ratings', allow_redirects=False)
+        r = self._session.get('http://www.imdb.com/list/ratings', allow_redirects=False)
         self.user_id = re.search('ur\d+(?!\d)', r.headers['location']).group()
         # Get list ID
         if self.config['list'] == 'watchlist':
-            data = {'consts[]': 'tt0805570', 'tracking_tag': 'watchlistRibbon'}
-            wl_data = self.session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data).json()
+            data = {'consts[]': 'tt0133093', 'tracking_tag': 'watchlistRibbon'}
+            wl_data = self._session.post('http://www.imdb.com/list/_ajax/watchlist_has', data=data).json()
             self.list_id = wl_data['list_id']
-        else:
+        elif self.config['list'] in IMMUTABLE_LISTS or self.config['list'].startswith('ls'):
             self.list_id = self.config['list']
+        else:
+            data = {'tconst': 'tt0133093'}
+            list_data = self._session.post('http://www.imdb.com/list/_ajax/wlb_dropdown', data=data).json()
+            for li in list_data['items']:
+                if li['wlb_text'] == self.config['list']:
+                    self.list_id = li['data_list_id']
+                    break
+            else:
+                raise plugin.PluginError('Could not find list %s' % self.config['list'])
 
-    def __contains__(self, x):
-        pass
+        self._authenticated = True
+
+    @property
+    def items(self):
+        if self._items is None:
+            r = self.session.get('http://www.imdb.com/list/export?list_id=%s&author_id=%s' %
+                                 (self.list_id, self.user_id))
+            field_names = ['imdb_list_position', 'imdb_id', 'imdb_list_created', 'imdb_list_modified', '_',
+                           'imdb_name', '_', '_', 'imdb_user_score', 'imdb_score', 'imdb_runtime', 'imdb_year', '_',
+                           'imdb_votes', '_']
+            lines = r.iter_lines()
+            # Throw away first line with headers
+            next(lines)
+            self._items = []
+            for row in csv.reader(lines):
+                row = [unicode(cell, 'utf-8') for cell in row]
+                entry = Entry({
+                    'title': '%s (%s)' % (row[5], row[11]),
+                    'url': row[15],
+                    'imdb_id': row[1],
+                    'imdb_url': row[15],
+                    'imdb_list_position': int(row[0]),
+                    'imdb_list_created': datetime.strptime(row[2], '%a %b %d %H:%M:%S %Y') if row[2] else None,
+                    'imdb_list_modified': datetime.strptime(row[3], '%a %b %d %H:%M:%S %Y') if row[3] else None,
+                    'imdb_list_description': row[4],
+                    'imdb_name': row[5],
+                    'movie_name': row[5],
+                    'imdb_year': int(row[11]),
+                    'movie_year': int(row[11]),
+                    'imdb_score': float(row[9]),
+                    'imdb_user_score': float(row[8]) if row[8] else None,
+                    'imdb_votes': int(row[13]),
+                    'imdb_genres': [genre.strip() for genre in row[12].split(',')]
+                })
+                self._items.append(entry)
+        return self._items
+
+    def __contains__(self, entry):
+        if not entry.get('imdb_id'):
+            return False
+        return any(e['imdb_id'] == entry['imdb_id'] for e in self.items)
 
     def __iter__(self):
-        pass
+        return iter(self.items)
 
     def discard(self, entry):
         if 'imdb_id' not in entry:
@@ -103,4 +163,21 @@ class ImdbEntrySet(MutableSet):
         self.session.post('http://www.imdb.com/list/_ajax/edit', data=data)
 
     def __len__(self):
-        pass
+        return len(self.items)
+
+
+
+class ImdbList(object):
+    schema = ImdbEntrySet.schema
+
+    @staticmethod
+    def get_list(config):
+        return ImdbEntrySet(config)
+
+    def on_task_input(self, task, config):
+        return list(self.get_list(config))
+
+
+@event('plugin.register')
+def register_plugin():
+    plugin.register(ImdbList, 'imdb_list', api_ver=2)
