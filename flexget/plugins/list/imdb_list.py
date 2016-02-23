@@ -121,6 +121,8 @@ class ImdbEntrySet(MutableSet):
         return iter(self.items)
 
     def discard(self, entry):
+        if self.config['list'] in IMMUTABLE_LISTS:
+            raise plugin.PluginError('%s lists are not modifiable' % ' and '.join(IMMUTABLE_LISTS))
         if 'imdb_id' not in entry:
             log.warning('Cannot remove %s from imdb_list because it does not have an imdb_id', entry['title'])
             return
@@ -149,6 +151,8 @@ class ImdbEntrySet(MutableSet):
             self.session.post('http://www.imdb.com/list/_ajax/edit', data=dict(data, list_item_id=item_id))
 
     def add(self, entry):
+        if self.config['list'] in IMMUTABLE_LISTS:
+            raise plugin.PluginError('%s lists are not modifiable' % ' and '.join(IMMUTABLE_LISTS))
         if 'imdb_id' not in entry:
             log.warning('Cannot add %s to imdb_list because it does not have an imdb_id', entry['title'])
             return
@@ -176,4 +180,4 @@ class ImdbList(object):
 
 @event('plugin.register')
 def register_plugin():
-    plugin.register(ImdbList, 'imdb_list', api_ver=2)
+    plugin.register(ImdbList, 'imdb_list', api_ver=2, groups=['list'])
