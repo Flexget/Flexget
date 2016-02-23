@@ -169,7 +169,7 @@ class Filesystem(object):
                     if match(path_object):
                         if (path_object.isdir() and get_dirs) or (
                                 path_object.islink() and get_symlinks) or (
-                                path_object.isfile() and get_files):
+                                path_object.isfile() and not path_object.islink() and get_files):
                             entry = self.create_entry(path_object, test_mode)
                         else:
                             log.debug("Path object's %s type doesn't match requested object types." % path_object)
