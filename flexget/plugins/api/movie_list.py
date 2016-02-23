@@ -204,9 +204,22 @@ class MovieListMovieAPI(APIResource):
     @api.response(200, model=movie_list_object_schema)
     @api.response(404, description='List not found', model=default_error_schema)
     def get(self, list_id, movie_id, session=None):
+        ''' Get a movie by list ID and movie ID '''
         try:
             movie = ml.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'could not find movie with id %d in list %d' % (movie_id, list_id)}, 404
         return jsonify(movie.to_dict())
+
+    @api.response(404, description='List not found', model=default_error_schema)
+    @api.response(200, model=empty_response)
+    def delete(self, list_id, movie_id, session=None):
+        ''' Delete a movie by list ID and movie ID '''
+        try:
+            movie = ml.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'could not find movie with id %d in list %d' % (movie_id, list_id)}, 404
+        session.delete(movie)
+        return {}

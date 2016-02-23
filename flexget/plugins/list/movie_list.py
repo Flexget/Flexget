@@ -205,4 +205,5 @@ def delete_list_by_id(list_id, session=None):
 def get_movie_by_title(list_id, title, session=None):
     list = get_list_by_id(list_id=list_id, session=session)
     if list:
+        log.debug('searching for movie %s in list %d' % (title, list_id))
         return session.query(MovieListMovie).filter(func.lower(MovieListMovie.title) == title.lower()).first()
