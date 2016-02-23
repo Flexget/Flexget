@@ -126,16 +126,15 @@ class MovieListSearchAPI(APIResource):
 @api.doc(params={'list_id': 'ID of the list'})
 class MovieListMoviesAPI(APIResource):
     @api.response(404, model=default_error_schema)
-    @api.response(200, model=return_movies_schema)
+    @api.response(200, model=list_object_schema)
     def get(self, list_id, session=None):
-        ''' Get movies by list ID '''
+        ''' Get list by ID '''
         try:
             list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
-        movies = [movie.to_dict() for movie in list.movies]
-        return jsonify({'movies': movies})
+        return jsonify(list.to_dict())
 
     @api.response(200, model=empty_response)
     @api.response(404, model=default_error_schema)
@@ -147,6 +146,22 @@ class MovieListMoviesAPI(APIResource):
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
         return {}
+
+
+@movie_list_api.route('/<int:list_id>/movies/')
+@api.doc(params={'list_id': 'ID of the list'})
+class MovieListMovieAPI(APIResource):
+    @api.response(404, model=default_error_schema)
+    @api.response(200, model=return_movies_schema)
+    def get(self, list_id, session=None):
+        ''' Get movies by list ID '''
+        try:
+            list = ml.get_list_by_id(list_id=list_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'list_id %d does not exist' % list_id}, 404
+        movies = [movie.to_dict() for movie in list.movies]
+        return jsonify({'movies': movies})
 
     @api.validate(input_movie_entry_schema)
     @api.response(201, model=movie_list_object_schema)
@@ -181,3 +196,4 @@ class MovieListMoviesAPI(APIResource):
         response = jsonify({'movie': movie.to_dict()})
         response.status_code = 201
         return response
+
