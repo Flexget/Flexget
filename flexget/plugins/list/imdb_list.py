@@ -112,6 +112,11 @@ class ImdbEntrySet(MutableSet):
                 self._items.append(entry)
         return self._items
 
+    @property
+    def immutable(self):
+        if self.config['list'] in IMMUTABLE_LISTS:
+            return '%s list is not modifiable' % self.config['list']
+
     def __contains__(self, entry):
         if not entry.get('imdb_id'):
             return False

@@ -22,6 +22,13 @@ class ListAdd(object):
         }
     }
 
+    def on_task_start(self, task, config):
+        for item in config:
+            for plugin_name, plugin_config in item.iteritems():
+                thelist = plugin.get_plugin_by_name(plugin_name).instance.get_list(plugin_config)
+                if thelist.immutable:
+                    raise plugin.PluginError(thelist.immutable)
+
     def on_task_output(self, task, config):
         for item in config:
             for plugin_name, plugin_config in item.iteritems():
