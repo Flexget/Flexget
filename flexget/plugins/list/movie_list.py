@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
 from collections import MutableSet
 
@@ -23,6 +24,15 @@ class MovieListList(Base):
     name = Column(Unicode, unique=True)
     movies = relationship('MovieListMovie', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
 
+    def to_dict(self):
+        movies = [movie.to_dict() for movie in self.movies]
+
+        return {
+            'id': self.id,
+            'name': self.name,
+            'movies': movies
+        }
+
 
 class MovieListMovie(Base):
     __tablename__ = 'movie_list_movies'
@@ -34,7 +44,6 @@ class MovieListMovie(Base):
 
     def to_entry(self):
         entry = Entry()
-        entry['id'] = self.id
         entry['title'] = entry['movie_name'] = self.title
         entry['url'] = 'mock://localhost/movie_list/%d' % self.id
         if self.year:
@@ -44,6 +53,16 @@ class MovieListMovie(Base):
             entry[id.id_name] = id.id_value
         return entry
 
+    def to_dict(self):
+        movie_list_ids = [movie_list_id.to_dict() for movie_list_id in self.ids]
+        return {
+            'id': self.id,
+            'title': self.title,
+            'year': self.year,
+            'list_id': self.list_id,
+            'movie_list_ids': movie_list_ids
+        }
+
 
 class MovieListID(Base):
     __tablename__ = 'movie_list_ids'
@@ -51,6 +70,14 @@ class MovieListID(Base):
     id_name = Column(Unicode)
     id_value = Column(Unicode)
     movie_id = Column(Integer, ForeignKey(MovieListMovie.id))
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'id_name': self.id_name,
+            'id_value': self.id_value,
+            'movie_id': self.movie_id
+        }
 
 
 class MovieList(MutableSet):
@@ -113,7 +140,7 @@ class MovieList(MutableSet):
             if id_name in entry:
                 # TODO: Make this real
                 res = (self._db_list(session).movies.filter(MovieListID.id_name == id_name)
-                                                    .filter(MovieListID.id_value == entry[id_name]).first())
+                       .filter(MovieListID.id_value == entry[id_name]).first())
                 if res:
                     return res
         # Fall back to title/year match
@@ -122,7 +149,7 @@ class MovieList(MutableSet):
         else:
             name, year = split_title_year(entry['title'])
         res = (self._db_list(session).movies.filter(MovieListMovie.title == name)
-                                            .filter(MovieListMovie.year == year).first())
+               .filter(MovieListMovie.year == year).first())
         return res
 
 
@@ -141,3 +168,18 @@ class PluginMovieList(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginMovieList, 'movie_list', api_ver=2, groups=['list'])
+
+
+@with_session
+def get_all_lists(session=None):
+    return session.query(MovieListList).all()
+
+
+@with_session
+def get_list_by_id(id, session=None):
+    return session.query(MovieListList).filter(MovieListList.id == id).one()
+
+
+@with_session
+def get_movie_by_id(id, session=None):
+    return session.query(MovieListMovie).filter(MovieListMovie.id == id).one()
