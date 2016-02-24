@@ -15,6 +15,7 @@ local
 .idea/
 *.iml
 config.yml
+.config-lock
 db-config.sqlite
 flexget.log
 flexget.log.*
@@ -38,3 +39,5 @@ flexget/ui/node_modules/
 flexget/ui/bower_components/
 flexget/ui/.tmp/
 flexget/ui/app/
+cherrypy/
+pip-selfcheck.json
