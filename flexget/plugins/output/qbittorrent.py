@@ -19,7 +19,7 @@ class OutputQBitTorrent(object):
         password: <PASSWORD> (default: (none))
         host: <HOSTNAME> (default: localhost)
         port: <PORT> (default: 8080)
-        movedone: <OUTPUT_DIR> (default: (none))
+        path: <OUTPUT_DIR> (default: (none))
         label: <LABEL> (default: (none))
     """
     schema = {
@@ -32,7 +32,7 @@ class OutputQBitTorrent(object):
                     'password': {'type': 'string'},
                     'host': {'type': 'string'},
                     'port': {'type': 'integer'},
-                    'movedone': {'type': 'string'},
+                    'path': {'type': 'string'},
                     'label': {'type': 'string'}
                 },
                 'additionalProperties': False
@@ -94,7 +94,7 @@ class OutputQBitTorrent(object):
             self.connect(config)
         for entry in task.accepted:
             data = {}
-            data['savepath'] = entry.get('movedone', config.get('movedone'))
+            data['savepath'] = entry.get('path', config.get('path'))
             data['label'] = entry.get('label', config['label']).lower()
             data['urls'] = [entry.get('url')]
             if task.manager.options.test:
