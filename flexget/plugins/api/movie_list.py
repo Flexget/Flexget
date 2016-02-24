@@ -148,6 +148,9 @@ class MovieListListAPI(APIResource):
         return {}
 
 
+movie_identifiers_doc = "Use movie identifier using the following format:\n[{'ID_NAME>:'ID_VALUE'}]"
+
+
 @movie_list_api.route('/<int:list_id>/movies/')
 @api.doc(params={'list_id': 'ID of the list'})
 class MovieListMoviesAPI(APIResource):
@@ -163,7 +166,7 @@ class MovieListMoviesAPI(APIResource):
         movies = [movie.to_dict() for movie in list.movies]
         return jsonify({'movies': movies})
 
-    @api.validate(input_movie_entry_schema)
+    @api.validate(model=input_movie_entry_schema, description=movie_identifiers_doc)
     @api.response(201, model=movie_list_object_schema)
     @api.response(404, description='List not found', model=default_error_schema)
     @api.response(500, description='Movie already exist in list', model=default_error_schema)
@@ -220,7 +223,7 @@ class MovieListMovieAPI(APIResource):
         session.delete(movie)
         return {}
 
-    @api.validate(input_movie_list_id_schema)
+    @api.validate(model=input_movie_entry_schema, description=movie_identifiers_doc)
     @api.response(200, model=movie_list_object_schema)
     @api.doc(description='Sent movie identifiers will override any existing identifiers that the movie currently holds')
     def put(self, list_id, movie_id, session=None):
