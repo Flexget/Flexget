@@ -1,17 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import csv
 import logging
-from datetime import datetime
-
 import re
 from collections import MutableSet
+from datetime import datetime
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils.requests import Session
 from flexget.utils.soup import get_soup
-
 
 log = logging.getLogger('imdb_list')
 IMMUTABLE_LISTS = ['ratings', 'checkins']
@@ -102,9 +101,9 @@ class ImdbEntrySet(MutableSet):
                     'imdb_list_description': row[4],
                     'imdb_name': row[5],
                     'movie_name': row[5],
-                    'imdb_year': int(row[11]),
-                    'movie_year': int(row[11]),
-                    'imdb_score': float(row[9]),
+                    'imdb_year': int(row[11]) if (row[11]) != '????' else None,
+                    'movie_year': int(row[11]) if (row[11]) != '????' else None,
+                    'imdb_score': float(row[9]) if row[9] else None,
                     'imdb_user_score': float(row[8]) if row[8] else None,
                     'imdb_votes': int(row[13]),
                     'imdb_genres': [genre.strip() for genre in row[12].split(',')]
@@ -116,6 +115,10 @@ class ImdbEntrySet(MutableSet):
     def immutable(self):
         if self.config['list'] in IMMUTABLE_LISTS:
             return '%s list is not modifiable' % self.config['list']
+
+    def _from_iterable(cls, it):
+        # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
+        return set(it)
 
     def __contains__(self, entry):
         if not entry.get('imdb_id'):
