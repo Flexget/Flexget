@@ -28,9 +28,12 @@ default_error_schema = api.schema('default_error_schema', default_error_schema)
 empty_response = api.schema('empty_response', empty_response)
 
 input_movie_list_id_object = {
-    'type': 'object',
-    'minProperties': 1,
-    'additionalProperties': {"type": "string"}
+    'type': 'array',
+    'items': {
+        'type': 'object',
+        'minProperties': 1,
+        'additionalProperties': True
+    }
 }
 
 input_movie_entry = {
@@ -40,10 +43,7 @@ input_movie_entry = {
         'url': {'type': 'string'},
         'movie_name': {'type': 'string'},
         'movie_year': {'type': 'integer'},
-        'movie_identifiers': {
-            'type': 'array',
-            'items': input_movie_list_id_object
-        }
+        'movie_identifiers': input_movie_list_id_object
     },
     'additionalProperties': True,
     'required': ['url'],
@@ -94,7 +94,7 @@ return_movies = {
 return_lists = {'type': 'array', 'items': list_object}
 
 input_movie_entry_schema = api.schema('input_movie_entry', input_movie_entry)
-input_movie_list_id_object = api.schema('input_movie_list_id_object', input_movie_list_id_object)
+input_movie_list_id_schema = api.schema('input_movie_list_id_object', input_movie_list_id_object)
 
 movie_list_id_object_schema = api.schema('movie_list_id_object', return_movie_list_id_object)
 movie_list_object_schema = api.schema('movie_list_object', movie_list_object)
@@ -107,7 +107,7 @@ return_movies_schema = api.schema('return_movies', return_movies)
 class MovieListAPI(APIResource):
     @api.response(200, model=return_lists_schema)
     def get(self, session=None):
-        ''' Gets all movies lists '''
+        """ Gets all movies lists """
         movie_lists = [movie_list.to_dict() for movie_list in ml.get_all_lists(session=session)]
         return jsonify({'movie_lists': movie_lists})
 
@@ -117,7 +117,7 @@ class MovieListAPI(APIResource):
 class MovieListSearchAPI(APIResource):
     @api.response(200, model=return_lists_schema)
     def get(self, list_name, session=None):
-        ''' Search lists by name '''
+        """ Search lists by name """
         movie_lists = [movie_list.to_dict() for movie_list in ml.get_list_by_name(name=list_name, session=session)]
         return jsonify({'movie_lists': movie_lists})
 
@@ -128,7 +128,7 @@ class MovieListListAPI(APIResource):
     @api.response(404, model=default_error_schema)
     @api.response(200, model=list_object_schema)
     def get(self, list_id, session=None):
-        ''' Get list by ID '''
+        """ Get list by ID """
         try:
             list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -139,7 +139,7 @@ class MovieListListAPI(APIResource):
     @api.response(200, model=empty_response)
     @api.response(404, model=default_error_schema)
     def delete(self, list_id, session=None):
-        ''' Delete list by ID '''
+        """ Delete list by ID """
         try:
             ml.delete_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -154,7 +154,7 @@ class MovieListMoviesAPI(APIResource):
     @api.response(404, model=default_error_schema)
     @api.response(200, model=return_movies_schema)
     def get(self, list_id, session=None):
-        ''' Get movies by list ID '''
+        """ Get movies by list ID """
         try:
             list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -168,7 +168,7 @@ class MovieListMoviesAPI(APIResource):
     @api.response(404, description='List not found', model=default_error_schema)
     @api.response(500, description='Movie already exist in list', model=default_error_schema)
     def post(self, list_id, session=None):
-        ''' Add movies to list by ID '''
+        """ Add movies to list by ID """
         try:
             list = ml.get_list_by_id(list_id=list_id, session=session)
         except NoResultFound:
@@ -186,10 +186,7 @@ class MovieListMoviesAPI(APIResource):
         movie = ml.MovieListMovie()
         movie.title = title
         movie.year = year
-        for identifier in data.get('movie_identifiers'):
-            for key, value in identifier.items():
-                if key in ml.SUPPORTED_IDS:
-                    movie.ids.append(ml.MovieListID(id_name=key, id_value=value))
+        movie.ids = ml.get_db_movie_identifiers(data.get('movie_identifiers'))
         movie.list_id = list_id
         session.add(movie)
         session.commit()
@@ -200,11 +197,11 @@ class MovieListMoviesAPI(APIResource):
 
 @movie_list_api.route('/<int:list_id>/movies/<int:movie_id>/')
 @api.doc(params={'list_id': 'ID of the list', 'movie_id': 'ID of the movie'})
+@api.response(404, description='List or movie not found', model=default_error_schema)
 class MovieListMovieAPI(APIResource):
     @api.response(200, model=movie_list_object_schema)
-    @api.response(404, description='List not found', model=default_error_schema)
     def get(self, list_id, movie_id, session=None):
-        ''' Get a movie by list ID and movie ID '''
+        """ Get a movie by list ID and movie ID """
         try:
             movie = ml.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
@@ -212,10 +209,9 @@ class MovieListMovieAPI(APIResource):
                     'message': 'could not find movie with id %d in list %d' % (movie_id, list_id)}, 404
         return jsonify(movie.to_dict())
 
-    @api.response(404, description='List not found', model=default_error_schema)
     @api.response(200, model=empty_response)
     def delete(self, list_id, movie_id, session=None):
-        ''' Delete a movie by list ID and movie ID '''
+        """ Delete a movie by list ID and movie ID """
         try:
             movie = ml.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
         except NoResultFound:
@@ -223,3 +219,17 @@ class MovieListMovieAPI(APIResource):
                     'message': 'could not find movie with id %d in list %d' % (movie_id, list_id)}, 404
         session.delete(movie)
         return {}
+
+    @api.validate(input_movie_list_id_schema)
+    @api.response(200, model=movie_list_object_schema)
+    @api.doc(description='Sent movie identifiers will override any existing identifiers that the movie currently holds')
+    def put(self, list_id, movie_id, session=None):
+        """ Sets movie identifiers """
+        try:
+            movie = ml.get_movie_by_id(list_id=list_id, movie_id=movie_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'could not find movie with id %d in list %d' % (movie_id, list_id)}, 404
+        data = request.json
+        movie.ids[:] = ml.get_db_movie_identifiers(data)
+        return movie.to_dict()
