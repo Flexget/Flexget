@@ -210,24 +210,27 @@ def get_movie_by_title(list_id, title, session=None):
 
 
 @with_session
-def get_movie_identifier(identifier_name, identifier_value, session=None):
+def get_movie_identifier(identifier_name, identifier_value, movie_id=None, session=None):
     db_movie_id = session.query(MovieListID).filter(
         and_(MovieListID.id_name == identifier_name,
-             MovieListID.id_value == identifier_value)).first()
+             MovieListID.id_value == identifier_value,
+             MovieListID.movie_id == movie_id)).first()
     if db_movie_id:
-        log.debug('fetching movie identifier %s: %s', (db_movie_id.id_name, db_movie_id.id_value))
+        log.debug('fetching movie identifier %s: %s', db_movie_id.id_name, db_movie_id.id_value)
         return db_movie_id
 
 
 @with_session
-def get_db_movie_identifiers(identifier_list, session=None):
+def get_db_movie_identifiers(identifier_list, movie_id=None, session=None):
     db_movie_ids = []
     for identifier in identifier_list:
         for key, value in identifier.items():
             if key in SUPPORTED_IDS:
-                db_movie_id = get_movie_identifier(identifier_name=key, identifier_value=value, session=session)
+                db_movie_id = get_movie_identifier(identifier_name=key, identifier_value=value, movie_id=movie_id,
+                                                   session=session)
                 if not db_movie_id:
-                    log.debug('creating movie identifier %s: %s' % (key, value))
-                    db_movie_id = MovieListID(id_name=key, id_value=value)
+                    log.debug('creating movie identifier %s: %s', key, value)
+                    db_movie_id = MovieListID(id_name=key, id_value=value, movie_id=movie_id)
+                    session.add(db_movie_id)
                 db_movie_ids.append(db_movie_id)
     return db_movie_ids

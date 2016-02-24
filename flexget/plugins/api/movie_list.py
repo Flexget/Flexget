@@ -186,7 +186,7 @@ class MovieListMoviesAPI(APIResource):
         movie = ml.MovieListMovie()
         movie.title = title
         movie.year = year
-        movie.ids = ml.get_db_movie_identifiers(data.get('movie_identifiers'))
+        movie.ids = ml.get_db_movie_identifiers(identifier_list=data.get('movie_identifiers'), session=session)
         movie.list_id = list_id
         session.add(movie)
         session.commit()
@@ -231,5 +231,6 @@ class MovieListMovieAPI(APIResource):
             return {'status': 'error',
                     'message': 'could not find movie with id %d in list %d' % (movie_id, list_id)}, 404
         data = request.json
-        movie.ids[:] = ml.get_db_movie_identifiers(data)
+        movie.ids[:] = ml.get_db_movie_identifiers(identifier_list=data, movie_id=movie_id, session=session)
+        session.commit()
         return movie.to_dict()
