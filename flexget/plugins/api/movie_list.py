@@ -81,6 +81,9 @@ list_object = {
     }
 }
 
+list_input = copy.deepcopy(list_object)
+del list_input['properties']['id']
+
 return_movies = {
     'type': 'object',
     'properties': {
@@ -102,20 +105,41 @@ list_object_schema = api.schema('list_object', list_object)
 return_lists_schema = api.schema('return_lists', return_lists)
 return_movies_schema = api.schema('return_movies', return_movies)
 
+new_list_schema = api.schema('new_list', list_input)
+
 movie_list_parser = api.parser()
 movie_list_parser.add_argument('name', help='Filter results by list name')
 
 
 @movie_list_api.route('/')
-@api.doc(parser=movie_list_parser)
 class MovieListAPI(APIResource):
     @api.response(200, model=return_lists_schema)
+    @api.doc(parser=movie_list_parser)
     def get(self, session=None):
         """ Gets movies lists """
         args = movie_list_parser.parse_args()
         name = args.get('name')
         movie_lists = [movie_list.to_dict() for movie_list in ml.get_movie_lists(name=name, session=session)]
         return jsonify({'movie_lists': movie_lists})
+
+    @api.validate(new_list_schema)
+    @api.response(201, model=list_object_schema)
+    @api.response(500, description='List already exist', model=default_error_schema)
+    def post(self, session=None):
+        """ Create a new list """
+        data = request.json
+        name=data.get('name')
+        movie_list = ml.get_list_by_exact_name(name=name, session=session)
+        if movie_list:
+            return {'status': 'error',
+                    'message': "list with name '%s' already exists" % name}, 500
+        movie_list = ml.MovieListList()
+        movie_list.name = name
+        session.add(movie_list)
+        session.commit()
+        resp = jsonify(movie_list.to_dict())
+        resp.status_code = 201
+        return resp
 
 
 @movie_list_api.route('/<int:list_id>/')
