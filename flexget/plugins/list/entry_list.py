@@ -5,7 +5,9 @@ from collections import MutableSet
 from datetime import datetime
 
 from sqlalchemy import Column, Unicode, PickleType, Integer, DateTime, or_
+from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
+from sqlalchemy.sql.schema import ForeignKey
 
 from flexget import plugin
 from flexget.db_schema import versioned_base
@@ -17,45 +19,74 @@ log = logging.getLogger('entry_list')
 Base = versioned_base('entry_list', 0)
 
 
-class StoredEntry(Base):
-    __tablename__ = 'entry_list'
+class EntryListList(Base):
+    __tablename__ = 'entry_list_lists'
     id = Column(Integer, primary_key=True)
-    list = Column(Unicode, index=True)
+    name = Column(Unicode, unique=True)
+    added = Column(DateTime, default=datetime.now)
+    entries = relationship('EntryListEntry', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'added_on': self.added
+        }
+
+
+class EntryListEntry(Base):
+    __tablename__ = 'entry_list_entries'
+    id = Column(Integer, primary_key=True)
+    list_id = Column(Integer, ForeignKey(EntryListList.id), nullable=False)
     added = Column(DateTime, default=datetime.now)
     title = Column(Unicode)
     original_url = Column(Unicode)
     _entry = Column('entry', PickleType)
     entry = safe_pickle_synonym('_entry')
 
-    def __init__(self, list, entry):
-        self.list = list
+    def __init__(self, entry, entry_list_id):
         self.title = entry['title']
         self.original_url = entry['original_url']
         self.entry = entry
+        self.list_id = entry_list_id
 
     def __repr__(self):
-        return '<StoredEntry,title=%s,original_url=%s>' % (self.title, self.original_url)
+        return '<EntryListEntry,title=%s,original_url=%s>' % (self.title, self.original_url)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'list_id': self.list_id,
+            'added_on': self.added,
+            'title': self.title,
+            'original_url': self.original_url,
+            'entry': dict(self.entry)
+        }
 
 
 class DBEntrySet(MutableSet):
-    def __init__(self, config):
+    @with_session
+    def __init__(self, config, session=None):
         self.config = config
-
-    def _query(self, session):
-        return session.query(StoredEntry).filter(StoredEntry.list == self.config)
+        self.db_list = session.query(EntryListList).filter(EntryListList.name == self.config).first()
+        if not self.db_list:
+            session.add(EntryListList(name=self.config))
 
     def _entry_query(self, session, entry):
-        query = self._query(session)
-        db_entry = query.filter(or_(
-            StoredEntry.title == entry['title'], and_(
-                StoredEntry.original_url,
-                StoredEntry.original_url == entry['original_url']))).first()
-        if db_entry:
-            return db_entry
+        db_entry = session.query(EntryListEntry).filter(and_(
+            EntryListEntry.list_id == self.db_list.id,
+            or_(
+                EntryListEntry.title == entry['title'], and_(
+                    EntryListEntry.original_url,
+                    EntryListEntry.original_url == entry[
+                        'original_url'])))).first()
+
+        return db_entry
 
     @with_session
     def __iter__(self, session=None):
-        return (Entry(e.entry) for e in self._query(session).order_by(StoredEntry.added.desc()).all())
+        return (Entry(e.entry) for e in
+                self.db_list.entries.order_by(EntryListEntry.added.desc()).all())
 
     @with_session
     def __contains__(self, entry, session=None):
@@ -63,7 +94,7 @@ class DBEntrySet(MutableSet):
 
     @with_session
     def __len__(self, session=None):
-        return self._query(session).count()
+        return self.db_list.entries.count()
 
     @with_session
     def discard(self, entry, session=None):
@@ -80,8 +111,11 @@ class DBEntrySet(MutableSet):
             log.debug('refreshing entry %s', entry)
             stored_entry.entry = entry
         else:
-            log.debug('adding entry %s', entry)
-            session.add(StoredEntry(list=self.config, entry=entry))
+            log.debug('adding entry %s to list %s', entry, self.db_list.name)
+            stored_entry = EntryListEntry(entry=entry, entry_list_id=self.db_list.id)
+        session.add(stored_entry)
+        session.commit()
+        return stored_entry.to_dict()
 
     @with_session
     def __ior__(self, other, session=None):
@@ -90,7 +124,13 @@ class DBEntrySet(MutableSet):
             self.add(value, session=session)
         return self
 
-    update = __ior__
+    @property
+    def immutable(self):
+        return False
+
+    def _from_iterable(self, it):
+        # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
+        return set(it)
 
 
 class EntryList(object):
