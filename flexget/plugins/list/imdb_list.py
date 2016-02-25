@@ -105,7 +105,7 @@ class ImdbEntrySet(MutableSet):
                     'movie_year': int(row[11]) if (row[11]) != '????' else None,
                     'imdb_score': float(row[9]) if row[9] else None,
                     'imdb_user_score': float(row[8]) if row[8] else None,
-                    'imdb_votes': int(row[13]),
+                    'imdb_votes': int(row[13]) if row[13] else None,
                     'imdb_genres': [genre.strip() for genre in row[12].split(',')]
                 })
                 self._items.append(entry)
