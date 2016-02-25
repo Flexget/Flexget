@@ -4,7 +4,7 @@
     angular.module('flexget.plugins.profile')
         .controller('profileController', profileController);
 
-    function profileController($http) {
+    function profileController($http, Dialog, $state) {
         var vm = this;
 
         vm.title = 'Profile';
@@ -14,13 +14,17 @@
         vm.errorMessages = undefined; 
 
         vm.updatePassword = function() {
-            /*vm.errorMessage = {
-            "firstError": {
-                "testing": "Bullshit"
-            }
-        };;*/
             $http.put('/api/user/', { password: vm.password }).success(function(data) {
-                console.log(data);
+                var options = {
+                    title: "Password updated",
+                    body: "Your password has been successfully updated.",
+                    ok: "Close"
+                }
+
+                Dialog.open(options)
+                .finally(function() {
+                    $state.go('flexget.home');
+                });
             }).error(function(error) {
                 vm.Error = true;
                 vm.errorMessages = error;
