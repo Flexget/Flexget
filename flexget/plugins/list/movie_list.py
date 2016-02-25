@@ -2,8 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 
 import logging
 from collections import MutableSet
+from datetime import datetime
 
-from sqlalchemy import Column, Unicode, Integer, ForeignKey, func
+from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 
@@ -23,18 +24,21 @@ class MovieListList(Base):
     __tablename__ = 'movie_list_lists'
     id = Column(Integer, primary_key=True)
     name = Column(Unicode, unique=True)
+    added = Column(DateTime, default=datetime.now)
     movies = relationship('MovieListMovie', backref='list', cascade='all, delete, delete-orphan', lazy='dynamic')
 
     def to_dict(self):
         return {
             'id': self.id,
-            'name': self.name
+            'name': self.name,
+            'added_on': self.added
         }
 
 
 class MovieListMovie(Base):
     __tablename__ = 'movie_list_movies'
     id = Column(Integer, primary_key=True)
+    added = Column(DateTime, default=datetime.now)
     title = Column(Unicode)
     year = Column(Integer)
     list_id = Column(Integer, ForeignKey(MovieListList.id), nullable=False)
@@ -55,6 +59,7 @@ class MovieListMovie(Base):
         movies_list_ids = [movie_list_id.to_dict() for movie_list_id in self.ids]
         return {
             'id': self.id,
+            'added_on': self.added,
             'title': self.title,
             'year': self.year,
             'list_id': self.list_id,
@@ -65,6 +70,7 @@ class MovieListMovie(Base):
 class MovieListID(Base):
     __tablename__ = 'movie_list_ids'
     id = Column(Integer, primary_key=True)
+    added = Column(DateTime, default=datetime.now)
     id_name = Column(Unicode)
     id_value = Column(Unicode)
     movie_id = Column(Integer, ForeignKey(MovieListMovie.id))
@@ -72,6 +78,7 @@ class MovieListID(Base):
     def to_dict(self):
         return {
             'id': self.id,
+            'added_on': self.added,
             'id_name': self.id_name,
             'id_value': self.id_value,
             'movie_id': self.movie_id
@@ -119,6 +126,7 @@ class MovieList(MutableSet):
                 db_movie.ids.append(MovieListID(id_name=id_name, id_value=entry[id_name]))
         log.debug('adding entry %s', entry)
         db_list.movies.append(db_movie)
+        session.commit()
         return db_movie.to_entry()
 
     @with_session

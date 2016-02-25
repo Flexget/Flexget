@@ -57,6 +57,7 @@ return_movie_list_id_object = copy.deepcopy(input_movie_list_id_object)
 return_movie_list_id_object.update(
     {'properties': {
         'id': {'type': 'integer'},
+        'added_on': {'type': 'string'},
         'movie_id': {'type': 'integer'}
     }})
 
@@ -64,6 +65,7 @@ movie_list_object = {
     'type': 'object',
     'properties': {
         'title': {'type': 'string'},
+        'added_on': {'type': 'string'},
         'year': {'type': 'integer'},
         'list_id': {'type': 'integer'},
         'movie_list_ids': {
@@ -77,12 +79,14 @@ list_object = {
     'type': 'object',
     'properties': {
         'id': {'type': 'integer'},
+        'added_on': {'type': 'string'},
         'name': {'type': 'string'}
     }
 }
 
 list_input = copy.deepcopy(list_object)
 del list_input['properties']['id']
+del list_input['properties']['added_on']
 
 return_movies = {
     'type': 'object',
