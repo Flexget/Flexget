@@ -159,7 +159,7 @@ def setup_server(manager, session=None):
 
     # Create default flexget user
     if session.query(User).count() == 0:
-        session.add(User(name="flexget", password=generate_password_hash("flexget")))
+        session.add(User(name="flexget", password=unicode(generate_password_hash("flexget"))))
         session.commit()
     # Migrate existing user password to be hashed
     elif session.query(User).count() >= 1:
