@@ -102,27 +102,23 @@ list_object_schema = api.schema('list_object', list_object)
 return_lists_schema = api.schema('return_lists', return_lists)
 return_movies_schema = api.schema('return_movies', return_movies)
 
+movie_list_parser = api.parser()
+movie_list_parser.add_argument('name', help='Filter results by list name')
+
 
 @movie_list_api.route('/')
+@api.doc(parser=movie_list_parser)
 class MovieListAPI(APIResource):
     @api.response(200, model=return_lists_schema)
     def get(self, session=None):
-        """ Gets all movies lists """
-        movie_lists = [movie_list.to_dict() for movie_list in ml.get_all_lists(session=session)]
+        """ Gets movies lists """
+        args = movie_list_parser.parse_args()
+        name = args.get('name')
+        movie_lists = [movie_list.to_dict() for movie_list in ml.get_movie_lists(name=name, session=session)]
         return jsonify({'movie_lists': movie_lists})
 
 
-@movie_list_api.route('/search/<string:list_name>/')
-@api.doc(params={'list_name': 'Name of the list(s) to search'})
-class MovieListSearchAPI(APIResource):
-    @api.response(200, model=return_lists_schema)
-    def get(self, list_name, session=None):
-        """ Search lists by name """
-        movie_lists = [movie_list.to_dict() for movie_list in ml.get_list_by_name(name=list_name, session=session)]
-        return jsonify({'movie_lists': movie_lists})
-
-
-@movie_list_api.route('/<int:list_id>')
+@movie_list_api.route('/<int:list_id>/')
 @api.doc(params={'list_id': 'ID of the list'})
 class MovieListListAPI(APIResource):
     @api.response(404, model=default_error_schema)

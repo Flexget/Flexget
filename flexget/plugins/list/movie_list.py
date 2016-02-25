@@ -169,15 +169,13 @@ def register_plugin():
 
 
 @with_session
-def get_all_lists(session=None):
-    log.debug('retrieving all lists')
-    return session.query(MovieListList).all()
-
-
-@with_session
-def get_list_by_name(name, session=None):
-    log.debug('searching for movie lists matching %s', name)
-    return session.query(MovieListList).filter(MovieListList.name.contains(name)).all()
+def get_movie_lists(name, session=None):
+    log.debug('retrieving movie lists')
+    query = session.query(MovieListList)
+    if name:
+        log.debug('filtering by name %s', name)
+        query = query.filter(MovieListList.name.contains(name))
+    return query.all()
 
 
 @with_session
