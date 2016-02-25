@@ -47,8 +47,8 @@ class MovieListMovie(Base):
         if self.year:
             entry['title'] += ' (%d)' % self.year
             entry['movie_year'] = self.year
-        for id in self.ids:
-            entry[id.id_name] = id.id_value
+        for movie_list_id in self.ids:
+            entry[movie_list_id.id_name] = movie_list_id.id_value
         return entry
 
     def to_dict(self):
@@ -82,7 +82,7 @@ class MovieList(MutableSet):
     def _db_list(self, session):
         return session.query(MovieListList).filter(MovieListList.name == self.config).first()
 
-    def _from_iterable(cls, it):
+    def _from_iterable(self, it):
         # TODO: is this the right answer? the returned object won't have our custom __contains__ logic
         return set(it)
 
@@ -176,36 +176,36 @@ def get_all_lists(session=None):
 
 @with_session
 def get_list_by_name(name, session=None):
-    log.debug('searching for movie lists matching %s' % name)
+    log.debug('searching for movie lists matching %s', name)
     return session.query(MovieListList).filter(MovieListList.name.contains(name)).all()
 
 
 @with_session
 def get_list_by_id(list_id, session=None):
-    log.debug('fetching list with id %d' % list_id)
+    log.debug('fetching list with id %d', list_id)
     return session.query(MovieListList).filter(MovieListList.id == list_id).one()
 
 
 @with_session
 def get_movie_by_id(list_id, movie_id, session=None):
-    log.debug('fetching movie with id %d from list id %d' % (movie_id, list_id))
+    log.debug('fetching movie with id %d from list id %d', movie_id, list_id)
     return session.query(MovieListMovie).filter(
         and_(MovieListMovie.id == movie_id, MovieListMovie.list_id == list_id)).one()
 
 
 @with_session
 def delete_list_by_id(list_id, session=None):
-    list = get_list_by_id(list_id=list_id, session=session)
+    movie_list = get_list_by_id(list_id=list_id, session=session)
     if list:
-        log.debug('deleting list with id %d' % list_id)
-        session.delete(list)
+        log.debug('deleting list with id %d', list_id)
+        session.delete(movie_list)
 
 
 @with_session
 def get_movie_by_title(list_id, title, session=None):
-    list = get_list_by_id(list_id=list_id, session=session)
-    if list:
-        log.debug('searching for movie %s in list %d' % (title, list_id))
+    movie_list = get_list_by_id(list_id=list_id, session=session)
+    if movie_list:
+        log.debug('searching for movie %s in list %d', title, list_id)
         return session.query(MovieListMovie).filter(func.lower(MovieListMovie.title) == title.lower()).first()
 
 
