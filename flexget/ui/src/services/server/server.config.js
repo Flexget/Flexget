@@ -4,43 +4,26 @@
     angular.module('flexget.services')
         .run(serverConfig);
 
-    function serverConfig(toolBar, server, $mdDialog) {
+    function serverConfig(toolBar, server, Dialog) {
 
         var reload = function () {
-            var reloadController = function ($mdDialog) {
-                var vm = this;
-
-                vm.title = 'Reload Config';
-                vm.showCircular = true;
-                vm.content = null;
-                vm.buttons = [];
-                vm.ok = null;
-
-                vm.hide = function () {
-                    $mdDialog.hide();
-                };
-
-                var done = function (text) {
-                    vm.showCircular = false;
-                    vm.content = text;
-                    vm.ok = 'Close';
-                };
-
-                server.reload()
-                    .success(function () {
-                        done('Reload Success');
-                    })
-                    . error(function (data, status, headers, config) {
-                        done('Reload failed: ' + data.error);
-                    });
-            };
-
-            $mdDialog.show({
-                templateUrl: 'services/modal/modal.dialog.circular.tmpl.html',
-                parent: angular.element(document.body),
-                controllerAs: 'vm',
-                controller: reloadController
-            });
+            server.reload()
+                .success(function() {
+                    var options = {
+                        title: "Reload success",
+                        body: "Your config file has been successfully reloaded.",
+                        ok: "Ok"
+                    }
+                    Dialog.open(options);
+                })
+                .error(function(data, status, headers, config) {
+                    var options = {
+                        title: "Reload failed",
+                        body: "Oops, something went wrong: " + data.error,
+                        ok: "Ok"
+                    }
+                    Dialog.open(options);
+                });
         };
 
         var doShutdown = function () {
