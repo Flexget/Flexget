@@ -128,13 +128,12 @@ class MovieListAPI(APIResource):
     def post(self, session=None):
         """ Create a new list """
         data = request.json
-        name=data.get('name')
+        name = data.get('name')
         movie_list = ml.get_list_by_exact_name(name=name, session=session)
         if movie_list:
             return {'status': 'error',
                     'message': "list with name '%s' already exists" % name}, 500
-        movie_list = ml.MovieListList()
-        movie_list.name = name
+        movie_list = ml.MovieListList(name=name)
         session.add(movie_list)
         session.commit()
         resp = jsonify(movie_list.to_dict())
