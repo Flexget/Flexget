@@ -58,7 +58,9 @@ class ImdbEntrySet(MutableSet):
         data['password'] = self.config['password']
         self._session.post('https://www.imdb.com/ap/signin', data=data)
         # Get user id by exctracting from redirect url
-        r = self._session.get('http://www.imdb.com/list/ratings', allow_redirects=False)
+        r = self._session.head('http://www.imdb.com/profile', allow_redirects=False)
+        if not r.headers.get('location') or 'login' in r.headers['location']:
+            raise plugin.PluginError('Login to imdb failed. Check your credentials.')
         self.user_id = re.search('ur\d+(?!\d)', r.headers['location']).group()
         # Get list ID
         if self.config['list'] == 'watchlist':
