@@ -1,16 +1,17 @@
-<div layout="column" flex class="profile">
-	<md-content layout-padding>
-        <div layout="row" layout-gt-sm="column" layout-align="center center" layout-wrap>
-            <md-input-container>
+<md-content>
+    <form name="passwordForm" layout layout-align="center" layout-padding>
+        <div layout="row" flex>
+            <md-input-container flex class="md-block">
                 <label>New Password</label>
-                <input type="text" ng-model="vm.password">
+                <input type="password" name="password" ng-model="vm.password">
                 <div ng-messages="vm.errorMessages" md-auto-hide="false">
                     <div ng-message="message">{{ vm.errorMessages.message }}</div>
                 </div>
             </md-input-container>
+            <div flex="5"></div>
+            <div>
+                <md-button class="md-raised md-primary" ng-click="vm.updatePassword()">Update</md-button>
+            </div>
         </div>
-        <div layout="row" layout-gt-sm="column" layout-align="center center" layout-wrap>
-            <md-button class="md-raised md-primary" ng-click="vm.updatePassword()">Update</md-button>
-        </div>
-    </md-content>
-</div>
+    </form>
+</md-content>
