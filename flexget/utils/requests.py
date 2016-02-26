@@ -7,12 +7,14 @@ from urlparse import urlparse
 
 import requests
 # Allow some request objects to be imported from here instead of requests
+import warnings
 from requests import RequestException, HTTPError
 
 from flexget import __version__ as version
-from flexget.utils.tools import parse_timedelta, TimedDict
+from flexget.utils.tools import parse_timedelta, TimedDict, timedelta_total_seconds
 
-log = logging.getLogger('requests')
+# If we use just 'requests' here, we'll get the logger created by requests, rather than our own
+log = logging.getLogger('utils.requests')
 
 # Don't emit info level urllib3 log messages or below
 logging.getLogger('requests.packages.urllib3').setLevel(logging.WARNING)
@@ -50,19 +52,74 @@ def set_unresponsive(url):
     unresponsive_hosts[host] = True
 
 
-def wait_for_domain(url, delay_dict):
-    for domain, domain_dict in delay_dict.iteritems():
-        if domain in url:
-            next_req = domain_dict.get('next_req')
-            if next_req and datetime.now() < next_req:
-                wait_time = next_req - datetime.now()
-                seconds = wait_time.seconds + (wait_time.microseconds / 1000000.0)
-                log.debug('Waiting %.2f seconds until next request to %s' % (seconds, domain))
-                # Sleep until it is time for the next request
-                time.sleep(seconds)
-            # Record the next allowable request time for this domain
-            domain_dict['next_req'] = datetime.now() + domain_dict['delay']
-            break
+class DomainLimiter(object):
+    def __init__(self, domain):
+        self.domain = domain
+
+    def __call__(self):
+        """This method will be called once before every request to the domain."""
+        raise NotImplementedError
+
+
+class TokenBucketLimiter(DomainLimiter):
+    """
+    A token bucket rate limiter for domains.
+    
+    New instances for the same domain will restore previous values.
+    """
+    # This is just an in memory cache right now, it works for the daemon, and across tasks in a single execution
+    # but not for multiple executions via cron. Do we need to store this to db?
+    state_cache = {}
+    
+    def __init__(self, domain, tokens, rate, wait=True):
+        """
+        :param int tokens: Size of bucket
+        :param rate: Amount of time to accrue 1 token. Either `timedelta` or interval string.
+        :param bool wait: If true, will wait for a token to be available. If false, errors when token is not available.
+        """
+        super(TokenBucketLimiter, self).__init__(domain)
+        self.max_tokens = tokens
+        self.rate = parse_timedelta(rate)
+        self.wait = wait
+        # Restore previous state for this domain, or establish new state cache
+        self.state = self.state_cache.setdefault(domain, {'tokens': self.max_tokens, 'last_update': datetime.now()})
+
+    @property
+    def tokens(self):
+        return min(self.max_tokens, self.state['tokens'])
+
+    @tokens.setter
+    def tokens(self, value):
+        self.state['tokens'] = value
+
+    @property
+    def last_update(self):
+        return self.state['last_update']
+
+    @last_update.setter
+    def last_update(self, value):
+        self.state['last_update'] = value
+
+    def __call__(self):
+        if self.tokens < self.max_tokens:
+            regen = (timedelta_total_seconds(datetime.now() - self.last_update) /
+                     timedelta_total_seconds(self.rate))
+            self.tokens += regen
+        self.last_update = datetime.now()
+        if self.tokens < 1:
+            if not self.wait:
+                raise RequestException('Requests to %s have exceeded their limit.' % self.domain)
+            wait = timedelta_total_seconds(self.rate) * (1 - self.tokens)
+            log.verbose('Waiting %.2f seconds until next request to %s' % (wait, self.domain))
+            # Sleep until it is time for the next request
+            time.sleep(wait)
+        self.tokens -= 1
+
+
+class TimedLimiter(TokenBucketLimiter):
+    """Enforces a minimum interval between requests to a given domain."""
+    def __init__(self, domain, interval):
+        super(TimedLimiter, self).__init__(domain, 1, interval)
 
 
 def _wrap_urlopen(url, timeout=None):
@@ -89,6 +146,18 @@ def _wrap_urlopen(url, timeout=None):
     return resp
 
 
+def limit_domains(url, limit_dict):
+    """
+    If this url matches a domain in `limit_dict`, run the limiter.
+
+    This is separated in to its own function so that limits can be disabled during unit tests with VCR.
+    """
+    for domain, limiter in limit_dict.iteritems():
+        if domain in url:
+            limiter()
+            break
+
+
 class Session(requests.Session):
     """
     Subclass of requests Session class which defines some of our own defaults, records unresponsive sites,
@@ -103,7 +172,7 @@ class Session(requests.Session):
         self.stream = True
         self.adapters['http://'].max_retries = max_retries
         # Stores min intervals between requests for certain sites
-        self.domain_delay = {}
+        self.domain_limiters = {}
         self.headers.update({'User-Agent': 'FlexGet/%s (www.flexget.com)' % version})
 
     def add_cookiejar(self, cookiejar):
@@ -117,12 +186,22 @@ class Session(requests.Session):
 
     def set_domain_delay(self, domain, delay):
         """
+        DEPRECATED, use `add_domain_limiter`
         Registers a minimum interval between requests to `domain`
 
         :param domain: The domain to set the interval on
         :param delay: The amount of time between requests, can be a timedelta or string like '3 seconds'
         """
-        self.domain_delay[domain] = {'delay': parse_timedelta(delay)}
+        warnings.warn('set_domain_delay is deprecated, use add_domain_limiter', DeprecationWarning, stacklevel=2)
+        self.domain_limiters[domain] = TimedLimiter(domain, delay)
+            
+    def add_domain_limiter(self, limiter):
+        """
+        Add a limiter to throttle requests to a specific domain.
+
+        :param DomainLimiter limiter: The `DomainLimiter` to add to the session.
+        """
+        self.domain_limiters[limiter.domain] = limiter
 
     def request(self, method, url, *args, **kwargs):
         """
@@ -137,8 +216,8 @@ class Session(requests.Session):
             raise requests.Timeout('Requests to this site (%s) have timed out recently. Waiting before trying again.' %
                 urlparse(url).hostname)
 
-        # Delay, if needed, before another request to this site
-        wait_for_domain(url, self.domain_delay)
+        # Run domain limiters for this url
+        limit_domains(url, self.domain_limiters)
 
         kwargs.setdefault('timeout', self.timeout)
         raise_status = kwargs.pop('raise_status', True)

@@ -5,14 +5,14 @@ import re
 from flexget import plugin
 from flexget.event import event
 from flexget.plugins.plugin_urlrewriting import UrlRewritingError
-from flexget.utils.requests import Session
+from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('newpct')
 
 requests = Session()
 requests.headers.update({'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'})
-requests.set_domain_delay('imdb.com', '2 seconds')
+requests.add_domain_limiter(TimedLimiter('imdb.com', '2 seconds'))
 
 
 class UrlRewriteNewPCT(object):
