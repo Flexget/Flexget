@@ -20,7 +20,7 @@ log = logging.getLogger('api_rottentomatoes')
 Base = db_schema.versioned_base('api_rottentomatoes', 2)
 session = requests.Session()
 # There is a 5 call per second rate limit per api key with multiple users on the same api key, this can be problematic
-session.set_domain_delay('api.rottentomatoes.com', '0.4 seconds')
+session.add_domain_limiter(requests.TimedLimiter('api.rottentomatoes.com', '0.4 seconds'))
 
 # This is developer Atlanta800's API key
 API_KEY = 'rh8chjzp8vu6gnpwj88736uv'

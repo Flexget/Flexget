@@ -7,17 +7,19 @@ from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests, json
+from flexget.utils.requests import TokenBucketLimiter
 from flexget.utils.search import torrent_availability
 
 log = logging.getLogger('search_btn')
 
-# TODO: btn has a limit of 150 searches per hour
-
 
 class SearchBTN(object):
     schema = {'type': 'string'}
+    # Advertised limit is 150/hour (24s/request average). This may need some tweaking.
+    request_limiter = TokenBucketLimiter('api.btnapps.net', 100, '25 seconds')
 
     def search(self, task, entry, config):
+        task.requests.add_domain_limiter(self.request_limiter)
         api_key = config
 
         searches = entry.get('search_strings', [entry['title']])
@@ -57,7 +59,11 @@ class SearchBTN(object):
             if not content or not content['result']:
                 log.debug('No results from btn')
                 if content and content.get('error'):
-                    log.error('Error searching btn: %s' % content['error'].get('message', content['error']))
+                    if content['error'].get('code') == -32002:
+                        log.error('btn api call limit exceeded, throttling connection rate')
+                        self.request_limiter.tokens = -1
+                    else:
+                        log.error('Error searching btn: %s' % content['error'].get('message', content['error']))
                 continue
             if 'torrents' in content['result']:
                 for item in content['result']['torrents'].itervalues():

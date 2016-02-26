@@ -303,8 +303,8 @@ class ApiTmdb(object):
                 elif title:
                     try:
                         result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True, year=year))
-                    except socket.timeout:
-                        raise LookupError('Timeout contacting TMDb')
+                    except (socket.timeout, URLError):
+                        raise LookupError('Error contacting TMDb')
                     if not result and year:
                         result = _first_result(tmdb3.tmdb_api.searchMovie(title.lower(), adult=True))
                     if result:

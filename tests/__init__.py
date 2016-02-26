@@ -87,9 +87,9 @@ def use_vcr(func=None, **kwargs):
     elif vcr.record_mode == 'once':
         online = not os.path.exists(cassette_path)
     func = attr(online=online, vcr=True)(func)
-    # If we are not going online, disable domain delay during test
+    # If we are not going online, disable domain limiting during test
     if not online:
-        func = mock.patch('flexget.utils.requests.wait_for_domain', new=mock.MagicMock())(func)
+        func = mock.patch('flexget.utils.requests.limit_domains', new=mock.MagicMock())(func)
     if VCR_RECORD_MODE == 'off':
         return func
     else:
