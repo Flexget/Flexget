@@ -8,23 +8,33 @@ import sys
 import click
 
 
+def _get_version():
+    __version__ = None
+    with open('flexget/_version.py') as f:
+        exec(f.read())
+    if not __version__:
+        raise click.ClickException('Could not find __version__ from flexget/_version.py')
+    return __version__
+
+
 @click.group()
 def cli():
     pass
 
 
 @cli.command()
+def version():
+    """Prints the version number of the source"""
+    click.echo(_get_version())
+
+
+@cli.command()
 @click.argument('bump_type', type=click.Choice(['dev', 'release']))
 def bump_version(bump_type):
     """Bumps version to the next release, or development version."""
-    __version__ = None
-    with open('flexget/_version.py') as f:
-        exec(f.read())
-    if not __version__:
-        print('Could not find __version__ from flexget/_version.py')
-        sys.exit(1)
-    print('current version: %s' % __version__)
-    ver_split = __version__.split('.')
+    cur_ver = _get_version()
+    click.echo('current version: %s' % cur_ver)
+    ver_split = cur_ver.split('.')
     if 'dev' in ver_split[-1]:
         if bump_type == 'dev':
             # If this is already a development version, increment the dev count by 1
@@ -46,27 +56,30 @@ def bump_version(bump_type):
         if line.startswith('__version__ ='):
             line = "__version__ = '%s'\n" % new_version
         print(line, end='')
-    print('new version: %s' % new_version)
+    click.echo('new version: %s' % new_version)
 
 
 @cli.command()
 def build_webui():
-    print('aoeu')
     cwd = os.path.join('flexget', 'ui')
 
     # Cleanup previous builds
+    click.echo('cleaning previous builds')
     for folder in ['bower_components' 'node_modules']:
         folder = os.path.join(cwd, folder)
         if os.path.exists(folder):
             shutil.rmtree(folder)
 
     # Install npm packages
+    click.echo('running `npm install`')
     subprocess.check_call('npm install', cwd=cwd, shell=True)
 
     # Build the ui
+    click.echo('running `bower install`')
     subprocess.check_call('bower install', cwd=cwd, shell=True)
 
     # Build the ui
+    click.echo('running `gulp buildapp`')
     subprocess.check_call('gulp buildapp', cwd=cwd, shell=True)
 
 
