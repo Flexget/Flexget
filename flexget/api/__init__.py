@@ -37,7 +37,7 @@ def register_config():
     register_config_key('api', api_config_schema)
 
 
-class ApiSchemaModel(Model):
+class ApiSchemaModel(Model, object):
     """A flask restplus :class:`flask_restplus.models.ApiModel` which can take a json schema directly."""
     def __init__(self, name, schema, *args, **kwargs):
         super(ApiSchemaModel, self).__init__(name, *args, **kwargs)
@@ -62,7 +62,7 @@ class ApiSchemaModel(Model):
         return '<ApiSchemaModel(%r)>' % self._schema
 
 
-class Api(RestPlusAPI):
+class Api(RestPlusAPI, object):
     """
     Extends a flask restplus :class:`flask_restplus.Api` with:
       - methods to make using json schemas easier
@@ -147,7 +147,7 @@ class Api(RestPlusAPI):
         return super(Api, self).response(code_or_apierror, description, model=model)
 
 
-class APIResource(Resource):
+class APIResource(Resource, object):
     """All api resources should subclass this class."""
     method_decorators = [with_session]
 

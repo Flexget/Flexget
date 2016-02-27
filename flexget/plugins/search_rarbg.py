@@ -1,18 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import urllib
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.utils.requests import Session, get
+from flexget.utils.requests import Session, get, TimedLimiter
 from flexget.utils.search import normalize_scene
 
 log = logging.getLogger('rarbg')
 
 requests = Session()
-requests.set_domain_delay('torrentapi.org', '2.3 seconds')  # they only allow 1 request per 2 seconds
+requests.add_domain_limiter(TimedLimiter('torrentapi.org', '2.3 seconds'))  # they only allow 1 request per 2 seconds
 
 CATEGORIES = {
     'all': 0,

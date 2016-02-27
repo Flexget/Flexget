@@ -1,20 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import re
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
-from flexget.plugin import get_plugin_by_name
 from flexget.utils.cached_input import cached
-from flexget.utils.requests import RequestException, Session
+from flexget.utils.requests import RequestException, Session, TimedLimiter
 from flexget.utils.soup import get_soup
 
 log = logging.getLogger('letterboxd')
 logging.getLogger('api_tmdb').setLevel(logging.CRITICAL)
 
 requests = Session(max_retries=5)
-requests.set_domain_delay('letterboxd.com', '1 seconds')
+requests.add_domain_limiter(TimedLimiter('letterboxd.com', '1 seconds'))
 base_url = 'http://letterboxd.com'
 
 SLUGS = {

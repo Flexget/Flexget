@@ -23,11 +23,15 @@ directory support or provide interface for external utilities like FlexGet.
 .. image:: https://img.shields.io/pypi/dm/Flexget.svg
         :target: https://pypi.python.org/pypi/Flexget
 
+.. image:: https://badges.gitter.im/Flexget/Flexget.svg
+   :alt: Join the chat at https://gitter.im/Flexget/Flexget
+   :target: https://gitter.im/Flexget/Flexget?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+
 
 
 **Help:** http://discuss.flexget.com/
 
-**Chat:** http://webchat.freenode.net/?channels=#flexget
+**Chat:** http://webchat.freenode.net/?channels=#flexget or https://gitter.im/Flexget/Flexget
 
 **Bugs:** https://github.com/Flexget/Flexget/issues
 
