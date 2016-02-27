@@ -45,7 +45,7 @@ setup(
     install_requires=load_requirements('requirements.txt'),
     extras_require={
         ':python_version=="2.6"': ['argparse'],
-        'dev-tools': load_requirements('dev-requirements.txt')
+        'dev_tools': load_requirements('dev-requirements.txt')
     },
     entry_points=entry_points,
     classifiers=[
