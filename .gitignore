@@ -38,3 +38,5 @@ flexget/ui/node_modules/
 flexget/ui/bower_components/
 flexget/ui/.tmp/
 flexget/ui/app/
+cherrypy
+pip-selfcheck.json
