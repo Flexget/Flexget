@@ -16,10 +16,18 @@ class OutputSlack(object):
 
       slack:
         webhook-url: <string>
-        [text: <string>] (default: "{{task}} - Download started: {{series_name}} {{series_id}}" -- accepts Jinja2)
+        [text: <string>] (default: "{{task}} - Download started:
+                                    {% if series_name is defined %}
+                                    {{tvdb_series_name|d(series_name)}} {{series_id}} {{tvdb_ep_name|d('')}}
+                                    {% elif imdb_name is defined %}
+                                    {{imdb_name}} {{imdb_year}}
+                                    {% else %}
+                                    {{title}}
+                                    {% endif %}"
         [channel: <string>] (override channel, use "@username" or "#channel")
         [username: <string>] (override username)
-        [icon-emoji: <string>] (override emoji icon, do not include the colons: e.g., use "tv" instead of ":tv:")
+        [icon-emoji: <string>] (override emoji icon, do not include the colons:
+                                e.g., use "tv" instead of ":tv:")
 
     Configuration parameters are also supported from entries (e.g., through set).
     """
