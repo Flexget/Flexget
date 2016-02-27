@@ -5,6 +5,7 @@ from flexget import plugin
 from flexget.event import event
 from flexget.utils import json
 from flexget.utils.template import RenderError
+from requests import ConnectionError
 
 log = logging.getLogger('slack')
 
@@ -99,8 +100,8 @@ class OutputSlack(object):
             response = task.requests.post(webhook_url, headers=headers,
                                           data=json.dumps(data),
                                           raise_status=False)
-        except Exception as e:
-            log.error('Unable to connect to Slack API: {0}'.format(e))
+        except ConnectionError as e:
+            log.error('Unable to connect to Slack API: {0}'.format(e.message))
             return
 
         response_code = response.status_code
