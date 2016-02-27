@@ -844,6 +844,7 @@ def populate_entry_fields(entry, parser, config):
     entry['quality'] = parser.quality
     entry['proper'] = parser.proper
     entry['proper_count'] = parser.proper_count
+    entry['release_group'] = parser.group
     if parser.id_type == 'ep':
         entry['series_season'] = parser.season
         entry['series_episode'] = parser.episode
