@@ -1,7 +1,4 @@
 include LICENSE
 include README.rst
-include pavement.py
-include paver-minilib.zip
 include setup.py
-include bootstrap.py
 recursive-exclude tests *
