@@ -1,3 +1,4 @@
+sphinx
 pylint
 coverage
 nose>=0.11
