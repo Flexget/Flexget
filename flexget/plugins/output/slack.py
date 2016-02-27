@@ -78,15 +78,15 @@ class OutputSlack(object):
 
         if task.options.test:
             log.info('Test mode. Slack notification would be:')
-            log.info('    Webhook URL: {}'.format(webhook_url))
-            log.info('    Text: {}'.format(text))
+            log.info('    Webhook URL: {0}'.format(webhook_url))
+            log.info('    Text: {0}'.format(text))
             if channel:
-                log.info('    Channel: {}'.format(channel))
+                log.info('    Channel: {0}'.format(channel))
             if username:
-                log.info('    Username: {}'.format(username))
+                log.info('    Username: {0}'.format(username))
             if icon_emoji:
-                log.info('    Icon Emoji: :{}:'.format(icon_emoji))
-            log.info('    Raw POST Data: {}'.format(json.dumps(data)))
+                log.info('    Icon Emoji: :{0}:'.format(icon_emoji))
+            log.info('    Raw POST Data: {0}'.format(json.dumps(data)))
             # Early return (test mode)
             return
 
@@ -100,7 +100,7 @@ class OutputSlack(object):
                                           data=json.dumps(data),
                                           raise_status=False)
         except Exception as e:
-            log.error('Unable to connect to Slack API: {}'.format(e))
+            log.error('Unable to connect to Slack API: {0}'.format(e))
             return
 
         response_code = response.status_code
@@ -110,9 +110,9 @@ class OutputSlack(object):
         elif response_code == 500:
             log.warning('Slack notification failed: server problem')
         elif response_code >= 400:
-            log.error('Slack API error {}: {}'.format(response_code, response.content))
+            log.error('Slack API error {0}: {1}'.format(response_code, response.content))
         else:
-            log.error('Unknown error when sending Slack notification: {}'.format(response_code))
+            log.error('Unknown error when sending Slack notification: {0}'.format(response_code))
 
 
 @event('plugin.register')
