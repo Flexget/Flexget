@@ -1,5 +1,8 @@
-from __future__ import unicode_literals, print_function
+from __future__ import print_function
 import fileinput
+import os
+import shutil
+import subprocess
 import sys
 
 import click
@@ -44,3 +47,28 @@ def bump_version(bump_type):
             line = "__version__ = '%s'\n" % new_version
         print(line, end='')
     print('new version: %s' % new_version)
+
+
+@cli.command()
+def build_webui():
+    print('aoeu')
+    cwd = os.path.join('flexget', 'ui')
+
+    # Cleanup previous builds
+    for folder in ['bower_components' 'node_modules']:
+        folder = os.path.join(cwd, folder)
+        if os.path.exists(folder):
+            shutil.rmtree(folder)
+
+    # Install npm packages
+    subprocess.check_call('npm install', cwd=cwd, shell=True)
+
+    # Build the ui
+    subprocess.check_call('bower install', cwd=cwd, shell=True)
+
+    # Build the ui
+    subprocess.check_call('gulp buildapp', cwd=cwd, shell=True)
+
+
+if __name__ == '__main__':
+    cli()
