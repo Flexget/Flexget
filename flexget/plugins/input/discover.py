@@ -260,6 +260,7 @@ class Discover(object):
         return result
 
     def on_task_input(self, task, config):
+        config.setdefault('release_estimations', 'auto')
         task.no_entries_ok = True
         entries = self.execute_inputs(config, task)
         log.verbose('Discovering %i titles ...' % len(entries))
