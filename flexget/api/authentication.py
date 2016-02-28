@@ -1,10 +1,8 @@
 import base64
-
 from flask import request, jsonify, session as flask_session
 from flask.ext.login import login_user, LoginManager, current_user, current_app
 from flask_restplus import inputs
 from werkzeug.security import check_password_hash
-
 from flexget.api import api, APIResource, app
 from flexget.utils.database import with_session
 from flexget.webserver import User
@@ -91,10 +89,18 @@ class LoginAPI(APIResource):
 
         if data:
             user = session.query(User).filter(User.name == user_name.lower()).first()
-            if user and user.password and check_password_hash(user.password, password):
-                args = login_parser.parse_args()
-                login_user(user, remember=args['remember'])
-                return {}
+            if user:
+                if user_name == 'flexget' and not user.password:
+                    return {
+                               'status': 'failed',
+                               'message': 'If this is your first time running the webui you need to set a password via'
+                                          ' the command line by running flexget web passwd <new_password>'
+                           }, 401
+
+                if user.password and check_password_hash(user.password, password):
+                    args = login_parser.parse_args()
+                    login_user(user, remember=args['remember'])
+                    return {}
 
         return {'status': 'failed', 'message': 'Invalid username or password'}, 401
 

@@ -45,8 +45,10 @@
                     })
             },
             state: function (state, params) {
-                prevState = state;
-                prevParams = params;
+                if (state.name != 'login') {
+                    prevState = state;
+                    prevParams = params;
+                }
             }
         }
     }
