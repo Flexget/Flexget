@@ -68,7 +68,9 @@ class SeenEntry(Base):
 
     fields = relation('SeenField', backref='seen_entry', cascade='all, delete, delete-orphan')
 
-    def __init__(self, title, task, reason=None, local=False):
+    def __init__(self, title, task, reason=None, local=None):
+        if local is None:
+            local = False
         self.title = title
         self.reason = reason
         self.task = task
@@ -176,7 +178,8 @@ def search_by_field_values(field_value_list, task_name, local=False, session=Non
     if local:
         found = found.filter(SeenEntry.task == task_name)
     else:
-        found = found.filter(SeenEntry.local == False)
+        # Entries added from CLI were having local marked as None rather than False for a while gh#879
+        found = found.filter(or_(SeenEntry.local == False, SeenEntry.local == None))
     return found.first()
 
 
