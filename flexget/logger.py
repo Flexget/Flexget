@@ -95,17 +95,19 @@ def get_capture_loglevel():
     return getattr(local_context, 'loglevel', None)
 
 
-def console(text):
+def console(text, *args, **kwargs):
     """
     Print to console safely. Output is able to be captured by different streams in different contexts.
 
     Any plugin wishing to output to the user's console should use this function instead of print so that
     output can be redirected when FlexGet is invoked from another process.
+
+    Accepts arguments like the `print` function does.
     """
     if not isinstance(text, str):
         text = unicode(text).encode(io_encoding, 'replace')
-    output = getattr(local_context, 'output', sys.stdout)
-    print(text, file=output)
+    kwargs['file'] = getattr(local_context, 'output', sys.stdout)
+    print(text, *args, **kwargs)
 
 
 class RollingBuffer(collections.deque):

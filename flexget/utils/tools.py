@@ -312,13 +312,6 @@ else:
         io_encoding = 'ascii'
 
 
-def console(text, *args, **kwargs):
-    """Print to console safely."""
-    if not isinstance(text, str):
-        text = unicode(text).encode(io_encoding, 'replace')
-    print(text, *args, **kwargs)
-
-
 def parse_timedelta(value):
     """Parse a string like '5 days' into a timedelta object. Also allows timedeltas to pass through."""
     if isinstance(value, timedelta):

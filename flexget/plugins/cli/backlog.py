@@ -2,9 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 
 from flexget import options
 from flexget.event import event
+from flexget.logger import console
 from flexget.manager import Session
 from flexget.plugins.input.backlog import get_entries, clear_entries
-from flexget.utils.tools import console
 
 
 def do_cli(manager, options):
