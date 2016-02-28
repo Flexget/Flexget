@@ -73,7 +73,7 @@ def device_auth(account, session):
     log.debug('Polling for user authorization.')
     data['code'] = device_code
     data['client_secret'] = CLIENT_SECRET
-    end_time = time.time() + 5
+    end_time = time.time() + expires_in
     console('Waiting...')
     # stop polling after expires_in seconds
     while time.time() < end_time:
