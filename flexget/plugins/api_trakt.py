@@ -58,39 +58,31 @@ def token_created_date(created):
     return datetime.fromtimestamp(created)
 
 
-def device_auth(account, session):
+def device_auth():
     data = {'client_id': CLIENT_ID}
     r = requests.post(get_api_url('oauth/device/code'), data=data).json()
     device_code = r['device_code']
     user_code = r['user_code']
-    verification_url = r['verification_url']
     expires_in = r['expires_in']
     interval = r['interval']
 
     console('Please visit {0} and authorize Flexget. Your user code is {1}. Your code expires in '
-            '{2} minutes.'.format(verification_url, user_code, expires_in/60.0))
+            '{2} minutes.'.format(r['verification_url'], user_code, expires_in / 60.0))
 
     log.debug('Polling for user authorization.')
     data['code'] = device_code
     data['client_secret'] = CLIENT_SECRET
     end_time = time.time() + expires_in
-    console('Waiting...')
+    console('Waiting...', end='')
     # stop polling after expires_in seconds
     while time.time() < end_time:
         time.sleep(interval)
         polling_request = requests.post(get_api_url('oauth/device/token'), data=data,
                                         raise_status=False)
         if polling_request.status_code == 200:  # success
-            result = polling_request.json()
-
-            access_token = result['access_token']
-            refresh_token = result['refresh_token']
-            expires = result['expires_in']
-            acc = TraktUserAuth(account, access_token, refresh_token, time.time(), expires)
-            session.add(acc)
-            return access_token
+            return polling_request.json()
         elif polling_request.status_code == 400:  # pending -- waiting for user
-            console('...')
+            console('...', end='')
         elif polling_request.status_code == 404:  # not found -- invalid device_code
             raise plugin.PluginError('Invalid device code. Open an issue on Github.')
         elif polling_request.status_code == 409:  # already used -- user already approved
@@ -105,6 +97,13 @@ def device_auth(account, session):
     raise plugin.PluginError('User code has expired. Please try again.')
 
 
+def token_auth(data):
+    try:
+        return requests.post(get_api_url('oauth/token'), data=data).json()
+    except requests.RequestException as e:
+        raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e.args[0]))
+
+
 def get_access_token(account, token=None, refresh=False, re_auth=False):
     """
     Gets authorization info from a pin or refresh token.
@@ -116,8 +115,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
     """
     data = {
         'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-        'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob'
+        'client_secret': CLIENT_SECRET
     }
     with Session() as session:
         acc = session.query(TraktUserAuth).filter(TraktUserAuth.account == account).first()
@@ -125,31 +123,35 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
             return acc.access_token
         else:
             if acc and (refresh or datetime.now() >= acc.expires) and not re_auth:
+                log.debug('Using refresh token to re-authorize account {0}.'.format(account))
                 data['refresh_token'] = acc.refresh_token
                 data['grant_type'] = 'refresh_token'
+                token_dict = token_auth(data)
             elif token:
                 # We are only in here if a pin was specified, so it's safe to use console instead of logging
-                console('PIN authorization has been deprecated.')
+                console('Warning: PIN authorization has been deprecated. Use Device Authorization instead.')
                 data['code'] = token
                 data['grant_type'] = 'authorization_code'
+                data['redirect_uri'] = 'urn:ietf:wg:oauth:2.0:oob'
+                token_dict = token_auth(data)
             else:
                 log.debug('No pin specified for an unknown account %s. Attempting to authorize device.' % account)
-                try:
-                    return device_auth(account, session)
-                except requests.RequestException as e:
-                    raise plugin.PluginError('Retrieving user code from Trakt.tv failed: {0}'.format(e.args[0]))
+                token_dict = device_auth()
             try:
-                r = requests.post(get_api_url('oauth/token'), data=data).json()
+                access_token = token_dict['access_token']
+                refresh_token = token_dict['refresh_token']
+                created_at = token_dict.get('created_at', time.time())
+                expires_in = token_dict['expires_in']
                 if acc:
-                    acc.access_token = r.get('access_token')
-                    acc.refresh_token = r.get('refresh_token')
-                    acc.expires = token_expire_date(r.get('expires_in'))
-                    acc.created = token_created_date(r.get('created_at'))
+                    acc.access_token = access_token
+                    acc.refresh_token = refresh_token
+                    acc.created = token_created_date(created_at)
+                    acc.expires = token_expire_date(expires_in)
                 else:
-                    acc = TraktUserAuth(account, r.get('access_token'), r.get('refresh_token'), r.get('created_at'),
-                                        r.get('expires_in'))
+                    acc = TraktUserAuth(account, access_token, refresh_token, created_at,
+                                        expires_in)
                     session.add(acc)
-                return r.get('access_token')
+                return access_token
             except requests.RequestException as e:
                 raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e.args[0]))
 
