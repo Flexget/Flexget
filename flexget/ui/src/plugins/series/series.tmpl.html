@@ -11,10 +11,10 @@
     						</md-card-title-text>
     					</md-card-title>
     					<md-card-content layout="row" layout-align="space-between" class="custom-card">
-    						<div class="md-media-lg series-image">Placeholder</div>
-    						<p>
-    							Placeholder for series description
-    						</p>
+    						<div class="md-media-lg series-image">
+                                <img ng-src="http://www.thetvdb.com/banners/{{ show.metadata.poster }}">                  
+                            </div>
+    						<p>{{ show.metadata.overview }}</p>
     					</md-card-content>
     					<md-card-actions layout="row" layout-align="end center">
     						<md-button class="md-primary md-raised" ng-click="vm.gotoEpisodes(show.show_id)">Episodes</md-button>

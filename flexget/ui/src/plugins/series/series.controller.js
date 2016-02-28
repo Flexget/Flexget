@@ -16,6 +16,14 @@
         $http.get('/api/series/', { params: options })
             .success(function(data) {
                 vm.series = data.shows;
+
+                $http.get('/api/tvdb/' + vm.series[0].show_name)
+                    .success(function(data) {
+                        vm.series[0].metadata = data;
+                    })
+                    .error(function(error) {
+                        console.log(error);
+                    });
             });
 
         vm.gotoEpisodes = function(id) {

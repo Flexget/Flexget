@@ -49,11 +49,11 @@ md-input-container .hint {
 
 }
 
-.custom-card {
-  height: 150px;
+.custom-card .series-image {
+  margin-right: 15px;
 }
 
-.custom-card .series-image {
-  border: 1px grey solid;
-  background: lightgrey;
+.series-image img {
+  max-width: 150px;
+  max-height: 300px;
 }
