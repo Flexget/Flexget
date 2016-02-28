@@ -232,29 +232,29 @@ class WebServer(threading.Thread):
 
 
 @with_session
-def get_user(session=None):
-    user = session.query(User).filter(User.name == 'flexget').first()
+def get_user(username='flexget', session=None):
+    user = session.query(User).filter(User.name == username).first()
     if not user:
         user = User()
-        user.name = 'flexget'
+        user.name = username
         session.add(user)
     return user
 
 
 @with_session
-def change_password(password, session=None):
+def change_password(username='flexget', password='', session=None):
     check = safe.check(password)
     if check.strength not in ['medium', 'strong']:
         raise WeakPassword('Password {0} is not strong enough'.format(password))
 
-    user = get_user(session=session)
+    user = get_user(username=username, session=session)
     user.password = unicode(generate_password_hash(password))
     session.commit()
 
 
 @with_session
-def generate_token(session=None):
-    user = get_user(session=session)
+def generate_token(username='flexget', session=None):
+    user = get_user(username=username, session=session)
     user.token = generate_key()
     session.commit()
     return user.token
