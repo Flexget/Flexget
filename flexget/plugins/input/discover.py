@@ -68,7 +68,7 @@ class Discover(object):
                 'allOf': [{'$ref': '/schema/plugins?group=search'}, {'maxProperties': 1, 'minProperties': 1}]
             }},
             'interval': {'type': 'string', 'format': 'interval', 'default': '5 hours'},
-            'ignore_estimations': {'type': 'boolean', 'default': False},
+            'release_estimations': {'type': 'string', 'default': 'auto', 'enum': ['auto', 'strict', 'ignore']},
             'limit': {'type': 'integer', 'minimum': 1}
         },
         'required': ['what', 'from'],
@@ -180,7 +180,7 @@ class Discover(object):
         if not search_results:
             query.complete()
 
-    def estimated(self, entries):
+    def estimated(self, entries, estimation_mode):
         """
         :return: Entries that we have estimated to be available
         """
@@ -190,7 +190,11 @@ class Discover(object):
             est_date = estimator.estimate(entry)
             if est_date is None:
                 log.debug('No release date could be determined for %s' % entry['title'])
-                result.append(entry)
+                if estimation_mode == 'strict':
+                    entry.reject('has no release date')
+                    entry.complete()
+                else:
+                    result.append(entry)
                 continue
             if type(est_date) == datetime.date:
                 # If we just got a date, add a time so we can compare it to now()
@@ -256,6 +260,7 @@ class Discover(object):
         return result
 
     def on_task_input(self, task, config):
+        config.setdefault('release_estimations', 'auto')
         task.no_entries_ok = True
         entries = self.execute_inputs(config, task)
         log.verbose('Discovering %i titles ...' % len(entries))
@@ -264,8 +269,9 @@ class Discover(object):
                          'over 500 entries, please reduce the amount!')
         # TODO: the entries that are estimated should be given priority over expiration
         entries = self.interval_expired(config, task, entries)
-        if not config.get('ignore_estimations', False):
-            entries = self.estimated(entries)
+        estimation_mode = config['release_estimations']
+        if estimation_mode != 'ignore':
+            entries = self.estimated(entries, estimation_mode)
         return self.execute_searches(config, entries, task)
 
 
