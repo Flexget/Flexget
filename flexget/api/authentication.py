@@ -91,7 +91,7 @@ class LoginAPI(APIResource):
 
         if data:
             user = session.query(User).filter(User.name == user_name.lower()).first()
-            if user and check_password_hash(user.password, password):
+            if user.password and check_password_hash(user.password, password):
                 args = login_parser.parse_args()
                 login_user(user, remember=args['remember'])
                 return {}
