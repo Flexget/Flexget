@@ -2,8 +2,6 @@ click
 sphinx
 pylint
 coverage
-nose>=0.11
-nosexcover
 flake8
 mock
 requests
@@ -13,3 +11,4 @@ boto3
 # vcrpy requires this, and 0.5 drops python 2.6 support
 contextlib2<0.5
 wheel
+pytest
