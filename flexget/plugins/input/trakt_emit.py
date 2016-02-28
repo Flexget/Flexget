@@ -1,6 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-from urlparse import urljoin
+import re
 
 from requests import RequestException
 
@@ -38,7 +38,8 @@ class TraktEmit(object):
             'account': {'type': 'string'},
             'position': {'type': 'string', 'enum': ['last', 'next'], 'default': 'next'},
             'context': {'type': 'string', 'enum': ['watched', 'collected'], 'default': 'watched'},
-            'list': {'type': 'string'}
+            'list': {'type': 'string'},
+            'strip_dates': {'type': 'boolean', 'default': False}
         },
         'anyOf': [{'required': ['username']}, {'required': ['account']}],
         'error_anyOf': 'At least one of `username` or `account` options are needed.',
@@ -115,6 +116,9 @@ class TraktEmit(object):
                         continue
             if eps and epn:
                 entry = self.make_entry(fields, eps, epn)
+                if config.get('strip_dates'):
+                    # Remove year from end of name if present, assumes name ends with S<number>E<number>
+                    entry['title'] = re.sub(r'\s+\(\d{4}\)(?=\sS[0-9]*E[0-9]*$)', '', entry['title'])
                 entries.append(entry)
         return entries
 
