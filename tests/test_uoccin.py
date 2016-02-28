@@ -40,7 +40,12 @@ class TestUoccinReader(FlexGetBase):
 
     def __init__(self):
         super(TestUoccinReader, self).__init__()
-        with open(os.path.join('uoccin', 'device.flexget_test', '1431093328970.uoccin_test.diff'), 'w') as txt:
+        dir = os.path.join('uoccin', 'device.flexget_test')
+        try:
+            os.makedirs(dir)
+        except:
+            pass
+        with open(os.path.join(dir, '1431093328970.uoccin_test.diff'), 'w') as txt:
             txt.write(TestUoccinReader.__diff__.strip())
 
     def test_read(self):
