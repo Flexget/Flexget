@@ -111,6 +111,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
     :param account: Arbitrary account name to attach authorization to.
     :param unicode token: The pin or refresh token, as supplied by the trakt website.
     :param bool refresh: If True, refresh the access token using refresh_token from db.
+    :param bool re_auth: If True, account is re-authorized even if it already exists in db.
     :raises RequestException: If there is a network error while authorizing.
     """
     data = {
@@ -123,7 +124,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
             return acc.access_token
         else:
             if acc and (refresh or datetime.now() >= acc.expires) and not re_auth:
-                log.debug('Using refresh token to re-authorize account {0}.'.format(account))
+                log.debug('Using refresh token to re-authorize account %s.', account)
                 data['refresh_token'] = acc.refresh_token
                 data['grant_type'] = 'refresh_token'
                 token_dict = token_auth(data)
@@ -135,7 +136,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
                 data['redirect_uri'] = 'urn:ietf:wg:oauth:2.0:oob'
                 token_dict = token_auth(data)
             else:
-                log.debug('No pin specified for an unknown account %s. Attempting to authorize device.' % account)
+                log.debug('No pin specified for an unknown account %s. Attempting to authorize device.', account)
                 token_dict = device_auth()
             try:
                 access_token = token_dict['access_token']
