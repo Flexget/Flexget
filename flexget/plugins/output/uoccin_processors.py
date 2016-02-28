@@ -139,8 +139,9 @@ class UoccinProcess(object):
                     season = ser['collected'].setdefault(sno, {})
                     if val == 'true':
                         season.setdefault(eno, [])
-                    elif eno in season:
-                        season.pop(eno)
+                    else:
+                        if eno in season:
+                            season.pop(eno)
                         if not season:
                             self.log.verbose('deleting unused section: series\%s\collected\%s' % (sid, sno))
                             ser['collected'].pop(sno)
@@ -150,7 +151,7 @@ class UoccinProcess(object):
                     season = ser['watched'].setdefault(sno, [])
                     if val == 'true':
                         season = ser['watched'][sno] = list(set(season) | set([int(eno)]))
-                    elif eno in season:
+                    elif int(eno) in season:
                         season.remove(int(eno))
                     season.sort()
                     if not season:
