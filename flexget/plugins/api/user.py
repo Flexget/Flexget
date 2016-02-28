@@ -67,5 +67,5 @@ class UserManagementAPI(APIResource):
     @api.doc(description='Get new user token')
     def get(self, session=None):
         """ Change current user token """
-        user = generate_token(username=current_user.name, session=session)
-        return {'token': user.token}
+        token = generate_token(username=current_user.name, session=session)
+        return {'token': token}
