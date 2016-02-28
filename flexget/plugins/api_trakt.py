@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 import re
+import time
 from datetime import datetime, timedelta
 
 from dateutil.parser import parse as dateutil_parse
@@ -80,10 +81,59 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
                 data['refresh_token'] = acc.refresh_token
                 data['grant_type'] = 'refresh_token'
             elif token:
+                # We are only in here if a pin was specified, so it's safe to use console instead of logging
+                console('PIN authorization has been deprecated.')
                 data['code'] = token
                 data['grant_type'] = 'authorization_code'
             else:
-                raise plugin.PluginError('Account %s not found in db and no pin specified.' % account)
+                log.debug('No pin specified for an unknown account %s. Attempting to authorize device.' % account)
+                try:
+                    data = {'client_id': CLIENT_ID}
+                    r = requests.post(get_api_url('oauth/device/code'), data=data).json()
+                    device_code = r['device_code']
+                    user_code = r['user_code']
+                    verification_url = r['verification_url']
+                    expires_in = r['expires_in']
+                    interval = r['interval']
+
+                    console('Please visit {0} and authorize Flexget. Your user code is {1}. Your code expires in '
+                            '{2} minutes.'.format(verification_url, user_code, expires_in/60.0))
+
+                    log.debug('Polling for user authorization.')
+                    data['code'] = device_code
+                    data['client_secret'] = CLIENT_SECRET
+                    end_time = time.time() + 5
+                    console('Waiting...')
+                    # stop polling after expires_in seconds
+                    while time.time() < end_time:
+                        time.sleep(interval)
+                        polling_request = requests.post(get_api_url('oauth/device/token'), data=data,
+                                                        raise_status=False)
+                        if polling_request.status_code == 200:  # success
+                            result = polling_request.json()
+
+                            access_token = result['access_token']
+                            refresh_token = result['refresh_token']
+                            expires = result['expires_in']
+                            acc = TraktUserAuth(account, access_token, refresh_token, time.time(), expires)
+                            session.add(acc)
+                            return access_token
+                        elif polling_request.status_code == 400:  # pending -- waiting for user
+                            console('...')
+                        elif polling_request.status_code == 404:  # not found -- invalid device_code
+                            raise plugin.PluginError('Invalid device code. Open an issue on Github.')
+                        elif polling_request.status_code == 409:  # already used -- user already approved
+                            raise plugin.PluginError('User code has already been approved.')
+                        elif polling_request.status_code == 410:  # expired -- restart process
+                            break
+                        elif polling_request.status_code == 418:  # denied -- user denied code
+                            raise plugin.PluginError('User code has been denied.')
+                        elif polling_request.status_code == 429:  # polling too fast
+                            log.warning('Polling too quickly. Upping the interval. No action required.')
+                            interval += 1
+                    raise plugin.PluginError('User code has expired. Please try again.')
+                except requests.RequestException as e:
+                    raise plugin.PluginError('Retrieving user code from Trakt.tv failed: {0}'.format(e.args[0]))
             try:
                 r = requests.post(get_api_url('oauth/token'), data=data).json()
                 if acc:
@@ -97,7 +147,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
                     session.add(acc)
                 return r.get('access_token')
             except requests.RequestException as e:
-                raise plugin.PluginError('Token exchange with trakt failed: %s' % e.args[0])
+                raise plugin.PluginError('Token exchange with trakt failed: {0}'.format(e.args[0]))
 
 
 def make_list_slug(name):
@@ -801,7 +851,7 @@ def delete_account(account):
 
 def do_cli(manager, options):
     if options.action == 'auth':
-        if not (options.account and options.pin):
+        if not (options.account):
             console('You must specify an account (local identifier) so we know where to save your access token! '
                     'Visit %s to get a pin code and authorize flexget to access your trakt account.' % PIN_URL)
             return
@@ -864,7 +914,7 @@ def register_parser_arguments():
 
     auth_parser.add_argument('account', metavar='<account>', help=acc_text)
     auth_parser.add_argument('pin', metavar='<pin>', help='get this by authorizing FlexGet to use your trakt account '
-                                                          'at %s' % PIN_URL)
+                                                          'at %s' % PIN_URL, nargs='?')
 
     show_parser = subparsers.add_parser('show', help='show expiration date for Flexget authorization(s) (don\'t worry, '
                                                      'they will automatically refresh when expired)')
