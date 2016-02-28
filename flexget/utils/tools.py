@@ -312,12 +312,11 @@ else:
         io_encoding = 'ascii'
 
 
-def console(text):
+def console(text, *args, **kwargs):
     """Print to console safely."""
-    if isinstance(text, str):
-        print(text)
-        return
-    print(unicode(text).encode(io_encoding, 'replace'))
+    if not isinstance(text, str):
+        text = unicode(text).encode(io_encoding, 'replace')
+    print(text, *args, **kwargs)
 
 
 def parse_timedelta(value):
