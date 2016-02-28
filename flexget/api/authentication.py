@@ -35,7 +35,7 @@ def load_user_from_request(request, session=None):
             credentials = base64.b64decode(auth_value.replace('Basic ', '', 1))
             username, password = credentials.split(':')
             user = session.query(User).filter(User.name == username).first()
-            if check_password_hash(user.password, password):
+            if user and user.password and check_password_hash(user.password, password):
                 return user
             else:
                 return None
@@ -91,7 +91,7 @@ class LoginAPI(APIResource):
 
         if data:
             user = session.query(User).filter(User.name == user_name.lower()).first()
-            if user.password and check_password_hash(user.password, password):
+            if user and user.password and check_password_hash(user.password, password):
                 args = login_parser.parse_args()
                 login_user(user, remember=args['remember'])
                 return {}

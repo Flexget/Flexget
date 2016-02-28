@@ -157,7 +157,7 @@ def setup_server(manager, session=None):
 
     _default_app.secret_key = get_secret()
 
-    user = session.query(User).first()
+    user = get_user()
     if not user or not user.password:
         log.warn('No password set for web server, create one by using'
                  ' `flexget web password <password>`')
