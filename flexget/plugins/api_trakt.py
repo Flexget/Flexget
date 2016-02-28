@@ -135,7 +135,7 @@ def get_access_token(account, token=None, refresh=False, re_auth=False):
             else:
                 log.debug('No pin specified for an unknown account %s. Attempting to authorize device.' % account)
                 try:
-                    device_auth(account, session)
+                    return device_auth(account, session)
                 except requests.RequestException as e:
                     raise plugin.PluginError('Retrieving user code from Trakt.tv failed: {0}'.format(e.args[0]))
             try:
