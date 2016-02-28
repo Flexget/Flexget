@@ -42,7 +42,7 @@ class UserManagementAPI(APIResource):
         user = current_user
         data = request.json
         try:
-            change_password(user_name=user.name, password=data.get('password'), session=session)
+            change_password(username=user.name, password=data.get('password'), session=session)
         except WeakPassword as e:
             return {'status': 'error',
                     'message': e.value}, 500
@@ -67,5 +67,5 @@ class UserManagementAPI(APIResource):
     @api.doc(description='Get new user token')
     def get(self, session=None):
         """ Change current user token """
-        user = generate_token(user_name=current_user.name, session=session)
+        user = generate_token(username=current_user.name, session=session)
         return {'token': user.token}
