@@ -1,0 +1,9 @@
+<md-content flex layout-margin>
+	<md-list>
+    	<md-list-item class="md-3-line" ng-repeat="episode in vm.episodes">
+    		<div class="md-list-item-text" layout="column">
+		       	<h3>{{ episode.episode_identifier }}</h3>
+		       	<md-button class="md-secondary md-raised" ng-click="vm.forgetEpisode(episode)">Forget</md-button>
+		</md-list-item>
+	</md-list>
+</md-content>
