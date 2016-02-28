@@ -4,18 +4,33 @@ import datetime
 from math import ceil
 
 from flask import jsonify, request
+from flask_restplus import inputs
 
 from flexget.api import api, APIResource
+from flexget.plugins.api.series import NoResultFound
 from flexget.plugins.filter import movie_queue as mq
 from flexget.utils import qualities
 
 movie_queue_api = api.namespace('movie_queue', description='Movie Queue operations')
 
+default_error_schema = {
+    'type': 'object',
+    'properties': {
+        'status': {'type': 'string'},
+        'message': {'type': 'string'}
+    }
+}
+
+default_error_schema = api.schema('default_error_schema', default_error_schema)
+
+empty_response = api.schema('empty', {'type': 'object'})
+
 movie_object = {
     'type': 'object',
     'properties': {
         'added_date': {'type': 'string'},
-        'is_downloaded': {'type': 'string'},
+        'is_downloaded': {'type': 'boolean'},
+        'download_date': {'type': 'string'},
         'entry_original_url': {'type': 'string'},
         'entry_title': {'type': 'string'},
         'entry_url': {'type': 'string'},
@@ -24,8 +39,10 @@ movie_object = {
         'quality': {'type': 'string'},
         'title': {'type': 'string'},
         'tmdb_id': {'type': 'string'},
+        'queue_name': {'type': 'string'}
     }
 }
+movie_object_schema = api.schema('movie_object', movie_object)
 
 movie_queue_schema = {
     'type': 'object',
@@ -46,18 +63,11 @@ movie_queue_schema = api.schema('list_movie_queue', movie_queue_schema)
 movie_queue_parser = api.parser()
 movie_queue_parser.add_argument('page', type=int, default=1, help='Page number')
 movie_queue_parser.add_argument('max', type=int, default=100, help='Movies per page')
-movie_queue_parser.add_argument('status', choices=('pending', 'downloaded'), help='Filter list by status')
-movie_queue_parser.add_argument('sort_by', choices=('added', 'downloaded', 'id', 'title'), default='added',
-                                help="Sort response by value")
+movie_queue_parser.add_argument('queue_name', default='default', help='Filter by movie queue name')
+movie_queue_parser.add_argument('is_downloaded', type=inputs.boolean, help='Filter list by movies download status')
+movie_queue_parser.add_argument('sort_by', choices=('added', 'is_downloaded', 'id', 'title', 'download_date'),
+                                default='added', help="Sort response by attribute")
 movie_queue_parser.add_argument('order', choices=('asc', 'desc'), default='desc', help="Sorting order")
-
-movie_add_results_schema = {
-    'type': 'object',
-    'properties': {
-        'message': {'type': 'string'},
-        'movie': movie_object
-    }
-}
 
 movie_add_input_schema = {
     'type': 'object',
@@ -65,7 +75,8 @@ movie_add_input_schema = {
         'title': {'type': 'string'},
         'imdb_id': {'type': 'string', 'pattern': r'tt\d{7}'},
         'tmdb_id': {'type': 'integer'},
-        'quality': {'type': 'string', 'format': 'quality_requirements', 'default': 'any'}
+        'quality': {'type': 'string', 'format': 'quality_requirements', 'default': 'any'},
+        'queue_name': {'type': 'string', 'default': 'default'}
     },
     'anyOf': [
         {'required': ['title']},
@@ -74,22 +85,13 @@ movie_add_input_schema = {
     ]
 }
 
-movie_add_results_schema = api.schema('movie_add_results', movie_add_results_schema)
 movie_add_input_schema = api.schema('movie_add_input_schema', movie_add_input_schema)
-
-movie_edit_results_schema = {
-    'type': 'object',
-    'properties': {
-        'message': {'type': 'string'},
-        'movie': movie_object
-    }
-}
 
 movie_edit_input_schema = {
     'type': 'object',
     'properties': {
         'quality': {'type': 'string', 'format': 'quality_requirements'},
-        'reset_downloaded': {'type': 'boolean', 'default': False}
+        'reset_downloaded': {'type': 'boolean', 'default': True}
     },
     'anyOf': [
         {'required': ['quality']},
@@ -97,70 +99,61 @@ movie_edit_input_schema = {
     ]
 }
 
-movie_edit_results_schema = api.schema('movie_edit_results_schema', movie_edit_results_schema)
 movie_edit_input_schema = api.schema('movie_edit_input_schema', movie_edit_input_schema)
 
 
 @movie_queue_api.route('/')
-@api.doc(description='Get queued movies from list or add a new movie')
 class MovieQueueAPI(APIResource):
-    @api.response(404, 'Page does not exist')
+    @api.response(404, 'Page does not exist', model=default_error_schema)
     @api.response(code_or_apierror=200, model=movie_queue_schema)
-    @api.doc(parser=movie_queue_parser, description='test')
+    @api.doc(parser=movie_queue_parser, description="Get flexget's queued movies")
     def get(self, session=None):
         """ List queued movies """
         args = movie_queue_parser.parse_args()
         page = args['page']
         max_results = args['max']
-        downloaded = args['status']
+        downloaded = args['is_downloaded']
         sort_by = args['sort_by']
         order = args['order']
+        queue_name = args['queue_name']
         # Handles default if it explicitly called
         if order == 'desc':
             order = True
         else:
             order = False
 
-        # Handles download status conversion
-        if downloaded == 'downloaded':
-            downloaded = True
-        elif downloaded == 'pending':
-            downloaded = False
-        else:
-            downloaded = None
+        raw_movie_queue = mq.queue_get(session=session, downloaded=downloaded, queue_name=queue_name)
+        converted_movie_queue = [movie.to_dict() for movie in raw_movie_queue]
+        sorted_movie_list = sorted(converted_movie_queue,
+                                   key=lambda movie: movie[sort_by] if movie[sort_by] else datetime.datetime,
+                                   reverse=order)
 
-        movie_queue = mq.queue_get(session=session, downloaded=downloaded)
-        count = len(movie_queue)
-
+        count = len(sorted_movie_list)
         pages = int(ceil(count / float(max_results)))
-
-        movie_items = []
-
         if page > pages and pages != 0:
-            return {'error': 'page %s does not exist' % page}, 404
+            return {'status': 'error',
+                    'message': 'page %s does not exist' % page}, 404
 
         start = (page - 1) * max_results
         finish = start + max_results
         if finish > count:
             finish = count
 
+        movie_items = []
         for movie_number in range(start, finish):
-            movie_items.append(movie_queue[movie_number].to_dict())
-
-        sorted_movie_list = sorted(movie_items,
-                                   key=lambda movie: movie[sort_by] if movie[sort_by] else datetime.datetime,
-                                   reverse=order)
+            movie_items.append(sorted_movie_list[movie_number])
 
         return jsonify({
-            'movies': sorted_movie_list,
+            'movies': movie_items,
             'number_of_movies': count,
             'page_number': page,
             'total_number_of_pages': pages
         })
 
-    @api.response(400, 'Page not found')
-    @api.response(201, 'Movie successfully added', movie_add_results_schema)
+    @api.response(500, 'Movie already in queue', model=default_error_schema)
+    @api.response(201, 'Movie successfully added', model=movie_object_schema)
     @api.validate(movie_add_input_schema)
+    @api.doc(description="Add a movie to flexget's queued movies")
     def post(self, session=None):
         """ Add movies to movie queue """
         kwargs = request.json
@@ -174,77 +167,73 @@ class MovieQueueAPI(APIResource):
                 'status': 'error',
                 'message': e.message
             }
-            return reply, 404
+            return reply, 500
 
-        reply = jsonify(
-                {
-                    'message': 'Successfully added movie to movie queue',
-                    'movie': movie
-                }
-        )
+        reply = jsonify(movie)
         reply.status_code = 201
         return reply
 
 
-@api.response(404, 'Movie not found')
-@api.response(400, 'Invalid type received')
-@movie_queue_api.route('/<type>/<id>/')
-@api.doc(params={'id': 'ID of Queued Movie', 'type': 'Type of ID to be used (imdb/tmdb/movie_id)'},
-         description='Remove a movie from movie queue or edit its quality or download status')
+@api.response(404, 'ID not found', model=default_error_schema)
+@movie_queue_api.route('/<id>/')
+@api.doc(params={'id': 'ID of Queued Movie'})
 class MovieQueueManageAPI(APIResource):
-    def validate_type(self, type, id, session):
-        if type not in ['imdb', 'tmdb', 'movie_id']:
-            reply = {
-                'status': 'error',
-                'message': 'invalid ID type received. Must be one of (imdb/tmdb/movie_id)'
-            }
-            return reply, 400
-        kwargs = {'session': session}
-        if type == 'imdb':
-            kwargs['imdb_id'] = id
-        elif type == 'tmdb':
-            kwargs['tmdb_id'] = id
-        elif type == 'movie_id':
-            kwargs['movie_id'] = id
-        return kwargs
-
-    @api.response(200, 'Movie successfully deleted')
-    def delete(self, type, id, session=None):
-        """ Delete movies from movie queue """
-        kwargs = self.validate_type(type, id, session)
+    @api.response(200, 'Movie successfully retrieved', movie_object_schema)
+    @api.doc(description="Get a specific movie")
+    def get(self, id, session=None):
+        """ Returns a movie from queue by ID """
         try:
-            mq.queue_del(**kwargs)
-        except mq.QueueError as e:
-            reply = {'status': 'error',
-                     'message': e.message}
-            return reply, 404
+            movie = mq.get_movie_by_id(movie_id=id)
+        except NoResultFound as e:
+            return {'status': 'error',
+                    'message': 'movie with ID {0} was not found'.format(id)}, 404
+        return jsonify(movie)
 
-        reply = jsonify(
-                {'status': 'success',
-                 'message': 'successfully deleted {0} movie {1}'.format(type, id)})
-        return reply
+    @api.response(200, 'Movie successfully deleted', model=empty_response)
+    @api.doc(description="Delete a specific movie")
+    def delete(self, id, session=None):
+        """ Delete movies from movie queue """
+        try:
+            mq.delete_movie_by_id(movie_id=id)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'movie with ID {0} was not found'.format(id)}, 404
+        return {}
 
-    @api.response(200, 'Movie successfully updated', movie_edit_results_schema)
-    @api.validate(movie_edit_input_schema)
-    def put(self, type, id, session=None):
+    @api.response(405, 'Movie not marked as downloaded', model=default_error_schema)
+    @api.response(200, 'Movie successfully updated', movie_object_schema)
+    @api.validate(model=movie_edit_input_schema,
+                  description='Values to use when editing existing movie. At least one value should be used')
+    @api.doc(description="Update a specific movie")
+    def put(self, id, session=None):
         """ Updates movie quality or downloaded state in movie queue """
-        kwargs = self.validate_type(type, id, session)
-        movie = None
         data = request.json
+        try:
+            movie = mq.get_movie_by_id(movie_id=id)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'movie with ID {0} was not found'.format(id)}, 404
+        queue_name = movie.get('queue_name')
         if data.get('reset_downloaded'):
             try:
-                movie = mq.queue_forget(**kwargs)
+                movie = mq.queue_forget(movie_id=id, queue_name=queue_name)
             except mq.QueueError as e:
-                reply = {
-                    'status': 'error',
-                    'message': e.message
-                }
-                return reply, 404
+                if e.errno == 1:
+                    reply = {
+                        'status': 'error',
+                        'message': e.message
+                    }
+                    return reply, 405
+                else:
+                    reply = {
+                        'status': 'error',
+                        'message': e.message
+                    }
+                    return reply, 404
 
         if data.get('quality'):
-            kwargs['quality'] = data['quality']
             try:
-                movie = mq.queue_edit(**kwargs)
+                movie = mq.queue_edit(quality=data['quality'], movie_id=id, queue_name=queue_name)
             except mq.QueueError as e:
                 reply = {'status': 'error',
                          'message': e.message}
@@ -253,10 +242,4 @@ class MovieQueueManageAPI(APIResource):
             return {'status': 'error',
                     'message': 'Not enough parameters to edit movie data'}, 400
 
-        return jsonify(
-                {
-                    'status': 'success',
-                    'message': 'Successfully updated movie details',
-                    'movie': movie
-                }
-        )
+        return jsonify(movie)

@@ -153,7 +153,10 @@ class Decompress(object):
         """
 
         match = re.compile(config['regexp'], re.IGNORECASE).match
-        archive_path = entry['location']
+        archive_path = entry.get('location')
+        if not archive_path:
+            log.warn('Entry does not appear to represent a local file, decompress plugin only supports local files')
+            return
         archive_dir = os.path.dirname(archive_path)
         archive_file = os.path.basename(archive_path)
 

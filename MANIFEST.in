@@ -1,7 +1,5 @@
 include LICENSE
 include README.rst
-include pavement.py
-include paver-minilib.zip
-include setup.py
-include bootstrap.py
 recursive-exclude tests *
+include flexget/ui/load.failure.html
+recursive-include flexget/ui/app **

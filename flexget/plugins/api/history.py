@@ -37,6 +37,16 @@ history_api_schema = {
 
 history_api_schema = api.schema('history.list', history_api_schema)
 
+default_error_schema = {
+    'type': 'object',
+    'properties': {
+        'status': {'type': 'string'},
+        'message': {'type': 'string'}
+    }
+}
+
+default_error_schema = api.schema('default_error_schema', default_error_schema)
+
 history_parser = api.parser()
 history_parser.add_argument('page', type=int, required=False, default=1, help='Page number')
 history_parser.add_argument('max', type=int, required=False, default=50, help='Results per page')
@@ -46,7 +56,7 @@ history_parser.add_argument('task', type=str, required=False, default=None, help
 @history_api.route('/')
 @api.doc(parser=history_parser)
 class HistoryAPI(APIResource):
-    @api.response(404, description='Page does not exist')
+    @api.response(404, description='Page does not exist', model=default_error_schema)
     @api.response(200, model=history_api_schema)
     def get(self, session=None):
         """ List of previously accepted entries """

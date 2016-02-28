@@ -41,14 +41,8 @@ def add_deluge_windows_install_dir_to_sys_path():
 
 add_deluge_windows_install_dir_to_sys_path()
 
-# Some twisted import is throwing a warning see #2434
-warnings.filterwarnings('ignore', message='Not importing directory .*')
 
-try:
-    from twisted.python import log as twisted_log
-    from twisted.internet.main import installReactor
-    from twisted.internet.selectreactor import SelectReactor
-
+def install_pausing_reactor():
     class PausingReactor(SelectReactor):
         """A SelectReactor that can be paused and resumed."""
 
@@ -118,14 +112,54 @@ try:
     # Configure twisted to use the PausingReactor.
     installReactor(PausingReactor())
 
+    @event('manager.shutdown')
+    def stop_reactor(manager):
+        """Shut down the twisted reactor after all tasks have run."""
+        if not reactor._stopped:
+            log.debug('Stopping twisted reactor.')
+            reactor.stop()
+
+
+# Some twisted import is throwing a warning see #2434
+warnings.filterwarnings('ignore', message='Not importing directory .*')
+
+try:
+    from twisted.python import log as twisted_log
+    from twisted.internet.main import installReactor
+    from twisted.internet.selectreactor import SelectReactor
 except ImportError:
     # If twisted is not found, errors will be shown later
     pass
+else:
+    install_pausing_reactor()
+try:
+    # These have to wait until reactor has been installed to import
+    from twisted.internet import reactor
+    from deluge.ui.client import client
+    from deluge.ui.common import get_localhost_auth
+except (ImportError, pkg_resources.DistributionNotFound):
+    # If deluge is not found, errors will be shown later
+    pass
 
 
-# Define a base class with some methods that are used for all deluge versions
 class DelugePlugin(object):
     """Base class for deluge plugins, contains settings and methods for connecting to a deluge daemon."""
+
+    def on_task_start(self, task, config):
+        """Raise a DependencyError if our dependencies aren't available"""
+        try:
+            from deluge.ui.client import client
+        except ImportError as e:
+            log.debug('Error importing deluge: %s' % e)
+            raise plugin.DependencyError('deluge', 'deluge',
+                                  'Deluge >=1.2 module and it\'s dependencies required. ImportError: %s' % e, log)
+        try:
+            from twisted.internet import reactor
+        except:
+            raise plugin.DependencyError('deluge', 'twisted.internet', 'Twisted.internet package required', log)
+
+    def on_task_abort(self, task, config):
+        pass
 
     def prepare_connection_info(self, config):
         config.setdefault('host', 'localhost')
@@ -138,81 +172,45 @@ class DelugePlugin(object):
         config.setdefault('username', '')
         config.setdefault('password', '')
 
-    def on_task_start(self, task, config):
-        """Raise a DependencyError if our dependencies aren't available"""
-        # This is overridden by OutputDeluge to add deluge 1.1 support
-        try:
-            from deluge.ui.client import client
-        except ImportError as e:
-            log.debug('Error importing deluge: %s' % e)
-            raise plugin.DependencyError('output_deluge', 'deluge',
-                                  'Deluge module and it\'s dependencies required. ImportError: %s' % e, log)
-        try:
-            from twisted.internet import reactor
-        except:
-            raise plugin.DependencyError('output_deluge', 'twisted.internet', 'Twisted.internet package required', log)
-        log.debug('Using deluge 1.2 api')
+    def on_disconnect(self):
+        """Pauses the reactor. Gets called when we disconnect from the daemon."""
+        # pause the reactor, so flexget can continue
+        reactor.callLater(0, reactor.pause)
 
-    def on_task_abort(self, task, config):
-        pass
+    def on_connect_fail(self, result):
+        """Pauses the reactor, returns PluginError. Gets called when connection to deluge daemon fails."""
+        log.debug('Connect to deluge daemon failed, result: %s' % result)
+        reactor.callLater(0, reactor.pause, plugin.PluginError('Could not connect to deluge daemon', log))
 
-# Add some more methods to the base class if we are using deluge 1.2+
-try:
-    from twisted.internet import reactor
-    from deluge.ui.client import client
-    from deluge.ui.common import get_localhost_auth
+    def on_connect_success(self, result, task, config):
+        """Gets called when successfully connected to the daemon. Should do the work then call client.disconnect"""
+        raise NotImplementedError
 
-    class DelugePlugin(DelugePlugin):
+    def connect(self, task, config):
+        """Connects to the deluge daemon and runs on_connect_success """
 
-        def on_disconnect(self):
-            """Pauses the reactor. Gets called when we disconnect from the daemon."""
-            # pause the reactor, so flexget can continue
-            reactor.callLater(0, reactor.pause)
+        if config['host'] in ['localhost', '127.0.0.1'] and not config.get('username'):
+            # If an username is not specified, we have to do a lookup for the localclient username/password
+            auth = get_localhost_auth()
+            if auth[0]:
+                config['username'], config['password'] = auth
+            else:
+                raise plugin.PluginError('Unable to get local authentication info for Deluge. You may need to '
+                                         'specify an username and password from your Deluge auth file.')
 
-        def on_connect_fail(self, result):
-            """Pauses the reactor, returns PluginError. Gets called when connection to deluge daemon fails."""
-            log.debug('Connect to deluge daemon failed, result: %s' % result)
-            reactor.callLater(0, reactor.pause, plugin.PluginError('Could not connect to deluge daemon', log))
+        client.set_disconnect_callback(self.on_disconnect)
 
-        def on_connect_success(self, result, task, config):
-            """Gets called when successfully connected to the daemon. Should do the work then call client.disconnect"""
-            raise NotImplementedError
+        d = client.connect(
+            host=config['host'],
+            port=config['port'],
+            username=config['username'],
+            password=config['password'])
 
-        def connect(self, task, config):
-            """Connects to the deluge daemon and runs on_connect_success """
-
-            if config['host'] in ['localhost', '127.0.0.1'] and not config.get('username'):
-                # If an username is not specified, we have to do a lookup for the localclient username/password
-                auth = get_localhost_auth()
-                if auth[0]:
-                    config['username'], config['password'] = auth
-                else:
-                    raise plugin.PluginError('Unable to get local authentication info for Deluge. You may need to '
-                                             'specify an username and password from your Deluge auth file.')
-
-            client.set_disconnect_callback(self.on_disconnect)
-
-            d = client.connect(
-                host=config['host'],
-                port=config['port'],
-                username=config['username'],
-                password=config['password'])
-
-            d.addCallback(self.on_connect_success, task, config).addErrback(self.on_connect_fail)
-            result = reactor.run()
-            if isinstance(result, Exception):
-                raise result
-            return result
-
-    @event('manager.shutdown')
-    def stop_reactor(manager):
-        """Shut down the twisted reactor after all tasks have run."""
-        if not reactor._stopped:
-            log.debug('Stopping twisted reactor.')
-            reactor.stop()
-
-except (ImportError, pkg_resources.DistributionNotFound):
-    pass
+        d.addCallback(self.on_connect_success, task, config).addErrback(self.on_connect_fail)
+        result = reactor.run()
+        if isinstance(result, Exception):
+            raise result
+        return result
 
 
 class InputDeluge(DelugePlugin):
@@ -369,33 +367,11 @@ class OutputDeluge(DelugePlugin):
         return config
 
     def __init__(self):
-        self.deluge12 = None
         self.deluge_version = None
         self.options = {'maxupspeed': 'max_upload_speed', 'maxdownspeed': 'max_download_speed',
                         'maxconnections': 'max_connections', 'maxupslots': 'max_upload_slots',
                         'automanaged': 'auto_managed', 'ratio': 'stop_ratio', 'removeatratio': 'remove_at_ratio',
                         'addpaused': 'add_paused', 'compact': 'compact_allocation'}
-
-    @plugin.priority(120)
-    def on_task_start(self, task, config):
-        """
-        Detect what version of deluge is loaded.
-        """
-
-        if self.deluge12 is None:
-            logger = log.info if task.options.test else log.debug
-            try:
-                log.debug('Looking for deluge 1.1 API')
-                from deluge.ui.client import sclient
-                log.debug('1.1 API found')
-            except ImportError:
-                log.debug('Looking for deluge 1.2 API')
-                DelugePlugin.on_task_start(self, task, config)
-                logger('Using deluge 1.2 api')
-                self.deluge12 = True
-            else:
-                logger('Using deluge 1.1 api')
-                self.deluge12 = False
 
     @plugin.priority(120)
     def on_task_download(self, task, config):
@@ -434,98 +410,13 @@ class OutputDeluge(DelugePlugin):
         if not config['enabled'] or not (task.accepted or task.options.test):
             return
 
-        add_to_deluge = self.connect if self.deluge12 else self.add_to_deluge11
-        add_to_deluge(task, config)
+        self.connect(task, config)
         # Clean up temp file if download plugin is not configured for this task
         if 'download' not in task.config:
             for entry in task.accepted + task.failed:
                 if os.path.exists(entry.get('file', '')):
                     os.remove(entry['file'])
                     del(entry['file'])
-
-    def add_to_deluge11(self, task, config):
-        """Add torrents to deluge using deluge 1.1.x api."""
-        try:
-            from deluge.ui.client import sclient
-        except:
-            raise plugin.PluginError('Deluge module required', log)
-
-        sclient.set_core_uri()
-        for entry in task.accepted:
-            try:
-                before = sclient.get_session_state()
-            except Exception as e:
-                (errno, msg) = e.args
-                raise plugin.PluginError('Could not communicate with deluge core. %s' % msg, log)
-            if task.options.test:
-                return
-            opts = {}
-            path = entry.get('path', config['path'])
-            if path:
-                try:
-                    opts['download_location'] = os.path.expanduser(entry.render(path))
-                except RenderError as e:
-                    log.error('Could not set path for %s: %s' % (entry['title'], e))
-            for fopt, dopt in self.options.iteritems():
-                value = entry.get(fopt, config.get(fopt))
-                if value is not None:
-                    opts[dopt] = value
-                    if fopt == 'ratio':
-                        opts['stop_at_ratio'] = True
-
-            # check that file is downloaded
-            if 'file' not in entry:
-                entry.fail('file missing?')
-                continue
-
-            # see that temp file is present
-            if not os.path.exists(entry['file']):
-                tmp_path = os.path.join(task.manager.config_base, 'temp')
-                log.debug('entry: %s' % entry)
-                log.debug('temp: %s' % ', '.join(os.listdir(tmp_path)))
-                entry.fail('Downloaded temp file \'%s\' doesn\'t exist!?' % entry['file'])
-                continue
-
-            sclient.add_torrent_file([entry['file']], [opts])
-            log.info('%s torrent added to deluge with options %s' % (entry['title'], opts))
-
-            movedone = entry.get('movedone', config['movedone'])
-            label = entry.get('label', config['label']).lower()
-            queuetotop = entry.get('queuetotop', config.get('queuetotop'))
-
-            # Sometimes deluge takes a moment to add the torrent, wait a second.
-            time.sleep(2)
-            after = sclient.get_session_state()
-            for item in after:
-                # find torrentid of just added torrent
-                if item not in before:
-                    try:
-                        movedone = entry.render(movedone)
-                    except RenderError as e:
-                        log.error('Could not set movedone for %s: %s' % (entry['title'], e))
-                        movedone = ''
-                    if movedone:
-                        movedone = os.path.expanduser(movedone)
-                        if not os.path.isdir(movedone):
-                            log.debug('movedone path %s doesn\'t exist, creating' % movedone)
-                            os.makedirs(movedone)
-                        log.debug('%s move on complete set to %s' % (entry['title'], movedone))
-                        sclient.set_torrent_move_on_completed(item, True)
-                        sclient.set_torrent_move_on_completed_path(item, movedone)
-                    if label:
-                        if 'label' not in sclient.get_enabled_plugins():
-                            sclient.enable_plugin('label')
-                        if label not in sclient.label_get_labels():
-                            sclient.label_add(label)
-                        log.debug('%s label set to \'%s\'' % (entry['title'], label))
-                        sclient.label_set_torrent(item, label)
-                    if queuetotop:
-                        log.debug('%s moved to top of queue' % entry['title'])
-                        sclient.queue_top([item])
-                    break
-            else:
-                log.info('%s is already loaded in deluge. Cannot change label, movedone, or queuetotop' %
-                         entry['title'])
 
     def on_connect_success(self, result, task, config):
         """Gets called when successfully connected to a daemon."""

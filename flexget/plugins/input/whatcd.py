@@ -8,7 +8,7 @@ from flexget.entry import Entry
 from flexget.event import event
 from flexget.plugin import PluginError
 from flexget.utils.cached_input import cached
-from flexget.utils.requests import Session
+from flexget.utils.requests import Session, TokenBucketLimiter
 
 log = logging.getLogger('whatcd')
 
@@ -293,7 +293,7 @@ class InputWhatCD(object):
         self.session = Session()
 
         # From the API docs: "Refrain from making more than five (5) requests every ten (10) seconds"
-        self.session.set_domain_delay('ssl.what.cd', '2 seconds')
+        self.session.add_domain_limiter(TokenBucketLimiter('ssl.what.cd', 2, '2 seconds'))
 
         # Custom user agent
         user_agent = config.pop('user_agent', None)

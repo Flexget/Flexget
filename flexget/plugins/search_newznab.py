@@ -1,11 +1,10 @@
 import logging
 import urllib
 
-import feedparser
-
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
+import feedparser
 
 __author__ = 'deksan'
 
@@ -41,9 +40,11 @@ class Newznab(object):
     }
 
     def build_config(self, config):
+        log.debug(type(config))
+
         if config['category'] == 'tv':
             config['category'] = 'tvsearch'
-        log.debug(config['category'])
+
         if 'url' not in config:
             if 'apikey' in config and 'website' in config:
                 params = {
@@ -52,21 +53,27 @@ class Newznab(object):
                     'extended': 1
                 }
                 config['url'] = config['website'] + '/api?' + urllib.urlencode(params)
+
         return config
 
-    def fill_entries_for_url(self, url, config):
+    def fill_entries_for_url(self, url, task):
         entries = []
-        rss = feedparser.parse(url)
-        status = rss.get('status', False)
-        if status != 200 and status != 301:     # in cae of redirection...
-            log.error('Search result not 200 (OK), received %s' % status)
-            raise
+        log.verbose('Fetching %s' % url)
+
+        try:
+            r = task.requests.get(url)
+        except task.requests.RequestException as e:
+            log.error("Failed fetching '%s': %s" % (url, e))
+
+        rss = feedparser.parse(r.content)
+        log.debug("Raw RSS: %s" % rss)
 
         if not len(rss.entries):
             log.info('No results returned')
 
         for rss_entry in rss.entries:
             new_entry = Entry()
+            
             for key in rss_entry.keys():
                 new_entry[key] = rss_entry[key]
             new_entry['url'] = new_entry['link']
@@ -79,15 +86,15 @@ class Newznab(object):
     def search(self, task, entry, config=None):
         config = self.build_config(config)
         if config['category'] == 'movie':
-            return self.do_search_movie(entry, config)
+            return self.do_search_movie(entry, task, config)
         elif config['category'] == 'tvsearch':
-            return self.do_search_tvsearch(entry, config)
+            return self.do_search_tvsearch(entry, task, config)
         else:
             entries = []
             log.warning("Not done yet...")
             return entries
 
-    def do_search_tvsearch(self, arg_entry, config=None):
+    def do_search_tvsearch(self, arg_entry, task, config=None):
         log.info('Searching for %s' % (arg_entry['title']))
         # normally this should be used with emit_series who has provided season and episodenumber
         if 'series_name' not in arg_entry or 'series_season' not in arg_entry or 'series_episode' not in arg_entry:
@@ -99,9 +106,9 @@ class Newznab(object):
 
         url = (config['url'] + '&rid=%s&season=%s&ep=%s' %
                (arg_entry['tvrage_id'], arg_entry['series_season'], arg_entry['series_episode']))
-        return self.fill_entries_for_url(url, config)
+        return self.fill_entries_for_url(url, task)
 
-    def do_search_movie(self, arg_entry, config=None):
+    def do_search_movie(self, arg_entry, task, config=None):
         entries = []
         log.info('Searching for %s (imdbid:%s)' % (arg_entry['title'], arg_entry['imdb_id']))
         # normally this should be used with emit_movie_queue who has imdbid (i guess)
@@ -110,8 +117,7 @@ class Newznab(object):
 
         imdb_id = arg_entry['imdb_id'].replace('tt', '')
         url = config['url'] + '&imdbid=' + imdb_id
-        return self.fill_entries_for_url(url, config)
-
+        return self.fill_entries_for_url(url, task)
 
 @event('plugin.register')
 def register_plugin():

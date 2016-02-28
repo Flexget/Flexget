@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+
 import logging
 
 from flexget import plugin
-from flexget.event import event
 from flexget.entry import Entry
+from flexget.event import event
 from flexget.manager import Session
 from flexget.utils.imdb import make_url as make_imdb_url
 
@@ -26,6 +27,7 @@ class EmitMovieQueue(object):
                 'properties': {
                     'year': {'type': 'boolean'},
                     'quality': {'type': 'boolean'},
+                    'queue_name': {'type': 'string'}
                 },
                 'additionalProperties': False
             }
@@ -37,6 +39,7 @@ class EmitMovieQueue(object):
             config = {}
         config.setdefault('year', True)
         config.setdefault('quality', False)
+        config.setdefault('queue_name', 'default')
         return config
 
     def on_task_input(self, task, config):
@@ -44,9 +47,10 @@ class EmitMovieQueue(object):
             return
         config = self.prepare_config(config)
         entries = []
+        queue_name = config.get('queue_name')
 
         with Session() as session:
-            for queue_item in queue_get(session=session, downloaded=False):
+            for queue_item in queue_get(session=session, downloaded=False, queue_name=queue_name):
                 entry = Entry()
                 # make sure the entry has IMDB fields filled
                 entry['url'] = ''
@@ -71,7 +75,8 @@ class EmitMovieQueue(object):
                     entry['title'] = queue_item.title
 
                 # Add the year and quality if configured to (make sure not to double it up)
-                if config.get('year') and entry.get('movie_year') and unicode(entry['movie_year']) not in entry['title']:
+                if config.get('year') and entry.get('movie_year') \
+                        and unicode(entry['movie_year']) not in entry['title']:
                     entry['title'] += ' %s' % entry['movie_year']
                 # TODO: qualities can now be ranges.. how should we handle this?
                 if config.get('quality') and queue_item.quality != 'ANY':
@@ -79,7 +84,7 @@ class EmitMovieQueue(object):
                     # entry['title'] += ' %s' % queue_item.quality
                 entries.append(entry)
                 log.debug('Added title and IMDB id to new entry: %s - %s' %
-                         (entry['title'], entry['imdb_id']))
+                          (entry['title'], entry['imdb_id']))
 
         return entries
 

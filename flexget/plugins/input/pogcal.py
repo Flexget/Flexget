@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
 
-from bs4 import BeautifulSoup
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.utils import requests
+from flexget.utils.soup import get_soup
 
 log = logging.getLogger('pogcal')
 
@@ -36,7 +36,7 @@ class InputPogDesign(object):
             page = session.get('http://www.pogdesign.co.uk/cat/showselect.php')
         except requests.RequestException as e:
             raise plugin.PluginError('Error retrieving source: %s' % e)
-        soup = BeautifulSoup(page.text)
+        soup = get_soup(page.text)
         entries = []
         for row in soup.find_all('label', {'class': 'label_check'}):
             if row.find(attrs={'checked': 'checked'}):

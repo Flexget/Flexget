@@ -1,10 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 
 import logging
-import re
 
 from flexget import plugin
 from flexget.event import event
+from flexget.utils.tools import split_title_year
 
 try:
     from flexget.plugins.api_tvmaze import APITVMaze
@@ -25,15 +25,14 @@ class EstimatesSeriesTVMaze(object):
         series_name = entry['series_name']
         season = entry['series_season']
         episode_number = entry['series_episode']
-        year_match = re.search('\(([\d]{4})\)', series_name)  # Gets year from title if present
-        if year_match:
-            year_match = year_match.group(1)
+        title, year_match = split_title_year(series_name)
 
         kwargs = {}
         kwargs['maze_id'] = entry.get('tvmaze_id')
         kwargs['tvdb_id'] = entry.get('tvdb_id') or entry.get('trakt_series_tvdb_id')
         kwargs['tvrage_id'] = entry.get('tvrage_id') or entry.get('trakt_series_tvrage_id')
-        kwargs['show_name'] = re.sub('\(([\d]{4})\)', '', series_name).rstrip()  # Remove year from name if present
+        kwargs['imdb_id'] = entry.get('imdb_id')
+        kwargs['show_name'] = title
         kwargs['show_year'] = entry.get('trakt_series_year') or entry.get('year') or entry.get(
             'imdb_year') or year_match
         kwargs['show_network'] = entry.get('network') or entry.get('trakt_series_network')

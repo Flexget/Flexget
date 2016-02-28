@@ -22,11 +22,18 @@
         };
 
         // Execute task(s), return stream log etc
-        this.executeStream = function (tasks) {
-            var stream = oboe({
-                url: '/api/execution/execute/stream/?progress=true&log=true&summary=true&entry_dump=true',
-                method: 'POST',
-                body: {tasks: tasks}
+        this.execute = function (task_name, options) {
+            var deferred = $q.defer();
+
+            var params = '';
+
+            angular.forEach(options, function (value, key) {
+                var option = key + '=' + value;
+                if (params) {
+                    params = params + '&' + option
+                } else {
+                    params = '?' + option
+                }
             });
 
             var on = function (event, pattern, callback) {
@@ -43,58 +50,48 @@
                 } else {
                     stream.on(event, wrappedCallback)
                 }
-
-                return executeWrapper;
             };
 
-            var executeWrapper = {
-                start: function (callback) {
-                    return on('start', null, callback);
-                },
-                tasks: function (callback) {
-                    return on('node', 'tasks', callback);
-                },
-                log: function (callback) {
-                    return on('node', 'log', callback);
-                },
-                progress: function (callback) {
-                    var wrappedCallback = function (data) {
-                        var taskId = Object.keys(data)[0];
-                        return callback(taskId, data[taskId])
-                    };
-                    return on('node', 'progress', wrappedCallback);
-                },
-                summary: function (callback) {
-                    var wrappedCallback = function (data) {
-                        var taskId = Object.keys(data)[0];
-                        return callback(taskId, data[taskId])
-                    };
-                    return on('node', 'summary', wrappedCallback);
-                },
-                entry_dump: function (callback) {
-                    var wrappedCallback = function (data) {
-                        var taskId = Object.keys(data)[0];
-                        return callback(taskId, data[taskId])
-                    };
-                    return on('node', 'entry_dump', wrappedCallback);
-                },
-                done: function (callback) {
-                    return on('done', null, callback);
-                },
-                error: function (callback) {
-                    return on('fail', null, callback);
-                },
-                abort: function () {
-                    stream.abort()
-                }
+            var stream = oboe({
+                url: '/api/tasks/' + task_name + '/execute/' + params,
+                method: 'GET'
+            }).done(function () {
+                deferred.resolve("finished stream");
+            }).fail(function (error) {
+                deferred.reject(error)
+            });
+
+            deferred.promise.log = function (callback) {
+                on('node', 'log', callback);
+                return deferred.promise;
             };
-            return executeWrapper;
+
+            deferred.promise.progress = function (callback) {
+                on('node', 'progress', callback);
+                return deferred.promise;
+            };
+
+            deferred.promise.summary = function (callback) {
+                on('node', 'summary', callback);
+                return deferred.promise;
+            };
+
+            deferred.promise.entry_dump = function (callback) {
+                on('node', 'entry_dump', callback);
+                return deferred.promise;
+            };
+
+            deferred.promise.abort = function () {
+                return stream.abort();
+            };
+
+            return deferred.promise;
         };
 
         this.queue = function () {
             var defer = $q.defer();
 
-            $http.get('/api/execution/queue/').then(function (response) {
+            $http.get('/api/tasks/queue/', {ignoreLoadingBar: true}).then(function (response) {
                 defer.resolve(response.data.tasks);
             }, function (response) {
                 defer.reject(response);
@@ -118,5 +115,4 @@
 
         }
     }
-
 })();

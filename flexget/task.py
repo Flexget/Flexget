@@ -571,6 +571,7 @@ class Task(object):
         """
 
         try:
+            self.finished_event.clear()
             if self.options.cron:
                 self.manager.db_cleanup()
             fire_event('task.execute.started', self)

@@ -20,7 +20,6 @@ class SearchRSS(object):
 
     def search(self, task, entry, config=None):
         from flexget.utils.template import environment
-        from flexget.manager import manager
         search_strings = [urllib.quote(normalize_unicode(s).encode('utf-8'))
                           for s in entry.get('search_strings', [entry['title']])]
         rss_plugin = plugin.get_plugin_by_name('rss')

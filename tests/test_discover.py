@@ -40,7 +40,7 @@ class TestDiscover(FlexGetBase):
         tasks:
           test_sort:
             discover:
-              ignore_estimations: yes
+              release_estimations: ignore
               what:
               - mock:
                 - title: Foo
@@ -53,7 +53,7 @@ class TestDiscover(FlexGetBase):
               - test_search: yes
           test_interval:
             discover:
-              ignore_estimations: yes
+              release_estimations: ignore
               what:
               - mock:
                 - title: Foo
@@ -69,7 +69,7 @@ class TestDiscover(FlexGetBase):
               - test_search: yes
           test_emit_series:
             discover:
-              ignore_estimations: yes
+              release_estimations: ignore
               what:
               - emit_series:
                   from_start: yes
@@ -81,7 +81,7 @@ class TestDiscover(FlexGetBase):
             rerun: 0
           test_emit_series_with_bad_search:
             discover:
-              ignore_estimations: yes
+              release_estimations: ignore
               what:
               - emit_series:
                   from_start: yes
@@ -151,7 +151,7 @@ class TestEmitSeriesInDiscover(FlexGetBase):
               - My Show 2
           test_emit_series_backfill:
             discover:
-              ignore_estimations: yes
+              release_estimations: ignore
               what:
               - emit_series:
                   backfill: yes
