@@ -9,9 +9,9 @@ from sqlalchemy import Column, Integer, String
 
 from flexget import db_schema, plugin, options
 from flexget.event import event
+from flexget.logger import console
 from flexget.utils.database import with_session
 from flexget.utils.template import RenderError
-from flexget.utils.tools import console
 
 try:
     import telegram

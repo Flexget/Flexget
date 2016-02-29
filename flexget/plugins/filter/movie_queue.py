@@ -372,9 +372,9 @@ def queue_del(title=None, imdb_id=None, tmdb_id=None, session=None, movie_id=Non
 @with_session
 def queue_clear(queue_name='default', session=None):
     """Deletes waiting movies from queue"""
-    (session.query(QueuedMovie).filter(QueuedMovie.downloaded == False)
-                               .filter(func.lower(QueuedMovie.queue_name) == queue_name.lower())
-                               .delete())
+    results = queue_get(downloaded=False, queue_name=queue_name, session=session)
+    for res in results:
+        session.delete(res)
 
 
 @with_session

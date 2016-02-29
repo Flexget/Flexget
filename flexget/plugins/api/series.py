@@ -584,11 +584,11 @@ release_list_parser.add_argument('downloaded', choices=('downloaded', 'not_downl
 @api.response(414, 'Episode ID not found', default_error_schema)
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id', default_error_schema)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
-         parser=release_list_parser)
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
 class SeriesReleasesAPI(APIResource):
     @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
-    @api.doc(description='Get all downloaded releases for a specific episode of a specific show')
+    @api.doc(description='Get all downloaded releases for a specific episode of a specific show',
+             parser=release_list_parser)
     def get(self, show_id, ep_id, session):
         """ Get all episodes releases by show ID and episode ID """
         try:
@@ -624,7 +624,8 @@ class SeriesReleasesAPI(APIResource):
         })
 
     @api.response(200, 'Successfully deleted all releases for episode', empty_response)
-    @api.doc(description='Delete all releases for a specific episode of a specific show.')
+    @api.doc(description='Delete all releases for a specific episode of a specific show.',
+             parser=release_list_parser)
     def delete(self, show_id, ep_id, session):
         """ Deletes all episodes releases by show ID and episode ID """
         try:
@@ -654,6 +655,33 @@ class SeriesReleasesAPI(APIResource):
         number_of_releases = len(release_items)
         for release in release_items:
             series.delete_release_by_id(release.id)
+        return {}
+
+    @api.response(200, 'Successfully reset all downloaded releases for episode', empty_response)
+    @api.doc(description='Resets all of the downloaded releases of an episode, clearing the quality to be downloaded '
+                         'again,')
+    def put(self, show_id, ep_id, session):
+        """ Marks all downloaded releases as not downloaded """
+        try:
+            show = series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Show with ID %s not found' % show_id
+                    }, 404
+        try:
+            episode = series.episode_by_id(ep_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Episode with ID %s not found' % ep_id
+                    }, 414
+        if not series.episode_in_show(show_id, ep_id):
+            return {'status': 'error',
+                    'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
+
+        for release in episode.releases:
+            if release.downloaded:
+                release.downloaded = False
+
         return {}
 
 
@@ -692,7 +720,7 @@ class SeriesReleaseAPI(APIResource):
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
         if not series.release_in_episode(ep_id, rel_id):
             return {'status': 'error',
-                    'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
+                    'message': 'Release id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
 
         return jsonify({
             'show': show.name,
@@ -731,4 +759,40 @@ class SeriesReleaseAPI(APIResource):
                     'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
 
         series.delete_release_by_id(rel_id)
+        return {}
+
+    @api.response(200, 'Successfully reset downloaded release status', empty_response)
+    @api.response(500, 'Release is not marked as downloaded', default_error_schema)
+    @api.doc(description='Resets the downloaded release status, clearing the quality to be downloaded again')
+    def put(self, show_id, ep_id, rel_id, session):
+        """ Resets a downloaded release status """
+        try:
+            show = series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Show with ID %s not found' % show_id
+                    }, 404
+        try:
+            episode = series.episode_by_id(ep_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Episode with ID %s not found' % ep_id
+                    }, 414
+        try:
+            release = series.release_by_id(rel_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Release with ID %s not found' % rel_id
+                    }, 424
+        if not series.episode_in_show(show_id, ep_id):
+            return {'status': 'error',
+                    'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
+        if not series.release_in_episode(ep_id, rel_id):
+            return {'status': 'error',
+                    'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
+        if not release.downloaded:
+            return {'status': 'error',
+                    'message': 'Release with id %s is not set as downloaded' % rel_id}, 500
+
+        release.downloaded = False
         return {}
