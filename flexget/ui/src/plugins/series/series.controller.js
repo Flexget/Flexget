@@ -9,13 +9,38 @@
 
         var options = {
             page: 1,
-            //number_of_shows: 10,
+            page_size: 10,
             in_config: 'all'
         }
 
         vm.searchTerm = "";
 
-        
+        function getSeriesList() {
+            $http.get('/api/series/', { params: options })
+                .success(function(data) {
+                    vm.series = data.shows;
+                    vm.currentPage = data.page;
+                    vm.totalPages = data.total_number_of_pages;
+
+                    getMetadata(data.shows[0].show_name);
+                });
+        }
+
+        function getMetadata(show) {
+            $http.get('/api/tvdb/' + vm.series[0].show_name)
+                .success(function(data) {
+                    vm.series[0].metadata = data;
+                })
+                .error(function(error) {
+                    console.log(error);
+                });
+        }
+
+        vm.updateListPage = function(index) {
+            options.page = index;
+
+            getSeriesList();
+        }
 
         vm.search = function() {
             $http.get('/api/series/search/' + vm.searchTerm, { params: options })
@@ -24,19 +49,7 @@
                 });
         }
 
-
-        $http.get('/api/series/', { params: options })
-            .success(function(data) {
-                vm.series = data.shows;
-
-                $http.get('/api/tvdb/' + vm.series[0].show_name)
-                    .success(function(data) {
-                        vm.series[0].metadata = data;
-                    })
-                    .error(function(error) {
-                        console.log(error);
-                    });
-            });
+        getSeriesList();
 
         vm.gotoEpisodes = function(id) {
             $state.go('flexget.episodes', { id: id });

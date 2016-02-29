@@ -34,7 +34,7 @@
 			            <a ui-sref="flexget.episodes({ id: show.show_id })">Episodes</a>
 			        </div>-->
 			    </md-list-item>
-                <fg-material-pagination total-pages="3" position="center center" step="5" goto-page="vm.loadData()" current-page="2"></fg-material-pagination>
+                <fg-material-pagination total-pages="vm.totalPages" position="center center" step="5" goto-page="vm.updateListPage(index)" current-page="vm.currentPage"></fg-material-pagination>
 			</md-list>
 		</md-tab>
 	</md-tabs>
