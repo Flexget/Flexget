@@ -236,7 +236,7 @@ series_list_parser.add_argument('status', choices=('new', 'stale'), help="Filter
 series_list_parser.add_argument('days', type=int,
                                 help="Filter status by number of days. Default is 7 for new and 365 for stale")
 series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
-series_list_parser.add_argument('number_of_shows', type=int, default=100, help='Shows per page. Default is 100.')
+series_list_parser.add_argument('page_size', type=int, default=100, help='Shows per page. Default is 100.')
 
 series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behind_latest', 'last_download_date'),
                                 default='show_name',
@@ -253,7 +253,7 @@ class SeriesListAPI(APIResource):
         """ List existing shows """
         args = series_list_parser.parse_args()
         page = args['page']
-        max_results = args['number_of_shows']
+        page_size = args['page_size']
 
         sort_by = args['sort_by']
         order = args['order']
@@ -268,9 +268,12 @@ class SeriesListAPI(APIResource):
             'premieres': args.get('premieres'),
             'status': args.get('status'),
             'days': args.get('days'),
+            'page_size': args.get('page_size'),
+            'page': args.get('page'),
             'session': session
 
         }
+        num_of_shows = series.get_series_summary(count=True, **kwargs)
 
         raw_series_list = series.get_series_summary(**kwargs)
         converted_series_list = [get_series_details(show) for show in raw_series_list]
@@ -288,25 +291,15 @@ class SeriesListAPI(APIResource):
                                           'last_downloaded_release'] else datetime.datetime(1970, 1, 1),
                                       reverse=order)
 
-        num_of_shows = len(sorted_show_list)
-        pages = int(ceil(num_of_shows / float(max_results)))
+        pages = int(ceil(num_of_shows / float(page_size)))
 
-        shows = []
         if page > pages and pages != 0:
             return {'error': 'page %s does not exist' % page}, 400
 
-        start = (page - 1) * max_results
-        finish = start + max_results
-        if finish > num_of_shows:
-            finish = num_of_shows
-
-        for show_number in range(start, finish):
-            shows.append(sorted_show_list[show_number])
-
-        number_of_shows = min(max_results, num_of_shows)
+        number_of_shows = min(page_size, num_of_shows)
 
         return jsonify({
-            'shows': shows,
+            'shows': sorted_show_list,
             'number_of_shows': number_of_shows,
             'total_number_of_shows': num_of_shows,
             'page': page,
@@ -584,11 +577,11 @@ release_list_parser.add_argument('downloaded', choices=('downloaded', 'not_downl
 @api.response(414, 'Episode ID not found', default_error_schema)
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id', default_error_schema)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
-         parser=release_list_parser)
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
 class SeriesReleasesAPI(APIResource):
     @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
-    @api.doc(description='Get all downloaded releases for a specific episode of a specific show')
+    @api.doc(description='Get all downloaded releases for a specific episode of a specific show',
+             parser=release_list_parser)
     def get(self, show_id, ep_id, session):
         """ Get all episodes releases by show ID and episode ID """
         try:
@@ -624,7 +617,8 @@ class SeriesReleasesAPI(APIResource):
         })
 
     @api.response(200, 'Successfully deleted all releases for episode', empty_response)
-    @api.doc(description='Delete all releases for a specific episode of a specific show.')
+    @api.doc(description='Delete all releases for a specific episode of a specific show.',
+             parser=release_list_parser)
     def delete(self, show_id, ep_id, session):
         """ Deletes all episodes releases by show ID and episode ID """
         try:
@@ -654,6 +648,33 @@ class SeriesReleasesAPI(APIResource):
         number_of_releases = len(release_items)
         for release in release_items:
             series.delete_release_by_id(release.id)
+        return {}
+
+    @api.response(200, 'Successfully reset all downloaded releases for episode', empty_response)
+    @api.doc(description='Resets all of the downloaded releases of an episode, clearing the quality to be downloaded '
+                         'again,')
+    def put(self, show_id, ep_id, session):
+        """ Marks all downloaded releases as not downloaded """
+        try:
+            show = series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Show with ID %s not found' % show_id
+                    }, 404
+        try:
+            episode = series.episode_by_id(ep_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Episode with ID %s not found' % ep_id
+                    }, 414
+        if not series.episode_in_show(show_id, ep_id):
+            return {'status': 'error',
+                    'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
+
+        for release in episode.releases:
+            if release.downloaded:
+                release.downloaded = False
+
         return {}
 
 
@@ -692,7 +713,7 @@ class SeriesReleaseAPI(APIResource):
                     'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
         if not series.release_in_episode(ep_id, rel_id):
             return {'status': 'error',
-                    'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
+                    'message': 'Release id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
 
         return jsonify({
             'show': show.name,
@@ -731,4 +752,40 @@ class SeriesReleaseAPI(APIResource):
                     'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
 
         series.delete_release_by_id(rel_id)
+        return {}
+
+    @api.response(200, 'Successfully reset downloaded release status', empty_response)
+    @api.response(500, 'Release is not marked as downloaded', default_error_schema)
+    @api.doc(description='Resets the downloaded release status, clearing the quality to be downloaded again')
+    def put(self, show_id, ep_id, rel_id, session):
+        """ Resets a downloaded release status """
+        try:
+            show = series.show_by_id(show_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Show with ID %s not found' % show_id
+                    }, 404
+        try:
+            episode = series.episode_by_id(ep_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Episode with ID %s not found' % ep_id
+                    }, 414
+        try:
+            release = series.release_by_id(rel_id, session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'Release with ID %s not found' % rel_id
+                    }, 424
+        if not series.episode_in_show(show_id, ep_id):
+            return {'status': 'error',
+                    'message': 'Episode with id %s does not belong to show %s' % (ep_id, show_id)}, 400
+        if not series.release_in_episode(ep_id, rel_id):
+            return {'status': 'error',
+                    'message': 'Release with id %s does not belong to episode %s' % (rel_id, ep_id)}, 410
+        if not release.downloaded:
+            return {'status': 'error',
+                    'message': 'Release with id %s is not set as downloaded' % rel_id}, 500
+
+        release.downloaded = False
         return {}

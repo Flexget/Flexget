@@ -355,7 +355,7 @@ class BaseFilterSeries(FlexGetBase):
         entry2 = self.task.find_entry('accepted', title='other show season 2 episode 2')
         # Make sure case is normalized so series are marked with the same name no matter the case in the title
         assert entry.get('series_name') == entry2.get(
-                'series_name') == 'Other Show', 'Series names should be in title case'
+            'series_name') == 'Other Show', 'Series names should be in title case'
         entry = self.task.find_entry('accepted', title='Date.Show.03-29-2012.HDTV.XViD-FlexGet')
         assert entry.get('series_guessed')
         assert entry.get('series_name') == 'Date Show'
@@ -2270,26 +2270,31 @@ class TestSeriesAPI(APITest):
     def test_series_list_get(self, mock_series_list):
         session = Session()
         query = session.query(series.Series)
-        mock_series_list.return_value = query
+        mock_series_list.side_effect = [0, query]
 
         # No params
         rsp = self.get('/series/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_series_list.call_count == 2, 'Should have 2 calls, is actually %s' % mock_series_list.call_count
+        mock_series_list.side_effect = [0, query]
 
         # Default params
         rsp = self.get('/series/?max=100&sort_by=show_name&in_config=configured&order=desc&page=1')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_series_list.call_count == 4, 'Should have 4 calls, is actually %s' % mock_series_list.call_count
+        mock_series_list.side_effect = [0, query]
 
         # Changed params
         rsp = self.get('/series/?status=new&max=10&days=4&sort_by=last_download_date&in_config=all'
                        '&premieres=true&order=asc&page=2')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
+        assert mock_series_list.call_count == 6, 'Should have 6 calls, is actually %s' % mock_series_list.call_count
+        mock_series_list.side_effect = [0, query]
 
         # Negative test, invalid parameter
         rsp = self.get('/series/?status=bla&max=10&days=4&sort_by=last_download_date&in_config=all'
                        '&premieres=true&order=asc&page=2')
         assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
-        assert mock_series_list.call_count == 3, 'Should have 3 calls, is actually %s' % mock_series_list.call_count
 
     @patch.object(series, 'new_eps_after')
     @patch.object(series, 'get_latest_release')

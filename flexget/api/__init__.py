@@ -21,7 +21,7 @@ from flexget import manager
 from flexget.utils.database import with_session
 
 
-__version__ = '0.3-beta'
+__version__ = '0.3.2-beta'
 
 log = logging.getLogger('api')
 

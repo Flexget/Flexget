@@ -20,7 +20,7 @@ from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.plugins.parsers import SERIES_ID_TYPES
 from flexget.utils import qualities
-from flexget.utils.database import quality_property
+from flexget.utils.database import quality_property, with_session
 from flexget.utils.log import log_once
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
@@ -437,14 +437,20 @@ def get_latest_status(episode):
     return status.rstrip(', ') if status else None
 
 
-def get_series_summary(configured=None, premieres=None, status=None, days=None, session=None):
+@with_session
+def get_series_summary(configured=None, premieres=None, status=None, days=None, page=None, page_size=None, count=False,
+                       session=None):
     """
     Return a query with results for all series.
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
     Default is 'all'
     :param premieres: Return only shows with 1 season and less than 3 episodes
-    :param status:
-    :param days:
+    :param status: Stale or not
+    :param days: Value to determine stale
+    :param page_size: Number of result per page
+    :param page: Page number to return
+    :param count: Decides whether to return count of all shows or data itself
+     :param session: Passed session
     :return:
     """
     if not configured:
@@ -468,7 +474,9 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         if not days:
             days = 365
         query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
-    return query
+    if count:
+        return query.count()
+    return query.slice(page, page_size)
 
 
 def get_latest_episode(series):
@@ -777,13 +785,13 @@ def delete_release_by_id(release_id):
 def shows_by_name(normalized_name, session=None):
     """ Returns all series matching `normalized_name` """
     return session.query(Series).filter(Series._name_normalized.contains(normalized_name)).order_by(
-            func.char_length(Series.name)).all()
+        func.char_length(Series.name)).all()
 
 
 def shows_by_exact_name(normalized_name, session=None):
     """ Returns all series matching `normalized_name` """
     return session.query(Series).filter(Series._name_normalized == normalized_name).order_by(
-            func.char_length(Series.name)).all()
+        func.char_length(Series.name)).all()
 
 
 def show_by_id(show_id, session=None):
