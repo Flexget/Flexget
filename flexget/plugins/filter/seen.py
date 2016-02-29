@@ -310,14 +310,16 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
 
 
 @with_session
-def search(value=None, status=None, session=None):
+def search(value=None, status=None, page=None, page_size=None, count=False, session=None):
     if value:
         query = session.query(SeenEntry).join(SeenField).filter(SeenField.value.like(value)).order_by(SeenField.added)
     else:
         query = session.query(SeenEntry).join(SeenField).order_by(SeenField.added)
     if status is not None:
         query = query.filter(SeenEntry.local == status)
-    return query.all()
+    if count:
+        return query.count()
+    return query.slice(page, page_size)
 
 
 @event('plugin.register')
