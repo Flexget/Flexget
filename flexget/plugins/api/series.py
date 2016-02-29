@@ -236,7 +236,7 @@ series_list_parser.add_argument('status', choices=('new', 'stale'), help="Filter
 series_list_parser.add_argument('days', type=int,
                                 help="Filter status by number of days. Default is 7 for new and 365 for stale")
 series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
-series_list_parser.add_argument('number_of_shows', type=int, default=100, help='Shows per page. Default is 100.')
+series_list_parser.add_argument('page_size', type=int, default=100, help='Shows per page. Default is 100.')
 
 series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behind_latest', 'last_download_date'),
                                 default='show_name',
@@ -253,7 +253,7 @@ class SeriesListAPI(APIResource):
         """ List existing shows """
         args = series_list_parser.parse_args()
         page = args['page']
-        max_results = args['number_of_shows']
+        page_size = args['page_size']
 
         sort_by = args['sort_by']
         order = args['order']
@@ -268,9 +268,12 @@ class SeriesListAPI(APIResource):
             'premieres': args.get('premieres'),
             'status': args.get('status'),
             'days': args.get('days'),
+            'page_size': args.get('page_size'),
+            'page': args.get('page'),
             'session': session
 
         }
+        num_of_shows = series.get_series_summary(count=True, **kwargs)
 
         raw_series_list = series.get_series_summary(**kwargs)
         converted_series_list = [get_series_details(show) for show in raw_series_list]
@@ -288,25 +291,15 @@ class SeriesListAPI(APIResource):
                                           'last_downloaded_release'] else datetime.datetime(1970, 1, 1),
                                       reverse=order)
 
-        num_of_shows = len(sorted_show_list)
-        pages = int(ceil(num_of_shows / float(max_results)))
+        pages = int(ceil(num_of_shows / float(page_size)))
 
-        shows = []
         if page > pages and pages != 0:
             return {'error': 'page %s does not exist' % page}, 400
 
-        start = (page - 1) * max_results
-        finish = start + max_results
-        if finish > num_of_shows:
-            finish = num_of_shows
-
-        for show_number in range(start, finish):
-            shows.append(sorted_show_list[show_number])
-
-        number_of_shows = min(max_results, num_of_shows)
+        number_of_shows = min(page_size, num_of_shows)
 
         return jsonify({
-            'shows': shows,
+            'shows': sorted_show_list,
             'number_of_shows': number_of_shows,
             'total_number_of_shows': num_of_shows,
             'page': page,
