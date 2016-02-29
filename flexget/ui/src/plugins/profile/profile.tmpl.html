@@ -1,0 +1,17 @@
+<md-content>
+    <form name="passwordForm" layout layout-align="center" layout-padding>
+        <div layout="row" flex>
+            <md-input-container flex class="md-block">
+                <label>New Password</label>
+                <input type="password" name="password" ng-model="vm.password">
+                <div ng-messages="vm.errorMessages" md-auto-hide="false">
+                    <div ng-message="message">{{ vm.errorMessages.message }}</div>
+                </div>
+            </md-input-container>
+            <div flex="5"></div>
+            <div>
+                <md-button class="md-raised md-primary" ng-click="vm.updatePassword()">Update</md-button>
+            </div>
+        </div>
+    </form>
+</md-content>

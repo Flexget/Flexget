@@ -1,0 +1,25 @@
+<md-dialog aria-label="{{ vm.options.title }}">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>{{ vm.options.title }}</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="vm.cancel()">
+                <i class="material-icons">&#xE14C;</i>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-dialog-content ng-if="vm.options.body">
+        <div class="md-dialog-content">
+            <p>{{ vm.options.body }}</p>
+        </div>
+    </md-dialog-content>
+    <md-dialog-actions ng-if="vm.options.ok || vm.options.cancel">
+        <md-button ng-if="vm.options.cancel" ng-click="vm.cancel()" class="md-warn md-raised">
+            {{ vm.options.cancel }}
+        </md-button>
+        <span flex></span>
+        <md-button ng-if="vm.options.ok" ng-click="vm.hide('confirm')" class="md-primary md-raised">
+            {{ vm.options.ok }}
+        </md-button>
+    </md-dialog-actions>
+</md-dialog>

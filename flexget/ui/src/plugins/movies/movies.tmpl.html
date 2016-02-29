@@ -1,0 +1,15 @@
+<md-content flex layout-margin>
+	<md-tabs md-dynamic-height md-border-bottom>
+		<md-tab ng-repeat="tab in vm.tabs" label="{{ tab.label }}" md-on-select="tab.action()">
+			<md-list>
+    			<md-list-item class="md-3-line" ng-repeat="movie in vm.movies">
+        			<div class="md-list-item-text" layout="column">
+			        	<h3>{{ movie.title }}</h3>
+			            <h4>{{ movie.added | date: 'dd-MM-yyyy' }}</h4>
+			            <p>{{ movie.is_downloaded }}</p>
+			        </div>
+			    </md-list-item>
+			</md-list>
+		</md-tab>
+	</md-tabs>
+</md-content>
