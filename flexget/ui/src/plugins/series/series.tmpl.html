@@ -1,6 +1,13 @@
 <md-content flex layout-margin>
 	<md-tabs md-dynamic-height md-border-bottom>
-		<md-tab label="All series">
+		<md-tab label="All series" >
+            <div layout-gt-sm="row">
+                <md-input-container flex layout-align="end center">
+                    <label>Search</label>
+                    <input ng-model="vm.searchTerm" ng-model-options="{ debounce: 1000 }">
+                    {{ vm.searchTerm }}
+                </md-input-container>
+            </div>
 			<md-list>
     			<md-list-item class="md-3-line" ng-repeat="show in vm.series">
     				<md-card flex>

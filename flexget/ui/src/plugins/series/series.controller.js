@@ -4,7 +4,7 @@
     angular.module('flexget.plugins.series')
         .controller('seriesController', seriesController);
 
-    function seriesController($http, $state, $mdDialog) {
+    function seriesController($scope, $http, $state, $mdDialog) {
         var vm = this;
 
         var options = {
@@ -12,6 +12,18 @@
             //number_of_shows: 10,
             in_config: 'all'
         }
+
+        vm.searchTerm = "";
+
+        
+
+        vm.search = function() {
+            $http.get('/api/series/search/' + vm.searchTerm, { params: options })
+                .success(function(data) {
+                    vm.series = data.shows;
+                });
+        }
+
 
         $http.get('/api/series/', { params: options })
             .success(function(data) {
@@ -53,6 +65,14 @@
                     })
             });
         }
+
+        $scope.$watch(function watchScope(scope) {
+            return (vm.searchTerm);
+        }, function(oldValue, newValue) {
+            if(oldValue !== newValue) {
+                vm.search();
+            }
+        });
     }
 
 })();
