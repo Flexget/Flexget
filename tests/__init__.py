@@ -12,6 +12,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 
 import mock
+import pytest
 from nose.plugins.attrib import attr
 from vcr import VCR
 
@@ -44,6 +45,7 @@ def setup_logging_level():
     return level
 
 
+@pytest.fixture(autouse=True, scope='session')
 def setup_once():
     global plugins_loaded, test_arguments
     if not plugins_loaded:
@@ -168,14 +170,15 @@ class FlexGetBase(object):
 
     __tmp__ = False
 
-    def __init__(self):
-        self.log = log
-        self.manager = None
-        self.task = None
-        self.database_uri = None
-        self.base_path = os.path.dirname(__file__)
-        self.config_functions = []
-        self.tasks_functions = []
+    @classmethod
+    def setup_class(cls):
+        cls.log = log
+        cls.manager = None
+        cls.task = None
+        cls.database_uri = None
+        cls.base_path = os.path.dirname(__file__)
+        cls.config_functions = []
+        cls.tasks_functions = []
 
     def add_config_function(self, config_function):
         self.config_functions.append(config_function)
@@ -183,9 +186,8 @@ class FlexGetBase(object):
     def add_tasks_function(self, tasks_function):
         self.tasks_functions.append(tasks_function)
 
-    def setup(self):
+    def setup_method(self, method):
         """Set up test env"""
-        setup_once()
         if self.__tmp__:
             self.__tmp__ = util.maketemp() + '/'
             self.__yaml__ = self.__yaml__.replace("__tmp__", self.__tmp__)
@@ -197,7 +199,7 @@ class FlexGetBase(object):
                 for task_function in self.tasks_functions:
                     task_function(task_name, task_definition)
 
-    def teardown(self):
+    def teardown_method(self, method):
         try:
             try:
                 self.task.session.close()
