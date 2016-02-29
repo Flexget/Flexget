@@ -58,7 +58,6 @@
         return result;
       })();
 
-      console.log(vm.stepInfo);
 
       vm.page = (function() {
         var i, result = [];
