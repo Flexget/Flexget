@@ -172,60 +172,36 @@ class FlexGetBase(object):
 
     @classmethod
     def setup_class(cls):
+        setup_once()
         cls.log = log
         cls.manager = None
         cls.task = None
-        cls.database_uri = None
         cls.base_path = os.path.dirname(__file__)
-        cls.config_functions = []
-        cls.tasks_functions = []
 
-    def add_config_function(self, config_function):
-        self.config_functions.append(config_function)
-
-    def add_tasks_function(self, tasks_function):
-        self.tasks_functions.append(tasks_function)
-
-    def setup_method(self, method):
-        """Set up test env"""
-        if self.__tmp__:
-            self.__tmp__ = util.maketemp() + '/'
-            self.__yaml__ = self.__yaml__.replace("__tmp__", self.__tmp__)
-        self.manager = MockManager(self.__yaml__, self.__class__.__name__, db_uri=self.database_uri)
-        for config_function in self.config_functions:
-            config_function(self.manager.config)
-        if self.tasks_functions and 'tasks' in self.manager.config:
-            for task_name, task_definition in self.manager.config['tasks'].items():
-                for task_function in self.tasks_functions:
-                    task_function(task_name, task_definition)
-
-    def teardown_method(self, method):
-        try:
-            try:
-                self.task.session.close()
-            except:
-                pass
-            self.manager.shutdown()
-            self.manager.__del__()
-        finally:
-            if self.__tmp__:
-                import shutil
-                log.trace('Removing tmpdir %r' % self.__tmp__)
-                shutil.rmtree(self.__tmp__.rstrip(os.sep))
-
-    def execute_task(self, name, abort_ok=False, options=None):
+    def execute(self, task_name, abort_ok=False, options=None):
         """Use to execute one test task from config"""
-        log.info('********** Running task: %s ********** ' % name)
-        config = self.manager.config['tasks'][name]
+        log.info('********** Running task: %s ********** ' % task_name)
+        manager = MockManager(self.config, self.__class__.__name__)
+        config = manager.config['tasks'][task_name]
+
         if hasattr(self, 'task'):
             if hasattr(self, 'session'):
                 self.task.session.close() # pylint: disable-msg=E0203
-        self.task = Task(self.manager, name, config=config, options=options)
+
+        self.task = Task(manager, task_name, config=config, options=options)
+
         try:
             self.task.execute()
         except TaskAbort:
             if not abort_ok:
                 raise
+        finally:
+            try:
+                self.task.session.close()
+            except:
+                pass
+            manager.shutdown()
+            manager.__del__()
 
     def dump(self):
         """Helper method for debugging"""

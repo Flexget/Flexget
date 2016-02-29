@@ -209,7 +209,7 @@ class TestRTorrentClient(object):
 
 class TestRTorrentOutputPlugin(FlexGetBase):
 
-    __yaml__ = """
+    config = """
         tasks:
           test_add_torrent:
             accept_all: yes
@@ -274,7 +274,7 @@ class TestRTorrentOutputPlugin(FlexGetBase):
         mocked_client.version = [0, 9, 4]
         mocked_client.torrent.side_effect = [False, {'hash': torrent_info_hash}]
 
-        self.execute_task('test_add_torrent')
+        self.execute('test_add_torrent')
 
         mocked_client.load.assert_called_with(
             torrent_raw,
@@ -290,7 +290,7 @@ class TestRTorrentOutputPlugin(FlexGetBase):
         mocked_client.version = [0, 9, 4]
         mocked_client.torrent.side_effect = [False, {'hash': torrent_info_hash}]
 
-        self.execute_task('test_add_torrent_set')
+        self.execute('test_add_torrent_set')
 
         mocked_client.load.assert_called_with(
             torrent_raw,
