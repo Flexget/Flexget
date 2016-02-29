@@ -119,6 +119,8 @@ class TraktEmit(object):
                 if config.get('strip_dates'):
                     # Remove year from end of name if present, assumes name ends with S<number>E<number>
                     entry['title'] = re.sub(r'\s+\(\d{4}\)(?=\sS[0-9]*E[0-9]*$)', '', entry['title'])
+                    # remove year from end of series_name if present
+                    entry['series_name'] = re.sub(r'\s+\(\d{4}\)$', '', entry['series_name'])
                 entries.append(entry)
         return entries
 
