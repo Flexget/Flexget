@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    angular.module('flexget.plugins.series.episodes')
+    angular.module('flexget.plugins.series')
         .controller('episodesController', episodesController);
 
     function episodesController($http, $stateParams, $mdDialog) {
