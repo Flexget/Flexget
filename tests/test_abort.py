@@ -27,7 +27,7 @@ class TestAbort(object):
 
             # another event hookup with this plugin
             headers:
-              test: {{value}}
+              test: value
     """
 
     def test_abort(self, execute_task):
