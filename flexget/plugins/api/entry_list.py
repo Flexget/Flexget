@@ -152,7 +152,7 @@ entry_list_parser.add_argument('page_size', type=int, default=10, help='Number o
 @entry_list_api.route('/<int:list_id>/entries/')
 @api.doc(params={'list_id': 'ID of the list'}, parser=entry_list_parser)
 class MovieListMoviesAPI(APIResource):
-    @api.response(404, model=default_error_schema)
+    @api.response(404, 'List does not exist', model=default_error_schema)
     @api.response(200, model=entry_lists_entries_return_schema)
     def get(self, list_id, session=None):
         """ Get movies by list ID """
@@ -193,3 +193,27 @@ class MovieListMoviesAPI(APIResource):
             'page': page,
             'total_number_of_pages': pages
         })
+
+    @api.validate(base_entry_schema)
+    @api.response(201, description='Succesfully created entry object', model=entry_list_entry_base_schema)
+    @api.response(404, 'List id not found', model=default_error_schema)
+    @api.response(500, 'Entry already exist', model=default_error_schema)
+    def post(self, list_id, session=None):
+        """ Create a new entry object"""
+        try:
+            list = el.get_list_by_id(list_id=list_id, session=session)
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'list_id %d does not exist' % list_id}, 404
+        data = request.json
+        title = data.get('title')
+        entry_object = el.get_entry_by_title(title=title, session=session)
+        if entry_object:
+            return {'status': 'error',
+                    'message': 'entry with title %s already exists' % title}, 500
+        entry_object = el.EntryListEntry(entry=data, entry_list_id=list_id)
+        session.add(entry_object)
+        session.commit()
+        response = jsonify({'entry': entry_object.to_dict()})
+        response.status_code = 201
+        return response

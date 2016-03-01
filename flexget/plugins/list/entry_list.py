@@ -191,3 +191,7 @@ def get_entries_by_list_id(list_id, count=None, start=None, stop=None, order_by=
     else:
         query = query.order_by(getattr(EntryListEntry, order_by))
     return query
+
+@with_session
+def get_entry_by_title(title, session=None):
+    return session.query(EntryListEntry).filter(EntryListEntry.title == title).first()
