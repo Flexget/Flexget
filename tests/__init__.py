@@ -5,20 +5,13 @@ import inspect
 import functools
 import os
 import sys
-import yaml
 import logging
-import warnings
-from contextlib import contextmanager
-from copy import deepcopy
 
 import mock
-import pytest
 from nose.plugins.attrib import attr
 from vcr import VCR
 
 import flexget.logger
-from flexget.manager import Manager
-from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
 from tests import util
 
@@ -43,23 +36,6 @@ def setup_logging_level():
 
     logging.getLogger().setLevel(level)
     return level
-
-
-@pytest.fixture(autouse=True, scope='session')
-def setup_once():
-    global plugins_loaded, test_arguments
-    if not plugins_loaded:
-        flexget.logger.initialize(True)
-        setup_logging_level()
-        # VCR.py mocked functions not handle ssl verification well. Older versions of urllib3 don't have this
-        if VCR_RECORD_MODE != 'off':
-            try:
-                from requests.packages.urllib3.exceptions import SecurityWarning
-                warnings.simplefilter('ignore', SecurityWarning)
-            except ImportError:
-                pass
-        load_plugins()
-        plugins_loaded = True
 
 
 def use_vcr(func=None, **kwargs):
@@ -98,58 +74,6 @@ def use_vcr(func=None, **kwargs):
         return vcr.use_cassette(**kwargs)(func)
 
 
-class CrashReport(Exception):
-    pass
-
-
-class MockManager(Manager):
-    unit_test = True
-
-    def __init__(self, config_text, config_name, db_uri=None):
-        self.config_text = config_text
-        self._db_uri = db_uri or 'sqlite:///:memory:'
-        super(MockManager, self).__init__(['execute'])
-        self.config_name = config_name
-        self.database_uri = self._db_uri
-        log.debug('database_uri: %s' % self.database_uri)
-        self.initialize()
-
-    def find_config(self, *args, **kwargs):
-        """
-        Override configuration loading
-        """
-        try:
-            self.config = yaml.safe_load(self.config_text) or {}
-            self.user_config = deepcopy(self.config)
-            self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))
-        except Exception:
-            print 'Invalid configuration'
-            raise
-
-    def load_config(self):
-        pass
-
-    def validate_config(self, config=None):
-        # We don't actually quit on errors in the unit tests, as the configs get modified after manager start
-        try:
-            return super(MockManager, self).validate_config(config)
-        except ValueError as e:
-            for error in getattr(e, 'errors', []):
-                log.critical(error)
-
-    # no lock files with unit testing
-    @contextmanager
-    def acquire_lock(self, **kwargs):
-        self._has_lock = True
-        yield
-
-    def release_lock(self):
-        pass
-
-    def crash_report(self):
-        # We don't want to silently swallow crash reports during unit tests
-        log.error('Crash Report Traceback:', exc_info=True)
-        raise CrashReport('Crash report created during unit test, check log for traceback.')
 
 
 def build_parser_function(parser_name):
@@ -219,6 +143,11 @@ class FlexGetBase(object):
         print '-- REJECTED: ----------------------------------------------------'
         # print yaml.safe_dump(rejected)
         dump(self.task.entries, True)
+
+
+class BaseTest(object):
+    config = None
+
 
 
 class with_filecopy(object):
