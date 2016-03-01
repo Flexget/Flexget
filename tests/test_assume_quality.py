@@ -11,7 +11,7 @@ class TestAssumeQuality(object):
           global:
             parsing:
               series: {{parser}}
-              movies: {{parser}}
+              movie: {{parser}}
             mock:
               - {title: 'Testfile[h264-720p]'}
               - {title: 'Testfile.1280x720'}
@@ -52,10 +52,6 @@ class TestAssumeQuality(object):
           test_invalid_target:
             assume_quality:
               potato: 720p
-
-          test_invalid_quality:
-            assume_quality:
-              hdtv: rhubarb
 
           test_with_series:
             template: no_global
@@ -128,10 +124,6 @@ class TestAssumeQuality(object):
     def test_invalid_target(self, execute_task):
         #with assert_raises(TaskAbort): task = execute_task('test_invalid_target')  #Requires Python 2.7
         assert_raises(TaskAbort, execute_task, 'test_invalid_target')
-
-    def test_invalid_quality(self, execute_task):
-        #with assert_raises(TaskAbort): task = execute_task('test_invalid_quality')  #Requires Python 2.7
-        assert_raises(TaskAbort, execute_task, 'test_invalid_quality')
 
     def test_with_series(self, execute_task):
         task = execute_task('test_with_series')
