@@ -173,20 +173,47 @@ class MovieListListAPI(APIResource):
 
 movie_identifiers_doc = "Use movie identifier using the following format:\n[{'ID_NAME>:'ID_VALUE'}]"
 
+movies_parser = api.parser()
+movies_parser.add_argument('sort_by', choices=('id', 'added_on', 'title', 'year'), default='title',
+                           help='Sort by attribute')
+movies_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
+movies_parser.add_argument('page', type=int, default=1, help='Page number')
+movies_parser.add_argument('page_size', type=int, default=10, help='Number of movies per page')
+
 
 @movie_list_api.route('/<int:list_id>/movies/')
-@api.doc(params={'list_id': 'ID of the list'})
+@api.doc(params={'list_id': 'ID of the list'}, parser=movies_parser)
 class MovieListMoviesAPI(APIResource):
     @api.response(404, model=default_error_schema)
     @api.response(200, model=return_movies_schema)
     def get(self, list_id, session=None):
         """ Get movies by list ID """
+
+        args = movies_parser.parse_args()
+        page = args.get('page')
+        page_size = args.get('page_size')
+
+        start = page_size * (page - 1)
+        stop = start + page_size
+        if args.get('order') == 'desc':
+            descending = True
+        else:
+            descending = False
+
+        kwargs = {
+            'start': start,
+            'stop': stop,
+            'list_id': list_id,
+            'order_by': args.get('sort_by'),
+            'descending': descending,
+            'session': session
+        }
         try:
-            list = ml.get_list_by_id(list_id=list_id, session=session)
+            movies = [movie.to_dict() for movie in ml.get_movies_by_list_id(**kwargs)]
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404
-        movies = [movie.to_dict() for movie in list.movies]
+
         return jsonify({'movies': movies})
 
     @api.validate(model=input_movie_entry_schema, description=movie_identifiers_doc)

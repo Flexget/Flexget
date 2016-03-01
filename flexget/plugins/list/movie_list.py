@@ -4,7 +4,7 @@ import logging
 from collections import MutableSet
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime
+from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime, desc
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 
@@ -158,6 +158,10 @@ class MovieList(MutableSet):
                .filter(MovieListMovie.year == year).first())
         return res
 
+    @property
+    def immutable(self):
+        return False
+
 
 class PluginMovieList(object):
     """Remove all accepted elements from your trakt.tv watchlist/library/seen or custom list."""
@@ -174,6 +178,19 @@ class PluginMovieList(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(PluginMovieList, 'movie_list', api_ver=2, groups=['list'])
+
+
+@with_session
+def get_movies_by_list_id(list_id, count=None, start=None, stop=None, order_by=None, descending=False, session=None):
+    query = session.query(MovieListMovie).filter(MovieListList.id == list_id)
+    if count:
+        return query.count()
+    query = query.slice(start, stop)
+    if descending:
+        query = query.order_by(desc(order_by))
+    else:
+        query = query.order_by(order_by)
+    return query
 
 
 @with_session
@@ -195,14 +212,13 @@ def get_list_by_exact_name(name, session=None):
 @with_session
 def get_list_by_id(list_id, session=None):
     log.debug('fetching list with id %d', list_id)
-    return session.query(MovieListList).filter(MovieListList.id == list_id).one()
+    return session.query(MovieListList).filter(MovieListList.id == list_id)
 
 
 @with_session
 def get_movie_by_id(list_id, movie_id, session=None):
     log.debug('fetching movie with id %d from list id %d', movie_id, list_id)
-    return session.query(MovieListMovie).filter(
-        and_(MovieListMovie.id == movie_id, MovieListMovie.list_id == list_id)).one()
+    return session.query(MovieListMovie).filter(and_(MovieListMovie.id == movie_id, MovieListMovie.list_id == list_id))
 
 
 @with_session
