@@ -51,11 +51,18 @@ def setup_once():
 
 @pytest.fixture()
 def config(request):
+    """
+    If used inside a test class, uses the `config` class attribute of the class.
+    This is used by `manager` fixture, and can be parametrized.
+    """
     return request.cls.config
 
 
 @pytest.fixture()
 def manager(request, config):
+    """
+    Create a :class:`MockManager` for this test based on `config` argument.
+    """
     mockmanager = MockManager(config, request.cls.__name__)
 
     def fin():
@@ -68,6 +75,9 @@ def manager(request, config):
 
 @pytest.fixture()
 def execute_task(manager):
+    """
+    A function that can be used to execute and return a named task in `config` argument.
+    """
 
     def execute(task_name, abort_ok=False, options=None):
         """Use to execute one test task from config"""
@@ -115,6 +125,9 @@ class MockManager(Manager):
         self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))
 
     def load_config(self):
+        """
+        Just load our config from the text passed in on init
+        """
         config = yaml.safe_load(self.config_text) or {}
         self.update_config(config)
 
