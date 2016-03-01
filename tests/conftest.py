@@ -4,10 +4,8 @@ import os
 import sys
 import yaml
 from contextlib import contextmanager
-from copy import deepcopy
 
 import pytest
-from jinja2 import Template
 
 import flexget.logger
 from flexget.manager import Manager
@@ -33,7 +31,7 @@ def setup_once():
 
 # --- These are the public fixtures tests can ask for ---
 
-@pytest.fixture()
+@pytest.fixture(scope='class')
 def config(request):
     """
     If used inside a test class, uses the `config` class attribute of the class.
@@ -63,21 +61,26 @@ def execute_task(manager):
     A function that can be used to execute and return a named task in `config` argument.
     """
 
-    def execute(task_name, abort_ok=False, options=None):
-        """Use to execute one test task from config"""
+    def execute(task_name, abort=False, options=None):
+        """
+        Use to execute one test task from config.
+
+        :param abort: If `True` expect (and require) this task to abort.
+        """
         log.info('********** Running task: %s ********** ' % task_name)
         config = manager.config['tasks'][task_name]
         task = Task(manager, task_name, config=config, options=options)
 
         try:
-            task.execute()
-        except TaskAbort:
-            if not abort_ok:
-                raise
+            if abort:
+                with pytest.raises(TaskAbort):
+                    task.execute()
+            else:
+                task.execute()
         finally:
             try:
                 task.session.close()
-            except:
+            except Exception:
                 pass
         return task
 

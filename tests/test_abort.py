@@ -31,5 +31,4 @@ class TestAbort(object):
     """
 
     def test_abort(self, execute_task):
-        task = execute_task('test', abort_ok=True)
-        assert task.aborted, 'Task not aborted'
+        execute_task('test', abort=True)

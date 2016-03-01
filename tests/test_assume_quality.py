@@ -83,9 +83,9 @@ class TestAssumeQuality(object):
                 qualities: [720p hdtv]
     """
 
-    @pytest.fixture(params=['internal', 'guessit'], ids=['internal', 'guessit'])
+    @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
     def config(self, request):
-        """Override ad parametrize default config fixture."""
+        """Override and parametrize default config fixture."""
         return Template(self._config).render({'parser': request.param})
 
     def test_matching(self, execute_task):
