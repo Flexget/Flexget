@@ -9,7 +9,7 @@
 
         var options = {
             page: 1,
-            page_size: 10,
+            page_size: 3,
             in_config: 'all'
         }
 

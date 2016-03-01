@@ -8,28 +8,17 @@
         var vm = this;
 
         vm.goto = function(index) {
-          console.log(index);
-          $scope.gotoPage({ index: index});
+          if(vm.currentPage != index) {
+            $scope.gotoPage({ index: index});
+          }
           //$scope.gotoPage(index);
           //vm.currentPage = vm.page[index];
         };
 
-    /*vm.getoPre = function(){
-      $scope.currentPage = vm.index;
-      vm.index -= vm.step;
-    };
+   
+  
 
-    vm.getoNext = function(){
-      vm.index += vm.step;
-      $scope.currentPage = vm.index + 1;
-    };
-
-      vm.gotoFirst = function(){
-        vm.index = 0;
-        $scope.currentPage = 1;
-      };
-
-    vm.gotoLast = function(){
+    /*vm.gotoLast = function(){
       vm.index = parseInt($scope.totalPages / vm.step) * vm.step;
       vm.index === $scope.totalPages ? vm.index = vm.index - vm.step : '';
       $scope.currentPage = $scope.totalPages;
@@ -40,6 +29,13 @@
      // $scope.gotoPage();
     });*/
 
+    $scope.$watch('currentPage', function(newValue, oldValue) {
+      if(newValue) {
+        //updateCurrentPage();
+        vm.currentPage = newValue;
+      }
+    })
+
      $scope.$watch('totalPages', function(newValue) {
       if(newValue) {
         vm.init();
@@ -49,7 +45,7 @@
     vm.init = function() {
       vm.totalPages = $scope.totalPages;
       vm.step = $scope.step;
-      vm.currentPage = $scope.currentPage;
+      //vm.currentPage = $scope.currentPage;
       vm.index = 0;
 
       vm.stepInfo = (function() {
@@ -71,6 +67,8 @@
         }
         return result;
       })();
+
+      console.log(vm.page);
     };
   }
 })();

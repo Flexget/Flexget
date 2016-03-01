@@ -1,6 +1,6 @@
 <div layout="row" class="fg-material-paging" layout-align="center center">
-    <md-button class="md-raised md-primary fg-pagination-button" ng-click="vm.gotoFirst()"><<</md-button>
-    <!--<md-button class="md-raised fg-pagination-button" ng-click="vm.getoPre()" ng-show="vm.index - 1 >= 0">...</md-button>-->
+    <md-button class="md-raised md-primary fg-pagination-button" ng-disabled="vm.currentPage === 1" ng-click="vm.goto(1)"><<</md-button>
+    <!--<md-button class="md-raised fg-pagination-button" ng-click="vm.getoPre()" ng-show="vm.currentPage > 1"><</md-button>-->
     <md-button class="md-raised fg-pagination-button" aria-label="vm.page[vm.index + i]"
         ng-repeat="i in vm.stepInfo" 
         ng-click="vm.goto(i + 1)" 
@@ -9,5 +9,5 @@
             {{ vm.page[vm.index + i] }}
     </md-button>
     <!--<md-button class="md-raised fg-pagination-button" ng-click="vm.getoNext()" ng-show="vm.index + vm.step < totalPages">...</md-button>-->
-    <md-button class="md-raised md-primary fg-pagination-button" ng-click="vm.gotoLast()">>></md-button>
+    <md-button class="md-raised md-primary fg-pagination-button" ng-click="vm.goto()">>></md-button>
 </div>
