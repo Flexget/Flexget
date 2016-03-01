@@ -4,7 +4,7 @@ import logging
 from collections import MutableSet
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, PickleType, Integer, DateTime, or_
+from sqlalchemy import Column, Unicode, PickleType, Integer, DateTime, or_, func
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 from sqlalchemy.sql.schema import ForeignKey
@@ -147,3 +147,47 @@ class EntryList(object):
 @event('plugin.register')
 def register_plugin():
     plugin.register(EntryList, 'entry_list', api_ver=2, groups=['list'])
+
+
+@with_session
+def get_entry_lists(name=None, session=None):
+    log.debug('retrieving entry lists')
+    query = session.query(EntryListList)
+    if name:
+        log.debug('searching for entry lists with name %s', name)
+        query = query.filter(EntryListList.name.contains(name))
+    return query
+
+
+@with_session
+def get_list_by_exact_name(name, session=None):
+    log.debug('returning entry list with name %s', name)
+    return session.query(EntryListList).filter(func.lower(EntryListList.name) == name.lower())
+
+
+@with_session
+def get_list_by_id(list_id, session=None):
+    log.debug('fetching entry list with id %d', list_id)
+    return session.query(EntryListList).filter(EntryListList.id == list_id)
+
+
+@with_session
+def delete_list_by_id(list_id, session=None):
+    entry_list = get_list_by_id(list_id=list_id, session=session)
+    if entry_list:
+        log.debug('deleting entry list with id %d', list_id)
+        session.delete(entry_list)
+
+
+@with_session
+def get_entries_by_list_id(list_id, count=None, start=None, stop=None, order_by=None, descending=False, session=None):
+    log.debug('querying entries from entry list with id %d', list_id)
+    query = session.query(EntryListEntry).filter(EntryListList.id == list_id)
+    if count:
+        return query.count()
+    query = query.slice(start, stop).from_self()
+    if descending:
+        query = query.order_by(getattr(EntryListEntry, order_by).desc())
+    else:
+        query = query.order_by(getattr(EntryListEntry, order_by))
+    return query
