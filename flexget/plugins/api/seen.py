@@ -127,11 +127,14 @@ class SeenSearchAPI(APIResource):
             value = unquote(value)
             value = '%{0}%'.format(value)
 
+        start = page_size * (page - 1)
+        stop = start + page_size
+
         kwargs = {
             'value': value,
             'status': is_seen_local,
-            'page': page,
-            'page_size': page_size,
+            'stop': stop,
+            'start': start,
             'session': session
         }
         count = seen.search(count=True, **kwargs)
