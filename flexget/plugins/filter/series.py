@@ -438,7 +438,7 @@ def get_latest_status(episode):
 
 
 @with_session
-def get_series_summary(configured=None, premieres=None, status=None, days=None, page=None, page_size=None, count=False,
+def get_series_summary(configured=None, premieres=None, status=None, days=None, start=None, stop=None, count=False,
                        session=None):
     """
     Return a query with results for all series.
@@ -457,8 +457,11 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         configured = 'configured'
     elif configured not in ['configured', 'unconfigured', 'all']:
         raise LookupError('"configured" parameter must be either "configured", "unconfigured", or "all"')
-    query = (session.query(Series).outerjoin(Series.episodes).outerjoin(Episode.releases).
-             outerjoin(Series.in_tasks).group_by(Series.id))
+    query = session.query(Series)
+    if count:
+        return query.count()
+    query = query.slice(start, stop).from_self()
+    query = query.outerjoin(Series.episodes).outerjoin(Episode.releases).outerjoin(Series.in_tasks).group_by(Series.id)
     if configured == 'configured':
         query = query.having(func.count(SeriesTask.id) >= 1)
     elif configured == 'unconfigured':
@@ -474,9 +477,7 @@ def get_series_summary(configured=None, premieres=None, status=None, days=None, 
         if not days:
             days = 365
         query = query.having(func.max(Episode.first_seen) < datetime.now() - timedelta(days=days))
-    if count:
-        return query.count()
-    return query.slice(page, page_size)
+    return query
 
 
 def get_latest_episode(series):
