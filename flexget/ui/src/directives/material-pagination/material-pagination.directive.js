@@ -35,7 +35,7 @@
     for(i = start; i <= end; i++) {
       scope.stepList.push({
         value: i,
-        activeClass: scope.activeClass,
+        activeClass: scope.page == i ? scope.activeClass : '',
         action: function() {
           internalAction(scope, this.value);
         }
@@ -53,12 +53,54 @@
     });
   }
 
+  function setPrevNext(scope, pageCount, mode) {
+    var disabled, item;
+    switch(mode) {
+      case 'prev':
+        disabled = scope.page - 1 <= 0;
+        var prevPage = scope.page - 1 <= 0 ? 1 : scope.page - 1;
+
+        item = {
+          value: '<',
+          disabled: disabled,
+          action: function() {
+            if(!disabled) {
+              internalAction(scope, prevPage);
+            }
+          }
+        }
+        break;
+
+      case 'next':
+        disabled = scope.page >= pageCount;
+        var nextPage = scope.page + 1 >= pageCount ? pageCount : scope.page + 1;
+
+        item = {
+          value: '>',
+          disabled: disabled,
+          action: function() {
+            if(!disabled) {
+              internalAction(scope, nextPage);
+            }
+          }
+        }
+        break;
+    }
+
+    if(item) {
+      scope.stepList.push(item);
+    }
+  }
+
   function updateButtons(scope) {
     var pageCount = Math.ceil(scope.total / scope.pageSize);
 
     scope.stepList = [];
 
     var cutOff = 5;
+
+    // Set left navigator
+    setPrevNext(scope, pageCount, 'prev');
 
     if(pageCount <= cutOff) {
       addRange(1, pageCount, scope);
@@ -79,6 +121,9 @@
         addRange(scope.page - 2, scope.page + 2, scope);
       }
     }
+
+    // Set right navigator
+    setPrevNext(scope, pageCount, 'next');
   }
 
 })();
