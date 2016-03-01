@@ -78,6 +78,7 @@ seen_search_schema = {
             'type': 'array',
             'items': seen_object
         },
+        'total_number_of_seen_entries': {'type': 'integer'},
         'number_of_seen_entries': {'type': 'integer'},
         'total_number_of_pages': {'type': 'integer'},
         'page_number': {'type': 'integer'}
@@ -152,7 +153,8 @@ class SeenSearchAPI(APIResource):
 
         return jsonify({
             'seen_entries': sorted_seen_entries_list,
-            'number_of_seen_entries': count,
+            'total_number_of_seen_entries': count,
+            'number_of_seen_entries': page_size,
             'page_number': page,
             'total_number_of_pages': pages
         })
