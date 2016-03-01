@@ -174,7 +174,7 @@ class MovieListListAPI(APIResource):
 movie_identifiers_doc = "Use movie identifier using the following format:\n[{'ID_NAME>:'ID_VALUE'}]"
 
 movies_parser = api.parser()
-movies_parser.add_argument('sort_by', choices=('id', 'added_on', 'title', 'year'), default='title',
+movies_parser.add_argument('sort_by', choices=('id', 'added', 'title', 'year'), default='title',
                            help='Sort by attribute')
 movies_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help='Sorting order')
 movies_parser.add_argument('page', type=int, default=1, help='Page number')

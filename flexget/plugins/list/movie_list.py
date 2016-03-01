@@ -4,7 +4,7 @@ import logging
 from collections import MutableSet
 from datetime import datetime
 
-from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime, desc
+from sqlalchemy import Column, Unicode, Integer, ForeignKey, func, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql.elements import and_
 
@@ -185,11 +185,11 @@ def get_movies_by_list_id(list_id, count=None, start=None, stop=None, order_by=N
     query = session.query(MovieListMovie).filter(MovieListList.id == list_id)
     if count:
         return query.count()
-    query = query.slice(start, stop)
+    query = query.slice(start, stop).from_self()
     if descending:
-        query = query.order_by(desc(order_by))
+        query = query.order_by(getattr(MovieListMovie, order_by).desc())
     else:
-        query = query.order_by(order_by)
+        query = query.order_by(getattr(MovieListMovie, order_by))
     return query
 
 
