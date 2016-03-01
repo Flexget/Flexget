@@ -40,19 +40,15 @@ def config(request):
     return request.cls.config
 
 
-@pytest.fixture()
+@pytest.yield_fixture()
 def manager(request, config):
     """
     Create a :class:`MockManager` for this test based on `config` argument.
     """
     mockmanager = MockManager(config, request.cls.__name__)
-
-    def fin():
-        mockmanager.shutdown()
-        mockmanager.__del__()
-
-    request.addfinalizer(fin)
-    return mockmanager
+    yield mockmanager
+    mockmanager.shutdown()
+    mockmanager.__del__()
 
 
 @pytest.fixture()
