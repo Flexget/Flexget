@@ -179,6 +179,7 @@ class MovieListMoviesAPI(APIResource):
 
         try:
             count = el.get_entries_by_list_id(count=True, **kwargs)
+            log.debug('entry lists entries count is %d', count)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'list_id %d does not exist' % list_id}, 404

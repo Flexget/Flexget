@@ -206,7 +206,7 @@ def get_movie_lists(name, session=None):
 @with_session
 def get_list_by_exact_name(name, session=None):
     log.debug('returning list with name %s', name)
-    return session.query(MovieListList).filter(func.lower(MovieListList.name) == name.lower()).first()
+    return session.query(MovieListList).filter(func.lower(MovieListList.name) == name.lower())
 
 
 @with_session
@@ -234,7 +234,7 @@ def get_movie_by_title(list_id, title, session=None):
     movie_list = get_list_by_id(list_id=list_id, session=session)
     if movie_list:
         log.debug('searching for movie %s in list %d', title, list_id)
-        return session.query(MovieListMovie).filter(func.lower(MovieListMovie.title) == title.lower()).first()
+        return session.query(MovieListMovie).filter(func.lower(MovieListMovie.title) == title.lower())
 
 
 @with_session
