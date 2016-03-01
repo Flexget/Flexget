@@ -112,7 +112,7 @@ class FriendlySearchQuery(object):
         self.max_results = 10
 
 
-T411API_DOMAIN_URL = "api.t411.in"
+T411API_DOMAIN_URL = "api.t411.ch"
 T411API_CATEGORY_TREE_PATH = "/categories/tree/"
 T411API_AUTH_PATH = "/auth"
 T411API_TERMS_PATH = "/terms/tree/"
