@@ -17,22 +17,6 @@ from flexget.task import Task, TaskAbort
 log = logging.getLogger('tests')
 
 
-def pytest_generate_tests(metafunc):
-    """
-    For any tests in a class with a `config_params` argument, the config will pe parametrized.
-
-    The test will be run multiple times with the config rendered against the values in the `config_params` dict.
-    """
-    if getattr(metafunc.cls, 'config_params', None):
-        config_params = metafunc.cls.config_params
-        if isinstance(config_params, dict):
-            config_params = config_params.items()
-        idlist, contexts = zip(*config_params)
-        config_template = Template(metafunc.cls.config)
-        configs = [config_template.render(context) for context in contexts]
-        metafunc.parametrize('config', configs, ids=idlist, scope="class")
-
-
 @pytest.fixture(scope='session', autouse=True)
 def setup_once():
     flexget.logger.initialize(True)

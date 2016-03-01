@@ -1,12 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import build_parser_function
-from nose.tools import assert_raises
-from flexget.task import TaskAbort
+
+import pytest
+from jinja2 import Template
+
 import flexget.utils.qualities as qualities
+from flexget.task import TaskAbort
 
 
 class TestAssumeQuality(object):
-    config = """
+    _config = """
         templates:
           global:
             parsing:
@@ -81,10 +83,10 @@ class TestAssumeQuality(object):
                 qualities: [720p hdtv]
     """
 
-    config_params = {
-        'internal': {'parser': 'internal'},
-        'guessit': {'parser': 'guessit'},
-    }
+    @pytest.fixture(params=['internal', 'guessit'], ids=['internal', 'guessit'])
+    def config(self, request):
+        """Override ad parametrize default config fixture."""
+        return Template(self._config).render({'parser': request.param})
 
     def test_matching(self, execute_task):
         task = execute_task('test_matching')
@@ -122,8 +124,8 @@ class TestAssumeQuality(object):
         assert entry.get('quality') == qualities.Quality('720p h264 flac')
 
     def test_invalid_target(self, execute_task):
-        #with assert_raises(TaskAbort): task = execute_task('test_invalid_target')  #Requires Python 2.7
-        assert_raises(TaskAbort, execute_task, 'test_invalid_target')
+        with pytest.raises(TaskAbort):
+            execute_task('test_invalid_target')
 
     def test_with_series(self, execute_task):
         task = execute_task('test_with_series')
