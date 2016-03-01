@@ -46,18 +46,18 @@ class KodiLibrary(object):
             try:
                 r = task.requests.get(url, params=params, auth=(config.get('username'), config.get('password'))).json()
                 if r.get('result') == 'OK':
-                    log.debug('Successfully sent a %s request for the %s library', config['action'], config['category'])
+                    log.info('Successfully sent a %s request for the %s library', config['action'], config['category'])
                 else:
                     if r.get('error'):
                         log.error('Kodi JSONRPC failed. Error %s: %s', r['error']['code'], r['error']['message'])
                     else:
                         # this should never happen as Kodi say they follow the JSON-RPC 2.0 spec
-                        log.trace('Received error response %s', json.dumps(r))
+                        log.debug('Received error response %s', json.dumps(r))
                         log.error('Kodi JSONRPC failed with unrecognized message: %s', json.dumps(r))
             except RequestException as e:
                 raise plugin.PluginError('Failed to send request to Kodi: %s', e.args[0])
         else:
-            log.debug('No entries were accepted. No request is sent.')
+            log.info('No entries were accepted. No request is sent.')
 
 
 @event('plugin.register')
