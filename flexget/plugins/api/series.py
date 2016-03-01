@@ -263,13 +263,16 @@ class SeriesListAPI(APIResource):
         else:
             order = False
 
+        start = page_size * (page - 1)
+        stop = start + page_size
+
         kwargs = {
             'configured': args.get('in_config'),
             'premieres': args.get('premieres'),
             'status': args.get('status'),
             'days': args.get('days'),
-            'page_size': args.get('page_size'),
-            'page': args.get('page'),
+            'start': start,
+            'stop': stop,
             'session': session
 
         }

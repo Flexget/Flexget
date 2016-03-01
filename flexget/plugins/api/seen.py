@@ -78,6 +78,7 @@ seen_search_schema = {
             'type': 'array',
             'items': seen_object
         },
+        'total_number_of_seen_entries': {'type': 'integer'},
         'number_of_seen_entries': {'type': 'integer'},
         'total_number_of_pages': {'type': 'integer'},
         'page_number': {'type': 'integer'}
@@ -127,11 +128,14 @@ class SeenSearchAPI(APIResource):
             value = unquote(value)
             value = '%{0}%'.format(value)
 
+        start = page_size * (page - 1)
+        stop = start + page_size
+
         kwargs = {
             'value': value,
             'status': is_seen_local,
-            'page': page,
-            'page_size': page_size,
+            'stop': stop,
+            'start': start,
             'session': session
         }
         count = seen.search(count=True, **kwargs)
@@ -149,7 +153,8 @@ class SeenSearchAPI(APIResource):
 
         return jsonify({
             'seen_entries': sorted_seen_entries_list,
-            'number_of_seen_entries': count,
+            'total_number_of_seen_entries': count,
+            'number_of_seen_entries': page_size,
             'page_number': page,
             'total_number_of_pages': pages
         })
