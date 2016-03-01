@@ -4,12 +4,12 @@
     angular.module('flexget.plugins.series')
         .controller('seriesController', seriesController);
 
-    function seriesController($scope, $http, $state, $mdDialog) {
+    function seriesController($http, $state, $mdDialog) {
         var vm = this;
 
         var options = {
             page: 1,
-            page_size: 3,
+            page_size: 10,
             in_config: 'all'
         }
 
@@ -19,9 +19,15 @@
             $http.get('/api/series/', { params: options })
                 .success(function(data) {
                     vm.series = data.shows;
-                    vm.currentPage = data.page;
-                    vm.totalPages = data.total_number_of_pages;
 
+                    //Set vars for pagination
+                    vm.currentPage = data.page;
+                    vm.totalShows = data.total_number_of_shows;
+                    vm.pageSize = data.number_of_shows;
+
+                    //Get metadata for first show
+                    // TODO: Update this to load for all
+                    // We will have to use caching in the server, maybe even browser as well?
                     getMetadata(data.shows[0].show_name);
                 });
         }
@@ -36,6 +42,7 @@
                 });
         }
 
+        //Call from the pagination to update the page to the selected page
         vm.updateListPage = function(index) {
             options.page = index;
 
@@ -48,8 +55,6 @@
                     vm.series = data.shows;
                 });
         }
-
-        getSeriesList();
 
         vm.gotoEpisodes = function(id) {
             $state.go('flexget.episodes', { id: id });
@@ -79,13 +84,8 @@
             });
         }
 
-        $scope.$watch(function watchScope(scope) {
-            return (vm.searchTerm);
-        }, function(oldValue, newValue) {
-            if(oldValue !== newValue) {
-                vm.search();
-            }
-        });
+        //Load initial list of series
+        getSeriesList();
     }
 
 })();
