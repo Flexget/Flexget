@@ -58,6 +58,8 @@ def api_client(manager):
 
 
 class TestValidator(object):
+    config = '{tasks: {}}'
+
     def test_invalid_payload(self, api_client):
         new_task = {
             'name': 'new_task',

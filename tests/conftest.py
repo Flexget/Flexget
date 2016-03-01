@@ -37,10 +37,7 @@ def config(request):
     If used inside a test class, uses the `config` class attribute of the class.
     This is used by `manager` fixture, and can be parametrized.
     """
-    if hasattr(request.cls, 'config'):
-        return request.cls.config
-    else:
-        return '{tasks: {}}'
+    return request.cls.config
 
 
 @pytest.yield_fixture()
