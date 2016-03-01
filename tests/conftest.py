@@ -112,24 +112,11 @@ class MockManager(Manager):
         """
         Override configuration loading
         """
-        try:
-            self.config = yaml.safe_load(self.config_text) or {}
-            self.user_config = deepcopy(self.config)
-            self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))
-        except Exception:
-            print 'Invalid configuration'
-            raise
+        self.config_base = os.path.dirname(os.path.abspath(sys.path[0]))
 
     def load_config(self):
-        pass
-
-    def validate_config(self, config=None):
-        # We don't actually quit on errors in the unit tests, as the configs get modified after manager start
-        try:
-            return super(MockManager, self).validate_config(config)
-        except ValueError as e:
-            for error in getattr(e, 'errors', []):
-                log.critical(error)
+        config = yaml.safe_load(self.config_text) or {}
+        self.update_config(config)
 
     # no lock files with unit testing
     @contextmanager
