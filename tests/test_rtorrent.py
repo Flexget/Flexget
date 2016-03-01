@@ -207,7 +207,7 @@ class TestRTorrentClient(object):
         assert mocked_proxy.d.close.called_with((torrent_info_hash,))
 
 
-class TestRTorrentOutputPlugin(FlexGetBase):
+class TestRTorrentOutputPlugin(object):
 
     config = """
         tasks:
@@ -268,13 +268,13 @@ class TestRTorrentOutputPlugin(FlexGetBase):
     """
 
     @mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
-    def test_add(self, mocked_client):
+    def test_add(self, mocked_client, execute_task):
         mocked_client = mocked_client()
         mocked_client.load.return_value = 0
         mocked_client.version = [0, 9, 4]
         mocked_client.torrent.side_effect = [False, {'hash': torrent_info_hash}]
 
-        self.execute('test_add_torrent')
+        execute_task('test_add_torrent')
 
         mocked_client.load.assert_called_with(
             torrent_raw,
@@ -284,13 +284,13 @@ class TestRTorrentOutputPlugin(FlexGetBase):
         )
 
     @mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
-    def test_add_set(self, mocked_client):
+    def test_add_set(self, mocked_client, execute_task):
         mocked_client = mocked_client()
         mocked_client.load.return_value = 0
         mocked_client.version = [0, 9, 4]
         mocked_client.torrent.side_effect = [False, {'hash': torrent_info_hash}]
 
-        self.execute('test_add_torrent_set')
+        execute_task('test_add_torrent_set')
 
         mocked_client.load.assert_called_with(
             torrent_raw,
@@ -305,12 +305,12 @@ class TestRTorrentOutputPlugin(FlexGetBase):
         )
 
     @mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
-    def teest_update(self, mocked_client):
+    def test_update(self, mocked_client, execute_task):
         mocked_client = mocked_client()
         mocked_client.version = [0, 9, 4]
         mocked_client.update.return_value = 0
 
-        self.execute_task('test_update')
+        execute_task('test_update')
 
         mocked_client.update.assert_called_with(
             torrent_info_hash,
@@ -318,14 +318,14 @@ class TestRTorrentOutputPlugin(FlexGetBase):
         )
 
     @mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
-    def test_update_path(self, mocked_client):
+    def test_update_path(self, mocked_client, execute_task):
         mocked_client = mocked_client()
         mocked_client.version = [0, 9, 4]
         mocked_client.update.return_value = 0
         mocked_client.move.return_value = 0
         mocked_client.torrent.return_value = {'base_path': '/some/path'}
 
-        self.execute_task('test_update_path')
+        execute_task('test_update_path')
 
         mocked_client.update.assert_called_with(
             torrent_info_hash,
@@ -338,20 +338,20 @@ class TestRTorrentOutputPlugin(FlexGetBase):
         )
 
     @mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
-    def test_delete(self, mocked_client):
+    def test_delete(self, mocked_client, execute_task):
         mocked_client = mocked_client()
         mocked_client.load.return_value = 0
         mocked_client.version = [0, 9, 4]
         mocked_client.delete.return_value = 0
 
-        self.execute_task('test_delete')
+        execute_task('test_delete')
 
         mocked_client.delete.assert_called_with(torrent_info_hash)
 
 
-class TestRTorrentInputPlugin(FlexGetBase):
+class TestRTorrentInputPlugin(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test_input:
             accept_all: yes
@@ -366,7 +366,7 @@ class TestRTorrentInputPlugin(FlexGetBase):
     """
 
     @mock.patch('flexget.plugins.plugin_rtorrent.RTorrent')
-    def test_input(self, mocked_client):
+    def test_input(self, mocked_client, execute_task):
         mocked_client = mocked_client()
         mocked_client.version = [0, 9, 4]
 
@@ -381,16 +381,16 @@ class TestRTorrentInputPlugin(FlexGetBase):
 
         mocked_client.torrents.return_value = [mocked_torrent, mocked_torrent]
 
-        self.execute_task('test_input')
+        task = execute_task('test_input')
 
         mocked_client.torrents.assert_called_with(
             'complete',
             fields=['custom1', 'custom3', 'down_rate'],
         )
 
-        assert len(self.task.all_entries) == 2
+        assert len(task.all_entries) == 2
 
-        for entry in self.task.entries:
+        for entry in task.entries:
             assert entry['url'] == 'http://localhost/RPC2/%s' % torrent_info_hash
             assert entry['name'] == 'private.torrent'
             assert entry['torrent_info_hash'] == torrent_info_hash
