@@ -17,7 +17,7 @@ class KodiLibrary(object):
         'properties': {
             'action': {'type': 'string', 'enum': ['clean', 'scan']},
             'category': {'type': 'string', 'enum': ['audio', 'video']},
-            'url': {'type': 'string'},
+            'url': {'type': 'string', 'format': 'url'},
             'port': {'type': 'integer'},
             'username': {'type': 'string'},
             'password': {'type': 'string'},
