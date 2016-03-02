@@ -12,3 +12,4 @@ boto3
 contextlib2<0.5
 wheel
 pytest
+pytest-capturelog

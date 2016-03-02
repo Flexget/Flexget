@@ -118,7 +118,6 @@ def use_vcr(request):
 @pytest.fixture(scope='session', autouse=True)
 def setup_once():
     flexget.logger.initialize(True)
-    #setup_logging_level()
     # VCR.py mocked functions not handle ssl verification well. Older versions of urllib3 don't have this
     # if VCR_RECORD_MODE != 'off':
     #     try:
@@ -127,6 +126,18 @@ def setup_once():
     #     except ImportError:
     #         pass
     load_plugins()
+
+
+@pytest.fixture(autouse=True)
+def setup_loglevel(pytestconfig, caplog):
+    # set logging level according to pytest verbosity
+    level = logging.DEBUG
+    if pytestconfig.getoption('verbose') == 1:
+        level = flexget.logger.TRACE
+    elif pytestconfig.getoption('quiet') == 1:
+        level = logging.INFO
+    logging.getLogger().setLevel(level)
+    caplog.setLevel(level)
 
 
 def pytest_configure(config):
@@ -194,8 +205,6 @@ class MockManager(Manager):
         raise CrashReport('Crash report created during unit test, check log for traceback.')
 
 
-
-
 class with_filecopy(object):
     """
         @with_filecopy decorator
@@ -224,7 +233,6 @@ class with_filecopy(object):
             self.pairs = [(src[0], dst)]
 
     def __enter__(self):
-
         for src, dst in self.pairs:
             log.trace("Copying %r to %r" % (src, dst))
             shutil.copy(src, dst)
