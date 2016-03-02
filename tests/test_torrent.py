@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
+import pytest
 
 from flexget.utils.bittorrent import Torrent
 
@@ -53,7 +54,7 @@ class TestSeenInfoHash(object):
             accept_all: yes
     """
 
-    @with_filecopy('test.torrent', 'test2.torrent')
+    @pytest.mark.filecopy('test.torrent', 'test2.torrent')
     def test_seen_info_hash(self, execute_task):
         task = execute_task('test')
         assert task.find_entry('accepted', title='test'), 'torrent should have been accepted on first run'
@@ -106,7 +107,7 @@ class TestModifyTrackers(object):
             data = f.read()
         return Torrent(data)
 
-    @with_filecopy('test.torrent', 'test_add_trackers.torrent')
+    @pytest.mark.filecopy('test.torrent', 'test_add_trackers.torrent')
     def test_add_trackers(self, execute_task):
         task = execute_task('test_add_trackers')
         torrent = self.load_torrent('test_add_trackers.torrent')
@@ -115,7 +116,7 @@ class TestModifyTrackers(object):
         # Check magnet url
         assert 'tr=udp://thetracker.com/announce' in task.find_entry(title='test_magnet')['url']
 
-    @with_filecopy('test.torrent', 'test_remove_trackers.torrent')
+    @pytest.mark.filecopy('test.torrent', 'test_remove_trackers.torrent')
     def test_remove_trackers(self, execute_task):
         task = execute_task('test_remove_trackers')
         torrent = self.load_torrent('test_remove_trackers.torrent')
@@ -125,7 +126,7 @@ class TestModifyTrackers(object):
         # Check magnet url
         assert 'tr=http://ipv6.torrent.ubuntu.com:6969/announce' not in task.find_entry(title='test_magnet')['url']
 
-    @with_filecopy('test.torrent', 'test_modify_trackers.torrent')
+    @pytest.mark.filecopy('test.torrent', 'test_modify_trackers.torrent')
     def test_modify_trackers(self, execute_task):
         task = execute_task('test_modify_trackers')
         torrent = self.load_torrent('test_modify_trackers.torrent')
@@ -193,7 +194,7 @@ class TestTorrentScrub(object):
     )
     test_files = [i[1] for i in test_cases]
 
-    @with_filecopy(test_files, "__tmp__")
+    @pytest.mark.filecopy(test_files, "__tmp__")
     def test_torrent_scrub(self, execute_task):
         # Run task
         task = execute_task('test_all')
@@ -239,7 +240,7 @@ class TestTorrentScrub(object):
                 assert 'libtorrent_resume' in original.content
                 assert 'libtorrent_resume' not in modified.content
 
-    @with_filecopy(test_files, "__tmp__")
+    @pytest.mark.filecopy(test_files, "__tmp__")
     def test_torrent_scrub_fields(self, execute_task):
         task = execute_task('test_fields')
         title = 'fields.LICENSE'
@@ -252,7 +253,7 @@ class TestTorrentScrub(object):
         assert 'comment' not in torrent.content, "'comment' not scrubbed"
         assert 'x_cross_seed' not in torrent.content['info'], "'info.x_cross_seed' not scrubbed"
 
-    @with_filecopy(test_files, "__tmp__")
+    @pytest.mark.filecopy(test_files, "__tmp__")
     def test_torrent_scrub_off(self, execute_task):
         task = execute_task('test_off')
 
@@ -279,9 +280,8 @@ class TestTorrentAlive(object):
             torrent_alive: 0
     """
 
-    @use_vcr
-    @with_filecopy('test.torrent', 'test_torrent_alive.torrent')
-    def test_torrent_alive_fail(self, execute_task):
+    @pytest.mark.filecopy('test.torrent', 'test_torrent_alive.torrent')
+    def test_torrent_alive_fail(self, execute_task, use_vcr):
         task = execute_task('test_torrent_alive_fail')
         assert not task.accepted, 'Torrent should not have met seed requirement.'
         assert task._rerun_count == 1, ('Task should have been rerun 1 time. Was rerun %s times.' %
@@ -292,9 +292,8 @@ class TestTorrentAlive(object):
         assert not task.accepted, 'Torrent should have been rejected by remember_rejected.'
         assert task._rerun_count == 0, 'Task should not have been rerun.'
 
-    @use_vcr
-    @with_filecopy('test.torrent', 'test_torrent_alive.torrent')
-    def test_torrent_alive_pass(self, execute_task):
+    @pytest.mark.filecopy('test.torrent', 'test_torrent_alive.torrent')
+    def test_torrent_alive_pass(self, execute_task, use_vcr):
         task = execute_task('test_torrent_alive_pass')
         assert task.accepted
         assert task._rerun_count == 0, 'Torrent should have been accepted without rerun.'
@@ -308,6 +307,7 @@ class TestTorrentAlive(object):
         assert get_udp_seeds('udp://127.0.0.1:-1/announce','HASH') == 0
         assert get_udp_seeds('udp://127.0.0.1:PORT/announce','HASH') == 0
         assert get_udp_seeds('udp://127.0.0.1:65536/announce','HASH') == 0
+
 
 class TestRtorrentMagnet(object):
     __tmp__ = True

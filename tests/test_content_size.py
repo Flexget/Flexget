@@ -1,5 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
-
+import pytest
 
 class TestTorrentSize(object):
 
@@ -35,21 +35,21 @@ class TestTorrentSize(object):
               min: 2000
     """
 
-    @with_filecopy('test.torrent', 'test_min.torrent')
+    @pytest.mark.filecopy('test.torrent', 'test_min.torrent')
     def test_min(self, execute_task):
         """Content Size: torrent with min size"""
         task = execute_task('test_min')
         assert task.find_entry('rejected', title='test'), \
             'should have rejected, minimum size'
 
-    @with_filecopy('test.torrent', 'test_max.torrent')
+    @pytest.mark.filecopy('test.torrent', 'test_max.torrent')
     def test_max(self, execute_task):
         """Content Size: torrent with max size"""
         task = execute_task('test_max')
         assert task.find_entry('rejected', title='test'), \
             'should have rejected, maximum size'
 
-    @with_filecopy('test.torrent', 'test_strict.torrent')
+    @pytest.mark.filecopy('test.torrent', 'test_strict.torrent')
     def test_strict(self, execute_task):
         """Content Size: strict enabled"""
         task = execute_task('test_strict')
@@ -94,7 +94,7 @@ class TestFileSize(object):
               - {title: 'test', location: 'test.torrent'}
     """
 
-    @with_filecopy('test.torrent', 'min.file')
+    @pytest.mark.filecopy('test.torrent', 'min.file')
     def test_min(self, execute_task):
         """Content Size: torrent with min size"""
         task = execute_task('test_min')
@@ -103,7 +103,7 @@ class TestFileSize(object):
         assert entry['content_size'] == 0, \
             'content_size was not detected'
 
-    @with_filecopy('test.torrent', 'max.file')
+    @pytest.mark.filecopy('test.torrent', 'max.file')
     def test_max(self, execute_task):
         """Content Size: torrent with max size"""
         task = execute_task('test_max')

@@ -2,11 +2,10 @@ from __future__ import unicode_literals, division, absolute_import
 
 
 from flexget.utils.imdb import ImdbParser
-from tests import use_vcr
 
 
 class TestImdbParser(object):
-    def test_parsed_data(self, execute_task, use_vcr):
+    def test_parsed_data(self, use_vcr):
         parser = ImdbParser()
         parser.parse('tt0114814')
         assert parser.actors == {
@@ -47,7 +46,7 @@ class TestImdbParser(object):
         assert 400000 < parser.votes < 1000000, 'Votes not parsed correctly'
         assert parser.year == 1995, 'Year not parsed correctly'
 
-    def test_no_plot(self, execute_task, use_vcr):
+    def test_no_plot(self, use_vcr):
         # Make sure parser doesn't crash for movies with no plot
         parser = ImdbParser()
         parser.parse('tt1300562')
@@ -55,7 +54,7 @@ class TestImdbParser(object):
         # There is no plot
         assert not parser.plot_outline
 
-    def test_no_year(self, execute_task, use_vcr):
+    def test_no_year(self, use_vcr):
         # Make sure parser doesn't crash for movies with no year
         parser = ImdbParser()
         parser.parse('tt3303790')
@@ -63,7 +62,7 @@ class TestImdbParser(object):
         # There is no year
         assert not parser.year
 
-    def test_plot_with_links(self, execute_task, use_vcr):
+    def test_plot_with_links(self, use_vcr):
         """Make sure plot doesn't terminate at the first link. GitHub #756"""
         parser = ImdbParser()
         parser.parse('tt2503944')

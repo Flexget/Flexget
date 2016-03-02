@@ -5,7 +5,6 @@ from mock import patch
 
 from flexget.plugins.filter import movie_queue
 from flexget.plugins.filter.movie_queue import queue_add, queue_get
-from tests.test_api import APITest
 
 
 class TestMovieQueue(object):
@@ -175,7 +174,10 @@ class TestMovieQueue(object):
         assert len(queue_get(queue_name='a New queue')) == 1
 
 
-class TestMovieQueueAPI(APITest):
+class TestMovieQueueAPI(object):
+
+    config = 'tasks: {}'
+
     mock_return_movie = {u'added': datetime.datetime(2015, 12, 30, 12, 32, 10, 688000),
                          u'tmdb_id': None, u'imdb_id': u'tt1234567', u'downloaded': None,
                          u'quality': u'', u'id': 181, u'entry_title': None,
@@ -183,45 +185,45 @@ class TestMovieQueueAPI(APITest):
                          u'entry_url': None, u'quality_req': u''}
 
     @patch.object(movie_queue, 'queue_get')
-    def test_queue_get(self, mocked_queue_get):
-        rsp = self.get('/movie_queue/?page=1&max=100&sort_by=added&order=desc')
+    def test_queue_get(self, mocked_queue_get, api_client):
+        rsp = api_client.get('/movie_queue/?page=1&max=100&sort_by=added&order=desc')
         assert rsp.status_code == 200, 'status code is actually %s' % rsp.status_code
         assert mocked_queue_get.called
 
         # Test using defaults
-        rsp = self.get('/movie_queue/')
+        rsp = api_client.get('/movie_queue/')
         assert rsp.status_code == 200, 'status code is actually %s' % rsp.status_code
         assert mocked_queue_get.called
 
         # Sorting by attribute
-        rsp = self.get('/movie_queue/?sort_by=added')
+        rsp = api_client.get('/movie_queue/?sort_by=added')
         assert rsp.status_code == 200, 'status code is actually %s' % rsp.status_code
-        rsp = self.get('/movie_queue/?sort_by=is_downloaded')
+        rsp = api_client.get('/movie_queue/?sort_by=is_downloaded')
         assert rsp.status_code == 200, 'status code is actually %s' % rsp.status_code
-        rsp = self.get('/movie_queue/?sort_by=id')
+        rsp = api_client.get('/movie_queue/?sort_by=id')
         assert rsp.status_code == 200, 'status code is actually %s' % rsp.status_code
-        rsp = self.get('/movie_queue/?sort_by=title')
+        rsp = api_client.get('/movie_queue/?sort_by=title')
         assert rsp.status_code == 200, 'status code is actually %s' % rsp.status_code
-        rsp = self.get('/movie_queue/?sort_by=download_date')
+        rsp = api_client.get('/movie_queue/?sort_by=download_date')
         assert rsp.status_code == 200, 'status code is actually %s' % rsp.status_code
         # Negative test
-        rsp = self.get('/movie_queue/?sort_by=bla')
+        rsp = api_client.get('/movie_queue/?sort_by=bla')
         assert rsp.status_code == 400, 'status code is actually %s' % rsp.status_code
 
         # Filtering by status
-        rsp = self.get('/movie_queue/?is_downloaded=true')
+        rsp = api_client.get('/movie_queue/?is_downloaded=true')
         assert rsp.status_code == 200, 'status code is actually %s' % rsp.status_code
-        rsp = self.get('/movie_queue/?is_downloaded=false')
+        rsp = api_client.get('/movie_queue/?is_downloaded=false')
         assert rsp.status_code == 200, 'status code is actually %s' % rsp.status_code
 
         # Sort order
-        rsp = self.get('/movie_queue/?order=desc')
+        rsp = api_client.get('/movie_queue/?order=desc')
         assert rsp.status_code == 200, 'status code is actually %s' % rsp.status_code
-        rsp = self.get('/movie_queue/?order=asc')
+        rsp = api_client.get('/movie_queue/?order=asc')
         assert rsp.status_code == 200, 'status code is actually %s' % rsp.status_code
 
     @patch.object(movie_queue, 'queue_add')
-    def test_queue_add(self, mocked_queue_add):
+    def test_queue_add(self, mocked_queue_add, api_client):
         imdb_movie = {
             "imdb_id": "tt1234567"
         }
@@ -239,23 +241,23 @@ class TestMovieQueueAPI(APITest):
 
         mocked_queue_add.return_value = self.mock_return_movie
 
-        rsp = self.json_post('/movie_queue/', data=json.dumps(imdb_movie))
+        rsp = api_client.json_post('/movie_queue/', data=json.dumps(imdb_movie))
         assert rsp.status_code == 201, 'response code should be 201, is actually %s' % rsp.status_code
 
-        rsp = self.json_post('/movie_queue/', data=json.dumps(tmdb_movie))
+        rsp = api_client.json_post('/movie_queue/', data=json.dumps(tmdb_movie))
         assert rsp.status_code == 201, 'response code should be 201, is actually %s' % rsp.status_code
 
-        rsp = self.json_post('/movie_queue/', data=json.dumps(title_movie))
+        rsp = api_client.json_post('/movie_queue/', data=json.dumps(title_movie))
         assert rsp.status_code == 201, 'response code should be 201, is actually %s' % rsp.status_code
 
-        rsp = self.json_post('/movie_queue/', data=json.dumps(with_quality))
+        rsp = api_client.json_post('/movie_queue/', data=json.dumps(with_quality))
         assert rsp.status_code == 201, 'response code should be 201, is actually %s' % rsp.status_code
         assert mocked_queue_add.call_count == 4
 
     @patch.object(movie_queue, 'get_movie_by_id')
     @patch.object(movie_queue, 'queue_forget')
     @patch.object(movie_queue, 'queue_edit')
-    def test_queue_movie_put(self, mocked_queue_edit, mocked_queue_forget, mocked_get_movie_by_id):
+    def test_queue_movie_put(self, mocked_queue_edit, mocked_queue_forget, mocked_get_movie_by_id, api_client):
         payload = {
             "reset_downloaded": True,
             "quality": "720p"
@@ -269,7 +271,7 @@ class TestMovieQueueAPI(APITest):
         mocked_queue_edit.return_value = self.mock_return_movie
         mocked_queue_forget.return_value = self.mock_return_movie
 
-        rsp = self.json_put('/movie_queue/1/', data=json.dumps(payload))
+        rsp = api_client.json_put('/movie_queue/1/', data=json.dumps(payload))
 
         assert json.loads(rsp.data) == valid_response, 'response data is %s' % json.loads(rsp.data)
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
@@ -279,15 +281,15 @@ class TestMovieQueueAPI(APITest):
         assert mocked_queue_forget.called
 
     @patch.object(movie_queue, 'delete_movie_by_id')
-    def test_queue_movie_del(self, delete_movie_by_id):
-        rsp = self.delete('/movie_queue/7/')
+    def test_queue_movie_del(self, delete_movie_by_id, api_client):
+        rsp = api_client.delete('/movie_queue/7/')
 
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
         assert delete_movie_by_id.called
 
     @patch.object(movie_queue, 'get_movie_by_id')
-    def test_queue_get_movie(self, mocked_get_movie_by_id):
-        rsp = self.get('/movie_queue/7/')
+    def test_queue_get_movie(self, mocked_get_movie_by_id, api_client):
+        rsp = api_client.get('/movie_queue/7/')
 
         assert rsp.status_code == 200, 'response code should be 200, is actually %s' % rsp.status_code
         assert mocked_get_movie_by_id.called

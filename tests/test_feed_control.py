@@ -43,7 +43,7 @@ class TestManualAutomatic(object):
     """
 
     def test_manual_without_onlytask(self, execute_task):
-        task = execute_task('test', abort_ok=True)
+        task = execute_task('test', abort=True)
         assert task.aborted
         assert not task.find_entry(title='nodownload'), 'Manual tasks downloaded on automatic run'
 

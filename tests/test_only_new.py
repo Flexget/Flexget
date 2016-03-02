@@ -13,7 +13,7 @@ class TestOnlyNew(object):
             accept_all: yes
     """
 
-    def test_only_new(self, execute_task):
+    def test_only_new(self, execute_task, manager):
         task = execute_task('test')
         # only_new will reject the entry on task_exit, make sure accept_all accepted it during filter event though
         assert task.find_entry('rejected', title='title 1', accepted_by='accept_all'), 'Test entry missing'
@@ -22,7 +22,7 @@ class TestOnlyNew(object):
         assert task.find_entry('rejected', title='title 1', rejected_by='remember_rejected'), 'Seen test entry remains'
 
         # add another entry to the task
-        self.manager.config['tasks']['test']['mock'].append({'title': 'title 2', 'url': 'http://localhost/title2'})
+        manager.config['tasks']['test']['mock'].append({'title': 'title 2', 'url': 'http://localhost/title2'})
         # execute again
         task = execute_task('test')
         # both entries should be present as config has changed

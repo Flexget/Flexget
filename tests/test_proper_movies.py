@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+import pytest
+from jinja2 import Template
 
 
-class BaseProperMovies(object):
+class TestProperMovies(object):
 
     config = """
         templates:
@@ -9,7 +11,9 @@ class BaseProperMovies(object):
             seen_movies: strict
             accept_all: yes
             proper_movies: yes
-
+            parsing:
+              series: {{parser}}
+              movie: {{parser}}
         tasks:
           test1:
             mock:
@@ -29,6 +33,11 @@ class BaseProperMovies(object):
               - {title: 'Movie.Name.2011.PROPER.720p-FlexGet', imdb_id: 'tt12345678'}
     """
 
+    @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
+    def config(self, request):
+        """Override and parametrize default config fixture."""
+        return Template(self._config).render({'parser': request.param})
+
     def test_proper_movies(self, execute_task):
         # first occurence
         task = execute_task('test1')
@@ -45,15 +54,3 @@ class BaseProperMovies(object):
         # proper version of same quality
         task = execute_task('test4')
         assert task.find_entry('accepted', title='Movie.Name.2011.PROPER.720p-FlexGet')
-
-
-class TestGuessitProperMovies(BaseProperMovies):
-    def __init__(self):
-        super(TestGuessitProperMovies, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalProperMovies(BaseProperMovies):
-    def __init__(self):
-        super(TestInternalProperMovies, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))

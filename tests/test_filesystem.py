@@ -81,7 +81,7 @@ class TestFilesystem(object):
     item_list = ['file1.mkv', 'file2.txt', 'file10.mkv', 'file11.txt', 'file4.avi', 'file3.xlsx', 'file5.mkv', 'dir1',
                  'dir2', 'dir4', 'dir6', 'dir7', 'dir8']
 
-    def assert_check(self, task_name, test_type, filenames):
+    def assert_check(self, task, task_name, test_type, filenames):
         for file in filenames:
             file = Path(file)
             if test_type == 'positive':
@@ -97,8 +97,8 @@ class TestFilesystem(object):
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
-        self.assert_check(task_name, 'negative', should_not_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'negative', should_not_exist)
 
     def test_list(self, execute_task):
         task_name = 'list'
@@ -106,8 +106,8 @@ class TestFilesystem(object):
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
-        self.assert_check(task_name, 'negative', should_not_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'negative', should_not_exist)
 
     def test_object_string(self, execute_task):
         task_name = 'object_string'
@@ -115,8 +115,8 @@ class TestFilesystem(object):
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
-        self.assert_check(task_name, 'negative', should_not_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'negative', should_not_exist)
 
     def test_object_list(self, execute_task):
         task_name = 'object_list'
@@ -124,8 +124,8 @@ class TestFilesystem(object):
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
-        self.assert_check(task_name, 'negative', should_not_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'negative', should_not_exist)
 
     def test_file_mask(self, execute_task):
         task_name = 'file_mask'
@@ -133,8 +133,8 @@ class TestFilesystem(object):
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
-        self.assert_check(task_name, 'negative', should_not_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'negative', should_not_exist)
 
     def test_regexp_test(self, execute_task):
         task_name = 'regexp_test'
@@ -142,8 +142,8 @@ class TestFilesystem(object):
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
-        self.assert_check(task_name, 'negative', should_not_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'negative', should_not_exist)
 
     def test_recursive_true(self, execute_task):
         task_name = 'recursive_true'
@@ -152,8 +152,8 @@ class TestFilesystem(object):
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
-        self.assert_check(task_name, 'negative', should_not_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'negative', should_not_exist)
 
     def test_recursive_2_levels(self, execute_task):
         task_name = 'recursive_2_levels'
@@ -161,8 +161,8 @@ class TestFilesystem(object):
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
-        self.assert_check(task_name, 'negative', should_not_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'negative', should_not_exist)
 
     def test_retrieve_files(self, execute_task):
         task_name = 'retrieve_files'
@@ -170,8 +170,8 @@ class TestFilesystem(object):
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
-        self.assert_check(task_name, 'negative', should_not_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'negative', should_not_exist)
 
     def test_retrieve_files_and_dirs(self, execute_task):
         task_name = 'retrieve_files_and_dirs'
@@ -179,8 +179,8 @@ class TestFilesystem(object):
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
-        self.assert_check(task_name, 'negative', should_not_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'negative', should_not_exist)
 
     def test_combine_1(self, execute_task):
         task_name = 'combine_1'
@@ -188,8 +188,8 @@ class TestFilesystem(object):
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
-        self.assert_check(task_name, 'negative', should_not_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'negative', should_not_exist)
 
     def test_combine_2(self, execute_task):
         task_name = 'combine_2'
@@ -197,12 +197,12 @@ class TestFilesystem(object):
         should_not_exist = [item for item in self.item_list if item not in should_exist]
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
-        self.assert_check(task_name, 'negative', should_not_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'negative', should_not_exist)
 
     def test_non_ascii(self, execute_task):
         task_name = 'non_ascii'
         should_exist = ['\u0161 dir', '\u0152 file.txt']
         task = execute_task(task_name)
 
-        self.assert_check(task_name, 'positive', should_exist)
+        self.assert_check(task, task_name, 'positive', should_exist)

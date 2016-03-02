@@ -6,7 +6,6 @@ from flexget.manager import Session
 from flexget.plugins.filter import seen
 from flexget.plugins.filter.seen import SeenEntry, SeenField
 from flexget.utils import json
-from tests.test_api import APITest
 
 
 class TestFilterSeen(object):
@@ -155,58 +154,61 @@ class TestFilterSeenMovies(object):
         assert not task.find_entry(title='Seen movie title 10'), 'strict should not have passed movie 10'
 
 
-class TestSeenAPI(APITest):
+class TestSeenAPI(object):
+
+    config = 'tasks: {}'
+
     @patch.object(seen, 'search')
-    def test_seen_get(self, mock_seen_search):
+    def test_seen_get(self, mock_seen_search, api_client):
         session = Session()
         entry_list = session.query(SeenEntry).join(SeenField).all()
         mock_seen_search.return_value = entry_list
 
         # No params
-        rsp = self.get('/seen/')
+        rsp = api_client.get('/seen/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         # Default params
-        rsp = self.get('/seen/?page=1&max=100&local_seen=true&sort_by=added&order=desc')
+        rsp = api_client.get('/seen/?page=1&max=100&local_seen=true&sort_by=added&order=desc')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         # Changed params
-        rsp = self.get('/seen/?max=1000&local_seen=false&sort_by=title&order=asc')
+        rsp = api_client.get('/seen/?max=1000&local_seen=false&sort_by=title&order=asc')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         # Negative test, invalid parameter
-        rsp = self.get('/seen/?max=1000&local_seen=BLA&sort_by=title &order=asc')
+        rsp = api_client.get('/seen/?max=1000&local_seen=BLA&sort_by=title &order=asc')
         assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
 
         # With value
-        rsp = self.get('/seen/?value=bla')
+        rsp = api_client.get('/seen/?value=bla')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         assert mock_seen_search.call_count == 4, 'Should have 4 calls, is actually %s' % mock_seen_search.call_count
 
     @patch.object(seen, 'search')
-    def test_seen_delete_all(self, mock_seen_search):
+    def test_seen_delete_all(self, mock_seen_search, api_client):
         session = Session()
         entry_list = session.query(SeenEntry).join(SeenField).all()
         mock_seen_search.return_value = entry_list
 
         # No params
-        rsp = self.delete('/seen/')
+        rsp = api_client.delete('/seen/')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         # With value
-        rsp = self.delete('/seen/?value=bla')
+        rsp = api_client.delete('/seen/?value=bla')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
         assert mock_seen_search.call_count == 2, 'Should have 2 calls, is actually %s' % mock_seen_search.call_count
 
     @patch.object(seen, 'forget_by_id')
-    def test_delete_seen_entry(self, mock_forget):
-        rsp = self.delete('/seen/1234')
+    def test_delete_seen_entry(self, mock_forget, api_client):
+        rsp = api_client.delete('/seen/1234')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_cod
         assert mock_forget.called
 
-    def test_seen_add(self, execute_task):
+    def test_seen_add(self, execute_task, api_client):
         fields = {
             'url': 'http://test.com/file.torrent',
             'title': 'Test.Title',
@@ -220,5 +222,5 @@ class TestSeenAPI(APITest):
             'fields': fields
         }
 
-        rsp = self.json_post('/seen/', data=json.dumps(entry))
+        rsp = api_client.json_post('/seen/', data=json.dumps(entry))
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code

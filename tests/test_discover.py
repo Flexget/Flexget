@@ -103,12 +103,12 @@ class TestDiscover(object):
         order = list(e.get('search_sort') for e in task.entries)
         assert order == sorted(order, reverse=True)
 
-    def test_interval(self, execute_task):
+    def test_interval(self, execute_task, manager):
         task = execute_task('test_interval')
         assert len(task.entries) == 1
 
         # Insert a new entry into the search input
-        self.manager.config['tasks']['test_interval']['discover']['what'][0]['mock'].append({'title': 'Bar'})
+        manager.config['tasks']['test_interval']['discover']['what'][0]['mock'].append({'title': 'Bar'})
         task = execute_task('test_interval')
         # First entry should be waiting for interval
         assert len(task.entries) == 1
@@ -118,8 +118,8 @@ class TestDiscover(object):
         task = execute_task('test_interval')
         assert len(task.entries) == 0
 
-    def test_estimates(self, execute_task):
-        mock_config = self.manager.config['tasks']['test_estimates']['discover']['what'][0]['mock']
+    def test_estimates(self, execute_task, manager):
+        mock_config = manager.config['tasks']['test_estimates']['discover']['what'][0]['mock']
         # It should not be searched before the release date
         mock_config[0]['est_release'] = datetime.now() + timedelta(days=7)
         task = execute_task('test_estimates')
@@ -163,11 +163,8 @@ class TestEmitSeriesInDiscover(object):
             rerun: 0
     """
 
-    def inject_series(self, release_name):
-        task = execute_task('inject_series', options = {'inject': [Entry(title=release_name, url='')]})
-
     def test_emit_series_backfill(self, execute_task):
-        self.inject_series('My Show 2 S02E01')
+        execute_task('inject_series', options = {'inject': [Entry(title='My Show 2 S02E01', url='')]})
         task = execute_task('test_emit_series_backfill')
         assert task.find_entry(title='My Show 2 S01E01')
         assert task.find_entry(title='My Show 2 S02E02')

@@ -13,16 +13,18 @@ class TestPluginApi(object):
     Contains plugin api related tests
     """
 
+    config = 'tasks: {}'
+
     @raises(plugin.DependencyError)
-    def test_unknown_plugin(self, execute_task):
+    def test_unknown_plugin(self):
         plugin.get_plugin_by_name('nonexisting_plugin')
 
-    def test_no_dupes(self, execute_task):
+    def test_no_dupes(self):
         plugin.load_plugins()
 
         assert plugin.PluginInfo.dupe_counter == 0, "Duplicate plugin names, see log"
 
-    def test_load(self, execute_task):
+    def test_load(self):
 
         plugin.load_plugins()
         plugin_path = os.path.dirname(plugins.__file__)

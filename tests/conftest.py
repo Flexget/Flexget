@@ -14,6 +14,9 @@ import flexget.logger
 from flexget.manager import Manager
 from flexget.plugin import load_plugins
 from flexget.task import Task, TaskAbort
+from flexget.webserver import User
+from flexget.manager import Session
+from flexget.api import app
 
 log = logging.getLogger('tests')
 
@@ -111,6 +114,17 @@ def use_vcr(request):
     else:
         with vcr.use_cassette(path=cassette_path) as cassette:
             yield cassette
+
+
+@pytest.fixture()
+def api_client(manager):
+    with Session() as session:
+        user = session.query(User).first()
+        if not user:
+            user = User(name='flexget', password='flexget')
+            session.add(user)
+            session.commit()
+        return APIClient(user.token)
 
 # --- End Public Fixtures ---
 
@@ -219,3 +233,39 @@ class MockManager(Manager):
         log.error('Crash Report Traceback:', exc_info=True)
         raise CrashReport('Crash report created during unit test, check log for traceback.')
 
+
+
+class APIClient(object):
+    def __init__(self, api_key):
+        self.api_key = api_key
+        self.client = app.test_client()
+
+    def _append_header(self, key, value, kwargs):
+        if 'headers' not in kwargs:
+            kwargs['headers'] = {}
+
+        kwargs['headers'][key] = value
+
+    def json_post(self, *args, **kwargs):
+        self._append_header('Content-Type', 'application/json', kwargs)
+        if kwargs.get('auth', True):
+            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+        return self.client.post(*args, **kwargs)
+
+    def json_put(self, *args, **kwargs):
+        self._append_header('Content-Type', 'application/json', kwargs)
+        if kwargs.get('auth', True):
+            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+        return self.client.put(*args, **kwargs)
+
+    def get(self, *args, **kwargs):
+        if kwargs.get('auth', True):
+            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+
+        return self.client.get(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if kwargs.get('auth', True):
+            self._append_header('Authorization', 'Token %s' % self.api_key, kwargs)
+
+        return self.client.delete(*args, **kwargs)

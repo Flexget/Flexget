@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import json
 import mock
+import os
 
-movie_list_file = 'couchpotoato_movie_list_test_response.json'
-qualities_profiles_file = 'couchpotoato_quality_profile_test_response.json'
+movie_list_file = os.path.join(os.path.dirname(__file__), 'couchpotoato_movie_list_test_response.json')
+qualities_profiles_file = os.path.join(os.path.dirname(__file__), 'couchpotoato_quality_profile_test_response.json')
 
 with open(movie_list_file, "r") as data:
     movie_list_response = json.load(data)
@@ -23,7 +24,7 @@ class TestCouchpotato(object):
         """
 
     @mock.patch('flexget.plugins.input.couchpotato.CouchPotato.get_json')
-    def test_couchpotato_no_data(self, mock_get):
+    def test_couchpotato_no_data(self, mock_get, execute_task):
         mock_get.return_value = movie_list_response
 
         task = execute_task('couch')
@@ -88,7 +89,7 @@ class TestCouchpotatoWithQuality(object):
                                                                                 entry.store['quality_req'])
 
     @mock.patch('flexget.plugins.input.couchpotato.CouchPotato.get_json')
-    def test_couchpotato_with_quality(self, mock_get):
+    def test_couchpotato_with_quality(self, mock_get, execute_task):
         mock_get.side_effect = [movie_list_response, qualities_response]
         task = execute_task('couch')
 

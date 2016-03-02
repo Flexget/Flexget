@@ -6,7 +6,7 @@ from flexget.utils.pathscrub import pathscrub
 
 
 class TestPathscrub(object):
-    def test_windows_filenames(self, execute_task):
+    def test_windows_filenames(self):
         # Windows filename tests
         # 'None' indicates there should be no changes after path scrub
         win_fn = {
@@ -24,7 +24,7 @@ class TestPathscrub(object):
             result = pathscrub(test, os='windows', filename=True)
             assert result == win_fn[test], '%s != %s' % (result, win_fn[test])
 
-    def test_windows_paths(self, execute_task):
+    def test_windows_paths(self):
         win_path = {
             'aoeu/aoeu': 'aoeu/aoeu',  # Don't strip slashes in path mode
             'aoeu\\aoeu': 'aoeu\\aoeu',  # Or backslashes
@@ -36,11 +36,11 @@ class TestPathscrub(object):
             result = pathscrub(test, os='windows', filename=False)
             assert result == win_path[test], '%s != %s' % (result, win_path[test])
 
-    def test_degenerate(self, execute_task):
+    def test_degenerate(self):
         # If path is reduced to nothing, make sure it complains
         assert_raises(ValueError, pathscrub, '<<<<:>>>>', os='windows', filename=True)
 
-    def test_space_around(self, execute_task):
+    def test_space_around(self):
         # We don't want folder or file names to end or start with spaces on any platform
         space_paths = {
             ' / aoeu /aoeu ': '/aoeu/aoeu',
