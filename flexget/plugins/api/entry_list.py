@@ -79,7 +79,7 @@ class EntryListListsAPI(APIResource):
 
 @entry_list_api.route('/<int:list_id>/')
 @api.doc(params={'list_id': 'ID of the list'})
-class MovieListListAPI(APIResource):
+class EntryListListAPI(APIResource):
     @api.response(404, model=default_error_schema)
     @api.response(200, model=entry_list_object_schema)
     def get(self, list_id, session=None):
@@ -150,7 +150,7 @@ entry_list_parser.add_argument('page_size', type=int, default=10, help='Number o
 
 
 @entry_list_api.route('/<int:list_id>/entries/')
-class MovieListMoviesAPI(APIResource):
+class EntryListEntriessAPI(APIResource):
     @api.response(404, 'List does not exist', model=default_error_schema)
     @api.response(200, model=entry_lists_entries_return_schema)
     @api.doc(params={'list_id': 'ID of the list'}, parser=entry_list_parser)
