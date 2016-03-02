@@ -60,41 +60,44 @@ def token_created_date(created):
 
 def device_auth():
     data = {'client_id': CLIENT_ID}
-    r = requests.post(get_api_url('oauth/device/code'), data=data).json()
-    device_code = r['device_code']
-    user_code = r['user_code']
-    expires_in = r['expires_in']
-    interval = r['interval']
+    try:
+        r = requests.post(get_api_url('oauth/device/code'), data=data).json()
+        device_code = r['device_code']
+        user_code = r['user_code']
+        expires_in = r['expires_in']
+        interval = r['interval']
 
-    console('Please visit {0} and authorize Flexget. Your user code is {1}. Your code expires in '
-            '{2} minutes.'.format(r['verification_url'], user_code, expires_in / 60.0))
+        console('Please visit {0} and authorize Flexget. Your user code is {1}. Your code expires in '
+                '{2} minutes.'.format(r['verification_url'], user_code, expires_in / 60.0))
 
-    log.debug('Polling for user authorization.')
-    data['code'] = device_code
-    data['client_secret'] = CLIENT_SECRET
-    end_time = time.time() + expires_in
-    console('Waiting...', end='')
-    # stop polling after expires_in seconds
-    while time.time() < end_time:
-        time.sleep(interval)
-        polling_request = requests.post(get_api_url('oauth/device/token'), data=data,
-                                        raise_status=False)
-        if polling_request.status_code == 200:  # success
-            return polling_request.json()
-        elif polling_request.status_code == 400:  # pending -- waiting for user
-            console('...', end='')
-        elif polling_request.status_code == 404:  # not found -- invalid device_code
-            raise plugin.PluginError('Invalid device code. Open an issue on Github.')
-        elif polling_request.status_code == 409:  # already used -- user already approved
-            raise plugin.PluginError('User code has already been approved.')
-        elif polling_request.status_code == 410:  # expired -- restart process
-            break
-        elif polling_request.status_code == 418:  # denied -- user denied code
-            raise plugin.PluginError('User code has been denied.')
-        elif polling_request.status_code == 429:  # polling too fast
-            log.warning('Polling too quickly. Upping the interval. No action required.')
-            interval += 1
-    raise plugin.PluginError('User code has expired. Please try again.')
+        log.debug('Polling for user authorization.')
+        data['code'] = device_code
+        data['client_secret'] = CLIENT_SECRET
+        end_time = time.time() + expires_in
+        console('Waiting...', end='')
+        # stop polling after expires_in seconds
+        while time.time() < end_time:
+            time.sleep(interval)
+            polling_request = requests.post(get_api_url('oauth/device/token'), data=data,
+                                            raise_status=False)
+            if polling_request.status_code == 200:  # success
+                return polling_request.json()
+            elif polling_request.status_code == 400:  # pending -- waiting for user
+                console('...', end='')
+            elif polling_request.status_code == 404:  # not found -- invalid device_code
+                raise plugin.PluginError('Invalid device code. Open an issue on Github.')
+            elif polling_request.status_code == 409:  # already used -- user already approved
+                raise plugin.PluginError('User code has already been approved.')
+            elif polling_request.status_code == 410:  # expired -- restart process
+                break
+            elif polling_request.status_code == 418:  # denied -- user denied code
+                raise plugin.PluginError('User code has been denied.')
+            elif polling_request.status_code == 429:  # polling too fast
+                log.warning('Polling too quickly. Upping the interval. No action required.')
+                interval += 1
+        raise plugin.PluginError('User code has expired. Please try again.')
+    except requests.RequestException as e:
+        raise plugin.PluginError('Device authorization with Trakt.tv failed: {0}'.format(e.args[0]))
 
 
 def token_auth(data):
