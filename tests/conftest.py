@@ -1,6 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+import glob
 import logging
 import os
+import shutil
 import sys
 import yaml
 from contextlib import contextmanager
@@ -17,18 +19,10 @@ from flexget.task import Task, TaskAbort
 log = logging.getLogger('tests')
 
 
-@pytest.fixture(scope='session', autouse=True)
-def setup_once():
-    flexget.logger.initialize(True)
-    #setup_logging_level()
-    # VCR.py mocked functions not handle ssl verification well. Older versions of urllib3 don't have this
-    # if VCR_RECORD_MODE != 'off':
-    #     try:
-    #         from requests.packages.urllib3.exceptions import SecurityWarning
-    #         warnings.simplefilter('ignore', SecurityWarning)
-    #     except ImportError:
-    #         pass
-    load_plugins()
+VCR_CASSETTE_DIR = os.path.join(os.path.dirname(__file__), 'cassettes')
+VCR_RECORD_MODE = os.environ.get('VCR_RECORD_MODE', 'once')
+
+vcr = VCR(cassette_library_dir=VCR_CASSETTE_DIR, record_mode=VCR_RECORD_MODE)
 
 
 # --- These are the public fixtures tests can ask for ---
@@ -84,7 +78,76 @@ def execute_task(manager):
 
     return execute
 
+
+@pytest.yield_fixture()
+def use_vcr(request):
+    """
+    Decorator for test functions which go online. A vcr cassette will automatically be created and used to capture and
+    play back online interactions. The nose 'vcr' attribute will be set, and the nose 'online' attribute will be set on
+    it based on whether it might go online.
+
+    The record mode of VCR can be set using the VCR_RECORD_MODE environment variable when running tests. Depending on
+    the record mode, and the existence of an already recorded cassette, this decorator will also dynamically set the
+    nose 'online' attribute.
+
+    Keyword arguments to :func:`vcr.VCR.use_cassette` can be supplied.
+    """
+    module = request.module.__name__.split('tests.')[-1]
+    class_name = request.cls.__name__
+    cassette_name = '.'.join([module, class_name, request.function.__name__])
+    cassette_path = os.path.join(VCR_CASSETTE_DIR, cassette_name)
+    online = True
+    # Set our nose online attribute based on the VCR record mode
+    if vcr.record_mode == 'none':
+        online = False
+    elif vcr.record_mode == 'once':
+        online = not os.path.exists(cassette_path)
+    # TODO: Don't know if this is right, do some testing.
+    pytest.mark.online(request)
+    # If we are not going online, disable domain limiting during test
+    if not online:
+        request.function = mock.patch('flexget.utils.requests.limit_domains', new=mock.MagicMock())(request.function)
+    if VCR_RECORD_MODE == 'off':
+        yield None
+    else:
+        with vcr.use_cassette(path=cassette_path) as cassette:
+            yield cassette
 # --- End Public Fixtures ---
+
+
+@pytest.fixture(scope='session', autouse=True)
+def setup_once():
+    flexget.logger.initialize(True)
+    #setup_logging_level()
+    # VCR.py mocked functions not handle ssl verification well. Older versions of urllib3 don't have this
+    # if VCR_RECORD_MODE != 'off':
+    #     try:
+    #         from requests.packages.urllib3.exceptions import SecurityWarning
+    #         warnings.simplefilter('ignore', SecurityWarning)
+    #     except ImportError:
+    #         pass
+    load_plugins()
+
+
+def pytest_configure(config):
+    # register the filecopy marker
+    config.addinivalue_line('markers',
+        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.')
+
+
+# Do file copies for tests marked with filecopy
+def pytest_runtest_setup(item):
+    envmarker = item.get_marker('filecopy')
+    if envmarker is not None:
+        src, dst = envmarker.args
+        with_filecopy(src, dst).__enter__()
+
+
+def pytest_runtest_teardown(item):
+    envmarker = item.get_marker('filecopy')
+    if envmarker is not None:
+        src, dst = envmarker.args
+        with_filecopy(src, dst).__exit__()
 
 
 class CrashReport(Exception):
@@ -131,44 +194,44 @@ class MockManager(Manager):
         raise CrashReport('Crash report created during unit test, check log for traceback.')
 
 
-VCR_CASSETTE_DIR = os.path.join(os.path.dirname(__file__), 'cassettes')
-VCR_RECORD_MODE = os.environ.get('VCR_RECORD_MODE', 'once')
-
-vcr = VCR(cassette_library_dir=VCR_CASSETTE_DIR, record_mode=VCR_RECORD_MODE)
 
 
-@pytest.yield_fixture()
-def use_vcr(request):
+class with_filecopy(object):
     """
-    Decorator for test functions which go online. A vcr cassette will automatically be created and used to capture and
-    play back online interactions. The nose 'vcr' attribute will be set, and the nose 'online' attribute will be set on
-    it based on whether it might go online.
+        @with_filecopy decorator
+        make a copy of src to dst for test case and deleted file afterwards
 
-    The record mode of VCR can be set using the VCR_RECORD_MODE environment variable when running tests. Depending on
-    the record mode, and the existence of an already recorded cassette, this decorator will also dynamically set the
-    nose 'online' attribute.
-
-    Keyword arguments to :func:`vcr.VCR.use_cassette` can be supplied.
+        src can be also be a glob pattern, or a list of patterns; in both
+        cases, dst is then handled as a prefix (preferably a temp dir)
     """
-    module = request.module.__name__.split('tests.')[-1]
-    class_name = request.cls.__name__
-    cassette_name = '.'.join([module, class_name, request.function.__name__])
-    cassette_path = os.path.join(VCR_CASSETTE_DIR, cassette_name)
-    online = True
-    # Set our nose online attribute based on the VCR record mode
-    if vcr.record_mode == 'none':
-        online = False
-    elif vcr.record_mode == 'once':
-        online = not os.path.exists(cassette_path)
-    # TODO: Don't know if this is right, do some testing.
-    pytest.mark.online(request)
-    # If we are not going online, disable domain limiting during test
-    if not online:
-        request.function = mock.patch('flexget.utils.requests.limit_domains', new=mock.MagicMock())(request.function)
-    if VCR_RECORD_MODE == 'off':
-        yield None
-    else:
-        with vcr.use_cassette(path=cassette_path) as cassette:
-            yield cassette
+    def __init__(self, src, dst):
+        self.src = src
+        self.dst = dst
+        #
+        # if "__tmp__" in dst:
+        #     dst = dst.replace('__tmp__', 'tmp/%s/' % util.find_test_name().replace(':', '_'))
+        if isinstance(src, basestring):
+            src = [src]
+        files = []
+        for pattern in src:
+            files.extend(glob.glob(pattern))
 
+        if len(src) > 1 or set(files) != set(src):
+            # Glob expansion, "dst" is a prefix
+            self.pairs = [(i, dst + i) for i in files]
+        else:
+            # Explicit source and destination names
+            self.pairs = [(src[0], dst)]
+
+    def __enter__(self):
+
+        for src, dst in self.pairs:
+            log.trace("Copying %r to %r" % (src, dst))
+            shutil.copy(src, dst)
+
+    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
+        for _, dst in self.pairs:
+            if os.path.exists(dst):
+                log.trace("Removing %r" % dst)
+                os.remove(dst)
 

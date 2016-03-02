@@ -2,7 +2,8 @@ from __future__ import unicode_literals, division, absolute_import
 from datetime import timedelta
 import os
 
-from tests import with_filecopy
+import pytest
+
 from flexget.utils.cached_input import cached
 from flexget import plugin
 from flexget.entry import Entry
@@ -23,9 +24,10 @@ class InputPersist(object):
 plugin.register(InputPersist, 'test_input', api_ver=2)
 
 
+@pytest.mark.filecopy('rss.xml', 'cached.xml')
 class TestInputCache(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test_memory:
             rss:
@@ -34,7 +36,6 @@ class TestInputCache(object):
             test_input: True
     """
 
-    @with_filecopy('rss.xml', 'cached.xml')
     def test_memory_cache(self, execute_task):
         """Test memory input caching"""
         task = execute_task('test_memory')

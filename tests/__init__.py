@@ -1,14 +1,10 @@
 #!/usr/bin/python
 
 from __future__ import unicode_literals, division, absolute_import
-import inspect
-import functools
 import os
 import sys
 import logging
 
-import mock
-from nose.plugins.attrib import attr
 
 import flexget.logger
 from flexget.task import Task, TaskAbort
@@ -103,55 +99,3 @@ class BaseTest(object):
     config = None
 
 
-
-class with_filecopy(object):
-    """
-        @with_filecopy decorator
-        make a copy of src to dst for test case and deleted file afterwards
-
-        src can be also be a glob pattern, or a list of patterns; in both
-        cases, dst is then handled as a prefix (preferably a temp dir)
-    """
-
-    def __init__(self, src, dst):
-        self.src = src
-        self.dst = dst
-
-    def __call__(self, func):
-
-        def wrapper(*args, **kwargs):
-            import shutil
-            import glob
-
-            dst = self.dst
-            if "__tmp__" in dst:
-                dst = dst.replace('__tmp__', 'tmp/%s/' % util.find_test_name().replace(':', '_'))
-
-            src = self.src
-            if isinstance(src, basestring):
-                src = [self.src]
-            files = []
-            for pattern in src:
-                files.extend(glob.glob(pattern))
-
-            if len(src) > 1 or set(files) != set(src):
-                # Glob expansion, "dst" is a prefix
-                pairs = [(i, dst + i) for i in files]
-            else:
-                # Explicit source and destination names
-                pairs = [(self.src, dst)]
-
-            for src, dst in pairs:
-                log.trace("Copying %r to %r" % (src, dst))
-                shutil.copy(src, dst)
-            try:
-                return func(*args, **kwargs)
-            finally:
-                for _, dst in pairs:
-                    if os.path.exists(dst):
-                        log.trace("Removing %r" % dst)
-                        os.remove(dst)
-
-        from nose.tools import make_decorator
-        wrapper = make_decorator(func)(wrapper)
-        return wrapper
