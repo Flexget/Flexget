@@ -130,22 +130,20 @@ def pytest_runtest_setup(item):
 
 @pytest.fixture()
 def filecopy(request, tmpdir):
-    envmarker = request.node.get_marker('filecopy')
-    if envmarker is not None:
-        src, dst = envmarker.args
-        dst = Path(dst.replace('__tmp__', tmpdir.strpath))
-        out_files = []
-        for f in Path().glob(src):
-            if dst.isdir():
-                dst = dst / f.basename()
-            f.copy(dst)
-            out_files.append(dst)
+    src, dst = request.node.get_marker('filecopy').args
+    dst = Path(dst.replace('__tmp__', tmpdir.strpath))
+    out_files = []
+    for f in Path().glob(src):
+        if dst.isdir():
+            dst = dst / f.basename()
+        f.copy(dst)
+        out_files.append(dst)
 
-        def fin():
-            for f in out_files:
-                f.remove()
+    def fin():
+        for f in out_files:
+            f.remove()
 
-        request.addfinalizer(fin)
+    request.addfinalizer(fin)
 
 
 @pytest.fixture(scope='session', autouse=True)
