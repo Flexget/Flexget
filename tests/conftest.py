@@ -130,24 +130,27 @@ def pytest_runtest_setup(item):
 
 @pytest.fixture()
 def filecopy(request, tmpdir):
-    src, dst = request.node.get_marker('filecopy').args
-    dst = Path(dst.replace('__tmp__', tmpdir.strpath))
-    out_files = []
-    for f in Path().glob(src):
-        if dst.isdir():
-            dst = dst / f.basename()
-        f.copy(dst)
-        out_files.append(dst)
+    marker = request.node.get_marker('filecopy')
+    if marker is not None:
+        src, dst = marker.args
+        dst = Path(dst.replace('__tmp__', tmpdir.strpath))
+        out_files = []
+        for f in Path().glob(src):
+            if dst.isdir():
+                dst = dst / f.basename()
+            f.copy(dst)
+            out_files.append(dst)
 
-    def fin():
-        for f in out_files:
-            f.remove()
+        def fin():
+            for f in out_files:
+                f.remove()
 
-    request.addfinalizer(fin)
+        request.addfinalizer(fin)
 
 
 @pytest.fixture(scope='session', autouse=True)
-def setup_once():
+def setup_once(pytestconfig, request):
+    os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'tests'))
     flexget.logger.initialize(True)
     # VCR.py mocked functions not handle ssl verification well. Older versions of urllib3 don't have this
     # if VCR_RECORD_MODE != 'off':
