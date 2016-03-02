@@ -588,7 +588,7 @@ class Manager(object):
             self.config = old_config
             raise
         log.debug('New config data loaded.')
-        self.user_config = new_user_config
+        self.user_config = copy.deepcopy(new_user_config)
         fire_event('manager.config_updated', self)
 
     def save_config(self):
