@@ -157,17 +157,10 @@ def setup_server(manager, session=None):
 
     _default_app.secret_key = get_secret()
 
-    # Create default flexget user
-    if session.query(User).count() == 0:
-        session.add(User(name="flexget", password=unicode(generate_password_hash("flexget"))))
-        session.commit()
-    # Migrate existing user password to be hashed
-    elif session.query(User).count() >= 1:
-        users = session.query(User).filter(User.name == "flexget").all()
-        for user in users:
-            if not user.password.startswith('pbkdf2:sha1'):
-                user.password = unicode(generate_password_hash(user.password))
-        session.commit()
+    user = get_user()
+    if not user or not user.password:
+        log.warn('No password set for web server, create one by using'
+                 ' `flexget web passwd <password>`')
 
     if web_server.is_alive():
         web_server.stop()
@@ -239,22 +232,29 @@ class WebServer(threading.Thread):
 
 
 @with_session
-def user_exist(name, session=None):
-    return session.query(User).filter(User.name == name).first()
+def get_user(username='flexget', session=None):
+    user = session.query(User).filter(User.name == username).first()
+    if not user:
+        user = User()
+        user.name = username
+        session.add(user)
+    return user
 
 
 @with_session
-def change_password(user_name, password, session=None):
-    user = user_exist(name=user_name, session=session)
+def change_password(username='flexget', password='', session=None):
     check = safe.check(password)
     if check.strength not in ['medium', 'strong']:
         raise WeakPassword('Password {0} is not strong enough'.format(password))
+
+    user = get_user(username=username, session=session)
     user.password = unicode(generate_password_hash(password))
+    session.commit()
 
 
 @with_session
-def generate_token(user_name, session=None):
-    user = user_exist(name=user_name, session=session)
+def generate_token(username='flexget', session=None):
+    user = get_user(username=username, session=session)
     user.token = generate_key()
     session.commit()
-    return user
+    return user.token

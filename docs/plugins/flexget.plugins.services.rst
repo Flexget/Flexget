@@ -16,12 +16,3 @@ services Package
     :members:
     :undoc-members:
     :show-inheritance:
-
-:mod:`trakt_acquired` Module
-----------------------------
-
-.. automodule:: flexget.plugins.services.trakt_acquired
-    :members:
-    :undoc-members:
-    :show-inheritance:
-

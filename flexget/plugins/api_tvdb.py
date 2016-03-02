@@ -242,6 +242,25 @@ class TVDBEpisode(TVDBContainer, Base):
 
     series_id = Column(Integer, ForeignKey('tvdb_series.id'), nullable=False)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'expired': self.expired,
+            'last_update': self.lastupdated,
+            'season_number': self.seasonnumber,
+            'episode_number': self.episodenumber,
+            'absolute_number': self.absolute_number,
+            'episode_name': self.episodename,
+            'overview': self.overview,
+            'director': self.director,
+            'writer': self.writer,
+            'guest_stars': self.gueststars,
+            'rating': self.rating,
+            'file_name': self.filename,
+            'first_aired': self.firstaired,
+            'series_id': self.series_id
+        }
+
     def update(self):
         if not self.id:
             raise LookupError('Cannot update an episode without an episode id.')
@@ -338,7 +357,7 @@ def lookup_series(name=None, tvdb_id=None, only_cached=False, session=None):
         series = session.query(TVDBSeries).filter(func.lower(TVDBSeries.seriesname) == name.lower()).first()
         if not series:
             found = session.query(TVDBSearchResult).filter(
-                    func.lower(TVDBSearchResult.search) == name.lower()).first()
+                func.lower(TVDBSearchResult.search) == name.lower()).first()
             if found and found.series:
                 series = found.series
     if series:

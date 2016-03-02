@@ -49,3 +49,17 @@ md-input-container .hint {
 
 }
 
+.custom-card .series-image {
+  margin-right: 15px;
+}
+
+.series-image img {
+  max-width: 150px;
+  max-height: 300px;
+}
+
+.fg-material-paging .fg-pagination-button {
+  width: 50px;
+  min-width: 50px;
+  margin: 3px;
+}

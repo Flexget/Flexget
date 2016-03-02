@@ -1,17 +1,21 @@
 import copy
-from flask import request
-from flexget.config_schema import process_config
-from flexget.api import api, APIResource, ApiError, NotFoundError
+import cherrypy
 from datetime import datetime
 from Queue import Queue, Empty
-import cherrypy
+from json import JSONEncoder
+import argparse
+
+from flask import request
 from flask import jsonify, Response
+import flask_restplus
+
+from flexget.config_schema import process_config
+from flexget.api import api, APIResource, ApiError, NotFoundError
 from flexget.task import task_phases
 from flexget.utils import json
-from json import JSONEncoder
 from flexget.event import event
 from flexget.utils.lazy_dict import LazyLookup
-import flask_restplus
+from flexget.options import get_parser
 
 # Tasks API
 tasks_api = api.namespace('tasks', description='Manage Tasks')
@@ -248,16 +252,16 @@ class ExecuteLog(Queue):
         self.put(json.dumps({'log': s}))
 
 
-stream_parser = api.parser()
+execute_parser = api.parser()
 
-stream_parser.add_argument('progress', type=flask_restplus.inputs.boolean, required=False, default=True,
-                           help='Include task progress updates')
-stream_parser.add_argument('summary', type=flask_restplus.inputs.boolean, required=False, default=True,
-                           help='Include task summary')
-stream_parser.add_argument('log', type=flask_restplus.inputs.boolean, required=False, default=False,
-                           help='Include execution log')
-stream_parser.add_argument('entry_dump', type=flask_restplus.inputs.boolean, required=False, default=False,
-                           help='Include dump of entries including fields')
+execute_parser.add_argument('progress', type=flask_restplus.inputs.boolean, required=False, default=True,
+                            help='Include task progress updates')
+execute_parser.add_argument('summary', type=flask_restplus.inputs.boolean, required=False, default=True,
+                            help='Include task summary')
+execute_parser.add_argument('log', type=flask_restplus.inputs.boolean, required=False, default=False,
+                            help='Include execution log')
+execute_parser.add_argument('entry_dump', type=flask_restplus.inputs.boolean, required=False, default=False,
+                            help='Include dump of entries including fields')
 
 _streams = {}
 
@@ -267,10 +271,9 @@ _streams = {}
 class TaskExecutionAPI(APIResource):
     @api.response(404, description='task not found')
     @api.response(200, model=task_api_execute_schema)
-    @api.doc(parser=stream_parser)
     def get(self, task, session=None):
         """ Execute task and stream results """
-        args = stream_parser.parse_args()
+        args = execute_parser.parse_args()
 
         if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {}).iterkeys()]:
             return {'error': 'task does not exist'}, 404
@@ -311,6 +314,23 @@ class TaskExecutionAPI(APIResource):
             yield '{}]}}'
 
         return Response(stream_response(), mimetype='text/event-stream')
+
+
+@event('manager.daemon.started')
+def setup_params(mgr):
+    parser = get_parser('execute')
+
+    for action in parser._optionals._actions:
+        ignore = ['v', 's', 'try-regexp', 'dump-config']
+        name = action.option_strings[0].strip('--')
+        if name in ignore:
+            continue
+        if isinstance(action, argparse._StoreConstAction) and action.help != '==SUPPRESS==':
+            execute_parser.add_argument(name,
+                                        type=flask_restplus.inputs.boolean,
+                                        required=False,
+                                        help=action.help)
+    api.doc(parser=execute_parser)(TaskExecutionAPI)
 
 
 class EntryDecoder(JSONEncoder):
