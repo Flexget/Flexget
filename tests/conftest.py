@@ -152,7 +152,8 @@ def filecopy(request, tmpdir):
 def setup_once(pytestconfig, request):
     os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'tests'))
     flexget.logger.initialize(True)
-    MockManager('tasks: {}', 'init')  # This makes sure our template environment is set up before any tests are run
+    m = MockManager('tasks: {}', 'init')  # This makes sure our template environment is set up before any tests are run
+    m.__del__()
     # VCR.py mocked functions not handle ssl verification well. Older versions of urllib3 don't have this
     # if VCR_RECORD_MODE != 'off':
     #     try:
