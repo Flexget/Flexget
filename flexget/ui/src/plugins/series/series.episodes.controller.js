@@ -7,12 +7,17 @@
     function episodesController($http, $stateParams, $mdDialog) {
         var vm = this;
 
-        var show = undefined;
+        var show = "";
 
         $http.get('/api/series/' + $stateParams.id + '/episodes')
             .success(function(data) {
                 vm.episodes = data.episodes;
-                show = data.show
+
+                show = data.show;
+                loadReleases();
+            })
+            .error(function(error) {
+                console.log(error);
             });
 
         vm.forgetEpisode = function(episode) {
@@ -37,6 +42,18 @@
                         $mdDialog.show(errorDialog);
                     })
             });
+        }
+
+        function loadReleases() {
+            vm.episodes.map(function(episode) {
+                $http.get('/api/series/' + $stateParams.id + '/episodes/' + episode.episode_id + '/releases')
+                    .success(function(data) {
+                        episode.releases = data.releases;
+                    })
+                    .error(function(error) {
+                        console.log(error);
+                    })
+            })
         }
     }
 
