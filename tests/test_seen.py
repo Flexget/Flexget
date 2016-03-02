@@ -37,6 +37,22 @@ class TestFilterSeen(FlexGetBase):
             - title: learned entry
             accept_all: yes
             mock_output: yes
+
+          test_non_default_fields:
+            mock:
+              - {title: 'Seen title 2', url: 'http://localhost/seen1'}
+            seen: {fields: [title]}
+
+          test_using_new_fields_1:
+            mock:
+              - {title: 'Seen title 1', url: 'http://localhost/seen1', new_field: 'should_filter'}
+            seen: {fields: [new_field]}
+
+          test_using_new_fields_2:
+            mock:
+              - {title: 'Seen title 2', url: 'http://localhost/seen2', new_field: 'should_filter'}
+            seen: {fields: [new_field]}
+
     """
 
     def test_seen(self):
@@ -66,6 +82,21 @@ class TestFilterSeen(FlexGetBase):
         assert not self.task.mock_output, 'Entry should not have been output with --learn'
         self.execute_task('test_learn')
         assert len(self.task.rejected) == 1, 'Seen plugin should have rejected on second run'
+
+    def test_non_default_fields(self):
+        self.execute_task('test')
+        assert self.task.find_entry(title='Seen title 1'), 'Test entry missing'
+        self.execute_task('test_non_default_fields')
+        # Should accept even though URL is the same, since basing seen status only by title
+        assert self.task.find_entry(title='Seen title 2'), 'Test entry missing'
+
+    def test_using_new_fields(self):
+        self.execute_task('test_using_new_fields_1')
+        assert self.task.find_entry(title='Seen title 1'), 'Test entry missing'
+
+        self.execute_task('test_using_new_fields_2')
+        # Should not accept entry based only on its 'new_field' attribute
+        assert not self.task.find_entry(title='Seen title 2'), 'Entry should have been filtered'
 
 
 class TestSeenLocal(FlexGetBase):
