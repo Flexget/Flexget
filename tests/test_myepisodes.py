@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from tests import FlexGetBase, use_vcr
 
 
 class TestMyEpisodes(object):
@@ -17,8 +16,7 @@ class TestMyEpisodes(object):
               password: flexget
     """
 
-    @use_vcr
-    def test_myepisodes_id(self, execute_task):
+    def test_myepisodes_id(self, execute_task, use_vcr):
         """Test myepisodes (DISABLED) -- account locked?"""
         return
 

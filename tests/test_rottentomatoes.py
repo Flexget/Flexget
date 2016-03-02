@@ -2,7 +2,6 @@ from __future__ import unicode_literals, division, absolute_import
 
 from nose.plugins.skip import SkipTest
 
-from tests import FlexGetBase, use_vcr
 
 
 class TestRottenTomatoesLookup(object):
@@ -24,8 +23,7 @@ class TestRottenTomatoesLookup(object):
             rottentomatoes_lookup: yes
     """
 
-    @use_vcr
-    def test_rottentomatoes_lookup(self, execute_task):
+    def test_rottentomatoes_lookup(self, execute_task, use_vcr):
         raise SkipTest('This plugin seems to be broken')
         task = execute_task('test')
         # check that these were created

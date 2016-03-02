@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from tests import FlexGetBase, use_vcr
 
 
 class TestInputSites(object):
@@ -20,22 +19,18 @@ class TestInputSites(object):
 
     """
 
-    @use_vcr
-    def test_rlslog(self, execute_task):
+    def test_rlslog(self, execute_task, use_vcr):
         task = execute_task('test_rlslog')
         assert task.entries, 'no entries created / site may be down'
 
-    @use_vcr
-    def test_sceper(self, execute_task):
+    def test_sceper(self, execute_task, use_vcr):
         task = execute_task('test_sceper')
         assert task.entries, 'no entries created / site may be down'
 
-    @use_vcr
-    def test_apple_trailers(self, execute_task):
+    def test_apple_trailers(self, execute_task, use_vcr):
         task = execute_task('test_apple_trailers')
         assert task.entries, 'no entries created / site may be down'
 
-    @use_vcr
-    def test_apple_trailers_simple(self, execute_task):
+    def test_apple_trailers_simple(self, execute_task, use_vcr):
         task = execute_task('test_apple_trailers_simple')
         assert task.entries, 'no entries created / site may be down'

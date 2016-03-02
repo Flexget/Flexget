@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 
-from tests import FlexGetBase, with_filecopy, use_vcr
 from flexget.utils.bittorrent import Torrent
 
 
@@ -300,8 +299,7 @@ class TestTorrentAlive(object):
         assert task.accepted
         assert task._rerun_count == 0, 'Torrent should have been accepted without rerun.'
 
-    @use_vcr
-    def test_torrent_alive_udp_invalid_port(self, execute_task):
+    def test_torrent_alive_udp_invalid_port(self, execute_task, use_vcr):
         from flexget.plugins.filter.torrent_alive import get_udp_seeds
         assert get_udp_seeds('udp://[2001::1]/announce','HASH') == 0
         assert get_udp_seeds('udp://[::1]/announce','HASH') == 0

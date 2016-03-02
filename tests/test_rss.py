@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import yaml
 
-from tests import FlexGetBase, use_vcr
 
 
 class TestInputRSS(object):
@@ -163,8 +162,7 @@ class TestRssOnline(object):
 
     """
 
-    @use_vcr
-    def test_rss_online(self, execute_task):
+    def test_rss_online(self, execute_task, use_vcr):
         # Make sure entries are created for all test tasks
         tasks = yaml.load(self.config)['tasks']
         for task in tasks:

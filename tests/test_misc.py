@@ -4,7 +4,6 @@ import stat
 
 from nose.tools import raises
 
-from tests import FlexGetBase, use_vcr
 from flexget.entry import EntryUnicodeError, Entry
 
 
@@ -43,8 +42,7 @@ class TestInputHtml(object):
             html: http://download.flexget.com/
     """
 
-    @use_vcr
-    def test_parsing(self, execute_task):
+    def test_parsing(self, execute_task, use_vcr):
         task = execute_task('test')
         assert task.entries, 'did not produce entries'
 
@@ -131,8 +129,7 @@ class TestDownload(object):
         if os.path.exists(temp_dir) and os.path.isdir(temp_dir):
             os.rmdir(temp_dir)
 
-    @use_vcr
-    def test_download(self, execute_task):
+    def test_download(self, execute_task, use_vcr):
         # NOTE: what the hell is .obj and where it comes from?
         # Re: seems to come from python mimetype detection in download plugin ...
         # Re Re: Implemented in such way that extension does not matter?

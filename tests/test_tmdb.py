@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from tests import FlexGetBase, use_vcr
 
 
 class TestTmdbLookup(object):
@@ -17,8 +16,7 @@ class TestTmdbLookup(object):
               afield: "{{ tmdb_id }}"
     """
 
-    @use_vcr
-    def test_tmdb_lookup(self, execute_task):
+    def test_tmdb_lookup(self, execute_task, use_vcr):
         task = execute_task('test')
         # check that these were created
         assert task.find_entry(tmdb_name='Taken', tmdb_year=2008), 'Didn\'t populate tmdb info for Taken'

@@ -9,7 +9,6 @@ from flexget.manager import get_parser, Session
 from flexget.plugins.filter import series
 from flexget.task import TaskAbort
 from flexget.utils import json
-from tests import FlexGetBase, build_parser_function
 from tests.test_api import APITest
 
 

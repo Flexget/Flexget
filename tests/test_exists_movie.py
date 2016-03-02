@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
 
-from tests import FlexGetBase, build_parser_function, use_vcr
 from tests.util import maketemp
 
 
@@ -130,8 +129,7 @@ class BaseExistsMovie(object):
         assert task.find_entry('accepted', title='Gone.Missing.2013'), \
             'Gone.Missing.2013 should have been accepted'
 
-    @use_vcr
-    def test_lookup_imdb(self, execute_task):
+    def test_lookup_imdb(self, execute_task, use_vcr):
         """exists_movie plugin: existing"""
         task = execute_task('test_lookup_imdb')
         assert task.find_entry('accepted', title='The.Matrix.1999')['imdb_id'], \

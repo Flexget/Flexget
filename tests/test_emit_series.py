@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from tests import FlexGetBase, build_parser_function
 from flexget.entry import Entry
 
 

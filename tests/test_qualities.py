@@ -5,7 +5,6 @@ from nose.plugins.skip import SkipTest
 from flexget.plugins.parsers.parser_guessit import ParserGuessit
 from flexget.plugins.parsers.parser_internal import ParserInternal
 from flexget.utils.qualities import Quality
-from tests import FlexGetBase, build_parser_function
 
 
 class TestQualityModule(object):
