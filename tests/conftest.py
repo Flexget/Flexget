@@ -1,14 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
-import glob
 import logging
 import os
-import shutil
 import sys
 import yaml
 from contextlib import contextmanager
 
 import mock
 import pytest
+from path import Path
 from vcr import VCR
 
 import flexget.logger
@@ -37,7 +36,7 @@ def config(request):
 
 
 @pytest.yield_fixture()
-def manager(request, config):
+def manager(request, config, filecopy):  # enforce filecopy is run before manager
     """
     Create a :class:`MockManager` for this test based on `config` argument.
     """
@@ -112,7 +111,41 @@ def use_vcr(request):
     else:
         with vcr.use_cassette(path=cassette_path) as cassette:
             yield cassette
+
 # --- End Public Fixtures ---
+
+
+def pytest_configure(config):
+    # register the filecopy marker
+    config.addinivalue_line('markers',
+        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.')
+
+
+def pytest_runtest_setup(item):
+    # Add the filcopy fixture to any test marked with filecopy
+    envmarker = item.get_marker('filecopy')
+    if envmarker is not None:
+        item.add_marker(pytest.mark.usefixtures('filecopy'))
+
+
+@pytest.fixture()
+def filecopy(request, tmpdir):
+    envmarker = request.node.get_marker('filecopy')
+    if envmarker is not None:
+        src, dst = envmarker.args
+        dst = Path(dst.replace('__tmp__', tmpdir.strpath))
+        out_files = []
+        for f in Path().glob(src):
+            if dst.isdir():
+                dst = dst / f.basename()
+            f.copy(dst)
+            out_files.append(dst)
+
+        def fin():
+            for f in out_files:
+                f.remove()
+
+        request.addfinalizer(fin)
 
 
 @pytest.fixture(scope='session', autouse=True)
@@ -138,27 +171,6 @@ def setup_loglevel(pytestconfig, caplog):
         level = logging.INFO
     logging.getLogger().setLevel(level)
     caplog.setLevel(level)
-
-
-def pytest_configure(config):
-    # register the filecopy marker
-    config.addinivalue_line('markers',
-        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.')
-
-
-# Do file copies for tests marked with filecopy
-def pytest_runtest_setup(item):
-    envmarker = item.get_marker('filecopy')
-    if envmarker is not None:
-        src, dst = envmarker.args
-        with_filecopy(src, dst).__enter__()
-
-
-def pytest_runtest_teardown(item):
-    envmarker = item.get_marker('filecopy')
-    if envmarker is not None:
-        src, dst = envmarker.args
-        with_filecopy(src, dst).__exit__()
 
 
 class CrashReport(Exception):
@@ -203,43 +215,4 @@ class MockManager(Manager):
         # We don't want to silently swallow crash reports during unit tests
         log.error('Crash Report Traceback:', exc_info=True)
         raise CrashReport('Crash report created during unit test, check log for traceback.')
-
-
-class with_filecopy(object):
-    """
-        @with_filecopy decorator
-        make a copy of src to dst for test case and deleted file afterwards
-
-        src can be also be a glob pattern, or a list of patterns; in both
-        cases, dst is then handled as a prefix (preferably a temp dir)
-    """
-    def __init__(self, src, dst):
-        self.src = src
-        self.dst = dst
-        #
-        # if "__tmp__" in dst:
-        #     dst = dst.replace('__tmp__', 'tmp/%s/' % util.find_test_name().replace(':', '_'))
-        if isinstance(src, basestring):
-            src = [src]
-        files = []
-        for pattern in src:
-            files.extend(glob.glob(pattern))
-
-        if len(src) > 1 or set(files) != set(src):
-            # Glob expansion, "dst" is a prefix
-            self.pairs = [(i, dst + i) for i in files]
-        else:
-            # Explicit source and destination names
-            self.pairs = [(src[0], dst)]
-
-    def __enter__(self):
-        for src, dst in self.pairs:
-            log.trace("Copying %r to %r" % (src, dst))
-            shutil.copy(src, dst)
-
-    def __exit__(self, exc_type=None, exc_val=None, exc_tb=None):
-        for _, dst in self.pairs:
-            if os.path.exists(dst):
-                log.trace("Removing %r" % dst)
-                os.remove(dst)
 
