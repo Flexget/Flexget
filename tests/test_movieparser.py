@@ -2,14 +2,13 @@ from __future__ import unicode_literals, division, absolute_import
 from flexget.plugin import get_plugin_by_name
 from flexget.plugins.parsers.parser_guessit import ParserGuessit
 from flexget.plugins.parsers.parser_internal import ParserInternal
-from tests import FlexGetBase
 
 
 class ParserTests(object):
     def parse(self, data, name=None, **kwargs):
         return self.parser.parse_movie(data, name=name, **kwargs)
 
-    def test_parsing(self):
+    def test_parsing(self, execute_task):
         movie = self.parse('The.Matrix.1999.1080p.HDDVD.x264-FlexGet')
         assert movie.name == 'The Matrix', 'failed to parse %s (got %s)' % (movie.data, movie.name)
         assert movie.year == 1999, 'failed to parse year from %s' % movie.data

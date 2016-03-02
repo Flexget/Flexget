@@ -9,14 +9,14 @@ from tests.util import maketemp
 
 class TestValidator(object):
 
-    def test_default(self):
+    def test_default(self, execute_task):
         root = validator.factory()
         assert root.name == 'root', 'expected root'
         dv = root.accept('dict')
         assert dv.name == 'dict', 'expected dict'
         dv.accept('text', key='text')
 
-    def test_dict(self):
+    def test_dict(self, execute_task):
         dv = validator.factory('dict')
         dv.accept('dict', key='foo')
         result = dv.validate({'foo': {}})
@@ -36,13 +36,13 @@ class TestValidator(object):
         assert dv.errors.messages, 'should not have passed three'
         assert not result, 'should have an invalid result for 3'"""
 
-    def test_regexp_match(self):
+    def test_regexp_match(self, execute_task):
         re_match = validator.factory('regexp_match')
         re_match.accept('abc.*')
         assert not re_match.validate('foobar'), 'foobar should not have passed'
         assert re_match.validate('abcdefg'), 'abcdefg should have passed'
 
-    def test_interval(self):
+    def test_interval(self, execute_task):
         interval = validator.factory('interval')
         assert interval.validate('3 days')
         assert interval.validate('12 hours')
@@ -53,7 +53,7 @@ class TestValidator(object):
         assert not interval.validate('3 dayz')
         assert not interval.validate('about 5 minutes')
 
-    def test_choice(self):
+    def test_choice(self, execute_task):
         choice = validator.factory('choice')
         choice.accept('foo')
         choice.accept('Bar', ignore_case=True)
@@ -99,7 +99,7 @@ class TestValidator(object):
         test_config['recurse']['badkey'] = 4
         assert not recursive_validator().validate(test_config), 'Config should not be valid'
 
-    def test_path(self):
+    def test_path(self, execute_task):
         path = validator.factory('path')
         path_allow_missing = validator.factory('path', allow_missing=True)
         temp_path = maketemp()

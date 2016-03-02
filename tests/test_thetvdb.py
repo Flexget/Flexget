@@ -5,9 +5,9 @@ from flexget.plugins.api_tvdb import lookup_episode
 from tests import FlexGetBase, use_vcr
 
 
-class TestThetvdbLookup(FlexGetBase):
+class TestThetvdbLookup(object):
 
-    __yaml__ = """
+    config = """
         templates:
           global:
             thetvdb_lookup: yes
@@ -47,34 +47,34 @@ class TestThetvdbLookup(FlexGetBase):
     """
 
     @use_vcr
-    def test_lookup(self):
+    def test_lookup(self, execute_task):
         """thetvdb: Test Lookup (ONLINE)"""
-        self.execute_task('test')
-        entry = self.task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
+        task = execute_task('test')
+        entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvdb_ep_name'] == 'Paternity', \
             '%s tvdb_ep_name should be Paternity' % entry['title']
         assert entry['tvdb_status'] == 'Ended', \
             'runtime for %s is %s, should be Ended' % (entry['title'], entry['tvdb_status'])
         assert entry['tvdb_absolute_number'] == 3
         assert entry['afield'] == '73255Paternity', 'afield was not set correctly'
-        assert self.task.find_entry(tvdb_ep_name='School Reunion'), \
+        assert task.find_entry(tvdb_ep_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
 
     @use_vcr
-    def test_unknown_series(self):
+    def test_unknown_series(self, execute_task):
         # Test an unknown series does not cause any exceptions
-        self.execute_task('test_unknown_series')
+        task = execute_task('test_unknown_series')
         # Make sure it didn't make a false match
-        entry = self.task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
+        entry = task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
     @use_vcr
-    def test_mark_expired(self):
+    def test_mark_expired(self, execute_task):
 
         def test_run():
             # Run the task and check tvdb data was populated.
-            self.execute_task('test_mark_expired')
-            entry = self.task.find_entry(title='House.S02E02.hdtv')
+            task = execute_task('test_mark_expired')
+            entry = task.find_entry(title='House.S02E02.hdtv')
             assert entry['tvdb_ep_name'] == 'Autopsy'
 
         # Run the task once, this populates data from tvdb
@@ -91,21 +91,21 @@ class TestThetvdbLookup(FlexGetBase):
         test_run()
 
     @use_vcr
-    def test_date(self):
-        self.execute_task('test_date')
-        entry = self.task.find_entry(title='the daily show 2012-6-6')
+    def test_date(self, execute_task):
+        task = execute_task('test_date')
+        entry = task.find_entry(title='the daily show 2012-6-6')
         assert entry
         assert entry['tvdb_ep_name'] == 'Michael Fassbender'
 
     @use_vcr
-    def test_absolute(self):
-        self.execute_task('test_absolute')
-        entry = self.task.find_entry(title='naruto 128')
+    def test_absolute(self, execute_task):
+        task = execute_task('test_absolute')
+        entry = task.find_entry(title='naruto 128')
         assert entry
         assert entry['tvdb_ep_name'] == 'A Cry on Deaf Ears'
 
 
-class TestThetvdbFavorites(FlexGetBase):
+class TestThetvdbFavorites(object):
     """
         Tests thetvdb favorites plugin with a test user at thetvdb.
         Test user info:
@@ -115,7 +115,7 @@ class TestThetvdbFavorites(FlexGetBase):
         Favorites: House, Doctor Who 2005, Penn & Teller: Bullshit, Hawaii Five-0 (2010)
     """
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -134,22 +134,22 @@ class TestThetvdbFavorites(FlexGetBase):
     """
 
     @use_vcr
-    def test_favorites(self):
+    def test_favorites(self, execute_task):
         """thetvdb: Test favorites (ONLINE)"""
-        self.execute_task('test')
-        assert self.task.find_entry('accepted', title='House.S01E02.HDTV.XViD-FlexGet'), \
+        task = execute_task('test')
+        assert task.find_entry('accepted', title='House.S01E02.HDTV.XViD-FlexGet'), \
             'series House should have been accepted'
-        assert self.task.find_entry('accepted', title='Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'), \
+        assert task.find_entry('accepted', title='Doctor.Who.2005.S02E03.PDTV.XViD-FlexGet'), \
             'series Doctor Who 2005 should have been accepted'
-        assert self.task.find_entry('accepted', title='Penn.and.Teller.Bullshit.S02E02.720p.x264'), \
+        assert task.find_entry('accepted', title='Penn.and.Teller.Bullshit.S02E02.720p.x264'), \
             'series Penn and Teller Bullshit should have been accepted'
-        entry = self.task.find_entry(title='Lost.S03E02.720p-FlexGet')
+        entry = task.find_entry(title='Lost.S03E02.720p-FlexGet')
         assert entry, 'Entry not found?'
-        assert entry not in self.task.accepted, \
+        assert entry not in task.accepted, \
             'series Lost should not have been accepted'
 
     @use_vcr
-    def test_strip_date(self):
-        self.execute_task('test_strip_dates')
-        assert self.task.find_entry(title='Hawaii Five-0'), \
+    def test_strip_date(self, execute_task):
+        task = execute_task('test_strip_dates')
+        assert task.find_entry(title='Hawaii Five-0'), \
             'series Hawaii Five-0 (2010) should have date stripped'

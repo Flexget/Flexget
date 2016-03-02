@@ -3,9 +3,9 @@ from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase, use_vcr
 
 
-class TestWhatCDOnline(FlexGetBase):
+class TestWhatCDOnline(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           badlogin:
             whatcd:
@@ -14,6 +14,6 @@ class TestWhatCDOnline(FlexGetBase):
     """
 
     @use_vcr
-    def test_invalid_login(self):
-        self.execute_task("badlogin", abort_ok=True)
-        assert self.task.aborted, 'Task not aborted with invalid login credentials'
+    def test_invalid_login(self, execute_task):
+        task = execute_task("badlogin", abort_ok=True)
+        assert task.aborted, 'Task not aborted with invalid login credentials'

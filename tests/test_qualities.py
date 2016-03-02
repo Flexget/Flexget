@@ -10,11 +10,11 @@ from tests import FlexGetBase, build_parser_function
 
 class TestQualityModule(object):
 
-    def test_get(self):
+    def test_get(self, execute_task):
         assert not Quality(), 'unknown quality is not false'
         assert Quality('foobar') == Quality(), 'unknown not returned'
 
-    def test_common_name(self):
+    def test_common_name(self, execute_task):
         for test_val in ('720p', '1280x720'):
             got_val = Quality(test_val).name
             assert got_val == '720p', got_val
@@ -22,7 +22,7 @@ class TestQualityModule(object):
 
 class QualityParser(object):
 
-    def test_quality_failures(self):
+    def test_quality_failures(self, execute_task):
         items = [('Test.File 1080p.web-dl', '1080p webdl'),
                  ('Test.File.web-dl.1080p', '1080p webdl'),
                  ('Test.File.WebHD.720p', '720p webdl'),
@@ -104,9 +104,9 @@ class TestGuessitQualityParser(QualityParser):
     parser = ParserGuessit()
 
 
-class TestFilterQuality(FlexGetBase):
+class TestFilterQuality(object):
 
-    __yaml__ = """
+    config = """
         templates:
           global:
             mock:
@@ -128,49 +128,49 @@ class TestFilterQuality(FlexGetBase):
             quality: HR-720i
     """
 
-    def test_quality(self):
-        self.execute_task('qual')
-        entry = self.task.find_entry('rejected', title='Smoke.cam')
+    def test_quality(self, execute_task):
+        task = execute_task('qual')
+        entry = task.find_entry('rejected', title='Smoke.cam')
         assert entry, 'Smoke.cam should have been rejected'
 
-        entry = self.task.find_entry(title='Smoke.1280x720')
+        entry = task.find_entry(title='Smoke.1280x720')
         assert entry, 'entry not found?'
-        assert entry in self.task.accepted, '720p should be accepted'
-        assert len(self.task.rejected) == 2, 'wrong number of entries rejected'
-        assert len(self.task.accepted) == 2, 'wrong number of entries accepted'
+        assert entry in task.accepted, '720p should be accepted'
+        assert len(task.rejected) == 2, 'wrong number of entries rejected'
+        assert len(task.accepted) == 2, 'wrong number of entries accepted'
 
-    def test_min(self):
-        self.execute_task('min')
-        entry = self.task.find_entry('rejected', title='Smoke.HDTV')
+    def test_min(self, execute_task):
+        task = execute_task('min')
+        entry = task.find_entry('rejected', title='Smoke.HDTV')
         assert entry, 'Smoke.HDTV should have been rejected'
 
-        entry = self.task.find_entry(title='Smoke.1280x720')
+        entry = task.find_entry(title='Smoke.1280x720')
         assert entry, 'entry not found?'
-        assert entry in self.task.accepted, '720p should be accepted'
-        assert len(self.task.rejected) == 2, 'wrong number of entries rejected'
-        assert len(self.task.accepted) == 2, 'wrong number of entries accepted'
+        assert entry in task.accepted, '720p should be accepted'
+        assert len(task.rejected) == 2, 'wrong number of entries rejected'
+        assert len(task.accepted) == 2, 'wrong number of entries accepted'
 
-    def test_max(self):
-        self.execute_task('max')
-        entry = self.task.find_entry('rejected', title='Smoke.1280x720')
+    def test_max(self, execute_task):
+        task = execute_task('max')
+        entry = task.find_entry('rejected', title='Smoke.1280x720')
         assert entry, 'Smoke.1280x720 should have been rejected'
 
-        entry = self.task.find_entry(title='Smoke.cam')
+        entry = task.find_entry(title='Smoke.cam')
         assert entry, 'entry not found?'
-        assert entry in self.task.accepted, 'cam should be accepted'
-        assert len(self.task.rejected) == 3, 'wrong number of entries rejected'
-        assert len(self.task.accepted) == 1, 'wrong number of entries accepted'
+        assert entry in task.accepted, 'cam should be accepted'
+        assert len(task.rejected) == 3, 'wrong number of entries rejected'
+        assert len(task.accepted) == 1, 'wrong number of entries accepted'
 
-    def test_min_max(self):
-        self.execute_task('min_max')
-        entry = self.task.find_entry('rejected', title='Smoke.1280x720')
+    def test_min_max(self, execute_task):
+        task = execute_task('min_max')
+        entry = task.find_entry('rejected', title='Smoke.1280x720')
         assert entry, 'Smoke.1280x720 should have been rejected'
 
-        entry = self.task.find_entry(title='Smoke.HR')
+        entry = task.find_entry(title='Smoke.HR')
         assert entry, 'entry not found?'
-        assert entry in self.task.accepted, 'HR should be accepted'
-        assert len(self.task.rejected) == 3, 'wrong number of entries rejected'
-        assert len(self.task.accepted) == 1, 'wrong number of entries accepted'
+        assert entry in task.accepted, 'HR should be accepted'
+        assert len(task.rejected) == 3, 'wrong number of entries rejected'
+        assert len(task.accepted) == 1, 'wrong number of entries accepted'
 
 
 class TestGuessitFilterQuality(TestFilterQuality):

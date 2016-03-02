@@ -43,7 +43,7 @@ class ParserTests(object):
         r = self.parse(name, data, **kwargs)
         assert not r.valid, '{data} should not be valid'.format(data=data)
 
-    def test_proper(self):
+    def test_proper(self, execute_task):
         """SeriesParser: proper"""
         s = self.parse(name='Something Interesting', data='Something.Interesting.S01E02.Proper-FlexGet')
         assert s.season == 1
@@ -53,7 +53,7 @@ class ParserTests(object):
         s = self.parse(name='foobar', data='foobar 720p proper s01e01')
         assert s.proper, 'did not detect proper from %s' % s.data
 
-    def test_non_proper(self):
+    def test_non_proper(self, execute_task):
         """SeriesParser: non-proper"""
         s = self.parse(name='Something Interesting', data='Something.Interesting.S01E02-FlexGet')
         assert s.season == 1
@@ -61,7 +61,7 @@ class ParserTests(object):
         assert s.quality.name == 'unknown'
         assert not s.proper, 'detected proper'
 
-    def test_anime_proper(self):
+    def test_anime_proper(self, execute_task):
         """SeriesParser: anime fansub style proper (13v2)"""
         s = self.parse(name='Anime', data='[aoeu] Anime 19v2 [23BA98]')
         assert s.identifier == 19
@@ -70,7 +70,7 @@ class ParserTests(object):
         assert s.identifier == 19
         assert s.proper_count == 2
 
-    def test_basic(self):
+    def test_basic(self, execute_task):
         """SeriesParser: basic parsing"""
         s = self.parse(name='Something Interesting', data='The.Something.Interesting.S01E02-FlexGet')
         assert not s.valid, 'Should not be valid'
@@ -79,7 +79,7 @@ class ParserTests(object):
         assert s.valid, 'Fix the implementation, should be valid'
         assert s.identifier == 'S01E02', 'identifier broken'
 
-    def test_confusing_date(self):
+    def test_confusing_date(self, execute_task):
         """SeriesParser: confusing (invalid) numbering scheme"""
         s = self.parse(name='Something', data='Something.2008x12.13-FlexGet')
         assert not s.episode, 'Should not have episode'
@@ -88,11 +88,11 @@ class ParserTests(object):
         assert s.identifier == '2008-12-13', 'invalid id'
         assert s.valid, 'should be valid'
 
-    def test_unwanted_disc(self):
+    def test_unwanted_disc(self, execute_task):
         """SeriesParser: unwanted disc releases"""
         self.parse_invalid(name='Something', data='Something.S01D2.DVDR-FlexGet')
 
-    def test_season_x_ep(self):
+    def test_season_x_ep(self, execute_task):
         """SeriesParser: 01x02"""
         s = self.parse(name='Something', data='Something.01x02-FlexGet')
         assert (s.season == 1 and s.episode == 2), 'failed to parse 01x02'
@@ -104,7 +104,7 @@ class ParserTests(object):
         s = self.parse(name='Something', data='Something - This is the Subtitle 14x9 [Group-Name]')
         assert (s.season == 14 and s.episode == 9), 'failed to parse %s' % s.data
 
-    def test_ep_in_square_brackets(self):
+    def test_ep_in_square_brackets(self, execute_task):
         """SeriesParser: [S01] [E02] NOT IMPLEMENTED"""
         return
 
@@ -112,12 +112,12 @@ class ParserTests(object):
         s = self.parse(name='Something', data='Something [S01] [E02]')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
 
-    def test_ep_in_parenthesis(self):
+    def test_ep_in_parenthesis(self, execute_task):
         """SeriesParser: test ep in parenthesis"""
         s = self.parse(name='Something', data='Something (S01E02)')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
 
-    def test_season_episode(self):
+    def test_season_episode(self, execute_task):
         """SeriesParser: season X, episode Y"""
         s = self.parse(name='Something', data='Something - Season 3, Episode 2')
         assert (s.season == 3 and s.episode == 2), 'failed to parse %s' % s
@@ -128,7 +128,7 @@ class ParserTests(object):
         s = self.parse(name='Something', data='Something - Season2 Episode2')
         assert (s.season == 2 and s.episode == 2), 'failed to parse %s' % s
 
-    def test_series_episode(self):
+    def test_series_episode(self, execute_task):
         """SeriesParser: series X, episode Y"""
         s = self.parse(name='Something', data='Something - Series 2, Episode 2')
         assert (s.season == 2 and s.episode == 2), 'failed to parse %s' % s
@@ -139,7 +139,7 @@ class ParserTests(object):
         s = self.parse(name='Something', data='Something - Series4 Episode2')
         assert (s.season == 4 and s.episode == 2), 'failed to parse %s' % s
 
-    def test_episode(self):
+    def test_episode(self, execute_task):
         """SeriesParser: episode X (assume season 1)"""
         s = self.parse(name='Something', data='Something - Episode2')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
@@ -150,7 +150,7 @@ class ParserTests(object):
         s = self.parse(name='Something', data='Something - Episode VIII')
         assert (s.season == 1 and s.episode == 8), 'failed to parse %s' % s
 
-    def test_ep(self):
+    def test_ep(self, execute_task):
         """SeriesParser: ep X (assume season 1)"""
         s = self.parse(name='Something', data='Something - Ep2')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
@@ -161,7 +161,7 @@ class ParserTests(object):
         s = self.parse(name='Something', data='Something - Ep VIII')
         assert (s.season == 1 and s.episode == 8), 'failed to parse %s' % s
 
-    def test_season_episode_of_total(self):
+    def test_season_episode_of_total(self, execute_task):
         """SeriesParser: season X YofZ"""
         s = self.parse(name='Something', data='Something Season 2 2of12')
         assert (s.season == 2 and s.episode == 2), 'failed to parse %s' % s
@@ -169,7 +169,7 @@ class ParserTests(object):
         s = self.parse(name='Something', data='Something Season 2, 2 of 12')
         assert (s.season == 2 and s.episode == 2), 'failed to parse %s' % s
 
-    def test_episode_of_total(self):
+    def test_episode_of_total(self, execute_task):
         """SeriesParser: YofZ (assume season 1)"""
         s = self.parse(name='Something', data='Something 2of12')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
@@ -177,7 +177,7 @@ class ParserTests(object):
         s = self.parse(name='Something', data='Something 2 of 12')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s
 
-    def test_part(self):
+    def test_part(self, execute_task):
         """SeriesParser: test parsing part numeral (assume season 1)"""
         s = self.parse(name='Test', data='Test.Pt.I.720p-FlexGet')
         assert (s.season == 1 and s.episode == 1), 'failed to parse %s' % s
@@ -192,7 +192,7 @@ class ParserTests(object):
         s = self.parse(name='Test', data='Test.Part.One')
         assert (s.season == 1 and s.episode == 1), 'failed to parse %s' % s
 
-    def test_digits(self):
+    def test_digits(self, execute_task):
         """SeriesParser: digits (UID)"""
         s = self.parse(name='Something', data='Something 01 FlexGet')
         assert (s.id == 1), 'failed to parse %s' % s.data
@@ -210,7 +210,7 @@ class ParserTests(object):
         assert (s.id == 12), 'failed to parse %s' % s.data
         assert s.id_type == 'sequence'
 
-    def test_quality(self):
+    def test_quality(self, execute_task):
         """SeriesParser: quality"""
         s = self.parse(name='Foo Bar', data='Foo.Bar.S01E01.720p.HDTV.x264-FlexGet')
         assert (s.season == 1 and s.episode == 1), 'failed to parse episodes from %s' % s.data
@@ -225,7 +225,7 @@ class ParserTests(object):
         s = self.parse(name='ShowB', data='ShowB.S04E19.Name of Ep.720p.WEB-DL.DD5.1.H.264')
         assert s.quality.name == '720p webdl h264 dd5.1', 'failed to parse quality %s' % s.data
 
-    def test_quality_parenthesis(self):
+    def test_quality_parenthesis(self, execute_task):
         """SeriesParser: quality in parenthesis"""
         s = self.parse(name='Foo Bar', data='Foo.Bar.S01E01.[720p].HDTV.x264-FlexGet')
         assert (s.season == 1 and s.episode == 1), 'failed to parse episodes from %s' % s.data
@@ -239,7 +239,7 @@ class ParserTests(object):
         assert (s.season == 1 and s.episode == 1), 'failed to parse episodes from %s' % s.data
         assert (s.quality.name == '720p hdtv h264'), 'failed to parse quality from %s' % s.data
 
-    def test_numeric_names(self):
+    def test_numeric_names(self, execute_task):
         """SeriesParser: numeric names (24)"""
         s = self.parse(name='24', data='24.1x2-FlexGet')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s.data
@@ -247,7 +247,7 @@ class ParserTests(object):
         s = self.parse(name='90120', data='90120.1x2-FlexGet')
         assert (s.season == 1 and s.episode == 2), 'failed to parse %s' % s.data
 
-    def test_group_prefix(self):
+    def test_group_prefix(self, execute_task):
         """SeriesParser: [group] before name"""
         s = self.parse(name='Foo Bar', data='[l.u.l.z] Foo Bar - 11 (H.264) [5235532D].mkv')
         assert (s.id == 11), 'failed to parse %s' % s.data
@@ -255,19 +255,19 @@ class ParserTests(object):
         s = self.parse(name='Foo Bar', data='[7.1.7.5] Foo Bar - 11 (H.264) [5235532D].mkv')
         assert (s.id == 11), 'failed to parse %s' % s.data
 
-    def test_hd_prefix(self):
+    def test_hd_prefix(self, execute_task):
         """SeriesParser: HD 720p before name"""
         s = self.parse(name='Foo Bar', data='HD 720p: Foo Bar - 11 (H.264) [5235532D].mkv')
         assert (s.id == 11), 'failed to parse %s' % s.data
         assert (s.quality.name == '720p h264'), 'failed to pick up quality'
 
-    def test_partially_numeric(self):
+    def test_partially_numeric(self, execute_task):
         """SeriesParser: partially numeric names"""
         s = self.parse(name='Foo 2009', data='Foo.2009.S02E04.HDTV.XviD-2HD[FlexGet]')
         assert (s.season == 2 and s.episode == 4), 'failed to parse %s' % s.data
         assert (s.quality.name == 'hdtv xvid'), 'failed to parse quality from %s' % s.data
 
-    def test_ignore_seasonpacks(self):
+    def test_ignore_seasonpacks(self, execute_task):
         """SeriesParser: ignoring season packs"""
         #self.parse_invalid(name='The Foo', data='The.Foo.S04.1080p.FlexGet.5.1')
         self.parse_invalid(name='The Foo', data='The Foo S05 720p BluRay DTS x264-FlexGet')
@@ -288,26 +288,26 @@ class ParserTests(object):
         assert self.parse(name='Something', data='Something S01E03 Full Throttle').valid
 
 
-    def test_similar(self):
+    def test_similar(self, execute_task):
         s = self.parse(name='Foo Bar', data='Foo.Bar:Doppelganger.S02E04.HDTV.FlexGet', strict_name=True)
         assert not s.valid, 'should not have parser Foo.Bar:Doppelganger'
         s = self.parse(name='Foo Bar', data='Foo.Bar.Doppelganger.S02E04.HDTV.FlexGet', strict_name=True)
         assert not s.valid, 'should not have parser Foo.Bar.Doppelganger'
 
-    def test_idiotic_numbering(self):
+    def test_idiotic_numbering(self, execute_task):
         """SeriesParser: idiotic 101, 102, 103, .. numbering"""
         s = self.parse('Test.706.720p-FlexGet', name='test', identified_by='ep')
         assert s.season == 7, 'didn\'t pick up season'
         assert s.episode == 6, 'didn\'t pick up episode'
 
-    def test_idiotic_numbering_with_zero(self):
+    def test_idiotic_numbering_with_zero(self, execute_task):
         """SeriesParser: idiotic 0101, 0102, 0103, .. numbering"""
         s = self.parse('Test.0706.720p-FlexGet', name='test', identified_by='ep')
         assert s.season == 7, 'season missing'
         assert s.episode == 6, 'episode missing'
         assert s.identifier == 'S07E06', 'identifier broken'
 
-    def test_idiotic_invalid(self):
+    def test_idiotic_invalid(self, execute_task):
         """SeriesParser: idiotic confused by invalid"""
         s = self.parse('Test.Revealed.WS.PDTV.XviD-aAF.5190458.TPB.torrent', name='test', identified_by='ep')
         #assert_raises(ParseWarning, s.parse)
@@ -316,7 +316,7 @@ class ParserTests(object):
         assert not s.episode == 19, 'confused, got episode'
         assert not s.episode == 58, 'confused, got episode'
 
-    def test_zeroes(self):
+    def test_zeroes(self, execute_task):
         """SeriesParser: test zeroes as a season, episode"""
 
         for data in ['Test.S00E00-FlexGet', 'Test.S00E01-FlexGet', 'Test.S01E00-FlexGet']:
@@ -327,7 +327,7 @@ class ParserTests(object):
             assert isinstance(s.season, int), 'season is not a int for %s' % data
             assert isinstance(s.episode, int), 'season is not a int for %s' % data
 
-    def test_exact_name(self):
+    def test_exact_name(self, execute_task):
         """SeriesParser: test exact/strict name parsing"""
 
         s = self.parse('Test.Foobar.S01E02.720p-FlexGet', name='test')
@@ -342,7 +342,7 @@ class ParserTests(object):
         s = self.parse('Red Tomato (US) S01E02 720p-FlexGet', name='Red Tomato', strict_name=True)
         assert not s.valid, 'Red Tomato (US) should not match Red Tomato in exact mode'
 
-    def test_name_word_boundries(self):
+    def test_name_word_boundries(self, execute_task):
         name='test'
         s = self.parse('Test.S01E02.720p-FlexGet', name=name)
         assert s.valid, 'normal failed'
@@ -355,21 +355,21 @@ class ParserTests(object):
         s = self.parse('Testing.S01E02.720p-FlexGet', name=name)
         assert not s.valid, 'word border failed'
 
-    def test_quality_as_ep(self):
+    def test_quality_as_ep(self, execute_task):
         """SeriesParser: test that qualities are not picked as ep"""
         from flexget.utils import qualities
         for quality in qualities.all_components():
             s = self.parse('FooBar %s XviD-FlexGet' % quality.name, name='FooBar')
             #assert_raises(ParseWarning, s.parse)
 
-    def test_sound_as_ep(self):
+    def test_sound_as_ep(self, execute_task):
         """SeriesParser: test that sound infos are not picked as ep"""
         sounds = ['AC3', 'DD5.1', 'DTS']
         for sound in sounds:
             s = self.parse(data = 'FooBar %s XViD-FlexGet' % sound, name = 'FooBar')
             #assert_raises(ParseWarning, s.parse)
 
-    def test_ep_as_quality(self):
+    def test_ep_as_quality(self, execute_task):
         """SeriesParser: test that eps are not picked as qualities"""
         from flexget.utils import qualities
 
@@ -407,12 +407,12 @@ class ParserTests(object):
                 assert s.episode == int(mock_ep1), "confused episode %s with quality %s" % \
                                                   (mock_ep1, quality2.name)
 
-    def test_name_with_number(self):
+    def test_name_with_number(self, execute_task):
         """SeriesParser: test number in a name"""
         s = self.parse('Storage 13 no ep number', name='Storage 13')
         #assert_raises(ParseWarning, s.parse)
 
-    def test_name_uncorrupted(self):
+    def test_name_uncorrupted(self, execute_task):
         """SeriesParser: test name doesn't get corrupted when cleaned"""
         s = self.parse(name='The New Adventures of Old Christine',
                        data='The.New.Adventures.of.Old.Christine.S05E16.HDTV.XviD-FlexGet')
@@ -421,17 +421,17 @@ class ParserTests(object):
         assert s.episode == 16
         assert s.quality.name == 'hdtv xvid'
 
-    def test_from_groups(self):
+    def test_from_groups(self, execute_task):
         """SeriesParser: test from groups"""
         s = self.parse('Test.S01E01-Group', name='Test', allow_groups = ['xxxx', 'group'])
         assert s.group == 'group', 'did not get group'
 
-    def test_group_dashes(self):
+    def test_group_dashes(self, execute_task):
         """SeriesParser: group name around extra dashes"""
         s = self.parse('Test.S01E01-FooBar-Group', name='Test', allow_groups = ['xxxx', 'group'])
         assert s.group == 'group', 'did not get group with extra dashes'
 
-    def test_id_and_hash(self):
+    def test_id_and_hash(self, execute_task):
         """SeriesParser: Series with confusing hash"""
         s = self.parse(name='Something', data='Something 63 [560D3414]')
         assert (s.id == 63), 'failed to parse %s' % s.data
@@ -439,13 +439,13 @@ class ParserTests(object):
         s = self.parse(name='Something', data='Something 62 [293A8395]')
         assert (s.id == 62), 'failed to parse %s' % s.data
 
-    def test_ticket_700(self):
+    def test_ticket_700(self, execute_task):
         """SeriesParser: confusing name (#700)"""
         s = self.parse(name='Something', data='Something 9x02 - Episode 2')
         assert s.season == 9, 'failed to parse season'
         assert s.episode == 2, 'failed to parse episode'
 
-    def test_date_id(self):
+    def test_date_id(self, execute_task):
         """SeriesParser: Series with dates"""
         s = self.parse(name='Something', data='Something.2010.10.25')
         assert (s.identifier == '2010-10-25'), 'failed to parse %s' % s.data
@@ -490,7 +490,7 @@ class ParserTests(object):
         assert (s.identifier == '1993-02-01'), 'failed to parse %s' % s.data
         assert s.id_type == 'date'
 
-    def test_date_options(self):
+    def test_date_options(self, execute_task):
         # By default we should pick the latest interpretation
         s = self.parse(name='Something', data='Something 01-02-03')
         assert (s.identifier == '2003-02-01'), 'failed to parse %s' % s.data
@@ -507,18 +507,18 @@ class ParserTests(object):
         s = self.parse(name='Something', data='Something 01-02-03', date_dayfirst=False)
         assert (s.identifier == '2003-01-02'), 'failed to parse %s' % s.data
 
-    def test_season_title_episode(self):
+    def test_season_title_episode(self, execute_task):
         """SeriesParser: Series with title between season and episode"""
         s = self.parse(name='Something', data='Something.S5.Drunk.Santa.Part1')
         assert s.season == 5, 'failed to parse season'
         assert s.episode == 1, 'failed to parse episode'
 
-    def test_specials(self):
+    def test_specials(self, execute_task):
         """SeriesParser: Special episodes with no id"""
         s = self.parse(name='The Show', data='The Show 2005 A Christmas Carol 2010 Special 720p HDTV x264')
         assert s.valid, 'Special episode should be valid'
 
-    def test_double_episodes(self):
+    def test_double_episodes(self, execute_task):
         s = self.parse(name='Something', data='Something.S04E05-06')
         assert s.season == 4, 'failed to parse season'
         assert s.episode == 5, 'failed to parse episode'
@@ -542,7 +542,7 @@ class ParserTests(object):
         s = self.parse(name='Something', data='Something.S04E05')
         assert s.episodes == 1, 'should not have detected end_episode'
 
-    def test_and_replacement(self):
+    def test_and_replacement(self, execute_task):
         titles = ['Alpha.&.Beta.S01E02.hdtv', 'alpha.and.beta.S01E02.hdtv', 'alpha&beta.S01E02.hdtv']
         for title in titles:
             s = self.parse(name='Alpha & Beta', data=title)
@@ -553,12 +553,12 @@ class ParserTests(object):
         s = self.parse(name='Sandy Dunes', data='S&y Dunes.S01E01.hdtv')
         assert not s.valid
 
-    def test_unicode(self):
+    def test_unicode(self, execute_task):
         s = self.parse(name=u'abc äää abc', data=u'abc.äää.abc.s01e02')
         assert s.season == 1
         assert s.episode == 2
 
-    def test_parentheticals(self):
+    def test_parentheticals(self, execute_task):
         s = self.parse('The Show (US)', name="The Show (US)")
         # Make sure US is ok outside of parentheses
         s = self.parse('The.Show.US.S01E01', name="The Show (US)")
@@ -573,7 +573,7 @@ class ParserTests(object):
         s = self.parse('The Show (UK) S01E01', name="The Show (US)")
         assert not s.valid
 
-    def test_id_regexps(self):
+    def test_id_regexps(self, execute_task):
         id_regexps=['(dog)?e(cat)?']
         s = self.parse('The Show dogecat', name='The Show', id_regexps=id_regexps)
         assert s.valid
@@ -586,7 +586,7 @@ class ParserTests(object):
         assert s.id == 'cat'
         #assert_raises(ParseWarning, s.parse, 'The Show e')
 
-    def test_apostrophe(self):
+    def test_apostrophe(self, execute_task):
         s = self.parse(name=u"FlexGet's show", data=u"FlexGet's show s01e01")
         assert s.valid
         s = self.parse(name=u"FlexGet's show", data=u"FlexGets show s01e01")
@@ -599,7 +599,7 @@ class ParserTests(object):
         s = self.parse(name=u"FlexGet's show", data=u"FlexGet\\'s show s01e01")
         assert s.valid
 
-    def test_alternate_names(self):
+    def test_alternate_names(self, execute_task):
         name = 'The Show'
         alternate_names = ['Show', 'Completely Different']
         s = self.parse('The Show S01E01', name=name, alternate_names=alternate_names)
@@ -611,7 +611,7 @@ class ParserTests(object):
         s = self.parse('Not The Show S01E01', name=name, alternate_names=alternate_names)
         assert not s.valid
 
-    def test_long_season(self):
+    def test_long_season(self, execute_task):
         """SeriesParser: long season ID Ticket #2197"""
         s = self.parse(name='FlexGet', data='FlexGet.US.S2013E14.Title.Here.720p.HDTV.AAC5.1.x264-NOGRP')
         assert s.season == 2013

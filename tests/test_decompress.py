@@ -4,7 +4,6 @@ import shutil
 
 from nose.plugins.skip import SkipTest
 
-from tests import FlexGetBase
 
 try:
     import rarfile
@@ -12,9 +11,9 @@ except ImportError:
     rarfile = None
 
 
-class TestExtract(FlexGetBase):
+class TestExtract(object):
     __tmp__ = True
-    __yaml__ = """
+    config = """
         templates:
             global:
                 accept_all: yes
@@ -75,43 +74,43 @@ class TestExtract(FlexGetBase):
         self.temp_out = os.path.join(self.__tmp__, 'hooray.txt')
         self.temp_out_dir = os.path.join(self.__tmp__, 'directory', 'hooray.txt')
 
-    def test_rar(self):
+    def test_rar(self, execute_task):
         """Test basic RAR extraction"""
         if not rarfile:
             raise SkipTest('Needs RarFile module.')
         shutil.copy(self.rar_name, self.temp_rar)
-        self.execute_task('test_rar')
+        task = execute_task('test_rar')
 
         assert os.path.exists(self.temp_out), 'Output file does not exist at the correct path.'
         assert os.path.exists(self.temp_rar), 'RAR archive should still exist.'
 
-    def test_delete_rar(self):
+    def test_delete_rar(self, execute_task):
         """Test RAR deletion after extraction"""
         if not rarfile:
             raise SkipTest('Needs RarFile module.')
         shutil.copy(self.rar_name, self.temp_rar)
-        self.execute_task('test_delete_rar')
+        task = execute_task('test_delete_rar')
 
         assert not os.path.exists(self.temp_rar), 'RAR archive was not deleted.'
 
-    def test_zip(self):
+    def test_zip(self, execute_task):
         """Test basic Zip extraction"""
         shutil.copy(self.zip_name, self.temp_zip)
-        self.execute_task('test_zip')
+        task = execute_task('test_zip')
 
         assert os.path.exists(self.temp_out), 'Output file does not exist at the correct path.'
         assert os.path.exists(self.temp_zip), 'Zip archive should still exist.'
 
-    def test_keep_dirs(self):
+    def test_keep_dirs(self, execute_task):
         """Test directory creation"""
         shutil.copy(self.zip_name, self.temp_zip)
-        self.execute_task('test_keep_dirs')
+        task = execute_task('test_keep_dirs')
 
         assert os.path.exists(self.temp_out_dir), 'Output file does not exist at the correct path.'
 
-    def test_delete_zip(self):
+    def test_delete_zip(self, execute_task):
         """Test Zip deletion after extraction"""
         shutil.copy(self.zip_name, self.temp_zip)
-        self.execute_task('test_delete_zip')
+        task = execute_task('test_delete_zip')
 
         assert not os.path.exists(self.temp_zip), 'Zip archive was not deleted.'

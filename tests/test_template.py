@@ -1,9 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
 
 
-class TestTemplate(FlexGetBase):
-    __yaml__ = """
+class TestTemplate(object):
+    config = """
         templates:
           global:
             mock:
@@ -37,31 +36,31 @@ class TestTemplate(FlexGetBase):
               - no_global
     """
 
-    def test_preset1(self):
-        self.execute_task('test1')
-        assert self.task.find_entry(title='global'), 'test1, preset global not applied'
-        assert self.task.find_entry(title='movies'), 'test1, preset movies not applied'
+    def test_preset1(self, execute_task):
+        task = execute_task('test1')
+        assert task.find_entry(title='global'), 'test1, preset global not applied'
+        assert task.find_entry(title='movies'), 'test1, preset movies not applied'
 
-    def test_preset2(self):
-        self.execute_task('test2')
-        assert not self.task.find_entry(title='global'), 'test2, preset global applied'
-        assert not self.task.find_entry(title='movies'), 'test2, preset movies applied'
+    def test_preset2(self, execute_task):
+        task = execute_task('test2')
+        assert not task.find_entry(title='global'), 'test2, preset global applied'
+        assert not task.find_entry(title='movies'), 'test2, preset movies applied'
 
-    def test_preset3(self):
-        self.execute_task('test3')
-        assert not self.task.find_entry(title='global'), 'test3, preset global applied'
-        assert self.task.find_entry(title='movies'), 'test3, preset movies not applied'
+    def test_preset3(self, execute_task):
+        task = execute_task('test3')
+        assert not task.find_entry(title='global'), 'test3, preset global applied'
+        assert task.find_entry(title='movies'), 'test3, preset movies not applied'
 
-    def test_nested(self):
-        self.execute_task('test_nested')
-        assert self.task.find_entry(title='a'), 'Entry from preset a was not created'
-        assert self.task.find_entry(title='b'), 'Entry from preset b was not created'
-        assert len(self.task.entries) == 2, 'Should only have been 2 entries created'
+    def test_nested(self, execute_task):
+        task = execute_task('test_nested')
+        assert task.find_entry(title='a'), 'Entry from preset a was not created'
+        assert task.find_entry(title='b'), 'Entry from preset b was not created'
+        assert len(task.entries) == 2, 'Should only have been 2 entries created'
 
 
-class TestTemplateMerge(FlexGetBase):
+class TestTemplateMerge(object):
 
-    __yaml__ = """
+    config = """
         templates:
           movies:
             seen_movies: strict
@@ -84,14 +83,14 @@ class TestTemplateMerge(FlexGetBase):
                 - comedy
     """
 
-    def test_merge(self):
-        self.execute_task('test')
-        assert self.task.config['imdb']['min_score'] == 6.5, 'float merge failed'
-        assert 'comedy' in self.task.config['imdb']['reject_genres'], 'list merge failed'
+    def test_merge(self, execute_task):
+        task = execute_task('test')
+        assert task.config['imdb']['min_score'] == 6.5, 'float merge failed'
+        assert 'comedy' in task.config['imdb']['reject_genres'], 'list merge failed'
 
 
-class TestTemplateRerun(FlexGetBase):
-    __yaml__ = """
+class TestTemplateRerun(object):
+    config = """
         templates:
           a:
             series:
@@ -102,6 +101,6 @@ class TestTemplateRerun(FlexGetBase):
             rerun: 1
     """
 
-    def test_rerun(self):
-        self.execute_task('test_rerun')
-        assert len(self.task.config['series']) == 1
+    def test_rerun(self, execute_task):
+        task = execute_task('test_rerun')
+        assert len(task.config['series']) == 1

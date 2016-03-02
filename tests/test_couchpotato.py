@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import json
 import mock
-from tests import FlexGetBase
 
 movie_list_file = 'couchpotoato_movie_list_test_response.json'
 qualities_profiles_file = 'couchpotoato_quality_profile_test_response.json'
@@ -13,8 +12,8 @@ with open(qualities_profiles_file, "r") as data:
     qualities_response = json.load(data)
 
 
-class TestCouchpotato(FlexGetBase):
-    __yaml__ = """
+class TestCouchpotato(object):
+    config = """
         tasks:
           couch:
             couchpotato:
@@ -27,16 +26,16 @@ class TestCouchpotato(FlexGetBase):
     def test_couchpotato_no_data(self, mock_get):
         mock_get.return_value = movie_list_response
 
-        self.execute_task('couch')
+        task = execute_task('couch')
 
         assert mock_get.called, 'Did not access Couchpotato results.'
-        assert len(self.task._all_entries) == 31, 'Did not produce 31 entries'
-        for entry in self.task._all_entries:
+        assert len(task._all_entries) == 31, 'Did not produce 31 entries'
+        for entry in task._all_entries:
             assert entry['quality_req'] == '', 'Quality for entry {} should be empty, instead its {}'.format(
                 entry['title'], entry['quality_req'])
 
 
-class TestCouchpotatoWithQuality(FlexGetBase):
+class TestCouchpotatoWithQuality(object):
     expected_qualities = {'American Ultra': '720p|1080p',
                           'Anomalisa': '720p|1080p',
                           'Ant-Man': '720p',
@@ -69,7 +68,7 @@ class TestCouchpotatoWithQuality(FlexGetBase):
                           'True Story': '720p',
                           'Untitled Next Bourne Chapter': '720p',
                           }
-    __yaml__ = """
+    config = """
         tasks:
           couch:
             couchpotato:
@@ -91,10 +90,10 @@ class TestCouchpotatoWithQuality(FlexGetBase):
     @mock.patch('flexget.plugins.input.couchpotato.CouchPotato.get_json')
     def test_couchpotato_with_quality(self, mock_get):
         mock_get.side_effect = [movie_list_response, qualities_response]
-        self.execute_task('couch')
+        task = execute_task('couch')
 
         assert mock_get.call_count == 2
 
-        for entry in self.task._all_entries:
+        for entry in task._all_entries:
             self.quality_assertion(entry)
 

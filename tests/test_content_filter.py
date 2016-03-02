@@ -2,9 +2,9 @@ from __future__ import unicode_literals, division, absolute_import
 from tests import FlexGetBase, with_filecopy
 
 
-class TestContentFilter(FlexGetBase):
+class TestContentFilter(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test_reject1:
             mock:
@@ -71,56 +71,56 @@ class TestContentFilter(FlexGetBase):
     """
 
     @with_filecopy('test.torrent', 'test_reject1.torrent')
-    def test_reject1(self):
-        self.execute_task('test_reject1')
-        assert self.task.find_entry('rejected', title='test'), \
+    def test_reject1(self, execute_task):
+        task = execute_task('test_reject1')
+        assert task.find_entry('rejected', title='test'), \
             'should have rejected, contains *.iso'
 
     @with_filecopy('test.torrent', 'test_reject2.torrent')
-    def test_reject2(self):
-        self.execute_task('test_reject2')
-        assert self.task.find_entry('accepted', title='test'), \
+    def test_reject2(self, execute_task):
+        task = execute_task('test_reject2')
+        assert task.find_entry('accepted', title='test'), \
             'should have accepted, doesn\t contain *.avi'
 
     @with_filecopy('test.torrent', 'test_require1.torrent')
-    def test_require1(self):
-        self.execute_task('test_require1')
-        assert self.task.find_entry('accepted', title='test'), \
+    def test_require1(self, execute_task):
+        task = execute_task('test_require1')
+        assert task.find_entry('accepted', title='test'), \
             'should have accepted, contains *.iso'
 
     @with_filecopy('test.torrent', 'test_require2.torrent')
-    def test_require2(self):
-        self.execute_task('test_require2')
-        assert self.task.find_entry('rejected', title='test'), \
+    def test_require2(self, execute_task):
+        task = execute_task('test_require2')
+        assert task.find_entry('rejected', title='test'), \
             'should have rejected, doesn\t contain *.avi'
 
     @with_filecopy('test.torrent', 'test_require_all.torrent')
-    def test_require_all1(self):
-        self.execute_task('test_require_all1')
-        assert self.task.find_entry('accepted', title='test'), \
+    def test_require_all1(self, execute_task):
+        task = execute_task('test_require_all1')
+        assert task.find_entry('accepted', title='test'), \
             'should have accepted, both masks are satisfied'
 
     @with_filecopy('test.torrent', 'test_require_all.torrent')
-    def test_require_all2(self):
-        self.execute_task('test_require_all2')
-        assert self.task.find_entry('rejected', title='test'), \
+    def test_require_all2(self, execute_task):
+        task = execute_task('test_require_all2')
+        assert task.find_entry('rejected', title='test'), \
             'should have rejected, one mask isn\'t satisfied'
 
     @with_filecopy('test.torrent', 'test_strict.torrent')
-    def test_strict(self):
+    def test_strict(self, execute_task):
         """Content Filter: strict enabled"""
-        self.execute_task('test_strict')
-        assert self.task.find_entry('rejected', title='test'), \
+        task = execute_task('test_strict')
+        assert task.find_entry('rejected', title='test'), \
             'should have rejected non torrent'
 
-    def test_cache(self):
+    def test_cache(self, execute_task):
         """Content Filter: caching"""
-        self.execute_task('test_cache')
+        task = execute_task('test_cache')
 
-        assert self.task.find_entry('rejected', title='test'), \
+        assert task.find_entry('rejected', title='test'), \
             'should have rejected, contains *.iso'
 
         # Test that remember_rejected rejects the entry before us next time
-        self.execute_task('test_cache')
-        assert self.task.find_entry('rejected', title='test', rejected_by='remember_rejected'), \
+        task = execute_task('test_cache')
+        assert task.find_entry('rejected', title='test', rejected_by='remember_rejected'), \
             'should have rejected, content files present from the cache'

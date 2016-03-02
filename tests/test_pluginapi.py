@@ -4,7 +4,6 @@ import glob
 
 from nose.tools import raises
 
-from tests import FlexGetBase
 from flexget import plugin, plugins
 from flexget.event import event
 
@@ -15,15 +14,15 @@ class TestPluginApi(object):
     """
 
     @raises(plugin.DependencyError)
-    def test_unknown_plugin(self):
+    def test_unknown_plugin(self, execute_task):
         plugin.get_plugin_by_name('nonexisting_plugin')
 
-    def test_no_dupes(self):
+    def test_no_dupes(self, execute_task):
         plugin.load_plugins()
 
         assert plugin.PluginInfo.dupe_counter == 0, "Duplicate plugin names, see log"
 
-    def test_load(self):
+    def test_load(self, execute_task):
 
         plugin.load_plugins()
         plugin_path = os.path.dirname(plugins.__file__)
@@ -35,7 +34,7 @@ class TestPluginApi(object):
         # and one module can load multiple plugins TODO: Maybe consider some replacement
         # assert len(plugin.plugins) >= len(plugin_modules) - 1, "Less plugins than plugin modules"
 
-    def test_register_by_class(self):
+    def test_register_by_class(self, execute_task):
 
         class TestPlugin(object):
             pass
@@ -61,8 +60,8 @@ class TestPluginApi(object):
         assert 'test_html' in plugin.plugins
 
 
-class TestExternalPluginLoading(FlexGetBase):
-    __yaml__ = """
+class TestExternalPluginLoading(object):
+    config = """
         tasks:
           ext_plugin:
             external_plugin: yes
@@ -77,6 +76,6 @@ class TestExternalPluginLoading(FlexGetBase):
         del os.environ['FLEXGET_PLUGIN_PATH']
         super(TestExternalPluginLoading, self).teardown()
 
-    def test_external_plugin_loading(self):
-        self.execute_task('ext_plugin')
-        assert self.task.find_entry(title='test entry'), 'External plugin did not create entry'
+    def test_external_plugin_loading(self, execute_task):
+        task = execute_task('ext_plugin')
+        assert task.find_entry(title='test entry'), 'External plugin did not create entry'

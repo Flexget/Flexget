@@ -4,9 +4,9 @@ import os
 from tests.util import maketemp
 
 
-class BaseExistsSeries(FlexGetBase):
+class BaseExistsSeries(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -115,67 +115,67 @@ class BaseExistsSeries(FlexGetBase):
         os.rmdir(self.test_home)
         FlexGetBase.teardown(self)
 
-    def test_existing(self):
+    def test_existing(self, execute_task):
         """Exists_series plugin: existing"""
-        self.execute_task('test')
-        assert not self.task.find_entry('accepted', title='Foo.Bar.S01E02.XViD'), \
+        task = execute_task('test')
+        assert not task.find_entry('accepted', title='Foo.Bar.S01E02.XViD'), \
             'Foo.Bar.S01E02.XViD should not have been accepted (exists)'
-        assert self.task.find_entry('accepted', title='Foo.Bar.S01E03.XViD'), \
+        assert task.find_entry('accepted', title='Foo.Bar.S01E03.XViD'), \
             'Foo.Bar.S01E03.XViD should have been accepted'
 
-    def test_diff_qualities_allowed(self):
+    def test_diff_qualities_allowed(self, execute_task):
         """Exists_series plugin: existsting but w. diff quality"""
-        self.execute_task('test_diff_qualities_allowed')
-        assert self.task.find_entry('accepted', title='Asdf.S01E02.720p'), \
+        task = execute_task('test_diff_qualities_allowed')
+        assert task.find_entry('accepted', title='Asdf.S01E02.720p'), \
             'Asdf.S01E02.720p should have been accepted'
 
-    def test_diff_qualities_not_allowed(self):
+    def test_diff_qualities_not_allowed(self, execute_task):
         """Exists_series plugin: existsting but w. diff quality"""
-        self.execute_task('test_diff_qualities_not_allowed')
-        assert self.task.find_entry('rejected', title='Asdf.S01E02.720p'), \
+        task = execute_task('test_diff_qualities_not_allowed')
+        assert task.find_entry('rejected', title='Asdf.S01E02.720p'), \
             'Asdf.S01E02.720p should have been rejected'
 
-    def test_diff_qualities_downgrade(self):
+    def test_diff_qualities_downgrade(self, execute_task):
         """Test worse qualities than exist are rejected."""
-        self.execute_task('test_diff_qualities_downgrade')
-        assert self.task.find_entry('rejected', title='Asdf.S01E02.sdtv'), \
+        task = execute_task('test_diff_qualities_downgrade')
+        assert task.find_entry('rejected', title='Asdf.S01E02.sdtv'), \
             'Asdf.S01E02.sdtv should have been rejected'
 
-    def test_diff_qualities_upgrade(self):
+    def test_diff_qualities_upgrade(self, execute_task):
         """Test better qualities than exist are accepted."""
-        self.execute_task('test_diff_qualities_upgrade')
-        assert self.task.find_entry('accepted', title='Asdf.S01E02.webdl'), \
+        task = execute_task('test_diff_qualities_upgrade')
+        assert task.find_entry('accepted', title='Asdf.S01E02.webdl'), \
             'Asdf.S01E02.webdl should have been rejected'
 
-    def test_propers(self):
+    def test_propers(self, execute_task):
         """Exists_series plugin: new proper & proper already exists"""
-        self.execute_task('test_propers')
-        assert self.task.find_entry('accepted', title='Mock.S01E01.Proper'), \
+        task = execute_task('test_propers')
+        assert task.find_entry('accepted', title='Mock.S01E01.Proper'), \
             'new proper not accepted'
-        assert self.task.find_entry('rejected', title='Test.S01E01'), \
+        assert task.find_entry('rejected', title='Test.S01E01'), \
             'pre-existin proper should have caused reject'
 
-    def test_invalid(self):
+    def test_invalid(self, execute_task):
         """Exists_series plugin: no episode numbering on the disk"""
         # shouldn't raise anything
-        self.execute_task('test_invalid')
+        task = execute_task('test_invalid')
 
-    def test_with_metainfo_series(self):
+    def test_with_metainfo_series(self, execute_task):
         """Tests that exists_series works with series data from metainfo_series"""
-        self.execute_task('test_with_metainfo_series')
-        assert self.task.find_entry('rejected', title='Foo.Bar.S01E02.XViD'), \
+        task = execute_task('test_with_metainfo_series')
+        assert task.find_entry('rejected', title='Foo.Bar.S01E02.XViD'), \
             'Foo.Bar.S01E02.XViD should have been rejected(exists)'
-        assert not self.task.find_entry('rejected', title='Foo.Bar.S01E03.XViD'), \
+        assert not task.find_entry('rejected', title='Foo.Bar.S01E03.XViD'), \
             'Foo.Bar.S01E03.XViD should not have been rejected'
 
-    def test_jinja_path(self):
+    def test_jinja_path(self, execute_task):
         self.manager.config['tasks']['test_jinja_path']['exists_series'] += '/{{series_name}}'
-        self.execute_task('test_jinja_path')
-        assert self.task.find_entry('rejected', title='jinja s01e01'), \
+        task = execute_task('test_jinja_path')
+        assert task.find_entry('rejected', title='jinja s01e01'), \
             'jinja s01e01 should have been rejected (exists)'
-        assert self.task.find_entry('rejected', title='jinja2 s01e01'), \
+        assert task.find_entry('rejected', title='jinja2 s01e01'), \
             'jinja2 s01e01 should have been rejected (exists)'
-        assert self.task.find_entry('accepted', title='jinja s01e02'), \
+        assert task.find_entry('accepted', title='jinja s01e02'), \
             'jinja s01e02 should have been accepted'
 
 class TestGuessitExistsSeries(BaseExistsSeries):

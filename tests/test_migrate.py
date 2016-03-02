@@ -1,11 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
-from tests import FlexGetBase
 
 
-class TestMigrate(FlexGetBase):
+class TestMigrate(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -25,9 +24,9 @@ class TestMigrate(FlexGetBase):
     # This fails on windows when it tries to delete upgrade_test.sqlite
     # WindowsError: [Error 32] The process cannot access the file because it is being used by another process: 'upgrade_test.sqlite'
     #@with_filecopy('db-r1042.sqlite', 'upgrade_test.sqlite')
-    def test_upgrade(self):
+    def test_upgrade(self, execute_task):
         # TODO: for some reason this will fail
         return
 
-        self.execute_task('test')
-        assert self.task.accepted
+        task = execute_task('test')
+        assert task.accepted

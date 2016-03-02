@@ -4,7 +4,7 @@ from flexget.utils.soup import get_soup
 
 class TestHtml5Lib():
 
-    def test_parse_broken(self):
+    def test_parse_broken(self, execute_task):
         s = """<html>
 <head><title>Foo</title>
 <body>

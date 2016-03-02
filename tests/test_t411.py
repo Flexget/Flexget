@@ -118,18 +118,18 @@ class TestRestClient(object):
         del client.web_session.headers['Accept-Encoding']
         return client
 
-    def test_init_state(self):
+    def test_init_state(self, execute_task):
         client = self.build_unauthenticated_client()
         assert not client.is_authenticated()
 
     @use_vcr
-    def test_auth(self):
+    def test_auth(self, execute_task):
         client = self.build_unauthenticated_client()
         client.auth()
         assert client.is_authenticated(), 'Client is not authenticated (are you using mocked credentials online?)'
 
     @use_vcr
-    def test_retrieve_categories(self):
+    def test_retrieve_categories(self, execute_task):
         client = self.build_authenticated_client()
         json_tree_categories = client.retrieve_category_tree()
         json_category = json_tree_categories.get('210')
@@ -144,7 +144,7 @@ class TestRestClient(object):
         assert json_sub_category.get('name') == 'Film'
 
     @use_vcr
-    def test_retrieve_terms(self):
+    def test_retrieve_terms(self, execute_task):
         client = self.build_authenticated_client()
         json_terms = client.retrieve_terms_tree()
         assert json_terms is not None
@@ -155,7 +155,7 @@ class TestRestClient(object):
         assert term_type.get('mode') == 'single'
 
     @use_vcr
-    def test_malformed_search_response(self):
+    def test_malformed_search_response(self, execute_task):
         """
         Search without expression produces server response
         that contains some error messages. This test check
@@ -168,7 +168,7 @@ class TestRestClient(object):
         assert search_result.get('limit') == 10
 
     @use_vcr()
-    def test_error_message_handler(self):
+    def test_error_message_handler(self, execute_task):
         exception_was_raised = False
         client = T411RestClient()
         client.set_api_token('LEAVE:THIS:TOKEN:FALSE')
@@ -186,7 +186,7 @@ class TestObjectMapper(object):
     def __init__(self):
         self.mapper = T411ObjectMapper()
 
-    def test_map_category(self):
+    def test_map_category(self, execute_task):
         category = self.mapper.map_category({
             u'pid': u'0',
             u'id': u'210',
@@ -209,7 +209,7 @@ class TestObjectMapper(object):
         assert category.name == u'Film/Vidéo'
         assert len(category.sub_categories) == 10
 
-    def test_map_term_type_tree(self):
+    def test_map_term_type_tree(self, execute_task):
         tree = {
             "234": {
                 "11": {
@@ -249,8 +249,8 @@ class TestObjectMapper(object):
         assert term_types.get(11).terms[0].name == "Edition multimédia"
 
 
-class TestProxy(FlexGetBase):
-    def test_offline_proxy(self):
+class TestProxy(object):
+    def test_offline_proxy(self, execute_task):
         proxy = T411Proxy()
         proxy.rest_client = MockRestClient()
         assert not proxy.has_cached_criterias()
@@ -266,7 +266,7 @@ class TestProxy(FlexGetBase):
         assert proxy.rest_client.last_query['category_id'] == 14
         assert proxy.rest_client.last_query['expression'] == 'Mickey'
 
-    def test_details(self):
+    def test_details(self, execute_task):
         proxy = T411Proxy()
         proxy.rest_client = MockRestClient()
         details = proxy.details(123123)
@@ -280,8 +280,8 @@ class TestProxy(FlexGetBase):
         assert proxy.rest_client.details_called == False, 'Proxy not used the cache'
 
 
-class TestInputPlugin(FlexGetBase):
-    __yaml__ = """
+class TestInputPlugin(object):
+    config = """
         tasks:
           series:
             - Mickey vs Donald
@@ -304,10 +304,10 @@ class TestInputPlugin(FlexGetBase):
         mock_term.return_value = MockRestClient.term_result
         mock_search.return_value = MockRestClient.search_result
         mock_auth.return_value = None
-        self.execute_task('uncached_db')
-        log.debug(self.task.all_entries)
-        assert len(self.task.all_entries) == 1
-        entry = self.task.all_entries[0]
+        task = execute_task('uncached_db')
+        log.debug(task.all_entries)
+        assert len(task.all_entries) == 1
+        entry = task.all_entries[0]
         quality = entry.get('quality')
         assert quality is not None
         log.debug(quality)

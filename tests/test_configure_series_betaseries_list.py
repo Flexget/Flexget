@@ -1,6 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
 from mock import patch, call
-from tests import FlexGetBase
 import flexget.plugins.input.betaseries_list
 
 
@@ -18,9 +17,9 @@ def assert_series_count_in_db(expected_count):
                                                   (expected_count, actual_series_count)
 
 
-class Test_configure_series_betaseries_list(FlexGetBase):
+class Test_configure_series_betaseries_list(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test_no_members:
             configure_series:
@@ -69,27 +68,27 @@ class Test_configure_series_betaseries_list(FlexGetBase):
         self.create_token_patcher.stop()
         self.query_series_patcher.stop()
 
-    def test_no_members(self):
+    def test_no_members(self, execute_task):
         # GIVEN
         self.query_series_mock.return_value = ["Breaking Bad", "Dexter"]
         # WHEN
-        self.execute_task('test_no_members')
+        task = execute_task('test_no_members')
         # THEN
         assert_series_count_in_db(2)
         assert_mock_calls([call('api_key_foo', 'user_foo', 'passwd_foo')],  self.create_token_mock)
         assert_mock_calls([call('api_key_foo', 'token_foo', 'user_foo')], self.query_series_mock)
 
-    def test_with_one_members(self):
+    def test_with_one_members(self, execute_task):
         # GIVEN
         self.query_series_mock.return_value = ["Breaking Bad", "Dexter", "The Simpsons"]
         # WHEN
-        self.execute_task('test_with_one_members')
+        task = execute_task('test_with_one_members')
         # THEN
         assert_series_count_in_db(3)
         assert_mock_calls([call('api_key_foo', 'user_foo', 'passwd_foo')],  self.create_token_mock)
         assert_mock_calls([call('api_key_foo', 'token_foo', 'other_member_1')], self.query_series_mock)
 
-    def test_with_two_members(self):
+    def test_with_two_members(self, execute_task):
         # GIVEN
         return_values_generator = (val for val in [
             ["Family guy", "The Simpsons"],
@@ -97,7 +96,7 @@ class Test_configure_series_betaseries_list(FlexGetBase):
         ])
         self.query_series_mock.side_effect = lambda *args: return_values_generator.next()
         # WHEN
-        self.execute_task('test_with_two_members')
+        task = execute_task('test_with_two_members')
         # THEN
         assert_series_count_in_db(4)
         assert_mock_calls([call('api_key_foo', 'user_foo', 'passwd_foo')],  self.create_token_mock)

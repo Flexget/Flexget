@@ -5,9 +5,9 @@ from tests import FlexGetBase, with_filecopy, use_vcr
 from flexget.utils.bittorrent import Torrent
 
 
-class TestInfoHash(FlexGetBase):
+class TestInfoHash(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -21,23 +21,23 @@ class TestInfoHash(FlexGetBase):
                 urls: ['magnet:?xt=urn:btih:2b3959bed2be445bb0e3ea96f497d873d5faed05&dn=some.thing.else.720p']
     """
 
-    def test_infohash(self):
+    def test_infohash(self, execute_task):
         """Torrent: infohash parsing"""
-        self.execute_task('test')
-        info_hash = self.task.entries[0].get('torrent_info_hash')
+        task = execute_task('test')
+        info_hash = task.entries[0].get('torrent_info_hash')
         assert info_hash == '14FFE5DD23188FD5CB53A1D47F1289DB70ABF31E', \
             'InfoHash does not match (got %s)' % info_hash
 
-    def test_magnet_infohash(self):
+    def test_magnet_infohash(self, execute_task):
         """Tests metainfo/magnet_btih plugin"""
-        self.execute_task('test_magnet')
-        assert self.task.all_entries[0]['torrent_info_hash'] == '2A8959BED2BE495BB0E3EA96F497D873D5FAED05'
-        assert self.task.all_entries[1]['torrent_info_hash'] == '2B3959BED2BE445BB0E3EA96F497D873D5FAED05'
+        task = execute_task('test_magnet')
+        assert task.all_entries[0]['torrent_info_hash'] == '2A8959BED2BE495BB0E3EA96F497D873D5FAED05'
+        assert task.all_entries[1]['torrent_info_hash'] == '2B3959BED2BE445BB0E3EA96F497D873D5FAED05'
 
 
-class TestSeenInfoHash(FlexGetBase):
+class TestSeenInfoHash(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -55,22 +55,22 @@ class TestSeenInfoHash(FlexGetBase):
     """
 
     @with_filecopy('test.torrent', 'test2.torrent')
-    def test_seen_info_hash(self):
-        self.execute_task('test')
-        assert self.task.find_entry('accepted', title='test'), 'torrent should have been accepted on first run'
-        self.execute_task('test2')
-        assert self.task.find_entry('rejected', title='test2'), 'torrent should have been rejected on second run'
+    def test_seen_info_hash(self, execute_task):
+        task = execute_task('test')
+        assert task.find_entry('accepted', title='test'), 'torrent should have been accepted on first run'
+        task = execute_task('test2')
+        assert task.find_entry('rejected', title='test2'), 'torrent should have been rejected on second run'
 
-    def test_same_run(self):
+    def test_same_run(self, execute_task):
         # Test that 2 entries with the same info hash don't get accepted on the same run.
         # Also tests that the plugin compares info hash case insensitively.
-        self.execute_task('test_same_run')
-        assert len(self.task.accepted) == 1, 'Should not have accepted both entries with the same info hash'
+        task = execute_task('test_same_run')
+        assert len(task.accepted) == 1, 'Should not have accepted both entries with the same info hash'
 
 
-class TestModifyTrackers(FlexGetBase):
+class TestModifyTrackers(object):
 
-    __yaml__ = """
+    config = """
         templates:
           global:
             accept_all: yes
@@ -108,27 +108,27 @@ class TestModifyTrackers(FlexGetBase):
         return Torrent(data)
 
     @with_filecopy('test.torrent', 'test_add_trackers.torrent')
-    def test_add_trackers(self):
-        self.execute_task('test_add_trackers')
+    def test_add_trackers(self, execute_task):
+        task = execute_task('test_add_trackers')
         torrent = self.load_torrent('test_add_trackers.torrent')
         assert 'udp://thetracker.com/announce' in torrent.trackers, \
             'udp://thetracker.com/announce should have been added to trackers'
         # Check magnet url
-        assert 'tr=udp://thetracker.com/announce' in self.task.find_entry(title='test_magnet')['url']
+        assert 'tr=udp://thetracker.com/announce' in task.find_entry(title='test_magnet')['url']
 
     @with_filecopy('test.torrent', 'test_remove_trackers.torrent')
-    def test_remove_trackers(self):
-        self.execute_task('test_remove_trackers')
+    def test_remove_trackers(self, execute_task):
+        task = execute_task('test_remove_trackers')
         torrent = self.load_torrent('test_remove_trackers.torrent')
         assert 'http://ipv6.torrent.ubuntu.com:6969/announce' not in torrent.trackers, \
             'ipv6 tracker should have been removed'
 
         # Check magnet url
-        assert 'tr=http://ipv6.torrent.ubuntu.com:6969/announce' not in self.task.find_entry(title='test_magnet')['url']
+        assert 'tr=http://ipv6.torrent.ubuntu.com:6969/announce' not in task.find_entry(title='test_magnet')['url']
 
     @with_filecopy('test.torrent', 'test_modify_trackers.torrent')
-    def test_modify_trackers(self):
-        self.execute_task('test_modify_trackers')
+    def test_modify_trackers(self, execute_task):
+        task = execute_task('test_modify_trackers')
         torrent = self.load_torrent('test_modify_trackers.torrent')
         assert 'http://torrent.replaced.com:6969/announce' in torrent.trackers, \
             'ubuntu tracker should have been added'
@@ -139,9 +139,9 @@ class TestModifyTrackers(FlexGetBase):
             'ubuntu tracker should have been removed'
 
 
-class TestPrivateTorrents(FlexGetBase):
+class TestPrivateTorrents(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -151,16 +151,16 @@ class TestPrivateTorrents(FlexGetBase):
             private_torrents: no
     """
 
-    def test_private_torrents(self):
-        self.execute_task('test')
-        assert self.task.find_entry('rejected', title='test_private'), 'did not reject private torrent'
-        assert self.task.find_entry('accepted', title='test_public'), 'did not pass public torrent'
+    def test_private_torrents(self, execute_task):
+        task = execute_task('test')
+        assert task.find_entry('rejected', title='test_private'), 'did not reject private torrent'
+        assert task.find_entry('accepted', title='test_public'), 'did not pass public torrent'
 
 
-class TestTorrentScrub(FlexGetBase):
+class TestTorrentScrub(object):
 
     __tmp__ = True
-    __yaml__ = """
+    config = """
         tasks:
           test_all:
             mock:
@@ -195,16 +195,16 @@ class TestTorrentScrub(FlexGetBase):
     test_files = [i[1] for i in test_cases]
 
     @with_filecopy(test_files, "__tmp__")
-    def test_torrent_scrub(self):
+    def test_torrent_scrub(self, execute_task):
         # Run task
-        self.execute_task('test_all')
+        task = execute_task('test_all')
 
         for clean, filename in self.test_cases:
             original = Torrent.from_file(filename)
             title = os.path.splitext(filename)[0]
 
-            modified = self.task.find_entry(title=title)
-            assert modified, "%r cannot be found in %r" % (title, self.task)
+            modified = task.find_entry(title=title)
+            assert modified, "%r cannot be found in %r" % (title, task)
             modified = modified.get('torrent')
             assert modified, "No 'torrent' key in %r" % (title,)
 
@@ -241,11 +241,11 @@ class TestTorrentScrub(FlexGetBase):
                 assert 'libtorrent_resume' not in modified.content
 
     @with_filecopy(test_files, "__tmp__")
-    def test_torrent_scrub_fields(self):
-        self.execute_task('test_fields')
+    def test_torrent_scrub_fields(self, execute_task):
+        task = execute_task('test_fields')
         title = 'fields.LICENSE'
-        torrent = self.task.find_entry(title=title)
-        assert torrent, "%r cannot be found in %r" % (title, self.task)
+        torrent = task.find_entry(title=title)
+        assert torrent, "%r cannot be found in %r" % (title, task)
         torrent = torrent.get('torrent')
         assert torrent, "No 'torrent' key in %r" % (title,)
 
@@ -254,8 +254,8 @@ class TestTorrentScrub(FlexGetBase):
         assert 'x_cross_seed' not in torrent.content['info'], "'info.x_cross_seed' not scrubbed"
 
     @with_filecopy(test_files, "__tmp__")
-    def test_torrent_scrub_off(self):
-        self.execute_task('test_off')
+    def test_torrent_scrub_off(self, execute_task):
+        task = execute_task('test_off')
 
         for filename in self.test_files:
             osize = os.path.getsize(filename)
@@ -264,8 +264,8 @@ class TestTorrentScrub(FlexGetBase):
                 filename, osize, self.__tmp__ + filename, msize)
 
 
-class TestTorrentAlive(FlexGetBase):
-    __yaml__ = """
+class TestTorrentAlive(object):
+    config = """
         templates:
           global:
             accept_all: yes
@@ -282,26 +282,26 @@ class TestTorrentAlive(FlexGetBase):
 
     @use_vcr
     @with_filecopy('test.torrent', 'test_torrent_alive.torrent')
-    def test_torrent_alive_fail(self):
-        self.execute_task('test_torrent_alive_fail')
-        assert not self.task.accepted, 'Torrent should not have met seed requirement.'
-        assert self.task._rerun_count == 1, ('Task should have been rerun 1 time. Was rerun %s times.' %
-                                             self.task._rerun_count)
+    def test_torrent_alive_fail(self, execute_task):
+        task = execute_task('test_torrent_alive_fail')
+        assert not task.accepted, 'Torrent should not have met seed requirement.'
+        assert task._rerun_count == 1, ('Task should have been rerun 1 time. Was rerun %s times.' %
+                                             task._rerun_count)
 
         # Run it again to make sure remember_rejected prevents a rerun from occurring
-        self.execute_task('test_torrent_alive_fail')
-        assert not self.task.accepted, 'Torrent should have been rejected by remember_rejected.'
-        assert self.task._rerun_count == 0, 'Task should not have been rerun.'
+        task = execute_task('test_torrent_alive_fail')
+        assert not task.accepted, 'Torrent should have been rejected by remember_rejected.'
+        assert task._rerun_count == 0, 'Task should not have been rerun.'
 
     @use_vcr
     @with_filecopy('test.torrent', 'test_torrent_alive.torrent')
-    def test_torrent_alive_pass(self):
-        self.execute_task('test_torrent_alive_pass')
-        assert self.task.accepted
-        assert self.task._rerun_count == 0, 'Torrent should have been accepted without rerun.'
+    def test_torrent_alive_pass(self, execute_task):
+        task = execute_task('test_torrent_alive_pass')
+        assert task.accepted
+        assert task._rerun_count == 0, 'Torrent should have been accepted without rerun.'
 
     @use_vcr
-    def test_torrent_alive_udp_invalid_port(self):
+    def test_torrent_alive_udp_invalid_port(self, execute_task):
         from flexget.plugins.filter.torrent_alive import get_udp_seeds
         assert get_udp_seeds('udp://[2001::1]/announce','HASH') == 0
         assert get_udp_seeds('udp://[::1]/announce','HASH') == 0
@@ -311,9 +311,9 @@ class TestTorrentAlive(FlexGetBase):
         assert get_udp_seeds('udp://127.0.0.1:PORT/announce','HASH') == 0
         assert get_udp_seeds('udp://127.0.0.1:65536/announce','HASH') == 0
 
-class TestRtorrentMagnet(FlexGetBase):
+class TestRtorrentMagnet(object):
     __tmp__ = True
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -324,8 +324,8 @@ class TestRtorrentMagnet(FlexGetBase):
     """
 
 
-    def test_rtorrent_magnet(self):
-        self.execute_task('test')
+    def test_rtorrent_magnet(self, execute_task):
+        task = execute_task('test')
         filename = 'meta-test.torrent'
         fullpath = os.path.join(self.__tmp__, filename)
         assert os.path.isfile(fullpath)
