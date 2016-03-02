@@ -1,0 +1,41 @@
+<md-content flex layout-margin>
+	<md-tabs md-dynamic-height md-border-bottom>
+		<md-tab label="All series" >
+            <div layout-gt-sm="row">
+                <md-input-container flex layout-align="end center">
+                    <label>Search</label>
+                    <input ng-model="vm.searchTerm" ng-change="vm.search()" ng-model-options="{ debounce: 1000 }">
+                </md-input-container>
+            </div>
+			<md-list>
+    			<md-list-item class="md-3-line" ng-repeat="show in vm.series">
+    				<md-card flex>
+    					<md-card-title>
+    						<md-card-title-text>
+    							<span class="md-headline">{{ show.show_name }}</span>
+    							<span class="md-subhead">Latest: {{ show.latest_downloaded_episode.episode_identifier ? show.latest_downloaded_episode.episode_identifier : 'No yet' }}</span>
+    						</md-card-title-text>
+    					</md-card-title>
+    					<md-card-content layout="row" layout-align="space-between" class="custom-card">
+    						<div class="md-media-lg series-image">
+                                <img ng-src="http://www.thetvdb.com/banners/{{ show.metadata.poster }}">                  
+                            </div>
+    						<p>{{ show.metadata.overview }}</p>
+    					</md-card-content>
+    					<md-card-actions layout="row" layout-align="end center">
+    						<md-button class="md-primary md-raised" ng-click="vm.gotoEpisodes(show.show_id)">Episodes</md-button>
+    						<!--<md-button class="md-primary md-raised">Configure</md-button>-->
+                            <md-button class="md-warn md-raised" ng-click="vm.forgetSeries(show)">Forget</md-button>
+    					</md-card-actions>
+    				</md-card>
+        			<!--<div class="md-list-item-text" layout="column">
+			        	<h3>{{ show.show_name }}</h3>
+			        	<p class="md-secondary">Latest: {{ show.latest_downloaded_episode.episode_identifier ? show.latest_downloaded_episode.episode_identifier : 'No yet' }}</p>
+			            <a ui-sref="flexget.episodes({ id: show.show_id })">Episodes</a>
+			        </div>-->
+			    </md-list-item>
+                <fg-material-pagination page="vm.currentPage" page-size="vm.pageSize" total="vm.totalShows" active-class="md-primary" paging-action="vm.updateListPage(index)"></fg-material-pagination>
+			</md-list>
+		</md-tab>
+	</md-tabs>
+</md-content>
