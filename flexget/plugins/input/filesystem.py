@@ -4,6 +4,7 @@ import re
 import sys
 import urllib
 import urlparse
+import os
 from datetime import datetime
 
 from path import Path
@@ -110,6 +111,9 @@ class Filesystem(object):
         entry['location'] = filepath
         entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(filepath.encode('utf8')))
         entry['filename'] = filepath.name
+        entry['full_path'] = os.path.dirname(filepath.encode('utf8'))
+        entry['parent_folder'] = os.path.split(entry['full_path'])[1]
+
         if filepath.isfile():
             entry['title'] = filepath.namebase
         else:
@@ -127,6 +131,8 @@ class Filesystem(object):
                 log.info("    Filename: %s" % entry["filename"])
                 log.info("    Location: %s" % entry["location"])
                 log.info("    Timestamp: %s" % entry["timestamp"])
+                log.info("    Parent Folder Name: %s" % entry["parent_folder"])
+                log.info("    Full Path: %s" % entry["full_path"])
             return entry
         else:
             log.error('Non valid entry created: %s ' % entry)
