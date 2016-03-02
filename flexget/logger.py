@@ -173,9 +173,8 @@ def initialize(unit_test=False):
     logging.addLevelName(VERBOSE, 'VERBOSE')
     _logging_configured = True
 
-    # with unit test we want a bit simpler setup
+    # with unit test we want pytest to add the handlers
     if unit_test:
-        logging.basicConfig()
         _logging_started = True
         return
 
