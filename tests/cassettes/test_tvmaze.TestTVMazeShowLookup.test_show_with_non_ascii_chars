@@ -10,15 +10,19 @@ interactions:
   response:
     body: {string: "{\"id\":8652,\"url\":\"http://www.tvmaze.com/shows/8652/unite-9\",\"name\":\"Unit\xE9
         9\",\"type\":\"Scripted\",\"language\":\"French\",\"genres\":[],\"status\":\"Running\",\"runtime\":45,\"premiered\":\"2012-09-11\",\"schedule\":{\"time\":\"20:00\",\"days\":[\"Wednesday\"]},\"rating\":{\"average\":null},\"weight\":0,\"network\":{\"id\":451,\"name\":\"ICI
-        Radio-Canada T\xE9l\xE9\",\"country\":{\"name\":\"Canada\",\"code\":\"CA\",\"timezone\":\"Canada/Atlantic\"}},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":261952},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/30/77041.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/30/77041.jpg\"},\"summary\":\"\",\"updated\":1448242776,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/8652\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/485612\"}},\"_embedded\":{\"cast\":[]}}"}
+        Radio-Canada T\xE9l\xE9\",\"country\":{\"name\":\"Canada\",\"code\":\"CA\",\"timezone\":\"Canada/Atlantic\"}},\"webChannel\":null,\"externals\":{\"tvrage\":null,\"thetvdb\":261952,\"imdb\":\"tt2388350\"},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/30/77041.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/30/77041.jpg\"},\"summary\":\"\",\"updated\":1452815788,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/8652\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/485612\"}},\"_embedded\":{\"cast\":[{\"person\":{\"id\":109492,\"url\":\"http://www.tvmaze.com/people/109492/guylaine-tremblay\",\"name\":\"Guylaine
+        Tremblay\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/39/98646.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/39/98646.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/109492\"}}},\"character\":{\"id\":230261,\"url\":\"http://www.tvmaze.com/characters/230261/unite-9-marie-lamontagne\",\"name\":\"Marie
+        Lamontagne\",\"image\":null,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/230261\"}}}},{\"person\":{\"id\":112530,\"url\":\"http://www.tvmaze.com/people/112530/celine-bonnier\",\"name\":\"C\xE9line
+        Bonnier\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/42/106484.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/42/106484.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/112530\"}}},\"character\":{\"id\":230262,\"url\":\"http://www.tvmaze.com/characters/230262/unite-9-suzanne-beauchemin\",\"name\":\"Suzanne
+        Beauchemin\",\"image\":null,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/230262\"}}}}]}}"}
     headers:
       access-control-allow-origin: ['*']
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 29 Dec 2015 09:59:43 GMT']
+      date: ['Thu, 03 Mar 2016 14:50:30 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
     status: {code: 200, message: OK}
 - request:
     body: null
@@ -36,8 +40,8 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Tue, 29 Dec 2015 09:59:43 GMT']
+      date: ['Thu, 03 Mar 2016 14:50:31 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
-      x-powered-by: [PHP/5.5.9-1ubuntu4.11]
+      x-powered-by: [PHP/5.5.9-1ubuntu4.14]
     status: {code: 200, message: OK}
 version: 1

@@ -9,7 +9,7 @@ interactions:
     uri: http://api.tvmaze.com/shows/13?embed=cast
   response:
     body: {string: "{\"id\":13,\"url\":\"http://www.tvmaze.com/shows/13/the-flash\",\"name\":\"The
-        Flash\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Action\",\"Adventure\",\"Fantasy\"],\"status\":\"Running\",\"runtime\":60,\"premiered\":\"2014-10-07\",\"schedule\":{\"time\":\"20:00\",\"days\":[\"Tuesday\"]},\"rating\":{\"average\":8.3},\"weight\":36,\"network\":{\"id\":5,\"name\":\"The
+        Flash\",\"type\":\"Scripted\",\"language\":\"English\",\"genres\":[\"Drama\",\"Action\",\"Adventure\",\"Science-Fiction\"],\"status\":\"Running\",\"runtime\":60,\"premiered\":\"2014-10-07\",\"schedule\":{\"time\":\"20:00\",\"days\":[\"Tuesday\"]},\"rating\":{\"average\":8.3},\"weight\":50,\"network\":{\"id\":5,\"name\":\"The
         CW\",\"country\":{\"name\":\"United States\",\"code\":\"US\",\"timezone\":\"America/New_York\"}},\"webChannel\":null,\"externals\":{\"tvrage\":36939,\"thetvdb\":279121,\"imdb\":\"tt3107288\"},\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/148.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/148.jpg\"},\"summary\":\"<p>After
         a particle accelerator causes a freak storm, CSI Investigator Barry Allen
         is struck by lightning and falls into a coma. Months later he awakens with
@@ -20,15 +20,15 @@ interactions:
         is using their new powers for good. Barry partners with S.T.A.R. Labs and
         dedicates his life to protect the innocent. For now, only a few close friends
         and associates know that Barry is literally the fastest man alive, but it
-        won't be long before the world learns what Barry Allen has become...The Flash.</p>\",\"updated\":1454485664,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/13\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/526408\"},\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/578912\"}},\"_embedded\":{\"cast\":[{\"person\":{\"id\":634,\"url\":\"http://www.tvmaze.com/people/634/danielle-panabaker\",\"name\":\"Danielle
-        Panabaker\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6033.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6033.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/634\"}}},\"character\":{\"id\":2296,\"url\":\"http://www.tvmaze.com/characters/2296/the-flash-caitlin-snow\",\"name\":\"Caitlin
-        Snow\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/150.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/150.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2296\"}}}},{\"person\":{\"id\":2568,\"url\":\"http://www.tvmaze.com/people/2568/jesse-l-martin\",\"name\":\"Jesse
+        won't be long before the world learns what Barry Allen has become...The Flash.</p>\",\"updated\":1456662415,\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/shows/13\"},\"previousepisode\":{\"href\":\"http://api.tvmaze.com/episodes/600637\"},\"nextepisode\":{\"href\":\"http://api.tvmaze.com/episodes/622447\"}},\"_embedded\":{\"cast\":[{\"person\":{\"id\":2568,\"url\":\"http://www.tvmaze.com/people/2568/jesse-l-martin\",\"name\":\"Jesse
         L. Martin\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6036.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6036.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2568\"}}},\"character\":{\"id\":2299,\"url\":\"http://www.tvmaze.com/characters/2299/the-flash-detective-joe-west\",\"name\":\"Detective
         Joe West\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/1174.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/1174.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2299\"}}}},{\"person\":{\"id\":578,\"url\":\"http://www.tvmaze.com/people/578/grant-gustin\",\"name\":\"Grant
         Gustin\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5936.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5936.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/578\"}}},\"character\":{\"id\":2293,\"url\":\"http://www.tvmaze.com/characters/2293/the-flash-barry-allen-the-flash\",\"name\":\"Barry
         Allen / The Flash\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/1172.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/1172.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2293\"}}}},{\"person\":{\"id\":2565,\"url\":\"http://www.tvmaze.com/people/2565/candice-patton\",\"name\":\"Candice
         Patton\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/5942.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/5942.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2565\"}}},\"character\":{\"id\":2294,\"url\":\"http://www.tvmaze.com/characters/2294/the-flash-iris-west\",\"name\":\"Iris
-        West\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/152.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/152.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2294\"}}}},{\"person\":{\"id\":633,\"url\":\"http://www.tvmaze.com/people/633/carlos-valdes\",\"name\":\"Carlos
+        West\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/152.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/152.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2294\"}}}},{\"person\":{\"id\":634,\"url\":\"http://www.tvmaze.com/people/634/danielle-panabaker\",\"name\":\"Danielle
+        Panabaker\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6033.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6033.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/634\"}}},\"character\":{\"id\":2296,\"url\":\"http://www.tvmaze.com/characters/2296/the-flash-caitlin-snow\",\"name\":\"Caitlin
+        Snow\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/150.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/150.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2296\"}}}},{\"person\":{\"id\":633,\"url\":\"http://www.tvmaze.com/people/633/carlos-valdes\",\"name\":\"Carlos
         Vald\xE9s\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6034.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6034.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/633\"}}},\"character\":{\"id\":2297,\"url\":\"http://www.tvmaze.com/characters/2297/the-flash-cisco-ramon\",\"name\":\"Cisco
         Ramon\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/0/153.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/0/153.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/characters/2297\"}}}},{\"person\":{\"id\":2567,\"url\":\"http://www.tvmaze.com/people/2567/tom-cavanagh\",\"name\":\"Tom
         Cavanagh\",\"image\":{\"medium\":\"http://tvmazecdn.com/uploads/images/medium_portrait/2/6035.jpg\",\"original\":\"http://tvmazecdn.com/uploads/images/original_untouched/2/6035.jpg\"},\"_links\":{\"self\":{\"href\":\"http://api.tvmaze.com/people/2567\"}}},\"character\":{\"id\":175145,\"url\":\"http://www.tvmaze.com/characters/175145/the-flash-dr-harrison-wells-reverse-flash\",\"name\":\"Dr.
@@ -44,7 +44,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Wed, 03 Feb 2016 08:33:06 GMT']
+      date: ['Thu, 03 Mar 2016 14:50:22 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.14]
     status: {code: 200, message: OK}
@@ -69,7 +69,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Wed, 03 Feb 2016 08:33:06 GMT']
+      date: ['Thu, 03 Mar 2016 14:50:22 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.14]
     status: {code: 200, message: OK}
@@ -94,7 +94,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Wed, 03 Feb 2016 08:33:06 GMT']
+      date: ['Thu, 03 Mar 2016 14:50:23 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.14]
     status: {code: 200, message: OK}
@@ -119,7 +119,7 @@ interactions:
       cache-control: ['public, max-age=3600']
       connection: [close]
       content-type: [application/json; charset=UTF-8]
-      date: ['Wed, 03 Feb 2016 08:33:07 GMT']
+      date: ['Thu, 03 Mar 2016 14:50:23 GMT']
       server: [nginx/1.4.6 (Ubuntu)]
       x-powered-by: [PHP/5.5.9-1ubuntu4.14]
     status: {code: 200, message: OK}

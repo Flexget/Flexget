@@ -810,17 +810,21 @@ def release_by_id(release_id, session=None):
     return session.query(Release).filter(Release.id == release_id).one()
 
 
-def show_episodes(series, session=None):
+def show_episodes(series, start=None, stop=None, count=False, descending=False, session=None):
     """ Return all episodes of a given series """
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
+    if count:
+        return episodes.count()
+    episodes = episodes.slice(start, stop).from_self()
     # Query episodes in sane order instead of iterating from series.episodes
     if series.identified_by == 'sequence':
-        episodes = episodes.order_by(Episode.number).all()
+        episodes = episodes.order_by(Episode.number.desc()) if descending else episodes.order_by(Episode.number)
     elif series.identified_by == 'ep':
-        episodes = episodes.order_by(Episode.season, Episode.number).all()
+        episodes = episodes.order_by(Episode.season, Episode.number.desc()) if descending else episodes.order_by(
+            Episode.season, Episode.number)
     else:
-        episodes = episodes.order_by(Episode.identifier).all()
-    return episodes
+        episodes = episodes.order_by(Episode.identifier.desc()) if descending else episodes.order_by(Episode.identifier)
+    return episodes.all()
 
 
 def episode_in_show(series_id, episode_id):

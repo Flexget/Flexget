@@ -33,7 +33,7 @@ seen_field_object = {
         'id': {'type': 'integer'},
         'field': {'type': 'string'},
         'value': {'type': 'string'},
-        'added': {'type': 'string'},
+        'added': {'type': 'string', 'format': 'date-time'},
         'seen_entry_id': {'type': 'integer'}
     }
 }
@@ -45,7 +45,7 @@ seen_object = {
         'title': {'type': 'string'},
         'reason': {'type': 'string'},
         'task': {'type': 'string'},
-        'added': {'type': 'string'},
+        'added': {'type': 'string', 'format': 'date-time'},
         'local': {'type': 'boolean'},
         'fields': {'type': 'array', 'items': seen_field_object}
     }
@@ -89,7 +89,7 @@ seen_search_schema = api.schema('seen_search_schema', seen_search_schema)
 seen_search_parser = api.parser()
 seen_search_parser.add_argument('value', help='Search by any field value or leave empty to get entries')
 seen_search_parser.add_argument('page', type=int, default=1, help='Page number')
-seen_search_parser.add_argument('page_size', type=int, default=50, help='Seen entries per page')
+seen_search_parser.add_argument('page_size', type=int, default=10, help='Seen entries per page. Max value is 100')
 seen_search_parser.add_argument('is_seen_local', type=inputs.boolean, default=None,
                                 help='Filter results by seen locality.')
 seen_search_parser.add_argument('sort_by', choices=('title', 'task', 'added', 'local', 'id'), default='added',
@@ -117,6 +117,10 @@ class SeenSearchAPI(APIResource):
         sort_by = args['sort_by']
         order = args['order']
 
+        # Handle max size limit
+        if page_size > 100:
+            page_size = 100
+
         # Handles default if it explicitly called
         if order == 'desc':
             order = True
@@ -136,13 +140,14 @@ class SeenSearchAPI(APIResource):
             'status': is_seen_local,
             'stop': stop,
             'start': start,
+            'order_by': sort_by,
+            'descending': order,
             'session': session
         }
         count = seen.search(count=True, **kwargs)
 
         raw_seen_entries_list = seen.search(**kwargs)
         converted_seen_entry_list = [entry.to_dict() for entry in raw_seen_entries_list.all()]
-        sorted_seen_entries_list = sorted(converted_seen_entry_list, key=itemgetter(sort_by), reverse=order)
 
         pages = int(ceil(count / float(page_size)))
 
@@ -152,7 +157,7 @@ class SeenSearchAPI(APIResource):
                     'message': 'page %s does not exist' % page}, 404
 
         return jsonify({
-            'seen_entries': sorted_seen_entries_list,
+            'seen_entries': converted_seen_entry_list,
             'total_number_of_seen_entries': count,
             'number_of_seen_entries': page_size,
             'page_number': page,

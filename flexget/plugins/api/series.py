@@ -8,7 +8,7 @@ from flask import request
 from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import api, APIResource, ApiClient
 from flexget.plugins.filter import series
 
 series_api = api.namespace('series', description='Flexget Series operations')
@@ -41,7 +41,7 @@ release_object = {
         'release_downloaded': {'type': 'string'},
         'release_quality': {'type': 'string'},
         'release_proper_count': {'type': 'integer'},
-        'release_first_seen': {'type': 'string'},
+        'release_first_seen': {'type': 'string', 'format': 'date-time'},
         'release_episode_id': {'type': 'integer'}
     }
 }
@@ -88,7 +88,7 @@ latest_object = {
 episode_object = {
     'type': 'object',
     'properties': {
-        "episode_first_seen": {'type': 'string'},
+        "episode_first_seen": {'type': 'string', 'format': 'date-time'},
         "episode_id": {'type': 'string'},
         "episode_identified_by": {'type': 'string'},
         "episode_identifier": {'type': 'string'},
@@ -106,6 +106,7 @@ show_object = {
         'show_name': {'type': 'string'},
         'begin_episode': begin_object,
         'latest_downloaded_episode': latest_object,
+        'in_tasks': {'type': 'array', 'items': {'type': 'string'}}
     }
 }
 
@@ -117,9 +118,9 @@ series_list_schema = {
             'items': show_object
         },
         'total_number_of_shows': {'type': 'integer'},
-        'number_of_shows': {'type': 'integer'},
+        'page_size': {'type': 'integer'},
         'total_number_of_pages': {'type': 'integer'},
-        'page_number': {'type': 'integer'}
+        'page': {'type': 'integer'}
     }
 }
 series_list_schema = api.schema('list_series', series_list_schema)
@@ -132,10 +133,14 @@ episode_list_schema = {
             'items': episode_object
         },
         'number_of_episodes': {'type': 'integer'},
+        'total_number_of_episodes': {'type': 'integer'},
+        'page': {'type': 'integer'},
+        'total_number_of_pages': {'type': 'integer'},
         'show_id': {'type': 'integer'},
         'show': {'type': 'string'}
     }
 }
+
 episode_list_schema = api.schema('episode_list', episode_list_schema)
 
 episode_schema = {
@@ -222,7 +227,8 @@ def get_series_details(show):
         'show_id': show.id,
         'show_name': show.name,
         'begin_episode': begin,
-        'latest_downloaded_episode': latest
+        'latest_downloaded_episode': latest,
+        'in_tasks': [_show.name for _show in show.in_tasks]
     }
     return show_item
 
@@ -234,14 +240,16 @@ series_list_parser.add_argument('premieres', type=inputs.boolean, default=False,
                                 help="Filter by downloaded premieres only.")
 series_list_parser.add_argument('status', choices=('new', 'stale'), help="Filter by status")
 series_list_parser.add_argument('days', type=int,
-                                help="Filter status by number of days. Default is 7 for new and 365 for stale")
+                                help="Filter status by number of days.")
 series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
-series_list_parser.add_argument('page_size', type=int, default=100, help='Shows per page. Default is 100.')
+series_list_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Max is 100.')
 
 series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behind_latest', 'last_download_date'),
                                 default='show_name',
                                 help="Sort response by attribute.")
 series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
+series_list_parser.add_argument('lookup', choices=('tvdb', 'tvmaze'), action='append',
+                                help="Get lookup result for every show by sending another request to lookup API")
 
 
 @series_api.route('/')
@@ -254,6 +262,11 @@ class SeriesListAPI(APIResource):
         args = series_list_parser.parse_args()
         page = args['page']
         page_size = args['page_size']
+        lookup = args.get('lookup')
+
+        # Handle max size limit
+        if page_size > 100:
+            page_size = 100
 
         sort_by = args['sort_by']
         order = args['order']
@@ -297,17 +310,29 @@ class SeriesListAPI(APIResource):
         pages = int(ceil(num_of_shows / float(page_size)))
 
         if page > pages and pages != 0:
-            return {'error': 'page %s does not exist' % page}, 400
+            return {'error': 'page %s does not exist' % page}, 404
 
         number_of_shows = min(page_size, num_of_shows)
 
-        return jsonify({
+        response = {
             'shows': sorted_show_list,
-            'number_of_shows': number_of_shows,
+            'page_size': number_of_shows,
             'total_number_of_shows': num_of_shows,
             'page': page,
             'total_number_of_pages': pages
-        })
+        }
+
+        if lookup:
+            api_client = ApiClient()
+            for endpoint in lookup:
+                base_url = '/%s/series/' % endpoint
+                for show in response['shows']:
+                    pos = response['shows'].index(show)
+                    response['shows'][pos].setdefault('lookup', {})
+                    url = base_url + show['show_name'] + '/'
+                    result = api_client.get_endpoint(url)
+                    response['shows'][pos]['lookup'].update({endpoint: result})
+        return jsonify(response)
 
 
 release_object = {
@@ -416,7 +441,7 @@ class SeriesShowAPI(APIResource):
         except ValueError as e:
             return {'status': 'error',
                     'message': e.args[0]
-                    }, 400
+                    }, 404
         return {}
 
     @api.response(200, 'Episodes for series will be accepted starting with ep_id', show_details_schema)
@@ -472,26 +497,68 @@ class SeriesBeginByNameAPI(APIResource):
         return jsonify(get_series_details(show))
 
 
+episode_parser = api.parser()
+episode_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
+episode_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Max is 100.')
+episode_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
+
+
 @api.response(404, 'Show ID not found', default_error_schema)
 @series_api.route('/<int:show_id>/episodes')
 @api.doc(params={'show_id': 'ID of the show'})
 class SeriesEpisodesAPI(APIResource):
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
-    @api.doc(description='Get all show episodes via its ID')
+    @api.response(405, 'Page does not exists', model=default_error_schema)
+    @api.doc(description='Get all show episodes via its ID', parser=episode_parser)
     def get(self, show_id, session):
         """ Get episodes by show ID """
+        args = episode_parser.parse_args()
+        page = args['page']
+        page_size = args['page_size']
+
+        # Handle max size limit
+        if page_size > 100:
+            page_size = 100
+
+        order = args['order']
+        # In case the default 'desc' order was received
+        if order == 'desc':
+            order = True
+        else:
+            order = False
+
+        start = page_size * (page - 1)
+        stop = start + page_size
+
+        kwargs = {
+            'start': start,
+            'stop': stop,
+            'descending': order,
+            'session': session
+        }
+
         try:
             show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
-        episodes = [get_episode_details(episode) for episode in show.episodes]
+        count = series.show_episodes(show, count=True, session=session)
+        episodes = [get_episode_details(episode) for episode in series.show_episodes(show, **kwargs)]
+        pages = int(ceil(count / float(page_size)))
+
+        if page > pages and pages != 0:
+            return {'status': 'error',
+                    'message': 'page does not exist' % show_id
+                    }, 500
 
         return jsonify({'show': show.name,
                         'show_id': show_id,
                         'number_of_episodes': len(episodes),
-                        'episodes': episodes})
+                        'episodes': episodes,
+                        'total_number_of_episodes': count,
+                        'page': page,
+                        'total_number_of_pages': pages})
 
     @api.response(500, 'Error when trying to forget episode', default_error_schema)
     @api.response(200, 'Successfully forgotten all episodes from show', empty_response)
@@ -580,10 +647,11 @@ release_list_parser.add_argument('downloaded', choices=('downloaded', 'not_downl
 @api.response(414, 'Episode ID not found', default_error_schema)
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id', default_error_schema)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
+         description='Releases are any seen entries that match the episode. ')
 class SeriesReleasesAPI(APIResource):
     @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
-    @api.doc(description='Get all downloaded releases for a specific episode of a specific show',
+    @api.doc(description='Get all matching releases for a specific episode of a specific show.',
              parser=release_list_parser)
     def get(self, show_id, ep_id, session):
         """ Get all episodes releases by show ID and episode ID """
