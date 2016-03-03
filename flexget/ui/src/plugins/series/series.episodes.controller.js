@@ -45,8 +45,11 @@
         }
 
         function loadReleases() {
+            var params = {
+                downloaded: 'downloaded'
+            }
             vm.episodes.map(function(episode) {
-                $http.get('/api/series/' + $stateParams.id + '/episodes/' + episode.episode_id + '/releases')
+                $http.get('/api/series/' + $stateParams.id + '/episodes/' + episode.episode_id + '/releases', { params: params })
                     .success(function(data) {
                         episode.releases = data.releases;
                     })
