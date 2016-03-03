@@ -632,10 +632,11 @@ release_list_parser.add_argument('downloaded', choices=('downloaded', 'not_downl
 @api.response(414, 'Episode ID not found', default_error_schema)
 @api.response(400, 'Episode with ep_ids does not belong to show with show_id', default_error_schema)
 @series_api.route('/<int:show_id>/episodes/<int:ep_id>/releases')
-@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'})
+@api.doc(params={'show_id': 'ID of the show', 'ep_id': 'Episode ID'},
+         description='Releases are any seen entries that match the episode. ')
 class SeriesReleasesAPI(APIResource):
     @api.response(200, 'Releases retrieved successfully for episode', release_list_schema)
-    @api.doc(description='Get all downloaded releases for a specific episode of a specific show',
+    @api.doc(description='Get all matching releases for a specific episode of a specific show.',
              parser=release_list_parser)
     def get(self, show_id, ep_id, session):
         """ Get all episodes releases by show ID and episode ID """
