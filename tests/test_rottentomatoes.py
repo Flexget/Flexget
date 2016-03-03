@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from nose.plugins.skip import SkipTest
-
+import pytest
 
 
 class TestRottenTomatoesLookup(object):
@@ -23,8 +22,8 @@ class TestRottenTomatoesLookup(object):
             rottentomatoes_lookup: yes
     """
 
+    @pytest.mark.xfail(reason='This plugin seems to be broken')
     def test_rottentomatoes_lookup(self, execute_task, use_vcr):
-        raise SkipTest('This plugin seems to be broken')
         task = execute_task('test')
         # check that these were created
         assert task.find_entry(rt_name='Toy Story', rt_year=1995, rt_id=9559, imdb_id='tt0114709'), \
