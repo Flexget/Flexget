@@ -1,6 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from nose.plugins.skip import SkipTest
+import pytest
+from jinja2 import Template
 
 from flexget.plugins.parsers.parser_guessit import ParserGuessit
 from flexget.plugins.parsers.parser_internal import ParserInternal
@@ -9,19 +10,26 @@ from flexget.utils.qualities import Quality
 
 class TestQualityModule(object):
 
-    def test_get(self, execute_task):
+    def test_get(self):
         assert not Quality(), 'unknown quality is not false'
         assert Quality('foobar') == Quality(), 'unknown not returned'
 
-    def test_common_name(self, execute_task):
+    def test_common_name(self):
         for test_val in ('720p', '1280x720'):
             got_val = Quality(test_val).name
             assert got_val == '720p', got_val
 
 
-class QualityParser(object):
+class TestQualityParser(object):
 
-    def test_quality_failures(self, execute_task):
+    @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'], autouse=True)
+    def parser(self, request):
+        if request.param == 'internal':
+            return ParserInternal
+        if request.param == 'guessit':
+            return ParserGuessit
+
+    def test_quality_failures(self, parser):
         items = [('Test.File 1080p.web-dl', '1080p webdl'),
                  ('Test.File.web-dl.1080p', '1080p webdl'),
                  ('Test.File.WebHD.720p', '720p webdl'),
@@ -89,25 +97,20 @@ class QualityParser(object):
 
         failures = []
         for item in items:
-            quality = self.parser.parse_movie(item[0]).quality
+            quality = parser().parse_movie(item[0]).quality
             if str(quality) != item[1]:
                 failures.append('`%s` quality should be `%s` not `%s`' % (item[0], item[1], quality))
         assert not failures, '%s failures:\n%s' % (len(failures), '\n'.join(failures))
 
 
-class TestInternalQualityParser(QualityParser):
-    parser = ParserInternal()
-
-
-class TestGuessitQualityParser(QualityParser):
-    parser = ParserGuessit()
-
-
 class TestFilterQuality(object):
 
-    config = """
+    _config = """
         templates:
           global:
+            parsing:
+              series: {{parser}}
+              movie: {{parser}}
             mock:
               - {title: 'Smoke.1280x720'}
               - {title: 'Smoke.HDTV'}
@@ -126,6 +129,11 @@ class TestFilterQuality(object):
           min_max:
             quality: HR-720i
     """
+
+    @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
+    def config(self, request):
+        """Override and parametrize default config fixture."""
+        return Template(self._config).render({'parser': request.param})
 
     def test_quality(self, execute_task):
         task = execute_task('qual')
@@ -170,15 +178,3 @@ class TestFilterQuality(object):
         assert entry in task.accepted, 'HR should be accepted'
         assert len(task.rejected) == 3, 'wrong number of entries rejected'
         assert len(task.accepted) == 1, 'wrong number of entries accepted'
-
-
-class TestGuessitFilterQuality(TestFilterQuality):
-    def __init__(self):
-        super(TestGuessitFilterQuality, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalFilterQuality(TestFilterQuality):
-    def __init__(self):
-        super(TestInternalFilterQuality, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
