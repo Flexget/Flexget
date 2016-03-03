@@ -1,12 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
-import sys
 import tempfile
 
-from nose.plugins.attrib import attr
-from nose.plugins.skip import SkipTest
-from nose.tools import assert_raises
-
-from flexget.task import TaskAbort
 
 # TODO more checks: fail_html, etc.
 class TestDownload(object):
@@ -14,20 +8,20 @@ class TestDownload(object):
         tasks:
           path_and_temp:
             mock:
-              - {title: 'entry 1', url: 'http://www.speedtest.qsc.de/1kB.qsc'}
+              - {title: 'entry 1', url: 'http://speedtest.ftp.otenet.gr/files/test100k.db'}
             accept_all: yes
             download:
               path: ~/
               temp: """ + tempfile.gettempdir() + """
           just_path:
             mock:
-              - {title: 'entry 2', url: 'http://www.speedtest.qsc.de/10kB.qsc'}
+              - {title: 'entry 2', url: 'http://speedtest.ftp.otenet.gr/files/test100k.db'}
             accept_all: yes
             download:
               path: ~/
           just_string:
             mock:
-              - {title: 'entry 3', url: 'http://www.speedtest.qsc.de/100kB.qsc'}
+              - {title: 'entry 3', url: 'http://speedtest.ftp.otenet.gr/files/test100k.db'}
             accept_all: yes
             download: ~/
       """
