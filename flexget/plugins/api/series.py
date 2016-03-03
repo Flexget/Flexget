@@ -106,6 +106,7 @@ show_object = {
         'show_name': {'type': 'string'},
         'begin_episode': begin_object,
         'latest_downloaded_episode': latest_object,
+        'in_tasks': {'type': 'array', 'items': {'type': 'string'}}
     }
 }
 
@@ -117,9 +118,9 @@ series_list_schema = {
             'items': show_object
         },
         'total_number_of_shows': {'type': 'integer'},
-        'number_of_shows': {'type': 'integer'},
+        'page_size': {'type': 'integer'},
         'total_number_of_pages': {'type': 'integer'},
-        'page_number': {'type': 'integer'}
+        'page': {'type': 'integer'}
     }
 }
 series_list_schema = api.schema('list_series', series_list_schema)
@@ -226,7 +227,8 @@ def get_series_details(show):
         'show_id': show.id,
         'show_name': show.name,
         'begin_episode': begin,
-        'latest_downloaded_episode': latest
+        'latest_downloaded_episode': latest,
+        'in_tasks': [_show.name for _show in show.in_tasks]
     }
     return show_item
 
@@ -311,7 +313,7 @@ class SeriesListAPI(APIResource):
 
         return jsonify({
             'shows': sorted_show_list,
-            'number_of_shows': number_of_shows,
+            'page_size': number_of_shows,
             'total_number_of_shows': num_of_shows,
             'page': page,
             'total_number_of_pages': pages
