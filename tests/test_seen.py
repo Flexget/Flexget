@@ -160,9 +160,15 @@ class TestSeenAPI(object):
 
     @patch.object(seen, 'search')
     def test_seen_get(self, mock_seen_search, api_client):
-        session = Session()
-        entry_list = session.query(SeenEntry).join(SeenField).all()
-        mock_seen_search.return_value = entry_list
+
+        def search(*args, **kwargs):
+            if 'count' in kwargs:
+                return 0
+            else:
+                with Session() as session:
+                    return session.query(SeenEntry).join(SeenField)
+
+        mock_seen_search.side_effect = search
 
         # No params
         rsp = api_client.get('/seen/')
@@ -184,7 +190,7 @@ class TestSeenAPI(object):
         rsp = api_client.get('/seen/?value=bla')
         assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
 
-        assert mock_seen_search.call_count == 4, 'Should have 4 calls, is actually %s' % mock_seen_search.call_count
+        assert mock_seen_search.call_count == 8, 'Should have 8 calls, is actually %s' % mock_seen_search.call_count
 
     @patch.object(seen, 'search')
     def test_seen_delete_all(self, mock_seen_search, api_client):
