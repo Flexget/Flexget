@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import mock
 from flexget.config_schema import parse_size
+import pytest
 
 
 def mock_os_disk_stats(folder):
@@ -15,6 +16,7 @@ def mock_os_disk_stats(folder):
     return free_bytes, total_bytes
 
 
+@mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
 class TestPathSelect(object):
 
     config = """
@@ -24,7 +26,7 @@ class TestPathSelect(object):
               - {title: 'Existence.2012'}
             path_select:
               to_field: path
-              within: 0
+              within: 0G
               select: most_free
               paths:
                 - /data/1.5G,100G
@@ -94,13 +96,16 @@ class TestPathSelect(object):
                 - /data/90.5G,100G
     """
 
-    @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
-    def test_most_free(self, disk_static_fun, execute_task):
+    @pytest.fixture()
+    def no_path_validation(self, monkeypatch):
+        from flexget.config_schema import format_checker
+        monkeypatch.delitem(format_checker.checkers, 'path')
+
+    def test_most_free(self, disk_static_fun, no_path_validation,  execute_task):
         task = execute_task('test_most_free')
         assert task.entries[0].get('path') == "/data/1G,100G"
 
-    @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
-    def test_most_free_within(self, disk_static_func, execute_task):
+    def test_most_free_within(self, disk_static_func, no_path_validation, execute_task):
         for i in range(0, 3):
             task = execute_task('test_most_free_within')
             assert task.entries[0].get('path') in [
@@ -109,8 +114,7 @@ class TestPathSelect(object):
                 "/data/50G,100G",
             ], "path %s not in list" % task.entries[0].get('path')
 
-    @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
-    def test_most_free_percent(self, disk_static_func, execute_task):
+    def test_most_free_percent(self, disk_static_func, no_path_validation, execute_task):
         for i in range(0, 2):
             task = execute_task('test_most_free_percent')
             assert task.entries[0].get('path') in [
@@ -118,8 +122,7 @@ class TestPathSelect(object):
                 '/data/50G,100G',
             ], "path %s not in list" % task.entries[0].get('path')
 
-    @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
-    def test_most_free_percent_within(self, disk_static_func, execute_task):
+    def test_most_free_percent_within(self, disk_static_func, no_path_validation, execute_task):
         for i in range(0, 2):
             task = execute_task('test_most_free_percent_within')
             assert task.entries[0].get('path') in [
@@ -128,8 +131,7 @@ class TestPathSelect(object):
                 '/data/52G,100G',
             ], "path %s not in list" % task.entries[0].get('path')
 
-    @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
-    def test_most_used_percent(self, disk_static_func, execute_task):
+    def test_most_used_percent(self, disk_static_func, no_path_validation, execute_task):
         for i in range(0, 2):
             task = execute_task('test_most_used_percent')
             assert task.entries[0].get('path') in [
@@ -137,8 +139,7 @@ class TestPathSelect(object):
                 '/data/49G,50G',
             ], "path %s not in list" % task.entries[0].get('path')
 
-    @mock.patch('flexget.plugins.modify.path_select.os_disk_stats', side_effect=mock_os_disk_stats)
-    def test_most_used(self, disk_static_func, execute_task):
+    def test_most_used(self, disk_static_func, no_path_validation, execute_task):
         for i in range(0, 2):
             task = execute_task('test_most_used')
             assert task.entries[0].get('path') in [
