@@ -100,8 +100,11 @@ class Manager(object):
         """
         :param args: CLI args
         """
-        global manager
-        assert not manager, 'Only one instance of Manager should be created at a time!'
+        if not self.unit_test:
+            global manager
+            assert not manager, 'Only one instance of Manager should be created at a time!'
+        else:
+            log.info('last manager was not torn down correctly')
 
         if args is None:
             # Decode all arguments to unicode before parsing
