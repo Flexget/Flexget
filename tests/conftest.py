@@ -154,6 +154,7 @@ def pytest_runtest_setup(item):
 
 @pytest.yield_fixture()
 def filecopy(request):
+    out_files = []
     marker = request.node.get_marker('filecopy')
     if marker is not None:
         sources, dst = marker.args
@@ -162,14 +163,14 @@ def filecopy(request):
         if 'tmpdir' in request.fixturenames:
             dst = dst.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)
         dst = Path(dst)
-        out_files = []
         for f in itertools.chain(*(Path().glob(src) for src in sources)):
             dest_path = dst
             if dest_path.isdir():
                 dest_path = dest_path / f.basename()
             f.copy(dest_path)
             out_files.append(dest_path)
-        yield
+    yield
+    if out_files:
         for f in out_files:
             try:
                 f.remove()
