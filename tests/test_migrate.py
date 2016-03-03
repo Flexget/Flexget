@@ -15,13 +15,13 @@ class TestMigrate(object):
     """
 
     @pytest.mark.filecopy('db-r1042.sqlite', '__tmp__/upgrade_test.sqlite')
-    def test_upgrade(self, request, config, caplog, tmpdir, filecopy):
+    def test_upgrade(self, request, tmpdir):
         db_filename = tmpdir.join('upgrade_test.sqlite')
         # in case running on windows, needs double \\
         filename = db_filename.strpath.replace('\\', '\\\\')
         database_uri = 'sqlite:///%s' % filename
         # This will raise an error if the upgrade wasn't successful
-        mockmanager = MockManager(config, request.cls.__name__, db_uri=database_uri)
+        mockmanager = MockManager(self.config, request.cls.__name__, db_uri=database_uri)
         try:
             mockmanager.shutdown()
         finally:
