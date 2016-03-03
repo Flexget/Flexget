@@ -8,7 +8,7 @@ from flask import request
 from flask_restplus import inputs
 from sqlalchemy.orm.exc import NoResultFound
 
-from flexget.api import api, APIResource
+from flexget.api import api, APIResource, ApiClient
 from flexget.plugins.filter import series
 
 series_api = api.namespace('series', description='Flexget Series operations')
@@ -41,7 +41,7 @@ release_object = {
         'release_downloaded': {'type': 'string'},
         'release_quality': {'type': 'string'},
         'release_proper_count': {'type': 'integer'},
-        'release_first_seen': {'type': 'string'},
+        'release_first_seen': {'type': 'string', 'format': 'date-time'},
         'release_episode_id': {'type': 'integer'}
     }
 }
@@ -88,7 +88,7 @@ latest_object = {
 episode_object = {
     'type': 'object',
     'properties': {
-        "episode_first_seen": {'type': 'string'},
+        "episode_first_seen": {'type': 'string', 'format': 'date-time'},
         "episode_id": {'type': 'string'},
         "episode_identified_by": {'type': 'string'},
         "episode_identifier": {'type': 'string'},
@@ -248,11 +248,13 @@ series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behin
                                 default='show_name',
                                 help="Sort response by attribute.")
 series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
+series_list_parser.add_argument('lookup', choices=('tvdb', 'tvmaze'), action='append',
+                                help="Get lookup result for every show by sending another request to lookup API")
 
 
 @series_api.route('/')
 class SeriesListAPI(APIResource):
-    @api.response(405, 'Page does not exist', default_error_schema)
+    @api.response(404, 'Page does not exist', default_error_schema)
     @api.response(200, 'Series list retrieved successfully', series_list_schema)
     @api.doc(parser=series_list_parser, description="Get a  list of Flexget's shows in DB")
     def get(self, session=None):
@@ -260,6 +262,7 @@ class SeriesListAPI(APIResource):
         args = series_list_parser.parse_args()
         page = args['page']
         page_size = args['page_size']
+        lookup = args.get('lookup')
 
         # Handle max size limit
         if page_size > 100:
@@ -307,17 +310,29 @@ class SeriesListAPI(APIResource):
         pages = int(ceil(num_of_shows / float(page_size)))
 
         if page > pages and pages != 0:
-            return {'error': 'page %s does not exist' % page}, 405
+            return {'error': 'page %s does not exist' % page}, 404
 
         number_of_shows = min(page_size, num_of_shows)
 
-        return jsonify({
+        response = {
             'shows': sorted_show_list,
             'page_size': number_of_shows,
             'total_number_of_shows': num_of_shows,
             'page': page,
             'total_number_of_pages': pages
-        })
+        }
+
+        if lookup:
+            api_client = ApiClient()
+            for endpoint in lookup:
+                base_url = '/%s/series/' % endpoint
+                for show in response['shows']:
+                    pos = response['shows'].index(show)
+                    response['shows'][pos].setdefault('lookup', {})
+                    url = base_url + show['show_name'] + '/'
+                    result = api_client.get_endpoint(url)
+                    response['shows'][pos]['lookup'].update({endpoint: result})
+        return jsonify(response)
 
 
 release_object = {
