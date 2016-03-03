@@ -24,15 +24,12 @@ class TestURLRewriters(object):
               - {title: 'cinemageddon download', url: 'http://cinemageddon.net/details.php?id=1234'}
     """
 
-    def setup(self):
-        FlexGetBase.setup(self)
-        task = execute_task('test')
-
     def get_urlrewriter(self, name):
         info = get_plugin_by_name(name)
         return info.instance
 
     def test_piratebay(self, execute_task):
+        task = execute_task('test')
         # test with piratebay entry
         urlrewriter = self.get_urlrewriter('piratebay')
         entry = task.find_entry(title='tpb page')
@@ -47,12 +44,14 @@ class TestURLRewriters(object):
             'TPB link with invalid subdomain should not be url_rewritable'
 
     def test_piratebay_search(self, execute_task):
+        task = execute_task('test')
         # test with piratebay entry
         urlrewriter = self.get_urlrewriter('piratebay')
         entry = task.find_entry(title='tbp search')
         assert_true(urlrewriter.url_rewritable(task, entry))
 
     def test_nyaa_torrents(self, execute_task):
+        task = execute_task('test')
         entry = task.find_entry(title='nyaa')
         urlrewriter = self.get_urlrewriter('nyaa')
         assert entry['url'] == 'http://www.nyaa.eu/?page=torrentinfo&tid=12345'
@@ -61,6 +60,7 @@ class TestURLRewriters(object):
         assert entry['url'] == 'http://www.nyaa.eu/?page=download&tid=12345'
 
     def test_isohunt(self, execute_task):
+        task = execute_task('test')
         entry = task.find_entry(title='isohunt search')
         urlrewriter = self.get_urlrewriter('isohunt')
         assert not urlrewriter.url_rewritable(task, entry), \
@@ -70,6 +70,7 @@ class TestURLRewriters(object):
             'direct entry should be url_rewritable'
 
     def test_cinemageddon(self, execute_task):
+        task = execute_task('test')
         entry = task.find_entry(title='cinemageddon download')
         urlrewriter = self.get_urlrewriter('cinemageddon')
         assert urlrewriter.url_rewritable(task, entry)
