@@ -52,11 +52,11 @@ class PluginParsing(object):
         if config:
             selected_parsers.update(config)
 
-    def on_task_end(self, task, config):
+    def on_task_exit(self, task, config):
         # Restore default parsers for next task run
         selected_parsers.clear()
 
-    on_task_abort = on_task_end
+    on_task_abort = on_task_exit
 
     def parse_series(self, data, name=None, **kwargs):
         """
