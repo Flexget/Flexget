@@ -5,7 +5,7 @@ from jinja2 import Template
 
 class TestProperMovies(object):
 
-    config = """
+    _config = """
         templates:
           global:
             seen_movies: strict
