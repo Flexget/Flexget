@@ -34,16 +34,16 @@ class TestExec(object):
                 for_entries: """ + sys.executable + """ exec.py "{{temp_dir}}" "{{title}}" "{{quotes}}" "/start/{{quotes}}" "{{otherchars}}"
     """
 
-    def test_replace_from_entry(self, execute_task):
+    def test_replace_from_entry(self, execute_task, tmpdir):
         task = execute_task('replace_from_entry')
         assert len(task.accepted) == 2, "not all entries were accepted"
         for entry in task.accepted:
-            assert os.path.exists(os.path.join(self.__tmp__, entry['title'])), "exec.py did not create a file for %s" % entry['title']
+            assert tmpdir.join(entry['title']).exists(), "exec.py did not create a file for %s" % entry['title']
 
-    def test_adv_format(self, execute_task):
+    def test_adv_format(self, execute_task, tmpdir):
         task = execute_task('test_adv_format')
         for entry in task.accepted:
-            with open(os.path.join(self.__tmp__, entry['title']), 'r') as infile:
+            with tmpdir.join(entry['title']).open('r') as infile:
                 line = infile.readline().rstrip('\n')
                 assert line == '/path/with spaces', '%s != /path/with spaces' % line
                 line = infile.readline().rstrip('\n')
