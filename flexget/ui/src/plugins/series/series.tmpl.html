@@ -16,9 +16,9 @@
     							<span class="md-subhead">Latest: {{ show.latest_downloaded_episode.episode_identifier ? show.latest_downloaded_episode.episode_identifier : 'No yet' }}</span>
     						</md-card-title-text>
     					</md-card-title>
-    					<md-card-content layout="row" layout-align="space-between" class="custom-card">
+    					<md-card-content layout="row" class="custom-card">
     						<div class="md-media-lg series-image">
-                                <img ng-src="http://www.thetvdb.com/banners/{{ show.metadata.poster }}">                  
+                                <img ng-src="http://www.thetvdb.com/banners/{{ show.metadata.poster }}">
                             </div>
     						<p>{{ show.metadata.overview }}</p>
     					</md-card-content>
