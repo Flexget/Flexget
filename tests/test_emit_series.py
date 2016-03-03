@@ -1,10 +1,18 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import pytest
+from jinja2 import Template
+
 from flexget.entry import Entry
 
 
-class BaseEmitSeries(object):
-    config = """
+class TestEmitSeries(object):
+    _config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
+              movie: {{parser}}
         tasks:
           inject_series:
             series:
@@ -40,10 +48,9 @@ class BaseEmitSeries(object):
             rerun: 0
           test_emit_series_from_start:
             emit_series:
-              backfill: yes
+              from_start: yes
             series:
             - Test Series 3:
-                from_start: yes
                 identified_by: ep
             rerun: 0
           test_emit_series_begin:
@@ -111,18 +118,23 @@ class BaseEmitSeries(object):
             mock_output: yes
     """
 
-    def inject_series(self, release_name):
-        task = execute_task('inject_series', options = {'inject': [Entry(title=release_name, url='')], 'disable_tracking': True})
+    @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
+    def config(self, request):
+        """Override and parametrize default config fixture."""
+        return Template(self._config).render({'parser': request.param})
+
+    def inject_series(self, execute_task, release_name):
+        execute_task('inject_series', options={'inject': [Entry(title=release_name, url='')], 'disable_tracking': True})
 
     def test_emit_series_backfill(self, execute_task):
-        self.inject_series('Test Series 1 S02E01')
+        self.inject_series(execute_task, 'Test Series 1 S02E01')
         task = execute_task('test_emit_series_backfill')
         assert task.find_entry(title='Test Series 1 S01E01')
         assert task.find_entry(title='Test Series 1 S02E02')
         task = execute_task('test_emit_series_backfill')
         assert task.find_entry(title='Test Series 1 S01E02')
         assert task.find_entry(title='Test Series 1 S02E03')
-        self.inject_series('Test Series 1 S02E08')
+        self.inject_series(execute_task, 'Test Series 1 S02E08')
         task = execute_task('test_emit_series_backfill')
         assert task.find_entry(title='Test Series 1 S01E03')
         assert task.find_entry(title='Test Series 1 S02E04')
@@ -131,21 +143,21 @@ class BaseEmitSeries(object):
         assert task.find_entry(title='Test Series 1 S02E07')
 
     def test_emit_series_no_backfill(self, execute_task):
-        self.inject_series('Test Series 1 S01E01')
-        self.inject_series('Test Series 1 S01E05')
+        self.inject_series(execute_task, 'Test Series 1 S01E01')
+        self.inject_series(execute_task, 'Test Series 1 S01E05')
         task = execute_task('test_emit_series_no_backfill')
         assert len(task.all_entries) == 1
         assert task.find_entry(title='Test Series 1 S01E06')
 
     def test_emit_series_rejected(self, execute_task):
-        self.inject_series('Test Series 2 S01E03 720p')
+        self.inject_series(execute_task, 'Test Series 2 S01E03 720p')
         task = execute_task('test_emit_series_rejected')
         assert task.find_entry(title='Test Series 2 S01E01')
         assert task.find_entry(title='Test Series 2 S01E02')
         assert task.find_entry(title='Test Series 2 S01E03')
 
     def test_emit_series_from_start(self, execute_task):
-        self.inject_series('Test Series 3 S01E03')
+        self.inject_series(execute_task, 'Test Series 3 S01E03')
         task = execute_task('test_emit_series_from_start')
         assert task.find_entry(title='Test Series 3 S01E01')
         assert task.find_entry(title='Test Series 3 S01E02')
@@ -158,14 +170,14 @@ class BaseEmitSeries(object):
         assert task.find_entry(title='Test Series 4 S03E03')
 
     def test_emit_series_begin_and_backfill(self, execute_task):
-        self.inject_series('Test Series 5 S02E02')
+        self.inject_series(execute_task, 'Test Series 5 S02E02')
         task = execute_task('test_emit_series_begin_and_backfill')
         # with backfill and begin, no backfilling should be done
         assert task.find_entry(title='Test Series 5 S03E02')
         assert len(task.all_entries) == 1
 
     def test_emit_series_begin_backfill_and_rerun(self, execute_task):
-        self.inject_series('Test Series 6 S03E01')
+        self.inject_series(execute_task, 'Test Series 6 S03E01')
         task = execute_task('test_emit_series_begin_backfill_and_rerun')
         # with backfill and begin, no backfilling should be done
         assert task._rerun_count == 1
@@ -174,14 +186,14 @@ class BaseEmitSeries(object):
         assert len(task.mock_output) == 2 # Should have S03E02 and S03E03
 
     def test_emit_series_backfill_advancement(self, execute_task):
-        self.inject_series('Test Series 7 S02E01')
+        self.inject_series(execute_task, 'Test Series 7 S02E01')
         task = execute_task('test_emit_series_backfill_advancement')
         assert task._rerun_count == 1
         assert len(task.all_entries) == 1
         assert task.find_entry('rejected', title='Test Series 7 S03E01')
 
     def test_emit_series_advancement(self, execute_task):
-        self.inject_series('Test Series 8 S01E01')
+        self.inject_series(execute_task, 'Test Series 8 S01E01')
         task = execute_task('test_emit_series_advancement')
         assert task._rerun_count == 1
         assert len(task.all_entries) == 1
@@ -210,13 +222,3 @@ class BaseEmitSeries(object):
         s2 = len(task.mock_output[0].get('search_strings'))
         assert s2 > s1, 'Alternate names did not create sufficient search strings.'
 
-class TestGuessitEmitSeries(BaseEmitSeries):
-    def __init__(self):
-        super(TestGuessitEmitSeries, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalEmitSeries(BaseEmitSeries):
-    def __init__(self):
-        super(TestInternalEmitSeries, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
