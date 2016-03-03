@@ -6,35 +6,42 @@ import yaml
 class TestInputRSS(object):
 
     config = """
-        templates:
-          global:
-            rss:
+        tasks:
+          _:
+            rss: &rss
               url: rss.xml
               silent: yes
-        tasks:
-          test: {}
+          test:
+            rss: *rss
           test2:
             rss:
+              <<: *rss
               link: otherlink
           test3:
             rss:
+              <<: *rss
               other_fields: ['Otherfield']
           test_group_links:
             rss:
+              <<: *rss
               group_links: yes
           test_multiple_links:
             rss:
+              <<: *rss
               link:
                 - guid
                 - otherlink
           test_all_entries_no:
             rss:
+              <<: *rss
               all_entries: no
           test_all_entries_yes:
             rss:
+              <<: *rss
               all_entries: yes
           test_field_sanitation:
             rss:
+              <<: *rss
               link: "other:link"
               title: "other:Title"
               other_fields:
