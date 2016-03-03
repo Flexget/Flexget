@@ -1,12 +1,17 @@
 import datetime
 import os
-import posixpath
 import sys
 
-from flexget.plugins.filter.subtitle_queue import queue_add, queue_get, SubtitleLanguages, QueuedSubtitle, \
-    normalize_path
+import pytest
+
+from flexget.plugins.filter.subtitle_queue import queue_add, queue_get, QueuedSubtitle, normalize_path
 from flexget.manager import Session
-from nose.plugins.skip import SkipTest
+
+try:
+    import babelfish
+    import subliminal
+except ImportError:
+    subliminal = babelfish = None
 
 
 class TestSubtitleQueue(object):
@@ -49,7 +54,8 @@ class TestSubtitleQueue(object):
              template: no_global
              subtitle_queue: emit
              subliminal:
-                exact_match: yes
+               languages: [en]
+               exact_match: yes
              rerun: 0
     """
 
@@ -168,17 +174,11 @@ class TestSubtitleQueue(object):
         assert queue[0].alternate_path == normalize_path(os.path.join('~/', 'slackware-14.1-iso')), \
             'Queued path should be torrent name in user dir'
 
+    # Skip if subliminal is not installed or if python version <2.7
+    @pytest.mark.skipif(sys.version_info < (2, 7), reason='requires python2.7')
+    @pytest.mark.skipif(not subliminal, reason='requires subliminal')
     def test_subtitle_queue_subliminal_fail(self, execute_task):
-        # Skip if subliminal is not installed or if python version <2.7
-        if list(sys.version_info) < [2, 7]:
-            raise SkipTest("Subliminal does not work in Python 2.6")
-        try:
-            import babelfish
-            import subliminal
-        except ImportError:
-            raise SkipTest("Subliminal not installed.")
-        config = {}
-        config['languages'] = ['en']
+        config = {'languages': ['en']}
 
         queue_add('movie.mkv', 'Movie', config)
 
