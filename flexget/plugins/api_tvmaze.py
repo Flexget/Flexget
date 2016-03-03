@@ -392,6 +392,9 @@ def prepare_lookup_for_pytvmaze(**lookup_params):
     series_name = lookup_params.get('series_name') or lookup_params.get('show_name') or lookup_params.get('title')
     if series_name:
         title, year_match = split_title_year(series_name)
+    # Support for when title is just a number
+    if not title:
+        title = series_name
 
     prepared_params['maze_id'] = lookup_params.get('tvmaze_id')
     prepared_params['tvdb_id'] = lookup_params.get('tvdb_id') or lookup_params.get('trakt_series_tvdb_id')
