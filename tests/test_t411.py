@@ -149,7 +149,7 @@ class TestRestClient(object):
         assert term_type.get('type') == 'Application - Genre'
         assert term_type.get('mode') == 'single'
 
-    def test_malformed_search_response(self, execute_task, use_vcr):
+    def test_malformed_search_response(self, use_vcr):
         """
         Search without expression produces server response
         that contains some error messages. This test check
