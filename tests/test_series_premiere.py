@@ -1,14 +1,24 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import pytest
+from jinja2 import Template
 
-class BaseSeriesPremiere(object):
+
+@pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'], autouse=True)
+def config(request):
+    """Override and parametrize default config fixture for all series tests."""
+    return Template(request.cls.config).render({'parser': request.param})
+
+
+class TestSeriesPremiere(object):
 
     config = """
 
         templates:
-          global: # just cleans log a bit ..
-            disable:
-              - seen
+          global:
+            parsing:
+              series: {{parser}}
+            disable: [seen]  # just cleans log a bit ..
 
         tasks:
           test_only_one:
@@ -106,15 +116,3 @@ class BaseSeriesPremiere(object):
         assert not entry.accepted
         entry = task.find_entry(title='other show s01e01')
         assert entry.accepted
-
-
-class TestGuessitSeriesPremiere(BaseSeriesPremiere):
-    def __init__(self):
-        super(TestGuessitSeriesPremiere, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalSeriesPremiere(BaseSeriesPremiere):
-    def __init__(self):
-        super(TestInternalSeriesPremiere, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
