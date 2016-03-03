@@ -157,23 +157,22 @@ class TestPrivateTorrents(object):
         assert task.find_entry('accepted', title='test_public'), 'did not pass public torrent'
 
 
+@pytest.mark.usefixtures('tmpdir')
 class TestTorrentScrub(object):
-
-    __tmp__ = True
     config = """
         tasks:
           test_all:
             mock:
-              - {title: 'test', file: '__tmp__test.torrent'}
-              - {title: 'LICENSE', file: '__tmp__LICENSE.torrent'}
-              - {title: 'LICENSE-resume', file: '__tmp__LICENSE-resume.torrent'}
+              - {title: 'test', file: '__tmp__/test.torrent'}
+              - {title: 'LICENSE', file: '__tmp__/LICENSE.torrent'}
+              - {title: 'LICENSE-resume', file: '__tmp__/LICENSE-resume.torrent'}
             accept_all: yes
             torrent_scrub: all
             disable: [seen_info_hash]
 
           test_fields:
             mock:
-              - {title: 'fields.LICENSE', file: '__tmp__LICENSE.torrent'}
+              - {title: 'fields.LICENSE', file: '__tmp__/LICENSE.torrent'}
             accept_all: yes
             torrent_scrub:
               - comment
@@ -182,7 +181,7 @@ class TestTorrentScrub(object):
 
           test_off:
             mock:
-              - {title: 'off.LICENSE-resume', file: '__tmp__LICENSE-resume.torrent'}
+              - {title: 'off.LICENSE-resume', file: '__tmp__/LICENSE-resume.torrent'}
             accept_all: yes
             torrent_scrub: off
     """
@@ -194,8 +193,8 @@ class TestTorrentScrub(object):
     )
     test_files = [i[1] for i in test_cases]
 
-    @pytest.mark.filecopy(test_files, "__tmp__")
-    def test_torrent_scrub(self, execute_task):
+    @pytest.mark.filecopy(test_files, '__tmp__')
+    def test_torrent_scrub(self, execute_task, tmpdir):
         # Run task
         task = execute_task('test_all')
 
@@ -209,7 +208,7 @@ class TestTorrentScrub(object):
             assert modified, "No 'torrent' key in %r" % (title,)
 
             osize = os.path.getsize(filename)
-            msize = os.path.getsize(self.__tmp__ + filename)
+            msize = tmpdir.join(filename).size()
 
             # Dump small torrents on demand
             if 0 and not clean:
@@ -240,7 +239,7 @@ class TestTorrentScrub(object):
                 assert 'libtorrent_resume' in original.content
                 assert 'libtorrent_resume' not in modified.content
 
-    @pytest.mark.filecopy(test_files, "__tmp__")
+    @pytest.mark.filecopy(test_files, '__tmp__')
     def test_torrent_scrub_fields(self, execute_task):
         task = execute_task('test_fields')
         title = 'fields.LICENSE'
@@ -253,13 +252,13 @@ class TestTorrentScrub(object):
         assert 'comment' not in torrent.content, "'comment' not scrubbed"
         assert 'x_cross_seed' not in torrent.content['info'], "'info.x_cross_seed' not scrubbed"
 
-    @pytest.mark.filecopy(test_files, "__tmp__")
-    def test_torrent_scrub_off(self, execute_task):
+    @pytest.mark.filecopy(test_files, '__tmp__')
+    def test_torrent_scrub_off(self, execute_task, tmpdir):
         task = execute_task('test_off')
 
         for filename in self.test_files:
             osize = os.path.getsize(filename)
-            msize = os.path.getsize(self.__tmp__ + filename)
+            msize = tmpdir.join(filename).size()
             assert osize == msize, "Filesizes aren't supposed to differ (%r %d, %r %d)!" % (
                 filename, osize, self.__tmp__ + filename, msize)
 
@@ -322,11 +321,9 @@ class TestRtorrentMagnet(object):
     """
 
 
-    def test_rtorrent_magnet(self, execute_task):
-        task = execute_task('test')
-        filename = 'meta-test.torrent'
-        fullpath = os.path.join(self.__tmp__, filename)
-        assert os.path.isfile(fullpath)
-        with open(fullpath) as f:
-            assert (f.read() ==
-                    'd10:magnet-uri76:magnet:?xt=urn:btih:HASH&dn=title&tr=http://torrent.ubuntu.com:6969/announcee')
+    def test_rtorrent_magnet(self, execute_task, tmpdir):
+        execute_task('test')
+        fullpath = tmpdir.join('meta-test.torrent')
+        assert fullpath.isfile()
+        assert (fullpath.read() ==
+                'd10:magnet-uri76:magnet:?xt=urn:btih:HASH&dn=title&tr=http://torrent.ubuntu.com:6969/announcee')
