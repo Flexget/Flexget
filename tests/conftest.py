@@ -1,5 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
+
+import itertools
+
 import os
 import sys
 import yaml
@@ -43,6 +46,8 @@ def manager(request, config, caplog, filecopy):  # enforce filecopy is run befor
     """
     Create a :class:`MockManager` for this test based on `config` argument.
     """
+    if 'tmpdir' in request.fixturenames:
+        config = config.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)
     try:
         mockmanager = MockManager(config, request.cls.__name__)
     except Exception:
@@ -148,17 +153,22 @@ def pytest_runtest_setup(item):
 
 
 @pytest.fixture()
-def filecopy(request, tmpdir):
+def filecopy(request):
     marker = request.node.get_marker('filecopy')
     if marker is not None:
-        src, dst = marker.args
-        dst = Path(dst.replace('__tmp__', tmpdir.strpath))
+        sources, dst = marker.args
+        if isinstance(sources, basestring):
+            sources = [sources]
+        if 'tmpdir' in request.fixturenames:
+            dst = dst.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)
+        dst = Path(dst)
         out_files = []
-        for f in Path().glob(src):
-            if dst.isdir():
-                dst = dst / f.basename()
-            f.copy(dst)
-            out_files.append(dst)
+        for f in itertools.chain(*(Path().glob(src) for src in sources)):
+            dest_path = dst
+            if dest_path.isdir():
+                dest_path = dest_path / f.basename()
+            f.copy(dest_path)
+            out_files.append(dest_path)
 
         def fin():
             for f in out_files:
