@@ -140,13 +140,14 @@ class SeenSearchAPI(APIResource):
             'status': is_seen_local,
             'stop': stop,
             'start': start,
+            'order_by': sort_by,
+            'descending': order,
             'session': session
         }
         count = seen.search(count=True, **kwargs)
 
         raw_seen_entries_list = seen.search(**kwargs)
         converted_seen_entry_list = [entry.to_dict() for entry in raw_seen_entries_list.all()]
-        sorted_seen_entries_list = sorted(converted_seen_entry_list, key=itemgetter(sort_by), reverse=order)
 
         pages = int(ceil(count / float(page_size)))
 
@@ -156,7 +157,7 @@ class SeenSearchAPI(APIResource):
                     'message': 'page %s does not exist' % page}, 404
 
         return jsonify({
-            'seen_entries': sorted_seen_entries_list,
+            'seen_entries': converted_seen_entry_list,
             'total_number_of_seen_entries': count,
             'number_of_seen_entries': page_size,
             'page_number': page,

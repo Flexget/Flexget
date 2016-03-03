@@ -338,17 +338,20 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
 
 
 @with_session
-def search(value=None, status=None, start=None, stop=None, count=False, session=None):
+def search(value=None, status=None, start=None, stop=None, count=False, order_by=None, descending=False, session=None):
     query = session.query(SeenEntry)
     if count:
         return query.count()
-    query = query.slice(start, stop).from_self()
-    if value:
-        query = query.join(SeenField).filter(SeenField.value.like(value)).order_by(SeenField.added)
+    if descending:
+        query = query.order_by(getattr(SeenEntry, order_by).desc())
     else:
-        query = query.join(SeenField).order_by(SeenField.added)
+        query = query.order_by(getattr(SeenEntry, order_by))
+    query = query.join(SeenField)
+    if value:
+        query = query.join(SeenField).filter(SeenField.value.like(value))
     if status is not None:
         query = query.filter(SeenEntry.local == status)
+    query = query.slice(start, stop).from_self()
     return query
 
 
