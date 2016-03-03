@@ -16,7 +16,7 @@
         vm.searchTerm = "";
 
         function getSeriesList() {
-            $http.get('/api/series/', { params: options })
+            $http.get('/api/series/', { params: options, cache: true })
                 .success(function(data) {
                     vm.series = data.shows;
 
@@ -28,18 +28,21 @@
                     //Get metadata for first show
                     // TODO: Update this to load for all
                     // We will have to use caching in the server, maybe even browser as well?
-                    getMetadata(data.shows[0].show_name);
+                    getMetadata();
                 });
         }
 
-        function getMetadata(show) {
-            $http.get('/api/tvdb/' + vm.series[0].show_name)
-                .success(function(data) {
-                    vm.series[0].metadata = data;
-                })
-                .error(function(error) {
-                    console.log(error);
-                });
+        function getMetadata() {
+            vm.series.map(function(show) {
+                $http.get('/api/tvdb/series/' + show.show_name, { cache: true })
+                    .success(function(data) {
+                        show.metadata = data;
+                    })
+                    .error(function(error) {
+                        console.log(error);
+                    });
+                return show;
+            })
         }
 
         //Call from the pagination to update the page to the selected page

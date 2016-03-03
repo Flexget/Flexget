@@ -9,7 +9,7 @@
         vm.title = 'History';
         $http.get('/api/history').
         success(function (data) {
-            vm.entries = data['items'];
+            vm.entries = data['entries'];
         }).
         error(function (data, status, headers, config) {
             // log error
