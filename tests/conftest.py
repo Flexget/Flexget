@@ -92,7 +92,7 @@ def execute_task(manager):
 
 
 @pytest.yield_fixture()
-def use_vcr(request):
+def use_vcr(request, monkeypatch):
     """
     Decorator for test functions which go online. A vcr cassette will automatically be created and used to capture and
     play back online interactions. The nose 'vcr' attribute will be set, and the nose 'online' attribute will be set on
@@ -114,11 +114,12 @@ def use_vcr(request):
         online = False
     elif vcr.record_mode == 'once':
         online = not os.path.exists(cassette_path)
-    # TODO: Don't know if this is right, do some testing.
-    pytest.mark.online(request)
     # If we are not going online, disable domain limiting during test
     if not online:
-        request.function = mock.patch('flexget.utils.requests.limit_domains', new=mock.MagicMock())(request.function)
+        monkeypatch.setattr('flexget.utils.requests.limit_domains', mock.Mock())
+    else:
+        # TODO: Don't know if this is right, do some testing.
+        request.node.add_marker(pytest.mark.online)
     if VCR_RECORD_MODE == 'off':
         yield None
     else:
