@@ -26,6 +26,8 @@ def init_parsers(manager):
         func_name = 'parse_' + parser_type
         default_parsers[parser_type] = max(parsers[parser_type].iteritems(),
                                           key=lambda p: getattr(getattr(p[1], func_name), 'priority', 0))[0]
+        log.debug('setting default %s parser to %s. (options: %s)' %
+                  (parser_type, default_parsers[parser_type], parsers[parser_type]))
 
 
 class PluginParsing(object):
