@@ -248,7 +248,7 @@ series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behin
                                 default='show_name',
                                 help="Sort response by attribute.")
 series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
-series_list_parser.add_argument('lookup', choices=('tvdb',), action='append',
+series_list_parser.add_argument('lookup', choices=('tvdb','tvmaze'), action='append',
                                 help="Get lookup result for every show by sending another request to lookup API")
 
 
