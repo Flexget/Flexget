@@ -238,9 +238,9 @@ series_list_parser.add_argument('premieres', type=inputs.boolean, default=False,
                                 help="Filter by downloaded premieres only.")
 series_list_parser.add_argument('status', choices=('new', 'stale'), help="Filter by status")
 series_list_parser.add_argument('days', type=int,
-                                help="Filter status by number of days. Default is 7 for new and 365 for stale")
+                                help="Filter status by number of days.")
 series_list_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
-series_list_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Default is 100.')
+series_list_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Max is 100.')
 
 series_list_parser.add_argument('sort_by', choices=('show_name', 'episodes_behind_latest', 'last_download_date'),
                                 default='show_name',
@@ -258,6 +258,10 @@ class SeriesListAPI(APIResource):
         args = series_list_parser.parse_args()
         page = args['page']
         page_size = args['page_size']
+
+        # Handle max size limit
+        if page_size > 100:
+            page_size = 100
 
         sort_by = args['sort_by']
         order = args['order']
@@ -478,7 +482,7 @@ class SeriesBeginByNameAPI(APIResource):
 
 episode_parser = api.parser()
 episode_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
-episode_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Default is 100.')
+episode_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Max is 100.')
 episode_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
 
 
@@ -494,6 +498,10 @@ class SeriesEpisodesAPI(APIResource):
         args = episode_parser.parse_args()
         page = args['page']
         page_size = args['page_size']
+
+        # Handle max size limit
+        if page_size > 100:
+            page_size = 100
 
         order = args['order']
         # In case the default 'desc' order was received
