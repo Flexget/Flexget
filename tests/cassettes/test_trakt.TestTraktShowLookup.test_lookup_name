@@ -144,16 +144,16 @@ interactions:
           imdb\":\"tt2279701\",\"tmdb\":null,\"tvrage\":null}}}]"}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [EXPIRED]
-        cf-ray: [27dc158ef94f04b6-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce6605c5b04b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:32:59 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:31 GMT']
         etag: [W/"20793cb1d9858d55c6f9a2ae72306f0c"]
-        expires: ['Thu, 03 Mar 2016 13:32:59 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:31 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d0784bc0c5c4e730cdb7846721b0fa3171456997578; expires=Fri,
-            03-Mar-17 09:32:58 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d17d63e8788cd17ddaf215e0c0ee444d91457006131; expires=Fri,
+            03-Mar-17 11:55:31 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -169,7 +169,7 @@ interactions:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=d0784bc0c5c4e730cdb7846721b0fa3171456997578]
+        Cookie: [__cfduid=d17d63e8788cd17ddaf215e0c0ee444d91457006131]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -187,12 +187,12 @@ interactions:
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [27dc15955a4304b6-SYD]
+        cf-ray: [27dce660bc6504b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:32:59 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:31 GMT']
         etag: [W/"d59feb20b1932bbe0d26e500a30e74b5"]
-        expires: ['Thu, 03 Mar 2016 13:32:59 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:31 GMT']
         last-modified: ['Thu, 11 Feb 2016 10:31:53 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]

@@ -1,0 +1,26 @@
+interactions:
+  - request:
+      body: username=set&password=this
+      headers:
+        Accept: ['*/*']
+        Connection: [keep-alive]
+        Content-Length: ['26']
+        Content-Type: [application/x-www-form-urlencoded]
+        User-Agent: [FlexGet/1.2.470.dev (www.flexget.com)]
+      method: POST
+      uri: http://api.t411.ch/auth
+    response:
+      body: {string: '{"error":"User not found","code":101}'}
+      headers:
+        cf-ray: [27dca0a5d2ee04ce-SYD]
+        connection: [keep-alive]
+        content-type: [text/html; charset=windows-1252]
+        date: ['Thu, 03 Mar 2016 11:07:55 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=d01fd02bad0373170658abf87b72dd94b1457003275; expires=Fri,
+            03-Mar-17 11:07:55 GMT; path=/; domain=.t411.ch; HttpOnly']
+        t411-node: [webus1]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.30-1+deb.sury.org~trusty+1]
+      status: {code: 200, message: OK}
+version: 1

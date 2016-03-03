@@ -34,16 +34,16 @@ interactions:
           Enter the Dragon and The Matrix.","year":1999,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/037/624/posters/original/c5c0cb76f8.jpg","medium":"https://walter.trakt.us/images/movies/000/037/624/posters/medium/c5c0cb76f8.jpg","thumb":"https://walter.trakt.us/images/movies/000/037/624/posters/thumb/c5c0cb76f8.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/037/624/fanarts/original/de31c092f7.jpg","medium":"https://walter.trakt.us/images/movies/000/037/624/fanarts/medium/de31c092f7.jpg","thumb":"https://walter.trakt.us/images/movies/000/037/624/fanarts/thumb/de31c092f7.jpg"}},"ids":{"trakt":37624,"slug":"the-tricky-master-1999","imdb":"tt0212864","tmdb":53281}}}]'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc15b05b140b20-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce6da4c1319ce-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:03 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:50 GMT']
         etag: [W/"30f5b2247f81809ef63cc7c4862e04d1"]
-        expires: ['Thu, 03 Mar 2016 13:33:03 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:50 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d2eb69d4e9f31b640ee5f1acd342e9c711456997583; expires=Fri,
-            03-Mar-17 09:33:03 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=de9482a21717a777f62231cdb186464ed1457006150; expires=Fri,
+            03-Mar-17 11:55:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -59,7 +59,7 @@ interactions:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=d2eb69d4e9f31b640ee5f1acd342e9c711456997583]
+        Cookie: [__cfduid=de9482a21717a777f62231cdb186464ed1457006150]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -74,12 +74,12 @@ interactions:
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [27dc15b24b450b20-SYD]
+        cf-ray: [27dce6da8c1b19ce-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:03 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:50 GMT']
         etag: [W/"067454e5c83c3ba6a6e36ba7b868bf43"]
-        expires: ['Thu, 03 Mar 2016 13:33:03 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:50 GMT']
         last-modified: ['Sun, 01 Nov 2015 15:09:57 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]
@@ -159,16 +159,16 @@ interactions:
           Wachowski","ids":{"trakt":413681,"slug":"lana-wachowski","imdb":"nm0905154","tmdb":9340,"tvrage":null}}}]}}'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc15b7bf0104b6-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce6dbbf5904b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:05 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:51 GMT']
         etag: [W/"52d2942b4e9f6b9f52201fcdbbe78fb4"]
-        expires: ['Thu, 03 Mar 2016 13:33:05 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:51 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dda4a9934e6f05ed22da05369989ef8791456997584; expires=Fri,
-            03-Mar-17 09:33:04 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d26ff56152670904f18ab98b35539cd031457006150; expires=Fri,
+            03-Mar-17 11:55:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]

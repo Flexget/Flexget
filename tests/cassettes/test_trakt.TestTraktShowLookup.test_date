@@ -153,16 +153,16 @@ interactions:
           tmdb\":3430,\"tvrage\":null}}}]"}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc1598109719ce-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce674355504d4-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:00 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:34 GMT']
         etag: [W/"ade7d61917d04b2218ad54e47518eae5"]
-        expires: ['Thu, 03 Mar 2016 13:33:00 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:34 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dc9177e7897f65c4950de9668813e913e1456997579; expires=Fri,
-            03-Mar-17 09:32:59 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=df5fbbeba5bf67fa55722541b1c96c2dc1457006134; expires=Fri,
+            03-Mar-17 11:55:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]

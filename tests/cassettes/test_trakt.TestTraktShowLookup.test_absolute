@@ -59,16 +59,16 @@ interactions:
           who are the primary audience.","year":2006,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/006/742/posters/original/08a1152b05.jpg","medium":"https://walter.trakt.us/images/shows/000/006/742/posters/medium/08a1152b05.jpg","thumb":"https://walter.trakt.us/images/shows/000/006/742/posters/thumb/08a1152b05.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/006/742/fanarts/original/39a770759a.jpg","medium":"https://walter.trakt.us/images/shows/000/006/742/fanarts/medium/39a770759a.jpg","thumb":"https://walter.trakt.us/images/shows/000/006/742/fanarts/thumb/39a770759a.jpg"}},"ids":{"trakt":6742,"slug":"pucca","tvdb":81774,"imdb":"tt0795256","tmdb":6782,"tvrage":null}}}]'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc15a3121a04d4-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce676dd6319c2-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:01 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:34 GMT']
         etag: [W/"4865255802d2834e7964b12548c5329c"]
-        expires: ['Thu, 03 Mar 2016 13:33:01 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:34 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=db66ccd06886e0530c194187e8449881b1456997581; expires=Fri,
-            03-Mar-17 09:33:01 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=dd376971ed900c9b46efacc76eb56c9e41457006134; expires=Fri,
+            03-Mar-17 11:55:34 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -84,7 +84,7 @@ interactions:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=db66ccd06886e0530c194187e8449881b1456997581]
+        Cookie: [__cfduid=dd376971ed900c9b46efacc76eb56c9e41457006134]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -101,13 +101,13 @@ interactions:
           Tokyo","country":"jp","trailer":null,"homepage":null,"status":"ended","rating":8.20478,"votes":1675,"updated_at":"2016-03-02T11:14:51.000Z","language":"ja","available_translations":["en","de","fr","he","ar","es","it","ru","cs","pt","ko"],"genres":["animation","comedy","action","adventure","fantasy","thriller"],"aired_episodes":220}'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [EXPIRED]
-        cf-ray: [27dc15a5022904d4-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce6771d6f19c2-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:02 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:34 GMT']
         etag: [W/"343fb9f617322846df60772c458d8f78"]
-        expires: ['Thu, 03 Mar 2016 13:33:02 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:34 GMT']
         last-modified: ['Wed, 02 Mar 2016 11:14:51 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]

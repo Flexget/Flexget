@@ -37,16 +37,16 @@ interactions:
           lenses to play the role of the highly influential author.","year":2011,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/059/971/posters/original/d5c52dbee5.jpg","medium":"https://walter.trakt.us/images/movies/000/059/971/posters/medium/d5c52dbee5.jpg","thumb":"https://walter.trakt.us/images/movies/000/059/971/posters/thumb/d5c52dbee5.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/059/971/fanarts/original/7505ef5301.jpg","medium":"https://walter.trakt.us/images/movies/000/059/971/fanarts/medium/7505ef5301.jpg","thumb":"https://walter.trakt.us/images/movies/000/059/971/fanarts/thumb/7505ef5301.jpg"}},"ids":{"trakt":59971,"slug":"magic-beyond-words-the-jk-rowling-story-2011","imdb":"tt1979269","tmdb":80530}}}]'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc15d08dda04d4-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce6d7856f19c2-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:09 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:50 GMT']
         etag: [W/"b3de5b4146eb32308c15cd97ae22cb7a"]
-        expires: ['Thu, 03 Mar 2016 13:33:09 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:50 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d64da97d01287cee7e3191c2ff1eb2ba81456997588; expires=Fri,
-            03-Mar-17 09:33:08 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=dc00794c618e8f10f5494682eb4ab79c61457006150; expires=Fri,
+            03-Mar-17 11:55:50 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -62,7 +62,7 @@ interactions:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=d64da97d01287cee7e3191c2ff1eb2ba81456997588]
+        Cookie: [__cfduid=dc00794c618e8f10f5494682eb4ab79c61457006150]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -78,13 +78,13 @@ interactions:
           blame.","released":"2001-11-04","runtime":152,"trailer":"http://youtube.com/watch?v=qPvlb6eXzMA","homepage":"http://harrypotter.warnerbros.com/harrypotterandthedeathlyhallows/mainsite/index.html","rating":7.92714,"votes":10760,"updated_at":"2015-12-02T08:31:11.000Z","language":"en","available_translations":["en","de","it","fr","nl","hu","sk","pt","ru","sv","cs","zh","tr","es","fa","fi","el","da","pl","th","he","sr","ja","no","et","ko","lv","ro"],"genres":["adventure","fantasy","family"],"certification":"PG"}'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc15d6ee3504d4-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce6d7c57519c2-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:09 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:50 GMT']
         etag: [W/"2a29c634c1885cc71925c51a6abf9f4e"]
-        expires: ['Thu, 03 Mar 2016 13:33:09 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:50 GMT']
         last-modified: ['Wed, 02 Dec 2015 08:31:11 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]

@@ -83,14 +83,14 @@ class TestTraktShowLookup(object):
         task = execute_task('test_search_result')
         entry = task.entries[0]
         print entry['trakt_series_name'].lower()
-        assert entry['trakt_series_name'].lower() == 'Shameless (US)'.lower(), 'lookup failed'
+        assert entry['trakt_series_name'].lower() == 'Shameless'.lower(), 'lookup failed'
         with Session() as session:
-            assert task.entries[1]['trakt_series_name'].lower() == 'Shameless (US)'.lower(), 'second lookup failed'
+            assert task.entries[1]['trakt_series_name'].lower() == 'Shameless'.lower(), 'second lookup failed'
 
             assert len(session.query(TraktShowSearchResult).all()) == 1, 'should have added 1 show to search result'
 
             assert len(session.query(TraktShow).all()) == 1, 'should only have added one show to show table'
-            assert session.query(TraktShow).first().title == 'Shameless (US)', 'should have added Shameless (US) and' \
+            assert session.query(TraktShow).first().title == 'Shameless', 'should have added Shameless and' \
                                                                                'not Shameless (2011)'
             # change the search query
             session.query(TraktShowSearchResult).update({'search': "Shameless.S01E03.HDTV-FlexGet"})

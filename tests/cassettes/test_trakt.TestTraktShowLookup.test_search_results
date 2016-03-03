@@ -17,16 +17,16 @@ interactions:
           who they are.","year":2011,"status":"returning series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/034/160/posters/original/0fed195982.jpg","medium":"https://walter.trakt.us/images/shows/000/034/160/posters/medium/0fed195982.jpg","thumb":"https://walter.trakt.us/images/shows/000/034/160/posters/thumb/0fed195982.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/034/160/fanarts/original/c04bebba45.jpg","medium":"https://walter.trakt.us/images/shows/000/034/160/fanarts/medium/c04bebba45.jpg","thumb":"https://walter.trakt.us/images/shows/000/034/160/fanarts/thumb/c04bebba45.jpg"}},"ids":{"trakt":34160,"slug":"shameless-2011","tvdb":161511,"imdb":"tt1586680","tmdb":34307,"tvrage":25117}}}]'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc159c470519aa-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce66d44fb19aa-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:01 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:33 GMT']
         etag: [W/"598b71a131fa8197168edd97eae5fbe8"]
-        expires: ['Thu, 03 Mar 2016 13:33:01 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:33 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=db1f1d9a6436011366ea84b2298495f821456997580; expires=Fri,
-            03-Mar-17 09:33:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=dbad9330304566e2bb85867e16d94ecd01457006133; expires=Fri,
+            03-Mar-17 11:55:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -42,7 +42,7 @@ interactions:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=db1f1d9a6436011366ea84b2298495f821456997580]
+        Cookie: [__cfduid=dbad9330304566e2bb85867e16d94ecd01457006133]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -59,12 +59,12 @@ interactions:
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [27dc15a287a019aa-SYD]
+        cf-ray: [27dce66d84fe19aa-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:01 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:33 GMT']
         etag: [W/"87f84564ca17791610c103817fb053a5"]
-        expires: ['Thu, 03 Mar 2016 13:33:01 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:33 GMT']
         last-modified: ['Wed, 02 Mar 2016 11:08:35 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]

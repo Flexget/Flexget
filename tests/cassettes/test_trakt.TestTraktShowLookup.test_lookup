@@ -145,15 +145,15 @@ interactions:
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [27dc159a80d019ce-SYD]
+        cf-ray: [27dce663adae19ce-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:32:59 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:31 GMT']
         etag: [W/"20793cb1d9858d55c6f9a2ae72306f0c"]
-        expires: ['Thu, 03 Mar 2016 13:32:59 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:31 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dc9177e7897f65c4950de9668813e913e1456997579; expires=Fri,
-            03-Mar-17 09:32:59 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=df86ac5eb77751d6bb8b07d5ccbd1e0951457006131; expires=Fri,
+            03-Mar-17 11:55:31 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -169,7 +169,7 @@ interactions:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=dc9177e7897f65c4950de9668813e913e1456997579]
+        Cookie: [__cfduid=df86ac5eb77751d6bb8b07d5ccbd1e0951457006131]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -187,12 +187,12 @@ interactions:
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [27dc159ad0d619ce-SYD]
+        cf-ray: [27dce6641db619ce-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:32:59 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:31 GMT']
         etag: [W/"d59feb20b1932bbe0d26e500a30e74b5"]
-        expires: ['Thu, 03 Mar 2016 13:32:59 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:31 GMT']
         last-modified: ['Thu, 11 Feb 2016 10:31:53 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]
@@ -221,16 +221,16 @@ interactions:
           off in spades.","rating":8.05909,"votes":440,"first_aired":"2004-11-23T05:00:00.000Z","updated_at":"2016-02-29T03:06:23.000Z","available_translations":[]}'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc159beaf604d4-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce664f77219aa-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:00 GMT']
-        expires: ['Thu, 03 Mar 2016 13:33:00 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:32 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:32 GMT']
         last-modified: ['Mon, 29 Feb 2016 03:06:23 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=ddaa5ec11a4224f7361ca4bbcff9c43511456997580; expires=Fri,
-            03-Mar-17 09:33:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d1b97378c168b8f586be6748da1b0e4321457006132; expires=Fri,
+            03-Mar-17 11:55:32 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -394,16 +394,16 @@ interactions:
           ,\"tvdb\":294625,\"imdb\":\"tt1301845\",\"tmdb\":16715,\"tvrage\":14290}}}]"}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc159e8d6619b6-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce666153619b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:00 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:32 GMT']
         etag: [W/"e5b218f5e5ee3693cef8efbdf480bada"]
-        expires: ['Thu, 03 Mar 2016 13:33:00 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:32 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dffbdee456fb17a159ac1c73cd2b7940c1456997580; expires=Fri,
-            03-Mar-17 09:33:00 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=de6f02964862a582f72e78b67f3c562c51457006132; expires=Fri,
+            03-Mar-17 11:55:32 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -419,7 +419,7 @@ interactions:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=dffbdee456fb17a159ac1c73cd2b7940c1456997580]
+        Cookie: [__cfduid=de6f02964862a582f72e78b67f3c562c51457006132]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -445,13 +445,13 @@ interactions:
           ],\"aired_episodes\":115}"}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [REVALIDATED]
-        cf-ray: [27dc15a0ad8d19b6-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce666654d19b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:01 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:32 GMT']
         etag: [W/"28f1487f00f8f7a8a255e316c2cf3549"]
-        expires: ['Thu, 03 Mar 2016 13:33:01 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:32 GMT']
         last-modified: ['Tue, 01 Mar 2016 10:34:03 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]
@@ -482,16 +482,16 @@ interactions:
           :[]}"}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc15a343f019ce-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce66783020b20-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:02 GMT']
-        expires: ['Thu, 03 Mar 2016 13:33:02 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:32 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:32 GMT']
         last-modified: ['Wed, 02 Mar 2016 10:22:34 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dd9f296c6d5f18575cddcae4dc7ee10c71456997581; expires=Fri,
-            03-Mar-17 09:33:01 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=dfa3c8d0c58c9eca458d1b504be85e8e61457006132; expires=Fri,
+            03-Mar-17 11:55:32 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]

@@ -16,17 +16,17 @@ interactions:
           about our reality.","released":"1999-03-30","runtime":136,"trailer":"http://youtube.com/watch?v=m8e-FF8MsqU","homepage":"http://www.warnerbros.com/movies/home-entertainment/the-matrix/37313ac7-9229-474d-a423-44b7a6bc1a54.html","rating":8.93307,"votes":19080,"updated_at":"2015-11-01T15:09:57.000Z","language":"en","available_translations":["en","de","es","cs","ru","fr","pt","hu","da","zh","it","tr","nl","sv","fi","ja","pl","mk","sk","he","no","el","bg","th","ko","uk","ro","sr","id"],"genres":["action","adventure","science-fiction","thriller"],"certification":"R"}'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc15abbb2719aa-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce6d5004604b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:02 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:49 GMT']
         etag: [W/"067454e5c83c3ba6a6e36ba7b868bf43"]
-        expires: ['Thu, 03 Mar 2016 13:33:02 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:49 GMT']
         last-modified: ['Sun, 01 Nov 2015 15:09:57 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d7c280960e0ce329e5f09e88352b950201456997582; expires=Fri,
-            03-Mar-17 09:33:02 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d3196f2959f0c181f1556dc26f5352b961457006149; expires=Fri,
+            03-Mar-17 11:55:49 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]

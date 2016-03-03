@@ -11,16 +11,16 @@ interactions:
       body: {string: '[]'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc15932d820b14-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce66aad2804b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:32:59 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:32 GMT']
         etag: [W/"54e191b1c0642fe003365c024ea193b1"]
-        expires: ['Thu, 03 Mar 2016 13:32:59 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:32 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d03c4193d792d4ab8a10936005c743d6d1456997578; expires=Fri,
-            03-Mar-17 09:32:58 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d3c64cbd8f3d4f7a446e36fdd33c3e5291457006132; expires=Fri,
+            03-Mar-17 11:55:32 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]

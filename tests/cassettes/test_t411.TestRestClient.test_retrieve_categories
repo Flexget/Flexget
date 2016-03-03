@@ -1,0 +1,25 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept: ['*/*']
+        Authorization: [you must set this value for online test]
+        Connection: [keep-alive]
+        User-Agent: [FlexGet/1.2.470.dev (www.flexget.com)]
+      method: GET
+      uri: http://api.t411.ch/categories/tree/
+    response:
+      body: {string: '{"error":"Invalid token","code":202}'}
+      headers:
+        cf-ray: [27dca0ab84c904c2-SYD]
+        connection: [keep-alive]
+        content-type: [text/html; charset=windows-1252]
+        date: ['Thu, 03 Mar 2016 11:07:56 GMT']
+        server: [cloudflare-nginx]
+        set-cookie: ['__cfduid=de74ab40342aa119f53ed9dc12151c50d1457003276; expires=Fri,
+            03-Mar-17 11:07:56 GMT; path=/; domain=.t411.ch; HttpOnly']
+        t411-node: [webus1]
+        vary: [Accept-Encoding]
+        x-powered-by: [PHP/5.5.30-1+deb.sury.org~trusty+1]
+      status: {code: 200, message: OK}
+version: 1

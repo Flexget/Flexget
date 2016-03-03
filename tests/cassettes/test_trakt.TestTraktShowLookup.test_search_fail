@@ -206,16 +206,16 @@ interactions:
           :\"tt0187698\",\"tmdb\":43566,\"tvrage\":null}}}]"}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [MISS]
-        cf-ray: [27dc15c59d4e19aa-SYD]
+        cf-cache-status: [HIT]
+        cf-ray: [27dce67127a219aa-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Mar 2016 09:33:07 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:33 GMT']
         etag: [W/"63a12c36b9e5f3e10e7a7e5e802103bb"]
-        expires: ['Thu, 03 Mar 2016 13:33:07 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:33 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d616e8c33d623ed539cceb7ea7df990c61456997586; expires=Fri,
-            03-Mar-17 09:33:06 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=dbad9330304566e2bb85867e16d94ecd01457006133; expires=Fri,
+            03-Mar-17 11:55:33 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
