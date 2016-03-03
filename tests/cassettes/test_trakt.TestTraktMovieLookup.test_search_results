@@ -8,14 +8,19 @@ interactions:
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=harry+potter+and+the+philosopher%27s+stone&type=movie
     response:
-      body: {string: '[{"type":"movie","score":92.32303,"movie":{"title":"Harry Potter
+      body: {string: '[{"type":"movie","score":87.11672,"movie":{"title":"Harry Potter
           and the Philosopher''s Stone","overview":"Harry Potter has lived under the
           stairs at his aunt and uncle''s house his whole life. But on his 11th birthday,
           he learns he''s a powerful wizard -- with a place waiting for him at the
           Hogwarts School of Witchcraft and Wizardry. As he learns to harness his
           newfound powers with the help of the school''s kindly headmaster, Harry
           uncovers the truth about his parents'' deaths -- and about the villain who''s
-          to blame.","year":2001,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/545/posters/original/c8779ab3c4.jpg","medium":"https://walter.trakt.us/images/movies/000/000/545/posters/medium/c8779ab3c4.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/545/posters/thumb/c8779ab3c4.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/545/fanarts/original/8446d03b80.jpg","medium":"https://walter.trakt.us/images/movies/000/000/545/fanarts/medium/8446d03b80.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/545/fanarts/thumb/8446d03b80.jpg"}},"ids":{"trakt":545,"slug":"harry-potter-and-the-philosopher-s-stone-2001","imdb":"tt0241527","tmdb":671}}},{"type":"movie","score":2.3393703,"movie":{"title":"Magic
+          to blame.","year":2001,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/000/545/posters/original/c8779ab3c4.jpg","medium":"https://walter.trakt.us/images/movies/000/000/545/posters/medium/c8779ab3c4.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/545/posters/thumb/c8779ab3c4.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/000/545/fanarts/original/8446d03b80.jpg","medium":"https://walter.trakt.us/images/movies/000/000/545/fanarts/medium/8446d03b80.jpg","thumb":"https://walter.trakt.us/images/movies/000/000/545/fanarts/thumb/8446d03b80.jpg"}},"ids":{"trakt":545,"slug":"harry-potter-and-the-philosopher-s-stone-2001","imdb":"tt0241527","tmdb":671}}},{"type":"movie","score":9.901385,"movie":{"title":"Percy
+          Jackson & the Olympians: The Lightning Thief","overview":"Accident prone
+          teenager, Percy discovers he''s actually a demi-God, the son of Poseidon,
+          and he is needed when Zeus'' lightning is stolen. Percy must master his
+          new found skills in order to prevent a war between the Gods that could devastate
+          the entire world.","year":2010,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/020/979/posters/original/4e154a1693.jpg","medium":"https://walter.trakt.us/images/movies/000/020/979/posters/medium/4e154a1693.jpg","thumb":"https://walter.trakt.us/images/movies/000/020/979/posters/thumb/4e154a1693.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/020/979/fanarts/original/3aab8b13c1.jpg","medium":"https://walter.trakt.us/images/movies/000/020/979/fanarts/medium/3aab8b13c1.jpg","thumb":"https://walter.trakt.us/images/movies/000/020/979/fanarts/thumb/3aab8b13c1.jpg"}},"ids":{"trakt":20979,"slug":"percy-jackson-the-olympians-the-lightning-thief-2010","imdb":"tt0814255","tmdb":32657}}},{"type":"movie","score":2.2706547,"movie":{"title":"Magic
           Beyond Words: The JK Rowling Story","overview":"Magic Beyond Words: The
           J.K. Rowling Story is a made-for-TV film starring Australian actress Poppy
           Montgomery. The film, which was shot in B.C. Canada locations altered to
@@ -32,32 +37,32 @@ interactions:
           lenses to play the role of the highly influential author.","year":2011,"images":{"poster":{"full":"https://walter.trakt.us/images/movies/000/059/971/posters/original/d5c52dbee5.jpg","medium":"https://walter.trakt.us/images/movies/000/059/971/posters/medium/d5c52dbee5.jpg","thumb":"https://walter.trakt.us/images/movies/000/059/971/posters/thumb/d5c52dbee5.jpg"},"fanart":{"full":"https://walter.trakt.us/images/movies/000/059/971/fanarts/original/7505ef5301.jpg","medium":"https://walter.trakt.us/images/movies/000/059/971/fanarts/medium/7505ef5301.jpg","thumb":"https://walter.trakt.us/images/movies/000/059/971/fanarts/thumb/7505ef5301.jpg"}},"ids":{"trakt":59971,"slug":"magic-beyond-words-the-jk-rowling-story-2011","imdb":"tt1979269","tmdb":80530}}}]'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [24ec65450d1c1fe2-DFW]
+        cf-cache-status: [MISS]
+        cf-ray: [27dc15d08dda04d4-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:05:51 GMT']
-        etag: [W/"de8774f8617159b652f270746228f3a7"]
-        expires: ['Thu, 03 Dec 2015 08:05:51 GMT']
+        date: ['Thu, 03 Mar 2016 09:33:09 GMT']
+        etag: [W/"b3de5b4146eb32308c15cd97ae22cb7a"]
+        expires: ['Thu, 03 Mar 2016 13:33:09 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d0acc22b10d169acfac9d0912b6c093991449115551; expires=Fri,
-            02-Dec-16 04:05:51 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d64da97d01287cee7e3191c2ff1eb2ba81456997588; expires=Fri,
+            03-Mar-17 09:33:08 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['2']
+        x-pagination-item-count: ['3']
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
         x-pagination-page-count: ['1']
-        x-request-id: [e209bda7-2848-4bd3-98ba-3731e8b73dd4]
-        x-runtime: ['0.019631']
+        x-request-id: [b36dd793-21cb-4d3b-9a6c-3bd12e9b30ab]
+        x-runtime: ['0.018420']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=d0acc22b10d169acfac9d0912b6c093991449115551]
+        Cookie: [__cfduid=d64da97d01287cee7e3191c2ff1eb2ba81456997588]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -70,23 +75,23 @@ interactions:
           School of Witchcraft and Wizardry. As he learns to harness his newfound
           powers with the help of the school''s kindly headmaster, Harry uncovers
           the truth about his parents'' deaths -- and about the villain who''s to
-          blame.","released":"2001-11-04","runtime":152,"trailer":"http://youtube.com/watch?v=qPvlb6eXzMA","homepage":"http://harrypotter.warnerbros.com/harrypotterandthedeathlyhallows/mainsite/index.html","rating":7.97787,"votes":9850,"updated_at":"2015-12-02T08:31:11.000Z","language":"en","available_translations":["en","de","it","fr","nl","hu","sk","pt","ru","sv","cs","zh","tr","es","fa","fi","el","da","pl","th","he","sr","ja","no","et","ko","lv","ro"],"genres":["adventure","fantasy","family"],"certification":"PG"}'}
+          blame.","released":"2001-11-04","runtime":152,"trailer":"http://youtube.com/watch?v=qPvlb6eXzMA","homepage":"http://harrypotter.warnerbros.com/harrypotterandthedeathlyhallows/mainsite/index.html","rating":7.92714,"votes":10760,"updated_at":"2015-12-02T08:31:11.000Z","language":"en","available_translations":["en","de","it","fr","nl","hu","sk","pt","ru","sv","cs","zh","tr","es","fa","fi","el","da","pl","th","he","sr","ja","no","et","ko","lv","ro"],"genres":["adventure","fantasy","family"],"certification":"PG"}'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [24ec65455d211fe2-DFW]
+        cf-cache-status: [MISS]
+        cf-ray: [27dc15d6ee3504d4-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:05:51 GMT']
-        etag: [W/"04b7276ca1d4c714da410a5fc5a46504"]
-        expires: ['Thu, 03 Dec 2015 08:05:51 GMT']
+        date: ['Thu, 03 Mar 2016 09:33:09 GMT']
+        etag: [W/"2a29c634c1885cc71925c51a6abf9f4e"]
+        expires: ['Thu, 03 Mar 2016 13:33:09 GMT']
         last-modified: ['Wed, 02 Dec 2015 08:31:11 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [e8b4dc72-b298-4349-a249-85e322a1781d]
-        x-runtime: ['0.012625']
+        x-request-id: [9e9431b9-eaaf-4cc8-9ed1-44b4e0a12960]
+        x-runtime: ['0.012109']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

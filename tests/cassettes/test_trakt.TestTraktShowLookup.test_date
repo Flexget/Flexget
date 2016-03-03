@@ -8,38 +8,40 @@ interactions:
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=the+daily+show+%28with+jon+stewart%29&type=show
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":35.20958,\"show\":{\"title\":\"\
-          The Daily Show\",\"overview\":\"Forget trying to keep pace with 24 hour\
-          \ news networks- the best fake news show in the world will provide you with\
-          \ all the news you can handle. The Daily Show is a comedic view of recent\
-          \ news headlines and political figures through a series of satirical monologues\
-          \ along with segments by correspondents and finally interviews with guest\
-          \ celebrities and political figures. The Daily Show with Trevor Noah is\
-          \ filmed at 733 11th Avenue,  New York, NY.\",\"year\":1996,\"status\":\"\
-          returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/002/211/posters/original/9a93a8a3d9.jpg\"\
+      body: {string: "[{\"type\":\"show\",\"score\":31.02108,\"show\":{\"title\":\"\
+          The Daily Show with Trevor Noah\",\"overview\":\"Forget trying to keep pace\
+          \ with 24 hour news networks- the best fake news show in the world will\
+          \ provide you with all the news you can handle. The Daily Show is a comedic\
+          \ view of recent news headlines and political figures through a series of\
+          \ satirical monologues along with segments by correspondents and finally\
+          \ interviews with guest celebrities and political figures. The Daily Show\
+          \ with Trevor Noah is filmed at 733 11th Avenue,  New York, NY.\",\"year\"\
+          :1996,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"\
+          https://walter.trakt.us/images/shows/000/002/211/posters/original/9a93a8a3d9.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/002/211/posters/medium/9a93a8a3d9.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/002/211/posters/thumb/9a93a8a3d9.jpg\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/002/211/fanarts/original/3c89474355.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/002/211/fanarts/medium/3c89474355.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/002/211/fanarts/thumb/3c89474355.jpg\"\
-          }},\"ids\":{\"trakt\":2211,\"slug\":\"the-daily-show\",\"tvdb\":71256,\"\
-          imdb\":\"tt0115147\",\"tmdb\":2224,\"tvrage\":5714}}},{\"type\":\"show\"\
-          ,\"score\":23.508991,\"show\":{\"title\":\"Daily Planet\",\"overview\":\"\
-          Ever since the Discovery Channel was created in 1995, Daily Planet (2002;\
-          \ previously @discovery.ca), continues to be Canada's only daily science\
-          \ series. Daily Planet is a show about new advances in science. Every weekday,\
-          \ hosts Jay Ingram (1995) and Kim Jagtiani (2007) bring science current\
-          \ events to the airwaves with short documentaries, interviews and discussions.\
-          \ Among some of the common topics in Daily Planet are nature and the environment,\
-          \ advances in robotics, medicine, space travel and many more as the occasion\
-          \ warrants. The show also features theme weeks: an in-depth week-long view\
-          \ at several interesting domains.\",\"year\":2002,\"status\":\"returning\
-          \ series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/011/421/posters/original/77102af1cb.jpg\"\
+          }},\"ids\":{\"trakt\":2211,\"slug\":\"the-daily-show-with-trevor-noah\"\
+          ,\"tvdb\":71256,\"imdb\":\"tt0115147\",\"tmdb\":2224,\"tvrage\":5714}}},{\"\
+          type\":\"show\",\"score\":21.499828,\"show\":{\"title\":\"Daily Planet\"\
+          ,\"overview\":\"Ever since the Discovery Channel was created in 1995, Daily\
+          \ Planet (2002; previously @discovery.ca), continues to be Canada's only\
+          \ daily science series. Daily Planet is a show about new advances in science.\
+          \ Every weekday, hosts Jay Ingram (1995) and Kim Jagtiani (2007) bring science\
+          \ current events to the airwaves with short documentaries, interviews and\
+          \ discussions. Among some of the common topics in Daily Planet are nature\
+          \ and the environment, advances in robotics, medicine, space travel and\
+          \ many more as the occasion warrants. The show also features theme weeks:\
+          \ an in-depth week-long view at several interesting domains.\",\"year\"\
+          :2002,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"\
+          https://walter.trakt.us/images/shows/000/011/421/posters/original/77102af1cb.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/011/421/posters/medium/77102af1cb.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/011/421/posters/thumb/77102af1cb.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":11421,\"slug\":\"daily-planet\",\"tvdb\":83356,\"imdb\":null,\"\
-          tmdb\":11473,\"tvrage\":26680}}},{\"type\":\"show\",\"score\":23.28529,\"\
+          tmdb\":11473,\"tvrage\":26680}}},{\"type\":\"show\",\"score\":21.388205,\"\
           show\":{\"title\":\"Daily Tech News Show\",\"overview\":\"Tom is an award-winning\
           \ independent tech podcaster and host of regular tech news and information\
           \ shows. Tom hosts Sword and Laser, a science fiction and fantasy podcast,\
@@ -51,7 +53,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/078/590/posters/thumb/37fd62992b.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":78590,\"slug\":\"daily-tech-news-show\",\"tvdb\":281008,\"imdb\"\
-          :null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":22.322222,\"\
+          :null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":20.759283,\"\
           show\":{\"title\":\"The Daily Show: Global Edition\",\"overview\":\"The\
           \ Daily Show: Global Edition is a weekly version of the Daily Show with\
           \ Jon Stewart created for overseas markets and airs on foreign networks.\
@@ -62,7 +64,7 @@ interactions:
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":60953,\"slug\":\"the-daily-show-global-edition\",\"tvdb\":83846,\"\
           imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :18.830753,\"show\":{\"title\":\"Day[9] Daily\",\"overview\":\"The Day[9]\
+          :17.224058,\"show\":{\"title\":\"Day[9] Daily\",\"overview\":\"The Day[9]\
           \ Daily is an internet television show streamed live from Los Angeles over\
           \ Justin.TV Sunday through Thursday at 7pm PST. The host of the show, Day[9],\
           \ offers his personal reflections on competitive StarCraft strategy and\
@@ -76,7 +78,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/066/221/posters/thumb/9654538ff0.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":66221,\"slug\":\"day-9-daily\",\"tvdb\":258077,\"imdb\":null,\"\
-          tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.70691,\"\
+          tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":10.025817,\"\
           show\":{\"title\":\"heute-show\",\"overview\":\"As a German adaption of\
           \ 'The Daily Show with Jon Stewart' Oliver Welke and his team report on\
           \ political topics as well as international news giving them their own satirical,\
@@ -88,18 +90,18 @@ interactions:
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/045/801/fanarts/medium/1ce388d415.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/045/801/fanarts/thumb/1ce388d415.jpg\"\
           }},\"ids\":{\"trakt\":45801,\"slug\":\"heute-show\",\"tvdb\":234791,\"imdb\"\
-          :\"tt1441143\",\"tmdb\":46056,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :10.193672,\"show\":{\"title\":\"The Brak Show\",\"overview\":\"The Brak\
-          \ Show is about the daily adventures of Brak and his best buddy Zorak prior\
-          \ to meeting Space Ghost. Brak lives with his family in a lovely suburb\
-          \ somewhere in space. Brak gets advice from Mom (a nice lady who keeps a\
-          \ clean house) & Dad (a human with a Latin accent that is rather short due\
-          \ to a shrink-ray accident), and gets corrupted by Zorak.Brak is an honest\
-          \ and somewhat dumb kid, and Zorak is a foul-mouthed, destruction-loving\
-          \ mantis. Brak's brother Sisto is also around from time to time. Their neighbor\
-          \ is Thundercleese, a giant robot with massive armaments, who likes maintaining\
-          \ his lawn. The Brak Show is a spin-off of Cartoon Planet, which was a spin-off\
-          \ of Space Ghost: Coast To Coast. Confused yet?\",\"year\":2000,\"status\"\
+          :\"\",\"tmdb\":46056,\"tvrage\":null}}},{\"type\":\"show\",\"score\":9.712307,\"\
+          show\":{\"title\":\"The Brak Show\",\"overview\":\"The Brak Show is about\
+          \ the daily adventures of Brak and his best buddy Zorak prior to meeting\
+          \ Space Ghost. Brak lives with his family in a lovely suburb somewhere in\
+          \ space. Brak gets advice from Mom (a nice lady who keeps a clean house)\
+          \ & Dad (a human with a Latin accent that is rather short due to a shrink-ray\
+          \ accident), and gets corrupted by Zorak.Brak is an honest and somewhat\
+          \ dumb kid, and Zorak is a foul-mouthed, destruction-loving mantis. Brak's\
+          \ brother Sisto is also around from time to time. Their neighbor is Thundercleese,\
+          \ a giant robot with massive armaments, who likes maintaining his lawn.\
+          \ The Brak Show is a spin-off of Cartoon Planet, which was a spin-off of\
+          \ Space Ghost: Coast To Coast. Confused yet?\",\"year\":2000,\"status\"\
           :\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/000/480/posters/original/be8a28240f.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/000/480/posters/medium/be8a28240f.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/000/480/posters/thumb/be8a28240f.jpg\"\
@@ -108,7 +110,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/000/480/fanarts/thumb/83ac0b11e3.jpg\"\
           }},\"ids\":{\"trakt\":480,\"slug\":\"the-brak-show\",\"tvdb\":77118,\"imdb\"\
           :\"tt0297512\",\"tmdb\":481,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :9.838442,\"show\":{\"title\":\"The Nightly Show with Larry Wilmore\",\"\
+          :9.44301,\"show\":{\"title\":\"The Nightly Show with Larry Wilmore\",\"\
           overview\":\"The Nightly Show with Larry Wilmore is an American late-night\
           \ panel talk show hosted by Larry Wilmore. The Nightly Show with Larry Wilmore\
           \ is a spin-off of The Daily Show, which featured Wilmore as a recurring\
@@ -119,8 +121,8 @@ interactions:
           \ 2005 until December 2014. The show has been described as a combination\
           \ of The Daily Show and Politically Incorrect. Each episode begins with\
           \ Wilmore's scripted take on the news followed by a panel discussion with\
-          \ his guests.\",\"year\":2015,\"status\":\"returning series\",\"images\"\
-          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/082/039/posters/original/94e139c048.jpg\"\
+          \ his guests.\",\"year\":2015,\"status\":\"in production\",\"images\":{\"\
+          poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/082/039/posters/original/94e139c048.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/082/039/posters/medium/94e139c048.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/082/039/posters/thumb/94e139c048.jpg\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/082/039/fanarts/original/95d54c591e.jpg\"\
@@ -128,7 +130,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/082/039/fanarts/thumb/95d54c591e.jpg\"\
           }},\"ids\":{\"trakt\":82039,\"slug\":\"the-nightly-show-with-larry-wilmore\"\
           ,\"tvdb\":286373,\"imdb\":\"tt3722332\",\"tmdb\":61587,\"tvrage\":42474}}},{\"\
-          type\":\"show\",\"score\":9.5176115,\"show\":{\"title\":\"The Bob Newhart\
+          type\":\"show\",\"score\":9.084276,\"show\":{\"title\":\"The Bob Newhart\
           \ Show\",\"overview\":\"Bob Newhart is Dr. Robert Hartley, a Chicago psychologist\
           \ living with his schoolteacher wife Emily. Complicating life for the serene,\
           \ stammering doc was his neighbor, Howard, a flighty navigator; and Bob's\
@@ -142,7 +144,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/961/fanarts/thumb/759b69fa7f.jpg\"\
           }},\"ids\":{\"trakt\":1961,\"slug\":\"the-bob-newhart-show\",\"tvdb\":78089,\"\
           imdb\":\"tt0068049\",\"tmdb\":1974,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":9.22402,\"show\":{\"title\":\"The Paul O'Grady Show\",\"overview\"\
+          ,\"score\":8.8148575,\"show\":{\"title\":\"The Paul O'Grady Show\",\"overview\"\
           :\"Daily live entertainment talk show with the lively comedian! Bert put\
           \ that tape in!\",\"year\":2004,\"status\":\"returning series\",\"images\"\
           :{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"\
@@ -151,62 +153,25 @@ interactions:
           tmdb\":3430,\"tvrage\":null}}}]"}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [24ec655390c31195-DFW]
+        cf-cache-status: [MISS]
+        cf-ray: [27dc1598109719ce-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:05:53 GMT']
-        etag: [W/"83e34a2a4c4f5b8cce4c7292fba2eda9"]
-        expires: ['Thu, 03 Dec 2015 08:05:53 GMT']
+        date: ['Thu, 03 Mar 2016 09:33:00 GMT']
+        etag: [W/"ade7d61917d04b2218ad54e47518eae5"]
+        expires: ['Thu, 03 Mar 2016 13:33:00 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d9ce19544bd9958ef24c75912c6759c561449115553; expires=Fri,
-            02-Dec-16 04:05:53 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=dc9177e7897f65c4950de9668813e913e1456997579; expires=Fri,
+            03-Mar-17 09:32:59 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['115']
+        x-pagination-item-count: ['118']
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
         x-pagination-page-count: ['12']
-        x-request-id: [168110a2-423a-4323-ba80-9102f7cd51e4]
-        x-runtime: ['0.038549']
-        x-xss-protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Content-Type: [application/json]
-        Cookie: [__cfduid=d9ce19544bd9958ef24c75912c6759c561449115553]
-        trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
-        trakt-api-version: [2]
-      method: GET
-      uri: https://api-v2launch.trakt.tv/shows/2211?extended=full
-    response:
-      body: {string: '{"title":"The Daily Show","year":1996,"ids":{"trakt":2211,"slug":"the-daily-show","tvdb":71256,"imdb":"tt0115147","tmdb":2224,"tvrage":5714},"overview":"Forget
-          trying to keep pace with 24 hour news networks- the best fake news show
-          in the world will provide you with all the news you can handle. The Daily
-          Show is a comedic view of recent news headlines and political figures through
-          a series of satirical monologues along with segments by correspondents and
-          finally interviews with guest celebrities and political figures. The Daily
-          Show with Trevor Noah is filmed at 733 11th Avenue,  New York, NY.","first_aired":"1996-09-01T00:00:00.000Z","airs":{"day":"Wednesday","time":"23:00","timezone":"America/New_York"},"runtime":25,"certification":"TV-14","network":"Comedy
-          Central (US)","country":"us","trailer":null,"homepage":null,"status":"returning
-          series","rating":8.91899,"votes":2543,"updated_at":"2015-12-02T10:30:41.000Z","language":"en","available_translations":["en","tr","de","pt","es","nl","da","fr"],"genres":["comedy","news","talk-show"],"aired_episodes":3059}'}
-      headers:
-        cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [24ec6553f0c91195-DFW]
-        connection: [keep-alive]
-        content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:05:53 GMT']
-        etag: [W/"fd9d44cb3fb28d1e0786c009fb1292d8"]
-        expires: ['Thu, 03 Dec 2015 08:05:53 GMT']
-        last-modified: ['Wed, 02 Dec 2015 10:30:41 GMT']
-        server: [cloudflare-nginx]
-        vary: [Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [SAMEORIGIN]
-        x-request-id: [97bdc634-a39e-4c08-bf46-95ea9e4f56a7]
-        x-runtime: ['0.020041']
+        x-request-id: [3759604a-7abd-4d9d-af6f-a74f79ccc191]
+        x-runtime: ['0.033506']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

@@ -6,126 +6,125 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=Homeland&type=show&year=2011
+      uri: https://api-v2launch.trakt.tv/search?query=Homeland&type=show
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":107.827866,\"show\":{\"title\"\
-          :\"Homeland\",\"overview\":\"It has been 2 years since the events in Pakistan.\
-          \ Carrie Mathison has left the CIA and is working as head of security for\
-          \ the philanthrophic D\xFCring Foundation and residing in Berlin, Germany.\
-          \ Two hackers from Berlin accidentally gain access to the CIA network and\
-          \ get their hands on sensitive documents regarding Germany allowing the\
-          \ CIA to snoop on German citizens.\",\"year\":2011,\"status\":\"returning\
-          \ series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/398/posters/original/cb506c45bc.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/398/posters/medium/cb506c45bc.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/398/posters/thumb/cb506c45bc.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/398/fanarts/original/701b0475bf.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/398/fanarts/medium/701b0475bf.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/398/fanarts/thumb/701b0475bf.jpg\"\
-          }},\"ids\":{\"trakt\":1398,\"slug\":\"homeland\",\"tvdb\":247897,\"imdb\"\
-          :\"tt1796960\",\"tmdb\":1407,\"tvrage\":27811}}},{\"type\":\"show\",\"score\"\
-          :0.89444196,\"show\":{\"title\":\"To Catch a Smuggler\",\"overview\":\"\
-          This NatGeo series follows Homeland Security officers at New York City's\
-          \ John F. Kennedy International Airport as they deal with cases ranging\
-          \ from fraudulent visas to human trafficking.\",\"year\":2011,\"status\"\
-          :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/068/989/posters/original/d81847a5ab.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/068/989/posters/medium/d81847a5ab.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/068/989/posters/thumb/d81847a5ab.jpg\"\
-          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
-          trakt\":68989,\"slug\":\"to-catch-a-smuggler\",\"tvdb\":264244,\"imdb\"\
-          :\"tt2562174\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
-          :0.26087892,\"show\":{\"title\":\"Return to Tuscany\",\"overview\":\"Join\
-          \ Giancarlo Caldesi as he sets out to fulfil his dream - a cookery school\
-          \ in his Tuscan homeland. But there\u2019s a lot of hard work to do before\
-          \ he gets there\u2026After 30 years in the UK, successful restaurateur Giancarlo\
-          \ Caldesi has decided to take a break from wet and windy London for the\
-          \ stunning vistas and sun-drenched vineyards of the land of his birth, Tuscany.But\
-          \ with his wedding to organise, a new cookery school in Tuscany to set up\
-          \ and business interests to look after back in London, has he bitten off\
-          \ more than he can chew? Plus, there\u2019s the hotel for the school to\
-          \ renovate, a sous chef who likes a drink to deal with and staff who can\u2019\
-          t even make a decent cappuccino to train.Giancarlo, a passionate and charismatic\
-          \ native of Tuscany, and his partner Katie, a calm and elegant English rose,\
-          \ need much more than just a hotel to offer their guests the complete Tuscan\
-          \ experience. A good food market needs to be found, the local shops need\
-          \ to be visited, the best ingredients sourced and there\u2019s the region\u2019\
-          s vintners and pasta makers to meet. Giancarlo will have to use all the\
-          \ experience he\u2019s built up running his London restaurants to make it\
-          \ work.Set against a stunning landscape, there\u2019s bound to be trouble\
-          \ in paradise. Will Giancarlo\u2019s flamboyance turn up the temperature?\
-          \ Can the cool breath of fresh air Katie take the heat?Return to Tuscany\
-          \ is an endearing story of emotion, a celebration and feast of Italian food,\
-          \ and a humorous account of a chaotic summer in Tuscany. Prepare to meet\
-          \ the Caldesi\u2019s!\",\"year\":2011,\"status\":\"ended\",\"images\":{\"\
-          poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\"\
-          :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":61349,\"slug\"\
-          :\"return-to-tuscany\",\"tvdb\":222661,\"imdb\":null,\"tmdb\":null,\"tvrage\"\
-          :null}}}]"}
+      body: {string: '[{"type":"show","score":109.115364,"show":{"title":"Homeland","overview":"When
+          Marine Nicolas Brody is hailed as a hero after he returns home from eight
+          years of captivity in Iraq, intelligence officer Carrie Mathison is the
+          only one who suspects that he may have been turned.","year":2011,"status":"returning
+          series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/001/398/posters/original/cb506c45bc.jpg","medium":"https://walter.trakt.us/images/shows/000/001/398/posters/medium/cb506c45bc.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/398/posters/thumb/cb506c45bc.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/001/398/fanarts/original/701b0475bf.jpg","medium":"https://walter.trakt.us/images/shows/000/001/398/fanarts/medium/701b0475bf.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/398/fanarts/thumb/701b0475bf.jpg"}},"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811}}},{"type":"show","score":62.351635,"show":{"title":"Homeland
+          Security USA","overview":"Series Gives Viewers an Unprecedented Look at
+          the Agencies and People Who Protect Our Country. Every day the men and women
+          of the Department of Homeland Security patrol more than 100,000 miles of
+          America''s borders. This territory includes airports, seaports, land borders,
+          international mail centers, the open seas, mountains, deserts and even cyberspace.
+          Now viewers will get an unprecedented look at the work of these men and
+          women while they use the newest technology to safeguard our country and
+          enforce our laws.Comprised of 13 hour-long episodes shot entirely on location
+          throughout the United States, \"Homeland Security USA\" is based on a popular
+          Australian series now in its fifth season. Produced by Oscar and Emmy-winner
+          Arnold Shapiro (\"Scared Straight\" \"Big Brother\"), the series takes cameras
+          into situations never before seen on television, with each episode covering
+          eight or more locations on the \"front lines\" where the officers and agents
+          work each day. They have a job that is dangerous, difficult and always unpredictable.
+          These aren''t heroes. They''re average men and women working against an
+          epic landscape. The Department''s missions include everything from vetting
+          adoption papers and checking visitors'' passports to intercepting undocumented
+          immigrants, drugs and other contraband, and stopping potential terrorists
+          trying to cross our borders. What viewers will see is powerful, dramatic,
+          unforgettable and emotional, with unexpected moments of humor.","year":2009,"status":"ended","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":"https://walter.trakt.us/images/shows/000/008/539/fanarts/original/4a85b66a5b.jpg","medium":"https://walter.trakt.us/images/shows/000/008/539/fanarts/medium/4a85b66a5b.jpg","thumb":"https://walter.trakt.us/images/shows/000/008/539/fanarts/thumb/4a85b66a5b.jpg"}},"ids":{"trakt":8539,"slug":"homeland-security-usa","tvdb":84450,"imdb":"","tmdb":8585,"tvrage":20619}}},{"type":"show","score":0.9024013,"show":{"title":"To
+          Catch a Smuggler","overview":"This NatGeo series follows Homeland Security
+          officers at New York City''s John F. Kennedy International Airport as they
+          deal with cases ranging from fraudulent visas to human trafficking.","year":2011,"status":"returning
+          series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/068/989/posters/original/d81847a5ab.jpg","medium":"https://walter.trakt.us/images/shows/000/068/989/posters/medium/d81847a5ab.jpg","thumb":"https://walter.trakt.us/images/shows/000/068/989/posters/thumb/d81847a5ab.jpg"},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":68989,"slug":"to-catch-a-smuggler","tvdb":264244,"imdb":"tt2562174","tmdb":null,"tvrage":null}}},{"type":"show","score":0.9024013,"show":{"title":"Anh
+          Does Vietnam","overview":"Anh Do''s travels through his homeland are a warm
+          and wacky cultural mix from a tour guide with an infectious smile.","year":2012,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/068/044/posters/original/b1991ac593.jpg","medium":"https://walter.trakt.us/images/shows/000/068/044/posters/medium/b1991ac593.jpg","thumb":"https://walter.trakt.us/images/shows/000/068/044/posters/thumb/b1991ac593.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/068/044/fanarts/original/0766ef2c58.jpg","medium":"https://walter.trakt.us/images/shows/000/068/044/fanarts/medium/0766ef2c58.jpg","thumb":"https://walter.trakt.us/images/shows/000/068/044/fanarts/thumb/0766ef2c58.jpg"}},"ids":{"trakt":68044,"slug":"anh-does-vietnam","tvdb":263000,"imdb":null,"tmdb":null,"tvrage":null}}},{"type":"show","score":0.7520011,"show":{"title":"Marvel''s
+          Agents of S.H.I.E.L.D.","overview":"Agent Phil Coulson of S.H.I.E.L.D. (Strategic
+          Homeland Intervention, Enforcement and Logistics Division) puts together
+          a team of agents to investigate the new, the strange and the unknown around
+          the globe, protecting the ordinary from the extraordinary.","year":2013,"status":"returning
+          series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/001/394/posters/original/c4a4211e12.jpg","medium":"https://walter.trakt.us/images/shows/000/001/394/posters/medium/c4a4211e12.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/394/posters/thumb/c4a4211e12.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/001/394/fanarts/original/2cc61c8eea.jpg","medium":"https://walter.trakt.us/images/shows/000/001/394/fanarts/medium/2cc61c8eea.jpg","thumb":"https://walter.trakt.us/images/shows/000/001/394/fanarts/thumb/2cc61c8eea.jpg"}},"ids":{"trakt":1394,"slug":"marvel-s-agents-of-s-h-i-e-l-d","tvdb":263365,"imdb":"tt2364582","tmdb":1403,"tvrage":32656}}},{"type":"show","score":0.7520011,"show":{"title":"Pioneer
+          One","overview":"An object in the sky spreads radiation over North America.
+          Fearing terrorism, U.S. Homeland Security agents are dispatched to investigate
+          and contain the damage. What they discover will have implications for the
+          entire world.","year":null,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/032/905/posters/original/489e8bdbfe.jpg","medium":"https://walter.trakt.us/images/shows/000/032/905/posters/medium/489e8bdbfe.jpg","thumb":"https://walter.trakt.us/images/shows/000/032/905/posters/thumb/489e8bdbfe.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/032/905/fanarts/original/43f2cd68a5.jpg","medium":"https://walter.trakt.us/images/shows/000/032/905/fanarts/medium/43f2cd68a5.jpg","thumb":"https://walter.trakt.us/images/shows/000/032/905/fanarts/thumb/43f2cd68a5.jpg"}},"ids":{"trakt":32905,"slug":"pioneer-one","tvdb":170551,"imdb":"tt1748166","tmdb":33050,"tvrage":null}}},{"type":"show","score":0.7444431,"show":{"title":"Kaiketsu
+          Zorro","overview":"Diego Vega returns from his study trip to discover his
+          homeland is under the army''s dictatorship. Diego, refusing to watch idly,
+          disguises himself as Zorro to protect the weak and oppressed. Diego is not
+          a coward but he is unable to win the affections of his sweetheart, Lolita,
+          who is attracted to other more noble men. Diego serenades Lolita as Zorro
+          and fights the evils of his homeland, hoping to capture her heart.","year":null,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/016/946/posters/original/f7f94e9774.jpg","medium":"https://walter.trakt.us/images/shows/000/016/946/posters/medium/f7f94e9774.jpg","thumb":"https://walter.trakt.us/images/shows/000/016/946/posters/thumb/f7f94e9774.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/016/946/fanarts/original/95771f7771.jpg","medium":"https://walter.trakt.us/images/shows/000/016/946/fanarts/medium/95771f7771.jpg","thumb":"https://walter.trakt.us/images/shows/000/016/946/fanarts/thumb/95771f7771.jpg"}},"ids":{"trakt":16946,"slug":"kaiketsu-zorro","tvdb":250582,"imdb":"","tmdb":17017,"tvrage":null}}},{"type":"show","score":0.6016009,"show":{"title":"Tuscan
+          Passion","overview":"Aurora is a modern-day heroine who fights for her freedom
+          and her independence against all those who have plotted against her and
+          imprisoned her. In the background lies a ruthless fight for the homeland,
+          an old feud between rival families, conspiracies, secrets and unspeakable
+          sins, brothers competing for the love of one woman.","year":2012,"status":"returning
+          series","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":79865,"slug":"tuscan-passion-2012","tvdb":258095,"imdb":"tt3242776","tmdb":null,"tvrage":null}}},{"type":"show","score":0.6016009,"show":{"title":"My
+          Neighbor, Charles","overview":"Foreigners, leaving their homelands behind,
+          have come all the way to new country, South Korea.They chose South Korea
+          not for sightseeing or short-term stay.But, they are here for various reasons,
+          such as work, study or even marriage.The real stories of foreigners who
+          challenge themselves to survive in Korean society will be unfolded!","year":2015,"status":"returning
+          series","images":{"poster":{"full":null,"medium":null,"thumb":null},"fanart":{"full":null,"medium":null,"thumb":null}},"ids":{"trakt":97178,"slug":"my-neighbor-charles","tvdb":293315,"imdb":null,"tmdb":null,"tvrage":null}}},{"type":"show","score":0.6016009,"show":{"title":"GR:
+          Giant Robo","overview":"The story takes place at the dawn of the 21st century,
+          when the Earth is overrun by giant robots. Daisaku Kusama encounters one
+          of these monsters, the titular Robo, in a ruin in Okinawa. Beckoned by forces
+          he cannot understand, Daisaku is made to bond, body and spirit, with the
+          ancient weapon and defend his homeland from the incoming evil.","year":2007,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/072/702/posters/original/99571d13f4.jpg","medium":"https://walter.trakt.us/images/shows/000/072/702/posters/medium/99571d13f4.jpg","thumb":"https://walter.trakt.us/images/shows/000/072/702/posters/thumb/99571d13f4.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/072/702/fanarts/original/99571d13f4.jpg","medium":"https://walter.trakt.us/images/shows/000/072/702/fanarts/medium/99571d13f4.jpg","thumb":"https://walter.trakt.us/images/shows/000/072/702/fanarts/thumb/99571d13f4.jpg"}},"ids":{"trakt":72702,"slug":"gr-giant-robo","tvdb":272638,"imdb":null,"tmdb":null,"tvrage":null}}}]'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [24ec658e9b110107-DFW]
+        cf-cache-status: [MISS]
+        cf-ray: [27dc15ae72f419b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:03 GMT']
-        etag: [W/"c689f618d48f61c66afa90e458908c83"]
-        expires: ['Thu, 03 Dec 2015 08:06:03 GMT']
+        date: ['Thu, 03 Mar 2016 09:33:03 GMT']
+        etag: [W/"29ddc50695a7a457a07030a6f6790ca2"]
+        expires: ['Thu, 03 Mar 2016 13:33:03 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d908b7cde22aa8567fc952c762e39ec961449115563; expires=Fri,
-            02-Dec-16 04:06:03 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d59384d381b6e12c7458cc1fe749c94c21456997583; expires=Fri,
+            03-Mar-17 09:33:03 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['3']
+        x-pagination-item-count: ['69']
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
-        x-pagination-page-count: ['1']
-        x-request-id: [c2fd1626-44c1-4ad6-897a-a5d665c2576e]
-        x-runtime: ['0.048862']
+        x-pagination-page-count: ['7']
+        x-request-id: [944dd056-ca07-4ee7-a509-84dc6e4349b7]
+        x-runtime: ['0.021687']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=d908b7cde22aa8567fc952c762e39ec961449115563]
+        Cookie: [__cfduid=d59384d381b6e12c7458cc1fe749c94c21456997583]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
       uri: https://api-v2launch.trakt.tv/shows/1398?extended=full
     response:
-      body: {string: "{\"title\":\"Homeland\",\"year\":2011,\"ids\":{\"trakt\":1398,\"\
-          slug\":\"homeland\",\"tvdb\":247897,\"imdb\":\"tt1796960\",\"tmdb\":1407,\"\
-          tvrage\":27811},\"overview\":\"It has been 2 years since the events in Pakistan.\
-          \ Carrie Mathison has left the CIA and is working as head of security for\
-          \ the philanthrophic D\xFCring Foundation and residing in Berlin, Germany.\
-          \ Two hackers from Berlin accidentally gain access to the CIA network and\
-          \ get their hands on sensitive documents regarding Germany allowing the\
-          \ CIA to snoop on German citizens.\\n\",\"first_aired\":\"2011-10-02T00:00:00.000Z\"\
-          ,\"airs\":{\"day\":\"Sunday\",\"time\":\"21:00\",\"timezone\":\"America/New_York\"\
-          },\"runtime\":45,\"certification\":\"TV-MA\",\"network\":\"Showtime\",\"\
-          country\":\"us\",\"trailer\":\"http://youtube.com/watch?v=KyFmS3wRPCQ\"\
-          ,\"homepage\":null,\"status\":\"returning series\",\"rating\":8.50012,\"\
-          votes\":16056,\"updated_at\":\"2015-12-02T10:31:14.000Z\",\"language\":\"\
-          en\",\"available_translations\":[\"en\",\"fr\",\"es\",\"nl\",\"pt\",\"el\"\
-          ,\"it\",\"de\",\"he\",\"da\",\"tr\",\"zh\",\"pl\",\"ru\",\"cs\",\"hu\",\"\
-          hr\",\"bs\",\"lt\",\"sr\"],\"genres\":[\"drama\",\"mystery\",\"thriller\"\
-          ,\"crime\",\"suspense\"],\"aired_episodes\":57}"}
+      body: {string: '{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811},"overview":"When
+          Marine Nicolas Brody is hailed as a hero after he returns home from eight
+          years of captivity in Iraq, intelligence officer Carrie Mathison is the
+          only one who suspects that he may have been turned.\n","first_aired":"2011-10-03T01:00:00.000Z","airs":{"day":"Sunday","time":"21:00","timezone":"America/New_York"},"runtime":60,"certification":"TV-MA","network":"Showtime","country":"us","trailer":null,"homepage":"http://www.sho.com/sho/homeland/home","status":"returning
+          series","rating":8.48675,"votes":16828,"updated_at":"2016-02-27T10:33:58.000Z","language":"en","available_translations":["en","fr","es","nl","pt","el","it","de","he","da","tr","zh","pl","ru","cs","hu","hr","bs","lt","sr","ro","sv"],"genres":["drama","mystery","thriller"],"aired_episodes":60}'}
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [24ec658eeb130107-DFW]
+        cf-ray: [27dc15b0631d19b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:03 GMT']
-        etag: [W/"0dc0de84e1303300e3acc2303efdbb43"]
-        expires: ['Thu, 03 Dec 2015 08:06:03 GMT']
-        last-modified: ['Wed, 02 Dec 2015 10:31:14 GMT']
+        date: ['Thu, 03 Mar 2016 09:33:03 GMT']
+        etag: [W/"546218f5a683fd4030afd55566a6a797"]
+        expires: ['Thu, 03 Mar 2016 13:33:03 GMT']
+        last-modified: ['Sat, 27 Feb 2016 10:33:58 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [1b061313-f9da-4bf3-87a8-7c3a89994bea]
-        x-runtime: ['0.010407']
+        x-request-id: [f2c66ae0-984f-4869-baa5-1dea9e1c01d2]
+        x-runtime: ['0.019110']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -137,31 +136,31 @@ interactions:
       method: GET
       uri: https://api-v2launch.trakt.tv/shows/1398/seasons/2/episodes/1/?extended=full
     response:
-      body: {string: '{"season":2,"number":1,"title":"The Smile","ids":{"trakt":74308,"tvdb":4303747,"imdb":null,"tmdb":63712,"tvrage":0},"number_abs":null,"overview":"Months
+      body: {string: '{"season":2,"number":1,"title":"The Smile","ids":{"trakt":74308,"tvdb":4303747,"imdb":null,"tmdb":0,"tvrage":0},"number_abs":null,"overview":"Months
           after undergoing Electroconvulsive Therapy, former CIA case officer Carrie
           Mathison has found a modicum of peace in her family''s suburban embrace.
           But the strides she''s made towards mental health are threatened when an
           asset from her former life comes in from the cold. Meanwhile, freshman Congressman
           Nick Brody discovers that Abu Nazir may not be content with his nonviolent
           approach to affecting change in American foreign policy. Brody''s daughter
-          Dana lets a vital secret slip.","rating":8.10198,"votes":1363,"first_aired":"2012-10-01T01:00:00.000Z","updated_at":"2015-12-03T00:17:00.000Z","available_translations":[]}'}
+          Dana lets a vital secret slip.","rating":8.04637,"votes":1488,"first_aired":"2012-10-01T01:00:00.000Z","updated_at":"2016-03-03T08:47:05.000Z","available_translations":[]}'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [24ec6590098e1195-DFW]
+        cf-cache-status: [MISS]
+        cf-ray: [27dc15b17cfc19c2-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:03 GMT']
-        expires: ['Thu, 03 Dec 2015 08:06:03 GMT']
-        last-modified: ['Thu, 03 Dec 2015 00:17:00 GMT']
+        date: ['Thu, 03 Mar 2016 09:33:03 GMT']
+        expires: ['Thu, 03 Mar 2016 13:33:03 GMT']
+        last-modified: ['Thu, 03 Mar 2016 08:47:05 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d49af27a93667f81d03cd6d903e88131b1449115563; expires=Fri,
-            02-Dec-16 04:06:03 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=dbd58c965812300c0a903d03d2dc37e211456997583; expires=Fri,
+            03-Mar-17 09:33:03 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [4b378489-64a0-47a3-aaa5-e893fa1daa3a]
-        x-runtime: ['0.008218']
+        x-request-id: [bf0100cf-2ae8-4d9c-901c-caebded500b9]
+        x-runtime: ['0.006751']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -176,20 +175,21 @@ interactions:
       body: {string: '[{"last_collected_at":"2012-10-01T02:00:00.000Z","show":{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811}},"seasons":[{"number":2,"episodes":[{"number":1,"collected_at":"2012-10-01T02:00:00.000Z"}]}]}]'}
       headers:
         cache-control: ['max-age=0, private, must-revalidate']
-        cf-ray: [24ec6590f2ab2000-DFW]
+        cf-ray: [27dc15b4255119ce-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:03 GMT']
-        etag: [W/"40f1d15a8c92e65f45d924515676e57f"]
-        last-modified: ['Thu, 03 Dec 2015 01:09:57 GMT']
+        date: ['Thu, 03 Mar 2016 09:33:04 GMT']
+        etag: [W/"d89b299bed426e4408466127cdd8be3a"]
+        last-modified: ['Thu, 03 Mar 2016 08:23:48 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d6b7909f13b3bd9390e2fabb3a33bbe071449115563; expires=Fri,
-            02-Dec-16 04:06:03 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d5107348eecaa7ab5e51db60de535b82b1456997584; expires=Fri,
+            03-Mar-17 09:33:04 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [98743b63-7365-4d6f-96c8-3bfe2857ebf2]
-        x-runtime: ['0.010915']
+        x-private-user: ['false']
+        x-request-id: [fa8dc96b-19ac-4e1c-b450-0a10d134ebc0]
+        x-runtime: ['0.008522']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -199,9 +199,9 @@ interactions:
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
-      uri: https://api-v2launch.trakt.tv/search?query=The+Flash&type=show&year=2014
+      uri: https://api-v2launch.trakt.tv/search?query=The+Flash&type=show
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":60.337543,\"show\":{\"title\"\
+      body: {string: "[{\"type\":\"show\",\"score\":59.768856,\"show\":{\"title\"\
           :\"The Flash\",\"overview\":\"After a particle accelerator causes a freak\
           \ storm, CSI Investigator Barry Allen is struck by lightning and falls into\
           \ a coma. Months later he awakens with the power of super speed, granting\
@@ -222,64 +222,160 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"\
           }},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"\
           imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}},{\"type\":\"show\"\
-          ,\"score\":0.45168138,\"show\":{\"title\":\"Tornado Hunters\",\"overview\"\
-          :\"Greg Johnson, Chris Chittick, and Ricky Forbes are the Tornado Hunters.Outfitted\
-          \ with their truck Flash and the best equipment money can buy, they target\
-          \ the biggest tornadoes in North America. From Regina to Mexico, there\u2019\
-          s nowhere they won\u2019t go as they risk life, limb and a lot of windshields\
-          \ to chase their passion for the world\u2019s worst weather. - See more\
-          \ at: http://www.cmt.ca/show/tornado-hunters/#sthash.FtuhY0T3.dpuf\",\"\
-          year\":2014,\"status\":\"returning series\",\"images\":{\"poster\":{\"full\"\
-          :\"https://walter.trakt.us/images/shows/000/081/448/posters/original/ecede5e037.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/081/448/posters/medium/ecede5e037.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/081/448/posters/thumb/ecede5e037.jpg\"\
+          ,\"score\":59.768856,\"show\":{\"title\":\"The Flash\",\"overview\":\"Central\
+          \ City Police forensic scientist Barry Allen's crime lab is struck by lightning.\
+          \ Allen's electrified body is flung into and shatters a cabinet of chemicals,\
+          \ which are both electrified and forced to interact with each other and\
+          \ with his physiology when they come into physical contact with his body.\
+          \ He soon discovers that the accident has changed his body's metabolism\
+          \ and as a result he has gained the ability to move at superhuman speed.\
+          \ Barry Allen has become the Flash.\",\"year\":1990,\"status\":\"ended\"\
+          ,\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/000/235/posters/original/fb1d03e09f.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/000/235/posters/medium/fb1d03e09f.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/000/235/posters/thumb/fb1d03e09f.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/000/235/fanarts/original/826b9ef114.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/000/235/fanarts/medium/826b9ef114.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/000/235/fanarts/thumb/826b9ef114.jpg\"\
+          }},\"ids\":{\"trakt\":235,\"slug\":\"the-flash\",\"tvdb\":78650,\"imdb\"\
+          :\"tt0098798\",\"tmdb\":236,\"tvrage\":5781}}},{\"type\":\"show\",\"score\"\
+          :59.768856,\"show\":{\"title\":\"The Flash\",\"overview\":\"The Flash is-\
+          \ of course!- the fastest man alive. Barry Allen, otherwise known as the\
+          \ Flash, and his sidekick Wally West, otherwise known as Kid Flash, battle\
+          \ evil villains and aliens who try to cause mayhem on Earth. They can outrun\
+          \ a bullet, vibrate through solid walls, and do all sorts of other things\
+          \ with their incredible speed. When there is trouble, Barry and Wally open\
+          \ up their rings which shoot out their costumes.\",\"year\":1967,\"status\"\
+          :\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/075/481/posters/original/0782d34337.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/075/481/posters/medium/0782d34337.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/075/481/posters/thumb/0782d34337.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
-          trakt\":81448,\"slug\":\"tornado-hunters\",\"tvdb\":287638,\"imdb\":null,\"\
-          tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.3310531,\"\
-          show\":{\"title\":\"Stop Skeletons From Fighting\",\"overview\":\"Hello,\
-          \ I'm Derek Alexander, and I've been producing video reviews of retro (and\
-          \ sometimes modern) video games for over 7 years.When I started producing\
-          \ reviews in 2007, I was known as the Happy Video Game Nerd (HVGN). In late-2014\
-          \ I dropped the HVGN name and established Stop Skeletons From Fighting,\
-          \ a new outlet for video reviews (and other future projects). Even though\
-          \ I\u2019ve dropped the HVGN name, I still strive to set myself apart from\
-          \ the typical review show by using a positive spin to highlight lesser-known\
-          \ or underrated games and occasionally entire series. Some of the titles\
-          \ I've covered include:-Earthbound-Jumping Flash!-Gargoyle's Quest-Splatterhouse-Parasite\
-          \ Eve-Sweet Home-Wild Guns-IllbleedHaven't heard of some of these games?\
-          \ That's the point! \",\"year\":2014,\"status\":\"returning series\",\"\
-          images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\"\
-          :{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":101605,\"\
-          slug\":\"stop-skeletons-from-fighting\",\"tvdb\":300088,\"imdb\":null,\"\
-          tmdb\":null,\"tvrage\":null}}}]"}
+          trakt\":75481,\"slug\":\"the-flash-1967\",\"tvdb\":272094,\"imdb\":null,\"\
+          tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":54.453686,\"\
+          show\":{\"title\":\"Flash Gordon\",\"overview\":\"Flash Gordon, Flash Gordon's\
+          \ Trip to Mars and Flash Gordon Conquers the Universe, the most expensive\
+          \ and popular movie serials ever made, have been favorites of movie and\
+          \ comic fans for decades.\",\"year\":1936,\"status\":\"ended\",\"images\"\
+          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/065/589/posters/original/2bd008c174.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/065/589/posters/medium/2bd008c174.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/065/589/posters/thumb/2bd008c174.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/065/589/fanarts/original/cc39bc13ca.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/065/589/fanarts/medium/cc39bc13ca.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/065/589/fanarts/thumb/cc39bc13ca.jpg\"\
+          }},\"ids\":{\"trakt\":65589,\"slug\":\"flash-gordon-1936-65589\",\"tvdb\"\
+          :254867,\"imdb\":null,\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
+          ,\"score\":54.453125,\"show\":{\"title\":\"Flash Forward\",\"overview\"\
+          :\"Becca Fisher and Tucker James are two 13 year-olds who have been best\
+          \ friends since birth. They live next door to each other and have shared\
+          \ birthday parties, babysitters and backyard swings. But now, Becca and\
+          \ Tucker are beginning the rite of passage known as the eighth grade. Suddenly,\
+          \ they are teenagers, testing the bounds of their new independence while\
+          \ struggling to hang on the their past.\",\"year\":1997,\"status\":\"ended\"\
+          ,\"images\":{\"poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"\
+          fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/010/320/fanarts/original/14b1376513.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/010/320/fanarts/medium/14b1376513.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/010/320/fanarts/thumb/14b1376513.jpg\"\
+          }},\"ids\":{\"trakt\":10320,\"slug\":\"flash-forward\",\"tvdb\":77954,\"\
+          imdb\":\"tt0115173\",\"tmdb\":10371,\"tvrage\":3556}}},{\"type\":\"show\"\
+          ,\"score\":54.45256,\"show\":{\"title\":\"Flash Gordon\",\"overview\":\"\
+          Placing a 21st century spin on a science fiction classic, SCI FI's contemporized\
+          \ version of Flash Gordon follows the all-new adventures of Flash and his\
+          \ companions, Dale Arden, Baylin and Dr. Hans Zarkov. Ordinary people thrust\
+          \ into extraordinary circumstances, they find themselves as Earth's last\
+          \ line of defense against the forces of the merciless dictator Ming.\",\"\
+          year\":2007,\"status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/219/posters/original/398e858b92.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/219/posters/medium/398e858b92.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/219/posters/thumb/398e858b92.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/001/219/fanarts/original/b63400965b.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/001/219/fanarts/medium/b63400965b.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/219/fanarts/thumb/b63400965b.jpg\"\
+          }},\"ids\":{\"trakt\":1219,\"slug\":\"flash-gordon\",\"tvdb\":80441,\"imdb\"\
+          :\"tt0959086\",\"tmdb\":1225,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
+          :47.815086,\"show\":{\"title\":\"The Flashing Blade\",\"overview\":\"The\
+          \ Flashing Blade (Le Chevalier Temp\xEAte) is a French television serial\
+          \ made in the late 1960s, which was broadcast in the UK on BBC children's\
+          \ television during the 1960s, with several re-runs in the 1970s.Dubbed\
+          \ from French into English, the action was set in 17th century France, during\
+          \ a period of war between France and Spain. The plot involves a besieged\
+          \ French garrison in a castle (Fort Casal) on the Savoie border, and the\
+          \ efforts of a dashing spy to engineer their rescue.\",\"year\":null,\"\
+          status\":\"ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/435/posters/original/6ff5562a10.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/006/435/posters/medium/6ff5562a10.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/006/435/posters/thumb/6ff5562a10.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
+          trakt\":6435,\"slug\":\"the-flashing-blade\",\"tvdb\":81666,\"imdb\":\"\
+          tt0167561\",\"tmdb\":6474,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
+          :43.60749,\"show\":{\"title\":\"Flash Gordon (1996)\",\"overview\":\"In\
+          \ this animated space adventure, Flash Gordon takes on the evil Ming the\
+          \ Merciless. \",\"year\":1996,\"status\":\"ended\",\"images\":{\"poster\"\
+          :{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\":null,\"\
+          medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":3442,\"slug\":\"flash-gordon-1996\"\
+          ,\"tvdb\":72679,\"imdb\":null,\"tmdb\":3464,\"tvrage\":null}}},{\"type\"\
+          :\"show\",\"score\":43.56565,\"show\":{\"title\":\"Cutie Honey Flash\",\"\
+          overview\":\"On her sixteenth birthday, Honey Kisaragi goes to meet her\
+          \ father. However, he shows up injured and on the run. Out of nowhere, a\
+          \ group of thugs and a monster show up. A detective, Seiji Hayama, rescues\
+          \ Honey and her father. Unfortunately, the monster captures Honey's father.\
+          \ A grieving Honey goes home to find it in ruins, but a handsome man gives\
+          \ her hope and a device to use against the monsters who took her father.\
+          \ With them, Honey can transform into multiple forms and destroy Panther\
+          \ Zora, the evil behind this.\",\"year\":1997,\"status\":\"ended\",\"images\"\
+          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/035/845/posters/original/df14538ddf.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/035/845/posters/medium/df14538ddf.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/035/845/posters/thumb/df14538ddf.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/035/845/fanarts/original/3b4680ed51.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/035/845/fanarts/medium/3b4680ed51.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/035/845/fanarts/thumb/3b4680ed51.jpg\"\
+          }},\"ids\":{\"trakt\":35845,\"slug\":\"cutie-honey-flash\",\"tvdb\":258511,\"\
+          imdb\":\"\",\"tmdb\":36001,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
+          :43.56295,\"show\":{\"title\":\"Dirty Pair Flash\",\"overview\":\"Dirty\
+          \ Pair Flash is related to the original Dirty Pair, with the same characters\
+          \ but there are some changes. Dirty Pair Flash was released later but it\
+          \ is something of a prequel, showing the two main characters on their first\
+          \ assignments. It contains animated violence and mayhem, some profanity\
+          \ and a small amount of nudity. The DVD release is rated 15 and up. The\
+          \ Pair consists of two 17-year-old junior level 'Trouble Consultants', a\
+          \ cross between a trouble-shooter and a secret agent. They work for an organization\
+          \ called World Welfare & Works Association or the 3WA which handles problems\
+          \ galaxy-wide. Their codename is 'Lovely Angels' but it's easy to see why\
+          \ they are eventually known as the Dirty Pair, not in a naughty way, but\
+          \ because they tend to leave ruination wherever they go. Yuri is the purple-haired\
+          \ and perky team member, she is occasionally zany and a bit distracted.\
+          \ Yuri tends to rely on her feminine wiles to get out of trouble, rarely\
+          \ plans ahead and is obsessed wit\",\"year\":1994,\"status\":\"ended\",\"\
+          images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/064/804/posters/original/6e4d179d47.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/064/804/posters/medium/6e4d179d47.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/064/804/posters/thumb/6e4d179d47.jpg\"\
+          },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
+          trakt\":64804,\"slug\":\"dirty-pair-flash\",\"tvdb\":73312,\"imdb\":\"tt0109633\"\
+          ,\"tmdb\":null,\"tvrage\":null}}}]"}
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [24ec6592f29a2018-DFW]
+        cf-ray: [27dc15bb33a00b0e-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:03 GMT']
-        etag: [W/"df21148219dad3fd530fdcc478406725"]
-        expires: ['Thu, 03 Dec 2015 08:06:03 GMT']
+        date: ['Thu, 03 Mar 2016 09:33:05 GMT']
+        etag: [W/"e2830d6c35dd5709e7e8aaf856ee76b3"]
+        expires: ['Thu, 03 Mar 2016 13:33:05 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d8746820e99df5ff72046570882e40af81449115563; expires=Fri,
-            02-Dec-16 04:06:03 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d270907d7a7d7e34237b24162f9818a661456997585; expires=Fri,
+            03-Mar-17 09:33:05 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['3']
+        x-pagination-item-count: ['105']
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
-        x-pagination-page-count: ['1']
-        x-request-id: [ada72fc9-22a3-4f58-9cc6-dd02441d024d]
-        x-runtime: ['0.023493']
+        x-pagination-page-count: ['11']
+        x-request-id: [054b96a8-b970-49c7-849e-ebe1c4f0ecfc]
+        x-runtime: ['0.027834']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=d8746820e99df5ff72046570882e40af81449115563]
+        Cookie: [__cfduid=d270907d7a7d7e34237b24162f9818a661456997585]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -298,32 +394,33 @@ interactions:
           \ life to protect the innocent. For now, only a few close friends and associates\
           \ know that Barry is literally the fastest man alive, but it won't be long\
           \ before the world learns what Barry Allen has become... The Flash.\",\"\
-          first_aired\":\"2014-10-07T00:00:00.000Z\",\"airs\":{\"day\":\"Tuesday\"\
-          ,\"time\":\"20:00\",\"timezone\":\"America/New_York\"},\"runtime\":45,\"\
+          first_aired\":\"2014-10-08T00:00:00.000Z\",\"airs\":{\"day\":\"Tuesday\"\
+          ,\"time\":\"20:00\",\"timezone\":\"America/New_York\"},\"runtime\":43,\"\
           certification\":\"TV-14\",\"network\":\"The CW\",\"country\":\"us\",\"trailer\"\
-          :\"http://youtube.com/watch?v=aZxhA_Jihmw\",\"homepage\":null,\"status\"\
-          :\"returning series\",\"rating\":8.29924,\"votes\":7499,\"updated_at\":\"\
-          2015-12-02T10:31:13.000Z\",\"language\":\"en\",\"available_translations\"\
+          :\"http://youtube.com/watch?v=aZxhA_Jihmw\",\"homepage\":\"http://www.cwtv.com/shows/the-flash/\"\
+          ,\"status\":\"returning series\",\"rating\":8.32149,\"votes\":8753,\"updated_at\"\
+          :\"2016-03-02T11:04:37.000Z\",\"language\":\"en\",\"available_translations\"\
           :[\"pl\",\"sv\",\"fr\",\"en\",\"zh\",\"da\",\"pt\",\"el\",\"de\",\"es\"\
           ,\"bg\",\"it\",\"tr\",\"ru\",\"nl\",\"hu\",\"ko\",\"lt\",\"cs\",\"hr\",\"\
-          bs\",\"za\",\"he\",\"id\"],\"genres\":[\"action\",\"adventure\",\"drama\"\
-          ,\"science-fiction\"],\"aired_episodes\":31}"}
+          bs\",\"za\",\"he\",\"id\",\"ro\",\"fa\",\"th\",\"ar\",\"te\"],\"genres\"\
+          :[\"action\",\"adventure\",\"drama\",\"science-fiction\"],\"aired_episodes\"\
+          :38}"}
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [24ec6593629c2018-DFW]
+        cf-ray: [27dc15bec3cf0b0e-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:04 GMT']
-        etag: [W/"e6c71125088a1cf50015e7324f8ad369"]
-        expires: ['Thu, 03 Dec 2015 08:06:04 GMT']
-        last-modified: ['Wed, 02 Dec 2015 10:31:13 GMT']
+        date: ['Thu, 03 Mar 2016 09:33:05 GMT']
+        etag: [W/"361920f7908969796bb8fe51cf6560d3"]
+        expires: ['Thu, 03 Mar 2016 13:33:05 GMT']
+        last-modified: ['Wed, 02 Mar 2016 11:04:37 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [7ac0b93d-9861-4408-91f1-c803f3b96070]
-        x-runtime: ['0.014000']
+        x-request-id: [c398c021-156e-4719-a55d-261839f296c3]
+        x-runtime: ['0.016373']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -337,8 +434,8 @@ interactions:
     response:
       body: {string: "{\"season\":1,\"number\":10,\"title\":\"Revenge of the Rogues\"\
           ,\"ids\":{\"trakt\":999431,\"tvdb\":5052260,\"imdb\":\"tt4016102\",\"tmdb\"\
-          :0,\"tvrage\":1065644215},\"number_abs\":null,\"overview\":\"Leonard Snart\
-          \ AKA Captain Cold returns to Central City with a new hotheaded partner\
+          :1018355,\"tvrage\":1065644215},\"number_abs\":null,\"overview\":\"Leonard\
+          \ Snart AKA Captain Cold returns to Central City with a new hotheaded partner\
           \ in tow \u2013 Mick Rory AKA Heat Wave. The duo plan to steal a multi-million\
           \ dollar painting, but Cold has another agenda while in town \u2013 to set\
           \ a trap for The Flash. Snart and Mick kidnap someone close to The Flash\
@@ -348,26 +445,26 @@ interactions:
           \ Barry asks Dr. Wells, Caitlin and Cisco to help him double his training\
           \ efforts so he\u2019s ready for the Reverse Flash when he returns to Central\
           \ City. Iris deals with the aftermath of Barry\u2019s confession, and Cisco\
-          \ makes the CCPD a new shield.\",\"rating\":7.6782,\"votes\":1358,\"first_aired\"\
-          :\"2015-01-21T01:00:00.000Z\",\"updated_at\":\"2015-12-02T23:40:11.000Z\"\
+          \ makes the CCPD a new shield.\",\"rating\":7.67167,\"votes\":1532,\"first_aired\"\
+          :\"2015-01-21T01:00:00.000Z\",\"updated_at\":\"2016-03-03T07:40:25.000Z\"\
           ,\"available_translations\":[]}"}
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [24ec6594d1a12036-DFW]
+        cf-ray: [27dc15bfd94719c2-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:04 GMT']
-        expires: ['Thu, 03 Dec 2015 08:06:04 GMT']
-        last-modified: ['Wed, 02 Dec 2015 23:40:11 GMT']
+        date: ['Thu, 03 Mar 2016 09:33:06 GMT']
+        expires: ['Thu, 03 Mar 2016 13:33:06 GMT']
+        last-modified: ['Thu, 03 Mar 2016 07:40:25 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d396fbabc56b78c3592ee8eecaa4f8e6a1449115564; expires=Fri,
-            02-Dec-16 04:06:04 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=db2a0f73c6069e7dc901b22e03e6c541d1456997585; expires=Fri,
+            03-Mar-17 09:33:05 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [da963da8-2e06-42cb-b11d-75bfdb6ac676]
-        x-runtime: ['0.008538']
+        x-request-id: [74e8413b-4da4-4774-b182-141e9a320439]
+        x-runtime: ['0.007600']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -382,20 +479,21 @@ interactions:
       body: {string: '[{"last_collected_at":"2012-10-01T02:00:00.000Z","show":{"title":"Homeland","year":2011,"ids":{"trakt":1398,"slug":"homeland","tvdb":247897,"imdb":"tt1796960","tmdb":1407,"tvrage":27811}},"seasons":[{"number":2,"episodes":[{"number":1,"collected_at":"2012-10-01T02:00:00.000Z"}]}]}]'}
       headers:
         cache-control: ['max-age=0, private, must-revalidate']
-        cf-ray: [24ec6596be1d1ffa-DFW]
+        cf-ray: [27dc15c71f7c04b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:04 GMT']
-        etag: [W/"40f1d15a8c92e65f45d924515676e57f"]
-        last-modified: ['Thu, 03 Dec 2015 01:09:57 GMT']
+        date: ['Thu, 03 Mar 2016 09:33:07 GMT']
+        etag: [W/"d89b299bed426e4408466127cdd8be3a"]
+        last-modified: ['Thu, 03 Mar 2016 08:23:48 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dc3b72ca4f1d681ef30dfc33d776f16801449115564; expires=Fri,
-            02-Dec-16 04:06:04 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d8e5b42d1b450cdd481d5bf3d2518a4421456997587; expires=Fri,
+            03-Mar-17 09:33:07 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [5d65607e-987e-4d3e-b3c5-938db957adce]
-        x-runtime: ['0.011333']
+        x-private-user: ['false']
+        x-request-id: [555881a4-31f8-4c09-bc8c-50438ae5e848]
+        x-runtime: ['0.007952']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1
