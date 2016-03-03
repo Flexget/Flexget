@@ -32,7 +32,7 @@ class TestTraktShowLookup(object):
             mock:
               - title: the daily show 2012-6-6
             series:
-              - the daily show (with jon stewart)
+              - the daily show (with trevor noah)
           test_absolute:
             mock:
               - title: naruto 128
