@@ -19,9 +19,7 @@ class TraktSubmit(object):
             'list': {'type': 'string'},
             'type': {'type': 'string', 'enum': ['shows', 'seasons', 'episodes', 'movies', 'auto'], 'default': 'auto'}
         },
-        'required': ['list'],
-        'anyOf': [{'required': ['username']}, {'required': ['account']}],
-        'error_anyOf': 'At least one of `username` or `account` options are needed.',
+        'required': ['list', 'account'],
         'additionalProperties': False
     }
 

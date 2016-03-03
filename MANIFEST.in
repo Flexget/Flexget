@@ -1,5 +1,8 @@
 include LICENSE
 include README.rst
-recursive-exclude tests *
 include flexget/ui/load.failure.html
+include requirements.txt
+include dev-requirements.txt
 recursive-include flexget/ui/app **
+recursive-include flexget/templates **
+recursive-exclude tests *

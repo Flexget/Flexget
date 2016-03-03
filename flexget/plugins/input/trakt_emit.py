@@ -115,10 +115,10 @@ class TraktEmit(object):
                         # There were no watched/collected episodes, nothing to emit in 'last' mode
                         continue
             if eps and epn:
-                entry = self.make_entry(fields, eps, epn)
                 if config.get('strip_dates'):
-                    # Remove year from end of name if present, assumes name ends with S<number>E<number>
-                    entry['title'] = re.sub(r'\s+\(\d{4}\)(?=\sS[0-9]*E[0-9]*$)', '', entry['title'])
+                    # remove year from end of series_name if present
+                    fields['series_name'] = re.sub(r'\s+\(\d{4}\)$', '', fields['series_name'])
+                entry = self.make_entry(fields, eps, epn)
                 entries.append(entry)
         return entries
 

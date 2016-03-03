@@ -78,6 +78,7 @@ seen_search_schema = {
             'type': 'array',
             'items': seen_object
         },
+        'total_number_of_seen_entries': {'type': 'integer'},
         'number_of_seen_entries': {'type': 'integer'},
         'total_number_of_pages': {'type': 'integer'},
         'page_number': {'type': 'integer'}
@@ -88,7 +89,7 @@ seen_search_schema = api.schema('seen_search_schema', seen_search_schema)
 seen_search_parser = api.parser()
 seen_search_parser.add_argument('value', help='Search by any field value or leave empty to get entries')
 seen_search_parser.add_argument('page', type=int, default=1, help='Page number')
-seen_search_parser.add_argument('max', type=int, default=50, help='Seen entries per page')
+seen_search_parser.add_argument('page_size', type=int, default=10, help='Seen entries per page. Max value is 100')
 seen_search_parser.add_argument('is_seen_local', type=inputs.boolean, default=None,
                                 help='Filter results by seen locality.')
 seen_search_parser.add_argument('sort_by', choices=('title', 'task', 'added', 'local', 'id'), default='added',
@@ -111,10 +112,14 @@ class SeenSearchAPI(APIResource):
         args = seen_search_parser.parse_args()
         value = args['value']
         page = args['page']
-        max_results = args['max']
+        page_size = args['page_size']
         is_seen_local = args['is_seen_local']
         sort_by = args['sort_by']
         order = args['order']
+
+        # Handle max size limit
+        if page_size > 100:
+            page_size = 100
 
         # Handles default if it explicitly called
         if order == 'desc':
@@ -127,32 +132,33 @@ class SeenSearchAPI(APIResource):
             value = unquote(value)
             value = '%{0}%'.format(value)
 
-        raw_seen_entries_list = seen.search(value=value, status=is_seen_local, session=session)
-        converted_seen_entry_list = [entry.to_dict() for entry in raw_seen_entries_list]
+        start = page_size * (page - 1)
+        stop = start + page_size
+
+        kwargs = {
+            'value': value,
+            'status': is_seen_local,
+            'stop': stop,
+            'start': start,
+            'session': session
+        }
+        count = seen.search(count=True, **kwargs)
+
+        raw_seen_entries_list = seen.search(**kwargs)
+        converted_seen_entry_list = [entry.to_dict() for entry in raw_seen_entries_list.all()]
         sorted_seen_entries_list = sorted(converted_seen_entry_list, key=itemgetter(sort_by), reverse=order)
 
-        # Pagination
-        count = len(sorted_seen_entries_list)
-
-        pages = int(ceil(count / float(max_results)))
+        pages = int(ceil(count / float(page_size)))
 
         # Invalid page request
         if page > pages and pages != 0:
             return {'status': 'error',
                     'message': 'page %s does not exist' % page}, 404
 
-        start = (page - 1) * max_results
-        finish = start + max_results
-        if finish > count:
-            finish = count
-
-        paginated_seen_entries = []
-        for seen_entry_num in range(start, finish):
-            paginated_seen_entries.append(sorted_seen_entries_list[seen_entry_num])
-
         return jsonify({
-            'seen_entries': paginated_seen_entries,
-            'number_of_seen_entries': count,
+            'seen_entries': sorted_seen_entries_list,
+            'total_number_of_seen_entries': count,
+            'number_of_seen_entries': page_size,
             'page_number': page,
             'total_number_of_pages': pages
         })

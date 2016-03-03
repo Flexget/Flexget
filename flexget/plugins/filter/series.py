@@ -20,7 +20,7 @@ from flexget.manager import Session
 from flexget.plugin import get_plugin_by_name
 from flexget.plugins.parsers import SERIES_ID_TYPES
 from flexget.utils import qualities
-from flexget.utils.database import quality_property
+from flexget.utils.database import quality_property, with_session
 from flexget.utils.log import log_once
 from flexget.utils.sqlalchemy_utils import (table_columns, table_exists, drop_tables, table_schema, table_add_column,
                                             create_index)
@@ -437,22 +437,31 @@ def get_latest_status(episode):
     return status.rstrip(', ') if status else None
 
 
-def get_series_summary(configured=None, premieres=None, status=None, days=None, session=None):
+@with_session
+def get_series_summary(configured=None, premieres=None, status=None, days=None, start=None, stop=None, count=False,
+                       session=None):
     """
     Return a query with results for all series.
     :param configured: 'configured' for shows in config, 'unconfigured' for shows not in config, 'all' for both.
     Default is 'all'
     :param premieres: Return only shows with 1 season and less than 3 episodes
-    :param status:
-    :param days:
+    :param status: Stale or not
+    :param days: Value to determine stale
+    :param page_size: Number of result per page
+    :param page: Page number to return
+    :param count: Decides whether to return count of all shows or data itself
+     :param session: Passed session
     :return:
     """
     if not configured:
         configured = 'configured'
     elif configured not in ['configured', 'unconfigured', 'all']:
         raise LookupError('"configured" parameter must be either "configured", "unconfigured", or "all"')
-    query = (session.query(Series).outerjoin(Series.episodes).outerjoin(Episode.releases).
-             outerjoin(Series.in_tasks).group_by(Series.id))
+    query = session.query(Series)
+    if count:
+        return query.count()
+    query = query.slice(start, stop).from_self()
+    query = query.outerjoin(Series.episodes).outerjoin(Episode.releases).outerjoin(Series.in_tasks).group_by(Series.id)
     if configured == 'configured':
         query = query.having(func.count(SeriesTask.id) >= 1)
     elif configured == 'unconfigured':
@@ -777,13 +786,13 @@ def delete_release_by_id(release_id):
 def shows_by_name(normalized_name, session=None):
     """ Returns all series matching `normalized_name` """
     return session.query(Series).filter(Series._name_normalized.contains(normalized_name)).order_by(
-            func.char_length(Series.name)).all()
+        func.char_length(Series.name)).all()
 
 
 def shows_by_exact_name(normalized_name, session=None):
     """ Returns all series matching `normalized_name` """
     return session.query(Series).filter(Series._name_normalized == normalized_name).order_by(
-            func.char_length(Series.name)).all()
+        func.char_length(Series.name)).all()
 
 
 def show_by_id(show_id, session=None):
@@ -801,17 +810,21 @@ def release_by_id(release_id, session=None):
     return session.query(Release).filter(Release.id == release_id).one()
 
 
-def show_episodes(series, session=None):
+def show_episodes(series, start=None, stop=None, count=False, descending=False, session=None):
     """ Return all episodes of a given series """
     episodes = session.query(Episode).filter(Episode.series_id == series.id)
+    if count:
+        return episodes.count()
+    episodes = episodes.slice(start, stop).from_self()
     # Query episodes in sane order instead of iterating from series.episodes
     if series.identified_by == 'sequence':
-        episodes = episodes.order_by(Episode.number).all()
+        episodes = episodes.order_by(Episode.number.desc()) if descending else episodes.order_by(Episode.number)
     elif series.identified_by == 'ep':
-        episodes = episodes.order_by(Episode.season, Episode.number).all()
+        episodes = episodes.order_by(Episode.season, Episode.number.desc()) if descending else episodes.order_by(
+            Episode.season, Episode.number)
     else:
-        episodes = episodes.order_by(Episode.identifier).all()
-    return episodes
+        episodes = episodes.order_by(Episode.identifier.desc()) if descending else episodes.order_by(Episode.identifier)
+    return episodes.all()
 
 
 def episode_in_show(series_id, episode_id):

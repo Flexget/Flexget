@@ -1,0 +1,8 @@
+{
+  "tests/test_t411.py::TestInputPlugin::()::test_schema": true, 
+  "tests/test_t411.py::TestRestClient::()::test_auth": true, 
+  "tests/test_t411.py::TestRestClient::()::test_error_message_handler": true, 
+  "tests/test_t411.py::TestRestClient::()::test_malformed_search_response": true, 
+  "tests/test_t411.py::TestRestClient::()::test_retrieve_categories": true, 
+  "tests/test_t411.py::TestRestClient::()::test_retrieve_terms": true
+}

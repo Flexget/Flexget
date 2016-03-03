@@ -43,7 +43,7 @@ def seen_add(options):
 def seen_search(options, session=None):
     search_term = '%' + options.search_term + '%'
     seen_entries = seen.search(value=search_term, status=None, session=session)
-    for se in seen_entries:
+    for se in seen_entries.all():
         console('ID: %s Name: %s Task: %s Added: %s' % (se.id, se.title, se.task, se.added.strftime('%c')))
         for sf in se.fields:
             console(' %s: %s' % (sf.field, sf.value))

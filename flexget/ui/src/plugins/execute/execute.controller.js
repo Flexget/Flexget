@@ -120,7 +120,13 @@
             var streamTask = function (name) {
                 var task = getTask(name);
 
-                return tasks.execute(name, vm.options)
+                var options = {};
+                angular.copy(vm.options.settings, options);
+                angular.forEach(vm.options.optional, function (setting) {
+                    //options[setting.name] = setting.value;
+                });
+
+                return tasks.execute(name, options)
                     .log(function (log) {
                         task.log.push(log);
                     })
@@ -139,7 +145,9 @@
 
             var done = vm.tasksInput.tasks.reduce(function (previous, taskName) {
                 return previous.then(function () {
-                    return streamTask(taskName);
+                    if (vm.stream.running) {
+                        return streamTask(taskName);
+                    }
                 });
             }, $q.when());
 
