@@ -3,10 +3,9 @@ import os
 import glob
 
 import pytest
-from nose.tools import raises
 
 from flexget import plugin, plugins
-from flexget.event import event
+from flexget.event import event, fire_event
 
 
 class TestPluginApi(object):
@@ -74,6 +73,8 @@ class TestExternalPluginLoading(object):
     def config(self, request):
         os.environ['FLEXGET_PLUGIN_PATH'] = request.fspath.dirpath().join('external_plugins').strpath
         plugin.load_plugins()
+        # fire the config register event again so that task schema is rebuilt with new plugin
+        fire_event('config.register')
         yield self._config
         del os.environ['FLEXGET_PLUGIN_PATH']
 
