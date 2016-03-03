@@ -1,7 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 
 
-
 class TestWhatCDOnline(object):
 
     config = """
@@ -13,5 +12,5 @@ class TestWhatCDOnline(object):
     """
 
     def test_invalid_login(self, execute_task, use_vcr):
-        task = execute_task("badlogin", abort_ok=True)
+        task = execute_task("badlogin", abort=True)
         assert task.aborted, 'Task not aborted with invalid login credentials'
