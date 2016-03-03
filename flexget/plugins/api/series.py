@@ -41,7 +41,7 @@ release_object = {
         'release_downloaded': {'type': 'string'},
         'release_quality': {'type': 'string'},
         'release_proper_count': {'type': 'integer'},
-        'release_first_seen': {'type': 'string'},
+        'release_first_seen': {'type': 'string', 'format': 'date-time'},
         'release_episode_id': {'type': 'integer'}
     }
 }
@@ -88,7 +88,7 @@ latest_object = {
 episode_object = {
     'type': 'object',
     'properties': {
-        "episode_first_seen": {'type': 'string'},
+        "episode_first_seen": {'type': 'string', 'format': 'date-time'},
         "episode_id": {'type': 'string'},
         "episode_identified_by": {'type': 'string'},
         "episode_identifier": {'type': 'string'},

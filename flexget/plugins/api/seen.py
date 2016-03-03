@@ -33,7 +33,7 @@ seen_field_object = {
         'id': {'type': 'integer'},
         'field': {'type': 'string'},
         'value': {'type': 'string'},
-        'added': {'type': 'string'},
+        'added': {'type': 'string', 'format': 'date-time'},
         'seen_entry_id': {'type': 'integer'}
     }
 }
@@ -45,7 +45,7 @@ seen_object = {
         'title': {'type': 'string'},
         'reason': {'type': 'string'},
         'task': {'type': 'string'},
-        'added': {'type': 'string'},
+        'added': {'type': 'string', 'format': 'date-time'},
         'local': {'type': 'boolean'},
         'fields': {'type': 'array', 'items': seen_field_object}
     }

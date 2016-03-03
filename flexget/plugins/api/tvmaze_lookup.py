@@ -32,7 +32,7 @@ actor_object = {
 schedule_object = {
     'type': 'object',
     'properties': {
-        "days": {'type': 'array', 'items': 'string'},
+        "days": {'type': 'array', 'items': {'type': 'string'}},
         "time": {'type': 'string'}
     }
 }

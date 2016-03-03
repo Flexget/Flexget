@@ -22,7 +22,7 @@ tvdb_series_object = {
     'type': 'object',
     'properties': {
         'TVDB_id': {'type': 'integer'},
-        'last_updated': {'type': 'string'},
+        'last_updated': {'type': 'string', 'format': 'date-time'},
         'expired': {'type': 'boolean'},
         'series_name': {'type': 'string'},
         'language': {'type': 'string'},
