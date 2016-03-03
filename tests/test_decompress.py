@@ -1,6 +1,4 @@
 from __future__ import unicode_literals, division, absolute_import
-import os
-import shutil
 
 import pytest
 
@@ -57,17 +55,6 @@ class TestExtract(object):
     zip_name = 'test.zip'
     out_file = 'hooray.txt'
     out_dir = 'directory'
-    def _setup(self):
-        self.rar_name = 'test.rar'
-        self.zip_name = 'test.zip'
-
-        #archive paths
-        self.temp_rar = os.path.join(self.__tmp__, self.rar_name)
-        self.temp_zip = os.path.join(self.__tmp__, self.zip_name)
-
-        # extraction paths
-        self.temp_out = os.path.join(self.__tmp__, 'hooray.txt')
-        self.temp_out_dir = os.path.join(self.__tmp__, 'directory', 'hooray.txt')
 
     @pytest.mark.skipif(rarfile is None, reason='rarfile module required')
     @pytest.mark.filecopy(rar_name, '__tmp__')
@@ -82,16 +69,13 @@ class TestExtract(object):
     @pytest.mark.filecopy(rar_name, '__tmp__')
     def test_delete_rar(self, execute_task, tmpdir):
         """Test RAR deletion after extraction"""
-        shutil.copy(self.rar_name, self.temp_rar)
         execute_task('test_delete_rar')
-
         assert not tmpdir.join(self.rar_name).exists(), 'RAR archive was not deleted.'
 
     @pytest.mark.filecopy(zip_name, '__tmp__')
     def test_zip(self, execute_task, tmpdir):
         """Test basic Zip extraction"""
         execute_task('test_zip')
-
         assert tmpdir.join(self.out_file).exists(), 'Output file does not exist at the correct path.'
         assert tmpdir.join(self.zip_name).exists(), 'Zip archive should still exist.'
 
@@ -99,7 +83,6 @@ class TestExtract(object):
     def test_keep_dirs(self, execute_task, tmpdir):
         """Test directory creation"""
         execute_task('test_keep_dirs')
-
         assert tmpdir.join(self.out_dir, self.out_file).exists(), 'Output file does not exist at the correct path.'
 
     @pytest.mark.filecopy(zip_name, '__tmp__')
