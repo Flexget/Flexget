@@ -16,3 +16,17 @@ class TestParsingAPI(object):
             for plugin in get_plugins(group='%s_parser' % parser_type):
                 assert hasattr(plugin.instance, 'parse_%s' % parser_type), \
                     '{type} parsing plugin {name} has no parse_{type} method'.format(type=parser_type, name=plugin.name)
+
+
+class TestTaskParsing(object):
+    config = """
+        tasks:
+          explicit_parser:
+            parsing:
+              movie: guessit
+              series: guessit
+    """
+    def test_selected_parser_cleared(self, manager, execute_task):
+        # make sure when a non-default parser is installed on a task, it doesn't affect other tasks
+        execute_task('explicit_parser')
+        assert not plugin_parsing.selected_parsers
