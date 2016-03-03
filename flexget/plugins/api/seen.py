@@ -89,7 +89,7 @@ seen_search_schema = api.schema('seen_search_schema', seen_search_schema)
 seen_search_parser = api.parser()
 seen_search_parser.add_argument('value', help='Search by any field value or leave empty to get entries')
 seen_search_parser.add_argument('page', type=int, default=1, help='Page number')
-seen_search_parser.add_argument('page_size', type=int, default=50, help='Seen entries per page')
+seen_search_parser.add_argument('page_size', type=int, default=10, help='Seen entries per page')
 seen_search_parser.add_argument('is_seen_local', type=inputs.boolean, default=None,
                                 help='Filter results by seen locality.')
 seen_search_parser.add_argument('sort_by', choices=('title', 'task', 'added', 'local', 'id'), default='added',
