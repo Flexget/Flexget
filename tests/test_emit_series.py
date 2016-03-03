@@ -157,13 +157,10 @@ class TestEmitSeries(object):
         assert task.find_entry(title='Test Series 2 S01E03')
 
     def test_emit_series_from_start(self, execute_task):
-        self.inject_series(execute_task, 'Test Series 3 S01E03')
         task = execute_task('test_emit_series_from_start')
         assert task.find_entry(title='Test Series 3 S01E01')
-        assert task.find_entry(title='Test Series 3 S01E02')
-        assert task.find_entry(title='Test Series 3 S01E04')
         task = execute_task('test_emit_series_from_start')
-        assert task.find_entry(title='Test Series 3 S01E05')
+        assert task.find_entry(title='Test Series 3 S01E02')
 
     def test_emit_series_begin(self, execute_task):
         task = execute_task('test_emit_series_begin')
