@@ -11,11 +11,17 @@ class TestSeriesAPI(object):
     config = """
         tasks: {}
     """
+
     @patch.object(series, 'get_series_summary')
     def test_series_list_get(self, mock_series_list, api_client):
-        session = Session()
-        query = session.query(series.Series)
-        mock_series_list.return_value = query
+        def search(*args, **kwargs):
+            if 'count' in kwargs:
+                return 0
+            else:
+                with Session() as session:
+                    return session.query(series.Series)
+
+        mock_series_list.side_effect = search
 
         # No params
         rsp = api_client.get('/series/')
@@ -34,7 +40,7 @@ class TestSeriesAPI(object):
         rsp = api_client.get('/series/?status=bla&max=10&days=4&sort_by=last_download_date&in_config=all'
                        '&premieres=true&order=asc&page=2')
         assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
-        assert mock_series_list.call_count == 3, 'Should have 3 calls, is actually %s' % mock_series_list.call_count
+        assert mock_series_list.call_count == 6, 'Should have 3 calls, is actually %s' % mock_series_list.call_count
 
     @patch.object(series, 'new_eps_after')
     @patch.object(series, 'get_latest_release')
