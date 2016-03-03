@@ -250,7 +250,6 @@ class MockManager(Manager):
         raise CrashReport('Crash report created during unit test, check log for traceback.')
 
 
-
 class APIClient(object):
     def __init__(self, api_key):
         self.api_key = api_key
