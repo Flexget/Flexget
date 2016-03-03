@@ -5,7 +5,7 @@ old validators will get converted to new schemas properly for plugins still usin
 from __future__ import unicode_literals, division, absolute_import
 
 from flexget import validator
-from tests.util import maketemp
+
 
 class TestValidator(object):
 
@@ -59,24 +59,23 @@ class TestValidator(object):
         choice.accept('Bar', ignore_case=True)
         choice.accept(120)
         choice.validate('foo')
-        print choice.errors.messages
         assert not choice.errors.messages, 'foo should be valid'
+
         choice.validate(120)
-        print choice.errors.messages
         assert not choice.errors.messages, '120 should be valid'
+
         choice.validate('bAR')
-        print choice.errors.messages
         assert not choice.errors.messages, 'bAR should be valid'
+
         choice.validate('xxx')
-        print choice.errors.messages
         assert choice.errors.messages, 'xxx should be invalid'
+
         choice.errors.messages = []
         choice.validate(300)
-        print choice.errors.messages
         assert choice.errors.messages, '300 should be invalid'
+
         choice.errors.messages = []
         choice.validate('fOO')
-        print choice.errors.messages
         assert choice.errors.messages, 'fOO should be invalid'
 
     # This validator is not supported with json schema
@@ -102,13 +101,13 @@ class TestValidator(object):
     def test_path(self, tmpdir):
         path = validator.factory('path')
         path_allow_missing = validator.factory('path', allow_missing=True)
+
         path.validate(tmpdir.strpath)
-        print path.errors.messages
-        assert not path.errors.messages, '%s should be valid' % (tmpdir.strpath)
+        assert not path.errors.messages, '%s should be valid' % tmpdir.strpath
+
         path_allow_missing.validate('missing_directory')
-        print path_allow_missing.errors.messages
         assert not path_allow_missing.errors.messages, 'missing_directory should be valid with allow_missing'
+
         path.validate('missing_directory')
-        print path.errors.messages
         assert path.errors.messages, 'missing_directory should be invalid'
         path_allow_missing.errors.messages = []
