@@ -132,10 +132,14 @@ episode_list_schema = {
             'items': episode_object
         },
         'number_of_episodes': {'type': 'integer'},
+        'total_number_of_episodes': {'type': 'integer'},
+        'page': {'type': 'integer'},
+        'total_number_of_pages': {'type': 'integer'},
         'show_id': {'type': 'integer'},
         'show': {'type': 'string'}
     }
 }
+
 episode_list_schema = api.schema('episode_list', episode_list_schema)
 
 episode_schema = {
@@ -246,7 +250,7 @@ series_list_parser.add_argument('order', choices=('desc', 'asc'), default='desc'
 
 @series_api.route('/')
 class SeriesListAPI(APIResource):
-    @api.response(404, 'Page does not exist', default_error_schema)
+    @api.response(405, 'Page does not exist', default_error_schema)
     @api.response(200, 'Series list retrieved successfully', series_list_schema)
     @api.doc(parser=series_list_parser, description="Get a  list of Flexget's shows in DB")
     def get(self, session=None):
@@ -297,7 +301,7 @@ class SeriesListAPI(APIResource):
         pages = int(ceil(num_of_shows / float(page_size)))
 
         if page > pages and pages != 0:
-            return {'error': 'page %s does not exist' % page}, 400
+            return {'error': 'page %s does not exist' % page}, 405
 
         number_of_shows = min(page_size, num_of_shows)
 
@@ -416,7 +420,7 @@ class SeriesShowAPI(APIResource):
         except ValueError as e:
             return {'status': 'error',
                     'message': e.args[0]
-                    }, 400
+                    }, 404
         return {}
 
     @api.response(200, 'Episodes for series will be accepted starting with ep_id', show_details_schema)
@@ -472,26 +476,64 @@ class SeriesBeginByNameAPI(APIResource):
         return jsonify(get_series_details(show))
 
 
+episode_parser = api.parser()
+episode_parser.add_argument('page', type=int, default=1, help='Page number. Default is 1')
+episode_parser.add_argument('page_size', type=int, default=10, help='Shows per page. Default is 100.')
+episode_parser.add_argument('order', choices=('desc', 'asc'), default='desc', help="Sorting order.")
+
+
 @api.response(404, 'Show ID not found', default_error_schema)
 @series_api.route('/<int:show_id>/episodes')
 @api.doc(params={'show_id': 'ID of the show'})
 class SeriesEpisodesAPI(APIResource):
     @api.response(200, 'Episodes retrieved successfully for show', episode_list_schema)
-    @api.doc(description='Get all show episodes via its ID')
+    @api.response(405, 'Page does not exists', model=default_error_schema)
+    @api.doc(description='Get all show episodes via its ID', parser=episode_parser)
     def get(self, show_id, session):
         """ Get episodes by show ID """
+        args = episode_parser.parse_args()
+        page = args['page']
+        page_size = args['page_size']
+
+        order = args['order']
+        # In case the default 'desc' order was received
+        if order == 'desc':
+            order = True
+        else:
+            order = False
+
+        start = page_size * (page - 1)
+        stop = start + page_size
+
+        kwargs = {
+            'start': start,
+            'stop': stop,
+            'descending': order,
+            'session': session
+        }
+
         try:
             show = series.show_by_id(show_id, session=session)
         except NoResultFound:
             return {'status': 'error',
                     'message': 'Show with ID %s not found' % show_id
                     }, 404
-        episodes = [get_episode_details(episode) for episode in show.episodes]
+        count = series.show_episodes(show, count=True, session=session)
+        episodes = [get_episode_details(episode) for episode in series.show_episodes(show, **kwargs)]
+        pages = int(ceil(count / float(page_size)))
+
+        if page > pages and pages != 0:
+            return {'status': 'error',
+                    'message': 'page does not exist' % show_id
+                    }, 500
 
         return jsonify({'show': show.name,
                         'show_id': show_id,
                         'number_of_episodes': len(episodes),
-                        'episodes': episodes})
+                        'episodes': episodes,
+                        'total_number_of_episodes': count,
+                        'page': page,
+                        'total_number_of_pages': pages})
 
     @api.response(500, 'Error when trying to forget episode', default_error_schema)
     @api.response(200, 'Successfully forgotten all episodes from show', empty_response)
