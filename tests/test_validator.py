@@ -99,13 +99,12 @@ class TestValidator(object):
         test_config['recurse']['badkey'] = 4
         assert not recursive_validator().validate(test_config), 'Config should not be valid'
 
-    def test_path(self):
+    def test_path(self, tmpdir):
         path = validator.factory('path')
         path_allow_missing = validator.factory('path', allow_missing=True)
-        temp_path = maketemp()
-        path.validate(temp_path)
+        path.validate(tmpdir.strpath)
         print path.errors.messages
-        assert not path.errors.messages, '%s should be valid' % (temp_path)
+        assert not path.errors.messages, '%s should be valid' % (tmpdir.strpath)
         path_allow_missing.validate('missing_directory')
         print path_allow_missing.errors.messages
         assert not path_allow_missing.errors.messages, 'missing_directory should be valid with allow_missing'
