@@ -152,7 +152,7 @@ def pytest_runtest_setup(item):
         item.add_marker(pytest.mark.usefixtures('filecopy'))
 
 
-@pytest.fixture()
+@pytest.yield_fixture()
 def filecopy(request):
     marker = request.node.get_marker('filecopy')
     if marker is not None:
@@ -169,12 +169,12 @@ def filecopy(request):
                 dest_path = dest_path / f.basename()
             f.copy(dest_path)
             out_files.append(dest_path)
-
-        def fin():
-            for f in out_files:
+        yield
+        for f in out_files:
+            try:
                 f.remove()
-
-        request.addfinalizer(fin)
+            except OSError as e:
+                print("couldn't remove %s: %s" % (f, e))
 
 
 @pytest.fixture(scope='session', autouse=True)
