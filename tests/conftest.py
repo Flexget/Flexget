@@ -42,12 +42,14 @@ def config(request):
 
 
 @pytest.yield_fixture()
-def manager(request, config, caplog, filecopy):  # enforce filecopy is run before manager
+def manager(request, config, caplog, monkeypatch, filecopy):  # enforce filecopy is run before manager
     """
     Create a :class:`MockManager` for this test based on `config` argument.
     """
     if 'tmpdir' in request.fixturenames:
         config = config.replace('__tmp__', request.getfuncargvalue('tmpdir').strpath)
+    # If a test fails while initializing manager, it can cause subsequent tests to fail without this.
+    monkeypatch.setattr('flexget.manager.manager', None)
     try:
         mockmanager = MockManager(config, request.cls.__name__)
     except Exception:
