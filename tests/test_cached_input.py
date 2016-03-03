@@ -24,26 +24,25 @@ class InputPersist(object):
 plugin.register(InputPersist, 'test_input', api_ver=2)
 
 
-@pytest.mark.filecopy('rss.xml', 'cached.xml')
+@pytest.mark.filecopy('rss.xml', '__tmp__/cached.xml')
+@pytest.mark.usefixtures('tmpdir')
 class TestInputCache(object):
 
     config = """
         tasks:
           test_memory:
             rss:
-              url: cached.xml
+              url: __tmp__/cached.xml
           test_db:
             test_input: True
     """
 
-    def test_memory_cache(self, execute_task):
+    def test_memory_cache(self, execute_task, tmpdir):
         """Test memory input caching"""
         task = execute_task('test_memory')
         assert task.entries, 'should have created entries at the start'
-        os.remove('cached.xml')
-        f = open('cached.xml', 'w')
-        f.write('')
-        f.close()
+        tmpdir.join('cached.xml').remove()
+        tmpdir.join('cached.xml').write('')
         task = execute_task('test_memory')
         assert task.entries, 'should have created entries from the cache'
         # Turn the cache time down and run again to make sure the entries are not created again
