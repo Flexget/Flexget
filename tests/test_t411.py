@@ -176,11 +176,9 @@ class TestRestClient(object):
 
 
 class TestObjectMapper(object):
-    def __init__(self):
-        self.mapper = T411ObjectMapper()
 
-    def test_map_category(self, execute_task):
-        category = self.mapper.map_category({
+    def test_map_category(self):
+        category = T411ObjectMapper().map_category({
             u'pid': u'0',
             u'id': u'210',
             u'name': u'Film/Vidéo',
@@ -202,7 +200,7 @@ class TestObjectMapper(object):
         assert category.name == u'Film/Vidéo'
         assert len(category.sub_categories) == 10
 
-    def test_map_term_type_tree(self, execute_task):
+    def test_map_term_type_tree(self):
         tree = {
             "234": {
                 "11": {
@@ -230,7 +228,7 @@ class TestObjectMapper(object):
                 }
             }
         }
-        category_to_term_type, term_types = self.mapper.map_term_type_tree(tree)
+        category_to_term_type, term_types = T411ObjectMapper().map_term_type_tree(tree)
         assert (234, 11) in category_to_term_type
         assert (234, 43) in category_to_term_type
         assert term_types.has_key(11)
@@ -276,9 +274,9 @@ class TestProxy(object):
 class TestInputPlugin(object):
     config = """
         tasks:
-          series:
-            - Mickey vs Donald
           uncached_db:
+            series:
+              - Mickey vs Donald
             t411:
               category: cartoons
               terms:
