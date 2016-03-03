@@ -104,11 +104,12 @@ class AppleTrailers(InputRSS):
             genre_head = soup.find(name='dt', text='Genre')
             if not genre_head:
                 log.debug('genre(s) not found')
-            for genre_name in genre_head.next_sibling.contents:
-                if genre_name == ' ' or genre_name == ', ':
-                    continue
-                genres.add(genre_name.contents[0].string)
-                log.debug('genre found: %s' % genre_name.contents[0].string)
+            else:
+                for genre_name in genre_head.next_sibling.contents:
+                    if genre_name == ' ' or genre_name == ', ':
+                        continue
+                    genres.add(genre_name.contents[0].string)
+                    log.debug('genre found: %s' % genre_name.contents[0].string)
 
             # Turn simple config into full config
             if isinstance(config, basestring):
