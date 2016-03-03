@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import glob
 
+import pytest
 from nose.tools import raises
 
 from flexget import plugin, plugins
@@ -15,9 +16,9 @@ class TestPluginApi(object):
 
     config = 'tasks: {}'
 
-    @raises(plugin.DependencyError)
     def test_unknown_plugin(self):
-        plugin.get_plugin_by_name('nonexisting_plugin')
+        with pytest.raises(plugin.DependencyError):
+            plugin.get_plugin_by_name('nonexisting_plugin')
 
     def test_no_dupes(self):
         plugin.load_plugins()
@@ -63,21 +64,20 @@ class TestPluginApi(object):
 
 
 class TestExternalPluginLoading(object):
-    config = """
+    _config = """
         tasks:
           ext_plugin:
             external_plugin: yes
     """
 
-    def setup(self):
-        os.environ['FLEXGET_PLUGIN_PATH'] = os.path.join(self.base_path, 'external_plugins')
+    @pytest.yield_fixture()
+    def config(self, request):
+        os.environ['FLEXGET_PLUGIN_PATH'] = request.fspath.dirpath().join('external_plugins').strpath
         plugin.load_plugins()
-        super(TestExternalPluginLoading, self).setup()
-
-    def teardown(self):
+        yield self._config
         del os.environ['FLEXGET_PLUGIN_PATH']
-        super(TestExternalPluginLoading, self).teardown()
 
     def test_external_plugin_loading(self, execute_task):
+        # TODO: This isn't working because calling load_plugins again doesn't cause the schema for tasks to regenerate
         task = execute_task('ext_plugin')
         assert task.find_entry(title='test entry'), 'External plugin did not create entry'

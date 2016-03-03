@@ -6,6 +6,7 @@ from flexget.event import event
 
 
 class ExternalPlugin(object):
+    schema = {'type': 'bool'}
     def on_task_input(self, task, config):
         return [Entry('test entry', 'fake url')]
 
