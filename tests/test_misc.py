@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
+import pytest
 import stat
 
 from nose.tools import raises
@@ -161,10 +162,10 @@ class TestDownload(object):
 
 class TestEntryUnicodeError(object):
 
-    @raises(EntryUnicodeError)
-    def test_encoding(self, execute_task):
+    def test_encoding(self):
         e = Entry('title', 'url')
-        e['invalid'] = b'\x8e'
+        with pytest.raises(EntryUnicodeError):
+            e['invalid'] = b'\x8e'
 
 
 class TestFilterRequireField(object):
@@ -199,13 +200,13 @@ class TestFilterRequireField(object):
 
 class TestHtmlUtils(object):
 
-    def test_decode_html(self, execute_task):
+    def test_decode_html(self):
         """utils decode_html"""
         from flexget.utils.tools import decode_html
         assert decode_html('&lt;&#51;') == u'<3'
         assert decode_html('&#x2500;') == u'\u2500'
 
-    def test_encode_html(self, execute_task):
+    def test_encode_html(self):
         """utils encode_html (FAILS - DISABLED)"""
         return
 
