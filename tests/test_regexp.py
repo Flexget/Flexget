@@ -68,7 +68,7 @@ class TestRegexp(object):
               reject_excluding:
                 - reg
                 - exp
-                - 5
+                - '5'
               rest: accept
 
           # test complicated
