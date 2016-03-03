@@ -18,9 +18,9 @@
     					</md-card-title>
     					<md-card-content layout="row" class="custom-card">
     						<div class="md-media-lg series-image">
-                                <img ng-src="http://www.thetvdb.com/banners/{{ show.metadata.poster }}">
+                                <img ng-src="{{ show.metadata.medium_image }}">
                             </div>
-    						<p>{{ show.metadata.overview }}</p>
+    						<p>{{ show.metadata.summary }}</p>
     					</md-card-content>
     					<md-card-actions layout="row" layout-align="end center">
     						<md-button class="md-primary md-raised" ng-click="vm.gotoEpisodes(show.show_id)">Episodes</md-button>

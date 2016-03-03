@@ -34,7 +34,7 @@
 
         function getMetadata() {
             vm.series.map(function(show) {
-                $http.get('/api/tvdb/series/' + show.show_name, { cache: true })
+                $http.get('/api/tvmaze/series/' + show.show_name, { cache: true })
                     .success(function(data) {
                         show.metadata = data;
                     })
