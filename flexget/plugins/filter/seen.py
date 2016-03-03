@@ -346,12 +346,12 @@ def search(value=None, status=None, start=None, stop=None, count=False, order_by
         query = query.order_by(getattr(SeenEntry, order_by).desc())
     else:
         query = query.order_by(getattr(SeenEntry, order_by))
+    query = query.slice(start, stop).from_self()
     query = query.join(SeenField)
     if value:
         query = query.join(SeenField).filter(SeenField.value.like(value))
     if status is not None:
         query = query.filter(SeenEntry.local == status)
-    query = query.slice(start, stop).from_self()
     return query
 
 
