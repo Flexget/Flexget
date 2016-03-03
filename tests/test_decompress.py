@@ -2,8 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import shutil
 
-from nose.plugins.skip import SkipTest
-
+import pytest
 
 try:
     import rarfile
@@ -11,18 +10,18 @@ except ImportError:
     rarfile = None
 
 
+@pytest.mark.usefixtures('tmpdir')
 class TestExtract(object):
-    __tmp__ = True
     config = """
         templates:
             global:
                 accept_all: yes
             rar_file:
                 mock:
-                    - {title: 'test', location: '__tmp__test.rar'}
+                    - {title: 'test', location: '__tmp__/test.rar'}
             zip_file:
                 mock:
-                    - {title: 'test', location: '__tmp__test.zip'}
+                    - {title: 'test', location: '__tmp__/test.zip'}
         tasks:
             test_rar:
                 template: rar_file
@@ -54,15 +53,11 @@ class TestExtract(object):
                     
         """
 
-    def __init__(self):
-        super(TestExtract, self).__init__()
-        self.temp_rar = None
-        self.temp_zip = None
-        self.temp_out = None
-        self.temp_out_dir = None
-
-    def setup(self):
-        super(TestExtract, self).setup()
+    rar_name = 'test.rar'
+    zip_name = 'test.zip'
+    out_file = 'hooray.txt'
+    out_dir = 'directory'
+    def _setup(self):
         self.rar_name = 'test.rar'
         self.zip_name = 'test.zip'
 
@@ -74,43 +69,41 @@ class TestExtract(object):
         self.temp_out = os.path.join(self.__tmp__, 'hooray.txt')
         self.temp_out_dir = os.path.join(self.__tmp__, 'directory', 'hooray.txt')
 
-    def test_rar(self, execute_task):
+    @pytest.mark.skipif(rarfile is None, reason='rarfile module required')
+    @pytest.mark.filecopy(rar_name, '__tmp__')
+    def test_rar(self, execute_task, tmpdir):
         """Test basic RAR extraction"""
-        if not rarfile:
-            raise SkipTest('Needs RarFile module.')
-        shutil.copy(self.rar_name, self.temp_rar)
-        task = execute_task('test_rar')
+        execute_task('test_rar')
 
-        assert os.path.exists(self.temp_out), 'Output file does not exist at the correct path.'
-        assert os.path.exists(self.temp_rar), 'RAR archive should still exist.'
+        assert tmpdir.join(self.out_file).exists(), 'Output file does not exist at the correct path.'
+        assert tmpdir.join(self.rar_name).exists(), 'RAR archive should still exist.'
 
-    def test_delete_rar(self, execute_task):
+    @pytest.mark.skipif(rarfile is None, reason='rarfile module required')
+    @pytest.mark.filecopy(rar_name, '__tmp__')
+    def test_delete_rar(self, execute_task, tmpdir):
         """Test RAR deletion after extraction"""
-        if not rarfile:
-            raise SkipTest('Needs RarFile module.')
         shutil.copy(self.rar_name, self.temp_rar)
-        task = execute_task('test_delete_rar')
+        execute_task('test_delete_rar')
 
-        assert not os.path.exists(self.temp_rar), 'RAR archive was not deleted.'
+        assert not tmpdir.join(self.rar_name).exists(), 'RAR archive was not deleted.'
 
-    def test_zip(self, execute_task):
+    @pytest.mark.filecopy(zip_name, '__tmp__')
+    def test_zip(self, execute_task, tmpdir):
         """Test basic Zip extraction"""
-        shutil.copy(self.zip_name, self.temp_zip)
-        task = execute_task('test_zip')
+        execute_task('test_zip')
 
-        assert os.path.exists(self.temp_out), 'Output file does not exist at the correct path.'
-        assert os.path.exists(self.temp_zip), 'Zip archive should still exist.'
+        assert tmpdir.join(self.out_file).exists(), 'Output file does not exist at the correct path.'
+        assert tmpdir.join(self.zip_name).exists(), 'Zip archive should still exist.'
 
-    def test_keep_dirs(self, execute_task):
+    @pytest.mark.filecopy(zip_name, '__tmp__')
+    def test_keep_dirs(self, execute_task, tmpdir):
         """Test directory creation"""
-        shutil.copy(self.zip_name, self.temp_zip)
-        task = execute_task('test_keep_dirs')
+        execute_task('test_keep_dirs')
 
-        assert os.path.exists(self.temp_out_dir), 'Output file does not exist at the correct path.'
+        assert tmpdir.join(self.out_dir, self.out_file).exists(), 'Output file does not exist at the correct path.'
 
-    def test_delete_zip(self, execute_task):
+    @pytest.mark.filecopy(zip_name, '__tmp__')
+    def test_delete_zip(self, execute_task, tmpdir):
         """Test Zip deletion after extraction"""
-        shutil.copy(self.zip_name, self.temp_zip)
-        task = execute_task('test_delete_zip')
-
-        assert not os.path.exists(self.temp_zip), 'Zip archive was not deleted.'
+        execute_task('test_delete_zip')
+        assert not tmpdir.join(self.zip_name).exists(), 'Zip archive was not deleted.'
