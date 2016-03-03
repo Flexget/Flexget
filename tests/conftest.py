@@ -39,11 +39,16 @@ def config(request):
 
 
 @pytest.yield_fixture()
-def manager(request, config, filecopy):  # enforce filecopy is run before manager
+def manager(request, config, caplog, filecopy):  # enforce filecopy is run before manager
     """
     Create a :class:`MockManager` for this test based on `config` argument.
     """
-    mockmanager = MockManager(config, request.cls.__name__)
+    try:
+        mockmanager = MockManager(config, request.cls.__name__)
+    except Exception:
+        # Since we haven't entered the test function yet, pytest won't print the logs on failure. Print them manually.
+        print(caplog.text())
+        raise
     yield mockmanager
     mockmanager.shutdown()
     mockmanager.__del__()
