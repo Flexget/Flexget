@@ -2,11 +2,16 @@
   "name": "triangular",
   "version": "2.5.0",
   "private": true,
+  "scripts": {
+    "start": "gulp server",
+    "lint": "eslint ."
+  },
   "devDependencies": {
     "browser-sync": "~2.10.1",
     "chalk": "^1.1.1",
     "del": "~2.2.0",
-    "eslint": "^1.10.3",
+    "eslint": "^2.2.0",
+    "eslint-config-airbnb": "^6.0.2",
     "gulp": "~3.9.0",
     "gulp-angular-filesort": "~1.1.1",
     "gulp-angular-templatecache": "~1.8.0",
