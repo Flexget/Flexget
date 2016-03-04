@@ -4,7 +4,7 @@
     angular.module('flexget.plugins.series')
         .controller('episodesController', episodesController);
 
-    function episodesController($http, $stateParams, $mdDialog) {
+    function episodesController($http, $stateParams, $mdDialog, $state) {
         var vm = this;
 
         var show = "";
@@ -18,6 +18,10 @@
             options.page = index;
 
             getEpisodesList();
+        }
+
+        vm.goBack = function() {
+            $state.go('flexget.series');
         }
 
         function getEpisodesList() {
