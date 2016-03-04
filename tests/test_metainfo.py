@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import pytest
+
 
 class TestMetainfo(object):
 
@@ -73,10 +75,12 @@ class TestMetainfoQuality(object):
         assert entry['quality'].name == 'hdtv', 'picked up wrong quality %s' % entry.get('quality', None)
 
 
-class BaseMetainfoSeries(object):
-    config = """
+class TestMetainfoSeries(object):
+    _config = """
         templates:
           global:
+            parsing:
+              series: __parser__
             metainfo_series: yes
         tasks:
           test:
@@ -100,6 +104,11 @@ class BaseMetainfoSeries(object):
               - {title: 'Something Seasons 4 Complete'}
               - {title: 'Something.S01D2.DVDR-FlexGet'}
     """
+
+    @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
+    def config(self, request):
+        """Override and parametrize default config fixture for all series tests."""
+        return self._config.replace('__parser__', request.param)
 
     def test_metainfo_series(self, execute_task):
         """Metainfo series: name/episode"""
@@ -131,15 +140,3 @@ class BaseMetainfoSeries(object):
             assert 'series_name' not in entry, error
             assert 'series_guessed' not in entry, error
             assert 'series_parser' not in entry, error
-
-
-class TestGuessitMetainfoSeries(BaseMetainfoSeries):
-    def __init__(self):
-        super(TestGuessitMetainfoSeries, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalMetainfoSeries(BaseMetainfoSeries):
-    def __init__(self):
-        super(TestInternalMetainfoSeries, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))

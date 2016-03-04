@@ -4,7 +4,7 @@ import pytest
 from jinja2 import Template
 
 
-@pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'], autouse=True)
+@pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
 def config(request):
     """Override and parametrize default config fixture for all series tests."""
     return Template(request.cls.config).render({'parser': request.param})
@@ -13,7 +13,6 @@ def config(request):
 class TestSeriesPremiere(object):
 
     config = """
-
         templates:
           global:
             parsing:
