@@ -2,6 +2,11 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 
 
+import pytest
+
+
+# TODO: Is this test supposed to be going online?
+@pytest.mark.online
 class TestUoccinReader(object):
 
     config = """
@@ -62,6 +67,7 @@ class TestUoccinReader(object):
             'Expected "ita" in uoccin_subtitles for episode "TURN S02E05", found %s instead.' % entry.get('uoccin_subtitles')
 
 
+@pytest.mark.online
 class TestUoccinWriters(object):
 
     config = """
