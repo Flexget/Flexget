@@ -226,6 +226,7 @@ class TestImdb(object):
         assert not saw.accepted, 'R rated movie should not have been accepted'
 
 
+@pytest.mark.online
 class TestImdbRequired(object):
 
     config = """

@@ -165,6 +165,7 @@ class TestTraktShowLookup(object):
             assert actor.tmdb_id == '41419', 'saving tmdb_id for actors table failed'
 
 
+@pytest.mark.online
 class TestTraktList(object):
     config = """
         tasks:
