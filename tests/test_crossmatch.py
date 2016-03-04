@@ -1,8 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
 
-class TestCrossmatch(FlexGetBase):
-    __yaml__ = """
+class TestCrossmatch(object):
+    config = """
         tasks:
           test_title:
             mock:
@@ -16,7 +15,7 @@ class TestCrossmatch(FlexGetBase):
               fields: [title]
     """
 
-    def test_reject_title(self):
-        self.execute_task('test_title')
-        assert self.task.find_entry('rejected', title='entry 2')
-        assert len(self.task.rejected) == 1
+    def test_reject_title(self, execute_task):
+        task = execute_task('test_title')
+        assert task.find_entry('rejected', title='entry 2')
+        assert len(task.rejected) == 1

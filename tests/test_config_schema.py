@@ -4,7 +4,6 @@ from datetime import timedelta
 import jsonschema
 
 from flexget import config_schema
-from tests import FlexGetBase
 
 
 def iter_registered_schemas():
@@ -13,7 +12,7 @@ def iter_registered_schemas():
         yield path, schema
 
 
-class TestSchemaValidator(FlexGetBase):
+class TestSchemaValidator(object):
     def test_registered_schemas_are_valid(self):
         for path, schema in iter_registered_schemas():
             try:

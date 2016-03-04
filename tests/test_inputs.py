@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
 
 
-class TestInputs(FlexGetBase):
+class TestInputs(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test_inputs:
             inputs:
@@ -29,18 +28,18 @@ class TestInputs(FlexGetBase):
                   - title: title2
     """
 
-    def test_inputs(self):
-        self.execute_task('test_inputs')
-        assert len(self.task.entries) == 2, 'Should have created 2 entries'
+    def test_inputs(self, execute_task):
+        task = execute_task('test_inputs')
+        assert len(task.entries) == 2, 'Should have created 2 entries'
 
-    def test_no_dupes(self):
-        self.execute_task('test_no_dupes')
-        assert len(self.task.entries) == 2, 'Should only have created 2 entries'
-        assert self.task.find_entry(title='title1a'), 'title1a should be in entries'
-        assert self.task.find_entry(title='title2'), 'title2 should be in entries'
+    def test_no_dupes(self, execute_task):
+        task = execute_task('test_no_dupes')
+        assert len(task.entries) == 2, 'Should only have created 2 entries'
+        assert task.find_entry(title='title1a'), 'title1a should be in entries'
+        assert task.find_entry(title='title2'), 'title2 should be in entries'
 
-    """def test_no_url(self):
+    """def test_no_url(self, execute_task):
         # Oops, this test doesn't do anything, as the mock plugin adds a fake url to entries
         # TODO: fix this
-        self.execute_task('test_no_url')
-        assert len(self.task.entries) == 2, 'Should have created 2 entries'"""
+        task = execute_task('test_no_url')
+        assert len(task.entries) == 2, 'Should have created 2 entries'"""

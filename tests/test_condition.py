@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
 
 
-class TestCondition(FlexGetBase):
+class TestCondition(object):
 
-    __yaml__ = """
+    config = """
         templates:
           global:
             disable: [seen]
@@ -42,36 +41,36 @@ class TestCondition(FlexGetBase):
                   accept_all: yes
     """
 
-    def test_reject(self):
-        self.execute_task('test_condition_reject')
-        count = len(self.task.rejected)
+    def test_reject(self, execute_task):
+        task = execute_task('test_condition_reject')
+        count = len(task.rejected)
         assert count == 1
 
-    def test_accept(self):
-        self.execute_task('test_condition_accept')
-        count = len(self.task.accepted)
+    def test_accept(self, execute_task):
+        task = execute_task('test_condition_accept')
+        count = len(task.accepted)
         assert count == 2
 
-    def test_implicit_and(self):
+    def test_implicit_and(self, execute_task):
         for i in "12":
-            self.execute_task('test_condition_and' + i)
-            count = len(self.task.accepted)
+            task = execute_task('test_condition_and' + i)
+            count = len(task.accepted)
             assert count == int(i)
 
-    def test_has_field(self):
-        self.execute_task('test_has_field')
-        assert len(self.task.accepted) == 2
+    def test_has_field(self, execute_task):
+        task = execute_task('test_has_field')
+        assert len(task.accepted) == 2
 
-    def test_sub_plugin(self):
-        self.execute_task('test_sub_plugin')
-        entry = self.task.find_entry('accepted', title='test', some_field='some value')
+    def test_sub_plugin(self, execute_task):
+        task = execute_task('test_sub_plugin')
+        entry = task.find_entry('accepted', title='test', some_field='some value')
         assert entry
-        assert len(self.task.accepted) == 1
+        assert len(task.accepted) == 1
 
 
-class TestQualityCondition(FlexGetBase):
+class TestQualityCondition(object):
 
-    __yaml__ = """
+    config = """
         templates:
           global:
             disable: [seen]
@@ -94,9 +93,9 @@ class TestQualityCondition(FlexGetBase):
               - "quality < '720p'": reject
     """
 
-    def test_quality(self):
-        for taskname in self.manager.config['tasks']:
-            self.execute_task(taskname)
-            count = len(self.task.rejected)
+    def test_quality(self, manager, execute_task):
+        for taskname in manager.config['tasks']:
+            task = execute_task(taskname)
+            count = len(task.rejected)
             expected = int(taskname[-1])
             assert count == expected, "Expected %s rejects, got %d" % (expected, count)

@@ -1,57 +1,65 @@
 from __future__ import unicode_literals, division, absolute_import
 import os
+import pytest
 import stat
 
 from nose.tools import raises
 
-from tests import FlexGetBase, use_vcr
 from flexget.entry import EntryUnicodeError, Entry
 
 
-class TestDisableBuiltins(FlexGetBase):
+class TestDisableBuiltins(object):
     """
         Quick a hack, test disable functionality by checking if seen filtering (builtin) is working
     """
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
               - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5}
               - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
+            accept_all: yes
             disable: builtins
 
-            test2:
-              mock:
-                - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5, description: 'http://www.imdb.com/title/tt0409459/'}
-                - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
-              disable:
-                - seen
-                - cli_config
+          test2:
+            mock:
+              - {title: 'dupe1', url: 'http://localhost/dupe', 'imdb_score': 5, description: 'http://www.imdb.com/title/tt0409459/'}
+              - {title: 'dupe2', url: 'http://localhost/dupe', 'imdb_score': 5}
+            accept_all: yes
+            disable:
+              - seen
+              - cli_config
     """
 
-    def test_disable_builtins(self):
-        self.execute_task('test')
-        assert self.task.find_entry(title='dupe1') and self.task.find_entry(title='dupe2'), 'disable_builtins is not working?'
+    def test_disable_builtins(self, execute_task):
+        # Execute the task once, then we'll make sure seen plugin isn't rejecting on future executions
+        execute_task('test')
+        task = execute_task('test')
+        assert task.find_entry('accepted', title='dupe1') and task.find_entry('accepted', title='dupe2'), \
+            'disable is not working?'
+        task = execute_task('test2')
+        assert task.find_entry(title='dupe1').accepted and task.find_entry('accepted', title='dupe2'), \
+            'disable is not working?'
 
 
-class TestInputHtml(FlexGetBase):
+@pytest.mark.online
+class TestInputHtml(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             html: http://download.flexget.com/
     """
 
-    @use_vcr
-    def test_parsing(self):
-        self.execute_task('test')
-        assert self.task.entries, 'did not produce entries'
+    def test_parsing(self, execute_task):
+        task = execute_task('test')
+        assert task.entries, 'did not produce entries'
 
 
-class TestPriority(FlexGetBase):
+class TestPriority(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -78,16 +86,16 @@ class TestPriority(FlexGetBase):
               accept_all: 1
     """
 
-    def test_smoke(self):
-        self.execute_task('test')
-        assert self.task.accepted, 'set plugin should have changed quality before quality plugin was run'
-        self.execute_task('test2')
-        assert self.task.rejected, 'quality plugin should have rejected Smoke as hdtv'
+    def test_smoke(self, execute_task):
+        task = execute_task('test')
+        assert task.accepted, 'set plugin should have changed quality before quality plugin was run'
+        task = execute_task('test2')
+        assert task.rejected, 'quality plugin should have rejected Smoke as hdtv'
 
 
-class TestImmortal(FlexGetBase):
+class TestImmortal(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -98,15 +106,16 @@ class TestImmortal(FlexGetBase):
                 - .*
     """
 
-    def test_immortal(self):
-        self.execute_task('test')
-        assert self.task.find_entry(title='title1'), 'rejected immortal entry'
-        assert not self.task.find_entry(title='title2'), 'did not reject mortal'
+    def test_immortal(self, execute_task):
+        task = execute_task('test')
+        assert task.find_entry(title='title1'), 'rejected immortal entry'
+        assert not task.find_entry(title='title2'), 'did not reject mortal'
 
 
-class TestDownload(FlexGetBase):
+@pytest.mark.online
+class TestDownload(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -115,40 +124,24 @@ class TestDownload(FlexGetBase):
                 filename: flexget_test_data
             accept_all: true
             download:
-              path: ~/
+              path: __tmp__
               fail_html: no
     """
 
-    def __init__(self):
-        self.testfile = None
-        FlexGetBase.__init__(self)
-
-    def teardown(self):
-        FlexGetBase.teardown(self)
-        if getattr(self, 'testfile', None) and os.path.exists(self.testfile):
-            os.remove(self.testfile)
-        temp_dir = os.path.join(self.manager.config_base, 'temp')
-        if os.path.exists(temp_dir) and os.path.isdir(temp_dir):
-            os.rmdir(temp_dir)
-
-    @use_vcr
-    def test_download(self):
+    def test_download(self, execute_task, tmpdir):
         # NOTE: what the hell is .obj and where it comes from?
         # Re: seems to come from python mimetype detection in download plugin ...
         # Re Re: Implemented in such way that extension does not matter?
-        self.testfile = os.path.expanduser('~/flexget_test_data.obj')
         # A little convoluted, but you have to set the umask in order to have
         # the current value returned to you
         curr_umask = os.umask(0)
         tmp_umask = os.umask(curr_umask)
-        if os.path.exists(self.testfile):
-            os.remove(self.testfile)
         # executes task and downloads the file
-        self.execute_task('test')
-        assert self.task.entries[0]['output'], 'output missing?'
-        self.testfile = self.task.entries[0]['output']
-        assert os.path.exists(self.testfile), 'download file does not exists'
-        testfile_stat = os.stat(self.testfile)
+        task = execute_task('test')
+        assert task.entries[0]['output'], 'output missing?'
+        testfile = task.entries[0]['output']
+        assert os.path.exists(testfile), 'download file does not exists'
+        testfile_stat = os.stat(testfile)
         modes_equal = 666 - int(oct(curr_umask)) == \
                       int(oct(stat.S_IMODE(testfile_stat.st_mode)))
         assert modes_equal, 'download file mode not honoring umask'
@@ -156,15 +149,15 @@ class TestDownload(FlexGetBase):
 
 class TestEntryUnicodeError(object):
 
-    @raises(EntryUnicodeError)
     def test_encoding(self):
         e = Entry('title', 'url')
-        e['invalid'] = b'\x8e'
+        with pytest.raises(EntryUnicodeError):
+            e['invalid'] = b'\x8e'
 
 
-class TestFilterRequireField(FlexGetBase):
+class TestFilterRequireField(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -178,17 +171,17 @@ class TestFilterRequireField(FlexGetBase):
             require_field: series_name
     """
 
-    def test_field_required(self):
-        self.execute_task('test')
-        assert not self.task.find_entry('rejected', title='Taken[2008]DvDrip[Eng]-FOO'), \
+    def test_field_required(self, execute_task):
+        task = execute_task('test')
+        assert not task.find_entry('rejected', title='Taken[2008]DvDrip[Eng]-FOO'), \
             'Taken should NOT have been rejected'
-        assert self.task.find_entry('rejected', title='ASDFASDFASDF'), \
+        assert task.find_entry('rejected', title='ASDFASDFASDF'), \
             'ASDFASDFASDF should have been rejected'
 
-        self.execute_task('test2')
-        assert not self.task.find_entry('rejected', title='Entry.S01E05.720p'), \
+        task = execute_task('test2')
+        assert not task.find_entry('rejected', title='Entry.S01E05.720p'), \
             'Entry should NOT have been rejected'
-        assert self.task.find_entry('rejected', title='Entry2.is.a.Movie'), \
+        assert task.find_entry('rejected', title='Entry2.is.a.Movie'), \
             'Entry2 should have been rejected'
 
 
@@ -210,9 +203,9 @@ class TestHtmlUtils(object):
         assert encode_html('<3') == '&lt;3'
 
 
-class TestSetPlugin(FlexGetBase):
+class TestSetPlugin(object):
 
-    __yaml__ = """
+    config = """
         templates:
           global:
             accept_all: yes
@@ -250,37 +243,37 @@ class TestSetPlugin(FlexGetBase):
               other: "{{eaeou}"
     """
 
-    def test_set(self):
-        self.execute_task('test')
-        entry = self.task.find_entry('entries', title='Entry 1')
+    def test_set(self, execute_task):
+        task = execute_task('test')
+        entry = task.find_entry('entries', title='Entry 1')
         assert entry['thefield'] == 'TheValue'
         assert entry['otherfield'] == 3.0
 
-    def test_jinja(self):
-        self.execute_task('test_jinja')
-        entry = self.task.find_entry('entries', title='Entry 1')
+    def test_jinja(self, execute_task):
+        task = execute_task('test_jinja')
+        entry = task.find_entry('entries', title='Entry 1')
         assert entry['field'] == 'The VALUE'
         assert entry['otherfield'] == ''
         assert entry['alu'] == 'alu'
-        entry = self.task.find_entry('entries', title='Entry 2')
+        entry = task.find_entry('entries', title='Entry 2')
         assert entry['field'] is None,\
                 '`field` should be None when jinja rendering fails'
         assert entry['otherfield'] == 'no series'
 
-    def test_non_string(self):
-        self.execute_task('test_non_string')
-        entry = self.task.find_entry('entries', title='Entry 1')
+    def test_non_string(self, execute_task):
+        task = execute_task('test_non_string')
+        entry = task.find_entry('entries', title='Entry 1')
         assert entry['bool'] is False
         assert entry['int'] == 42
 
-    def test_lazy(self):
-        self.execute_task('test_lazy')
-        entry = self.task.find_entry('entries', title='Entry 1')
+    def test_lazy(self, execute_task):
+        task = execute_task('test_lazy')
+        entry = task.find_entry('entries', title='Entry 1')
         assert entry.is_lazy('a')
         assert entry['a'] == 'the Entry 1'
 
-    def test_lazy_err(self):
-        self.execute_task('test_lazy_err')
-        entry = self.task.find_entry('entries', title='Entry 1')
+    def test_lazy_err(self, execute_task):
+        task = execute_task('test_lazy_err')
+        entry = task.find_entry('entries', title='Entry 1')
         assert entry['title'] == 'Entry 1', 'should fall back to original value when template fails'
         assert entry['other'] is None

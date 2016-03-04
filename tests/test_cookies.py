@@ -1,9 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from tests import FlexGetBase, use_vcr
+import pytest
 
-class TestCookies(FlexGetBase):
-    __yaml__ = """
+
+class TestCookies(object):
+    config = """
         tasks:
           test_cookies:
             text:
@@ -14,7 +15,7 @@ class TestCookies(FlexGetBase):
             cookies: cookies.txt
     """
 
-    @use_vcr
-    def test_cookies(self):
-        self.execute_task('test_cookies', options={'nocache': True})
-        assert self.task.find_entry(title='blah', url='aoeu'), 'Entry should have been created.'
+    @pytest.mark.online()
+    def test_cookies(self, request, execute_task):
+        task = execute_task('test_cookies', options={'nocache': True})
+        assert task.find_entry(title='blah', url='aoeu'), 'Entry should have been created.'

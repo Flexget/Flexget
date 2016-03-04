@@ -8,7 +8,7 @@ interactions:
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=House&type=show
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":48.04239,\"show\":{\"title\":\"\
+      body: {string: "[{\"type\":\"show\",\"score\":49.67352,\"show\":{\"title\":\"\
           House\",\"overview\":\"Go deeper into the medical mysteries of House, TV's\
           \ most compelling drama. Hugh Laurie stars as the brilliant but sarcastic\
           \ Dr. Gregory House, a maverick physician who is devoid of bedside manner.\
@@ -24,7 +24,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/001/399/fanarts/thumb/c628f24771.jpg\"\
           }},\"ids\":{\"trakt\":1399,\"slug\":\"house\",\"tvdb\":73255,\"imdb\":\"\
           tt0412142\",\"tmdb\":1408,\"tvrage\":3908}}},{\"type\":\"show\",\"score\"\
-          :38.824112,\"show\":{\"title\":\"House vs. House\",\"overview\":\"House\
+          :40.142265,\"show\":{\"title\":\"House vs. House\",\"overview\":\"House\
           \ vs. House is a new home makeover competition series where amateur and\
           \ experienced renovation teams compete for the chance to win $10,000 by\
           \ proving they can create the better DIY projects in their home. From painting\
@@ -36,7 +36,7 @@ interactions:
           poster\":{\"full\":null,\"medium\":null,\"thumb\":null},\"fanart\":{\"full\"\
           :null,\"medium\":null,\"thumb\":null}},\"ids\":{\"trakt\":93965,\"slug\"\
           :\"house-vs-house\",\"tvdb\":287378,\"imdb\":\"tt4097428\",\"tmdb\":null,\"\
-          tvrage\":null}}},{\"type\":\"show\",\"score\":34.31599,\"show\":{\"title\"\
+          tvrage\":null}}},{\"type\":\"show\",\"score\":35.481087,\"show\":{\"title\"\
           :\"Full House\",\"overview\":\"Full House is an American sitcom created\
           \ by Jeff Franklin for ABC. The show chronicles a widowed father, who enlists\
           \ his best friend and his brother-in-law to help raise his three daughters.\
@@ -50,10 +50,10 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/004/289/fanarts/thumb/98635a003a.jpg\"\
           }},\"ids\":{\"trakt\":4289,\"slug\":\"full-house-1987\",\"tvdb\":70500,\"\
           imdb\":\"tt0092359\",\"tmdb\":4313,\"tvrage\":3622}}},{\"type\":\"show\"\
-          ,\"score\":34.31599,\"show\":{\"title\":\"House Hunters\",\"overview\":\"\
-          House Hunters takes viewers behind the scenes as individuals, couples and\
-          \ families learn what to look for and decide whether or not a home is meant\
-          \ for them. Focusing on the emotional experience of finding and purchasing\
+          ,\"score\":35.481087,\"show\":{\"title\":\"House Hunters\",\"overview\"\
+          :\"House Hunters takes viewers behind the scenes as individuals, couples\
+          \ and families learn what to look for and decide whether or not a home is\
+          \ meant for them. Focusing on the emotional experience of finding and purchasing\
           \ a new home, each episode follows a prospective buyer and real estate agent\
           \ through the home-buying process, from start to finish.\",\"year\":1999,\"\
           status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/006/441/posters/original/d9d5f542d4.jpg\"\
@@ -64,7 +64,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/006/441/fanarts/thumb/36bdbe2817.jpg\"\
           }},\"ids\":{\"trakt\":6441,\"slug\":\"house-hunters\",\"tvdb\":73182,\"\
           imdb\":\"tt0369117\",\"tmdb\":6480,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":34.31599,\"show\":{\"title\":\"Alpha House\",\"overview\":\"\
+          ,\"score\":35.481087,\"show\":{\"title\":\"Alpha House\",\"overview\":\"\
           Alpha House follows four senators who live together in a rented house in\
           \ Washington DC.Re-election battles, looming indictments, parties, their\
           \ Party... these senators need a drink. And a new housemate.\",\"year\"\
@@ -77,11 +77,23 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/285/fanarts/thumb/e477e76c44.jpg\"\
           }},\"ids\":{\"trakt\":60285,\"slug\":\"alpha-house\",\"tvdb\":269008,\"\
           imdb\":\"tt3012160\",\"tmdb\":60719,\"tvrage\":34454}}},{\"type\":\"show\"\
-          ,\"score\":34.31599,\"show\":{\"title\":\"Playing House\",\"overview\":\"\
-          A single-camera buddy comedy about what happens when two best friends come\
-          \ back together, just when they need each other most.Inspired by the ultra-close\
-          \ friendship between the series' creators and stars, \\\"Playing House\\\
-          \" centers on mother to-be Maggie who asks her single and career-driven\
+          ,\"score\":35.481087,\"show\":{\"title\":\"Fuller House\",\"overview\":\"\
+          Recently widowed D.J. Tanner-Fuller gets help from her sister Stephanie\
+          \ and best friend Kimmy when the women move in with their families to help\
+          \ D.J. raise her children in this spin-off series.\",\"year\":2016,\"status\"\
+          :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/102/424/posters/original/ff4124c48a.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/102/424/posters/medium/ff4124c48a.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/102/424/posters/thumb/ff4124c48a.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/original/37bbde27f6.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/medium/37bbde27f6.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/102/424/fanarts/thumb/37bbde27f6.jpg\"\
+          }},\"ids\":{\"trakt\":102424,\"slug\":\"fuller-house\",\"tvdb\":301236,\"\
+          imdb\":\"tt3986586\",\"tmdb\":63623,\"tvrage\":48701}}},{\"type\":\"show\"\
+          ,\"score\":35.481087,\"show\":{\"title\":\"Playing House\",\"overview\"\
+          :\"A single-camera buddy comedy about what happens when two best friends\
+          \ come back together, just when they need each other most.Inspired by the\
+          \ ultra-close friendship between the series' creators and stars, \\\"Playing\
+          \ House\\\" centers on mother to-be Maggie who asks her single and career-driven\
           \ best friend Emma to return home from her job overseas to attend her baby\
           \ shower, having no idea what\u2019s truly in store.\",\"year\":2014,\"\
           status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/073/385/posters/original/43003e74db.jpg\"\
@@ -92,15 +104,10 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/073/385/fanarts/thumb/49c78c5d22.jpg\"\
           }},\"ids\":{\"trakt\":73385,\"slug\":\"playing-house\",\"tvdb\":269898,\"\
           imdb\":\"tt2750182\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":34.31599,\"show\":{\"title\":\"House Husbands\",\"overview\"\
+          ,\"score\":35.481087,\"show\":{\"title\":\"House Husbands\",\"overview\"\
           :\"House Husbands centres around four families with one thing in common,\
-          \ the husbands stay home to raise the children.Firass Dirani plays a fallen\
-          \ AFL hero, struggling with the burden of family life. In the midst of losing\
-          \ the ability to see his two twin boys (primary school age) and his eight\
-          \ month daughter, he is offered a contract to play football again in Perth.\
-          \ He rejects the offer made by his former manager (who is in a relationship\
-          \ with his ex wife)\",\"year\":2012,\"status\":\"returning series\",\"images\"\
-          :{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/posters/original/8d6ef762b1.jpg\"\
+          \ the husbands stay home to raise the children.\",\"year\":2012,\"status\"\
+          :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/posters/original/8d6ef762b1.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/043/830/posters/medium/8d6ef762b1.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/posters/thumb/8d6ef762b1.jpg\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/original/632ffeb8be.jpg\"\
@@ -108,71 +115,61 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/043/830/fanarts/thumb/632ffeb8be.jpg\"\
           }},\"ids\":{\"trakt\":43830,\"slug\":\"house-husbands\",\"tvdb\":262026,\"\
           imdb\":\"tt2402807\",\"tmdb\":44072,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":34.31599,\"show\":{\"title\":\"House Arrest\",\"year\":2011,\"\
-          status\":\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/065/016/posters/original/8e883c8947.jpg\"\
+          ,\"score\":35.481087,\"show\":{\"title\":\"Full House\",\"overview\":\"\
+          Han Ji Eun is a naive writer who got swindled out of everything she owned\
+          \ including her house by her best friends. Stranded in China, She managed\
+          \ to borrow money from an actor Lee Young Jae to return to Korea. On her\
+          \ return, she found out that her house was bought by Lee Young Jae. In an\
+          \ attempt to get her possessions back, she entered in a contract marriage\
+          \ with Young Jae for one year. In spite of losing all, Ji Eun manages to\
+          \ be cheerful and takes things in strike and the business relationship between\
+          \ the two becomes personal as they start to rely and care for each other.\
+          \ \",\"year\":2004,\"status\":\"ended\",\"images\":{\"poster\":{\"full\"\
+          :\"https://walter.trakt.us/images/shows/000/003/482/posters/original/3d0d97a090.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/003/482/posters/medium/3d0d97a090.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/003/482/posters/thumb/3d0d97a090.jpg\"\
+          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/003/482/fanarts/original/eedae3b9b4.jpg\"\
+          ,\"medium\":\"https://walter.trakt.us/images/shows/000/003/482/fanarts/medium/eedae3b9b4.jpg\"\
+          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/003/482/fanarts/thumb/eedae3b9b4.jpg\"\
+          }},\"ids\":{\"trakt\":3482,\"slug\":\"full-house\",\"tvdb\":84928,\"imdb\"\
+          :\"tt0464625\",\"tmdb\":3504,\"tvrage\":null}}},{\"type\":\"show\",\"score\"\
+          :35.481087,\"show\":{\"title\":\"House Arrest\",\"year\":2011,\"status\"\
+          :\"returning series\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/065/016/posters/original/8e883c8947.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/065/016/posters/medium/8e883c8947.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/065/016/posters/thumb/8e883c8947.jpg\"\
           },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/065/016/fanarts/original/8e883c8947.jpg\"\
           ,\"medium\":\"https://walter.trakt.us/images/shows/000/065/016/fanarts/medium/8e883c8947.jpg\"\
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/065/016/fanarts/thumb/8e883c8947.jpg\"\
           }},\"ids\":{\"trakt\":65016,\"slug\":\"house-arrest\",\"tvdb\":253261,\"\
-          imdb\":\"tt2279701\",\"tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":34.31599,\"show\":{\"title\":\"Grandma's House\",\"overview\"\
-          :\"TV presenter Simon Amstell plays a version of himself in Grandma's House,\
-          \ a new six-part comedy written by Simon and his long-term collaborator\
-          \ Dan Swimer.The series stars Simon Amstell as a TV presenter who is quitting\
-          \ his job to try to do something more meaningful with his life.Each episode\
-          \ is set at Grandma's house, where Simon's family regularly congregate to\
-          \ catch up. Everything happens under the watchful eye of Grandma, who is\
-          \ desperate to see everything going well.\",\"year\":2010,\"status\":\"\
-          ended\",\"images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/033/144/posters/original/8eace1ae32.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/033/144/posters/medium/8eace1ae32.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/posters/thumb/8eace1ae32.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/original/72aecb12bc.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/medium/72aecb12bc.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/033/144/fanarts/thumb/72aecb12bc.jpg\"\
-          }},\"ids\":{\"trakt\":33144,\"slug\":\"grandma-s-house\",\"tvdb\":181551,\"\
-          imdb\":\"tt1706532\",\"tmdb\":33289,\"tvrage\":null}}},{\"type\":\"show\"\
-          ,\"score\":34.31599,\"show\":{\"title\":\"Safe House\",\"overview\":\"A\
-          \ married couple, former detective Robert and teacher Katy, are asked by\
-          \ close friend and police officer Mark, to turn their remote Guest House\
-          \ into a Safe House.\",\"year\":2015,\"status\":\"returning series\",\"\
-          images\":{\"poster\":{\"full\":\"https://walter.trakt.us/images/shows/000/097/962/posters/original/c8c7453fb3.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/097/962/posters/medium/c8c7453fb3.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/097/962/posters/thumb/c8c7453fb3.jpg\"\
-          },\"fanart\":{\"full\":\"https://walter.trakt.us/images/shows/000/097/962/fanarts/original/c5e28cf152.jpg\"\
-          ,\"medium\":\"https://walter.trakt.us/images/shows/000/097/962/fanarts/medium/c5e28cf152.jpg\"\
-          ,\"thumb\":\"https://walter.trakt.us/images/shows/000/097/962/fanarts/thumb/c5e28cf152.jpg\"\
-          }},\"ids\":{\"trakt\":97962,\"slug\":\"safe-house\",\"tvdb\":294195,\"imdb\"\
-          :\"tt4567314\",\"tmdb\":62452,\"tvrage\":42379}}}]"}
+          imdb\":\"tt2279701\",\"tmdb\":null,\"tvrage\":null}}}]"}
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [24ec6571c5da1fca-DFW]
+        cf-ray: [27dce6605c5b04b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:05:58 GMT']
-        etag: [W/"d6d9c3f07e7a28f6a608e935541b8cf4"]
-        expires: ['Thu, 03 Dec 2015 08:05:58 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:31 GMT']
+        etag: [W/"20793cb1d9858d55c6f9a2ae72306f0c"]
+        expires: ['Thu, 03 Mar 2016 15:55:31 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d4f38910aa1b72122b10b139eab4b370a1449115558; expires=Fri,
-            02-Dec-16 04:05:58 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d17d63e8788cd17ddaf215e0c0ee444d91457006131; expires=Fri,
+            03-Mar-17 11:55:31 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['1488']
+        x-pagination-item-count: ['1533']
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
-        x-pagination-page-count: ['149']
-        x-request-id: [56bdc100-6991-44df-b26d-c73a6d59607b]
-        x-runtime: ['0.024533']
+        x-pagination-page-count: ['154']
+        x-request-id: [1197df3b-d2c4-45f4-bd79-19ee002cabbc]
+        x-runtime: ['0.025071']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=d4f38910aa1b72122b10b139eab4b370a1449115558]
+        Cookie: [__cfduid=d17d63e8788cd17ddaf215e0c0ee444d91457006131]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -185,24 +182,24 @@ interactions:
           on antisocial, Dr. House thrives on the challenge of solving the medical
           puzzles that other doctors give up on. Together with his hand-picked team
           of young medical experts, he''ll do whatever it takes in the race against
-          the clock to solve the case.","first_aired":"2004-11-16T00:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":42,"certification":"TV-14","network":"FOX
-          (US)","country":"us","trailer":null,"homepage":null,"status":"ended","rating":8.81407,"votes":15377,"updated_at":"2015-12-01T10:30:22.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es","ro","cs","bs","lt"],"genres":["comedy","drama","mystery","action"],"aired_episodes":176}'}
+          the clock to solve the case.","first_aired":"2004-11-16T08:00:00.000Z","airs":{"day":null,"time":null,"timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"FOX
+          (US)","country":"us","trailer":null,"homepage":"http://www.fox.com/house/index.htm","status":"ended","rating":8.80422,"votes":15819,"updated_at":"2016-02-11T10:31:53.000Z","language":"en","available_translations":["en","tr","sk","ru","pt","fr","pl","bg","hu","it","de","nl","el","he","da","es","ro","cs","bs","lt"],"genres":["comedy","drama","mystery","action"],"aired_episodes":176}'}
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [24ec657235e01fca-DFW]
+        cf-ray: [27dce660bc6504b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:05:58 GMT']
-        etag: [W/"14fbb3cb04d87ad1b5db20eeb29ad8eb"]
-        expires: ['Thu, 03 Dec 2015 08:05:58 GMT']
-        last-modified: ['Tue, 01 Dec 2015 10:30:22 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:31 GMT']
+        etag: [W/"d59feb20b1932bbe0d26e500a30e74b5"]
+        expires: ['Thu, 03 Mar 2016 15:55:31 GMT']
+        last-modified: ['Thu, 11 Feb 2016 10:31:53 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [baaafd45-d665-4b0a-8bf5-89ed38533147]
-        x-runtime: ['0.076119']
+        x-request-id: [fc712727-9a77-4be8-a8f0-40178b7bb579]
+        x-runtime: ['0.019998']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

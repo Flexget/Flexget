@@ -5,56 +5,43 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+        User-Agent: [FlexGet/1.2.470.dev (www.flexget.com)]
       method: GET
-      uri: http://github.com/Flexget/Flexget/raw/master/README.rst
-    response:
-      body: {string: ''}
-      headers:
-        connection: [close]
-        content-length: ['0']
-        location: ['https://github.com/Flexget/Flexget/raw/master/README.rst']
-      status: {code: 301, message: Moved Permanently}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: https://github.com:443/Flexget/Flexget/raw/master/README.rst
+      uri: https://github.com/Flexget/Flexget/raw/master/README.rst
     response:
       body: {string: '<html><body>You are being <a href="https://raw.githubusercontent.com/Flexget/Flexget/master/README.rst">redirected</a>.</body></html>'}
       headers:
         access-control-allow-origin: ['https://render.githubusercontent.com']
+        age: ['0']
         cache-control: [no-cache]
-        content-security-policy: ['default-src *; script-src assets-cdn.github.com
-            collector-cdn.github.com; object-src assets-cdn.github.com; style-src
-            ''self'' ''unsafe-inline'' ''unsafe-eval'' assets-cdn.github.com; img-src
-            ''self'' data: assets-cdn.github.com identicons.github.com www.google-analytics.com
-            collector.githubapp.com *.githubusercontent.com *.gravatar.com *.wp.com;
-            media-src ''none''; frame-src ''self'' render.githubusercontent.com gist.github.com
-            www.youtube.com player.vimeo.com checkout.paypal.com; font-src assets-cdn.github.com;
-            connect-src ''self'' ghconduit.com:25035 live.github.com uploads.github.com
-            www.google-analytics.com s3.amazonaws.com']
+        content-length: ['133']
+        content-security-policy: ['default-src *; base-uri ''self''; block-all-mixed-content;
+            child-src ''self'' render.githubusercontent.com; connect-src ''self''
+            uploads.github.com status.github.com api.github.com www.google-analytics.com
+            api.braintreegateway.com client-analytics.braintreegateway.com github-cloud.s3.amazonaws.com
+            wss://live.github.com; font-src assets-cdn.github.com; form-action ''self''
+            github.com gist.github.com; frame-src ''self'' render.githubusercontent.com;
+            img-src ''self'' data: assets-cdn.github.com identicons.github.com www.google-analytics.com
+            checkout.paypal.com collector.githubapp.com *.gravatar.com *.wp.com *.githubusercontent.com;
+            media-src ''none''; object-src assets-cdn.github.com; plugin-types application/x-shockwave-flash;
+            script-src assets-cdn.github.com; style-src ''self'' ''unsafe-inline''
+            assets-cdn.github.com']
         content-type: [text/html; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 02:39:43 GMT']
+        date: ['Fri, 04 Mar 2016 01:36:54 GMT']
         location: ['https://raw.githubusercontent.com/Flexget/Flexget/master/README.rst']
+        public-key-pins: [max-age=300; pin-sha256="WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=";
+            pin-sha256="JbQbUG5JMJUoI6brnx0x3vZF6jilxsapbXGVfjhN8Fg="; includeSubDomains]
         server: [GitHub.com]
-        set-cookie: [_gh_sess=eyJzZXNzaW9uX2lkIjoiYzFlMWQyODRmNDFlOTU2YTJhNGY0ZTc5YzZmN2UwMWEiLCJzcHlfcmVwbyI6IkZsZXhnZXQvRmxleGdldCIsInNweV9yZXBvX2F0IjoxNDEzOTQ1NTgzfQ%3D%3D--76c1d5251fa850602010baa8c411d1b1c99b0b76;
-            path=/; secure; HttpOnly]
         status: [302 Found]
         strict-transport-security: [max-age=31536000; includeSubdomains; preload]
-        transfer-encoding: [chunked]
-        vary: [X-PJAX, Accept-Encoding]
+        vary: ['X-PJAX, Accept-Encoding']
         x-content-type-options: [nosniff]
         x-frame-options: [deny]
-        x-github-request-id: ['47C7797C:5796:17B884F:544718EF']
+        x-github-request-id: ['6C27E1E5:6B87:3DC612A:56D8E6B6']
         x-ratelimit-limit: ['100']
         x-ratelimit-remaining: ['100']
-        x-runtime: ['0.010697']
-        x-served-by: [353c3e3783cd5fa717715b8bdf83c23b]
+        x-runtime: ['0.014877']
+        x-served-by: [4580e595d77515caa5593194518fa90f]
         x-ua-compatible: ['IE=Edge,chrome=1']
         x-xss-protection: [1; mode=block]
       status: {code: 302, message: Found}
@@ -64,53 +51,50 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        Cookie: [_gh_sess=eyJzZXNzaW9uX2lkIjoiYzFlMWQyODRmNDFlOTU2YTJhNGY0ZTc5YzZmN2UwMWEiLCJzcHlfcmVwbyI6IkZsZXhnZXQvRmxleGdldCIsInNweV9yZXBvX2F0IjoxNDEzOTQ1NTgzfQ%3D%3D--76c1d5251fa850602010baa8c411d1b1c99b0b76]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+        User-Agent: [FlexGet/1.2.470.dev (www.flexget.com)]
       method: GET
-      uri: https://raw.githubusercontent.com:443/Flexget/Flexget/master/README.rst
+      uri: https://raw.githubusercontent.com/Flexget/Flexget/master/README.rst
     response:
       body:
         string: !!binary |
-          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
+          H4sIAAAAAAAAA61WbW/bNhD+zl9BYMDyAksCOmAFjKbF1iFth20dlq7bgAIRLZ1sLhKpkZQd98N+
+          +54jJdlZkhYDJiRRRB7v5bm753jZ0u0rCuIiPUKUl2mlvJbaSyW7oQ26H1xvPUk1BNupoK2RwdpW
+          NtbJyppAJshW3xBWncOHX0jzceUXord1pTx/V7bTFd6enCa8O7uNbwpVLt8EWSkjB5ioddMQ65A3
+          2tRe2kZ6O7iKvIgWfrm6yhqiGkc3oWtlr9aspvJb2eiWogXlqo0ks9aGEIKpZdhApVT4pS0Z0bcD
+          9nx03+sAobBRQdZWGhtk7+BaDXGzjz6wC/CsGRAvG86FeDfrM0NHzg5eTjqjJtW2dieHoFv9UZu1
+          HDGV2uAn4KwPvLxTey/Yv86O6lbE66quqY7AajNAebuHzVmHl3QbHHXU7ie/oBfSfw6mirnZ6bCR
+          qu9bXcVkebnbaECyUVuC0VBtRK0dVcjWXvqh760LElhMkUcfG1VRRAjWyBnVpngCspZyPToE1/Jc
+          Xo9fS2Ql9MuiaPC9xi7yHgV0h0Qt07bHvup1Hpzaap9VOrduXVymE9M77836xcopU20uOtQQOSHx
+          LINy68kOK/qkkgdN626d+42mFrnUtuj3vS62s1m/XT9siOXyfh821kRT8dx/tVN39wz9P8ZWqkYj
+          5GsdgFSuu3twjuaWqoWZ7y1KBl0hq1iuYVbz6HnxkJePSr8YQned+vYievYlL3RU66E7WqhU1yu9
+          Nhe9y45WE6MkOYHn/Pw1tf3y/Hwqrlr7avA+PyqygsVeIpojsR2tOL68cUTG1pQbePgCS8ZQ6y++
+          GI9z6X8+fqj/dlj7Sf0ovBlW0fq/pAvt/QDKEm+MD2ADkaXnThvrtKdWLcmtVrLXfWrdmBjbdaCG
+          5VLEIuG9UV42k0eXcDxSR01BgfzqKOKGKjW9J4qqyslQJIf1gBYvr8e2vb/1UAcXO32jiymWKSiw
+          D7PVd7a6ISdPfwBZ3Upr2v3ZFO7jjxDjMeb9FTGRgabtHCOzohvMFOsEQ50O8U6mg8y2stjYjopn
+          OA+O6uh5MRXFsnDWhvlTZpnrYEG3qi1mBF+DpmGVB8+rN+/QDVTd2CE85r8QL1kikfzeDolRf45t
+          Kp/kX8sMf59KtUU2YlpjOsdUyrJMDS2z92WZM4wYbR1mktlqZ03Hg1Ma2jGYyKxta3ILqRu25DAY
+          kVrLdQMNo6KvFmfjv6LT601gJA/GBwMFQNLy+JOMTiLuk3TkydcnXPnTV/70hOdInBQCQ5tigIZS
+          XhihGLU1FJNEKg7GvlU4NOo44dFoJTKIeZKKYyr3xlmgv4H38+RBSi+182ExJ/1USezx7N+S81yR
+          tjlLJQyEwqBaQIWLSa+qG7Af+xWh8Xv4040VfZD8DJseBIX4ye7YjaRuqoKDqwuuuKkGD+ckTL6d
+          U5SwqgkXAWJgMZiM70AEHEirMcr45pOQSB6jPDBtx1wC4QcsZFkSzfieko2BexnvIABzp1ue/pjK
+          CleNWddBQS6jXG3Jm5Mwp3NFY3C4Q2gjHg17hU/g7+kusyiwW5cK4oQvF3wb0sxpOSMZi4UJK4Ya
+          daOqj6M6avQeHQQIYcTcI7jD+WPfOE8YJCHWeAdan2BbaVMc82RU/eBORozgNw2oPlX1ESsPfibk
+          snx2H5TnBWsbXUQfy/e40TZ7cYdJV3uuGIMOOHZupqL3QvyBgunUnhuoopHxTaPX8Rb7yVK0EYGy
+          /HvmtrIUp78afbuQP6pKvr2Sv5+xVFm+XH4AzQ6JWZiCrijwzfPDgS8/zDrk6W+47dqdP2NuSiVd
+          W66anUJLjiRwnEXOO/JflqOO660yKEiFVoO6GMhEJ3dInul7QpwZkgNcgaxRYbi1wr8FX8TpQLOx
+          zMfaFfOIwK+jvwYgw23XE+jOVNxiDJ2ntsnFPyWtr2PfDAAA
       headers:
         accept-ranges: [bytes]
-        access-control-allow-origin: ['https://render.githubusercontent.com']
+        access-control-allow-origin: ['*']
         cache-control: [max-age=300]
-        connection: [Keep-Alive]
+        connection: [keep-alive]
         content-encoding: [gzip]
-        content-length: ['1456']
+        content-length: ['1461']
         content-security-policy: [default-src 'none']
         content-type: [text/plain; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 02:39:43 GMT']
-        etag: ['"f27b254bea13de2b96a03ac950cdf1cc2e7c0560"']
-        expires: ['Wed, 22 Oct 2014 02:44:43 GMT']
-        keep-alive: ['timeout=10, max=50']
-        server: [Apache]
+        date: ['Fri, 04 Mar 2016 01:36:55 GMT']
+        etag: ['"978467820e92769a2dc93a971b247ad2dd147fb5"']
+        expires: ['Fri, 04 Mar 2016 01:41:55 GMT']
         source-age: ['0']
         strict-transport-security: [max-age=31536000]
         vary: ['Authorization,Accept-Encoding']
@@ -118,115 +102,10 @@ interactions:
         x-cache: [MISS]
         x-cache-hits: ['0']
         x-content-type-options: [nosniff]
+        x-fastly-request-id: [9d8f65aa543d12af33271a6b92155c54193413d4]
         x-frame-options: [deny]
-        x-served-by: [cache-atl6222-ATL]
-        x-xss-protection: [1; mode=block]
-      status: {code: 200, message: OK}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: https://github.com:443/Flexget/Flexget/raw/master/README.rst
-    response:
-      body: {string: '<html><body>You are being <a href="https://raw.githubusercontent.com/Flexget/Flexget/master/README.rst">redirected</a>.</body></html>'}
-      headers:
-        access-control-allow-origin: ['https://render.githubusercontent.com']
-        cache-control: [no-cache]
-        content-security-policy: ['default-src *; script-src assets-cdn.github.com
-            collector-cdn.github.com; object-src assets-cdn.github.com; style-src
-            ''self'' ''unsafe-inline'' ''unsafe-eval'' assets-cdn.github.com; img-src
-            ''self'' data: assets-cdn.github.com identicons.github.com www.google-analytics.com
-            collector.githubapp.com *.githubusercontent.com *.gravatar.com *.wp.com;
-            media-src ''none''; frame-src ''self'' render.githubusercontent.com gist.github.com
-            www.youtube.com player.vimeo.com checkout.paypal.com; font-src assets-cdn.github.com;
-            connect-src ''self'' ghconduit.com:25035 live.github.com uploads.github.com
-            www.google-analytics.com s3.amazonaws.com']
-        content-type: [text/html; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 02:43:08 GMT']
-        location: ['https://raw.githubusercontent.com/Flexget/Flexget/master/README.rst']
-        server: [GitHub.com]
-        set-cookie: [_gh_sess=eyJzZXNzaW9uX2lkIjoiNzUyODgzYjYwMzZiNGIyNTMwNzRmYjI5N2I4MjExMDkiLCJzcHlfcmVwbyI6IkZsZXhnZXQvRmxleGdldCIsInNweV9yZXBvX2F0IjoxNDEzOTQ1Nzg4fQ%3D%3D--ba4dea0a22f9838498ab1aebd2054a45c3127c1d;
-            path=/; secure; HttpOnly]
-        status: [302 Found]
-        strict-transport-security: [max-age=31536000; includeSubdomains; preload]
-        transfer-encoding: [chunked]
-        vary: [X-PJAX, Accept-Encoding]
-        x-content-type-options: [nosniff]
-        x-frame-options: [deny]
-        x-github-request-id: ['47C7797C:5799:2BE23C4:544719BC']
-        x-ratelimit-limit: ['100']
-        x-ratelimit-remaining: ['100']
-        x-runtime: ['0.009746']
-        x-served-by: [a568c03544f42dddf712bab3bfd562fd]
-        x-ua-compatible: ['IE=Edge,chrome=1']
-        x-xss-protection: [1; mode=block]
-      status: {code: 302, message: Found}
-  - request:
-      body: null
-      headers:
-        Accept: ['*/*']
-        Accept-Encoding: ['gzip, deflate']
-        Connection: [keep-alive]
-        Cookie: [_gh_sess=eyJzZXNzaW9uX2lkIjoiNzUyODgzYjYwMzZiNGIyNTMwNzRmYjI5N2I4MjExMDkiLCJzcHlfcmVwbyI6IkZsZXhnZXQvRmxleGdldCIsInNweV9yZXBvX2F0IjoxNDEzOTQ1Nzg4fQ%3D%3D--ba4dea0a22f9838498ab1aebd2054a45c3127c1d]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
-      method: GET
-      uri: https://raw.githubusercontent.com:443/Flexget/Flexget/master/README.rst
-    response:
-      body:
-        string: !!binary |
-          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
-      headers:
-        accept-ranges: [bytes]
-        access-control-allow-origin: ['https://render.githubusercontent.com']
-        cache-control: [max-age=300]
-        connection: [Keep-Alive]
-        content-encoding: [gzip]
-        content-length: ['1456']
-        content-security-policy: [default-src 'none']
-        content-type: [text/plain; charset=utf-8]
-        date: ['Wed, 22 Oct 2014 02:43:09 GMT']
-        etag: ['"f27b254bea13de2b96a03ac950cdf1cc2e7c0560"']
-        expires: ['Wed, 22 Oct 2014 02:48:09 GMT']
-        keep-alive: ['timeout=10, max=50']
-        server: [Apache]
-        source-age: ['205']
-        strict-transport-security: [max-age=31536000]
-        vary: ['Authorization,Accept-Encoding']
-        via: [1.1 varnish]
-        x-cache: [HIT]
-        x-cache-hits: ['1']
-        x-content-type-options: [nosniff]
-        x-frame-options: [deny]
-        x-served-by: [cache-atl6227-ATL]
+        x-github-request-id: ['C71B4C21:2C66:2A76FCD:56D8E6B7']
+        x-served-by: [cache-jfk1029-JFK]
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1
