@@ -35,8 +35,6 @@ class RemoteStream(object):
         self.writer = writer
 
     def write(self, data):
-        if not self.writer:
-            return
         # This relies on all data up to a newline being either unicode or str, not mixed
         if not self.buffer:
             self.buffer = data
@@ -47,7 +45,7 @@ class RemoteStream(object):
             self.flush()
 
     def flush(self):
-        if self.buffer is None:
+        if self.buffer is None or self.writer is None:
             return
         try:
             self.writer(self.buffer, end='')
