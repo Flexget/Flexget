@@ -10,7 +10,10 @@
 
 from __future__ import unicode_literals, division, absolute_import
 
+import pytest
 
+
+@pytest.mark.online
 class TestImdb(object):
 
     config = """
@@ -100,7 +103,7 @@ class TestImdb(object):
               - R
     """
 
-    def test_lookup(self, execute_task, use_vcr):
+    def test_lookup(self, execute_task):
         """IMDB: Test Lookup (ONLINE)"""
         task = execute_task('test')
         assert task.find_entry(imdb_name='Spirited Away'), \
@@ -112,7 +115,7 @@ class TestImdb(object):
         assert task.find_entry(imdb_id='tt1049413'), \
             'Failed to lookup Up.REPACK.720p.Bluray.x264-FlexGet'
 
-    def test_year(self, execute_task, use_vcr):
+    def test_year(self, execute_task):
         task = execute_task('year')
         assert task.find_entry('accepted', imdb_name='Taken'), \
             'Taken should\'ve been accepted'
@@ -124,7 +127,7 @@ class TestImdb(object):
         assert not task.find_entry('accepted', imdb_name='Inglourious Basterds 2009'), \
             'Inglourious Basterds should not have been accepted'
 
-    def test_actors(self, execute_task, use_vcr):
+    def test_actors(self, execute_task):
         task = execute_task('actor')
 
         # check that actors have been parsed properly
@@ -141,7 +144,7 @@ class TestImdb(object):
         assert not task.find_entry('rejected', imdb_name='The Terminator'), \
             'The The Terminator have been rejected'
 
-    def test_directors(self, execute_task, use_vcr):
+    def test_directors(self, execute_task):
         task = execute_task('director')
         # check that directors have been parsed properly
         matrix = task.find_entry(imdb_name='The Matrix')
@@ -155,7 +158,7 @@ class TestImdb(object):
         assert not task.find_entry('rejected', imdb_name='The Terminator'), \
             'The The Terminator have been rejected'
 
-    def test_score(self, execute_task, use_vcr):
+    def test_score(self, execute_task):
         task = execute_task('score')
         assert task.find_entry(imdb_name='The Matrix'), 'The Matrix not found'
         matrix = float(task.find_entry(imdb_name='The Matrix')['imdb_score'])
@@ -173,7 +176,7 @@ class TestImdb(object):
         assert not task.find_entry('accepted', title='Battlefield Earth'), \
             'Battlefield Earth shouldn\'t have been accepted'
 
-    def test_genre(self, execute_task, use_vcr):
+    def test_genre(self, execute_task):
         task = execute_task('genre')
         matrix = (task.find_entry(imdb_name='The Matrix')['imdb_genres'])
         assert matrix == ['action', 'sci-fi'], \
@@ -192,7 +195,7 @@ class TestImdb(object):
         assert not task.find_entry('rejected', title='Frozen'), \
             'Frozen should have been rejected'
 
-    def test_language(self, execute_task, use_vcr):
+    def test_language(self, execute_task):
         task = execute_task('language')
         matrix = task.find_entry(imdb_name='The Matrix')['imdb_languages']
         assert matrix == ['english'], 'Could not find languages for The Matrix'
@@ -212,7 +215,7 @@ class TestImdb(object):
         assert host_langs == ['korean', 'english'], \
             'Languages were not returned in order of prominence, got %s' % (', '.join(host_langs))
 
-    def test_mpaa(self, execute_task, use_vcr):
+    def test_mpaa(self, execute_task):
         task = execute_task('mpaa')
         aladdin = task.find_entry(imdb_name='Aladdin')
         assert aladdin['imdb_mpaa_rating'] == 'G', ('Didn\'t get right rating for Aladdin. Should be G got %s' %
@@ -234,7 +237,7 @@ class TestImdbRequired(object):
             imdb_required: yes
     """
 
-    def test_imdb_required(self, execute_task, use_vcr):
+    def test_imdb_required(self, execute_task):
         task = execute_task('test')
         assert not task.find_entry('rejected', title='Taken[2008]DvDrip[Eng]-FOO'), \
             'Taken should NOT have been rejected'
@@ -242,6 +245,7 @@ class TestImdbRequired(object):
             'ASDFASDFASDF should have been rejected'
 
 
+@pytest.mark.online
 class TestImdbLookup(object):
 
     config = """
@@ -259,7 +263,7 @@ class TestImdbLookup(object):
 
     """
 
-    def test_invalid_url(self, execute_task, use_vcr):
+    def test_invalid_url(self, execute_task):
         task = execute_task('invalid url')
         # check that these were created
         assert task.entries[0]['imdb_score'], 'didn\'t get score'

@@ -3,6 +3,7 @@ from __future__ import unicode_literals, division, absolute_import
 import pytest
 
 
+@pytest.mark.online
 class TestRottenTomatoesLookup(object):
 
     config = """
@@ -23,7 +24,7 @@ class TestRottenTomatoesLookup(object):
     """
 
     @pytest.mark.xfail(reason='This plugin seems to be broken')
-    def test_rottentomatoes_lookup(self, execute_task, use_vcr):
+    def test_rottentomatoes_lookup(self, execute_task):
         task = execute_task('test')
         # check that these were created
         assert task.find_entry(rt_name='Toy Story', rt_year=1995, rt_id=9559, imdb_id='tt0114709'), \

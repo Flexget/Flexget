@@ -263,6 +263,7 @@ class TestTorrentScrub(object):
                 filename, osize, self.__tmp__ + filename, msize)
 
 
+@pytest.mark.online
 class TestTorrentAlive(object):
     config = """
         templates:
@@ -280,7 +281,7 @@ class TestTorrentAlive(object):
     """
 
     @pytest.mark.filecopy('test.torrent', 'test_torrent_alive.torrent')
-    def test_torrent_alive_fail(self, execute_task, use_vcr):
+    def test_torrent_alive_fail(self, execute_task):
         task = execute_task('test_torrent_alive_fail')
         assert not task.accepted, 'Torrent should not have met seed requirement.'
         assert task._rerun_count == 1, ('Task should have been rerun 1 time. Was rerun %s times.' %
@@ -292,12 +293,12 @@ class TestTorrentAlive(object):
         assert task._rerun_count == 0, 'Task should not have been rerun.'
 
     @pytest.mark.filecopy('test.torrent', 'test_torrent_alive.torrent')
-    def test_torrent_alive_pass(self, execute_task, use_vcr):
+    def test_torrent_alive_pass(self, execute_task):
         task = execute_task('test_torrent_alive_pass')
         assert task.accepted
         assert task._rerun_count == 0, 'Torrent should have been accepted without rerun.'
 
-    def test_torrent_alive_udp_invalid_port(self, execute_task, use_vcr):
+    def test_torrent_alive_udp_invalid_port(self):
         from flexget.plugins.filter.torrent_alive import get_udp_seeds
         assert get_udp_seeds('udp://[2001::1]/announce','HASH') == 0
         assert get_udp_seeds('udp://[::1]/announce','HASH') == 0

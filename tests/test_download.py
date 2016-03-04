@@ -1,8 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
-import tempfile
+
+import pytest
 
 
 # TODO more checks: fail_html, etc.
+@pytest.mark.online
+@pytest.mark.usefixtures('tmpdir')
 class TestDownload(object):
     config = """
         tasks:
@@ -11,32 +14,32 @@ class TestDownload(object):
               - {title: 'entry 1', url: 'http://speedtest.ftp.otenet.gr/files/test100k.db'}
             accept_all: yes
             download:
-              path: ~/
-              temp: """ + tempfile.gettempdir() + """
+              path: __tmp__
+              temp: __tmp__
           just_path:
             mock:
               - {title: 'entry 2', url: 'http://speedtest.ftp.otenet.gr/files/test100k.db'}
             accept_all: yes
             download:
-              path: ~/
+              path: __tmp__
           just_string:
             mock:
               - {title: 'entry 3', url: 'http://speedtest.ftp.otenet.gr/files/test100k.db'}
             accept_all: yes
-            download: ~/
+            download: __tmp__
       """
 
-    def test_path_and_temp(self, execute_task, use_vcr):
+    def test_path_and_temp(self, execute_task):
         """Download plugin: Path and Temp directories set"""
         task = execute_task('path_and_temp')
         assert not task.aborted, 'Task should not have aborted'
 
-    def test_just_path(self, execute_task, use_vcr):
+    def test_just_path(self, execute_task):
         """Download plugin: Path directory set as dict"""
         task = execute_task('just_path')
         assert not task.aborted, 'Task should not have aborted'
 
-    def test_just_string(self, execute_task, use_vcr):
+    def test_just_string(self, execute_task):
         """Download plugin: Path directory set as string"""
         task = execute_task('just_string')
         assert not task.aborted, 'Task should not have aborted'

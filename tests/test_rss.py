@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+
+import pytest
 import yaml
 
 
@@ -145,6 +147,7 @@ class TestInputRSS(object):
         assert entry['other:field'] == 'otherfield'
 
 
+@pytest.mark.online
 class TestRssOnline(object):
 
     config = """

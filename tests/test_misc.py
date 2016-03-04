@@ -43,6 +43,7 @@ class TestDisableBuiltins(object):
             'disable is not working?'
 
 
+@pytest.mark.online
 class TestInputHtml(object):
 
     config = """
@@ -51,7 +52,7 @@ class TestInputHtml(object):
             html: http://download.flexget.com/
     """
 
-    def test_parsing(self, execute_task, use_vcr):
+    def test_parsing(self, execute_task):
         task = execute_task('test')
         assert task.entries, 'did not produce entries'
 
@@ -111,6 +112,7 @@ class TestImmortal(object):
         assert not task.find_entry(title='title2'), 'did not reject mortal'
 
 
+@pytest.mark.online
 class TestDownload(object):
 
     config = """
@@ -122,39 +124,24 @@ class TestDownload(object):
                 filename: flexget_test_data
             accept_all: true
             download:
-              path: ~/
+              path: __tmp__
               fail_html: no
     """
 
-    def __init__(self):
-        self.testfile = None
-        FlexGetBase.__init__(self)
-
-    def teardown(self):
-        FlexGetBase.teardown(self)
-        if getattr(self, 'testfile', None) and os.path.exists(self.testfile):
-            os.remove(self.testfile)
-        temp_dir = os.path.join(self.manager.config_base, 'temp')
-        if os.path.exists(temp_dir) and os.path.isdir(temp_dir):
-            os.rmdir(temp_dir)
-
-    def test_download(self, execute_task, use_vcr):
+    def test_download(self, execute_task, tmpdir):
         # NOTE: what the hell is .obj and where it comes from?
         # Re: seems to come from python mimetype detection in download plugin ...
         # Re Re: Implemented in such way that extension does not matter?
-        self.testfile = os.path.expanduser('~/flexget_test_data.obj')
         # A little convoluted, but you have to set the umask in order to have
         # the current value returned to you
         curr_umask = os.umask(0)
         tmp_umask = os.umask(curr_umask)
-        if os.path.exists(self.testfile):
-            os.remove(self.testfile)
         # executes task and downloads the file
         task = execute_task('test')
         assert task.entries[0]['output'], 'output missing?'
-        self.testfile = task.entries[0]['output']
-        assert os.path.exists(self.testfile), 'download file does not exists'
-        testfile_stat = os.stat(self.testfile)
+        testfile = task.entries[0]['output']
+        assert os.path.exists(testfile), 'download file does not exists'
+        testfile_stat = os.stat(testfile)
         modes_equal = 666 - int(oct(curr_umask)) == \
                       int(oct(stat.S_IMODE(testfile_stat.st_mode)))
         assert modes_equal, 'download file mode not honoring umask'

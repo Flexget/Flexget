@@ -2,12 +2,15 @@ from __future__ import unicode_literals, division, absolute_import
 
 from datetime import timedelta, datetime
 
+import pytest
+
 from flexget.manager import Session
 from flexget.plugins.api_tvmaze import APITVMaze, TVMazeLookup, TVMazeSeries
 
 lookup_series = APITVMaze.series_lookup
 
 
+@pytest.mark.online
 class TestTVMazeShowLookup(object):
     config = """
         templates:
@@ -121,7 +124,7 @@ class TestTVMazeShowLookup(object):
               - The Flash
     """
 
-    def test_lookup_name(self, use_vcr, execute_task):
+    def test_lookup_name(self, execute_task):
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvmaze_series_id'] == 118, \
@@ -129,7 +132,7 @@ class TestTVMazeShowLookup(object):
         assert entry['tvmaze_series_status'] == 'Ended', 'Series Status should be "ENDED" returned %s' \
                                                          % (entry['tvmaze_series_status'])
 
-    def test_lookup(self, use_vcr, execute_task):
+    def test_lookup(self, execute_task):
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
         assert entry['tvmaze_episode_name'] == 'Paternity', \
@@ -142,14 +145,14 @@ class TestTVMazeShowLookup(object):
         assert task.find_entry(tvmaze_episode_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
 
-    def test_unknown_series(self, use_vcr, execute_task):
+    def test_unknown_series(self, execute_task):
         # Test an unknown series does not cause any exceptions
         task = execute_task('test_unknown_series')
         # Make sure it didn't make a false match
         entry = task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
-    def test_search_results(self, use_vcr, execute_task):
+    def test_search_results(self, execute_task):
         task = execute_task('test_search_result')
         entry = task.entries[0]
         print entry['tvmaze_series_name'].lower()
@@ -173,7 +176,7 @@ class TestTVMazeShowLookup(object):
             assert series.tvmaze_id == entry['tvmaze_series_id'], 'tvmaze id should be the same as the first entry'
             assert series.name.lower() == entry['tvmaze_series_name'].lower(), 'series name should match first entry'
 
-    def test_date(self, use_vcr, execute_task):
+    def test_date(self, execute_task):
         task = execute_task('test_date')
         entry = task.find_entry(title='the daily show 2012-6-6')
         assert entry.get('tvmaze_series_id') == 249, 'expected tvmaze_series_id 249, got %s' % entry.get(
@@ -181,7 +184,7 @@ class TestTVMazeShowLookup(object):
         assert entry.get('tvmaze_episode_id') == 20471, 'episode id should be 20471, is actually %s' % entry.get(
             'tvmaze_episode_id')
 
-    def test_title_with_year(self, use_vcr, execute_task):
+    def test_title_with_year(self, execute_task):
         task = execute_task('test_title_with_year')
         entry = task.find_entry(title='The.Flash.2014.S02E06.HDTV.x264-LOL')
         assert entry.get('tvmaze_series_id') == 13, 'expected tvmaze_series_id 13, got %s' % entry.get(
@@ -189,7 +192,7 @@ class TestTVMazeShowLookup(object):
         assert entry.get('tvmaze_series_year') == 2014, 'expected tvmaze_series_year 2014, got %s' % entry.get(
             'tvmaze_series_year')
 
-    def test_from_filesystem(self, use_vcr, execute_task):
+    def test_from_filesystem(self, execute_task):
         task = execute_task('test_from_filesystem')
         entry = task.find_entry(title='Marvels.Jessica.Jones.S01E02.PROPER.720p.WEBRiP.x264-QCF')
         assert entry.get('tvmaze_series_id') == 1370, 'expected tvmaze_series_id 1370, got %s' % entry.get(
@@ -217,7 +220,7 @@ class TestTVMazeShowLookup(object):
         assert entry.get('tvmaze_episode_id') == 185073, 'episode id should be 185073, is actually %s' % entry.get(
             'tvmaze_episode_id')
 
-    def test_series_expiration(self, use_vcr, execute_task):
+    def test_series_expiration(self, execute_task):
         task = execute_task('test_series_expiration')
         entry = task.entries[0]
         assert entry['tvmaze_series_name'].lower() == 'Shameless'.lower(), 'lookup failed'
@@ -251,7 +254,7 @@ class TestTVMazeShowLookup(object):
                 'weight should have been updated back to 15 from 99, instead its %s' % series.weight
             assert session.query(TVMazeSeries).first().expired == False, 'expired status should be False'
 
-    def test_test_show_is_number(self, use_vcr, execute_task):
+    def test_test_show_is_number(self, execute_task):
         task = execute_task('test_show_is_number')
         entry = task.find_entry(series_name='1992')
         assert entry['tvmaze_series_name'] == '1992'.lower(), 'lookup failed'
@@ -266,7 +269,7 @@ class TestTVMazeShowLookup(object):
         assert entry['tvmaze_episode_id'] == 12094, 'episode id should be 12094, instead its %s' % entry[
             'tvmaze_episode_id']
 
-    def test_show_contain_number(self, use_vcr, execute_task):
+    def test_show_contain_number(self, execute_task):
         task = execute_task('test_show_contain_number')
         entry = task.find_entry(series_name='Detroit 1-8-7')
         assert entry['tvmaze_series_name'] == 'Detroit 1-8-7', \
@@ -297,7 +300,7 @@ class TestTVMazeShowLookup(object):
         assert entry['tvmaze_episode_id'] == 184265, 'episode id should be 184265, instead its %s' % entry[
             'tvmaze_episode_id']
 
-    def test_episode_without_air_date_and_air_stamp(self, use_vcr, execute_task):
+    def test_episode_without_air_date_and_air_stamp(self, execute_task):
         task = execute_task('test_episode_without_air_date')
 
         entry = task.find_entry(title='Firefly S01E13 HDTV x264-LOL')
@@ -310,7 +313,7 @@ class TestTVMazeShowLookup(object):
         assert entry['tvmaze_episode_airstamp'] == None, \
             'Expected airdate to be None, got %s' % entry['tvmaze_episode_airstamp']
 
-    def test_episode_summary(self, use_vcr, execute_task):
+    def test_episode_summary(self, execute_task):
         expected_summary = u"The team's visitor, Jay Garrick, explains that he comes from a parallel world and " \
                            u"was a speedster there, but lost his powers transitioning over. Now he insists that" \
                            u" Barry needs his help fighting a new metahuman, Sand Demon, who came from Jay's world." \
@@ -325,7 +328,7 @@ class TestTVMazeShowLookup(object):
         assert entry['tvmaze_episode_summary'] == expected_summary, 'Expected summary is different %s' % entry[
             'tvmaze_episode_summary']
 
-    def test_show_with_non_ascii_chars(self, use_vcr, execute_task):
+    def test_show_with_non_ascii_chars(self, execute_task):
         task = execute_task('test_show_with_non_ascii_chars')
         entry = task.entries[0]
         assert entry['tvmaze_series_name'] == u'Unit\xe9 9', u'series id should be Unit\xe9 9, instead its %s' % entry[
@@ -335,7 +338,7 @@ class TestTVMazeShowLookup(object):
         assert entry['tvmaze_episode_id'] == 476294, 'episode id should be 476294, instead its %s' % entry[
             'tvmaze_episode_id']
 
-    def test_show_cast(self, use_vcr, execute_task):
+    def test_show_cast(self, execute_task):
         task = execute_task('test_show_cast')
         entry = task.entries[0]
         assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[
@@ -346,7 +349,7 @@ class TestTVMazeShowLookup(object):
             'expected actors list for series to contain 9 members,' \
             ' instead it contains %s' % len(entry['tvmaze_series_actors'])
 
-    def test_episode_air_date(self, use_vcr, execute_task):
+    def test_episode_air_date(self, execute_task):
         task = execute_task('test_episode_air_date')
         entry = task.entries[0]
         assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[
@@ -357,7 +360,7 @@ class TestTVMazeShowLookup(object):
         airdate = datetime.strftime(entry['tvmaze_episode_airdate'], '%Y-%m-%d')
         assert airdate == '2015-10-13', 'episode airdate should be 2015-10-13, instead its %s' % airdate
 
-    def test_queries_via_ids(self, use_vcr, execute_task):
+    def test_queries_via_ids(self, execute_task):
         task = execute_task('test_queries_via_ids')
         entry = task.entries[0]
         assert entry['tvmaze_series_id'] == 13, 'series id should be 13, instead its %s' % entry[

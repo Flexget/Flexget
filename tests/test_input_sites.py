@@ -1,6 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import pytest
 
+
+@pytest.mark.online
 class TestInputSites(object):
 
     config = """
@@ -20,7 +23,7 @@ class TestInputSites(object):
 
     """
 
-    def test_sceper(self, execute_task, use_vcr):
+    def test_sceper(self, execute_task):
         task = execute_task('test_sceper')
         assert task.entries, 'no entries created / site may be down'
 
@@ -29,6 +32,6 @@ class TestInputSites(object):
     #    task = execute_task('test_apple_trailers')
     #    assert task.entries, 'no entries created / site may be down'
 
-    def test_apple_trailers_simple(self, execute_task, use_vcr):
+    def test_apple_trailers_simple(self, execute_task):
         task = execute_task('test_apple_trailers_simple')
         assert task.entries, 'no entries created / site may be down'

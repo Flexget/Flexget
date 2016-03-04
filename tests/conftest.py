@@ -94,35 +94,27 @@ def execute_task(manager):
 @pytest.yield_fixture()
 def use_vcr(request, monkeypatch):
     """
-    Decorator for test functions which go online. A vcr cassette will automatically be created and used to capture and
-    play back online interactions. The nose 'vcr' attribute will be set, and the nose 'online' attribute will be set on
-    it based on whether it might go online.
+    This fixture is applied automatically to any test using the `online` mark. It will record and playback network
+    sessions using VCR.
 
-    The record mode of VCR can be set using the VCR_RECORD_MODE environment variable when running tests. Depending on
-    the record mode, and the existence of an already recorded cassette, this decorator will also dynamically set the
-    nose 'online' attribute.
-
-    Keyword arguments to :func:`vcr.VCR.use_cassette` can be supplied.
+    The record mode of VCR can be set using the VCR_RECORD_MODE environment variable when running tests.
     """
-    module = request.module.__name__.split('tests.')[-1]
-    class_name = request.cls.__name__
-    cassette_name = '.'.join([module, class_name, request.function.__name__])
-    cassette_path = os.path.join(VCR_CASSETTE_DIR, cassette_name)
-    online = True
-    # Set our nose online attribute based on the VCR record mode
-    if vcr.record_mode == 'none':
-        online = False
-    elif vcr.record_mode == 'once':
-        online = not os.path.exists(cassette_path)
-    # If we are not going online, disable domain limiting during test
-    if not online:
-        monkeypatch.setattr('flexget.utils.requests.limit_domains', mock.Mock())
-    else:
-        # TODO: Don't know if this is right, do some testing.
-        request.node.add_marker(pytest.mark.online)
     if VCR_RECORD_MODE == 'off':
         yield None
     else:
+        module = request.module.__name__.split('tests.')[-1]
+        class_name = request.cls.__name__
+        cassette_name = '.'.join([module, class_name, request.function.__name__])
+        cassette_path = os.path.join(VCR_CASSETTE_DIR, cassette_name)
+        online = True
+        if vcr.record_mode == 'none':
+            online = False
+        elif vcr.record_mode == 'once':
+            online = not os.path.exists(cassette_path)
+        # If we are not going online, disable domain limiting during test
+        if not online:
+            log.debug('Disabling domain limiters during VCR playback.')
+            monkeypatch.setattr('flexget.utils.requests.limit_domains', mock.Mock())
         with vcr.use_cassette(path=cassette_path) as cassette:
             yield cassette
 
@@ -143,14 +135,19 @@ def api_client(manager):
 def pytest_configure(config):
     # register the filecopy marker
     config.addinivalue_line('markers',
-        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.')
+        'filecopy(src, dst): mark test to copy a file from `src` to `dst` before running.'
+        'online: mark a test that goes online. VCR will automatically be used.')
 
 
 def pytest_runtest_setup(item):
     # Add the filcopy fixture to any test marked with filecopy
-    envmarker = item.get_marker('filecopy')
-    if envmarker is not None:
-        item.add_marker(pytest.mark.usefixtures('filecopy'))
+    if item.get_marker('filecopy'):
+        item.fixturenames.append('filecopy')
+    # Add the online marker to tests that will go online
+    if item.get_marker('online'):
+        item.fixturenames.append('use_vcr')
+    else:
+        item.fixturenames.append('no_requests')
 
 
 @pytest.yield_fixture()
@@ -179,19 +176,18 @@ def filecopy(request):
                 print("couldn't remove %s: %s" % (f, e))
 
 
+@pytest.fixture()
+def no_requests(monkeypatch):
+    monkeypatch.setattr("requests.sessions.Session.request",
+                        mock.Mock(side_effect=Exception('Online tests should use @pytest.mark.online')))
+
+
 @pytest.fixture(scope='session', autouse=True)
 def setup_once(pytestconfig, request):
     os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'tests'))
     flexget.logger.initialize(True)
     m = MockManager('tasks: {}', 'init')  # This makes sure our template environment is set up before any tests are run
     m.__del__()
-    # VCR.py mocked functions not handle ssl verification well. Older versions of urllib3 don't have this
-    # if VCR_RECORD_MODE != 'off':
-    #     try:
-    #         from requests.packages.urllib3.exceptions import SecurityWarning
-    #         warnings.simplefilter('ignore', SecurityWarning)
-    #     except ImportError:
-    #         pass
     load_plugins()
 
 

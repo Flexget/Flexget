@@ -2,7 +2,9 @@
 from __future__ import unicode_literals, division, absolute_import
 from __builtin__ import object
 import logging
+
 import mock
+import pytest
 
 from flexget.plugins.api_t411 import T411RestClient, T411ObjectMapper, T411Proxy, FriendlySearchQuery, ApiError
 from flexget.utils.qualities import Requirements
@@ -120,12 +122,14 @@ class TestRestClient(object):
         client = self.build_unauthenticated_client()
         assert not client.is_authenticated()
 
-    def test_auth(self, use_vcr):
+    @pytest.mark.online
+    def test_auth(self):
         client = self.build_unauthenticated_client()
         client.auth()
         assert client.is_authenticated(), 'Client is not authenticated (are you using mocked credentials online?)'
 
-    def test_retrieve_categories(self, use_vcr):
+    @pytest.mark.online
+    def test_retrieve_categories(self):
         client = self.build_authenticated_client()
         json_tree_categories = client.retrieve_category_tree()
         json_category = json_tree_categories.get('210')
@@ -139,7 +143,8 @@ class TestRestClient(object):
         assert json_sub_category is not None
         assert json_sub_category.get('name') == 'Film'
 
-    def test_retrieve_terms(self, use_vcr):
+    @pytest.mark.online
+    def test_retrieve_terms(self):
         client = self.build_authenticated_client()
         json_terms = client.retrieve_terms_tree()
         assert json_terms is not None
@@ -149,7 +154,8 @@ class TestRestClient(object):
         assert term_type.get('type') == 'Application - Genre'
         assert term_type.get('mode') == 'single'
 
-    def test_malformed_search_response(self, use_vcr):
+    @pytest.mark.online
+    def test_malformed_search_response(self):
         """
         Search without expression produces server response
         that contains some error messages. This test check
@@ -161,7 +167,8 @@ class TestRestClient(object):
         assert search_result.get('query') is None
         assert search_result.get('limit') == 10
 
-    def test_error_message_handler(self, use_vcr):
+    @pytest.mark.online
+    def test_error_message_handler(self):
         exception_was_raised = False
         client = T411RestClient()
         client.set_api_token('LEAVE:THIS:TOKEN:FALSE')

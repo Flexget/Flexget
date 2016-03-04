@@ -112,7 +112,8 @@ class TestExistsMovie(object):
         assert task.find_entry('accepted', title='Gone.Missing.2013'), \
             'Gone.Missing.2013 should have been accepted'
 
-    def test_lookup_imdb(self, execute_task, use_vcr):
+    @pytest.mark.online
+    def test_lookup_imdb(self, execute_task):
         """exists_movie plugin: existing"""
         task = execute_task('test_lookup_imdb')
         assert task.find_entry('accepted', title='The.Matrix.1999')['imdb_id'], \

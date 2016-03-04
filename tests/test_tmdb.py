@@ -1,6 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import pytest
 
+
+@pytest.mark.online
 class TestTmdbLookup(object):
 
     config = """
@@ -15,7 +18,7 @@ class TestTmdbLookup(object):
               afield: "{{ tmdb_id }}"
     """
 
-    def test_tmdb_lookup(self, execute_task, use_vcr):
+    def test_tmdb_lookup(self, execute_task):
         task = execute_task('test')
         # check that these were created
         assert task.find_entry(tmdb_name='Taken', tmdb_year=2008), 'Didn\'t populate tmdb info for Taken'

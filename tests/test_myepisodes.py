@@ -1,7 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import pytest
 
 
+@pytest.mark.online
 class TestMyEpisodes(object):
     """Uses test account at MyEpisodes, username and password are 'flexget'"""
 
@@ -16,7 +18,7 @@ class TestMyEpisodes(object):
               password: flexget
     """
 
-    def test_myepisodes_id(self, execute_task, use_vcr):
+    def test_myepisodes_id(self, execute_task):
         """Test myepisodes (DISABLED) -- account locked?"""
         return
 

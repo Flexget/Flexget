@@ -1,5 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import pytest
+
 from flexget.manager import Session
 from flexget.plugins.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResult, TraktShowSearchResult, TraktShow
 
@@ -7,6 +9,7 @@ from flexget.plugins.api_trakt import ApiTrakt, TraktActor, TraktMovieSearchResu
 lookup_series = ApiTrakt.lookup_series
 
 
+@pytest.mark.online
 class TestTraktShowLookup(object):
     config = """
         templates:
@@ -51,7 +54,7 @@ class TestTraktShowLookup(object):
               - Baking Around
     """
 
-    def test_lookup_name(self, execute_task, use_vcr):
+    def test_lookup_name(self, execute_task):
         """trakt: Test Lookup (ONLINE)"""
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
@@ -60,7 +63,7 @@ class TestTraktShowLookup(object):
         assert entry['trakt_series_status'] == 'ended', 'Series Status should be "ENDED" returned %s' \
                                                         % (entry['trakt_series_status'])
 
-    def test_lookup(self, execute_task, use_vcr):
+    def test_lookup(self, execute_task):
         """trakt: Test Lookup (ONLINE)"""
         task = execute_task('test')
         entry = task.find_entry(title='House.S01E02.HDTV.XViD-FlexGet')
@@ -72,14 +75,14 @@ class TestTraktShowLookup(object):
         assert task.find_entry(trakt_ep_name='School Reunion'), \
             'Failed imdb lookup Doctor Who 2005 S02E03'
 
-    def test_unknown_series(self, execute_task, use_vcr):
+    def test_unknown_series(self, execute_task):
         # Test an unknown series does not cause any exceptions
         task = execute_task('test_unknown_series')
         # Make sure it didn't make a false match
         entry = task.find_entry('accepted', title='Aoeu.Htns.S01E01.htvd')
         assert entry.get('tvdb_id') is None, 'should not have populated tvdb data'
 
-    def test_search_results(self, execute_task, use_vcr):
+    def test_search_results(self, execute_task):
         task = execute_task('test_search_result')
         entry = task.entries[0]
         print entry['trakt_series_name'].lower()
@@ -102,12 +105,12 @@ class TestTraktShowLookup(object):
             assert series.tvdb_id == entry['tvdb_id'], 'tvdb id should be the same as the first entry'
             assert series.id == entry['trakt_show_id'], 'trakt id should be the same as the first entry'
             assert series.title.lower() == entry['trakt_series_name'].lower(), 'series name should match first entry'
-    def test_search_fail(self, execute_task, use_vcr):
+    def test_search_fail(self, execute_task):
         task = execute_task('test_search_fail')
         entry = task.find_entry('accepted', title='Baking.Around.S01E01.HDTV.XViD-FlexGet')
         assert entry.get('trakt_show_id') is None, 'Should not have returned trakt id'
 
-    def test_date(self, execute_task, use_vcr):
+    def test_date(self, execute_task):
         task = execute_task('test_date')
         entry = task.find_entry(title='the daily show 2012-6-6')
         # Make sure show data got populated
@@ -119,7 +122,7 @@ class TestTraktShowLookup(object):
             assert entry.get('trakt_episode_id') is None, 'false positive for episode match, we don\'t ' \
                                                           'support lookup by date'
 
-    def test_absolute(self, execute_task, use_vcr):
+    def test_absolute(self, execute_task):
         task = execute_task('test_absolute')
         entry = task.find_entry(title='naruto 128')
         # Make sure show data got populated
@@ -131,7 +134,7 @@ class TestTraktShowLookup(object):
             assert entry.get('trakt_episode_id') is None, 'false positive for episode match, we don\'t ' \
                                                           'support lookup by absolute number'
 
-    def test_lookup_actors(self, execute_task, use_vcr):
+    def test_lookup_actors(self, execute_task):
         task = execute_task('test')
         actors = ['Hugh Laurie',
                   'Jesse Spencer',
@@ -172,7 +175,7 @@ class TestTraktList(object):
               type: movies
     """
 
-    def test_trakt_movies(self, execute_task, use_vcr):
+    def test_trakt_movies(self, execute_task):
         task = execute_task('test_trakt_movies')
         assert len(task.entries) == 1
         entry = task.entries[0]
@@ -182,6 +185,7 @@ class TestTraktList(object):
         assert entry['imdb_id'] == 'tt0050083'
 
 
+@pytest.mark.online
 class TestTraktWatchedAndCollected(object):
     config = """
         tasks:
@@ -221,7 +225,7 @@ class TestTraktWatchedAndCollected(object):
               - trakt_collected: accept
     """
 
-    def test_trakt_watched_lookup(self, execute_task, use_vcr):
+    def test_trakt_watched_lookup(self, execute_task):
         task = execute_task('test_trakt_watched')
         assert len(task.accepted) == 1, 'Episode should have been marked as watched and accepted'
         entry = task.accepted[0]
@@ -229,7 +233,7 @@ class TestTraktWatchedAndCollected(object):
         assert entry['series_name'] == 'Hawaii Five-0', 'wrong series was returned by lookup'
         assert entry['trakt_watched'] == True, 'episode should be marked as watched'
 
-    def test_trakt_collected_lookup(self, execute_task, use_vcr):
+    def test_trakt_collected_lookup(self, execute_task):
         task = execute_task('test_trakt_collected')
         assert len(task.accepted) == 1, 'Episode should have been marked as collected and accepted'
         entry = task.accepted[0]
@@ -237,7 +241,7 @@ class TestTraktWatchedAndCollected(object):
         assert entry['series_name'] == 'Homeland 2011', 'wrong series was returned by lookup'
         assert entry['trakt_collected'] == True, 'episode should be marked as collected'
 
-    def test_trakt_watched_movie_lookup(self, execute_task, use_vcr):
+    def test_trakt_watched_movie_lookup(self, execute_task):
         task = execute_task('test_trakt_watched_movie')
         assert len(task.accepted) == 1, 'Movie should have been accepted as it is watched on Trakt profile'
         entry = task.accepted[0]
@@ -245,7 +249,7 @@ class TestTraktWatchedAndCollected(object):
         assert entry['movie_name'] == 'Inside Out', 'wrong movie name'
         assert entry['trakt_watched'] == True, 'movie should be marked as watched'
 
-    def test_trakt_collected_movie_lookup(self, execute_task, use_vcr):
+    def test_trakt_collected_movie_lookup(self, execute_task):
         task = execute_task('test_trakt_collected_movie')
         assert len(task.accepted) == 1, 'Movie should have been accepted as it is collected on Trakt profile'
         entry = task.accepted[0]
@@ -254,6 +258,7 @@ class TestTraktWatchedAndCollected(object):
         assert entry['trakt_collected'] == True, 'movie should be marked as collected'
 
 
+@pytest.mark.online
 class TestTraktMovieLookup(object):
     config = """
         templates:
@@ -285,12 +290,12 @@ class TestTraktMovieLookup(object):
             - title: harry.potter.and.the.philosopher's.stone
     """
 
-    def test_lookup_sources(self, execute_task, use_vcr):
+    def test_lookup_sources(self, execute_task):
         task = execute_task('test_lookup_sources')
         for e in task.all_entries:
             assert e['movie_name'] == 'The Matrix', 'looking up based on %s failed' % e['title']
 
-    def test_search_results(self, execute_task, use_vcr):
+    def test_search_results(self, execute_task):
         task = execute_task('test_search_results')
         entry = task.entries[0]
         assert entry['movie_name'].lower() == 'Harry Potter and The Philosopher\'s Stone'.lower(), 'lookup failed'
@@ -307,7 +312,7 @@ class TestTraktMovieLookup(object):
             assert movie.imdb_id == entry['imdb_id']
             assert movie.title.lower() == entry['movie_name'].lower()
 
-    def test_lookup_actors(self, execute_task, use_vcr):
+    def test_lookup_actors(self, execute_task):
         task = execute_task('test_lookup_actors')
         assert len(task.entries) == 1
         entry = task.entries[0]
