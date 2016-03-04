@@ -4,6 +4,10 @@ sudo: false
 python:
   - "2.6"
   - "2.7"
+# Install libyaml for vcr speedup?
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libyaml-dev
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - pip install .
