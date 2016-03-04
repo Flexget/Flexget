@@ -1,14 +1,19 @@
 language: python
+cache: pip
 sudo: false
 python:
-  - "2.6"
   - "2.7"
+# Install libyaml for vcr speedup?
+addons:
+  apt:
+    packages:
+      - libyaml-dev
 # command to install dependencies, e.g. pip install -r requirements.txt --use-mirrors
 install:
   - pip install .
   - pip install -r dev-requirements.txt
 # command to run tests, e.g. python setup.py test
-script: nosetests -q --attr !online
+script: py.test
 env: VCR_RECORD_MODE=none
 notifications:
   email: false

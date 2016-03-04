@@ -5,9 +5,9 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+        User-Agent: [FlexGet/1.2.464.dev (www.flexget.com)]
       method: GET
-      uri: https://secure3.silverorange.com:443/rsstest/rss_with_ssl.xml
+      uri: https://secure3.silverorange.com/rsstest/rss_with_ssl.xml
     response:
       body:
         string: !!binary |
@@ -82,7 +82,7 @@ interactions:
         content-encoding: [gzip]
         content-length: ['3729']
         content-type: [text/xml]
-        date: ['Wed, 22 Oct 2014 02:43:12 GMT']
+        date: ['Thu, 03 Mar 2016 09:31:52 GMT']
         keep-alive: ['timeout=2, max=100']
         last-modified: ['Sun, 13 Mar 2005 17:23:31 GMT']
         server: [Apache/2.2.16 (Fedora)]
@@ -94,7 +94,7 @@ interactions:
         Accept: ['*/*']
         Accept-Encoding: ['gzip, deflate']
         Connection: [keep-alive]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+        User-Agent: [FlexGet/1.2.464.dev (www.flexget.com)]
       method: GET
       uri: http://labs.silverorange.com/local/solabs/rsstest/rss_plain.xml
     response:
@@ -171,7 +171,7 @@ interactions:
         content-encoding: [gzip]
         content-length: ['3729']
         content-type: [text/xml]
-        date: ['Wed, 22 Oct 2014 02:43:12 GMT']
+        date: ['Thu, 03 Mar 2016 09:31:53 GMT']
         keep-alive: ['timeout=2, max=100']
         last-modified: ['Wed, 09 Jul 2003 17:10:48 GMT']
         server: [Apache/2.2.16 (Fedora)]
@@ -184,7 +184,7 @@ interactions:
         Accept-Encoding: ['gzip, deflate']
         Authorization: [Basic dGVzdHVzZXI6dGVzdHBhc3M=]
         Connection: [keep-alive]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+        User-Agent: [FlexGet/1.2.464.dev (www.flexget.com)]
       method: GET
       uri: http://labs.silverorange.com/local/solabs/rsstest/httpauth/rss_with_auth.xml
     response:
@@ -261,7 +261,7 @@ interactions:
         content-encoding: [gzip]
         content-length: ['3727']
         content-type: [text/xml]
-        date: ['Wed, 22 Oct 2014 02:43:12 GMT']
+        date: ['Thu, 03 Mar 2016 09:31:54 GMT']
         keep-alive: ['timeout=2, max=100']
         last-modified: ['Wed, 09 Jul 2003 17:11:01 GMT']
         server: [Apache/2.2.16 (Fedora)]
@@ -274,9 +274,9 @@ interactions:
         Accept-Encoding: ['gzip, deflate']
         Authorization: [Basic dGVzdHVzZXI6dGVzdHBhc3M=]
         Connection: [keep-alive]
-        User-Agent: ['FlexGet/{git} (www.flexget.com)']
+        User-Agent: [FlexGet/1.2.464.dev (www.flexget.com)]
       method: GET
-      uri: https://secure3.silverorange.com:443/rsstest/httpauth/rss_with_ssl_and_auth.xml
+      uri: https://secure3.silverorange.com/rsstest/httpauth/rss_with_ssl_and_auth.xml
     response:
       body:
         string: !!binary |
@@ -351,7 +351,7 @@ interactions:
         content-encoding: [gzip]
         content-length: ['3725']
         content-type: [text/xml]
-        date: ['Wed, 22 Oct 2014 02:43:13 GMT']
+        date: ['Thu, 03 Mar 2016 09:31:56 GMT']
         keep-alive: ['timeout=2, max=100']
         last-modified: ['Sun, 13 Mar 2005 17:23:56 GMT']
         server: [Apache/2.2.16 (Fedora)]

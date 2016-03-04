@@ -2,11 +2,10 @@ from __future__ import unicode_literals, division, absolute_import
 import os
 import glob
 
-from nose.tools import raises
+import pytest
 
-from tests import FlexGetBase
 from flexget import plugin, plugins
-from flexget.event import event
+from flexget.event import event, fire_event
 
 
 class TestPluginApi(object):
@@ -14,9 +13,11 @@ class TestPluginApi(object):
     Contains plugin api related tests
     """
 
-    @raises(plugin.DependencyError)
+    config = 'tasks: {}'
+
     def test_unknown_plugin(self):
-        plugin.get_plugin_by_name('nonexisting_plugin')
+        with pytest.raises(plugin.DependencyError):
+            plugin.get_plugin_by_name('nonexisting_plugin')
 
     def test_no_dupes(self):
         plugin.load_plugins()
@@ -35,7 +36,7 @@ class TestPluginApi(object):
         # and one module can load multiple plugins TODO: Maybe consider some replacement
         # assert len(plugin.plugins) >= len(plugin_modules) - 1, "Less plugins than plugin modules"
 
-    def test_register_by_class(self):
+    def test_register_by_class(self, execute_task):
 
         class TestPlugin(object):
             pass
@@ -61,22 +62,23 @@ class TestPluginApi(object):
         assert 'test_html' in plugin.plugins
 
 
-class TestExternalPluginLoading(FlexGetBase):
-    __yaml__ = """
+class TestExternalPluginLoading(object):
+    _config = """
         tasks:
           ext_plugin:
             external_plugin: yes
     """
 
-    def setup(self):
-        os.environ['FLEXGET_PLUGIN_PATH'] = os.path.join(self.base_path, 'external_plugins')
+    @pytest.yield_fixture()
+    def config(self, request):
+        os.environ['FLEXGET_PLUGIN_PATH'] = request.fspath.dirpath().join('external_plugins').strpath
         plugin.load_plugins()
-        super(TestExternalPluginLoading, self).setup()
-
-    def teardown(self):
+        # fire the config register event again so that task schema is rebuilt with new plugin
+        fire_event('config.register')
+        yield self._config
         del os.environ['FLEXGET_PLUGIN_PATH']
-        super(TestExternalPluginLoading, self).teardown()
 
-    def test_external_plugin_loading(self):
-        self.execute_task('ext_plugin')
-        assert self.task.find_entry(title='test entry'), 'External plugin did not create entry'
+    def test_external_plugin_loading(self, execute_task):
+        # TODO: This isn't working because calling load_plugins again doesn't cause the schema for tasks to regenerate
+        task = execute_task('ext_plugin')
+        assert task.find_entry(title='test entry'), 'External plugin did not create entry'

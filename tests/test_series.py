@@ -2,15 +2,12 @@ from __future__ import unicode_literals, division, absolute_import
 
 from StringIO import StringIO
 
-from mock import patch
+import pytest
+from jinja2 import Template
 
 from flexget.logger import capture_output
-from flexget.manager import get_parser, Session
-from flexget.plugins.filter import series
+from flexget.manager import get_parser
 from flexget.task import TaskAbort
-from flexget.utils import json
-from tests import FlexGetBase, build_parser_function
-from tests.test_api import APITest
 
 
 def age_series(**kwargs):
@@ -22,8 +19,21 @@ def age_series(**kwargs):
     session.commit()
 
 
-class BaseQuality(FlexGetBase):
-    __yaml__ = """
+@pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'], autouse=True)
+def config(request):
+    """Override and parametrize default config fixture for all series tests."""
+    newconfig = Template(request.cls.config).render({'parser': request.param})
+    # Make sure we remembered to put the section in config
+    assert request.cls.config != newconfig, 'config parameterization did nothing?'
+    return newconfig
+
+
+class TestQuality(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           exact_quality:
             mock:
@@ -113,74 +123,64 @@ class BaseQuality(FlexGetBase):
                 quality: '<720p'
     """
 
-    def test_exact_quality(self):
+    def test_exact_quality(self, execute_task):
         """Series plugin: choose by quality"""
-        self.execute_task('exact_quality')
-        assert self.task.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), \
+        task = execute_task('exact_quality')
+        assert task.find_entry('accepted', title='QTest.S01E01.720p.XViD-FlexGet'), \
             '720p should have been accepted'
-        assert len(self.task.accepted) == 1, 'should have accepted only one'
+        assert len(task.accepted) == 1, 'should have accepted only one'
 
-    def test_quality_fail(self):
-        self.execute_task('quality_fail')
-        assert not self.task.accepted, 'No qualities should have matched'
+    def test_quality_fail(self, execute_task):
+        task = execute_task('quality_fail')
+        assert not task.accepted, 'No qualities should have matched'
 
-    def test_min_quality(self):
+    def test_min_quality(self, execute_task):
         """Series plugin: min_quality"""
-        self.execute_task('min_quality')
-        assert self.task.find_entry('accepted', title='MinQTest.S01E01.1080p.XViD-FlexGet'), \
+        task = execute_task('min_quality')
+        assert task.find_entry('accepted', title='MinQTest.S01E01.1080p.XViD-FlexGet'), \
             'MinQTest.S01E01.1080p.XViD-FlexGet should have been accepted'
-        assert len(self.task.accepted) == 1, 'should have accepted only one'
+        assert len(task.accepted) == 1, 'should have accepted only one'
 
-    def test_max_quality(self):
+    def test_max_quality(self, execute_task):
         """Series plugin: max_quality"""
-        self.execute_task('max_quality')
-        assert self.task.find_entry('accepted', title='MaxQTest.S01E01.HDTV.XViD-FlexGet'), \
+        task = execute_task('max_quality')
+        assert task.find_entry('accepted', title='MaxQTest.S01E01.HDTV.XViD-FlexGet'), \
             'MaxQTest.S01E01.HDTV.XViD-FlexGet should have been accepted'
-        assert len(self.task.accepted) == 1, 'should have accepted only one'
+        assert len(task.accepted) == 1, 'should have accepted only one'
 
-    def test_min_max_quality(self):
+    def test_min_max_quality(self, execute_task):
         """Series plugin: min_quality with max_quality"""
-        self.execute_task('min_max_quality')
-        assert self.task.find_entry('accepted', title='MinMaxQTest.S01E01.HR.XViD-FlexGet'), \
+        task = execute_task('min_max_quality')
+        assert task.find_entry('accepted', title='MinMaxQTest.S01E01.HR.XViD-FlexGet'), \
             'MinMaxQTest.S01E01.HR.XViD-FlexGet should have been accepted'
-        assert len(self.task.accepted) == 1, 'should have accepted only one'
+        assert len(task.accepted) == 1, 'should have accepted only one'
 
-    def test_max_unknown_quality(self):
+    def test_max_unknown_quality(self, execute_task):
         """Series plugin: max quality with unknown quality"""
-        self.execute_task('max_unknown_quality')
-        assert len(self.task.accepted) == 1, 'should have accepted'
+        task = execute_task('max_unknown_quality')
+        assert len(task.accepted) == 1, 'should have accepted'
 
-    def test_group_quality(self):
+    def test_group_quality(self, execute_task):
         """Series plugin: quality from group name"""
-        self.execute_task('quality_from_group')
-        assert self.task.find_entry('accepted', title='GroupQual.S01E01.720p.XViD-FlexGet'), \
+        task = execute_task('quality_from_group')
+        assert task.find_entry('accepted', title='GroupQual.S01E01.720p.XViD-FlexGet'), \
             'GroupQual.S01E01.720p.XViD-FlexGet should have been accepted'
-        assert len(self.task.accepted) == 1, 'should have accepted only one (no entries should pass for series `other`'
+        assert len(task.accepted) == 1, 'should have accepted only one (no entries should pass for series `other`'
 
-    def test_quality_in_series_name(self):
+    def test_quality_in_series_name(self, execute_task):
         """Make sure quality in title does not get parsed as quality"""
-        self.execute_task('quality_in_series_name')
-        assert self.task.find_entry('accepted', title='my 720p show S01E01'), \
+        task = execute_task('quality_in_series_name')
+        assert task.find_entry('accepted', title='my 720p show S01E01'), \
             'quality in title should not have been parsed'
-        assert len(self.task.accepted) == 1, 'should not have accepted 720p entry'
+        assert len(task.accepted) == 1, 'should not have accepted 720p entry'
 
 
-class TestGuessitQuality(BaseQuality):
-    def __init__(self):
-        super(TestGuessitQuality, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalQuality(BaseQuality):
-    def __init__(self):
-        super(TestInternalQuality, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseDatabase(FlexGetBase):
-    __yaml__ = """
+class TestDatabase(object):
+    config = """
         templates:
           global:
+            parsing:
+              series: {{parser}}
             series:
               - some series
               - progress
@@ -204,42 +204,34 @@ class BaseDatabase(FlexGetBase):
               - {title: 'Progress.S01E20.HDTV-Another-FlexGet'}
     """
 
-    def test_database(self):
+    def test_database(self, execute_task):
         """Series plugin: simple database"""
 
-        self.execute_task('test_1')
-        self.execute_task('test_2')
-        assert self.task.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), \
+        task = execute_task('test_1')
+        task = execute_task('test_2')
+        assert task.find_entry('rejected', title='Some.Series.S01E20.720p.XViD-DoppelGanger'), \
             'failed basic download remembering'
 
-    def test_doppelgangers(self):
+    def test_doppelgangers(self, execute_task):
         """Series plugin: doppelganger releases (dupes)"""
 
-        self.execute_task('progress_1')
-        assert self.task.find_entry('accepted', title='Progress.S01E20.720p-FlexGet'), \
+        task = execute_task('progress_1')
+        assert task.find_entry('accepted', title='Progress.S01E20.720p-FlexGet'), \
             'best quality not accepted'
         # should not accept anything
-        self.execute_task('progress_1')
-        assert not self.task.accepted, 'repeated execution accepted'
+        task = execute_task('progress_1')
+        assert not task.accepted, 'repeated execution accepted'
         # introduce new doppelgangers
-        self.execute_task('progress_2')
-        assert not self.task.accepted, 'doppelgangers accepted'
+        task = execute_task('progress_2')
+        assert not task.accepted, 'doppelgangers accepted'
 
 
-class TestGuessitDatabase(BaseDatabase):
-    def __init__(self):
-        super(TestGuessitDatabase, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalDatabase(BaseDatabase):
-    def __init__(self):
-        super(TestInternalDatabase, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseFilterSeries(FlexGetBase):
-    __yaml__ = """
+class TestFilterSeries(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           test:
             mock:
@@ -300,87 +292,78 @@ class BaseFilterSeries(FlexGetBase):
                 alternate_name: paren title 2013
     """
 
-    def test_smoke(self):
+    def test_smoke(self, execute_task):
         """Series plugin: test several standard features"""
-        self.execute_task('test')
+        task = execute_task('test')
 
         # normal passing
-        assert self.task.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'), \
+        assert task.find_entry(title='Another.Series.S01E20.720p.XViD-FlexGet'), \
             'Another.Series.S01E20.720p.XViD-FlexGet should have passed'
 
         # date formats
         df = ['Date.Series.10-11-2008.XViD', 'Date.Series.10.12.2008.XViD', 'Date Series 2010 11 17 XViD',
               'Date.Series.2008-10-13.XViD', 'Date.Series.10.14.09.XViD']
         for d in df:
-            entry = self.task.find_entry(title=d)
+            entry = task.find_entry(title=d)
             assert entry, 'Date format did not match %s' % d
             assert 'series_parser' in entry, 'series_parser missing from %s' % d
             assert entry['series_parser'].id_type == 'date', '%s did not return three groups for dates' % d
 
         # parse from filename
-        assert self.task.find_entry(filename='Filename.Series.S01E26.XViD'), 'Filename parsing failed'
+        assert task.find_entry(filename='Filename.Series.S01E26.XViD'), 'Filename parsing failed'
 
         # empty description
-        assert self.task.find_entry(title='Empty.Description.S01E22.XViD'), 'Empty Description failed'
+        assert task.find_entry(title='Empty.Description.S01E22.XViD'), 'Empty Description failed'
 
         # chaining with regexp plugin
-        assert self.task.find_entry('rejected', title='Another.Series.S01E21.1080p.H264-FlexGet'), \
+        assert task.find_entry('rejected', title='Another.Series.S01E21.1080p.H264-FlexGet'), \
             'regexp chaining'
 
-    def test_metainfo_series_override(self):
+    def test_metainfo_series_override(self, execute_task):
         """Series plugin: override metainfo_series"""
-        self.execute_task('metainfo_series_override')
+        task = execute_task('metainfo_series_override')
         # Make sure the metainfo_series plugin is working first
-        entry = self.task.find_entry('entries', title='Other.Show.with.extra.crap.S02E01.PDTV.XViD-FlexGet')
+        entry = task.find_entry('entries', title='Other.Show.with.extra.crap.S02E01.PDTV.XViD-FlexGet')
         assert entry['series_guessed'], 'series should have been guessed'
         assert entry['series_name'] == entry['series_parser'].name == 'Other Show With Extra Crap', \
             'metainfo_series is not running'
         # Make sure the good series data overrode metainfo data for the listed series
-        entry = self.task.find_entry('accepted', title='Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet')
+        entry = task.find_entry('accepted', title='Test.Series.with.extra.crap.S01E02.PDTV.XViD-FlexGet')
         assert not entry.get('series_guessed'), 'series plugin should override series_guessed'
         assert entry['series_name'] == entry['series_parser'].name == 'Test Series', \
             'Series name should be \'Test Series\', was: entry: %s, parser: %s' % (
                 entry['series_name'], entry['series_parser'].name)
 
-    def test_all_series_mode(self):
+    def test_all_series_mode(self, execute_task):
         """Series plugin: test all option"""
-        self.execute_task('test_all_series_mode')
-        assert self.task.find_entry('accepted', title='Test.Series.S01E02.PDTV.XViD-FlexGet')
-        self.task.find_entry('accepted', title='Test Series - 1x03 - PDTV XViD-FlexGet')
-        entry = self.task.find_entry('accepted', title='Test Series - 1x03 - PDTV XViD-FlexGet')
+        task = execute_task('test_all_series_mode')
+        assert task.find_entry('accepted', title='Test.Series.S01E02.PDTV.XViD-FlexGet')
+        task.find_entry('accepted', title='Test Series - 1x03 - PDTV XViD-FlexGet')
+        entry = task.find_entry('accepted', title='Test Series - 1x03 - PDTV XViD-FlexGet')
         assert entry
         assert entry.get('series_name') == 'Test Series'
-        entry = self.task.find_entry('accepted', title='Other.Show.S02E01.PDTV.XViD-FlexGet')
+        entry = task.find_entry('accepted', title='Other.Show.S02E01.PDTV.XViD-FlexGet')
         assert entry.get('series_guessed')
-        entry2 = self.task.find_entry('accepted', title='other show season 2 episode 2')
+        entry2 = task.find_entry('accepted', title='other show season 2 episode 2')
         # Make sure case is normalized so series are marked with the same name no matter the case in the title
         assert entry.get('series_name') == entry2.get(
-            'series_name') == 'Other Show', 'Series names should be in title case'
-        entry = self.task.find_entry('accepted', title='Date.Show.03-29-2012.HDTV.XViD-FlexGet')
+                'series_name') == 'Other Show', 'Series names should be in title case'
+        entry = task.find_entry('accepted', title='Date.Show.03-29-2012.HDTV.XViD-FlexGet')
         assert entry.get('series_guessed')
         assert entry.get('series_name') == 'Date Show'
 
-    def test_alternate_name(self):
-        self.execute_task('test_alternate_name')
-        assert all(e.accepted for e in self.task.all_entries), 'All releases should have matched a show'
+    def test_alternate_name(self, execute_task):
+        task = execute_task('test_alternate_name')
+        assert all(e.accepted for e in task.all_entries), 'All releases should have matched a show'
 
 
-class TestGuessitFilterSeries(BaseFilterSeries):
-    def __init__(self):
-        super(TestGuessitFilterSeries, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalFilterSeries(BaseFilterSeries):
-    def __init__(self):
-        super(TestInternalFilterSeries, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseEpisodeAdvancement(FlexGetBase):
-    __yaml__ = """
+class TestEpisodeAdvancement(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
-
           test_backwards_1:
             mock:
               - {title: 'backwards s02e12'}
@@ -491,89 +474,81 @@ class BaseEpisodeAdvancement(FlexGetBase):
 
     """
 
-    def test_backwards(self):
+    def test_backwards(self, execute_task):
         """Series plugin: episode advancement (backwards)"""
-        self.execute_task('test_backwards_1')
-        assert self.task.find_entry('accepted', title='backwards s02e12'), \
+        task = execute_task('test_backwards_1')
+        assert task.find_entry('accepted', title='backwards s02e12'), \
             'backwards s02e12 should have been accepted'
-        assert self.task.find_entry('accepted', title='backwards s02e10'), \
+        assert task.find_entry('accepted', title='backwards s02e10'), \
             'backwards s02e10 should have been accepted within grace margin'
-        self.execute_task('test_backwards_2')
-        assert self.task.find_entry('accepted', title='backwards s02e01'), \
+        task = execute_task('test_backwards_2')
+        assert task.find_entry('accepted', title='backwards s02e01'), \
             'backwards s02e01 should have been accepted, in current season'
-        self.execute_task('test_backwards_3')
-        assert self.task.find_entry('rejected', title='backwards s01e01'), \
+        task = execute_task('test_backwards_3')
+        assert task.find_entry('rejected', title='backwards s01e01'), \
             'backwards s01e01 should have been rejected, in previous season'
-        self.execute_task('test_backwards_okay_1')
-        assert self.task.find_entry('accepted', title='backwards s01e02'), \
+        task = execute_task('test_backwards_okay_1')
+        assert task.find_entry('accepted', title='backwards s01e02'), \
             'backwards s01e01 should have been accepted, backfill enabled'
-        self.execute_task('test_backwards_okay_2')
-        assert self.task.find_entry('accepted', title='backwards s01e03'), \
+        task = execute_task('test_backwards_okay_2')
+        assert task.find_entry('accepted', title='backwards s01e03'), \
             'backwards s01e01 should have been accepted, tracking off'
 
-    def test_forwards(self):
+    def test_forwards(self, execute_task):
         """Series plugin: episode advancement (future)"""
-        self.execute_task('test_forwards_1')
-        assert self.task.find_entry('accepted', title='forwards s01e01'), \
+        task = execute_task('test_forwards_1')
+        assert task.find_entry('accepted', title='forwards s01e01'), \
             'forwards s01e01 should have been accepted'
-        self.execute_task('test_forwards_2')
-        assert self.task.find_entry('accepted', title='forwards s02e01'), \
+        task = execute_task('test_forwards_2')
+        assert task.find_entry('accepted', title='forwards s02e01'), \
             'forwards s02e01 should have been accepted'
-        self.execute_task('test_forwards_3')
-        assert self.task.find_entry('accepted', title='forwards s03e01'), \
+        task = execute_task('test_forwards_3')
+        assert task.find_entry('accepted', title='forwards s03e01'), \
             'forwards s03e01 should have been accepted'
-        self.execute_task('test_forwards_4')
-        assert self.task.find_entry('rejected', title='forwards s04e02'), \
+        task = execute_task('test_forwards_4')
+        assert task.find_entry('rejected', title='forwards s04e02'), \
             'forwards s04e02 should have been rejected'
-        self.execute_task('test_forwards_5')
-        assert self.task.find_entry('rejected', title='forwards s05e01'), \
+        task = execute_task('test_forwards_5')
+        assert task.find_entry('rejected', title='forwards s05e01'), \
             'forwards s05e01 should have been rejected'
-        self.execute_task('test_forwards_okay_1')
-        assert self.task.find_entry('accepted', title='forwards s05e01'), \
+        task = execute_task('test_forwards_okay_1')
+        assert task.find_entry('accepted', title='forwards s05e01'), \
             'forwards s05e01 should have been accepted with tracking turned off'
 
-    def test_unordered(self):
+    def test_unordered(self, execute_task):
         """Series plugin: unordered episode advancement"""
-        self.execute_task('test_unordered')
-        assert len(self.task.accepted) == 12, \
+        task = execute_task('test_unordered')
+        assert len(task.accepted) == 12, \
             'not everyone was accepted'
 
-    def test_sequence(self):
+    def test_sequence(self, execute_task):
         # First should be accepted
-        self.execute_task('test_seq1')
-        entry = self.task.find_entry('accepted', title='seq 05')
+        task = execute_task('test_seq1')
+        entry = task.find_entry('accepted', title='seq 05')
         assert entry['series_id'] == 5
 
         # Next in sequence should be accepted
-        self.execute_task('test_seq2')
-        entry = self.task.find_entry('accepted', title='seq 06')
+        task = execute_task('test_seq2')
+        entry = task.find_entry('accepted', title='seq 06')
         assert entry['series_id'] == 6
 
         # Should be too far in the future
-        self.execute_task('test_seq3')
-        entry = self.task.find_entry(title='seq 10')
-        assert entry not in self.task.accepted, 'Should have been too far in future'
+        task = execute_task('test_seq3')
+        entry = task.find_entry(title='seq 10')
+        assert entry not in task.accepted, 'Should have been too far in future'
 
         # Should be too far in the past
-        self.execute_task('test_seq4')
-        entry = self.task.find_entry(title='seq 01')
-        assert entry not in self.task.accepted, 'Should have been too far in the past'
+        task = execute_task('test_seq4')
+        entry = task.find_entry(title='seq 01')
+        assert entry not in task.accepted, 'Should have been too far in the past'
 
 
-class TestGuessitEpisodeAdvancement(BaseEpisodeAdvancement):
-    def __init__(self):
-        super(TestGuessitEpisodeAdvancement, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalEpisodeAdvancement(BaseEpisodeAdvancement):
-    def __init__(self):
-        super(TestInternalEpisodeAdvancement, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseFilterSeriesPriority(FlexGetBase):
-    __yaml__ = """
+class TestFilterSeriesPriority(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           test:
             mock:
@@ -586,31 +561,21 @@ class BaseFilterSeriesPriority(FlexGetBase):
               - foobar
     """
 
-    def test_priorities(self):
+    def test_priorities(self, execute_task):
         """Series plugin: regexp plugin is able to reject before series plugin"""
-        self.execute_task('test')
-        assert self.task.find_entry('rejected', title='foobar 720p s01e01'), \
+        task = execute_task('test')
+        assert task.find_entry('rejected', title='foobar 720p s01e01'), \
             'foobar 720p s01e01 should have been rejected'
-        assert self.task.find_entry('accepted', title='foobar hdtv s01e01'), \
+        assert task.find_entry('accepted', title='foobar hdtv s01e01'), \
             'foobar hdtv s01e01 is not accepted'
 
 
-class TestGuessitFilterSeriesPriority(BaseFilterSeriesPriority):
-    def __init__(self):
-        super(TestGuessitFilterSeriesPriority, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalFilterSeriesPriority(BaseFilterSeriesPriority):
-    def __init__(self):
-        super(TestInternalFilterSeriesPriority, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BasePropers(FlexGetBase):
-    __yaml__ = """
+class TestPropers(object):
+    config = """
         templates:
           global:
+            parsing:
+              series: {{parser}}
             # prevents seen from rejecting on second execution,
             # we want to see that series is able to reject
             disable: builtins
@@ -719,118 +684,110 @@ class BasePropers(FlexGetBase):
                - title: test s01e01 proper hdtv
         """
 
-    def test_propers_timeframe(self):
+    def test_propers_timeframe(self, execute_task):
         """Series plugin: propers timeframe"""
-        self.execute_task('proper_timeframe_1')
-        assert self.task.find_entry('accepted', title='TFTest.S01E01.720p-FlexGet'), \
+        task = execute_task('proper_timeframe_1')
+        assert task.find_entry('accepted', title='TFTest.S01E01.720p-FlexGet'), \
             'Did not accept before timeframe'
 
         # let 6 hours pass
         age_series(hours=6)
 
-        self.execute_task('proper_timeframe_2')
-        assert self.task.find_entry('rejected', title='TFTest.S01E01.720p.proper-FlexGet'), \
+        task = execute_task('proper_timeframe_2')
+        assert task.find_entry('rejected', title='TFTest.S01E01.720p.proper-FlexGet'), \
             'Did not reject after proper timeframe'
 
-    def test_no_propers(self):
+    def test_no_propers(self, execute_task):
         """Series plugin: no propers at all"""
-        self.execute_task('no_propers_1')
-        assert len(self.task.accepted) == 1, 'broken badly'
-        self.execute_task('no_propers_2')
-        assert len(self.task.rejected) == 1, 'accepted proper'
+        task = execute_task('no_propers_1')
+        assert len(task.accepted) == 1, 'broken badly'
+        task = execute_task('no_propers_2')
+        assert len(task.rejected) == 1, 'accepted proper'
 
-    def test_min_max_propers(self):
+    def test_min_max_propers(self, execute_task):
         """Series plugin: min max propers"""
-        self.execute_task('min_max_quality_1')
-        assert len(self.task.accepted) == 1, 'uhh, broken badly'
-        self.execute_task('min_max_quality_2')
-        assert len(self.task.accepted) == 1, 'should have accepted proper'
+        task = execute_task('min_max_quality_1')
+        assert len(task.accepted) == 1, 'uhh, broken badly'
+        task = execute_task('min_max_quality_2')
+        assert len(task.accepted) == 1, 'should have accepted proper'
 
-    def test_lot_propers(self):
+    def test_lot_propers(self, execute_task):
         """Series plugin: proper flood"""
-        self.execute_task('lot_propers')
-        assert len(self.task.accepted) == 1, 'should have accepted (only) one of the propers'
+        task = execute_task('lot_propers')
+        assert len(task.accepted) == 1, 'should have accepted (only) one of the propers'
 
-    def test_diff_quality_propers(self):
+    def test_diff_quality_propers(self, execute_task):
         """Series plugin: proper in different/wrong quality"""
-        self.execute_task('diff_quality_1')
-        assert len(self.task.accepted) == 1
-        self.execute_task('diff_quality_2')
-        assert len(self.task.accepted) == 0, 'should not have accepted lower quality proper'
+        task = execute_task('diff_quality_1')
+        assert len(task.accepted) == 1
+        task = execute_task('diff_quality_2')
+        assert len(task.accepted) == 0, 'should not have accepted lower quality proper'
 
-    def test_propers(self):
+    def test_propers(self, execute_task):
         """Series plugin: proper accepted after episode is downloaded"""
         # start with normal download ...
-        self.execute_task('propers_1')
-        assert self.task.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), \
+        task = execute_task('propers_1')
+        assert task.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), \
             'Test.S01E01-FlexGet should have been accepted'
 
         # rejects downloaded
-        self.execute_task('propers_1')
-        assert self.task.find_entry('rejected', title='Test.S01E01.720p-FlexGet'), \
+        task = execute_task('propers_1')
+        assert task.find_entry('rejected', title='Test.S01E01.720p-FlexGet'), \
             'Test.S01E01-FlexGet should have been rejected'
 
         # accepts proper
-        self.execute_task('propers_2')
-        assert self.task.find_entry('accepted', title='Test.S01E01.720p.Proper-FlexGet'), \
+        task = execute_task('propers_2')
+        assert task.find_entry('accepted', title='Test.S01E01.720p.Proper-FlexGet'), \
             'new undownloaded proper should have been accepted'
 
         # reject downloaded proper
-        self.execute_task('propers_2')
-        assert self.task.find_entry('rejected', title='Test.S01E01.720p.Proper-FlexGet'), \
+        task = execute_task('propers_2')
+        assert task.find_entry('rejected', title='Test.S01E01.720p.Proper-FlexGet'), \
             'downloaded proper should have been rejected'
 
         # reject episode that has been downloaded normally and with proper
-        self.execute_task('propers_3')
-        assert self.task.find_entry('rejected', title='Test.S01E01.FlexGet'), \
+        task = execute_task('propers_3')
+        assert task.find_entry('rejected', title='Test.S01E01.FlexGet'), \
             'Test.S01E01.FlexGet should have been rejected'
 
-    def test_proper_available(self):
+    def test_proper_available(self, execute_task):
         """Series plugin: proper available immediately"""
-        self.execute_task('proper_at_first')
-        assert self.task.find_entry('accepted', title='Foobar.S01E01.720p.proper.FlexGet'), \
+        task = execute_task('proper_at_first')
+        assert task.find_entry('accepted', title='Foobar.S01E01.720p.proper.FlexGet'), \
             'Foobar.S01E01.720p.proper.FlexGet should have been accepted'
 
-    def test_proper_upgrade(self):
+    def test_proper_upgrade(self, execute_task):
         """Series plugin: real proper after proper"""
-        self.execute_task('proper_upgrade_1')
-        assert self.task.find_entry('accepted', title='Test.S02E01.hdtv.proper')
-        self.execute_task('proper_upgrade_2')
-        assert self.task.find_entry('accepted', title='Test.S02E01.hdtv.real.proper')
+        task = execute_task('proper_upgrade_1')
+        assert task.find_entry('accepted', title='Test.S02E01.hdtv.proper')
+        task = execute_task('proper_upgrade_2')
+        assert task.find_entry('accepted', title='Test.S02E01.hdtv.real.proper')
 
-    def test_anime_proper(self):
-        self.execute_task('anime_proper_1')
-        assert self.task.accepted, 'ep should have accepted'
-        self.execute_task('anime_proper_2')
-        assert self.task.accepted, 'proper ep should have been accepted'
+    def test_anime_proper(self, execute_task):
+        task = execute_task('anime_proper_1')
+        assert task.accepted, 'ep should have accepted'
+        task = execute_task('anime_proper_2')
+        assert task.accepted, 'proper ep should have been accepted'
 
-    def test_fastsub_proper(self):
-        self.execute_task('fastsub_proper_1')
-        assert self.task.accepted, 'ep should have accepted'
-        self.execute_task('fastsub_proper_2')
-        assert self.task.accepted, 'proper ep should have been accepted'
-        self.execute_task('fastsub_proper_3')
-        assert self.task.accepted, 'proper ep should have been accepted'
-        self.execute_task('fastsub_proper_4')
-        assert self.task.accepted, 'proper ep should have been accepted'
-
-
-class TestGuessitPropers(BasePropers):
-    def __init__(self):
-        super(TestGuessitPropers, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
+    def test_fastsub_proper(self, execute_task):
+        task = execute_task('fastsub_proper_1')
+        assert task.accepted, 'ep should have accepted'
+        task = execute_task('fastsub_proper_2')
+        assert task.accepted, 'proper ep should have been accepted'
+        task = execute_task('fastsub_proper_3')
+        assert task.accepted, 'proper ep should have been accepted'
+        task = execute_task('fastsub_proper_4')
+        assert task.accepted, 'proper ep should have been accepted'
 
 
-class TestInternalPropers(BasePropers):
-    def __init__(self):
-        super(TestInternalPropers, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseSimilarNames(FlexGetBase):
+class TestSimilarNames(object):
     # hmm, not very good way to test this .. seriesparser should be tested alone?
 
-    __yaml__ = """
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           test:
             mock:
@@ -851,36 +808,26 @@ class BaseSimilarNames(FlexGetBase):
                 identified_by: sequence
     """
 
-    def test_names(self):
+    def test_names(self, execute_task):
         """Series plugin: similar namings"""
-        self.execute_task('test')
-        assert self.task.find_entry('accepted', title='FooBar.S03E01.DSR-FlexGet'), 'Standard failed?'
-        assert self.task.find_entry('accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'), 'FirstAlt failed'
-        assert self.task.find_entry('accepted', title='FooBar: SecondAlt.S01E01.DSR-FlexGet'), 'SecondAlt failed'
+        task = execute_task('test')
+        assert task.find_entry('accepted', title='FooBar.S03E01.DSR-FlexGet'), 'Standard failed?'
+        assert task.find_entry('accepted', title='FooBar: FirstAlt.S02E01.DSR-FlexGet'), 'FirstAlt failed'
+        assert task.find_entry('accepted', title='FooBar: SecondAlt.S01E01.DSR-FlexGet'), 'SecondAlt failed'
 
-    def test_ambiguous(self):
-        self.execute_task('test_ambiguous')
+    def test_ambiguous(self, execute_task):
+        task = execute_task('test_ambiguous')
         # In the event of ambiguous match, more specific one should be chosen
-        assert self.task.find_entry('accepted', title='Foo.2.2')['series_name'] == 'Foo 2'
+        assert task.find_entry('accepted', title='Foo.2.2')['series_name'] == 'Foo 2'
 
 
-class TestGuessitSimilarNames(BaseSimilarNames):
-    def __init__(self):
-        super(TestGuessitSimilarNames, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalSimilarNames(BaseSimilarNames):
-    def __init__(self):
-        super(TestInternalSimilarNames, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseDuplicates(FlexGetBase):
-    __yaml__ = """
-
+class TestDuplicates(object):
+    config = """
         templates:
-          global: # just cleans log a bit ..
+          global:
+            parsing:
+              series: {{parser}}
+            # just cleans log a bit ..
             disable:
               - seen
 
@@ -920,52 +867,42 @@ class BaseDuplicates(FlexGetBase):
               - dupe
     """
 
-    def test_dupes(self):
+    def test_dupes(self, execute_task):
         """Series plugin: dupes with same quality"""
-        self.execute_task('test_dupes')
-        assert len(self.task.accepted) == 1, 'accepted both'
+        task = execute_task('test_dupes')
+        assert len(task.accepted) == 1, 'accepted both'
 
-    def test_true_dupes(self):
+    def test_true_dupes(self, execute_task):
         """Series plugin: true duplicate items"""
-        self.execute_task('test_true_dupes')
-        assert len(self.task.accepted) == 1, 'should have accepted (only) one'
+        task = execute_task('test_true_dupes')
+        assert len(task.accepted) == 1, 'should have accepted (only) one'
 
-    def test_downloaded(self):
+    def test_downloaded(self, execute_task):
         """Series plugin: multiple downloaded and new episodes are handled correctly"""
 
-        self.execute_task('test_1')
-        self.execute_task('test_2')
+        task = execute_task('test_1')
+        task = execute_task('test_2')
 
         # these should be accepted
         accepted = ['Foo.Bar.S02E03.HDTV.XviD-FlexGet', 'Foo.Bar.S02E05.720p.HDTV.XviD-YYY']
         for item in accepted:
-            assert self.task.find_entry('accepted', title=item), \
+            assert task.find_entry('accepted', title=item), \
                 '%s should have been accepted' % item
 
         # these should be rejected
         rejected = ['Foo.Bar.S02E04.XviD-2HD[ASDF]', 'Foo.Bar.S02E04.HDTV.720p.XviD-2HD[FlexGet]',
                     'Foo.Bar.S02E04.DSRIP.XviD-2HD[ASDF]', 'Foo.Bar.S02E04.HDTV.1080p.XviD-2HD[ASDF]']
         for item in rejected:
-            assert self.task.find_entry('rejected', title=item), \
+            assert task.find_entry('rejected', title=item), \
                 '%s should have been rejected' % item
 
 
-class TestGuessitDuplicates(BaseDuplicates):
-    def __init__(self):
-        super(TestGuessitDuplicates, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalDuplicates(BaseDuplicates):
-    def __init__(self):
-        super(TestInternalDuplicates, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseQualities(FlexGetBase):
-    __yaml__ = """
+class TestQualities(object):
+    config = """
         templates:
           global:
+            parsing:
+              series: {{parser}}
             disable: builtins
             series:
               - FooBar:
@@ -1036,87 +973,78 @@ class BaseQualities(FlexGetBase):
               - title: Food.S06E11.720p
     """
 
-    def test_qualities(self):
+    def test_qualities(self, execute_task):
         """Series plugin: qualities"""
-        self.execute_task('test_1')
+        task = execute_task('test_1')
 
-        assert self.task.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet'), \
+        assert task.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet'), \
             'Didn''t accept FooBar.S01E01.PDTV-FlexGet'
-        assert self.task.find_entry('accepted', title='FooBar.S01E01.1080p-FlexGet'), \
+        assert task.find_entry('accepted', title='FooBar.S01E01.1080p-FlexGet'), \
             'Didn''t accept FooBar.S01E01.1080p-FlexGet'
 
-        assert not self.task.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
+        assert not task.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
             'Accepted FooBar.S01E01.HR-FlexGet'
 
-        self.execute_task('test_2')
+        task = execute_task('test_2')
 
-        assert self.task.find_entry('accepted', title='FooBar.S01E01.720p-FlexGet'), \
+        assert task.find_entry('accepted', title='FooBar.S01E01.720p-FlexGet'), \
             'Didn''t accept FooBar.S01E01.720p-FlexGet'
 
         # test that it rejects them afterwards
 
-        self.execute_task('test_1')
+        task = execute_task('test_1')
 
-        assert self.task.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet'), \
+        assert task.find_entry('rejected', title='FooBar.S01E01.PDTV-FlexGet'), \
             'Didn\'t reject FooBar.S01E01.PDTV-FlexGet'
-        assert self.task.find_entry('rejected', title='FooBar.S01E01.1080p-FlexGet'), \
+        assert task.find_entry('rejected', title='FooBar.S01E01.1080p-FlexGet'), \
             'Didn\'t reject FooBar.S01E01.1080p-FlexGet'
 
-        assert not self.task.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
+        assert not task.find_entry('accepted', title='FooBar.S01E01.HR-FlexGet'), \
             'Accepted FooBar.S01E01.HR-FlexGet'
 
-    def test_propers(self):
+    def test_propers(self, execute_task):
         """Series plugin: qualities + propers"""
-        self.execute_task('propers_1')
-        assert self.task.accepted
-        self.execute_task('propers_2')
-        assert self.task.accepted, 'proper not accepted'
-        self.execute_task('propers_2')
-        assert not self.task.accepted, 'proper accepted again'
+        task = execute_task('propers_1')
+        assert task.accepted
+        task = execute_task('propers_2')
+        assert task.accepted, 'proper not accepted'
+        task = execute_task('propers_2')
+        assert not task.accepted, 'proper accepted again'
 
-    def test_qualities_upgrade(self):
-        self.execute_task('upgrade_1')
-        assert self.task.find_entry('accepted', title='FooBaz.S01E02.HR-FlexGet'), 'HR quality should be accepted'
-        assert len(self.task.accepted) == 1, 'Only best quality should be accepted'
-        self.execute_task('upgrade_2')
-        assert self.task.find_entry('accepted', title='FooBaz.S01E02.720p-FlexGet'), '720p quality should be accepted'
-        assert len(self.task.accepted) == 1, 'Only best quality should be accepted'
-        self.execute_task('upgrade_3')
-        assert not self.task.accepted, 'Should not have accepted worse qualities'
+    def test_qualities_upgrade(self, execute_task):
+        task = execute_task('upgrade_1')
+        assert task.find_entry('accepted', title='FooBaz.S01E02.HR-FlexGet'), 'HR quality should be accepted'
+        assert len(task.accepted) == 1, 'Only best quality should be accepted'
+        task = execute_task('upgrade_2')
+        assert task.find_entry('accepted', title='FooBaz.S01E02.720p-FlexGet'), '720p quality should be accepted'
+        assert len(task.accepted) == 1, 'Only best quality should be accepted'
+        task = execute_task('upgrade_3')
+        assert not task.accepted, 'Should not have accepted worse qualities'
 
-    def test_quality_upgrade(self):
-        self.execute_task('quality_upgrade_1')
-        assert len(self.task.accepted) == 1, 'Only one ep should have passed quality filter'
-        assert self.task.find_entry('accepted', title='FooBum.S03E01.720p')
-        self.execute_task('quality_upgrade_2')
-        assert len(self.task.accepted) == 1, 'one ep should be valid upgrade'
-        assert self.task.find_entry('accepted', title='FooBum.S03E01.1080i')
+    def test_quality_upgrade(self, execute_task):
+        task = execute_task('quality_upgrade_1')
+        assert len(task.accepted) == 1, 'Only one ep should have passed quality filter'
+        assert task.find_entry('accepted', title='FooBum.S03E01.720p')
+        task = execute_task('quality_upgrade_2')
+        assert len(task.accepted) == 1, 'one ep should be valid upgrade'
+        assert task.find_entry('accepted', title='FooBum.S03E01.1080i')
 
-    def test_target_upgrade(self):
-        self.execute_task('target_1')
-        assert len(self.task.accepted) == 1, 'Only one ep should have been grabbed'
-        assert self.task.find_entry('accepted', title='Food.S06E11.hdtv')
-        self.execute_task('target_2')
-        assert len(self.task.accepted) == 1, 'one ep should be valid upgrade'
-        assert self.task.find_entry('accepted', title='Food.S06E11.720p'), 'Should upgrade to `target`'
-
-
-class TestGuessitQualities(BaseQualities):
-    def __init__(self):
-        super(TestGuessitQualities, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
+    def test_target_upgrade(self, execute_task):
+        task = execute_task('target_1')
+        assert len(task.accepted) == 1, 'Only one ep should have been grabbed'
+        assert task.find_entry('accepted', title='Food.S06E11.hdtv')
+        task = execute_task('target_2')
+        assert len(task.accepted) == 1, 'one ep should be valid upgrade'
+        assert task.find_entry('accepted', title='Food.S06E11.720p'), 'Should upgrade to `target`'
 
 
-class TestInternalQualities(BaseQualities):
-    def __init__(self):
-        super(TestInternalQualities, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
 
-
-class BaseIdioticNumbering(FlexGetBase):
-    __yaml__ = """
+class TestIdioticNumbering(object):
+    config = """
         templates:
           global:
+            parsing:
+              series: {{parser}}
             series:
               - FooBar:
                   identified_by: ep
@@ -1130,34 +1058,25 @@ class BaseIdioticNumbering(FlexGetBase):
               - {title: 'FooBar.102.PDTV-FlexGet'}
     """
 
-    def test_idiotic(self):
+    def test_idiotic(self, execute_task):
         """Series plugin: idiotic numbering scheme"""
 
-        self.execute_task('test_1')
-        self.execute_task('test_2')
-        entry = self.task.find_entry(title='FooBar.102.PDTV-FlexGet')
+        task = execute_task('test_1')
+        task = execute_task('test_2')
+        entry = task.find_entry(title='FooBar.102.PDTV-FlexGet')
         assert entry, 'entry not found?'
         assert entry['series_season'] == 1, 'season not detected'
         assert entry['series_episode'] == 2, 'episode not detected'
 
 
-class TestGuessitIdioticNumbering(BaseIdioticNumbering):
-    def __init__(self):
-        super(TestGuessitIdioticNumbering, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalIdioticNumbering(BaseIdioticNumbering):
-    def __init__(self):
-        super(TestInternalIdioticNumbering, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseNormalization(FlexGetBase):
-    __yaml__ = """
-        tasks:
+class TestNormalization(object):
+    config = """
+        templates:
           global:
+            parsing:
+              series: {{parser}}
             disable: [seen]
+        tasks:
           test_1:
             mock:
               - {title: 'FooBar.S01E01.PDTV-FlexGet'}
@@ -1180,36 +1099,26 @@ class BaseNormalization(FlexGetBase):
               - Foo/Bar and Co. (2012)
     """
 
-    def test_capitalization(self):
+    def test_capitalization(self, execute_task):
         """Series plugin: configuration capitalization"""
-        self.execute_task('test_1')
-        assert self.task.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet')
-        self.execute_task('test_2')
-        assert self.task.find_entry('rejected', title='FooBar.S01E01.PDTV-aoeu')
+        task = execute_task('test_1')
+        assert task.find_entry('accepted', title='FooBar.S01E01.PDTV-FlexGet')
+        task = execute_task('test_2')
+        assert task.find_entry('rejected', title='FooBar.S01E01.PDTV-aoeu')
 
-    def test_normalization(self):
-        self.execute_task('test_3')
-        assert self.task.find_entry('accepted', title='Foo bar & co 2012.s01e01.sdtv.a')
-        self.execute_task('test_4')
-        assert self.task.find_entry('rejected', title='Foo bar & co 2012.s01e01.sdtv.b')
-
-
-class TestGuessitNormalization(BaseNormalization):
-    def __init__(self):
-        super(TestGuessitNormalization, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
+    def test_normalization(self, execute_task):
+        task = execute_task('test_3')
+        assert task.find_entry('accepted', title='Foo bar & co 2012.s01e01.sdtv.a')
+        task = execute_task('test_4')
+        assert task.find_entry('rejected', title='Foo bar & co 2012.s01e01.sdtv.b')
 
 
-class TestInternalNormalization(BaseNormalization):
-    def __init__(self):
-        super(TestInternalNormalization, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseMixedNumbering(FlexGetBase):
-    __yaml__ = """
+class TestMixedNumbering(object):
+    config = """
         templates:
           global:
+            parsing:
+              series: {{parser}}
             series:
               - FooBar:
                   identified_by: ep
@@ -1223,29 +1132,21 @@ class BaseMixedNumbering(FlexGetBase):
               - {title: 'FooBar.0307.PDTV-FlexGet'}
     """
 
-    def test_mixednumbering(self):
+    def test_mixednumbering(self, execute_task):
         """Series plugin: Mixed series numbering"""
 
-        self.execute_task('test_1')
-        assert self.task.find_entry('accepted', title='FooBar.S03E07.PDTV-FlexGet')
-        self.execute_task('test_2')
-        assert self.task.find_entry('rejected', title='FooBar.0307.PDTV-FlexGet')
+        task = execute_task('test_1')
+        assert task.find_entry('accepted', title='FooBar.S03E07.PDTV-FlexGet')
+        task = execute_task('test_2')
+        assert task.find_entry('rejected', title='FooBar.0307.PDTV-FlexGet')
 
 
-class TestGuessitMixedNumbering(BaseMixedNumbering):
-    def __init__(self):
-        super(TestGuessitMixedNumbering, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalMixedNumbering(BaseMixedNumbering):
-    def __init__(self):
-        super(TestInternalMixedNumbering, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseExact(FlexGetBase):
-    __yaml__ = """
+class TestExact(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           auto:
             mock:
@@ -1273,40 +1174,30 @@ class BaseExact(FlexGetBase):
                   exact: yes
     """
 
-    def test_auto(self):
+    def test_auto(self, execute_task):
         """Series plugin: auto enable exact"""
-        self.execute_task('auto')
-        assert self.task.find_entry('accepted', title='ABC.S01E01.PDTV-FlexGet')
-        assert self.task.find_entry('accepted', title='ABC.LA.S01E01.PDTV-FlexGet')
-        assert self.task.find_entry('accepted', title='ABC.MIAMI.S01E01.PDTV-FlexGet')
+        task = execute_task('auto')
+        assert task.find_entry('accepted', title='ABC.S01E01.PDTV-FlexGet')
+        assert task.find_entry('accepted', title='ABC.LA.S01E01.PDTV-FlexGet')
+        assert task.find_entry('accepted', title='ABC.MIAMI.S01E01.PDTV-FlexGet')
 
-    def test_with_name_regexp(self):
-        self.execute_task('name_regexp')
-        assert self.task.find_entry('accepted', title='show s09e05 hdtv')
-        assert not self.task.find_entry('accepted', title='show a s09e06 hdtv')
+    def test_with_name_regexp(self, execute_task):
+        task = execute_task('name_regexp')
+        assert task.find_entry('accepted', title='show s09e05 hdtv')
+        assert not task.find_entry('accepted', title='show a s09e06 hdtv')
 
-    def test_dated_show(self):
-        self.execute_task('date')
-        assert self.task.find_entry('accepted', title='date show 04.01.2011 hdtv')
-        assert not self.task.find_entry('accepted', title='date show b 04.02.2011 hdtv')
-
-
-class TestGuessitExact(BaseExact):
-    def __init__(self):
-        super(TestGuessitExact, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
+    def test_dated_show(self, execute_task):
+        task = execute_task('date')
+        assert task.find_entry('accepted', title='date show 04.01.2011 hdtv')
+        assert not task.find_entry('accepted', title='date show b 04.02.2011 hdtv')
 
 
-class TestInternalExact(BaseExact):
-    def __init__(self):
-        super(TestInternalExact, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseTimeframe(FlexGetBase):
-    __yaml__ = """
+class TestTimeframe(object):
+    config = """
         templates:
           global:
+            parsing:
+              series: {{parser}}
             series:
               - test:
                   timeframe: 5 hours
@@ -1397,110 +1288,102 @@ class BaseTimeframe(FlexGetBase):
 
     """
 
-    def test_no_waiting(self):
+    def test_no_waiting(self, execute_task):
         """Series plugin: no timeframe waiting needed"""
-        self.execute_task('test_no_waiting')
-        assert self.task.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), \
+        task = execute_task('test_no_waiting')
+        assert task.find_entry('accepted', title='Test.S01E01.720p-FlexGet'), \
             '720p not accepted immediattely'
 
-    def test_stop_waiting(self):
+    def test_stop_waiting(self, execute_task):
         """Series plugin: timeframe quality appears, stop waiting, proper appears"""
-        self.execute_task('test_stop_waiting_1')
-        assert self.task.entries and not self.task.accepted
-        self.execute_task('test_stop_waiting_2')
-        assert self.task.find_entry('accepted', title='Test.S01E02.720p-FlexGet'), \
+        task = execute_task('test_stop_waiting_1')
+        assert task.entries and not task.accepted
+        task = execute_task('test_stop_waiting_2')
+        assert task.find_entry('accepted', title='Test.S01E02.720p-FlexGet'), \
             '720p should have caused stop waiting'
-        self.execute_task('test_proper_afterwards')
-        assert self.task.find_entry('accepted', title='Test.S01E02.720p.Proper-FlexGet'), \
+        task = execute_task('test_proper_afterwards')
+        assert task.find_entry('accepted', title='Test.S01E02.720p.Proper-FlexGet'), \
             'proper should have been accepted'
 
-    def test_expires(self):
+    def test_expires(self, execute_task):
         """Series plugin: timeframe expires"""
         # first execution should not accept anything
-        self.execute_task('test_expires')
-        assert not self.task.accepted
+        task = execute_task('test_expires')
+        assert not task.accepted
 
         # let 3 hours pass
         age_series(hours=3)
-        self.execute_task('test_expires')
-        assert not self.task.accepted, 'expired too soon'
+        task = execute_task('test_expires')
+        assert not task.accepted, 'expired too soon'
 
         # let another 3 hours pass, should expire now!
         age_series(hours=6)
-        self.execute_task('test_expires')
-        assert self.task.accepted, 'timeframe didn\'t expire'
+        task = execute_task('test_expires')
+        assert task.accepted, 'timeframe didn\'t expire'
 
-    def test_min_max_fail(self):
-        self.execute_task('test_min_max_fail')
-        assert not self.task.accepted
+    def test_min_max_fail(self, execute_task):
+        task = execute_task('test_min_max_fail')
+        assert not task.accepted
 
         # Let 6 hours pass, timeframe should not even been started, as pdtv doesn't meet min_quality
         age_series(hours=6)
-        self.execute_task('test_min_max_fail')
-        assert self.task.entries and not self.task.accepted
+        task = execute_task('test_min_max_fail')
+        assert task.entries and not task.accepted
 
-    def test_min_max_pass(self):
-        self.execute_task('test_min_max_pass')
-        assert not self.task.accepted
+    def test_min_max_pass(self, execute_task):
+        task = execute_task('test_min_max_pass')
+        assert not task.accepted
 
         # Let 6 hours pass, timeframe should expire and accept hdtv copy
         age_series(hours=6)
-        self.execute_task('test_min_max_pass')
-        assert self.task.find_entry('accepted', title='MM Test.S01E02.hdtv-FlexGet')
-        assert len(self.task.accepted) == 1
+        task = execute_task('test_min_max_pass')
+        assert task.find_entry('accepted', title='MM Test.S01E02.hdtv-FlexGet')
+        assert len(task.accepted) == 1
 
-    def test_qualities_fail(self):
-        self.execute_task('test_qualities_fail')
-        assert self.task.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet'), \
+    def test_qualities_fail(self, execute_task):
+        task = execute_task('test_qualities_fail')
+        assert task.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet'), \
             'should have accepted wanted quality'
-        assert len(self.task.accepted) == 1
+        assert len(task.accepted) == 1
 
         # Let 6 hours pass, timeframe should not even been started, as we already have one of our qualities
         age_series(hours=6)
-        self.execute_task('test_qualities_fail')
-        assert self.task.entries and not self.task.accepted
+        task = execute_task('test_qualities_fail')
+        assert task.entries and not task.accepted
 
-    def test_qualities_pass(self):
-        self.execute_task('test_qualities_pass')
-        assert not self.task.accepted, 'None of the qualities should have matched'
+    def test_qualities_pass(self, execute_task):
+        task = execute_task('test_qualities_pass')
+        assert not task.accepted, 'None of the qualities should have matched'
 
         # Let 6 hours pass, timeframe should expire and accept 1080p copy
         age_series(hours=6)
-        self.execute_task('test_qualities_pass')
-        assert self.task.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet')
-        assert len(self.task.accepted) == 1
+        task = execute_task('test_qualities_pass')
+        assert task.find_entry('accepted', title='Q Test.S01E02.1080p-FlexGet')
+        assert len(task.accepted) == 1
 
-    def test_with_quality(self):
-        self.execute_task('test_with_quality_1')
-        assert not self.task.accepted, 'Entry does not pass quality'
+    def test_with_quality(self, execute_task):
+        task = execute_task('test_with_quality_1')
+        assert not task.accepted, 'Entry does not pass quality'
 
         age_series(hours=6)
         # Entry from first test feed should not pass quality
-        self.execute_task('test_with_quality_1')
-        assert not self.task.accepted, 'Entry does not pass quality'
+        task = execute_task('test_with_quality_1')
+        assert not task.accepted, 'Entry does not pass quality'
         # Timeframe should not yet have started
-        self.execute_task('test_with_quality_2')
-        assert not self.task.accepted, 'Timeframe should not yet have passed'
+        task = execute_task('test_with_quality_2')
+        assert not task.accepted, 'Timeframe should not yet have passed'
 
         age_series(hours=6)
-        self.execute_task('test_with_quality_2')
-        assert self.task.accepted, 'Timeframe should have passed'
+        task = execute_task('test_with_quality_2')
+        assert task.accepted, 'Timeframe should have passed'
 
 
-class TestGuessitTimeframe(BaseTimeframe):
-    def __init__(self):
-        super(TestGuessitTimeframe, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalTimeframe(BaseTimeframe):
-    def __init__(self):
-        super(TestInternalTimeframe, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseBacklog(FlexGetBase):
-    __yaml__ = """
+class TestBacklog(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           backlog:
             mock:
@@ -1509,33 +1392,25 @@ class BaseBacklog(FlexGetBase):
               - test: {timeframe: 6 hours}
     """
 
-    def testBacklog(self):
+    def testBacklog(self, manager, execute_task):
         """Series plugin: backlog"""
-        self.execute_task('backlog')
-        assert self.task.entries and not self.task.accepted, 'no entries at the start'
+        task = execute_task('backlog')
+        assert task.entries and not task.accepted, 'no entries at the start'
         # simulate test going away from the task
-        del (self.manager.config['tasks']['backlog']['mock'])
+        del (manager.config['tasks']['backlog']['mock'])
         age_series(hours=12)
-        self.execute_task('backlog')
-        assert self.task.accepted, 'backlog is not injecting episodes'
+        task = execute_task('backlog')
+        assert task.accepted, 'backlog is not injecting episodes'
 
 
-class TestGuessitBacklog(BaseBacklog):
-    def __init__(self):
-        super(TestGuessitBacklog, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalBacklog(BaseBacklog):
-    def __init__(self):
-        super(TestInternalBacklog, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseManipulate(FlexGetBase):
+class TestManipulate(object):
     """Tests that it's possible to manipulate entries before they're parsed by series plugin"""
 
-    __yaml__ = """
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           test_1:
             mock:
@@ -1552,30 +1427,22 @@ class BaseManipulate(FlexGetBase):
                   extract: '^PREFIX: (.*)'
     """
 
-    def testManipulate(self):
+    def testManipulate(self, execute_task):
         """Series plugin: test manipulation priority"""
         # should not work with the prefix
-        self.execute_task('test_1')
-        assert not self.task.accepted, 'series accepted even with prefix?'
-        assert not self.task.accepted, 'series rejecte even with prefix?'
-        self.execute_task('test_2')
-        assert self.task.accepted, 'manipulate failed to pre-clean title'
+        task = execute_task('test_1')
+        assert not task.accepted, 'series accepted even with prefix?'
+        assert not task.accepted, 'series rejecte even with prefix?'
+        task = execute_task('test_2')
+        assert task.accepted, 'manipulate failed to pre-clean title'
 
 
-class TestGuessitManipulate(BaseManipulate):
-    def __init__(self):
-        super(TestGuessitManipulate, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalManipulate(BaseManipulate):
-    def __init__(self):
-        super(TestInternalManipulate, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseFromGroup(FlexGetBase):
-    __yaml__ = """
+class TestFromGroup(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           test:
             mock:
@@ -1588,29 +1455,20 @@ class BaseFromGroup(FlexGetBase):
               - test: {from_group: [Name, FlexGet]}
     """
 
-    def testFromGroup(self):
+    def testFromGroup(self, execute_task):
         """Series plugin: test from_group"""
-        self.execute_task('test')
-        assert self.task.find_entry('accepted', title='[FlexGet] Test 12')
-        assert self.task.find_entry('accepted', title='Test.13.HDTV-FlexGet')
-        assert self.task.find_entry('accepted', title='Test.14.HDTV-Name')
+        task = execute_task('test')
+        assert task.find_entry('accepted', title='[FlexGet] Test 12')
+        assert task.find_entry('accepted', title='Test.13.HDTV-FlexGet')
+        assert task.find_entry('accepted', title='Test.14.HDTV-Name')
 
 
-class TestGuessitFromGroup(BaseFromGroup):
-    def __init__(self):
-        super(TestGuessitFromGroup, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalFromGroup(BaseFromGroup):
-    def __init__(self):
-        super(TestInternalFromGroup, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseBegin(FlexGetBase):
-    __yaml__ = """
+class TestBegin(object):
+    config = """
         templates:
+          global:
+            parsing:
+              series: {{parser}}
           eps:
             mock:
               - {title: 'WTest.S02E03.HDTV.XViD-FlexGet'}
@@ -1685,58 +1543,48 @@ class BaseBegin(FlexGetBase):
 
     """
 
-    def test_before_ep(self):
-        self.execute_task('before_ep_test')
-        assert not self.task.accepted, 'No entries should have been accepted, they are before the begin episode'
+    def test_before_ep(self, execute_task):
+        task = execute_task('before_ep_test')
+        assert not task.accepted, 'No entries should have been accepted, they are before the begin episode'
 
-    def test_after_ep(self):
-        self.execute_task('after_ep_test')
-        assert len(self.task.accepted) == 2, 'Entries should have been accepted, they are not before the begin episode'
+    def test_after_ep(self, execute_task):
+        task = execute_task('after_ep_test')
+        assert len(task.accepted) == 2, 'Entries should have been accepted, they are not before the begin episode'
 
-    def test_before_seq(self):
-        self.execute_task('before_seq_test')
-        assert not self.task.accepted, 'No entries should have been accepted, they are before the begin episode'
+    def test_before_seq(self, execute_task):
+        task = execute_task('before_seq_test')
+        assert not task.accepted, 'No entries should have been accepted, they are before the begin episode'
 
-    def test_after_seq(self):
-        self.execute_task('after_seq_test')
-        assert len(self.task.accepted) == 2, 'Entries should have been accepted, they are not before the begin episode'
+    def test_after_seq(self, execute_task):
+        task = execute_task('after_seq_test')
+        assert len(task.accepted) == 2, 'Entries should have been accepted, they are not before the begin episode'
 
-    def test_before_date(self):
-        self.execute_task('before_date_test')
-        assert not self.task.accepted, 'No entries should have been accepted, they are before the begin episode'
+    def test_before_date(self, execute_task):
+        task = execute_task('before_date_test')
+        assert not task.accepted, 'No entries should have been accepted, they are before the begin episode'
 
-    def test_after_date(self):
-        self.execute_task('after_date_test')
-        assert len(self.task.accepted) == 2, 'Entries should have been accepted, they are not before the begin episode'
+    def test_after_date(self, execute_task):
+        task = execute_task('after_date_test')
+        assert len(task.accepted) == 2, 'Entries should have been accepted, they are not before the begin episode'
 
-    def test_advancement(self):
+    def test_advancement(self, execute_task):
         # Put S01E01 into the database as latest download
-        self.execute_task('test_advancement1')
-        assert self.task.accepted
+        task = execute_task('test_advancement1')
+        assert task.accepted
         # Just verify regular ep advancement would block S03E01
-        self.execute_task('test_advancement2')
-        assert not self.task.accepted, 'Episode advancement should have blocked'
+        task = execute_task('test_advancement2')
+        assert not task.accepted, 'Episode advancement should have blocked'
         # Make sure ep advancement doesn't block it when we've set begin to that ep
-        self.execute_task('test_advancement3')
-        assert self.task.accepted, 'Episode should have been accepted'
+        task = execute_task('test_advancement3')
+        assert task.accepted, 'Episode should have been accepted'
 
 
-class TestGuessitBegin(BaseBegin):
-    def __init__(self):
-        super(TestGuessitBegin, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalBegin(BaseBegin):
-    def __init__(self):
-        super(TestInternalBegin, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseSeriesPremiere(FlexGetBase):
-    __yaml__ = """
+class TestSeriesPremiere(object):
+    config = """
         templates:
           global:
+            parsing:
+              series: {{parser}}
             metainfo_series: yes
             series_premiere: yes
         tasks:
@@ -1747,30 +1595,22 @@ class BaseSeriesPremiere(FlexGetBase):
               - {title: 'Foobar.S02E02.HR-FlexGet'}
     """
 
-    def testOnlyPremieres(self):
+    def testOnlyPremieres(self, execute_task):
         """Test series premiere"""
-        self.execute_task('test')
-        assert self.task.find_entry('accepted', title='Foobar.S01E01.PDTV-FlexGet',
+        task = execute_task('test')
+        assert task.find_entry('accepted', title='Foobar.S01E01.PDTV-FlexGet',
                                     series_name='Foobar', series_season=1,
                                     series_episode=1), 'Series premiere should have been accepted'
-        assert len(self.task.accepted) == 1
+        assert len(task.accepted) == 1
         # TODO: Add more tests, test interaction with series plugin and series_exists
 
 
-class TestGuessitSeriesPremiere(BaseSeriesPremiere):
-    def __init__(self):
-        super(TestGuessitSeriesPremiere, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalSeriesPremiere(BaseSeriesPremiere):
-    def __init__(self):
-        super(TestInternalSeriesPremiere, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseImportSeries(FlexGetBase):
-    __yaml__ = """
+class TestImportSeries(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           timeframe_max:
             configure_series:
@@ -1794,37 +1634,29 @@ class BaseImportSeries(FlexGetBase):
               - title: le show s03e03
     """
 
-    def test_timeframe_max(self):
+    def test_timeframe_max(self, execute_task):
         """Tests configure_series as well as timeframe with max_quality."""
-        self.execute_task('timeframe_max')
-        assert not self.task.accepted, 'Entry shouldnot have been accepted on first run.'
+        task = execute_task('timeframe_max')
+        assert not task.accepted, 'Entry shouldnot have been accepted on first run.'
         age_series(minutes=6)
-        self.execute_task('timeframe_max')
-        assert self.task.find_entry('accepted', title='the show s03e02 hdtv'), \
+        task = execute_task('timeframe_max')
+        assert task.find_entry('accepted', title='the show s03e02 hdtv'), \
             'hdtv should have been accepted after timeframe.'
 
-    def test_import_altnames(self):
+    def test_import_altnames(self, execute_task):
         """Tests configure_series with alternate_name."""
-        self.execute_task('test_import_altnames')
-        entry = self.task.find_entry(title='le show s03e03')
+        task = execute_task('test_import_altnames')
+        entry = task.find_entry(title='le show s03e03')
         assert entry.accepted, 'entry matching series alternate name should have been accepted.'
         assert entry['series_name'] == 'the show', 'entry series should be set to the main name'
 
 
-class TestGuessitImportSeries(BaseImportSeries):
-    def __init__(self):
-        super(TestGuessitImportSeries, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalImportSeries(BaseImportSeries):
-    def __init__(self):
-        super(TestInternalImportSeries, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseIDTypes(FlexGetBase):
-    __yaml__ = """
+class TestIDTypes(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           all_types:
             series:
@@ -1843,27 +1675,19 @@ class BaseIDTypes(FlexGetBase):
               - title: stupid id 3cat
     """
 
-    def test_id_types(self):
-        self.execute_task('all_types')
-        for entry in self.task.entries:
+    def test_id_types(self, execute_task):
+        task = execute_task('all_types')
+        for entry in task.entries:
             assert entry['series_name'], '%s not parsed by series plugin' % entry['title']
             assert entry['series_id_type'] in entry['series_name']
 
 
-class TestGuessitIDTypes(BaseIDTypes):
-    def __init__(self):
-        super(TestGuessitIDTypes, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalIDTypes(BaseIDTypes):
-    def __init__(self):
-        super(TestInternalIDTypes, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseCaseChange(FlexGetBase):
-    __yaml__ = """
+class TestCaseChange(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           first:
             mock:
@@ -1877,29 +1701,21 @@ class BaseCaseChange(FlexGetBase):
               - THESHOW
     """
 
-    def test_case_change(self):
-        self.execute_task('first')
+    def test_case_change(self, execute_task):
+        task = execute_task('first')
         # Make sure series_name uses case from config, make sure episode is accepted
-        assert self.task.find_entry('accepted', title='theshow s02e04', series_name='TheShow')
-        self.execute_task('second')
+        assert task.find_entry('accepted', title='theshow s02e04', series_name='TheShow')
+        task = execute_task('second')
         # Make sure series_name uses new case from config, make sure ep is rejected because we have a copy
-        assert self.task.find_entry('rejected', title='thEshoW s02e04 other', series_name='THESHOW')
+        assert task.find_entry('rejected', title='thEshoW s02e04 other', series_name='THESHOW')
 
 
-class TestGuessitCaseChange(BaseCaseChange):
-    def __init__(self):
-        super(TestGuessitCaseChange, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalCaseChange(BaseCaseChange):
-    def __init__(self):
-        super(TestInternalCaseChange, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseInvalidSeries(FlexGetBase):
-    __yaml__ = """
+class TestInvalidSeries(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           blank:
             mock:
@@ -1909,26 +1725,18 @@ class BaseInvalidSeries(FlexGetBase):
                   quality: 720p
     """
 
-    def test_blank_series(self):
+    def test_blank_series(self, execute_task):
         """Make sure a blank series doesn't crash."""
-        self.execute_task('blank')
-        assert not self.task.aborted, 'Task should not have aborted'
+        task = execute_task('blank')
+        assert not task.aborted, 'Task should not have aborted'
 
 
-class TestGuessitInvalidSeries(BaseInvalidSeries):
-    def __init__(self):
-        super(TestGuessitInvalidSeries, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalInvalidSeries(BaseInvalidSeries):
-    def __init__(self):
-        super(TestInternalInvalidSeries, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseDoubleEps(FlexGetBase):
-    __yaml__ = """
+class TestDoubleEps(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           test_double1:
             mock:
@@ -1949,38 +1757,28 @@ class BaseDoubleEps(FlexGetBase):
               - double
     """
 
-    def test_double(self):
+    def test_double(self, execute_task):
         # First should be accepted
-        self.execute_task('test_double1')
-        assert self.task.find_entry('accepted', title='double S01E02-E03')
+        task = execute_task('test_double1')
+        assert task.find_entry('accepted', title='double S01E02-E03')
 
         # We already got ep 3 as part of double, should not be accepted
-        self.execute_task('test_double2')
-        assert not self.task.find_entry('accepted', title='double S01E03')
+        task = execute_task('test_double2')
+        assert not task.find_entry('accepted', title='double S01E03')
 
-    def test_double_prefered(self):
+    def test_double_prefered(self, execute_task):
         # Given a choice of single or double ep at same quality, grab the double
-        self.execute_task('test_double_prefered')
-        assert self.task.find_entry('accepted', title='double S02E03-04')
-        assert not self.task.find_entry('accepted', title='S02E03')
+        task = execute_task('test_double_prefered')
+        assert task.find_entry('accepted', title='double S02E03-04')
+        assert not task.find_entry('accepted', title='S02E03')
 
 
-class TestGuessitDoubleEps(BaseDoubleEps):
-    def __init__(self):
-        super(TestGuessitDoubleEps, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalDoubleEps(BaseDoubleEps):
-    def __init__(self):
-        super(TestInternalDoubleEps, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseAutoLockin(FlexGetBase):
-    __yaml__ = """
+class TestAutoLockin(object):
+    config = """
         templates:
           global:
+            parsing:
+              series: {{parser}}
             series:
             - FooBar
             - BarFood
@@ -2009,38 +1807,30 @@ class BaseAutoLockin(FlexGetBase):
 
     """
 
-    def test_ep_lockin(self):
-        self.execute_task('try_date_1')
-        assert self.task.find_entry('accepted', title='FooBar 2012-10-10 HDTV'), \
+    def test_ep_lockin(self, execute_task):
+        task = execute_task('try_date_1')
+        assert task.find_entry('accepted', title='FooBar 2012-10-10 HDTV'), \
             'dates should be accepted before locked in on an identifier type'
-        self.execute_task('lock_ep')
-        assert len(self.task.accepted) == 3, 'All ep mode episodes should have been accepted'
-        self.execute_task('try_date_2')
-        assert not self.task.find_entry('accepted', title='FooBar 2012-10-11 HDTV'), \
+        task = execute_task('lock_ep')
+        assert len(task.accepted) == 3, 'All ep mode episodes should have been accepted'
+        task = execute_task('try_date_2')
+        assert not task.find_entry('accepted', title='FooBar 2012-10-11 HDTV'), \
             'dates should not be accepted after series has locked in to ep mode'
 
-    def test_special_lock(self):
+    def test_special_lock(self, execute_task):
         """Make sure series plugin does not lock in to type 'special'"""
-        self.execute_task('test_special_lock')
-        assert len(self.task.accepted) == 4, 'All specials should have been accepted'
-        self.execute_task('try_reg')
-        assert len(self.task.accepted) == 2, 'Specials should not have caused episode type lock-in'
+        task = execute_task('test_special_lock')
+        assert len(task.accepted) == 4, 'All specials should have been accepted'
+        task = execute_task('try_reg')
+        assert len(task.accepted) == 2, 'Specials should not have caused episode type lock-in'
 
 
-class TestGuessitAutoLockin(BaseAutoLockin):
-    def __init__(self):
-        super(TestGuessitAutoLockin, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalAutoLockin(BaseAutoLockin):
-    def __init__(self):
-        super(TestInternalAutoLockin, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseReruns(FlexGetBase):
-    __yaml__ = """
+class TestReruns(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           one_accept:
             mock:
@@ -2052,26 +1842,18 @@ class BaseReruns(FlexGetBase):
             mock_output: yes
     """
 
-    def test_one_accept(self):
-        self.execute_task('one_accept')
-        assert len(self.task.mock_output) == 1, \
-            'should have accepted once!: %s' % ', '.join(e['title'] for e in self.task.mock_output)
+    def test_one_accept(self, execute_task):
+        task = execute_task('one_accept')
+        assert len(task.mock_output) == 1, \
+            'should have accepted once!: %s' % ', '.join(e['title'] for e in task.mock_output)
 
 
-class TestGuessitReruns(BaseReruns):
-    def __init__(self):
-        super(TestGuessitReruns, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalReruns(BaseReruns):
-    def __init__(self):
-        super(TestInternalReruns, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class BaseSpecials(FlexGetBase):
-    __yaml__ = """
+class TestSpecials(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           preferspecials:
             mock:
@@ -2102,35 +1884,39 @@ class BaseSpecials(FlexGetBase):
                 assume_special: False
     """
 
-    def test_prefer_specials(self):
+    def test_prefer_specials(self, execute_task):
         # Test that an entry matching both ep and special is flagged as a special when prefer_specials is True
-        self.execute_task('preferspecials')
-        entry = self.task.find_entry('accepted', title='the show s03e04 special')
+        task = execute_task('preferspecials')
+        entry = task.find_entry('accepted', title='the show s03e04 special')
         assert entry.get('series_id_type') == 'special', 'Entry which should have been flagged a special was not.'
 
-    def test_not_prefer_specials(self):
+    def test_not_prefer_specials(self, execute_task):
         # Test that an entry matching both ep and special is flagged as an ep when prefer_specials is False
-        self.execute_task('nopreferspecials')
-        entry = self.task.find_entry('accepted', title='the show s03e05 special')
+        task = execute_task('nopreferspecials')
+        entry = task.find_entry('accepted', title='the show s03e05 special')
         assert entry.get('series_id_type') != 'special', 'Entry which should not have been flagged a special was.'
 
-    def test_assume_special(self):
+    def test_assume_special(self, execute_task):
         # Test that an entry with no ID found gets flagged as a special and accepted if assume_special is True
-        self.execute_task('assumespecial')
-        entry = self.task.find_entry(title='the show SOMETHING')
+        task = execute_task('assumespecial')
+        entry = task.find_entry(title='the show SOMETHING')
         assert entry.get('series_id_type') == 'special', 'Entry which should have been flagged as a special was not.'
         assert entry.accepted, 'Entry which should have been accepted was not.'
 
-    def test_not_assume_special(self):
+    def test_not_assume_special(self, execute_task):
         # Test that an entry with no ID found does not get flagged as a special and accepted if assume_special is False
-        self.execute_task('noassumespecial')
-        entry = self.task.find_entry(title='the show SOMETHING')
+        task = execute_task('noassumespecial')
+        entry = task.find_entry(title='the show SOMETHING')
         assert entry.get('series_id_type') != 'special', 'Entry which should not have been flagged as a special was.'
         assert not entry.accepted, 'Entry which should not have been accepted was.'
 
 
-class BaseAlternateNames(FlexGetBase):
-    __yaml__ = """
+class TestAlternateNames(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           alternate_name:
             series:
@@ -2159,59 +1945,48 @@ class BaseAlternateNames(FlexGetBase):
                  alternate_name: Third Show
     """
 
-    def test_set_alternate_name(self):
+    def test_set_alternate_name(self, execute_task):
         # Tests that old alternate names are not kept in the database.
-        self.execute_task('alternate_name')
-        self.execute_task('set_other_alternate_name')
-        assert self.task.find_entry('accepted', title='Third.Show.S01E01'), \
+        task = execute_task('alternate_name')
+        task = execute_task('set_other_alternate_name')
+        assert task.find_entry('accepted', title='Third.Show.S01E01'), \
             'A new alternate name should have been associated with the series.'
-        assert self.task.find_entry('undecided', title='Other.Show.S01E01'), \
+        assert task.find_entry('undecided', title='Other.Show.S01E01'), \
             'The old alternate name for the series is still present.'
 
-    def test_duplicate_alternate_names_in_different_series(self):
-        try:
-            assert self.execute_task('duplicate_names_in_different_series')
-        except TaskAbort as ex:
-            # only test that the reason is about alternate names, not which names.
-            reason = 'Error adding alternate name'
-            assert ex.reason[:27] == reason, \
-                'Wrong reason for task abortion. Should be about duplicate alternate names.'
-        else:
-            assert False, 'Duplicate alternate names across series should cause a TaskAbort.'
+    def test_duplicate_alternate_names_in_different_series(self, execute_task):
+        with pytest.raises(TaskAbort) as ex:
+            execute_task('duplicate_names_in_different_series')
+        # only test that the reason is about alternate names, not which names.
+        reason = 'Error adding alternate name'
+        assert ex.value.reason[:27] == reason, \
+            'Wrong reason for task abortion. Should be about duplicate alternate names.'
 
     # Test the DB behaves like we expect ie. alternate names cannot
-    def test_alternate_names_are_removed_from_db(self):
+    def test_alternate_names_are_removed_from_db(self, execute_task):
         from flexget.manager import Session
         from flexget.plugins.filter.series import AlternateNames
         with Session() as session:
-            self.execute_task('alternate_name')
+            task = execute_task('alternate_name')
             # test the current state of alternate names
             assert len(session.query(AlternateNames).all()) == 1, 'There should be one alternate name present.'
             assert session.query(AlternateNames).first().alt_name == 'Other Show', \
                 'Alternate name should have been Other Show.'
 
             # run another task that overwrites the alternate names
-            self.execute_task('another_alternate_name')
+            task = execute_task('another_alternate_name')
             assert len(session.query(AlternateNames).all()) == 1, \
                 'The old alternate name should have been removed from the database.'
             assert session.query(AlternateNames).first().alt_name == 'Good Show', \
                 'The alternate name in the database should be the new one, Good Show.'
 
 
-class TestGuessitSpecials(BaseSpecials):
-    def __init__(self):
-        super(TestGuessitSpecials, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalSpecials(BaseSpecials):
-    def __init__(self):
-        super(TestInternalSpecials, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
-
-
-class TestCLI(FlexGetBase):
-    __yaml__ = """
+class TestCLI(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           learn_series:
             series:
@@ -2222,19 +1997,23 @@ class TestCLI(FlexGetBase):
             - title: Other Series S01E02
     """
 
-    def test_series_list(self):
+    def test_series_list(self, manager, execute_task):
         """Very rudimentary test, mostly makes sure this doesn't crash."""
-        self.execute_task('learn_series')
+        execute_task('learn_series')
         options = get_parser().parse_args(['series', 'list'])
         buffer = StringIO()
         with capture_output(buffer, loglevel='error'):
-            self.manager.handle_cli(options=options)
+            manager.handle_cli(options=options)
         lines = buffer.getvalue().split('\n')
         assert all(any(line.lstrip().startswith(series) for line in lines) for series in ['Some Show', 'Other Show'])
 
 
-class TestSeriesForget(FlexGetBase):
-    __yaml__ = """
+class TestSeriesForget(object):
+    config = """
+        templates:
+          global:
+            parsing:
+              series: {{parser}}
         tasks:
           get_episode:
             seen: local
@@ -2253,287 +2032,13 @@ class TestSeriesForget(FlexGetBase):
             series_forget: yes
     """
 
-    def test_forget_episode(self):
-        self.execute_task('get_episode')
-        assert len(self.task.accepted) == 1
-        first_rls = self.task.accepted[0]
-        self.execute_task('get_episode')
-        assert not self.task.accepted, 'series plugin duplicate blocking not working?'
-        self.execute_task('forget_episode')
-        self.execute_task('get_episode')
-        assert len(self.task.accepted) == 1, 'new release not accepted after forgetting ep'
-        assert self.task.accepted[0] != first_rls, 'same release accepted on second run'
-
-
-class TestSeriesAPI(APITest):
-    @patch.object(series, 'get_series_summary')
-    def test_series_list_get(self, mock_series_list):
-        session = Session()
-        query = session.query(series.Series)
-        mock_series_list.side_effect = [0, query]
-
-        # No params
-        rsp = self.get('/series/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_series_list.call_count == 2, 'Should have 2 calls, is actually %s' % mock_series_list.call_count
-        mock_series_list.side_effect = [0, query]
-
-        # Default params
-        rsp = self.get('/series/?max=100&sort_by=show_name&in_config=configured&order=desc&page=1')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_series_list.call_count == 4, 'Should have 4 calls, is actually %s' % mock_series_list.call_count
-        mock_series_list.side_effect = [0, query]
-
-        # Changed params
-        rsp = self.get('/series/?status=new&max=10&days=4&sort_by=last_download_date&in_config=all'
-                       '&premieres=true&order=asc&page=2')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_series_list.call_count == 6, 'Should have 6 calls, is actually %s' % mock_series_list.call_count
-        mock_series_list.side_effect = [0, query]
-
-        # Negative test, invalid parameter
-        rsp = self.get('/series/?status=bla&max=10&days=4&sort_by=last_download_date&in_config=all'
-                       '&premieres=true&order=asc&page=2')
-        assert rsp.status_code == 400, 'Response code is %s' % rsp.status_code
-
-    @patch.object(series, 'new_eps_after')
-    @patch.object(series, 'get_latest_release')
-    @patch.object(series, 'shows_by_name')
-    def test_series_search(self, mocked_series_search, mock_latest_release, mock_new_eps_after):
-        show = series.Series()
-        episode = series.Episode()
-        release = series.Release()
-        release.downloaded = True
-        episode.releases.append(release)
-
-        mock_latest_release.return_value = episode
-        mock_new_eps_after.return_value = 0
-        mocked_series_search.return_value = [show]
-
-        rsp = self.get('/series/search/the%20big%20bang%20theory')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_latest_release.called
-        assert mock_new_eps_after.called
-        assert mocked_series_search.called
-
-    @patch.object(series, 'new_eps_after')
-    @patch.object(series, 'get_latest_release')
-    @patch.object(series, 'show_by_id')
-    def test_series_get(self, mock_show_by_id, mock_latest_release, mock_new_eps_after):
-        show = series.Series()
-        episode = series.Episode()
-        release = series.Release()
-        release.downloaded = True
-        episode.releases.append(release)
-
-        mock_show_by_id.return_value = show
-        mock_latest_release.return_value = episode
-        mock_new_eps_after.return_value = 0
-
-        rsp = self.get('/series/1')
-
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_latest_release.called
-        assert mock_new_eps_after.called
-        assert mock_show_by_id.called
-
-    @patch.object(series, 'forget_series')
-    @patch.object(series, 'show_by_id')
-    def test_series_delete(self, mock_show_by_id, mock_forget_series):
-        show = series.Series()
-        show.name = 'Some name'
-
-        mock_show_by_id.return_value = show
-
-        rsp = self.delete('/series/1')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_show_by_id.called
-        assert mock_forget_series.called
-
-    @patch.object(series, 'new_eps_after')
-    @patch.object(series, 'get_latest_release')
-    @patch.object(series, 'set_series_begin')
-    @patch.object(series, 'show_by_id')
-    def test_series_begin(self, mock_show_by_id, mock_series_begin, mock_latest_release, mock_new_eps_after):
-        show = series.Series()
-        episode = series.Episode()
-        release = series.Release()
-        release.downloaded = True
-        episode.releases.append(release)
-        ep_id = {"episode_identifier": "s01e01"}
-
-        mock_show_by_id.return_value = show
-        mock_latest_release.return_value = episode
-        mock_new_eps_after.return_value = 0
-
-        rsp = self.json_put('/series/1', data=json.dumps(ep_id))
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_show_by_id.called
-
-    def test_new_series_begin(self):
-        show = 'Test Show'
-        ep_id = {"episode_identifier": "s01e01"}
-
-        rsp = self.json_post(('/series/%s' % show), data=json.dumps(ep_id))
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-
-    @patch.object(series, 'show_by_id')
-    def test_series_get_episodes(self, mock_show_by_id):
-        show = series.Series()
-        episode = series.Episode()
-        release = series.Release()
-        release.downloaded = True
-        episode.releases.append(release)
-        show.episodes.append(episode)
-
-        mock_show_by_id.return_value = show
-
-        rsp = self.get('/series/1/episodes')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_show_by_id.called
-
-    @patch.object(series, 'forget_episodes_by_id')
-    @patch.object(series, 'show_by_id')
-    def test_series_delete_episodes(self, mock_show_by_id, mock_forget_episodes_by_id):
-        show = series.Series()
-        episode = series.Episode()
-        release = series.Release()
-        release.downloaded = True
-        episode.releases.append(release)
-        show.episodes.append(episode)
-
-        mock_show_by_id.return_value = show
-
-        rsp = self.delete('/series/1/episodes')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_show_by_id.called
-        assert mock_forget_episodes_by_id.called
-
-    @patch.object(series, 'episode_in_show')
-    @patch.object(series, 'episode_by_id')
-    @patch.object(series, 'show_by_id')
-    def test_series_get_episode(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show):
-        show = series.Series()
-        episode = series.Episode()
-
-        mock_show_by_id.return_value = show
-        mock_episode_by_id.return_value = episode
-
-        rsp = self.get('/series/1/episodes/1')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_show_by_id.called
-        assert mock_episode_by_id.called
-        assert mock_episode_in_show.called
-
-    @patch.object(series, 'forget_episodes_by_id')
-    @patch.object(series, 'episode_in_show')
-    @patch.object(series, 'episode_by_id')
-    @patch.object(series, 'show_by_id')
-    def test_series_delete_episode(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show,
-                                   mock_forget_episodes_by_id):
-        show = series.Series()
-        episode = series.Episode()
-
-        mock_show_by_id.return_value = show
-        mock_episode_by_id.return_value = episode
-
-        rsp = self.delete('/series/1/episodes/1')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_show_by_id.called
-        assert mock_episode_by_id.called
-        assert mock_episode_in_show.called
-        assert mock_forget_episodes_by_id.called
-
-    @patch.object(series, 'episode_in_show')
-    @patch.object(series, 'episode_by_id')
-    @patch.object(series, 'show_by_id')
-    def test_series_get_episode_releases(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show):
-        show = series.Series()
-        episode = series.Episode()
-
-        mock_show_by_id.return_value = show
-        mock_episode_by_id.return_value = episode
-
-        rsp = self.get('/series/1/episodes/1/releases?downloaded=all')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-
-        rsp = self.get('/series/1/episodes/1/releases?downloaded=downloaded')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-
-        rsp = self.get('/series/1/episodes/1/releases?downloaded=not_downloaded')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-
-        assert mock_show_by_id.call_count == 3
-        assert mock_episode_by_id.call_count == 3
-        assert mock_episode_in_show.call_count == 3
-
-    @patch.object(series, 'episode_in_show')
-    @patch.object(series, 'episode_by_id')
-    @patch.object(series, 'show_by_id')
-    def test_series_delete_episode_releases(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show):
-        show = series.Series()
-        episode = series.Episode()
-
-        mock_show_by_id.return_value = show
-        mock_episode_by_id.return_value = episode
-
-        rsp = self.delete('/series/1/episodes/1/releases?downloaded=all')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-
-        rsp = self.delete('/series/1/episodes/1/releases?downloaded=downloaded')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-
-        rsp = self.delete('/series/1/episodes/1/releases?downloaded=not_downloaded')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-
-        assert mock_show_by_id.call_count == 3
-        assert mock_episode_by_id.call_count == 3
-        assert mock_episode_in_show.call_count == 3
-
-    @patch.object(series, 'release_in_episode')
-    @patch.object(series, 'release_by_id')
-    @patch.object(series, 'episode_in_show')
-    @patch.object(series, 'episode_by_id')
-    @patch.object(series, 'show_by_id')
-    def test_series_get_release(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show, mock_release_by_id,
-                                mock_release_in_episode):
-        show = series.Series()
-        episode = series.Episode()
-        release = series.Release()
-
-        mock_show_by_id.return_value = show
-        mock_episode_by_id.return_value = episode
-        mock_release_by_id.return_value = release
-
-        rsp = self.get('/series/2/episodes/653/releases/1551/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_show_by_id.called
-        assert mock_episode_by_id.called
-        assert mock_episode_in_show.called
-        assert mock_release_by_id.called
-        assert mock_release_in_episode.called
-
-    @patch.object(series, 'delete_release_by_id')
-    @patch.object(series, 'release_in_episode')
-    @patch.object(series, 'release_by_id')
-    @patch.object(series, 'episode_in_show')
-    @patch.object(series, 'episode_by_id')
-    @patch.object(series, 'show_by_id')
-    def test_series_delete_release(self, mock_show_by_id, mock_episode_by_id, mock_episode_in_show, mock_release_by_id,
-                                   mock_release_in_episode, mock_delete_release_by_id):
-        show = series.Series()
-        episode = series.Episode()
-        release = series.Release()
-
-        mock_show_by_id.return_value = show
-        mock_episode_by_id.return_value = episode
-        mock_release_by_id.return_value = release
-
-        rsp = self.delete('/series/2/episodes/653/releases/1551/')
-        assert rsp.status_code == 200, 'Response code is %s' % rsp.status_code
-        assert mock_show_by_id.called
-        assert mock_episode_by_id.called
-        assert mock_episode_in_show.called
-        assert mock_release_by_id.called
-        assert mock_release_in_episode.called
-        assert mock_delete_release_by_id.called
+    def test_forget_episode(self, execute_task):
+        task = execute_task('get_episode')
+        assert len(task.accepted) == 1
+        first_rls = task.accepted[0]
+        task = execute_task('get_episode')
+        assert not task.accepted, 'series plugin duplicate blocking not working?'
+        task = execute_task('forget_episode')
+        task = execute_task('get_episode')
+        assert len(task.accepted) == 1, 'new release not accepted after forgetting ep'
+        assert task.accepted[0] != first_rls, 'same release accepted on second run'

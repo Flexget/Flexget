@@ -2,9 +2,11 @@ from __future__ import unicode_literals, division, absolute_import
 from flexget.utils.soup import get_soup
 
 
-class TestHtml5Lib():
+class TestHtml5Lib(object):
 
-    def test_parse_broken(self):
+    config = 'tasks: {}'
+
+    def test_parse_broken(self, execute_task):
         s = """<html>
 <head><title>Foo</title>
 <body>

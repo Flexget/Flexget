@@ -2,11 +2,12 @@
 from __future__ import unicode_literals, division, absolute_import
 from __builtin__ import object
 import logging
+
 import mock
+import pytest
 
 from flexget.plugins.api_t411 import T411RestClient, T411ObjectMapper, T411Proxy, FriendlySearchQuery, ApiError
 from flexget.utils.qualities import Requirements
-from tests import use_vcr, FlexGetBase
 
 log = logging.getLogger('test_t411')
 
@@ -102,19 +103,18 @@ class MockRestClient(object):
 
 
 class TestRestClient(object):
-    def __init__(self):
-        self.credentials = {'username': 'set', 'password': 'this'}
-        self.api_token = 'you must set this value for online test'
+    credentials = {'username': 'set', 'password': 'this'}
+    api_token = 'you must set this value for online test'
 
     def build_unauthenticated_client(self):
         client = T411RestClient()
-        client.credentials = self.credentials
+        client.credentials = TestRestClient.credentials
         del client.web_session.headers['Accept-Encoding']
         return client
 
     def build_authenticated_client(self):
         client = T411RestClient()
-        client.set_api_token(self.api_token)
+        client.set_api_token(TestRestClient.api_token)
         del client.web_session.headers['Accept-Encoding']
         return client
 
@@ -122,13 +122,13 @@ class TestRestClient(object):
         client = self.build_unauthenticated_client()
         assert not client.is_authenticated()
 
-    @use_vcr
+    @pytest.mark.online
     def test_auth(self):
         client = self.build_unauthenticated_client()
         client.auth()
         assert client.is_authenticated(), 'Client is not authenticated (are you using mocked credentials online?)'
 
-    @use_vcr
+    @pytest.mark.online
     def test_retrieve_categories(self):
         client = self.build_authenticated_client()
         json_tree_categories = client.retrieve_category_tree()
@@ -143,7 +143,7 @@ class TestRestClient(object):
         assert json_sub_category is not None
         assert json_sub_category.get('name') == 'Film'
 
-    @use_vcr
+    @pytest.mark.online
     def test_retrieve_terms(self):
         client = self.build_authenticated_client()
         json_terms = client.retrieve_terms_tree()
@@ -154,7 +154,7 @@ class TestRestClient(object):
         assert term_type.get('type') == 'Application - Genre'
         assert term_type.get('mode') == 'single'
 
-    @use_vcr
+    @pytest.mark.online
     def test_malformed_search_response(self):
         """
         Search without expression produces server response
@@ -167,7 +167,7 @@ class TestRestClient(object):
         assert search_result.get('query') is None
         assert search_result.get('limit') == 10
 
-    @use_vcr()
+    @pytest.mark.online
     def test_error_message_handler(self):
         exception_was_raised = False
         client = T411RestClient()
@@ -183,11 +183,9 @@ class TestRestClient(object):
 
 
 class TestObjectMapper(object):
-    def __init__(self):
-        self.mapper = T411ObjectMapper()
 
     def test_map_category(self):
-        category = self.mapper.map_category({
+        category = T411ObjectMapper().map_category({
             u'pid': u'0',
             u'id': u'210',
             u'name': u'Film/Vidéo',
@@ -237,7 +235,7 @@ class TestObjectMapper(object):
                 }
             }
         }
-        category_to_term_type, term_types = self.mapper.map_term_type_tree(tree)
+        category_to_term_type, term_types = T411ObjectMapper().map_term_type_tree(tree)
         assert (234, 11) in category_to_term_type
         assert (234, 43) in category_to_term_type
         assert term_types.has_key(11)
@@ -249,7 +247,7 @@ class TestObjectMapper(object):
         assert term_types.get(11).terms[0].name == "Edition multimédia"
 
 
-class TestProxy(FlexGetBase):
+class TestProxy(object):
     def test_offline_proxy(self):
         proxy = T411Proxy()
         proxy.rest_client = MockRestClient()
@@ -280,12 +278,12 @@ class TestProxy(FlexGetBase):
         assert proxy.rest_client.details_called == False, 'Proxy not used the cache'
 
 
-class TestInputPlugin(FlexGetBase):
-    __yaml__ = """
+class TestInputPlugin(object):
+    config = """
         tasks:
-          series:
-            - Mickey vs Donald
           uncached_db:
+            series:
+              - Mickey vs Donald
             t411:
               category: cartoons
               terms:
@@ -298,16 +296,16 @@ class TestInputPlugin(FlexGetBase):
     @mock.patch('flexget.plugins.api_t411.T411RestClient.retrieve_terms_tree')
     @mock.patch('flexget.plugins.api_t411.T411RestClient.retrieve_category_tree')
     @mock.patch('flexget.plugins.api_t411.T411RestClient.details')
-    def test_schema(self, mock_details, mock_cat, mock_term, mock_search, mock_auth):
+    def test_schema(self, mock_details, mock_cat, mock_term, mock_search, mock_auth, execute_task):
         mock_details.return_value = MockRestClient.details_result
         mock_cat.return_value = MockRestClient.cat_result
         mock_term.return_value = MockRestClient.term_result
         mock_search.return_value = MockRestClient.search_result
         mock_auth.return_value = None
-        self.execute_task('uncached_db')
-        log.debug(self.task.all_entries)
-        assert len(self.task.all_entries) == 1
-        entry = self.task.all_entries[0]
+        task = execute_task('uncached_db')
+        log.debug(task.all_entries)
+        assert len(task.all_entries) == 1
+        entry = task.all_entries[0]
         quality = entry.get('quality')
         assert quality is not None
         log.debug(quality)
