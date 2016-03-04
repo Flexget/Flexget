@@ -1113,7 +1113,7 @@ class TestNormalization(object):
         assert task.find_entry('rejected', title='Foo bar & co 2012.s01e01.sdtv.b')
 
 
-class BaseMixedNumbering(object):
+class TestMixedNumbering(object):
     config = """
         templates:
           global:
