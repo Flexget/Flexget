@@ -36,6 +36,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=load_requirements('requirements.txt'),
+    tests_require=['pytest'],
     extras_require={
         ':python_version=="2.6"': ['argparse'],
         'dev_tools': load_requirements('dev-requirements.txt')
