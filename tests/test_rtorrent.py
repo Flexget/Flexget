@@ -298,6 +298,8 @@ class TestRTorrentOutputPlugin(object):
         mocked_client = mocked_client()
         mocked_client.version = [0, 9, 4]
         mocked_client.update.return_value = 0
+        # ntpath complains on windows if base_path is a MagicMock
+        mocked_client.torrent.side_effect = [False, {'base_path': ''}]
 
         execute_task('test_update')
 
