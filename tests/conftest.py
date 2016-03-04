@@ -188,6 +188,7 @@ def setup_once(pytestconfig, request):
     flexget.logger.initialize(True)
     m = MockManager('tasks: {}', 'init')  # This makes sure our template environment is set up before any tests are run
     m.__del__()
+    logging.getLogger().setLevel(logging.DEBUG)
     load_plugins()
 
 
