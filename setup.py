@@ -35,7 +35,6 @@ setup(
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     zip_safe=False,
-    test_suite='nose.collector',
     install_requires=load_requirements('requirements.txt'),
     extras_require={
         ':python_version=="2.6"': ['argparse'],
