@@ -447,7 +447,7 @@ class APITVMaze(object):
             pytvmaze_show = get_show(**prepared_params)
         except ShowNotFound as e:
             log.debug('could not find series {0} in pytvmaze'.format(title))
-            raise LookupError(e)
+            raise LookupError('could not find series {0} in pytvmaze'.format(title))
         except ConnectionError as e:
             log.warning(e)
             raise LookupError(e)
