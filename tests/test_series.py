@@ -1136,7 +1136,7 @@ class TestMixedNumbering(object):
         """Series plugin: Mixed series numbering"""
 
         task = execute_task('test_1')
-        assert not task.find_entry('accepted', title='FooBar.S03E07.PDTV-FlexGet')
+        assert task.find_entry('accepted', title='FooBar.S03E07.PDTV-FlexGet')
         task = execute_task('test_2')
         assert task.find_entry('rejected', title='FooBar.0307.PDTV-FlexGet')
 
