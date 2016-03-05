@@ -6,12 +6,8 @@
     .component('seenEntry',{
       templateUrl: 'plugins/seen/components/seen-entry/seen-entry.tmpl.html',
       controllerAs: 'vm',
-      controller: seenEntryController,
       bindings: {
         entry: '<',
       },
     });
-
-  function seenEntryController() {
-  }
 })();

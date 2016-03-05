@@ -47,10 +47,6 @@
       });
     }
 
-    vm.gotoEpisodes = function(id) {
-      $state.go('flexget.episodes', { id: id });
-    };
-
     vm.forgetSeries = function(show) {
       var confirm = $mdDialog.confirm()
       .title('Confirm forgetting show.')
