@@ -57,7 +57,7 @@ class NPOWatchlist(object):
         if login_response.url == 'http://www.npo.nl/profiel':
             log.debug('Already logged in')
             return login_response
-        elif login_response.url <> 'https://mijn.npo.nl/inloggen':
+        elif login_response.url != 'https://mijn.npo.nl/inloggen':
             raise plugin.PluginError('Unexpected login page: {}'.format(login_response.url))
         
         login_page = BeautifulSoup(login_response.content, 'html5lib')
@@ -86,7 +86,7 @@ class NPOWatchlist(object):
         profile_page = BeautifulSoup(profile_response.content, 'html5lib')
         
         entries = list()
-        for listItem in profilePage.findAll('div', class_='list-item'):
+        for listItem in profile_page.findAll('div', class_='list-item'):
             title = next(listItem.find('h4').stripped_strings)
             subtitle = listItem.find('h5').text 
             url = listItem.find('a')['href']
