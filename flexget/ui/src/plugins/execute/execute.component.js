@@ -1,8 +1,13 @@
 (function () {
     'use strict';
 
-    angular.module('flexget.plugins.execute')
-        .controller('executeController', executeController);
+    angular
+      .module('flexget.plugins.execute')
+        .component('executeView', {
+          templateUrl: 'plugins/execute/execute.tmpl.html',
+          controllerAs: 'vm',
+          controller: executeController,
+        });
 
     function executeController($scope, $interval, $q, tasks) {
         var vm = this,

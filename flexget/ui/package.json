@@ -3,7 +3,7 @@
   "version": "2.5.0",
   "private": true,
   "scripts": {
-    "start": "gulp server",
+    "start": "gulp serve",
     "lint": "eslint ."
   },
   "devDependencies": {
