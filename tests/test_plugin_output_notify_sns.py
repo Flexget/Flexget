@@ -1,7 +1,6 @@
 from mock import patch, Mock, sentinel
 from nose.tools import raises
 
-from tests import FlexGetBase
 from flexget.task import Task
 from flexget.plugins.output import notify_sns
 

@@ -26,6 +26,8 @@ def init_parsers(manager):
         func_name = 'parse_' + parser_type
         default_parsers[parser_type] = max(parsers[parser_type].iteritems(),
                                           key=lambda p: getattr(getattr(p[1], func_name), 'priority', 0))[0]
+        log.debug('setting default %s parser to %s. (options: %s)' %
+                  (parser_type, default_parsers[parser_type], parsers[parser_type]))
 
 
 class PluginParsing(object):
@@ -50,11 +52,11 @@ class PluginParsing(object):
         if config:
             selected_parsers.update(config)
 
-    def on_task_end(self, task, config):
+    def on_task_exit(self, task, config):
         # Restore default parsers for next task run
         selected_parsers.clear()
 
-    on_task_abort = on_task_end
+    on_task_abort = on_task_exit
 
     def parse_series(self, data, name=None, **kwargs):
         """

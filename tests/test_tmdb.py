@@ -1,11 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 
-from tests import FlexGetBase, use_vcr
+import pytest
 
 
-class TestTmdbLookup(FlexGetBase):
+@pytest.mark.online
+class TestTmdbLookup(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -17,10 +18,9 @@ class TestTmdbLookup(FlexGetBase):
               afield: "{{ tmdb_id }}"
     """
 
-    @use_vcr
-    def test_tmdb_lookup(self):
-        self.execute_task('test')
+    def test_tmdb_lookup(self, execute_task):
+        task = execute_task('test')
         # check that these were created
-        assert self.task.find_entry(tmdb_name='Taken', tmdb_year=2008), 'Didn\'t populate tmdb info for Taken'
-        assert self.task.find_entry(tmdb_name='The Matrix', tmdb_year=1999), \
+        assert task.find_entry(tmdb_name='Taken', tmdb_year=2008), 'Didn\'t populate tmdb info for Taken'
+        assert task.find_entry(tmdb_name='The Matrix', tmdb_year=1999), \
                 'Didn\'t populate tmdb info for The Matrix'

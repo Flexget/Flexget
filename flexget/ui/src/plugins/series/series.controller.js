@@ -10,7 +10,8 @@
         var options = {
             page: 1,
             page_size: 10,
-            in_config: 'all'
+            in_config: 'all',
+            lookup: 'tvmaze'
         }
 
         vm.searchTerm = "";
@@ -23,26 +24,8 @@
                     //Set vars for pagination
                     vm.currentPage = data.page;
                     vm.totalShows = data.total_number_of_shows;
-                    vm.pageSize = data.number_of_shows;
-
-                    //Get metadata for first show
-                    // TODO: Update this to load for all
-                    // We will have to use caching in the server, maybe even browser as well?
-                    getMetadata();
+                    vm.pageSize = data.page_size;
                 });
-        }
-
-        function getMetadata() {
-            vm.series.map(function(show) {
-                $http.get('/api/tvmaze/series/' + show.show_name, { cache: true })
-                    .success(function(data) {
-                        show.metadata = data;
-                    })
-                    .error(function(error) {
-                        console.log(error);
-                    });
-                return show;
-            })
         }
 
         //Call from the pagination to update the page to the selected page

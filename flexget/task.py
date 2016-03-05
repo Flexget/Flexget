@@ -538,7 +538,7 @@ class Task(object):
                     continue
                 if phase == 'start' and self.is_rerun:
                     log.debug('skipping task_start during rerun')
-                elif phase == 'exit' and self._rerun:
+                elif phase == 'exit' and self._rerun and self._rerun_count < self.max_reruns:
                     log.debug('not running task_exit yet because task will rerun')
                 else:
                     # run all plugins with this phase

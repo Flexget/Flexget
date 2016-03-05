@@ -4,21 +4,44 @@
     angular.module('flexget.plugins.series')
         .controller('episodesController', episodesController);
 
-    function episodesController($http, $stateParams, $mdDialog) {
+    function episodesController($http, $stateParams, $mdDialog, $state) {
         var vm = this;
 
         var show = "";
 
-        $http.get('/api/series/' + $stateParams.id + '/episodes')
-            .success(function(data) {
-                vm.episodes = data.episodes;
+        var options = {
+            page: 1,
+            page_size: 10
+        }
 
-                show = data.show;
-                loadReleases();
-            })
-            .error(function(error) {
-                console.log(error);
-            });
+        vm.updateListPage = function(index) {
+            options.page = index;
+
+            getEpisodesList();
+        }
+
+        vm.goBack = function() {
+            $state.go('flexget.series');
+        }
+
+        function getEpisodesList() {
+            $http.get('/api/series/' + $stateParams.id + '/episodes', { params: options, cache: true})
+                .success(function(data) {
+                    vm.episodes = data.episodes;
+
+                    vm.currentPage = data.page;
+                    vm.totalEpisodes = data.total_number_of_episodes;
+                    vm.pageSize = options.page_size;
+
+                    show = data.show;
+                    loadReleases();
+                })
+                .error(function(error) {
+                    console.log(error);
+                });
+        }
+
+        getEpisodesList();
 
         vm.forgetEpisode = function(episode) {
             var confirm = $mdDialog.confirm()

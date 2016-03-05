@@ -1,11 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
-import os
-from tests import FlexGetBase
 
+import pytest
 
-class TestMigrate(FlexGetBase):
+from .conftest import MockManager
 
-    __yaml__ = """
+class TestMigrate(object):
+
+    config = """
         tasks:
           test:
             mock:
@@ -13,21 +14,16 @@ class TestMigrate(FlexGetBase):
             accept_all: yes
     """
 
-    def setup(self):
-        import logging
-        logging.critical('TestMigrate.setup()')
-        db_filename = os.path.join(self.base_path, 'upgrade_test.sqlite')
+    @pytest.mark.filecopy('db-r1042.sqlite', '__tmp__/upgrade_test.sqlite')
+    def test_upgrade(self, request, tmpdir):
+        db_filename = tmpdir.join('upgrade_test.sqlite')
         # in case running on windows, needs double \\
-        filename = db_filename.replace('\\', '\\\\')
-        self.database_uri = 'sqlite:///%s' % filename
-        super(TestMigrate, self).setup()
-
-    # This fails on windows when it tries to delete upgrade_test.sqlite
-    # WindowsError: [Error 32] The process cannot access the file because it is being used by another process: 'upgrade_test.sqlite'
-    #@with_filecopy('db-r1042.sqlite', 'upgrade_test.sqlite')
-    def test_upgrade(self):
-        # TODO: for some reason this will fail
-        return
-
-        self.execute_task('test')
-        assert self.task.accepted
+        filename = db_filename.strpath.replace('\\', '\\\\')
+        database_uri = 'sqlite:///%s' % filename
+        # This will raise an error if the upgrade wasn't successful
+        mockmanager = MockManager(self.config, request.cls.__name__, db_uri=database_uri)
+        try:
+            mockmanager.shutdown()
+        finally:
+            mockmanager.__del__()
+        # TODO: verify we actually loaded the old config, and didn't just create a new one or something
