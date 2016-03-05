@@ -6,7 +6,6 @@ from flexget.entry import Entry
 from flexget.event import event
 
 from bs4 import BeautifulSoup
-from datetime import datetime
 
 import unicodedata
 import requests
@@ -74,7 +73,7 @@ class NPOWatchlist(object):
 
         if profile_response.url == 'https://mijn.npo.nl/sessions':
             raise plugin.PluginError('Failed to login. Check username and password.')
-        elif profile_response.url <> 'http://www.npo.nl/profiel':
+        elif profile_response.url != 'http://www.npo.nl/profiel':
             raise plugin.PluginError('Unexpected profile page: {}'.format(profile_response.url))
         
         return profile_response
@@ -112,9 +111,8 @@ class NPOWatchlist(object):
             entries.append(e)
         
         return entries
-    
-    
-    def entry_complete(self, e, task=None, **kwargs):
+        
+    def entry_complete(self, e, task=None):
         if not e.accepted:
             log.warning('Not removing %s entry %s', e.state, e['title'])
         elif 'remove_url' not in e:
@@ -129,8 +127,8 @@ class NPOWatchlist(object):
             except requests.HTTPError:
                 log.warning('Failed to remove %s, already removed (404)', e['title'])
             else:
-                if deleteResponse.status_code != requests.codes.ok:
-                    log.warning('Failed to remove %s, got status %s', e['title'], deleteResponse.status_code)
+                if delete_response.status_code != requests.codes.ok:
+                    log.warning('Failed to remove %s, got status %s', e['title'], delete_response.status_code)
 
             
 @event('plugin.register')
