@@ -13,12 +13,10 @@
 
         this.$get = function () {
             return {
-                register: function (name, url, controller, template) {
+                register: function (name, url, template) {
                     $stateProvider.state('flexget.' + name, {
                         url: url,
-                        templateUrl: template,
-                        controller: controller,
-                        controllerAs: 'vm'
+                        template: '<md-content><'+template +'></'+template+'></content>',
                     });
                 }
             }

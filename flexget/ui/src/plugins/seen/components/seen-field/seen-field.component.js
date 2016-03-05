@@ -2,9 +2,9 @@
   'use strict';
 
   angular
-    .module('flexget.components')
+    .module('flexget.plugins.seen')
     .component('seenFields',{
-      templateUrl: 'components/seen/seen-fields/seen-fields.tmpl.html',
+      templateUrl: 'plugins/seen/compnents/seen-fields/seen-fields.tmpl.html',
       controllerAs: 'vm',
       controller: seenFieldsController,
       bindings: {

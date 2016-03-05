@@ -108,6 +108,7 @@ def console(text, *args, **kwargs):
         text = unicode(text).encode(io_encoding, 'replace')
     kwargs['file'] = getattr(local_context, 'output', sys.stdout)
     print(text, *args, **kwargs)
+    kwargs['file'].flush()  # flush to make sure the output is printed right away
 
 
 class RollingBuffer(collections.deque):
