@@ -44,7 +44,7 @@ class NPOWatchlist(object):
             'password': {'type': 'string'},
             'remove_accepted': {'type': 'boolean', 'default': False}
         },
-        'required': [],
+        'required': ['email', 'password'],
         'additionalProperties': False
     }
     
