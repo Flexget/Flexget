@@ -76,7 +76,7 @@ class Text(object):
     def on_task_input(self, task, config):
         url = config['url']
         if '://' in url:
-            lines = task.requests.get(url).iter_lines(decode_unicode=True)
+            lines = task.requests.get(url).text.split('\n')
         else:
             lines = path.Path(url).lines(encoding=config.get('encoding', 'utf-8'))
 
