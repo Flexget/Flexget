@@ -169,7 +169,7 @@ class Discover(object):
                 continue
             result.extend(entry_results)
 
-        return sorted(result, reverse=True, key=lambda x: x.get('search_sort'))
+        return sorted(result, reverse=True, key=lambda x: x.get('search_sort', -1))
 
     def entry_complete(self, entry, query=None, search_results=None, **kwargs):
         if entry.accepted:
