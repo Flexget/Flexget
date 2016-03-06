@@ -179,9 +179,8 @@ def encode_dictionary(data):
 
 def bencode(data):
     encode_func = {
-        str: encode_string,
+        bytes: encode_string,
         str: encode_unicode,
-        int: encode_integer,
         int: encode_integer,
         list: encode_list,
         dict: encode_dictionary}
