@@ -350,8 +350,8 @@ class RequirementComponent(object):
     def reset(self):
         self.min = None
         self.max = None
-        self.acceptable = []
-        self.none_of = []
+        self.acceptable = set()
+        self.none_of = set()
 
     def allows(self, comp, loose=False):
         if comp.type != self.type:
@@ -381,16 +381,16 @@ class RequirementComponent(object):
             self.min, self.max = min, max
         elif '|' in text:
             quals = text.split('|')
-            quals = [_registry[qual] for qual in quals]
+            quals = {_registry[qual] for qual in quals}
             if any(qual.type != self.type for qual in quals):
                 raise ValueError('Component type mismatch: %s' % text)
-            self.acceptable.extend(quals)
+            self.acceptable |= quals
         else:
             qual = _registry[text.strip('!<>=+')]
             if qual.type != self.type:
                 raise ValueError('Component type mismatch!')
             if text in _registry:
-                self.acceptable.append(qual)
+                self.acceptable.add(qual)
             else:
                 if text[0] == '<':
                     if text[1] != '=':
@@ -401,7 +401,10 @@ class RequirementComponent(object):
                         qual += 1
                     self.min = qual
                 elif text[0] == '!':
-                    self.none_of.append(qual)
+                    self.none_of.add(qual)
+
+    def __eq__(self, other):
+        return (self.max, self.max, self.acceptable, self.none_of) == (other.max, other.max, other.acceptable, other.none_of)
 
 
 class Requirements(object):
@@ -466,6 +469,11 @@ class Requirements(object):
             if not r_component.allows(q_component, loose=loose):
                 return False
         return True
+
+    def __eq__(self, other):
+        if isinstance(other, str):
+            other = Requirements(other)
+        return self.components == other.components
 
     def __str__(self):
         return self.text or 'any'

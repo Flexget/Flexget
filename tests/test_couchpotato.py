@@ -4,6 +4,8 @@ import json
 import mock
 import os
 
+from flexget.utils.qualities import Requirements
+
 movie_list_file = os.path.join(os.path.dirname(__file__), 'couchpotoato_movie_list_test_response.json')
 qualities_profiles_file = os.path.join(os.path.dirname(__file__), 'couchpotoato_quality_profile_test_response.json')
 
@@ -85,7 +87,7 @@ class TestCouchpotatoWithQuality(object):
         assert entry['title'] in self.expected_qualities , 'Could not find entry {} in qualities list.'.format(entry)
         expected_quality = self.expected_qualities[entry['title']]
 
-        assert entry['quality_req'] == expected_quality, \
+        assert Requirements(expected_quality) == entry['quality_req'], \
             'Expected Quality for entry {} should be {}, instead its {}'.format(entry['title'], expected_quality,
                                                                                 entry.store['quality_req'])
 
