@@ -59,9 +59,9 @@ def config_hash(config):
     """
     if isinstance(config, dict):
         # this does in fact support nested dicts, they're sorted too!
-        return hashlib.md5(str(sorted(config.items()))).hexdigest()
+        return hashlib.md5(str(sorted(config.items())).encode('utf-8')).hexdigest()
     else:
-        return hashlib.md5(str(config)).hexdigest()
+        return hashlib.md5(str(config).encode('utf-8')).hexdigest()
 
 
 class cached(object):
