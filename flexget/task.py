@@ -103,6 +103,8 @@ class EntryIterator(object):
         return itertools.chain(other, self)
 
     def __getitem__(self, item):
+        if isinstance(item, slice):
+            return list(itertools.islice(self, item.start, item.stop))
         if not isinstance(item, int):
             raise ValueError('Index must be integer.')
         for index, entry in enumerate(self):
@@ -110,9 +112,6 @@ class EntryIterator(object):
                 return entry
         else:
             raise IndexError('%d is out of bounds' % item)
-
-    def __getslice__(self, a, b):
-        return list(itertools.islice(self, a, b))
 
     def reverse(self):
         self.all_entries.sort(reverse=True)
