@@ -171,9 +171,9 @@ class PluginCookies(object):
         task.requests.add_cookiejar(cj)
         # Add handler to urllib2 default opener for backwards compatibility
         handler = urllib.request.HTTPCookieProcessor(cj)
-        if urllib2._opener:
+        if urllib.request._opener:
             log.debug('Adding HTTPCookieProcessor to default opener')
-            urllib2._opener.add_handler(handler)
+            urllib.request._opener.add_handler(handler)
         else:
             log.debug('Creating new opener and installing it')
             urllib.request.install_opener(urllib.request.build_opener(handler))
