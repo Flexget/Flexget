@@ -253,7 +253,7 @@ class AlternateNames(Base):
     def __init__(self, name):
         self.alt_name = name
 
-    def __unicode__(self):
+    def __str__(self):
         return '<SeriesAlternateName(series_id=%s, alt_name=%s)>' % (self.series_id, self.alt_name)
 
     def __repr__(self):
@@ -292,7 +292,7 @@ class Series(Base):
     name = hybrid_property(name_getter, name_setter)
     name.comparator(name_comparator)
 
-    def __unicode__(self):
+    def __str__(self):
         return '<Series(id=%s,name=%s)>' % (self.id, self.name)
 
     def __repr__(self):
@@ -351,7 +351,7 @@ class Episode(Base):
     def downloaded_releases(self):
         return [release for release in self.releases if release.downloaded]
 
-    def __unicode__(self):
+    def __str__(self):
         return '<Episode(id=%s,identifier=%s,season=%s,number=%s)>' % \
                (self.id, self.identifier, self.season, self.number)
 
@@ -403,7 +403,7 @@ class Release(Base):
         warnings.warn("accessing deprecated release.proper, use release.proper_count instead")
         return self.proper_count > 0
 
-    def __unicode__(self):
+    def __str__(self):
         return '<Release(id=%s,quality=%s,downloaded=%s,proper_count=%s,title=%s)>' % \
                (self.id, self.quality, self.downloaded, self.proper_count, self.title)
 
