@@ -180,7 +180,8 @@ def delete_list_by_id(list_id, session=None):
 
 
 @with_session
-def get_entries_by_list_id(list_id, count=None, start=None, stop=None, order_by=None, descending=False, session=None):
+def get_entries_by_list_id(list_id, count=False, start=None, stop=None, order_by='title', descending=False,
+                           session=None):
     log.debug('querying entries from entry list with id %d', list_id)
     query = session.query(EntryListEntry).filter(EntryListList.id == list_id)
     if count:

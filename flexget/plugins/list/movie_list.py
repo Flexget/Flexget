@@ -181,7 +181,8 @@ def register_plugin():
 
 
 @with_session
-def get_movies_by_list_id(list_id, count=None, start=None, stop=None, order_by=None, descending=False, session=None):
+def get_movies_by_list_id(list_id, count=False, start=None, stop=None, order_by='title', descending=False,
+                          session=None):
     query = session.query(MovieListMovie).filter(MovieListList.id == list_id)
     if count:
         return query.count()
