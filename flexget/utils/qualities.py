@@ -404,7 +404,11 @@ class RequirementComponent(object):
                     self.none_of.add(qual)
 
     def __eq__(self, other):
-        return (self.max, self.max, self.acceptable, self.none_of) == (other.max, other.max, other.acceptable, other.none_of)
+        return ((self.max, self.max, self.acceptable, self.none_of) ==
+                (other.max, other.max, other.acceptable, other.none_of))
+
+    def __hash__(self):
+        return hash(tuple([self.min, self.max, tuple(sorted(self.acceptable)), tuple(sorted(self.none_of))]))
 
 
 class Requirements(object):
@@ -474,6 +478,9 @@ class Requirements(object):
         if isinstance(other, str):
             other = Requirements(other)
         return self.components == other.components
+
+    def __hash__(self):
+        return hash(tuple(self.components))
 
     def __str__(self):
         return self.text or 'any'
