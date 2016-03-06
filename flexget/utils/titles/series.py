@@ -1,4 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from past.builtins import cmp
+from builtins import map
+from builtins import str
+from builtins import range
 import logging
 from datetime import datetime, timedelta
 from string import capwords
@@ -573,7 +577,7 @@ class SeriesParser(TitleParser):
         if not self.valid:
             raise Exception('Series flagged invalid')
         if self.id_type == 'ep':
-            return ['S%02dE%02d' % (self.season, self.episode + x) for x in xrange(self.episodes)]
+            return ['S%02dE%02d' % (self.season, self.episode + x) for x in range(self.episodes)]
         elif self.id_type == 'date':
             return [self.id.strftime('%Y-%m-%d')]
         if self.id is None:

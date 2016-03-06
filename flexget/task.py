@@ -1,4 +1,11 @@
 from __future__ import absolute_import, division, unicode_literals
+from past.builtins import cmp
+from builtins import next
+from builtins import map
+from builtins import str
+from builtins import range
+from past.builtins import basestring
+from builtins import object
 
 import copy
 import hashlib
@@ -81,7 +88,7 @@ class EntryIterator(object):
         self.filter = lambda e: e._state in states
 
     def __iter__(self):
-        return itertools.ifilter(self.filter, self.all_entries)
+        return filter(self.filter, self.all_entries)
 
     def __bool__(self):
         return any(e for e in self)
@@ -194,7 +201,7 @@ class Task(object):
             The default is 0, if the cron option is set though, the default is lowered to 10.
 
         """
-        self.name = unicode(name)
+        self.name = str(name)
         self.id = ''.join(random.choice(string.digits) for _ in range(6))
         self.manager = manager
         if config is None:
@@ -337,7 +344,7 @@ class Task(object):
         if not isinstance(cat, EntryIterator):
             raise TypeError('category must be a EntryIterator')
         for entry in cat:
-            for k, v in values.iteritems():
+            for k, v in values.items():
                 if not (k in entry and entry[k] == v):
                     break
             else:
@@ -355,7 +362,7 @@ class Task(object):
         if phase:
             plugins = sorted(get_plugins(phase=phase), key=lambda p: p.phase_handlers[phase], reverse=True)
         else:
-            plugins = all_plugins.itervalues()
+            plugins = iter(all_plugins.values())
         return (p for p in plugins if p.name in self.config or p.builtin)
 
     def __run_task_phase(self, phase):
@@ -499,7 +506,7 @@ class Task(object):
             self.disable_phase('download')
             self.disable_phase('output')
         if self.options.disable_phases:
-            map(self.disable_phase, self.options.disable_phases)
+            list(map(self.disable_phase, self.options.disable_phases))
         if self.options.inject:
             # If entries are passed for this execution (eg. rerun), disable the input phase
             self.disable_phase('input')

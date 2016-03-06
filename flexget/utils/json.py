@@ -35,7 +35,7 @@ def _datetime_encoder(obj):
 
 
 def _datetime_decoder(dict_):
-    for key, value in dict_.iteritems():
+    for key, value in dict_.items():
         # The built-in `json` library will `unicode` strings, except for empty strings. patch this for
         # consistency so that `unicode` is always returned.
         if value == b'':
@@ -56,7 +56,7 @@ def _datetime_decoder(dict_):
 
 
 def _empty_unicode_decoder(dict_):
-    for key, value in dict_.iteritems():
+    for key, value in dict_.items():
         # The built-in `json` library will `unicode` strings, except for empty strings. patch this for
         # consistency so that `unicode` is always returned.
         if value == b'':

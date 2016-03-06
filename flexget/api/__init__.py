@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 import json
 import logging
 import os
@@ -61,7 +63,7 @@ class ApiSchemaModel(Model, object):
         else:
             return self._schema
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self._schema)
 
     def __repr__(self):
@@ -81,7 +83,7 @@ class Api(RestPlusAPI, object):
                 self._rewrite_refs(value)
 
         if isinstance(schema, dict):
-            for key, value in schema.iteritems():
+            for key, value in schema.items():
                 if isinstance(value, (list, dict)):
                     self._rewrite_refs(value)
 

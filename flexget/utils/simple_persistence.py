@@ -130,7 +130,7 @@ class SimplePersistence(MutableMapping):
         log.debug('Flushing simple persistence for task %s to db.' % task)
         with Session() as session:
             for pluginname in cls.class_store[task]:
-                for key, value in cls.class_store[task][pluginname].iteritems():
+                for key, value in cls.class_store[task][pluginname].items():
                     query = (session.query(SimpleKeyValue).
                         filter(SimpleKeyValue.task == task).
                         filter(SimpleKeyValue.plugin == pluginname).

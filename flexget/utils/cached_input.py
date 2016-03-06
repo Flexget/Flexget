@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import str
+from builtins import object
 import copy
 import logging
 import hashlib
@@ -79,7 +81,7 @@ class cached(object):
 
     def __init__(self, name, persist=None):
         # Cast name to unicode to prevent sqlalchemy warnings when filtering
-        self.name = unicode(name)
+        self.name = str(name)
         # Parse persist time
         self.persist = persist and parse_timedelta(persist)
 
@@ -106,7 +108,7 @@ class cached(object):
             log.trace('hash: %s' % hash)
 
             cache_name = self.name + '_' + hash
-            log.debug('cache name: %s (has: %s)' % (cache_name, ', '.join(self.cache.keys())))
+            log.debug('cache name: %s (has: %s)' % (cache_name, ', '.join(list(self.cache.keys()))))
 
             if not task.options.nocache and cache_name in self.cache:
                 # return from the cache

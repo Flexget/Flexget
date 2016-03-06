@@ -1,7 +1,10 @@
 from __future__ import absolute_import, division, unicode_literals
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 
 import logging
-import Queue
+import queue
 import threading
 import time
 from datetime import datetime
@@ -20,7 +23,7 @@ class TaskQueue(object):
     Only executes one task at a time, if more are requested they are queued up and run in turn.
     """
     def __init__(self):
-        self.run_queue = Queue.PriorityQueue()
+        self.run_queue = queue.PriorityQueue()
         self._shutdown_now = False
         self._shutdown_when_finished = False
 
@@ -39,7 +42,7 @@ class TaskQueue(object):
             # Grab the first job from the run queue and do it
             try:
                 self.current_task = self.run_queue.get(timeout=0.5)
-            except Queue.Empty:
+            except queue.Empty:
                 if self._shutdown_when_finished:
                     self._shutdown_now = True
                 continue

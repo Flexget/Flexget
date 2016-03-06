@@ -1,3 +1,5 @@
+from builtins import range
+from builtins import object
 import os
 import logging
 import json
@@ -231,7 +233,7 @@ class ServerLogAPI(APIResource):
         return Response(follow(args['lines'], args['search']), mimetype='text/event-stream')
 
 
-class LogParser:
+class LogParser(object):
     """
     Filter log file.
 

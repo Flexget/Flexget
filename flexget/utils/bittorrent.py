@@ -2,6 +2,9 @@
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
 from __future__ import unicode_literals, division, absolute_import
+from builtins import next
+from builtins import zip
+from builtins import object
 import re
 import logging
 
@@ -41,7 +44,7 @@ def clean_meta(meta, including_info=False, logger=None):
     """
     modified = set()
 
-    for key in meta.keys():
+    for key in list(meta.keys()):
         if [key] not in METAFILE_STD_KEYS:
             if logger:
                 logger("Removing key %r..." % (key,))
@@ -49,7 +52,7 @@ def clean_meta(meta, including_info=False, logger=None):
             modified.add(key)
 
     if including_info:
-        for key in meta["info"].keys():
+        for key in list(meta["info"].keys()):
             if ["info", key] not in METAFILE_STD_KEYS:
                 if logger:
                     logger("Removing key %r..." % ("info." + key,))
@@ -57,7 +60,7 @@ def clean_meta(meta, including_info=False, logger=None):
                 modified.add("info." + key)
 
         for idx, entry in enumerate(meta["info"].get("files", [])):
-            for key in entry.keys():
+            for key in list(entry.keys()):
                 if ["info", "files", key] not in METAFILE_STD_KEYS:
                     if logger:
                         logger("Removing key %r from file #%d..." % (key, idx + 1))
@@ -123,7 +126,7 @@ def decode_item(next, token):
             data.append(decode_item(next, tok))
             tok = next()
         if token == b"d":
-            data = dict(zip(data[0::2], data[1::2]))
+            data = dict(list(zip(data[0::2], data[1::2])))
     else:
         raise ValueError
     return data
@@ -132,7 +135,7 @@ def decode_item(next, token):
 def bdecode(text):
     try:
         src = tokenize(text)
-        data = decode_item(src.next, src.next()) # pylint:disable=E1101
+        data = decode_item(src.__next__, next(src)) # pylint:disable=E1101
         for token in src: # look for more tokens
             raise SyntaxError("trailing junk")
     except (AttributeError, ValueError, StopIteration) as e:
@@ -163,7 +166,7 @@ def encode_list(data):
 
 def encode_dictionary(data):
     encoded = b"d"
-    items = data.items()
+    items = list(data.items())
     items.sort()
     for (key, value) in items:
         encoded += bencode(key)
@@ -175,9 +178,9 @@ def encode_dictionary(data):
 def bencode(data):
     encode_func = {
         str: encode_string,
-        unicode: encode_unicode,
+        str: encode_unicode,
         int: encode_integer,
-        long: encode_integer,
+        int: encode_integer,
         list: encode_list,
         dict: encode_dictionary}
     return encode_func[type(data)](data)
@@ -231,7 +234,7 @@ class Torrent(object):
         for item in files:
             for field in ('name', 'path'):
                 # These should already be decoded if they were utf-8, if not we can try some other stuff
-                if not isinstance(item[field], unicode):
+                if not isinstance(item[field], str):
                     try:
                         item[field] = item[field].decode(self.content.get('encoding', 'cp1252'))
                     except UnicodeError:

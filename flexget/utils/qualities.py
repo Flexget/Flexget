@@ -1,4 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import zip
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 import re
 import copy
 import logging
@@ -49,7 +53,7 @@ class QualityComponent(object):
     def __hash__(self):
         return hash(self.type + str(self.value))
 
-    def __nonzero__(self):
+    def __bool__(self):
         return self.value
 
     def __eq__(self, other):
@@ -188,7 +192,7 @@ for items in (_resolutions, _sources, _codecs, _audios):
 
 
 def all_components():
-    return _registry.itervalues()
+    return iter(_registry.values())
 
 
 class Quality(object):
@@ -269,7 +273,7 @@ class Quality(object):
                 return False
         return True
 
-    def __nonzero__(self):
+    def __bool__(self):
         return any(self._comparator)
 
     def __eq__(self, other):
@@ -330,7 +334,7 @@ def get(quality_name):
     if not found_components:
         raise ValueError('No quality specified')
     result = Quality()
-    for type, component in found_components.iteritems():
+    for type, component in found_components.items():
         setattr(result, type, component)
     return result
 

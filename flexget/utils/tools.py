@@ -1,11 +1,18 @@
 """Contains miscellaneous helpers"""
 
 from __future__ import unicode_literals, division, absolute_import, print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import chr
+from builtins import str
+from builtins import zip
+from builtins import range
+from past.builtins import basestring
 
-import Queue
+import queue
 import ast
 import copy
-import httplib
+import http.client
 import locale
 import operator
 import os
@@ -13,11 +20,11 @@ import re
 import socket
 import sys
 import time
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from collections import MutableMapping
 from datetime import timedelta, datetime
-from htmlentitydefs import name2codepoint
-from urlparse import urlparse
+from html.entities import name2codepoint
+from urllib.parse import urlparse
 
 import requests
 
@@ -85,10 +92,10 @@ charrefpat = re.compile(r'&(#(\d+|x[\da-fA-F]+)|[\w.:-]+);?')
 def _htmldecode(text):
     """Decode HTML entities in the given text."""
     # From screpe.py - licensed under apache 2.0 .. should not be a problem for a MIT afaik
-    if type(text) is unicode:
-        uchr = unichr
+    if type(text) is str:
+        uchr = chr
     else:
-        uchr = lambda value: value > 127 and unichr(value) or chr(value)
+        uchr = lambda value: value > 127 and chr(value) or chr(value)
 
     def entitydecode(match, uchr=uchr):
         entity = match.group(1)
@@ -142,7 +149,7 @@ def _xmlcharref_encode(unicode_data, encoding):
 
 def merge_dict_from_to(d1, d2):
     """Merges dictionary d1 into dictionary d2. d1 will remain in original form."""
-    for k, v in d1.items():
+    for k, v in list(d1.items()):
         if k in d2:
             if type(v) == type(d2[k]):
                 if isinstance(v, dict):
@@ -164,14 +171,14 @@ def merge_dict_from_to(d1, d2):
             d2[k] = copy.deepcopy(v)
 
 
-class SmartRedirectHandler(urllib2.HTTPRedirectHandler):
+class SmartRedirectHandler(urllib.request.HTTPRedirectHandler):
     def http_error_301(self, req, fp, code, msg, headers):
-        result = urllib2.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
+        result = urllib.request.HTTPRedirectHandler.http_error_301(self, req, fp, code, msg, headers)
         result.status = code
         return result
 
     def http_error_302(self, req, fp, code, msg, headers):
-        result = urllib2.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
+        result = urllib.request.HTTPRedirectHandler.http_error_302(self, req, fp, code, msg, headers)
         result.status = code
         return result
 
@@ -191,14 +198,14 @@ def urlopener(url_or_request, log, **kwargs):
     """
     from flexget.utils.requests import is_unresponsive, set_unresponsive
 
-    if isinstance(url_or_request, urllib2.Request):
+    if isinstance(url_or_request, urllib.request.Request):
         url = url_or_request.get_host()
     else:
         url = url_or_request
     if is_unresponsive(url):
         msg = '%s is known to be unresponsive, not trying again.' % urlparse(url).hostname
         log.warning(msg)
-        raise urllib2.URLError(msg)
+        raise urllib.error.URLError(msg)
 
     retries = kwargs.get('retries', 3)
     timeout = kwargs.get('timeout', 15.0)
@@ -218,19 +225,19 @@ def urlopener(url_or_request, log, **kwargs):
         if len(handlers) > 1:
             handler_names = [h.__class__.__name__ for h in handlers]
             log.debug('Additional handlers have been specified for this urlopen: %s' % ', '.join(handler_names))
-        opener = urllib2.build_opener(*handlers).open
+        opener = urllib.request.build_opener(*handlers).open
         for i in range(retries):  # retry getting the url up to 3 times.
             if i > 0:
                 time.sleep(3)
             try:
                 retrieved = opener(url_or_request, kwargs.get('data'))
-            except urllib2.HTTPError as e:
+            except urllib.error.HTTPError as e:
                 if e.code < 500:
                     # If it was not a server error, don't keep retrying.
                     log.warning('Could not retrieve url (HTTP %s error): %s' % (e.code, e.url))
                     raise
                 log.debug('HTTP error (try %i/%i): %s' % (i + 1, retries, e.code))
-            except (urllib2.URLError, socket.timeout) as e:
+            except (urllib.error.URLError, socket.timeout) as e:
                 if hasattr(e, 'reason'):
                     reason = str(e.reason)
                 else:
@@ -238,7 +245,7 @@ def urlopener(url_or_request, log, **kwargs):
                 if reason == 'timed out':
                     set_unresponsive(url)
                 log.debug('Failed to retrieve url (try %i/%i): %s' % (i + 1, retries, reason))
-            except httplib.IncompleteRead as e:
+            except http.client.IncompleteRead as e:
                 log.critical('Incomplete read - see python bug 6312')
                 break
             else:
@@ -255,7 +262,7 @@ def urlopener(url_or_request, log, **kwargs):
                 return retrieved
 
         log.warning('Could not retrieve url: %s' % url_or_request)
-        raise urllib2.URLError('Could not retrieve url after %s tries.' % retries)
+        raise urllib.error.URLError('Could not retrieve url after %s tries.' % retries)
     finally:
         socket.setdefaulttimeout(oldtimeout)
 
@@ -383,7 +390,7 @@ _binOps = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
     ast.Mult: operator.mul,
-    ast.Div: operator.div,
+    ast.Div: operator.truediv,
     ast.Mod: operator.mod
 }
 
@@ -422,7 +429,7 @@ class TimedDict(MutableMapping):
 
     def _prune(self):
         """Prune all expired keys."""
-        for key, (add_time, value) in self._store.items():
+        for key, (add_time, value) in list(self._store.items()):
             if add_time < datetime.now() - self.cache_time:
                 del self._store[key]
         self._last_prune = datetime.now()
@@ -446,19 +453,19 @@ class TimedDict(MutableMapping):
 
     def __iter__(self):
         # Uses our getitem to skip expired items
-        return (key for key in self._store.keys() if key in self)
+        return (key for key in list(self._store.keys()) if key in self)
 
     def __len__(self):
         return len(list(self.__iter__()))
 
     def __repr__(self):
-        return '%s(%r)' % (self.__class__.__name__, dict(zip(self._store, (v[1] for v in self._store.values()))))
+        return '%s(%r)' % (self.__class__.__name__, dict(list(zip(self._store, (v[1] for v in list(self._store.values()))))))
 
 
-class BufferQueue(Queue.Queue):
+class BufferQueue(queue.Queue):
     """Used in place of a file-like object to capture text and access it safely from another thread."""
     # Allow access to the Empty error from here
-    Empty = Queue.Empty
+    Empty = queue.Empty
 
     def write(self, line):
         self.put(line)

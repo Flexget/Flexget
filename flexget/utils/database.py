@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from past.builtins import basestring
 import functools
 from collections import Mapping
 from datetime import datetime, date
@@ -89,14 +90,14 @@ def safe_pickle_synonym(name):
         Raises ValueError if passed an object that doesn't subclass a builtin type.
         """
 
-        supported_types = [str, unicode, int, float, long, bool, datetime]
+        supported_types = [str, str, int, float, int, bool, datetime]
         # dict, list, tuple and set are also supported, but handled separately
 
         if type(item) in supported_types:
             return item
         elif isinstance(item, Mapping):
             result = {}
-            for key, value in item.iteritems():
+            for key, value in item.items():
                 try:
                     result[key] = only_builtins(value)
                 except TypeError:

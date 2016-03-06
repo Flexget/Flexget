@@ -1,7 +1,10 @@
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
 import copy
 import cherrypy
 from datetime import datetime
-from Queue import Queue, Empty
+from queue import Queue, Empty
 from json import JSONEncoder
 import argparse
 
@@ -57,7 +60,7 @@ class TasksAPI(APIResource):
     def get(self, session=None):
         """ List all tasks """
         tasks = []
-        for name, config in self.manager.user_config.get('tasks', {}).iteritems():
+        for name, config in self.manager.user_config.get('tasks', {}).items():
             tasks.append({'name': name, 'config': config})
         return {'tasks': tasks}
 
@@ -275,13 +278,13 @@ class TaskExecutionAPI(APIResource):
         """ Execute task and stream results """
         args = execute_parser.parse_args()
 
-        if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {}).iterkeys()]:
+        if task.lower() not in [t.lower() for t in self.manager.user_config.get('tasks', {}).keys()]:
             return {'error': 'task does not exist'}, 404
 
         queue = ExecuteLog()
         output = queue if args['log'] else None
         stream = True if any(
-            arg[0] in ['progress', 'summary', 'log', 'entry_dump'] for arg in args.iteritems() if arg[1]) else False
+            arg[0] in ['progress', 'summary', 'log', 'entry_dump'] for arg in args.items() if arg[1]) else False
 
         task_id, __, task_event = self.manager.execute(options={'tasks': [task]}, output=output)[0]
 

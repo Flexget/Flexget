@@ -1,4 +1,6 @@
 from __future__ import absolute_import, division, unicode_literals
+from builtins import str
+from past.builtins import basestring
 
 import copy
 import functools
@@ -184,9 +186,9 @@ class Entry(LazyDict):
 
     def __setitem__(self, key, value):
         # Enforce unicode compatibility. Check for all subclasses of basestring, so that NavigableStrings are also cast
-        if isinstance(value, basestring) and not type(value) == unicode:
+        if isinstance(value, basestring) and not type(value) == str:
             try:
-                value = unicode(value)
+                value = str(value)
             except UnicodeDecodeError:
                 raise EntryUnicodeError(key, value)
 
@@ -234,7 +236,7 @@ class Entry(LazyDict):
         :param string name: Snapshot name
         """
         snapshot = {}
-        for field, value in self.iteritems():
+        for field, value in self.items():
             try:
                 snapshot[field] = copy.deepcopy(value)
             except TypeError:
@@ -259,7 +261,7 @@ class Entry(LazyDict):
           Ignore any None values, do not record it to the Entry
         """
         func = dict.get if isinstance(source_item, dict) else getattr
-        for field, value in field_map.iteritems():
+        for field, value in field_map.items():
             if isinstance(value, basestring):
                 v = functools.reduce(func, value.split('.'), source_item)
             else:

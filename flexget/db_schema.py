@@ -1,4 +1,6 @@
 from __future__ import absolute_import, division, unicode_literals
+from builtins import str
+from past.builtins import basestring
 
 import logging
 
@@ -216,7 +218,7 @@ def after_table_create(event, target, bind, tables=None, **kw):
         # TODO: Detect if any database upgrading is needed and acquire the lock only in one place
         with manager.acquire_lock(event=False):
             tables = [table.name for table in tables]
-            for plugin, info in plugin_schemas.iteritems():
+            for plugin, info in plugin_schemas.items():
                 # Only set the version if all tables for a given plugin are being created
                 if all(table in tables for table in info['tables']):
                     set_version(plugin, info['version'])

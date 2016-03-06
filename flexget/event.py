@@ -2,6 +2,7 @@
 Provides small event framework
 """
 from __future__ import absolute_import, division, unicode_literals
+from builtins import object
 
 import logging
 
@@ -97,10 +98,9 @@ def fire_event(name, *args, **kwargs):
     :param args: List of arguments passed to handler function
     :param kwargs: Key Value arguments passed to handler function
     """
-    if name not in _events:
-        return
-    for event in get_events(name):
-        result = event(*args, **kwargs)
-        if result is not None:
-            args = (result,) + args[1:]
+    if name in _events:
+        for event in get_events(name):
+            result = event(*args, **kwargs)
+            if result is not None:
+                args = (result,) + args[1:]
     return args and args[0]

@@ -1,4 +1,8 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+from builtins import str
+from builtins import map
+from past.builtins import basestring
+from builtins import object
 
 import re
 
@@ -22,7 +26,7 @@ class Errors(object):
 
     def add(self, msg):
         """Add new error message to current path."""
-        path = [unicode(p) for p in self.path]
+        path = [str(p) for p in self.path]
         msg = '[/%s] %s' % ('/'.join(path), msg)
         self.messages.append(msg)
 
@@ -199,7 +203,7 @@ class ChoiceValidator(Validator):
         if self.valid_ic:
             schemas.append(any_schema({"type": "string", "pattern": "(?i)^%s$" % p} for p in self.valid_ic))
         s = any_schema(schemas)
-        s['error'] = 'Must be one of the following: %s' % ', '.join(map(unicode, self.valid + self.valid_ic))
+        s['error'] = 'Must be one of the following: %s' % ', '.join(map(str, self.valid + self.valid_ic))
         return s
 
 
@@ -457,7 +461,7 @@ class DictValidator(Validator):
     def _schema(self):
         schema = {'type': 'object'}
         properties = schema['properties'] = {}
-        for key, validators in self.valid.iteritems():
+        for key, validators in self.valid.items():
             if not validators:
                 continue
             properties[key] = any_schema(v.schema() for v in validators)
