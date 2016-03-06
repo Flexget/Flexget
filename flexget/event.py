@@ -36,6 +36,9 @@ class Event(object):
 
     __repr__ = __str__
 
+    def __hash__(self):
+        return hash((self.name, self.func, self.priority))
+
 
 def event(name, priority=128):
     """Register event to function with a decorator"""
