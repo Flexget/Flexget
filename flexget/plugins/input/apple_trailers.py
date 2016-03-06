@@ -3,6 +3,7 @@ import logging
 import re
 
 import feedparser
+from requests.auth import AuthBase
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -77,7 +78,6 @@ class AppleTrailers(object):
         if isinstance(config, basestring):
             config = {'quality': config}
 
-        headers = {'User-Agent': 'Quicktime/7.7'}
         try:
             r = task.requests.get(self.rss_url)
         except RequestException as e:
@@ -101,7 +101,7 @@ class AppleTrailers(object):
             entry['movie_name'], entry['apple_trailers_name'] = entry['title'].split(' - ')
             if not trailers.get(movie_url):
                 try:
-                    movie_page = task.requests.get(movie_url, headers=headers).content
+                    movie_page = task.requests.get(movie_url).content
                     match = filmid_regex.search(movie_page)
                     if match:
                         json_url = self.movie_data_url + match.group(2) + '.json'
@@ -158,10 +158,18 @@ class AppleTrailers(object):
             if genres:
                 entry['genres'] = ', '.join(list(genres))
 
+            # set the correct header without modifying the task.requests obj
+            entry['download_auth'] = AppleTrailersHeader()
             entries.append(entry)
-        # set the correct header in task requests adapter
-        task.requests.headers.update(headers)
+
         return entries
+
+
+class AppleTrailersHeader(AuthBase):
+
+    def __call__(self, request):
+        request.headers['User-Agent'] = 'QuickTime/7.7'
+        return request
 
 
 @event('plugin.register')
