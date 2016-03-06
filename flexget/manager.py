@@ -104,10 +104,10 @@ class Manager(object):
         """
         :param args: CLI args
         """
+        global manager
         if not self.unit_test:
-            global manager
             assert not manager, 'Only one instance of Manager should be created at a time!'
-        else:
+        elif manager:
             log.info('last manager was not torn down correctly')
 
         if args is None:
@@ -164,10 +164,6 @@ class Manager(object):
             log.warning('Your locale declares ascii as the filesystem encoding. Any plugins reading filenames from '
                         'disk will not work properly for filenames containing non-ascii characters. Make sure your '
                         'locale env variables are set up correctly for the environment which is launching FlexGet.')
-
-    def __del__(self):
-        global manager
-        manager = None
 
     def initialize(self):
         """
@@ -875,6 +871,8 @@ class Manager(object):
             if self._has_lock:
                 os.remove(self.db_filename)
                 log.info('Removed test database')
+        global manager
+        manager = None
 
     def crash_report(self):
         """

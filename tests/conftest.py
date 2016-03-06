@@ -58,7 +58,6 @@ def manager(request, config, caplog, monkeypatch, filecopy):  # enforce filecopy
         raise
     yield mockmanager
     mockmanager.shutdown()
-    mockmanager.__del__()
 
 
 @pytest.fixture()
@@ -189,7 +188,7 @@ def setup_once(pytestconfig, request):
     os.chdir(os.path.join(pytestconfig.rootdir.strpath, 'tests'))
     flexget.logger.initialize(True)
     m = MockManager('tasks: {}', 'init')  # This makes sure our template environment is set up before any tests are run
-    m.__del__()
+    m.shutdown()
     logging.getLogger().setLevel(logging.DEBUG)
     load_plugins()
 

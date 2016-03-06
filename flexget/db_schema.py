@@ -6,6 +6,7 @@ import logging
 
 from sqlalchemy import Column, Integer, String
 
+import flexget
 from flexget.event import event
 from flexget.manager import Base, Session
 from flexget.utils.database import with_session
@@ -213,10 +214,9 @@ def versioned_base(plugin, version):
 
 def after_table_create(event, target, bind, tables=None, **kw):
     """Sets the schema version to most recent for a plugin when it's tables are freshly created."""
-    from flexget.manager import manager
     if tables:
         # TODO: Detect if any database upgrading is needed and acquire the lock only in one place
-        with manager.acquire_lock(event=False):
+        with flexget.manager.manager.acquire_lock(event=False):
             tables = [table.name for table in tables]
             for plugin, info in plugin_schemas.items():
                 # Only set the version if all tables for a given plugin are being created
