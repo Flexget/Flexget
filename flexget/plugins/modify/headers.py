@@ -59,9 +59,9 @@ class PluginHeaders(object):
         else:
             task.requests.headers = config
         # Set the headers in urllib2 for backwards compatibility
-        if urllib2._opener:
+        if urllib.request._opener:
             log.debug('Adding HTTPHeadersProcessor to default opener')
-            urllib2._opener.add_handler(HTTPHeadersProcessor(config))
+            urllib.request._opener.add_handler(HTTPHeadersProcessor(config))
         else:
             log.debug('Creating new opener and installing it')
             opener = urllib.request.build_opener(HTTPHeadersProcessor(config))
@@ -69,7 +69,7 @@ class PluginHeaders(object):
 
     def on_task_exit(self, task, config):
         """Task exiting, remove additions"""
-        if urllib2._opener:
+        if urllib.request._opener:
             log.debug('Removing urllib2 default opener')
             # TODO: this uninstalls all other handlers as well, but does it matter?
             urllib.request.install_opener(None)
