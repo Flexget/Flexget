@@ -111,7 +111,7 @@ class Filesystem(object):
         filepath = filepath.abspath()
         entry = Entry()
         entry['location'] = filepath
-        entry['url'] = urllib.parse.urljoin('file:', urllib.request.pathname2url(filepath.encode('utf8')))
+        entry['url'] = urllib.parse.urljoin('file:', urllib.request.pathname2url(filepath))
         entry['filename'] = filepath.name
         if filepath.isfile():
             entry['title'] = filepath.namebase
