@@ -155,7 +155,7 @@ class EntryListEntriessAPI(APIResource):
     @api.response(200, model=entry_lists_entries_return_schema)
     @api.doc(params={'list_id': 'ID of the list'}, parser=entry_list_parser)
     def get(self, list_id, session=None):
-        """ Get movies by list ID """
+        """ Get entries by list ID """
 
         args = entry_list_parser.parse_args()
         page = args.get('page')
@@ -217,3 +217,45 @@ class EntryListEntriessAPI(APIResource):
         response = jsonify({'entry': entry_object.to_dict()})
         response.status_code = 201
         return response
+
+
+@entry_list_api.route('/<int:list_id>/entries/<int:entry_id>/')
+@api.doc(params={'list_id': 'ID of the list', 'entry_id': 'ID of the entry'})
+@api.response(404, description='List or entry not found', model=default_error_schema)
+class EntryListEntryAPI(APIResource):
+    @api.response(200, model=entry_list_entry_base_schema)
+    def get(self, list_id, entry_id, session=None):
+        """ Get an entry by list ID and entry ID """
+        try:
+            entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session).first()
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'could not find entry with id %d in list %d' % (entry_id, list_id)}, 404
+        return jsonify(entry.to_dict())
+
+    @api.response(200, model=empty_response)
+    def delete(self, list_id, entry_id, session=None):
+        """ Delete an entry by list ID and entry ID """
+        try:
+            entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session).first()
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'could not find entry with id %d in list %d' % (entry_id, list_id)}, 404
+        log.debug('deleting movie %d', entry.id)
+        session.delete(entry)
+        return {}
+
+    @api.validate(model=base_entry_schema)
+    @api.response(200, model=entry_list_entry_base_schema)
+    @api.doc(description='Sent entry data will override any existing entry data the existed before')
+    def put(self, list_id, entry_id, session=None):
+        """ Sets entry object's entry data """
+        try:
+            entry = el.get_entry_by_id(list_id=list_id, entry_id=entry_id, session=session).first()
+        except NoResultFound:
+            return {'status': 'error',
+                    'message': 'could not find entry with id %d in list %d' % (entry_id, list_id)}, 4044
+        data = request.json
+        entry.entry = data
+        session.commit()
+        return jsonify(entry.to_dict())

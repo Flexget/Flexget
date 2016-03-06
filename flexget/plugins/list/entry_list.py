@@ -197,3 +197,9 @@ def get_entries_by_list_id(list_id, count=False, start=None, stop=None, order_by
 @with_session
 def get_entry_by_title(title, session=None):
     return session.query(EntryListEntry).filter(EntryListEntry.title == title).first()
+
+
+@with_session
+def get_entry_by_id(list_id, entry_id, session=None):
+    log.debug('fetching entry with id %d from list id %d', entry_id, list_id)
+    return session.query(EntryListEntry).filter(and_(EntryListEntry.id == entry_id, EntryListEntry.list_id == list_id))
