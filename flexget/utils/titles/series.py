@@ -320,7 +320,7 @@ class SeriesParser(TitleParser):
                     if ep_match['match'].start() > 1:
                         return
 
-                if ep_match['end_episode'] > ep_match['episode'] + 2:
+                if ep_match['end_episode'] and ep_match['end_episode'] > ep_match['episode'] + 2:
                     # This is a pack of too many episodes, ignore it.
                     log.debug('Series pack contains too many episodes (%d). Rejecting',
                               ep_match['end_episode'] - ep_match['episode'])
