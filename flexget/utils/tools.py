@@ -218,8 +218,8 @@ def urlopener(url_or_request, log, **kwargs):
         socket.setdefaulttimeout(timeout)
 
         handlers = [SmartRedirectHandler()]
-        if urllib2._opener:
-            handlers.extend(urllib2._opener.handlers)
+        if urllib.request._opener:
+            handlers.extend(urllib.request._opener.handlers)
         if kwargs.get('handlers'):
             handlers.extend(kwargs['handlers'])
         if len(handlers) > 1:
