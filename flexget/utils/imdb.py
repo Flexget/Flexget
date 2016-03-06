@@ -6,7 +6,7 @@ import re
 from bs4.element import Tag
 
 from flexget.utils.soup import get_soup
-from flexget.utils.requests import Session
+from flexget.utils.requests import Session, TimedLimiter
 from flexget.utils.tools import str_to_int
 from flexget.plugin import get_plugin_by_name, PluginError
 
@@ -21,7 +21,7 @@ requests.headers.update({'User-Agent': 'Python-urllib/2.6'})
 requests.headers.update({'Accept-Language': 'en-US,en;q=0.8'})
 
 # give imdb a little break between requests (see: http://flexget.com/ticket/129#comment:1)
-requests.set_domain_delay('imdb.com', '3 seconds')
+requests.add_domain_limiter(TimedLimiter('imdb.com', '3 seconds'))
 
 
 def is_imdb_url(url):

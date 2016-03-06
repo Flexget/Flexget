@@ -1,10 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase
 
 
-class TestBacklog(FlexGetBase):
+class TestBacklog(object):
 
-    __yaml__ = """
+    config = """
         tasks:
           test:
             mock:
@@ -18,23 +17,23 @@ class TestBacklog(FlexGetBase):
             backlog: 10 minutes
     """
 
-    def test_backlog(self):
+    def test_backlog(self, manager, execute_task):
         """Tests backlog (and snapshot) functionality."""
 
         # Test entry comes out as expected on first run
-        self.execute_task('test')
-        entry = self.task.find_entry(title='Test.S01E01.hdtv-FlexGet')
+        task = execute_task('test')
+        entry = task.find_entry(title='Test.S01E01.hdtv-FlexGet')
         assert entry['description'] == 'I'
         assert entry['laterfield'] == 'something'
         # Simulate entry leaving the task, make sure backlog injects it
-        del(self.manager.config['tasks']['test']['mock'])
-        self.execute_task('test')
-        entry = self.task.find_entry(title='Test.S01E01.hdtv-FlexGet')
+        del(manager.config['tasks']['test']['mock'])
+        task = execute_task('test')
+        entry = task.find_entry(title='Test.S01E01.hdtv-FlexGet')
         assert entry['description'] == 'I'
         assert entry['laterfield'] == 'something'
         # This time take away the set plugin too, to make sure data is being restored at it's state from input
-        del(self.manager.config['tasks']['test']['set'])
-        self.execute_task('test')
-        entry = self.task.find_entry(title='Test.S01E01.hdtv-FlexGet')
+        del(manager.config['tasks']['test']['set'])
+        task = execute_task('test')
+        entry = task.find_entry(title='Test.S01E01.hdtv-FlexGet')
         assert entry['description'] == ''
         assert 'laterfield' not in entry

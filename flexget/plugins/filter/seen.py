@@ -12,6 +12,7 @@ from __future__ import unicode_literals, division, absolute_import
 
 import logging
 from datetime import datetime, timedelta
+from types import NoneType
 
 from sqlalchemy import Column, Integer, DateTime, Unicode, Boolean, or_, select, update, Index
 from sqlalchemy.orm import relation
@@ -68,7 +69,9 @@ class SeenEntry(Base):
 
     fields = relation('SeenField', backref='seen_entry', cascade='all, delete, delete-orphan')
 
-    def __init__(self, title, task, reason=None, local=False):
+    def __init__(self, title, task, reason=None, local=None):
+        if local is None:
+            local = False
         self.title = title
         self.reason = reason
         self.task = task
@@ -176,7 +179,8 @@ def search_by_field_values(field_value_list, task_name, local=False, session=Non
     if local:
         found = found.filter(SeenEntry.task == task_name)
     else:
-        found = found.filter(SeenEntry.local == False)
+        # Entries added from CLI were having local marked as None rather than False for a while gh#879
+        found = found.filter(or_(SeenEntry.local == False, SeenEntry.local == None))
     return found.first()
 
 
@@ -192,7 +196,15 @@ class FilterSeen(object):
     schema = {
         'oneOf': [
             {'type': 'boolean'},
-            {'type': 'string', 'enum': ['global', 'local']}
+            {'type': 'string', 'enum': ['global', 'local']},
+            {'type': 'object',
+             'properties': {
+                 'local': {'type': 'boolean'},
+                 'fields': {'type': 'array',
+                            'items': {'type': 'string'},
+                            "minItems": 1,
+                            "uniqueItems": True}
+             }}
         ]
     }
 
@@ -201,15 +213,31 @@ class FilterSeen(object):
         self.fields = ['title', 'url', 'original_url']
         self.keyword = 'seen'
 
+    def prepare_config(self, config):
+        if isinstance(config, NoneType):
+            config = {}
+        elif isinstance(config, bool):
+            if config is False:
+                return config
+            else:
+                config = {'local': config}
+        elif isinstance(config, basestring):
+            config = {'local': config}
+
+        config.setdefault('local', 'global')
+        config.setdefault('fields', self.fields)
+        return config
+
     @plugin.priority(255)
     def on_task_filter(self, task, config, remember_rejected=False):
         """Filter entries already accepted on previous runs."""
+        config = self.prepare_config(config)
         if config is False:
             log.debug('%s is disabled' % self.keyword)
             return
 
-        fields = self.fields
-        local = config == 'local'
+        fields = config.get('fields')
+        local = config.get('local') == 'local'
 
         for entry in task.entries:
             # construct list of values looked
@@ -233,16 +261,19 @@ class FilterSeen(object):
 
     def on_task_learn(self, task, config):
         """Remember succeeded entries"""
+        config = self.prepare_config(config)
         if config is False:
             log.debug('disabled')
             return
 
-        fields = self.fields
+        fields = config.get('fields')
+        local = config.get('local') == 'local'
+
         if isinstance(config, list):
             fields.extend(config)
 
         for entry in task.accepted:
-            self.learn(task, entry, fields=fields, local=config == 'local')
+            self.learn(task, entry, fields=fields, local=local)
             # verbose if in learning mode
             if task.options.learn:
                 log.info("Learned '%s' (will skip this in the future)" % (entry['title']))
@@ -307,14 +338,21 @@ def add(title, task_name, fields, reason=None, local=None, session=None):
 
 
 @with_session
-def search(value=None, status=None, session=None):
-    if value:
-        query = session.query(SeenEntry).join(SeenField).filter(SeenField.value.like(value)).order_by(SeenField.added)
+def search(value=None, status=None, start=None, stop=None, count=False, order_by='added', descending=False, session=None):
+    query = session.query(SeenEntry)
+    if count:
+        return query.count()
+    if descending:
+        query = query.order_by(getattr(SeenEntry, order_by).desc())
     else:
-        query = session.query(SeenEntry).join(SeenField).order_by(SeenField.added)
+        query = query.order_by(getattr(SeenEntry, order_by))
+    query = query.slice(start, stop).from_self()
+    query = query.join(SeenField)
+    if value:
+        query = query.filter(SeenField.value.like(value))
     if status is not None:
         query = query.filter(SeenEntry.local == status)
-    return query.all()
+    return query
 
 
 @event('plugin.register')

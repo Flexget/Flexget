@@ -20,16 +20,8 @@ Base = db_schema.versioned_base('failed', SCHEMA_VER)
 
 @db_schema.upgrade('failed')
 def upgrade(ver, session):
-    if ver is None:
-        # add count column
-        table_add_column('failed', 'count', Integer, session, default=1)
-        ver = 0
-    if ver == 0:
-        # define an index
-        log.info('Adding database index ...')
-        failed = table_schema('failed', session)
-        Index('failed_title_url', failed.c.title, failed.c.url, failed.c.count).create()
-        ver = 1
+    if ver is None or ver < 1:
+        raise db_schema.UpgradeImpossible
     if ver == 1:
         table_add_column('failed', 'reason', Unicode, session)
         ver = 2

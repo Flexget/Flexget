@@ -38,9 +38,8 @@ How do I get started?
 Set up development environment, which is basically just two steps.
 
 #. `GIT clone`_ our repository.
-#. - Either the wheel package of `setuptools`_ and `pip`_ need to be in the directory with bootstrap.py
-   - Or `virtualenv`_ package needs to be installed.
-#. Run ``bootstrap.py`` with Python 2.6.x - 2.7.x.
+#. Create a virtualenv in your clone dir.
+#. Run ``pip install -e .`` from your checkout directory with your virtualenv pip.
 
 For easier collaboration we recommend forking us on github and sending pull
 request. Once we see any semi-serious input from a developer we will grant
@@ -72,12 +71,8 @@ How to activate virtualenv under linux::
 
   source bin/activate
 
-FlexGet project uses `paver`_ to provide development related utilities and tasks.
-Run ``paver --help`` to see what commands are available. Some of these will
-be mentioned later.
 
 .. _virtual environment: https://pypi.python.org/pypi/virtualenv
-.. _paver: http://paver.github.io/paver/
 
 Code quality
 ------------
@@ -87,38 +82,30 @@ Unit tests
 
 There are currently over 250 unit tests ensuring that existing functionality
 is not accidentally broken. Unit tests can be invoked with the installation
-of additionnal requirments::
+of additional requirements::
 
-  pip install -r jenkins-requirements.txt
+  pip install -r dev-requirements.txt
 
-Easiest way to run tests is through paver::
+We use the `py.test`_ framework for testing. Easiest way to run tests is just::
 
-  paver test
+  py.test
 
-By default no online tests are executed, these can be enabled with ``--online``
-argument. There are other ways to run the tests as well, more specifically
-we use `nose`_ framework.
+Run single test file via py.test::
 
-Run single test file via nose::
-
-  nosetests test_file
+  py.test -v test_file.py
 
 Run single test suite (class)::
 
-  nosetests test_file:class
+  py.test -v test_file.py::TestClass
 
 Run single test case from suite::
 
-  nosetests test_file:class.case
+  py.test test_file.py::TestClass::test_method
 
 Live example::
 
-  nosetests test_seriesparser:TestSeriesParser.test_basic
+  py.test tests/test_seriesparser.py::TestSeriesParser::test_basic
 
-.. NOTE::
-
-   Don't use .py extension or include path with these. Configuration file ``setup.cfg`` defines
-   needed parameters for Nose.
 
 Project has `Jenkins CI server`_ which polls master branch and makes runs tests
 and makes new build if they pass.
@@ -138,9 +125,9 @@ instead.
 
 To run PEP8 checker::
 
-  paver pep8
+  flake8
 
 We do have some violations in our codebase, but new code should not add any.
 
-.. _nose: https://nose.readthedocs.org/
+.. _py.test: https://pytest.org/latest/
 .. _Python PEP8: http://www.python.org/dev/peps/pep-0008/

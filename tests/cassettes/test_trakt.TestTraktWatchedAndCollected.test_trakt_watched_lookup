@@ -8,39 +8,42 @@ interactions:
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=Hawaii+Five-0&type=show
     response:
-      body: {string: '[{"type":"show","score":96.42374,"show":{"title":"Hawaii Five-0","overview":"Steve
+      body: {string: '[{"type":"show","score":97.6956,"show":{"title":"Hawaii Five-0","overview":"Steve
           McGarrett returns home to Oahu, in order to find his father''s killer. The
           governor offers him the chance to run his own task force (Five-0). Steve''s
           team is joined by Chin Ho Kelly, Danny \"Danno\" Williams, and Kono Kalakaua.","year":2010,"status":"returning
-          series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/032/657/posters/original/ff94033565.jpg","medium":"https://walter.trakt.us/images/shows/000/032/657/posters/medium/ff94033565.jpg","thumb":"https://walter.trakt.us/images/shows/000/032/657/posters/thumb/ff94033565.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/032/657/fanarts/original/03ff15aa9c.jpg","medium":"https://walter.trakt.us/images/shows/000/032/657/fanarts/medium/03ff15aa9c.jpg","thumb":"https://walter.trakt.us/images/shows/000/032/657/fanarts/thumb/03ff15aa9c.jpg"}},"ids":{"trakt":32657,"slug":"hawaii-five-0","tvdb":164541,"imdb":"tt1600194","tmdb":32798,"tvrage":24840}}}]'}
+          series","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/032/657/posters/original/ff94033565.jpg","medium":"https://walter.trakt.us/images/shows/000/032/657/posters/medium/ff94033565.jpg","thumb":"https://walter.trakt.us/images/shows/000/032/657/posters/thumb/ff94033565.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/032/657/fanarts/original/03ff15aa9c.jpg","medium":"https://walter.trakt.us/images/shows/000/032/657/fanarts/medium/03ff15aa9c.jpg","thumb":"https://walter.trakt.us/images/shows/000/032/657/fanarts/thumb/03ff15aa9c.jpg"}},"ids":{"trakt":32657,"slug":"hawaii-five-0","tvdb":164541,"imdb":"tt1600194","tmdb":32798,"tvrage":24840}}},{"type":"show","score":23.332418,"show":{"title":"Hawaii
+          Five-O","overview":"The investigations of Hawaii Five-0, an elite branch
+          of the Hawaii State Police answerable only to the governor and headed by
+          stalwart Steve McGarrett.","year":1968,"status":"ended","images":{"poster":{"full":"https://walter.trakt.us/images/shows/000/002/289/posters/original/6847978a12.jpg","medium":"https://walter.trakt.us/images/shows/000/002/289/posters/medium/6847978a12.jpg","thumb":"https://walter.trakt.us/images/shows/000/002/289/posters/thumb/6847978a12.jpg"},"fanart":{"full":"https://walter.trakt.us/images/shows/000/002/289/fanarts/original/3456427ff9.jpg","medium":"https://walter.trakt.us/images/shows/000/002/289/fanarts/medium/3456427ff9.jpg","thumb":"https://walter.trakt.us/images/shows/000/002/289/fanarts/thumb/3456427ff9.jpg"}},"ids":{"trakt":2289,"slug":"hawaii-five-o","tvdb":71223,"imdb":"tt0062568","tmdb":2303,"tvrage":null}}}]'}
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [24ec65ac0ef3201e-DFW]
+        cf-ray: [27dce6833ef204b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:08 GMT']
-        etag: [W/"097cf531782572cda14d4ae6affb9a5e"]
-        expires: ['Thu, 03 Dec 2015 08:06:08 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:36 GMT']
+        etag: [W/"c1b3bca2e76daf12ba9549e147aa449c"]
+        expires: ['Thu, 03 Mar 2016 15:55:36 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d62591b573e53fb0de7fba5f19457c55c1449115568; expires=Fri,
-            02-Dec-16 04:06:08 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=dc9a82cf0c20d53d83d8863c17372af2e1457006136; expires=Fri,
+            03-Mar-17 11:55:36 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-pagination-item-count: ['1']
+        x-pagination-item-count: ['2']
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
         x-pagination-page-count: ['1']
-        x-request-id: [090ca772-f8a7-4f74-90ad-d768978f9450]
-        x-runtime: ['0.024067']
+        x-request-id: [2d3531e4-c1ad-45d9-a1b0-7fb244ad495d]
+        x-runtime: ['0.018962']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=d62591b573e53fb0de7fba5f19457c55c1449115568]
+        Cookie: [__cfduid=dc9a82cf0c20d53d83d8863c17372af2e1457006136]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -49,24 +52,24 @@ interactions:
       body: {string: '{"title":"Hawaii Five-0","year":2010,"ids":{"trakt":32657,"slug":"hawaii-five-0","tvdb":164541,"imdb":"tt1600194","tmdb":32798,"tvrage":24840},"overview":"Steve
           McGarrett returns home to Oahu, in order to find his father''s killer. The
           governor offers him the chance to run his own task force (Five-0). Steve''s
-          team is joined by Chin Ho Kelly, Danny \"Danno\" Williams, and Kono Kalakaua.","first_aired":"2010-09-21T01:00:00.000Z","airs":{"day":"Friday","time":"21:00","timezone":"America/New_York"},"runtime":42,"certification":"TV-14","network":"CBS","country":"us","trailer":"http://youtube.com/watch?v=EN6LMV4-Dfs","homepage":null,"status":"returning
-          series","rating":7.78793,"votes":3032,"updated_at":"2015-11-29T10:30:18.000Z","language":"en","available_translations":["en","de","pl","bg","it","fr","el","es","zh","ru","hu","nl","sv","pt","he","bs","da","lt"],"genres":["drama","action","crime"],"aired_episodes":127}'}
+          team is joined by Chin Ho Kelly, Danny \"Danno\" Williams, and Kono Kalakaua.","first_aired":"2010-09-20T07:00:00.000Z","airs":{"day":"Friday","time":"21:00","timezone":"America/New_York"},"runtime":45,"certification":"TV-14","network":"CBS","country":"us","trailer":"http://youtube.com/watch?v=EN6LMV4-Dfs","homepage":"http://www.cbs.com/shows/hawaii_five_0/","status":"returning
+          series","rating":7.77881,"votes":3133,"updated_at":"2016-03-02T10:49:54.000Z","language":"en","available_translations":["en","de","pl","bg","it","fr","el","es","zh","ru","hu","nl","sv","pt","he","bs","da","lt","fa","tr","ro"],"genres":["drama","action","crime"],"aired_episodes":134}'}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [24ec65ac7ef5201e-DFW]
+        cf-cache-status: [REVALIDATED]
+        cf-ray: [27dce6837ef904b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:08 GMT']
-        etag: [W/"d8de7be91f9d7201b55ea96b432fb6b9"]
-        expires: ['Thu, 03 Dec 2015 08:06:08 GMT']
-        last-modified: ['Sun, 29 Nov 2015 10:30:18 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:37 GMT']
+        etag: [W/"4112d5c848f1324c57a57f063fcfb578"]
+        expires: ['Thu, 03 Mar 2016 15:55:37 GMT']
+        last-modified: ['Wed, 02 Mar 2016 10:49:54 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [d78aaebe-e751-4c20-ad2d-4be3435e4177]
-        x-runtime: ['0.009711']
+        x-request-id: [98918c41-c884-4326-8827-8f168917f9d2]
+        x-runtime: ['0.025464']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -79,29 +82,30 @@ interactions:
       uri: https://api-v2launch.trakt.tv/shows/32657/seasons/4/episodes/13/?extended=full
     response:
       body: {string: "{\"season\":4,\"number\":13,\"title\":\"Hana Lokomaika'i\",\"\
-          ids\":{\"trakt\":776972,\"tvdb\":4749328,\"imdb\":null,\"tmdb\":0,\"tvrage\"\
-          :0},\"number_abs\":null,\"overview\":\"Internal Affairs questions Chin about\
-          \ his father\u2019s murder 15 years earlier and how his then-new relationship\
-          \ with Malia and her family might have hurt the investigation.\",\"rating\"\
-          :7.81026,\"votes\":390,\"first_aired\":\"2014-01-18T02:00:00.000Z\",\"updated_at\"\
-          :\"2015-12-02T06:49:46.000Z\",\"available_translations\":[]}"}
+          ids\":{\"trakt\":776972,\"tvdb\":4749328,\"imdb\":null,\"tmdb\":970659,\"\
+          tvrage\":0},\"number_abs\":null,\"overview\":\"Internal Affairs questions\
+          \ Chin about his father\u2019s murder 15 years earlier and how his then-new\
+          \ relationship with Malia and her family might have hurt the investigation.\"\
+          ,\"rating\":7.79901,\"votes\":403,\"first_aired\":\"2014-01-18T02:00:00.000Z\"\
+          ,\"updated_at\":\"2016-03-01T11:02:04.000Z\",\"available_translations\"\
+          :[]}"}
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [24ec65adccf31fc4-DFW]
+        cf-ray: [27dce68a77c419aa-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:08 GMT']
-        expires: ['Thu, 03 Dec 2015 08:06:08 GMT']
-        last-modified: ['Wed, 02 Dec 2015 06:49:46 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:38 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:38 GMT']
+        last-modified: ['Tue, 01 Mar 2016 11:02:04 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d7766ec7fd0a150989a5fa0e3374ad7211449115568; expires=Fri,
-            02-Dec-16 04:06:08 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=dc6a780b07c0a8f2074d5ce56614259a71457006138; expires=Fri,
+            03-Mar-17 11:55:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [86cfce72-6e98-48dd-a39d-e4d900c4a7a5]
-        x-runtime: ['0.013231']
+        x-request-id: [6a4fe822-5325-4e54-a7c4-9406d28b0742]
+        x-runtime: ['0.008041']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -114,19 +118,19 @@ interactions:
       uri: https://api-v2launch.trakt.tv/users/flexgettest/history/episodes/776972
     response:
       body: {string: '[{"id":558103917,"watched_at":"2015-01-02T03:46:38.000Z","action":"watch","type":"episode","episode":{"season":4,"number":13,"title":"Hana
-          Lokomaika''i","ids":{"trakt":776972,"tvdb":4749328,"imdb":null,"tmdb":0,"tvrage":0}},"show":{"title":"Hawaii
+          Lokomaika''i","ids":{"trakt":776972,"tvdb":4749328,"imdb":null,"tmdb":970659,"tvrage":0}},"show":{"title":"Hawaii
           Five-0","year":2010,"ids":{"trakt":32657,"slug":"hawaii-five-0","tvdb":164541,"imdb":"tt1600194","tmdb":32798,"tvrage":24840}}}]'}
       headers:
         cache-control: ['max-age=0, private, must-revalidate']
-        cf-ray: [24ec65aeb064095c-DFW]
+        cf-ray: [27dce68b883719c2-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:08 GMT']
-        etag: [W/"bf267f19527bd5fa6d42ec77440f9575"]
-        last-modified: ['Thu, 03 Dec 2015 01:09:57 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:39 GMT']
+        etag: [W/"8d1c0bc2eb3af0cd15c53484c8b7574d"]
+        last-modified: ['Thu, 03 Mar 2016 08:23:48 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d7d44d53cd1cc5bfa2e5a287221e0956e1449115568; expires=Fri,
-            02-Dec-16 04:06:08 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=d6d7386e9de386852675b08f530628ddc1457006138; expires=Fri,
+            03-Mar-17 11:55:38 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -134,8 +138,9 @@ interactions:
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
         x-pagination-page-count: ['1']
-        x-request-id: [4de7863f-62b9-4e72-b578-262fd6d7e53a]
-        x-runtime: ['0.017130']
+        x-private-user: ['false']
+        x-request-id: [1e3d7b65-143e-4a12-8ff3-1d53c35917bc]
+        x-runtime: ['0.015076']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -147,12 +152,12 @@ interactions:
       method: GET
       uri: https://api-v2launch.trakt.tv/search?query=The+Flash&type=show&year=2014
     response:
-      body: {string: "[{\"type\":\"show\",\"score\":60.337543,\"show\":{\"title\"\
-          :\"The Flash\",\"overview\":\"After a particle accelerator causes a freak\
-          \ storm, CSI Investigator Barry Allen is struck by lightning and falls into\
-          \ a coma. Months later he awakens with the power of super speed, granting\
-          \ him the ability to move through Central City like an unseen guardian angel.\
-          \ Though initially excited by his newfound powers, Barry is shocked to discover\
+      body: {string: "[{\"type\":\"show\",\"score\":60.95776,\"show\":{\"title\":\"\
+          The Flash\",\"overview\":\"After a particle accelerator causes a freak storm,\
+          \ CSI Investigator Barry Allen is struck by lightning and falls into a coma.\
+          \ Months later he awakens with the power of super speed, granting him the\
+          \ ability to move through Central City like an unseen guardian angel. Though\
+          \ initially excited by his newfound powers, Barry is shocked to discover\
           \ he is not the only \\\"meta-human\\\" who was created in the wake of the\
           \ accelerator explosion \u2013 and not everyone is using their new powers\
           \ for good. Barry partners with S.T.A.R. Labs and dedicates his life to\
@@ -168,7 +173,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/060/300/fanarts/thumb/df36c9a731.jpg\"\
           }},\"ids\":{\"trakt\":60300,\"slug\":\"the-flash-2014\",\"tvdb\":279121,\"\
           imdb\":\"tt3107288\",\"tmdb\":60735,\"tvrage\":36939}}},{\"type\":\"show\"\
-          ,\"score\":0.45168138,\"show\":{\"title\":\"Tornado Hunters\",\"overview\"\
+          ,\"score\":0.46511656,\"show\":{\"title\":\"Tornado Hunters\",\"overview\"\
           :\"Greg Johnson, Chris Chittick, and Ricky Forbes are the Tornado Hunters.Outfitted\
           \ with their truck Flash and the best equipment money can buy, they target\
           \ the biggest tornadoes in North America. From Regina to Mexico, there\u2019\
@@ -181,7 +186,7 @@ interactions:
           ,\"thumb\":\"https://walter.trakt.us/images/shows/000/081/448/posters/thumb/ecede5e037.jpg\"\
           },\"fanart\":{\"full\":null,\"medium\":null,\"thumb\":null}},\"ids\":{\"\
           trakt\":81448,\"slug\":\"tornado-hunters\",\"tvdb\":287638,\"imdb\":null,\"\
-          tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.3310531,\"\
+          tmdb\":null,\"tvrage\":null}}},{\"type\":\"show\",\"score\":0.3411771,\"\
           show\":{\"title\":\"Stop Skeletons From Fighting\",\"overview\":\"Hello,\
           \ I'm Derek Alexander, and I've been producing video reviews of retro (and\
           \ sometimes modern) video games for over 7 years.When I started producing\
@@ -200,16 +205,16 @@ interactions:
           tmdb\":null,\"tvrage\":null}}}]"}
       headers:
         cache-control: ['public, max-age=14400']
-        cf-cache-status: [HIT]
-        cf-ray: [24ec65b0124b2030-DFW]
+        cf-cache-status: [MISS]
+        cf-ray: [27dce69299d304b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:08 GMT']
-        etag: [W/"df21148219dad3fd530fdcc478406725"]
-        expires: ['Thu, 03 Dec 2015 08:06:08 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:40 GMT']
+        etag: [W/"b777ac411f4eb9080b6ea16185ce40cc"]
+        expires: ['Thu, 03 Mar 2016 15:55:40 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=df36566732f0b82a8641c35c2143975741449115568; expires=Fri,
-            02-Dec-16 04:06:08 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=def9ad89771685cc90adaeba1767baca61457006139; expires=Fri,
+            03-Mar-17 11:55:39 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -217,15 +222,15 @@ interactions:
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
         x-pagination-page-count: ['1']
-        x-request-id: [ada72fc9-22a3-4f58-9cc6-dd02441d024d]
-        x-runtime: ['0.023493']
+        x-request-id: [87d6456a-68e8-4d49-a0c0-bc2e6547cb63]
+        x-runtime: ['0.022691']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
       body: null
       headers:
         Content-Type: [application/json]
-        Cookie: [__cfduid=df36566732f0b82a8641c35c2143975741449115568]
+        Cookie: [__cfduid=def9ad89771685cc90adaeba1767baca61457006139]
         trakt-api-key: [57e188bcb9750c79ed452e1674925bc6848bd126e02bb15350211be74c6547af]
         trakt-api-version: [2]
       method: GET
@@ -244,32 +249,33 @@ interactions:
           \ life to protect the innocent. For now, only a few close friends and associates\
           \ know that Barry is literally the fastest man alive, but it won't be long\
           \ before the world learns what Barry Allen has become... The Flash.\",\"\
-          first_aired\":\"2014-10-07T00:00:00.000Z\",\"airs\":{\"day\":\"Tuesday\"\
-          ,\"time\":\"20:00\",\"timezone\":\"America/New_York\"},\"runtime\":45,\"\
+          first_aired\":\"2014-10-08T00:00:00.000Z\",\"airs\":{\"day\":\"Tuesday\"\
+          ,\"time\":\"20:00\",\"timezone\":\"America/New_York\"},\"runtime\":43,\"\
           certification\":\"TV-14\",\"network\":\"The CW\",\"country\":\"us\",\"trailer\"\
-          :\"http://youtube.com/watch?v=aZxhA_Jihmw\",\"homepage\":null,\"status\"\
-          :\"returning series\",\"rating\":8.29924,\"votes\":7499,\"updated_at\":\"\
-          2015-12-02T10:31:13.000Z\",\"language\":\"en\",\"available_translations\"\
+          :\"http://youtube.com/watch?v=aZxhA_Jihmw\",\"homepage\":\"http://www.cwtv.com/shows/the-flash/\"\
+          ,\"status\":\"returning series\",\"rating\":8.32188,\"votes\":8758,\"updated_at\"\
+          :\"2016-03-03T11:11:10.000Z\",\"language\":\"en\",\"available_translations\"\
           :[\"pl\",\"sv\",\"fr\",\"en\",\"zh\",\"da\",\"pt\",\"el\",\"de\",\"es\"\
           ,\"bg\",\"it\",\"tr\",\"ru\",\"nl\",\"hu\",\"ko\",\"lt\",\"cs\",\"hr\",\"\
-          bs\",\"za\",\"he\",\"id\"],\"genres\":[\"action\",\"adventure\",\"drama\"\
-          ,\"science-fiction\"],\"aired_episodes\":31}"}
+          bs\",\"za\",\"he\",\"id\",\"ro\",\"fa\",\"th\",\"ar\",\"te\"],\"genres\"\
+          :[\"action\",\"adventure\",\"drama\",\"science-fiction\"],\"aired_episodes\"\
+          :38}"}
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [24ec65b082602030-DFW]
+        cf-ray: [27dce698da4804b6-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:08 GMT']
-        etag: [W/"e6c71125088a1cf50015e7324f8ad369"]
-        expires: ['Thu, 03 Dec 2015 08:06:08 GMT']
-        last-modified: ['Wed, 02 Dec 2015 10:31:13 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:40 GMT']
+        etag: [W/"a87fb0e9027e63cbfd4dadfd4f53864d"]
+        expires: ['Thu, 03 Mar 2016 15:55:40 GMT']
+        last-modified: ['Thu, 03 Mar 2016 11:11:10 GMT']
         server: [cloudflare-nginx]
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [7ac0b93d-9861-4408-91f1-c803f3b96070]
-        x-runtime: ['0.014000']
+        x-request-id: [e542fff7-f8cd-44e8-8fc5-f7d3719dad75]
+        x-runtime: ['0.014968']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -283,8 +289,8 @@ interactions:
     response:
       body: {string: "{\"season\":1,\"number\":10,\"title\":\"Revenge of the Rogues\"\
           ,\"ids\":{\"trakt\":999431,\"tvdb\":5052260,\"imdb\":\"tt4016102\",\"tmdb\"\
-          :0,\"tvrage\":1065644215},\"number_abs\":null,\"overview\":\"Leonard Snart\
-          \ AKA Captain Cold returns to Central City with a new hotheaded partner\
+          :1018355,\"tvrage\":1065644215},\"number_abs\":null,\"overview\":\"Leonard\
+          \ Snart AKA Captain Cold returns to Central City with a new hotheaded partner\
           \ in tow \u2013 Mick Rory AKA Heat Wave. The duo plan to steal a multi-million\
           \ dollar painting, but Cold has another agenda while in town \u2013 to set\
           \ a trap for The Flash. Snart and Mick kidnap someone close to The Flash\
@@ -294,26 +300,26 @@ interactions:
           \ Barry asks Dr. Wells, Caitlin and Cisco to help him double his training\
           \ efforts so he\u2019s ready for the Reverse Flash when he returns to Central\
           \ City. Iris deals with the aftermath of Barry\u2019s confession, and Cisco\
-          \ makes the CCPD a new shield.\",\"rating\":7.6782,\"votes\":1358,\"first_aired\"\
-          :\"2015-01-21T01:00:00.000Z\",\"updated_at\":\"2015-12-02T23:40:11.000Z\"\
+          \ makes the CCPD a new shield.\",\"rating\":7.67167,\"votes\":1532,\"first_aired\"\
+          :\"2015-01-21T01:00:00.000Z\",\"updated_at\":\"2016-03-03T07:40:25.000Z\"\
           ,\"available_translations\":[]}"}
       headers:
         cache-control: ['public, max-age=14400']
         cf-cache-status: [HIT]
-        cf-ray: [24ec65b1f7352641-DFW]
+        cf-ray: [27dce69a023e0b20-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:08 GMT']
-        expires: ['Thu, 03 Dec 2015 08:06:08 GMT']
-        last-modified: ['Wed, 02 Dec 2015 23:40:11 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:40 GMT']
+        expires: ['Thu, 03 Mar 2016 15:55:40 GMT']
+        last-modified: ['Thu, 03 Mar 2016 07:40:25 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=d962db73b050bd26e33d85e17a96bea621449115568; expires=Fri,
-            02-Dec-16 04:06:08 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=da1938dcfbe17f9598ac48dbc2b37acbc1457006140; expires=Fri,
+            03-Mar-17 11:55:40 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
-        x-request-id: [da963da8-2e06-42cb-b11d-75bfdb6ac676]
-        x-runtime: ['0.008538']
+        x-request-id: [74e8413b-4da4-4774-b182-141e9a320439]
+        x-runtime: ['0.007600']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
   - request:
@@ -328,15 +334,15 @@ interactions:
       body: {string: '[]'}
       headers:
         cache-control: ['max-age=0, private, must-revalidate']
-        cf-ray: [24ec65b3b3bf1fc4-DFW]
+        cf-ray: [27dce69af5b90b20-SYD]
         connection: [keep-alive]
         content-type: [application/json; charset=utf-8]
-        date: ['Thu, 03 Dec 2015 04:06:09 GMT']
-        etag: [W/"8fabec5d4ccdcad4ecb9efa872548b0c"]
-        last-modified: ['Thu, 03 Dec 2015 01:09:57 GMT']
+        date: ['Thu, 03 Mar 2016 11:55:41 GMT']
+        etag: [W/"5fdcca48eb97f7a8edc22cf9a5b94573"]
+        last-modified: ['Thu, 03 Mar 2016 08:23:48 GMT']
         server: [cloudflare-nginx]
-        set-cookie: ['__cfduid=dd8ac38380655a2207cbcea56949ae8e71449115569; expires=Fri,
-            02-Dec-16 04:06:09 GMT; path=/; domain=.trakt.tv; HttpOnly']
+        set-cookie: ['__cfduid=da1938dcfbe17f9598ac48dbc2b37acbc1457006140; expires=Fri,
+            03-Mar-17 11:55:40 GMT; path=/; domain=.trakt.tv; HttpOnly']
         vary: [Accept-Encoding]
         x-content-type-options: [nosniff]
         x-frame-options: [SAMEORIGIN]
@@ -344,8 +350,9 @@ interactions:
         x-pagination-limit: ['10']
         x-pagination-page: ['1']
         x-pagination-page-count: ['0']
-        x-request-id: [67dd0acc-25de-454c-bb1b-4ceaa7c90f52]
-        x-runtime: ['0.014015']
+        x-private-user: ['false']
+        x-request-id: [8c72eeeb-8721-4acd-9296-cc3f823e29be]
+        x-runtime: ['0.011304']
         x-xss-protection: [1; mode=block]
       status: {code: 200, message: OK}
 version: 1

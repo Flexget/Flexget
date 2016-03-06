@@ -312,14 +312,6 @@ else:
         io_encoding = 'ascii'
 
 
-def console(text):
-    """Print to console safely."""
-    if isinstance(text, str):
-        print(text)
-        return
-    print(unicode(text).encode(io_encoding, 'replace'))
-
-
 def parse_timedelta(value):
     """Parse a string like '5 days' into a timedelta object. Also allows timedeltas to pass through."""
     if isinstance(value, timedelta):
@@ -339,11 +331,18 @@ def parse_timedelta(value):
         raise ValueError('Invalid time format \'%s\'' % value)
 
 
+def timedelta_total_seconds(td):
+    """replaces python 2.7+ timedelta.total_seconds()"""
+    # TODO: Remove this when we no longer support python 2.6
+    try:
+        return td.total_seconds()
+    except AttributeError:
+        return (td.days * 24 * 3600) + td.seconds + (td.microseconds / 1000000)
+
+
 def multiply_timedelta(interval, number):
-    """timedeltas can not normally be multiplied by floating points. This does that."""
-    # Python 2.6 doesn't have total seconds
-    total_seconds = interval.seconds + interval.days * 24 * 3600
-    return timedelta(seconds=total_seconds * number)
+    """`timedelta`s can not normally be multiplied by floating points. This does that."""
+    return timedelta(seconds=timedelta_total_seconds(interval) * number)
 
 
 if os.name == 'posix':

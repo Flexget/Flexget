@@ -1,18 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
 import logging
-import urllib
 
 from flexget import plugin
 from flexget.entry import Entry
 from flexget.event import event
 from flexget.config_schema import one_or_more
-from flexget.utils.requests import Session, get
+from flexget.utils.requests import Session, get, TimedLimiter, RequestException
 from flexget.utils.search import normalize_scene
 
 log = logging.getLogger('rarbg')
 
 requests = Session()
-requests.set_domain_delay('torrentapi.org', '2.3 seconds')  # they only allow 1 request per 2 seconds
+requests.add_domain_limiter(TimedLimiter('torrentapi.org', '2.3 seconds'))  # they only allow 1 request per 2 seconds
 
 CATEGORIES = {
     'all': 0,
@@ -74,14 +73,13 @@ class SearchRarBG(object):
 
     def get_token(self):
         # Don't use a session as tokens are not affected by domain limit
-        r = get(self.base_url, params={'get_token': 'get_token', 'format': 'json'})
-        token = None
         try:
-            token = r.json().get('token')
-        except ValueError:
-            log.error('Could not retrieve RARBG token.')
-        log.debug('RarBG token: %s' % token)
-        return token
+            r = get(self.base_url, params={'get_token': 'get_token', 'format': 'json'}).json()
+            token = r.get('token')
+            log.debug('RarBG token: %s' % token)
+            return token
+        except RequestException as e:
+            log.debug('Could not retrieve RarBG token: %s', e.args[0])
 
     @plugin.internet(log)
     def search(self, task, entry, config):
@@ -123,17 +121,22 @@ class SearchRarBG(object):
                 if config['use_tvdb']:
                     plugin.get_plugin_by_name('thetvdb_lookup').instance.lazy_series_lookup(entry)
                     params['search_tvdb'] = entry.get('tvdb_id')
-                    log.debug('Using tvdb id %s' % entry.get('tvdb_id'))
-
-            page = requests.get(self.base_url, params=params)
-            log.debug('requesting: %s' % page.url)
+                    log.debug('Using tvdb id %s', entry.get('tvdb_id'))
             try:
-                r = page.json()
-            except ValueError:
-                log.debug(page.text)
+                page = requests.get(self.base_url, params=params)
+                log.debug('requesting: %s', page.url)
+            except RequestException as e:
+                log.error('RarBG request failed: %s' % e.args[0])
                 continue
-            if r.get('error'):
-                log.error('Error code %s: %s' % (r.get('error_code'), r.get('error')))
+            r = page.json()
+            # error code 20 just means no results were found
+            if r.get('error_code') == 20:
+                searched_string = params.get('search_string') or 'imdb={0}'.format(params.get('search_imdb')) or \
+                                  'tvdb={0}'.format(params.get('tvdb_id'))
+                log.debug('No results found for %s', searched_string)
+                continue
+            elif r.get('error'):
+                log.error('Error code %s: %s', r.get('error_code'), r.get('error'))
                 continue
             else:
                 for result in r.get('torrent_results'):

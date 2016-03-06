@@ -1,12 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
 
+import pytest
 
 from flexget.utils.imdb import ImdbParser
-from tests import use_vcr
 
 
+@pytest.mark.online
 class TestImdbParser(object):
-    @use_vcr
     def test_parsed_data(self):
         parser = ImdbParser()
         parser.parse('tt0114814')
@@ -28,7 +28,7 @@ class TestImdbParser(object):
             'nm0000860': 'Paul Bartel'
         }, 'Actors not parsed correctly'
         assert parser.directors == {'nm0001741': 'Bryan Singer'}, 'Directors not parsed correctly'
-        assert parser.genres == [u'crime', u'mystery', u'thriller'], 'Genres not parsed correctly'
+        assert parser.genres == [u'crime', u'drama', u'mystery', u'thriller'], 'Genres not parsed correctly'
         assert parser.imdb_id == 'tt0114814', 'ID not parsed correctly'
         assert parser.languages == ['english', 'hungarian', 'spanish', 'french'], 'Languages not parsed correctly'
         assert parser.mpaa_rating == 'R', 'Rating not parsed correctly'
@@ -48,7 +48,6 @@ class TestImdbParser(object):
         assert 400000 < parser.votes < 1000000, 'Votes not parsed correctly'
         assert parser.year == 1995, 'Year not parsed correctly'
 
-    @use_vcr
     def test_no_plot(self):
         # Make sure parser doesn't crash for movies with no plot
         parser = ImdbParser()
@@ -57,7 +56,6 @@ class TestImdbParser(object):
         # There is no plot
         assert not parser.plot_outline
 
-    @use_vcr
     def test_no_year(self):
         # Make sure parser doesn't crash for movies with no year
         parser = ImdbParser()
@@ -66,7 +64,6 @@ class TestImdbParser(object):
         # There is no year
         assert not parser.year
 
-    @use_vcr
     def test_plot_with_links(self):
         """Make sure plot doesn't terminate at the first link. GitHub #756"""
         parser = ImdbParser()

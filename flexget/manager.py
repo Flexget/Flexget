@@ -32,7 +32,7 @@ from flexget.ipc import IPCClient, IPCServer  # noqa
 from flexget.options import CoreArgumentParser, get_parser, manager_parser, ParserError, unicode_argv  # noqa
 from flexget.task import Task  # noqa
 from flexget.task_queue import TaskQueue  # noqa
-from flexget.utils.tools import pid_exists, console, get_current_flexget_version  # noqa
+from flexget.utils.tools import pid_exists, get_current_flexget_version  # noqa
 
 log = logging.getLogger('manager')
 
@@ -100,8 +100,11 @@ class Manager(object):
         """
         :param args: CLI args
         """
-        global manager
-        assert not manager, 'Only one instance of Manager should be created at a time!'
+        if not self.unit_test:
+            global manager
+            assert not manager, 'Only one instance of Manager should be created at a time!'
+        else:
+            log.info('last manager was not torn down correctly')
 
         if args is None:
             # Decode all arguments to unicode before parsing
@@ -272,7 +275,7 @@ class Manager(object):
         # If another process is started, send the execution to the running process
         ipc_info = self.check_ipc_info()
         if ipc_info:
-            console('There is a FlexGet process already running for this config, sending execution there.')
+            logger.console('There is a FlexGet process already running for this config, sending execution there.')
             log.debug('Sending command to running FlexGet process: %s' % self.args)
             try:
                 client = IPCClient(ipc_info['port'], ipc_info['password'])
@@ -588,7 +591,7 @@ class Manager(object):
             self.config = old_config
             raise
         log.debug('New config data loaded.')
-        self.user_config = new_user_config
+        self.user_config = copy.deepcopy(new_user_config)
         fire_event('manager.config_updated', self)
 
     def save_config(self):

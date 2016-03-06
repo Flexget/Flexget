@@ -1,16 +1,19 @@
 from __future__ import unicode_literals, division, absolute_import
-from tests import FlexGetBase, build_parser_function
+import pytest
+from jinja2 import Template
 
 
-class BaseProperMovies(FlexGetBase):
+class TestProperMovies(object):
 
-    __yaml__ = """
+    _config = """
         templates:
           global:
             seen_movies: strict
             accept_all: yes
             proper_movies: yes
-
+            parsing:
+              series: {{parser}}
+              movie: {{parser}}
         tasks:
           test1:
             mock:
@@ -30,31 +33,24 @@ class BaseProperMovies(FlexGetBase):
               - {title: 'Movie.Name.2011.PROPER.720p-FlexGet', imdb_id: 'tt12345678'}
     """
 
-    def test_proper_movies(self):
+    @pytest.fixture(scope='class', params=['internal', 'guessit'], ids=['internal', 'guessit'])
+    def config(self, request):
+        """Override and parametrize default config fixture."""
+        return Template(self._config).render({'parser': request.param})
+
+    def test_proper_movies(self, execute_task):
         # first occurence
-        self.execute_task('test1')
-        assert self.task.find_entry('accepted', title='Movie.Name.2011.720p-FlexGet')
+        task = execute_task('test1')
+        assert task.find_entry('accepted', title='Movie.Name.2011.720p-FlexGet')
 
         # duplicate movie
-        self.execute_task('test2')
-        assert self.task.find_entry('rejected', title='Movie.Name.2011.720p-FooBar')
+        task = execute_task('test2')
+        assert task.find_entry('rejected', title='Movie.Name.2011.720p-FooBar')
 
         # proper with wrong quality
-        self.execute_task('test3')
-        assert self.task.find_entry('rejected', title='Movie.Name.2011.PROPER.DVDRip-AsdfAsdf')
+        task = execute_task('test3')
+        assert task.find_entry('rejected', title='Movie.Name.2011.PROPER.DVDRip-AsdfAsdf')
 
         # proper version of same quality
-        self.execute_task('test4')
-        assert self.task.find_entry('accepted', title='Movie.Name.2011.PROPER.720p-FlexGet')
-
-
-class TestGuessitProperMovies(BaseProperMovies):
-    def __init__(self):
-        super(TestGuessitProperMovies, self).__init__()
-        self.add_tasks_function(build_parser_function('guessit'))
-
-
-class TestInternalProperMovies(BaseProperMovies):
-    def __init__(self):
-        super(TestInternalProperMovies, self).__init__()
-        self.add_tasks_function(build_parser_function('internal'))
+        task = execute_task('test4')
+        assert task.find_entry('accepted', title='Movie.Name.2011.PROPER.720p-FlexGet')

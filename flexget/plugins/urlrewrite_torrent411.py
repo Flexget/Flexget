@@ -91,6 +91,101 @@ SUB_CATEGORIES = {
 
 }
 
+SEASONS = {
+    1: [45, 968],
+    2: [45, 969],
+    3: [45, 970],
+    4: [45, 971],
+    5: [45, 972],
+    6: [45, 973],
+    7: [45, 974],
+    8: [45, 975],
+    9: [45, 976],
+    10: [45, 977],
+    11: [45, 978],
+    12: [45, 979],
+    13: [45, 980],
+    14: [45, 981],
+    15: [45, 982],
+    16: [45, 983],
+    17: [45, 984],
+    18: [45, 985],
+    19: [45, 986],
+    20: [45, 987],
+    21: [45, 988],
+    22: [45, 989],
+    23: [45, 990],
+    24: [45, 991],
+    25: [45, 994],
+    26: [45, 992],
+    27: [45, 993],
+    28: [45, 995],
+    29: [45, 996],
+    30: [45, 997],
+}
+
+EPISODES = {
+    1: [46, 937],
+    2: [46, 938],
+    3: [46, 939],
+    4: [46, 940],
+    5: [46, 941],
+    6: [46, 942],
+    7: [46, 943],
+    8: [46, 944],
+    9: [46, 946],
+    10: [46, 947],
+    11: [46, 948],
+    12: [46, 949],
+    13: [46, 950],
+    14: [46, 951],
+    15: [46, 952],
+    16: [46, 954],
+    17: [46, 953],
+    18: [46, 955],
+    19: [46, 956],
+    20: [46, 957],
+    21: [46, 958],
+    22: [46, 959],
+    23: [46, 960],
+    24: [46, 961],
+    25: [46, 962],
+    26: [46, 963],
+    27: [46, 964],
+    28: [46, 965],
+    29: [46, 966],
+    30: [46, 967],
+    31: [46, 188],
+    32: [46, 189],
+    33: [46, 190],
+    34: [46, 191],
+    35: [46, 192],
+    36: [46, 193],
+    37: [46, 194],
+    38: [46, 195],
+    39: [46, 196],
+    40: [46, 197],
+    41: [46, 198],
+    42: [46, 199],
+    43: [46, 110],
+    44: [46, 111],
+    45: [46, 112],
+    46: [46, 113],
+    47: [46, 114],
+    48: [46, 115],
+    49: [46, 116],
+    50: [46, 117],
+    51: [46, 118],
+    52: [46, 119],
+    53: [46, 1110],
+    54: [46, 1111],
+    55: [46, 1112],
+    56: [46, 1113],
+    57: [46, 1114],
+    58: [46, 1115],
+    59: [46, 1116],
+    60: [46, 1117],
+}
 
 class JSONEncodedDict(TypeDecorator):
 
@@ -129,7 +224,7 @@ class t411Auth(AuthBase):
 
 #   RETREIVING LOGIN COOKIES ONLY ONCE A DAY
     def get_login_cookies(self, username, password):
-        url_auth = 'http://www.t411.in/users/login'
+        url_auth = 'http://www.t411.ch/users/login'
         db_session = Session()
         account = db_session.query(torrent411Account).filter(
             torrent411Account.username == username).first()
@@ -243,16 +338,16 @@ class UrlRewriteTorrent411(object):
 
             -- RSS DOWNLOAD WITH LOGIN
             rss:
-              url: http://www.t411.in/rss/?cat=210
+              url: http://www.t411.ch/rss/?cat=210
               username: ****
               password: ****
 
             - OR -
 
-            -- RSS NORMAL URL REWRITE (i.e.: http://www.t411.in/torrents/download/?id=12345678)
+            -- RSS NORMAL URL REWRITE (i.e.: http://www.t411.ch/torrents/download/?id=12345678)
             -- WARNING: NEED CUSTOM COOKIES NOT HANDLE BY THIS PLUGIN
             rss:
-              url: http://www.t411.in/rss/?cat=210
+              url: http://www.t411.ch/rss/?cat=210
 
         ---
             SEARCH WITHIN SITE
@@ -330,7 +425,7 @@ class UrlRewriteTorrent411(object):
             if match:
                 torrent_id = match.group(1)
                 log.debug("Got the Torrent ID: %s" % torrent_id)
-                entry['url'] = 'http://www.t411.in/torrents/download/?id=' + torrent_id
+                entry['url'] = 'http://www.t411.ch/torrents/download/?id=' + torrent_id
                 if 'download_auth' in entry:
                     auth_handler = t411Auth(*entry['download_auth'])
                     entry['download_auth'] = auth_handler
@@ -342,7 +437,7 @@ class UrlRewriteTorrent411(object):
         """
         Search for name from torrent411.
         """
-        url_base = 'http://www.t411.in'
+        url_base = 'http://www.t411.ch'
 
         if not isinstance(config, dict):
             config = {}
@@ -364,6 +459,15 @@ class UrlRewriteTorrent411(object):
                 filter_url = filter_url + '&' + '&'.join([urllib.quote_plus('term[%s][]' % c[0]).
                                                           encode('utf-8') + '=' + str(c[1])
                                                           for c in sub_categories])
+
+        if 'series_season' in entry and 'series_episode' in entry:
+            season = entry['series_season'] 
+            if season in list(SEASONS):
+                filter_url = filter_url + '&term[%d][]' % SEASONS[season][0] + '=' + str(SEASONS[season][1])
+
+            episode = entry['series_episode'] 
+            if episode in list(EPISODES):
+                filter_url = filter_url + '&term[%d][]' % EPISODES[episode][0] + '=' + str(EPISODES[episode][1])
 
         entries = set()
         for search_string in entry.get('search_strings', [entry['title']]):
@@ -388,12 +492,12 @@ class UrlRewriteTorrent411(object):
                 if nfo_link_res is not None:
                     tid = nfo_link_res.group(1)
                 title_res = re.search(
-                    '<a href=\"//www.t411.in/torrents/([-A-Za-z0-9+&@#/%|?=~_|!:,.;]+)\" title="([^"]*)">',
+                    '<a href=\"//www.t411.ch/torrents/([-A-Za-z0-9+&@#/%|?=~_|!:,.;]+)\" title="([^"]*)">',
                     str(tr))
                 if title_res is not None:
                     entry['title'] = title_res.group(2).decode('utf-8')
                 size = tr('td')[5].contents[0]
-                entry['url'] = 'http://www.t411.in/torrents/download/?id=%s' % tid
+                entry['url'] = 'http://www.t411.ch/torrents/download/?id=%s' % tid
                 entry['torrent_seeds'] = tr('td')[7].contents[0]
                 entry['torrent_leeches'] = tr('td')[8].contents[0]
                 entry['search_sort'] = torrent_availability(entry['torrent_seeds'],
