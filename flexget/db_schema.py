@@ -122,6 +122,7 @@ def upgrade(plugin):
                     session.rollback()
                     manager.shutdown(finish_queue=False)
                 else:
+                    current_ver = -1 if current_ver is None else current_ver
                     if new_ver > current_ver:
                         log.info('Plugin `%s` schema upgraded successfully' % plugin)
                         set_version(plugin, new_ver, session=session)
