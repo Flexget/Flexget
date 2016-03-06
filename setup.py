@@ -39,8 +39,7 @@ setup(
     install_requires=load_requirements('requirements.txt'),
     tests_require=['pytest'],
     extras_require={
-        ':python_version=="2.6"': ['argparse'],
-        'dev_tools': load_requirements('dev-requirements.txt')
+        'dev': load_requirements('dev-requirements.txt')
     },
     entry_points={
         'console_scripts': ['flexget = flexget:main'],
@@ -53,6 +52,8 @@ setup(
         "Programming Language :: Python",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ]
