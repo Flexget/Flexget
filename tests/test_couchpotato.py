@@ -7,10 +7,10 @@ import os
 movie_list_file = os.path.join(os.path.dirname(__file__), 'couchpotoato_movie_list_test_response.json')
 qualities_profiles_file = os.path.join(os.path.dirname(__file__), 'couchpotoato_quality_profile_test_response.json')
 
-with open(movie_list_file, "r") as data:
+with open(movie_list_file, "r", encoding="UTF-8") as data:
     movie_list_response = json.load(data)
 
-with open(qualities_profiles_file, "r") as data:
+with open(qualities_profiles_file, "r", encoding="UTF-8") as data:
     qualities_response = json.load(data)
 
 
@@ -50,7 +50,7 @@ class TestCouchpotatoWithQuality(object):
                           'Deadpool': '1080p',
                           'Doug Benson: Doug Dynasty': '720p',
                           'Ghostbusters': '720p',
-                          'The Gift': '720p|1080p dvdrip|bluray',
+                          'The Gift': '720p|1080p bluray|dvdrip',
                           'Hail, Caesar!': '720p',
                           'I Am Chris Farley': '720p|1080p',
                           'Inside Out': '720p',
