@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 import os
 import pytest
 import stat
@@ -199,7 +199,7 @@ class TestHtmlUtils(object):
 
         # why this does not encode < ?
         from flexget.utils.tools import encode_html
-        print encode_html('<3')
+        print(encode_html('<3'))
         assert encode_html('<3') == '&lt;3'
 
 

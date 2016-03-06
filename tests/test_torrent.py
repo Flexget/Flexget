@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 import os
 import pytest
 
@@ -212,8 +212,8 @@ class TestTorrentScrub(object):
 
             # Dump small torrents on demand
             if 0 and not clean:
-                print "original=%r" % original.content
-                print "modified=%r" % modified.content
+                print("original=%r" % original.content)
+                print("modified=%r" % modified.content)
 
             # Make sure essentials survived
             assert 'announce' in modified.content

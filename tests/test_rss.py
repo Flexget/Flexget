@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, division, absolute_import
+from __future__ import unicode_literals, division, absolute_import, print_function
 
 import pytest
 import yaml
@@ -100,7 +100,7 @@ class TestInputRSS(object):
         # grab other_fields and attach to entry
         task = execute_task('test3')
         for entry in task.rejected:
-            print entry['title']
+            print(entry['title'])
         assert task.find_entry(title='Other fields', otherfield='otherfield'), \
             'Specified other_field not attached to entry'
 

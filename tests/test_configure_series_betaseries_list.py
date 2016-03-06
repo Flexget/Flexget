@@ -90,7 +90,7 @@ class Test_configure_series_betaseries_list(object):
             ["Family guy", "The Simpsons"],
             ["Breaking Bad", "Dexter", "The Simpsons"],
         ])
-        query_series_mock.side_effect = lambda *args: return_values_generator.next()
+        query_series_mock.side_effect = lambda *args: next(return_values_generator)
         # WHEN
         task = execute_task('test_with_two_members')
         # THEN

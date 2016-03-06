@@ -238,8 +238,8 @@ class TestObjectMapper(object):
         category_to_term_type, term_types = T411ObjectMapper().map_term_type_tree(tree)
         assert (234, 11) in category_to_term_type
         assert (234, 43) in category_to_term_type
-        assert term_types.has_key(11)
-        assert term_types.has_key(43)
+        assert 11 in term_types
+        assert 43 in term_types
         assert term_types.get(11).mode == 'single'
         assert term_types.get(11).name == 'Application - Genre', \
             'Expected "Application - Genre", found "%s"' % term_types.get(11).name
