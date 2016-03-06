@@ -159,7 +159,8 @@ class AppleTrailers(object):
                 entry['genres'] = ', '.join(list(genres))
 
             entries.append(entry)
-
+        # set the correct header in task requests adapter
+        task.requests.headers.update(headers)
         return entries
 
 
