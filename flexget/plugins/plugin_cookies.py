@@ -93,7 +93,7 @@ class PluginCookies:
 
         while True:
             try:
-                item = cur.next()
+                item = next(cur)
                 # remove \t from item (#582)
                 item = [notabs(field) for field in item]
                 try:

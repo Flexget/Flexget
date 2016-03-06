@@ -175,7 +175,8 @@ class OutputAria2(object):
         except xmlrpclib.Fault as err:
             raise plugin.PluginError('XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
                                      % (baseurl, err.faultString), log)
-        except socket_error as (error, msg):
+        except socket_error as e:
+            (error, msg) = e.args
             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                      % (baseurl, msg), log)
         except:
@@ -333,7 +334,8 @@ class OutputAria2(object):
                         except xmlrpclib.ProtocolError as err:
                             raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
                                                      % (baseurl, err.errcode, err.errmsg), log)
-                        except socket_error as (error, msg):
+                        except socket_error as e:
+                            (error, msg) = e.args
                             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                                      % (baseurl, msg), log)
                     else:
@@ -363,7 +365,8 @@ class OutputAria2(object):
                                 r))
                         except xmlrpclib.Fault as err:
                             raise plugin.PluginError('aria2 response to add URI request: %s' % err.faultString, log)
-                        except socket_error as (error, msg):
+                        except socket_error as e:
+                            (error, msg) = e.args
                             raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                                      % (baseurl, msg), log)
                         except RenderError as e:
@@ -383,7 +386,8 @@ class OutputAria2(object):
                                 except xmlrpclib.Fault as err:
                                     raise plugin.PluginError('aria2 response to remove request: %s'
                                                              % err.faultString, log)
-                                except socket_error as (error, msg):
+                                except socket_error as e:
+                                    (error, msg) = e.args
                                     raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                                              % (baseurl, msg), log)
                         else:
@@ -395,7 +399,8 @@ class OutputAria2(object):
                                         'possibly previously removed or never added.' % config['aria_config']['gid'])
                         else:
                             raise plugin.PluginError('aria2 response to status request: %s' % err.faultString, log)
-                    except socket_error as (error, msg):
+                    except socket_error as e:
+                        (error, msg) = e.args
                         raise plugin.PluginError('Socket connection issue with aria2 daemon at %s: %s'
                                                  % (baseurl, msg), log)
 

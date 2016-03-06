@@ -52,7 +52,7 @@ class RegexExtract(object):
         try:
             for rx in self.regex_list:
                 pass
-        except re.error, e:
+        except re.error as e:
             raise plugin.PluginError('Error compiling regex: %s' % str(e))
 
     def on_task_modify(self, task, config):
@@ -66,7 +66,7 @@ class RegexExtract(object):
                 log.debug('Matching %s with regex: %s' % (entry_field, rx))
                 try:
                     match = rx.match(entry_field)
-                except re.error, e:
+                except re.error as e:
                     raise plugin.PluginError('Error encountered processing regex: %s' % str(e))
                 if match:
                     log.debug('Successfully matched %s' % entry_field)

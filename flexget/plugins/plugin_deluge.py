@@ -88,7 +88,7 @@ def install_pausing_reactor():
                 self.startRunning(installSignalHandlers)
                 self._mainLoopGen = self._mainLoopGenerator()
             try:
-                return self._mainLoopGen.next()
+                return next(self._mainLoopGen)
             except StopIteration:
                 pass
 
