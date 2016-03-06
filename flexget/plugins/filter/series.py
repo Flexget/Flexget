@@ -1479,7 +1479,7 @@ class FilterSeries(FilterSeriesBase):
         """
 
         latest = get_latest_release(episode.series)
-        if episode.series.begin and episode.series.begin > latest:
+        if episode.series.begin and (not latest or episode.series.begin > latest):
             latest = episode.series.begin
         log.debug('latest download: %s' % latest)
         log.debug('current: %s' % episode)
