@@ -65,16 +65,19 @@ class EntryListEntry(Base):
 
 
 class DBEntrySet(MutableSet):
+    def _db_list(self, session):
+        return session.query(EntryListList).filter(EntryListList.name == self.config).first()
+
     @with_session
     def __init__(self, config, session=None):
         self.config = config
-        self.db_list = session.query(EntryListList).filter(EntryListList.name == self.config).first()
-        if not self.db_list:
+        db_list = self._db_list(session)
+        if not db_list:
             session.add(EntryListList(name=self.config))
 
     def _entry_query(self, session, entry):
         db_entry = session.query(EntryListEntry).filter(and_(
-            EntryListEntry.list_id == self.db_list.id,
+            EntryListEntry.list_id == self._db_list(session).id,
             or_(
                 EntryListEntry.title == entry['title'], and_(
                     EntryListEntry.original_url,
@@ -86,7 +89,7 @@ class DBEntrySet(MutableSet):
     @with_session
     def __iter__(self, session=None):
         return (Entry(e.entry) for e in
-                self.db_list.entries.order_by(EntryListEntry.added.desc()).all())
+                self._db_list(session).entries.order_by(EntryListEntry.added.desc()).all())
 
     @with_session
     def __contains__(self, entry, session=None):
@@ -94,7 +97,7 @@ class DBEntrySet(MutableSet):
 
     @with_session
     def __len__(self, session=None):
-        return self.db_list.entries.count()
+        return self._db_list(session).entries.count()
 
     @with_session
     def discard(self, entry, session=None):
@@ -111,11 +114,10 @@ class DBEntrySet(MutableSet):
             log.debug('refreshing entry %s', entry)
             stored_entry.entry = entry
         else:
-            log.debug('adding entry %s to list %s', entry, self.db_list.name)
-            stored_entry = EntryListEntry(entry=entry, entry_list_id=self.db_list.id)
+            log.debug('adding entry %s to list %s', entry, self._db_list(session).name)
+            stored_entry = EntryListEntry(entry=entry, entry_list_id=self._db_list(session).id)
         session.add(stored_entry)
-        session.commit()
-        return stored_entry.to_dict()
+
 
     @with_session
     def __ior__(self, other, session=None):
