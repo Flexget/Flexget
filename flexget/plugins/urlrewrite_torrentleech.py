@@ -1,6 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import logging
 
 from flexget import plugin
@@ -119,7 +123,7 @@ class UrlRewriteTorrentleech(object):
             query = normalize_unicode(search_string).replace(":", "")
             # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
             url = ('http://torrentleech.org/torrents/browse/index/query/' +
-                   urllib.quote(query.encode('utf-8')) + filter_url)
+                   urllib.parse.quote(query.encode('utf-8')) + filter_url)
             log.debug('Using %s as torrentleech search url' % url)
 
             page = requests.get(url, cookies=login.cookies).content

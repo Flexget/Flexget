@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 import os
 import logging
 
@@ -11,7 +12,7 @@ PLUGIN_NAME = 'make_html'
 log = logging.getLogger(PLUGIN_NAME)
 
 
-class OutputHtml:
+class OutputHtml(object):
 
     schema = {
         'type': 'object',

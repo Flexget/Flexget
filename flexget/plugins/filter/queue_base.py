@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 from datetime import datetime
 import logging
 
@@ -72,7 +73,7 @@ class FilterQueueBase(object):
         if config is False:
             return
 
-        for id, entry in self.accepted_entries.iteritems():
+        for id, entry in self.accepted_entries.items():
             if entry in task.accepted and entry not in task.failed:
                 # If entry was not rejected or failed, mark it as downloaded
                 update_values = {'downloaded': datetime.now(),

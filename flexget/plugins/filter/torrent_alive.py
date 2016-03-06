@@ -1,14 +1,17 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import itertools
 import logging
 import threading
 import socket
-from urlparse import urlparse, SplitResult, urlsplit, urlunsplit
+from urllib.parse import urlparse, SplitResult, urlsplit, urlunsplit
 import struct
 from random import randrange
-from httplib import BadStatusLine
-from urllib import quote
-from urllib2 import URLError
+from http.client import BadStatusLine
+from urllib.parse import quote
+from urllib.error import URLError
 
 from flexget import plugin
 from flexget.event import event
@@ -19,7 +22,7 @@ log = logging.getLogger('torrent_alive')
 
 
 class TorrentAliveThread(threading.Thread):
-    _counter = itertools.count().next
+    _counter = itertools.count().__next__
 
     def __init__(self, tracker, info_hash):
         threading.Thread.__init__(self, name='torrent_alive-%d' % self._counter())
@@ -149,8 +152,8 @@ def get_http_seeds(url, info_hash):
     if not data:
         log.debug('No data received from tracker scrape.')
         return 0
-    log.debug('get_http_seeds is returning: %s' % data.values()[0]['complete'])
-    return data.values()[0]['complete']
+    log.debug('get_http_seeds is returning: %s' % list(data.values())[0]['complete'])
+    return list(data.values())[0]['complete']
 
 
 def get_tracker_seeds(url, info_hash):

@@ -1,7 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import re
 import logging
-from urlparse import urlparse, urlunparse
+from urllib.parse import urlparse, urlunparse
 from requests import RequestException
 
 from flexget import plugin

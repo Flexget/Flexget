@@ -1,7 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from past.builtins import basestring
+from builtins import object
 import logging
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 import feedparser
 import requests
@@ -64,7 +68,7 @@ class UrlRewriteTorrentz(object):
             query = normalize_unicode(search_string + config.get('extra_terms', ''))
             for domain in ['eu', 'me', 'ch', 'in']:
                 # urllib.quote will crash if the unicode string has non ascii characters, so encode in utf-8 beforehand
-                url = 'http://torrentz.%s/%s?q=%s' % (domain, feed, urllib.quote(query.encode('utf-8')))
+                url = 'http://torrentz.%s/%s?q=%s' % (domain, feed, urllib.parse.quote(query.encode('utf-8')))
                 log.debug('requesting: %s' % url)
                 try:
                     r = task.requests.get(url)

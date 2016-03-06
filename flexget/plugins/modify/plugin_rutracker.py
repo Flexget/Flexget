@@ -1,5 +1,7 @@
 # coding=utf-8
 from __future__ import unicode_literals, division, absolute_import
+from builtins import range
+from builtins import object
 import json
 import logging
 from time import sleep

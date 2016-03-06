@@ -1,11 +1,16 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 from datetime import datetime, timedelta
 import logging
 import os
 import posixpath
 import socket
 import sys
-from urllib2 import URLError
+from urllib.error import URLError
 
 from sqlalchemy import Table, Column, Integer, Float, String, Unicode, Boolean, DateTime, func
 from sqlalchemy.schema import ForeignKey

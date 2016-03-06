@@ -1,5 +1,6 @@
 # coding=utf-8
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 import logging
 import re
 from flexget.config_schema import one_or_more

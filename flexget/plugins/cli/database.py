@@ -50,7 +50,7 @@ def reset_plugin(options):
             console('-' * 79)
             console('%-20s Ver  Tables' % 'Name')
             console('-' * 79)
-        for k, v in sorted(plugin_schemas.iteritems()):
+        for k, v in sorted(plugin_schemas.items()):
             tables = ''
             line_len = 0
             for name in v['tables']:

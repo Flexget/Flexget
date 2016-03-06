@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from past.builtins import basestring
+from builtins import object
 import logging
 import subprocess
 
@@ -123,7 +125,7 @@ class PluginExec(object):
                     'for_rejected': task.rejected, 'for_failed': task.failed}
 
         allow_background = config.get('allow_background')
-        for operation, entries in name_map.iteritems():
+        for operation, entries in name_map.items():
             if operation not in config[phase_name]:
                 continue
 

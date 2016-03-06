@@ -1,6 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 import feedparser
 
@@ -42,7 +45,7 @@ class UrlRewriteNyaa(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             name = normalize_unicode(search_string)
             url = 'http://www.nyaa.eu/?page=rss&cats=%s&filter=%s&term=%s' % (
-                  CATEGORIES[config['category']], FILTERS.index(config['filter']), urllib.quote(name.encode('utf-8')))
+                  CATEGORIES[config['category']], FILTERS.index(config['filter']), urllib.parse.quote(name.encode('utf-8')))
 
             log.debug('requesting: %s' % url)
             rss = feedparser.parse(url)

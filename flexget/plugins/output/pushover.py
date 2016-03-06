@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import range
+from builtins import object
 
 import logging
 
@@ -107,7 +109,7 @@ class OutputPushover(object):
         # Loop through the provided entries
         for entry in task.accepted:
 
-            for key, value in config.items():
+            for key, value in list(config.items()):
                 if key in ['apikey', 'userkey']:
                     continue
                 # Tried to render data in field
@@ -140,7 +142,7 @@ class OutputPushover(object):
                 # Check for test mode
                 if task.options.test:
                     log.info("Test mode.  Pushover notification would be:")
-                    for key, value in data.items():
+                    for key, value in list(data.items()):
                         log.verbose('{0:>5}{1}: {2}'.format('', key.capitalize(), value))
                     # Test mode.  Skip remainder.
                     continue

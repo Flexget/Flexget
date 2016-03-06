@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 import logging
 
 from bs4 import BeautifulSoup
@@ -26,7 +27,7 @@ class UrlRewriteNnmClub(object):
         html = r.content
         soup = BeautifulSoup(html)
         links = soup.findAll('a', href=True)
-        magnets = filter(lambda x: x.get('href').startswith('magnet'), links)
+        magnets = [x for x in links if x.get('href').startswith('magnet')]
         if not magnets:
             log.error('There is no magnet links on page (%s)' % entry['url'])
             entry['url'] = None

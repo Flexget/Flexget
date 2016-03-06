@@ -1,7 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import logging
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 import feedparser
 
@@ -63,7 +66,7 @@ class UrlRewriteIsoHunt(object):
         search_strings = [normalize_unicode(s) for s in entry.get('search_strings', [entry['title']])]
         for search_string in search_strings:
             url = 'http://isohunt.com/js/rss/%s?iht=%s&noSL' % (
-                urllib.quote(search_string.encode('utf-8')), optionlist.index(config))
+                urllib.parse.quote(search_string.encode('utf-8')), optionlist.index(config))
 
             log.debug('requesting: %s' % url)
             rss = feedparser.parse(url)

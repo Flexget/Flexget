@@ -1,4 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import map
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 import logging
 import re
 import time
@@ -205,7 +209,7 @@ def get_api_url(*endpoint):
     if len(endpoint) == 1 and not isinstance(endpoint[0], basestring):
         endpoint = endpoint[0]
     # Make sure integer portions are turned into strings first too
-    url = API_URL + '/'.join(map(unicode, endpoint))
+    url = API_URL + '/'.join(map(str, endpoint))
     return url
 
 
@@ -614,7 +618,7 @@ def get_cached(style=None, title=None, year=None, trakt_id=None, trakt_slug=None
     result = None
     if any(ids.values()):
         result = session.query(model).filter(
-            or_(getattr(model, col) == val for col, val in ids.iteritems() if val)).first()
+            or_(getattr(model, col) == val for col, val in ids.items() if val)).first()
     elif title:
         title, y = split_title_year(title)
         year = year or y
@@ -643,7 +647,7 @@ def get_trakt(style=None, title=None, year=None, trakt_id=None, trakt_slug=None,
         if style == 'show':
             ids['tvdb'] = tvdb_id
             ids['tvrage'] = tvrage_id
-        for id_type, identifier in ids.iteritems():
+        for id_type, identifier in ids.items():
             if not identifier:
                 continue
             try:

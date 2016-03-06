@@ -1,9 +1,12 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import logging
 import re
 import sys
-import urllib
-import urlparse
+import urllib.request, urllib.parse, urllib.error
+import urllib.parse
 from datetime import datetime
 
 from path import Path
@@ -108,7 +111,7 @@ class Filesystem(object):
         filepath = filepath.abspath()
         entry = Entry()
         entry['location'] = filepath
-        entry['url'] = urlparse.urljoin('file:', urllib.pathname2url(filepath.encode('utf8')))
+        entry['url'] = urllib.parse.urljoin('file:', urllib.request.pathname2url(filepath.encode('utf8')))
         entry['filename'] = filepath.name
         if filepath.isfile():
             entry['title'] = filepath.namebase

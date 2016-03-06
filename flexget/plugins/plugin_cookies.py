@@ -1,7 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import next
+from builtins import hex
+from past.builtins import basestring
+from builtins import object
 import logging
-import urllib2
-import cookielib
+import urllib.request, urllib.error, urllib.parse
+import http.cookiejar
 
 from flexget import plugin
 from flexget.event import event
@@ -10,7 +16,7 @@ from flexget.utils.tools import TimedDict
 log = logging.getLogger('cookies')
 
 
-class PluginCookies:
+class PluginCookies(object):
     """
     Adds cookie to all requests (rss, resolvers, download). Anything
     that uses urllib2 to be exact.
@@ -52,7 +58,7 @@ class PluginCookies:
         return config
 
     def sqlite2cookie(self, filename):
-        from cStringIO import StringIO
+        from io import StringIO
         try:
             from pysqlite2 import dbapi2 as sqlite
         except ImportError:
@@ -125,7 +131,7 @@ class PluginCookies:
         s.seek(0)
         con.close()
 
-        cookie_jar = cookielib.MozillaCookieJar()
+        cookie_jar = http.cookiejar.MozillaCookieJar()
         cookie_jar._really_load(s, '', True, True)
         return cookie_jar
 
@@ -144,17 +150,17 @@ class PluginCookies:
         else:
             if cookie_type == 'mozilla':
                 log.debug('Loading %s cookies' % cookie_type)
-                cj = cookielib.MozillaCookieJar()
+                cj = http.cookiejar.MozillaCookieJar()
             elif cookie_type == 'lwp':
                 log.debug('Loading %s cookies' % cookie_type)
-                cj = cookielib.LWPCookieJar()
+                cj = http.cookiejar.LWPCookieJar()
             else:
                 raise plugin.PluginError('Unknown cookie type %s' % cookie_type, log)
 
             try:
                 cj.load(filename=cookie_file, ignore_expires=True)
                 log.debug('%s cookies loaded' % cookie_type)
-            except (cookielib.LoadError, IOError):
+            except (http.cookiejar.LoadError, IOError):
                 import sys
                 raise plugin.PluginError('Cookies could not be loaded: %s' % sys.exc_info()[1], log)
 
@@ -164,18 +170,18 @@ class PluginCookies:
         # Add cookiejar to our requests session
         task.requests.add_cookiejar(cj)
         # Add handler to urllib2 default opener for backwards compatibility
-        handler = urllib2.HTTPCookieProcessor(cj)
+        handler = urllib.request.HTTPCookieProcessor(cj)
         if urllib2._opener:
             log.debug('Adding HTTPCookieProcessor to default opener')
             urllib2._opener.add_handler(handler)
         else:
             log.debug('Creating new opener and installing it')
-            urllib2.install_opener(urllib2.build_opener(handler))
+            urllib.request.install_opener(urllib.request.build_opener(handler))
 
     def on_task_exit(self, task, config):
         """Task exiting, remove cookiejar"""
         log.debug('Removing urllib2 opener')
-        urllib2.install_opener(None)
+        urllib.request.install_opener(None)
 
     # Task aborted, unhook the cookiejar
     on_task_abort = on_task_exit

@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from past.builtins import basestring
+from builtins import object
 import logging
 
 from flexget import plugin
@@ -10,7 +12,7 @@ log = logging.getLogger('disable')
 
 def all_builtins():
     """Helper function to return an iterator over all builtin plugins."""
-    return (p for p in plugin.plugins.itervalues() if p.builtin)
+    return (p for p in plugin.plugins.values() if p.builtin)
 
 
 class DisablePlugin(object):

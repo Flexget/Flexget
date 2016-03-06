@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 import logging
 
 from requests import RequestException
@@ -91,7 +92,7 @@ class TraktSubmit(object):
             eps = res[action].get('episodes', 0)
             self.log.info('Successfully %s to/from list %s: %s movie(s), %s show(s), %s episode(s).',
                           action, config['list'], movies, shows, eps)
-            for k, r in res['not_found'].iteritems():
+            for k, r in res['not_found'].items():
                 if r:
                     self.log.debug('not found %s: %s' % (k, r))
             # TODO: Improve messages about existing and unknown results

@@ -1,5 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-from urlparse import urlparse
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from builtins import object
+from urllib.parse import urlparse
 import logging
 import math
 from requests import RequestException
@@ -116,7 +120,7 @@ class SonarrEmit(object):
                     # Test mode logging
                     if entry and task.options.test:
                         log.verbose("Test mode. Entry includes:")
-                        for key, value in entry.items():
+                        for key, value in list(entry.items()):
                             log.verbose('     %s: %s' % (key.capitalize(), value))
             json = self.get_page(task, config, page)
         return entries

@@ -1,4 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from past.builtins import basestring
+from builtins import object
 import hashlib
 import logging
 import mimetypes
@@ -8,8 +12,8 @@ import socket
 import sys
 import tempfile
 from cgi import parse_header
-from httplib import BadStatusLine
-from urllib import unquote
+from http.client import BadStatusLine
+from urllib.parse import unquote
 
 from requests import RequestException
 

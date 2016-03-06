@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 
 import argparse
 import logging
@@ -126,7 +129,7 @@ def upgrade(ver, session):
         unique_series = {}
         for row in all_series:
             unique_series.setdefault(normalize_series_name(row['name']), []).append(row['id'])
-        for series, ids in unique_series.iteritems():
+        for series, ids in unique_series.items():
             session.execute(update(ep_table, ep_table.c.series_id.in_(ids), {'series_id': ids[0]}))
             if len(ids) > 1:
                 session.execute(delete(series_table, series_table.c.id.in_(ids[1:])))
@@ -254,7 +257,7 @@ class AlternateNames(Base):
         return '<SeriesAlternateName(series_id=%s, alt_name=%s)>' % (self.series_id, self.alt_name)
 
     def __repr__(self):
-        return unicode(self).encode('ascii', 'replace')
+        return str(self).encode('ascii', 'replace')
 
 
 class Series(Base):
@@ -293,7 +296,7 @@ class Series(Base):
         return '<Series(id=%s,name=%s)>' % (self.id, self.name)
 
     def __repr__(self):
-        return unicode(self).encode('ascii', 'replace')
+        return str(self).encode('ascii', 'replace')
 
 
 class Episode(Base):
@@ -353,7 +356,7 @@ class Episode(Base):
                (self.id, self.identifier, self.season, self.number)
 
     def __repr__(self):
-        return unicode(self).encode('ascii', 'replace')
+        return str(self).encode('ascii', 'replace')
 
     def __eq__(self, other):
         if not isinstance(other, Episode):
@@ -405,7 +408,7 @@ class Release(Base):
                (self.id, self.quality, self.downloaded, self.proper_count, self.title)
 
     def __repr__(self):
-        return unicode(self).encode('ascii', 'replace')
+        return str(self).encode('ascii', 'replace')
 
 
 class SeriesTask(Base):
@@ -515,7 +518,7 @@ def auto_identified_by(series):
         return 'auto'
     log.debug('%s episode type totals: %r', series.name, type_totals)
     # Find total number of parsed episodes
-    total = sum(type_totals.itervalues())
+    total = sum(type_totals.values())
     # See which type has the most
     best = max(type_totals, key=lambda x: type_totals[x])
 
@@ -976,7 +979,7 @@ class FilterSeriesBase(object):
                 series_settings = {}
                 group_settings = config['settings'].get(group_name, {})
                 if isinstance(series, dict):
-                    series, series_settings = series.items()[0]
+                    series, series_settings = list(series.items())[0]
                     if series_settings is None:
                         raise Exception('Series %s has unexpected \':\'' % series)
                 # Make sure this isn't a series with no name
@@ -985,7 +988,7 @@ class FilterSeriesBase(object):
                     continue
                 # make sure series name is a string to accommodate for "24"
                 if not isinstance(series, basestring):
-                    series = unicode(series)
+                    series = str(series)
                 # if series have given path instead of dict, convert it into a dict
                 if isinstance(series_settings, basestring):
                     series_settings = {'path': series_settings}
@@ -1015,7 +1018,7 @@ class FilterSeriesBase(object):
         Applies group settings with advanced form."""
 
         config = self.apply_group_options(config)
-        return self.combine_series_lists(*config.values())
+        return self.combine_series_lists(*list(config.values()))
 
     def combine_series_lists(self, *series_lists, **kwargs):
         """Combines the series from multiple lists, making sure there are no doubles.
@@ -1025,7 +1028,7 @@ class FilterSeriesBase(object):
         unique_series = {}
         for series_list in series_lists:
             for series in series_list:
-                series, series_settings = series.items()[0]
+                series, series_settings = list(series.items())[0]
                 if series not in unique_series:
                     unique_series[series] = series_settings
                 else:
@@ -1099,12 +1102,12 @@ class FilterSeries(FilterSeriesBase):
         # generate list of all series in one dict
         all_series = {}
         for series_item in config:
-            series_name, series_config = series_item.items()[0]
+            series_name, series_config = list(series_item.items())[0]
             all_series[series_name] = series_config
 
         # scan for problematic names, enable exact mode for them
-        for series_name, series_config in all_series.iteritems():
-            for name in all_series.keys():
+        for series_name, series_config in all_series.items():
+            for name in list(all_series.keys()):
                 if (name.lower().startswith(series_name.lower())) and \
                         (name.lower() != series_name.lower()):
                     if 'exact' not in series_config:
@@ -1117,7 +1120,7 @@ class FilterSeries(FilterSeriesBase):
         config = self.prepare_config(config)
         self.auto_exact(config)
         for series_item in config:
-            series_name, series_config = series_item.items()[0]
+            series_name, series_config = list(series_item.items())[0]
             log.trace('series_name: %s series_config: %s', series_name, series_config)
             start_time = time.clock()
             self.parse_series(task.entries, series_name, series_config)
@@ -1138,12 +1141,12 @@ class FilterSeries(FilterSeriesBase):
 
         for series_item in config:
             with Session() as session:
-                series_name, series_config = series_item.items()[0]
+                series_name, series_config = list(series_item.items())[0]
                 if series_config.get('parse_only'):
                     log.debug('Skipping filtering of series %s because of parse_only', series_name)
                     continue
                 # Make sure number shows (e.g. 24) are turned into strings
-                series_name = unicode(series_name)
+                series_name = str(series_name)
                 db_series = session.query(Series).filter(Series.name == series_name).first()
                 if not db_series:
                     log.debug('adding series %s into db', series_name)
@@ -1253,7 +1256,7 @@ class FilterSeries(FilterSeriesBase):
         :param config: Series configuration
         """
 
-        for ep, entries in series_entries.iteritems():
+        for ep, entries in series_entries.items():
             if not entries:
                 continue
 
@@ -1615,9 +1618,9 @@ class SeriesDBManager(FilterSeriesBase):
                 return
             config = self.prepare_config(task.config['series'])
             for series_item in config:
-                series_name, series_config = series_item.items()[0]
+                series_name, series_config = list(series_item.items())[0]
                 # Make sure number shows (e.g. 24) are turned into strings
-                series_name = unicode(series_name)
+                series_name = str(series_name)
                 db_series = session.query(Series).filter(Series.name == series_name).first()
                 alts = series_config.get('alternate_name', [])
                 if not isinstance(alts, list):
@@ -1649,7 +1652,7 @@ class SeriesDBManager(FilterSeriesBase):
 
 
 def _add_alt_name(alt, db_series, series_name, session):
-    alt = unicode(alt)
+    alt = str(alt)
     db_series_alt = session.query(AlternateNames).filter(AlternateNames.alt_name == alt).first()
     if db_series_alt and db_series_alt.series_id == db_series.id:
         # Already exists, no need to create it then

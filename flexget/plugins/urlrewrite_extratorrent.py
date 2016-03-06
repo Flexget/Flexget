@@ -1,7 +1,10 @@
 from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import logging
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import feedparser
 
 from flexget import plugin
@@ -68,7 +71,7 @@ class UrlRewriteExtraTorrent(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
 
-            search_query = '&search=%s' % urllib.quote(query.encode('utf-8'))
+            search_query = '&search=%s' % urllib.parse.quote(query.encode('utf-8'))
 
             url = ('http://extratorrent.cc/rss.xml?type=search%s%s' %
                    (category_query, search_query))

@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import str
+from builtins import object
 
 import datetime
 import logging
@@ -134,7 +136,7 @@ class GuessitParsedVideoQuality(ParsedVideoQuality):
         codec = self.old_codec
         audio = self.old_audio
 
-        old_quality = qualities.Quality(' '.join(filter(None, [resolution, source, codec, audio])))
+        old_quality = qualities.Quality(' '.join([_f for _f in [resolution, source, codec, audio] if _f]))
         old_quality = old_assume_quality(old_quality, assumed_quality)
 
         return old_quality

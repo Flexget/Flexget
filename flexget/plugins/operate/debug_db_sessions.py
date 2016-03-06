@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import next
 import inspect
 import logging
 from threading import Lock
@@ -33,7 +34,7 @@ def find_caller(stack):
 def after_begin(session, transaction, connection):
     caller_info = find_caller(inspect.stack()[1:])
     with open_transactions_lock:
-        if any(info[1] is not connection.connection for info in open_transactions.itervalues()):
+        if any(info[1] is not connection.connection for info in open_transactions.values()):
             log.warning('Sessions from 2 threads! Transaction 0x%08X opened %s Already open one(s): %s',
                         id(transaction), caller_info, open_transactions)
         elif open_transactions:

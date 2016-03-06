@@ -1,8 +1,11 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import re
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import logging
-import urlparse
+import urllib.parse
 
 from flexget import plugin
 from flexget.event import event
@@ -34,7 +37,7 @@ class UrlRewriteGoogleCse(object):
         try:
             # need to fake user agent
             txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
-            req = urllib2.Request(entry['url'], None, txheaders)
+            req = urllib.request.Request(entry['url'], None, txheaders)
             page = urlopener(req, log)
             soup = get_soup(page)
             results = soup.find_all('a', attrs={'class': 'l'})
@@ -71,7 +74,7 @@ class UrlRewriteGoogle(object):
         for link in soup.findAll('a', attrs={'href': re.compile(r'^/url')}):
             # Extract correct url from google internal link
             href = 'http://google.com' + link['href']
-            args = urlparse.parse_qs(urlparse.urlparse(href).query)
+            args = urllib.parse.parse_qs(urllib.parse.urlparse(href).query)
             href = args['q'][0]
 
             # import IPython; IPython.embed()

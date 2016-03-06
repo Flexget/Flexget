@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 import logging
 import re
 
@@ -102,7 +103,7 @@ class ModifyTrackers(object):
                 torrent = entry['torrent']
                 trackers = torrent.trackers
                 for item in config:
-                    for replace in item.itervalues():
+                    for replace in item.values():
                         for tracker in trackers:
                             if replace.get('from') in tracker:
                                 torrent.remove_multitracker(tracker)

@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import logging
 
 from flexget import plugin
@@ -14,9 +17,9 @@ class UrlRewriteSTMusic(object):
         return entry['url'].startswith('http://www.stmusic.org/details.php?id=')
 
     def url_rewrite(self, task, entry):
-        import urllib
+        import urllib.request, urllib.parse, urllib.error
         entry['url'] = entry['url'].replace('details.php?id=', 'download.php/')
-        entry['url'] += '/%s.torrent' % (urllib.quote(entry['title'], safe=''))
+        entry['url'] += '/%s.torrent' % (urllib.parse.quote(entry['title'], safe=''))
 
 
 @event('plugin.register')

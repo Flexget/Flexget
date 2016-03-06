@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 import os
 import re
 import logging
@@ -74,7 +75,7 @@ class InputTail(object):
     }
 
     def format_entry(self, entry, d):
-        for k, v in d.iteritems():
+        for k, v in d.items():
             entry[k] = v % entry
 
     def on_task_input(self, task, config):
@@ -129,7 +130,7 @@ class InputTail(object):
                     if not line:
                         break
 
-                    for field, regexp in entry_config.iteritems():
+                    for field, regexp in entry_config.items():
                         # log.debug('search field: %s regexp: %s' % (field, regexp))
                         match = re.search(regexp, line)
                         if match:

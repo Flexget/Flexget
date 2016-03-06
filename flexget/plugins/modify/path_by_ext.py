@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 import logging
 import mimetypes
 
@@ -43,7 +44,7 @@ class PluginPathByExt(object):
                     log.debug('Unknown mimetype %s' % entry['mime-type'])
             else:
                 # try to find from url
-                for ext, path in config.iteritems():
+                for ext, path in config.items():
                     if entry['url'].endswith('.' + ext):
                         callback(entry, path)
 

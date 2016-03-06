@@ -54,7 +54,7 @@ class QualityComponent(object):
         return hash(self.type + str(self.value))
 
     def __bool__(self):
-        return self.value
+        return bool(self.value)
 
     def __eq__(self, other):
         if isinstance(other, basestring):

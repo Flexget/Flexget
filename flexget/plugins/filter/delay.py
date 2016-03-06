@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from past.builtins import basestring
+from builtins import object
 import logging
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Unicode, DateTime, PickleType, Index
@@ -38,7 +40,7 @@ def upgrade(ver, session):
         # TODO: Using the DelayedEntry object here is no good.
         all = session.query(DelayedEntry).all()
         for de in all:
-            for key, value in de.entry.iteritems():
+            for key, value in de.entry.items():
                 if not isinstance(value, (basestring, bool, int, float, list, dict)):
                     log.warning('Removing `%s` with erroneous data' % de.title)
                     session.delete(de)

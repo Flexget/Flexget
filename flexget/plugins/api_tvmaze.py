@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 
 import logging
 from datetime import datetime
@@ -358,9 +359,9 @@ def from_cache(session=None, search_params=None, cache_type=None):
     if not any(search_params.values()):
         raise LookupError('No parameters sent for cache lookup')
     else:
-        log.debug('searching db {0} for the values {1}'.format(cache_type.__tablename__, search_params.items()))
+        log.debug('searching db {0} for the values {1}'.format(cache_type.__tablename__, list(search_params.items())))
         result = session.query(cache_type).filter(
-            or_(getattr(cache_type, col) == val for col, val in search_params.iteritems() if val)).first()
+            or_(getattr(cache_type, col) == val for col, val in search_params.items() if val)).first()
     return result
 
 

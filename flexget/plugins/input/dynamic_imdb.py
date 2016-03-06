@@ -1,4 +1,6 @@
 from __future__ import unicode_literals, division, absolute_import
+from past.builtins import basestring
+from builtins import object
 import collections
 import logging
 
@@ -185,7 +187,7 @@ class DynamicIMDB(object):
     def flat_list(self, non_flat_list, remove_none=False):
         flat_list = self.flatten_list(non_flat_list)
         if remove_none:
-            flat_list = filter(None, flat_list)
+            flat_list = [_f for _f in flat_list if _f]
         return flat_list
 
     def filtered_items(self, unfiltered_items, content_types, match_type):
@@ -216,7 +218,7 @@ class DynamicIMDB(object):
         return self.filtered_items(unfiltered_items, content_types, match_type)
 
     def items_by_content_type(self, person, job_type, content_type):
-        return filter(None, (person.get(job_type + ' ' + self.content_type_conversion[content_type], [])))
+        return [_f for _f in (person.get(job_type + ' ' + self.content_type_conversion[content_type], [])) if _f]
 
     def items_by_job_type(self, person, job_type, content_types):
         items = person.get(job_type, []) if job_type in self.jobs_without_content_type else [
@@ -228,7 +230,7 @@ class DynamicIMDB(object):
             self.items_by_content_type(person, job_type, content_type)
             for content_type in content_types
             ]
-        return filter(None, items)
+        return [_f for _f in items if _f]
 
     def items_by_character(self, character, content_types, match_type):
         """
@@ -277,7 +279,7 @@ class DynamicIMDB(object):
                     entries.append(entry)
                     if entry and task.options.test:
                         log.info("Test mode. Entry includes:")
-                        for key, value in entry.items():
+                        for key, value in list(entry.items()):
                             log.info('     {}: {}'.format(key.capitalize(), value))
             else:
                 log.error('Invalid entry created? %s' % entry)

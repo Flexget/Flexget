@@ -1,4 +1,7 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import str
+from past.builtins import basestring
+from builtins import object
 import logging
 import re
 
@@ -72,7 +75,7 @@ class RegexExtract(object):
                     log.debug('Successfully matched %s' % entry_field)
                     data = match.groupdict()
                     if prefix:
-                        for key in data.keys():
+                        for key in list(data.keys()):
                             data[prefix + key] = data[key]
                             del data[key]
                     log.debug('Values added to entry: %s' % data)

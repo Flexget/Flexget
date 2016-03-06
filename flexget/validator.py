@@ -3,6 +3,7 @@ from builtins import str
 from builtins import map
 from past.builtins import basestring
 from builtins import object
+from future.utils import with_metaclass
 
 import re
 
@@ -77,17 +78,18 @@ def any_schema(schemas):
         return {'anyOf': schemas}
 
 
-class Validator(object):
+class ValidatorType(type):
+    """Automatically adds subclasses to the registry."""
+
+    def __init__(cls, name, bases, dict):
+        type.__init__(cls, name, bases, dict)
+        if 'name' not in dict:
+            raise Exception('Validator %s is missing class-attribute name' % name)
+        registry[dict['name']] = cls
+
+
+class Validator(with_metaclass(ValidatorType)):
     name = 'validator'
-
-    class __metaclass__(type):
-        """Automatically adds subclasses to the registry."""
-
-        def __init__(cls, name, bases, dict):
-            type.__init__(cls, name, bases, dict)
-            if 'name' not in dict:
-                raise Exception('Validator %s is missing class-attribute name' % name)
-            registry[dict['name']] = cls
 
     def __init__(self, parent=None, message=None, **kwargs):
         self.valid = []

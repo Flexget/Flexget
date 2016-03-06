@@ -1,9 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import os
 import logging
 import re
-import urlparse
-import xmlrpclib
+import urllib.parse
+import xmlrpc.client
 
 from flexget import plugin
 from flexget.event import event
@@ -167,12 +171,12 @@ class OutputAria2(object):
                 userpass = '%s:%s@' % (config['username'], config['password'])
             baseurl = 'http://%s%s:%s/rpc' % (userpass, config['server'], config['port'])
             log.debug('base url: %s' % baseurl)
-            s = xmlrpclib.ServerProxy(baseurl)
+            s = xmlrpc.client.ServerProxy(baseurl)
             log.info('Connected to daemon at ' + baseurl + '.')
-        except xmlrpclib.ProtocolError as err:
+        except xmlrpc.client.ProtocolError as err:
             raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
                                      % (baseurl, err.errcode, err.errmsg), log)
-        except xmlrpclib.Fault as err:
+        except xmlrpc.client.Fault as err:
             raise plugin.PluginError('XML-RPC fault: Unable to connect to aria2 daemon at %s: %s'
                                      % (baseurl, err.faultString), log)
         except socket_error as e:
@@ -320,18 +324,18 @@ class OutputAria2(object):
                                     if not task.manager.options.test:
                                         s.aria2.unpause(r['gid'])
                                     log.info('  Unpaused download.')
-                                except xmlrpclib.Fault as err:
+                                except xmlrpc.client.Fault as err:
                                     raise plugin.PluginError(
                                         'aria2 response to unpause request: %s' % err.faultString, log)
                             else:
                                 log.info('  Therefore, not re-adding.')
-                        except xmlrpclib.Fault as err:
+                        except xmlrpc.client.Fault as err:
                             if err.faultString[-12:] == 'is not found':
                                 new_download = 1
                             else:
                                 raise plugin.PluginError('aria2 response to download status request: %s'
                                                          % err.faultString, log)
-                        except xmlrpclib.ProtocolError as err:
+                        except xmlrpc.client.ProtocolError as err:
                             raise plugin.PluginError('Could not connect to aria2 at %s. Protocol error %s: %s'
                                                      % (baseurl, err.errcode, err.errmsg), log)
                         except socket_error as e:
@@ -349,9 +353,9 @@ class OutputAria2(object):
                         except RenderError as e:
                             raise plugin.PluginError('Unable to render uri: %s' % e)
                         try:
-                            for key, value in config['aria_config'].iteritems():
+                            for key, value in config['aria_config'].items():
                                 log.trace('rendering %s: %s' % (key, value))
-                                config['aria_config'][key] = entry.render(unicode(value))
+                                config['aria_config'][key] = entry.render(str(value))
                             log.debug('dir: %s' % config['aria_config']['dir'])
                             if not task.manager.options.test:
                                 r = s.aria2.addUri([cur_uri], config['aria_config'])
@@ -363,7 +367,7 @@ class OutputAria2(object):
                             log.info('%s successfully added to aria2 with gid %s.' % (
                                 config['aria_config'].get('out', config['uri']),
                                 r))
-                        except xmlrpclib.Fault as err:
+                        except xmlrpc.client.Fault as err:
                             raise plugin.PluginError('aria2 response to add URI request: %s' % err.faultString, log)
                         except socket_error as e:
                             (error, msg) = e.args
@@ -383,7 +387,7 @@ class OutputAria2(object):
                                     a = s.aria2.removeDownloadResult(r['gid'])
                                     if a == 'OK':
                                         log.info('Download with gid %s removed from memory' % r['gid'])
-                                except xmlrpclib.Fault as err:
+                                except xmlrpc.client.Fault as err:
                                     raise plugin.PluginError('aria2 response to remove request: %s'
                                                              % err.faultString, log)
                                 except socket_error as e:
@@ -393,7 +397,7 @@ class OutputAria2(object):
                         else:
                             log.info('Download with gid %s could not be removed because of its status: %s'
                                      % (r['gid'], r['status']))
-                    except xmlrpclib.Fault as err:
+                    except xmlrpc.client.Fault as err:
                         if err.faultString[-12:] == 'is not found':
                             log.warning('Download with gid %s could not be removed because it was not found. It was '
                                         'possibly previously removed or never added.' % config['aria_config']['gid'])

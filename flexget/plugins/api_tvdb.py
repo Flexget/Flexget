@@ -1,10 +1,15 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from past.builtins import basestring
+from builtins import object
 
 import logging
 import os
 import posixpath
 import random
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import xml.etree.ElementTree as ElementTree
 from datetime import datetime, timedelta
 
@@ -291,7 +296,7 @@ class TVDBSearchResult(Base):
 
 def find_series_id(name):
     """Looks up the tvdb id for a series"""
-    url = server + 'GetSeries.php?seriesname=%s&language=%s' % (urllib.quote(name), language)
+    url = server + 'GetSeries.php?seriesname=%s&language=%s' % (urllib.parse.quote(name), language)
     try:
         page = requests.get(url).content
     except RequestException as e:
@@ -549,7 +554,7 @@ def mark_expired(session=None):
 
         def chunked(seq):
             """Helper to divide our expired lists into sizes sqlite can handle in a query. (<1000)"""
-            for i in xrange(0, len(seq), 900):
+            for i in range(0, len(seq), 900):
                 yield seq[i:i + 900]
 
         # Update our cache to mark the items that have expired

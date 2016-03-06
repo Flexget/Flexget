@@ -1,5 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-import urllib2
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+import urllib.request, urllib.error, urllib.parse
 import logging
 
 from flexget import plugin
@@ -30,7 +33,7 @@ class UrlRewriteBakaBT(object):
     @plugin.internet(log)
     def parse_download_page(self, url):
         txheaders = {'User-agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'}
-        req = urllib2.Request(url, None, txheaders)
+        req = urllib.request.Request(url, None, txheaders)
         page = urlopener(req, log)
         try:
             soup = get_soup(page)

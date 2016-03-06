@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 from difflib import SequenceMatcher
 import logging
 
@@ -53,7 +54,7 @@ class PluginSearch(object):
                 search_config = None
                 if isinstance(name, dict):
                     # the name is the first/only key in the dict.
-                    name, search_config = name.items()[0]
+                    name, search_config = list(name.items())[0]
                 log.verbose('Searching `%s` from %s' % (entry['title'], name))
                 try:
                     try:

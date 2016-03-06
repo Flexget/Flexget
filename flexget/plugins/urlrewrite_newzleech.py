@@ -1,6 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
-import urllib
-import urllib2
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import logging
 import re
 
@@ -34,18 +38,18 @@ class UrlRewriteNewzleech(object):
         nzbs = set()
         for search_string in entry.get('search_strings', [entry['title']]):
             query = entry['title']
-            url = u'http://newzleech.com/?%s' % str(urllib.urlencode({'q': query.encode('latin1'),
+            url = u'http://newzleech.com/?%s' % str(urllib.parse.urlencode({'q': query.encode('latin1'),
                                                                       'm': 'search', 'group': '', 'min': 'min',
                                                                       'max': 'max', 'age': '', 'minage': '',
                                                                       'adv': ''}))
             # log.debug('Search url: %s' % url)
 
-            req = urllib2.Request(url, headers=txheaders)
+            req = urllib.request.Request(url, headers=txheaders)
             page = urlopener(req, log)
             soup = get_soup(page)
 
             for item in soup.find_all('table', attrs={'class': 'contentt'}):
-                subject_tag = item.find('td', attrs={'class': 'subject'}).next
+                subject_tag = item.find('td', attrs={'class': 'subject'}).__next__
                 subject = ''.join(subject_tag.find_all(text=True))
                 complete = item.find('td', attrs={'class': 'complete'}).contents[0]
                 size = item.find('td', attrs={'class': 'size'}).contents[0]

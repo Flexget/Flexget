@@ -1,4 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from past.builtins import basestring
+from builtins import object
 import os
 from datetime import datetime
 from datetime import timedelta
@@ -7,7 +11,7 @@ import logging
 import base64
 import re
 import time
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 from flexget import plugin, validator
 from flexget.entry import Entry
@@ -29,14 +33,14 @@ def save_opener(f):
     """
 
     def new_f(self, *args, **kwargs):
-        import urllib2
+        import urllib.request, urllib.error, urllib.parse
         prev_opener = urllib2._opener
-        urllib2.install_opener(self.opener)
+        urllib.request.install_opener(self.opener)
         try:
             f(self, *args, **kwargs)
             self.opener = urllib2._opener
         finally:
-            urllib2.install_opener(prev_opener)
+            urllib.request.install_opener(prev_opener)
     return new_f
 
 
@@ -101,7 +105,7 @@ class TransmissionBase(object):
         done = torrent.totalSize > 0
         vloc = None
         best = None
-        for t in torrent.files().iteritems():
+        for t in torrent.files().items():
             tf = t[1]
             if tf['selected']:
                 if tf['size'] <= 0 or tf['completed'] < tf['size']:
@@ -582,7 +586,7 @@ class PluginTransmission(TransmissionBase):
                                               % (len(options['change']['files_wanted']), len(full_list)))
                 
                 # Set any changed file properties
-                if options['change'].keys():
+                if list(options['change'].keys()):
                     cli.change_torrent(r.id, 30, **options['change'])
                            
                 # if addpaused was defined and set to False start the torrent;

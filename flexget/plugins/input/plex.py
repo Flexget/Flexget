@@ -1,4 +1,5 @@
 """Plugin for plex media server (www.plexapp.com)."""
+from builtins import object
 from xml.dom.minidom import parseString
 import re
 import logging

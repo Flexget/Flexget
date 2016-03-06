@@ -1,6 +1,10 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 import logging
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import re
 from datetime import datetime, timedelta
 
@@ -101,7 +105,7 @@ class InputThetvdbFavorites(object):
                     for i in data.findall('Series'):
                         if i.text:
                             favorite_ids.append(i.text)
-                except (urllib2.URLError, IOError, AttributeError):
+                except (urllib.error.URLError, IOError, AttributeError):
                     import traceback
                     # If there are errors getting the favorites or parsing the xml, fall back on cache
                     log.error('Error retrieving favorites from thetvdb, using cache.')

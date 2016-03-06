@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 import logging
 import csv
 
@@ -64,7 +65,7 @@ class InputCSV(object):
             if not row:
                 continue
             entry = Entry()
-            for name, index in config.get('values', {}).items():
+            for name, index in list(config.get('values', {}).items()):
                 try:
                     # Convert the value back to unicode
                     entry[name] = row[index - 1].decode('utf-8').strip()

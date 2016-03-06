@@ -1,5 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from urlparse import urljoin, urlparse
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+from urllib.parse import urljoin, urlparse
 from collections import namedtuple
 from itertools import groupby
 import logging

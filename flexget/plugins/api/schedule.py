@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import range
 import copy
 from flask import request, jsonify
 from flexget.manager import manager

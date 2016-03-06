@@ -1,8 +1,14 @@
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
+from past.utils import old_div
 import logging
 import ftplib
 import os
 import re
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from flexget import plugin
 from flexget.event import event
@@ -148,20 +154,20 @@ class InputFtpList(object):
                                   recursive, get_size, encoding)
 
             if not files_only or mlst.get('type') == 'file':
-                url = baseurl + urllib.quote(path) + '/' + urllib.quote(p)
+                url = baseurl + urllib.parse.quote(path) + '/' + urllib.parse.quote(p)
                 log.debug("Encoded URL: " + url)
                 title = os.path.basename(p)
                 log.info('Accepting entry "%s" [%s]' % (path + '/' + p, mlst.get('type') or "unknown",))
                 entry = Entry(title, url)
                 if get_size and 'size' not in mlst:
                     if mlst.get('type') == 'file':
-                        entry['content_size'] = ftp.size(path + '/' + p) / (1024 * 1024)
+                        entry['content_size'] = old_div(ftp.size(path + '/' + p), (1024 * 1024))
                         log.debug('(FILE) Size = %s', entry['content_size'])
                     elif mlst.get('type') == 'dir':
                         entry['content_size'] = self.get_folder_size(ftp, path, p)
                         log.debug('(DIR) Size = %s', entry['content_size'])
                 elif get_size:
-                    entry['content_size'] = float(mlst.get('size')) / (1024 * 1024)
+                    entry['content_size'] = old_div(float(mlst.get('size')), (1024 * 1024))
                 entries.append(entry)
 
     def parse_mlst(self, mlst):
@@ -199,7 +205,7 @@ class InputFtpList(object):
         for filename in dirs:
             filename = filename.replace(path + '/' + p + '/', '')
             try:
-                size += ftp.size(path + '/' + p + '/' + filename) / (1024 * 1024)
+                size += old_div(ftp.size(path + '/' + p + '/' + filename), (1024 * 1024))
             except ftplib.error_perm:
                 size += self.get_folder_size(ftp, path + '/' + p, filename)
         return size

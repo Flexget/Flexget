@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 import re
 import logging
 
@@ -38,7 +39,7 @@ class UrlRewrite(object):
 
     def on_task_start(self, task, config):
         resolves = self.resolves[task.name] = {}
-        for name, rewrite_config in config.iteritems():
+        for name, rewrite_config in config.items():
             match = re.compile(rewrite_config['regexp'])
             format = rewrite_config['format']
             resolves[name] = {'regexp_compiled': match, 'format': format, 'regexp': rewrite_config['regexp']}
@@ -47,7 +48,7 @@ class UrlRewrite(object):
     def url_rewritable(self, task, entry):
         log.trace('running url_rewritable')
         log.trace(self.resolves)
-        for name, config in self.resolves.get(task.name, {}).iteritems():
+        for name, config in self.resolves.get(task.name, {}).items():
             regexp = config['regexp_compiled']
             log.trace('testing %s' % config['regexp'])
             if regexp.search(entry['url']):
@@ -55,7 +56,7 @@ class UrlRewrite(object):
         return False
 
     def url_rewrite(self, task, entry):
-        for name, config in self.resolves.get(task.name, {}).iteritems():
+        for name, config in self.resolves.get(task.name, {}).items():
             regexp = config['regexp_compiled']
             format = config['format']
             if regexp.search(entry['url']):

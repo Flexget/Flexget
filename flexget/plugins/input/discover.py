@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from builtins import object
 import datetime
 import logging
 import random
@@ -86,7 +87,7 @@ class Discover(object):
         entry_urls = set()
         # run inputs
         for item in config['what']:
-            for input_name, input_config in item.iteritems():
+            for input_name, input_config in item.items():
                 input = get_plugin_by_name(input_name)
                 if input.api_ver == 1:
                     raise PluginError('Plugin %s does not support API v2' % input_name)
@@ -128,7 +129,7 @@ class Discover(object):
             entry_results = []
             for item in config['from']:
                 if isinstance(item, dict):
-                    plugin_name, plugin_config = item.items()[0]
+                    plugin_name, plugin_config = list(item.items())[0]
                 else:
                     plugin_name, plugin_config = item, None
                 search = get_plugin_by_name(plugin_name).instance

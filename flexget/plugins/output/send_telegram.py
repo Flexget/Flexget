@@ -1,9 +1,13 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
 
 import sys
 from distutils.version import LooseVersion
 from ssl import SSLError
-from urllib2 import URLError
+from urllib.error import URLError
 
 from sqlalchemy import Column, Integer, String
 
@@ -502,7 +506,7 @@ class SendTelegram(object):
         # avoid duplicate chat_ids. (this is possible if configuration specified both username & fullname
         chat_ids_d = dict((x.id, x) for x in chat_ids)
 
-        session.add_all(chat_ids_d.itervalues())
+        session.add_all(iter(chat_ids_d.values()))
         session.commit()
 
 

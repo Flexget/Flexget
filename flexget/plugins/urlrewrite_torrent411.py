@@ -1,10 +1,14 @@
 from __future__ import unicode_literals, division, absolute_import
-import urllib
-import urllib2
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+from builtins import object
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import logging
 import json
 import re
-import cookielib
+import http.cookiejar
 
 from flexget import plugin
 from flexget.config_schema import one_or_more
@@ -237,14 +241,14 @@ class t411Auth(AuthBase):
         else:
             log.debug("Getting login cookies from : %s " % url_auth)
             params = {'login': username, 'password': password, 'remember': '1'}
-            cj = cookielib.CookieJar()
+            cj = http.cookiejar.CookieJar()
 #           WE NEED A COOKIE HOOK HERE TO AVOID REDIRECT COOKIES
-            opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+            opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
 #           NEED TO BE SAME USER_AGENT THAN DOWNLOAD LINK
             opener.addheaders = [('User-agent', self.USER_AGENT)]
             login_output = None
             try:
-                login_output = opener.open(url_auth, urllib.urlencode(params)).read()
+                login_output = opener.open(url_auth, urllib.parse.urlencode(params)).read()
             except Exception as e:
                 raise UrlRewritingError("Connection Error for %s : %s" % (url_auth, e))
 
@@ -313,7 +317,7 @@ class t411Auth(AuthBase):
         params['captchaQuery'] = query.attrs['value']
         params['captchaToken'] = token.attrs['value']
 
-        return opener.open(url_auth, urllib.urlencode(params)).read()
+        return opener.open(url_auth, urllib.parse.urlencode(params)).read()
 
     def __init__(self, username, password):
         self.cookies_ = self.get_login_cookies(username,
@@ -414,7 +418,7 @@ class UrlRewriteTorrent411(object):
             log.debug("Got the URL: %s" % entry['url'])
             rawdata = ""
             try:
-                opener = urllib2.build_opener()
+                opener = urllib.request.build_opener()
                 opener.addheaders = [('User-agent', 'Mozilla/5.0')]
                 response = opener.open(url)
             except Exception as e:
@@ -456,7 +460,7 @@ class UrlRewriteTorrent411(object):
 
             if sub_categories[0] is not None:
                 sub_categories = [SUB_CATEGORIES[c] for c in sub_categories]
-                filter_url = filter_url + '&' + '&'.join([urllib.quote_plus('term[%s][]' % c[0]).
+                filter_url = filter_url + '&' + '&'.join([urllib.parse.quote_plus('term[%s][]' % c[0]).
                                                           encode('utf-8') + '=' + str(c[1])
                                                           for c in sub_categories])
 
@@ -473,10 +477,10 @@ class UrlRewriteTorrent411(object):
         for search_string in entry.get('search_strings', [entry['title']]):
             query = normalize_unicode(search_string)
             url_search = ('/torrents/search/?search=%40name+' +
-                          urllib.quote_plus(query.encode('utf-8')) +
+                          urllib.parse.quote_plus(query.encode('utf-8')) +
                           filter_url)
 
-            opener = urllib2.build_opener()
+            opener = urllib.request.build_opener()
             opener.addheaders = [('User-agent', 'Mozilla/5.0')]
             response = opener.open(url_base + url_search)
 

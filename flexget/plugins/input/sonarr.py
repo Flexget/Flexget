@@ -1,5 +1,8 @@
 from __future__ import unicode_literals, division, absolute_import
-from urlparse import urlparse
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+from urllib.parse import urlparse
 import logging
 from requests import RequestException
 
@@ -143,7 +146,7 @@ class Sonarr(object):
             # Test mode logging
             if entry and task.options.test:
                 log.verbose("Test mode. Entry includes:")
-                for key, value in entry.items():
+                for key, value in list(entry.items()):
                     log.verbose('     {}: {}'.format(key.capitalize(), value))
 
         return entries

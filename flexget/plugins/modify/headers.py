@@ -1,6 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
 import logging
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 from flexget import plugin
 from flexget.event import event
@@ -8,10 +11,10 @@ from flexget.event import event
 log = logging.getLogger('headers')
 
 
-class HTTPHeadersProcessor(urllib2.BaseHandler):
+class HTTPHeadersProcessor(urllib.request.BaseHandler):
 
     # run first
-    handler_order = urllib2.HTTPHandler.handler_order - 10
+    handler_order = urllib.request.HTTPHandler.handler_order - 10
 
     def __init__(self, headers=None):
         if headers:
@@ -20,7 +23,7 @@ class HTTPHeadersProcessor(urllib2.BaseHandler):
             self.headers = {}
 
     def http_request(self, request):
-        for name, value in self.headers.iteritems():
+        for name, value in self.headers.items():
             if not request.has_header(name):
                 log.debug('Adding %s: %s' % (name, value))
                 request.add_unredirected_header(name.capitalize(), value.strip())
@@ -61,15 +64,15 @@ class PluginHeaders(object):
             urllib2._opener.add_handler(HTTPHeadersProcessor(config))
         else:
             log.debug('Creating new opener and installing it')
-            opener = urllib2.build_opener(HTTPHeadersProcessor(config))
-            urllib2.install_opener(opener)
+            opener = urllib.request.build_opener(HTTPHeadersProcessor(config))
+            urllib.request.install_opener(opener)
 
     def on_task_exit(self, task, config):
         """Task exiting, remove additions"""
         if urllib2._opener:
             log.debug('Removing urllib2 default opener')
             # TODO: this uninstalls all other handlers as well, but does it matter?
-            urllib2.install_opener(None)
+            urllib.request.install_opener(None)
 
     on_task_abort = on_task_exit
 

@@ -1,4 +1,5 @@
 from __future__ import unicode_literals, division, absolute_import
+from past.builtins import basestring
 import logging
 
 from flexget import plugin
@@ -92,7 +93,7 @@ class AppleTrailers(InputRSS):
             trailers.setdefault(url, []).append(entry['title'])
 
         result = []
-        for url, titles in trailers.iteritems():
+        for url, titles in trailers.items():
             genre_url = url + '#gallery-film-info-details'
             try:
                 page = task.requests.get(genre_url)

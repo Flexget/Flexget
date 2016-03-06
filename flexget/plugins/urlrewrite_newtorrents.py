@@ -1,6 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-import urllib
-import urllib2
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+import urllib.request, urllib.parse, urllib.error
+import urllib.request, urllib.error, urllib.parse
 import logging
 import re
 import socket
@@ -19,7 +22,7 @@ socket.setdefaulttimeout(timeout)
 log = logging.getLogger('newtorrents')
 
 
-class NewTorrents:
+class NewTorrents(object):
     """NewTorrents urlrewriter and search plugin."""
 
     def __init__(self):
@@ -63,7 +66,7 @@ class NewTorrents:
         try:
             page = urlopener(url, log)
             data = page.read()
-        except urllib2.URLError:
+        except urllib.error.URLError:
             raise UrlRewritingError('URLerror when retrieving page')
         p = re.compile("copy\(\'(.*)\'\)", re.IGNORECASE)
         f = p.search(data)
@@ -78,7 +81,7 @@ class NewTorrents:
         """Parses torrent download url from search results"""
         name = normalize_unicode(name)
         if not url:
-            url = 'http://www.newtorrents.info/search/%s' % urllib.quote(name.encode('utf-8'), safe=b':/~?=&%')
+            url = 'http://www.newtorrents.info/search/%s' % urllib.parse.quote(name.encode('utf-8'), safe=b':/~?=&%')
 
         log.debug('search url: %s' % url)
 

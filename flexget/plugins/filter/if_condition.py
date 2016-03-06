@@ -1,5 +1,9 @@
 from __future__ import unicode_literals, division, absolute_import
-import __builtin__
+from future import standard_library
+standard_library.install_aliases()
+from past.builtins import basestring
+from builtins import object
+import builtins
 import logging
 import re
 import datetime
@@ -64,7 +68,7 @@ class FilterIf(object):
 
     def __getattr__(self, item):
         """Provides handlers for all phases."""
-        for phase, method in plugin.phase_methods.iteritems():
+        for phase, method in plugin.phase_methods.items():
             if item == method and phase not in ['accept', 'reject', 'fail', 'input']:
                 break
         else:
@@ -76,7 +80,7 @@ class FilterIf(object):
                 'reject': Entry.reject,
                 'fail': Entry.fail}
             for item in config:
-                requirement, action = item.items()[0]
+                requirement, action = list(item.items())[0]
                 passed_entries = [e for e in task.entries if self.check_condition(requirement, e)]
                 if isinstance(action, basestring):
                     if not phase == 'filter':
@@ -92,7 +96,7 @@ class FilterIf(object):
                     fake_task.all_entries[:] = passed_entries
 
                     methods = {}
-                    for plugin_name, plugin_config in action.iteritems():
+                    for plugin_name, plugin_config in action.items():
                         p = plugin.get_plugin_by_name(plugin_name)
                         method = p.phase_handlers.get(phase)
                         if method:

@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 import collections
 import logging
 import os
@@ -148,7 +150,7 @@ class PluginSubliminal(object):
                                 entry.fail('subtitles found for a second-choice language.')
                             else:
                                 entry.fail('cannot find any subtitles for now.')
-                        downloaded_languages = set([Language.fromietf(unicode(l.language))
+                        downloaded_languages = set([Language.fromietf(str(l.language))
                                                     for l in subtitle[video]])
                         if entry_langs:
                             entry['subtitles_missing'] = entry_langs - downloaded_languages
@@ -156,7 +158,7 @@ class PluginSubliminal(object):
                     # don't want to abort the entire task for errors in a  
                     # single video file or for occasional network timeouts
                     if err.args:
-                        msg = unicode(err.args[0])
+                        msg = str(err.args[0])
                     else:
                         # Subliminal errors don't always have a message, just use the name
                         msg = 'subliminal error: %s' % err.__class__.__name__
@@ -164,7 +166,7 @@ class PluginSubliminal(object):
                     entry.fail(msg)
         if downloaded_subtitles:
             # save subtitles to disk
-            for k, v in downloaded_subtitles.iteritems():
+            for k, v in downloaded_subtitles.items():
                 if v:
                     subliminal.save_subtitles(k, v, single=single_mode)
 

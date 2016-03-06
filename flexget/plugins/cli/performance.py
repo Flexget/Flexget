@@ -72,9 +72,9 @@ def cleanup(manager, options):
         return
 
     # Print summary
-    for name, data in performance.iteritems():
+    for name, data in performance.items():
         log.info('Performance results for task %s:' % name)
-        for keyword, results in data.iteritems():
+        for keyword, results in data.items():
             took = results['took']
             queries = results['queries']
             if took > 0.1 or queries > 10:

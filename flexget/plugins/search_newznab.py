@@ -1,5 +1,10 @@
+from __future__ import division
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+from past.utils import old_div
 import logging
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from flexget import plugin
 from flexget.entry import Entry
@@ -52,7 +57,7 @@ class Newznab(object):
                     'apikey': config['apikey'],
                     'extended': 1
                 }
-                config['url'] = config['website'] + '/api?' + urllib.urlencode(params)
+                config['url'] = config['website'] + '/api?' + urllib.parse.urlencode(params)
 
         return config
 
@@ -74,12 +79,12 @@ class Newznab(object):
         for rss_entry in rss.entries:
             new_entry = Entry()
             
-            for key in rss_entry.keys():
+            for key in list(rss_entry.keys()):
                 new_entry[key] = rss_entry[key]
             new_entry['url'] = new_entry['link']
             if rss_entry.enclosures:
                 size = int(rss_entry.enclosures[0]['length'])  # B
-                new_entry['content_size'] = size / 2**20       # MB
+                new_entry['content_size'] = old_div(size, 2**20)       # MB
             entries.append(new_entry)
         return entries
 
