@@ -514,7 +514,7 @@ class Task(object):
 
         # Save current config hash and set config_modidied flag
         with Session() as session:
-            config_hash = hashlib.md5(str(sorted(self.config.items()))).hexdigest()
+            config_hash = hashlib.md5(str(sorted(self.config.items())).encode('utf-8')).hexdigest()
             last_hash = session.query(TaskConfigHash).filter(TaskConfigHash.task == self.name).first()
             if self.is_rerun:
                 # Restore the config to state right after start phase

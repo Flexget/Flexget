@@ -90,7 +90,7 @@ def safe_pickle_synonym(name):
         Raises ValueError if passed an object that doesn't subclass a builtin type.
         """
 
-        supported_types = [str, str, int, float, int, bool, datetime]
+        supported_types = [str, bytes, float, int, bool, datetime]
         # dict, list, tuple and set are also supported, but handled separately
 
         if type(item) in supported_types:
