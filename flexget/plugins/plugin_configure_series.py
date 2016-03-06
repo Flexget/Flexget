@@ -90,7 +90,7 @@ class ConfigureSeries(FilterSeriesBase):
                             s[key] = entry['configure_series_' + key]
 
         # Set the config_modified flag if the list of shows changed since last time
-        new_hash = hashlib.md5(str(sorted(series))).hexdigest().decode('ascii')
+        new_hash = hashlib.md5(str(sorted(series)).encode('utf-8')).hexdigest()
         with Session() as session:
             last_hash = session.query(LastHash).filter(LastHash.task == task.name).first()
             if not last_hash:
