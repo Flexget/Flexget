@@ -82,10 +82,10 @@ class PluginWarning(Warning):
         self.log = logger
         self.kwargs = kwargs
 
-    def __str__(self):
+    def __bytes__(self):
         return str(self).encode('utf-8')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.value
 
 
@@ -100,10 +100,10 @@ class PluginError(Exception):
         self.log = logger
         self.kwargs = kwargs
 
-    def __str__(self):
+    def __bytes__(self):
         return str(self).encode('utf-8')
 
-    def __unicode__(self):
+    def __str__(self):
         return str(self.value)
 
 
