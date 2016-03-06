@@ -2,6 +2,8 @@
 # Torrent decoding is a short fragment from effbot.org. Site copyright says:
 # Test scripts and other short code fragments can be considered as being in the public domain.
 from __future__ import unicode_literals, division, absolute_import
+
+import codecs
 from builtins import next
 from builtins import zip
 from builtins import object
@@ -11,7 +13,7 @@ import logging
 log = logging.getLogger('torrent')
 
 # Magic indicator used to quickly recognize torrent files
-TORRENT_RE = re.compile(r'^d\d{1,3}:')
+TORRENT_RE = re.compile(br'^d\d{1,3}:')
 
 # List of all standard keys in a metafile
 # See http://packages.python.org/pyrocore/apidocs/pyrocore.util.metafile-module.html#METAFILE_STD_KEYS
@@ -84,7 +86,7 @@ def is_torrent_file(metafilepath):
 
     magic_marker = bool(TORRENT_RE.match(data))
     if not magic_marker:
-        log.trace('%s doesn\'t seem to be a torrent, got `%s` (hex)' % (metafilepath, data.encode('hex')))
+        log.trace('%s doesn\'t seem to be a torrent, got `%s` (hex)' % (metafilepath, codecs.encode(data, 'hex')))
 
     return bool(magic_marker)
 
