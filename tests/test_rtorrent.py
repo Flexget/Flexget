@@ -2,6 +2,7 @@ from __future__ import unicode_literals, division, absolute_import
 from future import standard_library
 standard_library.install_aliases()
 from builtins import object
+
 import mock
 import os
 import xmlrpc.client
@@ -66,13 +67,14 @@ class TestRTorrentClient(object):
 
         # Ensure load was called
         match_binary = Matcher(compare_binary, xmlrpc.client.Binary(torrent_raw))
-        mocked_proxy.load.raw_start.assert_called_with(
-            '',
-            match_binary,
-            'd.priority.set=3',
-            'd.directory.set=\\/data\\/downloads',
-            'd.custom1.set=test\\_custom1'
-        )
+        assert mocked_proxy.load.raw_start.called
+        called_args = mocked_proxy.load.raw_start.call_args_list[0][0]
+        assert len(called_args) == 5
+        assert '' in called_args
+        assert match_binary in called_args
+        assert 'd.directory.set=\\/data\\/downloads' in called_args
+        assert 'd.custom1.set=test_custom1' in called_args
+        assert 'd.priority.set=3' in called_args
 
     def test_torrent(self, mocked_proxy):
         mocked_proxy = mocked_proxy()
