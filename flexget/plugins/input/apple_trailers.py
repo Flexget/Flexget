@@ -135,7 +135,7 @@ class AppleTrailers(object):
                         if src.split('.')[-1] == 'mov':
                             entry['url'] = src.replace(desired_quality, 'h' + desired_quality)
                         elif src_alt.split('.')[-1] == 'mov':
-                            entry['url'] = src_alt
+                            entry['url'] = src_alt.replace(desired_quality, 'h' + desired_quality)
                         else:
                             continue  # just continue until we reach the else part of the for-else
                         break
