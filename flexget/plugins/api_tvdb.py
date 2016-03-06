@@ -117,7 +117,7 @@ class TVDBContainer(object):
                         value = float(node.text)
                     else:
                         # Make sure we always have unicode strings
-                        value = node.text.decode('utf-8') if isinstance(node.text, str) else node.text
+                        value = node.text
                         value = decode_html(value)
                     setattr(self, col.name, value)
         self.expired = False
@@ -184,8 +184,8 @@ class TVDBSeries(TVDBContainer, Base):
         if not os.path.isdir(fullpath):
             os.makedirs(fullpath)
         filename = os.path.join(dirname, posixpath.basename(self.poster))
-        thefile = file(os.path.join(base_dir, filename), 'wb')
-        thefile.write(requests.get(url).content)
+        the_file = open(os.path.join(base_dir, filename), 'wb')
+        the_file.write(requests.get(url).content)
         self.poster_file = filename
         # If we are detached from a session, update the db
         if not Session.object_session(self):
